@@ -5,16 +5,15 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import li.strolch.utils.helper.ExceptionHelper;
-
 public class ExceptionHelperTest {
 
 	@Test
 	public void shouldGetExceptionMsg() {
 
 		Exception e = nestedException();
-		assertEquals("Third", ExceptionHelper.getExceptionMessage(e));
-		assertEquals("Third\nSecond\nFirst", ExceptionHelper.getExceptionMessageWithCauses(e));
+		assertEquals("java.lang.RuntimeException: Third", ExceptionHelper.getExceptionMessage(e));
+		assertEquals("java.lang.RuntimeException: Third\n" + "java.lang.RuntimeException: Second\n"
+				+ "java.lang.RuntimeException: First", ExceptionHelper.getExceptionMessageWithCauses(e));
 	}
 
 	@Test
@@ -27,7 +26,8 @@ public class ExceptionHelperTest {
 		assertTrue(formatException.contains("java.lang.RuntimeException: Third"));
 
 		formatException = ExceptionHelper.formatExceptionMessage(e);
-		assertEquals("Third\ncause:\nSecond\ncause:\nFirst", formatException);
+		assertEquals("java.lang.RuntimeException: Third\n" + "cause: java.lang.RuntimeException: Second\n"
+				+ "cause: java.lang.RuntimeException: First", formatException);
 	}
 
 	private Exception nestedException() {
