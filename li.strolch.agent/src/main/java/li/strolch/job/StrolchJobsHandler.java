@@ -38,7 +38,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 		super.initialize(configuration);
 	}
 
-	public void registerAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
+	public StrolchJob registerAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
 
 		StrolchJob strolchJob;
 		try {
@@ -54,6 +54,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 		strolchJob.schedule();
 
 		this.jobs.put(strolchJob.getName(), strolchJob);
+		return strolchJob;
 	}
 
 	public List<StrolchJob> getJobs(Certificate cert) {

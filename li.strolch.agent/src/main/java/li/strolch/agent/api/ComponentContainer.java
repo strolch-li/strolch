@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,6 +33,18 @@ public interface ComponentContainer {
 
 	public abstract boolean hasComponent(Class<?> clazz);
 
+	/**
+	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
+	 * {@link IllegalArgumentException} is thrown
+	 *
+	 * @param clazz
+	 * 		the type of component to return
+	 *
+	 * @return the component with the given name
+	 *
+	 * @throws IllegalArgumentException
+	 * 		if the component does not exist
+	 */
 	public abstract <T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
 
 	public abstract PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException;
@@ -42,31 +54,31 @@ public interface ComponentContainer {
 	public abstract Set<String> getRealmNames();
 
 	/**
-	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constant
-	 * {@link StrolchConstants#DEFAULT_REALM}.
-	 * 
+	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constant {@link
+	 * StrolchConstants#DEFAULT_REALM}.
+	 *
 	 * @param realm
-	 *            the name of the {@link StrolchRealm} to return
-	 * 
+	 * 		the name of the {@link StrolchRealm} to return
+	 *
 	 * @return the {@link StrolchRealm} with the given name
-	 * 
+	 *
 	 * @throws StrolchException
-	 *             if the {@link StrolchRealm} does not exist with the given name
+	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	public abstract StrolchRealm getRealm(String realm) throws StrolchException;
 
 	/**
 	 * Returns the default {@link StrolchRealm} for the user with the given {@link Certificate}. This is done by
 	 * querying the property {@link StrolchConstants#PROP_REALM} from the certificate.
-	 * 
+	 *
 	 * @param certificate
-	 *            the {@link Certificate} from which to retrieve the name of the {@link StrolchRealm} to return
-	 * 
+	 * 		the {@link Certificate} from which to retrieve the name of the {@link StrolchRealm} to return
+	 *
 	 * @return the {@link StrolchRealm}
-	 * 
+	 *
 	 * @throws StrolchException
-	 *             if the user does not have a {@link StrolchConstants#PROP_REALM} property configured, and the default
-	 *             realm is not configured, or if the realm does not exist with the found value
+	 * 		if the user does not have a {@link StrolchConstants#PROP_REALM} property configured, and the default realm is
+	 * 		not configured, or if the realm does not exist with the found value
 	 */
 	public abstract StrolchRealm getRealm(Certificate certificate) throws StrolchException;
 

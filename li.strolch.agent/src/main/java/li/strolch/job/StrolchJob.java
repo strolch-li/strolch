@@ -2,6 +2,7 @@ package li.strolch.job;
 
 import static li.strolch.model.Tags.AGENT;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
@@ -50,6 +52,7 @@ public abstract class StrolchJob implements Runnable {
 	private long nrOfExecutions;
 	private boolean first;
 	private ScheduledFuture<?> future;
+	private ZonedDateTime lastExecution;
 	private Throwable lastException;
 
 	public StrolchJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit, long delay,
@@ -132,6 +135,22 @@ public abstract class StrolchJob implements Runnable {
 	}
 
 	/**
+	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
+	 * {@link IllegalArgumentException} is thrown
+	 *
+	 * @param clazz
+	 * 		the type of component to return
+	 *
+	 * @return the component with the given name
+	 *
+	 * @throws IllegalArgumentException
+	 * 		if the component does not exist
+	 */
+	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
+		return getContainer().getComponent(clazz);
+	}
+
+	/**
 	 * Opens a {@link StrolchTransaction} for the default realm and certificate
 	 *
 	 * @param cert
@@ -151,6 +170,7 @@ public abstract class StrolchJob implements Runnable {
 	public void runNow() {
 		synchronized (this) {
 			runAsAgent(this::execute);
+			this.lastExecution = ZonedDateTime.now();
 			this.nrOfExecutions++;
 		}
 	}
@@ -175,6 +195,7 @@ public abstract class StrolchJob implements Runnable {
 			}
 		}
 
+		this.lastExecution = ZonedDateTime.now();
 		this.nrOfExecutions++;
 
 		if (this.first) {
@@ -245,20 +266,36 @@ public abstract class StrolchJob implements Runnable {
 	public JsonObject toJson() {
 		JsonObject jsonObject = new JsonObject();
 
-		long delay = this.future.getDelay(TimeUnit.MILLISECONDS);
-		String nextExecution = ZonedDateTime.now().plus(delay, ChronoUnit.MILLIS)
-				.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
 		jsonObject.addProperty(Tags.Json.NAME, getName());
 		jsonObject.addProperty(Tags.Json.REALM, this.realmName);
+		jsonObject.addProperty("mode", this.mode.name());
 		jsonObject.addProperty("initialDelay", this.initialDelay);
 		jsonObject.addProperty("initialDelayTimeUnit", this.initialDelayTimeUnit.name());
 		jsonObject.addProperty("delay", this.delay);
 		jsonObject.addProperty("delayTimeUnit", this.delayTimeUnit.name());
-		jsonObject.addProperty("nextExecution", nextExecution);
+
+		if (this.lastExecution == null) {
+			jsonObject.addProperty("lastExecution", "-");
+		} else {
+			String lastExecution = this.lastExecution
+					.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
+			jsonObject.addProperty("lastExecution", lastExecution);
+		}
+
+		if (this.future == null) {
+			jsonObject.addProperty("nextExecution", "-");
+		} else {
+
+			long delay = this.future.getDelay(TimeUnit.MILLISECONDS);
+			String nextExecution = ZonedDateTime.now().plus(delay, ChronoUnit.MILLIS)
+					.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
+			jsonObject.addProperty("nextExecution", nextExecution);
+		}
+
 		jsonObject.addProperty("nrOfExecutions", this.nrOfExecutions);
-		jsonObject.addProperty("lastException",
-				this.lastException == null ? null : ExceptionHelper.formatExceptionMessage(this.lastException));
+
+		if (this.lastException != null)
+			jsonObject.addProperty("lastException", ExceptionHelper.formatExceptionMessage(this.lastException));
 
 		return jsonObject;
 	}

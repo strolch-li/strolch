@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,15 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.ComponentState;
-import li.strolch.agent.api.RealmHandler;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.api.StrolchRealm;
+import li.strolch.agent.api.*;
 import li.strolch.exception.StrolchException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
@@ -43,6 +35,8 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ComponentContainerImpl implements ComponentContainer {
 
@@ -118,8 +112,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 				realmName = StrolchConstants.DEFAULT_REALM;
 			} else {
 				String msg = "The User {0} is missing the property {1} and the Realm {2} can not be used as it does not exist!";
-				throw new StrolchException(MessageFormat.format(msg, certificate.getUsername(),
-						StrolchConstants.PROP_REALM, StrolchConstants.DEFAULT_REALM));
+				throw new StrolchException(MessageFormat
+						.format(msg, certificate.getUsername(), StrolchConstants.PROP_REALM,
+								StrolchConstants.DEFAULT_REALM));
 			}
 		}
 
@@ -156,8 +151,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			@SuppressWarnings("unchecked")
 			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
-			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainer.class,
-					String.class);
+			Constructor<StrolchComponent> constructor = strolchComponentClass
+					.getConstructor(ComponentContainer.class, String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 			strolchComponent.setup(componentConfiguration);
 
@@ -170,8 +165,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
 			throw new StrolchConfigurationException(msg, e);
 
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException
-				| IllegalArgumentException | InvocationTargetException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 
 			String msg = "Could not load class for component {0} due to: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
@@ -221,8 +215,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size(),
-				formatNanoDuration(took)));
+		logger.info(MessageFormat
+				.format(msg, applicationName, environment, this.componentMap.size(), formatNanoDuration(took)));
 	}
 
 	public void initialize(StrolchConfiguration strolchConfiguration) {
@@ -243,8 +237,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} All {2} Strolch Components have been initialized. Took {3}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-				formatNanoDuration(took)));
+		logger.info(MessageFormat
+				.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
 	}
 
 	public void start() {
@@ -264,8 +258,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} All {2} Strolch Components started. Took {3}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-				formatNanoDuration(took)));
+		logger.info(MessageFormat
+				.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString())); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
 	}
@@ -288,8 +282,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			long took = System.nanoTime() - start;
 			msg = "{0}:{1} All {2} Strolch Components have been stopped. Took {3}"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-					formatNanoDuration(took)));
+			logger.info(MessageFormat
+					.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
 		}
 
 		this.state = ComponentState.STOPPED;
@@ -313,8 +307,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			long took = System.nanoTime() - start;
 			msg = "{0}:{1} All {2} Strolch Components have been destroyed! Took {3}"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-					formatNanoDuration(took)));
+			logger.info(MessageFormat
+					.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
 			this.controllerMap.clear();
 			this.componentMap.clear();
 		}
