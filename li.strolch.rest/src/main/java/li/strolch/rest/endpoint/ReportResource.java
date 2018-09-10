@@ -4,8 +4,7 @@ import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import static li.strolch.utils.helper.StringHelper.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -60,11 +59,13 @@ public class ReportResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllReportIds(@Context HttpServletRequest request) {
+	public Response getAllReportIds(@Context HttpServletRequest request, @QueryParam("realm") String realm) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		if (isEmpty(realm))
+			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
 
 			List<Resource> ids = new ReportSearch().search(tx).orderByName(false).toList();
 
@@ -85,10 +86,12 @@ public class ReportResource {
 	@GET
 	@Path("{id}/facets")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getReportFacets(@Context HttpServletRequest request, @PathParam("id") String id,
-			@QueryParam(LIMIT) String limitS) throws IOException {
+	public Response getReportFacets(@Context HttpServletRequest request, @QueryParam("realm") String realm,
+			@PathParam("id") String id, @QueryParam(LIMIT) String limitS) throws IOException {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		if (isEmpty(realm))
+			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
 
 		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
 
@@ -102,7 +105,7 @@ public class ReportResource {
 		}
 
 		JsonArray result = new JsonArray();
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
 
 			Report report = new Report(tx, id);
 
@@ -135,11 +138,13 @@ public class ReportResource {
 	@Path("{id}/facets/{type}/fields")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getReportFacetValues(@Context HttpServletRequest request, @PathParam("id") String id,
-			@PathParam("type") String type, @QueryParam(PARAM_QUERY) String queryS, @QueryParam(LIMIT) String limitS)
-			throws IOException {
+	public Response getReportFacetValues(@Context HttpServletRequest request, @QueryParam("realm") String realm,
+			@PathParam("id") String id, @PathParam("type") String type, @QueryParam(PARAM_QUERY) String queryS,
+			@QueryParam(LIMIT) String limitS) throws IOException {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		if (isEmpty(realm))
+			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
 
 		String query = isNotEmpty(queryS) ? queryS.toLowerCase() : queryS;
 		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
@@ -153,7 +158,7 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
 		}
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
 
 			// get report
 			Report report = new Report(tx, id);
@@ -196,10 +201,12 @@ public class ReportResource {
 	@Path("{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getReportById(@Context HttpServletRequest request, @PathParam("id") String id, String data)
-			throws IOException {
+	public Response getReportById(@Context HttpServletRequest request, @QueryParam("realm") String realm,
+			@PathParam("id") String id, String data) throws IOException {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		if (isEmpty(realm))
+			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
 
 		DBC.PRE.assertNotEmpty("report ID is required", id);
 
@@ -248,7 +255,7 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
 		}
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
 			long start = System.nanoTime();
 
 			// get report
@@ -315,10 +322,12 @@ public class ReportResource {
 	@Path("{id}/csv")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(TEXT_CSV)
-	public Response getReportByIdAsCsv(@Context HttpServletRequest request, @PathParam("id") String id, String data)
-			throws IOException {
+	public Response getReportByIdAsCsv(@Context HttpServletRequest request, @QueryParam("realm") String realm,
+			@PathParam("id") String id, String data) throws IOException {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		if (isEmpty(realm))
+			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
 
 		DBC.PRE.assertNotEmpty("report ID is required", id);
 
@@ -338,7 +347,7 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
 		}
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
 
 			// get report
 			Report report = new Report(tx, id);

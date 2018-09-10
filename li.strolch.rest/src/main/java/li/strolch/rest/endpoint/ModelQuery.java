@@ -28,7 +28,7 @@ public class ModelQuery {
 	}
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().getContainer().getRealm(realm).openTx(certificate, getContext());
+		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getContext());
 	}
 
 	@POST
@@ -50,5 +50,4 @@ public class ModelQuery {
 		return Response.ok(queryResponse.asJson(Boolean.parseBoolean(flat)).toString(), MediaType.APPLICATION_JSON)
 				.build();
 	}
-
 }

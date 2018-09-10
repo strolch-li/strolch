@@ -22,9 +22,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.JsonArray;
-import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.json.AuditToJsonVisitor;
+import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -46,9 +46,8 @@ public class AuditsService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queryTypes(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		StrolchRealm realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 			JsonArray dataJ = new JsonArray();
 			tx.getAuditTrail().getTypes(tx).forEach(dataJ::add);
 			return Response.ok(dataJ.toString(), MediaType.APPLICATION_JSON).build();
@@ -61,11 +60,9 @@ public class AuditsService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queryAudits(@BeanParam AuditQueryData query, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		StrolchRealm realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, getContext())) {
-
-			li.strolch.model.query.AuditQuery<Audit> auditQuery = new ToAuditQueryVisitor().create(query);
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			AuditQuery<Audit> auditQuery = new ToAuditQueryVisitor().create(query);
 			JsonArray dataJ = new JsonArray();
 			tx.getAuditTrail().doQuery(tx, auditQuery).forEach(a -> a.accept(new AuditToJsonVisitor()));
 			return Response.ok(dataJ.toString(), MediaType.APPLICATION_JSON).build();
