@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,34 +27,34 @@ public class ExceptionHelper {
 	 * <p>
 	 * Returns a message for the given {@link Throwable}
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * A {@link NullPointerException} only has <code>null</code> as the message so this methods returns the class name
 	 * in such a case
 	 * </p>
-	 * 
+	 *
 	 * @param t
-	 *            the {@link Throwable}
-	 * 
+	 * 		the {@link Throwable}
+	 *
 	 * @return the exception as string
 	 */
 	public static String getExceptionMessage(Throwable t) {
-		return StringHelper.isEmpty(t.getMessage()) ? t.getClass().getName() : t.getMessage();
+		return t.getClass().getName() + ": " + t.getMessage();
 	}
 
 	/**
 	 * <p>
 	 * Returns a message for the given {@link Throwable}
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * A {@link NullPointerException} only has <code>null</code> as the message so this methods returns the class name
 	 * in such a case
 	 * </p>
-	 * 
+	 *
 	 * @param t
-	 *            the {@link Throwable}
-	 * 
+	 * 		the {@link Throwable}
+	 *
 	 * @return the exception as string
 	 */
 	public static String getExceptionMessageWithCauses(Throwable t) {
@@ -67,10 +67,10 @@ public class ExceptionHelper {
 
 	/**
 	 * Formats the given {@link Throwable}'s stack trace to a string
-	 * 
+	 *
 	 * @param t
-	 *            the throwable for which the stack trace is to be formatted to string
-	 * 
+	 * 		the throwable for which the stack trace is to be formatted to string
+	 *
 	 * @return a string representation of the given {@link Throwable}'s stack trace
 	 */
 	public static String formatException(Throwable t) {
@@ -82,10 +82,10 @@ public class ExceptionHelper {
 
 	/**
 	 * Formats the given {@link Throwable}'s message including causes to a string
-	 * 
+	 *
 	 * @param t
-	 *            the throwable for which the messages are to be formatted to a string
-	 * 
+	 * 		the throwable for which the messages are to be formatted to a string
+	 *
 	 * @return a string representation of the given {@link Throwable}'s messages including causes
 	 */
 	public static String formatExceptionMessage(Throwable t) {
@@ -93,15 +93,15 @@ public class ExceptionHelper {
 			return getExceptionMessage(t);
 
 		String root = formatExceptionMessage(t.getCause());
-		return getExceptionMessage(t) + "\ncause:\n" + root;
+		return getExceptionMessage(t) + "\ncause: " + root;
 	}
 
 	/**
 	 * Returns the root cause for the given {@link Throwable}
-	 * 
+	 *
 	 * @param throwable
-	 *            the {@link Throwable} for which to get the root cause
-	 * 
+	 * 		the {@link Throwable} for which to get the root cause
+	 *
 	 * @return the root cause of the given {@link Throwable}
 	 */
 	public static Throwable getRootCause(Throwable throwable) {
