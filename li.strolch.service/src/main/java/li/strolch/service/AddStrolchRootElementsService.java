@@ -15,38 +15,52 @@
  */
 package li.strolch.service;
 
+import li.strolch.model.Order;
 import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourceService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
+public class AddStrolchRootElementsService extends AbstractService<StrolchRootElementListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult(ServiceResultState.FAILED);
+		return new ServiceResult();
 	}
 
 	@Override
-	public StrolchRootElementArgument getArgumentInstance() {
-		return new StrolchRootElementArgument();
+	public StrolchRootElementListArgument getArgumentInstance() {
+		return new StrolchRootElementListArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
-		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
-		DBC.PRE.assertEquals("Expected a resource!", Tags.RESOURCE, arg.rootElement.getObjectType());
+	protected ServiceResult internalDoService(StrolchRootElementListArgument arg) {
+		DBC.PRE.assertNotNull("root elements must not be null!", arg.rootElements);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			tx.add((Resource) arg.rootElement);
+			for (StrolchRootElement rootElement : arg.rootElements) {
+				switch (rootElement.getObjectType()) {
+				case Tags.RESOURCE:
+					tx.add((Resource) rootElement);
+					break;
+				case Tags.ORDER:
+					tx.add((Order) rootElement);
+					break;
+				case Tags.ACTIVITY:
+					tx.add((Activity) rootElement);
+					break;
+
+				}
+			}
 			tx.commitOnClose();
 		}
 

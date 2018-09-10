@@ -15,19 +15,18 @@
  */
 package li.strolch.service;
 
-import java.util.List;
-
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddActivitiesService
-		extends AbstractService<AddActivitiesService.AddActivityCollectionArg, ServiceResult> {
+public class AddActivitiesService extends AbstractService<StrolchRootElementListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -37,25 +36,23 @@ public class AddActivitiesService
 	}
 
 	@Override
-	public AddActivityCollectionArg getArgumentInstance() {
-		return new AddActivityCollectionArg();
+	public StrolchRootElementListArgument getArgumentInstance() {
+		return new StrolchRootElementListArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddActivityCollectionArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementListArgument arg) {
+		DBC.PRE.assertNotNull("root elements must not be null!", arg.rootElements);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			for (Activity activity : arg.activities) {
-				tx.add(activity);
+			for (StrolchRootElement rootElement : arg.rootElements) {
+				DBC.PRE.assertEquals("Expected an activity!", Tags.ACTIVITY, rootElement.getObjectType());
+
+				tx.add((Activity) rootElement);
 			}
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddActivityCollectionArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public List<Activity> activities;
 	}
 }

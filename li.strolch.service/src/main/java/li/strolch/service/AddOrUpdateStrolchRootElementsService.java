@@ -16,8 +16,10 @@
 package li.strolch.service;
 
 import li.strolch.model.Order;
+import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
@@ -26,7 +28,8 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateOrdersService extends AbstractService<StrolchRootElementListArgument, ServiceResult> {
+public class AddOrUpdateStrolchRootElementsService
+		extends AbstractService<StrolchRootElementListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,11 +48,34 @@ public class UpdateOrdersService extends AbstractService<StrolchRootElementListA
 		DBC.PRE.assertNotNull("root elements must not be null!", arg.rootElements);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			for (StrolchRootElement rootElement : arg.rootElements) {
-				DBC.PRE.assertEquals("Expected an order!", Tags.ORDER, rootElement.getObjectType());
 
-				tx.update((Order) rootElement);
+			for (StrolchRootElement rootElement : arg.rootElements) {
+
+				switch (rootElement.getObjectType()) {
+				case Tags.RESOURCE:
+					if (tx.hasResource(rootElement.getType(), rootElement.getId())) {
+						tx.update((Resource) rootElement);
+					} else {
+						tx.add((Resource) rootElement);
+					}
+					break;
+				case Tags.ORDER:
+					if (tx.hasOrder(rootElement.getType(), rootElement.getId())) {
+						tx.update((Order) rootElement);
+					} else {
+						tx.add((Order) rootElement);
+					}
+					break;
+				case Tags.ACTIVITY:
+					if (tx.hasActivity(rootElement.getType(), rootElement.getId())) {
+						tx.update((Activity) rootElement);
+					} else {
+						tx.add((Activity) rootElement);
+					}
+					break;
+				}
 			}
+
 			tx.commitOnClose();
 		}
 

@@ -18,18 +18,16 @@ package li.strolch.service;
 import java.util.ArrayList;
 
 import li.strolch.model.ModelGenerator;
-import li.strolch.model.Order;
-import li.strolch.service.AddOrdersService.AddOrderCollectionArg;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
 import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrdersServiceTest extends AbstractRealmServiceTest<AddOrderCollectionArg, ServiceResult> {
+public class AddOrdersServiceTest extends AbstractRealmServiceTest<StrolchRootElementListArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -38,21 +36,21 @@ public class AddOrdersServiceTest extends AbstractRealmServiceTest<AddOrderColle
 	}
 
 	@Override
-	protected Class<? extends Service<AddOrderCollectionArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementListArgument, ServiceResult>> getSvcClass() {
 		return AddOrdersService.class;
 	}
 
 	@Override
-	protected AddOrderCollectionArg getArgInstance() {
+	protected StrolchRootElementListArgument getArgInstance() {
 
-		AddOrderCollectionArg arg = new AddOrderCollectionArg();
+		StrolchRootElementListArgument arg = new StrolchRootElementListArgument();
 
-		ArrayList<Order> orders = new ArrayList<>();
+		ArrayList<StrolchRootElement> orders = new ArrayList<>();
 		orders.add(ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders"));
 		orders.add(ModelGenerator.createOrder("secondOrder", "Second Order", "AdditionalOrders"));
 		orders.add(ModelGenerator.createOrder("thirdOrder", "Third Order", "AdditionalOrders"));
 
-		arg.orders = orders;
+		arg.rootElements = orders;
 
 		return arg;
 	}

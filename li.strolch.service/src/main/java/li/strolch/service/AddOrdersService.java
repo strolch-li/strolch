@@ -15,19 +15,18 @@
  */
 package li.strolch.service;
 
-import java.util.List;
-
 import li.strolch.model.Order;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.AddOrdersService.AddOrderCollectionArg;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrdersService extends AbstractService<AddOrderCollectionArg, ServiceResult> {
+public class AddOrdersService extends AbstractService<StrolchRootElementListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -37,25 +36,22 @@ public class AddOrdersService extends AbstractService<AddOrderCollectionArg, Ser
 	}
 
 	@Override
-	public AddOrderCollectionArg getArgumentInstance() {
-		return new AddOrderCollectionArg();
+	public StrolchRootElementListArgument getArgumentInstance() {
+		return new StrolchRootElementListArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrderCollectionArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementListArgument arg) {
+		DBC.PRE.assertNotNull("root elements must not be null!", arg.rootElements);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			for (Order order : arg.orders) {
-				tx.add(order);
+			for (StrolchRootElement rootElement : arg.rootElements) {
+				DBC.PRE.assertEquals("Expected an order!", Tags.ORDER, rootElement.getObjectType());
+				tx.add((Order) rootElement);
 			}
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddOrderCollectionArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public List<Order> orders;
 	}
 }

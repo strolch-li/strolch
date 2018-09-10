@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import li.strolch.model.ModelGenerator;
-import li.strolch.model.Order;
-import li.strolch.service.UpdateOrdersService.UpdateOrderCollectionArg;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -30,7 +29,7 @@ import org.junit.Test;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UpdateOrderCollectionServiceTest
-		extends AbstractRealmServiceTest<UpdateOrderCollectionArg, ServiceResult> {
+		extends AbstractRealmServiceTest<StrolchRootElementListArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -39,21 +38,21 @@ public class UpdateOrderCollectionServiceTest
 	}
 
 	@Override
-	protected Class<? extends Service<UpdateOrderCollectionArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementListArgument, ServiceResult>> getSvcClass() {
 		return UpdateOrdersService.class;
 	}
 
 	@Override
-	protected UpdateOrderCollectionArg getArgInstance() {
+	protected StrolchRootElementListArgument getArgInstance() {
 
-		UpdateOrderCollectionArg arg = new UpdateOrderCollectionArg();
+		StrolchRootElementListArgument arg = new StrolchRootElementListArgument();
 
-		List<Order> orders = new ArrayList<>();
+		List<StrolchRootElement> orders = new ArrayList<>();
 		orders.add(ModelGenerator.createOrder("@1", "Modified Test Order", "TestType"));
 		orders.add(ModelGenerator.createOrder("@2", "Modified Test Order", "TestType"));
 		orders.add(ModelGenerator.createOrder("@3", "Modified Test Order", "TestType"));
 
-		arg.orders = orders;
+		arg.rootElements = orders;
 
 		return arg;
 	}

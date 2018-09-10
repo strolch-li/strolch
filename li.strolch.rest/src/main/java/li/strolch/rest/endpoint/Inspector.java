@@ -63,12 +63,6 @@ import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.*;
 import li.strolch.service.*;
-import li.strolch.service.AddActivityService.AddActivityArg;
-import li.strolch.service.AddOrderService.AddOrderArg;
-import li.strolch.service.AddResourceService.AddResourceArg;
-import li.strolch.service.UpdateActivityService.UpdateActivityArg;
-import li.strolch.service.UpdateOrderService.UpdateOrderArg;
-import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -769,9 +763,9 @@ public class Inspector {
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
 
 		UpdateResourceService svc = new UpdateResourceService();
-		UpdateResourceArg arg = new UpdateResourceArg();
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 		arg.refreshUnknownVersion = true;
-		arg.resource = resource;
+		arg.rootElement = resource;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -794,7 +788,7 @@ public class Inspector {
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateResourceService svc = new UpdateResourceService();
-		UpdateResourceArg arg = new UpdateResourceArg();
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 
 		// parse JSON string
 		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
@@ -818,7 +812,7 @@ public class Inspector {
 
 		// prepare argument
 		arg.refreshUnknownVersion = true;
-		arg.resource = resource;
+		arg.rootElement = resource;
 		arg.realm = realm;
 
 		// do service
@@ -846,9 +840,9 @@ public class Inspector {
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
 
 		UpdateOrderService svc = new UpdateOrderService();
-		UpdateOrderArg arg = new UpdateOrderArg();
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 		arg.refreshUnknownVersion = true;
-		arg.order = order;
+		arg.rootElement = order;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -871,7 +865,7 @@ public class Inspector {
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateOrderService svc = new UpdateOrderService();
-		UpdateOrderArg arg = new UpdateOrderArg();
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 
 		// parse JSON string
 		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
@@ -895,7 +889,7 @@ public class Inspector {
 
 		// prepare argument
 		arg.refreshUnknownVersion = true;
-		arg.order = order;
+		arg.rootElement = order;
 		arg.realm = realm;
 
 		// do service
@@ -923,9 +917,9 @@ public class Inspector {
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
 
 		UpdateActivityService svc = new UpdateActivityService();
-		UpdateActivityArg arg = new UpdateActivityArg();
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 		arg.refreshUnknownVersion = true;
-		arg.activity = activity;
+		arg.rootElement = activity;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -948,7 +942,7 @@ public class Inspector {
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateActivityService svc = new UpdateActivityService();
-		UpdateActivityArg arg = new UpdateActivityArg();
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 
 		// parse JSON string
 		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
@@ -972,7 +966,7 @@ public class Inspector {
 
 		// prepare argument
 		arg.refreshUnknownVersion = true;
-		arg.activity = activity;
+		arg.rootElement = activity;
 		arg.realm = realm;
 
 		// do service
@@ -1045,8 +1039,8 @@ public class Inspector {
 		Resource resource = parseResourceFromXml(null, data);
 
 		AddResourceService svc = new AddResourceService();
-		AddResourceArg arg = new AddResourceArg();
-		arg.resource = resource;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = resource;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1073,8 +1067,8 @@ public class Inspector {
 		Resource resource = visitor.visit(jsonObject);
 
 		AddResourceService svc = new AddResourceService();
-		AddResourceArg arg = new AddResourceArg();
-		arg.resource = resource;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = resource;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1099,8 +1093,8 @@ public class Inspector {
 		Resource resource = parseNewResourceFromJson(cert, realm, type, data, flat);
 
 		AddResourceService svc = new AddResourceService();
-		AddResourceArg arg = new AddResourceArg();
-		arg.resource = resource;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = resource;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1125,8 +1119,8 @@ public class Inspector {
 		Order order = parseOrderFromXml(null, data);
 
 		AddOrderService svc = new AddOrderService();
-		AddOrderArg arg = new AddOrderArg();
-		arg.order = order;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = order;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1152,8 +1146,8 @@ public class Inspector {
 		Order order = visitor.visit(jsonObject);
 
 		AddOrderService svc = new AddOrderService();
-		AddOrderArg arg = new AddOrderArg();
-		arg.order = order;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = order;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1178,8 +1172,8 @@ public class Inspector {
 		Order order = parseNewOrderFromJson(cert, realm, type, data, flat);
 
 		AddOrderService svc = new AddOrderService();
-		AddOrderArg arg = new AddOrderArg();
-		arg.order = order;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = order;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1205,8 +1199,8 @@ public class Inspector {
 		Activity activity = parseActivityFromXml(null, data);
 
 		AddActivityService svc = new AddActivityService();
-		AddActivityArg arg = new AddActivityArg();
-		arg.activity = activity;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = activity;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1233,8 +1227,8 @@ public class Inspector {
 		Activity activity = visitor.visit(jsonObject);
 
 		AddActivityService svc = new AddActivityService();
-		AddActivityArg arg = new AddActivityArg();
-		arg.activity = activity;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = activity;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
@@ -1259,8 +1253,8 @@ public class Inspector {
 		Activity activity = parseNewActivityFromJson(cert, realm, type, data, flat);
 
 		AddActivityService svc = new AddActivityService();
-		AddActivityArg arg = new AddActivityArg();
-		arg.activity = activity;
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = activity;
 		arg.realm = realm;
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);

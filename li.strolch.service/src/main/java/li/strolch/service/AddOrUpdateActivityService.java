@@ -15,18 +15,19 @@
  */
 package li.strolch.service;
 
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@gmail.com>
  */
 public class AddOrUpdateActivityService
-		extends AbstractService<AddOrUpdateActivityService.AddOrUpdateActivityArg, ServiceResult> {
+		extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,28 +37,25 @@ public class AddOrUpdateActivityService
 	}
 
 	@Override
-	public AddOrUpdateActivityArg getArgumentInstance() {
-		return new AddOrUpdateActivityArg();
+	public StrolchRootElementArgument getArgumentInstance() {
+		return new StrolchRootElementArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrUpdateActivityArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
+		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
+		DBC.PRE.assertEquals("Expected an activity!", Tags.ACTIVITY, arg.rootElement.getObjectType());
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			if (tx.hasActivity(arg.activity.getType(), arg.activity.getId())) {
-				tx.update(arg.activity);
+			if (tx.hasActivity(arg.rootElement.getType(), arg.rootElement.getId())) {
+				tx.update((Activity) arg.rootElement);
 			} else {
-				tx.add(arg.activity);
+				tx.add((Activity) arg.rootElement);
 			}
 
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddOrUpdateActivityArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public Activity activity;
 	}
 }

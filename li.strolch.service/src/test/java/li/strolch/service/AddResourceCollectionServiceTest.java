@@ -18,19 +18,17 @@ package li.strolch.service;
 import java.util.ArrayList;
 
 import li.strolch.model.ModelGenerator;
-import li.strolch.model.Resource;
-import li.strolch.service.AddResourcesService.AddResourceCollectionArg;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
 import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AddResourceCollectionServiceTest
-		extends AbstractRealmServiceTest<AddResourceCollectionArg, ServiceResult> {
+		extends AbstractRealmServiceTest<StrolchRootElementListArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -39,21 +37,21 @@ public class AddResourceCollectionServiceTest
 	}
 
 	@Override
-	protected Class<? extends Service<AddResourceCollectionArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementListArgument, ServiceResult>> getSvcClass() {
 		return AddResourcesService.class;
 	}
 
 	@Override
-	protected AddResourceCollectionArg getArgInstance() {
+	protected StrolchRootElementListArgument getArgInstance() {
 
-		AddResourceCollectionArg arg = new AddResourceCollectionArg();
+		StrolchRootElementListArgument arg = new StrolchRootElementListArgument();
 
-		ArrayList<Resource> resources = new ArrayList<>();
+		ArrayList<StrolchRootElement> resources = new ArrayList<>();
 		resources.add(ModelGenerator.createResource("firstRes", "First Resource", "AdditionalResources"));
 		resources.add(ModelGenerator.createResource("secondRes", "Second Resource", "AdditionalResources"));
 		resources.add(ModelGenerator.createResource("thirdRes", "Third Resource", "AdditionalResources"));
 
-		arg.resources = resources;
+		arg.rootElements = resources;
 
 		return arg;
 	}

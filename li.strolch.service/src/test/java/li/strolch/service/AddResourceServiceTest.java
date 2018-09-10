@@ -16,17 +16,15 @@
 package li.strolch.service;
 
 import li.strolch.model.ModelGenerator;
-import li.strolch.service.AddResourceService.AddResourceArg;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
 import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourceServiceTest extends AbstractRealmServiceTest<AddResourceArg, ServiceResult> {
+public class AddResourceServiceTest extends AbstractRealmServiceTest<StrolchRootElementArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -35,15 +33,15 @@ public class AddResourceServiceTest extends AbstractRealmServiceTest<AddResource
 	}
 
 	@Override
-	protected Class<? extends Service<AddResourceArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementArgument, ServiceResult>> getSvcClass() {
 		return AddResourceService.class;
 	}
 
 	@Override
-	protected AddResourceArg getArgInstance() {
+	protected StrolchRootElementArgument getArgInstance() {
 
-		AddResourceArg arg = new AddResourceArg();
-		arg.resource = ModelGenerator.createResource("firstRes", "First Resource", "AdditionalResources");
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = ModelGenerator.createResource("firstRes", "First Resource", "AdditionalResources");
 
 		return arg;
 	}

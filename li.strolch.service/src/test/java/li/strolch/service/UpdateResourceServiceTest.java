@@ -16,7 +16,6 @@
 package li.strolch.service;
 
 import li.strolch.model.ModelGenerator;
-import li.strolch.service.UpdateResourceService.UpdateResourceArg;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -25,7 +24,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateResourceServiceTest extends AbstractRealmServiceTest<UpdateResourceArg, ServiceResult> {
+public class UpdateResourceServiceTest extends AbstractRealmServiceTest<StrolchRootElementArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -34,15 +33,15 @@ public class UpdateResourceServiceTest extends AbstractRealmServiceTest<UpdateRe
 	}
 
 	@Override
-	protected Class<? extends Service<UpdateResourceArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementArgument, ServiceResult>> getSvcClass() {
 		return UpdateResourceService.class;
 	}
 
 	@Override
-	protected UpdateResourceArg getArgInstance() {
+	protected StrolchRootElementArgument getArgInstance() {
 
-		UpdateResourceArg arg = new UpdateResourceArg();
-		arg.resource = ModelGenerator.createResource("yellow", "Modified Yellow Ball", "Ball");
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = ModelGenerator.createResource("yellow", "Modified Yellow Ball", "Ball");
 
 		return arg;
 	}

@@ -15,19 +15,17 @@
  */
 package li.strolch.service;
 
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceResult;
-import org.junit.Test;
-
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.activity.TimeOrdering;
-import li.strolch.service.AddActivityService.AddActivityArg;
+import li.strolch.service.api.Service;
+import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddActivityServiceTest extends AbstractRealmServiceTest<AddActivityArg, ServiceResult> {
+public class AddActivityServiceTest extends AbstractRealmServiceTest<StrolchRootElementArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -35,14 +33,14 @@ public class AddActivityServiceTest extends AbstractRealmServiceTest<AddActivity
 	}
 
 	@Override
-	protected Class<? extends Service<AddActivityArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementArgument, ServiceResult>> getSvcClass() {
 		return AddActivityService.class;
 	}
 
 	@Override
-	protected AddActivityArg getArgInstance() {
-		AddActivityArg arg = new AddActivityArg();
-		arg.activity = ModelGenerator
+	protected StrolchRootElementArgument getArgInstance() {
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = ModelGenerator
 				.createActivity("firstActivity", "First Activity", "AdditionalActivitys", TimeOrdering.SERIES);
 		return arg;
 	}

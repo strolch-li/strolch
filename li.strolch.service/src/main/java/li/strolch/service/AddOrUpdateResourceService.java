@@ -16,17 +16,17 @@
 package li.strolch.service;
 
 import li.strolch.model.Resource;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@gmail.com>
  */
-public class AddOrUpdateResourceService
-		extends AbstractService<AddOrUpdateResourceService.AddOrUpdateResourceArg, ServiceResult> {
+public class AddOrUpdateResourceService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,28 +36,25 @@ public class AddOrUpdateResourceService
 	}
 
 	@Override
-	public AddOrUpdateResourceArg getArgumentInstance() {
-		return new AddOrUpdateResourceArg();
+	public StrolchRootElementArgument getArgumentInstance() {
+		return new StrolchRootElementArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrUpdateResourceArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
+		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
+		DBC.PRE.assertEquals("Expected a resource!", Tags.RESOURCE, arg.rootElement.getObjectType());
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			if (tx.hasResource(arg.resource.getType(), arg.resource.getId())) {
-				tx.update(arg.resource);
+			if (tx.hasResource(arg.rootElement.getType(), arg.rootElement.getId())) {
+				tx.update((Resource) arg.rootElement);
 			} else {
-				tx.add(arg.resource);
+				tx.add((Resource) arg.rootElement);
 			}
 
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddOrUpdateResourceArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public Resource resource;
 	}
 }

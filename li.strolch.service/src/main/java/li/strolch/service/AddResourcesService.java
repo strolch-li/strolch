@@ -15,19 +15,18 @@
  */
 package li.strolch.service;
 
-import java.util.List;
-
 import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.AddResourcesService.AddResourceCollectionArg;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourcesService extends AbstractService<AddResourceCollectionArg, ServiceResult> {
+public class AddResourcesService extends AbstractService<StrolchRootElementListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -37,25 +36,22 @@ public class AddResourcesService extends AbstractService<AddResourceCollectionAr
 	}
 
 	@Override
-	public AddResourceCollectionArg getArgumentInstance() {
-		return new AddResourceCollectionArg();
+	public StrolchRootElementListArgument getArgumentInstance() {
+		return new StrolchRootElementListArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddResourceCollectionArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementListArgument arg) {
+		DBC.PRE.assertNotNull("root elements must not be null!", arg.rootElements);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			for (Resource resource : arg.resources) {
-				tx.add(resource);
+			for (StrolchRootElement rootElement : arg.rootElements) {
+				DBC.PRE.assertEquals("Expected a resource!", Tags.RESOURCE, rootElement.getObjectType());
+				tx.add((Resource) rootElement);
 			}
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddResourceCollectionArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public List<Resource> resources;
 	}
 }

@@ -16,17 +16,17 @@
 package li.strolch.service;
 
 import li.strolch.model.Order;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.AddOrderService.AddOrderArg;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderService extends AbstractService<AddOrderArg, ServiceResult> {
+public class AddOrderService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,23 +36,20 @@ public class AddOrderService extends AbstractService<AddOrderArg, ServiceResult>
 	}
 
 	@Override
-	public AddOrderArg getArgumentInstance() {
-		return new AddOrderArg();
+	public StrolchRootElementArgument getArgumentInstance() {
+		return new StrolchRootElementArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddOrderArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
+		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
+		DBC.PRE.assertEquals("Expected an order!", Tags.ORDER, arg.rootElement.getObjectType());
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			tx.add(arg.order);
+			tx.add((Order) arg.rootElement);
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddOrderArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public Order order;
 	}
 }

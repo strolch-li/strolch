@@ -15,24 +15,25 @@
  */
 package li.strolch.service;
 
+import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourceService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
+public class AddOrUpdateStrolchRootElementService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {
-		return new ServiceResult(ServiceResultState.FAILED);
+		return new ServiceResult();
 	}
 
 	@Override
@@ -43,10 +44,33 @@ public class AddResourceService extends AbstractService<StrolchRootElementArgume
 	@Override
 	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
 		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
-		DBC.PRE.assertEquals("Expected a resource!", Tags.RESOURCE, arg.rootElement.getObjectType());
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			tx.add((Resource) arg.rootElement);
+
+			switch (arg.rootElement.getObjectType()) {
+			case Tags.RESOURCE:
+				if (tx.hasResource(arg.rootElement.getType(), arg.rootElement.getId())) {
+					tx.update((Resource) arg.rootElement);
+				} else {
+					tx.add((Resource) arg.rootElement);
+				}
+				break;
+			case Tags.ORDER:
+				if (tx.hasOrder(arg.rootElement.getType(), arg.rootElement.getId())) {
+					tx.update((Order) arg.rootElement);
+				} else {
+					tx.add((Order) arg.rootElement);
+				}
+				break;
+			case Tags.ACTIVITY:
+				if (tx.hasActivity(arg.rootElement.getType(), arg.rootElement.getId())) {
+					tx.update((Activity) arg.rootElement);
+				} else {
+					tx.add((Activity) arg.rootElement);
+				}
+				break;
+			}
+
 			tx.commitOnClose();
 		}
 

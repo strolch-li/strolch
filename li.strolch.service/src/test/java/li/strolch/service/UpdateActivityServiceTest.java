@@ -17,7 +17,6 @@ package li.strolch.service;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.activity.TimeOrdering;
-import li.strolch.service.UpdateActivityService.UpdateActivityArg;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -26,7 +25,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateActivityServiceTest extends AbstractRealmServiceTest<UpdateActivityArg, ServiceResult> {
+public class UpdateActivityServiceTest extends AbstractRealmServiceTest<StrolchRootElementArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -35,15 +34,15 @@ public class UpdateActivityServiceTest extends AbstractRealmServiceTest<UpdateAc
 	}
 
 	@Override
-	protected Class<? extends Service<UpdateActivityArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementArgument, ServiceResult>> getSvcClass() {
 		return UpdateActivityService.class;
 	}
 
 	@Override
-	protected UpdateActivityArg getArgInstance() {
+	protected StrolchRootElementArgument getArgInstance() {
 
-		UpdateActivityArg arg = new UpdateActivityArg();
-		arg.activity = ModelGenerator
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = ModelGenerator
 				.createActivity("activity_1", "Modified Car Activity", "ActivityType", TimeOrdering.SERIES);
 
 		return arg;

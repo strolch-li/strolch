@@ -16,16 +16,17 @@
 package li.strolch.service;
 
 import li.strolch.model.Order;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateOrderService extends AbstractService<UpdateOrderService.UpdateOrderArg, ServiceResult> {
+public class UpdateOrderService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,30 +36,25 @@ public class UpdateOrderService extends AbstractService<UpdateOrderService.Updat
 	}
 
 	@Override
-	public UpdateOrderArg getArgumentInstance() {
-		return new UpdateOrderArg();
+	public StrolchRootElementArgument getArgumentInstance() {
+		return new StrolchRootElementArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(UpdateOrderArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
+		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
+		DBC.PRE.assertEquals("Expected an order!", Tags.ORDER, arg.rootElement.getObjectType());
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-
-			if (arg.refreshUnknownVersion && !arg.order.hasVersion()) {
-				Order current = tx.getOrderBy(arg.order.getType(), arg.order.getId(), true);
-				arg.order.setVersion(current.getVersion());
+			if (arg.refreshUnknownVersion && !arg.rootElement.hasVersion()) {
+				Order current = tx.getOrderBy(arg.rootElement.getType(), arg.rootElement.getId(), true);
+				arg.rootElement.setVersion(current.getVersion());
 			}
 
-			tx.update(arg.order);
+			tx.update((Order) arg.rootElement);
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class UpdateOrderArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public boolean refreshUnknownVersion = false;
-		public Order order;
 	}
 }

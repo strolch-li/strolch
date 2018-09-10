@@ -16,7 +16,6 @@
 package li.strolch.service;
 
 import li.strolch.model.ModelGenerator;
-import li.strolch.service.AddOrderService.AddOrderArg;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -25,7 +24,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddOrderServiceTest extends AbstractRealmServiceTest<AddOrderArg, ServiceResult> {
+public class AddOrderServiceTest extends AbstractRealmServiceTest<StrolchRootElementArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -33,14 +32,14 @@ public class AddOrderServiceTest extends AbstractRealmServiceTest<AddOrderArg, S
 	}
 
 	@Override
-	protected Class<? extends Service<AddOrderArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementArgument, ServiceResult>> getSvcClass() {
 		return AddOrderService.class;
 	}
 
 	@Override
-	protected AddOrderArg getArgInstance() {
-		AddOrderArg arg = new AddOrderArg();
-		arg.order = ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders");
+	protected StrolchRootElementArgument getArgInstance() {
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = ModelGenerator.createOrder("firstOrder", "First Order", "AdditionalOrders");
 		return arg;
 	}
 }

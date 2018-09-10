@@ -16,16 +16,17 @@
 package li.strolch.service;
 
 import li.strolch.model.Resource;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UpdateResourceService extends AbstractService<UpdateResourceService.UpdateResourceArg, ServiceResult> {
+public class UpdateResourceService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,30 +36,25 @@ public class UpdateResourceService extends AbstractService<UpdateResourceService
 	}
 
 	@Override
-	public UpdateResourceArg getArgumentInstance() {
-		return new UpdateResourceArg();
+	public StrolchRootElementArgument getArgumentInstance() {
+		return new StrolchRootElementArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(UpdateResourceArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
+		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
+		DBC.PRE.assertEquals("Expected a resource!", Tags.RESOURCE, arg.rootElement.getObjectType());
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-
-			if (arg.refreshUnknownVersion && !arg.resource.hasVersion()) {
-				Resource current = tx.getResourceBy(arg.resource.getType(), arg.resource.getId(), true);
-				arg.resource.setVersion(current.getVersion());
+			if (arg.refreshUnknownVersion && !arg.rootElement.hasVersion()) {
+				Resource current = tx.getResourceBy(arg.rootElement.getType(), arg.rootElement.getId(), true);
+				arg.rootElement.setVersion(current.getVersion());
 			}
 
-			tx.update(arg.resource);
+			tx.update((Resource) arg.rootElement);
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class UpdateResourceArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public boolean refreshUnknownVersion = false;
-		public Resource resource;
 	}
 }

@@ -18,8 +18,7 @@ package li.strolch.service;
 import java.util.ArrayList;
 
 import li.strolch.model.ModelGenerator;
-import li.strolch.model.Resource;
-import li.strolch.service.UpdateResourcesService.UpdateResourceCollectionArg;
+import li.strolch.model.StrolchRootElement;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
@@ -29,7 +28,7 @@ import org.junit.Test;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UpdateResourceCollectionServiceTest
-		extends AbstractRealmServiceTest<UpdateResourceCollectionArg, ServiceResult> {
+		extends AbstractRealmServiceTest<StrolchRootElementListArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -38,21 +37,21 @@ public class UpdateResourceCollectionServiceTest
 	}
 
 	@Override
-	protected Class<? extends Service<UpdateResourceCollectionArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementListArgument, ServiceResult>> getSvcClass() {
 		return UpdateResourcesService.class;
 	}
 
 	@Override
-	protected UpdateResourceCollectionArg getArgInstance() {
+	protected StrolchRootElementListArgument getArgInstance() {
 
-		UpdateResourceCollectionArg arg = new UpdateResourceCollectionArg();
+		StrolchRootElementListArgument arg = new StrolchRootElementListArgument();
 
-		ArrayList<Resource> resources = new ArrayList<>();
+		ArrayList<StrolchRootElement> resources = new ArrayList<>();
 		resources.add(ModelGenerator.createResource("salutations", "Modified Enumeration", "Enumeration"));
 		resources.add(ModelGenerator.createResource("sex", "Modified Enumeration", "Enumeration"));
 		resources.add(ModelGenerator.createResource("religions", "Modified Enumeration", "Enumeration"));
 
-		arg.resources = resources;
+		arg.rootElements = resources;
 
 		return arg;
 	}

@@ -15,8 +15,8 @@
  */
 package li.strolch.service;
 
-import li.strolch.model.Resource;
-import li.strolch.model.Tags;
+import li.strolch.model.*;
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
@@ -26,7 +26,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddResourceService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
+public class RemoveStrolchRootElementsService extends AbstractService<LocatorListArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,17 +36,34 @@ public class AddResourceService extends AbstractService<StrolchRootElementArgume
 	}
 
 	@Override
-	public StrolchRootElementArgument getArgumentInstance() {
-		return new StrolchRootElementArgument();
+	public LocatorListArgument getArgumentInstance() {
+		return new LocatorListArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
-		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
-		DBC.PRE.assertEquals("Expected a resource!", Tags.RESOURCE, arg.rootElement.getObjectType());
+	protected ServiceResult internalDoService(LocatorListArgument arg) {
+		DBC.PRE.assertNotNull("locators must not be null!", arg.locators);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			tx.add((Resource) arg.rootElement);
+
+			for (Locator locator : arg.locators) {
+
+				StrolchRootElement rootElement = tx.findElement(locator);
+
+				switch (rootElement.getObjectType()) {
+				case Tags.RESOURCE:
+					tx.remove((Resource) rootElement);
+					break;
+				case Tags.ORDER:
+					tx.remove((Order) rootElement);
+					break;
+				case Tags.ACTIVITY:
+					tx.remove((Activity) rootElement);
+					break;
+
+				}
+			}
+
 			tx.commitOnClose();
 		}
 

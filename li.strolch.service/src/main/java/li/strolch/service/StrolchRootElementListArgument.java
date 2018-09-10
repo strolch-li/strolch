@@ -1,10 +1,11 @@
 package li.strolch.service;
 
+import java.util.List;
+
 import li.strolch.model.StrolchRootElement;
 import li.strolch.service.api.ServiceArgument;
 
-public class StrolchRootElementArgument extends ServiceArgument {
+public class StrolchRootElementListArgument extends ServiceArgument {
 	private static final long serialVersionUID = 1L;
-	public StrolchRootElement rootElement;
-	public boolean refreshUnknownVersion;
+	public List<StrolchRootElement> rootElements;
 }

@@ -15,18 +15,18 @@
  */
 package li.strolch.service;
 
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.AddActivityService.AddActivityArg;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddActivityService extends AbstractService<AddActivityArg, ServiceResult> {
+public class AddActivityService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,23 +36,20 @@ public class AddActivityService extends AbstractService<AddActivityArg, ServiceR
 	}
 
 	@Override
-	public AddActivityArg getArgumentInstance() {
-		return new AddActivityArg();
+	public StrolchRootElementArgument getArgumentInstance() {
+		return new StrolchRootElementArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddActivityArg arg) {
+	protected ServiceResult internalDoService(StrolchRootElementArgument arg) {
+		DBC.PRE.assertNotNull("root element must not be null!", arg.rootElement);
+		DBC.PRE.assertEquals("Expected an activity!", Tags.ACTIVITY, arg.rootElement.getObjectType());
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			tx.add(arg.activity);
+			tx.add((Activity) arg.rootElement);
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddActivityArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
-		public Activity activity;
 	}
 }

@@ -15,18 +15,17 @@
  */
 package li.strolch.service;
 
+import li.strolch.model.ModelGenerator;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
-import org.junit.Test;
-
-import li.strolch.model.ModelGenerator;
-import li.strolch.service.AddOrUpdateResourceService.AddOrUpdateResourceArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
+import org.junit.Test;
 
 /**
  * Reto Breitenmoser <reto.breitenmoser@gmail.com>
  */
-public class AddOrUpdateResourceServiceTest extends AbstractRealmServiceTest<AddOrUpdateResourceArg, ServiceResult> {
+public class AddOrUpdateResourceServiceTest
+		extends AbstractRealmServiceTest<StrolchRootElementArgument, ServiceResult> {
 
 	@Test
 	public void runTest() {
@@ -37,15 +36,15 @@ public class AddOrUpdateResourceServiceTest extends AbstractRealmServiceTest<Add
 	}
 
 	@Override
-	protected Class<? extends Service<AddOrUpdateResourceArg, ServiceResult>> getSvcClass() {
+	protected Class<? extends Service<StrolchRootElementArgument, ServiceResult>> getSvcClass() {
 		return AddOrUpdateResourceService.class;
 	}
 
 	@Override
-	protected AddOrUpdateResourceArg getArgInstance() {
+	protected StrolchRootElementArgument getArgInstance() {
 
-		AddOrUpdateResourceArg arg = new AddOrUpdateResourceArg();
-		arg.resource = ModelGenerator.createResource("firstRes", "First Resource", "AdditionalResources");
+		StrolchRootElementArgument arg = new StrolchRootElementArgument();
+		arg.rootElement = ModelGenerator.createResource("firstRes", "First Resource", "AdditionalResources");
 
 		return arg;
 	}
