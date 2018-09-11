@@ -73,7 +73,7 @@ public class GenericReport extends ReportPolicy {
 		// get the reportRes
 		this.reportRes = tx().getResourceBy(TYPE_REPORT, reportId, true);
 
-		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
+		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE, true);
 		String objectType = objectTypeP.getValue();
 
 		this.columnsBag = this.reportRes.getParameterBag(BAG_COLUMNS, true);
@@ -104,7 +104,7 @@ public class GenericReport extends ReportPolicy {
 
 		// evaluate ordering params
 		if (this.reportRes.hasParameterBag(BAG_ORDERING)) {
-			ParameterBag orderingBag = this.reportRes.getParameterBag(BAG_ORDERING);
+			ParameterBag orderingBag = this.reportRes.getParameterBag(BAG_ORDERING, true);
 			if (orderingBag.hasParameters()) {
 				this.orderingParams = orderingBag.getParameters().stream().map(e -> (StringParameter) e)
 						.collect(Collectors.toList());
