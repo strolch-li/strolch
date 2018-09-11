@@ -37,6 +37,7 @@ import li.strolch.report.ReportSearch;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.utils.ObjectHelper;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
@@ -178,8 +179,10 @@ public class ReportResource {
 			if (valueSet != null) {
 
 				Stream<StrolchRootElement> stream = valueSet.stream();
-				if (query != null)
-					stream = stream.filter(f -> f.getName().toLowerCase().startsWith(query));
+				if (query != null && !query.isEmpty()) {
+					String[] parts = query.split(" ");
+					stream = stream.filter(f -> ObjectHelper.contains(f.getName(), parts, true));
+				}
 
 				// limit
 				stream.limit(limit) //
