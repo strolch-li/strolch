@@ -1,6 +1,7 @@
 package li.strolch.job;
 
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -49,11 +50,14 @@ public abstract class StrolchJob implements Runnable {
 	private long delay;
 	private TimeUnit delayTimeUnit;
 
+	private boolean running;
 	private long nrOfExecutions;
+	private long totalDuration;
+	private long lastDuration;
 	private boolean first;
 	private ScheduledFuture<?> future;
 	private ZonedDateTime lastExecution;
-	private Throwable lastException;
+	private Exception lastException;
 
 	public StrolchJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit, long delay,
 			TimeUnit delayTimeUnit) {
@@ -167,21 +171,21 @@ public abstract class StrolchJob implements Runnable {
 	/**
 	 * Executes this job now, but if the job is currently running, then it is blocked till the job is complete
 	 */
-	public void runNow() {
-		synchronized (this) {
-			runAsAgent(this::execute);
-			this.lastExecution = ZonedDateTime.now();
-			this.nrOfExecutions++;
-		}
+	public void runNow() throws Exception {
+		doWork();
+		if (this.lastException != null)
+			throw this.lastException;
 	}
 
-	@Override
-	public final void run() {
+	private synchronized void doWork() {
+		this.running = true;
+		long start = System.currentTimeMillis();
+
 		try {
-			synchronized (this) {
-				runAsAgent(this::execute);
-			}
-		} catch (Throwable e) {
+			runAsAgent(this::execute);
+			this.lastException = null;
+		} catch (Exception e) {
+			this.running = false;
 			this.lastException = e;
 			logger.error("Execution of Job " + this.getClass().getSimpleName() + " failed.", e);
 
@@ -195,8 +199,18 @@ public abstract class StrolchJob implements Runnable {
 			}
 		}
 
+		long took = System.currentTimeMillis() - start;
+		this.totalDuration += took;
+		this.lastDuration = took;
+		this.running = false;
 		this.lastExecution = ZonedDateTime.now();
 		this.nrOfExecutions++;
+	}
+
+	@Override
+	public final void run() {
+
+		doWork();
 
 		if (this.first) {
 			this.first = false;
@@ -220,8 +234,10 @@ public abstract class StrolchJob implements Runnable {
 	 * @see Future#cancel(boolean)
 	 */
 	public StrolchJob cancel(boolean mayInterruptIfRunning) {
-		if (this.future != null)
+		if (this.future != null) {
 			this.future.cancel(mayInterruptIfRunning);
+			this.future = null;
+		}
 
 		return this;
 	}
@@ -273,6 +289,10 @@ public abstract class StrolchJob implements Runnable {
 		jsonObject.addProperty("initialDelayTimeUnit", this.initialDelayTimeUnit.name());
 		jsonObject.addProperty("delay", this.delay);
 		jsonObject.addProperty("delayTimeUnit", this.delayTimeUnit.name());
+
+		jsonObject.addProperty("running", this.running);
+		jsonObject.addProperty("totalDuration", formatMillisecondsDuration(totalDuration));
+		jsonObject.addProperty("lastDuration", formatMillisecondsDuration(lastDuration));
 
 		if (this.lastExecution == null) {
 			jsonObject.addProperty("lastExecution", "-");
