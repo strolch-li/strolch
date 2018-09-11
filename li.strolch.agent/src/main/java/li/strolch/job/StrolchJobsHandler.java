@@ -38,8 +38,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 		super.initialize(configuration);
 	}
 
-	public StrolchJob registerAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
-
+	private StrolchJob instantiateStrolchJob(Class<? extends StrolchJob> strolchJobClass) {
 		StrolchJob strolchJob;
 		try {
 			Constructor<? extends StrolchJob> constructor = strolchJobClass.getConstructor(StrolchAgent.class);
@@ -47,13 +46,22 @@ public class StrolchJobsHandler extends StrolchComponent {
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Failed to instantiate class " + strolchJobClass.getName(), e);
 		}
+		return strolchJob;
+	}
 
+	public StrolchJob registerAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
+		return register(instantiateStrolchJob(strolchJobClass)).schedule();
+	}
+
+	public StrolchJob register(Class<? extends StrolchJob> strolchJobClass) {
+		return register(instantiateStrolchJob(strolchJobClass));
+	}
+
+	public StrolchJob register(StrolchJob strolchJob) {
 		if (this.jobs.containsKey(strolchJob.getName()))
 			throw new IllegalArgumentException("Job " + strolchJob.getName() + " is already registered!");
-
-		strolchJob.schedule();
-
 		this.jobs.put(strolchJob.getName(), strolchJob);
+
 		return strolchJob;
 	}
 
