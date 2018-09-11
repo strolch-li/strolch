@@ -364,9 +364,9 @@ public class GenericReport extends ReportPolicy {
 				Object columnValue2 = evaluateColumnValue(fieldRefP, row2);
 
 				if (this.descending) {
-					sortVal = ObjectHelper.compare(columnValue1, columnValue2, true);
-				} else {
 					sortVal = ObjectHelper.compare(columnValue2, columnValue1, true);
+				} else {
+					sortVal = ObjectHelper.compare(columnValue1, columnValue2, true);
 				}
 
 			} else {
@@ -382,9 +382,9 @@ public class GenericReport extends ReportPolicy {
 					return -1;
 
 				if (this.descending)
-					sortVal = param1.get().compareTo(param2.get());
-				else
 					sortVal = param2.get().compareTo(param1.get());
+				else
+					sortVal = param1.get().compareTo(param2.get());
 			}
 
 			if (sortVal != 0)
