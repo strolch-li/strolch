@@ -27,6 +27,7 @@ public class SetActionToErrorCommand extends ExecutionCommand {
 		DBC.PRE.assertNotNull("action can not be null", this.action);
 
 		tx().lock(this.action.getRootElement());
+		tx().lock(getResourceLocator(this.action));
 
 		if (!this.action.getState().canSetToError()) {
 			String msg = "Current state is {0} and canot be changed to {1} for action {2}";
@@ -39,6 +40,7 @@ public class SetActionToErrorCommand extends ExecutionCommand {
 	public void doCommand() {
 		Activity rootElement = this.action.getRootElement();
 		tx().lock(rootElement);
+		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.ERROR) {
 			logger.warn("Action " + this.action.getLocator() + " is already in ERROR! Not changing.");

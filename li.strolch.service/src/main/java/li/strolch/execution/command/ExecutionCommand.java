@@ -9,6 +9,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
 import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
+import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -29,7 +30,7 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		super(container, tx);
 	}
 
-	public static Resource getResource(StrolchTransaction tx, Action action) {
+	protected Locator getResourceLocator(Action action) {
 		String resourceId = action.getResourceId();
 		if (StringHelper.isEmpty(resourceId) || resourceId.equals(DASH))
 			throw new StrolchException("No resourceId defined on action " + action.getLocator());
@@ -37,7 +38,18 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		if (StringHelper.isEmpty(resourceType) || resourceType.equals(DASH))
 			throw new StrolchException("No resourceType defined on action " + action.getLocator());
 
-		return tx.getResourceBy(resourceType, resourceId, true);
+		return Resource.locatorFor(resourceType, resourceId);
+	}
+
+	protected Resource getResource(Action action) {
+		String resourceId = action.getResourceId();
+		if (StringHelper.isEmpty(resourceId) || resourceId.equals(DASH))
+			throw new StrolchException("No resourceId defined on action " + action.getLocator());
+		String resourceType = action.getResourceType();
+		if (StringHelper.isEmpty(resourceType) || resourceType.equals(DASH))
+			throw new StrolchException("No resourceType defined on action " + action.getLocator());
+
+		return tx().getResourceBy(resourceType, resourceId, true);
 	}
 
 	protected void updateOrderState(Activity rootElement, State currentState, State newState) {
@@ -57,13 +69,13 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	}
 
 	protected ExecutionPolicy getExecutionPolicy(Action action) {
-		Resource resource = getResource(tx(), action);
+		Resource resource = getResource(action);
 		PolicyDef executionPolicyDef = resource.getPolicyDefs().getPolicyDef(ExecutionPolicy.class.getSimpleName());
 		return getComponent(PolicyHandler.class).getPolicy(executionPolicyDef, tx());
 	}
 
 	protected ConfirmationPolicy getConfirmationPolicy(Action action) {
-		Resource resource = getResource(tx(), action);
+		Resource resource = getResource(action);
 		PolicyDef executionPolicyDef = resource.getPolicyDefs().getPolicyDef(ConfirmationPolicy.class.getSimpleName());
 		return getComponent(PolicyHandler.class).getPolicy(executionPolicyDef, tx());
 	}
@@ -149,6 +161,8 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 	@Override
 	public Void visitAction(Action action) {
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
+
+		tx().lock(getResourceLocator(action));
 
 		if (!executionPolicy.isExecutable(action)) {
 			logger.info("Action " + action.getLocator() + " is not yet executable.");

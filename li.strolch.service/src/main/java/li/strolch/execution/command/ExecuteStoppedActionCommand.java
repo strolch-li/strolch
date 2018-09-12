@@ -26,6 +26,9 @@ public class ExecuteStoppedActionCommand extends ExecutionCommand {
 	public void validate() {
 		DBC.PRE.assertNotNull("action can not be null", this.action);
 
+		tx().lock(this.action.getRootElement());
+		tx().lock(getResourceLocator(this.action));
+
 		if (this.action.getState() != State.STOPPED) {
 			String msg = "Action {0} is not in state " + State.STOPPED + " and can thus not be put into execution!";
 			msg = MessageFormat.format(msg, this.action.getState(), State.ERROR, this.action.getLocator());
@@ -37,6 +40,7 @@ public class ExecuteStoppedActionCommand extends ExecutionCommand {
 	public void doCommand() {
 		Activity rootElement = this.action.getRootElement();
 		tx().lock(rootElement);
+		tx().lock(getResourceLocator(this.action));
 
 		State currentState = rootElement.getState();
 		rootElement.accept(this);

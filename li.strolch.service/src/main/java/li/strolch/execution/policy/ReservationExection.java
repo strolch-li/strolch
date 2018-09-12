@@ -41,8 +41,6 @@ public class ReservationExection extends DurationExecution {
 	@Override
 	public boolean isExecutable(Action action) {
 
-		tx().lock(getResource(action));
-
 		// only check if reserve
 		if (!action.getType().equals(TYPE_RESERVE) && !action.getType().equals(TYPE_RELEASE)) {
 			// otherwise delegate to super class
@@ -71,8 +69,6 @@ public class ReservationExection extends DurationExecution {
 	@Override
 	public void toExecution(Action action) {
 
-		tx().lock(getResource(action));
-
 		// only do if reserve or release
 		boolean isReserve = action.getType().equals(TYPE_RESERVE);
 		boolean isRelease = action.getType().equals(TYPE_RELEASE);
@@ -94,8 +90,6 @@ public class ReservationExection extends DurationExecution {
 
 	@Override
 	public void toExecuted(Action action) {
-
-		tx().lock(getResource(action));
 
 		// only do if reserve or release
 		boolean isReserve = action.getType().equals(TYPE_RESERVE);
