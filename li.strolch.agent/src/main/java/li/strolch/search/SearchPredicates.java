@@ -47,6 +47,10 @@ public interface SearchPredicates {
 		return PredicatesSupport.containsIgnoreCase(right);
 	}
 
+	default SearchPredicate listContains(Object right) {
+		return PredicatesSupport.listContains(right);
+	}
+
 	default SearchPredicate isIn(Object right) {
 		return PredicatesSupport.isIn(right);
 	}
