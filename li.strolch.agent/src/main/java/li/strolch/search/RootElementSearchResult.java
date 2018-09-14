@@ -44,7 +44,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	 * @return this for chaining
 	 */
 	public RootElementSearchResult<T> orderByName(boolean reversed) {
-		Comparator<T> comparator = Comparator.comparing(StrolchElement::getName);
+		Comparator<T> comparator = Comparator.comparing(t -> t.getName().toLowerCase());
 		if (reversed)
 			comparator = comparator.reversed();
 		this.stream = this.stream.sorted(comparator);
