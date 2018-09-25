@@ -79,7 +79,7 @@ public class StringParameter extends AbstractParameter<String> {
 	}
 
 	@Override
-	public void setValue(Parameter<String> parameter) {
+	public void setValueFrom(Parameter<String> parameter) {
 		assertNotReadonly();
 		this.value = parameter.getValue();
 	}

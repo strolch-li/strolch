@@ -71,7 +71,7 @@ public class FloatParameter extends AbstractParameter<Double> {
 	}
 
 	@Override
-	public void setValue(Parameter<Double> parameter) {
+	public void setValueFrom(Parameter<Double> parameter) {
 		assertNotReadonly();
 		this.value = parameter.getValue();
 	}

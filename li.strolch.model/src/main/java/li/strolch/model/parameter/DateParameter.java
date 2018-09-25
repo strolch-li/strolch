@@ -76,7 +76,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	@Override
-	public void setValue(Parameter<Date> parameter) {
+	public void setValueFrom(Parameter<Date> parameter) {
 		assertNotReadonly();
 		this.value = parameter.getValue();
 	}

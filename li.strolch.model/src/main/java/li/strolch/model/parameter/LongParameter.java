@@ -69,7 +69,7 @@ public class LongParameter extends AbstractParameter<Long> {
 	}
 
 	@Override
-	public void setValue(Parameter<Long> parameter) {
+	public void setValueFrom(Parameter<Long> parameter) {
 		assertNotReadonly();
 		this.value = parameter.getValue();
 	}

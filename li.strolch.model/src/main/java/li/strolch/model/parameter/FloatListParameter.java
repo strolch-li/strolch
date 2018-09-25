@@ -92,7 +92,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
-	public void setValue(Parameter<List<Double>> parameter) {
+	public void setValueFrom(Parameter<List<Double>> parameter) {
 		assertNotReadonly();
 		this.value = new ArrayList<>(parameter.getValue());
 	}

@@ -92,7 +92,7 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
-	public void setValue(Parameter<List<Integer>> parameter) {
+	public void setValueFrom(Parameter<List<Integer>> parameter) {
 		assertNotReadonly();
 		this.value = new ArrayList<>(parameter.getValue());
 	}

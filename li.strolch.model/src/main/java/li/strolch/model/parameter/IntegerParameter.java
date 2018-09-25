@@ -79,7 +79,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	}
 
 	@Override
-	public void setValue(Parameter<Integer> parameter) {
+	public void setValueFrom(Parameter<Integer> parameter) {
 		assertNotReadonly();
 		this.value = parameter.getValue();
 	}

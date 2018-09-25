@@ -61,7 +61,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param parameter
 	 * 		the parameter from which to copy the new value
 	 */
-	public void setValue(Parameter<T> parameter);
+	public void setValueFrom(Parameter<T> parameter);
 
 	/**
 	 * Clears the value, dependent on the concrete class

@@ -70,7 +70,7 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	}
 
 	@Override
-	public void setValue(Parameter<Boolean> parameter) {
+	public void setValueFrom(Parameter<Boolean> parameter) {
 		assertNotReadonly();
 		this.value = parameter.getValue();
 	}

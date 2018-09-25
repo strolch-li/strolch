@@ -92,7 +92,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
-	public void setValue(Parameter<List<String>> parameter) {
+	public void setValueFrom(Parameter<List<String>> parameter) {
 		assertNotReadonly();
 		this.value = new ArrayList<>(parameter.getValue());
 	}

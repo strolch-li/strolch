@@ -92,7 +92,7 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
-	public void setValue(Parameter<List<Long>> parameter) {
+	public void setValueFrom(Parameter<List<Long>> parameter) {
 		assertNotReadonly();
 		this.value = new ArrayList<>(parameter.getValue());
 	}

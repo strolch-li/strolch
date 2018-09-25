@@ -36,7 +36,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals("", p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 	}
@@ -53,7 +53,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(Integer.valueOf(0), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -83,7 +83,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(Long.valueOf(0L), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -113,7 +113,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(Boolean.FALSE, p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -133,7 +133,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(Double.valueOf(0.0D), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -163,7 +163,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(new Date(0L), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -193,7 +193,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(Long.valueOf(0L), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 	}
@@ -210,7 +210,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(emptyList(), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -239,7 +239,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(emptyList(), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -268,7 +268,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(emptyList(), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
@@ -297,7 +297,7 @@ public class ParameterTest {
 		assertTrue(p.isEmpty());
 		assertEquals(emptyList(), p.getValue());
 
-		p.setValue(other);
+		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));
 		assertTrue(p.isEqualTo(other));
 
