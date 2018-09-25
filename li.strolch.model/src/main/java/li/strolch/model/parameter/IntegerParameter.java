@@ -78,6 +78,12 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		this.value = value;
 	}
 
+	@Override
+	public void setValue(Parameter<Integer> parameter) {
+		assertNotReadonly();
+		this.value = parameter.getValue();
+	}
+
 	/**
 	 * Sets the value to 0
 	 *
@@ -89,9 +95,52 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		this.value = 0;
 	}
 
+	/**
+	 * @return true if the value == 0
+	 */
 	@Override
 	public boolean isEmpty() {
 		return this.value == 0;
+	}
+
+	@Override
+	public boolean isEqualTo(Parameter<Integer> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(Integer otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	public void add(int value) {
+		assertNotReadonly();
+		this.value += value;
+	}
+
+	public void subtract(int value) {
+		assertNotReadonly();
+		this.value -= value;
+	}
+
+	public void multiply(int value) {
+		assertNotReadonly();
+		this.value *= value;
+	}
+
+	public void divide(int value) {
+		assertNotReadonly();
+		this.value /= value;
+	}
+
+	public void increment() {
+		assertNotReadonly();
+		this.value++;
+	}
+
+	public void decrement() {
+		assertNotReadonly();
+		this.value--;
 	}
 
 	@Override
@@ -124,5 +173,4 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((IntegerParameter) o).getValue());
 	}
-
 }

@@ -36,6 +36,14 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	public void addValue(E value);
 
 	/**
+	 * Adds a single value to the {@link List} of values if the current list does not already contain the value
+	 *
+	 * @param value
+	 * 		the value to add
+	 */
+	public boolean addValueIfNotContains(E value);
+
+	/**
 	 * Removes a single value from the {@link List} of values
 	 *
 	 * @param value
@@ -73,4 +81,14 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * @return true if the list of values contains the given element, false if not
 	 */
 	public boolean contains(E value);
+
+	/**
+	 * Returns true if the list of values contains all of the given elements, false if not
+	 *
+	 * @param values
+	 * 		the values to check if they are contained in the list of values
+	 *
+	 * @return true if the list of values contains all of the given elements, false if not
+	 */
+	public boolean containsAll(List<E> values);
 }

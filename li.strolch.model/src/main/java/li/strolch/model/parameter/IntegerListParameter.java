@@ -92,6 +92,12 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
+	public void setValue(Parameter<List<Integer>> parameter) {
+		assertNotReadonly();
+		this.value = new ArrayList<>(parameter.getValue());
+	}
+
+	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
 	}
@@ -100,6 +106,17 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	public void addValue(Integer value) {
 		assertNotReadonly();
 		this.value.add(value);
+	}
+
+	@Override
+	public boolean addValueIfNotContains(Integer value) {
+		assertNotReadonly();
+
+		if (this.value.contains(value))
+			return false;
+
+		this.value.add(value);
+		return true;
 	}
 
 	@Override
@@ -120,6 +137,16 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
+	public boolean isEqualTo(Parameter<List<Integer>> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(List<Integer> otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	@Override
 	public int size() {
 		return this.value.size();
 	}
@@ -127,6 +154,11 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	@Override
 	public boolean contains(Integer value) {
 		return this.value.contains(value);
+	}
+
+	@Override
+	public boolean containsAll(List<Integer> values) {
+		return this.value.containsAll(values);
 	}
 
 	@Override

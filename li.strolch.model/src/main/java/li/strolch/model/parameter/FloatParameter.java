@@ -70,6 +70,12 @@ public class FloatParameter extends AbstractParameter<Double> {
 		this.value = value;
 	}
 
+	@Override
+	public void setValue(Parameter<Double> parameter) {
+		assertNotReadonly();
+		this.value = parameter.getValue();
+	}
+
 	/**
 	 * Sets the value to 0
 	 *
@@ -81,9 +87,52 @@ public class FloatParameter extends AbstractParameter<Double> {
 		this.value = 0.0D;
 	}
 
+	/**
+	 * @return true if the value == 0.0D
+	 */
 	@Override
 	public boolean isEmpty() {
 		return this.value == 0.0D;
+	}
+
+	@Override
+	public boolean isEqualTo(Parameter<Double> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(Double otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	public void add(double value) {
+		assertNotReadonly();
+		this.value += value;
+	}
+
+	public void subtract(double value) {
+		assertNotReadonly();
+		this.value -= value;
+	}
+
+	public void multiply(double value) {
+		assertNotReadonly();
+		this.value *= value;
+	}
+
+	public void divide(double value) {
+		assertNotReadonly();
+		this.value /= value;
+	}
+
+	public void increment() {
+		assertNotReadonly();
+		this.value++;
+	}
+
+	public void decrement() {
+		assertNotReadonly();
+		this.value--;
 	}
 
 	@Override
@@ -126,5 +175,4 @@ public class FloatParameter extends AbstractParameter<Double> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((FloatParameter) o).getValue());
 	}
-
 }

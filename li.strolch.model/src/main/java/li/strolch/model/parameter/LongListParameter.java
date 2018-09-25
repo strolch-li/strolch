@@ -92,6 +92,12 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
+	public void setValue(Parameter<List<Long>> parameter) {
+		assertNotReadonly();
+		this.value = new ArrayList<>(parameter.getValue());
+	}
+
+	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
 	}
@@ -100,6 +106,17 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	public void addValue(Long value) {
 		assertNotReadonly();
 		this.value.add(value);
+	}
+
+	@Override
+	public boolean addValueIfNotContains(Long value) {
+		assertNotReadonly();
+
+		if (this.value.contains(value))
+			return false;
+
+		this.value.add(value);
+		return true;
 	}
 
 	@Override
@@ -120,6 +137,16 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
+	public boolean isEqualTo(Parameter<List<Long>> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(List<Long> otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	@Override
 	public int size() {
 		return this.value.size();
 	}
@@ -127,6 +154,11 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	@Override
 	public boolean contains(Long value) {
 		return this.value.contains(value);
+	}
+
+	@Override
+	public boolean containsAll(List<Long> values) {
+		return this.value.containsAll(values);
 	}
 
 	@Override

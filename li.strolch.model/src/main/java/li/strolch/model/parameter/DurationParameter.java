@@ -69,6 +69,12 @@ public class DurationParameter extends AbstractParameter<Long> {
 		this.value = value;
 	}
 
+	@Override
+	public void setValue(Parameter<Long> parameter) {
+		assertNotReadonly();
+		this.value = parameter.getValue();
+	}
+
 	/**
 	 * Sets the value to 0
 	 *
@@ -83,6 +89,16 @@ public class DurationParameter extends AbstractParameter<Long> {
 	@Override
 	public boolean isEmpty() {
 		return this.value == 0L;
+	}
+
+	@Override
+	public boolean isEqualTo(Parameter<Long> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(Long otherValue) {
+		return this.value.equals(otherValue);
 	}
 
 	@Override

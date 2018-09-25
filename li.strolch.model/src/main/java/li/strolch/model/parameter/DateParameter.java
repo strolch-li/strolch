@@ -15,6 +15,9 @@
  */
 package li.strolch.model.parameter;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
@@ -73,6 +76,12 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	@Override
+	public void setValue(Parameter<Date> parameter) {
+		assertNotReadonly();
+		this.value = parameter.getValue();
+	}
+
+	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
 	}
@@ -91,6 +100,40 @@ public class DateParameter extends AbstractParameter<Date> {
 	@Override
 	public boolean isEmpty() {
 		return this.value.equals(EMPTY_VALUE);
+	}
+
+	@Override
+	public boolean isEqualTo(Parameter<Date> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(Date otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	public boolean isEqualTo(LocalDateTime otherValue) {
+		return this.value.equals(Date.from(otherValue.atZone(ZoneId.systemDefault()).toInstant()));
+	}
+
+	public boolean isEqualTo(ZonedDateTime otherValue) {
+		return this.value.equals(Date.from(otherValue.toInstant()));
+	}
+
+	public ZonedDateTime toZonedDateTime() {
+		return ZonedDateTime.ofInstant(this.value.toInstant(), ZoneId.systemDefault());
+	}
+
+	public LocalDateTime toLocalDateTime() {
+		return LocalDateTime.ofInstant(this.value.toInstant(), ZoneId.systemDefault());
+	}
+
+	public void setValueFromLocalDateTime(LocalDateTime localDateTime) {
+		this.value = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	public void setValueFromZonedDateTime(ZonedDateTime zonedDateTime) {
+		this.value = Date.from(zonedDateTime.toInstant());
 	}
 
 	@Override
@@ -128,5 +171,4 @@ public class DateParameter extends AbstractParameter<Date> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((DateParameter) o).getValue());
 	}
-
 }

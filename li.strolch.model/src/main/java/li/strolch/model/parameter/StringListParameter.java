@@ -92,6 +92,12 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public void setValue(Parameter<List<String>> parameter) {
+		assertNotReadonly();
+		this.value = new ArrayList<>(parameter.getValue());
+	}
+
+	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
 	}
@@ -100,6 +106,17 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	public void addValue(String value) {
 		assertNotReadonly();
 		this.value.add(value);
+	}
+
+	@Override
+	public boolean addValueIfNotContains(String value) {
+		assertNotReadonly();
+
+		if (this.value.contains(value))
+			return false;
+
+		this.value.add(value);
+		return true;
 	}
 
 	@Override
@@ -120,6 +137,16 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public boolean isEqualTo(Parameter<List<String>> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(List<String> otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	@Override
 	public int size() {
 		return this.value.size();
 	}
@@ -127,6 +154,11 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	@Override
 	public boolean contains(String value) {
 		return this.value.contains(value);
+	}
+
+	@Override
+	public boolean containsAll(List<String> values) {
+		return this.value.containsAll(values);
 	}
 
 	@Override

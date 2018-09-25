@@ -70,6 +70,12 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	}
 
 	@Override
+	public void setValue(Parameter<Boolean> parameter) {
+		assertNotReadonly();
+		this.value = parameter.getValue();
+	}
+
+	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
 	}
@@ -85,9 +91,27 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		this.value = false;
 	}
 
+	/**
+	 * @return true if the value is false
+	 */
 	@Override
 	public boolean isEmpty() {
 		return !this.value;
+	}
+
+	@Override
+	public boolean isEqualTo(Parameter<Boolean> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(Boolean otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	public void flip() {
+		assertNotReadonly();
+		this.value = !this.value;
 	}
 
 	@Override
@@ -125,5 +149,4 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((BooleanParameter) o).getValue());
 	}
-
 }

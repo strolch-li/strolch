@@ -68,8 +68,14 @@ public class LongParameter extends AbstractParameter<Long> {
 		this.value = value;
 	}
 
+	@Override
+	public void setValue(Parameter<Long> parameter) {
+		assertNotReadonly();
+		this.value = parameter.getValue();
+	}
+
 	/**
-	 * Sets the value to 0
+	 * Sets the value to 0L
 	 *
 	 * @see Parameter#clear()
 	 */
@@ -79,9 +85,52 @@ public class LongParameter extends AbstractParameter<Long> {
 		this.value = 0L;
 	}
 
+	/**
+	 * @return true if the value == 0L
+	 */
 	@Override
 	public boolean isEmpty() {
 		return this.value == 0L;
+	}
+
+	@Override
+	public boolean isEqualTo(Parameter<Long> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(Long otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	public void add(long value) {
+		assertNotReadonly();
+		this.value += value;
+	}
+
+	public void subtract(long value) {
+		assertNotReadonly();
+		this.value -= value;
+	}
+
+	public void multiply(long value) {
+		assertNotReadonly();
+		this.value *= value;
+	}
+
+	public void divide(long value) {
+		assertNotReadonly();
+		this.value /= value;
+	}
+
+	public void increment() {
+		assertNotReadonly();
+		this.value++;
+	}
+
+	public void decrement() {
+		assertNotReadonly();
+		this.value--;
 	}
 
 	@Override

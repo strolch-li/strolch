@@ -92,6 +92,12 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
+	public void setValue(Parameter<List<Double>> parameter) {
+		assertNotReadonly();
+		this.value = new ArrayList<>(parameter.getValue());
+	}
+
+	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
 	}
@@ -100,6 +106,17 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	public void addValue(Double value) {
 		assertNotReadonly();
 		this.value.add(value);
+	}
+
+	@Override
+	public boolean addValueIfNotContains(Double value) {
+		assertNotReadonly();
+
+		if (this.value.contains(value))
+			return false;
+
+		this.value.add(value);
+		return true;
 	}
 
 	@Override
@@ -120,6 +137,16 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
+	public boolean isEqualTo(Parameter<List<Double>> otherValue) {
+		return this.value.equals(otherValue.getValue());
+	}
+
+	@Override
+	public boolean isEqualTo(List<Double> otherValue) {
+		return this.value.equals(otherValue);
+	}
+
+	@Override
 	public int size() {
 		return this.value.size();
 	}
@@ -127,6 +154,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	@Override
 	public boolean contains(Double value) {
 		return this.value.contains(value);
+	}
+
+	@Override
+	public boolean containsAll(List<Double> values) {
+		return this.value.containsAll(values);
 	}
 
 	@Override
@@ -178,5 +210,4 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((FloatListParameter) o).getValue().size());
 	}
-
 }

@@ -48,7 +48,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	public <U extends T> U getValue();
 
 	/**
-	 * the value of the parameter
+	 * set the value of the parameter
 	 *
 	 * @param value
 	 * 		the new value
@@ -56,15 +56,43 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	public void setValue(T value);
 
 	/**
+	 * set the value of the parameter from another value, i.e. copying the value
+	 *
+	 * @param parameter
+	 * 		the parameter from which to copy the new value
+	 */
+	public void setValue(Parameter<T> parameter);
+
+	/**
 	 * Clears the value, dependent on the concrete class
 	 */
 	public void clear();
 
 	/**
-	 * @return true if the value is empty, i.e. if the value is the same as the value which would be set if
-	 * {@link #clear()} was called
+	 * @return true if the value is empty, i.e. if the value is the same as the value which would be set if {@link
+	 * #clear()} was called
 	 */
 	public boolean isEmpty();
+
+	/**
+	 * Returns true if the given parameter's value is equal to the current value
+	 *
+	 * @param otherValue
+	 * 		the value to check on equality
+	 *
+	 * @return true if the given parameter's value is equal to the current value
+	 */
+	public boolean isEqualTo(Parameter<T> otherValue);
+
+	/**
+	 * Returns true if the given value is equal to the current value
+	 *
+	 * @param otherValue
+	 * 		the value to check on equality
+	 *
+	 * @return true if the given value is equal to the current value
+	 */
+	public boolean isEqualTo(T otherValue);
 
 	/**
 	 * get the hidden attribute
