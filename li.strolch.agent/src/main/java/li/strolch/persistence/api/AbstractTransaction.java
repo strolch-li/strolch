@@ -614,7 +614,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
 
 		if (assertExists && refP.isEmpty()) {
-			String msg = "The Order with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+			String msg = "The Order with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
@@ -690,7 +690,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
 
 		if (assertExists && refP.isEmpty()) {
-			String msg = "The Resource with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+			String msg = "The Resource with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
@@ -778,7 +778,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
 
 		if (assertExists && refP.isEmpty()) {
-			String msg = "The Activity with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+			String msg = "The Activity with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 

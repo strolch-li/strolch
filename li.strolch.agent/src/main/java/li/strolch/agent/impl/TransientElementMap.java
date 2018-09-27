@@ -87,7 +87,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		T t = getBy(tx, StrolchConstants.TEMPLATE, type);
 		if (assertExists && t == null) {
-			String msg = "The template with type '{0}' does not exist!"; //$NON-NLS-1$
+			String msg = "The template with type \"{0}\" does not exist!"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, type));
 		}
 
@@ -116,7 +116,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		}
 
 		if (assertExists && t == null) {
-			String msg = "The element with type '{0}' and id '{1}' does not exist!"; //$NON-NLS-1$
+			String msg = "The element with type \"{0}\" and id \"{1}\" does not exist!"; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, type, id));
 		}
 
@@ -135,7 +135,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		String id = refP.getValue();
 		T t = getBy(tx, type, id, false);
 		if (assertExists && t == null) {
-			String msg = "The element with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+			String msg = "The element with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
 			throw new StrolchException(MessageFormat.format(msg, type, id, refP.getLocator()));
 		}
 		return t;
@@ -153,7 +153,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 				.map(id -> {
 					T t = getBy(tx, type, id, false);
 					if (assertExists && t == null) {
-						String msg = "The element with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+						String msg = "The element with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
 						throw new StrolchException(MessageFormat.format(msg, type, id, refP.getLocator()));
 					}
 					return t;
@@ -256,7 +256,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		// assert no object already exists with this id
 		if (byType.containsKey(element.getId())) {
-			String msg = "An element already exists with the id '{0}'. Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
+			String msg = "An element already exists with the id \"{0}\". Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, element.getId());
 			throw new StrolchPersistenceException(msg);
 		}
@@ -280,7 +280,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		// assert no object already exists with this id
 		if (byType.containsKey(element.getId())) {
-			String msg = "An element already exists with the id '{0}'. Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
+			String msg = "An element already exists with the id \"{0}\". Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, element.getId());
 			throw new StrolchPersistenceException(msg);
 		}
@@ -306,14 +306,14 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	private void internalUpdate(StrolchTransaction tx, T element) {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType == null) {
-			String msg = "The element does not yet exist with the type '{0}' and id '{1}'. Use add() for new objects!"; //$NON-NLS-1$
+			String msg = "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, element.getType(), element.getId());
 			throw new StrolchPersistenceException(msg);
 		}
 
 		// assert no object already exists with this id
 		if (!byType.containsKey(element.getId())) {
-			String msg = "The element does not yet exist with the type '{0}' and id '{1}'. Use add() for new objects!"; //$NON-NLS-1$
+			String msg = "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, element.getType(), element.getId());
 			throw new StrolchPersistenceException(msg);
 		}
