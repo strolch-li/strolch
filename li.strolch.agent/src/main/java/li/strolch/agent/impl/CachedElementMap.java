@@ -185,7 +185,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 			throws StrolchException {
 		T t = getDbDao(tx).queryBy(type, id, version);
 		if (assertExists && t == null) {
-			String msg = "The element with type {0} and id {1} and version {2} does not exist!"; //$NON-NLS-1$
+			String msg = "The element with type '{0}' and id '{1}' and version '{2}' does not exist!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, type, id, version);
 			throw new StrolchException(msg);
 		}

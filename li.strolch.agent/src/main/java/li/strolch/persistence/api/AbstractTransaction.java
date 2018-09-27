@@ -613,6 +613,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
 
+		if (assertExists && refP.isEmpty()) {
+			String msg = "The Order with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
+		}
+
 		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
 			return element;
@@ -683,6 +688,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
+
+		if (assertExists && refP.isEmpty()) {
+			String msg = "The Resource with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
+		}
 
 		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
@@ -766,6 +776,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
+
+		if (assertExists && refP.isEmpty()) {
+			String msg = "The Activity with type '{0}' and id '{1}' does not exist for param '{2}'"; //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
+		}
 
 		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
