@@ -2,6 +2,7 @@ package li.strolch.privilege.handler;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.*;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
@@ -49,28 +50,30 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			throws InvalidCredentialsException, AccessDeniedException {
 
 		// first see if this is a local user
-		if (this.persistenceHandler.getUser(username) != null)
+		User internalUser = this.persistenceHandler.getUser(username);
+		if (internalUser != null && internalUser.getUserState() != UserState.REMOTE)
 			return super.checkCredentialsAndUserState(username, password);
 
 		// Set up the environment for creating the initial context
 		Hashtable<String, String> env = new Hashtable<>();
 
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, providerUrl);
+		env.put(Context.PROVIDER_URL, this.providerUrl);
 
 		// Authenticate 
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, username + domain);
+		env.put(Context.SECURITY_PRINCIPAL, username + this.domain);
 		env.put(Context.SECURITY_CREDENTIALS, new String(password));
 
-		logger.info("User {} tries to login on ldap", username + domain);
+		logger.info("User {} tries to login on ldap", username + this.domain);
 
 		String memberOfLdapString = "";
 		Set<String> strolchRoles = new HashSet<>();
 
 		// Create the initial context
+		DirContext ctx = null;
 		try {
-			DirContext ctx = new InitialDirContext(env);
+			ctx = new InitialDirContext(env);
 
 			//Create the search controls        
 			SearchControls searchCtls = new SearchControls();
@@ -79,58 +82,91 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
 			String searchFilter =
-					"(&(objectCategory=person)(objectClass=user)(userPrincipalName=" + username + domain + "))";
+					"(&(objectCategory=person)(objectClass=user)(userPrincipalName=" + username + this.domain + "))";
 
 			// Search for objects using the filter
-			NamingEnumeration<SearchResult> answer = ctx.search(searchBase, searchFilter, searchCtls);
+			NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase, searchFilter, searchCtls);
 
-			//Loop through the search results
-			while (answer.hasMoreElements()) {
-				SearchResult sr = (SearchResult) answer.next();
+			if (!answer.hasMore())
+				throw new AccessDeniedException(
+						"Could not login with user: " + username + this.domain + " on Ldap: no LDAP Data");
 
-				Attributes attrs = sr.getAttributes();
-				Attribute groupMembers = attrs.get("memberOf");
+			SearchResult sr = (SearchResult) answer.next();
+			if (answer.hasMore())
+				throw new AccessDeniedException(
+						"Could not login with user: " + username + this.domain + " on Ldap: Multiple LDAP Data");
 
-				if (groupMembers != null) {
-					for (int i = 0; i < groupMembers.size(); i++) {
+			Attributes attrs = sr.getAttributes();
 
-						memberOfLdapString = attrs.get("memberOf").get(i).toString();
+			Attribute sAMAccountName = attrs.get("sAMAccountName");
+			if (sAMAccountName == null || !username.equals(sAMAccountName.get().toString()))
+				throw new AccessDeniedException(
+						"Could not login with user: " + username + this.domain + " on Ldap: Wrong LDAP Data");
 
-						// extract group name from ldap string -> CN=groupname,OU=company,DC=domain,DC=country
-						LdapName memberOfName = new LdapName(memberOfLdapString);
-						for (Rdn rdn : memberOfName.getRdns()) {
-							if (rdn.getType().equalsIgnoreCase("CN")) {
-								String groupName = rdn.getValue().toString();
-								Set<String> foundStrolchRoles = rolesForLdapGroups.get(groupName);
-								if (foundStrolchRoles != null)
-									strolchRoles.addAll(foundStrolchRoles);
-								break;
-							}
+			Attribute givenName = attrs.get("givenName");
+			Attribute sn = attrs.get("sn");
+
+			String firstName = givenName == null ? username : givenName.get().toString();
+			String lastName = sn == null ? username : sn.get().toString();
+
+			// evaluate roles for this user
+			Attribute groupMembers = attrs.get("memberOf");
+			if (groupMembers != null) {
+				for (int i = 0; i < groupMembers.size(); i++) {
+
+					memberOfLdapString = attrs.get("memberOf").get(i).toString();
+
+					// extract group name from ldap string -> CN=groupname,OU=company,DC=domain,DC=country
+					LdapName memberOfName = new LdapName(memberOfLdapString);
+					for (Rdn rdn : memberOfName.getRdns()) {
+						if (rdn.getType().equalsIgnoreCase("CN")) {
+							String groupName = rdn.getValue().toString();
+							Set<String> foundStrolchRoles = this.rolesForLdapGroups.get(groupName);
+							if (foundStrolchRoles != null)
+								strolchRoles.addAll(foundStrolchRoles);
+							break;
 						}
-
-						logger.info("User " + username + " is member of groups: " + memberOfLdapString);
 					}
+
+					logger.info("User " + username + " is member of groups: " + memberOfLdapString);
 				}
 			}
 
-			ctx.close();
+			Map<String, String> properties = new HashMap<>();
+
+			// this must be changed, because the location param must be taken from the logged in person
+			properties.put("location", this.location);
+
+			// see if this is an admin user
+			if (this.adminUsers.contains(username))
+				strolchRoles = this.rolesForLdapGroups.get("admin");
+
+			User user = new User(username, username, null, null, null, -1, -1, firstName, lastName, UserState.REMOTE,
+					strolchRoles, Locale.GERMAN, properties);
+
+			// persist this user
+			if (internalUser == null)
+				this.persistenceHandler.addUser(user);
+			else
+				this.persistenceHandler.replaceUser(user);
+
+			if (this.autoPersistOnUserChangesData)
+				this.persistenceHandler.persist();
+
+			return user;
+
 		} catch (Exception e) {
 			logger.error("Could not login with user: " + username + domain + " on Ldap", e);
 			throw new AccessDeniedException("Could not login with user: " + username + domain + " on Ldap", e);
+		} finally {
+			if (ctx != null) {
+				try {
+					ctx.close();
+				} catch (NamingException e) {
+					logger.error("Failed to close DirContext", e);
+				}
+			}
 		}
-
-		Map<String, String> properties = new HashMap<>();
-
-		// this must be changed, because the location param must be taken from the logged in person
-		properties.put("location", location);
-
-		if (adminUsers.contains(username)) {
-			strolchRoles = rolesForLdapGroups.get("admin");
-		}
-
-		return new User(username, username, null, null, null, -1, -1, username, username, UserState.ENABLED,
-				strolchRoles, Locale.GERMAN, properties);
-
 	}
 
 	private Map<String, Set<String>> getLdapGroupToRolesMappingFromConfig(Map<String, String> params) {

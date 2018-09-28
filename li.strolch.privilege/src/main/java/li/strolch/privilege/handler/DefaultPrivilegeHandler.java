@@ -1223,6 +1223,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				continue;
 			}
 
+			if (user.getUserState() == UserState.DISABLED || user.getUserState() == UserState.EXPIRED) {
+				logger.error("Ignoring session data for disabled/expired user " + username);
+				continue;
+			}
+
 			Set<String> userRoles = user.getRoles();
 			if (userRoles.isEmpty()) {
 				logger.error("Ignoring session data for user " + username + " which has not roles defined!");
