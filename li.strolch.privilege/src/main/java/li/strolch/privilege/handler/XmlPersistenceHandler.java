@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,16 +15,11 @@
  */
 package li.strolch.privilege.handler;
 
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
@@ -36,11 +31,13 @@ import li.strolch.privilege.xml.PrivilegeUsersDomWriter;
 import li.strolch.privilege.xml.PrivilegeUsersSaxReader;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link PersistenceHandler} implementation which reads the configuration from XML files. These configuration is passed
  * in {@link #initialize(Map)}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class XmlPersistenceHandler implements PersistenceHandler {
@@ -136,7 +133,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * Initializes this {@link XmlPersistenceHandler} by reading the following parameters:
 	 * <ul>
 	 * <li>{@link XmlConstants#XML_PARAM_BASE_PATH}</li>
-	 * <li>{@link XmlConstants#XML_PARAM_MODEL_FILE}</li>
+	 * <li>{@link XmlConstants#XML_PARAM_USERS_FILE}</li>
+	 * <li>{@link XmlConstants#XML_PARAM_ROLES_FILE}</li>
 	 * </ul>
 	 */
 	@Override
@@ -202,7 +200,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	/**
 	 * Reads the XML configuration files which contain the model. Which configuration files are parsed was defined in
 	 * the while calling {@link #initialize(Map)}
-	 * 
+	 *
 	 * @see #initialize(Map)
 	 */
 	@Override
@@ -261,6 +259,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public boolean persist() {
 
+		long start = System.nanoTime();
+
 		// get users file name
 		String usersFileName = this.parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
 		if (usersFileName == null || usersFileName.isEmpty()) {
@@ -282,7 +282,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get users file
 		boolean usersFileUnchanged = this.usersPath.exists() && this.usersPath.lastModified() == this.usersFileDate;
 		if (usersFileUnchanged && !this.userMapDirty) {
-			logger.warn("Not persisting of users as current file is unchanged and users data is not dirty"); //$NON-NLS-1$
+			logger.warn(
+					"Not persisting of users as current file is unchanged and users data is not dirty"); //$NON-NLS-1$
 		} else {
 
 			// delegate writing
@@ -296,7 +297,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get roles file
 		boolean rolesFileUnchanged = this.rolesPath.exists() && this.rolesPath.lastModified() == this.rolesFileDate;
 		if (rolesFileUnchanged && !this.roleMapDirty) {
-			logger.warn("Not persisting of roles as current file is unchanged and roles data is not dirty"); //$NON-NLS-1$
+			logger.warn(
+					"Not persisting of roles as current file is unchanged and roles data is not dirty"); //$NON-NLS-1$
 		} else {
 
 			// delegate writing
@@ -307,8 +309,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			saved = true;
 		}
 
-		// reset dirty states
-
+		logger.info("Persist took " + (formatNanoDuration(System.nanoTime() - start)));
 		return saved;
 	}
 }
