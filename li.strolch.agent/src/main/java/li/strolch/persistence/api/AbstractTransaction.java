@@ -502,6 +502,52 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBagOrActivity));
 	}
 
+	@Override
+	public <U, T extends Parameter<U>> Optional<T> findParameterOnHierarchy(StrolchRootElement element,
+			String parentParamKey, String bagKey, String paramKey) {
+
+		DBC.PRE.assertNotNull("element must not be null!", element);
+		DBC.PRE.assertNotEmpty("parentParamKey must be set", parentParamKey);
+		DBC.PRE.assertNotEmpty("bagKey must be set", bagKey);
+		DBC.PRE.assertNotEmpty("paramKey must be set", paramKey);
+
+		T t = element.getParameter(bagKey, paramKey);
+
+		Set<StrolchRootElement> parents = new HashSet<>();
+
+		StrolchRootElement parent = element;
+		while (t == null) {
+			StringParameter parentP = parent.getParameter(BAG_RELATIONS, parentParamKey);
+			if (parentP == null)
+				break;
+
+			switch (parentP.getInterpretation()) {
+			case StrolchConstants.INTERPRETATION_RESOURCE_REF:
+				parent = getResourceBy(parentP);
+				break;
+			case StrolchConstants.INTERPRETATION_ORDER_REF:
+				parent = getOrderBy(parentP);
+				break;
+			case StrolchConstants.INTERPRETATION_ACTIVITY_REF:
+				parent = getActivityBy(parentP);
+				break;
+			default:
+				throw new IllegalStateException("Unhandled element ref " + parentP.getInterpretation());
+			}
+
+			if (parent == null)
+				break;
+			if (!parents.add(parent))
+				throw new IllegalStateException(
+						"circular dependencies from " + element.getLocator() + " to " + parent.getLocator()
+								+ " on relations parameter " + parentParamKey);
+
+			t = parent.getParameter(bagKey, paramKey);
+		}
+
+		return Optional.ofNullable(t);
+	}
+
 	private <V> V getElementFromFilter(String key, Locator locator) {
 		if (this.objectFilter == null)
 			return null;

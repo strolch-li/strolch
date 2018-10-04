@@ -16,6 +16,7 @@
 package li.strolch.persistence.api;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import li.strolch.agent.api.*;
@@ -545,6 +546,28 @@ public interface StrolchTransaction extends AutoCloseable {
 	 */
 	<T extends StrolchElement> T findElement(Locator locator, boolean allowNull)
 			throws StrolchException, ClassCastException;
+
+	/**
+	 * <p>Finds a parameter with the given @bagKey and @paramKey on the given @element, but if it does not exists
+	 * on the element, then it retrieves the elements parent by using the bag {@link
+	 * StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>
+	 *
+	 * <p>In Strolch relationships are usually defined on the parameter bag with the id {@link
+	 * StrolchModelConstants#BAG_RELATIONS}</p>
+	 *
+	 * @param element
+	 * 		the element on which to search for the parameter
+	 * @param parentParamKey
+	 * 		the id of the parameter with which to find the parent
+	 * @param bagKey
+	 * 		the id of the parameter bag where to find the requested parameter
+	 * @param paramKey
+	 * 		the id of the parameter to find
+	 *
+	 * @return the {@link Optional} with the parameter which was found, following the hierarchy up the chain
+	 */
+	<U, T extends Parameter<U>> Optional<T> findParameterOnHierarchy(StrolchRootElement element, String parentParamKey,
+			String bagKey, String paramKey);
 
 	/**
 	 * Returns a stream of resources for the given types, if empty, streams all possible types

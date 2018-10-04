@@ -2,6 +2,48 @@
 <StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
               xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
 
+    <Resource Id="Facility" Name="Hospital" Type="Location">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="productionMode" Name="ProductionMode" Type="String" Value="auto"/>
+        </ParameterBag>
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="parent" Name="Parent" Interpretation="Resource-Ref" Uom="Location" Type="String" Value=""/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="BlockA" Name="BlockA" Type="Location">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="productionMode" Name="ProductionMode" Type="String" Value="semi-auto"/>
+        </ParameterBag>
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="parent" Name="Parent" Interpretation="Resource-Ref" Uom="Location" Type="String" Value="Facility"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="BlockA.1" Name="BlockA.1" Type="Location">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+        </ParameterBag>
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="parent" Name="Parent" Interpretation="Resource-Ref" Uom="Location" Type="String" Value="BlockA"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="BlockA.2" Name="BlockA.2" Type="Location">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="productionMode" Name="ProductionMode" Type="String" Value="manual"/>
+        </ParameterBag>
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="parent" Name="Parent" Interpretation="Resource-Ref" Uom="Location" Type="String" Value="BlockA"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="BlockB" Name="Hospital" Type="Location">
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="parent" Name="Parent" Interpretation="Resource-Ref" Uom="Location" Type="String" Value="Facility"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="BlockB.1" Name="Hospital" Type="Location">
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="parent" Name="Parent" Interpretation="Resource-Ref" Uom="Location" Type="String" Value="BlockB"/>
+        </ParameterBag>
+    </Resource>
+
     <Resource Id="yellow" Name="Yellow Ball" Type="Ball">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="owner" Name="Owner" Type="String" Value="eitch"/>

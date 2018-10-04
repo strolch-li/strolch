@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
@@ -140,6 +141,38 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 			activity3.addParameter(BAG_ID, actRefP.getClone());
 
 			try (StrolchTransaction tx = openTx(arg.realm)) {
+
+				// find param
+				Resource location = tx.getResourceBy("Location", "Facility", true);
+				Optional<StringParameter> productionModeP = tx
+						.findParameterOnHierarchy(location, "parent", "parameters", "productionMode");
+				assertTrue(productionModeP.isPresent());
+				assertEquals("auto", productionModeP.get().getValue());
+
+				location = tx.getResourceBy("Location", "BlockA", true);
+				productionModeP = tx.findParameterOnHierarchy(location, "parent", "parameters", "productionMode");
+				assertTrue(productionModeP.isPresent());
+				assertEquals("semi-auto", productionModeP.get().getValue());
+
+				location = tx.getResourceBy("Location", "BlockA.1", true);
+				productionModeP = tx.findParameterOnHierarchy(location, "parent", "parameters", "productionMode");
+				assertTrue(productionModeP.isPresent());
+				assertEquals("semi-auto", productionModeP.get().getValue());
+
+				location = tx.getResourceBy("Location", "BlockA.2", true);
+				productionModeP = tx.findParameterOnHierarchy(location, "parent", "parameters", "productionMode");
+				assertTrue(productionModeP.isPresent());
+				assertEquals("manual", productionModeP.get().getValue());
+
+				location = tx.getResourceBy("Location", "BlockB", true);
+				productionModeP = tx.findParameterOnHierarchy(location, "parent", "parameters", "productionMode");
+				assertTrue(productionModeP.isPresent());
+				assertEquals("auto", productionModeP.get().getValue());
+
+				location = tx.getResourceBy("Location", "BlockB.1", true);
+				productionModeP = tx.findParameterOnHierarchy(location, "parent", "parameters", "productionMode");
+				assertTrue(productionModeP.isPresent());
+				assertEquals("auto", productionModeP.get().getValue());
 
 				// resource
 				assertNull(tx.getResourceBy(type, resId));
