@@ -87,9 +87,16 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			// Search for objects using the filter
 			NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase, searchFilter, searchCtls);
 
-			if (!answer.hasMore())
-				throw new AccessDeniedException(
-						"Could not login with user: " + username + this.domain + " on Ldap: no LDAP Data");
+			if (!answer.hasMore()) {
+
+				logger.warn("No LDAP data retrieved using userPrincipalName, trying with sAMAccountName...");
+				searchFilter = "(&(objectCategory=person)(objectClass=user)(sAMAccountName=" + username + "))";
+				answer = ctx.search(this.searchBase, searchFilter, searchCtls);
+
+				if (!answer.hasMore())
+					throw new AccessDeniedException("Could not login with user: " + username + this.domain
+							+ " on Ldap: no LDAP Data, for either userPrincipalName or sAMAccountName");
+			}
 
 			SearchResult sr = (SearchResult) answer.next();
 			if (answer.hasMore())
