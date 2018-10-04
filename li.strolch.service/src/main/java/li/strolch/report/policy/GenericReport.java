@@ -541,7 +541,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return the parameter, or null if it does not exist
 	 */
-	protected Parameter<?> findParameter(StringParameter columnDefP, StrolchRootElement column) {
+	protected Parameter<Object> findParameter(StringParameter columnDefP, StrolchRootElement column) {
 
 		String columnDef = columnDefP.getValue();
 
@@ -563,40 +563,8 @@ public class GenericReport extends ReportPolicy {
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
 
-		return findParameter(column, parentParamId, bagKey, paramKey);
-	}
-
-	/**
-	 * Performs a given parameter recursively by searching for the given parameter by parameter ID and bag. The parent
-	 * is queried by the parentParamId
-	 *
-	 * @param element
-	 * 		the element from which to find the parameter
-	 * @param parentParamId
-	 * 		the parent parameter to find a parent, if the parameter was not found on the element
-	 * @param bagKey
-	 * 		the {@link ParameterBag} on which to get the parameter
-	 * @param paramKey
-	 * 		the ID of the parameter to fetch from the {@link ParameterBag}
-	 *
-	 * @return the parameter, or null if it does not exist and was not found on any parent
-	 */
-	protected Parameter<?> findParameter(StrolchRootElement element, String parentParamId, String bagKey,
-			String paramKey) {
-
-		Parameter<?> parameter = element.getParameter(bagKey, paramKey);
-		if (parameter != null)
-			return parameter;
-
-		StringParameter parentRefP = element.getParameter(BAG_RELATIONS, parentParamId);
-		if (parentRefP == null)
-			return null;
-
-		Resource parent = tx().getResourceBy(parentRefP);
-		if (parent == null)
-			return null;
-
-		return findParameter(parent, parentParamId, bagKey, paramKey);
+		Optional<Parameter<Object>> parameter = tx().findParameterOnHierarchy(column, parentParamId, bagKey, paramKey);
+		return parameter.orElse(null);
 	}
 
 	/**
