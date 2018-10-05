@@ -30,7 +30,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 *
 	 * @return the value as string
 	 */
-	public String getValueAsString();
+	String getValueAsString();
 
 	/**
 	 * Set the value of the parameter from a string
@@ -38,14 +38,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param valueAsString
 	 * 		the string from which to set the value
 	 */
-	public void setValueFromString(String valueAsString);
+	void setValueFromString(String valueAsString);
 
 	/**
 	 * the value of the parameter
 	 *
 	 * @return the value
 	 */
-	public <U extends T> U getValue();
+	<U extends T> U getValue();
 
 	/**
 	 * set the value of the parameter
@@ -53,7 +53,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param value
 	 * 		the new value
 	 */
-	public void setValue(T value);
+	void setValue(T value);
 
 	/**
 	 * set the value of the parameter from another value, i.e. copying the value
@@ -61,18 +61,18 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param parameter
 	 * 		the parameter from which to copy the new value
 	 */
-	public void setValueFrom(Parameter<T> parameter);
+	void setValueFrom(Parameter<T> parameter);
 
 	/**
 	 * Clears the value, dependent on the concrete class
 	 */
-	public void clear();
+	void clear();
 
 	/**
 	 * @return true if the value is empty, i.e. if the value is the same as the value which would be set if {@link
 	 * #clear()} was called
 	 */
-	public boolean isEmpty();
+	boolean isEmpty();
 
 	/**
 	 * Returns true if the given parameter's value is equal to the current value
@@ -82,7 +82,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 *
 	 * @return true if the given parameter's value is equal to the current value
 	 */
-	public boolean isEqualTo(Parameter<T> otherValue);
+	boolean isEqualTo(Parameter<T> otherValue);
 
 	/**
 	 * Returns true if the given value is equal to the current value
@@ -92,14 +92,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 *
 	 * @return true if the given value is equal to the current value
 	 */
-	public boolean isEqualTo(T otherValue);
+	boolean isEqualTo(T otherValue);
 
 	/**
 	 * get the hidden attribute
 	 *
 	 * @return hidden value
 	 */
-	public boolean isHidden();
+	boolean isHidden();
 
 	/**
 	 * set the hidden attribute
@@ -107,14 +107,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param hidden
 	 * 		new hidden value
 	 */
-	public void setHidden(boolean hidden);
+	void setHidden(boolean hidden);
 
 	/**
 	 * Get the UOM of this {@link Parameter}
 	 *
 	 * @return the UOM
 	 */
-	public String getUom();
+	String getUom();
 
 	/**
 	 * Set the UOM of this {@link Parameter}
@@ -122,14 +122,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param uom
 	 * 		the new UOM
 	 */
-	public void setUom(String uom);
+	void setUom(String uom);
 
 	/**
 	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 *
 	 * @return the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 */
-	public int getIndex();
+	int getIndex();
 
 	/**
 	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
@@ -137,7 +137,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param index
 	 * 		the index to set
 	 */
-	public void setIndex(int index);
+	void setIndex(int index);
 
 	/**
 	 * Returns the interpretation of this {@link Parameter}. The interpretation semantic describes what the value of
@@ -150,7 +150,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 *
 	 * @return string value
 	 */
-	public String getInterpretation();
+	String getInterpretation();
 
 	/**
 	 * Set the interpretation of this {@link Parameter}. The interpretation semantic describes what the value of this
@@ -164,7 +164,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @param interpretation
 	 * 		the interpretation
 	 */
-	public void setInterpretation(String interpretation);
+	void setInterpretation(String interpretation);
 
 	/**
 	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs
@@ -172,27 +172,27 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @return the parent
 	 */
 	@Override
-	public ParameterizedElement getParent();
+	ParameterizedElement getParent();
 
 	/**
 	 * Sets the parent for this {@link Parameter}
 	 */
-	public void setParent(ParameterizedElement parent);
+	void setParent(ParameterizedElement parent);
 
 	@Override
-	public int hashCode();
+	int hashCode();
 
 	@Override
-	public boolean equals(Object obj);
+	boolean equals(Object obj);
 
 	@Override
-	public int compareTo(Parameter<?> o);
+	int compareTo(Parameter<?> o);
 
 	@Override
-	public Parameter<T> getClone();
+	Parameter<T> getClone();
 
 	/**
 	 * @return the {@link StrolchValueType}
 	 */
-	public StrolchValueType getValueType();
+	StrolchValueType getValueType();
 }

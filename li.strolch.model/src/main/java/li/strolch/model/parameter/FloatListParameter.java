@@ -107,6 +107,12 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
+	public void addAllValues(List<Double> values) {
+		assertNotReadonly();
+		this.value.addAll(values);
+	}
+
+	@Override
 	public boolean addValueIfNotContains(Double value) {
 		assertNotReadonly();
 

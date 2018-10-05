@@ -24,8 +24,8 @@ import java.util.List;
  */
 public interface ListParameter<E> extends Parameter<List<E>> {
 
-	public static final String VALUE_SEPARATOR1 = ";"; //$NON-NLS-1$
-	public static final String VALUE_SEPARATOR2 = ","; //$NON-NLS-1$
+	String VALUE_SEPARATOR1 = ";"; //$NON-NLS-1$
+	String VALUE_SEPARATOR2 = ","; //$NON-NLS-1$
 
 	/**
 	 * Adds a single value to the {@link List} of values
@@ -33,7 +33,15 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * @param value
 	 * 		the value to add
 	 */
-	public void addValue(E value);
+	void addValue(E value);
+
+	/**
+	 * Adds the given values to the {@link List} of values
+	 *
+	 * @param values
+	 * 		the values to add
+	 */
+	void addAllValues(List<E> values);
 
 	/**
 	 * Adds a single value to the {@link List} of values if the current list does not already contain the value
@@ -41,7 +49,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * @param value
 	 * 		the value to add
 	 */
-	public boolean addValueIfNotContains(E value);
+	boolean addValueIfNotContains(E value);
 
 	/**
 	 * Removes a single value from the {@link List} of values
@@ -51,26 +59,26 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 *
 	 * @return true if the value was removed, false if it did not exist
 	 */
-	public boolean removeValue(E value);
+	boolean removeValue(E value);
 
 	/**
 	 * Clears the list of values, i.e the list of values is empty after this call
 	 */
-	public void clear();
+	void clear();
 
 	/**
 	 * Returns true if the list of values is empty, false if not
 	 *
 	 * @return true if the list of values is empty, false if not
 	 */
-	public boolean isEmpty();
+	boolean isEmpty();
 
 	/**
 	 * Returns the size of the list of values
 	 *
 	 * @return the size of the list of values
 	 */
-	public int size();
+	int size();
 
 	/**
 	 * Returns true if the list of values contains the given element, false if not
@@ -80,7 +88,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 *
 	 * @return true if the list of values contains the given element, false if not
 	 */
-	public boolean contains(E value);
+	boolean contains(E value);
 
 	/**
 	 * Returns true if the list of values contains all of the given elements, false if not
@@ -90,5 +98,5 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 *
 	 * @return true if the list of values contains all of the given elements, false if not
 	 */
-	public boolean containsAll(List<E> values);
+	boolean containsAll(List<E> values);
 }

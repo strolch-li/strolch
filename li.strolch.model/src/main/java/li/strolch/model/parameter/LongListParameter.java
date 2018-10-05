@@ -107,6 +107,12 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
+	public void addAllValues(List<Long> values) {
+		assertNotReadonly();
+		this.value.addAll(values);
+	}
+
+	@Override
 	public boolean addValueIfNotContains(Long value) {
 		assertNotReadonly();
 
