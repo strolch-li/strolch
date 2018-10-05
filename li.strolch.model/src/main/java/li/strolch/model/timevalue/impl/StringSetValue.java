@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Martin Smock <smock.martin@gmail.com>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,8 +35,6 @@ import li.strolch.utils.helper.StringHelper;
  * @author Martin Smock <smock.martin@gmail.com>
  */
 public class StringSetValue implements IValue<Set<AString>>, Serializable {
-
-	private static final long serialVersionUID = 1L;
 
 	private static Set<AString> neu = Collections.emptySet();
 	public static final IValue<Set<AString>> NEUTRAL = new StringSetValue(neu);
@@ -75,17 +73,17 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 
 		Set<AString> toBeAdded = new HashSet<>(o);
 
-		for (Iterator<AString> iter1 = toBeAdded.iterator(); iter1.hasNext();) {
+		for (Iterator<AString> iter1 = toBeAdded.iterator(); iter1.hasNext(); ) {
 			AString toAdd = iter1.next();
 			if (StringHelper.isEmpty(toAdd.getString())) {
 				throw new StrolchException("StringSetValue may not contain null values in set!");
 			}
 
-			for (Iterator<AString> iter = this.aStrings.iterator(); iter.hasNext();) {
+			for (Iterator<AString> iter = this.aStrings.iterator(); iter.hasNext(); ) {
 				AString aString = iter.next();
 				boolean valueMatch = aString.getString().equals(toAdd.getString());
-				boolean compensate = (toAdd.isInverse() && !aString.isInverse())
-						|| (!toAdd.isInverse() && aString.isInverse());
+				boolean compensate =
+						(toAdd.isInverse() && !aString.isInverse()) || (!toAdd.isInverse() && aString.isInverse());
 				if (valueMatch && compensate) {
 					iter.remove();
 					iter1.remove();

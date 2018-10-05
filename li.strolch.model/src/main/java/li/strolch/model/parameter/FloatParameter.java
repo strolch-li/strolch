@@ -25,8 +25,6 @@ import li.strolch.utils.helper.MathHelper;
  */
 public class FloatParameter extends AbstractParameter<Double> {
 
-	private static final long serialVersionUID = 0L;
-
 	private Double value = Double.MAX_VALUE;
 
 	/**

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,47 +16,27 @@
 package li.strolch.privilege.test;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-
-import li.strolch.privilege.base.InvalidCredentialsException;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.i18n.PrivilegeMessages;
-import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.PrivilegeRep;
-import li.strolch.privilege.model.Restrictable;
-import li.strolch.privilege.model.RoleRep;
-import li.strolch.privilege.model.Usage;
-import li.strolch.privilege.model.UserRep;
-import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.UserChallenge;
 import li.strolch.privilege.test.model.TestRestrictable;
 import li.strolch.privilege.test.model.TestSystemUserAction;
 import li.strolch.privilege.test.model.TestSystemUserActionDeny;
 import li.strolch.privilege.test.model.TestUserChallengeHandler;
 import li.strolch.utils.helper.ArraysHelper;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum.br />

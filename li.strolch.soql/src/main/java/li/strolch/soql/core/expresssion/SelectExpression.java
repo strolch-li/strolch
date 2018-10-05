@@ -11,7 +11,7 @@ public class SelectExpression extends AbstractObjectExpression {
 	/**
 	 * @param inputObjects
 	 * @param queryParameter
-	 * 
+	 *
 	 * @return List of objects from child expression evaluation
 	 */
 	@Override

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,8 +47,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public static final String LASTNAME = "lastname";
 	public static final String FIRSTNAME = "firstname";
 	public static final String USERNAME = "username";
-	public static final String FIELDS = StringHelper.commaSeparated(ID, USERNAME, FIRSTNAME, LASTNAME, DATE,
-			ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE);
+	public static final String FIELDS = StringHelper
+			.commaSeparated(ID, USERNAME, FIRSTNAME, LASTNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED,
+					NEW_VERSION, ACTION, ACCESS_TYPE);
 	public static final String TABLE_NAME = "audits";
 
 	private PostgreSqlStrolchTransaction tx;
@@ -62,7 +63,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public boolean hasElement(String type, Long id) {
-		String sql = "select count(*) from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + ID + " = ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + ID
+				+ " = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -76,7 +78,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 				if (numberOfElements == 1)
 					return true;
 
-				String msg = MessageFormat.format("Non unique number of elements with type {0} and id {1}", type, id); //$NON-NLS-1$
+				String msg = MessageFormat
+						.format("Non unique number of elements with type {0} and id {1}", type, id); //$NON-NLS-1$
 				throw new StrolchPersistenceException(msg);
 			}
 
@@ -105,7 +108,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long querySize(String type, DateRange dateRange) {
-		String sql = "select count(*) from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE + " between ? and ?"; //$NON-NLS-1$
+		String sql = "select count(*) from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE
+				+ " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -143,7 +147,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public Audit queryBy(String type, Long id) {
 
-		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + ID + " = ?"; //$NON-NLS-1$
+		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + ID
+				+ " = ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -166,7 +171,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public List<Audit> queryAll(String type, DateRange dateRange) {
 		List<Audit> list = new ArrayList<>();
-		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE + " between ? and ?"; //$NON-NLS-1$
+		String sql = "select " + FIELDS + " from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE
+				+ " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(sql)) {
 
 			statement.setString(1, type);
@@ -188,20 +194,23 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void save(Audit audit) {
-		String sql = "insert into " + TABLE_NAME + " (" + FIELDS + ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)"; //$NON-NLS-1$
+		String sql = "insert into " + TABLE_NAME + " (" + FIELDS
+				+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"Expected to create 1 record, but created {0} for audit {2}", count, audit.getId())); //$NON-NLS-1$
+				throw new StrolchPersistenceException(MessageFormat
+						.format("Expected to create 1 record, but created {0} for audit {2}", count,
+								audit.getId())); //$NON-NLS-1$
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Audit {0} due to {1}", audit, //$NON-NLS-1$
-					e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update Audit {0} due to {1}", audit, //$NON-NLS-1$
+							e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -214,10 +223,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public void update(Audit audit) {
-		String sql = "update " + TABLE_NAME + " set " + ID + " = ?, " + USERNAME + " = ?, " + FIRSTNAME + " = ?, "
-				+ LASTNAME + " = ?, " + DATE + " = ?, " + ELEMENT_TYPE + " = ?, " + ELEMENT_SUB_TYPE + " = ?, "
-				+ ELEMENT_ACCESSED + " = ?, " + NEW_VERSION + " = ?, " + ACTION + " = ?, " + ACCESS_TYPE
-				+ " = ?::access_type where " + ID + " = ?";
+		String sql =
+				"update " + TABLE_NAME + " set " + ID + " = ?, " + USERNAME + " = ?, " + FIRSTNAME + " = ?, " + LASTNAME
+						+ " = ?, " + DATE + " = ?, " + ELEMENT_TYPE + " = ?, " + ELEMENT_SUB_TYPE + " = ?, "
+						+ ELEMENT_ACCESSED + " = ?, " + NEW_VERSION + " = ?, " + ACTION + " = ?, " + ACCESS_TYPE
+						+ " = ?::access_type where " + ID + " = ?";
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			setAuditFields(audit, preparedStatement);
@@ -225,13 +235,15 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"Expected to update 1 record, but updated {0} for audit {2}", count, audit.getId())); //$NON-NLS-1$
+				throw new StrolchPersistenceException(MessageFormat
+						.format("Expected to update 1 record, but updated {0} for audit {2}", count,
+								audit.getId())); //$NON-NLS-1$
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to update Audit {0} due to {1}", audit, //$NON-NLS-1$
-					e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update Audit {0} due to {1}", audit, //$NON-NLS-1$
+							e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -271,7 +283,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public long removeAll(String type, DateRange dateRange) {
-		String sql = "delete from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE + " between ? and ?"; //$NON-NLS-1$
+		String sql = "delete from " + TABLE_NAME + " where " + ELEMENT_TYPE + " = ? and " + DATE
+				+ " between ? and ?"; //$NON-NLS-1$
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(sql)) {
 
 			preparedStatement.setString(1, type);
@@ -282,8 +295,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 			return modCount;
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove all elements due to {0}", //$NON-NLS-1$
-					e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove all elements due to {0}", //$NON-NLS-1$
+							e.getLocalizedMessage()), e);
 		}
 	}
 

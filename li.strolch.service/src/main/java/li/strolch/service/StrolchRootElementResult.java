@@ -6,8 +6,6 @@ import li.strolch.service.api.ServiceResultState;
 
 public class StrolchRootElementResult extends ServiceResult {
 
-	private static final long serialVersionUID = 1L;
-
 	private StrolchRootElement rootElement;
 
 	public StrolchRootElementResult(ServiceResultState state) {

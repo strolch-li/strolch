@@ -1,12 +1,12 @@
 /*
  * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,22 +23,14 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Map;
 
+import li.strolch.communication.*;
+import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import li.strolch.communication.CommunicationConnection;
-import li.strolch.communication.CommunicationEndpoint;
-import li.strolch.communication.ConnectionException;
-import li.strolch.communication.ConnectionMessages;
-import li.strolch.communication.ConnectionState;
-import li.strolch.communication.IoMessage;
-import li.strolch.communication.IoMessageVisitor;
-import li.strolch.communication.StreamMessageVisitor;
-import li.strolch.utils.helper.StringHelper;
-
 /**
  * An {@link CommunicationEndpoint} which writes and/or reads from a designated file
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileEndpoint implements CommunicationEndpoint, Runnable {
@@ -92,16 +84,16 @@ public class FileEndpoint implements CommunicationEndpoint, Runnable {
 		if (this.endpointMode.isRead()) {
 			this.inboundFilename = parameters.get(INBOUND_FILENAME);
 			if (StringHelper.isEmpty(this.inboundFilename)) {
-				throw ConnectionMessages.throwInvalidParameter(FileEndpoint.class, INBOUND_FILENAME,
-						this.inboundFilename);
+				throw ConnectionMessages
+						.throwInvalidParameter(FileEndpoint.class, INBOUND_FILENAME, this.inboundFilename);
 			}
 		}
 
 		if (this.endpointMode.isWrite()) {
 			this.outboundFilename = parameters.get(OUTBOUND_FILENAME);
 			if (StringHelper.isEmpty(this.outboundFilename)) {
-				throw ConnectionMessages.throwInvalidParameter(FileEndpoint.class, OUTBOUND_FILENAME,
-						this.outboundFilename);
+				throw ConnectionMessages
+						.throwInvalidParameter(FileEndpoint.class, OUTBOUND_FILENAME, this.outboundFilename);
 			}
 		}
 	}
@@ -146,7 +138,8 @@ public class FileEndpoint implements CommunicationEndpoint, Runnable {
 				this.thread.interrupt();
 				this.thread.join(2000l);
 			} catch (Exception e) {
-				logger.error(MessageFormat.format("Error while interrupting thread: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
+				logger.error(MessageFormat
+						.format("Error while interrupting thread: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
 			}
 
 			this.thread = null;
@@ -232,9 +225,9 @@ public class FileEndpoint implements CommunicationEndpoint, Runnable {
 
 	/**
 	 * Reads the file and handle using {@link StreamMessageVisitor}
-	 * 
+	 *
 	 * @param file
-	 *            the {@link File} to read
+	 * 		the {@link File} to read
 	 */
 	protected void handleFile(File file) throws Exception {
 

@@ -95,7 +95,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		return sqlxml;
 	}
 
-	protected SQLXML writeObject(PreparedStatement preparedStatement, T t, int index) throws SQLException, SAXException {
+	protected SQLXML writeObject(PreparedStatement preparedStatement, T t, int index)
+			throws SQLException, SAXException {
 
 		SQLXML sqlxml = null;
 		if (this.dataType == DataType.xml) {

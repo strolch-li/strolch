@@ -8,7 +8,7 @@ import li.strolch.policy.StrolchPolicy;
 /**
  * The {@link ConfirmationPolicy} is called for every state change of an {@link Action}. This is where extra tasks can
  * be performed when an {@link Action} enters a specific state, e.g. send an e-mail, etc.
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ConfirmationPolicy extends StrolchPolicy {

@@ -4,10 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import li.strolch.execution.service.StartActivityExecutionService;
 import li.strolch.model.Locator;
 import li.strolch.model.State;
@@ -18,6 +14,9 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.LocatorArgument;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class StartActivityExecutionServiceTest extends RuntimeMock {
 

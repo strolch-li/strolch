@@ -21,15 +21,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.Locator;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
-import li.strolch.model.Version;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -41,8 +33,8 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.utils.dbc.DBC;
 
 /**
- * Visitor of {@link StrolchRootElement} to check if they are equal. This implementations stores a list of
- * {@link Locator} for every element of an object which is not equal, thus making it easy to find the inconsistencies in
+ * Visitor of {@link StrolchRootElement} to check if they are equal. This implementations stores a list of {@link
+ * Locator} for every element of an object which is not equal, thus making it easy to find the inconsistencies in
  * objects.
  *
  * @author Robert von Burg <eitch@eitchnet.ch>

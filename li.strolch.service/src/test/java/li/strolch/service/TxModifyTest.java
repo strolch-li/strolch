@@ -15,24 +15,20 @@
  */
 package li.strolch.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import java.util.List;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
-import li.strolch.persistence.api.AddResourceCommand;
-import li.strolch.persistence.api.RemoveResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.persistence.api.UpdateResourceCommand;
 import li.strolch.search.ResourceSearch;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
-import li.strolch.utils.dbc.DBC;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class TxModifyTest extends AbstractRealmServiceTest<ServiceArgument, ServiceResult> {
@@ -62,7 +58,6 @@ public class TxModifyTest extends AbstractRealmServiceTest<ServiceArgument, Serv
 	}
 
 	public static class ModifyAndSearchService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {
@@ -115,7 +110,6 @@ public class TxModifyTest extends AbstractRealmServiceTest<ServiceArgument, Serv
 	}
 
 	public static class RollbackService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {

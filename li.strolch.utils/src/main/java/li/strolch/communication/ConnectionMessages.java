@@ -1,12 +1,12 @@
 /*
  * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,14 +19,13 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import li.strolch.utils.helper.StringHelper;
-
 /**
  * Helper class to thrown connection messages
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ConnectionMessages {
@@ -42,12 +41,12 @@ public class ConnectionMessages {
 
 	/**
 	 * Convenience method to throw an exception when an illegal {@link ConnectionState} change occurs
-	 * 
+	 *
 	 * @param current
-	 *            the current state
+	 * 		the current state
 	 * @param change
-	 *            the new state
-	 * 
+	 * 		the new state
+	 *
 	 * @return the exception
 	 */
 	public static ConnectionException throwIllegalConnectionState(ConnectionState current, ConnectionState change) {
@@ -59,14 +58,14 @@ public class ConnectionMessages {
 
 	/**
 	 * Convenience method to throw an exception when an invalid parameter is set in the configuration
-	 * 
+	 *
 	 * @param clazz
-	 *            clazz type
+	 * 		clazz type
 	 * @param parameterName
-	 *            the name of the parameter
+	 * 		the name of the parameter
 	 * @param parameterValue
-	 *            the value of the parameter
-	 * 
+	 * 		the value of the parameter
+	 *
 	 * @return the exception
 	 */
 	public static ConnectionException throwInvalidParameter(Class<?> clazz, String parameterName,
@@ -85,14 +84,14 @@ public class ConnectionMessages {
 
 	/**
 	 * Convenience method to throw an exception when an two conflicting parameters are activated
-	 * 
+	 *
 	 * @param clazz
-	 *            clazz type
+	 * 		clazz type
 	 * @param parameter1
-	 *            parameter 1
+	 * 		parameter 1
 	 * @param parameter2
-	 *            parameter 2
-	 * 
+	 * 		parameter 2
+	 *
 	 * @return the exception
 	 */
 	public static ConnectionException throwConflictingParameters(Class<?> clazz, String parameter1, String parameter2) {
@@ -104,13 +103,13 @@ public class ConnectionMessages {
 
 	/**
 	 * Convenience method to log a warning when a parameter is not set in the configuration
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz of the warning
+	 * 		the clazz of the warning
 	 * @param parameterName
-	 *            the parameter name
+	 * 		the parameter name
 	 * @param defValue
-	 *            the default value to be used
+	 * 		the default value to be used
 	 */
 	public static void warnUnsetParameter(Class<?> clazz, String parameterName, String defValue) {
 		if (logger.isDebugEnabled()) {
@@ -123,11 +122,11 @@ public class ConnectionMessages {
 
 	/**
 	 * Convenience method to throw an exception when the connection is not yet configured
-	 * 
+	 *
 	 * @param connection
-	 *            the connection
+	 * 		the connection
 	 * @param message
-	 *            the message
+	 * 		the message
 	 */
 	public static void assertConfigured(CommunicationConnection connection, String message) {
 		if (connection.getState() == ConnectionState.CREATED) {
@@ -139,12 +138,12 @@ public class ConnectionMessages {
 
 	/**
 	 * Convenience method to throw an exception when the connection is not connected
-	 * 
+	 *
 	 * @param connection
-	 *            the connection
+	 * 		the connection
 	 * @param message
-	 *            the message
-	 * 
+	 * 		the message
+	 *
 	 * @return the exception
 	 */
 	public static ConnectionException throwNotConnected(CommunicationConnection connection, String message) {
@@ -156,12 +155,12 @@ public class ConnectionMessages {
 
 	/**
 	 * Convenience method to throw an exception when the connection is not connected
-	 * 
+	 *
 	 * @param connection
-	 *            the connection
+	 * 		the connection
 	 * @param message
-	 *            the message
-	 * 
+	 * 		the message
+	 *
 	 * @return the exception
 	 */
 	public static ConnectionException throwNotConnected(CommunicationConnection connection, IoMessage message) {
@@ -175,8 +174,8 @@ public class ConnectionMessages {
 			Class<? extends IoMessageVisitor> expectedVisitor, IoMessageVisitor actualVisitor) {
 		if (!(expectedVisitor.isAssignableFrom(actualVisitor.getClass()))) {
 			String msg = "{0} requires {1} but has received illegal type {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, endpoint.getName(), expectedVisitor.getName(),
-					actualVisitor.getClass().getName());
+			msg = MessageFormat
+					.format(msg, endpoint.getName(), expectedVisitor.getName(), actualVisitor.getClass().getName());
 			throw new ConnectionException(msg);
 		}
 	}

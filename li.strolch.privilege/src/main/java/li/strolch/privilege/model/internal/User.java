@@ -15,12 +15,7 @@
  */
 package li.strolch.privilege.model.internal;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.UserRep;

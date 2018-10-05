@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ public class MyParameter {
 	private String value;
 
 	/**
-	 * 
+	 *
 	 */
 	public MyParameter() {
 		// empty constructor
@@ -68,7 +68,7 @@ public class MyParameter {
 
 	/**
 	 * @param id
-	 *            the id to set
+	 * 		the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -83,7 +83,7 @@ public class MyParameter {
 
 	/**
 	 * @param name
-	 *            the name to set
+	 * 		the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -98,7 +98,7 @@ public class MyParameter {
 
 	/**
 	 * @param type
-	 *            the type to set
+	 * 		the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
@@ -113,7 +113,7 @@ public class MyParameter {
 
 	/**
 	 * @param value
-	 *            the value to set
+	 * 		the value to set
 	 */
 	public void setValue(String value) {
 		this.value = value;

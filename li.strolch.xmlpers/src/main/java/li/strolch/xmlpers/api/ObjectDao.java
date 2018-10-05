@@ -15,11 +15,7 @@
  */
 package li.strolch.xmlpers.api;
 
-import static li.strolch.xmlpers.util.AssertionUtil.assertIsIdRef;
-import static li.strolch.xmlpers.util.AssertionUtil.assertIsNotIdRef;
-import static li.strolch.xmlpers.util.AssertionUtil.assertIsNotRootRef;
-import static li.strolch.xmlpers.util.AssertionUtil.assertNotNull;
-import static li.strolch.xmlpers.util.AssertionUtil.assertObjectRead;
+import static li.strolch.xmlpers.util.AssertionUtil.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;

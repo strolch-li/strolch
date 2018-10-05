@@ -30,8 +30,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class StringListParameter extends AbstractParameter<List<String>> implements ListParameter<String> {
 
-	private static final long serialVersionUID = 1L;
-
 	protected List<String> value;
 
 	/**

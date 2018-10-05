@@ -20,13 +20,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

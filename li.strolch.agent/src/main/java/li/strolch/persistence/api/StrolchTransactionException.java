@@ -20,7 +20,7 @@ package li.strolch.persistence.api;
  */
 public class StrolchTransactionException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+
 
 	/**
 	 * @param message

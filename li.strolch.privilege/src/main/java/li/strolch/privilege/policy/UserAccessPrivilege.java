@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ import li.strolch.utils.dbc.DBC;
  * This {@link PrivilegePolicy} expects a {@link Tuple} as {@link Restrictable#getPrivilegeValue()} and then depending
  * on the user specific privileges (see {@link PrivilegeHandler}), uses the basic <code>Allow</code> and
  * <code>Deny</code> to detect if the username of the certificate is allowed
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UserAccessPrivilege implements PrivilegePolicy {
@@ -51,8 +51,8 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple)) {
-			String msg = Restrictable.class.getName()
-					+ PrivilegeMessages.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
+			String msg = Restrictable.class.getName() + PrivilegeMessages
+					.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -108,8 +108,8 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
 
 			String privilegeValue = newUser.getUsername();
-			DBC.INTERIM.assertEquals("oldUser and newUser names must be the same", oldUser.getUsername(),
-					privilegeValue);
+			DBC.INTERIM
+					.assertEquals("oldUser and newUser names must be the same", oldUser.getUsername(), privilegeValue);
 			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
 
 			break;

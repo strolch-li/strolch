@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,15 +22,13 @@ import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 
+import li.strolch.utils.helper.FileHelper;
+import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import li.strolch.utils.helper.FileHelper;
-import li.strolch.utils.helper.StringHelper;
-
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
- * 
  */
 public class FileClientUtil {
 
@@ -115,7 +113,8 @@ public class FileClientUtil {
 
 		// make sure the source file exists
 		if (!srcFile.canRead()) {
-			String msg = MessageFormat.format("The source file does not exist at {0}", srcFile.getAbsolutePath()); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("The source file does not exist at {0}", srcFile.getAbsolutePath()); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
@@ -155,7 +154,8 @@ public class FileClientUtil {
 
 				// validate we read the expected number of bytes
 				if (read == -1)
-					throw new IOException("Something went wrong while reading the bytes as -1 was returned!"); //$NON-NLS-1$
+					throw new IOException(
+							"Something went wrong while reading the bytes as -1 was returned!"); //$NON-NLS-1$
 				if (read != bytes.length) {
 					String msg = "Something went wrong while reading the bytes as the wrong number of bytes were read. Expected {0} Actual: {1}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, bytes.length, read);

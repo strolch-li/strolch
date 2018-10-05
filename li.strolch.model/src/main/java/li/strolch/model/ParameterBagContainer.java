@@ -19,9 +19,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * the {@link Parameter} or the {@link ParameterBag} does not exist
 	 *
 	 * @param bagKey
-	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
 	 * @param paramKey
-	 *            the key of the {@link Parameter} which is to be returned
+	 * 		the key of the {@link Parameter} which is to be returned
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
@@ -32,11 +32,11 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * the {@link Parameter} or the {@link ParameterBag} does not exist
 	 *
 	 * @param bagKey
-	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
 	 * @param paramKey
-	 *            the key of the {@link Parameter} which is to be returned
+	 * 		the key of the {@link Parameter} which is to be returned
 	 * @param assertExists
-	 *            if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
@@ -46,12 +46,12 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
 	 *
 	 * @param bagKey
-	 *            the key of the {@link ParameterBag} to which the {@link Parameter} should be added
+	 * 		the key of the {@link ParameterBag} to which the {@link Parameter} should be added
 	 * @param parameter
-	 *            the {@link Parameter} to be added to the {@link ParameterBag}
+	 * 		the {@link Parameter} to be added to the {@link ParameterBag}
 	 *
 	 * @throws StrolchException
-	 *             if the {@link ParameterBag} does not exist
+	 * 		if the {@link ParameterBag} does not exist
 	 */
 	public void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException;
 
@@ -59,9 +59,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
 	 *
 	 * @param bagKey
-	 *            the key of the {@link ParameterBag} from which the {@link Parameter} is to be removed
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be removed
 	 * @param paramKey
-	 *            the key of the {@link Parameter} which is to be removed
+	 * 		the key of the {@link Parameter} which is to be removed
 	 *
 	 * @return the removed {@link Parameter} or null if it did not exist
 	 */
@@ -71,7 +71,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
 	 *
 	 * @param key
-	 *            the key of the {@link ParameterBag} to return
+	 * 		the key of the {@link ParameterBag} to return
 	 *
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
@@ -81,9 +81,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
 	 *
 	 * @param key
-	 *            the key of the {@link ParameterBag} to return
+	 * 		the key of the {@link ParameterBag} to return
 	 * @param assertExists
-	 *            if set to true, and the parameter bag does not exist, a {@link StrolchModelException} is thrown
+	 * 		if set to true, and the parameter bag does not exist, a {@link StrolchModelException} is thrown
 	 *
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
@@ -93,7 +93,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * Adds the given {@link ParameterBag} to this {@link GroupedParameterizedElement}
 	 *
 	 * @param bag
-	 *            the {@link ParameterBag} to add
+	 * 		the {@link ParameterBag} to add
 	 */
 	public void addParameterBag(ParameterBag bag);
 
@@ -101,7 +101,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * Removes the {@link ParameterBag} with the given key
 	 *
 	 * @param key
-	 *            the key of the {@link ParameterBag} to remove
+	 * 		the key of the {@link ParameterBag} to remove
 	 *
 	 * @return the removed {@link ParameterBag}, or null if it does not exist
 	 */
@@ -118,7 +118,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * Returns true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
 	 *
 	 * @param bagKey
-	 *            the key of the {@link ParameterBag} which is to be checked for existence
+	 * 		the key of the {@link ParameterBag} which is to be checked for existence
+	 *
 	 * @return true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
 	 */
 	public boolean hasParameterBag(String bagKey);
@@ -128,13 +129,13 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * bagKey
 	 *
 	 * @param bagKey
-	 *            the key of the {@link ParameterBag} on which to find the {@link Parameter}
+	 * 		the key of the {@link ParameterBag} on which to find the {@link Parameter}
 	 * @param paramKey
-	 *            the key of the {@link Parameter} to be found
+	 * 		the key of the {@link Parameter} to be found
 	 *
 	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
-	 *         bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not
-	 *         exist on the {@link ParameterBag}
+	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
+	 * the {@link ParameterBag}
 	 */
 	public boolean hasParameter(String bagKey, String paramKey);
 

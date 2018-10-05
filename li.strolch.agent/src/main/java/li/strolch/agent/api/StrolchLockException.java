@@ -22,7 +22,7 @@ import li.strolch.exception.StrolchException;
  */
 public class StrolchLockException extends StrolchException {
 
-	private static final long serialVersionUID = 1L;
+
 
 	public StrolchLockException(String message, Throwable cause) {
 		super(message, cause);

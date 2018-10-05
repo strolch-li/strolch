@@ -1,22 +1,13 @@
 package li.strolch.utils;
 
-import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A simple helper class to send e-mails. Uses javax.mail and is built as a singleton, so configuration has to be done
  * only once.
- * 
+ *
  * The {@link Properties} required are as follows:
  * <ul>
  * <li><code>fromAddr</code> and <code>fromName</code> - defines the address from which the e-mail comes from</li>
@@ -37,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * <li>host - the SMTP host name</li>
  * <li>port - the SMTP port</li>
  * </ul>
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class SmtpMailer {
@@ -50,9 +41,9 @@ public class SmtpMailer {
 	 * <p>
 	 * Initializes the SMTP Mailer with the given properties.
 	 * </p>
-	 * 
+	 *
 	 * @param properties
-	 *            the properties to be used to initialize the mailer
+	 * 		the properties to be used to initialize the mailer
 	 */
 	public static void init(Properties properties) {
 		try {
@@ -64,7 +55,7 @@ public class SmtpMailer {
 
 	/**
 	 * Returns the instance
-	 * 
+	 *
 	 * @return the instance
 	 */
 	public static SmtpMailer getInstance() {
@@ -82,14 +73,14 @@ public class SmtpMailer {
 
 	/**
 	 * private constructor, use the {@link #init(Properties)}-method
-	 * 
+	 *
 	 * @param properties
-	 *            the properties to initialize the mailer
-	 * 
+	 * 		the properties to initialize the mailer
+	 *
 	 * @throws UnsupportedEncodingException
-	 *             if something goes wrong parsing the from or override addresses
+	 * 		if something goes wrong parsing the from or override addresses
 	 * @throws AddressException
-	 *             if something goes wrong parsing the from or override addresses
+	 * 		if something goes wrong parsing the from or override addresses
 	 */
 	private SmtpMailer(Properties properties) throws UnsupportedEncodingException, AddressException {
 
@@ -135,13 +126,13 @@ public class SmtpMailer {
 
 	/**
 	 * Sends an e-mail to given recipient (unless override address defined).
-	 * 
+	 *
 	 * @param subject
-	 *            the subject of the e-mail
+	 * 		the subject of the e-mail
 	 * @param text
-	 *            the test of the e-mail
+	 * 		the test of the e-mail
 	 * @param recipients
-	 *            the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
+	 * 		the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
 	 */
 	public void sendMail(String subject, String text, String recipients) {
 
@@ -161,8 +152,7 @@ public class SmtpMailer {
 				logger.info(MessageFormat.format("Sent E-mail to override recipient {0}: {1}",
 						Arrays.asList(this.overrideRecipients).stream() //
 								.map(Object::toString) //
-								.collect(Collectors.joining(",")),
-						subject));
+								.collect(Collectors.joining(",")), subject));
 
 			} else {
 
@@ -194,8 +184,7 @@ public class SmtpMailer {
 					logger.info(MessageFormat.format("Sent E-mail to override recipient {0}: {1}",
 							Arrays.asList(this.overrideRecipients).stream() //
 									.map(Object::toString) //
-									.collect(Collectors.joining(",")),
-							subject));
+									.collect(Collectors.joining(",")), subject));
 				}
 			}
 

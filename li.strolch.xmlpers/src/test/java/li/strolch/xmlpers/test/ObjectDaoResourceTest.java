@@ -16,37 +16,25 @@
 package li.strolch.xmlpers.test;
 
 import static li.strolch.xmlpers.test.impl.TestConstants.TYPE_RES;
-import static li.strolch.xmlpers.test.model.ModelBuilder.RES_ID;
-import static li.strolch.xmlpers.test.model.ModelBuilder.RES_TYPE;
-import static li.strolch.xmlpers.test.model.ModelBuilder.assertResource;
-import static li.strolch.xmlpers.test.model.ModelBuilder.assertResourceUpdated;
-import static li.strolch.xmlpers.test.model.ModelBuilder.createResource;
-import static li.strolch.xmlpers.test.model.ModelBuilder.updateResource;
+import static li.strolch.xmlpers.test.model.ModelBuilder.*;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import li.strolch.xmlpers.api.IoMode;
-import li.strolch.xmlpers.api.ObjectDao;
-import li.strolch.xmlpers.api.PersistenceConstants;
-import li.strolch.xmlpers.api.PersistenceTransaction;
-import li.strolch.xmlpers.api.XmlPersistenceException;
+import li.strolch.xmlpers.api.*;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
 import li.strolch.xmlpers.objref.ObjectRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.test.impl.TestConstants;
 import li.strolch.xmlpers.test.model.ModelBuilder;
 import li.strolch.xmlpers.test.model.MyModel;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

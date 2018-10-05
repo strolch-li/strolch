@@ -21,7 +21,7 @@ package li.strolch.persistence.api;
  */
 public class StrolchPersistenceException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+
 
 	/**
 	 * @param message

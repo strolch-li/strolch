@@ -6,9 +6,8 @@ import li.strolch.utils.SmtpMailer;
 
 /**
  * SMTP {@link MailHandler}. Uses {@link SmtpMailer}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  * @see SmtpMailer
  */
 public class SmtpMailHandler extends MailHandler {
@@ -19,7 +18,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	/**
 	 * See {@link SmtpMailer} for which configuration properties are required
-	 * 
+	 *
 	 * @see SmtpMailer
 	 */
 	@Override

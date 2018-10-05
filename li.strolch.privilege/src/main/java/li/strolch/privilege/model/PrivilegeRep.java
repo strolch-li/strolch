@@ -34,8 +34,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class PrivilegeRep implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	private String name;
 	private String policy;
 	private boolean allAllowed;
@@ -50,8 +48,8 @@ public class PrivilegeRep implements Serializable {
 	 * @param policy
 	 * 		the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
 	 * @param allAllowed
-	 * 		a boolean defining if a {@link Role} with this {@link IPrivilege} has unrestricted access to a
-	 * 		{@link Restrictable}
+	 * 		a boolean defining if a {@link Role} with this {@link IPrivilege} has unrestricted access to a {@link
+	 * 		Restrictable}
 	 * @param denyList
 	 * 		a list of deny rules for this {@link IPrivilege}
 	 * @param allowList

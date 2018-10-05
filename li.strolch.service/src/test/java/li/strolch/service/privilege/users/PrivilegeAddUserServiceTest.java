@@ -17,18 +17,13 @@ package li.strolch.service.privilege.users;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import li.strolch.service.api.Service;
-import org.junit.Test;
+import java.util.*;
 
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
+import li.strolch.service.api.Service;
 import li.strolch.service.test.AbstractRealmServiceTest;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -16,28 +16,21 @@
 package li.strolch.service.test;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceHandler;
-import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
+import li.strolch.service.api.*;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -178,14 +171,13 @@ public class LockingTest {
 	}
 
 	private static class LockingArgumentTest extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
+
 		public boolean longRunning;
 		public int nrOfLocks = 1;
 		public Locator resourceLoc;
 	}
 
 	private static class LockingServiceTest extends AbstractService<LockingArgumentTest, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {

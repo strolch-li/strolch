@@ -6,8 +6,6 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import li.strolch.utils.helper.StringHelper;
-
 public class ReplacePropertiesInTest {
 
 	@Test

@@ -30,8 +30,6 @@ import li.strolch.service.api.ServiceResultState;
 public class PrivilegeSetUserLocaleService
 		extends AbstractService<PrivilegeSetUserLocaleArgument, PrivilegeUserResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected PrivilegeUserResult getResultInstance() {
 		return new PrivilegeUserResult(ServiceResultState.FAILED);

@@ -5,17 +5,12 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import li.strolch.utils.UTF8Control;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import li.strolch.utils.UTF8Control;
 
 /**
  * Created by eitch on 03.11.16.
@@ -87,8 +82,9 @@ public class TexHelper {
 			}
 
 			if (!FileHelper.copy(templatePath.getParentFile().listFiles(), tmpPathF, false))
-				throw new RuntimeException("Failed to copy " + templatePath.getParentFile().getAbsolutePath()
-						+ " to tmpPath " + tmpPathF.getAbsolutePath());
+				throw new RuntimeException(
+						"Failed to copy " + templatePath.getParentFile().getAbsolutePath() + " to tmpPath " + tmpPathF
+								.getAbsolutePath());
 
 			// then write TEX file
 			String texFileName = fileName + ".tex";
@@ -99,8 +95,8 @@ public class TexHelper {
 
 			// do PDF generation
 			String cmd = "pdflatex";
-			ProcessHelper.ProcessResult processResult = ProcessHelper.runCommand(tmpPathF, cmd, "-halt-on-error",
-					"-file-line-error", texFileName);
+			ProcessHelper.ProcessResult processResult = ProcessHelper
+					.runCommand(tmpPathF, cmd, "-halt-on-error", "-file-line-error", texFileName);
 			if (processResult.returnValue != 0) {
 				logger.error(processResult.processOutput);
 				throw new RuntimeException(

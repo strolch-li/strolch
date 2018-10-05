@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package li.strolch.migrations;
 
@@ -7,11 +7,11 @@ import li.strolch.utils.Version;
 
 /**
  * Migration versions for data and code migrations
- * 
+ *
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
  */
 public class MigrationVersion {
-	
+
 	private Version dataVersion;
 	private Version codeVersion;
 

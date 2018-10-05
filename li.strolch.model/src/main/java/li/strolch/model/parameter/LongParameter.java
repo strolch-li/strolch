@@ -24,8 +24,6 @@ import li.strolch.utils.dbc.DBC;
  */
 public class LongParameter extends AbstractParameter<Long> {
 
-	private static final long serialVersionUID = 0L;
-
 	protected Long value;
 
 	/**

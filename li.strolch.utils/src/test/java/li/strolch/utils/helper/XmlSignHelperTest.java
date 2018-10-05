@@ -2,23 +2,20 @@ package li.strolch.utils.helper;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.TimeZone;
-
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-
-import li.strolch.utils.helper.XmlDomSigner;
 
 public class XmlSignHelperTest {
 
@@ -84,8 +81,8 @@ public class XmlSignHelperTest {
 	}
 
 	private void setIdAttrNs(Document document) {
-		NodeList authnRequestNodes = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol",
-				"AuthnRequest");
+		NodeList authnRequestNodes = document
+				.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol", "AuthnRequest");
 		if (authnRequestNodes.getLength() != 1)
 			throw new IllegalStateException("Multiple or no AuthnRequest Node found in document!");
 		Element authnRequestNode = (Element) authnRequestNodes.item(0);

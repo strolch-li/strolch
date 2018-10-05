@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,18 +15,7 @@
  */
 package li.strolch.utils.helper;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
@@ -40,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for dealing with files
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileHelper {
@@ -50,16 +39,17 @@ public class FileHelper {
 
 	/**
 	 * Reads the contents of a file into a byte array.
-	 * 
+	 *
 	 * @param file
-	 *            the file to read
-	 * 
+	 * 		the file to read
+	 *
 	 * @return the contents of a file as a string
 	 */
 	public static final byte[] readFile(File file) {
 		if (file.length() > MAX_FILE_SIZE)
-			throw new RuntimeException(String.format("Only allowed to read files up to %s. File too large: %s", //$NON-NLS-1$
-					humanizeFileSize(MAX_FILE_SIZE), humanizeFileSize(file.length())));
+			throw new RuntimeException(
+					String.format("Only allowed to read files up to %s. File too large: %s", //$NON-NLS-1$
+							humanizeFileSize(MAX_FILE_SIZE), humanizeFileSize(file.length())));
 
 		byte[] data = new byte[(int) file.length()];
 		int pos = 0;
@@ -82,10 +72,10 @@ public class FileHelper {
 
 	/**
 	 * Reads the contents of a file into a string. Note, no encoding is checked. It is expected to be UTF-8
-	 * 
+	 *
 	 * @param file
-	 *            the file to read
-	 * 
+	 * 		the file to read
+	 *
 	 * @return the contents of a file as a string
 	 */
 	public static final String readFileToString(File file) {
@@ -112,10 +102,10 @@ public class FileHelper {
 	/**
 	 * Reads the contents of a {@link InputStream} into a string. Note, no encoding is checked. It is expected to be
 	 * UTF-8
-	 * 
+	 *
 	 * @param stream
-	 *            the stream to read
-	 * 
+	 * 		the stream to read
+	 *
 	 * @return the contents of a file as a string
 	 */
 	public static final String readStreamToString(InputStream stream) {
@@ -139,11 +129,11 @@ public class FileHelper {
 
 	/**
 	 * Writes the given byte array to the given file
-	 * 
+	 *
 	 * @param bytes
-	 *            the data to write to the file
+	 * 		the data to write to the file
 	 * @param dstFile
-	 *            the path to which to write the data
+	 * 		the path to which to write the data
 	 */
 	public static final void writeToFile(byte[] bytes, File dstFile) {
 
@@ -158,11 +148,11 @@ public class FileHelper {
 
 	/**
 	 * Writes the string to dstFile
-	 * 
+	 *
 	 * @param string
-	 *            string to write to file
+	 * 		string to write to file
 	 * @param dstFile
-	 *            the file to write to
+	 * 		the file to write to
 	 */
 	public static final void writeStringToFile(String string, File dstFile) {
 
@@ -177,12 +167,12 @@ public class FileHelper {
 
 	/**
 	 * Deletes files recursively. No question asked, but logging is done in case of problems
-	 * 
+	 *
 	 * @param file
-	 *            the file to delete
+	 * 		the file to delete
 	 * @param log
-	 *            true to enable logging
-	 * 
+	 * 		true to enable logging
+	 *
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
 	public final static boolean deleteFile(File file, boolean log) {
@@ -191,12 +181,12 @@ public class FileHelper {
 
 	/**
 	 * Deletes files recursively. No question asked, but logging is done in case of problems
-	 * 
+	 *
 	 * @param files
-	 *            the files to delete
+	 * 		the files to delete
 	 * @param log
-	 *            true to enable logging
-	 * 
+	 * 		true to enable logging
+	 *
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
 	public final static boolean deleteFiles(File[] files, boolean log) {
@@ -216,7 +206,8 @@ public class FileHelper {
 							FileHelper.logger.info("Deleted DIR  " + file.getAbsolutePath()); //$NON-NLS-1$
 					} else {
 						worked = false;
-						FileHelper.logger.warn("Could not delete the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
+						FileHelper.logger
+								.warn("Could not delete the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
 					}
 				}
 			} else {
@@ -237,13 +228,14 @@ public class FileHelper {
 	 * <p>
 	 * Copy a given list of {@link File Files}. Recursively copies the files and directories to the destination.
 	 * </p>
-	 * 
+	 *
 	 * @param srcFiles
-	 *            The source files to copy
+	 * 		The source files to copy
 	 * @param dstDirectory
-	 *            The destination where to copy the files
+	 * 		The destination where to copy the files
 	 * @param checksum
-	 *            if true, then a MD5 checksum is made to validate copying
+	 * 		if true, then a MD5 checksum is made to validate copying
+	 *
 	 * @return <b>true</b> if and only if the copying succeeded; <b>false</b> otherwise
 	 */
 	public final static boolean copy(File[] srcFiles, File dstDirectory, boolean checksum) {
@@ -277,13 +269,14 @@ public class FileHelper {
 	/**
 	 * Copy a {@link File} The renameTo method does not allow action across NFS mounted filesystems this method is the
 	 * workaround
-	 * 
+	 *
 	 * @param fromFile
-	 *            The existing File
+	 * 		The existing File
 	 * @param toFile
-	 *            The new File
+	 * 		The new File
 	 * @param checksum
-	 *            if true, then a MD5 checksum is made to validate copying
+	 * 		if true, then a MD5 checksum is made to validate copying
+	 *
 	 * @return <b>true</b> if and only if the renaming succeeded; <b>false</b> otherwise
 	 */
 	public final static boolean copy(File fromFile, File toFile, boolean checksum) {
@@ -303,8 +296,9 @@ public class FileHelper {
 				String fromFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(fromFile));
 				String toFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
-					FileHelper.logger.error(MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
-							fromFileMD5, toFileMD5));
+					FileHelper.logger.error(MessageFormat
+							.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
+									fromFileMD5, toFileMD5));
 					toFile.delete();
 
 					return false;
@@ -322,7 +316,8 @@ public class FileHelper {
 			}
 
 		} catch (Exception e) {
-			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile, toFile); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Failed to copy path from {0} to + {1} due to:", fromFile, toFile); //$NON-NLS-1$
 			FileHelper.logger.error(msg, e);
 			return false;
 		}
@@ -333,11 +328,12 @@ public class FileHelper {
 	/**
 	 * Move a File The renameTo method does not allow action across NFS mounted filesystems this method is the
 	 * workaround
-	 * 
+	 *
 	 * @param fromFile
-	 *            The existing File
+	 * 		The existing File
 	 * @param toFile
-	 *            The new File
+	 * 		The new File
+	 *
 	 * @return <b>true</b> if and only if the renaming succeeded; <b>false</b> otherwise
 	 */
 	public final static boolean move(File fromFile, File toFile) {
@@ -359,10 +355,10 @@ public class FileHelper {
 
 	/**
 	 * Finds the common parent for the files in the given list
-	 * 
+	 *
 	 * @param files
-	 *            the files to find the common parent for
-	 * 
+	 * 		the files to find the common parent for
+	 *
 	 * @return the {@link File} representing the common parent, or null if there is none
 	 */
 	public static File findCommonParent(List<File> files) {
@@ -457,10 +453,10 @@ public class FileHelper {
 	/**
 	 * Returns the size of the file in a human readable form. Everything smaller than 1024 bytes is returned as x bytes,
 	 * next is KB, then MB and then GB
-	 * 
+	 *
 	 * @param file
-	 *            the file for which the humanized size is to be returned
-	 * 
+	 * 		the file for which the humanized size is to be returned
+	 *
 	 * @return the humanized form of the files size
 	 */
 	public final static String humanizeFileSize(File file) {
@@ -470,10 +466,10 @@ public class FileHelper {
 	/**
 	 * Returns the size of the file in a human readable form. Everything smaller than 1024 bytes is returned as x bytes,
 	 * next is KB, then MB and then GB
-	 * 
+	 *
 	 * @param fileSize
-	 *            the size of a file for which the humanized size is to be returned
-	 * 
+	 * 		the size of a file for which the humanized size is to be returned
+	 *
 	 * @return the humanized form of the files size
 	 */
 	@SuppressWarnings("nls")
@@ -491,12 +487,12 @@ public class FileHelper {
 	}
 
 	/**
-	 * Creates the MD5 hash of the given file, returning the hash as a byte array. Use
-	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
-	 * 
+	 * Creates the MD5 hash of the given file, returning the hash as a byte array. Use {@link
+	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
+	 *
 	 * @param file
-	 *            the file to hash
-	 * 
+	 * 		the file to hash
+	 *
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileMd5(File file) {
@@ -504,12 +500,12 @@ public class FileHelper {
 	}
 
 	/**
-	 * Creates the SHA1 hash of the given file, returning the hash as a byte array. Use
-	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
-	 * 
+	 * Creates the SHA1 hash of the given file, returning the hash as a byte array. Use {@link
+	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
+	 *
 	 * @param file
-	 *            the file to hash
-	 * 
+	 * 		the file to hash
+	 *
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileSha1(File file) {
@@ -517,12 +513,12 @@ public class FileHelper {
 	}
 
 	/**
-	 * Creates the SHA256 hash of the given file, returning the hash as a byte array. Use
-	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
-	 * 
+	 * Creates the SHA256 hash of the given file, returning the hash as a byte array. Use {@link
+	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
+	 *
 	 * @param file
-	 *            the file to hash
-	 * 
+	 * 		the file to hash
+	 *
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileSha256(File file) {
@@ -530,14 +526,14 @@ public class FileHelper {
 	}
 
 	/**
-	 * Creates the hash of the given file with the given algorithm, returning the hash as a byte array. Use
-	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
-	 * 
+	 * Creates the hash of the given file with the given algorithm, returning the hash as a byte array. Use {@link
+	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
+	 *
 	 * @param file
-	 *            the file to hash
+	 * 		the file to hash
 	 * @param algorithm
-	 *            the hashing algorithm to use
-	 * 
+	 * 		the hashing algorithm to use
+	 *
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFile(File file, String algorithm) {
@@ -555,18 +551,19 @@ public class FileHelper {
 
 			return complete.digest();
 		} catch (Exception e) {
-			throw new RuntimeException("Something went wrong while hashing file: " + file.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException(
+					"Something went wrong while hashing file: " + file.getAbsolutePath()); //$NON-NLS-1$
 		}
 	}
 
 	/**
 	 * Helper method to append bytes to a specified file. The file is created if it does not exist otherwise the bytes
 	 * are simply appended
-	 * 
+	 *
 	 * @param dstFile
-	 *            the file to append to
+	 * 		the file to append to
 	 * @param bytes
-	 *            the bytes to append
+	 * 		the bytes to append
 	 */
 	public static void appendFilePart(File dstFile, byte[] bytes) {
 

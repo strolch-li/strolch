@@ -33,8 +33,6 @@ import li.strolch.model.timevalue.impl.TimeVariable;
 @SuppressWarnings("rawtypes")
 public class TimedState<T extends IValue> implements ITimedState<T>, Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	private ITimeVariable<T> timeVariable = new TimeVariable<>();
 
 	@Override

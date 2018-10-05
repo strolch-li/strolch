@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -53,26 +53,26 @@
     <div class="content">
 
         <p>Policies are an integral part when writing business logic in Strolch. In many cases it would suffice to write
-            all such logic in <code>Services</code> and <code>Commands</code>, but as soon as behaviour can change,
-            depending on the element being accessed, then this would quickly lead to many if/else blocks.</p>
+           all such logic in <code>Services</code> and <code>Commands</code>, but as soon as behaviour can change,
+           depending on the element being accessed, then this would quickly lead to many if/else blocks.</p>
 
         <p>Since writing large if/else blocks is not maintanable in the long run, Strolch offers a different approach.
-            All Strolch elements can store Policy definitions. This is a simple key/value store where the key defines
-            the type of policy, and the value references the policy to use.</p>
+           All Strolch elements can store Policy definitions. This is a simple key/value store where the key defines the
+           type of policy, and the value references the policy to use.</p>
 
         <p>Currently there are two ways to reference a policy in Strolch, either via a key which defines a further
-            lookup in the <code>PolicyHandler</code>, or directly as the name of the class to instantiate.</p>
+           lookup in the <code>PolicyHandler</code>, or directly as the name of the class to instantiate.</p>
 
         <p>Using policies in Strolch gives the additional possibility of easily changing the behaviour at runtime, as a
-            Service and/or Command would delegate the behaviour to the currently configured policy on the releveant
-            element.</p>
+           Service and/or Command would delegate the behaviour to the currently configured policy on the releveant
+           element.</p>
 
         <p>Policies are implemented by defining an abstract class and extends <code>StrolchPolicy</code>. This abstract
-            class then defines the API of the actual policy. A concrete class then extends this abstract class and
-            implements the concrete methods.</p>
+           class then defines the API of the actual policy. A concrete class then extends this abstract class and
+           implements the concrete methods.</p>
 
         <p>Policies are registered on Resources, Orders, Activities and Actions. The following shows defining two
-            policies on a Resource, a PlanningPolicy, an ExecutionPolicy in XML:</p>
+           policies on a Resource, a PlanningPolicy, an ExecutionPolicy in XML:</p>
         <pre>
 &lt;Resource ...&gt;
   ...
@@ -83,9 +83,9 @@
 &lt;/Resource&gt;</pre>
 
         <p><b>Note</b> how the PlanningPolicy has a value of <code>key:SimplePlanning</code> and the ExecutionPolicy
-            defines a reference to an actual class.</p>
+                       defines a reference to an actual class.</p>
 
-        <br/>
+        <br />
         <p>To use the PolicyHandler, it must be configured in the StrolchConfiguration.xml as follows:</p>
         <pre>
 &lt;Component>
@@ -98,9 +98,9 @@
   &lt;/Properties&gt;
 &lt;/Component&gt;</pre>
 
-        <br/>
+        <br />
         <p>And this policy handler implementation requires a file where the lookups for the policies is defined,
-            e.g.:</p>
+           e.g.:</p>
         <pre>
 &lt;StrolchPolicies&gt;
 
@@ -114,7 +114,7 @@
 
 &lt;/StrolchPolicies&gt;</pre>
 
-        <br/>
+        <br />
         <p>Now at runtime we can access the policies:</p>
         <pre>
 PolicyHandler policyHandler = getComponent(PolicyHandler.class);
@@ -171,7 +171,7 @@ try (StrolchTransaction tx = openTx()) {
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>

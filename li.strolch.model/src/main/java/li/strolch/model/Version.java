@@ -221,8 +221,7 @@ public class Version {
 	 * @param username
 	 * 		the username of the user who created this version of the object
 	 * @param deleted
-	 * 		if true, then the version will be marked as deleted, i.e. this object was removed from the element
-	 * 		maps
+	 * 		if true, then the version will be marked as deleted, i.e. this object was removed from the element maps
 	 */
 	public static void updateVersionFor(StrolchRootElement element, String username, boolean deleted) {
 		int v = !element.hasVersion() ? 0 : element.getVersion().getVersion() + 1;

@@ -29,8 +29,6 @@ import li.strolch.utils.helper.MathHelper;
  */
 public class FloatValue implements IValue<Double>, Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	public static final FloatValue NEUTRAL = new FloatValue(0.0d);
 
 	private Double value;

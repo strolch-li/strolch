@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -53,8 +53,8 @@
     <div class="content">
 
         <p>A Strolch agent can be easily extended with arbitrary components. An agent is basically a container for
-            classes extending <code>StrolchComponent</code>. Theses classes mostly implement an interface which
-            describes the operations that are supported by the component.</p>
+           classes extending <code>StrolchComponent</code>. Theses classes mostly implement an interface which describes
+           the operations that are supported by the component.</p>
 
         <p>The following represents a list of the most used components:</p>
         <ul>
@@ -70,18 +70,18 @@
         </ul>
 
         <p>A component has a life-cycle, which is governed by the Agent's own life-cycle. The life-cycle is as
-            follows:</p>
+           follows:</p>
 
         <pre>
     setup -> initialize -> start <-> stop -> destroy</pre>
 
         <p>The setup step is used to instantiate the component, the initialize step is used to validate configuration
-            parameters, and the run step is used to start the component, i.e. start threads, etc. The stop step stops
-            these threads and also allows the component to be started again. The destroy step destroys the instance and
-            makes it unusable anymore, i.e. shutdown of the agent.</p>
+           parameters, and the run step is used to start the component, i.e. start threads, etc. The stop step stops
+           these threads and also allows the component to be started again. The destroy step destroys the instance and
+           makes it unusable anymore, i.e. shutdown of the agent.</p>
 
         <p>Each component has its own configuration parameters. A component is registered in the <code>StrolchConfiguration.xml</code>
-            file with a</p>
+           file with a</p>
         <ul>
             <li>name</li>
             <li>api class name</li>
@@ -91,7 +91,7 @@
         </ul>
 
         <p>The dependencies is an important feature as the dependencies of a component are always started before the
-            actual component.</p>
+           actual component.</p>
 
         <p>By example of the <code>MailHandler</code> we shall show how a strolch component would be implemented.</p>
 
@@ -131,8 +131,8 @@ public class SmtpMailHandler extends StrolchComponent implements MailHandler {
         </pre>
 
         <p>Now that the component is written, it must be registered on the component, so that it is loaded when the
-            agent is started. For this the <code>StrolchConfiguration.xml</code> file must be modified to include a
-            component element:</p>
+           agent is started. For this the <code>StrolchConfiguration.xml</code> file must be modified to include a
+           component element:</p>
 
         <pre>
 &lt;StrolchConfiguration&gt;
@@ -201,7 +201,7 @@ mailHandler.sendMail("My Subject", "Hello World", "test@test.ch");
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>

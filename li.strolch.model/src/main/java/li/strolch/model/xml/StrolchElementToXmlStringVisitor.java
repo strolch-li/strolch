@@ -1,9 +1,8 @@
 package li.strolch.model.xml;
 
-import java.io.StringWriter;
-
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.StringWriter;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Order;

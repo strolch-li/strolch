@@ -38,8 +38,8 @@ public class IsInReportFilter extends ReportFilterPolicy {
 					this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim)
 							.map(this::parseFilterValueToDate).collect(toList());
 				else
-					this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim)
-							.map(valueType::parseValue).collect(toList());
+					this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim).map(valueType::parseValue)
+							.collect(toList());
 			}
 
 			left = parameter.getValue();

@@ -32,8 +32,6 @@ import li.strolch.model.timevalue.IValueChange;
 @SuppressWarnings("rawtypes")
 public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	public SortedSet<ITimeValue<T>> container = new TreeSet<>();
 	private boolean readonly;
 

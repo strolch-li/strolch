@@ -28,8 +28,6 @@ import li.strolch.service.api.AbstractService;
  */
 public class PrivilegeAddRoleService extends AbstractService<PrivilegeRoleArgument, PrivilegeRoleResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected PrivilegeRoleResult getResultInstance() {
 		return new PrivilegeRoleResult();

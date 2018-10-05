@@ -7,8 +7,6 @@ import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
 
 public abstract class AbstractStrolchRootElement extends GroupedParameterizedElement implements StrolchRootElement {
 
-	private static final long serialVersionUID = 1L;
-
 	public AbstractStrolchRootElement() {
 		super();
 	}

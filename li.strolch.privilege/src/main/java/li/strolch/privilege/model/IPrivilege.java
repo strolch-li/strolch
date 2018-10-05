@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,13 +23,12 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 /**
  * <p>
  * {@link IPrivilege} is the main model object for Privilege. A {@link Role} has a set of Privileges assigned to it
- * which defines the privileges a logged in user with that role has. If the {@link IPrivilege} has a
- * {@link PrivilegePolicy} defined, then that policy will be used for finer granularity and with the deny and allow
- * lists configured which is used to evaluate if privilege is granted to a {@link Restrictable}
+ * which defines the privileges a logged in user with that role has. If the {@link IPrivilege} has a {@link
+ * PrivilegePolicy} defined, then that policy will be used for finer granularity and with the deny and allow lists
+ * configured which is used to evaluate if privilege is granted to a {@link Restrictable}
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public interface IPrivilege {
 

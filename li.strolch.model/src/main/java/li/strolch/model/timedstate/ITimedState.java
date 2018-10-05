@@ -63,14 +63,16 @@ public interface ITimedState<T extends IValue> {
 	ITimedState<T> getCopy();
 
 	/**
-	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it, call <code>getClone()</code> on the parent
+	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it,
+	 * call <code>getClone()</code> on the parent
 	 *
 	 * @return true if this element is read only
 	 */
 	public boolean isReadonly();
 
 	/**
-	 * Sets this element to readOnly, so that it may not be modified. To modify it, call <code>getClone()</code> on the parent
+	 * Sets this element to readOnly, so that it may not be modified. To modify it, call <code>getClone()</code> on the
+	 * parent
 	 */
 	public void setReadonly();
 }

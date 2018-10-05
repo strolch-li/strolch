@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package li.strolch.soql.core.expresssion;
 
@@ -7,9 +7,8 @@ import java.util.Map;
 
 /**
  * Abstract class for all expressions which evaluate to other objects than Boolean
- * 
- * @author msmock
  *
+ * @author msmock
  */
 public abstract class AbstractObjectExpression implements IObjectExpression {
 

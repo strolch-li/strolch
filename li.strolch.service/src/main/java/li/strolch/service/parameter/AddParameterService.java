@@ -32,8 +32,6 @@ import li.strolch.service.parameter.AddParameterService.AddParameterArg;
  */
 public class AddParameterService extends AbstractService<AddParameterArg, ServiceResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);
@@ -62,7 +60,7 @@ public class AddParameterService extends AbstractService<AddParameterArg, Servic
 	}
 
 	public static class AddParameterArg extends ServiceArgument {
-		private static final long serialVersionUID = 1L;
+
 		public Locator locator;
 		public Parameter<?> parameter;
 	}

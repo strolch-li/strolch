@@ -24,8 +24,6 @@ import li.strolch.model.visitor.StrolchElementVisitor;
  */
 public class FloatTimedState extends AbstractStrolchTimedState<FloatValue> {
 
-	private static final long serialVersionUID = 1L;
-
 	public FloatTimedState() {
 		super();
 	}

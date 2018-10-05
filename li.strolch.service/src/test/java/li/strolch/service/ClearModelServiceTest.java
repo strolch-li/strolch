@@ -22,7 +22,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
 import org.junit.Test;
 
 /**

@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import li.strolch.utils.helper.StringHelper;
 
 /**
  * Validates that any access to a privilege User is done only by users in the same organisation
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege {
@@ -48,8 +48,8 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple)) {
-			String msg = Restrictable.class.getName()
-					+ PrivilegeMessages.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
+			String msg = Restrictable.class.getName() + PrivilegeMessages
+					.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -73,8 +73,9 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			if (oldUser != null) {
 				String oldOrg = oldUser.getProperty(PARAM_ORGANISATION);
 				if (!userOrg.equals(oldOrg)) {
-					throw new AccessDeniedException("User " + ctx.getUsername()
-							+ " may not access users outside of their organisation: " + userOrg + " / " + oldOrg);
+					throw new AccessDeniedException(
+							"User " + ctx.getUsername() + " may not access users outside of their organisation: "
+									+ userOrg + " / " + oldOrg);
 				}
 			}
 
@@ -83,8 +84,9 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
 			String newdOrg = newUser.getProperty(PARAM_ORGANISATION);
 			if (!userOrg.equals(newdOrg)) {
-				throw new AccessDeniedException("User " + ctx.getUsername()
-						+ " may not access users outside of their organisations: " + userOrg + " / " + newdOrg);
+				throw new AccessDeniedException(
+						"User " + ctx.getUsername() + " may not access users outside of their organisations: " + userOrg
+								+ " / " + newdOrg);
 			}
 
 			break;
@@ -96,16 +98,17 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", user);
 			String org = user.getProperty(PARAM_ORGANISATION);
 			if (!userOrg.equals(org)) {
-				throw new AccessDeniedException("User " + ctx.getUsername()
-						+ " may not access users outside of their organisation: " + userOrg + " / " + org);
+				throw new AccessDeniedException(
+						"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrg
+								+ " / " + org);
 			}
 
 			break;
 		}
 
 		default:
-			String msg = Restrictable.class.getName()
-					+ PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+			String msg = Restrictable.class.getName() + PrivilegeMessages
+					.getString("Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeName);
 			throw new PrivilegeException(msg);
 		}

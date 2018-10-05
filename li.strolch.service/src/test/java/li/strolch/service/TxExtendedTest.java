@@ -66,7 +66,6 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 	}
 
 	public static class CommitService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {
@@ -284,7 +283,6 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 	}
 
 	public static class RollbackService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,16 +22,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles remote requests of clients to upload or download a file. Uploading a file is done by calling
  * {@link #handleFilePart(FilePart)} and the downloading a file is done by calling {@link #requestFile(FilePart)}
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class FileHandler {
@@ -47,17 +46,19 @@ public class FileHandler {
 	private boolean verbose;
 
 	/**
-	 * 
+	 *
 	 */
 	public FileHandler(String basePath, boolean verbose) {
 
 		File basePathF = new File(basePath);
 		if (!basePathF.exists()) {
-			String msg = MessageFormat.format("Base Path does not exist {0}", basePathF.getAbsolutePath()); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Base Path does not exist {0}", basePathF.getAbsolutePath()); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 		if (!basePathF.canWrite()) {
-			String msg = MessageFormat.format("Can not write to base path {0}", basePathF.getAbsolutePath()); //$NON-NLS-1$
+			String msg = MessageFormat
+					.format("Can not write to base path {0}", basePathF.getAbsolutePath()); //$NON-NLS-1$
 			throw new RuntimeException(msg);
 		}
 
@@ -70,9 +71,9 @@ public class FileHandler {
 	 * array of the file, with bytes from the file, respecting the desired offset. It is up to the client to call this
 	 * method multiple times for the entire file. It is a decision of the concrete implementation how much data is
 	 * returned in each part, the client may pass a request, but this is not definitive
-	 * 
+	 *
 	 * @param filePart
-	 *            the part of the file
+	 * 		the part of the file
 	 */
 	public FilePart requestFile(FilePart filePart) {
 
@@ -154,7 +155,8 @@ public class FileHandler {
 			// position the stream
 			long skip = fin.skip(requestOffset);
 			if (skip != requestOffset) {
-				String msg = MessageFormat.format("Asked to skip {0} but only skipped {1}", requestOffset, skip); //$NON-NLS-1$
+				String msg = MessageFormat
+						.format("Asked to skip {0} but only skipped {1}", requestOffset, skip); //$NON-NLS-1$
 				throw new IOException(msg);
 			}
 
@@ -162,7 +164,8 @@ public class FileHandler {
 			byte[] bytes = new byte[requestSize];
 			int read = fin.read(bytes);
 			if (read != requestSize) {
-				String msg = MessageFormat.format("Asked to read {0} but only read {1}", requestSize, read); //$NON-NLS-1$
+				String msg = MessageFormat
+						.format("Asked to read {0} but only read {1}", requestSize, read); //$NON-NLS-1$
 				throw new IOException(msg);
 			}
 
@@ -191,9 +194,9 @@ public class FileHandler {
 	/**
 	 * Method with which a client can push parts of files to the server. It is up to the client to send as many parts as
 	 * needed, the server will write the parts to the associated file
-	 * 
+	 *
 	 * @param filePart
-	 *            the part of the file
+	 * 		the part of the file
 	 */
 	public void handleFilePart(FilePart filePart) {
 
@@ -243,12 +246,11 @@ public class FileHandler {
 
 	/**
 	 * Method with which a client can delete files from the server. It only deletes single files if they exist
-	 * 
+	 *
 	 * @param fileDeletion
-	 *            the {@link FileDeletion} defining the deletion request
-	 * 
+	 * 		the {@link FileDeletion} defining the deletion request
+	 *
 	 * @return true if the file was deleted, false if the file did not exist
-	 * 
 	 */
 	public boolean deleteFile(FileDeletion fileDeletion) {
 
@@ -279,13 +281,14 @@ public class FileHandler {
 
 	/**
 	 * Validates that the file name is legal, i.e. not empty or contains references up the tree
-	 * 
+	 *
 	 * @param fileName
 	 */
 	private void validateFileName(String fileName) {
 
 		if (fileName == null || fileName.isEmpty()) {
-			throw new RuntimeException("The file name was not given! Can not find a file without a name!"); //$NON-NLS-1$
+			throw new RuntimeException(
+					"The file name was not given! Can not find a file without a name!"); //$NON-NLS-1$
 		} else if (fileName.contains("/")) { //$NON-NLS-1$
 			String msg = "The given file name contains illegal characters. The file name may not contain slashes!"; //$NON-NLS-1$
 			throw new RuntimeException(msg);
@@ -294,12 +297,13 @@ public class FileHandler {
 
 	/**
 	 * Validates that the file type is legal, i.e. not empty or contains references up the tree
-	 * 
+	 *
 	 * @param fileType
 	 */
 	private void validateFileType(String fileType) {
 		if (fileType == null || fileType.isEmpty()) {
-			throw new RuntimeException("The file type was not given! Can not find a file without a type!"); //$NON-NLS-1$
+			throw new RuntimeException(
+					"The file type was not given! Can not find a file without a type!"); //$NON-NLS-1$
 		} else if (fileType.contains("/")) { //$NON-NLS-1$
 			String msg = "The given file type contains illegal characters. The file type may not contain slashes!"; //$NON-NLS-1$
 			throw new RuntimeException(msg);

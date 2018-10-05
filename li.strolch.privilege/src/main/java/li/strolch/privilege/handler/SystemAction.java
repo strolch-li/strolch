@@ -21,7 +21,8 @@ import li.strolch.privilege.model.Restrictable;
 
 /**
  * With this interface system actions, which are to be performed in an automated fashion, i.e. by cron jobs, can be
- * implemented and then the authorized execution can be delegated to {@link PrivilegeHandler#runAs(String, SystemAction)}
+ * implemented and then the authorized execution can be delegated to {@link PrivilegeHandler#runAs(String,
+ * SystemAction)}
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

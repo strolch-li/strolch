@@ -24,8 +24,6 @@ import li.strolch.model.visitor.StrolchElementVisitor;
  */
 public class BooleanTimedState extends AbstractStrolchTimedState<BooleanValue> {
 
-	private static final long serialVersionUID = 1L;
-
 	public BooleanTimedState() {
 		super();
 	}

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@ package li.strolch.command;
 
 import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
+import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.OutputStream;
@@ -27,8 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
@@ -171,8 +170,8 @@ public class XmlExportModelCommand extends Command {
 					if (!this.multiFile) {
 						writeResourcesByType(writer, resourceMap, type);
 					} else {
-						String typeXmlFile = exportName + UNDERLINE + Tags.RESOURCE + UNDERLINE + type
-								+ XML_FILE_SUFFIX;
+						String typeXmlFile =
+								exportName + UNDERLINE + Tags.RESOURCE + UNDERLINE + type + XML_FILE_SUFFIX;
 						writer.writeEmptyElement(Tags.INCLUDE_FILE);
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
@@ -230,15 +229,16 @@ public class XmlExportModelCommand extends Command {
 					if (!this.multiFile) {
 						writeActivitiesByType(writer, activityMap, type);
 					} else {
-						String typeXmlFile = exportName + UNDERLINE + Tags.ACTIVITY + UNDERLINE + type
-								+ XML_FILE_SUFFIX;
+						String typeXmlFile =
+								exportName + UNDERLINE + Tags.ACTIVITY + UNDERLINE + type + XML_FILE_SUFFIX;
 						writer.writeEmptyElement(Tags.INCLUDE_FILE);
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
 						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
-						logger.info("Writing " + activityMap.querySize(tx(), type) + " " + type
-								+ " Activities to path: " + typeXmlFileF.getAbsolutePath() + "...");
+						logger.info(
+								"Writing " + activityMap.querySize(tx(), type) + " " + type + " Activities to path: "
+										+ typeXmlFileF.getAbsolutePath() + "...");
 						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
@@ -313,7 +313,7 @@ public class XmlExportModelCommand extends Command {
 
 	/**
 	 * @param modelFile
-	 *            the modelFile to set
+	 * 		the modelFile to set
 	 */
 	public void setModelFile(File modelFile) {
 		this.modelFile = modelFile;
@@ -328,7 +328,7 @@ public class XmlExportModelCommand extends Command {
 
 	/**
 	 * @param doOrders
-	 *            the doOrders to set
+	 * 		the doOrders to set
 	 */
 	public void setDoOrders(boolean doOrders) {
 		this.doOrders = doOrders;
@@ -336,7 +336,7 @@ public class XmlExportModelCommand extends Command {
 
 	/**
 	 * @param doResources
-	 *            the doResources to set
+	 * 		the doResources to set
 	 */
 	public void setDoResources(boolean doResources) {
 		this.doResources = doResources;
@@ -344,7 +344,7 @@ public class XmlExportModelCommand extends Command {
 
 	/**
 	 * @param doActivities
-	 *            the doActivities to set
+	 * 		the doActivities to set
 	 */
 	public void setDoActivities(boolean doActivities) {
 		this.doActivities = doActivities;
@@ -352,7 +352,7 @@ public class XmlExportModelCommand extends Command {
 
 	/**
 	 * @param orderTypes
-	 *            the orderTypes to set
+	 * 		the orderTypes to set
 	 */
 	public void setOrderTypes(Set<String> orderTypes) {
 		this.orderTypes = orderTypes;
@@ -360,7 +360,7 @@ public class XmlExportModelCommand extends Command {
 
 	/**
 	 * @param resourceTypes
-	 *            the resourceTypes to set
+	 * 		the resourceTypes to set
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
@@ -368,7 +368,7 @@ public class XmlExportModelCommand extends Command {
 
 	/**
 	 * @param activityTypes
-	 *            the activityTypes to set
+	 * 		the activityTypes to set
 	 */
 	public void setActivityTypes(Set<String> activityTypes) {
 		this.activityTypes = activityTypes;

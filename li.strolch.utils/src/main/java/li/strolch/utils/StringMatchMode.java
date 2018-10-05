@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * The {@link StringMatchMode} is used to match String in different scenarios. The strings can be matched case sensitive
  * or case insensitive as well as using contains or equals.
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public enum StringMatchMode {
@@ -34,9 +34,9 @@ public enum StringMatchMode {
 
 	/**
 	 * @param equals
-	 *            true if should be matched for entire string
+	 * 		true if should be matched for entire string
 	 * @param caseSensitive
-	 *            true if should be a case insensitive match
+	 * 		true if should be a case insensitive match
 	 */
 	private StringMatchMode(boolean equals, boolean caseSensitive) {
 		this.equals = equals;
@@ -60,12 +60,12 @@ public enum StringMatchMode {
 	/**
 	 * Returns true if <code>value2</code> matches <code>value1</code>. I.e. for contains <code>value2</code> must be
 	 * contained in <code>value1</code>
-	 * 
+	 *
 	 * @param value1
-	 *            the value to be matched against
+	 * 		the value to be matched against
 	 * @param value2
-	 *            the value to match with the first value
-	 * 
+	 * 		the value to match with the first value
+	 *
 	 * @return if <code>value2</code> matches <code>value1</code> according to the current settings
 	 */
 	public boolean matches(String value1, String value2) {
@@ -87,11 +87,11 @@ public enum StringMatchMode {
 	 * <p>
 	 * Returns {@link StringMatchMode#EQUALS_CASE_SENSITIVE}
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Short method, useful for static imports, or simply for shorter code
 	 * </p>
-	 * 
+	 *
 	 * @return {@link StringMatchMode#EQUALS_CASE_SENSITIVE}
 	 */
 	public static StringMatchMode es() {
@@ -102,11 +102,11 @@ public enum StringMatchMode {
 	 * <p>
 	 * Returns {@link #EQUALS_CASE_INSENSITIVE}
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Short method, useful for static imports, or simply for shorter code
 	 * </p>
-	 * 
+	 *
 	 * @return {@link #EQUALS_CASE_INSENSITIVE}
 	 */
 	public static StringMatchMode ei() {
@@ -117,11 +117,11 @@ public enum StringMatchMode {
 	 * <p>
 	 * Returns {@link #CONTAINS_CASE_SENSITIVE}
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Short method, useful for static imports, or simply for shorter code
 	 * </p>
-	 * 
+	 *
 	 * @return {@link #CONTAINS_CASE_SENSITIVE}
 	 */
 	public static StringMatchMode cs() {
@@ -132,11 +132,11 @@ public enum StringMatchMode {
 	 * <p>
 	 * Returns {@link #CONTAINS_CASE_INSENSITIVE}
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Short method, useful for static imports, or simply for shorter code
 	 * </p>
-	 * 
+	 *
 	 * @return {@link #CONTAINS_CASE_INSENSITIVE}
 	 */
 	public static StringMatchMode ci() {

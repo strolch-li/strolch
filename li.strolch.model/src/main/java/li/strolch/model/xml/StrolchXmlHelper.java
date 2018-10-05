@@ -1,26 +1,20 @@
 package li.strolch.model.xml;
 
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
+import javanet.staxutils.IndentingXMLStreamWriter;
+import li.strolch.model.*;
+import li.strolch.model.activity.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javanet.staxutils.IndentingXMLStreamWriter;
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchModelConstants;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
-import li.strolch.model.activity.Activity;
 
 public class StrolchXmlHelper {
 

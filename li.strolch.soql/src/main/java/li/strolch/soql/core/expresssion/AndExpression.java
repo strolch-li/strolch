@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * Boolean AND implementation to combine {@link ComparisonExpression} objects
- * 
+ *
  * @author msmock
  */
 public class AndExpression extends AbstractBooleanExpression {

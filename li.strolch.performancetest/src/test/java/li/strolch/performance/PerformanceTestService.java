@@ -36,7 +36,7 @@ import li.strolch.utils.helper.SystemHelper;
 public class PerformanceTestService extends AbstractService<PerformanceTestArgument, PerformanceTestResult> {
 
 	private static final String MY_TYPE = "MyType";
-	private static final long serialVersionUID = 1L;
+
 	private PerformanceTestArgument arg;
 
 	@Override

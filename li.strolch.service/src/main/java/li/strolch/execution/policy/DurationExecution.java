@@ -12,7 +12,7 @@ import li.strolch.runtime.StrolchConstants.PolicyConstants;
  * Simple Execution Policy which starts the execution immediately, i.e. set state to in execution and completes after
  * the {@link Action Action's} duration has passed.
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DurationExecution extends SimpleExecution {
@@ -24,8 +24,8 @@ public class DurationExecution extends SimpleExecution {
 	@Override
 	public void toExecution(Action action) {
 
-		DurationParameter durationP = action.findParameter(PolicyConstants.BAG_OBJECTIVES,
-				PolicyConstants.PARAM_DURATION, true);
+		DurationParameter durationP = action
+				.findParameter(PolicyConstants.BAG_OBJECTIVES, PolicyConstants.PARAM_DURATION, true);
 
 		String realmName = tx().getRealmName();
 		Locator locator = action.getLocator();

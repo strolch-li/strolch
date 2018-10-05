@@ -4,10 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import li.strolch.model.StrolchRootElement;
 import org.junit.Assert;
 import org.junit.Test;
-
-import li.strolch.model.StrolchRootElement;
 
 public class QueryProcessorTest extends BaseTest {
 
@@ -44,8 +43,8 @@ public class QueryProcessorTest extends BaseTest {
 	}
 
 	/**
-	 * verify that an exception is thrown, if the select statement declares classes
-	 * other than {@link StrolchRootElement}
+	 * verify that an exception is thrown, if the select statement declares classes other than {@link
+	 * StrolchRootElement}
 	 */
 	@Test
 	public void testProcess2() {

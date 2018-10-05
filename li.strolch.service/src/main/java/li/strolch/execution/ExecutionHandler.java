@@ -16,9 +16,9 @@ import li.strolch.model.activity.TimeOrdering;
  * </p>
  *
  * <p>
- * To start the execution of an {@link Activity} add it to the {@link ExecutionHandler} by calling
- * {@link #addForExecution(String, Locator)}. Actual execution is asynchronously performed and the
- * {@link ExecutionPolicy} of the resources of the {@link Action Actions} will perform the actual execution.
+ * To start the execution of an {@link Activity} add it to the {@link ExecutionHandler} by calling {@link
+ * #addForExecution(String, Locator)}. Actual execution is asynchronously performed and the {@link ExecutionPolicy} of
+ * the resources of the {@link Action Actions} will perform the actual execution.
  * </p>
  *
  * <p>

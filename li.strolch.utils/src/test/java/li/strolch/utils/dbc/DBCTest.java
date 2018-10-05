@@ -1,12 +1,12 @@
 /*
  * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,19 +18,17 @@ package li.strolch.utils.dbc;
 import java.io.File;
 import java.text.MessageFormat;
 
+import li.strolch.utils.dbc.DBC.DbcException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.dbc.DBC.DbcException;
-
 /**
  * The class <code>DBCTest</code> contains tests for the class <code>{@link DBC}</code>.
- * 
- * @generatedBy CodePro at 2/2/14 8:13 PM
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  * @version $Revision: 1.0 $
+ * @generatedBy CodePro at 2/2/14 8:13 PM
  */
 @SuppressWarnings("nls")
 public class DBCTest {
@@ -40,10 +38,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -59,10 +56,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -83,10 +79,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -106,10 +101,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -129,10 +123,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -151,10 +144,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -174,10 +166,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -191,10 +182,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -208,10 +198,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -225,10 +214,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -248,10 +236,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertExists(String,File) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -264,10 +251,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertExists(String,File) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -288,10 +274,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertFalse(String,boolean) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong if something goes wrong
-	 * 
+	 * 		if something goes wrong if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -307,10 +292,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertFalse(String,boolean) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -325,10 +309,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotEmpty(String,String) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -344,10 +327,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotEmpty(String,String) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -360,10 +342,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotExists(String,File) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -378,10 +359,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotExists(String,File) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -399,10 +379,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotNull(String,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -421,10 +400,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotNull(String,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -439,10 +417,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNull(String,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -459,10 +436,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNull(String,Object) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -477,10 +453,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertTrue(String,boolean) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
@@ -501,10 +476,9 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertTrue(String,boolean) method test.
-	 * 
+	 *
 	 * @throws Exception
-	 *             if something goes wrong
-	 * 
+	 * 		if something goes wrong
 	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test

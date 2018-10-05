@@ -5,8 +5,6 @@ import java.util.LinkedList;
 
 public class FixedSizeQueue<E> extends LinkedList<E> {
 
-	private static final long serialVersionUID = 1L;
-
 	private int maxSize;
 
 	public FixedSizeQueue(int size) {

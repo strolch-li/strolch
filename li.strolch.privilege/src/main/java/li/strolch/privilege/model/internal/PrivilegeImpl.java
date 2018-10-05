@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,20 +31,20 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * <p>
  * {@link IPrivilege} is the main model object for Privilege. A {@link Role} has a set of Privileges assigned to it
- * which defines the privileges a logged in user with that role has. If the {@link IPrivilege} has a
- * {@link PrivilegePolicy} defined, then that policy will be used for finer granularity and with the deny and allow
- * lists configured which is used to evaluate if privilege is granted to a {@link Restrictable}
+ * which defines the privileges a logged in user with that role has. If the {@link IPrivilege} has a {@link
+ * PrivilegePolicy} defined, then that policy will be used for finer granularity and with the deny and allow lists
+ * configured which is used to evaluate if privilege is granted to a {@link Restrictable}
  * </p>
- * 
+ *
  * <p>
  * {@link IPrivilege}s have allow and deny rules which the configured {@link PrivilegeHandler} uses to
  * </p>
- * 
+ *
  * <p>
  * Note: This is an internal object which is not to be serialized or passed to clients, {@link PrivilegeRep}s are used
  * for that
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public final class PrivilegeImpl implements IPrivilege {
@@ -57,19 +57,19 @@ public final class PrivilegeImpl implements IPrivilege {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param name
-	 *            the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
+	 * 		the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
 	 * @param policy
-	 *            the {@link PrivilegePolicy} configured to evaluate if the privilege is granted. If null, then
-	 *            privilege is granted
+	 * 		the {@link PrivilegePolicy} configured to evaluate if the privilege is granted. If null, then privilege is
+	 * 		granted
 	 * @param allAllowed
-	 *            a boolean defining if a {@link Role} with this {@link PrivilegeImpl} has unrestricted access to a
-	 *            {@link Restrictable} in which case the deny and allow lists are ignored and can be null
+	 * 		a boolean defining if a {@link Role} with this {@link PrivilegeImpl} has unrestricted access to a {@link
+	 * 		Restrictable} in which case the deny and allow lists are ignored and can be null
 	 * @param denyList
-	 *            a list of deny rules for this {@link PrivilegeImpl}, can be null if all allowed
+	 * 		a list of deny rules for this {@link PrivilegeImpl}, can be null if all allowed
 	 * @param allowList
-	 *            a list of allow rules for this {@link PrivilegeImpl}, can be null if all allowed
+	 * 		a list of allow rules for this {@link PrivilegeImpl}, can be null if all allowed
 	 */
 	public PrivilegeImpl(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 
@@ -77,13 +77,16 @@ public final class PrivilegeImpl implements IPrivilege {
 			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
 		}
 		if (StringHelper.isEmpty(policy)) {
-			throw new PrivilegeException(MessageFormat.format("Policy may not be empty for Privilege {0}!", name)); //$NON-NLS-1$
+			throw new PrivilegeException(
+					MessageFormat.format("Policy may not be empty for Privilege {0}!", name)); //$NON-NLS-1$
 		}
 		if (denyList == null) {
-			throw new PrivilegeException(MessageFormat.format("denyList is null for Privilege {0}!", name)); //$NON-NLS-1$
+			throw new PrivilegeException(
+					MessageFormat.format("denyList is null for Privilege {0}!", name)); //$NON-NLS-1$
 		}
 		if (allowList == null) {
-			throw new PrivilegeException(MessageFormat.format("allowList is null for Privilege {0}!", name)); //$NON-NLS-1$
+			throw new PrivilegeException(
+					MessageFormat.format("allowList is null for Privilege {0}!", name)); //$NON-NLS-1$
 		}
 
 		this.name = name;
@@ -95,9 +98,9 @@ public final class PrivilegeImpl implements IPrivilege {
 
 	/**
 	 * Constructs a {@link PrivilegeImpl} from the {@link PrivilegeRep}
-	 * 
+	 *
 	 * @param privilegeRep
-	 *            the {@link PrivilegeRep} from which to create the {@link PrivilegeImpl}
+	 * 		the {@link PrivilegeRep} from which to create the {@link PrivilegeImpl}
 	 */
 	public PrivilegeImpl(PrivilegeRep privilegeRep) {
 		this(privilegeRep.getName(), privilegeRep.getPolicy(), privilegeRep.isAllAllowed(), privilegeRep.getDenyList(),
@@ -187,7 +190,7 @@ public final class PrivilegeImpl implements IPrivilege {
 
 	/**
 	 * Returns a string representation of this object displaying its concrete type and its values
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@SuppressWarnings("nls")

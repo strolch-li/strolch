@@ -10,7 +10,7 @@ import li.strolch.policy.StrolchPolicy;
  * The {@link ActivityArchivalPolicy} is called when an {@link Activity} has reached the state {@link State#EXECUTED}
  * and can thus be archived. Here the archivation of the {@link Activity} can be implemented, e.g. removing it, or
  * exporting it to a different system etc.
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class ActivityArchivalPolicy extends StrolchPolicy {

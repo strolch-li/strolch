@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * wraps a comparison with an optional boolean inversion
- * 
+ *
  * @author msmock
  */
 public class ExpressionTerm extends AbstractBooleanExpression {
@@ -14,7 +14,7 @@ public class ExpressionTerm extends AbstractBooleanExpression {
 
 	@Override
 	public boolean evaluate(final Map<String, Object> inputObjects, final Map<String, Object> queryParameter) {
-		boolean result = comparisonExpression.evaluate(inputObjects,queryParameter);
+		boolean result = comparisonExpression.evaluate(inputObjects, queryParameter);
 		return not ? !result : result;
 	}
 

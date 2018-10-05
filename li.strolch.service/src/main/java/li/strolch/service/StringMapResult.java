@@ -8,8 +8,6 @@ import li.strolch.service.api.ServiceResultState;
 
 public class StringMapResult extends ServiceResult {
 
-	private static final long serialVersionUID = 1L;
-
 	private Map<String, String> map = new HashMap<>();
 
 	public StringMapResult(ServiceResultState state) {

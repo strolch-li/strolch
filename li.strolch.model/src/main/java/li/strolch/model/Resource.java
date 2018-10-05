@@ -16,13 +16,7 @@
 package li.strolch.model;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -38,8 +32,6 @@ import li.strolch.model.visitor.StrolchElementVisitor;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class Resource extends AbstractStrolchRootElement implements StrolchRootElement, Comparable<Resource> {
-
-	private static final long serialVersionUID = 0L;
 
 	protected Locator locator;
 	protected Version version;

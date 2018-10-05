@@ -23,7 +23,7 @@ import li.strolch.exception.StrolchException;
  */
 public class QueryException extends StrolchException {
 
-	private static final long serialVersionUID = 1L;
+
 
 	public QueryException(String message, Throwable cause) {
 		super(message, cause);

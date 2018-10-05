@@ -16,12 +16,7 @@
 package li.strolch.model;
 
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import li.strolch.exception.StrolchException;
@@ -33,8 +28,6 @@ import li.strolch.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class GroupedParameterizedElement extends AbstractStrolchElement implements ParameterBagContainer {
-
-	private static final long serialVersionUID = 0L;
 
 	protected Map<String, ParameterBag> parameterBagMap;
 	protected String type;
@@ -353,8 +346,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * 		the key of the {@link Parameter} to be found
 	 *
 	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
-	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not
-	 * exist on the {@link ParameterBag}
+	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
+	 * the {@link ParameterBag}
 	 */
 	public boolean hasParameter(String bagKey, String paramKey) {
 		if (this.parameterBagMap == null) {

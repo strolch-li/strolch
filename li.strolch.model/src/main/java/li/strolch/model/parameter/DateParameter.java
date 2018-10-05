@@ -30,7 +30,6 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  */
 public class DateParameter extends AbstractParameter<Date> {
 
-	private static final long serialVersionUID = 0L;
 	private static final Date EMPTY_VALUE = ISO8601FormatFactory.getInstance().getDateFormat().parse("-");
 
 	private Date value;

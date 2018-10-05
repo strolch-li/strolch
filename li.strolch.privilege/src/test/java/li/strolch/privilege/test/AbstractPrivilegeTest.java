@@ -5,15 +5,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.nio.file.Files;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.helper.PrivilegeInitializationHelper;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.utils.helper.FileHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AbstractPrivilegeTest {
 
@@ -42,10 +41,8 @@ public class AbstractPrivilegeTest {
 		}
 	}
 
-	protected static void prepareConfigs(String dst,
-										 String configFilename,
-										 String usersFilename,
-										 String rolesFilename) {
+	protected static void prepareConfigs(String dst, String configFilename, String usersFilename,
+			String rolesFilename) {
 		try {
 			File configPath = new File("src/test/resources/config");
 

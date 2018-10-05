@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,6 @@ package li.strolch.xmlpers.test.model;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class Book {
 
@@ -44,7 +43,7 @@ public class Book {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public Book(Long id) {
 		if (id == null)
@@ -68,7 +67,7 @@ public class Book {
 
 	/**
 	 * @param title
-	 *            the title to set
+	 * 		the title to set
 	 */
 	public void setTitle(String title) {
 		this.title = title;
@@ -83,7 +82,7 @@ public class Book {
 
 	/**
 	 * @param author
-	 *            the author to set
+	 * 		the author to set
 	 */
 	public void setAuthor(String author) {
 		this.author = author;
@@ -98,7 +97,7 @@ public class Book {
 
 	/**
 	 * @param press
-	 *            the press to set
+	 * 		the press to set
 	 */
 	public void setPress(String press) {
 		this.press = press;
@@ -113,7 +112,7 @@ public class Book {
 
 	/**
 	 * @param price
-	 *            the price to set
+	 * 		the price to set
 	 */
 	public void setPrice(double price) {
 		this.price = price;

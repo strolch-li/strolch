@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -63,8 +63,8 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		config.setPassword(password);
 
 		ds = new HikariDataSource(config);
-		logger.info("[" + realm + "] PostgreSQL Connection pool to " + url + " has a maximum pool size of "
-				+ ds.getMaximumPoolSize() + " connections");
+		logger.info("[" + realm + "] PostgreSQL Connection pool to " + url + " has a maximum pool size of " + ds
+				.getMaximumPoolSize() + " connections");
 
 		return new StrolchPostgreDataSource(ds);
 	}
@@ -83,6 +83,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @return
+		 *
 		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#getLogWriter()
 		 */
@@ -93,7 +94,9 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @param iface
+		 *
 		 * @return
+		 *
 		 * @throws SQLException
 		 * @see java.sql.Wrapper#unwrap(java.lang.Class)
 		 */
@@ -104,6 +107,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @param out
+		 *
 		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#setLogWriter(java.io.PrintWriter)
 		 */
@@ -114,7 +118,9 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @param iface
+		 *
 		 * @return
+		 *
 		 * @throws SQLException
 		 * @see java.sql.Wrapper#isWrapperFor(java.lang.Class)
 		 */
@@ -125,6 +131,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @return
+		 *
 		 * @throws SQLException
 		 * @see javax.sql.DataSource#getConnection()
 		 */
@@ -135,6 +142,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @param seconds
+		 *
 		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#setLoginTimeout(int)
 		 */
@@ -146,7 +154,9 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		/**
 		 * @param username
 		 * @param password
+		 *
 		 * @return
+		 *
 		 * @throws SQLException
 		 * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
 		 */
@@ -157,6 +167,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @return
+		 *
 		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#getLoginTimeout()
 		 */
@@ -167,6 +178,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		/**
 		 * @return
+		 *
 		 * @throws SQLFeatureNotSupportedException
 		 * @see javax.sql.CommonDataSource#getParentLogger()
 		 */
@@ -177,8 +189,8 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		@Override
 		public String toString() {
-			return "HikariDataSource for realm " + ds.getPoolName() + " for " + ds.getUsername() + " at "
-					+ ds.getJdbcUrl();
+			return "HikariDataSource for realm " + ds.getPoolName() + " for " + ds.getUsername() + " at " + ds
+					.getJdbcUrl();
 		}
 
 		/**

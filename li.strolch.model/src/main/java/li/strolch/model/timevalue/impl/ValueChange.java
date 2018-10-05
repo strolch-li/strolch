@@ -28,8 +28,6 @@ import li.strolch.model.timevalue.IValueChange;
 @SuppressWarnings("rawtypes")
 public class ValueChange<T extends IValue> implements IValueChange<T>, Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	protected Long time;
 	protected T value;
 	protected String stateId;

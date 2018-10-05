@@ -23,14 +23,7 @@ import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeConflictResolution;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.IPrivilege;
-import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.privilege.model.PrivilegeRep;
-import li.strolch.privilege.model.RoleRep;
-import li.strolch.privilege.model.Usage;
-import li.strolch.privilege.model.UserRep;
-import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
@@ -47,8 +40,8 @@ public interface PrivilegeHandler {
 	///
 
 	/**
-	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g. s
-	 * {@link #PRIVILEGE_ACTION_PERSIST} and {@link #PRIVILEGE_ACTION_GET_POLICIES}
+	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g. s {@link
+	 * #PRIVILEGE_ACTION_PERSIST} and {@link #PRIVILEGE_ACTION_GET_POLICIES}
 	 */
 	String PRIVILEGE_ACTION = "PrivilegeAction";
 
@@ -359,9 +352,8 @@ public interface PrivilegeHandler {
 	 * @param userRep
 	 * 		the {@link UserRep} containing the information to create the new {@link User}
 	 * @param password
-	 * 		the password of the new user. If the password is null, then this is accepted but the user can not
-	 * 		login, otherwise the password must be validated against
-	 * 		{@link PrivilegeHandler#validatePassword(char[])}
+	 * 		the password of the new user. If the password is null, then this is accepted but the user can not login,
+	 * 		otherwise the password must be validated against {@link PrivilegeHandler#validatePassword(char[])}
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user for this certificate may not perform the action
@@ -416,9 +408,8 @@ public interface PrivilegeHandler {
 	 * @param userRep
 	 * 		the {@link UserRep} containing the information to replace the existing {@link User}
 	 * @param password
-	 * 		the password of the new user. If the password is null, then this is accepted but the user can not
-	 * 		login, otherwise the password must be validated against
-	 * 		{@link PrivilegeHandler#validatePassword(char[])}
+	 * 		the password of the new user. If the password is null, then this is accepted but the user can not login,
+	 * 		otherwise the password must be validated against {@link PrivilegeHandler#validatePassword(char[])}
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user for this certificate may not perform the action
@@ -495,8 +486,8 @@ public interface PrivilegeHandler {
 	/**
 	 * <p>
 	 * Changes the password for the {@link User} with the given username. If the password is null, then the {@link User}
-	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under
-	 * {@link PrivilegeHandler#validatePassword(char[])}
+	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under {@link
+	 * PrivilegeHandler#validatePassword(char[])}
 	 * </p>
 	 *
 	 * <p>
@@ -508,9 +499,8 @@ public interface PrivilegeHandler {
 	 * @param username
 	 * 		the username of the {@link User} for which the password is to be changed
 	 * @param password
-	 * 		the new password for this user. If the password is null, then the {@link User} can not login anymore.
-	 * 		Otherwise the password must meet the requirements of the implementation under
-	 * 		{@link PrivilegeHandler#validatePassword(char[])}
+	 * 		the new password for this user. If the password is null, then the {@link User} can not login anymore. Otherwise
+	 * 		the password must meet the requirements of the implementation under {@link PrivilegeHandler#validatePassword(char[])}
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user for this certificate may not perform the action
@@ -586,8 +576,8 @@ public interface PrivilegeHandler {
 	 * @param username
 	 * 		the username of the {@link User} which is registered in the {@link PersistenceHandler}
 	 * @param password
-	 * 		the password with which this user is to be authenticated. Null passwords are not accepted and they
-	 * 		must meet the requirements of the {@link #validatePassword(char[])}-method
+	 * 		the password with which this user is to be authenticated. Null passwords are not accepted and they must meet
+	 * 		the requirements of the {@link #validatePassword(char[])}-method
 	 *
 	 * @return a {@link Certificate} with which this user may then perform actions
 	 *

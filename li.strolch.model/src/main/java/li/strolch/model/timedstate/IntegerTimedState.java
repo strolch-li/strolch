@@ -24,8 +24,6 @@ import li.strolch.model.visitor.StrolchElementVisitor;
  */
 public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 
-	private static final long serialVersionUID = 1L;
-
 	public IntegerTimedState() {
 		super();
 	}

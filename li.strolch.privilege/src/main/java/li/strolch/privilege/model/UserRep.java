@@ -33,8 +33,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class UserRep implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	private String userId;
 	private String username;
 	private String firstname;

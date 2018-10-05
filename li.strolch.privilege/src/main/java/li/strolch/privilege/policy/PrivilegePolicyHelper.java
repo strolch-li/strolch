@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,16 +32,16 @@ public class PrivilegePolicyHelper {
 
 	/**
 	 * Validates the given values and returns the privilege name
-	 * 
+	 *
 	 * @param privilege
-	 *            the {@link IPrivilege}
+	 * 		the {@link IPrivilege}
 	 * @param restrictable
-	 *            the {@link Restrictable}
-	 * 
+	 * 		the {@link Restrictable}
+	 *
 	 * @return the privilege name
-	 * 
+	 *
 	 * @throws PrivilegeException
-	 *             if something is wrong
+	 * 		if something is wrong
 	 */
 	public static String preValidate(IPrivilege privilege, Restrictable restrictable) throws PrivilegeException {
 		if (privilege == null)
@@ -58,8 +58,8 @@ public class PrivilegePolicyHelper {
 
 		// we want the privileges names to match
 		if (!privilege.getName().equals(privilegeName)) {
-			throw new PrivilegeException(
-					MessageFormat.format(PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"), //$NON-NLS-1$
+			throw new PrivilegeException(MessageFormat
+					.format(PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"),//$NON-NLS-1$
 							privilege.getName(), privilegeName));
 		}
 
@@ -68,20 +68,20 @@ public class PrivilegePolicyHelper {
 
 	/**
 	 * Validates privilege is granted by checking first if all is allows, then the deny values, then the allow values.
-	 * If the privilegeValue is in the deny list or not in the allow list, then access is denied and the
-	 * {@link AccessDeniedException} is thrown
-	 * 
+	 * If the privilegeValue is in the deny list or not in the allow list, then access is denied and the {@link
+	 * AccessDeniedException} is thrown
+	 *
 	 * @param ctx
-	 *            the context
+	 * 		the context
 	 * @param privilege
-	 *            the privielge
+	 * 		the privielge
 	 * @param restrictable
-	 *            the restrictable
+	 * 		the restrictable
 	 * @param privilegeValue
-	 *            the privilege value
-	 * 
+	 * 		the privilege value
+	 *
 	 * @throws AccessDeniedException
-	 *             if access is denied
+	 * 		if access is denied
 	 */
 	public static void checkByAllowDenyValues(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
 			String privilegeValue) throws AccessDeniedException {
@@ -94,14 +94,16 @@ public class PrivilegePolicyHelper {
 		if (privilege.isDenied(privilegeValue)) {
 
 			// then throw access denied
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
-					ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
+			String msg = MessageFormat
+					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
+							ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 			throw new AccessDeniedException(msg);
 		}
 
 		// default is not allowed
-		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
-				ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
+		String msg = MessageFormat
+				.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
+						ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 
 		throw new AccessDeniedException(msg);
 	}

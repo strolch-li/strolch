@@ -3,21 +3,11 @@ package li.strolch.utils.helper;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import li.strolch.utils.helper.AesCryptoHelper;
-import li.strolch.utils.helper.ExceptionHelper;
-import li.strolch.utils.helper.FileHelper;
-import li.strolch.utils.helper.StringHelper;
 
 public class AesCryptoHelperTest {
 

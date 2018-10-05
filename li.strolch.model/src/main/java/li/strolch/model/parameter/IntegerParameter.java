@@ -24,8 +24,6 @@ import li.strolch.utils.dbc.DBC;
  */
 public class IntegerParameter extends AbstractParameter<Integer> {
 
-	private static final long serialVersionUID = 0L;
-
 	private Integer value = Integer.MAX_VALUE;
 
 	/**

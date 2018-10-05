@@ -30,7 +30,8 @@ import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 
 /**
- * The {@link ServiceExecutionHandler} is used to perform long running services so that no singletons etc. are required.
+ * The {@link ServiceExecutionHandler} is used to perform long running services so that no singletons etc. are
+ * required.
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

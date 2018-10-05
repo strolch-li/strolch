@@ -31,22 +31,22 @@
  */
 package javanet.staxutils;
 
-import javanet.staxutils.helpers.StreamWriterDelegate;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import javanet.staxutils.helpers.StreamWriterDelegate;
 
 /**
  * A filter that indents an XML stream. To apply it, construct a filter that contains another {@link XMLStreamWriter},
  * which you pass to the constructor. Then call methods of the filter instead of the contained stream. For example:
- * 
+ *
  * <pre>
  * {@link XMLStreamWriter} stream = ...
  * stream = new {@link IndentingXMLStreamWriter}(stream);
  * stream.writeStartDocument();
  * ...
  * </pre>
- * 
+ *
  * <p>
  * The filter inserts characters to format the document as an outline, with nested elements indented. Basically, it
  * inserts a line break and whitespace before:
@@ -62,7 +62,7 @@ import javax.xml.stream.XMLStreamWriter;
  * Indentation can be adjusted by setting the newLine and indent properties. But set them to whitespace only, for best
  * results. Non-whitespace is apt to cause problems, for example when this class attempts to insert newLine before the
  * root element.
- * 
+ *
  * @author <a href="mailto:jk2006@engineer.com">John Kristian</a>
  */
 @SuppressWarnings("nls")
@@ -82,10 +82,14 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		setNewLine(newLine);
 	}
 
-	/** How deeply nested the current scope is. The root element is depth 1. */
+	/**
+	 * How deeply nested the current scope is. The root element is depth 1.
+	 */
 	private int depth = 0; // document scope
 
-	/** stack[depth] indicates what's been written into the current scope. */
+	/**
+	 * stack[depth] indicates what's been written into the current scope.
+	 */
 	private int[] stack = new int[] { 0, 0, 0, 0 }; // nothing written yet
 
 	private static final int WROTE_MARKUP = 1;
@@ -96,7 +100,9 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 
 	private String newLine = NORMAL_END_OF_LINE;
 
-	/** newLine followed by copies of indent. */
+	/**
+	 * newLine followed by copies of indent.
+	 */
 	private char[] linePrefix = null;
 
 	@Override
@@ -121,7 +127,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 	}
 
 	/**
-	 * @return System.getProperty("line.separator"); or {@link #NORMAL_END_OF_LINE} if that fails.
+	 * @return System.getProperty(" line.separator "); or {@link #NORMAL_END_OF_LINE} if that fails.
 	 */
 	public static String getLineSeparator() {
 		try {
@@ -272,7 +278,9 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		afterEndDocument();
 	}
 
-	/** Prepare to write markup, by writing a new line and indentation. */
+	/**
+	 * Prepare to write markup, by writing a new line and indentation.
+	 */
 	protected void beforeMarkup() {
 		int soFar = this.stack[this.depth];
 		if ((soFar & WROTE_DATA) == 0 // no data in this scope
@@ -289,17 +297,23 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		}
 	}
 
-	/** Note that markup or indentation was written. */
+	/**
+	 * Note that markup or indentation was written.
+	 */
 	protected void afterMarkup() {
 		this.stack[this.depth] |= WROTE_MARKUP;
 	}
 
-	/** Note that data were written. */
+	/**
+	 * Note that data were written.
+	 */
 	protected void afterData() {
 		this.stack[this.depth] |= WROTE_DATA;
 	}
 
-	/** Prepare to start an element, by allocating stack space. */
+	/**
+	 * Prepare to start an element, by allocating stack space.
+	 */
 	protected void beforeStartElement() {
 		beforeMarkup();
 		if (this.stack.length <= this.depth + 1) {
@@ -311,13 +325,17 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		this.stack[this.depth + 1] = 0; // nothing written yet
 	}
 
-	/** Note that an element was started. */
+	/**
+	 * Note that an element was started.
+	 */
 	protected void afterStartElement() {
 		afterMarkup();
 		++this.depth;
 	}
 
-	/** Prepare to end an element, by writing a new line and indentation. */
+	/**
+	 * Prepare to end an element, by writing a new line and indentation.
+	 */
 	protected void beforeEndElement() {
 		if (this.depth > 0 && this.stack[this.depth] == WROTE_MARKUP) { // but not data
 			try {
@@ -328,14 +346,18 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		}
 	}
 
-	/** Note that an element was ended. */
+	/**
+	 * Note that an element was ended.
+	 */
 	protected void afterEndElement() {
 		if (this.depth > 0) {
 			--this.depth;
 		}
 	}
 
-	/** Note that a document was ended. */
+	/**
+	 * Note that a document was ended.
+	 */
 	protected void afterEndDocument() {
 		if (this.stack[this.depth = 0] == WROTE_MARKUP) { // but not data
 			try {
@@ -347,7 +369,9 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		this.stack[this.depth] = 0; // start fresh
 	}
 
-	/** Write a line separator followed by indentation. */
+	/**
+	 * Write a line separator followed by indentation.
+	 */
 	protected void writeNewLine(int indentation) throws XMLStreamException {
 		final int newLineLength = getNewLine().length();
 		final int prefixLength = newLineLength + (getIndent().length() * indentation);

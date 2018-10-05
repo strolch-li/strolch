@@ -71,7 +71,6 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 	}
 
 	public static class CommitService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {
@@ -116,7 +115,6 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 	}
 
 	public static class RollbackService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {
@@ -161,7 +159,6 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 	}
 
 	public static class ReadonlyService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {
@@ -189,7 +186,6 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 	}
 
 	public static class ReadonlyFailService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {

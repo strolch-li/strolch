@@ -9,7 +9,6 @@ import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.helper.StringHelper;
 
 public class SetActionToStoppedService extends AbstractService<LocatorArgument, ServiceResult> {
-	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {

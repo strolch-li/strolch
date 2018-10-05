@@ -35,8 +35,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public abstract class AbstractParameter<T> extends AbstractStrolchElement implements Parameter<T> {
 
-	private static final long serialVersionUID = 0L;
-
 	protected boolean hidden = false;
 	protected int index;
 	protected String interpretation = INTERPRETATION_NONE;

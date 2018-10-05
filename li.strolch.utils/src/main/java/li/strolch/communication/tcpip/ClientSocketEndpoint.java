@@ -24,25 +24,18 @@ import java.net.UnknownHostException;
 import java.text.MessageFormat;
 import java.util.Map;
 
+import li.strolch.communication.*;
+import li.strolch.communication.IoMessage.State;
 import li.strolch.utils.helper.ExceptionHelper;
+import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import li.strolch.communication.CommunicationConnection;
-import li.strolch.communication.CommunicationEndpoint;
-import li.strolch.communication.ConnectionException;
-import li.strolch.communication.ConnectionMessages;
-import li.strolch.communication.ConnectionState;
-import li.strolch.communication.IoMessage;
-import li.strolch.communication.IoMessageVisitor;
-import li.strolch.communication.IoMessage.State;
-import li.strolch.utils.helper.StringHelper;
-
 /**
  * <p>
- * This {@link CommunicationEndpoint} is an abstract implementation with everything needed to connect through a
- * {@link Socket} to a remote server which is listening for incoming {@link Socket} connections. This {@link Socket}
- * endpoint can send messages to the remote side, as well as receive messages from the remote side
+ * This {@link CommunicationEndpoint} is an abstract implementation with everything needed to connect through a {@link
+ * Socket} to a remote server which is listening for incoming {@link Socket} connections. This {@link Socket} endpoint
+ * can send messages to the remote side, as well as receive messages from the remote side
  * </p>
  * <p>
  * This endpoint is maintained as a client connection. This means that this endpoint opens the {@link Socket} to the
@@ -275,8 +268,10 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 	 * <ul>
 	 * <li>remoteInputAddress - the IP or Hostname of the remote server</li>
 	 * <li>remoteInputPort - the port to which the socket should be established</li>
-	 * <li>localOutputAddress - the IP or Hostname of the local server (if null, then the network layer will decide)</li>
-	 * <li>localOutputPort - the local port from which the socket should go out of (if null, then the network layer will
+	 * <li>localOutputAddress - the IP or Hostname of the local server (if null, then the network layer will
+	 * decide)</li>
+	 * <li>localOutputPort - the local port from which the socket should go out of (if null, then the network layer
+	 * will
 	 * decide)</li>
 	 * <li>retry - a configured retry wait time. Default is {@link SocketEndpointConstants#RETRY}</li>
 	 * <li>timeout - the timeout after which an idle socket is deemed dead. Default is
@@ -284,8 +279,8 @@ public class ClientSocketEndpoint implements CommunicationEndpoint {
 	 * <li>useTimeout - if true, then the timeout is activated, otherwise it is. default is
 	 * {@link SocketEndpointConstants#USE_TIMEOUT}</li>
 	 * <li>clearOnConnect - if true, then the after a successful connect the input is cleared by discarding all
-	 * available bytes. This can be useful in cases where the channel is clogged with stale data. default is
-	 * {@link SocketEndpointConstants#CLEAR_ON_CONNECT}</li>
+	 * available bytes. This can be useful in cases where the channel is clogged with stale data. default is {@link
+	 * SocketEndpointConstants#CLEAR_ON_CONNECT}</li>
 	 * <li>connectOnStart - if true, then when the connection is started, the connection to the remote address is
 	 * attempted. default is {@link SocketEndpointConstants#CONNECT_ON_START}
 	 * </ul>

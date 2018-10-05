@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Privilege>
 
-	<Container>
+    <Container>
 
-		<Parameters>
-			<!-- parameters for the container itself -->
-			<Parameter name="autoPersistOnUserChangesData" value="true" />
-			<Parameter name="privilegeConflictResolution" value="MERGE" />
-		</Parameters>
+        <Parameters>
+            <!-- parameters for the container itself -->
+            <Parameter name="autoPersistOnUserChangesData" value="true"/>
+            <Parameter name="privilegeConflictResolution" value="MERGE"/>
+        </Parameters>
 
-		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
-			<Parameters>
-				<!-- WARNING: If you change iterations or keyLength, then all passwords are invalid -->
-				<!-- default algorithm is: PBKDF2WithHmacSHA512 -->
-				<Parameter name="hashAlgorithm" value="PBKDF2WithHmacSHA512" />
-				<!-- default iterations: 200000 -->
-				<Parameter name="hashIterations" value="10000" />
-				<!-- default key length: 256 -->
-				<Parameter name="hashKeyLength" value="256" />
-			</Parameters>
-		</EncryptionHandler>
+        <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
+            <Parameters>
+                <!-- WARNING: If you change iterations or keyLength, then all passwords are invalid -->
+                <!-- default algorithm is: PBKDF2WithHmacSHA512 -->
+                <Parameter name="hashAlgorithm" value="PBKDF2WithHmacSHA512"/>
+                <!-- default iterations: 200000 -->
+                <Parameter name="hashIterations" value="10000"/>
+                <!-- default key length: 256 -->
+                <Parameter name="hashKeyLength" value="256"/>
+            </Parameters>
+        </EncryptionHandler>
 
-		<PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
-			<Parameters>
-				<Parameter name="basePath" value="target/${target}" />
-				<Parameter name="usersXmlFile" value="PrivilegeUsersMerge.xml" />
-				<Parameter name="rolesXmlFile" value="PrivilegeRolesMerge.xml" />
-			</Parameters>
-		</PersistenceHandler>
+        <PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
+            <Parameters>
+                <Parameter name="basePath" value="target/${target}"/>
+                <Parameter name="usersXmlFile" value="PrivilegeUsersMerge.xml"/>
+                <Parameter name="rolesXmlFile" value="PrivilegeRolesMerge.xml"/>
+            </Parameters>
+        </PersistenceHandler>
 
-		<UserChallengeHandler class="li.strolch.privilege.handler.ConsoleUserChallengeHandler">
-		</UserChallengeHandler>
+        <UserChallengeHandler class="li.strolch.privilege.handler.ConsoleUserChallengeHandler">
+        </UserChallengeHandler>
 
-	</Container>
+    </Container>
 
-	<Policies>
-		<Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
-		<Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege" />
-		<Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
-	</Policies>
+    <Policies>
+        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege"/>
+        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege"/>
+        <Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege"/>
+    </Policies>
 
 </Privilege>

@@ -8,13 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import li.strolch.communication.CommandKey;
-import li.strolch.communication.CommunicationConnection;
-import li.strolch.communication.ConnectionMode;
-import li.strolch.communication.ConnectionObserver;
-import li.strolch.communication.ConnectionState;
-import li.strolch.communication.ConnectionStateObserver;
-import li.strolch.communication.IoMessage;
+import li.strolch.communication.*;
 import li.strolch.communication.tcpip.ClientSocketEndpoint;
 import li.strolch.communication.tcpip.SocketEndpointConstants;
 import li.strolch.communication.tcpip.SocketMessageVisitor;
@@ -46,7 +40,8 @@ public class ChatClient implements ConnectionObserver, ConnectionStateObserver {
 		SocketMessageVisitor messageVisitor = new ChatMessageVisitor(id);
 		ClientSocketEndpoint endpoint = new ClientSocketEndpoint();
 
-		CommunicationConnection connection = new CommunicationConnection(id, mode, parameters, endpoint, messageVisitor);
+		CommunicationConnection connection = new CommunicationConnection(id, mode, parameters, endpoint,
+				messageVisitor);
 		connection.addConnectionObserver(outboundKey, this);
 		connection.addConnectionObserver(inboundKey, this);
 		connection.addConnectionStateObserver(this);

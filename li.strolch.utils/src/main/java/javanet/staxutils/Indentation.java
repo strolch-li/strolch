@@ -6,7 +6,9 @@ package javanet.staxutils;
 @SuppressWarnings("nls")
 public interface Indentation {
 
-	/** Two spaces; the default indentation. */
+	/**
+	 * Two spaces; the default indentation.
+	 */
 	public static final String DEFAULT_INDENT = "  ";
 
 	/**
@@ -15,22 +17,25 @@ public interface Indentation {
 	 */
 	void setIndent(String indent);
 
-	/** The characters used for one level of indentation. */
+	/**
+	 * The characters used for one level of indentation.
+	 */
 	String getIndent();
 
 	/**
-	 * "\n"; the normalized representation of end-of-line in <a
-	 * href="http://www.w3.org/TR/xml11/#sec-line-ends">XML</a>.
+	 * "\n"; the normalized representation of end-of-line in <a href="http://www.w3.org/TR/xml11/#sec-line-ends">XML</a>.
 	 */
 	public static final String NORMAL_END_OF_LINE = "\n";
 
 	/**
-	 * Set the characters that introduce a new line. The default is {@link #NORMAL_END_OF_LINE}.
-	 * {@link IndentingXMLStreamWriter#getLineSeparator}() is a popular alternative.
+	 * Set the characters that introduce a new line. The default is {@link #NORMAL_END_OF_LINE}. {@link
+	 * IndentingXMLStreamWriter#getLineSeparator}() is a popular alternative.
 	 */
 	public void setNewLine(String newLine);
 
-	/** The characters that introduce a new line. */
+	/**
+	 * The characters that introduce a new line.
+	 */
 	String getNewLine();
 
 }

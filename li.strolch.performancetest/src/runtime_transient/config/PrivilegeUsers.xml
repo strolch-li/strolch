@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Users>
-	<User userId="1" username="agent">
-		<State>SYSTEM</State>
-		<Roles>
-			<Role>agent</Role>
-		</Roles>
-	</User>
-	<User userId="2" username="transient" password="cc6072ac76d018d95c964ca3d8d1d934a2bf66a369bdf2ff5a539bf23ecde11b" salt="7472616e7369656e74">
-		<Firstname>Application</Firstname>
-		<Lastname>Administrator</Lastname>
-		<State>ENABLED</State>
-		<Locale>en_GB</Locale>
-		<Roles>
-			<Role>AppUser</Role>
-		</Roles>
-		<Properties>
-			<Property name="realm" value="transient" />
-		</Properties>
-	</User>
+    <User userId="1" username="agent">
+        <State>SYSTEM</State>
+        <Roles>
+            <Role>agent</Role>
+        </Roles>
+    </User>
+    <User userId="2" username="transient" password="cc6072ac76d018d95c964ca3d8d1d934a2bf66a369bdf2ff5a539bf23ecde11b" salt="7472616e7369656e74">
+        <Firstname>Application</Firstname>
+        <Lastname>Administrator</Lastname>
+        <State>ENABLED</State>
+        <Locale>en_GB</Locale>
+        <Roles>
+            <Role>AppUser</Role>
+        </Roles>
+        <Properties>
+            <Property name="realm" value="transient"/>
+        </Properties>
+    </User>
 </Users>

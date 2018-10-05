@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,8 +30,6 @@ import li.strolch.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class XmlImportModelService extends AbstractService<XmlImportModelArgument, XmlImportModelResult> {
-
-	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected XmlImportModelResult getResultInstance() {
@@ -95,8 +93,9 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 
 		ModelStatistics statistics = command.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat.format("Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), //$NON-NLS-1$
-				arg.realm, durationS));
+		logger.info(MessageFormat
+				.format("Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), //$NON-NLS-1$
+						arg.realm, durationS));
 		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$

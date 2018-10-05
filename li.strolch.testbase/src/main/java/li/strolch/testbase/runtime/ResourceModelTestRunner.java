@@ -132,7 +132,8 @@ public class ResourceModelTestRunner {
 		}
 		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
-			assertNotSame("Objects can't be the same reference after re-reading!", readResource, updatedResource); //$NON-NLS-1$
+			assertNotSame("Objects can't be the same reference after re-reading!", readResource,
+					updatedResource); //$NON-NLS-1$
 		StringParameter updatedParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 

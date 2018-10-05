@@ -30,8 +30,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class FloatListParameter extends AbstractParameter<List<Double>> implements ListParameter<Double> {
 
-	private static final long serialVersionUID = 1L;
-
 	protected List<Double> value;
 
 	/**

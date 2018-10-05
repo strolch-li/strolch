@@ -5,18 +5,18 @@
  *
  * This file is part of the XXX.
  *
- *  XXX is free software: you can redistribute 
- *  it and/or modify it under the terms of the GNU General Public License as 
- *  published by the Free Software Foundation, either version 3 of the License, 
+ *  XXX is free software: you can redistribute
+ *  it and/or modify it under the terms of the GNU General Public License as
+ *  published by the Free Software Foundation, either version 3 of the License,
  *  or (at your option) any later version.
  *
- *  XXX is distributed in the hope that it will 
+ *  XXX is distributed in the hope that it will
  *  be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with XXX.  If not, see 
+ *  along with XXX.  If not, see
  *  <http://www.gnu.org/licenses/>.
  */
 package li.strolch.communication;
@@ -42,7 +42,8 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 * 		the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -56,7 +57,8 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param localUri the localUri to set
+	 * @param localUri
+	 * 		the localUri to set
 	 */
 	public void setLocalUri(String localUri) {
 		this.localUri = localUri;
@@ -70,7 +72,8 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param remoteUri the remoteUri to set
+	 * @param remoteUri
+	 * 		the remoteUri to set
 	 */
 	public void setRemoteUri(String remoteUri) {
 		this.remoteUri = remoteUri;
@@ -84,7 +87,8 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param mode the mode to set
+	 * @param mode
+	 * 		the mode to set
 	 */
 	public void setMode(ConnectionMode mode) {
 		this.mode = mode;
@@ -98,7 +102,8 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param state the state to set
+	 * @param state
+	 * 		the state to set
 	 */
 	public void setState(ConnectionState state) {
 		this.state = state;
@@ -112,7 +117,8 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param stateMsg the stateMsg to set
+	 * @param stateMsg
+	 * 		the stateMsg to set
 	 */
 	public void setStateMsg(String stateMsg) {
 		this.stateMsg = stateMsg;
@@ -126,7 +132,8 @@ public class ConnectionInfo {
 	}
 
 	/**
-	 * @param queueSize the queueSize to set
+	 * @param queueSize
+	 * 		the queueSize to set
 	 */
 	public void setQueueSize(int queueSize) {
 		this.queueSize = queueSize;

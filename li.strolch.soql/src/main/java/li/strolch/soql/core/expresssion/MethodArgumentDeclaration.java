@@ -6,9 +6,8 @@ import java.util.Map;
 
 /**
  * Expression to wrap a declaration of method arguments
- * 
- * @author msmock
  *
+ * @author msmock
  */
 public class MethodArgumentDeclaration extends AbstractObjectExpression {
 
@@ -21,9 +20,9 @@ public class MethodArgumentDeclaration extends AbstractObjectExpression {
 
 	@Override
 	public Object evaluate(Map<String, Object> inputObjects, Map<String, Object> queryParameter) {
-		final List<Object> result = new ArrayList<>(); 
+		final List<Object> result = new ArrayList<>();
 		for (ParameterReference parameterReference : parameterReferences) {
-			result.add(parameterReference.evaluate(inputObjects, queryParameter)); 
+			result.add(parameterReference.evaluate(inputObjects, queryParameter));
 		}
 		return result;
 	}

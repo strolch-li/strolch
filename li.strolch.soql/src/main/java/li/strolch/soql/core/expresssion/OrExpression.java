@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * Boolean OR implementation to combine {@link ComparisonExpression} objects
- * 
+ *
  * @author msmock
  */
 public class OrExpression extends AbstractBooleanExpression {

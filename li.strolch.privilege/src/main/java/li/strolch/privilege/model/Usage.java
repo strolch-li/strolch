@@ -3,7 +3,8 @@ package li.strolch.privilege.model;
 import li.strolch.privilege.base.PrivilegeException;
 
 public enum Usage {
-	ANY("any"), SET_PASSWORD("set-password");
+	ANY("any"),
+	SET_PASSWORD("set-password");
 
 	private String value;
 

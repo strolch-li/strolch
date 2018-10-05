@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,24 +23,15 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.api.StrolchBootstrapper;
-import li.strolch.agent.api.StrolchRealm;
-import li.strolch.agent.api.StrolchVersion;
+import li.strolch.agent.api.*;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.api.ServiceHandler;
-import li.strolch.service.api.ServiceResult;
-import li.strolch.service.api.ServiceResultState;
+import li.strolch.service.api.*;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RuntimeMock {
 
@@ -132,12 +123,13 @@ public class RuntimeMock {
 			throw new RuntimeException(msg);
 		}
 
-		logger.info(MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(), //$NON-NLS-1$
-				this.targetPathF.getAbsolutePath()));
+		logger.info(
+				MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(), //$NON-NLS-1$
+						this.targetPathF.getAbsolutePath()));
 
 		// setup the container
-		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", this.srcPathF,
-				this.targetPathF);
+		this.agent = new StrolchBootstrapper(getAppVersion())
+				.setupByCopyingRoot("dev", this.srcPathF, this.targetPathF);
 
 		return this;
 	}

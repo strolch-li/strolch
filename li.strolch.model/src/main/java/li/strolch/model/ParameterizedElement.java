@@ -16,13 +16,7 @@
 package li.strolch.model;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import li.strolch.exception.StrolchException;
@@ -35,8 +29,6 @@ import li.strolch.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class ParameterizedElement extends AbstractStrolchElement {
-
-	private static final long serialVersionUID = 0L;
 
 	protected GroupedParameterizedElement parent;
 	protected Map<String, Parameter<?>> parameterMap;

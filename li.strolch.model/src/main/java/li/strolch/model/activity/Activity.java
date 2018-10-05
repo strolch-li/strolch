@@ -40,8 +40,6 @@ import li.strolch.utils.dbc.DBC;
 public class Activity extends AbstractStrolchRootElement
 		implements IActivityElement, StrolchRootElement, Comparable<Activity> {
 
-	private static final long serialVersionUID = 1L;
-
 	protected Locator locator;
 	protected Version version;
 

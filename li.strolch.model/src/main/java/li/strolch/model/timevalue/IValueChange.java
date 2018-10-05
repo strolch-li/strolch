@@ -19,8 +19,8 @@ import li.strolch.model.timedstate.AbstractStrolchTimedState;
 import li.strolch.model.timevalue.impl.TimeVariable;
 
 /**
- * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable} or
- * {@link AbstractStrolchTimedState}.
+ * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable} or {@link
+ * AbstractStrolchTimedState}.
  *
  * @author Martin Smock <smock.martin@gmail.com>
  */
@@ -63,7 +63,8 @@ public interface IValueChange<T extends IValue> {
 	IValueChange<T> getClone();
 
 	/**
-	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it, call {@link #getClone()}
+	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it,
+	 * call {@link #getClone()}
 	 *
 	 * @return true if this element is read only
 	 */

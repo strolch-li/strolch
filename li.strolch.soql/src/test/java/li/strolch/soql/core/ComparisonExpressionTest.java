@@ -6,11 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-
 import li.strolch.soql.core.expresssion.ComparisonExpression;
 import li.strolch.soql.core.expresssion.ParameterReference;
 import li.strolch.soql.core.expresssion.ValueDeclaration;
+import org.junit.Test;
 
 /**
  * @author msmock
@@ -50,7 +49,7 @@ public class ComparisonExpressionTest {
 
 		assertTrue(ce.evaluate(null, null));
 	}
-	
+
 	@Test
 	public void testNumericMatch() {
 
@@ -64,20 +63,20 @@ public class ComparisonExpressionTest {
 		ce.addOperand(vd_1);
 		ce.addOperand(vd_2);
 		ce.setOperator("=");
-		
+
 		Map<String, Object> queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertTrue(ce.evaluate(null, queryParameter));
-		
+
 		queryParameter = new HashMap<>();
 		queryParameter.put("a", 1L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertFalse(ce.evaluate(null, queryParameter));
 	}
-	
+
 	@Test
 	public void testNumericLess() {
 
@@ -91,20 +90,20 @@ public class ComparisonExpressionTest {
 		ce.addOperand(vd_1);
 		ce.addOperand(vd_2);
 		ce.setOperator("<");
-		
+
 		Map<String, Object> queryParameter = new HashMap<>();
 		queryParameter.put("a", 1L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertTrue(ce.evaluate(null, queryParameter));
-		
+
 		queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertFalse(ce.evaluate(null, queryParameter));
 	}
-	
+
 	@Test
 	public void testNumericMore() {
 
@@ -118,20 +117,20 @@ public class ComparisonExpressionTest {
 		ce.addOperand(vd_1);
 		ce.addOperand(vd_2);
 		ce.setOperator(">");
-		
+
 		Map<String, Object> queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 1L);		
+		queryParameter.put("b", 1L);
 
 		assertTrue(ce.evaluate(null, queryParameter));
-		
+
 		queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertFalse(ce.evaluate(null, queryParameter));
 	}
-	
+
 	@Test
 	public void testNumericLessEquals() {
 
@@ -145,26 +144,26 @@ public class ComparisonExpressionTest {
 		ce.addOperand(vd_1);
 		ce.addOperand(vd_2);
 		ce.setOperator("<=");
-		
+
 		Map<String, Object> queryParameter = new HashMap<>();
 		queryParameter.put("a", 1L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertTrue(ce.evaluate(null, queryParameter));
-		
+
 		queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertTrue(ce.evaluate(null, queryParameter));
-		
+
 		queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 1L);		
+		queryParameter.put("b", 1L);
 
 		assertFalse(ce.evaluate(null, queryParameter));
 	}
-	
+
 	@Test
 	public void testNumericMoreEuals() {
 
@@ -178,25 +177,24 @@ public class ComparisonExpressionTest {
 		ce.addOperand(vd_1);
 		ce.addOperand(vd_2);
 		ce.setOperator(">=");
-		
+
 		Map<String, Object> queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 1L);		
+		queryParameter.put("b", 1L);
 
 		assertTrue(ce.evaluate(null, queryParameter));
-		
+
 		queryParameter = new HashMap<>();
 		queryParameter.put("a", 123L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertTrue(ce.evaluate(null, queryParameter));
-		
+
 		queryParameter = new HashMap<>();
 		queryParameter.put("a", 1L);
-		queryParameter.put("b", 123L);		
+		queryParameter.put("b", 123L);
 
 		assertFalse(ce.evaluate(null, queryParameter));
 	}
-	
 
 }

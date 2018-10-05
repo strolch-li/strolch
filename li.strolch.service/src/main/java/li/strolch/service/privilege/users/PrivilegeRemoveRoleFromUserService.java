@@ -29,8 +29,6 @@ import li.strolch.service.api.AbstractService;
 public class PrivilegeRemoveRoleFromUserService
 		extends AbstractService<PrivilegeRoleUserNamesArgument, PrivilegeUserResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected PrivilegeUserResult getResultInstance() {
 		return new PrivilegeUserResult();

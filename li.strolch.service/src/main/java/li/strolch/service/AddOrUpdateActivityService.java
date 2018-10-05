@@ -26,10 +26,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@gmail.com>
  */
-public class AddOrUpdateActivityService
-		extends AbstractService<StrolchRootElementArgument, ServiceResult> {
-
-	private static final long serialVersionUID = 1L;
+public class AddOrUpdateActivityService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
 	@Override
 	protected ServiceResult getResultInstance() {

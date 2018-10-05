@@ -39,8 +39,6 @@ import li.strolch.model.visitor.StrolchElementVisitor;
  */
 public class Action extends GroupedParameterizedElement implements IActivityElement, PolicyContainer {
 
-	protected static final long serialVersionUID = 1L;
-
 	protected Activity parent;
 	protected String resourceId;
 	protected String resourceType;

@@ -37,8 +37,6 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  */
 public class Order extends AbstractStrolchRootElement implements StrolchRootElement, Comparable<Order> {
 
-	private static final long serialVersionUID = 0L;
-
 	protected Locator locator;
 	protected Version version;
 	protected Date date;

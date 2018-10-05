@@ -4,13 +4,13 @@ import java.util.Map;
 
 /**
  * Expression to set a fixed value
- * 
- * TODO allow blancs in Strings, and support parsing to other objects like int, double, Dates, etc. 
- * 
+ *
+ * TODO allow blancs in Strings, and support parsing to other objects like int, double, Dates, etc.
+ *
  * @author msmock
  */
 public class ValueDeclaration extends AbstractObjectExpression {
-	
+
 	public String valueAsString;
 
 	@Override

@@ -30,8 +30,6 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AddStrolchRootElementsService extends AbstractService<StrolchRootElementListArgument, ServiceResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult();

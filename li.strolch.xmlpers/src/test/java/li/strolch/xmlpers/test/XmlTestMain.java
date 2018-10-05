@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,18 +14,6 @@
  * limitations under the License.
  */
 package li.strolch.xmlpers.test;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javanet.staxutils.IndentingXMLStreamWriter;
-import li.strolch.utils.exceptions.XmlException;
-import li.strolch.utils.helper.XmlHelper;
-import li.strolch.xmlpers.test.model.ModelBuilder;
-import li.strolch.xmlpers.test.model.MyModel;
-import li.strolch.xmlpers.test.model.MyParameter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,7 +27,17 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 
+import javanet.staxutils.IndentingXMLStreamWriter;
+import li.strolch.utils.exceptions.XmlException;
+import li.strolch.utils.helper.XmlHelper;
+import li.strolch.xmlpers.test.model.ModelBuilder;
+import li.strolch.xmlpers.test.model.MyModel;
+import li.strolch.xmlpers.test.model.MyParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -51,7 +49,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 @SuppressWarnings("nls")
 public class XmlTestMain {
@@ -78,7 +75,6 @@ public class XmlTestMain {
 
 	/**
 	 * @return
-	 * 
 	 */
 	private static List<MyModel> readDom() throws Exception {
 
@@ -133,7 +129,6 @@ public class XmlTestMain {
 
 	/**
 	 * @return
-	 * 
 	 */
 	private static List<MyModel> readSax() throws Exception {
 

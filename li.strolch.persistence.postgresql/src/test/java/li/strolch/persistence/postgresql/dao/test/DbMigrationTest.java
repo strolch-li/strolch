@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +15,7 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_URL;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_USERNAME;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 
 import java.io.File;
 import java.sql.Connection;
@@ -27,16 +24,15 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.db.DbException;
 import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.utils.Version;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -67,8 +63,8 @@ public class DbMigrationTest {
 			for (File scriptFile : scriptFiles) {
 
 				String name = scriptFile.getName();
-				String versionS = name.substring("strolch_db_schema_".length(),
-						name.length() - "_initial.sql".length());
+				String versionS = name
+						.substring("strolch_db_schema_".length(), name.length() - "_initial.sql".length());
 				Version version = Version.valueOf(versionS);
 				logger.info("Creating Version " + version);
 
@@ -102,8 +98,8 @@ public class DbMigrationTest {
 			for (File scriptFile : scriptFiles) {
 
 				String name = scriptFile.getName();
-				String versionS = name.substring("strolch_db_schema_".length(),
-						name.length() - "_migration.sql".length());
+				String versionS = name
+						.substring("strolch_db_schema_".length(), name.length() - "_migration.sql".length());
 				Version version = Version.valueOf(versionS);
 				logger.info("Migrating Version " + version);
 

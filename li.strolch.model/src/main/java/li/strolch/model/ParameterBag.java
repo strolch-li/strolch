@@ -23,8 +23,6 @@ import li.strolch.model.visitor.StrolchElementVisitor;
  */
 public class ParameterBag extends ParameterizedElement {
 
-	private static final long serialVersionUID = 1L;
-
 	/**
 	 * Empty Constructor
 	 */

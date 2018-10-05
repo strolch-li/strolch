@@ -9,7 +9,6 @@ import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
 public class SetActionToExecutedService extends AbstractService<LocatorArgument, ServiceResult> {
-	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected ServiceResult getResultInstance() {

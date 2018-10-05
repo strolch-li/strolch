@@ -4,22 +4,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.StrolchRootElement;
+import li.strolch.model.*;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.FloatParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.soql.antlr4.generated.SOQLLexer;
 import li.strolch.soql.antlr4.generated.SOQLParser;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 /**
  * @author msmock
@@ -37,7 +32,7 @@ public abstract class BaseTest {
 		final SOQLLexer lexer = new SOQLLexer(input); // create a buffer of tokens pulled from the lexer
 
 		final CommonTokenStream tokens = new CommonTokenStream(lexer); // create a parser that feeds off the tokens
-																		// buffer
+		// buffer
 		final SOQLParser parser = new SOQLParser(tokens);
 		parser.addErrorListener(new VerboseListener());
 
@@ -52,7 +47,9 @@ public abstract class BaseTest {
 	 * compile the antlr tree to executable
 	 *
 	 * @param tree
+	 *
 	 * @return CompiledSOQLStatement
+	 *
 	 * @throws Exception
 	 */
 	CompiledStatement compile(final ParseTree tree) throws Exception {

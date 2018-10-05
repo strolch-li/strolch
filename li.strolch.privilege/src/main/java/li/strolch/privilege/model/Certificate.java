@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,11 +16,7 @@
 package li.strolch.privilege.model;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
@@ -29,14 +25,12 @@ import li.strolch.utils.helper.StringHelper;
 
 /**
  * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
- * instance which is always used when performing an access and is returned when a user performs a login through
- * {@link PrivilegeHandler#authenticate(String, byte[])}
- * 
+ * instance which is always used when performing an access and is returned when a user performs a login through {@link
+ * PrivilegeHandler#authenticate(String, byte[])}
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public final class Certificate implements Serializable {
-
-	private static final long serialVersionUID = 1L;
 
 	private final Usage usage;
 	private final String sessionId;
@@ -55,31 +49,31 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Default constructor initializing with all information needed for this certificate
-	 * 
+	 *
 	 * <p>
 	 * Note, both the authentication token and password are private fields which are generated on login and only known
 	 * by the {@link PrivilegeHandler}
 	 * </p>
-	 * 
+	 *
 	 * @param usage
-	 *            the usage allowed for this certificate
+	 * 		the usage allowed for this certificate
 	 * @param sessionId
-	 *            the users session id
+	 * 		the users session id
 	 * @param username
-	 *            the users login name
+	 * 		the users login name
 	 * @param firstname
-	 *            the users first name
+	 * 		the users first name
 	 * @param lastname
-	 *            the users last name
+	 * 		the users last name
 	 * @param authToken
-	 *            the authentication token defining the users unique session and is a private field of this certificate.
+	 * 		the authentication token defining the users unique session and is a private field of this certificate.
 	 * @param locale
-	 *            the users {@link Locale}
+	 * 		the users {@link Locale}
 	 * @param userRoles
-	 *            the user's roles
+	 * 		the user's roles
 	 * @param propertyMap
-	 *            a {@link Map} containing string value pairs of properties for the logged in user. These properties can
-	 *            be edited and can be used for the user to change settings of this session
+	 * 		a {@link Map} containing string value pairs of properties for the logged in user. These properties can be
+	 * 		edited and can be used for the user to change settings of this session
 	 */
 	public Certificate(Usage usage, String sessionId, String username, String firstname, String lastname,
 			UserState userState, String authToken, Date loginTime, Locale locale, Set<String> userRoles,
@@ -127,7 +121,7 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Returns the {@link Usage}
-	 * 
+	 *
 	 * @return the {@link Usage}
 	 */
 	public Usage getUsage() {
@@ -136,7 +130,7 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Returns the set or roles this user has
-	 * 
+	 *
 	 * @return the user's roles
 	 */
 	public Set<String> getUserRoles() {
@@ -145,10 +139,10 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Returns true if the user of this certificate has the given role
-	 * 
+	 *
 	 * @param role
-	 *            the role to check for
-	 * 
+	 * 		the role to check for
+	 *
 	 * @return true if the user of this certificate has the given role
 	 */
 	public boolean hasRole(String role) {
@@ -157,7 +151,7 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Returns the {@link User User's} property map. The map is immutable
-	 * 
+	 *
 	 * @return the propertyMap
 	 */
 	public Map<String, String> getPropertyMap() {
@@ -166,10 +160,10 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Returns the property with the given key
-	 * 
+	 *
 	 * @param key
-	 *            the key for which the property is to be returned
-	 * 
+	 * 		the key for which the property is to be returned
+	 *
 	 * @return the value of the property with the given key, or null if it does not exist
 	 */
 	public String getProperty(String key) {
@@ -185,7 +179,7 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * @param locale
-	 *            the locale to set
+	 * 		the locale to set
 	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;
@@ -235,7 +229,7 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Returns the authToken if the given authPassword is correct, null otherwise
-	 * 
+	 *
 	 * @return the authToken if the given authPassword is correct, null otherwise
 	 */
 	public String getAuthToken() {
@@ -251,7 +245,7 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * @param lastAccess
-	 *            the lastAccess to set
+	 * 		the lastAccess to set
 	 */
 	public void setLastAccess(Date lastAccess) {
 		this.lastAccess = lastAccess;
@@ -259,7 +253,7 @@ public final class Certificate implements Serializable {
 
 	/**
 	 * Returns a string representation of this object displaying its concrete type and its values
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@SuppressWarnings("nls")

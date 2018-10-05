@@ -3,14 +3,13 @@ package li.strolch.privilege.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserChallenge;
 import li.strolch.utils.CodeGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class UserChallengeHandler {
 
@@ -21,9 +20,9 @@ public abstract class UserChallengeHandler {
 	/**
 	 * Initialize the concrete {@link UserChallengeHandler}. The passed parameter map contains any configuration the
 	 * concrete {@link UserChallengeHandler} might need
-	 * 
+	 *
 	 * @param parameterMap
-	 *            a map containing configuration properties
+	 * 		a map containing configuration properties
 	 */
 	public void initialize(Map<String, String> parameterMap) {
 		this.challenges = new HashMap<>();
@@ -31,7 +30,7 @@ public abstract class UserChallengeHandler {
 
 	/**
 	 * Generates and returns a new challenge
-	 * 
+	 *
 	 * @return a new challenge
 	 */
 	protected String generateChallenge() {
@@ -41,11 +40,11 @@ public abstract class UserChallengeHandler {
 
 	/**
 	 * Initiate a password reset challenge for the given user
-	 * 
+	 *
 	 * @param usage
-	 *            the {@link Usage} for this certificate
+	 * 		the {@link Usage} for this certificate
 	 * @param user
-	 *            the user for which to initiate the challenge for
+	 * 		the user for which to initiate the challenge for
 	 */
 	public synchronized void initiateChallengeFor(Usage usage, User user) {
 
@@ -58,16 +57,16 @@ public abstract class UserChallengeHandler {
 
 	/**
 	 * Validate the response of a challenge for the given username
-	 * 
+	 *
 	 * @param user
-	 *            the user for which the challenge is to be validated
+	 * 		the user for which the challenge is to be validated
 	 * @param challenge
-	 *            the challenge from the user
-	 * 
-	 * @throws PrivilegeException
-	 *             if anything goes wrong
-	 * 
+	 * 		the challenge from the user
+	 *
 	 * @return the challenge
+	 *
+	 * @throws PrivilegeException
+	 * 		if anything goes wrong
 	 */
 	public synchronized UserChallenge validateResponse(User user, String challenge) throws PrivilegeException {
 
@@ -93,7 +92,7 @@ public abstract class UserChallengeHandler {
 
 	/**
 	 * Sends the challenge to the user
-	 * 
+	 *
 	 * @param user
 	 * @param challenge
 	 */

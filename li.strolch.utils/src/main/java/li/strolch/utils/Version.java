@@ -7,9 +7,9 @@ import li.strolch.utils.helper.StringHelper;
 
 /**
  * This class has been adapted from org.osgi.framework.Version
- * 
+ *
  * Version identifier.
- * 
+ *
  * <p>
  * Version identifiers have four components.
  * </p>
@@ -19,17 +19,17 @@ import li.strolch.utils.helper.StringHelper;
  * <li>Micro version. A non-negative integer.</li>
  * <li>Qualifier. A text string. See {@code Version(String)} for the format of the qualifier string.</li>
  * </ol>
- * 
+ *
  * <p>
  * <b>Note:</b> The qualifier can be separated by two different styles: {@link #OSGI_QUALIFIER_SEPARATOR} or
- * {@link #MAVEN_QUALIFIER_SEPARATOR}. Thus the qualifier my also have two special values:
- * {@link #OSGI_SNAPSHOT_QUALIFIER} or {@value #MAVEN_SNAPSHOT_QUALIFIER}.
+ * {@link #MAVEN_QUALIFIER_SEPARATOR}. Thus the qualifier my also have two special values: {@link
+ * #OSGI_SNAPSHOT_QUALIFIER} or {@value #MAVEN_SNAPSHOT_QUALIFIER}.
  * </p>
- * 
+ *
  * <p>
  * The grammar for parsing version strings is as follows:
  * </p>
- * 
+ *
  * <pre>
  * version ::= major('.'minor('.'micro('.'qualifier)?)?)?
  * major ::= digit+
@@ -39,11 +39,11 @@ import li.strolch.utils.helper.StringHelper;
  * digit ::= [0..9]
  * alpha ::= [a..zA..Z]
  * </pre>
- * 
+ *
  * <p>
  * <b>Note:</b> There must be no whitespace in version.
  * </p>
- * 
+ *
  * <p>
  * <b>Note:</b> {@code Version} objects are immutable and thus thread safe
  * </p>
@@ -71,20 +71,21 @@ public class Version implements Comparable<Version> {
 	public static final Version emptyVersion = new Version(0, 0, 0);
 
 	/**
-	 * Creates a version identifier from the specified numerical components. This instance will have
-	 * {@link #isOsgiStyle()} return false
-	 * 
+	 * Creates a version identifier from the specified numerical components. This instance will have {@link
+	 * #isOsgiStyle()} return false
+	 *
 	 * <p>
 	 * The qualifier is set to the empty string.
-	 * 
+	 *
 	 * @param major
-	 *            Major component of the version identifier.
+	 * 		Major component of the version identifier.
 	 * @param minor
-	 *            Minor component of the version identifier.
+	 * 		Minor component of the version identifier.
 	 * @param micro
-	 *            Micro component of the version identifier.
+	 * 		Micro component of the version identifier.
+	 *
 	 * @throws IllegalArgumentException
-	 *             If the numerical components are negative.
+	 * 		If the numerical components are negative.
 	 */
 	public Version(final int major, final int minor, final int micro) {
 		this(major, minor, micro, null);
@@ -93,19 +94,19 @@ public class Version implements Comparable<Version> {
 	/**
 	 * Creates a version identifier from the specified components. This instance will have {@link #isOsgiStyle()} return
 	 * false
-	 * 
+	 *
 	 * @param major
-	 *            Major component of the version identifier.
+	 * 		Major component of the version identifier.
 	 * @param minor
-	 *            Minor component of the version identifier.
+	 * 		Minor component of the version identifier.
 	 * @param micro
-	 *            Micro component of the version identifier.
+	 * 		Micro component of the version identifier.
 	 * @param qualifier
-	 *            Qualifier component of the version identifier. If {@code null} is specified, then the qualifier will
-	 *            be set to the empty string.
-	 * 
+	 * 		Qualifier component of the version identifier. If {@code null} is specified, then the qualifier will be set to
+	 * 		the empty string.
+	 *
 	 * @throws IllegalArgumentException
-	 *             If the numerical components are negative or the qualifier string is invalid.
+	 * 		If the numerical components are negative or the qualifier string is invalid.
 	 */
 	public Version(final int major, final int minor, final int micro, String qualifier) {
 		this(major, minor, micro, null, false);
@@ -113,21 +114,21 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Creates a version identifier from the specified components.
-	 * 
+	 *
 	 * @param major
-	 *            Major component of the version identifier.
+	 * 		Major component of the version identifier.
 	 * @param minor
-	 *            Minor component of the version identifier.
+	 * 		Minor component of the version identifier.
 	 * @param micro
-	 *            Micro component of the version identifier.
+	 * 		Micro component of the version identifier.
 	 * @param qualifier
-	 *            Qualifier component of the version identifier. If {@code null} is specified, then the qualifier will
-	 *            be set to the empty string.
+	 * 		Qualifier component of the version identifier. If {@code null} is specified, then the qualifier will be set to
+	 * 		the empty string.
 	 * @param osgiStyle
-	 *            if true, then this is an osgi style version, otherwise not
-	 * 
+	 * 		if true, then this is an osgi style version, otherwise not
+	 *
 	 * @throws IllegalArgumentException
-	 *             If the numerical components are negative or the qualifier string is invalid.
+	 * 		If the numerical components are negative or the qualifier string is invalid.
 	 */
 	public Version(final int major, final int minor, final int micro, String qualifier, boolean osgiStyle) {
 		this.major = major;
@@ -142,12 +143,12 @@ public class Version implements Comparable<Version> {
 	 * <p>
 	 * Creates a version identifier from the specified string.
 	 * </p>
-	 * 
+	 *
 	 * @param version
-	 *            String representation of the version identifier.
-	 * 
+	 * 		String representation of the version identifier.
+	 *
 	 * @throws IllegalArgumentException
-	 *             If {@code version} is improperly formatted.
+	 * 		If {@code version} is improperly formatted.
 	 */
 	private Version(final String version) {
 		int maj = 0;
@@ -197,9 +198,9 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Called by the Version constructors to validate the version components.
-	 * 
+	 *
 	 * @throws IllegalArgumentException
-	 *             If the numerical components are negative or the qualifier string is invalid.
+	 * 		If the numerical components are negative or the qualifier string is invalid.
 	 */
 	private void validate() {
 		if (this.major < 0) {
@@ -235,18 +236,18 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Parses a version identifier from the specified string.
-	 * 
+	 *
 	 * <p>
 	 * See {@code Version(String)} for the format of the version string.
-	 * 
+	 *
 	 * @param version
-	 *            String representation of the version identifier. Leading and trailing whitespace will be ignored.
-	 * 
+	 * 		String representation of the version identifier. Leading and trailing whitespace will be ignored.
+	 *
 	 * @return A {@code Version} object representing the version identifier. If {@code version} is {@code null} or the
-	 *         empty string then {@code emptyVersion} will be returned.
-	 * 
+	 * empty string then {@code emptyVersion} will be returned.
+	 *
 	 * @throws IllegalArgumentException
-	 *             If {@code version} is improperly formatted.
+	 * 		If {@code version} is improperly formatted.
 	 */
 	public static Version valueOf(String version) {
 		if (version == null)
@@ -262,10 +263,10 @@ public class Version implements Comparable<Version> {
 	/**
 	 * Returns true if the given version string can be parsed, meaning a {@link Version} instance can be instantiated
 	 * with it
-	 * 
+	 *
 	 * @param version
-	 *            String representation of the version identifier. Leading and trailing whitespace will be ignored.
-	 * 
+	 * 		String representation of the version identifier. Leading and trailing whitespace will be ignored.
+	 *
 	 * @return true if no parse errors occurr
 	 */
 	public static boolean isParseable(String version) {
@@ -279,7 +280,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Returns the major component of this version identifier.
-	 * 
+	 *
 	 * @return The major component.
 	 */
 	public int getMajor() {
@@ -288,7 +289,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Returns the minor component of this version identifier.
-	 * 
+	 *
 	 * @return The minor component.
 	 */
 	public int getMinor() {
@@ -297,7 +298,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Returns the micro component of this version identifier.
-	 * 
+	 *
 	 * @return The micro component.
 	 */
 	public int getMicro() {
@@ -306,7 +307,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Returns the qualifier component of this version identifier.
-	 * 
+	 *
 	 * @return The qualifier component.
 	 */
 	public String getQualifier() {
@@ -315,14 +316,14 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Returns a new {@link Version} where each version number is incremented or decreased by the given parameters
-	 * 
+	 *
 	 * @param major
-	 *            the value to increase or decrease the major part of the version
+	 * 		the value to increase or decrease the major part of the version
 	 * @param minor
-	 *            the value to increase or decrease the minor part of the version
+	 * 		the value to increase or decrease the minor part of the version
 	 * @param micro
-	 *            the value to increase or decrease the micro part of the version
-	 * 
+	 * 		the value to increase or decrease the micro part of the version
+	 *
 	 * @return the new Version with the version parts modified as passed in by the parameters
 	 */
 	public Version add(int major, int minor, int micro) {
@@ -331,7 +332,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * @return true if this is an OSGI style version, i.e. if has a qualifier, then osgi defines how the qualifier is
-	 *         appended to the version
+	 * appended to the version
 	 */
 	public boolean isOsgiStyle() {
 		return this.osgiStyle;
@@ -339,7 +340,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * @return true if this version is for a snapshot version, i.e. ends with {@link #MAVEN_SNAPSHOT_QUALIFIER} or
-	 *         {@link #OSGI_SNAPSHOT_QUALIFIER}
+	 * {@link #OSGI_SNAPSHOT_QUALIFIER}
 	 */
 	public boolean isSnapshot() {
 		return MAVEN_SNAPSHOT_QUALIFIER.equals(this.qualifier) || OSGI_SNAPSHOT_QUALIFIER.equals(this.qualifier);
@@ -347,7 +348,7 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Returns a hash code value for the object.
-	 * 
+	 *
 	 * @return An integer which is a hash code value for this object.
 	 */
 	@Override
@@ -357,13 +358,14 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Compares this {@code Version} object to another object.
-	 * 
+	 *
 	 * <p>
 	 * A version is considered to be <b>equal to </b> another version if the major, minor and micro components are equal
 	 * and the qualifier component is equal (using {@code String.equals}).
-	 * 
+	 *
 	 * @param object
-	 *            The {@code Version} object to be compared.
+	 * 		The {@code Version} object to be compared.
+	 *
 	 * @return {@code true} if {@code object} is a {@code Version} and is equal to this object; {@code false} otherwise.
 	 */
 	@Override
@@ -380,13 +382,14 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Compares this {@code Version} object to another object ignoring the qualifier part.
-	 * 
+	 *
 	 * <p>
 	 * A version is considered to be <b>equal to </b> another version if the major, minor and micro components are
 	 * equal.
-	 * 
+	 *
 	 * @param object
-	 *            The {@code Version} object to be compared.
+	 * 		The {@code Version} object to be compared.
+	 *
 	 * @return {@code true} if {@code object} is a {@code Version} and is equal to this object; {@code false} otherwise.
 	 */
 	public boolean equalsIgnoreQualifier(final Object object) {
@@ -401,24 +404,26 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Compares this {@code Version} object to another {@code Version}.
-	 * 
+	 *
 	 * <p>
 	 * A version is considered to be <b>less than </b> another version if its major component is less than the other
 	 * version's major component, or the major components are equal and its minor component is less than the other
 	 * version's minor component, or the major and minor components are equal and its micro component is less than the
 	 * other version's micro component, or the major, minor and micro components are equal and it's qualifier component
 	 * is less than the other version's qualifier component (using {@code String.compareTo}).
-	 * 
+	 *
 	 * <p>
 	 * A version is considered to be <b>equal to</b> another version if the major, minor and micro components are equal
 	 * and the qualifier component is equal (using {@code String.compareTo}).
-	 * 
+	 *
 	 * @param other
-	 *            The {@code Version} object to be compared.
+	 * 		The {@code Version} object to be compared.
+	 *
 	 * @return A negative integer, zero, or a positive integer if this version is less than, equal to, or greater than
-	 *         the specified {@code Version} object.
+	 * the specified {@code Version} object.
+	 *
 	 * @throws ClassCastException
-	 *             If the specified object is not a {@code Version} object.
+	 * 		If the specified object is not a {@code Version} object.
 	 */
 	@Override
 	public int compareTo(final Version other) {
@@ -442,11 +447,11 @@ public class Version implements Comparable<Version> {
 
 	/**
 	 * Returns the string representation of this version identifier.
-	 * 
+	 *
 	 * <p>
-	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or
-	 * {@code major.minor.micro.qualifier} otherwise.
-	 * 
+	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or {@code
+	 * major.minor.micro.qualifier} otherwise.
+	 *
 	 * @return The string representation of this version identifier.
 	 */
 	@Override

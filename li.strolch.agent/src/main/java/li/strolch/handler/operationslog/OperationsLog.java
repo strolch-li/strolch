@@ -66,8 +66,6 @@ public class OperationsLog extends StrolchComponent {
 
 	private LinkedHashMap<LogMessage, LogMessage> newBoundedStringMap(String realm) {
 		return new LinkedHashMap<LogMessage, LogMessage>() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			protected boolean removeEldestEntry(java.util.Map.Entry<LogMessage, LogMessage> eldest) {
 				return size() > maxMessages;
@@ -77,8 +75,6 @@ public class OperationsLog extends StrolchComponent {
 
 	private LinkedHashMap<Locator, LinkedHashSet<LogMessage>> newBoundedLocatorMap(String realm) {
 		return new LinkedHashMap<Locator, LinkedHashSet<LogMessage>>() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			protected boolean removeEldestEntry(java.util.Map.Entry<Locator, LinkedHashSet<LogMessage>> eldest) {
 				return size() > maxMessages;

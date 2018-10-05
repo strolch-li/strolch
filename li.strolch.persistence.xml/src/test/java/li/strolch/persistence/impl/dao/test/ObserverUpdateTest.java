@@ -25,23 +25,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
+import li.strolch.model.*;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.xmlpers.api.ModificationResult;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

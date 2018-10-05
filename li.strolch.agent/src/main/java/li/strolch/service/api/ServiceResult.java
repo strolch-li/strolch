@@ -15,16 +15,13 @@
  */
 package li.strolch.service.api;
 
-import java.io.Serializable;
-
 import com.google.gson.JsonObject;
 import li.strolch.utils.helper.ExceptionHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ServiceResult implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class ServiceResult {
 
 	private ServiceResultState state;
 	private String message;

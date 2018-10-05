@@ -24,8 +24,6 @@ import li.strolch.utils.dbc.DBC;
  */
 public class StringParameter extends AbstractParameter<String> {
 
-	private static final long serialVersionUID = 0L;
-
 	private String value = "";
 
 	/**

@@ -4,35 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import li.strolch.soql.antlr4.generated.SOQLBaseListener;
-import li.strolch.soql.antlr4.generated.SOQLParser.And_expressionContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Chained_method_expressionContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Class_declarationContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Comparison_expressionContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Expression_termContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Method_argumentContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Method_expressionContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Method_nameContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Object_declarationContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Or_expressionContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Select_clauseContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Select_expressionContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Value_declarationContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Var_referenceContext;
-import li.strolch.soql.antlr4.generated.SOQLParser.Where_clauseContext;
-import li.strolch.soql.core.expresssion.AndExpression;
-import li.strolch.soql.core.expresssion.ChainedMethodExpression;
-import li.strolch.soql.core.expresssion.ComparisonExpression;
-import li.strolch.soql.core.expresssion.ExpressionTerm;
-import li.strolch.soql.core.expresssion.IExpression;
-import li.strolch.soql.core.expresssion.MethodArgumentDeclaration;
-import li.strolch.soql.core.expresssion.MethodExpression;
-import li.strolch.soql.core.expresssion.ObjectDeclaration;
-import li.strolch.soql.core.expresssion.OrExpression;
-import li.strolch.soql.core.expresssion.ParameterReference;
-import li.strolch.soql.core.expresssion.SelectClause;
-import li.strolch.soql.core.expresssion.SelectExpression;
-import li.strolch.soql.core.expresssion.ValueDeclaration;
-import li.strolch.soql.core.expresssion.WhereExpression;
+import li.strolch.soql.antlr4.generated.SOQLParser.*;
+import li.strolch.soql.core.expresssion.*;
 
 /**
  * @author msmock
@@ -103,8 +76,8 @@ public class SOQLListener extends SOQLBaseListener {
 	}
 
 	/**
-	 * extract the class declaration in the FROM clause. For example, in 'FROM
-	 * Resource res' the class declaration is 'Resource'.
+	 * extract the class declaration in the FROM clause. For example, in 'FROM Resource res' the class declaration is
+	 * 'Resource'.
 	 */
 	@Override
 	public void exitClass_declaration(Class_declarationContext ctx) {
@@ -112,9 +85,8 @@ public class SOQLListener extends SOQLBaseListener {
 	}
 
 	/**
-	 * extract the object declaration in the FROM clause, which defines the lookup
-	 * key for the class declaration. For example, in 'FROM Resource res' the object
-	 * declaration is 'res'.
+	 * extract the object declaration in the FROM clause, which defines the lookup key for the class declaration. For
+	 * example, in 'FROM Resource res' the object declaration is 'res'.
 	 */
 	@Override
 	public void exitObject_declaration(Object_declarationContext ctx) {

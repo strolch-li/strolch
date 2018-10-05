@@ -12,7 +12,7 @@ public class SelectClause implements IExpression {
 	/**
 	 * @param inputObjects
 	 * @param queryParameter
-	 * 
+	 *
 	 * @return List of objects from child expression evaluation
 	 */
 	public List<Object> evaluate(final Map<String, Object> inputObjects, final Map<String, Object> queryParameter) {

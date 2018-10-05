@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,17 +18,8 @@ package li.strolch.migrations;
 import java.io.File;
 import java.io.FileFilter;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
@@ -40,6 +31,8 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.Version;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Migrations {
 
@@ -157,9 +150,8 @@ public class Migrations {
 	 * @param cert
 	 * @param codeMigrationsByRealm
 	 */
-	public void runCodeMigrations(Certificate cert,
-								  Map<String, MigrationVersion> currentVersions,
-								  MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
+	public void runCodeMigrations(Certificate cert, Map<String, MigrationVersion> currentVersions,
+			MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
 
 		MapOfLists<String, Version> migrationsRan = new MapOfLists<>();
 
@@ -206,8 +198,8 @@ public class Migrations {
 	}
 
 	private static void logDetectedMigrations(Set<String> realmNames,
-											  Map<String, SortedSet<DataMigration>> allDataMigrations,
-											  Map<String, SortedSet<CodeMigration>> allCodeMigrations) {
+			Map<String, SortedSet<DataMigration>> allDataMigrations,
+			Map<String, SortedSet<CodeMigration>> allCodeMigrations) {
 
 		for (String realm : realmNames) {
 
@@ -234,7 +226,7 @@ public class Migrations {
 	}
 
 	private static Map<String, SortedSet<DataMigration>> loadDataMigrations(Set<String> realmNames,
-																			File migrationsPath) {
+			File migrationsPath) {
 
 		Map<String, SortedSet<DataMigration>> migrationsByRealm = new HashMap<>();
 
@@ -266,7 +258,7 @@ public class Migrations {
 	}
 
 	private static Map<String, SortedSet<CodeMigration>> loadCodeMigrations(Set<String> realmNames,
-																			File migrationsPath) {
+			File migrationsPath) {
 
 		Map<String, SortedSet<CodeMigration>> migrationsByRealm = new HashMap<>(); //new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 

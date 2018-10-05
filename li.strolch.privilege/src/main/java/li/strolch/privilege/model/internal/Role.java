@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,13 +15,8 @@
  */
 package li.strolch.privilege.model.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.IPrivilege;
@@ -34,12 +29,12 @@ import li.strolch.utils.helper.StringHelper;
  * A {@link User} is assigned a set of roles. These roles have a set of privileges assigned to them by name and they
  * define the privileges granted to a user with this role
  * </p>
- * 
+ *
  * <p>
  * Note: This is an internal object which is not to be serialized or passed to clients, {@link RoleRep}s are used for
  * that
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public final class Role {
@@ -49,11 +44,11 @@ public final class Role {
 
 	/**
 	 * Default constructor
-	 * 
+	 *
 	 * @param name
-	 *            the name of the role
+	 * 		the name of the role
 	 * @param privilegeMap
-	 *            a map of {@link IPrivilege}s granted to this role
+	 * 		a map of {@link IPrivilege}s granted to this role
 	 */
 	public Role(String name, Map<String, IPrivilege> privilegeMap) {
 
@@ -70,9 +65,9 @@ public final class Role {
 
 	/**
 	 * Construct {@link Role} from its representation {@link RoleRep}
-	 * 
+	 *
 	 * @param roleRep
-	 *            the representation from which to create the {@link Role}
+	 * 		the representation from which to create the {@link Role}
 	 */
 	public Role(RoleRep roleRep) {
 
@@ -104,7 +99,7 @@ public final class Role {
 
 	/**
 	 * Returns the {@link Set} of names for the currently stored {@link IPrivilege Privileges}
-	 * 
+	 *
 	 * @return the {@link Set} of names for the currently stored {@link IPrivilege Privileges}
 	 */
 	public Set<String> getPrivilegeNames() {
@@ -113,7 +108,7 @@ public final class Role {
 
 	/**
 	 * Returns the {@link IPrivilege} for the given name, null if it does not exist
-	 * 
+	 *
 	 * @return the {@link IPrivilege} for the given name, null if it does not exist
 	 */
 	public IPrivilege getPrivilege(String name) {
@@ -122,10 +117,10 @@ public final class Role {
 
 	/**
 	 * Determines if this {@link Role} has the {@link IPrivilege} with the given name
-	 * 
+	 *
 	 * @param name
-	 *            the name of the {@link IPrivilege}
-	 * 
+	 * 		the name of the {@link IPrivilege}
+	 *
 	 * @return true if this {@link Role} has the {@link IPrivilege} with the given name
 	 */
 	public boolean hasPrivilege(String name) {
@@ -145,7 +140,7 @@ public final class Role {
 
 	/**
 	 * Returns a string representation of this object displaying its concrete type and its values
-	 * 
+	 *
 	 * @see java.lang.Object#toString()
 	 */
 	@SuppressWarnings("nls")

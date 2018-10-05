@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -55,7 +55,7 @@
         <p>All changes done in a Strolch transaction are recorded and then propagated to any registered observers.</p>
 
         <p>The observer feature is opt-in and is configured for each realm. In the <code>StrolchConfiguration.xml</code>
-            file enable observers by adding the <code>enableObserverUpdates</code> propery per realm:</p>
+           file enable observers by adding the <code>enableObserverUpdates</code> propery per realm:</p>
         <pre>
 &lt;StrolchConfiguration&gt;
   &lt;env id="dev"&gt;
@@ -81,7 +81,7 @@
 
         <br />
         <p>Registering for updates is done by registering an <code>Observer</code> on the <code>ObserverHandler</code>
-            of the realm itself:</p>
+           of the realm itself:</p>
         <pre>
 ObserverHandler observerHandler = container.getRealm(StrolchConstants.DEFAULT_REALM).getObserverHandler();
 observerHandler.registerObserver(Tags.RESOURCE, new Observer() {
@@ -102,7 +102,7 @@ observerHandler.registerObserver(Tags.RESOURCE, new Observer() {
   }
 });</pre>
 
-        <br/>
+        <br />
         <p>Observer updates can be suppressed on the transaction by calling <code>tx.setSuppressUpdates()</code></p>
 
 
@@ -143,7 +143,7 @@ observerHandler.registerObserver(Tags.RESOURCE, new Observer() {
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>

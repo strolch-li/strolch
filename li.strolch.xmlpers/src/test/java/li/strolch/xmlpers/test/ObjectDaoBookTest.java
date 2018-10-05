@@ -15,21 +15,12 @@
  */
 package li.strolch.xmlpers.test;
 
-import static li.strolch.xmlpers.test.model.ModelBuilder.BOOK_ID;
-import static li.strolch.xmlpers.test.model.ModelBuilder.assertBook;
-import static li.strolch.xmlpers.test.model.ModelBuilder.assertBookUpdated;
-import static li.strolch.xmlpers.test.model.ModelBuilder.createBook;
-import static li.strolch.xmlpers.test.model.ModelBuilder.updateBook;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static li.strolch.xmlpers.test.model.ModelBuilder.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.ObjectDao;
@@ -40,6 +31,8 @@ import li.strolch.xmlpers.objref.ObjectRef;
 import li.strolch.xmlpers.objref.TypeRef;
 import li.strolch.xmlpers.test.impl.TestConstants;
 import li.strolch.xmlpers.test.model.Book;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

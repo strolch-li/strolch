@@ -15,13 +15,12 @@
  */
 package li.strolch.service;
 
-import li.strolch.service.api.Service;
-import li.strolch.service.api.ServiceResult;
-import org.junit.Test;
-
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
+import li.strolch.service.api.Service;
+import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

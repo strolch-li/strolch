@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,14 +28,14 @@ import li.strolch.privilege.model.internal.Role;
 /**
  * This is a simple implementation of {@link PrivilegePolicy} which uses the {@link Restrictable#getPrivilegeName()} to
  * see if a given {@link Role} has the privilege required by the value from {@link Restrictable#getPrivilegeValue()}
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DefaultPrivilege implements PrivilegePolicy {
 
 	/**
 	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege
-	 * 
+	 *
 	 * @see li.strolch.privilege.policy.PrivilegePolicy#validateAction(IPrivilege, Restrictable)
 	 */
 	@Override
@@ -48,8 +48,8 @@ public class DefaultPrivilege implements PrivilegePolicy {
 
 		// DefaultPrivilege policy expects the privilege value to be a string
 		if (!(object instanceof String)) {
-			String msg = Restrictable.class.getName()
-					+ PrivilegeMessages.getString("Privilege.illegalArgument.nonstring"); //$NON-NLS-1$
+			String msg = Restrictable.class.getName() + PrivilegeMessages
+					.getString("Privilege.illegalArgument.nonstring"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}

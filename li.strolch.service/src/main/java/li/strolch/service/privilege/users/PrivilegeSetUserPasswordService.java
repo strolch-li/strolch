@@ -29,8 +29,6 @@ import li.strolch.service.api.ServiceResultState;
  */
 public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSetUserPasswordArgument, ServiceResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);

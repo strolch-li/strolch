@@ -20,24 +20,9 @@ import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Deque;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchPolicyException;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.ModelStatistics;
-import li.strolch.model.Order;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.StrolchValueType;
-import li.strolch.model.Tags;
-import li.strolch.model.Version;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
@@ -49,6 +34,11 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

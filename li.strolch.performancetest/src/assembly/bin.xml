@@ -1,45 +1,45 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>bin</id>
-	<formats>
-		<format>tar.gz</format>
-		<!-- <format>tar.bz2</format> -->
-		<!-- <format>zip</format> -->
-	</formats>
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+    <id>bin</id>
+    <formats>
+        <format>tar.gz</format>
+        <!-- <format>tar.bz2</format> -->
+        <!-- <format>zip</format> -->
+    </formats>
 
-	<!-- Adds dependencies to zip package under lib directory -->
-	<dependencySets>
-		<dependencySet>
-			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>lib</outputDirectory>
-			<unpack>false</unpack>
-		</dependencySet>
-	</dependencySets>
+    <!-- Adds dependencies to zip package under lib directory -->
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+        </dependencySet>
+    </dependencySets>
 
-	<fileSets>
-		<!-- adds jar package to the root directory of zip package -->
-		<fileSet>
-			<directory>${project.build.directory}</directory>
-			<outputDirectory></outputDirectory>
-			<includes>
-				<include>*.jar</include>
-			</includes>
-		</fileSet>
+    <fileSets>
+        <!-- adds jar package to the root directory of zip package -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
 
-		<!-- Adds startup scripts to the root directory of zip package. The startup scripts are located to src/main/scripts directory 
-			as stated by Maven conventions. -->
-		<fileSet>
-			<directory>${project.build.scriptSourceDirectory}</directory>
-			<outputDirectory></outputDirectory>
-			<includes>
-				<include>startup.*</include>
-			</includes>
-			<filtered>true</filtered>
-		</fileSet>
+        <!-- Adds startup scripts to the root directory of zip package. The startup scripts are located to src/main/scripts directory
+            as stated by Maven conventions. -->
+        <fileSet>
+            <directory>${project.build.scriptSourceDirectory}</directory>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>startup.*</include>
+            </includes>
+            <filtered>true</filtered>
+        </fileSet>
 
-		<fileSet>
-			<directory>src/runtime</directory>
-			<outputDirectory></outputDirectory>
-		</fileSet>
-	</fileSets>
+        <fileSet>
+            <directory>src/runtime</directory>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+    </fileSets>
 </assembly>

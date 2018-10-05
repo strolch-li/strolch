@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,16 +33,16 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class RoleRep implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	private String name;
 	private List<PrivilegeRep> privileges;
 
 	/**
 	 * Default constructor
 	 *
-	 * @param name       the name of this role
-	 * @param privileges the list of privileges granted to this role
+	 * @param name
+	 * 		the name of this role
+	 * @param privileges
+	 * 		the list of privileges granted to this role
 	 */
 	public RoleRep(String name, List<PrivilegeRep> privileges) {
 		this.name = name;
@@ -77,7 +77,8 @@ public class RoleRep implements Serializable {
 	}
 
 	/**
-	 * @param name the name to set
+	 * @param name
+	 * 		the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -95,7 +96,8 @@ public class RoleRep implements Serializable {
 	/**
 	 * Sets the privileges on this from a list
 	 *
-	 * @param privileges the list of privileges to assign to this role
+	 * @param privileges
+	 * 		the list of privileges to assign to this role
 	 */
 	public void setPrivileges(List<PrivilegeRep> privileges) {
 		this.privileges = privileges;

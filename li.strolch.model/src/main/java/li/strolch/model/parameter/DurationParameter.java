@@ -25,8 +25,6 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  */
 public class DurationParameter extends AbstractParameter<Long> {
 
-	private static final long serialVersionUID = 0L;
-
 	private Long value;
 
 	/**

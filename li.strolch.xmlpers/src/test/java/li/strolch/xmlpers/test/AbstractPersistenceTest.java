@@ -18,9 +18,6 @@ package li.strolch.xmlpers.test;
 import java.io.File;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.PersistenceConstants;
@@ -31,6 +28,8 @@ import li.strolch.xmlpers.test.impl.MyModelContextFactory;
 import li.strolch.xmlpers.test.impl.TestConstants;
 import li.strolch.xmlpers.test.model.Book;
 import li.strolch.xmlpers.test.model.MyModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPersistenceTest {
 
@@ -67,9 +66,9 @@ public abstract class AbstractPersistenceTest {
 	protected void setup(Properties properties) {
 		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
 		this.persistenceManager = PersistenceManagerLoader.load(properties);
-		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(MyModel.class,
-				TestConstants.TYPE_RES, new MyModelContextFactory());
-		this.persistenceManager.getCtxFactory().registerPersistenceContextFactory(Book.class, TestConstants.TYPE_BOOK,
-				new BookContextFactory());
+		this.persistenceManager.getCtxFactory()
+				.registerPersistenceContextFactory(MyModel.class, TestConstants.TYPE_RES, new MyModelContextFactory());
+		this.persistenceManager.getCtxFactory()
+				.registerPersistenceContextFactory(Book.class, TestConstants.TYPE_BOOK, new BookContextFactory());
 	}
 }

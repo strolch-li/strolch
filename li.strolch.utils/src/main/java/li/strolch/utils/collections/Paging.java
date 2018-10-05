@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +20,11 @@ import java.util.List;
 /**
  * Paging helper creating windows on result list of queries. The input is the original complete list, and with the help
  * of an offset and a limit, a page/window can be fetched.
- * 
- * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  *
  * @param <T>
- *            the type of element in the list
+ * 		the type of element in the list
+ *
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class Paging<T> {
 
@@ -101,17 +101,17 @@ public class Paging<T> {
 
 	/**
 	 * Creates a sub list of the input list with the given limit and offset
-	 * 
+	 *
 	 * @param list
-	 *            the list to paginate / create a window for
+	 * 		the list to paginate / create a window for
 	 * @param offset
-	 *            where to start the sub list
+	 * 		where to start the sub list
 	 * @param limit
-	 *            The number of items to return in each page/window
-	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
-	 * 
+	 * 		The number of items to return in each page/window
 	 * @param <T>
-	 *            the type of element in the list
+	 * 		the type of element in the list
+	 *
+	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
 	 */
 	public static <T> Paging<T> asPage(List<T> list, int offset, int limit) {
 

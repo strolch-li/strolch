@@ -25,8 +25,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class BooleanParameter extends AbstractParameter<Boolean> {
 
-	private static final long serialVersionUID = 0L;
-
 	private Boolean value = Boolean.FALSE;
 
 	/**

@@ -15,14 +15,12 @@
  */
 package li.strolch.model;
 
-import java.io.Serializable;
-
 import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface StrolchElement extends Serializable {
+public interface StrolchElement {
 
 	/**
 	 * Return the {@link Locator} for this element
@@ -110,7 +108,8 @@ public interface StrolchElement extends Serializable {
 	public StrolchElement getClone();
 
 	/**
-	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it, call {@link #getClone()}
+	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it,
+	 * call {@link #getClone()}
 	 *
 	 * @return true if this element is read only
 	 */

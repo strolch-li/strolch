@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +22,6 @@ import java.io.Serializable;
  */
 public class FilePart implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-
 	private String fileName;
 	private long fileLength;
 	private String fileHash;
@@ -36,9 +34,9 @@ public class FilePart implements Serializable {
 
 	/**
 	 * @param fileName
-	 *            the name of the file being referenced. This is either just the name, or a path relative to the type
+	 * 		the name of the file being referenced. This is either just the name, or a path relative to the type
 	 * @param fileType
-	 *            defines the type of file being uploaded or retrieved. This defines in which path the file resides
+	 * 		defines the type of file being uploaded or retrieved. This defines in which path the file resides
 	 */
 	public FilePart(String fileName, String fileType) {
 
@@ -64,7 +62,7 @@ public class FilePart implements Serializable {
 
 	/**
 	 * @param fileLength
-	 *            the fileLength to set
+	 * 		the fileLength to set
 	 */
 	public void setFileLength(long fileLength) {
 		this.fileLength = fileLength;
@@ -79,7 +77,7 @@ public class FilePart implements Serializable {
 
 	/**
 	 * @param fileHash
-	 *            the fileHash to set
+	 * 		the fileHash to set
 	 */
 	public void setFileHash(String fileHash) {
 		this.fileHash = fileHash;
@@ -101,7 +99,7 @@ public class FilePart implements Serializable {
 
 	/**
 	 * @param partOffset
-	 *            the partOffset to set
+	 * 		the partOffset to set
 	 */
 	public void setPartOffset(long partOffset) {
 		this.partOffset = partOffset;
@@ -116,7 +114,7 @@ public class FilePart implements Serializable {
 
 	/**
 	 * @param partLength
-	 *            the partLength to set
+	 * 		the partLength to set
 	 */
 	public void setPartLength(int partLength) {
 		this.partLength = partLength;
@@ -131,7 +129,7 @@ public class FilePart implements Serializable {
 
 	/**
 	 * @param partBytes
-	 *            the partBytes to set
+	 * 		the partBytes to set
 	 */
 	public void setPartBytes(byte[] partBytes) {
 		this.partBytes = partBytes;
@@ -146,7 +144,7 @@ public class FilePart implements Serializable {
 
 	/**
 	 * @param lastPart
-	 *            the lastPart to set
+	 * 		the lastPart to set
 	 */
 	public void setLastPart(boolean lastPart) {
 		this.lastPart = lastPart;

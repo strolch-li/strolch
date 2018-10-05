@@ -16,9 +16,7 @@
 package li.strolch.xmlpers.test;
 
 import static li.strolch.xmlpers.test.impl.TestConstants.TYPE_RES;
-import static li.strolch.xmlpers.test.model.ModelBuilder.RES_TYPE;
-import static li.strolch.xmlpers.test.model.ModelBuilder.createResource;
-import static li.strolch.xmlpers.test.model.ModelBuilder.updateResource;
+import static li.strolch.xmlpers.test.model.ModelBuilder.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -26,16 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.PersistenceConstants;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
 import li.strolch.xmlpers.objref.LockableObject;
 import li.strolch.xmlpers.test.model.MyModel;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

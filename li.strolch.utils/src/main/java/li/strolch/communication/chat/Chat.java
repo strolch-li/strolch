@@ -38,9 +38,9 @@ public class Chat {
 		boolean isHostAddress = false;
 		try {
 			for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces
-					.hasMoreElements();) {
+					.hasMoreElements(); ) {
 				NetworkInterface iface = interfaces.nextElement();
-				for (Enumeration<InetAddress> addresses = iface.getInetAddresses(); addresses.hasMoreElements();) {
+				for (Enumeration<InetAddress> addresses = iface.getInetAddresses(); addresses.hasMoreElements(); ) {
 					InetAddress inetAddress = addresses.nextElement();
 					if (inetAddress.getHostAddress().equals(host.getHostAddress()))
 						isHostAddress = true;
@@ -51,7 +51,8 @@ public class Chat {
 		}
 
 		if (!isHostAddress) {
-			System.err.println(MessageFormat.format("The address {0} is not an address of this host!", hostS)); //$NON-NLS-1$
+			System.err.println(
+					MessageFormat.format("The address {0} is not an address of this host!", hostS)); //$NON-NLS-1$
 			printIllegalArgsAndExit(args);
 		}
 

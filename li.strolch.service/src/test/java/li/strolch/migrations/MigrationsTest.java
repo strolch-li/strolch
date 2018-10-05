@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,6 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.testbase.runtime.RuntimeMock;
 import li.strolch.utils.Version;
 import li.strolch.utils.collections.MapOfLists;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -75,8 +74,9 @@ public class MigrationsTest {
 		assertEquals("0.0.0", currentVersions.get("other").getCodeVersion().toString());
 
 		MapOfLists<String, Version> lastMigrations = migrationsHandler.getLastMigrations();
-		List<Version> expectedMigrations = Arrays.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"),
-				Version.valueOf("0.5.2"), Version.valueOf("1.0.0"), Version.valueOf("1.0.5"), Version.valueOf("1.1.1"));
+		List<Version> expectedMigrations = Arrays
+				.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"), Version.valueOf("0.5.2"),
+						Version.valueOf("1.0.0"), Version.valueOf("1.0.5"), Version.valueOf("1.1.1"));
 		assertEquals(expectedMigrations, lastMigrations.getList(defRealm));
 		assertEquals(null, lastMigrations.getList("other"));
 
@@ -97,7 +97,7 @@ public class MigrationsTest {
 
 		lastMigrations = migrationsHandler.getLastMigrations();
 		assertEquals(1, lastMigrations.keySet().size());
-		assertEquals(Arrays.asList(Version.valueOf("1.0.0"),Version.valueOf("1.2.0"), Version.valueOf("1.2.0.a")),
+		assertEquals(Arrays.asList(Version.valueOf("1.0.0"), Version.valueOf("1.2.0"), Version.valueOf("1.2.0.a")),
 				lastMigrations.getList(defRealm));
 
 		// assert new current version

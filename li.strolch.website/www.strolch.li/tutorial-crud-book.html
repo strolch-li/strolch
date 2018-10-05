@@ -320,7 +320,6 @@ public Response create(@Context HttpServletRequest request, String data) {
         The service is implemented as follows:
         <pre class="pre-scrollable">
 public class CreateBookService extends AbstractService&lt;JsonServiceArgument, JsonServiceResult&gt; {
-  private static final long serialVersionUID = 1L;
 
   @Override
   protected JsonServiceResult getResultInstance() {
@@ -415,8 +414,6 @@ public Response update(@Context HttpServletRequest request, @PathParam("id") Str
         <pre class="pre-scrollable">
 public class UpdateBookService extends AbstractService&lt;JsonServiceArgument, JsonServiceResult&gt; {
 
-  private static final long serialVersionUID = 1L;
-
   @Override
   protected JsonServiceResult getResultInstance() {
     return new JsonServiceResult();
@@ -508,8 +505,6 @@ public Response update(@Context HttpServletRequest request, @PathParam("id") Str
         <p><b>Remove Service:</b></p>
         <pre class="pre-scrollable">
 public class RemoveBookService extends AbstractService&lt;StringServiceArgument, ServiceResult&gt; {
-
-  private static final long serialVersionUID = 1L;
 
   @Override
   protected ServiceResult getResultInstance() {

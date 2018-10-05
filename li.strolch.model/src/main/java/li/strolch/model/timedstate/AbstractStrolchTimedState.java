@@ -35,8 +35,6 @@ import li.strolch.utils.helper.StringHelper;
 public abstract class AbstractStrolchTimedState<T extends IValue> extends AbstractStrolchElement
 		implements StrolchTimedState<T> {
 
-	private static final long serialVersionUID = 1L;
-
 	protected boolean hidden = false;
 	protected int index;
 	protected String interpretation = INTERPRETATION_NONE;

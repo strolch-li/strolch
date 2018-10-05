@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,16 +21,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.xmlpers.impl.PathBuilder;
 import li.strolch.xmlpers.objref.ObjectRef;
 import li.strolch.xmlpers.util.FilenameUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
 public class MetadataDao {
 
@@ -133,10 +131,10 @@ public class MetadataDao {
 
 	/**
 	 * Returns the types, i.e. directories in the given query path
-	 * 
+	 *
 	 * @param queryPath
-	 *            the path for which the types should be gathered
-	 * 
+	 * 		the path for which the types should be gathered
+	 *
 	 * @return a set of types in the given query path
 	 */
 	private Set<String> queryTypeSet(File queryPath) {
@@ -162,11 +160,12 @@ public class MetadataDao {
 	}
 
 	/**
-	 * Returns the ids of all objects in the given query path, i.e. the id part of all the files in the given query path
-	 * 
+	 * Returns the ids of all objects in the given query path, i.e. the id part of all the files in the given query
+	 * path
+	 *
 	 * @param queryPath
-	 *            the path for which the ids should be gathered
-	 * 
+	 * 		the path for which the ids should be gathered
+	 *
 	 * @return a set of ids for the objects in the given query path
 	 */
 	private Set<String> queryKeySet(File queryPath) {
@@ -195,10 +194,10 @@ public class MetadataDao {
 
 	/**
 	 * Returns the number of all types, i.e. directories in the given query path
-	 * 
+	 *
 	 * @param queryPath
-	 *            the path in which to count the types
-	 * 
+	 * 		the path in which to count the types
+	 *
 	 * @return the number of types in the given query path
 	 */
 	private long queryTypeSize(File queryPath) {
@@ -224,10 +223,10 @@ public class MetadataDao {
 
 	/**
 	 * Returns the number of all objects in the given query path
-	 * 
+	 *
 	 * @param queryPath
-	 *            the path in which to count the objects
-	 * 
+	 * 		the path in which to count the objects
+	 *
 	 * @return the number of objects in the given query path
 	 */
 	private long querySize(File queryPath) {

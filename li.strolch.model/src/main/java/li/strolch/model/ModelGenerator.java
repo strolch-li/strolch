@@ -119,8 +119,8 @@ public class ModelGenerator {
 	public static final String ACTION_RES_ID = "@resId";
 
 	/**
-	 * Creates an {@link Resource} with the given values and adds a {@link ParameterBag} by calling
-	 * {@link #createParameterBag(String, String, String)}
+	 * Creates an {@link Resource} with the given values and adds a {@link ParameterBag} by calling {@link
+	 * #createParameterBag(String, String, String)}
 	 *
 	 * @param id
 	 * 		the id of the {@link Resource}
@@ -234,8 +234,8 @@ public class ModelGenerator {
 	}
 
 	/**
-	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
-	 * {@link #createParameterBag(String, String, String)}
+	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling {@link
+	 * #createParameterBag(String, String, String)}
 	 *
 	 * @param id
 	 * 		the id of the {@link Order}
@@ -251,8 +251,8 @@ public class ModelGenerator {
 	}
 
 	/**
-	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
-	 * {@link #createParameterBag(String, String, String)}
+	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling {@link
+	 * #createParameterBag(String, String, String)}
 	 *
 	 * @param id
 	 * 		the id of the {@link Order}
@@ -291,8 +291,8 @@ public class ModelGenerator {
 	}
 
 	/**
-	 * Creates a list of {@link Order Orders} with the given values and adds a {@link ParameterBag} by calling
-	 * {@link #createParameterBag(String, String, String)}
+	 * Creates a list of {@link Order Orders} with the given values and adds a {@link ParameterBag} by calling {@link
+	 * #createParameterBag(String, String, String)}
 	 *
 	 * @param idStart
 	 * 		id range start

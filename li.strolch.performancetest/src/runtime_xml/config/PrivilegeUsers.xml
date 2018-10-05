@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Users>
-	<User userId="1" username="agent">
-		<State>SYSTEM</State>
-		<Roles>
-			<Role>agent</Role>
-		</Roles>
-	</User>
-	<User userId="2" username="cached" password="14df65e4ec6adae5e426dff1248f8a4bafc9791b7d5a4dfad89b00e06803e679" salt="636163686564">
-		<Firstname>Application</Firstname>
-		<Lastname>Administrator</Lastname>
-		<State>ENABLED</State>
-		<Locale>en_GB</Locale>
-		<Roles>
-			<Role>AppUser</Role>
-		</Roles>
-		<Properties>
-			<Property name="realm" value="cached" />
-		</Properties>
-	</User>
+    <User userId="1" username="agent">
+        <State>SYSTEM</State>
+        <Roles>
+            <Role>agent</Role>
+        </Roles>
+    </User>
+    <User userId="2" username="cached" password="14df65e4ec6adae5e426dff1248f8a4bafc9791b7d5a4dfad89b00e06803e679" salt="636163686564">
+        <Firstname>Application</Firstname>
+        <Lastname>Administrator</Lastname>
+        <State>ENABLED</State>
+        <Locale>en_GB</Locale>
+        <Roles>
+            <Role>AppUser</Role>
+        </Roles>
+        <Properties>
+            <Property name="realm" value="cached"/>
+        </Properties>
+    </User>
 </Users>

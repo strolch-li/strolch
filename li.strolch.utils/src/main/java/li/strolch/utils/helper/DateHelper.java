@@ -14,7 +14,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * Helper class to format dates and periods to Strings
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class DateHelper {
@@ -22,14 +22,15 @@ public class DateHelper {
 	/**
 	 * Formats the given ISO 8601 date to the given locale using {@link FormatStyle#MEDIUM}. If the year is > 2100 then
 	 * a - (dash) is returned.
-	 * 
+	 *
 	 * @param locale
-	 *            the locale to use
+	 * 		the locale to use
 	 * @param isoDate
-	 *            the date as ISO String
+	 * 		the date as ISO String
 	 * @param withTimeIfNonZero
-	 *            if true and the time part is not 0, then it is appended to the string, if the time is not 0, then it
-	 *            is always appended
+	 * 		if true and the time part is not 0, then it is appended to the string, if the time is not 0, then it is always
+	 * 		appended
+	 *
 	 * @return the string in the locale' format using {@link FormatStyle#MEDIUM}
 	 */
 	public static String formatDate(Locale locale, String isoDate, boolean withTimeIfNonZero) {
@@ -40,12 +41,13 @@ public class DateHelper {
 
 		DateTimeFormatter formatter;
 		if (withTimeIfNonZero && (parse.getHour() != 0 || parse.getMinute() != 0)) {
-			String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM,
-					FormatStyle.MEDIUM, Chronology.ofLocale(locale), locale);
+			String pattern = DateTimeFormatterBuilder
+					.getLocalizedDateTimePattern(FormatStyle.MEDIUM, FormatStyle.MEDIUM, Chronology.ofLocale(locale),
+							locale);
 			formatter = DateTimeFormatter.ofPattern(pattern);
 		} else {
-			String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null,
-					Chronology.ofLocale(locale), locale);
+			String pattern = DateTimeFormatterBuilder
+					.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale);
 			formatter = DateTimeFormatter.ofPattern(pattern);
 		}
 
@@ -53,8 +55,8 @@ public class DateHelper {
 	}
 
 	/**
-	 * Formats the given period in the form Pn[DWM] (n days, weeks or months) to the written out form of: &lt;prefix&gt; n
-	 * day(s) / n week(s) / n month(s). Note that the bundle must contain the following keys:
+	 * Formats the given period in the form Pn[DWM] (n days, weeks or months) to the written out form of: &lt;prefix&gt;
+	 * n day(s) / n week(s) / n month(s). Note that the bundle must contain the following keys:
 	 * <ul>
 	 * <li>days</li>
 	 * <li>day</li>
@@ -63,13 +65,14 @@ public class DateHelper {
 	 * <li>months</li>
 	 * <li>month</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param prefixKey
-	 *            if not null, then prefix lookup key in bundle to set before result
+	 * 		if not null, then prefix lookup key in bundle to set before result
 	 * @param bundle
-	 *            the bundle where to get the translations
+	 * 		the bundle where to get the translations
 	 * @param iso8601Period
-	 *            the period
+	 * 		the period
+	 *
 	 * @return the formatted period
 	 */
 	public static String formatPeriod(ResourceBundle bundle, String prefixKey, String iso8601Period) {
@@ -88,12 +91,12 @@ public class DateHelper {
 			labelString = labelString + (selectedPeriodNumber > 1 ? bundle.getString("days") : bundle.getString("day"));
 			break;
 		case 'W':
-			labelString = labelString
-					+ (selectedPeriodNumber > 1 ? bundle.getString("weeks") : bundle.getString("week"));
+			labelString =
+					labelString + (selectedPeriodNumber > 1 ? bundle.getString("weeks") : bundle.getString("week"));
 			break;
 		case 'M':
-			labelString = labelString
-					+ (selectedPeriodNumber > 1 ? bundle.getString("months") : bundle.getString("month"));
+			labelString =
+					labelString + (selectedPeriodNumber > 1 ? bundle.getString("months") : bundle.getString("month"));
 			break;
 		}
 
@@ -102,10 +105,10 @@ public class DateHelper {
 
 	/**
 	 * Parses the given ISO8601 time stamp and truncates the time from it, returning the time in long
-	 * 
+	 *
 	 * @param iso8601Timestamp
-	 *            the ISO 8601 date to parse
-	 * 
+	 * 		the ISO 8601 date to parse
+	 *
 	 * @return the truncated time in milliseconds
 	 */
 	public static long truncateTimeFromTimestamp(String iso8601Timestamp) {

@@ -26,8 +26,6 @@ import li.strolch.utils.helper.StringHelper;
  */
 public abstract class AbstractStrolchElement implements StrolchElement {
 
-	private static final long serialVersionUID = 0L;
-
 	protected long dbid = Long.MAX_VALUE;
 	protected String id;
 	protected String name;

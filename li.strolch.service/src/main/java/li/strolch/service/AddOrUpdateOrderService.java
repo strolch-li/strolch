@@ -28,8 +28,6 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AddOrUpdateOrderService extends AbstractService<StrolchRootElementArgument, ServiceResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult(ServiceResultState.FAILED);

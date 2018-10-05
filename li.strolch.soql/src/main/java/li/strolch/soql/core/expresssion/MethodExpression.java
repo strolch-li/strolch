@@ -10,7 +10,7 @@ import li.strolch.soql.core.SOQLEvaluationException;
 
 /**
  * extract state field value by reflection
- * 
+ *
  * @author msmock
  */
 public class MethodExpression extends AbstractObjectExpression {
@@ -44,8 +44,9 @@ public class MethodExpression extends AbstractObjectExpression {
 		try {
 			method = object.getClass().getMethod(methodName, clazzes.toArray(new Class[clazzes.size()]));
 		} catch (NoSuchMethodException e) {
-			throw new SOQLEvaluationException("Method " + methodName + " with arguments " + clazzes
-					+ " not declared on object " + object + " of class " + object.getClass());
+			throw new SOQLEvaluationException(
+					"Method " + methodName + " with arguments " + clazzes + " not declared on object " + object
+							+ " of class " + object.getClass());
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		}

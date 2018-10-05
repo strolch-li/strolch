@@ -34,8 +34,6 @@ import li.strolch.service.api.ServiceResultState;
  */
 public class PrivilegeUpdateUserRolesService extends AbstractService<JsonServiceArgument, PrivilegeUserResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected PrivilegeUserResult getResultInstance() {
 		return new PrivilegeUserResult(ServiceResultState.FAILED);

@@ -137,7 +137,7 @@
 
         <module>li.strolch.performancetest</module>
         <module>strolch_minimal_rest</module>
-        
+
         <module>li.strolch.website</module>
 
         <!-- keep a module as last which is deployable to central -->

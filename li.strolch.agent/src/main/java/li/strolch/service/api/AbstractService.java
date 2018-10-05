@@ -44,7 +44,6 @@ import li.strolch.utils.helper.StringHelper;
 public abstract class AbstractService<T extends ServiceArgument, U extends ServiceResult> implements Service<T, U> {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractService.class);
-	private static final long serialVersionUID = 1L;
 
 	private ComponentContainer container;
 	private PrivilegeContext privilegeContext;
@@ -111,7 +110,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
 	 * {@link IllegalArgumentException} is thrown
 	 * 
-	 * @param clazz
+	 * @param clazz the type of component to return
 	 * 
 	 * @return the component with the given name
 	 * 
@@ -259,7 +258,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * @param action
 	 *            the action to perform
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
 	 */
 	protected void runAs(String username, SystemAction action) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAs(username, action);
@@ -275,7 +274,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 
 	 * @return the result
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
 	 */
 	protected <V> V runWithResult(String username, SystemActionWithResult<V> action) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runWithResult(username, action);
@@ -289,7 +288,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * @param runnable
 	 *            the runnable to perform
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
 	 */
 	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAs(username, runnable);
@@ -305,7 +304,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 
 	 * @return the result
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
 	 */
 	protected <V> V runWithResult(String username, PrivilegedRunnableWithResult<V> runnable) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runWithResult(username, runnable);
@@ -314,12 +313,10 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 * 
-	 * @param username
-	 *            the name of the system user to perform the action as
 	 * @param action
 	 *            the action to perform
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
 	 */
 	protected void runAsAgent(SystemAction action) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAsAgent(action);
@@ -328,14 +325,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 * 
-	 * @param username
-	 *            the name of the system user to perform the action as
 	 * @param action
 	 *            the action to perform
 	 * 
 	 * @return the result
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
 	 */
 	protected <V> V runAsAgentWithResult(SystemActionWithResult<V> action) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(action);
@@ -345,10 +340,10 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 * 
-	 * @param action
+	 * @param runnable
 	 *            the action to perform
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
 		this.container.getPrivilegeHandler().runAsAgent(runnable);
@@ -358,12 +353,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 * 
-	 * @param action
+	 * @param runnable
 	 *            the action to perform
 	 * 
 	 * @return the result
 	 * 
-	 * @throws PrivilegeException
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
 	 */
 	protected <V> V runAsAgentWithResult(PrivilegedRunnableWithResult<V> runnable) throws PrivilegeException {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(runnable);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8"/>
+    <meta name="google-site-verification" content="CPhbjooaiTdROm7Vs4E7kuHZvBfkeLUtonGgcVUbTL8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -53,11 +53,11 @@
     <div class="content">
 
         <p>One of Strolch's features that sets it apart from other frameworks, is that versioning is baked into
-            Strolch's fabric. The feature is opt-in, as it is not required in all projects, but it only needs enabling,
-            for all modifications to objects to be versioned, so that rollbacks can be done when needed.</p>
+           Strolch's fabric. The feature is opt-in, as it is not required in all projects, but it only needs enabling,
+           for all modifications to objects to be versioned, so that rollbacks can be done when needed.</p>
 
         <p>The feature is enabled for each realm. In the <code>StrolchConfiguration.xml</code> file enable it by adding
-            the <code>enableVersioning</code> propery per realm:</p>
+           the <code>enableVersioning</code> propery per realm:</p>
         <pre>
 &lt;StrolchConfiguration&gt;
   &lt;env id="dev"&gt;
@@ -81,9 +81,9 @@
   ...
 &lt;/StrolchConfiguration&gt;</pre>
 
-        <br/>
+        <br />
         <p>Once versioning is enabled, versioning is handled automatically. The API for versioning is implemented on the
-            ElementMaps.</p>
+           ElementMaps.</p>
 
         <p>Example: Revert to previous version of a Resource:</p>
         <pre>
@@ -97,11 +97,12 @@ Resource previousVersion = resourceMap.revertToVersion(tx, "TestType", "MyTestRe
         <pre>
 List&lt;Resource&gt; versions = resourceMap.getVersionsFor(tx, "TestType", "MyTestResource");</pre>
 
-        <br/>
+        <br />
         <p><b>Note:</b> When reverting to a previous version, it is important to remember, that any references on an
-            element to other elements will also be restored. As long as the relationship is to the same element, then
-            this is not an issue, but should the relationship have changed, then it this must be handled and the user
-            performing a revert be allowed to decided which element to reference in the reverted version.</p>
+                        element to other elements will also be restored. As long as the relationship is to the same
+                        element, then this is not an issue, but should the relationship have changed, then it this must
+                        be handled and the user performing a revert be allowed to decided which element to reference in
+                        the reverted version.</p>
 
         <!-- content here -->
 
@@ -140,7 +141,7 @@ List&lt;Resource&gt; versions = resourceMap.getVersionsFor(tx, "TestType", "MyTe
         s.parentNode.insertBefore(g, s);
     })();
 </script>
-<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt=""/></p></noscript>
+<noscript><p><img src="http://piwik.eitchnet.ch/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 </body>

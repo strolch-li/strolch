@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -102,7 +102,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param addOrders
-	 *            the addOrders to set
+	 * 		the addOrders to set
 	 */
 	public void setAddOrders(boolean addOrders) {
 		this.addOrders = addOrders;
@@ -110,7 +110,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param addResources
-	 *            the addResources to set
+	 * 		the addResources to set
 	 */
 	public void setAddResources(boolean addResources) {
 		this.addResources = addResources;
@@ -118,7 +118,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param addActivities
-	 *            the addActivities to set
+	 * 		the addActivities to set
 	 */
 	public void setAddActivities(boolean addActivities) {
 		this.addActivities = addActivities;
@@ -126,7 +126,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param updateOrders
-	 *            the updateOrders to set
+	 * 		the updateOrders to set
 	 */
 	public void setUpdateOrders(boolean updateOrders) {
 		this.updateOrders = updateOrders;
@@ -134,7 +134,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param updateResources
-	 *            the updateResources to set
+	 * 		the updateResources to set
 	 */
 	public void setUpdateResources(boolean updateResources) {
 		this.updateResources = updateResources;
@@ -142,7 +142,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param updateActivities
-	 *            the updateActivities to set
+	 * 		the updateActivities to set
 	 */
 	public void setUpdateActivities(boolean updateActivities) {
 		this.updateActivities = updateActivities;
@@ -150,7 +150,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param orderTypes
-	 *            the orderTypes to set
+	 * 		the orderTypes to set
 	 */
 	public void setOrderTypes(Set<String> orderTypes) {
 		this.orderTypes = orderTypes;
@@ -158,7 +158,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param resourceTypes
-	 *            the resourceTypes to set
+	 * 		the resourceTypes to set
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
@@ -166,7 +166,7 @@ public class XmlImportModelCommand extends Command {
 
 	/**
 	 * @param activityTypes
-	 *            the activityTypes to set
+	 * 		the activityTypes to set
 	 */
 	public void setActivityTypes(Set<String> activityTypes) {
 		this.activityTypes = activityTypes;

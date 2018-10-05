@@ -15,9 +15,6 @@
  */
 package li.strolch.service;
 
-import li.strolch.service.api.Service;
-import org.junit.Test;
-
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.AddResourceCommand;
@@ -25,10 +22,12 @@ import li.strolch.persistence.api.RemoveResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.UpdateResourceCommand;
 import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import li.strolch.utils.dbc.DBC;
+import org.junit.Test;
 
 public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceResult> {
 
@@ -63,7 +62,6 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 	}
 
 	public static class FlushingCommandsService1 extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {
@@ -114,7 +112,6 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 	}
 
 	public static class FlushingCommandsService2 extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {
@@ -165,7 +162,6 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 	}
 
 	public static class RollbackAfterFlushCommandsService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected ServiceResult getResultInstance() {

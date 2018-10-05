@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Martin Smock <martin.smock@bluewin.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,15 +57,15 @@ public class AssignActionTest {
 		this.initialResource = ModelGenerator.createResource("initial", "Test With States", "Stated");
 		this.initialTimedState = this.initialResource.getTimedState(STATE_INTEGER_ID);
 		this.initialTimedState.getTimeEvolution().clear();
-		this.initialTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)),
-				true);
+		this.initialTimedState
+				.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
 		// add target resource with integer state variable
 		this.targetResource = ModelGenerator.createResource("target", "Test With States", "Stated");
 		this.targetTimedState = this.targetResource.getTimedState(STATE_INTEGER_ID);
 		this.targetTimedState.getTimeEvolution().clear();
-		this.targetTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)),
-				true);
+		this.targetTimedState
+				.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
 		this.action = new Action("action", "Action", "Use");
 
@@ -164,7 +164,7 @@ public class AssignActionTest {
 	 * add changes to action start and end time with a value defined in the action objective and set the stateId of the
 	 * state variable to apply the change to
 	 * </p>
-	 * 
+	 *
 	 * @param action
 	 */
 	protected static void createChanges(Action action) {

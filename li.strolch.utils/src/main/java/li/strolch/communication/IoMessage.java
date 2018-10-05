@@ -1,12 +1,12 @@
 /*
  * Copyright 2014 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,14 +25,14 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * <p>
- * An {@link IoMessage} is the object containing the data to be transmitted in IO. Implementations of
- * {@link CommunicationConnection} should implement sub classes of this method to hold the actual payload.
+ * An {@link IoMessage} is the object containing the data to be transmitted in IO. Implementations of {@link
+ * CommunicationConnection} should implement sub classes of this method to hold the actual payload.
  * </p>
- * 
+ *
  * <p>
  * This class also contains a {@link Map} to store transient meta data to the actual payload
  * </p>
- * 
+ *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class IoMessage {
@@ -47,11 +47,11 @@ public class IoMessage {
 
 	/**
 	 * @param id
-	 *            the id
+	 * 		the id
 	 * @param key
-	 *            the key
+	 * 		the key
 	 * @param connectionId
-	 *            the connection
+	 * 		the connection
 	 */
 	public IoMessage(String id, CommandKey key, String connectionId) {
 		this.id = id;
@@ -93,7 +93,7 @@ public class IoMessage {
 
 	/**
 	 * Used for testing purposes only!
-	 * 
+	 *
 	 * @param date
 	 */
 	void setUpdated(Date date) {
@@ -116,9 +116,9 @@ public class IoMessage {
 
 	/**
 	 * @param state
-	 *            the state
+	 * 		the state
 	 * @param stateMsg
-	 *            the stateMsg
+	 * 		the stateMsg
 	 */
 	public void setState(State state, String stateMsg) {
 		this.state = state;
@@ -133,11 +133,11 @@ public class IoMessage {
 
 	/**
 	 * Add a transient parameter to this message
-	 * 
+	 *
 	 * @param key
-	 *            the key under which the parameter is to be stored
+	 * 		the key under which the parameter is to be stored
 	 * @param value
-	 *            the value to store under the given key
+	 * 		the value to store under the given key
 	 */
 	public void addParam(String key, Object value) {
 		this.parameters.put(key, value);
@@ -145,9 +145,10 @@ public class IoMessage {
 
 	/**
 	 * Removes the parameter with the given key
-	 * 
+	 *
 	 * @param key
-	 *            The give of the parameter to be removed
+	 * 		The give of the parameter to be removed
+	 *
 	 * @return the removed value, or null if the object didn't exist
 	 */
 	@SuppressWarnings("unchecked")

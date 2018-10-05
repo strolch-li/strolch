@@ -22,13 +22,12 @@ import java.util.Map;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.communication.IoMessage.State;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;

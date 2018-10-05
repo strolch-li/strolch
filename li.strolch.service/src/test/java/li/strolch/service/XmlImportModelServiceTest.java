@@ -17,7 +17,6 @@ package li.strolch.service;
 
 import li.strolch.service.api.Service;
 import li.strolch.service.test.AbstractRealmServiceTest;
-
 import org.junit.Test;
 
 /**

@@ -26,8 +26,6 @@ import li.strolch.service.api.ServiceResult;
  */
 public class RemoveResourcesService extends AbstractService<LocatorListArgument, ServiceResult> {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	protected ServiceResult getResultInstance() {
 		return new ServiceResult();

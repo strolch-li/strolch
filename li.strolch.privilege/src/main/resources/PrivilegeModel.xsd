@@ -1,98 +1,98 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.eitchnet.ch/dev/privilege/PrivilegeModel"
-	xmlns:pr="http://www.eitchnet.ch/dev/privilege/PrivilegeModel" elementFormDefault="qualified">
+        xmlns:pr="http://www.eitchnet.ch/dev/privilege/PrivilegeModel" elementFormDefault="qualified">
 
-	<element name="UsersAndRoles">
-		<annotation>
-			<documentation>
-Copyright 2013 Robert von Burg &lt;eitch@eitchnet.ch&gt;
- 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- 
-     http://www.apache.org/licenses/LICENSE-2.0
- 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-			</documentation>
-		</annotation>
+    <element name="UsersAndRoles">
+        <annotation>
+            <documentation>
+                Copyright 2013 Robert von Burg &lt;eitch@eitchnet.ch&gt;
 
-	<complexType>
-		<sequence>
-			<element name="Users">
-				<complexType>
-					<sequence>
-						<element name="User" type="pr:User" minOccurs="0" maxOccurs="unbounded" />
-					</sequence>
-				</complexType>
-			</element>
+                Licensed under the Apache License, Version 2.0 (the "License");
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at
 
-			<element name="Roles">
-				<complexType>
-					<sequence>
-						<element name="Role" type="pr:Role" minOccurs="0" maxOccurs="unbounded" />
-					</sequence>
-				</complexType>
-			</element>
-		</sequence>
-	</complexType>
-	</element>
+                http://www.apache.org/licenses/LICENSE-2.0
 
-	<complexType name="User">
-		<sequence>
-			
-			<element type="string" name="Firstname" minOccurs="1" maxOccurs="1" />
-			<element type="string" name="Lastname" minOccurs="1" maxOccurs="1" />
-			<element type="string" name="State" minOccurs="1" maxOccurs="1" />
-			<element type="string" name="Locale" minOccurs="0" maxOccurs="1" />
-			
-			<element name="Roles" minOccurs="1" maxOccurs="1">
-				<complexType>
-					<sequence>
-						<element type="string" name="Role" minOccurs="0" maxOccurs="unbounded"/>
-					</sequence>
-				</complexType>
-			</element>
-			
-			<element name="Properties" type="pr:Properties" minOccurs="0" maxOccurs="1" />
-		</sequence>
-		<attribute type="long" name="userId" use="required" />
-		<attribute type="string" name="username" use="required" />
-		<attribute type="string" name="password" use="required" />
-	</complexType>
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+            </documentation>
+        </annotation>
 
-	<complexType name="Properties">
-		<sequence>
-			<element name="Property" minOccurs="0" maxOccurs="unbounded">
-				<complexType>
-					<simpleContent>
-						<extension base="string">
-							<attribute type="string" name="name" use="required" />
-							<attribute type="string" name="value" use="required" />
-						</extension>
-					</simpleContent>
-				</complexType>
-			</element>
-		</sequence>
-	</complexType>
+        <complexType>
+            <sequence>
+                <element name="Users">
+                    <complexType>
+                        <sequence>
+                            <element name="User" type="pr:User" minOccurs="0" maxOccurs="unbounded"/>
+                        </sequence>
+                    </complexType>
+                </element>
 
-	<complexType name="Role" mixed="true">
-		<sequence>
-			<element name="Privilege"  minOccurs="0" maxOccurs="unbounded">
-				<complexType>
-					<sequence>
-						<element type="string" name="AllAllowed" minOccurs="0" maxOccurs="1"/>
-						<element type="string" name="Allow"  minOccurs="0" maxOccurs="unbounded" />
-						<element type="string" name="Deny" minOccurs="0" maxOccurs="unbounded"  />
-					</sequence>
-					<attribute type="string" name="name" use="required" />
-				</complexType>
-			</element>
-		</sequence>
-		<attribute type="string" name="name" use="required" />
-	</complexType>
+                <element name="Roles">
+                    <complexType>
+                        <sequence>
+                            <element name="Role" type="pr:Role" minOccurs="0" maxOccurs="unbounded"/>
+                        </sequence>
+                    </complexType>
+                </element>
+            </sequence>
+        </complexType>
+    </element>
+
+    <complexType name="User">
+        <sequence>
+
+            <element type="string" name="Firstname" minOccurs="1" maxOccurs="1"/>
+            <element type="string" name="Lastname" minOccurs="1" maxOccurs="1"/>
+            <element type="string" name="State" minOccurs="1" maxOccurs="1"/>
+            <element type="string" name="Locale" minOccurs="0" maxOccurs="1"/>
+
+            <element name="Roles" minOccurs="1" maxOccurs="1">
+                <complexType>
+                    <sequence>
+                        <element type="string" name="Role" minOccurs="0" maxOccurs="unbounded"/>
+                    </sequence>
+                </complexType>
+            </element>
+
+            <element name="Properties" type="pr:Properties" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+        <attribute type="long" name="userId" use="required"/>
+        <attribute type="string" name="username" use="required"/>
+        <attribute type="string" name="password" use="required"/>
+    </complexType>
+
+    <complexType name="Properties">
+        <sequence>
+            <element name="Property" minOccurs="0" maxOccurs="unbounded">
+                <complexType>
+                    <simpleContent>
+                        <extension base="string">
+                            <attribute type="string" name="name" use="required"/>
+                            <attribute type="string" name="value" use="required"/>
+                        </extension>
+                    </simpleContent>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="Role" mixed="true">
+        <sequence>
+            <element name="Privilege" minOccurs="0" maxOccurs="unbounded">
+                <complexType>
+                    <sequence>
+                        <element type="string" name="AllAllowed" minOccurs="0" maxOccurs="1"/>
+                        <element type="string" name="Allow" minOccurs="0" maxOccurs="unbounded"/>
+                        <element type="string" name="Deny" minOccurs="0" maxOccurs="unbounded"/>
+                    </sequence>
+                    <attribute type="string" name="name" use="required"/>
+                </complexType>
+            </element>
+        </sequence>
+        <attribute type="string" name="name" use="required"/>
+    </complexType>
 
 </schema>
