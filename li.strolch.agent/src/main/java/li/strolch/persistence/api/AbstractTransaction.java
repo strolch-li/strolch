@@ -518,7 +518,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		StrolchRootElement parent = element;
 		while (t == null) {
 			StringParameter parentP = parent.getParameter(BAG_RELATIONS, parentParamKey);
-			if (parentP == null)
+			if (parentP == null || parentP.isEmpty())
 				break;
 
 			switch (parentP.getInterpretation()) {
@@ -664,6 +664,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
+		if (refP.isEmpty())
+			return null;
+
 		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
 			return element;
@@ -691,6 +694,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public List<Order> getOrdersBy(StringListParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
+		if (refP.isEmpty())
+			return new ArrayList<>();
+
 		List<Order> elements = new ArrayList<>();
 		for (String id : refP.getValue()) {
 			Order element = getOrderBy(refP.getUom(), id, assertExists);
@@ -740,6 +746,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
+		if (refP.isEmpty())
+			return null;
+
 		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
 			return element;
@@ -767,6 +776,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
+		if (refP.isEmpty())
+			return new ArrayList<>();
+
 		List<Resource> elements = new ArrayList<>();
 		for (String id : refP.getValue()) {
 			Resource element = getResourceBy(refP.getUom(), id, assertExists);
@@ -828,6 +840,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
+		if (refP.isEmpty())
+			return null;
+
 		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(refP.getUom(), refP.getValue()));
 		if (element != null)
 			return element;
@@ -855,6 +870,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public List<Activity> getActivitiesBy(StringListParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
+		if (refP.isEmpty())
+			return new ArrayList<>();
+
 		List<Activity> elements = new ArrayList<>();
 		for (String id : refP.getValue()) {
 			Activity element = getActivityBy(refP.getUom(), id, assertExists);
