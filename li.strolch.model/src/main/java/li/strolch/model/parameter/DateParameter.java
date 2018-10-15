@@ -23,14 +23,14 @@ import java.util.Date;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DateParameter extends AbstractParameter<Date> {
 
-	private static final Date EMPTY_VALUE = ISO8601FormatFactory.getInstance().getDateFormat().parse("-");
+	private static final Date EMPTY_VALUE = ISO8601.parseToDate("-");
 
 	private Date value;
 
@@ -58,7 +58,7 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	@Override
 	public String getValueAsString() {
-		return ISO8601FormatFactory.getInstance().formatDate(this.value);
+		return ISO8601.toString(this.value);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -162,7 +162,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	}
 
 	public static Date parseFromString(String valueS) {
-		return ISO8601FormatFactory.getInstance().getDateFormat().parse(valueS);
+		return ISO8601.parseToDate(valueS);
 	}
 
 	@Override

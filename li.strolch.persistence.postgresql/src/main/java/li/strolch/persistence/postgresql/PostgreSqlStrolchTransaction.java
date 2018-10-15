@@ -32,6 +32,7 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	private PostgreSqlOrderDao orderDao;
 	private PostgreSqlResourceDao resourceDao;
 	private PostgreSqlActivityDao activityDao;
+	private PostgreSqlLogMessageDao logMessageDao;
 	private AuditDao auditDao;
 	private Connection connection;
 
@@ -99,10 +100,16 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 		return this.activityDao;
 	}
 
-	public AuditDao getAuditDao() {
+	AuditDao getAuditDao() {
 		if (this.auditDao == null)
 			this.auditDao = new PostgreSqlAuditDao(this);
 		return this.auditDao;
+	}
+
+	LogMessageDao getLogMessageDao() {
+		if (this.logMessageDao == null)
+			this.logMessageDao = new PostgreSqlLogMessageDao(this);
+		return this.logMessageDao;
 	}
 
 	Connection getConnection() {

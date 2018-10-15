@@ -16,11 +16,10 @@
 package li.strolch.utils.iso8601;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
@@ -35,26 +34,10 @@ public class ISO8601 implements DateFormat {
 	private static final Logger logger = LoggerFactory.getLogger(ISO8601.class);
 
 	@Override
-	public String format(Date date) {
-		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()).format(date.toInstant());
-	}
-
-	/**
-	 * added by msmock convert a long to ISO8601
-	 *
-	 * @param timePoint
-	 * 		the timepoint
-	 *
-	 * @return time point as ISO8601 String
-	 */
-	@Override
 	public String format(long timePoint) {
-
-		if (timePoint == Long.MAX_VALUE || timePoint == Long.MIN_VALUE) {
+		if (timePoint == Long.MAX_VALUE || timePoint == Long.MIN_VALUE)
 			return "-";
-		}
 
-		// else
 		try {
 			Date date = new Date();
 			date.setTime(timePoint);
@@ -66,49 +49,44 @@ public class ISO8601 implements DateFormat {
 	}
 
 	@Override
+	public String format(Date date) {
+		return toString(date);
+	}
+
+	@Override
 	public long parseLong(String s) {
 		return parse(s).getTime();
 	}
 
-	public static void main(String[] args) {
-		Date d = new Date();
-		long start = System.currentTimeMillis();
-		for (int i = 0; i < 10000000; i++) {
-			String s = new ISO8601().format(d);
-			Date d1 = new ISO8601().parse(s);
-			if (!d.equals(d1))
-				throw new IllegalStateException("Dates not same: " + d + " / " + d1);
-		}
-		System.out.println("Took " + (System.currentTimeMillis() - start));
-	}
-
-	/**
-	 * parse ISO8601 date to long
-	 *
-	 * @param s
-	 * 		the string to parse
-	 *
-	 * @return time point as long
-	 *
-	 * @throws IllegalArgumentException
-	 * 		if the string can not be parsed
-	 */
 	@Override
 	public Date parse(String s) {
+		return parseToDate(s);
+	}
+
+	public static ZonedDateTime parseToZdt(String s) {
 		if (StringHelper.isEmpty(s)) {
 			String msg = "An empty value can not pe parsed to a date!";
 			throw new IllegalArgumentException(msg);
 		}
 
-		if (s.equals("-")) {
-			Calendar cal = Calendar.getInstance();
-			cal.clear();
-			cal.setTimeZone(TimeZone.getTimeZone("GMT0"));
-			return cal.getTime();
-		}
+		if (s.equals("-"))
+			return ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+		return ZonedDateTime.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
+	}
 
-		ZonedDateTime zd = ZonedDateTime
-				.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
-		return Date.from(zd.toInstant());
+	public static Date parseToDate(String s) {
+		return Date.from(parseToZdt(s).toInstant());
+	}
+
+	public static String toString(ZonedDateTime zonedDateTime) {
+		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()).format(zonedDateTime);
+	}
+
+	public static String toString(Date date) {
+		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()).format(date.toInstant());
+	}
+
+	public static void main(String[] args) {
+		System.out.println(toString(ISO8601.parseToZdt("-")));
 	}
 }
