@@ -105,6 +105,26 @@ public class StrolchAgent {
 	}
 
 	/**
+	 * Return the {@link ExecutorService} instantiated for this agent
+	 *
+	 * @return the {@link ExecutorService} instantiated for this agent
+	 */
+	public ExecutorService getSingleThreadExecutor() {
+		return getSingleThreadExecutor("Agent");
+	}
+
+	public synchronized ExecutorService getSingleThreadExecutor(String poolName) {
+		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
+		ExecutorService executor = this.executors.get(poolName);
+		if (executor == null) {
+			executor = Executors.newSingleThreadExecutor(new ThreadPoolFactory(poolName));
+			this.executors.put(poolName, executor);
+		}
+
+		return executor;
+	}
+
+	/**
 	 * Return the {@link ScheduledExecutorService} instantiated for this agent
 	 *
 	 * @return the {@link ScheduledExecutorService} instantiated for this agent
@@ -125,8 +145,8 @@ public class StrolchAgent {
 	}
 
 	/**
-	 * Initializes the underlying container and prepares the executor services. Before calling this method,
-	 * {@link #setup(String, File, File, File)} must have ben called
+	 * Initializes the underlying container and prepares the executor services. Before calling this method, {@link
+	 * #setup(String, File, File, File)} must have ben called
 	 */
 	public void initialize() {
 		if (this.container == null)

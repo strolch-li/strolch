@@ -137,6 +137,27 @@ public class StrolchComponent {
 	}
 
 	/**
+	 * Return the {@link ExecutorService} instantiated for this agent
+	 *
+	 * @return the {@link ExecutorService} instantiated for this agent
+	 */
+	protected ExecutorService getSingleThreadExecutor() {
+		return this.container.getAgent().getSingleThreadExecutor();
+	}
+
+	/**
+	 * Return the {@link ExecutorService} for the given poolName instantiated for this agent
+	 *
+	 * @param poolName
+	 * 		the name of the pool
+	 *
+	 * @return the {@link ExecutorService} for the given poolName  instantiated for this agent
+	 */
+	protected ExecutorService getSingleThreadExecutor(String poolName) {
+		return this.container.getAgent().getSingleThreadExecutor(poolName);
+	}
+
+	/**
 	 * Return the {@link ScheduledExecutorService} instantiated for this agent
 	 *
 	 * @return the {@link ScheduledExecutorService} instantiated for this agent
