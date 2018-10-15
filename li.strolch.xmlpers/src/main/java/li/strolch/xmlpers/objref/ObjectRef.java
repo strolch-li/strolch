@@ -22,7 +22,7 @@ import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.impl.PathBuilder;
 
-public abstract class ObjectRef extends LockableObject {
+public abstract class ObjectRef extends LockableObject implements Comparable<ObjectRef> {
 
 	protected final String name;
 
@@ -70,5 +70,10 @@ public abstract class ObjectRef extends LockableObject {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.name);
+	}
+
+	@Override
+	public int compareTo(ObjectRef o) {
+		return this.name.compareTo(o.name);
 	}
 }
