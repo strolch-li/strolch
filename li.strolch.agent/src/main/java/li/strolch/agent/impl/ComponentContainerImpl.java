@@ -269,7 +269,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Exception,
+						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
 						ResourceBundle.getBundle("strolch-agent"), "agent.started") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
@@ -290,7 +290,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Exception,
+						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
 						ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
