@@ -17,10 +17,7 @@ package li.strolch.xmlpers.api;
 
 import static li.strolch.xmlpers.util.AssertionUtil.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.utils.objectfilter.ObjectFilter;
 import li.strolch.xmlpers.objref.ObjectRef;
@@ -109,7 +106,7 @@ public class ObjectDao {
 
 		long removed = 0;
 
-		Set<ObjectRef> refs = new HashSet<>();
+		Set<ObjectRef> refs = new TreeSet<>();
 		typeRef.lock();
 		refs.add(typeRef);
 		try {
@@ -120,7 +117,7 @@ public class ObjectDao {
 				childTypeRef.lock();
 				refs.add(childTypeRef);
 
-				Set<String> ids = queryKeySet(childTypeRef);
+				Set<String> ids = queryKeySet(childTypeRef, false);
 				for (String id : ids) {
 
 					ObjectRef idRef = childTypeRef.getChildIdRef(this.tx, id);
@@ -149,7 +146,7 @@ public class ObjectDao {
 
 		subTypeRef.lock();
 		try {
-			Set<String> ids = queryKeySet(subTypeRef);
+			Set<String> ids = queryKeySet(subTypeRef, false);
 			for (String id : ids) {
 
 				ObjectRef idRef = subTypeRef.getChildIdRef(this.tx, id);
@@ -182,7 +179,7 @@ public class ObjectDao {
 		parentRef.lock();
 		try {
 
-			Set<String> keySet = queryKeySet(parentRef);
+			Set<String> keySet = queryKeySet(parentRef, false);
 			for (String id : keySet) {
 
 				ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
@@ -223,6 +220,10 @@ public class ObjectDao {
 	}
 
 	public <T> List<T> queryAll(ObjectRef parentRef) {
+		return queryAll(parentRef, Integer.MAX_VALUE, false);
+	}
+
+	public <T> List<T> queryAll(ObjectRef parentRef, int maxSize, boolean reverse) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
@@ -230,8 +231,9 @@ public class ObjectDao {
 		try {
 
 			MetadataDao metadataDao = this.tx.getMetadataDao();
-			Set<String> keySet = metadataDao.queryKeySet(parentRef);
+			Set<String> keySet = metadataDao.queryKeySet(parentRef, reverse);
 
+			int i = 0;
 			List<T> result = new ArrayList<>();
 			for (String id : keySet) {
 
@@ -245,6 +247,9 @@ public class ObjectDao {
 				} finally {
 					childCtx.getObjectRef().unlock();
 				}
+
+				if (maxSize != Integer.MAX_VALUE && i >= maxSize)
+					break;
 			}
 
 			return result;
@@ -254,14 +259,14 @@ public class ObjectDao {
 		}
 	}
 
-	private Set<String> queryKeySet(ObjectRef parentRef) {
+	private Set<String> queryKeySet(ObjectRef parentRef, boolean reverse) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
 		parentRef.lock();
 		try {
 			MetadataDao metadataDao = this.tx.getMetadataDao();
-			return metadataDao.queryKeySet(parentRef);
+			return metadataDao.queryKeySet(parentRef, reverse);
 		} finally {
 			parentRef.unlock();
 		}

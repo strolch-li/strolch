@@ -15,6 +15,8 @@
  */
 package li.strolch.migrations;
 
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+
 import java.io.File;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -200,10 +202,10 @@ public class MigrationsHandler extends StrolchComponent {
 				logger.error("Failed to run migrations!", e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
-					getComponent(OperationsLog.class).addMessage(
-							new LogMessage(Tags.AGENT, getLocator().append(StrolchAgent.getUniqueId()),
-									LogSeverity.Exception, ResourceBundle.getBundle("strolch-service"),
-									"execution.handler.failed.executed").withException(e).value("reason", e));
+					getComponent(OperationsLog.class).addMessage(new LogMessage(Tags.AGENT, SYSTEM_USER_AGENT,
+							getLocator().append(StrolchAgent.getUniqueId()), LogSeverity.Exception,
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
+							.withException(e).value("reason", e));
 				}
 			}
 		}

@@ -28,6 +28,14 @@ public class I18nMessage {
 		this.values = new Properties();
 	}
 
+	public I18nMessage(String key, Properties values, String message) {
+		DBC.INTERIM.assertNotEmpty("key must be set!", key);
+		DBC.INTERIM.assertNotEmpty("message must be set!", message);
+		this.key = key;
+		this.values = values == null ? new Properties() : values;
+		this.message = message;
+	}
+
 	public String getKey() {
 		return this.key;
 	}

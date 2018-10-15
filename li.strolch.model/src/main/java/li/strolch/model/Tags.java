@@ -41,7 +41,6 @@ public class Tags {
 	public static final String INDEX = "Index";
 	public static final String PARAMETER = "Parameter";
 	public static final String TIMED_STATE = "TimedState";
-	public static final String PARAMETERIZED_ELEMENT = "ParameterizedElement";
 
 	public static final String PARAMETER_BAG = "ParameterBag";
 	public static final String STROLCH_MODEL = "StrolchModel";
@@ -67,10 +66,16 @@ public class Tags {
 	public static final String RESOURCE_TYPE = "ResourceType";
 	public static final String STATE_ID = "StateId";
 
+	public static final String USERNAME = "Username";
+	public static final String STACK_TRACE = "StackTrace";
+	public static final String PROPERTIES = "Properties";
+	public static final String PROPERTY = "Property";
 	public static final String LOCATOR = "Locator";
 	public static final String SEVERITY = "Severity";
 	public static final String KEY = "Key";
+	public static final String LOG_MESSAGE = "LogMessage";
 	public static final String MESSAGE = "Message";
+	public static final String EXCEPTION = "Exception";
 	public static final String MESSAGES = "Messages";
 	public static final String REALM = "Realm";
 
@@ -127,6 +132,7 @@ public class Tags {
 
 		// miscellaneous
 
+		public static final String USERNAME = "username";
 		public static final String ELEMENTS = "elements";
 		public static final String NR_OF_ELEMENTS = "nrOfElements";
 		public static final String ELEMENT_MAPS = "elementMaps";

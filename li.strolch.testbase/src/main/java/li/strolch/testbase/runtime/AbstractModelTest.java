@@ -41,6 +41,12 @@ public abstract class AbstractModelTest {
 	}
 
 	@Test
+	public void shouldCreateQueryLogMessages() {
+		LogMessagesTestRunner testRunner = new LogMessagesTestRunner(getRuntimeMock().getContainer(), this.realmName);
+		testRunner.runLogMessagesTest();
+	}
+
+	@Test
 	public void shouldCreateOrders() {
 		OrderModelTestRunner testRunner = new OrderModelTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runCreateOrderTest();

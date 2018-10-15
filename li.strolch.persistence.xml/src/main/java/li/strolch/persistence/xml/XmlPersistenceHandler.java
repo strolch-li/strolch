@@ -27,6 +27,7 @@ import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.StoreToDaoElementListener;
+import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -35,10 +36,7 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.*;
-import li.strolch.persistence.xml.model.ActivityContextFactory;
-import li.strolch.persistence.xml.model.AuditContextFactory;
-import li.strolch.persistence.xml.model.OrderContextFactory;
-import li.strolch.persistence.xml.model.ResourceContextFactory;
+import li.strolch.persistence.xml.model.*;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -113,6 +111,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 			ctxFactory.registerPersistenceContextFactory(Order.class, Tags.ORDER, new OrderContextFactory());
 			ctxFactory.registerPersistenceContextFactory(Audit.class, Tags.AUDIT, new AuditContextFactory());
 			ctxFactory.registerPersistenceContextFactory(Activity.class, Tags.ACTIVITY, new ActivityContextFactory());
+			ctxFactory.registerPersistenceContextFactory(LogMessage.class, Tags.LOG_MESSAGE, new LogMessageContextFactory());
 
 			PersistenceStore persistenceStore = new PersistenceStore();
 			persistenceStore.dbStorePathF = dbStorePathF;
@@ -201,5 +200,10 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 	@Override
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return new XmlAuditDao(tx);
+	}
+
+	@Override
+	public LogMessageDao getLogMessageDao(StrolchTransaction tx) {
+		return new XmlLogMessageDao(tx);
 	}
 }

@@ -171,4 +171,9 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	public AuditDao getAuditDao(StrolchTransaction tx) {
 		return ((PostgreSqlStrolchTransaction) tx).getAuditDao();
 	}
+
+	@Override
+	public LogMessageDao getLogMessageDao(StrolchTransaction tx) {
+		return ((PostgreSqlStrolchTransaction)tx).getLogMessageDao();
+	}
 }

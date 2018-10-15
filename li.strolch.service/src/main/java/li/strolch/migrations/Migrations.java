@@ -15,6 +15,8 @@
  */
 package li.strolch.migrations;
 
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.text.MessageFormat;
@@ -137,9 +139,10 @@ public class Migrations {
 			for (String realm : migrationsRan.keySet()) {
 				List<Version> list = migrationsRan.getList(realm);
 				for (Version version : list) {
-					LogMessage logMessage = new LogMessage(realm, locator.append(StrolchAgent.getUniqueId()),
-							LogSeverity.Info, ResourceBundle.getBundle("strolch-service"),
-							"execution.handler.migrations.version").value("version", version.toString());
+					LogMessage logMessage = new LogMessage(realm, SYSTEM_USER_AGENT,
+							locator.append(StrolchAgent.getUniqueId()), LogSeverity.Info,
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.migrations.version")
+							.value("version", version.toString());
 					operationsLog.addMessage(logMessage);
 				}
 			}

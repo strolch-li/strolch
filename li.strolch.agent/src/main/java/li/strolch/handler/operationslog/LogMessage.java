@@ -2,6 +2,7 @@ package li.strolch.handler.operationslog;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 import com.google.gson.JsonObject;
@@ -14,19 +15,34 @@ import li.strolch.utils.helper.ExceptionHelper;
 public class LogMessage extends I18nMessage {
 
 	private final String id;
+	private final String username;
 	private ZonedDateTime zonedDateTime;
 	private final String realm;
 	private final Locator locator;
 	private final LogSeverity severity;
 	private String stackTrace;
 
-	public LogMessage(String realm, Locator locator, LogSeverity logSeverity, ResourceBundle bundle, String key) {
+	public LogMessage(String realm, String username, Locator locator, LogSeverity severity, ResourceBundle bundle,
+			String key) {
 		super(bundle, key);
 		this.id = StrolchAgent.getUniqueId();
 		this.zonedDateTime = ZonedDateTime.now();
 		this.realm = realm;
+		this.username = username;
 		this.locator = locator;
-		this.severity = logSeverity;
+		this.severity = severity;
+	}
+
+	public LogMessage(String id, ZonedDateTime zonedDateTime, String realm, String username, Locator locator,
+			LogSeverity severity, String key, Properties values, String message, String stackTrace) {
+		super(key, values, message);
+		this.id = id;
+		this.zonedDateTime = zonedDateTime;
+		this.realm = realm;
+		this.username = username;
+		this.locator = locator;
+		this.severity = severity;
+		this.stackTrace = stackTrace;
 	}
 
 	public String getId() {
@@ -39,6 +55,10 @@ public class LogMessage extends I18nMessage {
 
 	public String getRealm() {
 		return this.realm;
+	}
+
+	public String getUsername() {
+		return this.username;
 	}
 
 	public Locator getLocator() {
@@ -78,6 +98,7 @@ public class LogMessage extends I18nMessage {
 		jsonObject.addProperty(Json.KEY, getKey());
 		jsonObject.addProperty(Json.MESSAGE, formatMessage());
 		jsonObject.addProperty(Json.SEVERITY, this.severity.name());
+		jsonObject.addProperty(Json.USERNAME, this.username);
 		jsonObject.addProperty(Json.REALM, this.realm);
 		jsonObject.addProperty(Json.LOCATOR, this.locator.toString());
 		jsonObject.addProperty(Json.EXCEPTION, this.stackTrace);

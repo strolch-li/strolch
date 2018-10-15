@@ -18,8 +18,9 @@ package li.strolch.xmlpers.api;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import li.strolch.xmlpers.impl.PathBuilder;
 import li.strolch.xmlpers.objref.ObjectRef;
@@ -66,6 +67,10 @@ public class MetadataDao {
 	}
 
 	public Set<String> queryKeySet(ObjectRef parentRef) {
+		return queryKeySet(parentRef, false);
+	}
+
+	public Set<String> queryKeySet(ObjectRef parentRef, boolean reverse) {
 		assertNotClosed(this.tx);
 		assertNotRootRef(parentRef);
 		assertNotIdRef(parentRef);
@@ -73,7 +78,7 @@ public class MetadataDao {
 		parentRef.lock();
 		try {
 			File queryPath = parentRef.getPath(this.pathBuilder);
-			Set<String> keySet = queryKeySet(queryPath);
+			Set<String> keySet = queryKeySet(queryPath, reverse);
 
 			if (this.verbose) {
 				String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
@@ -147,7 +152,7 @@ public class MetadataDao {
 			throw new IllegalArgumentException(msg);
 		}
 
-		Set<String> keySet = new HashSet<>();
+		Set<String> keySet = new TreeSet<>();
 		File[] subTypeFiles = queryPath.listFiles();
 		for (File subTypeFile : subTypeFiles) {
 			if (subTypeFile.isDirectory()) {
@@ -168,7 +173,7 @@ public class MetadataDao {
 	 *
 	 * @return a set of ids for the objects in the given query path
 	 */
-	private Set<String> queryKeySet(File queryPath) {
+	private Set<String> queryKeySet(File queryPath, boolean reverse) {
 		if (!queryPath.exists())
 			return Collections.emptySet();
 
@@ -178,9 +183,16 @@ public class MetadataDao {
 			throw new IllegalArgumentException(msg);
 		}
 
-		Set<String> keySet = new HashSet<>();
+		Comparator<String> comparator = reverse ? Comparator.reverseOrder() : Comparator.naturalOrder();
+		Set<String> keySet = new TreeSet<>(comparator);
 
 		File[] subTypeFiles = queryPath.listFiles();
+		if (subTypeFiles == null) {
+			String msg = "The path does not exist, thus can not query key set for it: {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, queryPath.getAbsolutePath());
+			throw new IllegalArgumentException(msg);
+		}
+
 		for (File subTypeFile : subTypeFiles) {
 			if (subTypeFile.isFile()) {
 				String filename = subTypeFile.getName();

@@ -50,6 +50,7 @@
 			<impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
 			<Properties>
 				<allowSchemaCreation>true</allowSchemaCreation>
+				<allowSchemaMigration>true</allowSchemaMigration>
 				<allowSchemaDrop>true</allowSchemaDrop>
 
 				<db.url.svcCached>jdbc:postgresql://localhost/cacheduserdb</db.url.svcCached>
@@ -88,6 +89,13 @@
 			<name>ExecutionHandler</name>
 			<api>li.strolch.execution.ExecutionHandler</api>
 			<impl>li.strolch.execution.EventBasedExecutionHandler</impl>
+		</Component>
+
+		<Component>
+			<name>OperationsLog</name>
+			<api>li.strolch.handler.operationslog.OperationsLog</api>
+			<impl>li.strolch.handler.operationslog.OperationsLog</impl>
+			<depends>RealmHandler</depends>
 		</Component>
 
 	</env>
