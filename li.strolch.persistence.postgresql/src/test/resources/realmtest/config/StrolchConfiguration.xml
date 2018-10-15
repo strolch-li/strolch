@@ -51,5 +51,11 @@
                 <db.pool.maximumPoolSize.second>1</db.pool.maximumPoolSize.second>
             </Properties>
         </Component>
+        <Component>
+            <name>OperationsLog</name>
+            <api>li.strolch.handler.operationslog.OperationsLog</api>
+            <impl>li.strolch.handler.operationslog.OperationsLog</impl>
+            <depends>RealmHandler</depends>
+        </Component>
     </env>
 </StrolchConfiguration>
