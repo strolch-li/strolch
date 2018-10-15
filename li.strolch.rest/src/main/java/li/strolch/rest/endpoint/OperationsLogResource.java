@@ -45,7 +45,7 @@ public class OperationsLogResource {
 
 		if (isNotEmpty(severityS)) {
 			LogSeverity severity = LogSeverity.valueOf(severityS);
-			messages = messages.filter(logMessage -> logMessage.getSeverity() == severity);
+			messages = messages.filter(logMessage -> logMessage.getSeverity().compareTo(severity) >= 0);
 		}
 
 		if (isNotEmpty(query)) {
