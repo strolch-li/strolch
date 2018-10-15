@@ -15,18 +15,21 @@
  */
 package li.strolch.agent.impl;
 
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.agent.api.*;
 import li.strolch.exception.StrolchException;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -258,10 +261,22 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} All {2} Strolch Components started. Took {3}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
-		logger.info(MessageFormat
-				.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
+		String tookS = formatNanoDuration(took);
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(), tookS));
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString())); //$NON-NLS-1$
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
+
+		if (hasComponent(OperationsLog.class)) {
+			for (String realmName : getRealmNames()) {
+				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
+						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Exception,
+						ResourceBundle.getBundle("strolch-agent"), "agent.started") //
+						.value("applicationName", applicationName) //
+						.value("environment", environment) //
+						.value("components", "" + this.controllerMap.size()) //
+						.value("took", tookS));
+			}
+		}
 	}
 
 	public void stop() {
@@ -269,9 +284,21 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long start = System.nanoTime();
 
-		String msg = "{0}:{1} Stopping {2} Strolch Components..."; //$NON-NLS-1$
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
+
+		if (hasComponent(OperationsLog.class)) {
+			for (String realmName : getRealmNames()) {
+				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
+						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Exception,
+						ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
+						.value("applicationName", applicationName) //
+						.value("environment", environment) //
+						.value("components", "" + this.controllerMap.size()));
+			}
+		}
+
+		String msg = "{0}:{1} Stopping {2} Strolch Components..."; //$NON-NLS-1$
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 
 		if (this.dependencyAnalyzer == null) {
