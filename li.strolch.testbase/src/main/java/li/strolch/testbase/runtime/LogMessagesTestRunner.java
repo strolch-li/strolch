@@ -5,7 +5,6 @@ import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -56,12 +55,12 @@ public class LogMessagesTestRunner {
 
 			if (realm.getMode().isTransient()) {
 				List<LogMessage> messages = this.operationsLog.getMessages(realmName);
-				assertEquals(1, messages.size());
+				assertEquals(2, messages.size());
 			} else {
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test");) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<LogMessage> logMessages = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE);
-					assertEquals(1, logMessages.size());
+					assertEquals(2, logMessages.size());
 
 					LogMessage m = logMessages.get(0);
 					assertEquals(logMessage.getId(), m.getId());
@@ -77,8 +76,10 @@ public class LogMessagesTestRunner {
 				}
 			}
 
-			List<String> ids = new ArrayList<>();
-			ids.add(logMessage.getId());
+			// initialize with the existing message IDs
+			List<String> ids = this.operationsLog.getMessages(this.realmName).stream().map(LogMessage::getId)
+					.collect(toList());
+
 			for (int i = 0; i < MAX_MESSAGES * 2; i++) {
 				LogMessage m = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "li.strolch.testbase", StrolchAgent.getUniqueId()),
@@ -88,13 +89,13 @@ public class LogMessagesTestRunner {
 			}
 
 			// default is async persisting...
-			Thread.sleep(100L);
+			Thread.sleep(1000L);
 
 			int trimSize = (int) (MAX_MESSAGES * 0.1);
-			int expectedSize = MAX_MESSAGES - trimSize + 1;
+			int expectedSize = MAX_MESSAGES - trimSize + 2; // +2 => startup and first message
 
 			if (realm.getMode().isTransient()) {
-				List<LogMessage> messages = this.operationsLog.getMessages(realmName);
+				List<LogMessage> messages = this.operationsLog.getMessages(this.realmName);
 				assertEquals(expectedSize, messages.size());
 			} else {
 

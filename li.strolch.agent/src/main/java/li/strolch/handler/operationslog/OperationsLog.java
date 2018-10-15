@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Locator;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -29,7 +30,7 @@ public class OperationsLog extends StrolchComponent {
 		this.logMessagesByRealmAndId = new HashMap<>();
 		this.logMessagesByLocator = new HashMap<>();
 
-		this.executorService = getExecutorService("OperationsLog");
+		this.executorService = getSingleThreadExecutor("OperationsLog");
 
 		super.initialize(configuration);
 	}
@@ -65,48 +66,57 @@ public class OperationsLog extends StrolchComponent {
 	public synchronized void addMessage(LogMessage logMessage) {
 
 		// store in global list
-		List<LogMessage> logMessages = this.logMessagesByRealmAndId
-				.computeIfAbsent(logMessage.getRealm(), r -> new ArrayList<>());
+		String realmName = logMessage.getRealm();
+		List<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName, r -> new ArrayList<>());
 		logMessages.add(logMessage);
 
 		// store under locator
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator
-				.computeIfAbsent(logMessage.getRealm(), this::newBoundedLocatorMap);
+				.computeIfAbsent(realmName, this::newBoundedLocatorMap);
 		LinkedHashSet<LogMessage> messages = logMessagesLocator
 				.computeIfAbsent(logMessage.getLocator(), (l) -> new LinkedHashSet<>());
 		messages.add(logMessage);
 
-		this.executorService.submit(() -> this.persistAndPrune(logMessages, logMessage));
+		// prune if necessary
+		List<LogMessage> messagesToRemove = pruneMessages(logMessages);
+
+		// persist changes for non-transient realms
+		StrolchRealm realm = getContainer().getRealm(realmName);
+		if (!realm.getMode().isTransient())
+			this.executorService.submit(() -> this.persist(realm, logMessage, messagesToRemove));
 	}
 
-	private void persistAndPrune(List<LogMessage> logMessages, LogMessage logMessage) {
+	private List<LogMessage> pruneMessages(List<LogMessage> logMessages) {
+		if (logMessages.size() < this.maxMessages)
+			return Collections.emptyList();
+
+		List<LogMessage> messagesToRemove = new ArrayList<>();
+
+		int maxDelete = Math.max(1, (int) (this.maxMessages * 0.1));
+		int nrOfExcessMsgs = logMessages.size() - this.maxMessages;
+		if (nrOfExcessMsgs > 0)
+			maxDelete += nrOfExcessMsgs;
+
+		logger.info("Pruning " + maxDelete + " messages from OperationsLog...");
+		Iterator<LogMessage> iterator = logMessages.iterator();
+		while (maxDelete > 0 && iterator.hasNext()) {
+			LogMessage messageToRemove = iterator.next();
+			messagesToRemove.add(messageToRemove);
+			iterator.remove();
+			maxDelete--;
+		}
+
+		return messagesToRemove;
+	}
+
+	private void persist(StrolchRealm realm, LogMessage logMessage, List<LogMessage> messagesToRemove) {
 		runAsAgent(ctx -> {
-
-			List<LogMessage> messagesToRemove = null;
-			synchronized (this) {
-				if (logMessages.size() > this.maxMessages) {
-					messagesToRemove = new ArrayList<>();
-					int maxDelete = Math.max(1, (int) (this.maxMessages * 0.1));
-					logger.info("Pruning " + maxDelete + " messages from OperationsLog...");
-					Iterator<LogMessage> iterator = logMessages.iterator();
-					while (maxDelete > 0 && iterator.hasNext()) {
-						LogMessage messageToRemove = iterator.next();
-						messagesToRemove.add(messageToRemove);
-						iterator.remove();
-						maxDelete--;
-					}
-				}
-
-				// only for persisted realms
-				if (!getContainer().getRealm(logMessage.getRealm()).getMode().isTransient()) {
-					try (StrolchTransaction tx = openTx(logMessage.getRealm(), ctx.getCertificate())) {
-						LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-						if (messagesToRemove != null && !messagesToRemove.isEmpty())
-							logMessageDao.removeAll(messagesToRemove);
-						logMessageDao.save(logMessage);
-						tx.commitOnClose();
-					}
-				}
+			try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass())) {
+				LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
+				if (messagesToRemove != null && !messagesToRemove.isEmpty())
+					logMessageDao.removeAll(messagesToRemove);
+				logMessageDao.save(logMessage);
+				tx.commitOnClose();
 			}
 		});
 	}

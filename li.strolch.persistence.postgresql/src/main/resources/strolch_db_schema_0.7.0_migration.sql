@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS operations_log (
 );
 
 CREATE TABLE IF NOT EXISTS operations_log_values (
-  id varchar(255) PRIMARY KEY,
-  key VARCHAR(255),
+  id varchar(255),
+  key varchar(255),
   value text
 );
 
