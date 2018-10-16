@@ -64,6 +64,8 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public synchronized void addMessage(LogMessage logMessage) {
+		if (this.logMessagesByRealmAndId == null)
+			return;
 
 		// store in global list
 		String realmName = logMessage.getRealm();
