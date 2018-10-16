@@ -1778,7 +1778,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		if (!conflicts.isEmpty()) {
-			String msg = conflicts.stream().collect(Collectors.joining("\n"));
+			String msg = String.join("\n", conflicts);
 			throw new PrivilegeException(msg);
 		}
 	}
@@ -1790,10 +1790,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		for (String roleName : userRoles) {
 			Role role = this.persistenceHandler.getRole(roleName);
 			for (String privilegeName : role.getPrivilegeNames()) {
-				if (!privilegeNames.containsKey(privilegeName)) {
+				String roleOrigin = privilegeNames.get(privilegeName);
+				if (roleOrigin == null) {
 					privilegeNames.put(privilegeName, roleName);
-				} else {
-					String roleOrigin = privilegeNames.get(privilegeName);
+				} else if (!roleOrigin.equals(roleName)) {
 					String msg = "User {0} has conflicts for privilege {1} on roles {2} and {3}";
 					msg = MessageFormat.format(msg, user.getUsername(), privilegeName, roleOrigin, roleName);
 					conflicts.add(msg);
