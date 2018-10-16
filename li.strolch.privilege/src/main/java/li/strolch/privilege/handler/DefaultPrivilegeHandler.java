@@ -1114,7 +1114,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create a new certificate, with details of the user
 		Usage usage = userChallenge.getUsage();
 		Certificate certificate = buildCertificate(usage, user, authToken, sessionId);
-		certificate.setLastAccess(new Date());
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1154,7 +1153,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// create a new certificate, with details of the user
 			Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
-			certificate.setLastAccess(new Date());
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1193,7 +1191,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
-		certificate.setLastAccess(new Date());
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1947,7 +1944,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
-		systemUserCertificate.setLastAccess(new Date());
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);
