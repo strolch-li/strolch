@@ -308,11 +308,6 @@ public final class Certificate implements Serializable {
 				return false;
 		} else if (!this.authToken.equals(other.authToken))
 			return false;
-		if (this.locale == null) {
-			if (other.locale != null)
-				return false;
-		} else if (!this.locale.equals(other.locale))
-			return false;
 		if (this.sessionId == null) {
 			if (other.sessionId != null)
 				return false;
