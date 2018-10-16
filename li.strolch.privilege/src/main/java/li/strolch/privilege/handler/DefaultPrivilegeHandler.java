@@ -570,6 +570,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		logger.info("Updated user " + newUser.getUsername());
 
+		// update any existing sessions for this user
+		updateExistingSessionsForUser(newUser);
+
 		return newUser.asUserRep();
 	}
 
@@ -644,6 +647,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		logger.info("Added role " + roleName + " to " + newUser.getUsername());
 
+		// update any existing sessions for this user
+		updateExistingSessionsForUser(newUser);
+
 		return newUser.asUserRep();
 	}
 
@@ -684,6 +690,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler.replaceUser(newUser);
 
 		logger.info("Removed role " + roleName + " from " + newUser.getUsername());
+
+		// update any existing sessions for this user
+		updateExistingSessionsForUser(newUser);
 
 		return newUser.asUserRep();
 	}
@@ -882,6 +891,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		logger.info("Replaced role " + newRole.getName());
 
+		// update any existing certificates with new role
+		updateExistingSessionsWithNewRole(newRole);
+
 		return newRole.asRoleRep();
 	}
 
@@ -974,6 +986,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		logger.info("Added/replaced privilege " + privilegeRep.getName() + " to " + roleName);
 
+		// update any existing certificates with new role
+		updateExistingSessionsWithNewRole(newRole);
+
 		return newRole.asRoleRep();
 	}
 
@@ -1017,7 +1032,54 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		logger.info("Removed privilege " + privilegeName + " from " + roleName);
 
+		// update any existing certificates with new role
+		updateExistingSessionsWithNewRole(newRole);
+
 		return newRole.asRoleRep();
+	}
+
+	/**
+	 * Replaces any existing {@link PrivilegeContext} for the given user by updating with the new user object
+	 *
+	 * @param newUser
+	 * 		the new user to update with
+	 */
+	private void updateExistingSessionsForUser(User newUser) {
+		synchronized (this.privilegeContextMap) {
+			List<PrivilegeContext> ctxs = new ArrayList<>(this.privilegeContextMap.values());
+			for (PrivilegeContext ctx : ctxs) {
+				if (ctx.getUserRep().getUsername().equals(newUser.getUsername())) {
+					Certificate cert = ctx.getCertificate();
+					cert = buildCertificate(cert.getUsage(), newUser, cert.getAuthToken(), cert.getSessionId());
+					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, newUser);
+					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Replaces any existing {@link PrivilegeContext} for users with the given role
+	 *
+	 * @param role
+	 * 		the role to update with
+	 */
+	private void updateExistingSessionsWithNewRole(Role role) {
+		synchronized (this.privilegeContextMap) {
+			List<PrivilegeContext> ctxs = new ArrayList<>(this.privilegeContextMap.values());
+			for (PrivilegeContext ctx : ctxs) {
+				if (ctx.getUserRep().hasRole(role.getName())) {
+					User user = this.persistenceHandler.getUser(ctx.getUsername());
+					if (user == null)
+						continue;
+
+					Certificate cert = ctx.getCertificate();
+					cert = buildCertificate(cert.getUsage(), user, cert.getAuthToken(), cert.getSessionId());
+					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, user);
+					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -1570,7 +1632,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate privilege conflicts
 		validatePrivilegeConflicts();
 
-		this.privilegeContextMap = Collections.synchronizedMap(new HashMap<String, PrivilegeContext>());
+		this.privilegeContextMap = Collections.synchronizedMap(new HashMap<>());
 
 		loadSessions();
 

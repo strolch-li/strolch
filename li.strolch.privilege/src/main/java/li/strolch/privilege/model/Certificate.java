@@ -117,6 +117,7 @@ public final class Certificate implements Serializable {
 			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 
 		this.userRoles = Collections.unmodifiableSet(userRoles);
+		this.lastAccess = new Date();
 	}
 
 	/**
