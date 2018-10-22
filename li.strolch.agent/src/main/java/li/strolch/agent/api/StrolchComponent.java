@@ -408,6 +408,20 @@ public class StrolchComponent {
 	}
 
 	/**
+	 * Opens a {@link StrolchTransaction} for the default realm and certificate
+	 *
+	 * @param cert
+	 * 		the certificate authorizing the transaction
+	 * @param action
+	 * 		the action describing the transaction context
+	 *
+	 * @return the newly created transaction
+	 */
+	protected StrolchTransaction openTx(Certificate cert, String action) {
+		return getContainer().getRealm(cert).openTx(cert, action);
+	}
+
+	/**
 	 * Opens a {@link StrolchTransaction} for the given realm and certificate
 	 *
 	 * @param realm
@@ -435,6 +449,22 @@ public class StrolchComponent {
 	 */
 	protected StrolchTransaction openTx(String realm, Certificate cert, Class<?> clazz) {
 		return getContainer().getRealm(realm).openTx(cert, clazz);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} for the given realm and certificate
+	 *
+	 * @param realm
+	 * 		the name of the realm in which to open the transaction
+	 * @param cert
+	 * 		the certificate authorizing the transaction
+	 * @param action
+	 * 		the action describing the transaction context
+	 *
+	 * @return the newly created transaction
+	 */
+	protected StrolchTransaction openTx(String realm, Certificate cert, String action) {
+		return getContainer().getRealm(realm).openTx(cert, action);
 	}
 
 	/**
