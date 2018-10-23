@@ -1,5 +1,6 @@
 package li.strolch.execution;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,7 +23,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 	public SimpleDurationExecutionTimer(StrolchAgent agent) {
 		this.agent = agent;
-		this.simulationTasks = new HashMap<>();
+		this.simulationTasks = Collections.synchronizedMap(new HashMap<>());
 	}
 
 	@Override
@@ -42,10 +43,16 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 	@Override
 	public void execute(String realm, ComponentContainer container, Locator actionLocator, long duration) {
-		SimulationTask task = new SimulationTask(realm, container, actionLocator);
-		ScheduledFuture<?> future = getExecutor().schedule(task, duration, TimeUnit.MILLISECONDS);
-		this.simulationTasks.put(actionLocator, future);
-		logger.info("Registered execution timer for " + actionLocator);
+		synchronized (this.simulationTasks) {
+			if (this.simulationTasks.containsKey(actionLocator)) {
+				logger.warn("Ignoring duplicate timer for locator " + actionLocator);
+			} else {
+				SimulationTask task = new SimulationTask(realm, container, actionLocator);
+				ScheduledFuture<?> future = getExecutor().schedule(task, duration, TimeUnit.MILLISECONDS);
+				this.simulationTasks.put(actionLocator, future);
+				logger.info("Registered execution timer for " + actionLocator);
+			}
+		}
 	}
 
 	private ScheduledExecutorService getExecutor() {
@@ -56,6 +63,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 		logger.info("Completing execution for " + locator);
 
+		this.simulationTasks.remove(locator);
 		ExecutionHandler executionHandler = container.getComponent(ExecutionHandler.class);
 		executionHandler.toExecuted(realm, locator);
 	}
