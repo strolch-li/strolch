@@ -113,6 +113,15 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
+	public void addAllValuesIfNotContains(List<Integer> values) {
+		assertNotReadonly();
+		for (Integer value : values) {
+			if (!this.value.contains(value))
+				this.value.add(value);
+		}
+	}
+
+	@Override
 	public boolean addValueIfNotContains(Integer value) {
 		assertNotReadonly();
 

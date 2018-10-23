@@ -44,6 +44,14 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	void addAllValues(List<E> values);
 
 	/**
+	 * Adds all of the given values to the {@link List} of values which are not already in the current list
+	 *
+	 * @param values
+	 * 		the values to add
+	 */
+	void addAllValuesIfNotContains(List<E> values);
+
+	/**
 	 * Adds a single value to the {@link List} of values if the current list does not already contain the value
 	 *
 	 * @param value

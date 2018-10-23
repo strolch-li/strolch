@@ -113,6 +113,15 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
+	public void addAllValuesIfNotContains(List<String> values) {
+		assertNotReadonly();
+		for (String value : values) {
+			if (!this.value.contains(value))
+				this.value.add(value);
+		}
+	}
+
+	@Override
 	public boolean addValueIfNotContains(String value) {
 		assertNotReadonly();
 
