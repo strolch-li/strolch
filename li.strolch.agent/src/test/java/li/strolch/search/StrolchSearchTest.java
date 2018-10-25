@@ -276,7 +276,7 @@ public class StrolchSearchTest {
 
 			Map<String, State> states = new ActivitySearch()
 
-					.types().where(state().isEqualTo(State.PLANNING).and(name(isEqualTo("Activity"))).asActivity())
+					.types().where(state().isEqualTo(State.PLANNING).and(name(isEqualTo("Activity"))))
 
 					.search(tx).toMap(Activity::getId, Activity::getState);
 

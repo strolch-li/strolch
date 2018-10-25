@@ -87,6 +87,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
+	@Override
 	public <U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey) {
 		return getParameter(bagKey, paramKey, false);
 	}
@@ -105,8 +106,9 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * @return the found {@link Parameter} or null if it was not found
 	 *
 	 * @throws StrolchModelException
-	 * 		if the element does not exist and <code>assertExists</code> is true
+	 * 		if the element does not exist and {@code assertExists} is true
 	 */
+	@Override
 	public <U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey, boolean assertExists)
 			throws StrolchModelException {
 		if (this.parameterBagMap == null) {
@@ -147,6 +149,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the parameters with the given interpretation
 	 */
+	@Override
 	public List<Parameter<?>> getParametersByInterpretation(String bagKey, String interpretation) {
 		ParameterBag bag = getParameterBag(bagKey);
 		if (bag == null)
@@ -167,6 +170,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the parameters with the given interpretation
 	 */
+	@Override
 	public List<Parameter<?>> getParametersByInterpretationAndUom(String bagKey, String interpretation, String uom) {
 		ParameterBag bag = getParameterBag(bagKey);
 		if (bag == null)
@@ -186,6 +190,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * @throws StrolchException
 	 * 		if the {@link ParameterBag} does not exist
 	 */
+	@Override
 	public void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException {
 		assertNotReadonly();
 		if (this.parameterBagMap == null) {
@@ -211,6 +216,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the removed {@link Parameter} or null if it did not exist
 	 */
+	@Override
 	public <U, T extends Parameter<U>> T removeParameter(String bagKey, String paramKey) {
 		assertNotReadonly();
 		if (this.parameterBagMap == null) {
@@ -232,6 +238,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
+	@Override
 	public ParameterBag getParameterBag(String key) {
 		return getParameterBag(key, false);
 	}
@@ -246,6 +253,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
+	@Override
 	public ParameterBag getParameterBag(String key, boolean assertExists) {
 		if (this.parameterBagMap == null) {
 			if (assertExists) {
@@ -272,6 +280,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the {@link ParameterBag ParameterBags} of the given type
 	 */
+	@Override
 	public List<ParameterBag> getParameterBagsByType(String type) {
 		return this.parameterBagMap.values() //
 				.stream() //
@@ -285,6 +294,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * @param bag
 	 * 		the {@link ParameterBag} to add
 	 */
+	@Override
 	public void addParameterBag(ParameterBag bag) {
 		assertNotReadonly();
 		if (this.parameterBagMap == null) {
@@ -307,6 +317,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the removed {@link ParameterBag}, or null if it does not exist
 	 */
+	@Override
 	public ParameterBag removeParameterBag(String key) {
 		assertNotReadonly();
 		if (this.parameterBagMap == null) {
@@ -320,6 +331,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
 	 */
+	@Override
 	public boolean hasParameterBags() {
 		return this.parameterBagMap != null && !this.parameterBagMap.isEmpty();
 	}
@@ -332,6 +344,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
 	 */
+	@Override
 	public boolean hasParameterBag(String bagKey) {
 		return this.parameterBagMap != null && this.parameterBagMap.containsKey(bagKey);
 	}
@@ -349,6 +362,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
 	 * the {@link ParameterBag}
 	 */
+	@Override
 	public boolean hasParameter(String bagKey, String paramKey) {
 		if (this.parameterBagMap == null) {
 			return false;
@@ -366,6 +380,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 *
 	 * @return the {@link Set} of keys for the {@link ParameterBag}s on this {@link GroupedParameterizedElement}
 	 */
+	@Override
 	public Set<String> getParameterBagKeySet() {
 		if (this.parameterBagMap == null) {
 			return Collections.emptySet();
@@ -377,6 +392,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * Fills {@link GroupedParameterizedElement} properties of this clone
 	 *
 	 * @param clone
+	 * 		the clone to fill
 	 */
 	protected void fillClone(GroupedParameterizedElement clone) {
 		super.fillClone(clone);

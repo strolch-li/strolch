@@ -1,5 +1,6 @@
 package li.strolch.model;
 
+import java.util.List;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
@@ -25,7 +26,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	public <U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey);
+	<U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey);
 
 	/**
 	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or null if
@@ -40,7 +41,33 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	public <U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey, boolean assertExists);
+	<U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey, boolean assertExists);
+
+	/**
+	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	List<Parameter<?>> getParametersByInterpretation(String bagKey, String interpretation);
+
+	/**
+	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 * @param uom
+	 * 		the uom for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	List<Parameter<?>> getParametersByInterpretationAndUom(String bagKey, String interpretation, String uom);
 
 	/**
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
@@ -53,7 +80,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchException
 	 * 		if the {@link ParameterBag} does not exist
 	 */
-	public void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException;
+	void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException;
 
 	/**
 	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -65,7 +92,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the removed {@link Parameter} or null if it did not exist
 	 */
-	public <U, T extends Parameter<U>> T removeParameter(String bagKey, String paramKey);
+	<U, T extends Parameter<U>> T removeParameter(String bagKey, String paramKey);
 
 	/**
 	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
@@ -75,7 +102,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
-	public ParameterBag getParameterBag(String key);
+	ParameterBag getParameterBag(String key);
 
 	/**
 	 * Returns the {@link ParameterBag} with the given key, or null if it does not exist
@@ -87,7 +114,17 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
-	public ParameterBag getParameterBag(String key, boolean assertExists);
+	ParameterBag getParameterBag(String key, boolean assertExists);
+
+	/**
+	 * Returns the {@link ParameterBag ParameterBags} of the given type
+	 *
+	 * @param type
+	 * 		the type of {@link ParameterBag} to return
+	 *
+	 * @return the {@link ParameterBag ParameterBags} of the given type
+	 */
+	List<ParameterBag> getParameterBagsByType(String type);
 
 	/**
 	 * Adds the given {@link ParameterBag} to this {@link GroupedParameterizedElement}
@@ -95,7 +132,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @param bag
 	 * 		the {@link ParameterBag} to add
 	 */
-	public void addParameterBag(ParameterBag bag);
+	void addParameterBag(ParameterBag bag);
 
 	/**
 	 * Removes the {@link ParameterBag} with the given key
@@ -105,14 +142,14 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the removed {@link ParameterBag}, or null if it does not exist
 	 */
-	public ParameterBag removeParameterBag(String key);
+	ParameterBag removeParameterBag(String key);
 
 	/**
 	 * Returns true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
 	 *
 	 * @return true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
 	 */
-	public boolean hasParameterBags();
+	boolean hasParameterBags();
 
 	/**
 	 * Returns true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
@@ -122,7 +159,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return true if the {@link ParameterBag} with the given key exists on this {@link GroupedParameterizedElement}.
 	 */
-	public boolean hasParameterBag(String bagKey);
+	boolean hasParameterBag(String bagKey);
 
 	/**
 	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
@@ -137,12 +174,12 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
 	 * the {@link ParameterBag}
 	 */
-	public boolean hasParameter(String bagKey, String paramKey);
+	boolean hasParameter(String bagKey, String paramKey);
 
 	/**
 	 * Returns the {@link Set} of keys for the {@link ParameterBag}s on this {@link GroupedParameterizedElement}
 	 *
 	 * @return the {@link Set} of keys for the {@link ParameterBag}s on this {@link GroupedParameterizedElement}
 	 */
-	public Set<String> getParameterBagKeySet();
+	Set<String> getParameterBagKeySet();
 }

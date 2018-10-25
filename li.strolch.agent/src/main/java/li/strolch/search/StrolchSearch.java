@@ -19,7 +19,7 @@ import li.strolch.utils.helper.ExceptionHelper;
  * @param <T>
  */
 public abstract class StrolchSearch<T extends StrolchRootElement>
-		implements SearchExpressions<T>, SearchPredicates, Restrictable {
+		implements SearchExpressions, SearchPredicates, Restrictable {
 
 	private String privilegeValue;
 

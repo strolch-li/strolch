@@ -7,53 +7,54 @@ import li.strolch.model.StrolchRootElement;
  *
  * @param <T>
  */
-public interface SearchExpressions<T extends StrolchRootElement> {
+public interface SearchExpressions {
 
-	default SearchExpression<T> not(SearchExpression<T> expression) {
+	default <T extends StrolchRootElement> SearchExpression<T> not(SearchExpression<T> expression) {
 		return element -> !expression.matches(element);
 	}
 
-	default ExpressionBuilder<T> id() {
+	default ExpressionBuilder id() {
 		return ExpressionsSupport.id();
 	}
 
-	default SearchExpression<T> id(SearchPredicate predicate) {
+	default <T extends StrolchRootElement> SearchExpression<T> id(SearchPredicate predicate) {
 		return ExpressionsSupport.id(predicate);
 	}
 
-	default ExpressionBuilder<T> name() {
+	default ExpressionBuilder name() {
 		return ExpressionsSupport.name();
 	}
 
-	default SearchExpression<T> name(SearchPredicate predicate) {
+	default <T extends StrolchRootElement> SearchExpression<T> name(SearchPredicate predicate) {
 		return ExpressionsSupport.name(predicate);
 	}
 
-	default ExpressionBuilder<T> date() {
+	default ExpressionBuilder date() {
 		return ExpressionsSupport.date();
 	}
 
-	default SearchExpression<T> date(SearchPredicate predicate) {
+	default <T extends StrolchRootElement> SearchExpression<T> date(SearchPredicate predicate) {
 		return ExpressionsSupport.date(predicate);
 	}
 
-	default ExpressionBuilder<T> state() {
+	default ExpressionBuilder state() {
 		return ExpressionsSupport.state();
 	}
 
-	default SearchExpression<T> state(SearchPredicate predicate) {
+	default <T extends StrolchRootElement> SearchExpression<T> state(SearchPredicate predicate) {
 		return ExpressionsSupport.state(predicate);
 	}
 
-	default ExpressionBuilder<T> param(String bagId, String paramId) {
+	default ExpressionBuilder param(String bagId, String paramId) {
 		return ExpressionsSupport.param(bagId, paramId);
 	}
 
-	default SearchExpression<T> param(String bagId, String paramId, SearchPredicate predicate) {
+	default <T extends StrolchRootElement> SearchExpression<T> param(String bagId, String paramId,
+			SearchPredicate predicate) {
 		return ExpressionsSupport.param(bagId, paramId, predicate);
 	}
 
-	default SearchExpression<T> paramNull(String bagId, String paramId) {
+	default <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
 		return ExpressionsSupport.paramNull(bagId, paramId);
 	}
 }

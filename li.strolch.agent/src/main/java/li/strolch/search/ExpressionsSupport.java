@@ -18,7 +18,7 @@ public class ExpressionsSupport {
 		return element -> predicate.matches(element.getId());
 	}
 
-	public static <T extends StrolchRootElement> ExpressionBuilder<T> id() {
+	public static ExpressionBuilder id() {
 		return StrolchElement::getId;
 	}
 
@@ -26,17 +26,17 @@ public class ExpressionsSupport {
 		return element -> predicate.matches(element.getName());
 	}
 
-	public static <T extends StrolchRootElement> ExpressionBuilder<T> name() {
+	public static <T extends StrolchRootElement> ExpressionBuilder name() {
 		return StrolchElement::getName;
 	}
 
 	public static <T extends StrolchRootElement> SearchExpression<T> date(SearchPredicate predicate) {
-		ExpressionBuilder<StrolchRootElement> eb = date();
+		ExpressionBuilder eb = date();
 		return element -> predicate.coerce(eb.getValueCoercer(element)).matches(eb);
 	}
 
-	public static <T extends StrolchRootElement> ExpressionBuilder<T> date() {
-		return new ExpressionBuilder<T>() {
+	public static <T extends StrolchRootElement> ExpressionBuilder date() {
+		return new ExpressionBuilder() {
 
 			@Override
 			public ValueCoercer getValueCoercer(StrolchRootElement context) {
@@ -55,12 +55,12 @@ public class ExpressionsSupport {
 	}
 
 	public static <T extends StrolchRootElement> SearchExpression<T> state(SearchPredicate predicate) {
-		ExpressionBuilder<StrolchRootElement> eb = state();
+		ExpressionBuilder eb = state();
 		return element -> predicate.coerce(eb.getValueCoercer(element)).matches(eb.extract(element));
 	}
 
-	public static <T extends StrolchRootElement> ExpressionBuilder<T> state() {
-		return new ExpressionBuilder<T>() {
+	public static ExpressionBuilder state() {
+		return new ExpressionBuilder() {
 
 			@Override
 			public ValueCoercer getValueCoercer(StrolchRootElement context) {
@@ -84,12 +84,12 @@ public class ExpressionsSupport {
 
 	public static <T extends StrolchRootElement> SearchExpression<T> param(String bagId, String paramId,
 			SearchPredicate predicate) {
-		ExpressionBuilder<StrolchRootElement> eb = param(bagId, paramId);
+		ExpressionBuilder eb = param(bagId, paramId);
 		return element -> predicate.coerce(eb.getValueCoercer(element)).matches(eb.extract(element));
 	}
 
-	public static <T extends StrolchRootElement> ExpressionBuilder<T> param(String bagId, String paramId) {
-		return new ExpressionBuilder<T>() {
+	public static <T extends StrolchRootElement> ExpressionBuilder param(String bagId, String paramId) {
+		return new ExpressionBuilder() {
 
 			@Override
 			public ValueCoercer getValueCoercer(StrolchRootElement context) {

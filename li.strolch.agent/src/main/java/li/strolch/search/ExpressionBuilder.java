@@ -8,7 +8,7 @@ import li.strolch.utils.collections.DateRange;
  *
  * @param <T>
  */
-public interface ExpressionBuilder<T extends StrolchRootElement> {
+public interface ExpressionBuilder {
 
 	Object extract(StrolchRootElement element);
 
@@ -16,59 +16,59 @@ public interface ExpressionBuilder<T extends StrolchRootElement> {
 		return e -> e;
 	}
 
-	default SearchExpression<T> isEqualTo(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> isEqualTo(Object right) {
 		return element -> PredicatesSupport.isEqualTo(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> isNotEqualTo(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> isNotEqualTo(Object right) {
 		return element -> PredicatesSupport.isNotEqualTo(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> isEqualToIgnoreCase(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> isEqualToIgnoreCase(Object right) {
 		return element -> PredicatesSupport.isEqualToIgnoreCase(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> isNotEqualToIgnoreCase(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> isNotEqualToIgnoreCase(Object right) {
 		return element -> PredicatesSupport.isNotEqualToIgnoreCase(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> startsWith(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> startsWith(Object right) {
 		return element -> PredicatesSupport.startsWith(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> startsWithIgnoreCase(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> startsWithIgnoreCase(Object right) {
 		return element -> PredicatesSupport.startsWithIgnoreCase(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> endsWith(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> endsWith(Object right) {
 		return element -> PredicatesSupport.endsWith(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> endsWithIgnoreCase(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> endsWithIgnoreCase(Object right) {
 		return element -> PredicatesSupport.endsWithIgnoreCase(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> contains(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> contains(Object right) {
 		return element -> PredicatesSupport.contains(right).matches(extract(element));
 	}
-	
-	default SearchExpression<T> listContains(Object right) {
+
+	default <T extends StrolchRootElement> SearchExpression<T> listContains(Object right) {
 		return element -> PredicatesSupport.listContains(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> containsIgnoreCase(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> containsIgnoreCase(Object right) {
 		return element -> PredicatesSupport.containsIgnoreCase(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> isIn(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> isIn(Object right) {
 		return element -> PredicatesSupport.isIn(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> isInIgnoreCase(Object right) {
+	default <T extends StrolchRootElement> SearchExpression<T> isInIgnoreCase(Object right) {
 		return element -> PredicatesSupport.isInIgnoreCase(right).matches(extract(element));
 	}
 
-	default SearchExpression<T> inRange(DateRange range) {
+	default <T extends StrolchRootElement> SearchExpression<T> inRange(DateRange range) {
 		return element -> PredicatesSupport.inRange(range).matches(extract(element));
 	}
 }
