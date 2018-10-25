@@ -47,180 +47,91 @@
     <div class="page-header">
         <h1 class="page-title">Strolch Overview</h1>
 
-        <p class="lead page-description">This page describes the Strolch software agent and the motivation behind its
-                                         development.</p>
+        <p class="lead page-description">A short introduction to Strolch.</p>
     </div>
 
     <div class="content">
 
-        <h2>Overview</h2>
+        <h2>Strolch in short</h2>
 
-        <p>Strolch is an open source component based software agent written in Java and can be compared, in a light
-           sense, with the Java EE stack: Strolch takes care of persistence, implements Services for use cases, Commands
-           as re-usable algorithms and has a parameterized data model.</p>
-
-        <p>Strolch has an intrinsic understanding for mandates, which are called realms so that a single agent can be
-           used to implement applications with multiple users/customers for instance in SaaS environments.</p>
-
-        <p>The parameterized data model consists of three top level objects, Resources, Orders and Activities. These
-           objects can have any number of ParameterBags which in turn can have any number of Parameters on them. This
-           allows for a very dynamic modelling of data structures including modification at run time. Multiple ready to
-           use Parameter types are already implemented which handle the primitive types in Java including ListParameters
-           for collections of these primitive types.</p>
-
-        <p>One of the main features of the Strolch agent, is that persistence is handled transparently and the user must
-           not be worried about databases and the likes. Currently there are two implementations for persisting the
-           Strolch model, a PostgreSQL and an XML file persistence. Currently both persistence layers persist the data
-           by converting to XML and storing it into the database. The XML file persistence stores each object in its own
-           file.</p>
-
-        <p>The agent itself has a small memory footprint and requires very few components to start. For the agent to be
-           useful it needs additional functionality which is implemented in StrolchComponents. Each component is
-           registered via its Java interface on the agent and is bound to the life cycle of the agent. When the agent is
-           started, these components can be retrieved and used to perform any number of functionalities. This is the
-           preferred way to extend the Strolch agent. There are a number of components already implemented, e.g. the
-           ServiceHandler which executes Services in a controlled fashion and can validate authorized access to these
-           services.</p>
-
-        <p>No software product is complete without a system for authentication and authorization. Strolch implements
-           this by using the Privilege framework which has been written by Robert von Burg. The standard ServiceHandler
-           detects the existence of the PrivilegeHandler and then validates that the user has authorization to perform
-           the service. This framework is implemented as its own Strolch component, thus can be retrieved at any time
-           during execution to perform fine grained and special authorization validation.</p>
-
-        <h2>Motivation</h2>
-
-        <p>A question often asked is why create Strolch. What are its benefits in contrast to using Java SE with an
-           OR-Mapper like Hibernate, or using Java EE on JBoss or Glassfish? Especially since many of the features
-           existing in those stacks needed to be re-created in Strolch.</p>
-
-        <p>The first answer to this question is that those systems are often overly complicated and bloated. Java SE
-           with Hibernate certainly is a viable option when it comes to being light-weightier but Hibernate, even though
-           it is supposed to, often fails to truly help remove the need to really understand an RDBMS. Often enough
-           Hibernate will just get in the way of the most important part of development: writing the business code.
-           Being an OR-Mapper which is supposed to implement all the nitty-gritty details of an RDBMS system, Hibernate,
-           and JPA for that matter, still often has the developer go back to understanding these details.</p>
-
-        <p>Strolch tries a different approach to persistence. Instead of writing pojos/entities, Strolch's model has the
-           concept that each element's attributes are part of a composition pattern: each attribute is its own object
-           and thus can be dynamically changed at runtime, but also makes persistence of such an element generic.
-           Instead of having fixed attributes for a concrete class, these parameters are stored in a map and are
-           accessed through the parameter's ID.</p>
-
-        <p>Assigning an ID to an attribute for accessing of course brings its own downsides, i.e. the parameter might
-           simply not be there, when being accessed. This is certainly an issue that the developer must handle, when
-           implementing a project using Strolch, but allows the developer to not need to worry about persistence, as
-           this is generically handled.</p>
-
-        <p>Since the persistence is generically handled, and Strolch stays lightweight on its requirements at runtime,
-           the developer can quickly get down to what is important for business value: Writing the business logic and
-           the presentation layer. Here too Strolch tries to help the developer by bringing in concepts which are easy
-           to follow: Use cases are implemented as Services, and re-usable business logic is put into Commands.</p>
-
-        <p>There will be reasons against using Strolch, as there will be against using the Java EE stack, or an
-           OR-Mapper or even the Java ecosystem for that fact. Important is to note, that the concepts behind Strolch
-           are nothing new, but have been implemented in at least two previous proprietary products. Since those
-           products are not accessible to the public, it was decided that a re-implementation might be of use to the
-           programming community at large.</p>
-
-        <p>Currently there is at least one company using Strolch in a commercial project which helps drive Strolch's
-           development and further motivates its existence.</p>
-
-        <p>Strolch is an open source project and licensed under the Apache License 2.0.</p>
-
-        <h2>Technologoy</h2>
-
-        <p>Strolch is written in Java and is programmed against the JDK 8. Strolch runs on any JRE 8 compliant
-           environment. Strolch is tested on the Oracle JRE 8.</p>
-
-        <h3>Dependencies</h3>
-
-        <p>Strolch strives to use as few external dependencies as possible, so that the Strolch runtime is not bloated
-           unnecessarily. The following list of Strolch dependencies is a summary and was created using mvn
-           dependency:tree on the strolch_minimal project for release 1.6.47.</p>
-
-        <p>Logging</p>
+        <p>Strolch is framework for developing Software. It's main features are:</p>
         <ul>
-            <li>org.slf4j:slf4j-api:jar:1.7.25</li>
-            <li>ch.qos.logback:logback-classic:jar:1.2.3</li>
-            <li>ch.qos.logback:logback-core:jar:1.2.3</li>
-        </ul>
-
-        <p>Utils</p>
-        <ul>
-            <li>javax.mail:javax.mail-api:jar:1.6.0</li>
-            <li>com.sun.mail:javax.mail:jar:1.6.0</li>
-            <li>javax.activation:activation:jar:1.1</li>
-        </ul>
-
-        <p>Testing</p>
-        <ul>
-            <li>junit:junit:jar:4.12</li>
-            <li>org.hamcrest:hamcrest-core:jar:1.3</li>
-            <li>org.hamcrest:hamcrest-library:jar:1.3</li>
-            <li>org.mockito:mockito-core:jar:2.0.8-beta</li>
-            <li>org.objenesis:objenesis:jar:2.1</li>
-        </ul>
-
-        <p>Model</p>
-        <ul>
-            <li>com.google.code.gson:gson:jar:2.8.2</li>
-        </ul>
-
-        <p>SOQL</p>
-        <ul>
-            <li>org.abego.treelayout:org.abego.treelayout.core:jar:1.0.3</li>
-            <li>org.antlr:antlr-runtime:jar:3.5.2</li>
-            <li>org.antlr:antlr4-runtime:jar:4.7</li>
-            <li>org.antlr:antlr4:jar:4.7</li>
-            <li>org.antlr:ST4:jar:4.0.8</li>
-            <li>org.glassfish:javax.json:jar:1.0.4</li>
-            <li>com.ibm.icu:icu4j:jar:58.2</li>
-        </ul>
-
-        <p>PostgreSQL</p>
-        <ul>
-            <li>com.zaxxer:HikariCP:jar:2.7.1</li>
-            <li>org.postgresql:postgresql:jar:42.1.4</li>
-        </ul>
-
-        <p>REST</p>
-        <ul>
-            <li>javax.annotation:javax.annotation-api:jar:1.3.1</li>
-            <li>javax.servlet:javax.servlet-api:jar:3.1.0</li>
-            <li>javax.ws.rs:javax.ws.rs-api:jar:2.1</li>
-        </ul>
-
-        <p>REST testing</p>
-        <ul>
-            <li>javax.validation:validation-api:jar:1.1.0.Final</li>
-            <li>org.glassfish.grizzly:grizzly-framework:jar:2.3.28</li>
-            <li>org.glassfish.grizzly:grizzly-http-server:jar:2.3.28</li>
-            <li>org.glassfish.grizzly:grizzly-http-servlet:jar:2.3.28</li>
-            <li>org.glassfish.grizzly:grizzly-http:jar:2.3.28</li>
-            <li>org.glassfish.hk2:hk2-api:jar:2.5.0-b32</li>
-            <li>org.glassfish.hk2:hk2-locator:jar:2.5.0-b32</li>
-            <li>org.glassfish.hk2:hk2-utils:jar:2.5.0-b32</li>
-            <li>org.glassfish.hk2:osgi-resource-locator:jar:1.0.1</li>
-            <li>org.glassfish.hk2.external:aopalliance-repackaged:jar:2.5.0-b32</li>
-            <li>org.glassfish.hk2.external:javax.inject:jar:2.5.0-b32</li>
-            <li>org.glassfish.jersey.bundles.repackaged:jersey-guava:jar:2.25.1</li>
-            <li>org.glassfish.jersey.containers:jersey-container-grizzly2-http:jar:2.25.1</li>
-            <li>org.glassfish.jersey.containers:jersey-container-grizzly2-servlet:jar:2.25.1</li>
-            <li>org.glassfish.jersey.containers:jersey-container-servlet-core:jar:2.25.1</li>
-            <li>org.glassfish.jersey.containers:jersey-container-servlet:jar:2.25.1</li>
-            <li>org.glassfish.jersey.core:jersey-client:jar:2.25.1</li>
-            <li>org.glassfish.jersey.core:jersey-common:jar:2.25.1</li>
-            <li>org.glassfish.jersey.core:jersey-server:jar:2.25.1</li>
-            <li>org.glassfish.jersey.media:jersey-media-jaxb:jar:2.25.1</li>
-            <li>org.glassfish.jersey.test-framework:jersey-test-framework-core:jar:2.25.1</li>
-            <li>org.javassist:javassist:jar:3.20.0-GA</li>
+            <li>Complete persisted <a href="documentation-model.html">data model</a>:
+                <ul>
+                    <li>Parameters and values by time</li>
+                    <li>Resources, Orders with arbitrary parameter grouping</li>
+                    <li>Activity/Action hierarchy with arbitrary depth</li>
+                    <li>Policies for delegation</li>
+                    <li>JSON as well as XML transformation</li>
+                    <li>Locator API</li>
+                </ul>
+            </li>
+            <li><a href="documentation-transactions.html">Transactions with pessimistic locking and optional
+                                                          read-locking</a></li>
+            <li><a href="documentation-searches.html">Search API</a></li>
+            <li>Component based</li>
+            <li><a href="documentation-privileges.html">Deeply integrated privilege handling</a></li>
+            <li>Fully in-memory</li>
+            <li>Persisted auditing, versioning, operations log</li>
+            <li>DAOs for file system or PostgreSQL, easily extended</li>
+            <li>Execution framework</li>
+            <li><a href="documentation-services-and-commands.html">Service / Command oriented</a></li>
+            <li><a href="documentation-reports.html">Reporting API configured by Resource objects</a></li>
+            <li>REST API for data access</li>
+            <li>WebComponents UI for
+                <ul>
+                    <li>Inspector</li>
+                    <li>Users</li>
+                    <li>Roles</li>
+                    <li>Operations Log</li>
+                    <li>Login Screen</li>
+                    <li>Jobs</li>
+                </ul>
+            </li>
+            <li>runs on plain old Java SE</li>
         </ul>
 
 
-        <h4>API</h4>
+        <h2>Strolch Intro</h2>
+
+        <p>It is a different framework to Spring and other similar type of Java frameworks, as the model is defined as
+           an abstract model, where you always have the same three types of objects: Resources, Orders and Activities.
+           The fields are mapped as Parameter objects, of which the important primitives are available.</p>
+
+        <p>The nice part about this framework is, that you can be up and ready in a matter of minutes, and start
+           building your project immediately in that you open your favourite XML editor and start modelling your
+           data.</p>
+
+        <p>Once your data is defined, you write your business logic in the form of Services, Commands and Searches.
+           There are many predefined services and commands to manipulate the object model, so that you write your own
+           services when you need to enforce special business rules.</p>
+
+        <p>Through the use of Policy objects, you decouple algorithms from your object model, so that at runtime you can
+           change the behaviour, or easily implement different behaviour depending on your use-case. For instance you
+           might have a simple billing service which performs a few preparatory steps, and then calls the configured
+           billing policy to execute the billing depending on the customer, the warehouse, etc.</p>
+
+        <p>And of course persistence is as simple as configuring the persistence handler, pointing to your RDBMS and
+           then setting the mode to CACHED. For you as a developer there is no more thinking in terms of SQL etc., as
+           this is completely hidden from the developer. There is even a simple file persistence layer if you are
+           running IoT devices.</p>
+
+        <p>The runtime can be just about anything. Usually it is run inside an Apache Tomcat instance as a webapp, as a
+           WEB UI has been required for all current Strolch projects. You could just as well use a main class. Accessing
+           the Strolch Agent remotely is usually done through REST.</p>
+
+        <p>Strolch is being actively developed, and customers constantly give us reasons to improve and extend the
+           framework. There is a Polymer Inspector component which makes it easy to see and manipulate the actual data.
+           The new Search API makes it really easy to query your data.</p>
+
+        <p>Yes, Strolch is different, but the concept has come out of the planning and execution segment, and has been
+           refined over the years until it has become what it is today.</p>
+
+        <h2>API</h2>
 
         <p>Check out the <a href="api.html">API page</a> to see how to use Strolch.</p>
+
+        <a href="history.html">More to motivation etc.</a>
 
     </div>
     <!-- /.content -->

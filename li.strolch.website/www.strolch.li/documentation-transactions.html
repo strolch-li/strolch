@@ -60,7 +60,9 @@
         <p>Transactions handle the following:</p>
         <ul>
             <li>Opening and closing database connections</li>
-            <li>Releasing locks to strolch elements, if <code>tx.lock(StrolchRootElement)</code> was called</li>
+            <li>Releasing locks to strolch elements, if <code>tx.lock(StrolchRootElement)</code> or <code>tx.lock(Locator)</code>
+                was called
+            </li>
             <li>Performing Commands by executing them in the added order, and validating them first.</li>
             <li>Exception handling</li>
             <li>Auditing</li>
@@ -100,8 +102,11 @@
         <pre>
 try (StrolchTransaction tx = openTx(...)) {
 
-  // find a car by locator
+  // read lock our object
   Locator ferrariLoc = Resource.locatorFor("Car", "ferrari");
+  tx.lock(ferrariLoc);
+
+  // find a car by locator
   Resource ferrari = tx.findElement(ferrariLoc);
 
   // get a car by ID
@@ -121,13 +126,13 @@ try (StrolchTransaction tx = openTx(...)) {
 
   // check resource exists
   if (tx.hasResource("Car", "audi")) {
-  	Resource audi = tx.getResourceBy("Car", "audi", true);
+    Resource audi = tx.getResourceBy("Car", "audi", true);
 
-  	// assert has privilege to remove a car
-  	tx.assertHasPrivilege(Operation.REMOVE, audi);
+    // assert has privilege to remove a car
+    tx.assertHasPrivilege(Operation.REMOVE, audi);
 
-  	// remove the car
-  	tx.remove(audi);
+    // remove the car
+    tx.remove(audi);
   }
 
   // iterate all cars
@@ -137,7 +142,7 @@ try (StrolchTransaction tx = openTx(...)) {
 
   // commit if TX was changed
   if (tx.needsCommit())
-  	tx.commitOnClose();
+    tx.commitOnClose();
 }</pre>
 
 
