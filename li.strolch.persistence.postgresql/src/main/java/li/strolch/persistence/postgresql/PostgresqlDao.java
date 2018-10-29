@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Version;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.persistence.api.StrolchDao;
@@ -49,14 +48,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	private static final String deleteAllSqlS = "delete from {0}";
 	private static final String deleteAllByTypeSqlS = "delete from {0} where type = ?";
 
-	private static final String queryByVersionAsXmlSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where type = ? and id = ? and version = ?";
-	private static final String queryByVersionAsJsonSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where type = ? and id = ? and version = ?";
-	private static final String queryVersionsAsXmlForSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where type = ? and id = ? order by version";
-	private static final String queryVersionsAsJsonForSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where type = ? and id = ? order by version";
-	private static final String queryAllAsXmlSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where latest = true";
-	private static final String queryAllAsJsonSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where latest = true";
-	private static final String queryAllByTypeAsXmlSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where type = ? and latest = true";
-	private static final String queryAllByTypeAsJsonSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where type = ? and latest = true";
+	private static final String queryByVersionAsXmlSqlS = "select version, asxml from {0} where type = ? and id = ? and version = ?";
+	private static final String queryByVersionAsJsonSqlS = "select version, asjson from {0} where type = ? and id = ? and version = ?";
+	private static final String queryVersionsAsXmlForSqlS = "select asxml from {0} where type = ? and id = ? order by version";
+	private static final String queryVersionsAsJsonForSqlS = "select asjson from {0} where type = ? and id = ? order by version";
+	private static final String queryAllAsXmlSqlS = "select id, type, asxml from {0} where latest = true";
+	private static final String queryAllAsJsonSqlS = "select id, type, asjson from {0} where latest = true";
+	private static final String queryAllByTypeAsXmlSqlS = "select id, asxml from {0} where type = ? and latest = true";
+	private static final String queryAllByTypeAsJsonSqlS = "select id, asjson from {0} where type = ? and latest = true";
 
 	protected final DataType dataType;
 	protected Connection connection;
@@ -203,16 +202,10 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 				T t = parseDbObject(result, id, type);
 
-				int v = result.getInt(4);
+				int v = result.getInt("version");
 				if (v != versionNr)
 					throw new StrolchPersistenceException(
 							"Requested version " + versionNr + " != " + v + " for " + t.getLocator());
-				String createdBy = result.getString(5);
-				java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-				java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
-				boolean deleted = result.getBoolean(8);
-				Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
-				t.setVersion(version);
 
 				if (result.next())
 					throw new StrolchPersistenceException("Non unique result for query: " + sql);
@@ -247,15 +240,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 				while (result.next()) {
 
 					T t = parseDbObject(result, id, type);
-
-					int v = result.getInt(4);
-					String createdBy = result.getString(5);
-					java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-					java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
-					boolean deleted = result.getBoolean(8);
-					Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
-					t.setVersion(version);
-
 					list.add(t);
 				}
 
@@ -330,18 +314,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 				while (result.next()) {
 					String id = result.getString("id");
 					String type = result.getString("type");
-
-					T t = parseDbObject(result, id, type);
-
-					int v = result.getInt(4);
-					String createdBy = result.getString(5);
-					java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-					java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
-					boolean deleted = result.getBoolean(8);
-					Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
-					t.setVersion(version);
-
-					list.add(t);
+					list.add(parseDbObject(result, id, type));
 				}
 
 				return list;
@@ -372,18 +345,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			try (ResultSet result = statement.executeQuery()) {
 				while (result.next()) {
 					String id = result.getString("id");
-
-					T t = parseDbObject(result, id, type);
-
-					int v = result.getInt(4);
-					String createdBy = result.getString(5);
-					java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-					java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
-					boolean deleted = result.getBoolean(8);
-					Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
-					t.setVersion(version);
-
-					list.add(t);
+					list.add(parseDbObject(result, id, type));
 				}
 
 				return list;

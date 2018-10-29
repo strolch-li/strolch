@@ -270,14 +270,14 @@ public class XmlModelSaxReader extends DefaultHandler {
 				createdS = attributes.getValue("CreatedAt");
 				if (createdS == null)
 					createdS = attributes.getValue(Tags.CREATED);
-				Date created = ISO8601FormatFactory.getInstance().parseDate(createdS);
+				Date created = ISO8601FormatFactory.getInstance().getDateFormat().parse(createdS);
 
 				String updatedS = attributes.getValue(Tags.UPDATED);
 				Date updated;
 				if (updatedS == null)
 					updated = created;
 				else
-					updated = ISO8601FormatFactory.getInstance().parseDate(updatedS);
+					updated = ISO8601FormatFactory.getInstance().getDateFormat().parse(updatedS);
 
 				String deletedS = attributes.getValue(Tags.DELETED);
 				boolean deleted = StringHelper.parseBoolean(deletedS);
