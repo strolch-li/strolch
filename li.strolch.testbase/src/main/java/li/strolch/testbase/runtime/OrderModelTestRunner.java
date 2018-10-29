@@ -52,7 +52,7 @@ public class OrderModelTestRunner {
 
 		// create
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.add(newOrder);
 			tx.commitOnClose();
 		}
@@ -61,11 +61,11 @@ public class OrderModelTestRunner {
 	public void runQuerySizeTest() {
 
 		// remove all
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.getOrderMap().removeAll(tx, tx.getOrderMap().getAllElements(tx));
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			long size = tx.getOrderMap().querySize(tx);
 			assertEquals("Should have 0 objects", 0, size);
 		}
@@ -74,7 +74,7 @@ public class OrderModelTestRunner {
 		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.add(order1);
 			tx.add(order2);
 			tx.add(order3);
@@ -82,7 +82,7 @@ public class OrderModelTestRunner {
 		}
 
 		// query size
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			long size = tx.getOrderMap().querySize(tx);
 			assertEquals("Should have three objects", 3, size);
 
@@ -104,14 +104,14 @@ public class OrderModelTestRunner {
 
 		// create
 		Order newOrder = createOrder(ID, NAME, TYPE);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
 		// read
 		Order readOrder = null;
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			readOrder = tx.getOrderBy(TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, readOrder);
@@ -120,14 +120,14 @@ public class OrderModelTestRunner {
 		StringParameter sParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.update(readOrder);
 			tx.commitOnClose();
 		}
 
 		// read updated
 		Order updatedOrder = null;
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			updatedOrder = tx.getOrderBy(TYPE, ID);
 		}
 		assertNotNull("Should read Order with id " + ID, updatedOrder);
@@ -137,13 +137,13 @@ public class OrderModelTestRunner {
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			tx.remove(readOrder);
 			tx.commitOnClose();
 		}
 
 		// fail to re-read
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test");) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
 			Order order = tx.getOrderBy(TYPE, ID);
 			assertNull("Should not read Order with id " + ID, order);
 		}

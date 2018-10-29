@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,21 +42,21 @@ public class StoreToDaoElementListener implements StrolchElementListener {
 	@Override
 	public void notifyResource(Resource resource) {
 		if (resource.getVersion() == null)
-			Version.setInitialVersionFor(resource, -1, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(resource, this.tx.getCertificate().getUsername());
 		this.resourceDao.save(resource);
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
 		if (order.getVersion() == null)
-			Version.setInitialVersionFor(order, -1, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(order, this.tx.getCertificate().getUsername());
 		this.orderDao.save(order);
 	}
 
 	@Override
 	public void notifyActivity(Activity activity) {
 		if (activity.getVersion() == null)
-			Version.setInitialVersionFor(activity, -1, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(activity, this.tx.getCertificate().getUsername());
 		this.activityDao.save(activity);
 	}
 }

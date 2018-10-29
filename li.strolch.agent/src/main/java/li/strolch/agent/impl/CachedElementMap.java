@@ -44,14 +44,14 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
 		if (this.realm.isVersioningEnabled()) {
-			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
-			Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
+			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId()) + 1;
+			Version.updateVersionFor(element, latestVersion, tx.getCertificate().getUsername(), false);
 		} else {
-			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 		}
 
 		// first perform cached change
-		super.add(tx, element);
+		super.internalAdd(tx, element);
 
 		// last is to perform DB changes
 		getDbDao(tx).save(element);
@@ -59,17 +59,18 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
-		for (T element : elements) {
-			if (this.realm.isVersioningEnabled()) {
-				int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId());
-				Version.setInitialVersionFor(element, latestVersion, tx.getCertificate().getUsername());
-			} else {
-				Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
-			}
-		}
 
 		// first perform cached change
-		super.addAll(tx, elements);
+		for (T element : elements) {
+			if (this.realm.isVersioningEnabled()) {
+				int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId()) + 1;
+				Version.updateVersionFor(element, latestVersion, tx.getCertificate().getUsername(), false);
+			} else {
+				Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
+			}
+
+			internalAdd(tx, element);
+		}
 
 		// last is to perform DB changes
 		getDbDao(tx).saveAll(elements);
@@ -90,7 +91,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		updateVersion(tx, element, false);
 
 		// first perform cached change
-		super.update(tx, element);
+		super.internalUpdate(tx, element);
 
 		// last is to perform DB changes
 		getDbDao(tx).update(element);
@@ -98,12 +99,12 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 
 	@Override
 	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
-		for (T t : elements) {
-			updateVersion(tx, t, false);
-		}
 
 		// first perform cached change
-		super.updateAll(tx, elements);
+		for (T t : elements) {
+			updateVersion(tx, t, false);
+			internalUpdate(tx, t);
+		}
 
 		// last is to perform DB changes
 		getDbDao(tx).updateAll(elements);
@@ -252,7 +253,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 			getDbDao(tx).remove(element);
 		} else {
 			T previous = getBy(tx, type, id, elementVersion.getPreviousVersion(), true);
-			super.update(tx, previous);
+			super.internalUpdate(tx, previous);
 			getDbDao(tx).removeVersion(current);
 		}
 	}

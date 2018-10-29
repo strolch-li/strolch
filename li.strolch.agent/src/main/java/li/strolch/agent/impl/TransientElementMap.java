@@ -269,12 +269,13 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
+		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
 		internalAdd(tx, element);
 	}
 
-	private void internalAdd(StrolchTransaction tx, T element) {
+	protected void internalAdd(StrolchTransaction tx, T element) {
 		if (!element.hasVersion())
-			Version.setInitialVersionFor(element, -1, tx.getCertificate().getUsername());
+			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 
 		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
 
@@ -287,8 +288,6 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		byType.put(element.getId(), element);
 
-		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
-
 		// now make read only
 		element.setReadOnly();
 	}
@@ -296,16 +295,18 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
+			Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
 			internalAdd(tx, element);
 		}
 	}
 
 	@Override
 	public synchronized void update(StrolchTransaction tx, T element) {
+		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
 		internalUpdate(tx, element);
 	}
 
-	private void internalUpdate(StrolchTransaction tx, T element) {
+	protected void internalUpdate(StrolchTransaction tx, T element) {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType == null) {
 			String msg = "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!"; //$NON-NLS-1$
@@ -322,8 +323,6 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		byType.put(element.getId(), element);
 
-		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
-
 		// now make read only
 		element.setReadOnly();
 	}
@@ -331,6 +330,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
+			Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
 			internalUpdate(tx, element);
 		}
 	}

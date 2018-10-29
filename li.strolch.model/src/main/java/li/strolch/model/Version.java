@@ -216,14 +216,11 @@ public class Version {
 	 *
 	 * @param element
 	 * 		the element for which to create a new version
-	 * @param latestDbVersion
-	 * 		the latest version from the DB, or -1 if no version available
 	 * @param username
 	 * 		the username of the user who created this version of the object
 	 */
-	public static void setInitialVersionFor(StrolchRootElement element, int latestDbVersion, String username) {
-		int v = latestDbVersion == -1 ? 0 : latestDbVersion + 1;
-		Version version = new Version(element.getLocator(), v, username, false);
+	public static void setInitialVersionFor(StrolchRootElement element, String username) {
+		Version version = new Version(element.getLocator(), 0, username, false);
 		element.setVersion(version);
 	}
 
@@ -265,6 +262,8 @@ public class Version {
 	 * 		if true, then the version will be marked as deleted, i.e. this object was removed from the element maps
 	 */
 	public static void updateVersionFor(StrolchRootElement element, int version, String username, boolean deleted) {
+		if (version == -1)
+			version = 0;
 		Version v;
 		if (element.hasVersion()) {
 			Date created = element.getVersion().getCreated();

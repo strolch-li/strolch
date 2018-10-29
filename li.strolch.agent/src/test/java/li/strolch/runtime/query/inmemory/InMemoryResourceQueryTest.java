@@ -279,7 +279,7 @@ public class InMemoryResourceQueryTest {
 
 	private static Resource getBallResource() {
 		Resource res1 = new Resource("childrensBall", "Ball 1", "Ball");
-		Version.setInitialVersionFor(res1, -1, "test");
+		Version.setInitialVersionFor(res1, "test");
 		ParameterBag bag = new ParameterBag("parameters", "Ball Details", "Parameters");
 		bag.addParameter(new StringParameter("color", "Color", "red"));
 		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
@@ -310,7 +310,7 @@ public class InMemoryResourceQueryTest {
 		resources.add(res6);
 
 		for (Resource resource : resources) {
-			Version.setInitialVersionFor(resource, -1, "test");
+			Version.setInitialVersionFor(resource, "test");
 		}
 
 		return resources;
