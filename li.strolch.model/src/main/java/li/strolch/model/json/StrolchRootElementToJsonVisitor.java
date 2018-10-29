@@ -53,6 +53,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this;
 	}
 
+	public StrolchRootElementToJsonVisitor withoutVersion() {
+		this.visitor.withoutVersion();
+		return this;
+	}
+
 	public StrolchRootElementToJsonVisitor withoutElementName() {
 		this.visitor.withoutElementName();
 		return this;

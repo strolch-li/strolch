@@ -41,7 +41,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	private boolean flat;
 	private boolean withoutElementName;
-	private boolean withVersion;
+	private boolean withoutVersion;
 	private boolean withoutPolicies;
 	private int activityDepth = Integer.MAX_VALUE;
 
@@ -56,7 +56,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	public boolean isWithVersion() {
-		return this.withVersion;
+		return !this.withoutVersion;
+	}
+
+	public boolean isWithoutVersion() {
+		return this.withoutVersion;
 	}
 
 	public boolean isWithoutElementName() {
@@ -68,7 +72,12 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	public StrolchElementToJsonVisitor withVersion() {
-		this.withVersion = true;
+		this.withoutVersion = false;
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor withoutVersion() {
+		this.withoutVersion = true;
 		return this;
 	}
 
@@ -645,7 +654,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	protected void addVersion(StrolchRootElement element, JsonObject rootJ) {
 		if (!element.hasVersion())
 			return;
-		if (!isWithVersion())
+		if (isWithoutVersion())
 			return;
 
 		Version version = element.getVersion();

@@ -32,7 +32,7 @@ public class ModelToJsonTest extends ModelMarshallingTest {
 
 	@Override
 	protected Order formatAndParseOrder(Order order) {
-		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor().withVersion();
+		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor();
 		JsonObject jsonObject = order.accept(jsonVisitor).getAsJsonObject();
 
 		Order parsedOrder = new OrderFromJsonVisitor().visit(jsonObject);
@@ -47,7 +47,7 @@ public class ModelToJsonTest extends ModelMarshallingTest {
 	@Override
 	protected Resource formatAndParseResource(Resource resource) {
 
-		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor().withVersion();
+		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor();
 		JsonObject jsonObject = resource.accept(jsonVisitor).getAsJsonObject();
 
 		Resource parsedResource = new ResourceFromJsonVisitor().visit(jsonObject);
@@ -62,7 +62,7 @@ public class ModelToJsonTest extends ModelMarshallingTest {
 	@Override
 	protected Activity formatAndParseActivity(Activity activity) {
 
-		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor().withVersion();
+		StrolchRootElementToJsonVisitor jsonVisitor = new StrolchRootElementToJsonVisitor();
 		JsonObject jsonObject = activity.accept(jsonVisitor).getAsJsonObject();
 
 		Activity parsedActivity = new ActivityFromJsonVisitor().visit(jsonObject);

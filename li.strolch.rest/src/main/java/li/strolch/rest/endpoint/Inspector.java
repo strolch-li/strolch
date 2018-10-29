@@ -415,7 +415,7 @@ public class Inspector {
 		// build JSON response
 		ResourceVisitor<JsonObject> visitor;
 		if (overview == null || !overview) {
-			visitor = new StrolchRootElementToJsonVisitor().withVersion().asResourceVisitor();
+			visitor = new StrolchRootElementToJsonVisitor().asResourceVisitor();
 		} else {
 			visitor = e -> {
 				JsonObject jsonObject = new JsonObject();
@@ -459,7 +459,7 @@ public class Inspector {
 		// build JSON response
 		OrderVisitor<JsonObject> visitor;
 		if (overview == null || !overview) {
-			visitor = new StrolchRootElementToJsonVisitor().withVersion().asOrderVisitor();
+			visitor = new StrolchRootElementToJsonVisitor().asOrderVisitor();
 		} else {
 			visitor = e -> {
 				JsonObject jsonObject = new JsonObject();
@@ -505,7 +505,7 @@ public class Inspector {
 		// build JSON response
 		ActivityVisitor<JsonObject> visitor;
 		if (overview == null || !overview) {
-			visitor = new StrolchRootElementToJsonVisitor().withVersion().asActivityVisitor();
+			visitor = new StrolchRootElementToJsonVisitor().asActivityVisitor();
 		} else {
 			visitor = e -> {
 				JsonObject jsonObject = new JsonObject();
