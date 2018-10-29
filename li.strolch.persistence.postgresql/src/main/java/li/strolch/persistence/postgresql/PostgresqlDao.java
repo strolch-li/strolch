@@ -49,14 +49,14 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	private static final String deleteAllSqlS = "delete from {0}";
 	private static final String deleteAllByTypeSqlS = "delete from {0} where type = ?";
 
-	private static final String queryByVersionAsXmlSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where type = ? and id = ? and version = ?";
-	private static final String queryByVersionAsJsonSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where type = ? and id = ? and version = ?";
-	private static final String queryVersionsAsXmlForSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where type = ? and id = ? order by version";
-	private static final String queryVersionsAsJsonForSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where type = ? and id = ? order by version";
-	private static final String queryAllAsXmlSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where latest = true";
-	private static final String queryAllAsJsonSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where latest = true";
-	private static final String queryAllByTypeAsXmlSqlS = "select id, name, type, version, created_by, created_at, deleted, asxml from {0} where type = ? and latest = true";
-	private static final String queryAllByTypeAsJsonSqlS = "select id, name, type, version, created_by, created_at, deleted, asjson from {0} where type = ? and latest = true";
+	private static final String queryByVersionAsXmlSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where type = ? and id = ? and version = ?";
+	private static final String queryByVersionAsJsonSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where type = ? and id = ? and version = ?";
+	private static final String queryVersionsAsXmlForSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where type = ? and id = ? order by version";
+	private static final String queryVersionsAsJsonForSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where type = ? and id = ? order by version";
+	private static final String queryAllAsXmlSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where latest = true";
+	private static final String queryAllAsJsonSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where latest = true";
+	private static final String queryAllByTypeAsXmlSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asxml from {0} where type = ? and latest = true";
+	private static final String queryAllByTypeAsJsonSqlS = "select id, name, type, version, created_by, created_at, updated_at, deleted, asjson from {0} where type = ? and latest = true";
 
 	protected final DataType dataType;
 	protected Connection connection;
@@ -209,8 +209,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 							"Requested version " + versionNr + " != " + v + " for " + t.getLocator());
 				String createdBy = result.getString(5);
 				java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-				boolean deleted = result.getBoolean(7);
-				Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+				java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
+				boolean deleted = result.getBoolean(8);
+				Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
 				t.setVersion(version);
 
 				if (result.next())
@@ -250,8 +251,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
 					java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-					boolean deleted = result.getBoolean(7);
-					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+					java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
+					boolean deleted = result.getBoolean(8);
+					Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
 					t.setVersion(version);
 
 					list.add(t);
@@ -334,8 +336,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
 					java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-					boolean deleted = result.getBoolean(7);
-					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+					java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
+					boolean deleted = result.getBoolean(8);
+					Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
 					t.setVersion(version);
 
 					list.add(t);
@@ -375,8 +378,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 					int v = result.getInt(4);
 					String createdBy = result.getString(5);
 					java.util.Date createdAt = new java.util.Date(result.getDate(6).getTime());
-					boolean deleted = result.getBoolean(7);
-					Version version = new Version(t.getLocator(), v, createdBy, createdAt, deleted);
+					java.util.Date updatedAt = new java.util.Date(result.getDate(7).getTime());
+					boolean deleted = result.getBoolean(8);
+					Version version = new Version(t.getLocator(), v, createdBy, createdAt, updatedAt, deleted);
 					t.setVersion(version);
 
 					list.add(t);

@@ -270,8 +270,10 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 
 		attributes.addAttribute(null, null, Tags.VERSION, Tags.CDATA, Integer.toString(version.getVersion()));
 		attributes.addAttribute(null, null, Tags.CREATED_BY, Tags.CDATA, version.getCreatedBy());
-		attributes.addAttribute(null, null, Tags.CREATED_AT, Tags.CDATA,
-				ISO8601FormatFactory.getInstance().formatDate(version.getCreatedAt()));
+		attributes.addAttribute(null, null, Tags.CREATED, Tags.CDATA,
+				ISO8601FormatFactory.getInstance().formatDate(version.getCreated()));
+		attributes.addAttribute(null, null, Tags.UPDATED, Tags.CDATA,
+				ISO8601FormatFactory.getInstance().formatDate(version.getUpdated()));
 		attributes.addAttribute(null, null, Tags.DELETED, Tags.CDATA, Boolean.toString(version.isDeleted()));
 
 		return attributes;

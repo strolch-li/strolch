@@ -52,7 +52,8 @@ public class Tags {
 	public static final String POLICY = "Policy";
 
 	public static final String VERSION = "Version";
-	public static final String CREATED_AT = "CreatedAt";
+	public static final String CREATED = "Created";
+	public static final String UPDATED = "Updated";
 	public static final String CREATED_BY = "CreatedBy";
 	public static final String DELETED = "Deleted";
 
@@ -119,7 +120,8 @@ public class Tags {
 		public static final String POLICIES = "policies";
 
 		public static final String VERSION = "version";
-		public static final String CREATED_AT = "createdAt";
+		public static final String CREATED = "created";
+		public static final String UPDATED = "updated";
 		public static final String CREATED_BY = "createdBy";
 		public static final String DELETED = "deleted";
 

@@ -41,11 +41,11 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	public static final String ORDERS = "orders";
 
-	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
-	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
+	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
+	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asjson = ? where id = ? and version = ?";
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asjson = ? where id = ? and version = ?";
 
 	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
 
@@ -111,19 +111,21 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			// version
 			preparedStatement.setInt(2, order.getVersion().getVersion());
 			preparedStatement.setString(3, order.getVersion().getCreatedBy());
-			preparedStatement.setTimestamp(4, new Timestamp(order.getVersion().getCreatedAt().getTime()),
-					Calendar.getInstance());
-			preparedStatement.setBoolean(5, order.getVersion().isDeleted());
+			preparedStatement
+					.setTimestamp(4, new Timestamp(order.getVersion().getCreated().getTime()), Calendar.getInstance());
+			preparedStatement
+					.setTimestamp(5, new Timestamp(order.getVersion().getUpdated().getTime()), Calendar.getInstance());
+			preparedStatement.setBoolean(6, order.getVersion().isDeleted());
 
-			preparedStatement.setBoolean(6, !order.getVersion().isDeleted());
+			preparedStatement.setBoolean(7, !order.getVersion().isDeleted());
 
 			// attributes
-			preparedStatement.setString(7, order.getName());
-			preparedStatement.setString(8, order.getType());
-			preparedStatement.setString(9, order.getState().name());
-			preparedStatement.setTimestamp(10, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
+			preparedStatement.setString(8, order.getName());
+			preparedStatement.setString(9, order.getType());
+			preparedStatement.setString(10, order.getState().name());
+			preparedStatement.setTimestamp(11, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
-			SQLXML sqlxml = writeObject(preparedStatement, order, 11);
+			SQLXML sqlxml = writeObject(preparedStatement, order, 12);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -205,23 +207,25 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 			// version
 			preparedStatement.setString(1, order.getVersion().getCreatedBy());
-			preparedStatement.setTimestamp(2, new Timestamp(order.getVersion().getCreatedAt().getTime()),
-					Calendar.getInstance());
-			preparedStatement.setBoolean(3, order.getVersion().isDeleted());
+			preparedStatement
+					.setTimestamp(2, new Timestamp(order.getVersion().getCreated().getTime()), Calendar.getInstance());
+			preparedStatement
+					.setTimestamp(3, new Timestamp(order.getVersion().getUpdated().getTime()), Calendar.getInstance());
+			preparedStatement.setBoolean(4, order.getVersion().isDeleted());
 
-			preparedStatement.setBoolean(4, !order.getVersion().isDeleted());
+			preparedStatement.setBoolean(5, !order.getVersion().isDeleted());
 
 			// attributes
-			preparedStatement.setString(5, order.getName());
-			preparedStatement.setString(6, order.getType());
-			preparedStatement.setString(7, order.getState().name());
-			preparedStatement.setTimestamp(8, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
+			preparedStatement.setString(6, order.getName());
+			preparedStatement.setString(7, order.getType());
+			preparedStatement.setString(8, order.getState().name());
+			preparedStatement.setTimestamp(9, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
-			SQLXML sqlxml = writeObject(preparedStatement, order, 9);
+			SQLXML sqlxml = writeObject(preparedStatement, order, 10);
 
 			// primary key
-			preparedStatement.setString(10, order.getId());
-			preparedStatement.setInt(11, order.getVersion().getVersion());
+			preparedStatement.setString(11, order.getId());
+			preparedStatement.setInt(12, order.getVersion().getVersion());
 
 			try {
 				int modCount = preparedStatement.executeUpdate();

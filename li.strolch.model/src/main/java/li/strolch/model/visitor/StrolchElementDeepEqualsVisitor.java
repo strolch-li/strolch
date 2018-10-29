@@ -191,7 +191,9 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 			addLocator(srcVersion.getLocator().append(Tags.VERSION));
 		if (!srcVersion.getCreatedBy().equals(dstVersion.getCreatedBy()))
 			addLocator(srcVersion.getLocator().append(Tags.VERSION));
-		if (!srcVersion.getCreatedAt().equals(dstVersion.getCreatedAt()))
+		if (!srcVersion.getCreated().equals(dstVersion.getCreated()))
+			addLocator(srcVersion.getLocator().append(Tags.VERSION));
+		if (!srcVersion.getUpdated().equals(dstVersion.getUpdated()))
 			addLocator(srcVersion.getLocator().append(Tags.VERSION));
 		if (srcVersion.isDeleted() != dstVersion.isDeleted())
 			addLocator(srcVersion.getLocator().append(Tags.VERSION));

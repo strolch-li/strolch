@@ -381,11 +381,25 @@ public class StrolchElementFromJsonVisitor {
 
 		int v = versionJ.get(Json.VERSION).getAsInt();
 		String createdBy = versionJ.get(Json.CREATED_BY).getAsString();
-		String createdAtS = versionJ.get(Json.CREATED_AT).getAsString();
-		Date createdAt = ISO8601FormatFactory.getInstance().parseDate(createdAtS);
+
+		String createdS;
+		if (versionJ.has("createdAt"))
+			createdS = versionJ.get("createdAt").getAsString();
+		else
+			createdS = versionJ.get(Json.CREATED).getAsString();
+		Date created = ISO8601FormatFactory.getInstance().parseDate(createdS);
+
+		Date updated;
+		if (versionJ.has(Json.UPDATED)) {
+			String updatedS = versionJ.get(Json.UPDATED).getAsString();
+			updated = ISO8601FormatFactory.getInstance().parseDate(updatedS);
+		} else {
+			updated = created;
+		}
+
 		boolean deleted = versionJ.get(Json.DELETED).getAsBoolean();
 
-		Version version = new Version(rootElement.getLocator(), v, createdBy, createdAt, deleted);
+		Version version = new Version(rootElement.getLocator(), v, createdBy, created, updated, deleted);
 		rootElement.setVersion(version);
 	}
 }

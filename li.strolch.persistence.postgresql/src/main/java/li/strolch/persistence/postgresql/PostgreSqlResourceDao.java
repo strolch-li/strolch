@@ -41,11 +41,11 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 	public static final String RESOURCES = "resources";
 
-	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asjson = ? where id = ? and version = ?";
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asjson = ? where id = ? and version = ?";
 
 	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
 
@@ -111,17 +111,19 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			// version
 			preparedStatement.setInt(2, resource.getVersion().getVersion());
 			preparedStatement.setString(3, resource.getVersion().getCreatedBy());
-			preparedStatement.setTimestamp(4, new Timestamp(resource.getVersion().getCreatedAt().getTime()),
+			preparedStatement.setTimestamp(4, new Timestamp(resource.getVersion().getCreated().getTime()),
 					Calendar.getInstance());
-			preparedStatement.setBoolean(5, resource.getVersion().isDeleted());
+			preparedStatement.setTimestamp(5, new Timestamp(resource.getVersion().getUpdated().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(6, resource.getVersion().isDeleted());
 
-			preparedStatement.setBoolean(6, !resource.getVersion().isDeleted());
+			preparedStatement.setBoolean(7, !resource.getVersion().isDeleted());
 
 			// attributes
-			preparedStatement.setString(7, resource.getName());
-			preparedStatement.setString(8, resource.getType());
+			preparedStatement.setString(8, resource.getName());
+			preparedStatement.setString(9, resource.getType());
 
-			SQLXML sqlxml = writeObject(preparedStatement, resource, 9);
+			SQLXML sqlxml = writeObject(preparedStatement, resource, 10);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -204,21 +206,23 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 			// version
 			preparedStatement.setString(1, resource.getVersion().getCreatedBy());
-			preparedStatement.setTimestamp(2, new Timestamp(resource.getVersion().getCreatedAt().getTime()),
+			preparedStatement.setTimestamp(2, new Timestamp(resource.getVersion().getCreated().getTime()),
 					Calendar.getInstance());
-			preparedStatement.setBoolean(3, resource.getVersion().isDeleted());
+			preparedStatement.setTimestamp(3, new Timestamp(resource.getVersion().getUpdated().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(4, resource.getVersion().isDeleted());
 
-			preparedStatement.setBoolean(4, !resource.getVersion().isDeleted());
+			preparedStatement.setBoolean(5, !resource.getVersion().isDeleted());
 
 			// attributes
-			preparedStatement.setString(5, resource.getName());
-			preparedStatement.setString(6, resource.getType());
+			preparedStatement.setString(6, resource.getName());
+			preparedStatement.setString(7, resource.getType());
 
-			SQLXML sqlxml = writeObject(preparedStatement, resource, 7);
+			SQLXML sqlxml = writeObject(preparedStatement, resource, 8);
 
 			// primary key
-			preparedStatement.setString(8, resource.getId());
-			preparedStatement.setInt(9, resource.getVersion().getVersion());
+			preparedStatement.setString(9, resource.getId());
+			preparedStatement.setInt(10, resource.getVersion().getVersion());
 
 			try {
 				int modCount = preparedStatement.executeUpdate();

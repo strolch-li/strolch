@@ -365,10 +365,24 @@ public class StrolchElementFromDomVisitor {
 
 			int v = Integer.parseInt(versionElem.getAttribute(Tags.VERSION));
 			String createdBy = versionElem.getAttribute(Tags.CREATED_BY);
-			String createdAtS = versionElem.getAttribute(Tags.CREATED_AT);
-			Date createdAt = ISO8601FormatFactory.getInstance().parseDate(createdAtS);
+
+			String createdS;
+			if (versionElem.hasAttribute("CreatedAt"))
+				createdS = versionElem.getAttribute("CreatedAt");
+			else
+				createdS = versionElem.getAttribute(Tags.CREATED);
+			Date created = ISO8601FormatFactory.getInstance().parseDate(createdS);
+
+			Date updated;
+			if (versionElem.hasAttribute(Tags.UPDATED)) {
+				String updatedS = versionElem.getAttribute(Tags.UPDATED);
+				updated = ISO8601FormatFactory.getInstance().parseDate(updatedS);
+			} else {
+				updated = created;
+			}
+
 			boolean deleted = StringHelper.parseBoolean(versionElem.getAttribute(Tags.DELETED));
-			Version version = new Version(rootElement.getLocator(), v, createdBy, createdAt, deleted);
+			Version version = new Version(rootElement.getLocator(), v, createdBy, created, updated, deleted);
 
 			rootElement.setVersion(version);
 		}

@@ -41,11 +41,11 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 	public static final String ACTIVITIES = "activities";
 
-	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
-	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, deleted, latest, name, type, state, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
+	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
+	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asxml = ? where id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asjson = ? where id = ? and version = ?";
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asxml = ? where id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asjson = ? where id = ? and version = ?";
 
 	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
 
@@ -111,18 +111,20 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			// version
 			preparedStatement.setInt(2, activity.getVersion().getVersion());
 			preparedStatement.setString(3, activity.getVersion().getCreatedBy());
-			preparedStatement.setTimestamp(4, new Timestamp(activity.getVersion().getCreatedAt().getTime()),
+			preparedStatement.setTimestamp(4, new Timestamp(activity.getVersion().getCreated().getTime()),
 					Calendar.getInstance());
-			preparedStatement.setBoolean(5, activity.getVersion().isDeleted());
+			preparedStatement.setTimestamp(5, new Timestamp(activity.getVersion().getUpdated().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(6, activity.getVersion().isDeleted());
 
-			preparedStatement.setBoolean(6, !activity.getVersion().isDeleted());
+			preparedStatement.setBoolean(7, !activity.getVersion().isDeleted());
 
 			// attributes
-			preparedStatement.setString(7, activity.getName());
-			preparedStatement.setString(8, activity.getType());
-			preparedStatement.setString(9, activity.getState().name());
+			preparedStatement.setString(8, activity.getName());
+			preparedStatement.setString(9, activity.getType());
+			preparedStatement.setString(10, activity.getState().name());
 
-			SQLXML sqlxml = writeObject(preparedStatement, activity, 10);
+			SQLXML sqlxml = writeObject(preparedStatement, activity, 11);
 
 			try {
 				int modCount = preparedStatement.executeUpdate();
@@ -204,22 +206,24 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 			// version
 			preparedStatement.setString(1, activity.getVersion().getCreatedBy());
-			preparedStatement.setTimestamp(2, new Timestamp(activity.getVersion().getCreatedAt().getTime()),
+			preparedStatement.setTimestamp(2, new Timestamp(activity.getVersion().getCreated().getTime()),
 					Calendar.getInstance());
-			preparedStatement.setBoolean(3, activity.getVersion().isDeleted());
+			preparedStatement.setTimestamp(3, new Timestamp(activity.getVersion().getUpdated().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setBoolean(4, activity.getVersion().isDeleted());
 
-			preparedStatement.setBoolean(4, !activity.getVersion().isDeleted());
+			preparedStatement.setBoolean(5, !activity.getVersion().isDeleted());
 
 			// attributes
-			preparedStatement.setString(5, activity.getName());
-			preparedStatement.setString(6, activity.getType());
-			preparedStatement.setString(7, activity.getState().name());
+			preparedStatement.setString(6, activity.getName());
+			preparedStatement.setString(7, activity.getType());
+			preparedStatement.setString(8, activity.getState().name());
 
-			SQLXML sqlxml = writeObject(preparedStatement, activity, 8);
+			SQLXML sqlxml = writeObject(preparedStatement, activity, 9);
 
 			// primary key
-			preparedStatement.setString(9, activity.getId());
-			preparedStatement.setInt(10, activity.getVersion().getVersion());
+			preparedStatement.setString(10, activity.getId());
+			preparedStatement.setInt(11, activity.getVersion().getVersion());
 
 			try {
 				int modCount = preparedStatement.executeUpdate();

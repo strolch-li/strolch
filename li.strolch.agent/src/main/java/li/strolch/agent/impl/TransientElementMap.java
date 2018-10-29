@@ -287,6 +287,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		byType.put(element.getId(), element);
 
+		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
+
 		// now make read only
 		element.setReadOnly();
 	}
@@ -319,6 +321,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		}
 
 		byType.put(element.getId(), element);
+
+		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
 
 		// now make read only
 		element.setReadOnly();

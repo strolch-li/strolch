@@ -265,12 +265,25 @@ public class XmlModelSaxReader extends DefaultHandler {
 				String versionS = attributes.getValue(Tags.VERSION);
 				int v = Integer.parseInt(versionS);
 				String createdBy = attributes.getValue(Tags.CREATED_BY);
-				String createdAtS = attributes.getValue(Tags.CREATED_AT);
-				Date createdAt = ISO8601FormatFactory.getInstance().parseDate(createdAtS);
+
+				String createdS;
+				createdS = attributes.getValue("CreatedAt");
+				if (createdS == null)
+					createdS = attributes.getValue(Tags.CREATED);
+				Date created = ISO8601FormatFactory.getInstance().parseDate(createdS);
+
+				String updatedS = attributes.getValue(Tags.UPDATED);
+				Date updated;
+				if (updatedS == null)
+					updated = created;
+				else
+					updated = ISO8601FormatFactory.getInstance().parseDate(updatedS);
+
 				String deletedS = attributes.getValue(Tags.DELETED);
 				boolean deleted = StringHelper.parseBoolean(deletedS);
 
-				Version version = new Version(this.parameterizedElement.getLocator(), v, createdBy, createdAt, deleted);
+				Version version = new Version(this.parameterizedElement.getLocator(), v, createdBy, created, updated,
+						deleted);
 				((StrolchRootElement) this.parameterizedElement).setVersion(version);
 
 			} catch (Exception e) {
