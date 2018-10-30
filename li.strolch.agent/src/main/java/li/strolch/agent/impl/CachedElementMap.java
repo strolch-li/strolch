@@ -82,6 +82,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 				element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
 			Version.updateVersionFor(element, tx.getCertificate().getUsername(), deleted);
 		} else {
+			element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
 			Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), deleted);
 		}
 	}
