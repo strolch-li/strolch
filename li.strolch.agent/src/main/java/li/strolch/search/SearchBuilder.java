@@ -2,6 +2,7 @@ package li.strolch.search;
 
 import static li.strolch.search.ExpressionsSupport.*;
 import static li.strolch.search.PredicatesSupport.containsIgnoreCase;
+import static li.strolch.search.PredicatesSupport.isEqualTo;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 import li.strolch.model.StrolchRootElement;
@@ -20,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * <li>query is trimmed</li>
  * <li>empty query means search for everything, i.e. no {@link SearchExpression SearchExpressions} are added</li>
  * <li>query is split by space, and each part is handled further:</li>
- * <li>format <code>param:&lt;bagId&gt;:&lt;paramId&gt;:&lt;value&gt;</code> adds search expression for given
+ * <li>format {@code param:<bagId>:<paramId>:<value>} adds search expression for given
  * bag/param</li>
  * <li>otherwise search expression for id and name are added</li>
  * <li>all added search expressions are ANDed</li>
@@ -79,39 +80,48 @@ public class SearchBuilder {
 		if (query.isEmpty())
 			return search;
 
+		boolean and = true;
+		if (query.startsWith("&")) {
+			query = query.substring(1);
+		} else if (query.startsWith("and ")) {
+			query = query.substring("and ".length());
+		} else if (query.startsWith("|")) {
+			and = false;
+			query = query.substring(1);
+		} else if (query.startsWith("or ")) {
+			and = false;
+			query = query.substring("or ".length());
+		}
+
+		query = trimOrEmpty(query);
+
 		SearchExpression<T> se = null;
 
 		String[] parts = query.split(" ");
 		for (String part : parts) {
+			part = part.trim();
 
-			if (!part.startsWith("param:")) {
+			boolean negate = false;
+			if (part.startsWith("!")) {
+				negate = true;
+				part = part.substring(1);
+			}
 
-				if (se == null)
-					se = (SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
-				else
-					se = se.and((SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part))));
-
+			String[] paramParts = part.split(":", -1);
+			if (paramParts.length != 3) {
+				se = add(and, negate, se, id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part))));
 			} else {
-				String[] paramParts = part.split(":");
-				if (paramParts.length != 4) {
+				String bagId = paramParts[0];
+				String paramId = paramParts[1];
+				String value = paramParts[2];
 
-					if (se == null)
-						se = (SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
-					else
-						se = se.and(
-								(SearchExpression<T>) id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part))));
+				SearchPredicate predicate;
+				if (value.isEmpty())
+					predicate = isEqualTo(value);
+				else
+					predicate = containsIgnoreCase(value);
 
-				} else {
-
-					String bagId = paramParts[1];
-					String paramId = paramParts[2];
-					String value = paramParts[3];
-
-					if (se == null)
-						se = param(bagId, paramId, containsIgnoreCase(value));
-					else
-						se = se.and(param(bagId, paramId, containsIgnoreCase(value)));
-				}
+				se = add(and, negate, se, param(bagId, paramId, predicate));
 			}
 		}
 
@@ -120,6 +130,21 @@ public class SearchBuilder {
 
 		search = (U) search.where(se);
 		return search;
+	}
+
+	private static <T extends StrolchRootElement> SearchExpression<T> add(boolean and, boolean negate,
+			SearchExpression<T> se, SearchExpression<T> expression) {
+
+		if (negate)
+			expression = expression.not();
+
+		if (se == null)
+			return expression;
+
+		if (and)
+			return se.and(expression);
+		else
+			return se.or(expression);
 	}
 
 	public static <T extends StrolchRootElement> RootElementSearchResult<T> orderBy(
