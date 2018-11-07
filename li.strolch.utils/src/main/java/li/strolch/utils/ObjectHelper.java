@@ -1,7 +1,10 @@
 package li.strolch.utils;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
+
+import li.strolch.utils.iso8601.ISO8601;
 
 public class ObjectHelper {
 
@@ -182,6 +185,26 @@ public class ObjectHelper {
 		// comparing non-strings we use equals, as contains fits as well
 		if (left.getClass() == right.getClass())
 			return left.equals(right);
+
+		// try to coerce the right side to the left side
+		if (right instanceof String) {
+			String rightString = (String) right;
+			Object rightO;
+			if (left instanceof Integer) {
+				rightO = Integer.valueOf(rightString);
+			} else if (left instanceof Float) {
+				rightO = Float.valueOf(rightString);
+			} else if (left instanceof Double) {
+				rightO = Double.valueOf(rightString);
+			} else if (left instanceof Date) {
+				rightO = ISO8601.parseToDate(rightString);
+			} else {
+				throw new IllegalArgumentException(
+						"Unhandled type combination " + left.getClass() + " / " + right.getClass());
+			}
+
+			return rightO.equals(left);
+		}
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
 	}

@@ -5,8 +5,10 @@ import static li.strolch.search.PredicatesSupport.containsIgnoreCase;
 import static li.strolch.search.PredicatesSupport.isEqualTo;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
+import li.strolch.model.ParameterBag;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +87,7 @@ public class SearchBuilder {
 			query = query.substring(1);
 		} else if (query.startsWith("and ")) {
 			query = query.substring("and ".length());
+
 		} else if (query.startsWith("|")) {
 			and = false;
 			query = query.substring(1);
@@ -107,7 +110,7 @@ public class SearchBuilder {
 				part = part.substring(1);
 			}
 
-			String[] paramParts = part.split(":", -1);
+			String[] paramParts = parseParts(part);
 			if (paramParts.length != 3) {
 				se = add(and, negate, se, id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part))));
 			} else {
@@ -121,7 +124,20 @@ public class SearchBuilder {
 				else
 					predicate = containsIgnoreCase(value);
 
-				se = add(and, negate, se, param(bagId, paramId, predicate));
+				if (!bagId.equals("?")) {
+					se = add(and, negate, se, param(bagId, paramId, predicate));
+				} else {
+					se = add(and, negate, se, element -> {
+						for (String b : element.getParameterBagKeySet()) {
+							ParameterBag bag = element.getParameterBag(b);
+							Parameter<Object> param = bag.getParameter(paramId);
+							if (param != null && predicate.matches(param.getValue()))
+								return true;
+						}
+
+						return false;
+					});
+				}
 			}
 		}
 
@@ -130,6 +146,19 @@ public class SearchBuilder {
 
 		search = (U) search.where(se);
 		return search;
+	}
+
+	private static String[] parseParts(String part) {
+
+		int pos1 = part.indexOf(':');
+		if (pos1 == -1)
+			return new String[0];
+
+		int pos2 = part.indexOf(':', pos1 + 1);
+		if (pos2 == -1)
+			return new String[0];
+
+		return new String[] { part.substring(0, pos1), part.substring(pos1 + 1, pos2), part.substring(pos2 + 1) };
 	}
 
 	private static <T extends StrolchRootElement> SearchExpression<T> add(boolean and, boolean negate,
