@@ -124,7 +124,7 @@ public class SearchBuilder {
 				else
 					predicate = containsIgnoreCase(value);
 
-				if (!bagId.equals("?")) {
+				if (bagId.isEmpty() || !bagId.equals("?")) {
 					se = add(and, negate, se, param(bagId, paramId, predicate));
 				} else {
 					se = add(and, negate, se, element -> {
@@ -149,7 +149,6 @@ public class SearchBuilder {
 	}
 
 	private static String[] parseParts(String part) {
-
 		int pos1 = part.indexOf(':');
 		if (pos1 == -1)
 			return new String[0];
@@ -158,7 +157,13 @@ public class SearchBuilder {
 		if (pos2 == -1)
 			return new String[0];
 
-		return new String[] { part.substring(0, pos1), part.substring(pos1 + 1, pos2), part.substring(pos2 + 1) };
+		String bagId = part.substring(0, pos1);
+		String paramId = part.substring(pos1 + 1, pos2);
+		String query = part.substring(pos2 + 1);
+
+		if (bagId.isEmpty() || paramId.isEmpty() || query.isEmpty())
+			return new String[0];
+		return new String[] { bagId, paramId, query };
 	}
 
 	private static <T extends StrolchRootElement> SearchExpression<T> add(boolean and, boolean negate,
