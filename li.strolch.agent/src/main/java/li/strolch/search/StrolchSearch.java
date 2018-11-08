@@ -8,7 +8,6 @@ import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.ExceptionHelper;
@@ -85,8 +84,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 */
 	public RootElementSearchResult<T> search(StrolchTransaction tx) {
 		try {
-			PrivilegeContext privilegeContext = tx.getContainer().getPrivilegeHandler().validate(tx.getCertificate());
-			privilegeContext.validateAction(this);
+			tx.getPrivilegeContext().validateAction(this);
 		} catch (PrivilegeException e) {
 			throw new StrolchAccessDeniedException(tx.getCertificate(), this, ExceptionHelper.getExceptionMessage(e),
 					e);

@@ -32,6 +32,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.report.Report;
 import li.strolch.report.ReportSearch;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -67,12 +68,11 @@ public class ReportResource {
 			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
-
-			List<Resource> ids = new ReportSearch().search(tx).orderByName(false).toList();
+			List<Resource> reports = new ReportSearch(tx).search(tx).orderByName(false).toList();
 
 			// create final array
 			JsonArray array = new JsonArray();
-			ids.forEach(res -> {
+			reports.forEach(res -> {
 				JsonObject o = new JsonObject();
 				o.addProperty(Tags.Json.ID, res.getId());
 				o.addProperty(Tags.Json.NAME, res.getName());
@@ -107,6 +107,7 @@ public class ReportResource {
 
 		JsonArray result = new JsonArray();
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
+			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
 			Report report = new Report(tx, id);
 
@@ -160,6 +161,7 @@ public class ReportResource {
 		}
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
+			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
 			// get report
 			Report report = new Report(tx, id);
@@ -259,6 +261,8 @@ public class ReportResource {
 		}
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
+			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
+
 			long start = System.nanoTime();
 
 			// get report
@@ -351,6 +355,7 @@ public class ReportResource {
 		}
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
+			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
 			// get report
 			Report report = new Report(tx, id);
