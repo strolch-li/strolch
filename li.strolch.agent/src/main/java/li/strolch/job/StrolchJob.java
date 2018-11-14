@@ -174,6 +174,7 @@ public abstract class StrolchJob implements Runnable {
 	 */
 	public void runNow() throws Exception {
 		doWork();
+		schedule();
 		if (this.lastException != null)
 			throw this.lastException;
 	}
