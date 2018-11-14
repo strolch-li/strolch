@@ -1168,6 +1168,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} catch (PrivilegeException e) {
 			throw e;
 		} catch (RuntimeException e) {
+			logger.error(e.getMessage(), e);
 			String msg = "User {0} failed to authenticate: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, username, e.getMessage());
 			throw new PrivilegeException(msg, e);
