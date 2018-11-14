@@ -6,6 +6,7 @@ import static li.strolch.search.PredicatesSupport.isEqualTo;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 import li.strolch.model.ParameterBag;
+import li.strolch.model.State;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
@@ -112,7 +113,20 @@ public class SearchBuilder {
 
 			String[] paramParts = parseParts(part);
 			if (paramParts.length != 3) {
-				se = add(and, negate, se, id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part))));
+
+				SearchExpression<T> expression;
+				if (part.startsWith("$state") && (search instanceof OrderSearch || search instanceof ActivitySearch)) {
+					part = part.substring("$state".length() + 1);
+					if (part.isEmpty() || State.parseAllowNull(part) == null) {
+						expression = id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
+					} else {
+						expression = state(isEqualTo(part));
+					}
+				} else {
+					expression = id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
+				}
+
+				se = add(and, negate, se, expression);
 			} else {
 				String bagId = paramParts[0];
 				String paramId = paramParts[1];

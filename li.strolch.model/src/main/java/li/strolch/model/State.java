@@ -161,7 +161,7 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #STARTING} or {@link #EXECUTION} or {@link #WARNING}
+	 * @return true if {@link #EXECUTION} or {@link #WARNING}
 	 */
 	public boolean canSetToError() {
 		return this == EXECUTION || this == WARNING || this == ERROR;
@@ -172,6 +172,15 @@ public enum State {
 	 */
 	public boolean canSetToExecuted() {
 		return this == EXECUTION || this == WARNING || this == STOPPED;
+	}
+
+	public static State parseAllowNull(String s) {
+		for (State state : values()) {
+			if (state.state.toLowerCase().equals(s.toLowerCase()))
+				return state;
+		}
+
+		return null;
 	}
 
 	public static State parse(String s) {
