@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 package li.strolch.service.api;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -33,18 +30,20 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- * Implementation of the Command Pattern to create re-usable components which are performed during
- * {@link StrolchTransaction StrolchTransactions} as part of the execution of {@link Service Services}
+ * Implementation of the Command Pattern to create re-usable components which are performed during {@link
+ * StrolchTransaction StrolchTransactions} as part of the execution of {@link Service Services}
  * </p>
- * 
+ *
  * <p>
  * <b>Note:</b> Do not call {@link #doCommand()} from {@link Service Services} or other places. Add {@link Command}
  * instances to a {@link StrolchTransaction} by calling {@link StrolchTransaction#addCommand(Command)}
  * </p>
- * 
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class Command implements Restrictable {
@@ -54,11 +53,23 @@ public abstract class Command implements Restrictable {
 	private final StrolchTransaction tx;
 
 	/**
-	 * Instantiate a new {@link Command}
-	 * 
-	 * @param container
-	 *            the {@link ComponentContainer} to access components at runtime
+	 * Instantiate a new command
+	 *
 	 * @param tx
+	 * 		the transaction
+	 */
+	public Command(StrolchTransaction tx) {
+		this.container = tx.getContainer();
+		this.tx = tx;
+	}
+
+	/**
+	 * Instantiate a new command
+	 *
+	 * @param container
+	 * 		the {@link ComponentContainer} to access components at runtime
+	 * @param tx
+	 * 		the transaction
 	 */
 	public Command(ComponentContainer container, StrolchTransaction tx) {
 		this.container = container;
@@ -66,16 +77,15 @@ public abstract class Command implements Restrictable {
 	}
 
 	/**
-	 * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
-	 * runtime
-	 * 
+	 * Allows the concrete command implementation access to {@link StrolchComponent StrolchComponents} at runtime
+	 *
 	 * @param clazz
-	 *            the type of component to be returned
-	 * 
+	 * 		the type of component to be returned
+	 *
 	 * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
-	 * 
+	 *
 	 * @throws IllegalArgumentException
-	 *             if the component with the given class does not exist
+	 * 		if the component with the given class does not exist
 	 */
 	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
@@ -90,13 +100,11 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Returns a {@link StrolchPolicy} instance from the given parameters
-	 * 
+	 *
 	 * @param policyClass
-	 *            the policy type to return. The simple name of the class determines the type of Policy to return.
-	 * @param policyDefs
-	 *            the policy defs from which to get the policy by using the simple name of the policy class to determine
-	 *            the type of policy to return
-	 * 
+	 * 		the policy type to return. The simple name of the class determines the type of Policy to return.
+	 * @param policyContainer the container
+	 *
 	 * @return the policy
 	 */
 	protected <T extends StrolchPolicy> T getPolicy(Class<T> policyClass, PolicyContainer policyContainer) {
@@ -110,12 +118,12 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Performs the given {@link SystemAction} as a system user with the given username
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected void runAs(String username, SystemAction action) throws PrivilegeException {
@@ -124,14 +132,14 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Performs the given {@link SystemAction} as a system user with the given username
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException {
@@ -140,12 +148,12 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as a system user with the given username
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException {
@@ -154,14 +162,14 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Performs the given {@link PrivilegedRunnableWithResult} as a system user with the given username
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param runnable
-	 *            the runnable to perform
-	 * 
+	 * 		the runnable to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected <V> V runWithResult(String username, PrivilegedRunnableWithResult<V> runnable) throws PrivilegeException {
@@ -170,12 +178,12 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected void runAsAgent(SystemAction action) throws PrivilegeException {
@@ -184,14 +192,14 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 *
 	 * @param username
-	 *            the name of the system user to perform the action as
+	 * 		the name of the system user to perform the action as
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected <V> V runAsAgentWithResult(SystemActionWithResult<V> action) throws PrivilegeException {
@@ -199,12 +207,12 @@ public abstract class Command implements Restrictable {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
-	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
+	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 *
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
@@ -212,14 +220,14 @@ public abstract class Command implements Restrictable {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user
-	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
-	 * 
+	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user {@link
+	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 *
 	 * @param action
-	 *            the action to perform
-	 * 
+	 * 		the action to perform
+	 *
 	 * @return the result
-	 * 
+	 *
 	 * @throws PrivilegeException
 	 */
 	protected <V> V runAsAgentWithResult(PrivilegedRunnableWithResult<V> runnable) throws PrivilegeException {
@@ -228,7 +236,7 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * Returns the {@link StrolchTransaction} bound to this {@link Command}'s runtime
-	 * 
+	 *
 	 * @return the {@link StrolchTransaction} bound to this {@link Command}'s runtime
 	 */
 	protected StrolchTransaction tx() {
@@ -261,11 +269,11 @@ public abstract class Command implements Restrictable {
 	 * <p>
 	 * Clients implement this method to perform the work which is to be done in this {@link Command}.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * <b>Note:</b> Do not call this method directly, this method is called by the {@link StrolchTransaction} when the
-	 * transaction is committed. Add this {@link Command} to the transaction by calling
-	 * {@link StrolchTransaction#addCommand(Command)}
+	 * transaction is committed. Add this {@link Command} to the transaction by calling {@link
+	 * StrolchTransaction#addCommand(Command)}
 	 * </p>
 	 */
 	public abstract void doCommand();
