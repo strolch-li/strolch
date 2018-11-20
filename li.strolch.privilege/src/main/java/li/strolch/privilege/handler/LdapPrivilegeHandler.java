@@ -118,6 +118,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 			// evaluate roles for this user
 			Attribute groupMembers = attrs.get("memberOf");
+			logger.info("User " + username + " is member of groups: ");
 			if (groupMembers != null) {
 				for (int i = 0; i < groupMembers.size(); i++) {
 
@@ -128,14 +129,13 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 					for (Rdn rdn : memberOfName.getRdns()) {
 						if (rdn.getType().equalsIgnoreCase("CN")) {
 							String groupName = rdn.getValue().toString();
+							logger.info(" - " + groupName);
 							Set<String> foundStrolchRoles = this.rolesForLdapGroups.get(groupName);
 							if (foundStrolchRoles != null)
 								strolchRoles.addAll(foundStrolchRoles);
 							break;
 						}
 					}
-
-					logger.info("User " + username + " is member of groups: " + memberOfLdapString);
 				}
 			}
 
