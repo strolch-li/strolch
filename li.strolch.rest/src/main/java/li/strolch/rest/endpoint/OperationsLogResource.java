@@ -33,7 +33,8 @@ public class OperationsLogResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getOperationLog(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("severity") String severityS,
-			@QueryParam("from") String fromS, @QueryParam("to") String toS, @QueryParam("query") String query) {
+			@QueryParam("exactSeverity") Boolean exactSeverity, @QueryParam("from") String fromS,
+			@QueryParam("to") String toS, @QueryParam("query") String query) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer().getPrivilegeHandler();
@@ -45,7 +46,12 @@ public class OperationsLogResource {
 
 		if (isNotEmpty(severityS)) {
 			LogSeverity severity = LogSeverity.valueOf(severityS);
-			messages = messages.filter(logMessage -> logMessage.getSeverity().compareTo(severity) >= 0);
+			messages = messages.filter(logMessage -> {
+				if (exactSeverity)
+					return logMessage.getSeverity().equals(severity);
+				else
+					return logMessage.getSeverity().compareTo(severity) >= 0;
+			});
 		}
 
 		if (isNotEmpty(query)) {
