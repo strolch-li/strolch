@@ -75,7 +75,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	@Override
 	public void setup(ComponentConfiguration configuration) {
 
-		this.realms = new HashMap<>();
+		this.realms = new HashMap<>(1);
 		String[] realms = configuration.getStringArray(PROP_REALMS, StrolchConstants.DEFAULT_REALM);
 		for (String realmName : realms) {
 

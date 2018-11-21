@@ -15,31 +15,19 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLED_DELAYED_OBSERVER_UPDATES;
-import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL;
-import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_AUDIT_TRAIL_FOR_READ;
-import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_OBSERVER_UPDATES;
-import static li.strolch.agent.impl.DefaultRealmHandler.PROP_ENABLE_VERSIONING;
+import static li.strolch.agent.impl.DefaultRealmHandler.*;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.AuditTrail;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.LockHandler;
-import li.strolch.agent.api.ObserverHandler;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchRealm;
+import li.strolch.agent.api.*;
 import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -115,7 +103,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		String propTryLockTime = makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
 		long time = configuration.getLong(propTryLockTime, 10L);
-		this.lockHandler = new DefaultLockHandler(this.realm, timeUnit, time);
+		this.lockHandler = new DefaultLockHandler(this.container.getAgent(), this.realm, timeUnit, time);
 
 		// versioning
 		String enableVersioningKey = makeRealmKey(getRealm(), PROP_ENABLE_VERSIONING);

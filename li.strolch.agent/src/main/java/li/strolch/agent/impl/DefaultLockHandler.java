@@ -16,14 +16,17 @@
 package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import li.strolch.agent.api.LockHandler;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchLockException;
 import li.strolch.model.Locator;
+import li.strolch.utils.collections.TypedTuple;
 import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +41,11 @@ public class DefaultLockHandler implements LockHandler {
 	private String realm;
 	private TimeUnit tryLockTimeUnit;
 	private long tryLockTime;
-	private Map<Locator, ReentrantLock> lockMap;
+	private Map<Locator, TypedTuple<ReentrantLock, Long>> lockMap;
 
-	public DefaultLockHandler(String realm, TimeUnit tryLockTimeUnit, long tryLockTime) {
+	public DefaultLockHandler(StrolchAgent agent, String realm, TimeUnit tryLockTimeUnit, long tryLockTime) {
 
+		DBC.PRE.assertNotNull("agent must be set!", agent); //$NON-NLS-1$
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("TimeUnit must be set!", tryLockTimeUnit); //$NON-NLS-1$
 		DBC.PRE.assertNotEquals("try lock time must not be 0", 0, tryLockTime); //$NON-NLS-1$
@@ -50,6 +54,27 @@ public class DefaultLockHandler implements LockHandler {
 		this.tryLockTimeUnit = tryLockTimeUnit;
 		this.tryLockTime = tryLockTime;
 		this.lockMap = new ConcurrentHashMap<>();
+
+		agent.getScheduledExecutor().scheduleAtFixedRate(this::cleanupOldLocks, 1, 1, TimeUnit.HOURS);
+	}
+
+	private void cleanupOldLocks() {
+
+		Map<Locator, TypedTuple<ReentrantLock, Long>> lockMap;
+		synchronized (this.lockMap) {
+			lockMap = new HashMap<>(this.lockMap);
+		}
+
+		long maxAge = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1);
+		long count = 0;
+		for (Map.Entry<Locator, TypedTuple<ReentrantLock, Long>> entry : lockMap.entrySet()) {
+			if (!entry.getValue().getFirst().isLocked() && entry.getValue().getSecond() <= maxAge) {
+				this.lockMap.remove(entry.getKey());
+				count++;
+			}
+		}
+
+		logger.info("Pruned " + count + " Locator locks.");
 	}
 
 	public String getRealm() {
@@ -58,13 +83,15 @@ public class DefaultLockHandler implements LockHandler {
 
 	@Override
 	public void lock(Locator locator) throws StrolchLockException {
-		ReentrantLock lock = this.lockMap.computeIfAbsent(locator, l -> new ReentrantLock(true));
-		lock(this.tryLockTimeUnit, this.tryLockTime, lock, locator);
+		TypedTuple<ReentrantLock, Long> tuple = this.lockMap
+				.computeIfAbsent(locator, l -> new TypedTuple<>(new ReentrantLock(true), System.currentTimeMillis()));
+		lock(this.tryLockTimeUnit, this.tryLockTime, tuple, locator);
 	}
 
 	@Override
 	public void unlock(Locator locator) throws StrolchLockException {
-		ReentrantLock lock = this.lockMap.get(locator);
+		TypedTuple<ReentrantLock, Long> tuple = this.lockMap.get(locator);
+		ReentrantLock lock = tuple.getFirst();
 		if (lock == null || !lock.isHeldByCurrentThread()) {
 			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator)); //$NON-NLS-1$
 		} else {
@@ -75,7 +102,8 @@ public class DefaultLockHandler implements LockHandler {
 
 	@Override
 	public void releaseLock(Locator locator) throws StrolchLockException {
-		ReentrantLock lock = this.lockMap.get(locator);
+		TypedTuple<ReentrantLock, Long> tuple = this.lockMap.get(locator);
+		ReentrantLock lock = tuple.getFirst();
 		if (lock == null) {
 			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator));
 		} else if (!lock.isHeldByCurrentThread()) {
@@ -92,15 +120,17 @@ public class DefaultLockHandler implements LockHandler {
 	/**
 	 * @see java.util.concurrent.locks.ReentrantLock#tryLock(long, TimeUnit)
 	 */
-	private void lock(TimeUnit timeUnit, long tryLockTime, ReentrantLock lock, Locator locator)
+	private void lock(TimeUnit timeUnit, long tryLockTime, TypedTuple<ReentrantLock, Long> tuple, Locator locator)
 			throws StrolchLockException {
 		try {
 
-			if (!lock.tryLock(tryLockTime, timeUnit)) {
+			if (!tuple.getFirst().tryLock(tryLockTime, timeUnit)) {
 				String msg = "Failed to acquire lock after {0}s for {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, timeUnit.toSeconds(tryLockTime), locator);
 				throw new StrolchLockException(msg);
 			}
+
+			tuple.setSecond(System.currentTimeMillis());
 
 			// logger.debug("locked " + locator); //$NON-NLS-1$
 
