@@ -137,7 +137,7 @@ public class StrolchAgent {
 		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
 		ScheduledExecutorService executor = this.scheduledExecutors.get(poolName);
 		if (executor == null) {
-			executor = Executors.newScheduledThreadPool(0, new ThreadPoolFactory(poolName));
+			executor = Executors.newScheduledThreadPool(4, new ThreadPoolFactory(poolName));
 			this.scheduledExecutors.put(poolName, executor);
 		}
 
