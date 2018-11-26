@@ -83,10 +83,13 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
-	public void setValue(List<String> value) {
+	public void setValue(List<String> values) {
 		assertNotReadonly();
-		validateValue(value);
-		this.value = new ArrayList<>(value);
+		validateValue(values);
+		for (String value : values) {
+			DBC.PRE.assertNotEmpty("empty values not allowed!", value);
+		}
+		this.value = new ArrayList<>(values);
 	}
 
 	@Override
@@ -103,19 +106,24 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	@Override
 	public void addValue(String value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotEmpty("empty values not allowed!", value);
 		this.value.add(value);
 	}
 
 	@Override
 	public void addAllValues(List<String> values) {
 		assertNotReadonly();
-		this.value.addAll(values);
+		for (String value : values) {
+			DBC.PRE.assertNotEmpty("empty values not allowed!", value);
+			this.value.add(value);
+		}
 	}
 
 	@Override
 	public void addAllValuesIfNotContains(List<String> values) {
 		assertNotReadonly();
 		for (String value : values) {
+			DBC.PRE.assertNotEmpty("empty values not allowed!", value);
 			if (!this.value.contains(value))
 				this.value.add(value);
 		}
@@ -124,6 +132,7 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	@Override
 	public boolean addValueIfNotContains(String value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotEmpty("empty values not allowed!", value);
 
 		if (this.value.contains(value))
 			return false;
@@ -213,7 +222,9 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 
 		List<String> values = new ArrayList<>();
 		for (String val : valueArr) {
-			values.add(val.trim());
+			String trim = val.trim();
+			if (!trim.isEmpty())
+				values.add(trim);
 		}
 		return values;
 	}
@@ -223,5 +234,4 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((StringListParameter) o).getValue().size());
 	}
-
 }

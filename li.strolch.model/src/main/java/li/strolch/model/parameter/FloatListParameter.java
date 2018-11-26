@@ -46,13 +46,13 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	 * 		the id
 	 * @param name
 	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param values
+	 * 		the values
 	 */
-	public FloatListParameter(String id, String name, List<Double> value) {
+	public FloatListParameter(String id, String name, List<Double> values) {
 		super(id, name);
 
-		setValue(value);
+		setValue(values);
 	}
 
 	@Override
@@ -83,10 +83,13 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
-	public void setValue(List<Double> value) {
+	public void setValue(List<Double> values) {
 		assertNotReadonly();
-		validateValue(value);
-		this.value = new ArrayList<>(value);
+		validateValue(values);
+		for (Double value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
+		}
+		this.value = new ArrayList<>(values);
 	}
 
 	@Override
@@ -103,19 +106,24 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	@Override
 	public void addValue(Double value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotNull("null values not allowed!", value);
 		this.value.add(value);
 	}
 
 	@Override
 	public void addAllValues(List<Double> values) {
 		assertNotReadonly();
-		this.value.addAll(values);
+		for (Double value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
+			this.value.add(value);
+		}
 	}
 
 	@Override
 	public void addAllValuesIfNotContains(List<Double> values) {
 		assertNotReadonly();
 		for (Double value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
 			if (!this.value.contains(value))
 				this.value.add(value);
 		}
@@ -124,6 +132,7 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	@Override
 	public boolean addValueIfNotContains(Double value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotNull("null values not allowed!", value);
 
 		if (this.value.contains(value))
 			return false;

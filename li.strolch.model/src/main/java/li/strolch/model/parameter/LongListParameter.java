@@ -83,10 +83,13 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
-	public void setValue(List<Long> value) {
+	public void setValue(List<Long> values) {
 		assertNotReadonly();
-		validateValue(value);
-		this.value = new ArrayList<>(value);
+		validateValue(values);
+		for (Long value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
+		}
+		this.value = new ArrayList<>(values);
 	}
 
 	@Override
@@ -103,12 +106,17 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	@Override
 	public void addValue(Long value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotNull("null values not allowed!", value);
 		this.value.add(value);
 	}
 
 	@Override
 	public void addAllValues(List<Long> values) {
 		assertNotReadonly();
+		for (Long value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
+			this.value.add(value);
+		}
 		this.value.addAll(values);
 	}
 
@@ -116,6 +124,7 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	public void addAllValuesIfNotContains(List<Long> values) {
 		assertNotReadonly();
 		for (Long value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
 			if (!this.value.contains(value))
 				this.value.add(value);
 		}
@@ -124,6 +133,7 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	@Override
 	public boolean addValueIfNotContains(Long value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotNull("null values not allowed!", value);
 
 		if (this.value.contains(value))
 			return false;

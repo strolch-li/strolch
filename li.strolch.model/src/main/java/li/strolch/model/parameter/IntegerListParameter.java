@@ -83,10 +83,13 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
-	public void setValue(List<Integer> value) {
+	public void setValue(List<Integer> values) {
 		assertNotReadonly();
-		validateValue(value);
-		this.value = new ArrayList<>(value);
+		validateValue(values);
+		for (Integer value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
+		}
+		this.value = new ArrayList<>(values);
 	}
 
 	@Override
@@ -103,19 +106,24 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	@Override
 	public void addValue(Integer value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotNull("null values not allowed!", value);
 		this.value.add(value);
 	}
 
 	@Override
 	public void addAllValues(List<Integer> values) {
 		assertNotReadonly();
-		this.value.addAll(values);
+		for (Integer value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
+			this.value.add(value);
+		}
 	}
 
 	@Override
 	public void addAllValuesIfNotContains(List<Integer> values) {
 		assertNotReadonly();
 		for (Integer value : values) {
+			DBC.PRE.assertNotNull("null values not allowed!", value);
 			if (!this.value.contains(value))
 				this.value.add(value);
 		}
@@ -124,6 +132,7 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	@Override
 	public boolean addValueIfNotContains(Integer value) {
 		assertNotReadonly();
+		DBC.PRE.assertNotNull("null values not allowed!", value);
 
 		if (this.value.contains(value))
 			return false;
