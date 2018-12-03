@@ -1,12 +1,14 @@
 package li.strolch.search;
 
 import java.util.Comparator;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.utils.collections.CollectionsHelper;
 
 /**
  * A search result for {@link StrolchSearch} for {@link StrolchRootElement} adding methods specific to root element
@@ -99,6 +101,19 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 
 		});
 		return this;
+	}
+
+	/**
+	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream does not
+	 * contain 1 and only 1 element
+	 *
+	 * @return the single element in the stream
+	 *
+	 * @throws IllegalStateException
+	 * 		if not 1 and only 1 element is in the stream
+	 */
+	public T toSingleton(Supplier<String> errorMsgSupplier) throws IllegalStateException {
+		return this.stream.collect(CollectionsHelper.singletonCollector(errorMsgSupplier));
 	}
 
 	/**
