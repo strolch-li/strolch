@@ -7,9 +7,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import li.strolch.utils.collections.CollectionsHelper;
 import li.strolch.utils.collections.Paging;
 
 /**
@@ -131,6 +133,19 @@ public class SearchResult<T> {
 	 */
 	public Paging<T> toPaging(int offset, int limit) {
 		return Paging.asPage(this.stream.collect(Collectors.toList()), offset, limit);
+	}
+
+	/**
+	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream does not
+	 * contain 1 and only 1 element
+	 *
+	 * @return the single element in the stream
+	 *
+	 * @throws IllegalStateException
+	 * 		if not 1 and only 1 element is in the stream
+	 */
+	public T toSingleton(Supplier<String> errorMsgSupplier) throws IllegalStateException {
+		return this.stream.collect(CollectionsHelper.singletonCollector(errorMsgSupplier));
 	}
 
 	/**

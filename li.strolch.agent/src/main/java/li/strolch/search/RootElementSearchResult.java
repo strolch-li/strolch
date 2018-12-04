@@ -104,19 +104,6 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	}
 
 	/**
-	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream does not
-	 * contain 1 and only 1 element
-	 *
-	 * @return the single element in the stream
-	 *
-	 * @throws IllegalStateException
-	 * 		if not 1 and only 1 element is in the stream
-	 */
-	public T toSingleton(Supplier<String> errorMsgSupplier) throws IllegalStateException {
-		return this.stream.collect(CollectionsHelper.singletonCollector(errorMsgSupplier));
-	}
-
-	/**
 	 * Transforms this search result to be a search result returning elements with the given visitor
 	 *
 	 * @param visitor
