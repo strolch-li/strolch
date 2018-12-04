@@ -10,11 +10,11 @@ import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
-public class SetActionToWarningCommand extends ExecutionCommand {
+public class SetActionToClosedCommand extends ExecutionCommand {
 
 	private Action action;
 
-	public SetActionToWarningCommand(ComponentContainer container, StrolchTransaction tx) {
+	public SetActionToClosedCommand(ComponentContainer container, StrolchTransaction tx) {
 		super(container, tx);
 	}
 
@@ -29,9 +29,9 @@ public class SetActionToWarningCommand extends ExecutionCommand {
 		tx().lock(this.action.getRootElement());
 		tx().lock(getResourceLocator(this.action));
 
-		if (!this.action.getState().canSetToWarning()) {
+		if (!this.action.getState().canSetToClosed()) {
 			String msg = "Current state is {0} and can not be changed to {1} for action {2}";
-			msg = MessageFormat.format(msg, this.action.getState(), State.WARNING, this.action.getLocator());
+			msg = MessageFormat.format(msg, this.action.getState(), State.CLOSED, this.action.getLocator());
 			throw new StrolchException(msg);
 		}
 	}
@@ -42,15 +42,16 @@ public class SetActionToWarningCommand extends ExecutionCommand {
 		tx().lock(rootElement);
 		tx().lock(getResourceLocator(this.action));
 
-		if (this.action.getState() == State.WARNING) {
-			logger.warn("Action " + this.action.getLocator() + " is already in WARNING! Not changing.");
+		if (this.action.getState() == State.CLOSED) {
+			logger.warn("Action " + this.action.getLocator() + " is already in CLOSED! Not changing.");
 			return;
 		}
 
 		State currentState = rootElement.getState();
 
-		getExecutionPolicy(this.action).toWarning(this.action);
-		getConfirmationPolicy(this.action).toWarning(this.action);
+		this.action.setState(State.CLOSED);
+
+		getConfirmationPolicy(this.action).toClosed(this.action);
 
 		updateOrderState(rootElement, currentState, rootElement.getState());
 	}

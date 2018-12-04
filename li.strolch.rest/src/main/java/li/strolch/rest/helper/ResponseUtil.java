@@ -86,7 +86,11 @@ public class ResponseUtil {
 		return toResponse(member, list.stream().map(toJson).collect(Collectors.toList()));
 	}
 
-	public static Response toResponse(String member, List<JsonObject> jsonObjects) {
+	public static Response toResponse(List<? extends JsonElement> jsonObjects) {
+		return toResponse(DATA, jsonObjects);
+	}
+
+	public static Response toResponse(String member, List<? extends JsonElement> jsonObjects) {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, StringHelper.DASH);
 

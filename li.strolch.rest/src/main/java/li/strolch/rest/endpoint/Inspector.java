@@ -415,7 +415,7 @@ public class Inspector {
 		// build JSON response
 		ResourceVisitor<JsonObject> visitor;
 		if (overview == null || !overview) {
-			visitor = new StrolchRootElementToJsonVisitor().asResourceVisitor();
+			visitor = new StrolchRootElementToJsonVisitor().withLocator().asResourceVisitor();
 		} else {
 			visitor = e -> {
 				JsonObject jsonObject = new JsonObject();
@@ -423,6 +423,7 @@ public class Inspector {
 				jsonObject.addProperty(Json.ID, e.getId());
 				jsonObject.addProperty(Json.NAME, e.getName());
 				jsonObject.addProperty(Json.TYPE, e.getType());
+				jsonObject.addProperty(Json.LOCATOR, e.getLocator().toString());
 				return jsonObject;
 			};
 		}
@@ -459,7 +460,7 @@ public class Inspector {
 		// build JSON response
 		OrderVisitor<JsonObject> visitor;
 		if (overview == null || !overview) {
-			visitor = new StrolchRootElementToJsonVisitor().asOrderVisitor();
+			visitor = new StrolchRootElementToJsonVisitor().withLocator().asOrderVisitor();
 		} else {
 			visitor = e -> {
 				JsonObject jsonObject = new JsonObject();
@@ -467,6 +468,7 @@ public class Inspector {
 				jsonObject.addProperty(Json.ID, e.getId());
 				jsonObject.addProperty(Json.NAME, e.getName());
 				jsonObject.addProperty(Json.TYPE, e.getType());
+				jsonObject.addProperty(Json.LOCATOR, e.getLocator().toString());
 				jsonObject.addProperty(Json.STATE, e.getState().name());
 				jsonObject.addProperty(Json.DATE, ISO8601FormatFactory.getInstance().formatDate(e.getDate()));
 				return jsonObject;
@@ -505,7 +507,7 @@ public class Inspector {
 		// build JSON response
 		ActivityVisitor<JsonObject> visitor;
 		if (overview == null || !overview) {
-			visitor = new StrolchRootElementToJsonVisitor().asActivityVisitor();
+			visitor = new StrolchRootElementToJsonVisitor().withLocator().asActivityVisitor();
 		} else {
 			visitor = e -> {
 				JsonObject jsonObject = new JsonObject();
@@ -513,6 +515,7 @@ public class Inspector {
 				jsonObject.addProperty(Json.ID, e.getId());
 				jsonObject.addProperty(Json.NAME, e.getName());
 				jsonObject.addProperty(Json.TYPE, e.getType());
+				jsonObject.addProperty(Json.LOCATOR, e.getLocator().toString());
 				jsonObject.addProperty(Json.STATE, e.getState().name());
 				jsonObject.addProperty(Json.TIME_ORDERING, e.getTimeOrdering().name());
 				return jsonObject;
@@ -639,7 +642,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 		if (Boolean.parseBoolean(flat))
 			visitor.flat();
 
@@ -682,7 +685,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 		if (Boolean.parseBoolean(flat))
 			visitor.flat();
 		return Response.ok().entity(toString(order.accept(visitor))).build();
@@ -724,7 +727,7 @@ public class Inspector {
 			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
 		}
 
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion();
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 		if (Boolean.parseBoolean(flat))
 			visitor.flat();
 		return Response.ok().entity(toString(activity.accept(visitor))).build();
@@ -818,7 +821,7 @@ public class Inspector {
 		// do service
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
@@ -895,7 +898,7 @@ public class Inspector {
 		// do service
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
@@ -972,7 +975,7 @@ public class Inspector {
 		// do service
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
@@ -1073,7 +1076,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
@@ -1099,7 +1102,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
@@ -1152,7 +1155,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
@@ -1178,7 +1181,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
@@ -1233,7 +1236,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
@@ -1259,7 +1262,7 @@ public class Inspector {
 
 		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
-			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withVersion();
+			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
 				toJsonVisitor.flat();
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();

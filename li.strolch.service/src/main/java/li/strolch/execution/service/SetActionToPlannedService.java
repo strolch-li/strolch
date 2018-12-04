@@ -1,6 +1,6 @@
 package li.strolch.execution.service;
 
-import li.strolch.execution.command.SetActionToStoppedCommand;
+import li.strolch.execution.command.SetActionToPlannedCommand;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.LocatorArgument;
@@ -8,7 +8,7 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
-public class SetActionToStoppedService extends AbstractService<LocatorArgument, ServiceResult> {
+public class SetActionToPlannedService extends AbstractService<LocatorArgument, ServiceResult> {
 
 	@Override
 	protected ServiceResult getResultInstance() {
@@ -27,7 +27,7 @@ public class SetActionToStoppedService extends AbstractService<LocatorArgument, 
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToStoppedCommand command = new SetActionToStoppedCommand(getContainer(), tx);
+			SetActionToPlannedCommand command = new SetActionToPlannedCommand(getContainer(), tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

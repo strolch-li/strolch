@@ -147,31 +147,66 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #EXECUTION}
+	 * @return true if {@link #CREATED} or {@link #PLANNING} or {@link #PLANNED} or {@link #STOPPED}
+	 */
+	public boolean canSetToCreated() {
+		return this == CREATED || this == PLANNING || this == PLANNED || this == STOPPED;
+	}
+
+	/**
+	 * @return true if {@link #CREATED} or {@link #PLANNING}
+	 */
+	public boolean canSetToPlanning() {
+		return this == CREATED || this == PLANNING;
+	}
+
+	/**
+	 * @return true if {@link #CREATED} or {@link #PLANNING} or {@link #PLANNED}
+	 */
+	public boolean canSetToPlanned() {
+		return this == CREATED || this == PLANNING || this == PLANNED;
+	}
+
+	/**
+	 * @return true if {@link #CREATED} or {@link #PLANNING} or {@link #PLANNED} or {@link #EXECUTION}
+	 */
+	public boolean canSetToExecution() {
+		return this == CREATED || this == PLANNING || this == PLANNED || this == EXECUTION;
+	}
+
+	/**
+	 * @return true if {@link #EXECUTION} or {@link #WARNING}
 	 */
 	public boolean canSetToWarning() {
 		return this == EXECUTION || this == WARNING;
 	}
 
 	/**
-	 * @return true if {@link #ERROR} or {@link #STOPPED}
+	 * @return true if {@link #ERROR} or {@link #STOPPED} or {@link #WARNING}
 	 */
 	public boolean canSetToStopped() {
 		return this == ERROR || this == State.STOPPED || this == State.WARNING;
 	}
 
 	/**
-	 * @return true if {@link #EXECUTION} or {@link #WARNING}
+	 * @return true if {@link #EXECUTION} or {@link #WARNING} or {@link #ERROR}
 	 */
 	public boolean canSetToError() {
 		return this == EXECUTION || this == WARNING || this == ERROR;
 	}
 
 	/**
-	 * @return true if {@link #EXECUTION} or {@link #WARNING} or {@link #STOPPED}
+	 * @return true if {@link #EXECUTION} or {@link #WARNING} or {@link #STOPPED} or {@link #EXECUTED}
 	 */
 	public boolean canSetToExecuted() {
-		return this == EXECUTION || this == WARNING || this == STOPPED;
+		return this == EXECUTION || this == WARNING || this == STOPPED || this == EXECUTED;
+	}
+
+	/**
+	 * @return true if {@link #EXECUTED}
+	 */
+	public boolean canSetToClosed() {
+		return this == EXECUTED;
 	}
 
 	public static State parseAllowNull(String s) {

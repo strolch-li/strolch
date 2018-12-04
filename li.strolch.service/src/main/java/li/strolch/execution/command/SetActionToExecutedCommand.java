@@ -30,7 +30,7 @@ public class SetActionToExecutedCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (!this.action.getState().canSetToExecuted()) {
-			String msg = "Current state is {0} canot be changed to {1} for action {2}";
+			String msg = "Current state is {0} can not be changed to {1} for action {2}";
 			msg = MessageFormat.format(msg, this.action.getState(), State.EXECUTED, this.action.getLocator());
 			throw new StrolchException(msg);
 		}
@@ -41,6 +41,11 @@ public class SetActionToExecutedCommand extends ExecutionCommand {
 		Activity rootElement = this.action.getRootElement();
 		tx().lock(rootElement);
 		tx().lock(getResourceLocator(this.action));
+
+		if (this.action.getState() == State.EXECUTED) {
+			logger.warn("Action " + this.action.getLocator() + " is already in EXECUTED! Not changing.");
+			return;
+		}
 
 		State currentState = rootElement.getState();
 

@@ -39,6 +39,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(AuthenticationService.class);
 		restfulClasses.add(StrolchJobsResource.class);
 		restfulClasses.add(ReportResource.class);
+		restfulClasses.add(ControlResource.class);
 		restfulClasses.add(Inspector.class);
 		restfulClasses.add(VersionQuery.class);
 		restfulClasses.add(ModelQuery.class);

@@ -2,6 +2,8 @@ package li.strolch.execution;
 
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +24,6 @@ import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
@@ -82,6 +83,16 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public Set<Locator> getActiveActivitiesLocator(String realm) {
+		if (this.registeredActivities == null || !this.registeredActivities.containsSet(realm))
+			return Collections.emptySet();
+
+		synchronized (this.registeredActivities) {
+			return new HashSet<>(this.registeredActivities.getSet(realm));
+		}
+	}
+
+	@Override
 	public void addForExecution(String realm, Locator activityLoc) {
 		Locator rootElemLoc = activityLoc.trim(3);
 		synchronized (this.registeredActivities) {
@@ -98,48 +109,56 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 	}
 
+	@Override
+	public void clearAllCurrentExecutions(String realm) {
+		this.registeredActivities.removeSet(realm);
+	}
+
 	private void restartActivityExecution(PrivilegeContext ctx) {
 
 		// iterate the realms
 		for (String realmName : getContainer().getRealmNames()) {
-
-			// open a TX for each realm
-			try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate())) {
-
-				// iterate all activities
-				tx.streamActivities().forEach(activity -> {
-
-					if (activity.isReadOnly())
-						activity = activity.getClone(true);
-
-					// we only want to restart activities which were in execution
-					State state = activity.getState();
-					if (!state.inExecutionPhase())
-						return;
-
-					logger.info("Starting Execution of " + activity.getLocator() + " on realm " + realmName);
-
-					// Activities need to be in state STOPPED to restart
-					if (state == State.ERROR) {
-						activity.getActionsWithState(State.ERROR).forEach(a -> a.setState(State.STOPPED));
-					} else if (state == State.WARNING) {
-						activity.getActionsWithState(State.WARNING).forEach(a -> a.setState(State.STOPPED));
-					} else if (state == State.EXECUTION) {
-						activity.getActionsWithState(State.EXECUTION).forEach(a -> a.setState(State.STOPPED));
-					}
-					tx.update(activity);
-
-					// register for execution
-					this.registeredActivities.addElement(realmName, activity.getLocator());
-				});
-
-				// commit changes to state
-				tx.commitOnClose();
-			}
-
-			// trigger execution of the registered activities
-			triggerExecution(realmName);
+			reloadActivitiesInExecution(ctx, realmName);
 		}
+	}
+
+	@Override
+	public void reloadActivitiesInExecution(PrivilegeContext ctx, String realmName) {
+		try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate())) {
+
+			// iterate all activities
+			tx.streamActivities().forEach(activity -> {
+
+				if (activity.isReadOnly())
+					activity = activity.getClone(true);
+
+				// we only want to restart activities which were in execution
+				State state = activity.getState();
+				if (!state.inExecutionPhase())
+					return;
+
+				logger.info("Starting Execution of " + activity.getLocator() + " on realm " + realmName);
+
+				// Activities need to be in state STOPPED to restart
+				if (state == State.ERROR) {
+					activity.getActionsWithState(State.ERROR).forEach(a -> a.setState(State.STOPPED));
+				} else if (state == State.WARNING) {
+					activity.getActionsWithState(State.WARNING).forEach(a -> a.setState(State.STOPPED));
+				} else if (state == State.EXECUTION) {
+					activity.getActionsWithState(State.EXECUTION).forEach(a -> a.setState(State.STOPPED));
+				}
+				tx.update(activity);
+
+				// register for execution
+				this.registeredActivities.addElement(realmName, activity.getLocator());
+			});
+
+			// commit changes to state
+			tx.commitOnClose();
+		}
+
+		// trigger execution of the registered activities
+		triggerExecution(realmName);
 	}
 
 	@Override

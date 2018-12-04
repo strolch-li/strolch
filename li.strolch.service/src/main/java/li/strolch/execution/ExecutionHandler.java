@@ -1,5 +1,7 @@
 package li.strolch.execution;
 
+import java.util.Set;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.execution.policy.DurationExecution;
@@ -9,6 +11,7 @@ import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
+import li.strolch.privilege.model.PrivilegeContext;
 
 /**
  * <p>
@@ -56,6 +59,24 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public abstract void removeFromExecution(String realm, Locator activityLoc);
 
 	/**
+	 * Restarts all existing Activities which are not yet executed and already in state of execution
+	 *
+	 * @param ctx
+	 * 		the privilege context
+	 * @param realm
+	 * 		the realm for which to restart activities
+	 */
+	public abstract void reloadActivitiesInExecution(PrivilegeContext ctx, String realm);
+
+	/**
+	 * Removes all currently registered {@link Activity Activities} from execution
+	 *
+	 * @param realm
+	 * 		the realm for which to restart activities
+	 */
+	public abstract void clearAllCurrentExecutions(String realm);
+
+	/**
 	 * Triggers a to execution for all registered activities in the given realm
 	 *
 	 * @param realm
@@ -72,6 +93,17 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * 		the {@link Locator} of the {@link Activity}
 	 */
 	public abstract void archiveActivity(String realm, Locator activityLoc);
+
+	/**
+	 * Returns the {@link Set} of {@link Locator Locators} of {@link Activity Activities} which are registered for
+	 * execution for the given realm
+	 *
+	 * @param realm
+	 * 		the realm for which to return the registered activities
+	 *
+	 * @return a set of locators
+	 */
+	public abstract Set<Locator> getActiveActivitiesLocator(String realm);
 
 	/**
 	 * <p>
