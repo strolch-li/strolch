@@ -71,6 +71,16 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 			this.changes = new ArrayList<>();
 	}
 
+	@Override
+	public boolean isAction() {
+		return true;
+	}
+
+	@Override
+	public boolean isActivity() {
+		return false;
+	}
+
 	/**
 	 * @return the id of the {@link Resource} the {@link Action} acts on
 	 */
@@ -88,7 +98,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @return the current <code>State</code> of the a<code>Action</code>
+	 * @return the current {@code State} of the a {@code Action}
 	 */
 	@Override
 	public State getState() {
@@ -97,7 +107,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param state
-	 * 		the target <code>State</code> of the a<code>Action</code>
+	 * 		the target {@code State} of the a {@code Action}
 	 */
 	public void setState(State state) {
 		assertNotReadonly();
@@ -105,7 +115,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @return the type of the <code>Resource</code> this <code>Action</code> acts on
+	 * @return the type of the {@code Resource} this {@code Action} acts on
 	 */
 	public String getResourceType() {
 		return this.resourceType;
@@ -131,7 +141,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param change
-	 * 		<code>IValueChange</code> to be applied to the <code>Resource</code>
+	 * 		{@code IValueChange} to be applied to the {@code Resource}
 	 *
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
@@ -142,7 +152,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @return the list of <code>IValueChange</code> attached to the <code>Action</code> start
+	 * @return the list of {@code IValueChange} attached to the {@code Action} start
 	 */
 	public List<IValueChange<? extends IValue<?>>> getChanges() {
 		if (this.changes == null)
@@ -274,7 +284,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public Long getStart() {
-		Long start = Long.MAX_VALUE;
+		long start = Long.MAX_VALUE;
 		if (this.changes == null)
 			return start;
 		for (IValueChange<?> change : this.changes) {
@@ -285,7 +295,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public Long getEnd() {
-		Long end = 0L;
+		long end = 0L;
 		if (this.changes == null)
 			return end;
 		for (IValueChange<?> change : this.changes) {

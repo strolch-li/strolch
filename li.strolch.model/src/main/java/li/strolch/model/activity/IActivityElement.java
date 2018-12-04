@@ -32,24 +32,35 @@ public interface IActivityElement extends StrolchElement {
 	/**
 	 * @return the start time of this element
 	 */
-	public Long getStart();
+	Long getStart();
 
 	/**
 	 * @return the end time of this element
 	 */
-	public Long getEnd();
+	Long getEnd();
 
 	/**
 	 * @return the {@link State} of this element
 	 */
-	public State getState();
+	State getState();
+
+	/**
+	 * @return true if this element is an {@link Action}
+	 */
+	boolean isAction();
+
+	/**
+	 * @return true if this element is an {@link Activity}
+	 */
+	boolean isActivity();
 
 	/**
 	 * Set the parent
 	 *
 	 * @param activity
+	 * 		the activity to set as parent
 	 */
-	public void setParent(Activity activity);
+	void setParent(Activity activity);
 
 	/**
 	 * <p>
@@ -63,7 +74,7 @@ public interface IActivityElement extends StrolchElement {
 	 *
 	 * @see GroupedParameterizedElement#getParameter(String, String)
 	 */
-	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey);
+	<U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey);
 
 	/**
 	 * <p>
@@ -72,22 +83,22 @@ public interface IActivityElement extends StrolchElement {
 	 * </p>
 	 *
 	 * <p>
-	 * If the parameter does not exist and <code>assertExists</code> is true, then an
+	 * If the parameter does not exist and {@code assertExists} is true, then an
 	 * </p>
 	 *
 	 * @see GroupedParameterizedElement#getParameter(String, String, boolean)
 	 */
-	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey, boolean assertExists)
+	<U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey, boolean assertExists)
 			throws StrolchModelException;
 
 	@Override
-	public Activity getParent();
+	Activity getParent();
 
 	@Override
-	public Activity getRootElement();
+	Activity getRootElement();
 
 	@Override
-	public IActivityElement getClone();
+	IActivityElement getClone();
 
 	/**
 	 * Implements the visitor pattern. Concrete implementation will call the proper method on the visitor
@@ -97,5 +108,5 @@ public interface IActivityElement extends StrolchElement {
 	 *
 	 * @return the result of the visitor being accepted
 	 */
-	public <T> T accept(StrolchElementVisitor<T> visitor);
+	<T> T accept(StrolchElementVisitor<T> visitor);
 }

@@ -115,6 +115,16 @@ public class Activity extends AbstractStrolchRootElement
 		}
 	}
 
+	@Override
+	public boolean isAction() {
+		return false;
+	}
+
+	@Override
+	public boolean isActivity() {
+		return true;
+	}
+
 	/**
 	 * Returns true if this {@link Activity} contains any children i.e. any of {@link Action} or {@link Activity}
 	 *
@@ -139,7 +149,7 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	/**
-	 * add an activity element to the <code>LinkedHashMap</code> of <code>IActivityElements</code>
+	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements}
 	 *
 	 * @param activityElement
 	 * 		the element to add
@@ -185,10 +195,10 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	/**
-	 * get <code>IActivityElement</code> by id
+	 * get {@code IActivityElement} by id
 	 *
 	 * @param id
-	 * 		the id of the <code>IActivityElement</code>
+	 * 		the id of the {@code IActivityElement}
 	 *
 	 * @return IActivityElement
 	 */
@@ -291,7 +301,7 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	/**
-	 * @return get the <code>LinkedHashMap</code> of <code>IActivityElements</code>
+	 * @return get the {@code LinkedHashMap} of {@code IActivityElements}
 	 */
 	public Map<String, IActivityElement> getElements() {
 		if (this.elements == null)
@@ -385,7 +395,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public Long getStart() {
-		Long start = Long.MAX_VALUE;
+		long start = Long.MAX_VALUE;
 		if (this.elements == null)
 			return start;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
@@ -398,7 +408,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public Long getEnd() {
-		Long end = 0L;
+		long end = 0L;
 		if (this.elements == null)
 			return end;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
