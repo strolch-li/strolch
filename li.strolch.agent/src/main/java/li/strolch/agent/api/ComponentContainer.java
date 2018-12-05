@@ -18,20 +18,25 @@ package li.strolch.agent.api;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.runtime.privilege.PrivilegedRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 
 /**
+ * Strolch's Container for all its components
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ComponentContainer {
 
-	public abstract StrolchAgent getAgent();
+	StrolchAgent getAgent();
 
-	public abstract ComponentState getState();
+	ComponentState getState();
 
-	public abstract boolean hasComponent(Class<?> clazz);
+	boolean hasComponent(Class<?> clazz);
 
 	/**
 	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
@@ -45,13 +50,13 @@ public interface ComponentContainer {
 	 * @throws IllegalArgumentException
 	 * 		if the component does not exist
 	 */
-	public abstract <T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
+	<T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
 
-	public abstract PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException;
+	PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException;
 
-	public abstract Set<Class<?>> getComponentTypes();
+	Set<Class<?>> getComponentTypes();
 
-	public abstract Set<String> getRealmNames();
+	Set<String> getRealmNames();
 
 	/**
 	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constant {@link
@@ -65,7 +70,7 @@ public interface ComponentContainer {
 	 * @throws StrolchException
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
-	public abstract StrolchRealm getRealm(String realm) throws StrolchException;
+	StrolchRealm getRealm(String realm) throws StrolchException;
 
 	/**
 	 * Returns the default {@link StrolchRealm} for the user with the given {@link Certificate}. This is done by
@@ -80,6 +85,31 @@ public interface ComponentContainer {
 	 * 		if the user does not have a {@link StrolchConstants#PROP_REALM} property configured, and the default realm is
 	 * 		not configured, or if the realm does not exist with the found value
 	 */
-	public abstract StrolchRealm getRealm(Certificate certificate) throws StrolchException;
+	StrolchRealm getRealm(Certificate certificate) throws StrolchException;
 
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
+	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 *
+	 * @param runnable
+	 * 		the runnable to perform
+	 *
+	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
+	 */
+	void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException;
+
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
+	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 *
+	 * @param runnable
+	 * 		the runnable to perform
+	 *
+	 * @return the result
+	 *
+	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
+	 */
+	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
 }

@@ -30,12 +30,15 @@ import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
+import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.runtime.privilege.PrivilegedRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
 import org.slf4j.Logger;
@@ -128,6 +131,16 @@ public class ComponentContainerImpl implements ComponentContainer {
 			throw new StrolchException(
 					MessageFormat.format(msg, certificate.getUsername(), StrolchConstants.PROP_REALM, realmName), e);
 		}
+	}
+
+	@Override
+	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
+		getPrivilegeHandler().runAsAgent(runnable);
+	}
+
+	@Override
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
 	private void setupComponent(Map<Class<?>, StrolchComponent> componentMap,
