@@ -1,9 +1,8 @@
 package li.strolch.search;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static li.strolch.utils.collections.CollectionsHelper.singletonCollector;
+
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -11,7 +10,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import li.strolch.utils.collections.CollectionsHelper;
 import li.strolch.utils.collections.Paging;
 
 /**
@@ -144,8 +142,21 @@ public class SearchResult<T> {
 	 * @throws IllegalStateException
 	 * 		if not 1 and only 1 element is in the stream
 	 */
+	public Optional<T> toSingleton() {
+		return Optional.of(this.stream.collect(singletonCollector(true)));
+	}
+
+	/**
+	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream does not
+	 * contain 1 and only 1 element
+	 *
+	 * @return the single element in the stream
+	 *
+	 * @throws IllegalStateException
+	 * 		if not 1 and only 1 element is in the stream
+	 */
 	public T toSingleton(Supplier<String> errorMsgSupplier) throws IllegalStateException {
-		return this.stream.collect(CollectionsHelper.singletonCollector(errorMsgSupplier));
+		return this.stream.collect(singletonCollector(errorMsgSupplier));
 	}
 
 	/**
