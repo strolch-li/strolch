@@ -56,7 +56,25 @@ public class CollectionsHelper {
 	 * 		if not 1 and only 1 element is in the stream
 	 */
 	public static <T> Collector<T, List<T>, T> singletonCollector() throws IllegalStateException {
-		return singletonCollector(() -> null);
+		return singletonCollector(false, () -> null);
+	}
+
+	/**
+	 * Returns a collector which returns exactly one element from a stream, and throws an exception if not exactly one
+	 * element is in the stream
+	 *
+	 * @param allowNull
+	 * 		if true, then if the stream is empty, null is returned, instead of an exception is thrown
+	 * @param <T>
+	 * 		the type of element to return
+	 *
+	 * @return the singleton collector
+	 *
+	 * @throws IllegalStateException
+	 * 		if not 1 and only 1 element is in the stream
+	 */
+	public static <T> Collector<T, List<T>, T> singletonCollector(boolean allowNull) throws IllegalStateException {
+		return singletonCollector(allowNull, () -> null);
 	}
 
 	/**
@@ -74,7 +92,7 @@ public class CollectionsHelper {
 	 * 		if not 1 and only 1 element is in the stream
 	 */
 	public static <T> Collector<T, List<T>, T> singletonCollector(String errorMsg) throws IllegalStateException {
-		return singletonCollector(() -> errorMsg);
+		return singletonCollector(false, () -> errorMsg);
 	}
 
 	/**
@@ -93,12 +111,36 @@ public class CollectionsHelper {
 	 */
 	public static <T> Collector<T, List<T>, T> singletonCollector(Supplier<String> errorMsgSupplier)
 			throws IllegalStateException {
+		return singletonCollector(false, errorMsgSupplier);
+	}
+
+	/**
+	 * Returns a collector which returns exactly one element from a stream, and throws an exception if not exactly one
+	 * element is in the stream
+	 *
+	 * @param allowNull
+	 * 		if true, then if the stream is empty, null is returned, instead of an exception is thrown
+	 * @param errorMsgSupplier
+	 * 		the supplier for an error message to use if not 1 and only 1 element is in the collection
+	 * @param <T>
+	 * 		the type of element to return
+	 *
+	 * @return the singleton collector
+	 *
+	 * @throws IllegalStateException
+	 * 		if not 1 and only 1 element is in the stream
+	 */
+	public static <T> Collector<T, List<T>, T> singletonCollector(boolean allowNull, Supplier<String> errorMsgSupplier)
+			throws IllegalStateException {
 		return Collector.of(ArrayList::new, List::add, (left, right) -> {
 			left.addAll(right);
 			return left;
 		}, list -> {
 
 			if (list.isEmpty()) {
+				if (allowNull)
+					return null;
+
 				String errorMsg = errorMsgSupplier.get();
 				if (errorMsg == null) {
 					throw new IllegalStateException("Expect one element, but received no elements");
