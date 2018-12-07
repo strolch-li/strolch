@@ -134,21 +134,40 @@ public class SearchResult<T> {
 	}
 
 	/**
-	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream does not
-	 * contain 1 and only 1 element
+	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream contains more
+	 * than 1 element, or the empty {@link Optional}
 	 *
 	 * @return the single element in the stream
 	 *
 	 * @throws IllegalStateException
-	 * 		if not 1 and only 1 element is in the stream
+	 * 		if there is more than 1 element in the stream
 	 */
-	public Optional<T> toSingleton() {
-		return Optional.of(this.stream.collect(singletonCollector(true)));
+	public Optional<T> toSingletonO() {
+		return Optional.ofNullable(this.stream.collect(singletonCollector(true)));
+	}
+
+	/**
+	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream contains more
+	 * * than 1 element, or the empty {@link Optional}
+	 *
+	 * @param errorMsgSupplier
+	 * 		the supplier for an error message to use if not 1 and only 1 element is in the collection
+	 *
+	 * @return the single element in the stream
+	 *
+	 * @throws IllegalStateException
+	 * 		if there is more than 1 element in the stream
+	 */
+	public Optional<T> toSingletonO(Supplier<String> errorMsgSupplier) {
+		return Optional.ofNullable(this.stream.collect(singletonCollector(true, errorMsgSupplier)));
 	}
 
 	/**
 	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream does not
 	 * contain 1 and only 1 element
+	 *
+	 * @param errorMsgSupplier
+	 * 		the supplier for an error message to use if not 1 and only 1 element is in the collection
 	 *
 	 * @return the single element in the stream
 	 *

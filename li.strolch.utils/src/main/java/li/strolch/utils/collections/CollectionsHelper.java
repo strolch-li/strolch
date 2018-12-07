@@ -145,7 +145,7 @@ public class CollectionsHelper {
 				if (errorMsg == null) {
 					throw new IllegalStateException("Expect one element, but received no elements");
 				} else
-					throw new IllegalStateException(errorMsg);
+					throw new IllegalStateException(errorMsg + ": (none)");
 			}
 
 			if (list.size() != 1) {
