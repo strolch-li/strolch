@@ -6,6 +6,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
@@ -44,18 +45,9 @@ public class StrolchXmlHelper {
 		return elementListener.getElements();
 	}
 
-	public static void writeToFile(File file, Collection<StrolchRootElement> elements) {
-
+	public static void writeToFile(File file, Collection<? extends StrolchRootElement> elements) {
 		try (OutputStream out = Files.newOutputStream(file.toPath())) {
-
-			XMLStreamWriter writer = openXmlStreamWriter(out);
-
-			for (StrolchRootElement element : elements) {
-				element.accept(new StrolchElementToSaxWriterVisitor(writer));
-			}
-
-			writer.writeEndDocument();
-
+			writeToStream(out, elements);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to write elements to " + file, e);
 		}
@@ -63,14 +55,56 @@ public class StrolchXmlHelper {
 		logger.info("Wrote " + elements.size() + " to file " + file);
 	}
 
-	public static XMLStreamWriter openXmlStreamWriter(OutputStream out)
+	public static void writeToWriter(Writer writer, Collection<? extends StrolchRootElement> elements) {
+		try {
+			XMLStreamWriter xmlStreamWriter = prepareXmlStreamWriter(writer);
+
+			for (StrolchRootElement element : elements) {
+				element.accept(new StrolchElementToSaxWriterVisitor(xmlStreamWriter));
+			}
+
+			xmlStreamWriter.writeEndDocument();
+
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to write elements to " + writer, e);
+		}
+	}
+
+	public static void writeToStream(OutputStream out, Collection<? extends StrolchRootElement> elements)
+			throws Exception {
+
+		XMLStreamWriter writer = prepareXmlStreamWriter(out);
+
+		for (StrolchRootElement element : elements) {
+			element.accept(new StrolchElementToSaxWriterVisitor(writer));
+		}
+
+		writer.writeEndDocument();
+	}
+
+	public static XMLStreamWriter prepareXmlStreamWriter(Writer writer)
+			throws FactoryConfigurationError, XMLStreamException {
+
+		XMLOutputFactory factory = XMLOutputFactory.newInstance();
+		XMLStreamWriter xmlStreamWriter = factory.createXMLStreamWriter(writer);
+
+		return prepareXmlStreamWriter(xmlStreamWriter);
+	}
+
+	public static XMLStreamWriter prepareXmlStreamWriter(OutputStream out)
 			throws FactoryConfigurationError, XMLStreamException {
 
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		XMLStreamWriter writer = factory.createXMLStreamWriter(out, StrolchModelConstants.DEFAULT_ENCODING);
+
+		return prepareXmlStreamWriter(writer);
+	}
+
+	public static XMLStreamWriter prepareXmlStreamWriter(XMLStreamWriter writer)
+			throws FactoryConfigurationError, XMLStreamException {
+
 		writer = new IndentingXMLStreamWriter(writer);
 
-		// start document
 		writer.writeStartDocument(StrolchModelConstants.DEFAULT_ENCODING, StrolchModelConstants.DEFAULT_XML_VERSION);
 		writer.writeStartElement(Tags.STROLCH_MODEL);
 		return writer;

@@ -18,12 +18,11 @@ package li.strolch.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import javax.xml.stream.XMLStreamWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
-
-import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
@@ -42,7 +41,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 	protected Order formatAndParseOrder(Order order) throws Exception {
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
+		XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(out);
 		order.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
 
@@ -67,7 +66,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 	protected Resource formatAndParseResource(Resource resource) throws Exception {
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
+		XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(out);
 		resource.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
 
@@ -92,7 +91,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 	protected Activity formatAndParseActivity(Activity activity) throws Exception {
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
+		XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(out);
 		activity.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
 

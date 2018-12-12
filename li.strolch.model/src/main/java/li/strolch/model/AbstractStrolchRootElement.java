@@ -17,7 +17,7 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 
 	@Override
 	public String toXmlString() {
-		return accept(new StrolchElementToXmlStringVisitor());
+		return accept(new StrolchElementToXmlStringVisitor().withoutDocument());
 	}
 
 	@Override

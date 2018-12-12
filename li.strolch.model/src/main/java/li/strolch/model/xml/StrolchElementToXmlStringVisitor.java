@@ -15,6 +15,17 @@ import li.strolch.utils.dbc.DBC;
 
 public class StrolchElementToXmlStringVisitor implements StrolchRootElementVisitor<String> {
 
+	private boolean withDocument;
+
+	public StrolchElementToXmlStringVisitor() {
+		this.withDocument = true;
+	}
+
+	public StrolchElementToXmlStringVisitor withoutDocument() {
+		this.withDocument = false;
+		return this;
+	}
+
 	private String visit(StrolchRootElement element) {
 
 		try {
@@ -24,12 +35,14 @@ public class StrolchElementToXmlStringVisitor implements StrolchRootElementVisit
 			writer = new IndentingXMLStreamWriter(writer);
 
 			// start document
-			writer.writeStartDocument(StrolchModelConstants.DEFAULT_ENCODING,
-					StrolchModelConstants.DEFAULT_XML_VERSION);
+			if (this.withDocument)
+				writer.writeStartDocument(StrolchModelConstants.DEFAULT_ENCODING,
+						StrolchModelConstants.DEFAULT_XML_VERSION);
 
 			element.accept(new StrolchElementToSaxWriterVisitor(writer));
 
-			writer.writeEndDocument();
+			if (this.withDocument)
+				writer.writeEndDocument();
 
 			return stringWriter.toString();
 

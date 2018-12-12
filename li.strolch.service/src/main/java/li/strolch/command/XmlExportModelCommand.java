@@ -157,7 +157,7 @@ public class XmlExportModelCommand extends Command {
 		try (OutputStream out = Files.newOutputStream(this.modelFile.toPath())) {
 			createdFiles.add(this.modelFile);
 
-			XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(out);
+			XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(out);
 
 			if (this.doResources) {
 				ResourceMap resourceMap = tx().getResourceMap();
@@ -181,7 +181,7 @@ public class XmlExportModelCommand extends Command {
 								+ typeXmlFileF.getAbsolutePath() + "...");
 						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
-							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
+							XMLStreamWriter typeWriter = StrolchXmlHelper.prepareXmlStreamWriter(typeOut);
 							writeResourcesByType(typeWriter, resourceMap, type);
 							typeWriter.writeEndDocument();
 						}
@@ -210,7 +210,7 @@ public class XmlExportModelCommand extends Command {
 								+ typeXmlFileF.getAbsolutePath() + "...");
 						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
-							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
+							XMLStreamWriter typeWriter = StrolchXmlHelper.prepareXmlStreamWriter(typeOut);
 							writeOrdersByType(typeWriter, orderMap, type);
 							typeWriter.writeEndDocument();
 						}
@@ -241,7 +241,7 @@ public class XmlExportModelCommand extends Command {
 										+ typeXmlFileF.getAbsolutePath() + "...");
 						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
-							XMLStreamWriter typeWriter = StrolchXmlHelper.openXmlStreamWriter(typeOut);
+							XMLStreamWriter typeWriter = StrolchXmlHelper.prepareXmlStreamWriter(typeOut);
 							writeActivitiesByType(typeWriter, activityMap, type);
 							typeWriter.writeEndDocument();
 						}

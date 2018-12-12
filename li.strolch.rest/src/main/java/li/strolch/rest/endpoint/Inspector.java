@@ -188,7 +188,7 @@ public class Inspector {
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
-				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
 				tx.streamResources().forEach(e -> e.accept(visitor));
@@ -316,7 +316,7 @@ public class Inspector {
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
-				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
 				tx.streamResources().forEach(e -> e.accept(visitor));
@@ -343,7 +343,7 @@ public class Inspector {
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
-				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
 				tx.streamOrders().forEach(e -> e.accept(visitor));
@@ -370,7 +370,7 @@ public class Inspector {
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
-				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
 				tx.streamActivities().forEach(e -> e.accept(visitor));
@@ -542,7 +542,7 @@ public class Inspector {
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
 
-				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
 				search.search(tx).forEach(e -> e.accept(visitor));
@@ -575,7 +575,7 @@ public class Inspector {
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
 
-				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
 				search.search(tx).forEach(e -> e.accept(visitor));
@@ -608,7 +608,7 @@ public class Inspector {
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
 
-				XMLStreamWriter writer = StrolchXmlHelper.openXmlStreamWriter(stream);
+				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
 				search.search(tx).forEach(e -> e.accept(visitor));
