@@ -15,6 +15,9 @@
  */
 package li.strolch.utils.helper;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.parsers.*;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -126,6 +129,37 @@ public class XmlHelper {
 			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e); //$NON-NLS-1$
 		} catch (IOException e) {
 			throw new XmlException("The XML stream not be read: " + e.getMessage(), e); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * <p>Helper method to parse the given {@link File} using JAXB to the given object type</p>
+	 *
+	 * <p><b>Note:</b> The passed class must have the {@link XmlRootElement} annotation!</p>
+	 *
+	 * @param file
+	 * 		the file to parse
+	 * @param clazz
+	 * 		the class for the returning object type
+	 * @param <T>
+	 * 		the type of object to return
+	 *
+	 * @return the parsed object
+	 */
+	public static <T> T parseAndUnmarshalFile(File file, Class<T> clazz) {
+		try (FileInputStream fin = new FileInputStream(file)) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+			@SuppressWarnings("unchecked")
+			T o = (T) unmarshaller.unmarshal(fin);
+
+			return o;
+
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to parse file " + file.getAbsolutePath() + " to object " + clazz,
+					e);
 		}
 	}
 
