@@ -21,7 +21,7 @@ public class StrolchSystemAction extends SystemAction {
 	}
 
 	@Override
-	public void execute(PrivilegeContext privilegeContext) {
+	public void execute(PrivilegeContext privilegeContext) throws Exception {
 		try {
 			this.runnable.run(privilegeContext);
 		} catch (Exception e) {

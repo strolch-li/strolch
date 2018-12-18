@@ -176,8 +176,10 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the agent is missing the privilege
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
+	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getContainer().getPrivilegeHandler().runAs(StrolchConstants.SYSTEM_USER_AGENT, runnable);
 	}
 
@@ -192,8 +194,11 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the agent is missing the privilege
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable)
+			throws PrivilegeException, Exception {
 		return getContainer().getPrivilegeHandler().runWithResult(StrolchConstants.SYSTEM_USER_AGENT, runnable);
 	}
 }

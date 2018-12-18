@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ public interface PrivilegeHandler {
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[])
 	 */
 	Certificate authenticate(String username, char[] password);
-	
+
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
 	 *
@@ -104,8 +104,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	void runAs(String username, SystemAction action) throws PrivilegeException;
+	void runAs(String username, SystemAction action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link SystemActionWithResult} as the given system user
@@ -119,8 +121,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	<T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException;
+	<T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the given system user
@@ -132,8 +136,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException;
+	void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the given system user
@@ -147,8 +153,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	<T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
+	<T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link SystemAction} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
@@ -158,8 +166,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	void runAsAgent(SystemAction action) throws PrivilegeException;
+	void runAsAgent(SystemAction action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link SystemActionWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
@@ -169,8 +179,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	<T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException;
+	<T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
@@ -180,8 +192,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException;
+	void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnableWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
@@ -193,8 +207,10 @@ public interface PrivilegeHandler {
 	 *
 	 * @throws PrivilegeException
 	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
+	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Returns the {@link li.strolch.privilege.handler.PrivilegeHandler}
@@ -202,5 +218,4 @@ public interface PrivilegeHandler {
 	 * @return the {@link li.strolch.privilege.handler.PrivilegeHandler}
 	 */
 	li.strolch.privilege.handler.PrivilegeHandler getPrivilegeHandler();
-
 }

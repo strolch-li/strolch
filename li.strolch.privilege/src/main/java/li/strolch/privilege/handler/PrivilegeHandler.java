@@ -697,9 +697,11 @@ public interface PrivilegeHandler {
 	 * 		the action to be performed as the system user
 	 *
 	 * @throws PrivilegeException
-	 * 		if the user does not exist, or the system action is not alloed
+	 * 		if the user does not exist, or the system action is not allowed
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	void runAs(String systemUsername, SystemAction action) throws PrivilegeException;
+	void runAs(String systemUsername, SystemAction action) throws PrivilegeException, Exception;
 
 	/**
 	 * Special method to perform work as a System user, meaning the given systemUsername corresponds to an account which
@@ -714,9 +716,11 @@ public interface PrivilegeHandler {
 	 * @return the action
 	 *
 	 * @throws PrivilegeException
-	 * 		if the user does not exist, or the system action is not alloed
+	 * 		if the user does not exist, or the system action is not allowed
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	<T> T runWithResult(String systemUsername, SystemActionWithResult<T> action) throws PrivilegeException;
+	<T> T runWithResult(String systemUsername, SystemActionWithResult<T> action) throws PrivilegeException, Exception;
 
 	/**
 	 * Returns the {@link EncryptionHandler} instance

@@ -21,7 +21,7 @@ import li.strolch.privilege.model.Restrictable;
 
 /**
  * With this interface system actions, which are to be performed in an automated fashion, i.e. by cron jobs, can be
- * implemented and then the authorized execution can be delegated to {@link PrivilegeHandler#runAsSystem(String,
+ * implemented and then the authorized execution can be delegated to {@link PrivilegeHandler#runWithResult(String,
  * SystemActionWithResult)}
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -48,5 +48,5 @@ public abstract class SystemActionWithResult<T> implements Restrictable {
 	 *
 	 * @return the result
 	 */
-	public abstract T execute(PrivilegeContext privilegeContext);
+	public abstract T execute(PrivilegeContext privilegeContext) throws Exception;
 }

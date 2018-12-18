@@ -283,8 +283,10 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected void runAs(String username, SystemAction action) throws PrivilegeException {
+	protected void runAs(String username, SystemAction action) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAs(username, action);
 	}
 
@@ -300,8 +302,11 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException {
+	protected <T> T runWithResult(String username, SystemActionWithResult<T> action)
+			throws PrivilegeException, Exception {
 		return this.container.getPrivilegeHandler().runWithResult(username, action);
 	}
 
@@ -315,8 +320,10 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException {
+	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAs(username, runnable);
 	}
 
@@ -332,8 +339,11 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+	protected <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable)
+			throws PrivilegeException, Exception {
 		return this.container.getPrivilegeHandler().runWithResult(username, runnable);
 	}
 
@@ -345,8 +355,10 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected void runAsAgent(SystemAction action) throws PrivilegeException {
+	protected void runAsAgent(SystemAction action) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAsAgent(action);
 	}
 
@@ -360,8 +372,10 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException {
+	protected <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException, Exception {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(action);
 	}
 
@@ -374,8 +388,10 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
+	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAsAgent(runnable);
 	}
 
@@ -390,8 +406,11 @@ public class StrolchComponent {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable)
+			throws PrivilegeException, Exception {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 

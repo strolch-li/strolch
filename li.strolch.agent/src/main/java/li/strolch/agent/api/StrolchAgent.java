@@ -155,7 +155,7 @@ public class StrolchAgent {
 		this.executors = new HashMap<>();
 		this.scheduledExecutors = new HashMap<>();
 
-		this.container.initialize(this.strolchConfiguration);
+		this.container.initialize();
 	}
 
 	/**

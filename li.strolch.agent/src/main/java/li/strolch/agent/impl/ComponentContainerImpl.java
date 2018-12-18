@@ -134,12 +134,12 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	@Override
-	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
+	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getPrivilegeHandler().runAsAgent(runnable);
 	}
 
 	@Override
-	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException {
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
 		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
@@ -235,7 +235,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 				.format(msg, applicationName, environment, this.componentMap.size(), formatNanoDuration(took)));
 	}
 
-	public void initialize(StrolchConfiguration strolchConfiguration) {
+	public void initialize() {
 		this.state.validateStateChange(ComponentState.INITIALIZED, "agent");
 
 		long start = System.nanoTime();

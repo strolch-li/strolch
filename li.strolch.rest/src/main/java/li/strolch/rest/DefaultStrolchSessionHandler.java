@@ -185,6 +185,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	private void persistSessions() {
 		try {
 			runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler().persistSessions(ctx.getCertificate()));
+		} catch (Exception e) {
+			logger.error("Failed to persist sessions", e);
 		} finally {
 			this.persistSessionsTask = null;
 		}

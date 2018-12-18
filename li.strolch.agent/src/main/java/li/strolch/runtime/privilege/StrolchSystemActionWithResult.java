@@ -24,7 +24,7 @@ public class StrolchSystemActionWithResult<T> extends SystemActionWithResult<T> 
 	}
 
 	@Override
-	public T execute(PrivilegeContext privilegeContext) {
+	public T execute(PrivilegeContext privilegeContext) throws Exception {
 		try {
 			return this.runnable.run(privilegeContext);
 		} catch (Exception e) {

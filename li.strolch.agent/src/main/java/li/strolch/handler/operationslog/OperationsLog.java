@@ -1,9 +1,13 @@
 package li.strolch.handler.operationslog;
 
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Locator;
@@ -112,15 +116,27 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	private void persist(StrolchRealm realm, LogMessage logMessage, List<LogMessage> messagesToRemove) {
-		runAsAgent(ctx -> {
-			try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass())) {
-				LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-				if (messagesToRemove != null && !messagesToRemove.isEmpty())
-					logMessageDao.removeAll(messagesToRemove);
-				logMessageDao.save(logMessage);
-				tx.commitOnClose();
+		try {
+			runAsAgent(ctx -> {
+				try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass())) {
+					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
+					if (messagesToRemove != null && !messagesToRemove.isEmpty())
+						logMessageDao.removeAll(messagesToRemove);
+					logMessageDao.save(logMessage);
+					tx.commitOnClose();
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to persist operations logs!", e);
+			synchronized (this) {
+				this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), r -> new ArrayList<>())
+						.add(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
+								Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
+								ResourceBundle.getBundle("strolch-agent"), "operationsLog.persist.failed") //
+								.value("reason", e.getMessage()) //
+								.withException(e));
 			}
-		});
+		}
 	}
 
 	public synchronized void clearMessages(String realm, Locator locator) {

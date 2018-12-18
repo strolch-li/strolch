@@ -96,8 +96,10 @@ public interface ComponentContainer {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException;
+	void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
@@ -110,6 +112,8 @@ public interface ComponentContainer {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException;
+	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception;
 }

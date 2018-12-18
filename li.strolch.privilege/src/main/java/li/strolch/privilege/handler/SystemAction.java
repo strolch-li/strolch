@@ -45,5 +45,5 @@ public abstract class SystemAction implements Restrictable {
 	 * @param privilegeContext
 	 * 		the {@link PrivilegeContext} which was generated for a valid system user
 	 */
-	public abstract void execute(PrivilegeContext privilegeContext);
+	public abstract void execute(PrivilegeContext privilegeContext) throws Exception;
 }

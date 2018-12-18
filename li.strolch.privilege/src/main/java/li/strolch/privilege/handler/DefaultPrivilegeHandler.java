@@ -1839,7 +1839,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void runAs(String username, SystemAction action) throws PrivilegeException {
+	public void runAs(String username, SystemAction action) throws PrivilegeException, Exception {
 
 		PrivilegeContext systemUserPrivilegeContext = initiateSystemPrivilege(username, action);
 
@@ -1853,7 +1853,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException {
+	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException, Exception {
 
 		PrivilegeContext systemUserPrivilegeContext = initiateSystemPrivilege(username, action);
 
