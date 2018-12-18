@@ -60,6 +60,18 @@ public abstract class StrolchJob implements Runnable {
 	private ZonedDateTime lastExecution;
 	private Exception lastException;
 
+	public StrolchJob(StrolchAgent agent) {
+		this.agent = agent;
+		this.mode = JobMode.Manual;
+
+		this.initialDelay = 0;
+		this.initialDelayTimeUnit = TimeUnit.SECONDS;
+		this.delay = 0;
+		this.delayTimeUnit = TimeUnit.SECONDS;
+
+		this.first = true;
+	}
+
 	public StrolchJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit, long delay,
 			TimeUnit delayTimeUnit) {
 		this.agent = agent;
@@ -134,8 +146,10 @@ public abstract class StrolchJob implements Runnable {
 	 *
 	 * @throws PrivilegeException
 	 * 		if the agent can not perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
 	 */
-	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException {
+	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getContainer().getPrivilegeHandler().runAsAgent(runnable);
 	}
 
@@ -279,7 +293,7 @@ public abstract class StrolchJob implements Runnable {
 		return this;
 	}
 
-	protected abstract void execute(PrivilegeContext ctx);
+	protected abstract void execute(PrivilegeContext ctx) throws Exception;
 
 	public JsonObject toJson() {
 		JsonObject jsonObject = new JsonObject();
