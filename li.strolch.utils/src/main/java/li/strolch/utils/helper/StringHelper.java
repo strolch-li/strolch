@@ -712,6 +712,23 @@ public class StringHelper {
 	}
 
 	/**
+	 * Checks if all characters in the string are digits
+	 *
+	 * @param value
+	 * 		the value to check
+	 *
+	 * @return true if all characters are digits, false if not, i.e. a letter, special character or a minus, etc.
+	 */
+	public static boolean isAllDigits(String value) {
+		for (int i = 0; i < value.length(); i++) {
+			if (!Character.isDigit(value.charAt(i)))
+				return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * <p> Parses the given string value to a boolean. This extends the default {@link Boolean#parseBoolean(String)} as
 	 * it throws an exception if the string value is not equal to "true" or "false" being case insensitive. </p>
 	 *
