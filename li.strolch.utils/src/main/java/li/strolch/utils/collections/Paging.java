@@ -135,6 +135,12 @@ public class Paging<T> {
 			return paging;
 		}
 
+		// can happen if elements were removed and the user didn't see that, i.e. pressing next on a page that doesn't exist anymore
+		if (offset > paging.size) {
+			offset = paging.size;
+			paging.offset = offset;
+		}
+
 		paging.page = list.subList(offset, Math.min(paging.size, offset + limit));
 
 		if (limit == 1) {
