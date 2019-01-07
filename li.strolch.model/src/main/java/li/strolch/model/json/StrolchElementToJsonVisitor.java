@@ -34,6 +34,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private Set<String> ignoredTimedStates;
 	private Set<String> ignoredBagTypes;
 
+	private BiConsumer<ParameterBag, JsonObject> bagHook;
 	private BiConsumer<Resource, JsonObject> resourceHook;
 	private BiConsumer<Order, JsonObject> orderHook;
 	private BiConsumer<Activity, JsonObject> activityHook;
@@ -138,6 +139,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public StrolchElementToJsonVisitor ignoreBagByType(String type) {
 		this.ignoredBagTypes.add(type);
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor bagHook(BiConsumer<ParameterBag, JsonObject> hook) {
+		this.bagHook = hook;
 		return this;
 	}
 
@@ -291,12 +297,15 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 		if (isFlat()) {
 
-			JsonObject rootJ = new JsonObject();
+			JsonObject bagJ = new JsonObject();
 
 			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bag.getId());
-			addParameterBagFlat(rootJ, ignoredParamIds, bag);
+			addParameterBagFlat(bagJ, ignoredParamIds, bag);
 
-			return rootJ;
+			if (this.bagHook != null)
+				this.bagHook.accept(bag, bagJ);
+
+			return bagJ;
 		}
 
 		return parameterBagToJsonFull(bag);
@@ -551,6 +560,9 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			Parameter<?> param = bag.getParameter(paramKey);
 			paramsJ.add(paramKey, paramToJsonFull(param));
 		}
+
+		if (this.bagHook != null)
+			this.bagHook.accept(bag, bagJ);
 
 		return bagJ;
 	}
