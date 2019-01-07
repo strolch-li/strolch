@@ -936,6 +936,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void assertHasRole(String roleName) throws AccessDeniedException {
+		DBC.PRE.assertNotNull("roleName must not be null", roleName);
+		getPrivilegeContext().assertHasRole(roleName);
+	}
+
+	@Override
+	public void assertHasAnyRole(String... roleNames) throws AccessDeniedException {
+		DBC.PRE.assertNotNull("roleNames must not be null", roleNames);
+		getPrivilegeContext().assertHasAnyRole(roleNames);
+	}
+
+	@Override
 	public void add(Resource resource) throws StrolchModelException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().add(Tags.RESOURCE, resource.getLocator(), resource);

@@ -1244,4 +1244,26 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if the session for this TX does not have the required privilege
 	 */
 	void assertHasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException;
+
+	/**
+	 * Asserts that the current {@link Certificate} has the given role
+	 *
+	 * @param roleName
+	 * 		the name of the role the user should have
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the session for this TX does not have the given role
+	 */
+	void assertHasRole(String roleName) throws AccessDeniedException;
+
+	/**
+	 * Asserts that the current {@link Certificate} has at least one of the given roles
+	 *
+	 * @param roleNames
+	 * 		the list of roles to check if the session for this TX has at least one of them
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the session for this TX does not have any of the given roles
+	 */
+	void assertHasAnyRole(String... roleNames) throws AccessDeniedException;
 }

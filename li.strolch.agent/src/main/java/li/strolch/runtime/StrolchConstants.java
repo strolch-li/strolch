@@ -61,6 +61,11 @@ public class StrolchConstants {
 	 */
 	public static final String INTERPRETATION_ACTIVITY_REF = StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
 
+	/**
+	 * @see StrolchModelConstants#ROLE_STROLCH_ADMIN
+	 */
+	public static final String ROLE_STROLCH_ADMIN = StrolchModelConstants.ROLE_STROLCH_ADMIN;
+
 	public static String makeRealmKey(String realmName, String key) {
 		String realmKey = key;
 		if (!realmName.equals(DEFAULT_REALM))
