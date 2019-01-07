@@ -136,7 +136,7 @@ public enum State {
 	 * @return true if the state is {@link #EXECUTED}
 	 */
 	public boolean isExecuted() {
-		return this == EXECUTED;
+		return this == EXECUTED || this == CLOSED;
 	}
 
 	/**
@@ -275,5 +275,4 @@ public enum State {
 		// should never happen, unless new state is introduced
 		throw new IllegalStateException("Unhandled situation with states: " + states.stream().map(e -> e.state)
 				.collect(Collectors.joining(", ")));
-	}
-}
+	}}
