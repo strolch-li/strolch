@@ -81,6 +81,25 @@ public class PrivilegeContext {
 		}
 	}
 
+	public void assertHasRole(String roleName) throws AccessDeniedException {
+		if (!this.userRep.hasRole(roleName)) {
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.role"), //$NON-NLS-1$
+					userRep.getUsername(), roleName);
+			throw new AccessDeniedException(msg);
+		}
+	}
+
+	public void assertHasAnyRole(String... roleNames) throws AccessDeniedException {
+		for (String roleName : roleNames) {
+			if (this.userRep.hasRole(roleName))
+				return;
+		}
+
+		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.role"), //$NON-NLS-1$
+				userRep.getUsername(), String.join(", ", roleNames));
+		throw new AccessDeniedException(msg);
+	}
+
 	public IPrivilege getPrivilege(String privilegeName) throws AccessDeniedException {
 		assertHasPrivilege(privilegeName);
 		return this.privileges.get(privilegeName);
