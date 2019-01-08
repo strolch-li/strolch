@@ -1,6 +1,6 @@
 package li.strolch.search;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchAccessDeniedException;
@@ -109,7 +109,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 *
 	 * @return the search result
 	 */
-	public RootElementSearchResult<T> search(List<T> input) {
+	public RootElementSearchResult<T> search(Collection<T> input) {
 
 		// first prepare
 		define();
