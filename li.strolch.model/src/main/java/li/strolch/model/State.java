@@ -168,10 +168,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #CREATED} or {@link #PLANNING} or {@link #PLANNED} or {@link #EXECUTION}
+	 * @return true if {@link #CREATED} or {@link #PLANNING} or {@link #PLANNED} or {@link #EXECUTION} or {@link #STOPPED}
 	 */
 	public boolean canSetToExecution() {
-		return this == CREATED || this == PLANNING || this == PLANNED || this == EXECUTION;
+		return this == CREATED || this == PLANNING || this == PLANNED || this == EXECUTION || this == State.STOPPED;
 	}
 
 	/**
