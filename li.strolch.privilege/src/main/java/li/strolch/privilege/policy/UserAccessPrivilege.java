@@ -82,8 +82,7 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 		case PrivilegeHandler.PRIVILEGE_GET_USER:
 		case PrivilegeHandler.PRIVILEGE_ADD_USER:
 		case PrivilegeHandler.PRIVILEGE_REMOVE_USER:
-		case PrivilegeHandler.PRIVILEGE_MODIFY_USER:
-		case PrivilegeHandler.PRIVILEGE_SET_USER_STATE: {
+		case PrivilegeHandler.PRIVILEGE_MODIFY_USER: {
 			User oldUser = tuple.getFirst();
 			User newUser = tuple.getSecond();
 
@@ -93,6 +92,17 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 			String privilegeValue = newUser.getUsername();
 			DBC.INTERIM
 					.assertEquals("oldUser and newUser names must be the same", oldUser.getUsername(), privilegeValue);
+			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
+		}
+
+		case PrivilegeHandler.PRIVILEGE_SET_USER_STATE: {
+			User oldUser = tuple.getFirst();
+			User newUser = tuple.getSecond();
+
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldUser);
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
+
+			String privilegeValue = newUser.getUserState().name();
 			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
 
