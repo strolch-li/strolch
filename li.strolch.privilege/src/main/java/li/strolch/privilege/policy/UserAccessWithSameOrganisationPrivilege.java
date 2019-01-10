@@ -15,6 +15,9 @@
  */
 package li.strolch.privilege.policy;
 
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+
 import java.text.MessageFormat;
 
 import li.strolch.privilege.base.AccessDeniedException;
@@ -27,7 +30,6 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * Validates that any access to a privilege User is done only by users in the same organisation
@@ -41,7 +43,19 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
 			throws AccessDeniedException {
-		String privilegeName = PrivilegePolicyHelper.preValidate(privilege, restrictable);
+		validateAction(ctx, privilege, restrictable, true);
+	}
+
+	@Override
+	public boolean hasPrivilege(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+			throws PrivilegeException {
+		return validateAction(ctx, privilege, restrictable, false);
+	}
+
+	protected boolean validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+			boolean assertHasPrivilege) throws AccessDeniedException {
+
+		String privilegeName = preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
@@ -56,9 +70,8 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 
 		// get user organisation
 		String userOrg = ctx.getCertificate().getProperty(PARAM_ORGANISATION);
-		if (StringHelper.isEmpty(userOrg)) {
-			throw new AccessDeniedException("No organisation configured for user " + ctx.getUsername());
-		}
+		if (isEmpty(userOrg))
+			throw new PrivilegeException("No organisation configured for user " + ctx.getUsername());
 
 		Tuple tuple = (Tuple) object;
 
@@ -73,9 +86,12 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			if (oldUser != null) {
 				String oldOrg = oldUser.getProperty(PARAM_ORGANISATION);
 				if (!userOrg.equals(oldOrg)) {
-					throw new AccessDeniedException(
-							"User " + ctx.getUsername() + " may not access users outside of their organisation: "
-									+ userOrg + " / " + oldOrg);
+					if (assertHasPrivilege)
+						throw new AccessDeniedException(
+								"User " + ctx.getUsername() + " may not access users outside of their organisation: "
+										+ userOrg + " / " + oldOrg);
+
+					return false;
 				}
 			}
 
@@ -83,10 +99,14 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			User newUser = tuple.getSecond();
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
 			String newdOrg = newUser.getProperty(PARAM_ORGANISATION);
+
 			if (!userOrg.equals(newdOrg)) {
-				throw new AccessDeniedException(
-						"User " + ctx.getUsername() + " may not access users outside of their organisations: " + userOrg
-								+ " / " + newdOrg);
+				if (assertHasPrivilege)
+					throw new AccessDeniedException(
+							"User " + ctx.getUsername() + " may not access users outside of their organisations: "
+									+ userOrg + " / " + newdOrg);
+
+				return false;
 			}
 
 			break;
@@ -98,9 +118,13 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", user);
 			String org = user.getProperty(PARAM_ORGANISATION);
 			if (!userOrg.equals(org)) {
-				throw new AccessDeniedException(
-						"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrg
-								+ " / " + org);
+
+				if (assertHasPrivilege)
+					throw new AccessDeniedException(
+							"User " + ctx.getUsername() + " may not access users outside of their organisation: "
+									+ userOrg + " / " + org);
+
+				return false;
 			}
 
 			break;
@@ -114,6 +138,6 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		}
 
 		// now delegate the rest of the validation to the super class
-		super.validateAction(ctx, privilege, restrictable);
+		return super.validateAction(ctx, privilege, restrictable, assertHasPrivilege);
 	}
 }

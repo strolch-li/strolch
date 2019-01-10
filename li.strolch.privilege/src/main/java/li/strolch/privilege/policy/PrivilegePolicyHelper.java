@@ -79,32 +79,40 @@ public class PrivilegePolicyHelper {
 	 * 		the restrictable
 	 * @param privilegeValue
 	 * 		the privilege value
+	 * @param assertHasPrivilege
+	 * 		if true and the privilege is missing, then an {@link AccessDeniedException} is thrown if privilege, otherwise a
+	 * 		false is returned
+	 *
+	 * @return true if access is allowed, false if not allowed and assertHasPrivilege is false
 	 *
 	 * @throws AccessDeniedException
 	 * 		if access is denied
 	 */
-	public static void checkByAllowDenyValues(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
-			String privilegeValue) throws AccessDeniedException {
+	public static boolean checkByAllowDenyValues(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+			String privilegeValue, boolean assertHasPrivilege) throws AccessDeniedException {
+
+		// first check values not allowed
+		if (privilege.isDenied(privilegeValue))
+			return handleAccessDenied(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 
 		// now check values allowed
 		if (privilege.isAllowed(privilegeValue))
-			return;
+			return true;
 
-		// first check values not allowed
-		if (privilege.isDenied(privilegeValue)) {
+		return handleAccessDenied(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
+	}
 
-			// then throw access denied
+	private static boolean handleAccessDenied(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+			String privilegeValue, boolean assertHasPrivilege) {
+
+		if (assertHasPrivilege) {
 			String msg = MessageFormat
 					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
 							ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
+
 			throw new AccessDeniedException(msg);
 		}
 
-		// default is not allowed
-		String msg = MessageFormat
-				.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
-						ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
-
-		throw new AccessDeniedException(msg);
+		return false;
 	}
 }

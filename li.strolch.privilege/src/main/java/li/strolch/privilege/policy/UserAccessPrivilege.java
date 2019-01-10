@@ -15,6 +15,9 @@
  */
 package li.strolch.privilege.policy;
 
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
+
 import java.text.MessageFormat;
 
 import li.strolch.privilege.base.AccessDeniedException;
@@ -40,14 +43,26 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
 			throws AccessDeniedException {
-		String privilegeName = PrivilegePolicyHelper.preValidate(privilege, restrictable);
+		validateAction(ctx, privilege, restrictable, true);
+	}
+
+	@Override
+	public boolean hasPrivilege(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+			throws PrivilegeException {
+		return validateAction(ctx, privilege, restrictable, false);
+	}
+
+	protected boolean validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+			boolean assertHasPrivilege) throws AccessDeniedException {
+
+		String privilegeName = preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
 
-		// if the object is null, then it means the validation is that the privilege must exist
+		// if the object is null, then the validation is only that the privilege must exist
 		if (object == null)
-			return;
+			return true;
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple)) {
@@ -59,48 +74,16 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 
 		// if everything is allowed, then no need to carry on
 		if (privilege.isAllAllowed())
-			return;
+			return true;
 
 		Tuple tuple = (Tuple) object;
 
 		switch (privilegeName) {
-		case PrivilegeHandler.PRIVILEGE_GET_USER: {
-			User oldUser = tuple.getFirst();
-			User newUser = tuple.getSecond();
-
-			DBC.INTERIM.assertNull("For " + privilegeName + " first must be null!", oldUser);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
-
-			String privilegeValue = newUser.getUsername();
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
-
-			break;
-		}
-		case PrivilegeHandler.PRIVILEGE_ADD_USER: {
-			User oldUser = tuple.getFirst();
-			User newUser = tuple.getSecond();
-
-			DBC.INTERIM.assertNull("For " + privilegeName + " first must be null!", oldUser);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
-
-			String privilegeValue = newUser.getUsername();
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
-
-			break;
-		}
-		case PrivilegeHandler.PRIVILEGE_REMOVE_USER: {
-			User oldUser = tuple.getFirst();
-			User newUser = tuple.getSecond();
-
-			DBC.INTERIM.assertNull("For " + privilegeName + " first must be null!", oldUser);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
-
-			String privilegeValue = newUser.getUsername();
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
-
-			break;
-		}
-		case PrivilegeHandler.PRIVILEGE_MODIFY_USER: {
+		case PrivilegeHandler.PRIVILEGE_GET_USER:
+		case PrivilegeHandler.PRIVILEGE_ADD_USER:
+		case PrivilegeHandler.PRIVILEGE_REMOVE_USER:
+		case PrivilegeHandler.PRIVILEGE_MODIFY_USER:
+		case PrivilegeHandler.PRIVILEGE_SET_USER_STATE: {
 			User oldUser = tuple.getFirst();
 			User newUser = tuple.getSecond();
 
@@ -110,45 +93,11 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 			String privilegeValue = newUser.getUsername();
 			DBC.INTERIM
 					.assertEquals("oldUser and newUser names must be the same", oldUser.getUsername(), privilegeValue);
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
-
-			break;
+			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
-		case PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER: {
-			User user = tuple.getFirst();
-			String roleName = tuple.getSecond();
 
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", user);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", roleName);
-
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, roleName);
-
-			break;
-		}
-		case PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER: {
-			User user = tuple.getFirst();
-			String roleName = tuple.getSecond();
-
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", user);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", roleName);
-
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, roleName);
-
-			break;
-		}
-		case PrivilegeHandler.PRIVILEGE_SET_USER_STATE: {
-			User oldUser = tuple.getFirst();
-			User newUser = tuple.getSecond();
-
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldUser);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
-
-			String privilegeValue = newUser.getUserState().name();
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
-
-			break;
-		}
-		case PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE: {
+		case PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE:
+		case PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD: {
 			User oldUser = tuple.getFirst();
 			User newUser = tuple.getSecond();
 
@@ -159,28 +108,20 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 
 			// user can set their own locale
 			if (ctx.getUsername().equals(privilegeValue))
-				return;
+				return true;
 
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
-
-			break;
+			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
-		case PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD: {
-			User oldUser = tuple.getFirst();
-			User newUser = tuple.getSecond();
 
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldUser);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
+		case PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER:
+		case PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER: {
+			User user = tuple.getFirst();
+			String roleName = tuple.getSecond();
 
-			String privilegeValue = newUser.getUsername();
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", user);
+			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", roleName);
 
-			// user can set their own password
-			if (ctx.getUsername().equals(privilegeValue))
-				return;
-
-			PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
-
-			break;
+			return checkByAllowDenyValues(ctx, privilege, restrictable, roleName, assertHasPrivilege);
 		}
 
 		default:

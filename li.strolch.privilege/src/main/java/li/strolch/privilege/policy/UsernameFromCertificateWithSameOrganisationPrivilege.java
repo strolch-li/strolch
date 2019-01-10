@@ -15,6 +15,9 @@
  */
 package li.strolch.privilege.policy;
 
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+
 import java.text.MessageFormat;
 
 import li.strolch.privilege.base.AccessDeniedException;
@@ -24,7 +27,6 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * <p>
@@ -46,7 +48,19 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
 			throws AccessDeniedException {
-		PrivilegePolicyHelper.preValidate(privilege, restrictable);
+		validateAction(ctx, privilege, restrictable, true);
+	}
+
+	@Override
+	public boolean hasPrivilege(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+			throws PrivilegeException {
+		return validateAction(ctx, privilege, restrictable, false);
+	}
+
+	protected boolean validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+			boolean assertHasPrivilege) throws AccessDeniedException {
+
+		preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
@@ -64,18 +78,22 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 
 		// get user organisation
 		String userOrg = ctx.getCertificate().getProperty(PARAM_ORGANISATION);
-		if (StringHelper.isEmpty(userOrg)) {
-			throw new AccessDeniedException("No organisation configured for user " + ctx.getUsername());
-		}
+		if (isEmpty(userOrg))
+			throw new PrivilegeException("No organisation configured for user " + ctx.getUsername());
+
 		// assert same organisation
 		String org = cert.getProperty(PARAM_ORGANISATION);
 		if (!userOrg.equals(org)) {
-			throw new AccessDeniedException(
-					"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrg
-							+ " / " + org);
+
+			if (assertHasPrivilege)
+				throw new AccessDeniedException(
+						"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrg
+								+ " / " + org);
+
+			return false;
 		}
 
 		// now delegate the rest of the validation to the super class
-		super.validateAction(ctx, privilege, restrictable);
+		return super.validateAction(ctx, privilege, restrictable, assertHasPrivilege);
 	}
 }

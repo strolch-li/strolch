@@ -15,6 +15,9 @@
  */
 package li.strolch.privilege.policy;
 
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
+
 import java.text.MessageFormat;
 
 import li.strolch.privilege.base.AccessDeniedException;
@@ -43,7 +46,19 @@ public class UsernameFromCertificatePrivilege implements PrivilegePolicy {
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
 			throws AccessDeniedException {
-		PrivilegePolicyHelper.preValidate(privilege, restrictable);
+		validateAction(ctx, privilege, restrictable, true);
+	}
+
+	@Override
+	public boolean hasPrivilege(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+			throws PrivilegeException {
+		return validateAction(ctx, privilege, restrictable, false);
+	}
+
+	protected boolean validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+			boolean assertHasPrivilege) throws AccessDeniedException {
+
+		preValidate(privilege, restrictable);
 
 		// get the value on which the action is to be performed
 		Object object = restrictable.getPrivilegeValue();
@@ -58,10 +73,10 @@ public class UsernameFromCertificatePrivilege implements PrivilegePolicy {
 
 		// if everything is allowed, then no need to carry on
 		if (privilege.isAllAllowed())
-			return;
+			return true;
 
 		Certificate cert = (Certificate) object;
 		String privilegeValue = cert.getUsername();
-		PrivilegePolicyHelper.checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue);
+		return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 	}
 }

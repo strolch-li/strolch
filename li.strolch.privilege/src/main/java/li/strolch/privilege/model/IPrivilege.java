@@ -35,51 +35,51 @@ public interface IPrivilege {
 	/**
 	 * @return a {@link PrivilegeRep} which is a representation of this object used to serialize and view on clients
 	 */
-	public abstract PrivilegeRep asPrivilegeRep();
+	PrivilegeRep asPrivilegeRep();
 
 	/**
 	 * @return the name
 	 */
-	public abstract String getName();
+	String getName();
 
 	/**
 	 * @return the policy
 	 */
-	public abstract String getPolicy();
+	String getPolicy();
 
 	/**
 	 * @return the allAllowed
 	 */
-	public abstract boolean isAllAllowed();
+	boolean isAllAllowed();
 
 	/**
 	 * @return the allowList
 	 */
-	public abstract Set<String> getAllowList();
+	Set<String> getAllowList();
 
 	/**
 	 * @return the denyList
 	 */
-	public abstract Set<String> getDenyList();
+	Set<String> getDenyList();
 
 	/**
 	 * @return true if there are values in the allow list
 	 */
-	public abstract boolean hasAllowed();
+	boolean hasAllowed();
 
 	/**
 	 * @return if the value is in the allow list
 	 */
-	public abstract boolean isAllowed(String value);
+	boolean isAllowed(String value);
 
 	/**
 	 * @return true if there are values in the deny list
 	 */
-	public abstract boolean hasDenied();
+	boolean hasDenied();
 
 	/**
 	 * @return true if the value is in the deny list
 	 */
-	public abstract boolean isDenied(String value);
+	boolean isDenied(String value);
 
 }

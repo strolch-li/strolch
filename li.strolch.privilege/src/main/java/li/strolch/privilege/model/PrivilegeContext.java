@@ -81,6 +81,10 @@ public class PrivilegeContext {
 		}
 	}
 
+	public boolean hasRole(String roleName) {
+		return this.userRep.hasRole(roleName);
+	}
+
 	public void assertHasRole(String roleName) throws AccessDeniedException {
 		if (!this.userRep.hasRole(roleName)) {
 			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.role"), //$NON-NLS-1$
@@ -100,6 +104,15 @@ public class PrivilegeContext {
 		throw new AccessDeniedException(msg);
 	}
 
+	public boolean hasAnyRole(String... roleNames) throws AccessDeniedException {
+		for (String roleName : roleNames) {
+			if (this.userRep.hasRole(roleName))
+				return true;
+		}
+
+		return false;
+	}
+
 	public IPrivilege getPrivilege(String privilegeName) throws AccessDeniedException {
 		assertHasPrivilege(privilegeName);
 		return this.privileges.get(privilegeName);
@@ -114,7 +127,7 @@ public class PrivilegeContext {
 		return policy;
 	}
 
-	// 
+	//
 	// business logic
 	//
 
@@ -150,5 +163,33 @@ public class PrivilegeContext {
 
 		// delegate to the policy
 		policy.validateAction(this, privilege, restrictable);
+	}
+
+	/**
+	 * Validates if the user for this context has the privilege to access to the given {@link Restrictable}. Returning
+	 * true if the user has the privilege, and false if not
+	 *
+	 * @param restrictable
+	 * 		the {@link Restrictable} which the user wants to access
+	 *
+	 * @return returns true if the user has the privilege, and false if not
+	 *
+	 * @throws PrivilegeException
+	 * 		if there is an internal error due to wrongly configured privileges or programming errors
+	 */
+	public boolean hasPrivilege(Restrictable restrictable) throws PrivilegeException {
+
+		// the privilege for the restrictable
+		String privilegeName = restrictable.getPrivilegeName();
+		IPrivilege privilege = this.privileges.get(privilegeName);
+		if (privilege == null)
+			return false;
+
+		// get the policy referenced by the restrictable
+		String policyName = privilege.getPolicy();
+		PrivilegePolicy policy = getPolicy(policyName);
+
+		// delegate to the policy
+		return policy.hasPrivilege(this, privilege, restrictable);
 	}
 }
