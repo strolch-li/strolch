@@ -202,6 +202,7 @@ public class ResponseUtil {
 	private static <T> void addPagingInfo(Paging<T> paging, JsonObject response) {
 		response.addProperty(MSG, StringHelper.DASH);
 
+		response.addProperty(DATA_SET_SIZE, paging.getDataSetSize());
 		response.addProperty(LIMIT, paging.getLimit());
 		response.addProperty(OFFSET, paging.getOffset());
 		response.addProperty(SIZE, paging.getSize());

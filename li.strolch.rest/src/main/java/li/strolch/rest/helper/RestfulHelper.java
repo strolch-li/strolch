@@ -15,13 +15,16 @@
  */
 package li.strolch.rest.helper;
 
+import static java.util.stream.Collectors.toList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
@@ -29,6 +32,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.RootElementSearchResult;
+import li.strolch.search.SearchResult;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -53,8 +57,27 @@ public class RestfulHelper {
 	public static <T extends StrolchRootElement> JsonObject toJson(QueryData queryData, long dataSetSize,
 			RootElementSearchResult<T> result, StrolchRootElementVisitor<JsonObject> toJsonVisitor) {
 
-		// paging
 		Paging<T> paging = result.toPaging(queryData.getOffset(), queryData.getLimit());
+		Function<T, JsonObject> toJsonFunc = t -> t.accept(toJsonVisitor);
+		return toJson(queryData, dataSetSize, paging, toJsonFunc);
+	}
+
+	public static <T> JsonObject toJson(QueryData queryData, long dataSetSize, SearchResult<T> result,
+			Function<T, JsonObject> toJsonVisitor) {
+
+		Paging<T> paging = result.toPaging(queryData.getOffset(), queryData.getLimit());
+		return toJson(queryData, dataSetSize, paging, toJsonVisitor);
+	}
+
+	public static <T> JsonObject toJson(QueryData queryData, long dataSetSize, Stream<T> stream,
+			Function<T, JsonObject> toJsonVisitor) {
+
+		Paging<T> paging = Paging.asPage(stream.collect(toList()), queryData.getOffset(), queryData.getLimit());
+		return toJson(queryData, dataSetSize, paging, toJsonVisitor);
+	}
+
+	public static <T> JsonObject toJson(QueryData queryData, long dataSetSize, Paging<T> paging,
+			Function<T, JsonObject> toJsonVisitor) {
 
 		// get page
 		List<T> page = paging.getPage();
@@ -77,8 +100,7 @@ public class RestfulHelper {
 		// add items
 		JsonArray data = new JsonArray();
 		for (T t : page) {
-			JsonElement element = t.accept(toJsonVisitor);
-			data.add(element);
+			data.add(toJsonVisitor.apply(t));
 		}
 		root.add("data", data);
 		return root;

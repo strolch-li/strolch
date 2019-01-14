@@ -16,6 +16,8 @@
 package li.strolch.rest.endpoint;
 
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.rest.helper.RestfulHelper.toJson;
+import static li.strolch.search.SearchBuilder.orderBy;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -59,7 +61,6 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
-import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.*;
 import li.strolch.service.*;
@@ -405,12 +406,12 @@ public class Inspector {
 		RootElementSearchResult<Resource> result;
 		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			dataSetSize = tx.getResourceMap().querySize(tx);
+			dataSetSize = tx.getResourceMap().querySize(tx, type);
 			result = search.search(tx);
 		}
 
 		// do ordering
-		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
+		result = orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
 		ResourceVisitor<JsonObject> visitor;
@@ -427,7 +428,7 @@ public class Inspector {
 				return jsonObject;
 			};
 		}
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, visitor);
+		JsonObject root = toJson(queryData, dataSetSize, result, visitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
@@ -450,12 +451,12 @@ public class Inspector {
 		RootElementSearchResult<Order> result;
 		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			dataSetSize = tx.getOrderMap().querySize(tx);
+			dataSetSize = tx.getOrderMap().querySize(tx, type);
 			result = search.search(tx);
 		}
 
 		// do ordering
-		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
+		result = orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
 		OrderVisitor<JsonObject> visitor;
@@ -474,7 +475,7 @@ public class Inspector {
 				return jsonObject;
 			};
 		}
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, visitor);
+		JsonObject root = toJson(queryData, dataSetSize, result, visitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();
@@ -497,12 +498,12 @@ public class Inspector {
 		RootElementSearchResult<Activity> result;
 		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			dataSetSize = tx.getActivityMap().querySize(tx);
+			dataSetSize = tx.getActivityMap().querySize(tx, type);
 			result = search.search(tx);
 		}
 
 		// do ordering
-		result = SearchBuilder.orderBy(result, queryData.getOrderBy(), queryData.isDescending());
+		result = orderBy(result, queryData.getOrderBy(), queryData.isDescending());
 
 		// build JSON response
 		ActivityVisitor<JsonObject> visitor;
@@ -521,7 +522,7 @@ public class Inspector {
 				return jsonObject;
 			};
 		}
-		JsonObject root = RestfulHelper.toJson(queryData, dataSetSize, result, visitor);
+		JsonObject root = toJson(queryData, dataSetSize, result, visitor);
 
 		// marshall result
 		return Response.ok(toString(root)).build();

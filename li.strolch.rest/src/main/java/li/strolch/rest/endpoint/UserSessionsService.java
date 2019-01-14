@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,21 +15,31 @@
  */
 package li.strolch.rest.endpoint;
 
+import static li.strolch.rest.helper.RestfulHelper.toJson;
+import static li.strolch.search.ValueSearchExpressionBuilder.collectionContains;
+import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Locale;
 
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.rest.model.QueryData;
 import li.strolch.rest.model.UserSession;
+import li.strolch.search.SearchResult;
+import li.strolch.search.ValueSearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +50,23 @@ public class UserSessionsService {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSessions(@Context HttpServletRequest request) {
+	public Response querySessions(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		logger.info("[" + cert.getUsername() + "] Returning all sessions...");
+		logger.info("[" + cert.getUsername() + "] Querying user sessions...");
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
-		JsonArray sessionsJ = new JsonArray();
-		sessionHandler.getSessions(cert).stream().map(UserSession::toJson).forEach(sessionsJ::add);
-		return Response.ok(sessionsJ.toString(), MediaType.APPLICATION_JSON).build();
+		String query = queryData.getQuery();
+		List<UserSession> sessions = sessionHandler.getSessions(cert);
+		SearchResult<UserSession> result = new ValueSearch<UserSession>() //
+				.where(containsIgnoreCase(UserSession::getUsername, query) //
+						.or(containsIgnoreCase(UserSession::getFirstname, query)) //
+						.or(containsIgnoreCase(UserSession::getLastname, query)) //
+						.or(collectionContains(UserSession::getUserRoles, query)) //
+				).search(sessions);
+
+		JsonObject root = toJson(queryData, sessions.size(), result, UserSession::toJson);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return Response.ok(gson.toJson(root), MediaType.APPLICATION_JSON).build();
 	}
 
 	@GET

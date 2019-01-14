@@ -15,6 +15,10 @@
  */
 package li.strolch.rest.endpoint;
 
+import static li.strolch.rest.helper.RestfulHelper.toJson;
+import static li.strolch.search.ValueSearchExpressionBuilder.collectionContains;
+import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -25,8 +29,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.json.PrivilegeElementFromJsonVisitor;
 import li.strolch.model.json.PrivilegeElementToJsonVisitor;
@@ -38,6 +41,9 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.rest.model.QueryData;
+import li.strolch.search.SearchResult;
+import li.strolch.search.ValueSearch;
 import li.strolch.service.JsonServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
@@ -56,12 +62,40 @@ public class PrivilegeUsersService {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUsers(@Context HttpServletRequest request) {
+	public Response queryUsers(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
+		String query = queryData.getQuery();
 		List<UserRep> users = privilegeHandler.getUsers(cert);
-		JsonArray usersArr = toJson(users);
+		SearchResult<UserRep> result = new ValueSearch<UserRep>() //
+				.where(containsIgnoreCase(UserRep::getUsername, query) //
+						.or(containsIgnoreCase(UserRep::getFirstname, query)) //
+						.or(containsIgnoreCase(UserRep::getLastname, query)) //
+						.or(collectionContains(UserRep::getRoles, query)) //
+				).search(users);
+
+		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+		JsonObject root = toJson(queryData, users.size(), result, t -> t.accept(visitor));
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return Response.ok(gson.toJson(root), MediaType.APPLICATION_JSON).build();
+	}
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("query")
+	public Response queryUsersByUserRep(String query, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
+
+		UserRep queryRep = new PrivilegeElementFromJsonVisitor().userRepFromJson(query);
+		List<UserRep> users = privilegeHandler.queryUsers(cert, queryRep);
+
+		JsonArray usersArr = new JsonArray();
+		for (UserRep userRep : users) {
+			usersArr.add(userRep.accept(new PrivilegeElementToJsonVisitor()));
+		}
 		return Response.ok(usersArr.toString(), MediaType.APPLICATION_JSON).build();
 	}
 
@@ -75,20 +109,6 @@ public class PrivilegeUsersService {
 		UserRep user = privilegeHandler.getUser(cert, username);
 		return Response.ok(user.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
 				.build();
-	}
-
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("query")
-	public Response queryUsers(String query, @Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
-
-		UserRep queryRep = new PrivilegeElementFromJsonVisitor().userRepFromJson(query);
-		List<UserRep> users = privilegeHandler.queryUsers(cert, queryRep);
-		JsonArray usersArr = toJson(users);
-		return Response.ok(usersArr.toString(), MediaType.APPLICATION_JSON).build();
 	}
 
 	@POST
@@ -281,13 +301,4 @@ public class PrivilegeUsersService {
 		}
 		return ResponseUtil.toResponse(svcResult);
 	}
-
-	private JsonArray toJson(List<UserRep> users) {
-		JsonArray usersArr = new JsonArray();
-		for (UserRep userRep : users) {
-			usersArr.add(userRep.accept(new PrivilegeElementToJsonVisitor()));
-		}
-		return usersArr;
-	}
-
 }

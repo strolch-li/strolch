@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,7 +43,8 @@ public class OperationsLogResource {
 		ctx.assertHasPrivilege(OperationsLog.class.getName());
 
 		OperationsLog operationsLog = RestfulStrolchComponent.getInstance().getComponent(OperationsLog.class);
-		Stream<LogMessage> messages = operationsLog.getMessages(realm).stream();
+		List<LogMessage> allMessages = operationsLog.getMessages(realm);
+		Stream<LogMessage> messages = allMessages.stream();
 
 		if (isNotEmpty(severityS)) {
 			LogSeverity severity = LogSeverity.valueOf(severityS);
@@ -81,6 +83,7 @@ public class OperationsLogResource {
 		messages = messages.sorted(comparing(LogMessage::getId).reversed());
 
 		Paging<LogMessage> paging = Paging.asPage(messages.collect(Collectors.toList()), offset, limit);
+		paging.setDataSetSize(allMessages.size());
 		return ResponseUtil.toResponse(paging, LogMessage::toJson);
 	}
 }
