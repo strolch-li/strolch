@@ -48,7 +48,7 @@ public interface SearchPredicates {
 	}
 
 	default SearchPredicate listContains(Object right) {
-		return PredicatesSupport.listContains(right);
+		return PredicatesSupport.collectionContains(right);
 	}
 
 	default SearchPredicate isIn(Object right) {

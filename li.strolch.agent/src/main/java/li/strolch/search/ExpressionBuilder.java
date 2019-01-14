@@ -5,8 +5,6 @@ import li.strolch.utils.collections.DateRange;
 
 /**
  * An interface to add search expressions to easily discover the possible search expressions
- *
- * @param <T>
  */
 public interface ExpressionBuilder {
 
@@ -52,8 +50,16 @@ public interface ExpressionBuilder {
 		return element -> PredicatesSupport.contains(right).matches(extract(element));
 	}
 
+	/**
+	 * @deprecated use {@link #collectionContains(Object)} instead
+	 */
+	@Deprecated
 	default <T extends StrolchRootElement> SearchExpression<T> listContains(Object right) {
-		return element -> PredicatesSupport.listContains(right).matches(extract(element));
+		return element -> PredicatesSupport.collectionContains(right).matches(extract(element));
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> collectionContains(Object right) {
+		return element -> PredicatesSupport.collectionContains(right).matches(extract(element));
 	}
 
 	default <T extends StrolchRootElement> SearchExpression<T> containsIgnoreCase(Object right) {
