@@ -31,6 +31,7 @@ public class Paging<T> {
 	private int limit;
 	private int offset;
 	private int size;
+	private int dataSetSize;
 
 	private List<T> input;
 	private List<T> page;
@@ -83,6 +84,23 @@ public class Paging<T> {
 	 */
 	public int getSize() {
 		return this.size;
+	}
+
+	/**
+	 * @return the size of all the data unfiltered
+	 */
+	public int getDataSetSize() {
+		return this.dataSetSize;
+	}
+
+	/**
+	 * Set the size of all the data unfiltered
+	 *
+	 * @param dataSetSize
+	 * 		the size of all the data unfiltered
+	 */
+	public void setDataSetSize(int dataSetSize) {
+		this.dataSetSize = dataSetSize;
 	}
 
 	/**
