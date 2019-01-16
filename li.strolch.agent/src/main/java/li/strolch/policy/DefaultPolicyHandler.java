@@ -81,6 +81,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 	@Override
 	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, StrolchTransaction tx) {
+		DBC.PRE.assertNotNull("policyDef must not be null!", policyDef);
 		DBC.PRE.assertNotNull("tx must not be null!", tx);
 		try {
 
@@ -92,6 +93,19 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 			throw new StrolchPolicyException(
 					MessageFormat.format("Failed to instantiate policy {0} due to {1}", policyDef, e.getMessage()), e);
 		}
+	}
+
+	@Override
+	public boolean isPolicyDefAvailable(PolicyDef policyDef) {
+		DBC.PRE.assertNotNull("policyDef must not be null!", policyDef);
+
+		if (policyDef instanceof KeyPolicyDef)
+			return this.classByTypeMap.containsElement(policyDef.getType(), policyDef.getValue());
+
+		if (policyDef instanceof JavaPolicyDef)
+			return true;
+
+		throw new IllegalArgumentException("Unhandled PolicyDev instance " + policyDef.getClass());
 	}
 
 	@Override
