@@ -28,6 +28,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.utils.helper.ExceptionHelper;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * A StrolchJob is a simple job which performs an action. A StrolchJob can be scheduled so that it executes
  * periodically, or trigger externally e.g. from a UI. Sub classes must implement the
  */
-public abstract class StrolchJob implements Runnable {
+public abstract class StrolchJob implements Runnable, Restrictable {
 
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchJob.class);
 
@@ -294,6 +295,16 @@ public abstract class StrolchJob implements Runnable {
 	}
 
 	protected abstract void execute(PrivilegeContext ctx) throws Exception;
+
+	@Override
+	public String getPrivilegeName() {
+		return StrolchJob.class.getName();
+	}
+
+	@Override
+	public Object getPrivilegeValue() {
+		return this.getClass().getName();
+	}
 
 	public JsonObject toJson() {
 		JsonObject jsonObject = new JsonObject();
