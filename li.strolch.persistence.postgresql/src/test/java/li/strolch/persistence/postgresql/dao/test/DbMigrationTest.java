@@ -15,6 +15,8 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static java.util.Comparator.comparing;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX;
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 
 import java.io.File;
@@ -49,8 +51,8 @@ public class DbMigrationTest {
 	@Test
 	public void shouldCreate() throws Exception {
 
-		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class, true, true, true);
+		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class, true,
+				true, true);
 
 		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
@@ -59,7 +61,7 @@ public class DbMigrationTest {
 
 			File scriptsD = new File("src/main/resources");
 			File[] scriptFiles = scriptsD.listFiles(f -> f.getName().endsWith("_initial.sql"));
-			Arrays.sort(scriptFiles, (f1, f2) -> f1.getName().compareTo(f2.getName()));
+			Arrays.sort(scriptFiles, comparing(File::getName));
 			for (File scriptFile : scriptFiles) {
 
 				String name = scriptFile.getName();
@@ -84,28 +86,20 @@ public class DbMigrationTest {
 	@Test
 	public void shouldMigrate() throws Exception {
 
-		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(PostgreSqlPersistenceHandler.SCRIPT_PREFIX,
-				PostgreSqlPersistenceHandler.class, true, true, true);
+		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class, true,
+				true, true);
 
 		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
 			// CREATE 0.1.0
-			dbCheck.createSchema(con, StrolchConstants.DEFAULT_REALM, Version.valueOf("0.1.0"));
+			Version currentVersion = Version.valueOf("0.1.0");
+			dbCheck.createSchema(con, StrolchConstants.DEFAULT_REALM, currentVersion);
 
-			File scriptsD = new File("src/main/resources");
-			File[] scriptFiles = scriptsD.listFiles(f -> f.getName().endsWith("_migration.sql"));
-			Arrays.sort(scriptFiles, (f1, f2) -> f1.getName().compareTo(f2.getName()));
-			for (File scriptFile : scriptFiles) {
+			Version expectedDbVersion = DbSchemaVersionCheck
+					.getExpectedDbVersion(SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class);
 
-				String name = scriptFile.getName();
-				String versionS = name
-						.substring("strolch_db_schema_".length(), name.length() - "_migration.sql".length());
-				Version version = Version.valueOf(versionS);
-				logger.info("Migrating Version " + version);
-
-				// MIGRATE
-				dbCheck.migrateSchema(con, StrolchConstants.DEFAULT_REALM, version);
-			}
+			// MIGRATE
+			dbCheck.migrateSchema(con, StrolchConstants.DEFAULT_REALM, currentVersion, expectedDbVersion);
 
 		} catch (SQLException e) {
 			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$

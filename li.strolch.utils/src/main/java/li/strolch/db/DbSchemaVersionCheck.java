@@ -19,14 +19,18 @@ import static li.strolch.db.DbConstants.PROP_DB_VERSION;
 import static li.strolch.db.DbConstants.RESOURCE_DB_VERSION;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.security.CodeSource;
 import java.sql.*;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import li.strolch.utils.Version;
 import li.strolch.utils.dbc.DBC;
@@ -127,7 +131,7 @@ public class DbSchemaVersionCheck {
 				createSchema(con, realm, expectedDbVersion);
 				break;
 			case MIGRATED:
-				migrateSchema(con, realm, expectedDbVersion);
+				migrateSchema(con, realm, currentVersion, expectedDbVersion);
 				break;
 			case DROPPED_CREATED:
 				throw new DbException("Migration type " + migrationType + " not handled!");
@@ -266,11 +270,14 @@ public class DbSchemaVersionCheck {
 	public static String getSql(String scriptPrefix, Class<?> ctxClass, Version version, String type)
 			throws DbException {
 		String schemaResourceS = MessageFormat.format("/{0}_db_schema_{1}_{2}.sql", scriptPrefix, version, type);
-		try (InputStream stream = ctxClass.getResourceAsStream(schemaResourceS);) {
+		try (InputStream stream = ctxClass.getResourceAsStream(schemaResourceS)) {
+
 			DBC.PRE.assertNotNull(
 					MessageFormat.format("Schema Resource file with name {0} does not exist!", schemaResourceS),
 					stream);
+
 			return FileHelper.readStreamToString(stream);
+
 		} catch (IOException e) {
 			throw new DbException("Schema creation resource file is missing or could not be read: " + schemaResourceS,
 					e);
@@ -315,13 +322,14 @@ public class DbSchemaVersionCheck {
 	 *
 	 * @param realm
 	 * 		the realm to migrate (a {@link DataSource} must exist for it)
-	 * @param version
+	 * @param expectedVersion
 	 * 		the version to upgrade to
 	 *
 	 * @throws DbException
 	 * 		if something goes wrong
 	 */
-	public void migrateSchema(Connection con, String realm, Version version) throws DbException {
+	public void migrateSchema(Connection con, String realm, Version currentVersion, Version expectedVersion)
+			throws DbException {
 
 		if (!this.allowSchemaMigration) {
 			String msg = "[{0}:{1}] Schema is not valid. Schema migration is disabled, thus can not continue!";
@@ -329,18 +337,100 @@ public class DbSchemaVersionCheck {
 			throw new DbException(msg);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Migrating schema to {2}...", this.app, realm, version));
+		if (expectedVersion.equals(currentVersion))
+			throw new IllegalStateException("Expected version " + expectedVersion + " is same as " + currentVersion
+					+ " and thus no migration is necessary!");
+		if (expectedVersion.compareTo(currentVersion) < 0)
+			throw new IllegalStateException(
+					"Expected version " + expectedVersion + " is weirdly before current version" + currentVersion
+							+ " for " + this.app);
 
-		String sql = getSql(this.app, this.ctxClass, version, "migration");
-		try (Statement st = con.createStatement()) {
-			st.execute(sql);
+		logger.info(MessageFormat
+				.format("[{0}:{1}] Migrating schema from {2} to {3}...", this.app, realm, currentVersion,
+						expectedVersion));
+
+		// first get all possible migration scripts
+		List<Version> versions = parseMigrationVersions();
+		if (versions.isEmpty())
+			throw new IllegalStateException("No migration versions found for context " + this.app);
+		versions.sort(Version::compareTo);
+
+		if (!versions.contains(expectedVersion))
+			throw new IllegalStateException(
+					"Expected version " + expectedVersion + " is missing as a migration version for " + this.app);
+
+		for (Version version : versions) {
+			if (version.compareTo(currentVersion) <= 0)
+				continue;
+
+			logger.info("Migrating to version " + version + "...");
+
+			String sql = getSql(this.app, this.ctxClass, version, "migration");
+			try (Statement st = con.createStatement()) {
+				st.execute(sql);
+			} catch (SQLException e) {
+				logger.error("Failed to execute schema migration SQL: \n" + sql);
+				throw new DbException("Failed to execute schema migration SQL: " + e.getMessage(), e);
+			}
+		}
+
+		try {
+			Version version = getCurrentVersion(con, this.app);
+			if (version == null || !version.equals(expectedVersion))
+				throw new IllegalStateException(
+						"Migration to version " + expectedVersion + " failed as version after migration is " + version);
 		} catch (SQLException e) {
-			logger.error("Failed to execute schema migration SQL: \n" + sql);
-			throw new DbException("Failed to execute schema migration SQL: " + e.getMessage(), e);
+			throw new IllegalStateException("Failed to read current version", e);
 		}
 
 		logger.info(MessageFormat
-				.format("[{0}:{1}] Successfully migrated schema to version {2}", this.app, realm, version));
+				.format("[{0}:{1}] Successfully migrated schema to version {2}", this.app, realm, expectedVersion));
+	}
+
+	public List<Version> parseMigrationVersions() {
+
+		List<Version> versions = new ArrayList<>();
+
+		try {
+			CodeSource src = this.ctxClass.getProtectionDomain().getCodeSource();
+			URL url = src.getLocation();
+
+			String scheme = url.toURI().getScheme();
+			if (scheme.equals("jar") || scheme.equals("file") && url.toString().endsWith(".jar")) {
+				try (ZipInputStream zip = new ZipInputStream(url.openStream())) {
+					ZipEntry ze;
+					while ((ze = zip.getNextEntry()) != null) {
+						String entryName = ze.getName();
+						if (entryName.endsWith(".sql") && entryName.contains("migration"))
+							versions.add(parseVersion(entryName));
+					}
+				} catch (IOException e) {
+					throw new IllegalStateException("Failed to read JAR: " + url, e);
+				}
+
+			} else if (scheme.equals("file")) {
+
+				File file = Paths.get(url.toURI()).toFile();
+				File[] files = file.listFiles();
+				if (files != null) {
+					for (File f : files) {
+						if (f.getName().endsWith(".sql") && f.getName().contains("migration"))
+							versions.add(parseVersion(f.getName()));
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to parse migration script versions", e);
+		}
+
+		return versions;
+	}
+
+	private Version parseVersion(String scriptName) {
+		int versionStart = (this.app + "_db_schema_").length();
+		int versionEnd = scriptName.indexOf("_", versionStart);
+		return Version.valueOf(scriptName.substring(versionStart, versionEnd));
 	}
 
 	/**
