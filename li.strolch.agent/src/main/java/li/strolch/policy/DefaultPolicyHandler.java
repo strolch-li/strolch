@@ -67,15 +67,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
-
-		if (configuration.getBoolean(PROP_READ_POLICY_FILE, Boolean.FALSE)) {
-			File policyFile = configuration.getConfigFile(PROP_POLICY_CONFIG, DEF_STROLCH_POLICIES_XML,
-					configuration.getRuntimeConfiguration());
-			parsePolicyFile(policyFile);
-		} else {
-			logger.warn("Not loading Policy configuration file, as disabled by config");
-		}
-
+		reloadPolicies(configuration);
 		super.initialize(configuration);
 	}
 
@@ -123,6 +115,21 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 		if (clazz == null)
 			throw new StrolchPolicyException(MessageFormat.format("No policy is configured for {0}", policyDef));
 		return (Class<T>) clazz;
+	}
+
+	@Override
+	public void reloadPolicies() {
+		reloadPolicies(getConfiguration());
+	}
+
+	private void reloadPolicies(ComponentConfiguration configuration) {
+		if (configuration.getBoolean(PROP_READ_POLICY_FILE, Boolean.FALSE)) {
+			File policyFile = configuration.getConfigFile(PROP_POLICY_CONFIG, DEF_STROLCH_POLICIES_XML,
+					configuration.getRuntimeConfiguration());
+			parsePolicyFile(policyFile);
+		} else {
+			logger.warn("Not loading Policy configuration file, as disabled by config");
+		}
 	}
 
 	@SuppressWarnings("unchecked")

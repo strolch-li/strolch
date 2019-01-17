@@ -64,4 +64,9 @@ public interface PolicyHandler {
 	 * @return true if the policy definition is known, false otherwise
 	 */
 	boolean isPolicyDefAvailable(PolicyDef policyDef);
+
+	/**
+	 * Reload the policies configuration
+	 */
+	void reloadPolicies();
 }
