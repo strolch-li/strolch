@@ -48,17 +48,17 @@ public interface StrolchRealm {
 	 * 
 	 * @return the name of the realm
 	 */
-	public String getRealm();
+	String getRealm();
 
 	/**
 	 * Locks the element with the given {@link Locator}
 	 * 
-	 * @param element
+	 * @param locator
 	 *            the locator of the element to lock
 	 * 
 	 * @see LockHandler#lock(Locator)
 	 */
-	public void lock(Locator locator);
+	void lock(Locator locator);
 
 	/**
 	 * Unlocks the element with the given {@link Locator} (lock might still be held, if lock counter is used)
@@ -68,7 +68,7 @@ public interface StrolchRealm {
 	 * 
 	 * @see LockHandler#unlock(Locator)
 	 */
-	public void unlock(Locator locator);
+	void unlock(Locator locator);
 
 	/**
 	 * Releases the lock for the given element
@@ -78,14 +78,14 @@ public interface StrolchRealm {
 	 * 
 	 * @see LockHandler#releaseLock(Locator)
 	 */
-	public void releaseLock(Locator locator);
+	void releaseLock(Locator locator);
 
 	/**
 	 * Returns the {@link DataStoreMode}
 	 * 
 	 * @return the {@link DataStoreMode}
 	 */
-	public DataStoreMode getMode();
+	DataStoreMode getMode();
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the given certificate
@@ -97,7 +97,7 @@ public interface StrolchRealm {
 	 * 
 	 * @return the newly created transaction
 	 */
-	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz);
+	StrolchTransaction openTx(Certificate certificate, Class<?> clazz);
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the given certificate
@@ -109,35 +109,35 @@ public interface StrolchRealm {
 	 * 
 	 * @return the newly created transaction
 	 */
-	public StrolchTransaction openTx(Certificate certificate, String action);
+	StrolchTransaction openTx(Certificate certificate, String action);
 
 	/**
 	 * Returns if the audit trail is enabled for reads
 	 * 
 	 * @return if the audit trail is enabled for reads
 	 */
-	public boolean isAuditTrailEnabledForRead();
+	boolean isAuditTrailEnabledForRead();
 
 	/**
 	 * Returns if the audit trail is enabled for modifications
 	 * 
 	 * @return if the audit trail is enabled for modifications
 	 */
-	public boolean isAuditTrailEnabled();
+	boolean isAuditTrailEnabled();
 
 	/**
 	 * Returns if observer updates is enabled
 	 * 
 	 * @return if observer updates is enabled
 	 */
-	public boolean isUpdateObservers();
+	boolean isUpdateObservers();
 
 	/**
 	 * Returns if versioning is enabled
 	 * 
 	 * @return if versioning is enabled
 	 */
-	public boolean isVersioningEnabled();
+	boolean isVersioningEnabled();
 
 	/**
 	 * Returns the {@link ObserverHandler} if observer updates are enabled
@@ -147,5 +147,5 @@ public interface StrolchRealm {
 	 * @throws IllegalArgumentException
 	 *             if observer updates are not enabled
 	 */
-	public ObserverHandler getObserverHandler() throws IllegalArgumentException;
+	ObserverHandler getObserverHandler() throws IllegalArgumentException;
 }

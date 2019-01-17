@@ -286,8 +286,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public <T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException {
 		Locator locator = element.getLocator();
-		this.realm.releaseLock(locator);
-		this.lockedElements.remove(locator);
+		releaseLock(locator);
 	}
 
 	@Override
@@ -300,6 +299,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		for (Locator locator : this.lockedElements) {
 			this.realm.releaseLock(locator);
 		}
+		this.lockedElements.clear();
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public interface LockHandler {
 	 * @throws StrolchLockException
 	 *             if the lock could not be acquired
 	 */
-	public void lock(Locator locator) throws StrolchLockException;
+	void lock(Locator locator) throws StrolchLockException;
 
 	/**
 	 * <p>
@@ -73,7 +73,7 @@ public interface LockHandler {
 	 * @throws StrolchLockException
 	 *             if the unlock failed
 	 */
-	public void unlock(Locator locator) throws StrolchLockException;
+	void unlock(Locator locator) throws StrolchLockException;
 
 	/**
 	 * Releases the lock on the element with the given {@link Locator}, by unlocking all locks, i.e. after this method
@@ -85,5 +85,5 @@ public interface LockHandler {
 	 * @throws StrolchLockException
 	 *             if the lock could not be released
 	 */
-	public void releaseLock(Locator locator) throws StrolchLockException;
+	void releaseLock(Locator locator) throws StrolchLockException;
 }
