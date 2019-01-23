@@ -1126,6 +1126,39 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean hasActivity(String type, String id);
 
 	/**
+	 * Add or update and thus persist the given {@link Resource} by calling the relevant {@link Command}
+	 *
+	 * @param resource
+	 * 		the resource to add or update
+	 *
+	 * @throws StrolchModelException
+	 * 		if the resource is null
+	 */
+	void addOrUpdate(Resource resource) throws StrolchModelException;
+
+	/**
+	 * Add or update and thus persist the given {@link Order} by calling the relevant {@link Command}
+	 *
+	 * @param order
+	 * 		the order to add or update
+	 *
+	 * @throws StrolchModelException
+	 * 		if the order is null
+	 */
+	void addOrUpdate(Order order) throws StrolchModelException;
+
+	/**
+	 * Add or update and thus persist the given {@link Activity} by calling the relevant {@link Command}
+	 *
+	 * @param activity
+	 * 		the activity to add or update
+	 *
+	 * @throws StrolchModelException
+	 * 		if the resource is null
+	 */
+	void addOrUpdate(Activity activity) throws StrolchModelException;
+
+	/**
 	 * Adds and thus persists the given {@link Resource} by calling the relevant {@link Command}
 	 *
 	 * @param resource
