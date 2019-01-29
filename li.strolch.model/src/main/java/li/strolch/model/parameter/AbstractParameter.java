@@ -198,6 +198,14 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		return builder.toString();
 	}
 
+	/**
+	 * Compares the value of the given parameter to this parameter
+	 *
+	 * @param otherParam
+	 * 		the parameter for which the value is to be compared to
+	 *
+	 * @return the {@link Comparable#compareTo(Object)} result
+	 */
 	@Override
 	public abstract int compareTo(Parameter<?> otherParam);
 }

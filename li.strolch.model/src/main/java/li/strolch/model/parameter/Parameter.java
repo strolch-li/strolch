@@ -185,6 +185,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	@Override
 	boolean equals(Object obj);
 
+	/**
+	 * Compares the value of the given parameter to this parameter
+	 *
+	 * @param o
+	 * 		the parameter for which the value is to be compared to
+	 *
+	 * @return the {@link Comparable#compareTo(Object)} result
+	 */
 	@Override
 	int compareTo(Parameter<?> o);
 
