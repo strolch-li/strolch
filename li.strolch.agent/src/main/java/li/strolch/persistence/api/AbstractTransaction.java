@@ -950,7 +950,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void addOrUpdate(Resource resource) throws StrolchModelException {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
-		if (hasResource(resource.getType(), resource.getId()))
+		if (hasResource(resource.getType(), resource.getId()) && !getObjectFilter()
+				.hasElement(Tags.RESOURCE, resource.getLocator()))
 			getObjectFilter().update(Tags.RESOURCE, resource.getLocator(), resource);
 		else
 			getObjectFilter().add(Tags.RESOURCE, resource.getLocator(), resource);
@@ -959,7 +960,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void addOrUpdate(Order order) throws StrolchModelException {
 		DBC.PRE.assertNotNull("order must not be null", order);
-		if (hasOrder(order.getType(), order.getId()))
+		if (hasOrder(order.getType(), order.getId()) && !getObjectFilter().hasElement(Tags.ORDER, order.getLocator()))
 			getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
 		else
 			getObjectFilter().add(Tags.ORDER, order.getLocator(), order);
@@ -968,7 +969,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void addOrUpdate(Activity activity) throws StrolchModelException {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
-		if (hasActivity(activity.getType(), activity.getId()))
+		if (hasActivity(activity.getType(), activity.getId()) && !getObjectFilter()
+				.hasElement(Tags.ACTIVITY, activity.getLocator()))
 			getObjectFilter().update(Tags.ACTIVITY, activity.getLocator(), activity);
 		else
 			getObjectFilter().add(Tags.ACTIVITY, activity.getLocator(), activity);
