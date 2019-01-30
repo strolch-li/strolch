@@ -2,8 +2,8 @@ package li.strolch.rest.endpoint;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.report.ReportConstants.*;
-import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
+import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.utils.helper.StringHelper.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -415,7 +415,7 @@ public class ReportResource {
 		// go through all filters and add to the map of sets
 		for (JsonElement elem : filters.getAsJsonArray()) {
 			if (!elem.isJsonObject()) {
-				logger.warn("There are wrong formated filters:\n" + elem.toString());
+				logger.warn("There are wrong formatted filters:\n" + elem.toString());
 				continue;
 			}
 
