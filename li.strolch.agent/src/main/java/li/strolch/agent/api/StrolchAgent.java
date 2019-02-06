@@ -29,10 +29,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.impl.ComponentContainerImpl;
-import li.strolch.runtime.ThreadPoolFactory;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
+import li.strolch.utils.NamedThreadPoolFactory;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
@@ -97,7 +97,7 @@ public class StrolchAgent {
 		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
 		ExecutorService executor = this.executors.get(poolName);
 		if (executor == null) {
-			executor = Executors.newCachedThreadPool(new ThreadPoolFactory(poolName));
+			executor = Executors.newCachedThreadPool(new NamedThreadPoolFactory(poolName));
 			this.executors.put(poolName, executor);
 		}
 
@@ -117,7 +117,7 @@ public class StrolchAgent {
 		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
 		ExecutorService executor = this.executors.get(poolName);
 		if (executor == null) {
-			executor = Executors.newSingleThreadExecutor(new ThreadPoolFactory(poolName));
+			executor = Executors.newSingleThreadExecutor(new NamedThreadPoolFactory(poolName));
 			this.executors.put(poolName, executor);
 		}
 
@@ -137,7 +137,7 @@ public class StrolchAgent {
 		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
 		ScheduledExecutorService executor = this.scheduledExecutors.get(poolName);
 		if (executor == null) {
-			executor = Executors.newScheduledThreadPool(4, new ThreadPoolFactory(poolName));
+			executor = Executors.newScheduledThreadPool(4, new NamedThreadPoolFactory(poolName));
 			this.scheduledExecutors.put(poolName, executor);
 		}
 
