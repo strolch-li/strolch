@@ -1,5 +1,11 @@
 
-CREATE TYPE log_severity_type AS ENUM ('Info', 'Notification', 'Warning', 'Error', 'Exception');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'log_severity_type') THEN
+        CREATE TYPE log_severity_type AS ENUM ('Info', 'Notification', 'Warning', 'Error', 'Exception');
+    END IF;
+END$$;
+
 
 CREATE TABLE IF NOT EXISTS operations_log (
   id varchar(255) PRIMARY KEY,
