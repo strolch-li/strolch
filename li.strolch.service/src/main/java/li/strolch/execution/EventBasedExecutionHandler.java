@@ -370,6 +370,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 						logger.warn("Activity " + activityLoc + " already removed from registered activities!");
 				}
 
+				logger.info("Archiving activity " + activityLoc + " with state " + activity.getState());
 				archiveActivity(realm, activity.getLocator());
 
 			} else {
