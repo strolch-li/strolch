@@ -28,5 +28,4 @@ public interface SingleSignOnHandler {
 	 * 		if the SSO can not be performed with the given data
 	 */
 	User authenticateSingleSignOn(Object data) throws PrivilegeException;
-
 }

@@ -39,6 +39,7 @@ import li.strolch.privilege.xml.CertificateStubsDomWriter;
 import li.strolch.privilege.xml.CertificateStubsSaxReader;
 import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.collections.Tuple;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.AesCryptoHelper;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
@@ -1183,6 +1184,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new IllegalStateException("The SSO Handler is not configured!");
 
 		User user = this.ssoHandler.authenticateSingleSignOn(data);
+		DBC.PRE.assertEquals("SSO Users must have UserState.REMOTE!", UserState.REMOTE, user.getUserState());
+
+		// persist this user
+		User internalUser = this.persistenceHandler.getUser(user.getUsername());
+		if (internalUser == null)
+			this.persistenceHandler.addUser(user);
+		else
+			this.persistenceHandler.replaceUser(user);
+
+		if (this.autoPersistOnUserChangesData)
+			this.persistenceHandler.persist();
 
 		// get 2 auth tokens
 		String authToken = this.encryptionHandler.nextToken();

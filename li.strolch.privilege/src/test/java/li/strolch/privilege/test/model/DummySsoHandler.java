@@ -24,6 +24,6 @@ public class DummySsoHandler implements SingleSignOnHandler {
 		Set<String> roles = Arrays.stream(map.get("roles").split(",")).map(String::trim).collect(Collectors.toSet());
 		Map<String, String> properties = new HashMap<>();
 		return new User(map.get("userId"), map.get("username"), null, null, null, -1, -1, map.get("firstName"),
-				map.get("lastName"), UserState.ENABLED, roles, Locale.ENGLISH, properties);
+				map.get("lastName"), UserState.REMOTE, roles, Locale.ENGLISH, properties);
 	}
 }
