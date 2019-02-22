@@ -1257,7 +1257,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		if (!this.persistSessionsPath.exists()) {
-			logger.info("No persisted sessions exist to be loaded.");
+			logger.info("Sessions file does not exist");
 			return;
 		}
 
