@@ -37,6 +37,11 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 		this.tx = strolchTx.getTx();
 	}
 
+	@Override
+	public boolean supportsPaging() {
+		return false;
+	}
+
 	protected abstract String getClassType();
 
 	protected IdOfSubTypeRef getIdRef(String type, String id) {
@@ -52,7 +57,6 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 		long size = 0;
 		Set<String> types = queryTypes();
 		for (String type : types) {
-
 			SubTypeRef subTypeRef = getTypeRef(type);
 			size += this.tx.getMetadataDao().querySize(subTypeRef);
 		}
@@ -60,9 +64,23 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	}
 
 	@Override
-	public long querySize(String type) {
-		SubTypeRef subTypeRef = getTypeRef(type);
-		return this.tx.getMetadataDao().querySize(subTypeRef);
+	public long querySize(String... types) {
+
+		if (types.length == 0)
+			return querySize();
+
+		if (types.length == 1) {
+			SubTypeRef subTypeRef = getTypeRef(types[0]);
+			return this.tx.getMetadataDao().querySize(subTypeRef);
+		}
+
+		int size = 0;
+		for (String type : types) {
+			SubTypeRef subTypeRef = getTypeRef(type);
+			size += this.tx.getMetadataDao().querySize(subTypeRef);
+		}
+
+		return size;
 	}
 
 	@Override
@@ -84,8 +102,20 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	}
 
 	@Override
-	public List<T> queryAll(String type) {
-		return this.tx.getObjectDao().queryAll(getTypeRef(type));
+	public List<T> queryAll(String... types) {
+		if (types.length == 0)
+			return queryAll();
+
+		if (types.length == 1) {
+			return this.tx.getObjectDao().queryAll(getTypeRef(types[0]));
+		}
+
+		List<T> objects = new ArrayList<>();
+		for (String type : types) {
+			objects.addAll(this.tx.getObjectDao().queryAll(getTypeRef(type)));
+		}
+
+		return objects;
 	}
 
 	@Override
@@ -133,6 +163,16 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	@Override
 	public void flush() {
 		// nothing to do
+	}
+
+	@Override
+	public List<T> queryAll(long limit, long offset) throws StrolchPersistenceException {
+		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
+	}
+
+	@Override
+	public List<T> queryAll(long limit, long offset, String... types) throws StrolchPersistenceException {
+		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
 	}
 
 	@Override

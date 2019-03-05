@@ -94,14 +94,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 	@Override
 	protected void internalSave(final Activity activity) {
 
-		String sql;
-		if (this.dataType == DataType.xml)
-			sql = insertAsXmlSqlS;
-		else if (this.dataType == DataType.json)
-			sql = insertAsJsonSqlS;
-		else
-			throw new IllegalStateException("Unhandled DataType " + this.dataType);
-		sql = MessageFormat.format(sql, getTableName());
+		String sql = getSql(insertAsXmlSqlS, insertAsJsonSqlS);
 
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
@@ -193,14 +186,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 							activity.getVersion()));
 		}
 
-		String sql;
-		if (this.dataType == DataType.xml)
-			sql = updateAsXmlSqlS;
-		else if (this.dataType == DataType.json)
-			sql = updateAsJsonSqlS;
-		else
-			throw new IllegalStateException("Unhandled DataType " + this.dataType);
-		sql = MessageFormat.format(sql, getTableName());
+		String sql = getSql(updateAsXmlSqlS, updateAsJsonSqlS);
 
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 

@@ -94,14 +94,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	@Override
 	protected void internalSave(final Resource resource) {
 
-		String sql;
-		if (this.dataType == DataType.xml)
-			sql = insertAsXmlSqlS;
-		else if (this.dataType == DataType.json)
-			sql = insertAsJsonSqlS;
-		else
-			throw new IllegalStateException("Unhandled DataType " + this.dataType);
-		sql = MessageFormat.format(sql, getTableName());
+		String sql = getSql(insertAsXmlSqlS, insertAsJsonSqlS);
 
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
@@ -193,14 +186,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		}
 
 		// now we update the existing object
-		String sql;
-		if (this.dataType == DataType.xml)
-			sql = updateAsXmlSqlS;
-		else if (this.dataType == DataType.json)
-			sql = updateAsJsonSqlS;
-		else
-			throw new IllegalStateException("Unhandled DataType " + this.dataType);
-		sql = MessageFormat.format(sql, getTableName());
+		String sql = getSql(updateAsXmlSqlS, updateAsJsonSqlS);
 
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
