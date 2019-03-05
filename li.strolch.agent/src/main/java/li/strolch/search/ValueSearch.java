@@ -21,9 +21,15 @@ public class ValueSearch<T> implements SearchPredicates {
 	 * @return the search result
 	 */
 	public SearchResult<T> search(Collection<T> input) {
+		return search(input.stream());
+	}
 
-		Stream<T> stream = input.stream();
-
+	/**
+	 * Performs the actual search on the given input list
+	 *
+	 * @return the search result
+	 */
+	public SearchResult<T> search(Stream<T> stream) {
 		if (this.expression != null)
 			stream = stream.filter(e -> this.expression.matches(e));
 
