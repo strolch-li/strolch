@@ -5,6 +5,9 @@ import static li.strolch.search.PredicatesSupport.containsIgnoreCase;
 import static li.strolch.search.PredicatesSupport.isEqualTo;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
+import java.util.List;
+import java.util.function.Function;
+
 import li.strolch.model.ParameterBag;
 import li.strolch.model.State;
 import li.strolch.model.StrolchRootElement;
@@ -74,6 +77,50 @@ public class SearchBuilder {
 	 */
 	public static ActivitySearch buildActivitySearch(String query, String... types) {
 		return buildSearch(new ActivitySearch().types(types), query);
+	}
+
+	public static <T> ValueSearch<T> buildSimpleValueSearch(ValueSearch<T> search, String query,
+			List<Function<T, Object>> extractors) {
+
+		if (extractors.isEmpty())
+			return search;
+
+		query = query.trim();
+		boolean negate = false;
+		if (query.startsWith("!")) {
+			negate = true;
+			query = query.substring(1);
+		}
+
+		String[] parts = query.split(" ");
+
+		ValueSearchExpression<T> searchExpression = null;
+		for (String part : parts) {
+			ValueSearchExpression<T> partSearchExpression = null;
+			for (Function<T, Object> extractor : extractors) {
+				if (partSearchExpression == null) {
+					partSearchExpression = ValueSearchExpressionBuilder.containsIgnoreCase(extractor, part);
+				} else {
+					partSearchExpression = partSearchExpression
+							.or(ValueSearchExpressionBuilder.containsIgnoreCase(extractor, part));
+				}
+			}
+
+			if (searchExpression == null) {
+				searchExpression = partSearchExpression;
+			} else {
+				searchExpression = searchExpression.and(partSearchExpression);
+			}
+		}
+
+		if (searchExpression != null) {
+			if (negate)
+				searchExpression = searchExpression.not();
+
+			search.where(searchExpression);
+		}
+
+		return search;
 	}
 
 	@SuppressWarnings("unchecked")
