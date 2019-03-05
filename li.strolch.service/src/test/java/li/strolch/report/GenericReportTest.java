@@ -46,10 +46,10 @@ public class GenericReportTest {
 	@Test
 	public void shouldGenerateJsonReport() {
 
-		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate);
+				Report report = new Report(tx, "stockReport")) {
 
-			new Report(tx, "stockReport") //
-					.doReportAsJson() //
+			report.doReportAsJson() //
 					.forEach(e -> {
 
 						switch (e.get("slot").getAsString()) {
@@ -111,10 +111,10 @@ public class GenericReportTest {
 	@Test
 	public void shouldFilterReport1() {
 
-		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate);
+				Report report = new Report(tx, "stockReport")) {
 
-			new Report(tx, "stockReport") //
-					.filter("Product", "product01") //
+			report.filter("Product", "product01") //
 					.doReportAsJson() //
 					.forEach(e -> {
 
@@ -134,10 +134,10 @@ public class GenericReportTest {
 	@Test
 	public void shouldFilterReport2() {
 
-		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate);
+				Report report = new Report(tx, "stockReport")) {
 
-			new Report(tx, "stockReport") //
-					.filter("Product", "product01") //
+			report.filter("Product", "product01") //
 					.filter("Location", "location02") //
 					.doReportAsJson() //
 					.forEach(e -> {
@@ -157,15 +157,15 @@ public class GenericReportTest {
 	@Test
 	public void shouldFilterReportByDateRange1() {
 
-		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate);
+				Report report = new Report(tx, "stockReport")) {
 
 			Date from = new Date(LocalDate.of(2016, 1, 1).toEpochDay() * 86400000);
 			Date to = new Date(LocalDate.of(2017, 1, 1).toEpochDay() * 86400000);
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
 			// expect no slots as all not in date range
-			List<JsonObject> result = new Report(tx, "stockReport") //
-					.filter("Product", "product01") //
+			List<JsonObject> result = report.filter("Product", "product01") //
 					.dateRange(dateRange) //
 					.doReportAsJson() //
 					.collect(toList());
@@ -189,38 +189,48 @@ public class GenericReportTest {
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
 
 			Date from = new Date(LocalDate.of(2016, 1, 1).toEpochDay() * 86400000);
-			Date to = new Date(LocalDate.of(2017, 1, 1).toEpochDay() * 86400000);
-			DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
 			// expect no orders as all not in date range
-			Report report = new Report(tx, "fromStockReport");
-			List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
-					.collect(toList());
-			assertTrue(result.isEmpty());
+			try (Report report = new Report(tx, "fromStockReport")) {
+
+				Date to = new Date(LocalDate.of(2017, 1, 1).toEpochDay() * 86400000);
+				DateRange dateRange = new DateRange().from(from, true).to(to, false);
+
+				List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+						.collect(toList());
+				assertTrue(result.isEmpty());
+			}
 
 			// expect 2 orders, as in date range
-			to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
-			dateRange = new DateRange().from(from, true).to(to, false);
-			report = new Report(tx, "fromStockReport");
-			result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson().collect(toList());
-			assertEquals(2, result.size());
+			try (Report report = new Report(tx, "fromStockReport")) {
+
+				Date to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
+				DateRange dateRange = new DateRange().from(from, true).to(to, false);
+
+				List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+						.collect(toList());
+				assertEquals(2, result.size());
+			}
 
 			// expect 4 orders, as all in date range
-			to = new Date(LocalDate.of(2017, 3, 2).toEpochDay() * 86400000);
-			dateRange = new DateRange().from(from, true).to(to, false);
-			report = new Report(tx, "fromStockReport");
-			result = report.filter("Product", "product01", "product02").dateRange(dateRange).doReportAsJson()
-					.collect(toList());
-			assertEquals(4, result.size());
+			try (Report report = new Report(tx, "fromStockReport")) {
+
+				Date to = new Date(LocalDate.of(2017, 3, 2).toEpochDay() * 86400000);
+				DateRange dateRange = new DateRange().from(from, true).to(to, false);
+
+				List<JsonObject> result = report.filter("Product", "product01", "product02").dateRange(dateRange)
+						.doReportAsJson().collect(toList());
+				assertEquals(4, result.size());
+			}
 		}
 	}
 
 	@Test
 	public void shouldCreateFilterCriteria() {
 
-		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate);
+				Report report = new Report(tx, "stockReport")) {
 
-			Report report = new Report(tx, "stockReport");
 			MapOfSets<String, StrolchRootElement> filterCriteria = report.generateFilterCriteria();
 
 			assertFalse(filterCriteria.containsSet("Location"));
@@ -237,9 +247,9 @@ public class GenericReportTest {
 	@Test
 	public void shouldCreateFilterCriteriaFiltered1() {
 
-		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate);
+				Report report = new Report(tx, "stockReport")) {
 
-			Report report = new Report(tx, "stockReport");
 			MapOfSets<String, StrolchRootElement> filterCriteria = report.filter("Product", "product01")
 					.generateFilterCriteria();
 
@@ -264,13 +274,13 @@ public class GenericReportTest {
 	@Test
 	public void shouldCreateFilterCriteriaFiltered2() {
 
-		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate)) {
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate);
+				Report report = new Report(tx, "stockReport")) {
 
 			Date from = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
 			Date to = new Date(LocalDate.of(2017, 3, 5).toEpochDay() * 86400000);
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
-			Report report = new Report(tx, "stockReport");
 			MapOfSets<String, StrolchRootElement> filterCriteria = report //
 					.dateRange(dateRange) //
 					.filter("Product", "product01") //

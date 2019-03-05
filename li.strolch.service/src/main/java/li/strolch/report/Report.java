@@ -17,7 +17,7 @@ import li.strolch.report.policy.ReportPolicy;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
 
-public class Report {
+public class Report implements AutoCloseable {
 
 	private final ReportPolicy reportPolicy;
 
@@ -88,4 +88,12 @@ public class Report {
 		});
 	}
 
+	@Override
+	public void close() {
+		try {
+			this.reportPolicy.close();
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to close underlying policy " + this.reportPolicy.getClass(), e);
+		}
+	}
 }

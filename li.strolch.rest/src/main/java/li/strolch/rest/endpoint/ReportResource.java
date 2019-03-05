@@ -106,10 +106,10 @@ public class ReportResource {
 		}
 
 		JsonArray result = new JsonArray();
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
-			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+				Report report = new Report(tx, id)) {
 
-			Report report = new Report(tx, id);
+			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
 			// set i18n data if possible
 			if (localeJ != null)
@@ -160,11 +160,10 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
 		}
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
-			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+				Report report = new Report(tx, id)) {
 
-			// get report
-			Report report = new Report(tx, id);
+			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
 			// set i18n data if possible
 			if (localeJ != null)
@@ -260,13 +259,12 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
 		}
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
+		long start = System.nanoTime();
+
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+				Report report = new Report(tx, id)) {
+
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
-
-			long start = System.nanoTime();
-
-			// get report
-			Report report = new Report(tx, id);
 
 			// set i18n data if possible
 			if (localeJ != null)
@@ -354,54 +352,56 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
 		}
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
-			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
+		// create CSV printer with header
+		StreamingOutput out = getOut(cert, realm, id, localeJ, filters);
 
-			// get report
-			Report report = new Report(tx, id);
-
-			// set i18n data if possible
-			if (localeJ != null)
-				report.getReportPolicy().setI18nData(localeJ);
-
-			// add filters from request
-			filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
-
-			// get headers
-			List<String> orderedColumnKeys = report.getColumnKeys();
-			String[] headers = new String[orderedColumnKeys.size()];
-			orderedColumnKeys.toArray(headers);
-
-			if (localeJ != null) {
-				for (int i = 0; i < headers.length; i++) {
-					if (localeJ.has(headers[i]))
-						headers[i] = localeJ.get(headers[i]).getAsString();
-				}
-			}
-
-			// create CSV printer with header
-			StreamingOutput out = getOut(report, headers);
-
-			// send
-			String fileName = id + "_" + System.currentTimeMillis() + ".csv";
-			return Response.ok(out, TEXT_CSV_TYPE)
-					.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
-		}
+		// send
+		String fileName = id + "_" + System.currentTimeMillis() + ".csv";
+		return Response.ok(out, TEXT_CSV_TYPE)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
 	}
 
-	private StreamingOutput getOut(Report report, String[] headers) {
+	private StreamingOutput getOut(Certificate cert, String realm, String reportId, JsonObject localeJ,
+			MapOfSets<String, String> filters) {
+
 		return out -> {
 
-			// get report content and add to the buffer
-			try (CSVPrinter csvP = new CSVPrinter(new OutputStreamWriter(out),
-					CSVFormat.DEFAULT.withHeader(headers).withDelimiter(';'))) {
-				report.doReport().forEach(row -> {
-					try {
-						csvP.printRecord(row.valueStream().collect(Collectors.toList())); // add to CSV
-					} catch (Exception e) {
-						logger.error("Could not write CSV row", e);
+			try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+					Report report = new Report(tx, reportId)) {
+
+				tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), reportId));
+
+				// set i18n data if possible
+				if (localeJ != null)
+					report.getReportPolicy().setI18nData(localeJ);
+
+				// add filters from request
+				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
+
+				// get headers
+				List<String> orderedColumnKeys = report.getColumnKeys();
+				String[] headers = new String[orderedColumnKeys.size()];
+				orderedColumnKeys.toArray(headers);
+
+				if (localeJ != null) {
+					for (int i = 0; i < headers.length; i++) {
+						if (localeJ.has(headers[i]))
+							headers[i] = localeJ.get(headers[i]).getAsString();
 					}
-				});
+				}
+
+				// get report content and add to the buffer
+				try (CSVPrinter csvP = new CSVPrinter(new OutputStreamWriter(out),
+						CSVFormat.DEFAULT.withHeader(headers).withDelimiter(';'))) {
+
+					report.doReport().forEach(row -> {
+						try {
+							csvP.printRecord(row.valueStream().collect(Collectors.toList())); // add to CSV
+						} catch (Exception e) {
+							logger.error("Could not write CSV row", e);
+						}
+					});
+				}
 			}
 		};
 	}

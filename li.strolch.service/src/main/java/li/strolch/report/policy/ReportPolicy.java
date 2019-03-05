@@ -44,6 +44,10 @@ public abstract class ReportPolicy extends StrolchPolicy {
 
 	public abstract long getCounter();
 
+	public void close() throws Exception {
+		// do nothing
+	}
+
 	@Override
 	public void undo() {
 		// can't be undone

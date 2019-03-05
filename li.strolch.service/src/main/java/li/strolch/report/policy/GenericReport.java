@@ -129,6 +129,10 @@ public class GenericReport extends ReportPolicy {
 		}
 	}
 
+	public boolean isDescending() {
+		return this.descending;
+	}
+
 	public void setI18nData(JsonObject i18nData) {
 		this.i18nData = i18nData;
 	}
