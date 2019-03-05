@@ -74,8 +74,7 @@ public class UserRep implements Serializable {
 
 		if (propertyMap != null) {
 			this.properties = new HashMap<>(propertyMap);
-			if (this.properties.containsKey(""))
-				this.properties.remove("");
+			this.properties.remove("");
 		}
 	}
 
@@ -345,10 +344,8 @@ public class UserRep implements Serializable {
 		Set<String> roles = new HashSet<>(this.roles);
 		Map<String, String> propertyMap = this.properties == null ? null : new HashMap<>(this.properties);
 
-		UserRep clone = new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, roles,
+		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, roles,
 				this.locale, propertyMap);
-
-		return clone;
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
