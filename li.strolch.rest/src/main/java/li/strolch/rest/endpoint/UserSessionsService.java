@@ -16,8 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import static li.strolch.rest.helper.RestfulHelper.toJson;
-import static li.strolch.search.ValueSearchExpressionBuilder.collectionContains;
-import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
+import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -57,12 +57,13 @@ public class UserSessionsService {
 
 		String query = queryData.getQuery();
 		List<UserSession> sessions = sessionHandler.getSessions(cert);
-		SearchResult<UserSession> result = new ValueSearch<UserSession>() //
-				.where(containsIgnoreCase(UserSession::getUsername, query) //
-						.or(containsIgnoreCase(UserSession::getFirstname, query)) //
-						.or(containsIgnoreCase(UserSession::getLastname, query)) //
-						.or(collectionContains(UserSession::getUserRoles, query)) //
-				).search(sessions);
+
+		SearchResult<UserSession> result = buildSimpleValueSearch(new ValueSearch<UserSession>(), query,
+				Arrays.asList( //
+						UserSession::getUsername, //
+						UserSession::getFirstname,  //
+						UserSession::getLastname,  //
+						UserSession::getUserRoles)).search(sessions);
 
 		JsonObject root = toJson(queryData, sessions.size(), result, UserSession::toJson);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();

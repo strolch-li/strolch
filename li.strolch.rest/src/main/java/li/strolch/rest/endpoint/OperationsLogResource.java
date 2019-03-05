@@ -1,6 +1,7 @@
 package li.strolch.rest.endpoint;
 
 import static java.util.Comparator.comparing;
+import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,6 +26,7 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.search.ValueSearch;
 import li.strolch.utils.collections.Paging;
 
 @Path("strolch/operations-log")
@@ -57,8 +60,9 @@ public class OperationsLogResource {
 		}
 
 		if (isNotEmpty(query)) {
-			messages = messages.filter(logMessage -> logMessage.getMessage().toLowerCase().contains(query) //
-					|| logMessage.getLocator().getPathElements().contains(query));
+			ValueSearch<LogMessage> valueSearch = buildSimpleValueSearch(new ValueSearch<>(), query,
+					Arrays.asList(LogMessage::getMessage, m -> m.getLocator().toString()));
+			messages = valueSearch.search(messages).asStream();
 		}
 
 		if (isNotEmpty(fromS) && isNotEmpty(toS)) {

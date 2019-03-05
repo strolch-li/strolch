@@ -16,8 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import static li.strolch.rest.helper.RestfulHelper.toJson;
-import static li.strolch.search.ValueSearchExpressionBuilder.collectionContains;
-import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
+import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
@@ -68,12 +68,12 @@ public class PrivilegeUsersService {
 
 		String query = queryData.getQuery();
 		List<UserRep> users = privilegeHandler.getUsers(cert);
-		SearchResult<UserRep> result = new ValueSearch<UserRep>() //
-				.where(containsIgnoreCase(UserRep::getUsername, query) //
-						.or(containsIgnoreCase(UserRep::getFirstname, query)) //
-						.or(containsIgnoreCase(UserRep::getLastname, query)) //
-						.or(collectionContains(UserRep::getRoles, query)) //
-				).search(users);
+		SearchResult<UserRep> result = buildSimpleValueSearch(new ValueSearch<UserRep>(), query, Arrays.asList( //
+				UserRep::getUsername, //
+				UserRep::getFirstname,  //
+				UserRep::getLastname,  //
+				userRep -> userRep.getUserState().name(),  //
+				UserRep::getRoles)).search(users);
 
 		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 		JsonObject root = toJson(queryData, users.size(), result, t -> t.accept(visitor));
