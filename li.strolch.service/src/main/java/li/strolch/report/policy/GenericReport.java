@@ -291,7 +291,7 @@ public class GenericReport extends ReportPolicy {
 	}
 
 	/**
-	 * Generates the filter criteria for this report, i.e. it return a {@link MapOfSets} which defines the type of
+	 * Generates the filter criteria for this report, i.e. it returns a {@link MapOfSets} which defines the type of
 	 * elements on which a filter can be set and the {@link Set} of IDs which can be used for filtering.
 	 *
 	 * @return the filter criteria as a map of sets

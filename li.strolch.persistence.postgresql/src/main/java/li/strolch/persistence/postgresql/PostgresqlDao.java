@@ -61,9 +61,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	private static final String queryAllAsJsonLimitSqlS = "select id, type, asjson from {0} where latest = true order by id limit {1} offset {2}";
 
 	private static final String queryAllByTypeAsXmlSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true";
-	private static final String queryAllByTypeAsXmlLimitSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true order by id limit {1} offset {2}";
+	private static final String queryAllByTypeAsXmlLimitSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
 	private static final String queryAllByTypeAsJsonSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true";
-	private static final String queryAllByTypeAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true order by id limit {1} offset {2}";
+	private static final String queryAllByTypeAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
 
 	protected final DataType dataType;
 	protected Connection connection;
