@@ -33,10 +33,6 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	private Double value;
 
-	public FloatValue(Double value) {
-		this.value = value;
-	}
-
 	public FloatValue(double value) {
 		this.value = value;
 	}

@@ -32,10 +32,6 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 
 	private Integer value;
 
-	public IntegerValue(Integer value) {
-		this.value = value;
-	}
-
 	public IntegerValue(int value) {
 		this.value = value;
 	}

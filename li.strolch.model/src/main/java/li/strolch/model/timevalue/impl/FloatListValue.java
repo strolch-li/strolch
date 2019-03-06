@@ -36,10 +36,6 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 
 	private List<Double> value;
 
-	public FloatListValue(Double value) {
-		this.value = Collections.singletonList(value);
-	}
-
 	public FloatListValue(double value) {
 		this.value = Collections.singletonList(value);
 	}

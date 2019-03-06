@@ -32,10 +32,6 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 
 	private Boolean value;
 
-	public BooleanValue(Boolean value) {
-		this.value = value;
-	}
-
 	public BooleanValue(boolean value) {
 		this.value = value;
 	}
