@@ -1,10 +1,7 @@
 package li.strolch.model.activity;
 
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.STATE_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_TIME_30;
-
-import java.io.StringWriter;
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.assertEquals;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,21 +11,25 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.IOException;
+import java.io.StringWriter;
 
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.model.xml.StrolchElementToDomVisitor;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class ActionTest {
 
-	Action action;
+	private static final Logger logger = LoggerFactory.getLogger(ActionTest.class);
+
+	private Action action;
 
 	/**
 	 * initialize the resources with states and the activity with 2 actions.
@@ -51,21 +52,21 @@ public class ActionTest {
 
 	@Test
 	public void testGetStart() {
-		Assert.assertTrue(STATE_TIME_10 == this.action.getStart());
+		assertEquals(STATE_TIME_10, (long) this.action.getStart());
 	}
 
 	@Test
 	public void testGetEnd() {
-		Assert.assertTrue(STATE_TIME_30 == this.action.getEnd());
+		assertEquals(STATE_TIME_30, (long) this.action.getEnd());
 	}
 
 	@Test
 	public void testClone() {
 		Action clone = this.action.getClone();
-		Assert.assertEquals(this.action.toString(), clone.toString());
-		Assert.assertEquals(this.action.changes.size(), clone.changes.size());
+		assertEquals(this.action.toString(), clone.toString());
+		assertEquals(this.action.changes.size(), clone.changes.size());
 		for (int i = 0; i < this.action.changes.size(); i++) {
-			Assert.assertEquals(this.action.changes.get(i).getTime(), clone.changes.get(i).getTime());
+			assertEquals(this.action.changes.get(i).getTime(), clone.changes.get(i).getTime());
 		}
 	}
 
@@ -81,9 +82,13 @@ public class ActionTest {
 		document.appendChild(dom);
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		StringWriter stringWriter = new StringWriter();
-		transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
-		String content = stringWriter.getBuffer().toString();
-		System.out.println(content);
+		String content;
+		try (StringWriter stringWriter = new StringWriter()) {
+			transformer.transform(new DOMSource(document), new StreamResult(stringWriter));
+			content = stringWriter.getBuffer().toString();
+			logger.info(content);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

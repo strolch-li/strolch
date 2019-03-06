@@ -186,6 +186,7 @@
             <xs:enumeration value="Boolean"/>
             <xs:enumeration value="Integer"/>
             <xs:enumeration value="Float"/>
+            <xs:enumeration value="FloatList"/>
             <xs:enumeration value="StringSet"/>
         </xs:restriction>
     </xs:simpleType>

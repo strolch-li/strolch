@@ -11,10 +11,7 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.*;
-import li.strolch.model.timedstate.BooleanTimedState;
-import li.strolch.model.timedstate.FloatTimedState;
-import li.strolch.model.timedstate.IntegerTimedState;
-import li.strolch.model.timedstate.StringSetTimedState;
+import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.impl.*;
 import org.junit.Test;
 
@@ -217,6 +214,21 @@ public class ReadonlyModelTest {
 		}
 		try {
 			floatState.getTimeEvolution().setValueAt(1L, new FloatValue(2.0D));
+			fail("Should have failed as readOnly!");
+		} catch (IllegalStateException e) {
+			assertThat(e.getMessage(), containsString("is currently readOnly"));
+		}
+
+		FloatListTimedState floatListState = resource.getTimedState(STATE_FLOAT_LIST_ID);
+		assertTrue("Should be readOnly", floatListState.isReadOnly());
+		try {
+			floatListState.setStateFromStringAt(1L, "1.0D");
+			fail("Should have failed as readOnly!");
+		} catch (IllegalStateException e) {
+			assertThat(e.getMessage(), containsString("is currently readOnly"));
+		}
+		try {
+			floatListState.getTimeEvolution().setValueAt(1L, new FloatListValue(2.0D));
 			fail("Should have failed as readOnly!");
 		} catch (IllegalStateException e) {
 			assertThat(e.getMessage(), containsString("is currently readOnly"));

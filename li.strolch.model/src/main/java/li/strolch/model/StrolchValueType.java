@@ -21,10 +21,7 @@ import li.strolch.model.parameter.*;
 import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
-import li.strolch.model.timevalue.impl.BooleanValue;
-import li.strolch.model.timevalue.impl.FloatValue;
-import li.strolch.model.timevalue.impl.IntegerValue;
-import li.strolch.model.timevalue.impl.StringSetValue;
+import li.strolch.model.timevalue.impl.*;
 
 public enum StrolchValueType {
 
@@ -270,6 +267,9 @@ public enum StrolchValueType {
 	 * Can be used for:
 	 * <ul>
 	 * <li>{@link Parameter}</li>
+	 * <li>{@link TimedState}</li>
+	 * <li>{@link IValue}</li>
+	 * <li>{@link IValueChange}</li>
 	 * </ul>
 	 */
 	FLOAT_LIST("FloatList") {
@@ -285,14 +285,12 @@ public enum StrolchValueType {
 
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
-			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+			return new FloatListTimedState();
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
-			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+			return new FloatListValue(valueAsString);
 		}
 	},
 

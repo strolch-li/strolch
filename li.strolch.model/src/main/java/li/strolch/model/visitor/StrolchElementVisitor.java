@@ -21,53 +21,52 @@ import li.strolch.model.Resource;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.*;
-import li.strolch.model.timedstate.BooleanTimedState;
-import li.strolch.model.timedstate.FloatTimedState;
-import li.strolch.model.timedstate.IntegerTimedState;
-import li.strolch.model.timedstate.StringSetTimedState;
+import li.strolch.model.timedstate.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface StrolchElementVisitor<U> extends StrolchVisitor {
 
-	public U visitOrder(Order order);
+	U visitOrder(Order order);
 
-	public U visitResource(Resource resource);
+	U visitResource(Resource resource);
 
-	public U visitActivity(Activity activity);
+	U visitActivity(Activity activity);
 
-	public U visitAction(Action action);
+	U visitAction(Action action);
 
-	public U visitBooleanParam(BooleanParameter param);
+	U visitBooleanParam(BooleanParameter param);
 
-	public U visitDateParam(DateParameter param);
+	U visitDateParam(DateParameter param);
 
-	public U visitDurationParam(DurationParameter param);
+	U visitDurationParam(DurationParameter param);
 
-	public U visitFloatParam(FloatParameter param);
+	U visitFloatParam(FloatParameter param);
 
-	public U visitIntegerParam(IntegerParameter param);
+	U visitIntegerParam(IntegerParameter param);
 
-	public U visitLongParam(LongParameter param);
+	U visitLongParam(LongParameter param);
 
-	public U visitStringParam(StringParameter param);
+	U visitStringParam(StringParameter param);
 
-	public U visitStringListParam(StringListParameter param);
+	U visitStringListParam(StringListParameter param);
 
-	public U visitIntegerListParam(IntegerListParameter param);
+	U visitIntegerListParam(IntegerListParameter param);
 
-	public U visitFloatListParam(FloatListParameter param);
+	U visitFloatListParam(FloatListParameter param);
 
-	public U visitLongListParam(LongListParameter param);
+	U visitLongListParam(LongListParameter param);
 
-	public U visitBooleanState(BooleanTimedState state);
+	U visitBooleanState(BooleanTimedState state);
 
-	public U visitFloatState(FloatTimedState state);
+	U visitFloatState(FloatTimedState state);
 
-	public U visitIntegerState(IntegerTimedState state);
+	U visitFloatListState(FloatListTimedState state);
 
-	public U visitStringState(StringSetTimedState state);
+	U visitIntegerState(IntegerTimedState state);
 
-	public U visitParameterBag(ParameterBag bag);
+	U visitStringState(StringSetTimedState state);
+
+	U visitParameterBag(ParameterBag bag);
 }

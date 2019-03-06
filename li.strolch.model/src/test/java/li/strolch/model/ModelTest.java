@@ -15,88 +15,30 @@
  */
 package li.strolch.model;
 
-import static li.strolch.model.ModelGenerator.ACTION_RES_ID;
-import static li.strolch.model.ModelGenerator.ACTION_RES_TYPE;
-import static li.strolch.model.ModelGenerator.BAG_ID;
-import static li.strolch.model.ModelGenerator.BAG_NAME;
-import static li.strolch.model.ModelGenerator.BAG_TYPE;
-import static li.strolch.model.ModelGenerator.PARAM_BOOLEAN_ID;
-import static li.strolch.model.ModelGenerator.PARAM_DATE_ID;
-import static li.strolch.model.ModelGenerator.PARAM_FLOAT_ID;
-import static li.strolch.model.ModelGenerator.PARAM_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_FLOAT_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_LONG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_STRING_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LONG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
-import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_ID;
-import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_0;
-import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_20;
-import static li.strolch.model.ModelGenerator.STATE_BOOLEAN_TIME_30;
-import static li.strolch.model.ModelGenerator.STATE_FLOAT_ID;
-import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_0;
-import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_20;
-import static li.strolch.model.ModelGenerator.STATE_FLOAT_TIME_30;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_0;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_20;
-import static li.strolch.model.ModelGenerator.STATE_INTEGER_TIME_30;
-import static li.strolch.model.ModelGenerator.STATE_STRING_ID;
-import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_0;
-import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_20;
-import static li.strolch.model.ModelGenerator.STATE_STRING_TIME_30;
-import static li.strolch.model.ModelGenerator.STATE_TIME_0;
-import static li.strolch.model.ModelGenerator.STATE_TIME_10;
-import static li.strolch.model.ModelGenerator.STATE_TIME_20;
-import static li.strolch.model.ModelGenerator.STATE_TIME_30;
-import static li.strolch.model.ModelGenerator.createActivity;
-import static li.strolch.model.ModelGenerator.createOrder;
-import static li.strolch.model.ModelGenerator.createResource;
-import static li.strolch.model.Tags.BAG;
-import static li.strolch.model.Tags.ORDER;
-import static li.strolch.model.Tags.RESOURCE;
-import static li.strolch.model.Tags.STATE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.model.Tags.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
-import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.FloatListParameter;
-import li.strolch.model.parameter.FloatParameter;
-import li.strolch.model.parameter.IntegerListParameter;
-import li.strolch.model.parameter.IntegerParameter;
-import li.strolch.model.parameter.LongListParameter;
-import li.strolch.model.parameter.LongParameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
-import li.strolch.model.timedstate.BooleanTimedState;
-import li.strolch.model.timedstate.FloatTimedState;
-import li.strolch.model.timedstate.IntegerTimedState;
-import li.strolch.model.timedstate.StringSetTimedState;
+import li.strolch.model.parameter.*;
+import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.BooleanValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("nls")
 public class ModelTest {
@@ -547,17 +489,25 @@ public class ModelTest {
 
 		FloatTimedState floatState = resource.getTimedState(STATE_FLOAT_ID);
 		assertNotNull("Float State missing with id " + STATE_FLOAT_ID, floatState);
-		assertEquals(STATE_FLOAT_TIME_0, floatState.getStateAt(STATE_TIME_0).getValue().getValue());
-		assertEquals(STATE_FLOAT_TIME_10, floatState.getStateAt(STATE_TIME_10).getValue().getValue());
-		assertEquals(STATE_FLOAT_TIME_20, floatState.getStateAt(STATE_TIME_20).getValue().getValue());
-		assertEquals(STATE_FLOAT_TIME_30, floatState.getStateAt(STATE_TIME_30).getValue().getValue());
+		assertEquals(STATE_FLOAT_TIME_0, floatState.getStateAt(STATE_TIME_0).getValue().getValue(), 0.0);
+		assertEquals(STATE_FLOAT_TIME_10, floatState.getStateAt(STATE_TIME_10).getValue().getValue(), 0.0);
+		assertEquals(STATE_FLOAT_TIME_20, floatState.getStateAt(STATE_TIME_20).getValue().getValue(), 0.0);
+		assertEquals(STATE_FLOAT_TIME_30, floatState.getStateAt(STATE_TIME_30).getValue().getValue(), 0.0);
+
+		FloatListTimedState floatListState = resource.getTimedState(STATE_FLOAT_LIST_ID);
+		assertNotNull("Float List State missing with id " + STATE_FLOAT_ID, floatListState);
+		assertEquals(singletonList(STATE_FLOAT_TIME_0), floatListState.getStateAt(STATE_TIME_0).getValue().getValue());
+		assertEquals(singletonList(STATE_FLOAT_TIME_0), floatListState.getStateAt(STATE_TIME_10).getValue().getValue());
+		assertEquals(singletonList(STATE_FLOAT_TIME_0), floatListState.getStateAt(STATE_TIME_20).getValue().getValue());
+		assertEquals(asList(STATE_FLOAT_TIME_0, STATE_FLOAT_TIME_10, STATE_FLOAT_TIME_20),
+				floatListState.getStateAt(STATE_TIME_30).getValue().getValue());
 
 		IntegerTimedState integerState = resource.getTimedState(STATE_INTEGER_ID);
 		assertNotNull("Integer State missing with id " + STATE_INTEGER_ID, integerState);
-		assertEquals(STATE_INTEGER_TIME_0, integerState.getStateAt(STATE_TIME_0).getValue().getValue());
-		assertEquals(STATE_INTEGER_TIME_10, integerState.getStateAt(STATE_TIME_10).getValue().getValue());
-		assertEquals(STATE_INTEGER_TIME_20, integerState.getStateAt(STATE_TIME_20).getValue().getValue());
-		assertEquals(STATE_INTEGER_TIME_30, integerState.getStateAt(STATE_TIME_30).getValue().getValue());
+		assertEquals(STATE_INTEGER_TIME_0, integerState.getStateAt(STATE_TIME_0).getValue().getValue(), 0.0);
+		assertEquals(STATE_INTEGER_TIME_10, integerState.getStateAt(STATE_TIME_10).getValue().getValue(), 0.0);
+		assertEquals(STATE_INTEGER_TIME_20, integerState.getStateAt(STATE_TIME_20).getValue().getValue(), 0.0);
+		assertEquals(STATE_INTEGER_TIME_30, integerState.getStateAt(STATE_TIME_30).getValue().getValue(), 0.0);
 
 		StringSetTimedState stringState = resource.getTimedState(STATE_STRING_ID);
 		assertNotNull("String State missing with id " + STATE_STRING_ID, stringState);

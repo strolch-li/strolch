@@ -76,6 +76,9 @@ public class ModelGenerator {
 	public static final String STATE_FLOAT_ID = "@state1";
 	public static final String STATE_FLOAT_NAME = "Float State";
 
+	public static final String STATE_FLOAT_LIST_ID = "@state5";
+	public static final String STATE_FLOAT_LIST_NAME = "Float List State";
+
 	public static final String STATE_INTEGER_ID = "@state2";
 	public static final String STATE_INTEGER_NAME = "Integer State";
 
@@ -91,25 +94,25 @@ public class ModelGenerator {
 	public static final long STATE_TIME_30 = 30L;
 	public static final long STATE_TIME_40 = 40L;
 
-	public static final Double STATE_FLOAT_TIME_0 = 0.0D;
-	public static final Double STATE_FLOAT_TIME_10 = 10.0D;
-	public static final Double STATE_FLOAT_TIME_20 = 20.0D;
-	public static final Double STATE_FLOAT_TIME_30 = 30.0D;
+	public static final double STATE_FLOAT_TIME_0 = 0.0D;
+	public static final double STATE_FLOAT_TIME_10 = 10.0D;
+	public static final double STATE_FLOAT_TIME_20 = 20.0D;
+	public static final double STATE_FLOAT_TIME_30 = 30.0D;
 
-	public static final Integer STATE_INTEGER_TIME_0 = 0;
-	public static final Integer STATE_INTEGER_TIME_10 = 10;
-	public static final Integer STATE_INTEGER_TIME_20 = 20;
-	public static final Integer STATE_INTEGER_TIME_30 = 30;
+	public static final int STATE_INTEGER_TIME_0 = 0;
+	public static final int STATE_INTEGER_TIME_10 = 10;
+	public static final int STATE_INTEGER_TIME_20 = 20;
+	public static final int STATE_INTEGER_TIME_30 = 30;
 
 	public static final String STATE_STRING_TIME_0 = "empty";
 	public static final String STATE_STRING_TIME_10 = "a";
 	public static final String STATE_STRING_TIME_20 = "b";
 	public static final String STATE_STRING_TIME_30 = "c";
 
-	public static final Boolean STATE_BOOLEAN_TIME_0 = Boolean.FALSE;
-	public static final Boolean STATE_BOOLEAN_TIME_10 = Boolean.TRUE;
-	public static final Boolean STATE_BOOLEAN_TIME_20 = Boolean.FALSE;
-	public static final Boolean STATE_BOOLEAN_TIME_30 = Boolean.TRUE;
+	public static final boolean STATE_BOOLEAN_TIME_0 = Boolean.FALSE;
+	public static final boolean STATE_BOOLEAN_TIME_10 = Boolean.TRUE;
+	public static final boolean STATE_BOOLEAN_TIME_20 = Boolean.FALSE;
+	public static final boolean STATE_BOOLEAN_TIME_30 = Boolean.TRUE;
 
 	public static final String BAG_ID = "@bag01";
 	public static final String BAG_NAME = "Test Bag";
@@ -158,6 +161,13 @@ public class ModelGenerator {
 		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_20, floatValueChange), true);
 		floatTimedState.applyChange(new ValueChange<>(STATE_TIME_30, floatValueChange), true);
 		resource.addTimedState(floatTimedState);
+
+		// float list state
+		FloatListTimedState floatListTimedState = new FloatListTimedState(STATE_FLOAT_LIST_ID, STATE_FLOAT_LIST_NAME);
+		floatListTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new FloatListValue(STATE_FLOAT_TIME_0)), true);
+		FloatListValue floatListValueChange = new FloatListValue(STATE_FLOAT_TIME_10, STATE_FLOAT_TIME_20);
+		floatListTimedState.applyChange(new ValueChange<>(STATE_TIME_30, floatListValueChange), true);
+		resource.addTimedState(floatListTimedState);
 
 		// integer state
 		IntegerTimedState integerTimedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);

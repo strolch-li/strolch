@@ -20,10 +20,7 @@ import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.timedstate.BooleanTimedState;
-import li.strolch.model.timedstate.FloatTimedState;
-import li.strolch.model.timedstate.IntegerTimedState;
-import li.strolch.model.timedstate.StringSetTimedState;
+import li.strolch.model.timedstate.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -31,47 +28,52 @@ import li.strolch.model.timedstate.StringSetTimedState;
 public interface ParameterVisitor<U> extends StrolchElementVisitor<U> {
 
 	@Override
-	public default U visitActivity(Activity activity) {
+	default U visitActivity(Activity activity) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + activity.getClass());
 	}
 
 	@Override
-	public default U visitOrder(Order order) {
+	default U visitOrder(Order order) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + order.getClass());
 	}
 
 	@Override
-	public default U visitResource(Resource resource) {
+	default U visitResource(Resource resource) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + resource.getClass());
 	}
 
 	@Override
-	public default U visitAction(Action action) {
+	default U visitAction(Action action) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + action.getClass());
 	}
 
 	@Override
-	public default U visitBooleanState(BooleanTimedState state) {
+	default U visitBooleanState(BooleanTimedState state) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
 	}
 
 	@Override
-	public default U visitFloatState(FloatTimedState state) {
+	default U visitFloatState(FloatTimedState state) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
 	}
 
 	@Override
-	public default U visitIntegerState(IntegerTimedState state) {
+	default U visitFloatListState(FloatListTimedState state) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
 	}
 
 	@Override
-	public default U visitStringState(StringSetTimedState state) {
+	default U visitIntegerState(IntegerTimedState state) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
 	}
 
 	@Override
-	public default U visitParameterBag(ParameterBag bag) {
+	default U visitStringState(StringSetTimedState state) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
+	}
+
+	@Override
+	default U visitParameterBag(ParameterBag bag) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + bag.getClass());
 	}
 }
