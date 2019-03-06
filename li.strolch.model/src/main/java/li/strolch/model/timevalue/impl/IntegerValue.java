@@ -32,7 +32,7 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 
 	private Integer value;
 
-	public IntegerValue(int value) {
+	public IntegerValue(Integer value) {
 		this.value = value;
 	}
 

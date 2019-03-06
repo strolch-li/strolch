@@ -33,16 +33,12 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	private Double value;
 
-	public FloatValue(double value) {
+	public FloatValue(Double value) {
 		this.value = value;
 	}
 
 	public FloatValue(Integer value) {
 		this.value = value.doubleValue();
-	}
-
-	public FloatValue(int value) {
-		this.value = Integer.valueOf(value).doubleValue();
 	}
 
 	public FloatValue(String valueAsString) throws NumberFormatException {
