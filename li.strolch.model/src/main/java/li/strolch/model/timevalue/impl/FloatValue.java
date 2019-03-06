@@ -41,6 +41,10 @@ public class FloatValue implements IValue<Double>, Serializable {
 		this.value = value.doubleValue();
 	}
 
+	public FloatValue(Long value) {
+		this.value = value.doubleValue();
+	}
+
 	public FloatValue(String valueAsString) throws NumberFormatException {
 		this.value = Double.parseDouble(valueAsString);
 	}
