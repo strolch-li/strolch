@@ -343,6 +343,33 @@ public class ReportResource {
 				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) :
 				new MapOfSets<>();
 
+		// get date range if defined
+		JsonObject rangeJ = jsonObject != null && jsonObject.get(PARAM_DATE_RANGE) != null ?
+				jsonObject.getAsJsonObject(PARAM_DATE_RANGE) :
+				null;
+
+		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
+				rangeJ.get(PARAM_FROM).getAsString() :
+				null;
+		Date from;
+		try {
+			from = fromS != null ? ISO8601FormatFactory.getInstance().parseDate(fromS) : null;
+		} catch (Exception e) {
+			logger.error("Could not parse 'from' date, setting it to null.", e);
+			from = null;
+		}
+
+		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
+				rangeJ.get(PARAM_TO).getAsString() :
+				null;
+		Date to;
+		try {
+			to = (toS != null) ? ISO8601FormatFactory.getInstance().parseDate(toS) : null;
+		} catch (Exception e) {
+			logger.error("Could not parse 'to' date, setting it to null.", e);
+			to = null;
+		}
+
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
@@ -353,7 +380,7 @@ public class ReportResource {
 		}
 
 		// create CSV printer with header
-		StreamingOutput out = getOut(cert, realm, id, localeJ, filters);
+		StreamingOutput out = getOut(cert, realm, id, localeJ, filters, from, to);
 
 		// send
 		String fileName = id + "_" + System.currentTimeMillis() + ".csv";
@@ -362,7 +389,7 @@ public class ReportResource {
 	}
 
 	private StreamingOutput getOut(Certificate cert, String realm, String reportId, JsonObject localeJ,
-			MapOfSets<String, String> filters) {
+			MapOfSets<String, String> filters, Date from, Date to) {
 
 		return out -> {
 
@@ -374,6 +401,12 @@ public class ReportResource {
 				// set i18n data if possible
 				if (localeJ != null)
 					report.getReportPolicy().setI18nData(localeJ);
+
+				// add filters from request
+				if (report.hasDateRangeSelector()) {
+					DateRange dateRange = new DateRange().from(from, true).to(to, true);
+					report.dateRange(dateRange);
+				}
 
 				// add filters from request
 				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
