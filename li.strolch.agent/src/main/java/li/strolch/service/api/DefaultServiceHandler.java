@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -76,8 +77,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 			long end = System.nanoTime();
 			String msg = "User {0}: Service {1} failed after {2} due to {3}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, username, service.getClass().getName(),
-					StringHelper.formatNanoDuration(end - start), e.getMessage());
+			msg = MessageFormat
+					.format(msg, username, service.getClass().getName(), StringHelper.formatNanoDuration(end - start),
+							e.getMessage());
 			logger.error(msg);
 
 			if (!this.throwOnPrivilegeFail && service instanceof AbstractService) {
@@ -86,13 +88,18 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
 				@SuppressWarnings("unchecked")
 				U arg = (U) abstractService.getResultInstance();
-				arg.setState(ServiceResultState.ACCESS_DENIED);
+				arg.setState(e instanceof PrivilegeModelException ?
+						ServiceResultState.FAILED :
+						ServiceResultState.ACCESS_DENIED);
 				arg.setMessage(e.getMessage());
 				arg.setThrowable(e);
 				return arg;
 			}
 
-			throw new StrolchAccessDeniedException(certificate, service, e.getMessage(), e);
+			if (e instanceof PrivilegeModelException)
+				throw new StrolchException(e.getMessage(), e);
+			else
+				throw new StrolchAccessDeniedException(certificate, service, e.getMessage(), e);
 		}
 
 		try {
@@ -118,8 +125,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		} catch (Exception e) {
 			long end = System.nanoTime();
 			String msg = "User {0}: Service failed {1} after {2} due to {3}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, username, service.getClass().getName(),
-					StringHelper.formatNanoDuration(end - start), e.getMessage());
+			msg = MessageFormat
+					.format(msg, username, service.getClass().getName(), StringHelper.formatNanoDuration(end - start),
+							e.getMessage());
 			logger.error(msg);
 			throw new StrolchException(msg, e);
 		}
@@ -130,8 +138,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		long end = System.nanoTime();
 
 		String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, username, service.getClass().getName(),
-				StringHelper.formatNanoDuration(end - start));
+		msg = MessageFormat
+				.format(msg, username, service.getClass().getName(), StringHelper.formatNanoDuration(end - start));
 
 		if (serviceResult.getState() == ServiceResultState.SUCCESS) {
 			logger.info(msg);

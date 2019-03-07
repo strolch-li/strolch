@@ -15,6 +15,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.helper.ExceptionHelper;
@@ -133,6 +134,8 @@ public class ResponseUtil {
 		Status status;
 		if (t instanceof AccessDeniedException) {
 			status = Status.FORBIDDEN;
+		} else if (t instanceof PrivilegeModelException) {
+			status = Status.INTERNAL_SERVER_ERROR;
 		} else if (t instanceof PrivilegeException) {
 			status = Status.UNAUTHORIZED;
 		} else {
@@ -145,6 +148,8 @@ public class ResponseUtil {
 	public static Response toResponse(Throwable t) {
 		if (t instanceof AccessDeniedException) {
 			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
+		} else if (t instanceof PrivilegeModelException) {
+			return ResponseUtil.toResponse(Status.INTERNAL_SERVER_ERROR, t);
 		} else if (t instanceof PrivilegeException) {
 			return ResponseUtil.toResponse(Status.UNAUTHORIZED, t);
 		} else {
@@ -189,8 +194,7 @@ public class ResponseUtil {
 		List<JsonObject> page = paging.getPage();
 		JsonArray data = new JsonArray();
 		for (JsonObject jsonObject : page) {
-			JsonObject element = jsonObject;
-			data.add(element);
+			data.add(jsonObject);
 		}
 		response.add(DATA, data);
 

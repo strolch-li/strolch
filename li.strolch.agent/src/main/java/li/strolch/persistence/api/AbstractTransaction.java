@@ -44,6 +44,7 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
@@ -350,6 +351,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private void assertQueryAllowed(StrolchQuery query) {
 		try {
 			getPrivilegeContext().validateAction(query);
+		} catch (PrivilegeModelException e) {
+			throw e;
 		} catch (PrivilegeException e) {
 			throw new StrolchAccessDeniedException(this.certificate, query, ExceptionHelper.getExceptionMessage(e), e);
 		}
