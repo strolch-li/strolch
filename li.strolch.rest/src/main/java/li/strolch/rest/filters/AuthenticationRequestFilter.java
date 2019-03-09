@@ -16,15 +16,15 @@
 package li.strolch.rest.filters;
 
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_SOURCE;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import javax.annotation.Priority;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.HashSet;
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * <br>
  *
- * Sub classes should override {@link #validateSession(ContainerRequestContext)} to add further validation.
+ * Sub classes should override {@link #validateSession(ContainerRequestContext, String)} to add further validation.
  *
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -58,6 +58,9 @@ import org.slf4j.LoggerFactory;
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
+
+	@Context
+	private HttpServletRequest request;
 
 	private Set<String> unsecuredPaths;
 
@@ -101,12 +104,16 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
+		String remoteIp = getRemoteIp(this.request);
+		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " + requestContext.getUriInfo()
+				.getRequestUri());
+
 		if (isUnsecuredPath(requestContext))
 			return;
 
 		try {
 
-			validateSession(requestContext);
+			validateSession(requestContext, remoteIp);
 
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
@@ -137,11 +144,13 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	 *
 	 * @param requestContext
 	 * 		the request context for the secured path
+	 * @param remoteIp
+	 * 		the remote IP
 	 *
 	 * @return the certificate for the validated session, or null, of the request is aborted to no missing or invalid
 	 * authorization token
 	 */
-	protected Certificate validateSession(ContainerRequestContext requestContext) {
+	protected Certificate validateSession(ContainerRequestContext requestContext, String remoteIp) {
 
 		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
 		if (StringHelper.isEmpty(sessionId)) {
@@ -171,10 +180,34 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance()
 				.getComponent(StrolchSessionHandler.class);
-		Certificate certificate = sessionHandler.validate(sessionId);
+		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
 
 		return certificate;
+	}
+
+	public static String getRemoteIp(HttpServletRequest request) {
+
+		String remoteUser = request.getRemoteUser();
+		String remoteHost = request.getRemoteHost();
+		String remoteAddr = request.getRemoteAddr();
+
+		StringBuilder sb = new StringBuilder();
+		if (isNotEmpty(remoteUser))
+			sb.append(remoteUser).append(": ");
+
+		if (remoteHost.equals(remoteAddr))
+			sb.append(remoteAddr);
+		else {
+			sb.append(remoteUser).append(": (").append(remoteAddr).append(")");
+		}
+
+		String xForwardedFor = request.getHeader("X-Forwarded-For");
+		if (isNotEmpty(xForwardedFor))
+			sb.append(" (fwd)=> ").append(xForwardedFor);
+
+		return sb.toString();
 	}
 }

@@ -34,8 +34,7 @@ public abstract class UserChallengeHandler {
 	 * @return a new challenge
 	 */
 	protected String generateChallenge() {
-		String challenge = CodeGenerator.alphaNumericUpper(12);
-		return challenge;
+		return CodeGenerator.alphaNumericUpper(12);
 	}
 
 	/**
@@ -45,11 +44,13 @@ public abstract class UserChallengeHandler {
 	 * 		the {@link Usage} for this certificate
 	 * @param user
 	 * 		the user for which to initiate the challenge for
+	 * @param source
+	 * 		the source of the challenge initialization
 	 */
-	public synchronized void initiateChallengeFor(Usage usage, User user) {
+	public synchronized void initiateChallengeFor(Usage usage, User user, String source) {
 
 		String challenge = generateChallenge();
-		UserChallenge userChallenge = new UserChallenge(usage, user, challenge);
+		UserChallenge userChallenge = new UserChallenge(usage, user, challenge, source);
 		this.challenges.put(user, userChallenge);
 
 		sendChallengeToUser(user, challenge);
@@ -94,7 +95,9 @@ public abstract class UserChallengeHandler {
 	 * Sends the challenge to the user
 	 *
 	 * @param user
+	 * 		the user
 	 * @param challenge
+	 * 		the challenge
 	 */
 	public abstract void sendChallengeToUser(User user, String challenge);
 }

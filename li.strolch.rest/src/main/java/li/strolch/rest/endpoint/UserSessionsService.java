@@ -52,11 +52,12 @@ public class UserSessionsService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response querySessions(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
 		logger.info("[" + cert.getUsername() + "] Querying user sessions...");
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
 		String query = queryData.getQuery();
-		List<UserSession> sessions = sessionHandler.getSessions(cert);
+		List<UserSession> sessions = sessionHandler.getSessions(cert, source);
 
 		SearchResult<UserSession> result = buildSimpleValueSearch(new ValueSearch<UserSession>(), query,
 				Arrays.asList( //
@@ -75,9 +76,10 @@ public class UserSessionsService {
 	@Path("{sessionId}")
 	public Response getSession(@Context HttpServletRequest request, @PathParam("sessionId") String sessionId) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
 		logger.info("[" + cert.getUsername() + "] Returning session " + sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-		UserSession session = sessionHandler.getSession(cert, sessionId);
+		UserSession session = sessionHandler.getSession(cert, source, sessionId);
 		return Response.ok(session.toJson().toString(), MediaType.APPLICATION_JSON).build();
 	}
 

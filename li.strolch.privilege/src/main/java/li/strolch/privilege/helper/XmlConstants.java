@@ -229,6 +229,11 @@ public class XmlConstants {
 	public static final String XML_ATTR_AUTH_TOKEN = "authToken";
 
 	/**
+	 * XML_ATTR_SOURCE = "source" :
+	 */
+	public static final String XML_ATTR_SOURCE = "source";
+
+	/**
 	 * XML_ATTR_LOCALE = "locale" :
 	 */
 	public static final String XML_ATTR_LOCALE = "locale";

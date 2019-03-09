@@ -15,6 +15,8 @@
  */
 package li.strolch.rest.endpoint;
 
+import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -90,9 +92,10 @@ public class AuthenticationService {
 			}
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			Certificate certificate = sessionHandler.authenticate(usernameE.getAsString(), password);
+			String source = getRemoteIp(request);
+			Certificate certificate = sessionHandler.authenticate(usernameE.getAsString(), password, source);
 
-			return getAuthenticationResponse(request, loginResult, certificate);
+			return getAuthenticationResponse(request, loginResult, certificate, source);
 
 		} catch (InvalidCredentialsException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
@@ -126,9 +129,10 @@ public class AuthenticationService {
 		try {
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			Certificate certificate = sessionHandler.authenticateSingleSignOn(request.getUserPrincipal());
+			String source = getRemoteIp(request);
+			Certificate certificate = sessionHandler.authenticateSingleSignOn(request.getUserPrincipal(), source);
 
-			return getAuthenticationResponse(request, loginResult, certificate);
+			return getAuthenticationResponse(request, loginResult, certificate, source);
 
 		} catch (InvalidCredentialsException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
@@ -156,14 +160,15 @@ public class AuthenticationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
-	public Response invalidateSession(@PathParam("authToken") String authToken) {
+	public Response invalidateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 
 		JsonObject logoutResult = new JsonObject();
 
 		try {
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			Certificate certificate = sessionHandler.validate(authToken);
+			String source = getRemoteIp(request);
+			Certificate certificate = sessionHandler.validate(authToken, source);
 			sessionHandler.invalidate(certificate);
 
 			logoutResult.addProperty("username", certificate.getUsername());
@@ -190,12 +195,13 @@ public class AuthenticationService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
-	public Response validateSession(@PathParam("authToken") String authToken) {
+	public Response validateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 
 		try {
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			sessionHandler.validate(authToken);
+			String source = getRemoteIp(request);
+			sessionHandler.validate(authToken, source);
 
 			return Response.ok().build();
 
@@ -218,7 +224,7 @@ public class AuthenticationService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("challenge")
-	public Response initiateChallenge(String data) {
+	public Response initiateChallenge(@Context HttpServletRequest request, String data) {
 
 		try {
 			JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
@@ -226,7 +232,8 @@ public class AuthenticationService {
 			String usage = jsonObject.get("usage").getAsString();
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			sessionHandler.initiateChallengeFor(Usage.byValue(usage), username);
+			String source = getRemoteIp(request);
+			sessionHandler.initiateChallengeFor(Usage.byValue(usage), username, source);
 
 			return ResponseUtil.toResponse();
 
@@ -251,7 +258,8 @@ public class AuthenticationService {
 			String challenge = jsonObject.get("challenge").getAsString();
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			Certificate certificate = sessionHandler.validateChallenge(username, challenge);
+			String source = getRemoteIp(request);
+			Certificate certificate = sessionHandler.validateChallenge(username, challenge, source);
 
 			jsonObject = new JsonObject();
 			jsonObject.addProperty("authToken", certificate.getAuthToken());
@@ -278,10 +286,10 @@ public class AuthenticationService {
 	}
 
 	private Response getAuthenticationResponse(HttpServletRequest request, JsonObject loginResult,
-			Certificate certificate) {
+			Certificate certificate, String source) {
 
 		PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer().getPrivilegeHandler();
-		PrivilegeContext privilegeContext = privilegeHandler.validate(certificate);
+		PrivilegeContext privilegeContext = privilegeHandler.validate(certificate, source);
 		loginResult.addProperty("sessionId", certificate.getSessionId());
 		loginResult.addProperty("authToken", certificate.getAuthToken());
 		loginResult.addProperty("username", certificate.getUsername());

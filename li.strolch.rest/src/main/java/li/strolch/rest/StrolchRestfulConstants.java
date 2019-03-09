@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 public class StrolchRestfulConstants {
 
 	public static final String STROLCH_CERTIFICATE = "strolch.certificate"; //$NON-NLS-1$
+	public static final String STROLCH_REQUEST_SOURCE= "strolch.requestSource"; //$NON-NLS-1$
 	public static final String STROLCH_AUTHORIZATION = "strolch.authorization"; //$NON-NLS-1$
 
 	public static final String MSG = "msg";

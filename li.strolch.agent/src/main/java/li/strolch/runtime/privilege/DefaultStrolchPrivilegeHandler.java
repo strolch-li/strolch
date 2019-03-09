@@ -122,14 +122,15 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public Certificate authenticate(String username, char[] password) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticate(username, password);
-		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGIN)) {
-			tx.setSuppressDoNothingLogging(true);
-			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.CERTIFICATE, username);
-			tx.getAuditTrail().add(tx, audit);
-		}
+		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, username);
+		return certificate;
+	}
+
+	@Override
+	public Certificate authenticate(String username, char[] password, String source) {
+		assertContainerStarted();
+		Certificate certificate = this.privilegeHandler.authenticate(username, password, source);
+		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, username);
 		return certificate;
 	}
 
@@ -137,15 +138,28 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public Certificate authenticateSingleSignOn(Object data) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
+		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, certificate.getUsername());
+		return certificate;
+	}
+
+	@Override
+	public Certificate authenticateSingleSignOn(Object data, String source) {
+		assertContainerStarted();
+		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, source);
+		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, certificate.getUsername());
+		return certificate;
+	}
+
+	private void writeAudit(Certificate certificate, String login, AccessType accessType, String username) {
 		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGIN)) {
+		try (StrolchTransaction tx = realm.openTx(certificate, login)) {
 			tx.setSuppressDoNothingLogging(true);
 			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.CERTIFICATE, certificate.getUsername());
+			Audit audit = tx
+					.auditFrom(accessType, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.CERTIFICATE,
+							username);
 			tx.getAuditTrail().add(tx, audit);
 		}
-		return certificate;
 	}
 
 	@Override
@@ -154,16 +168,14 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
+	public PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException {
+		return this.privilegeHandler.validate(certificate, source);
+	}
+
+	@Override
 	public boolean invalidate(Certificate certificate) {
 		boolean invalidateSession = this.privilegeHandler.invalidate(certificate);
-		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.LOGOUT)) {
-			tx.setSuppressDoNothingLogging(true);
-			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.CERTIFICATE, certificate.getUsername());
-			tx.getAuditTrail().add(tx, audit);
-		}
+		writeAudit(certificate, StrolchPrivilegeConstants.LOGOUT, AccessType.DELETE, certificate.getUsername());
 		return invalidateSession;
 	}
 
@@ -171,14 +183,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public boolean sessionTimeout(Certificate certificate) {
 		assertStarted();
 		boolean invalidateSession = this.privilegeHandler.invalidate(certificate);
-		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, StrolchPrivilegeConstants.SESSION_TIME_OUT)) {
-			tx.setSuppressDoNothingLogging(true);
-			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.CERTIFICATE, certificate.getUsername());
-			tx.getAuditTrail().add(tx, audit);
-		}
+		writeAudit(certificate, StrolchPrivilegeConstants.SESSION_TIME_OUT, AccessType.DELETE,
+				certificate.getUsername());
 		return invalidateSession;
 	}
 

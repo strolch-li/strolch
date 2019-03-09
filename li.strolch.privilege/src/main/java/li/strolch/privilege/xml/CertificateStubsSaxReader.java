@@ -15,6 +15,9 @@
  */
 package li.strolch.privilege.xml;
 
+import static li.strolch.privilege.handler.DefaultPrivilegeHandler.SOURCE_UNKNOWN;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,6 +65,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			stub.sessionId = attributes.getValue(XmlConstants.XML_ATTR_SESSION_ID);
 			stub.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
 			stub.authToken = attributes.getValue(XmlConstants.XML_ATTR_AUTH_TOKEN);
+			stub.source = attributes.getValue(XmlConstants.XML_ATTR_SOURCE);
 			stub.locale = new Locale(attributes.getValue(XmlConstants.XML_ATTR_LOCALE));
 			stub.loginTime = ISO8601FormatFactory.getInstance()
 					.parseDate(attributes.getValue(XmlConstants.XML_ATTR_LOGIN_TIME));
@@ -71,6 +75,9 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
 			DBC.INTERIM.assertNotEmpty("username missing on sessions data!", stub.username);
 			DBC.INTERIM.assertNotEmpty("authToken missing on sessions data!", stub.authToken);
+
+			if (isEmpty(stub.source))
+				stub.source = SOURCE_UNKNOWN;
 
 			this.stubs.add(stub);
 			break;
@@ -85,6 +92,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		private String sessionId;
 		private String username;
 		private String authToken;
+		private String source;
 		private Locale locale;
 		private Date loginTime;
 		private Date lastAccess;
@@ -103,6 +111,10 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 
 		public String getAuthToken() {
 			return authToken;
+		}
+
+		public String getSource() {
+			return source;
 		}
 
 		public Locale getLocale() {

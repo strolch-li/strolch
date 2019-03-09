@@ -44,6 +44,22 @@ public interface PrivilegeHandler {
 	Certificate authenticate(String username, char[] password);
 
 	/**
+	 * Authenticate a user
+	 *
+	 * @param username
+	 * 		the username
+	 * @param password
+	 * 		the password
+	 * @param source
+	 * 		the source of the request
+	 *
+	 * @return the certificate
+	 *
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[])
+	 */
+	Certificate authenticate(String username, char[] password, String source);
+
+	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
 	 *
 	 * @param data
@@ -55,6 +71,21 @@ public interface PrivilegeHandler {
 	 * 		if something goes wrong with the SSO
 	 */
 	Certificate authenticateSingleSignOn(Object data) throws PrivilegeException;
+
+	/**
+	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
+	 *
+	 * @param data
+	 * 		the data to perform the SSO
+	 * @param source
+	 * 		the source of the request
+	 *
+	 * @return the {@link Certificate} for the user
+	 *
+	 * @throws PrivilegeException
+	 * 		if something goes wrong with the SSO
+	 */
+	Certificate authenticateSingleSignOn(Object data, String source) throws PrivilegeException;
 
 	/**
 	 * Returns the {@link PrivilegeContext} for the given certificate
@@ -69,6 +100,22 @@ public interface PrivilegeHandler {
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#validate(li.strolch.privilege.model.Certificate)
 	 */
 	PrivilegeContext validate(Certificate certificate) throws PrivilegeException;
+
+	/**
+	 * Returns the {@link PrivilegeContext} for the given certificate
+	 *
+	 * @param certificate
+	 * 		the certificate
+	 * @param source
+	 * 		the source of the request
+	 *
+	 * @return the {@link PrivilegeContext} for the given certificate
+	 *
+	 * @throws PrivilegeException
+	 * 		if the certificate is not valid anymore
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#validate(li.strolch.privilege.model.Certificate)
+	 */
+	PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException;
 
 	/**
 	 * Invalidates the given certificate

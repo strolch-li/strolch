@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +31,7 @@ public class UserSession {
 	private String username;
 	private String firstname;
 	private String lastname;
+	private String source;
 	private Set<String> userRoles;
 	private Locale locale;
 	private Date lastAccess;
@@ -41,6 +42,7 @@ public class UserSession {
 		this.username = certificate.getUsername();
 		this.firstname = certificate.getFirstname();
 		this.lastname = certificate.getLastname();
+		this.source = certificate.getSource();
 		this.userRoles = certificate.getUserRoles();
 		this.locale = certificate.getLocale();
 		this.lastAccess = certificate.getLastAccess();
@@ -74,6 +76,10 @@ public class UserSession {
 		return lastname;
 	}
 
+	public String getSource() {
+		return this.source;
+	}
+
 	public Set<String> getUserRoles() {
 		return userRoles;
 	}
@@ -86,6 +92,7 @@ public class UserSession {
 		jsonObject.addProperty("username", this.username);
 		jsonObject.addProperty("firstname", this.firstname);
 		jsonObject.addProperty("lastname", this.lastname);
+		jsonObject.addProperty("source", this.source);
 
 		jsonObject.addProperty("locale", this.locale.toString());
 		jsonObject.addProperty("lastAccess", ISO8601FormatFactory.getInstance().formatDate(this.lastAccess));

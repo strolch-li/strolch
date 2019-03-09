@@ -554,6 +554,18 @@ public interface PrivilegeHandler {
 	void initiateChallengeFor(Usage usage, String username);
 
 	/**
+	 * Initiate a password reset challenge for the given username
+	 *
+	 * @param usage
+	 * 		the usage for which the challenge is requested
+	 * @param username
+	 * 		the username of the user to initiate the challenge for
+	 * @param source
+	 * 		the source of the challenge
+	 */
+	void initiateChallengeFor(Usage usage, String username, String source);
+
+	/**
 	 * Validate the response of a challenge for the given username
 	 *
 	 * @param username
@@ -568,6 +580,24 @@ public interface PrivilegeHandler {
 	 * 		if anything goes wrong
 	 */
 	Certificate validateChallenge(String username, String challenge) throws PrivilegeException;
+
+	/**
+	 * Validate the response of a challenge for the given username
+	 *
+	 * @param username
+	 * 		the username of the user for which the challenge is to be validated
+	 * @param challenge
+	 * 		the challenge from the user
+	 * @param source
+	 * 		the source of the challenge validation
+	 *
+	 * @return certificate with which the user can access the system with the {@link Usage} set to the value from the
+	 * initiated challenge
+	 *
+	 * @throws PrivilegeException
+	 * 		if anything goes wrong
+	 */
+	Certificate validateChallenge(String username, String challenge, String source) throws PrivilegeException;
 
 	/**
 	 * Authenticates a user by validating that a {@link User} for the given username and password exist and then returns
@@ -587,6 +617,25 @@ public interface PrivilegeHandler {
 	Certificate authenticate(String username, char[] password) throws AccessDeniedException;
 
 	/**
+	 * Authenticates a user by validating that a {@link User} for the given username and password exist and then returns
+	 * a {@link Certificate} with which this user may then perform actions
+	 *
+	 * @param username
+	 * 		the username of the {@link User} which is registered in the {@link PersistenceHandler}
+	 * @param password
+	 * 		the password with which this user is to be authenticated. Null passwords are not accepted and they must meet
+	 * 		the requirements of the {@link #validatePassword(char[])}-method
+	 * @param source
+	 * 		the source of the authentication request, i.e. remote IP
+	 *
+	 * @return a {@link Certificate} with which this user may then perform actions
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the user credentials are not valid
+	 */
+	Certificate authenticate(String username, char[] password, String source) throws AccessDeniedException;
+
+	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
 	 *
 	 * @param data
@@ -598,6 +647,21 @@ public interface PrivilegeHandler {
 	 * 		if something goes wrong with the SSO
 	 */
 	Certificate authenticateSingleSignOn(Object data) throws PrivilegeException;
+
+	/**
+	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
+	 *
+	 * @param data
+	 * 		the data to perform the SSO
+	 * @param source
+	 * 		the source of the SSO authentication
+	 *
+	 * @return the {@link Certificate} for the user
+	 *
+	 * @throws PrivilegeException
+	 * 		if something goes wrong with the SSO
+	 */
+	Certificate authenticateSingleSignOn(Object data, String source) throws PrivilegeException;
 
 	/**
 	 * Invalidates the session for the given {@link Certificate}, effectively logging out the user who was authenticated
@@ -631,6 +695,28 @@ public interface PrivilegeHandler {
 	PrivilegeContext validate(Certificate certificate) throws PrivilegeException;
 
 	/**
+	 * Checks if the given {@link Certificate} is valid. This means that the certificate is for a valid session and that
+	 * the user exists for the certificate. This method checks if the {@link Certificate} has been tampered with
+	 *
+	 * Returns the {@link PrivilegeContext} for the given {@link Certificate}. The {@link PrivilegeContext} is an
+	 * encapsulated state of a user's privileges so that for the duration of a user's call, the user can perform their
+	 * actions and do not need to access the {@link PrivilegeHandler} anymore
+	 *
+	 * @param certificate
+	 * 		the {@link Certificate} to check
+	 * @param source
+	 * 		the source, e.g. remote IP for this validation request
+	 *
+	 * @return the {@link PrivilegeContext} for the given {@link Certificate}
+	 *
+	 * @throws PrivilegeException
+	 * 		if there is anything wrong with this certificate
+	 * @throws NotAuthenticatedException
+	 * 		if the certificate has expired
+	 */
+	PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException;
+
+	/**
 	 * Validate that the given password meets certain requirements. What these requirements are is a decision made by
 	 * the concrete implementation
 	 *
@@ -651,13 +737,15 @@ public interface PrivilegeHandler {
 	 *
 	 * @param certificate
 	 * 		the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param source
+	 * 		the source of the request
 	 *
 	 * @return true if the reload was successful, false if something went wrong
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the users of the given certificate does not have the privilege to perform this action
 	 */
-	boolean reload(Certificate certificate);
+	boolean reload(Certificate certificate, String source);
 
 	/**
 	 * Persists any changes to the privilege data model. Changes are thus not persisted immediately, but must be
@@ -678,13 +766,15 @@ public interface PrivilegeHandler {
 	 *
 	 * @param certificate
 	 * 		the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param source
+	 * 		the source of the request
 	 *
 	 * @return true if changes were persisted, false if not (i.e. not enabled)
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the users of the given certificate does not have the privilege to perform this action
 	 */
-	boolean persistSessions(Certificate certificate) throws AccessDeniedException;
+	boolean persistSessions(Certificate certificate, String source) throws AccessDeniedException;
 
 	/**
 	 * Special method to perform work as a System user, meaning the given systemUsername corresponds to an account which

@@ -66,6 +66,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
+	public static final String SOURCE_UNKNOWN = "unknown";
 
 	/**
 	 * Map keeping a reference to all active sessions
@@ -124,6 +125,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected SecretKey secretKey;
 
 	protected PrivilegeConflictResolution privilegeConflictResolution;
+	private String identifier;
 
 	@Override
 	public EncryptionHandler getEncryptionHandler() throws PrivilegeException {
@@ -196,15 +198,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Stream<Role> rolesStream = this.persistenceHandler.getAllRoles().stream();
 
 		// validate access to each role
-		// TODO throwing and catching exception ain't cool
-		rolesStream = rolesStream.filter(role -> {
-			try {
-				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role)));
-				return true;
-			} catch (AccessDeniedException e) {
-				return false;
-			}
-		});
+		rolesStream = rolesStream
+				.filter(role -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role))));
 
 		return rolesStream.map(Role::asRoleRep).collect(Collectors.toList());
 	}
@@ -219,15 +214,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Stream<User> usersStream = this.persistenceHandler.getAllUsers().stream();
 
 		// validate access to each user
-		// TODO throwing and catching exception ain't cool
-		usersStream = usersStream.filter(user -> {
-			try {
-				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user)));
-				return true;
-			} catch (AccessDeniedException e) {
-				return false;
-			}
-		});
+		usersStream = usersStream
+				.filter(user -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user))));
 
 		return usersStream.map(User::asUserRep).collect(Collectors.toList());
 	}
@@ -252,12 +240,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		List<User> allUsers = this.persistenceHandler.getAllUsers();
 		for (User user : allUsers) {
 
-			// TODO throwing and catching exception ain't cool
-			try {
-				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user)));
-			} catch (AccessDeniedException e) {
+			if (!prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user))))
 				continue;
-			}
 
 			// selections
 			boolean userIdSelected;
@@ -746,7 +730,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// get User
 			User existingUser = this.persistenceHandler.getUser(username);
 			if (existingUser == null) {
-				throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
+				throw new PrivilegeModelException(
+						MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 			}
 
 			byte[] passwordHash = null;
@@ -1051,7 +1036,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			for (PrivilegeContext ctx : ctxs) {
 				if (ctx.getUserRep().getUsername().equals(newUser.getUsername())) {
 					Certificate cert = ctx.getCertificate();
-					cert = buildCertificate(cert.getUsage(), newUser, cert.getAuthToken(), cert.getSessionId());
+					cert = buildCertificate(cert.getUsage(), newUser, cert.getAuthToken(), cert.getSessionId(),
+							cert.getSource());
 					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, newUser);
 					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 				}
@@ -1075,7 +1061,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 						continue;
 
 					Certificate cert = ctx.getCertificate();
-					cert = buildCertificate(cert.getUsage(), user, cert.getAuthToken(), cert.getSessionId());
+					cert = buildCertificate(cert.getUsage(), user, cert.getAuthToken(), cert.getSessionId(),
+							cert.getSource());
 					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, user);
 					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 				}
@@ -1085,6 +1072,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public void initiateChallengeFor(Usage usage, String username) {
+		initiateChallengeFor(usage, username, SOURCE_UNKNOWN);
+	}
+
+	@Override
+	public void initiateChallengeFor(Usage usage, String username, String source) {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -1093,13 +1086,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// initiate the challenge
-		this.userChallengeHandler.initiateChallengeFor(usage, user);
+		this.userChallengeHandler.initiateChallengeFor(usage, user, source);
 
 		logger.info(MessageFormat.format("Initiated Challenge for {0} with usage {1}", username, usage));
 	}
 
 	@Override
 	public Certificate validateChallenge(String username, String challenge) throws PrivilegeException {
+		return validateChallenge(username, challenge, "unknown");
+	}
+
+	@Override
+	public Certificate validateChallenge(String username, String challenge, String source) throws PrivilegeException {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -1114,10 +1113,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Usage usage = userChallenge.getUsage();
-		Certificate certificate = buildCertificate(usage, user, authToken, sessionId);
+		Certificate certificate = buildCertificate(usage, user, authToken, sessionId, userChallenge.getSource());
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
+
+		if (!source.equals("unknown") && !source.equals(userChallenge.getSource())) {
+			logger.warn("Challenge request and response source's are different: request: " + userChallenge.getSource()
+					+ " to " + source);
+		}
 
 		persistSessions();
 
@@ -1127,6 +1131,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public Certificate authenticate(String username, char[] password) {
+		return authenticate(username, password, "unknown");
+	}
+
+	@Override
+	public Certificate authenticate(String username, char[] password, String source) {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		try {
 			// username must be at least 2 characters in length
@@ -1153,7 +1163,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = UUID.randomUUID().toString();
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
+			Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source);
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1180,6 +1190,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public Certificate authenticateSingleSignOn(Object data) throws PrivilegeException {
+		return authenticateSingleSignOn(data, "unknown");
+	}
+
+	@Override
+	public Certificate authenticateSingleSignOn(Object data, String source) throws PrivilegeException {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		if (this.ssoHandler == null)
 			throw new IllegalStateException("The SSO Handler is not configured!");
 
@@ -1203,7 +1219,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
-		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
+		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source);
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1216,10 +1232,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return certificate;
 	}
 
-	private Certificate buildCertificate(Usage usage, User user, String authToken, String sessionId) {
+	private Certificate buildCertificate(Usage usage, User user, String authToken, String sessionId, String source) {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		Set<String> userRoles = user.getRoles();
 		return new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(), user.getLastname(),
-				user.getUserState(), authToken, new Date(), user.getLocale(), userRoles,
+				user.getUserState(), authToken, source, new Date(), user.getLocale(), userRoles,
 				new HashMap<>(user.getProperties()));
 	}
 
@@ -1289,6 +1306,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String username = certificateStub.getUsername();
 			String sessionId = certificateStub.getSessionId();
 			String authToken = certificateStub.getAuthToken();
+			String source = certificateStub.getSource();
 			User user = this.persistenceHandler.getUser(username);
 			if (user == null) {
 				logger.error("Ignoring session data for missing user " + username);
@@ -1307,7 +1325,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(usage, user, authToken, sessionId);
+			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source);
 			certificate.setLastAccess(certificateStub.getLastAccess());
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
@@ -1514,6 +1532,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public PrivilegeContext validate(Certificate certificate) throws PrivilegeException, NotAuthenticatedException {
+		return validate(certificate, "unknown");
+	}
+
+	@Override
+	public PrivilegeContext validate(Certificate certificate, String source)
+			throws PrivilegeException, NotAuthenticatedException {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		// certificate  must not be null
 		if (certificate == null)
@@ -1545,6 +1570,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		certificate.setLastAccess(new Date());
+
+		// TODO decide if we want to assert source did not change!
+		if (!source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
+			logger.warn("Source has changed for certificate " + certificate.toString() + " to " + source);
+		}
+
 		return privilegeContext;
 	}
 
@@ -1576,7 +1607,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public boolean persistSessions(Certificate certificate) {
+	public boolean persistSessions(Certificate certificate, String source) {
 
 		// validate who is doing this
 		PrivilegeContext prvCtx = validate(certificate);
@@ -1586,10 +1617,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public boolean reload(Certificate certificate) {
+	public boolean reload(Certificate certificate, String source) {
 
 		// validate who is doing this
-		PrivilegeContext prvCtx = validate(certificate);
+		PrivilegeContext prvCtx = validate(certificate, source);
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_RELOAD));
 
 		return this.persistenceHandler.reload();
@@ -1723,24 +1754,25 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	private void handleSecretParams(Map<String, String> parameterMap) {
 
-		if (!this.persistSessions)
-			return;
-
 		String secretKeyS = parameterMap.get(PARAM_SECRET_KEY);
 		if (StringHelper.isEmpty(secretKeyS)) {
-			String msg = "Parameter {0} may not be empty if parameter {1} is enabled."; //$NON-NLS-1$
+			String msg = "Parameter {0} may not be empty"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, PARAM_SECRET_KEY, PARAM_PRIVILEGE_CONFLICT_RESOLUTION);
 			throw new PrivilegeModelException(msg);
 		}
 
 		String secretSaltS = parameterMap.get(PARAM_SECRET_SALT);
 		if (StringHelper.isEmpty(secretSaltS)) {
-			String msg = "Parameter {0} may not be empty if parameter {1} is enabled."; //$NON-NLS-1$
+			String msg = "Parameter {0} may not be empty"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, PARAM_SECRET_SALT, PARAM_PRIVILEGE_CONFLICT_RESOLUTION);
 			throw new PrivilegeModelException(msg);
 		}
 
 		this.secretKey = AesCryptoHelper.buildSecret(secretKeyS.toCharArray(), secretSaltS.getBytes());
+
+		// build our identifier
+		byte[] encrypt = AesCryptoHelper.encrypt(this.secretKey, "PrivilegeHandler".getBytes());
+		this.identifier = Base64.getEncoder().encodeToString(encrypt);
 	}
 
 	private void validatePrivilegeConflicts() {
@@ -1956,7 +1988,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
-		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId);
+		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId, this.identifier);
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);

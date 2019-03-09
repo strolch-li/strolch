@@ -146,8 +146,31 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
+	public Certificate authenticate(String username, char[] password, String source) {
+		DBC.PRE.assertNotEmpty("Username must be set!", username); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
+
+		Certificate certificate = this.privilegeHandler.authenticate(username, password, source);
+
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
+
+		return certificate;
+	}
+
+	@Override
 	public Certificate authenticateSingleSignOn(Object data) {
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
+
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
+
+		return certificate;
+	}
+
+	@Override
+	public Certificate authenticateSingleSignOn(Object data, String source) {
+		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, source);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
@@ -168,6 +191,18 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
+	public Certificate validate(String authToken, String source) throws StrolchNotAuthenticatedException {
+		DBC.PRE.assertNotEmpty("authToken must be set!", authToken); //$NON-NLS-1$
+
+		Certificate certificate = this.certificateMap.get(authToken);
+		if (certificate == null)
+			throw new StrolchNotAuthenticatedException(
+					MessageFormat.format("No certificate exists for sessionId {0}", authToken)); //$NON-NLS-1$
+
+		return validate(certificate, source).getCertificate();
+	}
+
+	@Override
 	public PrivilegeContext validate(Certificate certificate) throws StrolchNotAuthenticatedException {
 		try {
 			PrivilegeContext privilegeContext = this.privilegeHandler.validate(certificate);
@@ -182,9 +217,24 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		}
 	}
 
+	@Override
+	public PrivilegeContext validate(Certificate certificate, String source) throws StrolchNotAuthenticatedException {
+		try {
+			PrivilegeContext privilegeContext = this.privilegeHandler.validate(certificate, source);
+
+			if (this.persistSessionsTask != null)
+				this.persistSessionsTask = getScheduledExecutor("SessionHandler")
+						.schedule(this::persistSessions, 5, TimeUnit.SECONDS);
+
+			return privilegeContext;
+		} catch (PrivilegeException e) {
+			throw new StrolchNotAuthenticatedException(e.getMessage(), e);
+		}
+	}
+
 	private void persistSessions() {
 		try {
-			runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler().persistSessions(ctx.getCertificate()));
+			runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler().persistSessions(ctx.getCertificate(), ctx.getCertificate().getSource()));
 		} catch (Exception e) {
 			logger.error("Failed to persist sessions", e);
 		} finally {
@@ -210,11 +260,30 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
+	public void initiateChallengeFor(Usage usage, String username, String source) {
+		this.privilegeHandler.getPrivilegeHandler().initiateChallengeFor(usage, username, source);
+	}
+
+	@Override
 	public Certificate validateChallenge(String username, String challenge) throws PrivilegeException {
 		DBC.PRE.assertNotEmpty("username must be set!", username); //$NON-NLS-1$
 		DBC.PRE.assertNotEmpty("challenge must be set", challenge); //$NON-NLS-1$
 
 		Certificate certificate = this.privilegeHandler.getPrivilegeHandler().validateChallenge(username, challenge);
+
+		this.certificateMap.put(certificate.getAuthToken(), certificate);
+		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
+
+		return certificate;
+	}
+
+	@Override
+	public Certificate validateChallenge(String username, String challenge, String source) throws PrivilegeException {
+		DBC.PRE.assertNotEmpty("username must be set!", username); //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("challenge must be set", challenge); //$NON-NLS-1$
+
+		Certificate certificate = this.privilegeHandler.getPrivilegeHandler()
+				.validateChallenge(username, challenge, source);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
@@ -253,9 +322,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public UserSession getSession(Certificate certificate, String sessionId)
-			throws AccessDeniedException, PrivilegeException {
-		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
+	public UserSession getSession(Certificate certificate, String source, String sessionId) throws PrivilegeException {
+		PrivilegeContext ctx = this.privilegeHandler.validate(certificate, source);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
 		synchronized (this.certificateMap) {
 			for (Certificate cert : certificateMap.values()) {
@@ -270,8 +338,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public List<UserSession> getSessions(Certificate certificate) {
-		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
+	public List<UserSession> getSessions(Certificate certificate, String source) {
+		PrivilegeContext ctx = this.privilegeHandler.validate(certificate, source);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
 		List<UserSession> sessions = new ArrayList<>(this.certificateMap.size());
 		synchronized (this.certificateMap) {

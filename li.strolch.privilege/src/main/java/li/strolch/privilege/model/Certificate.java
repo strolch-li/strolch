@@ -26,7 +26,7 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
  * instance which is always used when performing an access and is returned when a user performs a login through {@link
- * PrivilegeHandler#authenticate(String, byte[])}
+ * PrivilegeHandler#authenticate(String, char[])}
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -39,6 +39,7 @@ public final class Certificate implements Serializable {
 	private final String lastname;
 	private final UserState userState;
 	private final String authToken;
+	private final String source;
 	private final Date loginTime;
 
 	private final Set<String> userRoles;
@@ -76,7 +77,7 @@ public final class Certificate implements Serializable {
 	 * 		edited and can be used for the user to change settings of this session
 	 */
 	public Certificate(Usage usage, String sessionId, String username, String firstname, String lastname,
-			UserState userState, String authToken, Date loginTime, Locale locale, Set<String> userRoles,
+			UserState userState, String authToken, String source, Date loginTime, Locale locale, Set<String> userRoles,
 			Map<String, String> propertyMap) {
 
 		// validate arguments are not null
@@ -95,6 +96,9 @@ public final class Certificate implements Serializable {
 		if (usage == null) {
 			throw new PrivilegeException("usage is null!"); //$NON-NLS-1$
 		}
+		if (source == null) {
+			throw new PrivilegeException("source is null!"); //$NON-NLS-1$
+		}
 
 		this.usage = usage;
 		this.sessionId = sessionId;
@@ -103,6 +107,7 @@ public final class Certificate implements Serializable {
 		this.lastname = lastname;
 		this.userState = userState;
 		this.authToken = authToken;
+		this.source = source;
 		this.loginTime = loginTime;
 
 		// if no locale is given, set default
@@ -120,20 +125,10 @@ public final class Certificate implements Serializable {
 		this.lastAccess = new Date();
 	}
 
-	/**
-	 * Returns the {@link Usage}
-	 *
-	 * @return the {@link Usage}
-	 */
 	public Usage getUsage() {
 		return this.usage;
 	}
 
-	/**
-	 * Returns the set or roles this user has
-	 *
-	 * @return the user's roles
-	 */
 	public Set<String> getUserRoles() {
 		return this.userRoles;
 	}
@@ -171,93 +166,54 @@ public final class Certificate implements Serializable {
 		return this.propertyMap.get(key);
 	}
 
-	/**
-	 * @return the locale
-	 */
 	public Locale getLocale() {
 		return this.locale;
 	}
 
-	/**
-	 * @param locale
-	 * 		the locale to set
-	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}
 
-	/**
-	 * @return the sessionId
-	 */
 	public String getSessionId() {
 		return this.sessionId;
 	}
 
-	/**
-	 * @return the username
-	 */
 	public String getUsername() {
 		return this.username;
 	}
 
-	/**
-	 * @return the firstname
-	 */
 	public String getFirstname() {
 		return this.firstname;
 	}
 
-	/**
-	 * @return the lastname
-	 */
 	public String getLastname() {
 		return this.lastname;
 	}
 
-	/**
-	 * @return the userState
-	 */
 	public UserState getUserState() {
 		return userState;
 	}
 
-	/**
-	 * @return the loginTime
-	 */
 	public Date getLoginTime() {
 		return this.loginTime;
 	}
 
-	/**
-	 * Returns the authToken if the given authPassword is correct, null otherwise
-	 *
-	 * @return the authToken if the given authPassword is correct, null otherwise
-	 */
 	public String getAuthToken() {
 		return this.authToken;
 	}
 
-	/**
-	 * @return the lastAccess
-	 */
+	public String getSource() {
+		return this.source;
+	}
+
 	public Date getLastAccess() {
 		return this.lastAccess;
 	}
 
-	/**
-	 * @param lastAccess
-	 * 		the lastAccess to set
-	 */
 	public void setLastAccess(Date lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 
-	/**
-	 * Returns a string representation of this object displaying its concrete type and its values
-	 *
-	 * @see java.lang.Object#toString()
-	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -275,6 +231,9 @@ public final class Certificate implements Serializable {
 			builder.append(", lastname=");
 			builder.append(this.lastname);
 		}
+
+		builder.append(", source=");
+		builder.append(this.source);
 
 		builder.append(", locale=");
 		builder.append(this.locale);

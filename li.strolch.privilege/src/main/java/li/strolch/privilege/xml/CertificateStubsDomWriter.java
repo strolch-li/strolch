@@ -63,6 +63,9 @@ public class CertificateStubsDomWriter {
 			// authToken;
 			certElement.setAttribute(XmlConstants.XML_ATTR_AUTH_TOKEN, cert.getAuthToken());
 
+			// source;
+			certElement.setAttribute(XmlConstants.XML_ATTR_SOURCE, cert.getSource());
+
 			// locale;
 			certElement.setAttribute(XmlConstants.XML_ATTR_LOCALE, cert.getLocale().toString());
 

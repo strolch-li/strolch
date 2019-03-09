@@ -65,13 +65,14 @@ public class StrolchJobsHandler extends StrolchComponent {
 		return strolchJob;
 	}
 
-	public List<StrolchJob> getJobs(Certificate cert) {
-		getContainer().getPrivilegeHandler().validate(cert).assertHasPrivilege(StrolchJobsHandler.class.getName());
+	public List<StrolchJob> getJobs(Certificate cert, String source) {
+		getContainer().getPrivilegeHandler().validate(cert, source).assertHasPrivilege(StrolchJobsHandler.class.getName());
 		return new ArrayList<>(this.jobs.values());
 	}
 
-	public StrolchJob getJob(Certificate cert, String jobName) {
-		getContainer().getPrivilegeHandler().validate(cert).assertHasPrivilege(StrolchJobsHandler.class.getName());
+	public StrolchJob getJob(Certificate cert, String source, String jobName) {
+		getContainer().getPrivilegeHandler().validate(cert, source)
+				.assertHasPrivilege(StrolchJobsHandler.class.getName());
 		StrolchJob strolchJob = this.jobs.get(jobName);
 		if (strolchJob == null)
 			throw new IllegalArgumentException("Job " + jobName + " is not registered!");

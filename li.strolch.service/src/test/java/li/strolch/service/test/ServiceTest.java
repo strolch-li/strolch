@@ -56,14 +56,14 @@ public class ServiceTest extends AbstractServiceTest {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();
 		getServiceHandler().doService(
-				new Certificate(null, null, null, null, null, null, null, new Date(), null, new HashSet<>(), null),
-				testService);
+				new Certificate(null, null, null, null, null, null, null, null, new Date(), null, new HashSet<>(),
+						null), testService);
 	}
 
 	@Test
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
-		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf",
+		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", "asd",
 				//$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 				new Date(), null, new HashSet<>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
