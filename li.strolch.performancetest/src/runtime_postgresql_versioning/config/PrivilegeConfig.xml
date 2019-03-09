@@ -5,6 +5,8 @@
 
 		<Parameters>
 			<!-- parameters for the container itself -->
+			<Parameter name="secretKey" value="58d27145-5d1a-48ea-9e1c-f5a522f6a19f"/>
+			<Parameter name="secretSalt" value="25bd8911-0008-464f-82b8-4c5200db8dd7"/>
 			<Parameter name="autoPersistOnPasswordChange" value="true" />
 		</Parameters>
 
