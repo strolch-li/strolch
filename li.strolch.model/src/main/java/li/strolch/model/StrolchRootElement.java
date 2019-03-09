@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 
@@ -31,7 +32,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 *
 	 * @return the object type
 	 */
-	public String getObjectType();
+	String getObjectType();
 
 	/**
 	 * Set the type of this {@link StrolchRootElement}. Not that this method should only be called for new elements, not
@@ -40,21 +41,21 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * @param type
 	 * 		the new type
 	 */
-	public void setType(String type);
+	void setType(String type);
 
 	/**
 	 * Returns true if this {@link StrolchRootElement} has a version set
 	 *
 	 * @return true if this {@link StrolchRootElement} has a version set
 	 */
-	public boolean hasVersion();
+	boolean hasVersion();
 
 	/**
 	 * Returns the current version of this object, or null if no version is set
 	 *
 	 * @return the current version of this object, or null if no version is set
 	 */
-	public Version getVersion();
+	Version getVersion();
 
 	/**
 	 * <p>
@@ -67,7 +68,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * @throws IllegalArgumentException
 	 * 		if the given version's locator is not equal to the current element's locator
 	 */
-	public void setVersion(Version version) throws IllegalArgumentException;
+	void setVersion(Version version) throws IllegalArgumentException;
 
 	/**
 	 * Return a clone of this {@link StrolchElement}
@@ -75,14 +76,14 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * @return a clone of this {@link StrolchElement}
 	 */
 	@Override
-	public StrolchRootElement getClone();
+	StrolchRootElement getClone();
 
 	/**
 	 * Return a clone of this {@link StrolchElement}
 	 *
 	 * @return a clone of this {@link StrolchElement}
 	 */
-	public StrolchRootElement getClone(boolean withVersion);
+	StrolchRootElement getClone(boolean withVersion);
 
 	/**
 	 * Visitor pattern accept method. Takes a {@link StrolchRootElementVisitor} to visit this element
@@ -92,21 +93,21 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 *
 	 * @return the result of the visitation
 	 */
-	public <T> T accept(StrolchElementVisitor<T> visitor);
+	<T> T accept(StrolchElementVisitor<T> visitor);
 
 	/**
 	 * Formats this {@link StrolchRootElement} as an XML string
 	 *
 	 * @return the formatted XML string
 	 */
-	public String toXmlString();
+	String toXmlString();
 
 	/**
 	 * Formats this element as a JSON string
 	 *
 	 * @return the formatted JSON string
 	 */
-	public String toJsonString();
+	String toJsonString();
 
 	/**
 	 * Formats this element as a flat JSON string, i.e. all parameter bags are removed and parameters are on the root
@@ -114,5 +115,32 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 *
 	 * @return the formatted JSON string
 	 */
-	public String toFlatJsonString();
+	String toFlatJsonString();
+
+	/**
+	 * Casts this element to a Resource
+	 *
+	 * @return Casts this element to a Resource
+	 */
+	default Resource asResource() {
+		return (Resource) this;
+	}
+
+	/**
+	 * Casts this element to a Order
+	 *
+	 * @return Casts this element to a Order
+	 */
+	default Order asOrder() {
+		return (Order) this;
+	}
+
+	/**
+	 * Casts this element to a Activity
+	 *
+	 * @return Casts this element to a Activity
+	 */
+	default Activity asActivity() {
+		return (Activity) this;
+	}
 }
