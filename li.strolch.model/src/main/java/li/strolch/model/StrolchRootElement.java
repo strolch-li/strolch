@@ -15,9 +15,14 @@
  */
 package li.strolch.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
 
 /**
  * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
@@ -100,14 +105,19 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 *
 	 * @return the formatted XML string
 	 */
-	String toXmlString();
+	default String toXmlString() {
+		return accept(new StrolchElementToXmlStringVisitor().withoutDocument());
+	}
 
 	/**
 	 * Formats this element as a JSON string
 	 *
 	 * @return the formatted JSON string
 	 */
-	String toJsonString();
+	default String toJsonString() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return gson.toJson(this.accept(new StrolchRootElementToJsonVisitor()));
+	}
 
 	/**
 	 * Formats this element as a flat JSON string, i.e. all parameter bags are removed and parameters are on the root
@@ -115,7 +125,28 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 *
 	 * @return the formatted JSON string
 	 */
-	String toFlatJsonString();
+	default String toFlatJsonString() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return gson.toJson(this.accept(new StrolchRootElementToJsonVisitor().flat()));
+	}
+
+	/**
+	 * Formats this element to a {@link JsonObject}
+	 *
+	 * @return the {@link JsonObject}
+	 */
+	default JsonObject toJsonObject() {
+		return this.accept(new StrolchRootElementToJsonVisitor());
+	}
+
+	/**
+	 * Formats this element to a flat {@link JsonObject}
+	 *
+	 * @return the {@link JsonObject}
+	 */
+	default JsonObject toFlatJsonObject() {
+		return this.accept(new StrolchRootElementToJsonVisitor().flat());
+	}
 
 	/**
 	 * Casts this element to a Resource
