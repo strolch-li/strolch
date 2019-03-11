@@ -87,6 +87,7 @@
         <javaxmail.version>1.6.0</javaxmail.version>
         <serverlet.version>3.1.0</serverlet.version>
         <jaxrs.api.version>2.1</jaxrs.api.version>
+        <websocket.version>1.1</websocket.version>
         <csv.version>1.4</csv.version>
 
         <junit.version>4.12</junit.version>
@@ -134,6 +135,7 @@
         <module>li.strolch.agent</module>
         <module>li.strolch.service</module>
         <module>li.strolch.rest</module>
+        <module>li.strolch.websocket</module>
 
         <module>li.strolch.performancetest</module>
         <module>strolch_minimal_rest</module>
@@ -280,6 +282,14 @@
                 <version>${jersey.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- websocket -->
+            <dependency>
+                <groupId>javax.websocket</groupId>
+                <artifactId>javax.websocket-api</artifactId>
+                <version>${websocket.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- test -->
