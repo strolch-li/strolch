@@ -16,6 +16,7 @@
 package li.strolch.agent.impl;
 
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.PROP_REALM;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
@@ -112,14 +113,14 @@ public class ComponentContainerImpl implements ComponentContainer {
 	@Override
 	public StrolchRealm getRealm(Certificate certificate) throws StrolchException {
 
-		String realmName = certificate.getProperty(StrolchConstants.PROP_REALM);
+		String realmName = certificate.getRealm();
 		if (StringHelper.isEmpty(realmName)) {
 			if (getRealmNames().contains(StrolchConstants.DEFAULT_REALM)) {
 				realmName = StrolchConstants.DEFAULT_REALM;
 			} else {
 				String msg = "The User {0} is missing the property {1} and the Realm {2} can not be used as it does not exist!";
 				throw new StrolchException(MessageFormat
-						.format(msg, certificate.getUsername(), StrolchConstants.PROP_REALM,
+						.format(msg, certificate.getUsername(), PROP_REALM,
 								StrolchConstants.DEFAULT_REALM));
 			}
 		}
@@ -129,7 +130,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		} catch (StrolchException e) {
 			String msg = "The User {0} has property {1} with value={2}, but the Realm does not eixst, or is not accessible by this user!";
 			throw new StrolchException(
-					MessageFormat.format(msg, certificate.getUsername(), StrolchConstants.PROP_REALM, realmName), e);
+					MessageFormat.format(msg, certificate.getUsername(), PROP_REALM, realmName), e);
 		}
 	}
 

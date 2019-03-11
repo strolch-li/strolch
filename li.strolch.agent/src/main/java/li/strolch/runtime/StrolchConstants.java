@@ -20,6 +20,7 @@ import static li.strolch.utils.helper.StringHelper.DOT;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.PersistenceHandler;
+import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.handler.PrivilegeHandler;
 
 /**
@@ -35,7 +36,7 @@ public class StrolchConstants {
 	public static final String PRIVILEGE_HANDLER = "PrivilegeHandler";
 	public static final String SYSTEM_USER_AGENT = "agent";
 
-	public static final String PROP_REALM = "realm";
+	public static final String PROP_REALM = PrivilegeConstants.REALM;
 	public static final String DEFAULT_REALM = "defaultRealm";
 
 	public static final String DEFAULT_XML_VERSION = StrolchModelConstants.DEFAULT_XML_VERSION;

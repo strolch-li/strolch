@@ -15,8 +15,11 @@
  */
 package li.strolch.privilege.model.internal;
 
+import static li.strolch.privilege.base.PrivilegeConstants.*;
+
 import java.util.*;
 
+import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
@@ -277,6 +280,33 @@ public final class User {
 	 */
 	public Map<String, String> getProperties() {
 		return this.propertyMap;
+	}
+
+	/**
+	 * Returns the value of the property {@link PrivilegeConstants#REALM}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#REALM}
+	 */
+	public String getRealm() {
+		return getProperty(REALM);
+	}
+
+	/**
+	 * Returns the value of the property {@link PrivilegeConstants#LOCATION}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#LOCATION}
+	 */
+	public String getLocation() {
+		return getProperty(LOCATION);
+	}
+
+	/**
+	 * Returns the value of the property {@link PrivilegeConstants#EMAIL}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#EMAIL}
+	 */
+	public String getEmail() {
+		return getProperty(EMAIL);
 	}
 
 	/**

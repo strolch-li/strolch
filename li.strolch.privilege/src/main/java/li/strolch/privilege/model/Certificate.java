@@ -15,9 +15,12 @@
  */
 package li.strolch.privilege.model;
 
+import static li.strolch.privilege.base.PrivilegeConstants.*;
+
 import java.io.Serializable;
 import java.util.*;
 
+import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.internal.User;
@@ -164,6 +167,33 @@ public final class Certificate implements Serializable {
 	 */
 	public String getProperty(String key) {
 		return this.propertyMap.get(key);
+	}
+
+	/**
+	 * Returns the value of the property {@link PrivilegeConstants#REALM}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#REALM}
+	 */
+	public String getRealm() {
+		return getProperty(REALM);
+	}
+
+	/**
+	 * Returns the value of the property {@link PrivilegeConstants#LOCATION}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#LOCATION}
+	 */
+	public String getLocation() {
+		return getProperty(LOCATION);
+	}
+
+	/**
+	 * Returns the value of the property {@link PrivilegeConstants#EMAIL}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#EMAIL}
+	 */
+	public String getEmail() {
+		return getProperty(EMAIL);
 	}
 
 	public Locale getLocale() {

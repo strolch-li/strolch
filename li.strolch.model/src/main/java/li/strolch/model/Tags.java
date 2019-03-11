@@ -134,6 +134,7 @@ public class Tags {
 
 		// miscellaneous
 
+		public static final String MSG_TYPE = "msgType";
 		public static final String USERNAME = "username";
 		public static final String ELEMENTS = "elements";
 		public static final String NR_OF_ELEMENTS = "nrOfElements";
@@ -142,6 +143,8 @@ public class Tags {
 		public static final String REALMS = "realms";
 		public static final String SIZE = "size";
 		public static final String EXCEPTION = "exception";
+		public static final String FORMAT = "format";
+		public static final String FLAT = "flat";
 	}
 
 	public static class Audit {

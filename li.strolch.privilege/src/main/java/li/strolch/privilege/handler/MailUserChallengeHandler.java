@@ -1,5 +1,7 @@
 package li.strolch.privilege.handler;
 
+import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
+
 import java.text.MessageFormat;
 
 import li.strolch.privilege.model.internal.User;
@@ -7,8 +9,6 @@ import li.strolch.utils.SmtpMailer;
 import li.strolch.utils.helper.StringHelper;
 
 public class MailUserChallengeHandler extends UserChallengeHandler {
-
-	private static final String EMAIL = "email";
 
 	@Override
 	public void sendChallengeToUser(User user, String challenge) {
@@ -22,7 +22,7 @@ public class MailUserChallengeHandler extends UserChallengeHandler {
 		sb.append(challenge);
 
 		String text = sb.toString();
-		String recipient = user.getProperty(EMAIL);
+		String recipient = user.getEmail();
 		if (StringHelper.isEmpty(recipient)) {
 			String msg = "User {0} has no property {1}";
 			throw new RuntimeException(MessageFormat.format(msg, user.getUsername(), EMAIL));
