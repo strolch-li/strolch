@@ -190,18 +190,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	public static String getRemoteIp(HttpServletRequest request) {
 
-		String remoteUser = request.getRemoteUser();
 		String remoteHost = request.getRemoteHost();
 		String remoteAddr = request.getRemoteAddr();
 
 		StringBuilder sb = new StringBuilder();
-		if (isNotEmpty(remoteUser))
-			sb.append(remoteUser).append(": ");
-
 		if (remoteHost.equals(remoteAddr))
 			sb.append(remoteAddr);
 		else {
-			sb.append(remoteUser).append(": (").append(remoteAddr).append(")");
+			sb.append(remoteHost).append(": (").append(remoteAddr).append(")");
 		}
 
 		String xForwardedFor = request.getHeader("X-Forwarded-For");
