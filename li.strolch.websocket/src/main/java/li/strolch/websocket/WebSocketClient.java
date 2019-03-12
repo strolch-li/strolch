@@ -144,7 +144,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			this.certificate = sessionHandler.validate(authToken);
+			this.certificate = sessionHandler.validate(authToken, WebSocketRemoteIp.get());
 			if (!this.certificate.getUsername().equals(username)) {
 				logger.error("Invalid authentication for " + username);
 				close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");

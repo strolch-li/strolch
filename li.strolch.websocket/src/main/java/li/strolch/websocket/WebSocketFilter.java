@@ -20,8 +20,9 @@ public class WebSocketFilter implements Filter {
 			throws IOException, ServletException {
 
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		logger.info("Remote IP: " + getRemoteIp(httpRequest) + ": " + httpRequest.getMethod() + " " + httpRequest
-				.getRequestURI());
+		String remoteIp = getRemoteIp(httpRequest);
+		logger.info("Remote IP: " + remoteIp + ": " + httpRequest.getMethod() + " " + httpRequest.getRequestURI());
+		WebSocketRemoteIp.set(remoteIp);
 		chain.doFilter(request, response);
 	}
 
