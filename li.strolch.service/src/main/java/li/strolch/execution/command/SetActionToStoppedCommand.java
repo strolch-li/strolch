@@ -43,7 +43,7 @@ public class SetActionToStoppedCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.STOPPED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in STOPPED! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state STOPPED! Not changing.");
 			return;
 		}
 

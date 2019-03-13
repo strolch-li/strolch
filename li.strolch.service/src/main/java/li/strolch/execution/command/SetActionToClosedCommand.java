@@ -43,7 +43,7 @@ public class SetActionToClosedCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.CLOSED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in CLOSED! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state CLOSED! Not changing.");
 			return;
 		}
 

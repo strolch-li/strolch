@@ -43,7 +43,7 @@ public class SetActionToCreatedCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.CREATED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in CREATED! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state CREATED! Not changing.");
 			return;
 		}
 

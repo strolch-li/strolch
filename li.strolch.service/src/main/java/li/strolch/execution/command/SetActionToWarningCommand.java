@@ -43,7 +43,7 @@ public class SetActionToWarningCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.WARNING) {
-			logger.warn("Action " + this.action.getLocator() + " is already in WARNING! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state WARNING! Not changing.");
 			return;
 		}
 

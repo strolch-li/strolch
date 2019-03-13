@@ -43,7 +43,7 @@ public class SetActionToPlanningCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.PLANNING) {
-			logger.warn("Action " + this.action.getLocator() + " is already in PLANNING! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state PLANNING! Not changing.");
 			return;
 		}
 

@@ -43,7 +43,7 @@ public class SetActionToExecutedCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.EXECUTED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in EXECUTED! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state EXECUTED! Not changing.");
 			return;
 		}
 
