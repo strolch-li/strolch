@@ -280,12 +280,7 @@ public class PrivilegeUsersService {
 
 			String passwordEncoded = jsonObject.get("password").getAsString();
 			byte[] decode = Base64.getDecoder().decode(passwordEncoded);
-			String passwordString;
-			if (jsonObject.has("encoding") && !jsonObject.get("encoding").getAsString().isEmpty()) {
-				passwordString = new String(decode, jsonObject.get("encoding").getAsString());
-			} else {
-				passwordString = new String(decode);
-			}
+			String passwordString = new String(decode);
 
 			ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 			PrivilegeSetUserPasswordService svc = new PrivilegeSetUserPasswordService();

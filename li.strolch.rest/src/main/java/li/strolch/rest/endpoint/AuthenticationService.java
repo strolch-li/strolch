@@ -80,14 +80,8 @@ public class AuthenticationService {
 			String passwordEncoded = login.get("password").getAsString();
 
 			byte[] decode = Base64.getDecoder().decode(passwordEncoded);
-			String passwordString;
-			if (login.has("encoding") && !login.get("encoding").getAsString().isEmpty()) {
-				passwordString = new String(decode, login.get("encoding").getAsString());
-			} else {
-				passwordString = new String(decode);
-			}
+			char[] password = new String(decode).toCharArray();
 
-			char[] password = passwordString.toCharArray();
 			if (password.length < 3) {
 				logger.error("Authentication failed: Password was not given or is too short!");
 				loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}",
