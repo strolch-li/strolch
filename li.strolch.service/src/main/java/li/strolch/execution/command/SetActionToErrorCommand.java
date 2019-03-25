@@ -43,7 +43,7 @@ public class SetActionToErrorCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.ERROR) {
-			logger.warn("Action " + this.action.getLocator() + " is already in ERROR! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state ERROR! Not changing.");
 			return;
 		}
 

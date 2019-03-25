@@ -43,7 +43,7 @@ public class SetActionToPlannedCommand extends ExecutionCommand {
 		tx().lock(getResourceLocator(this.action));
 
 		if (this.action.getState() == State.PLANNED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in PLANNED! Not changing.");
+			logger.warn("Action " + this.action.getLocator() + " is already in state PLANNED! Not changing.");
 			return;
 		}
 

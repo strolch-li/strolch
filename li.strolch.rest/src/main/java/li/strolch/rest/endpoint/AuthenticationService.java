@@ -62,38 +62,36 @@ public class AuthenticationService {
 
 		try {
 
-			StringBuilder sb = new StringBuilder();
-			JsonElement usernameE = login.get("username");
-			if (usernameE == null || usernameE.getAsString().length() < 2) {
-				sb.append("Username was not given or is too short!"); //$NON-NLS-1$
+			if (!login.has("username") || login.get("username").getAsString().length() < 2) {
+				logger.error("Authentication failed: Username was not given or is too short!");
+				loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}",
+						"Username was not given or is too short!")); //$NON-NLS-2$
+				return Response.status(Status.BAD_REQUEST).entity(loginResult.toString()).build();
 			}
 
-			JsonElement passwordE = login.get("password");
-			if (passwordE == null) {
-				if (sb.length() > 0)
-					sb.append("\n");
-				sb.append("Password was not given!"); //$NON-NLS-1$
+			if (!login.has("password") || login.get("password").getAsString().length() < 3) {
+				logger.error("Authentication failed: Password was not given or is too short!");
+				loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}",
+						"Password was not given or is too short!")); //$NON-NLS-2$
+				return Response.status(Status.BAD_REQUEST).entity(loginResult.toString()).build();
 			}
 
-			char[] password = passwordE == null ?
-					new char[] {} :
-					new String(Base64.getDecoder().decode(passwordE.getAsString())).toCharArray();
+			String username = login.get("username").getAsString();
+			String passwordEncoded = login.get("password").getAsString();
+
+			byte[] decode = Base64.getDecoder().decode(passwordEncoded);
+			char[] password = new String(decode).toCharArray();
+
 			if (password.length < 3) {
-				if (sb.length() > 0)
-					sb.append("\n");
-				sb.append("Password not given or too short!"); //$NON-NLS-1$
-			}
-
-			if (sb.length() != 0) {
-				logger.error("Authentication failed due to: " + sb.toString());
-				loginResult.addProperty("msg",
-						MessageFormat.format("Could not log in due to: {0}", sb.toString())); //$NON-NLS-2$
+				logger.error("Authentication failed: Password was not given or is too short!");
+				loginResult.addProperty("msg", MessageFormat.format("Could not log in due to: {0}",
+						"Password was not given or is too short!")); //$NON-NLS-2$
 				return Response.status(Status.BAD_REQUEST).entity(loginResult.toString()).build();
 			}
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
-			Certificate certificate = sessionHandler.authenticate(usernameE.getAsString(), password, source);
+			Certificate certificate = sessionHandler.authenticate(username, password, source);
 
 			return getAuthenticationResponse(request, loginResult, certificate, source);
 

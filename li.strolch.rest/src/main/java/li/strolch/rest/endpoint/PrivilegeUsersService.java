@@ -48,12 +48,16 @@ import li.strolch.service.JsonServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.privilege.users.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/users")
 public class PrivilegeUsersService {
+
+	private static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersService.class);
 
 	private PrivilegeHandler getPrivilegeHandler() {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
@@ -270,26 +274,38 @@ public class PrivilegeUsersService {
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		String password = new JsonParser().parse(data).getAsJsonObject().get("password").getAsString();
-		char[] passwordChars = new String(Base64.getDecoder().decode(password)).toCharArray();
+		try {
 
-		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
-		PrivilegeSetUserPasswordService svc = new PrivilegeSetUserPasswordService();
-		PrivilegeSetUserPasswordArgument arg = new PrivilegeSetUserPasswordArgument();
-		arg.username = username;
-		arg.password = passwordChars;
+			JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
 
-		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
-		if (svcResult.isNok())
-			return ResponseUtil.toResponse(svcResult);
+			String passwordEncoded = jsonObject.get("password").getAsString();
+			byte[] decode = Base64.getDecoder().decode(passwordEncoded);
+			String passwordString = new String(decode);
 
-		// if user changes their own password, then invalidate the session
-		if (cert.getUsername().equals(username)) {
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			sessionHandler.invalidate(cert);
+			ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+			PrivilegeSetUserPasswordService svc = new PrivilegeSetUserPasswordService();
+			PrivilegeSetUserPasswordArgument arg = new PrivilegeSetUserPasswordArgument();
+			arg.username = username;
+			arg.password = passwordString.toCharArray();
+
+			ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
+			if (svcResult.isNok())
+				return ResponseUtil.toResponse(svcResult);
+
+			// if user changes their own password, then invalidate the session
+			if (cert.getUsername().equals(username)) {
+				StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+				sessionHandler.invalidate(cert);
+			}
+
+			return ResponseUtil.toResponse();
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			String msg = e.getMessage();
+			return ResponseUtil.toResponse("Failed to set password: ",
+					MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
 		}
-
-		return ResponseUtil.toResponse();
 	}
 
 	private Response handleServiceResult(PrivilegeUserResult svcResult) {

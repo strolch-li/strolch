@@ -34,6 +34,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	private ComponentContainer container;
 	private final Session session;
 	private final EndpointConfig config;
+	private String remoteIp;
 
 	private Certificate certificate;
 	private Map<String, WebSocketObserverHandler> observerHandlersByRealm;
@@ -42,6 +43,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		this.container = container;
 		this.session = session;
 		this.config = config;
+		this.remoteIp = WebSocketRemoteIp.get();
 		this.observerHandlersByRealm = new HashMap<>(1);
 	}
 
@@ -50,6 +52,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		JsonObject jsonObject = new JsonParser().parse(message).getAsJsonObject();
 		String msgType = jsonObject.get(MSG_TYPE).getAsString();
+		logger.info("Handling message " + msgType);
 
 		switch (msgType) {
 
@@ -75,13 +78,13 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		if (this.certificate == null) {
 			logger.error("Received " + type + " request, but not yet authed!");
-			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Not yet authed!");
+			close(CloseReason.CloseCodes.PROTOCOL_ERROR, "Not yet authed!");
 			return;
 		}
 
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			sessionHandler.validate(this.certificate);
+			sessionHandler.validate(this.certificate, this.remoteIp);
 		} catch (RuntimeException e) {
 			logger.error("Received " + type + " request, but authentication is not valid anymore: " + ExceptionHelper
 					.getExceptionMessage(e));
@@ -144,13 +147,14 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			this.certificate = sessionHandler.validate(authToken, WebSocketRemoteIp.get());
+			this.certificate = sessionHandler.validate(authToken, this.remoteIp);
 			if (!this.certificate.getUsername().equals(username)) {
 				logger.error("Invalid authentication for " + username);
 				close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 				return;
 			}
 		} catch (Exception e) {
+			logger.error("Failed to authenticate user " + username, e);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}

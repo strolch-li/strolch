@@ -11,6 +11,12 @@ import li.strolch.service.api.ServiceArgument;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class JsonServiceArgument extends ServiceArgument {
+
+	/**
+	 * the objectType - its context is defined by the service
+	 */
+	public String objectType;
+
 	/**
 	 * the objectId - its context is defined by the service
 	 */
