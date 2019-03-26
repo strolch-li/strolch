@@ -60,6 +60,12 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public void setId(String id) {
+		this.locator = null;
+		super.setId(id);
+	}
+
+	@Override
 	public String getObjectType() {
 		return Tags.RESOURCE;
 	}

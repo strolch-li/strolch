@@ -71,6 +71,12 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public void setId(String id) {
+		this.locator = null;
+		super.setId(id);
+	}
+
+	@Override
 	public String getObjectType() {
 		return Tags.ACTIVITY;
 	}
