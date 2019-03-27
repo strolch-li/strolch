@@ -15,6 +15,8 @@
  */
 package li.strolch.model.parameter;
 
+import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -29,8 +31,6 @@ import li.strolch.utils.iso8601.ISO8601;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class DateParameter extends AbstractParameter<Date> {
-
-	private static final Date EMPTY_VALUE = ISO8601.parseToDate("-");
 
 	private Date value;
 

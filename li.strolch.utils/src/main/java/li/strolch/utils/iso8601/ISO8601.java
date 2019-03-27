@@ -33,6 +33,8 @@ public class ISO8601 implements DateFormat {
 
 	private static final Logger logger = LoggerFactory.getLogger(ISO8601.class);
 
+	public static final Date EMPTY_VALUE = parseToDate("-");
+
 	@Override
 	public String format(long timePoint) {
 		if (timePoint == Long.MAX_VALUE || timePoint == Long.MIN_VALUE)
