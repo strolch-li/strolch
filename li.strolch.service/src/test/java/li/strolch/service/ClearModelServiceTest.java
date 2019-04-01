@@ -35,7 +35,7 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest<ClearModelAr
 	public void runClearTest() {
 
 		Runner validator = (strolchRealm, container) -> {
-			try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test")) {
+			try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test", true)) {
 				assertEquals(0, tx.getResourceMap().querySize(tx));
 				assertEquals(0, tx.getOrderMap().querySize(tx));
 			}
@@ -52,7 +52,7 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest<ClearModelAr
 	public void runClearOnlyOrdersTest() {
 
 		Runner validator = (strolchRealm, container) -> {
-			try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test")) {
+			try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test", true)) {
 				assertNotEquals(0, tx.getResourceMap().querySize(tx));
 				assertEquals(0, tx.getOrderMap().querySize(tx));
 			}
@@ -69,7 +69,7 @@ public class ClearModelServiceTest extends AbstractRealmServiceTest<ClearModelAr
 	public void runClearOnlyResourcesTest() {
 
 		Runner validator = (strolchRealm, container) -> {
-			try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test")) {
+			try (StrolchTransaction tx = strolchRealm.openTx(ClearModelServiceTest.this.certificate, "test", true)) {
 				assertNotEquals(0, tx.getOrderMap().querySize(tx));
 				assertEquals(0, tx.getResourceMap().querySize(tx));
 			}

@@ -61,7 +61,7 @@ public class QueryTest {
 			IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 			res1.addParameter(BAG_ID, iP);
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(res1);
 				tx.commitOnClose();
 			}
@@ -76,7 +76,7 @@ public class QueryTest {
 			InMemoryQuery<Resource, Resource> inMemoryQuery = resourceQuery.visit(query);
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 				result = inMemoryQuery.doQuery(tx, tx.getResourceMap());
 			}
 			assertEquals(1, result.size());
@@ -96,7 +96,7 @@ public class QueryTest {
 			IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 			o1.addParameter(BAG_ID, iP);
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(o1);
 				tx.commitOnClose();
 			}
@@ -111,7 +111,7 @@ public class QueryTest {
 			InMemoryQuery<Order, Order> inMemoryQuery = orderQuery.visit(query);
 			List<Order> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 				result = inMemoryQuery.doQuery(tx, tx.getOrderMap());
 			}
 			assertEquals(1, result.size());
@@ -131,7 +131,7 @@ public class QueryTest {
 			IntegerParameter iP = new IntegerParameter("nbOfBooks", "Number of Books", 33);
 			a1.addParameter(BAG_ID, iP);
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(a1);
 				tx.commitOnClose();
 			}
@@ -146,7 +146,7 @@ public class QueryTest {
 			InMemoryQuery<Activity, Activity> inMemoryQuery = orderQuery.visit(query);
 			List<Activity> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 				result = inMemoryQuery.doQuery(tx, tx.getActivityMap());
 			}
 			assertEquals(1, result.size());
@@ -164,7 +164,7 @@ public class QueryTest {
 
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(res1);
 				tx.commitOnClose();
 			}
@@ -174,7 +174,7 @@ public class QueryTest {
 					.stringSelection(BAG_ID, PARAM_STRING_ID, "olch", StringMatchMode.CONTAINS_CASE_SENSITIVE));
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 				result = tx.doQuery(query);
 			}
 			assertEquals(1, result.size());
@@ -192,7 +192,7 @@ public class QueryTest {
 
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(res1);
 				tx.commitOnClose();
 			}
@@ -202,7 +202,7 @@ public class QueryTest {
 					.stringSelection(BAG_ID, PARAM_STRING_ID, "str", StringMatchMode.CONTAINS_CASE_SENSITIVE));
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 				result = tx.doQuery(query);
 			}
 			assertEquals(0, result.size());
@@ -219,7 +219,7 @@ public class QueryTest {
 
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(res1);
 				tx.commitOnClose();
 			}
@@ -229,7 +229,7 @@ public class QueryTest {
 					.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch", StringMatchMode.EQUALS_CASE_INSENSITIVE));
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 				result = tx.doQuery(query);
 			}
 			assertEquals(1, result.size());
@@ -247,7 +247,7 @@ public class QueryTest {
 
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(res1);
 				tx.commitOnClose();
 			}
@@ -257,7 +257,7 @@ public class QueryTest {
 					.stringSelection(BAG_ID, PARAM_STRING_ID, "strolch", StringMatchMode.EQUALS_CASE_SENSITIVE));
 			List<Resource> result;
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 				result = tx.doQuery(query);
 			}
 			assertEquals(0, result.size());
@@ -275,7 +275,7 @@ public class QueryTest {
 			Resource res1 = createResource("@1", "Test Resource", "MyType");
 			Resource res2 = createResource("@2", "Test Resource", "MyType");
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", false)) {
 				tx.add(res1);
 				tx.add(res2);
 				tx.commitOnClose();
@@ -286,7 +286,7 @@ public class QueryTest {
 				query.not(new IdSelection("@1"));
 				List<Resource> result;
 				try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-						.openTx(certificate, "test")) {
+						.openTx(certificate, "test", true)) {
 					result = tx.doQuery(query);
 				}
 				assertEquals(1, result.size());
@@ -298,7 +298,7 @@ public class QueryTest {
 				query.not(new IdSelection("@2"));
 				List<Resource> result;
 				try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-						.openTx(certificate, "test")) {
+						.openTx(certificate, "test", false)) {
 					result = tx.doQuery(query);
 				}
 				assertEquals(1, result.size());
@@ -310,7 +310,7 @@ public class QueryTest {
 				query.not(new IdSelection("@1", "@2"));
 				List<Resource> result;
 				try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-						.openTx(certificate, "test")) {
+						.openTx(certificate, "test", true)) {
 					result = tx.doQuery(query);
 				}
 				assertEquals(0, result.size());

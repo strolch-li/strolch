@@ -25,8 +25,8 @@ import li.strolch.privilege.model.Certificate;
 public class TransientTransaction extends AbstractTransaction {
 
 	public TransientTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
-			String action) {
-		super(container, realm, certificate, action);
+			String action, boolean readOnly) {
+		super(container, realm, certificate, action, readOnly);
 	}
 
 	@Override

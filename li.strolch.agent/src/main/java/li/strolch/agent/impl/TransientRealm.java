@@ -52,15 +52,15 @@ public class TransientRealm extends InternalStrolchRealm {
 	}
 
 	@Override
-	public StrolchTransaction openTx(Certificate certificate, String action) {
+	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
-		return new TransientTransaction(this.container, this, certificate, action);
+		return new TransientTransaction(this.container, this, certificate, action, readOnly);
 	}
 
 	@Override
-	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
+	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
-		return new TransientTransaction(this.container, this, certificate, clazz.getName());
+		return new TransientTransaction(this.container, this, certificate, clazz.getName(), readOnly);
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class TransientRealm extends InternalStrolchRealm {
 		super.start(privilegeContext);
 
 		ModelStatistics statistics;
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot", false)) {
 			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
 
 			// explicitly deny updating, so that we can detect XML files with duplicates

@@ -33,8 +33,8 @@ public class InMemoryTransactionTest {
 		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 	}
 
-	protected StrolchTransaction openTx(String realmName) {
-		return runtimeMock.getAgent().getContainer().getRealm(realmName).openTx(certificate, "test");
+	protected StrolchTransaction openTx(String realmName, boolean readOnly) {
+		return runtimeMock.getAgent().getContainer().getRealm(realmName).openTx(certificate, "test", readOnly);
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class InMemoryTransactionTest {
 
 		// create
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 
 			// privilege assertion
 			try {
@@ -114,7 +114,7 @@ public class InMemoryTransactionTest {
 
 		// create
 		Order newOrder = ModelGenerator.createOrder(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 
 			// privilege assertion
 			try {
@@ -156,7 +156,7 @@ public class InMemoryTransactionTest {
 
 		// create
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 
 			// privilege assertion
 			try {
@@ -198,7 +198,7 @@ public class InMemoryTransactionTest {
 
 		// create
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.ADD, newRes);
@@ -208,12 +208,12 @@ public class InMemoryTransactionTest {
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Resource should exist!", tx.hasResource(type, id));
 		}
 
 		// update
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			Resource res = tx.getResourceBy(type, id);
 
 			// privilege assertion
@@ -226,13 +226,13 @@ public class InMemoryTransactionTest {
 		}
 
 		// verify
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			Resource res = tx.getResourceBy(type, id);
 			assertEquals("Foo foo", res.getName());
 		}
 
 		// remove
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			Resource res = tx.getResourceBy(type, id);
 
 			// privilege assertion
@@ -243,19 +243,19 @@ public class InMemoryTransactionTest {
 		}
 
 		// should not exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertFalse("Resource should not exist!", tx.hasResource(type, id));
 		}
 
 		// create again
 		newRes = ModelGenerator.createResource(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newRes);
 			tx.commitOnClose();
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Resource should exist!", tx.hasResource(type, id));
 		}
 	}
@@ -266,7 +266,7 @@ public class InMemoryTransactionTest {
 
 		// create
 		Order newOrder = ModelGenerator.createOrder(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.ADD, newOrder);
@@ -276,12 +276,12 @@ public class InMemoryTransactionTest {
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Order should exist!", tx.hasOrder(type, id));
 		}
 
 		// update
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			Order order = tx.getOrderBy(type, id);
 
 			// privilege assertion
@@ -294,13 +294,13 @@ public class InMemoryTransactionTest {
 		}
 
 		// verify
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			Order order = tx.getOrderBy(type, id);
 			assertEquals("Foo foo", order.getName());
 		}
 
 		// remove
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			Order order = tx.getOrderBy(type, id);
 
 			// privilege assertion
@@ -311,19 +311,19 @@ public class InMemoryTransactionTest {
 		}
 
 		// should not exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertFalse("Order should not exist!", tx.hasOrder(type, id));
 		}
 
 		// create again
 		newOrder = ModelGenerator.createOrder(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Order should exist!", tx.hasOrder(type, id));
 		}
 	}
@@ -334,7 +334,7 @@ public class InMemoryTransactionTest {
 
 		// create
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 
 			// privilege assertion
 			tx.assertHasPrivilege(Operation.ADD, newActivity);
@@ -344,12 +344,12 @@ public class InMemoryTransactionTest {
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Activity should exist!", tx.hasActivity(type, id));
 		}
 
 		// update
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			Activity activity = tx.getActivityBy(type, id);
 
 			// privilege assertion
@@ -362,13 +362,13 @@ public class InMemoryTransactionTest {
 		}
 
 		// verify
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			Activity activity = tx.getActivityBy(type, id);
 			assertEquals("Foo foo", activity.getName());
 		}
 
 		// remove
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			Activity activity = tx.getActivityBy(type, id);
 
 			// privilege assertion
@@ -379,19 +379,19 @@ public class InMemoryTransactionTest {
 		}
 
 		// should not exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertFalse("Activity should not exist!", tx.hasActivity(type, id));
 		}
 
 		// create again
 		newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newActivity);
 			tx.commitOnClose();
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Activity should exist!", tx.hasActivity(type, id));
 		}
 	}
@@ -402,7 +402,7 @@ public class InMemoryTransactionTest {
 
 		// create and update
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newRes);
 			newRes.setName("Foo foo!");
 			tx.update(newRes);
@@ -410,7 +410,7 @@ public class InMemoryTransactionTest {
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Resource should exist!", tx.hasResource(type, id));
 		}
 	}
@@ -421,7 +421,7 @@ public class InMemoryTransactionTest {
 
 		// create, update and remove
 		Resource newRes = ModelGenerator.createResource(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newRes);
 			newRes.setName("Foo foo!");
 			tx.update(newRes);
@@ -430,7 +430,7 @@ public class InMemoryTransactionTest {
 		}
 
 		// should not exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertFalse("Resource should not exist!", tx.hasResource(type, id));
 		}
 	}
@@ -441,7 +441,7 @@ public class InMemoryTransactionTest {
 
 		// create and update
 		Order newOrder = ModelGenerator.createOrder(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newOrder);
 			newOrder.setName("Foo foo!");
 			tx.update(newOrder);
@@ -449,7 +449,7 @@ public class InMemoryTransactionTest {
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Order should exist!", tx.hasOrder(type, id));
 		}
 	}
@@ -460,7 +460,7 @@ public class InMemoryTransactionTest {
 
 		// create and update
 		Order newOrder = ModelGenerator.createOrder(id, "200", type);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newOrder);
 			newOrder.setName("Foo foo!");
 			tx.update(newOrder);
@@ -469,7 +469,7 @@ public class InMemoryTransactionTest {
 		}
 
 		// create, update and remove
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertFalse("Order should not exist!", tx.hasOrder(type, id));
 		}
 	}
@@ -480,7 +480,7 @@ public class InMemoryTransactionTest {
 
 		// create and update
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newActivity);
 			newActivity.setName("Foo foo!");
 			tx.update(newActivity);
@@ -488,7 +488,7 @@ public class InMemoryTransactionTest {
 		}
 
 		// should exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertTrue("Activity should exist!", tx.hasActivity(type, id));
 		}
 	}
@@ -499,7 +499,7 @@ public class InMemoryTransactionTest {
 
 		// create, update and remove
 		Activity newActivity = ModelGenerator.createActivity(id, "200", type, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, false)) {
 			tx.add(newActivity);
 			newActivity.setName("Foo foo!");
 			tx.update(newActivity);
@@ -508,7 +508,7 @@ public class InMemoryTransactionTest {
 		}
 
 		// should not exist
-		try (StrolchTransaction tx = openTx(realmName)) {
+		try (StrolchTransaction tx = openTx(realmName, true)) {
 			assertFalse("Activity should not exist!", tx.hasActivity(type, id));
 		}
 	}

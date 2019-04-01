@@ -15,6 +15,8 @@
  */
 package li.strolch.service.api;
 
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -33,7 +35,6 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +160,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm) throws StrolchException {
-		return this.container.getRealm(realm).openTx(getCertificate(), getClass());
+		return this.container.getRealm(realm).openTx(getCertificate(), getClass(), false);
 	}
 
 	/**
@@ -176,7 +177,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg) throws StrolchException {
-		if (StringHelper.isEmpty(arg.realm))
+		if (isEmpty(arg.realm))
 			return openUserTx();
 		return openTx(arg.realm);
 	}
@@ -197,7 +198,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, String action) throws StrolchException {
-		if (StringHelper.isEmpty(arg.realm))
+		if (isEmpty(arg.realm))
 			return openUserTx();
 		return openTx(arg.realm, action);
 	}
@@ -217,7 +218,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm, String action) throws StrolchException {
-		return this.container.getRealm(realm).openTx(getCertificate(), action);
+		return this.container.getRealm(realm).openTx(getCertificate(), action, false);
 	}
 
 	/**
@@ -231,7 +232,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx() throws StrolchException {
-		return this.container.getRealm(getCertificate()).openTx(getCertificate(), getClass());
+		return this.container.getRealm(getCertificate()).openTx(getCertificate(), getClass(), false);
 	}
 
 	/**
@@ -247,7 +248,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx(String action) throws StrolchException {
-		return this.container.getRealm(getCertificate()).openTx(getCertificate(), action);
+		return this.container.getRealm(getCertificate()).openTx(getCertificate(), action, false);
 	}
 
 	/**

@@ -57,7 +57,7 @@ public class InMemoryResourceQueryTest {
 
 	private static StrolchTransaction openTx() {
 		return runtimeMock.getAgent().getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
-				.openTx(certificate, "test");
+				.openTx(certificate, "test", true);
 	}
 
 	@AfterClass

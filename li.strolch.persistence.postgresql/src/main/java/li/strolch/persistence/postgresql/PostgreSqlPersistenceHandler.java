@@ -132,8 +132,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	}
 
 	@Override
-	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
-		return new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, this);
+	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action, boolean readOnly) {
+		return new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, this);
 	}
 
 	public Connection getConnection(String realm) {
@@ -174,6 +174,6 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	@Override
 	public LogMessageDao getLogMessageDao(StrolchTransaction tx) {
-		return ((PostgreSqlStrolchTransaction)tx).getLogMessageDao();
+		return ((PostgreSqlStrolchTransaction) tx).getLogMessageDao();
 	}
 }

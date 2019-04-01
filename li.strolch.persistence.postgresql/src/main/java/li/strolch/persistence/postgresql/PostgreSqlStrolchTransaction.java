@@ -37,8 +37,8 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	private Connection connection;
 
 	public PostgreSqlStrolchTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
-			String action, PostgreSqlPersistenceHandler persistenceHandler) {
-		super(container, realm, certificate, action);
+			String action, boolean readOnly, PostgreSqlPersistenceHandler persistenceHandler) {
+		super(container, realm, certificate, action, readOnly);
 		this.persistenceHandler = persistenceHandler;
 	}
 

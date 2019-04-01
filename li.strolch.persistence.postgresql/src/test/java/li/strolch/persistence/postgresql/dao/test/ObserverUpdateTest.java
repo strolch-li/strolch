@@ -66,7 +66,8 @@ public class ObserverUpdateTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
+		if (!new File(rootPath, DB_STORE_PATH_DIR).mkdir())
+			throw new IllegalStateException("Failed to create dir " + rootPath + "/" + DB_STORE_PATH_DIR);
 		runtimeMock.startContainer();
 
 		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
@@ -125,7 +126,7 @@ public class ObserverUpdateTest {
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(),
 				State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = realm.openTx(certificate, "test")) { //$NON-NLS-1$
+		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) { //$NON-NLS-1$
 			tx.add(newOrder);
 			tx.commitOnClose();
 		}
@@ -133,7 +134,7 @@ public class ObserverUpdateTest {
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name",
 				"TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = realm.openTx(certificate, "test");) { //$NON-NLS-1$
+		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) { //$NON-NLS-1$
 			tx.add(newResource);
 			tx.commitOnClose();
 		}

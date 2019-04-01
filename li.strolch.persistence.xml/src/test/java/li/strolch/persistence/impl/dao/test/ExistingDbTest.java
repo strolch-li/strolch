@@ -70,7 +70,8 @@ public class ExistingDbTest {
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
 		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.toCharArray());
 
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, TEST)) {
+		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, TEST, true)) {
 			Resource resource = tx.getResourceBy("MyType", "@1"); //$NON-NLS-1$ //$NON-NLS-2$
 			assertNotNull("Should be able to read existing element from db", resource); //$NON-NLS-1$
 

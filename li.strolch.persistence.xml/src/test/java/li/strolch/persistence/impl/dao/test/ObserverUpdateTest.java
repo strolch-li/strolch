@@ -111,14 +111,14 @@ public class ObserverUpdateTest {
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(), State.CREATED);
-		try (StrolchTransaction tx = realm.openTx(certificate, TEST)) {
+		try (StrolchTransaction tx = realm.openTx(certificate, TEST, false)) {
 			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType");
-		try (StrolchTransaction tx = realm.openTx(certificate, TEST)) {
+		try (StrolchTransaction tx = realm.openTx(certificate, TEST, false)) {
 			tx.add(newResource);
 			tx.commitOnClose();
 		}

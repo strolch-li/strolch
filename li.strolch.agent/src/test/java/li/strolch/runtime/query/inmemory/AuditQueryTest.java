@@ -196,7 +196,7 @@ public class AuditQueryTest {
 
 		Certificate certificate = login(agent);
 		try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
-				.openTx(certificate, "test")) {
+				.openTx(certificate, "test", false)) {
 
 			tx.setSuppressAudits(true);
 			tx.getAuditTrail().addAll(tx, getAudits());

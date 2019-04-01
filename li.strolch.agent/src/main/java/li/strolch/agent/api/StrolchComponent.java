@@ -419,11 +419,13 @@ public class StrolchComponent {
 	 *
 	 * @param cert
 	 * 		the certificate authorizing the transaction
+	 * @param readOnly
+	 * 		if this TX is read-only
 	 *
 	 * @return the newly created transaction
 	 */
-	protected StrolchTransaction openTx(Certificate cert) {
-		return getContainer().getRealm(cert).openTx(cert, this.getClass());
+	protected StrolchTransaction openTx(Certificate cert, boolean readOnly) {
+		return getContainer().getRealm(cert).openTx(cert, this.getClass(), readOnly);
 	}
 
 	/**
@@ -433,11 +435,13 @@ public class StrolchComponent {
 	 * 		the certificate authorizing the transaction
 	 * @param action
 	 * 		the action describing the transaction context
+	 * @param readOnly
+	 * 		if this TX is read-only
 	 *
 	 * @return the newly created transaction
 	 */
-	protected StrolchTransaction openTx(Certificate cert, String action) {
-		return getContainer().getRealm(cert).openTx(cert, action);
+	protected StrolchTransaction openTx(Certificate cert, String action, boolean readOnly) {
+		return getContainer().getRealm(cert).openTx(cert, action, readOnly);
 	}
 
 	/**
@@ -447,11 +451,13 @@ public class StrolchComponent {
 	 * 		the name of the realm in which to open the transaction
 	 * @param cert
 	 * 		the certificate authorizing the transaction
+	 * @param readOnly
+	 * 		if this TX is read-only
 	 *
 	 * @return the newly created transaction
 	 */
-	protected StrolchTransaction openTx(String realm, Certificate cert) {
-		return getContainer().getRealm(realm).openTx(cert, this.getClass());
+	protected StrolchTransaction openTx(String realm, Certificate cert, boolean readOnly) {
+		return getContainer().getRealm(realm).openTx(cert, this.getClass(), readOnly);
 	}
 
 	/**
@@ -463,11 +469,13 @@ public class StrolchComponent {
 	 * 		the certificate authorizing the transaction
 	 * @param clazz
 	 * 		the clazz describing the transaction context
+	 * @param readOnly
+	 * 		if this TX is read-only
 	 *
 	 * @return the newly created transaction
 	 */
-	protected StrolchTransaction openTx(String realm, Certificate cert, Class<?> clazz) {
-		return getContainer().getRealm(realm).openTx(cert, clazz);
+	protected StrolchTransaction openTx(String realm, Certificate cert, Class<?> clazz, boolean readOnly) {
+		return getContainer().getRealm(realm).openTx(cert, clazz, readOnly);
 	}
 
 	/**
@@ -479,11 +487,13 @@ public class StrolchComponent {
 	 * 		the certificate authorizing the transaction
 	 * @param action
 	 * 		the action describing the transaction context
+	 * @param readOnly
+	 * 		if this TX is read-only
 	 *
 	 * @return the newly created transaction
 	 */
-	protected StrolchTransaction openTx(String realm, Certificate cert, String action) {
-		return getContainer().getRealm(realm).openTx(cert, action);
+	protected StrolchTransaction openTx(String realm, Certificate cert, String action, boolean readOnly) {
+		return getContainer().getRealm(realm).openTx(cert, action, readOnly);
 	}
 
 	/**

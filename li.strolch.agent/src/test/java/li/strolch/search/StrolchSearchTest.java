@@ -50,7 +50,7 @@ public class StrolchSearchTest {
 		cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, false)) {
 
 			{
 				Resource ball = createResource("the-id", "Yellow Ball", "Ball");
@@ -107,7 +107,7 @@ public class StrolchSearchTest {
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow")
 					// do search, returns SearchResult
@@ -128,7 +128,7 @@ public class StrolchSearchTest {
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow")
 					.where(element -> element.hasTimedState(STATE_FLOAT_ID)).search(tx)
@@ -145,7 +145,7 @@ public class StrolchSearchTest {
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			List<JsonObject> result = new NewBallSearch().id("the-id").status("bla").color("yellow")
 
@@ -163,7 +163,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchResources3() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			assertEquals(4,
 					new ResourceSearch().types().where(param(BAG_ID, PARAM_STRING_ID, contains("rol"))).search(tx)
@@ -177,7 +177,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchResources4() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			assertEquals(7, new ResourceSearch().types().search(tx).toList().size());
 		}
@@ -186,7 +186,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchResources5() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			assertEquals(2, new ResourceSearch().types("sdf", "Ball").search(tx).toList().size());
 			assertEquals(2, new ResourceSearch().types("Ball", "sdf").search(tx).toList().size());
@@ -197,7 +197,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchOrders() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			List<Order> result = new OrderSearch() {
 				@Override
@@ -220,7 +220,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchOrders1() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			StrolchSearch<Order> search = new OrderSearch() {
 				@Override
@@ -244,7 +244,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchOrders2() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			assertEquals(5, new OrderSearch().types("sdf", "SortingType").search(tx).toList().size());
 			assertEquals(5, new OrderSearch().types("SortingType", "sdf").search(tx).toList().size());
@@ -256,7 +256,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchActivities() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			Map<String, State> states = new ActivitySearch() {
 				@Override
@@ -272,7 +272,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchActivities1() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			Map<String, State> states = new ActivitySearch()
 
@@ -287,7 +287,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchActivities2() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			assertEquals(2, new ActivitySearch().types("sdf", "ActivityType").search(tx).toList().size());
 			assertEquals(2, new ActivitySearch().types("ActivityType", "sdf").search(tx).toList().size());
@@ -299,7 +299,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchActivities3() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			assertEquals(1, new ActivitySearch().types("sdf", "ActivityType")
 					.where(element -> element.getActionsByType("Use").size() == 4).search(tx).toList().size());
@@ -309,7 +309,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchRootElements() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
 			assertEquals(9,
 					new RootElementSearch().types("SortingType", "Ball", "ActivityType").search(tx).toList().size());

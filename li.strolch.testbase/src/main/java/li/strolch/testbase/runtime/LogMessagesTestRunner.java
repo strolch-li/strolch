@@ -57,7 +57,7 @@ public class LogMessagesTestRunner {
 				List<LogMessage> messages = this.operationsLog.getMessages(realmName);
 				assertEquals(2, messages.size());
 			} else {
-				try (StrolchTransaction tx = realm.openTx(this.certificate, "test");) {
+				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<LogMessage> logMessages = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE);
 					assertEquals(2, logMessages.size());
@@ -99,7 +99,7 @@ public class LogMessagesTestRunner {
 				assertEquals(expectedSize, messages.size());
 			} else {
 
-				try (StrolchTransaction tx = realm.openTx(this.certificate, "test");) {
+				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE).stream()
 							.map(LogMessage::getId).sorted().collect(toList());

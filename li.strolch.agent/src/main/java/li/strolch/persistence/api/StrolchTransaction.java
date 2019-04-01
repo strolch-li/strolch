@@ -208,17 +208,22 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#READ_ONLY}
 	 */
-	void doNothingOnClose();
+	StrolchTransaction readOnly();
+
+	/**
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#READ_ONLY}
+	 */
+	StrolchTransaction doNothingOnClose();
 
 	/**
 	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#COMMIT}
 	 */
-	void commitOnClose();
+	StrolchTransaction commitOnClose();
 
 	/**
 	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK}
 	 */
-	void rollbackOnClose();
+	StrolchTransaction rollbackOnClose();
 
 	/**
 	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK} and returns a {@link

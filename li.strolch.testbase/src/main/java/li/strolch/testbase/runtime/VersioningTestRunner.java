@@ -43,7 +43,8 @@ public class VersioningTestRunner {
 		// initialize by adding a resource
 		String type = "TestType";
 		String id = StrolchAgent.getUniqueId();
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = ModelGenerator.createResource(id, "Test Name", type);
 			tx.add(res1);
 			tx.flush();
@@ -53,7 +54,8 @@ public class VersioningTestRunner {
 		}
 
 		// first make sure that the we can't change anything without updating the model
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy(type, id, true);
 			// must be first version
 			assertEquals(0, res1.getVersion().getVersion());
@@ -61,7 +63,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy(type, id, true);
 			assertEquals("Test Name", res1.getName());
 
@@ -69,14 +72,16 @@ public class VersioningTestRunner {
 		}
 
 		// now do a change
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy(type, id, true);
 			res1.setName("Something");
 			tx.update(res1);
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy(type, id, true);
 			assertEquals("Something", res1.getName());
 			// version must be incremented
@@ -86,7 +91,8 @@ public class VersioningTestRunner {
 		}
 
 		// now revert the change
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource revertedVersion = tx.getResourceMap().revertToVersion(tx, type, id, 0);
 			assertEquals("Test Name", revertedVersion.getName());
 			// version must be incremented
@@ -94,7 +100,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy(type, id, true);
 			assertEquals("Test Name", res1.getName());
 			// version must be incremented
@@ -104,7 +111,8 @@ public class VersioningTestRunner {
 		}
 
 		// undo a version in same TX
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy(type, id, true);
 
 			// create a new version:
@@ -126,7 +134,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy(type, id, true);
 			assertEquals("Test Name", res1.getName());
 			// version must be incremented
@@ -136,7 +145,8 @@ public class VersioningTestRunner {
 		}
 
 		// undo all versions
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1;
 
 			// undo three times as we have version 0, 1, 2
@@ -162,7 +172,8 @@ public class VersioningTestRunner {
 		}
 
 		// do a deletion
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = ModelGenerator.createResource("ball", "Red Ball", "Ball");
 			assertNull(res1.getVersion());
 
@@ -172,7 +183,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy("Ball", "ball", true);
 			assertEquals("Red Ball", res1.getName());
 
@@ -190,7 +202,8 @@ public class VersioningTestRunner {
 		}
 
 		// restore a version manually
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy("Ball", "ball");
 			assertNull(res1);
 
@@ -205,7 +218,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res1 = tx.getResourceBy("Ball", "ball");
 			assertNotNull(res1);
 			assertEquals(2, res1.getVersion().getVersion());
@@ -215,24 +229,29 @@ public class VersioningTestRunner {
 
 		// do a create, get, remove, and re-create of the elements
 		Resource res1 = ModelGenerator.createResource(StrolchAgent.getUniqueId(), "Test Name", type);
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			tx.add(res1);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			assertTrue(tx.hasResource(res1.getType(), res1.getId()));
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Resource res = tx.getResourceBy(res1.getType(), res1.getId());
 			assertNotNull(res);
 			tx.remove(res);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			tx.add(res1.getClone());
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			assertTrue(tx.hasResource(res1.getType(), res1.getId()));
 		}
 	}
@@ -243,7 +262,8 @@ public class VersioningTestRunner {
 		// initialize by adding a order
 		String type = "TestType";
 		String id = StrolchAgent.getUniqueId();
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = ModelGenerator.createOrder(id, "Test Name", type);
 			tx.add(order1);
 			tx.flush();
@@ -253,7 +273,8 @@ public class VersioningTestRunner {
 		}
 
 		// first make sure that the we can't change anything without updating the model
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy(type, id, true);
 			// must be first version
 			assertEquals(0, order1.getVersion().getVersion());
@@ -261,7 +282,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy(type, id, true);
 			assertEquals("Test Name", order1.getName());
 
@@ -269,14 +291,16 @@ public class VersioningTestRunner {
 		}
 
 		// now do a change
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy(type, id, true);
 			order1.setName("Something");
 			tx.update(order1);
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy(type, id, true);
 			assertEquals("Something", order1.getName());
 			// version must be incremented
@@ -286,7 +310,8 @@ public class VersioningTestRunner {
 		}
 
 		// now revert the change
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order revertedVersion = tx.getOrderMap().revertToVersion(tx, type, id, 0);
 			assertEquals("Test Name", revertedVersion.getName());
 			// version must be incremented
@@ -294,7 +319,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy(type, id, true);
 			assertEquals("Test Name", order1.getName());
 			// version must be incremented
@@ -304,7 +330,8 @@ public class VersioningTestRunner {
 		}
 
 		// undo a version in same TX
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy(type, id, true);
 
 			// create a new version:
@@ -326,7 +353,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy(type, id, true);
 			assertEquals("Test Name", order1.getName());
 			// version must be incremented
@@ -336,7 +364,8 @@ public class VersioningTestRunner {
 		}
 
 		// undo all versions
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1;
 
 			// undo three times as we have version 0, 1, 2
@@ -362,7 +391,8 @@ public class VersioningTestRunner {
 		}
 
 		// do a deletion
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = ModelGenerator.createOrder("ball", "Red Ball", "Ball");
 			assertNull(order1.getVersion());
 
@@ -372,7 +402,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy("Ball", "ball", true);
 			assertEquals("Red Ball", order1.getName());
 
@@ -390,7 +421,8 @@ public class VersioningTestRunner {
 		}
 
 		// restore a version manually
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy("Ball", "ball");
 			assertNull(order1);
 
@@ -405,7 +437,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order order1 = tx.getOrderBy("Ball", "ball");
 			assertNotNull(order1);
 			assertEquals(2, order1.getVersion().getVersion());
@@ -415,24 +448,29 @@ public class VersioningTestRunner {
 
 		// do a create, get, remove, and re-create of the elements
 		Order order1 = ModelGenerator.createOrder(StrolchAgent.getUniqueId(), "Test Name", type);
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			tx.add(order1);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			assertTrue(tx.hasOrder(order1.getType(), order1.getId()));
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Order res = tx.getOrderBy(order1.getType(), order1.getId());
 			assertNotNull(res);
 			tx.remove(res);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			tx.add(order1.getClone());
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			assertTrue(tx.hasOrder(order1.getType(), order1.getId()));
 		}
 	}
@@ -443,7 +481,8 @@ public class VersioningTestRunner {
 		// initialize by adding a activity
 		String type = "TestType";
 		String id = StrolchAgent.getUniqueId();
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = ModelGenerator.createActivity(id, "Test Name", type, TimeOrdering.SERIES);
 			tx.add(act1);
 			tx.flush();
@@ -453,7 +492,8 @@ public class VersioningTestRunner {
 		}
 
 		// first make sure that the we can't change anything without updating the model
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy(type, id, true);
 			// must be first version
 			assertEquals(0, act1.getVersion().getVersion());
@@ -461,7 +501,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy(type, id, true);
 			assertEquals("Test Name", act1.getName());
 
@@ -469,14 +510,16 @@ public class VersioningTestRunner {
 		}
 
 		// now do a change
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy(type, id, true);
 			act1.setName("Something");
 			tx.update(act1);
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy(type, id, true);
 			assertEquals("Something", act1.getName());
 			// version must be incremented
@@ -486,7 +529,8 @@ public class VersioningTestRunner {
 		}
 
 		// now revert the change
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity revertedVersion = tx.getActivityMap().revertToVersion(tx, type, id, 0);
 			assertEquals("Test Name", revertedVersion.getName());
 			// version must be incremented
@@ -494,7 +538,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy(type, id, true);
 			assertEquals("Test Name", act1.getName());
 			// version must be incremented
@@ -504,7 +549,8 @@ public class VersioningTestRunner {
 		}
 
 		// undo a version in same TX
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy(type, id, true);
 
 			// create a new version:
@@ -526,7 +572,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy(type, id, true);
 			assertEquals("Test Name", act1.getName());
 			// version must be incremented
@@ -536,7 +583,8 @@ public class VersioningTestRunner {
 		}
 
 		// undo all versions
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1;
 
 			// undo three times as we have version 0, 1, 2
@@ -562,7 +610,8 @@ public class VersioningTestRunner {
 		}
 
 		// do a deletion
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = ModelGenerator.createActivity("ball", "Red Ball", "Ball", TimeOrdering.SERIES);
 			assertNull(act1.getVersion());
 
@@ -572,7 +621,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy("Ball", "ball", true);
 			assertEquals("Red Ball", act1.getName());
 
@@ -591,7 +641,8 @@ public class VersioningTestRunner {
 		}
 
 		// restore a version manually
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy("Ball", "ball");
 			assertNull(act1);
 
@@ -606,7 +657,8 @@ public class VersioningTestRunner {
 
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity act1 = tx.getActivityBy("Ball", "ball");
 			assertNotNull(act1);
 			assertEquals(2, act1.getVersion().getVersion());
@@ -617,24 +669,29 @@ public class VersioningTestRunner {
 		// do a create, get, remove, and re-create of the elements
 		Activity act1 = ModelGenerator
 				.createActivity(StrolchAgent.getUniqueId(), "Test Name", type, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			tx.add(act1);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			assertTrue(tx.hasActivity(act1.getType(), act1.getId()));
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			Activity res = tx.getActivityBy(act1.getType(), act1.getId());
 			assertNotNull(res);
 			tx.remove(res);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			tx.add(act1.getClone());
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = container.getRealm(certificate).openTx(certificate, VersioningTestRunner.class)) {
+		try (StrolchTransaction tx = container.getRealm(certificate)
+				.openTx(certificate, VersioningTestRunner.class, false)) {
 			assertTrue(tx.hasActivity(act1.getType(), act1.getId()));
 		}
 	}

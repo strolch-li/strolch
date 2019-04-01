@@ -124,7 +124,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void reloadActivitiesInExecution(PrivilegeContext ctx, String realmName) {
-		try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate())) {
+		try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), false)) {
 
 			// iterate all activities
 			tx.streamActivities().forEach(activity -> {
@@ -283,7 +283,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
-					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ActivityArchivalPolicy.class)) {
+					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ActivityArchivalPolicy.class,
+							false)) {
 						tx.lock(activityLoc);
 
 						Activity activity = tx.findElement(activityLoc);
@@ -319,7 +320,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	private void toExecution(String realm, Locator elementLoc, PrivilegeContext ctx) {
-		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ExecuteActivityCommand.class)) {
+		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ExecuteActivityCommand.class, false)) {
 
 			Locator activityLoc = elementLoc.trim(3);
 			tx.lock(activityLoc);
@@ -346,7 +347,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		Locator activityLoc = actionLoc.trim(3);
 
-		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
+		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class, false)) {
 
 			tx.lock(activityLoc);
 
@@ -394,7 +395,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	private void toWarning(String realm, Locator actionLoc, PrivilegeContext ctx) {
-		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
+		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class, false)) {
 			Locator rootElemLoc = actionLoc.trim(3);
 			tx.lock(rootElemLoc);
 
@@ -411,7 +412,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	private void toError(String realm, Locator actionLoc, PrivilegeContext ctx) {
-		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class)) {
+		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToExecutedCommand.class, false)) {
 			Locator rootElemLoc = actionLoc.trim(3);
 			tx.lock(rootElemLoc);
 
@@ -428,7 +429,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	private void toStopped(String realm, Locator actionLoc, PrivilegeContext ctx) {
-		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToStoppedCommand.class)) {
+		try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), SetActionToStoppedCommand.class, false)) {
 			Locator rootElemLoc = actionLoc.trim(3);
 			tx.lock(rootElemLoc);
 

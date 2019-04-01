@@ -137,7 +137,8 @@ public class ComponentContainerTest {
 		assertEquals(1, result.getResult());
 
 		Certificate certificate = login(agent);
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test", false)) {
 			tx.add(createResource("@testRes0", "Test Res", "Test"));
 			Resource queriedRes = tx.getResourceBy("Test", "@testRes0");
 			assertNotNull(queriedRes);
@@ -146,7 +147,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test", false)) {
 			tx.add(createOrder("@testOrder0", "Test Order", "Test"));
 			Order queriedOrder = tx.getOrderBy("Test", "@testOrder0");
 			assertNotNull(queriedOrder);
@@ -155,7 +157,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test", false)) {
 			tx.add(createActivity("@testActivity0", "Test Activity", "Test", TimeOrdering.SERIES));
 			Activity queriedActivity = tx.getActivityBy("Test", "@testActivity0");
 			assertNotNull(queriedActivity);
@@ -170,7 +173,8 @@ public class ComponentContainerTest {
 		ComponentContainer container = agent.getContainer();
 
 		Certificate certificate = login(agent);
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test", false)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			resourceMap.add(tx, createResource("@testRes1", "Test Res", "Test"));
 			Resource queriedRes = resourceMap.getBy(tx, "Test", "@testRes1");
@@ -180,7 +184,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test", false)) {
 			OrderMap orderMap = tx.getOrderMap();
 			orderMap.add(tx, createOrder("@testOrder1", "Test Order", "Test"));
 			Order queriedOrder = orderMap.getBy(tx, "Test", "@testOrder1");
@@ -190,7 +195,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test", false)) {
 			ActivityMap activityMap = tx.getActivityMap();
 			activityMap.add(tx, createActivity("@testActivity0", "Test Activity", "Test", TimeOrdering.SERIES));
 			Activity queriedActivity = activityMap.getBy(tx, "Test", "@testActivity0");
@@ -206,7 +212,8 @@ public class ComponentContainerTest {
 		ComponentContainer container = agent.getContainer();
 
 		Certificate certificate = login(agent);
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM).openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+				.openTx(certificate, "test", false)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			resourceMap.add(tx, createResource("@testRes1", "Test Res", "Test"));
 			Resource queriedRes = resourceMap.getBy(tx, "Test", "@testRes1");
@@ -228,7 +235,7 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm("myRealm").openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm("myRealm").openTx(certificate, "test", false)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			Resource myRealmRes = resourceMap.getBy(tx, "TestType", "MyRealmRes");
 			assertNotNull(myRealmRes);
@@ -253,7 +260,7 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm("otherRealm").openTx(certificate, "test")) {
+		try (StrolchTransaction tx = container.getRealm("otherRealm").openTx(certificate, "test", false)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			Resource otherRealmRes = resourceMap.getBy(tx, "TestType", "OtherRealmRes");
 			assertNotNull(otherRealmRes);

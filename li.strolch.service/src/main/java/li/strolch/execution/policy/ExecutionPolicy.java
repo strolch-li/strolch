@@ -155,16 +155,21 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Opens a {@link StrolchTransaction} where the realm retrieved using {@link ComponentContainer#getRealm(Certificate)}.
 	 * This transaction should be used in a try-with-resource clause so it is properly closed.
 	 *
+	 * @param ctx
+	 * 		the privilege context
+	 * @param readOnly
+	 * 		true if this is a read-only TX
+	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
 	 * @throws StrolchException
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
-	protected StrolchTransaction openTx(PrivilegeContext ctx) throws StrolchException {
+	protected StrolchTransaction openTx(PrivilegeContext ctx, boolean readOnly) throws StrolchException {
 		if (this.tx.isOpen())
 			throw new IllegalStateException("The current TX is still open, so can't open another one!");
 
-		this.tx = getContainer().getRealm(ctx.getCertificate()).openTx(ctx.getCertificate(), getClass());
+		this.tx = getContainer().getRealm(ctx.getCertificate()).openTx(ctx.getCertificate(), getClass(), readOnly);
 		return this.tx;
 	}
 

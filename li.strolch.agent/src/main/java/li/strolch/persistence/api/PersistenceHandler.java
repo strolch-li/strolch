@@ -15,11 +15,7 @@
  */
 package li.strolch.persistence.api;
 
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.AuditTrail;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
-import li.strolch.agent.api.StrolchRealm;
+import li.strolch.agent.api.*;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
@@ -41,10 +37,12 @@ public interface PersistenceHandler {
 	 * 		the certificate which has access to the realm
 	 * @param action
 	 * 		the name of the transaction used for auditing
+	 * @param readOnly
+	 * 		if this TX is read-only
 	 *
 	 * @return the newly created {@link StrolchTransaction}
 	 */
-	StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action);
+	StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action, boolean readOnly);
 
 	/**
 	 * Returns the {@link OrderDao} for the given transaction. Use this only if you want to bypass certain transaction

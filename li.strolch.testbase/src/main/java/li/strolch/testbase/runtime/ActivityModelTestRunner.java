@@ -54,7 +54,8 @@ public class ActivityModelTestRunner {
 		// create
 		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType",
 				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			tx.add(newActivity);
 			tx.commitOnClose();
 		}
@@ -63,7 +64,8 @@ public class ActivityModelTestRunner {
 	public void runQuerySizeTest() {
 
 		// remove all
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			tx.getActivityMap().removeAll(tx, tx.getActivityMap().getAllElements(tx));
 			tx.commitOnClose();
 		}
@@ -75,7 +77,8 @@ public class ActivityModelTestRunner {
 				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3",
 				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			tx.add(activity1);
 			tx.add(activity2);
 			tx.add(activity3);
@@ -83,7 +86,8 @@ public class ActivityModelTestRunner {
 		}
 
 		// query size
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			long size = tx.getActivityMap().querySize(tx);
 			assertEquals("Should have three objects", 3, size);
 
@@ -105,14 +109,16 @@ public class ActivityModelTestRunner {
 
 		// create
 		Activity newActivity = createActivity(ID, NAME, TYPE, TimeOrdering.SERIES);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			tx.add(newActivity);
 			tx.commitOnClose();
 		}
 
 		// read
 		Activity readActivity;
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			readActivity = tx.getActivityBy(TYPE, ID);
 		}
 		assertNotNull("Should read Activity with id " + ID, readActivity);
@@ -121,14 +127,16 @@ public class ActivityModelTestRunner {
 		StringParameter sParam = readActivity.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			tx.update(readActivity);
 			tx.commitOnClose();
 		}
 
 		// read updated
 		Activity updatedActivity;
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			updatedActivity = tx.getActivityBy(TYPE, ID);
 		}
 		assertNotNull("Should read Activity with id " + ID, updatedActivity);
@@ -138,13 +146,15 @@ public class ActivityModelTestRunner {
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			tx.remove(readActivity);
 			tx.commitOnClose();
 		}
 
 		// fail to re-read
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			Activity activity = tx.getActivityBy(TYPE, ID);
 			assertNull("Should no read Activity with id " + ID, activity);
 		}
@@ -165,7 +175,8 @@ public class ActivityModelTestRunner {
 		activities.sort(comparator);
 
 		// first clear the map, so that we have a clean state
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			ActivityMap activityMap = tx.getActivityMap();
 			List<Activity> allElements = activityMap.getAllElements(tx);
 			long removed = activityMap.removeAll(tx);
@@ -176,46 +187,53 @@ public class ActivityModelTestRunner {
 
 		{
 			// make sure it is empty
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+					.openTx(this.certificate, "test", true)) {
 				ActivityMap activityMap = tx.getActivityMap();
 				assertEquals(0, activityMap.querySize(tx));
 			}
 
 			// now add some activities
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+					.openTx(this.certificate, "test", false)) {
 				tx.getActivityMap().addAll(tx, activities);
 				tx.commitOnClose();
 			}
 
 			// make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+					.openTx(this.certificate, "test", true)) {
 				ActivityMap activityMap = tx.getActivityMap();
 				assertEquals(activities.size(), activityMap.querySize(tx));
 				assertEquals(5, activityMap.querySize(tx, "MyType3"));
 			}
 
 			// now use the remove all by type
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+					.openTx(this.certificate, "test", false)) {
 				tx.getActivityMap().removeAllBy(tx, "MyType3");
 				tx.commitOnClose();
 			}
 
 			// again make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+					.openTx(this.certificate, "test", true)) {
 				ActivityMap activityMap = tx.getActivityMap();
 				assertEquals(activities.size() - 5, activityMap.querySize(tx));
 				assertEquals(0, activityMap.querySize(tx, "MyType3"));
 			}
 
 			// now use the remove all
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+					.openTx(this.certificate, "test", false)) {
 				long removed = tx.getActivityMap().removeAll(tx);
 				assertEquals(activities.size() - 5, removed);
 				tx.commitOnClose();
 			}
 
 			// again make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+					.openTx(this.certificate, "test", true)) {
 				ActivityMap activityMap = tx.getActivityMap();
 				assertEquals(0, activityMap.querySize(tx));
 			}
@@ -225,7 +243,8 @@ public class ActivityModelTestRunner {
 		activities.forEach(t -> t.setVersion(null));
 
 		// now add all again
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
 			tx.getActivityMap().addAll(tx, activities);
 			tx.commitOnClose();
 		}
@@ -235,13 +254,13 @@ public class ActivityModelTestRunner {
 		expectedTypes.add("MyType2");
 		expectedTypes.add("MyType3");
 
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			List<Activity> allActivities = tx.getActivityMap().getAllElements(tx);
 			allActivities.sort(comparator);
 			assertEquals(activities, allActivities);
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			ActivityMap activityMap = tx.getActivityMap();
 
 			Set<String> types = activityMap.getTypes(tx);
@@ -259,7 +278,7 @@ public class ActivityModelTestRunner {
 			}
 		}
 
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test")) {
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			Activity activity = tx.getActivityBy("MyType1", "@00000001");
 			assertNotNull(activity);
 			activity = tx.getActivityBy("MyType2", "@00000006");

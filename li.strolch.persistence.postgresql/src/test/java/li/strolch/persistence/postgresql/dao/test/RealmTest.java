@@ -67,7 +67,8 @@ public class RealmTest extends AbstractModelTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
+		if (!new File(rootPath, DB_STORE_PATH_DIR).mkdir())
+			throw new IllegalStateException("Failed to create dir " + rootPath + "/" + DB_STORE_PATH_DIR);
 		runtimeMock.startContainer();
 
 		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
@@ -94,12 +95,12 @@ public class RealmTest extends AbstractModelTest {
 			StrolchRealm firstRealm = runtimeMock.getRealm(FIRST);
 			assertEquals(DataStoreMode.CACHED, firstRealm.getMode());
 			Resource expectedRes1 = ModelGenerator.createResource(expectedId1, "Bla bla", type); //$NON-NLS-1$
-			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST)) {
+			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST, false)) {
 				tx.add(expectedRes1);
 				tx.commitOnClose();
 			}
 
-			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST)) {
+			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST, true)) {
 				Resource res = tx.getResourceBy(type, expectedId1);
 				assertEquals("Should find object previously added in same realm!", expectedRes1, res); //$NON-NLS-1$
 			}
@@ -109,12 +110,12 @@ public class RealmTest extends AbstractModelTest {
 			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
 			assertEquals(DataStoreMode.CACHED, secondRealm.getMode());
 			Resource expectedRes2 = ModelGenerator.createResource(expectedId2, "Bla bla", type); //$NON-NLS-1$
-			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST, false)) {
 				tx.add(expectedRes2);
 				tx.commitOnClose();
 			}
 
-			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST, true)) {
 				Resource res = tx.getResourceBy(type, expectedId2);
 				assertEquals("Should find object previously added in same realm!", expectedRes2, res); //$NON-NLS-1$
 			}
@@ -122,7 +123,7 @@ public class RealmTest extends AbstractModelTest {
 
 		{
 			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
-			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST)) {
+			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST, true)) {
 				Resource res = tx.getResourceBy(type, expectedId1);
 				assertNull("Should not find object added in differenct realm!", res); //$NON-NLS-1$
 			}

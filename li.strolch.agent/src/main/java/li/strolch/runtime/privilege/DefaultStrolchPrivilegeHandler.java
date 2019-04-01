@@ -152,7 +152,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	private void writeAudit(Certificate certificate, String login, AccessType accessType, String username) {
 		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, login)) {
+		try (StrolchTransaction tx = realm.openTx(certificate, login, false)) {
 			tx.setSuppressDoNothingLogging(true);
 			tx.setSuppressAudits(true);
 			Audit audit = tx

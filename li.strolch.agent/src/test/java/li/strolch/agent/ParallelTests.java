@@ -38,7 +38,7 @@ public class ParallelTests {
 
 		// generate a some elements
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, false)) {
 
 			for (int i = 0; i < 5000; i++) {
 				String id = StrolchAgent.getUniqueId();
@@ -94,7 +94,7 @@ public class ParallelTests {
 			while (System.currentTimeMillis() - start < 1000L) {
 
 				StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-				try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class)) {
+				try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, false)) {
 
 					List<String> ids = tx.streamResources().map(StrolchElement::getId).collect(toList());
 					logger.info("There are " + ids.size() + " Resources!");

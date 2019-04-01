@@ -17,8 +17,6 @@ package li.strolch.policytest;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
-
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
@@ -28,6 +26,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,7 +45,7 @@ public class PolicyHandlerTest {
 			ComponentContainer container = agent.getContainer();
 			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 			try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 
 				Resource res = tx.getResourceBy("TestType", "MyTestResource");
 

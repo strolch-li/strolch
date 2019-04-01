@@ -15,16 +15,21 @@
  */
 package li.strolch.agent.impl;
 
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import li.strolch.agent.api.Observer;
-import li.strolch.agent.api.ObserverEvent;
-import li.strolch.agent.api.ObserverHandler;
-import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.*;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.utils.collections.MapOfLists;
 import org.slf4j.Logger;
@@ -46,9 +51,11 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 
 	private ScheduledFuture<?> future;
 	private StrolchAgent agent;
+	private final StrolchRealm realm;
 
-	public EventCollectingObserverHandler(StrolchAgent agent) {
+	public EventCollectingObserverHandler(StrolchAgent agent, StrolchRealm realm) {
 		this.agent = agent;
+		this.realm = realm;
 		this.observerMap = new MapOfLists<>();
 	}
 
@@ -133,6 +140,8 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 					String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, key, observer, e.getMessage());
 					logger.error(msg, e);
+
+					addLogMessage("add", e);
 				}
 			}
 		}
@@ -151,6 +160,8 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 					String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, key, observer, e.getMessage());
 					logger.error(msg, e);
+
+					addLogMessage("update", e);
 				}
 			}
 		}
@@ -169,8 +180,21 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 					String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
 					msg = MessageFormat.format(msg, key, observer, e.getMessage());
 					logger.error(msg, e);
+
+					addLogMessage("remove", e);
 				}
 			}
+		}
+	}
+
+	private void addLogMessage(String type, Exception e) {
+		ComponentContainer container = this.agent.getContainer();
+		if (container.hasComponent(OperationsLog.class)) {
+			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
+			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), SYSTEM_USER_AGENT,
+					Locator.valueOf(AGENT, ObserverHandler.class.getName(), type, StrolchAgent.getUniqueId()),
+					LogSeverity.Exception, ResourceBundle.getBundle("strolch-agent"), "agent.observers.update.failed")
+					.withException(e).value("type", type).value("reason", e));
 		}
 	}
 

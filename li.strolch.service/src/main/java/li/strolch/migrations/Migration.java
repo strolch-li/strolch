@@ -61,7 +61,7 @@ public abstract class Migration {
 	}
 
 	protected StrolchTransaction openTx(ComponentContainer container, Certificate cert) {
-		return container.getRealm(getRealm()).openTx(cert, getClass());
+		return container.getRealm(getRealm()).openTx(cert, getClass(), false);
 	}
 
 	protected void buildMigrationVersionChangeCommand(ComponentContainer container, StrolchTransaction tx) {

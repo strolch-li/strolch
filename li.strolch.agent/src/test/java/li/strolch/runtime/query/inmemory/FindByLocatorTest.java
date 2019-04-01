@@ -18,9 +18,6 @@ package li.strolch.runtime.query.inmemory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.model.Locator;
@@ -35,6 +32,8 @@ import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -60,7 +59,7 @@ public class FindByLocatorTest {
 	public void shouldFindByResource() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 
 				// Resource
 				Locator locResource = Locator.valueOf("Resource/TestType/MyTestResource");
@@ -92,7 +91,7 @@ public class FindByLocatorTest {
 	public void shouldFindByOrder() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 
 				// Order
 				Locator locOrder = Locator.valueOf("Order/TestType/MyTestOrder");
@@ -117,7 +116,7 @@ public class FindByLocatorTest {
 	public void shouldFindByActivity() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 
 				// Activity
 				Locator locActivity = Locator.valueOf("Activity/ActivityType/activity_1");
@@ -141,7 +140,7 @@ public class FindByLocatorTest {
 	public void shouldFindByAction() throws Exception {
 		runtimeMock.run(agent -> {
 			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
-					.openTx(certificate, "test")) {
+					.openTx(certificate, "test", true)) {
 
 				// sub action
 				Locator locAction = Locator.valueOf("Activity/ActivityType/activity_1/action_1");

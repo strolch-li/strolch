@@ -32,8 +32,8 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	private PersistenceTransaction tx;
 
 	public XmlStrolchTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
-			String action, PersistenceTransaction tx, XmlPersistenceHandler persistenceHandler) {
-		super(container, realm, certificate, action);
+			String action, boolean readOnly, PersistenceTransaction tx, XmlPersistenceHandler persistenceHandler) {
+		super(container, realm, certificate, action, readOnly);
 		this.persistenceHandler = persistenceHandler;
 		this.tx = tx;
 	}

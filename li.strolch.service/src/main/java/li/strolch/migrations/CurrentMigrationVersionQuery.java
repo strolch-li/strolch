@@ -45,7 +45,7 @@ public class CurrentMigrationVersionQuery {
 
 		for (String realmName : this.container.getRealmNames()) {
 			StrolchRealm realm = this.container.getRealm(realmName);
-			try (StrolchTransaction tx = realm.openTx(cert, getClass())) {
+			try (StrolchTransaction tx = realm.openTx(cert, getClass(), false)) {
 				tx.setSuppressDoNothingLogging(true);
 
 				Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);

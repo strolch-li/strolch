@@ -20,8 +20,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.StrolchRealm;
@@ -32,7 +32,6 @@ import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.audit.NoStrategyAuditVisitor;
 import li.strolch.model.query.AuditQuery;
-import li.strolch.persistence.api.AbstractTransaction;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.postgresql.DataType;
@@ -95,8 +94,8 @@ public class AuditQueryTest {
 		Certificate cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 		StrolchRealm realm = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM);
 		int i = 0;
-		try (StrolchTransaction tx = realm.openTx(cert, "test")) {
-			((AbstractTransaction) tx).setSuppressAudits(true);
+		try (StrolchTransaction tx = realm.openTx(cert, "test", false)) {
+			tx.setSuppressAudits(true);
 			AuditTrail auditTrail = tx.getAuditTrail();
 
 			Audit randomAudit;

@@ -15,8 +15,8 @@ public class ArchiveExecutedActivitiesJob extends StrolchJob {
 		super(agent, JobMode.Manual, 0, TimeUnit.MINUTES, 0, TimeUnit.MINUTES);
 	}
 
-	public ArchiveExecutedActivitiesJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit, long delay,
-			TimeUnit delayTimeUnit) {
+	public ArchiveExecutedActivitiesJob(StrolchAgent agent, JobMode jobMode, long initialDelay,
+			TimeUnit initialDelayTimeUnit, long delay, TimeUnit delayTimeUnit) {
 		super(agent, jobMode, initialDelay, initialDelayTimeUnit, delay, delayTimeUnit);
 	}
 
@@ -25,7 +25,7 @@ public class ArchiveExecutedActivitiesJob extends StrolchJob {
 
 		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
 
-		try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
+		try (StrolchTransaction tx = openTx(ctx.getCertificate(), true)) {
 			tx.streamActivities().forEach(activity -> {
 				if (activity.getState() == State.EXECUTED)
 					executionHandler.archiveActivity(tx.getRealmName(), activity.getLocator());

@@ -79,10 +79,6 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private boolean secureCookie;
 	private int cookieMaxAge;
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
 	public RestfulStrolchComponent(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
@@ -217,18 +213,18 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	}
 
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
-		return getContainer().getRealm(certificate).openTx(certificate, clazz);
+		return getContainer().getRealm(certificate).openTx(certificate, clazz, true);
 	}
 
 	public StrolchTransaction openTx(Certificate certificate, String name) {
-		return getContainer().getRealm(certificate).openTx(certificate, name);
+		return getContainer().getRealm(certificate).openTx(certificate, name, true);
 	}
 
 	public StrolchTransaction openTx(Certificate certificate, String realm, Class<?> clazz) {
-		return getContainer().getRealm(realm).openTx(certificate, clazz);
+		return getContainer().getRealm(realm).openTx(certificate, clazz, true);
 	}
 
 	public StrolchTransaction openTx(Certificate certificate, String realm, String name) {
-		return getContainer().getRealm(realm).openTx(certificate, name);
+		return getContainer().getRealm(realm).openTx(certificate, name, true);
 	}
 }

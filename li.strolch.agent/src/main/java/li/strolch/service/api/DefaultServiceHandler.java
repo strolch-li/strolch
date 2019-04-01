@@ -15,12 +15,22 @@
  */
 package li.strolch.service.api;
 
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+
 import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.Certificate;
@@ -28,7 +38,7 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -64,12 +74,13 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	@Override
 	public <T extends ServiceArgument, U extends ServiceResult> U doService(Certificate certificate,
 			Service<T, U> service, T argument) {
+		DBC.PRE.assertNotNull("Certificate my not be null!", certificate);
 
 		long start = System.nanoTime();
 
 		// first check that the caller may perform this service
 		PrivilegeContext privilegeContext;
-		String username = certificate == null ? "null" : certificate.getUsername();
+		String username = certificate.getUsername();
 		try {
 			privilegeContext = this.privilegeHandler.validate(certificate);
 			privilegeContext.validateAction(service);
@@ -77,9 +88,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 			long end = System.nanoTime();
 			String msg = "User {0}: Service {1} failed after {2} due to {3}"; //$NON-NLS-1$
-			msg = MessageFormat
-					.format(msg, username, service.getClass().getName(), StringHelper.formatNanoDuration(end - start),
-							e.getMessage());
+			msg = MessageFormat.format(msg, username, service.getClass().getName(), formatNanoDuration(end - start),
+					e.getMessage());
 			logger.error(msg);
 
 			if (!this.throwOnPrivilegeFail && service instanceof AbstractService) {
@@ -118,28 +128,35 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			}
 
 			// log the result
-			logResult(service, start, username, serviceResult);
+			logResult(service, argument, start, certificate, serviceResult);
 
 			return serviceResult;
 
 		} catch (Exception e) {
 			long end = System.nanoTime();
 			String msg = "User {0}: Service failed {1} after {2} due to {3}"; //$NON-NLS-1$
-			msg = MessageFormat
-					.format(msg, username, service.getClass().getName(), StringHelper.formatNanoDuration(end - start),
-							e.getMessage());
+			msg = MessageFormat.format(msg, username, service.getClass().getName(), formatNanoDuration(end - start),
+					e.getMessage());
 			logger.error(msg);
 			throw new StrolchException(msg, e);
 		}
 	}
 
-	private void logResult(Service<?, ?> service, long start, String username, ServiceResult serviceResult) {
+	private void logResult(Service<?, ?> service, ServiceArgument arg, long start, Certificate certificate,
+			ServiceResult serviceResult) {
 
 		long end = System.nanoTime();
 
 		String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
-		msg = MessageFormat
-				.format(msg, username, service.getClass().getName(), StringHelper.formatNanoDuration(end - start));
+		String username = certificate.getUsername();
+		String svcName = service.getClass().getName();
+		String realmName = isNotEmpty(arg.realm) ?
+				arg.realm :
+				isNotEmpty(certificate.getRealm()) ?
+						certificate.getRealm() :
+						getContainer().getRealmNames().iterator().next();
+
+		msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(end - start));
 
 		if (serviceResult.getState() == ServiceResultState.SUCCESS) {
 			logger.info(msg);
@@ -148,9 +165,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			msg = ServiceResultState.WARNING + ": " + msg;
 			logger.warn(msg);
 
-			if (StringHelper.isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
+			if (isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
 				logger.warn("Reason: " + serviceResult.getMessage(), serviceResult.getThrowable());
-			} else if (StringHelper.isNotEmpty(serviceResult.getMessage())) {
+			} else if (isNotEmpty(serviceResult.getMessage())) {
 				logger.warn("Reason: " + serviceResult.getMessage());
 			} else if (serviceResult.getThrowable() != null) {
 				logger.warn("Reason: " + serviceResult.getThrowable().getMessage(), serviceResult.getThrowable());
@@ -162,15 +179,40 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			msg = serviceResult.getState() + ": " + msg;
 			logger.error(msg);
 
-			if (StringHelper.isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
-				logger.error("Reason: " + serviceResult.getMessage(), serviceResult.getThrowable());
-			} else if (StringHelper.isNotEmpty(serviceResult.getMessage())) {
-				logger.error("Reason: " + serviceResult.getMessage());
+			String reason = null;
+			Throwable throwable = null;
+			if (isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
+				reason = serviceResult.getMessage();
+				throwable = serviceResult.getThrowable();
+			} else if (isNotEmpty(serviceResult.getMessage())) {
+				reason = serviceResult.getMessage();
 			} else if (serviceResult.getThrowable() != null) {
-				logger.error("Reason: " + serviceResult.getThrowable().getMessage(), serviceResult.getThrowable());
+				reason = serviceResult.getThrowable().getMessage();
+				throwable = serviceResult.getThrowable();
 			}
+			logger.error("Reason: " + reason, throwable);
+
+			if (getContainer().hasComponent(OperationsLog.class)) {
+
+				LogMessage logMessage;
+
+				ResourceBundle bundle = ResourceBundle.getBundle("strolch-agent");
+				if (throwable == null) {
+					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
+							LogSeverity.Exception, bundle, "agent.service.failed").value("service", svcName)
+							.value("reason", reason);
+				} else {
+					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
+							LogSeverity.Exception, bundle, "agent.service.failed.ex").withException(throwable)
+							.value("service", svcName).value("reason", reason).value("exception", throwable);
+				}
+
+				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
+				operationsLog.addMessage(logMessage);
+			}
+
 		} else if (serviceResult.getState() == null) {
-			logger.error("Service " + service.getClass().getName() + " returned a null ServiceResultState!");
+			logger.error("Service " + svcName + " returned a null ServiceResultState!");
 			logger.error(msg);
 		} else {
 			logger.error("UNHANDLED SERVICE RESULT STATE: " + serviceResult.getState());

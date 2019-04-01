@@ -65,7 +65,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 		// and verify that the activity is still created as the 
 		// first element tries to reserve the machine, which fail
 		// as we previously reserved it manually
-		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class, true)) {
 			Action action = tx.findElement(activityLoc.append("produce"));
 			assertEquals(State.CREATED, action.getState());
 		}
@@ -78,7 +78,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 
 		Certificate cert = loginTest();
 
-		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class, true)) {
 
 			// verify that the machine is not reserved
 			Resource machine = tx.getResourceBy("Machine", "machine1");
@@ -96,7 +96,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 
 		Thread.sleep(50L);
 
-		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class, true)) {
 
 			// and verify that the activity is in execution
 			Action action = tx.findElement(activityLoc.append("reserve"));
@@ -111,7 +111,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 		// now wait till execution should be finished
 		Thread.sleep(300L);
 
-		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class)) {
+		try (StrolchTransaction tx = getRealm("execution").openTx(cert, ReservationExecutionTest.class, true)) {
 
 			// and now verify is executed
 			Activity activity = tx.findElement(activityLoc);

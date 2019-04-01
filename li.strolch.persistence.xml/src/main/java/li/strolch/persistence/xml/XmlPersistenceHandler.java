@@ -111,7 +111,8 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 			ctxFactory.registerPersistenceContextFactory(Order.class, Tags.ORDER, new OrderContextFactory());
 			ctxFactory.registerPersistenceContextFactory(Audit.class, Tags.AUDIT, new AuditContextFactory());
 			ctxFactory.registerPersistenceContextFactory(Activity.class, Tags.ACTIVITY, new ActivityContextFactory());
-			ctxFactory.registerPersistenceContextFactory(LogMessage.class, Tags.LOG_MESSAGE, new LogMessageContextFactory());
+			ctxFactory.registerPersistenceContextFactory(LogMessage.class, Tags.LOG_MESSAGE,
+					new LogMessageContextFactory());
 
 			PersistenceStore persistenceStore = new PersistenceStore();
 			persistenceStore.dbStorePathF = dbStorePathF;
@@ -149,7 +150,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 
 					ModelStatistics statistics;
 					try (StrolchTransaction tx = openTx(getContainer().getRealm(realmName), ctx.getCertificate(),
-							getClass().getSimpleName())) {
+							getClass().getSimpleName(), false)) {
 
 						StoreToDaoElementListener listener = new StoreToDaoElementListener(tx);
 						XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF, true);
@@ -171,15 +172,14 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		File dbStorePathF;
 	}
 
-	@SuppressWarnings("resource")
 	@Override
-	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action) {
+	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action, boolean readOnly) {
 		PersistenceStore persistenceStore = this.persistenceStoreMap.get(realm.getRealm());
 		if (persistenceStore == null)
 			throw new IllegalStateException("No XML persistence enabled for realm " + realm.getRealm());
 
 		PersistenceTransaction tx = persistenceStore.persistenceManager.openTx();
-		return new XmlStrolchTransaction(getContainer(), realm, certificate, action, tx, this);
+		return new XmlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, tx, this);
 	}
 
 	@Override

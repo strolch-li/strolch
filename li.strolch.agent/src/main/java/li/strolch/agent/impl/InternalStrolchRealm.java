@@ -91,10 +91,10 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		if (this.updateObservers) {
 			String delayedObserversKey = makeRealmKey(getRealm(), PROP_ENABLED_DELAYED_OBSERVER_UPDATES);
 			if (configuration.getBoolean(delayedObserversKey, Boolean.FALSE)) {
-				this.observerHandler = new EventCollectingObserverHandler(container.getAgent());
+				this.observerHandler = new EventCollectingObserverHandler(container.getAgent(), this);
 				logger.info("Enabled Delayed Observer Updates.");
 			} else {
-				this.observerHandler = new DefaultObserverHandler(container.getAgent());
+				this.observerHandler = new DefaultObserverHandler(container.getAgent(), this);
 			}
 		}
 

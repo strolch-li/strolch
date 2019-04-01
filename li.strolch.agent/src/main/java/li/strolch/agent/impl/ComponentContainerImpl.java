@@ -16,28 +16,16 @@
 package li.strolch.agent.impl;
 
 import static li.strolch.model.Tags.AGENT;
-import static li.strolch.runtime.StrolchConstants.PROP_REALM;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.runtime.StrolchConstants.*;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.ComponentState;
-import li.strolch.agent.api.RealmHandler;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.api.StrolchRealm;
+import li.strolch.agent.api.*;
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
@@ -45,7 +33,6 @@ import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
@@ -53,8 +40,9 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ComponentContainerImpl implements ComponentContainer {
 
@@ -125,13 +113,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 	public StrolchRealm getRealm(Certificate certificate) throws StrolchException {
 
 		String realmName = certificate.getRealm();
-		if (StringHelper.isEmpty(realmName)) {
-			if (getRealmNames().contains(StrolchConstants.DEFAULT_REALM)) {
-				realmName = StrolchConstants.DEFAULT_REALM;
+		if (isEmpty(realmName)) {
+			if (getRealmNames().contains(DEFAULT_REALM)) {
+				realmName = DEFAULT_REALM;
 			} else {
 				String msg = "The User {0} is missing the property {1} and the Realm {2} can not be used as it does not exist!";
 				throw new StrolchException(MessageFormat.format(msg, certificate.getUsername(), PROP_REALM,
-						StrolchConstants.DEFAULT_REALM));
+						DEFAULT_REALM));
 			}
 		}
 

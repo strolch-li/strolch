@@ -19,19 +19,11 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.AuditTrail;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.OrderMap;
-import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.*;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
-import li.strolch.persistence.api.ActivityDao;
-import li.strolch.persistence.api.OrderDao;
-import li.strolch.persistence.api.PersistenceHandler;
-import li.strolch.persistence.api.ResourceDao;
-import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.persistence.api.*;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -59,15 +51,15 @@ public class CachedRealm extends InternalStrolchRealm {
 	}
 
 	@Override
-	public StrolchTransaction openTx(Certificate certificate, String action) {
+	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
-		return this.persistenceHandler.openTx(this, certificate, action);
+		return this.persistenceHandler.openTx(this, certificate, action, readOnly);
 	}
 
 	@Override
-	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
+	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
-		return this.persistenceHandler.openTx(this, certificate, clazz.getName());
+		return this.persistenceHandler.openTx(this, certificate, clazz.getName(), readOnly);
 	}
 
 	@Override
@@ -116,7 +108,7 @@ public class CachedRealm extends InternalStrolchRealm {
 
 		logger.info(MessageFormat.format("Loading Model from Database for realm {0}...", getRealm())); //$NON-NLS-1$
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot", false)) {
 			ResourceDao resourceDao = tx.getPersistenceHandler().getResourceDao(tx);
 			logger.info("Reading " + resourceDao.querySize() + " Resources from DB...");
 			Set<String> resourceTypes = resourceDao.queryTypes();
@@ -132,7 +124,7 @@ public class CachedRealm extends InternalStrolchRealm {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot", false)) {
 			OrderDao orderDao = tx.getPersistenceHandler().getOrderDao(tx);
 			logger.info("Reading " + orderDao.querySize() + " Orders from DB...");
 			Set<String> orderTypes = orderDao.queryTypes();
@@ -148,7 +140,7 @@ public class CachedRealm extends InternalStrolchRealm {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot")) {
+		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot", false)) {
 			ActivityDao activityDao = tx.getPersistenceHandler().getActivityDao(tx);
 			logger.info("Reading " + activityDao.querySize() + " Activities from DB...");
 			Set<String> activityTypes = activityDao.queryTypes();

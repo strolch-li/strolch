@@ -181,7 +181,21 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	protected StrolchTransaction openTx(Certificate cert) {
 		StrolchRealm realm = getContainer().getRealm(cert);
 		this.realmName = realm.getRealm();
-		return realm.openTx(cert, this.getClass());
+		return realm.openTx(cert, this.getClass(), false);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} for the default realm and certificate
+	 *
+	 * @param cert
+	 * 		the certificate authorizing the transaction
+	 *
+	 * @return the newly created transaction
+	 */
+	protected StrolchTransaction openTx(Certificate cert, boolean readOnly) {
+		StrolchRealm realm = getContainer().getRealm(cert);
+		this.realmName = realm.getRealm();
+		return realm.openTx(cert, this.getClass(), readOnly);
 	}
 
 	/**

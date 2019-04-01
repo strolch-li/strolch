@@ -57,10 +57,6 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 
 	protected abstract Certificate getCertificate();
 
-	/**
-	 * @param migrationType
-	 * @param realmName
-	 */
 	protected void initSchemaFromDataStore(DbMigrationState migrationType, String realmName) {
 		boolean needsDbInit = checkNeedsDbInit(migrationType);
 		if (!needsDbInit) {
@@ -74,7 +70,8 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 
 		ModelStatistics statistics;
 		try (StrolchTransaction tx = this.persistenceHandler
-				.openTx(this.agent.getContainer().getRealm(realmName), getCertificate(), getClass().getSimpleName())) {
+				.openTx(this.agent.getContainer().getRealm(realmName), getCertificate(), getClass().getSimpleName(),
+						false)) {
 			File dataStoreF = getDataStoreFile(this.runtimeConfig, this.realmConfig, realmName);
 
 			StoreToDaoElementListener listener = new StoreToDaoElementListener(tx);
@@ -90,17 +87,11 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 		boolean needsDbInit;
 		switch (migrationType) {
 		case CREATED:
-			needsDbInit = true;
-			break;
 		case DROPPED_CREATED:
 			needsDbInit = true;
 			break;
 		case MIGRATED:
-			needsDbInit = false;
-			break;
 		case NOTHING:
-			needsDbInit = false;
-			break;
 		default:
 			needsDbInit = false;
 			break;
@@ -111,7 +102,6 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 	protected File getDataStoreFile(RuntimeConfiguration runtimeConfiguration,
 			ComponentConfiguration realmConfiguration, String realmName) {
 		String dataStoreKey = makeRealmKey(realmName, PREFIX_DATA_STORE_FILE);
-		File dataStoreF = realmConfiguration.getDataFile(dataStoreKey, null, runtimeConfiguration, true);
-		return dataStoreF;
+		return realmConfiguration.getDataFile(dataStoreKey, null, runtimeConfiguration, true);
 	}
 }

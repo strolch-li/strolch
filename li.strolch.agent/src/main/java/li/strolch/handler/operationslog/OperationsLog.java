@@ -51,7 +51,7 @@ public class OperationsLog extends StrolchComponent {
 
 				logger.info("Loading OperationsLog for realm " + realmName + "...");
 
-				try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate())) {
+				try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<LogMessage> messages = logMessageDao.queryLatest(realmName, this.maxMessages);
 					logger.info("Loaded " + messages.size() + " messages for OperationsLog for realm " + realmName);
@@ -118,7 +118,7 @@ public class OperationsLog extends StrolchComponent {
 	private void persist(StrolchRealm realm, LogMessage logMessage, List<LogMessage> messagesToRemove) {
 		try {
 			runAsAgent(ctx -> {
-				try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass())) {
+				try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass(), false)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					if (messagesToRemove != null && !messagesToRemove.isEmpty())
 						logMessageDao.removeAll(messagesToRemove);

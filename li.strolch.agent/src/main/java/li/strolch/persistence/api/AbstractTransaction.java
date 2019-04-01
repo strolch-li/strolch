@@ -68,7 +68,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private ComponentContainer container;
 	private PrivilegeHandler privilegeHandler;
-	private OperationsLog operationsLog;
 
 	private InternalStrolchRealm realm;
 
@@ -97,8 +96,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private Certificate certificate;
 	private PrivilegeContext privilegeContext;
 
-	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
-			String action) {
+	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate, String action,
+			boolean readOnly) {
 		DBC.PRE.assertNotNull("container must be set!", container); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("certificate must be set!", certificate); //$NON-NLS-1$
@@ -106,8 +105,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		this.container = container;
 		this.privilegeHandler = container.getPrivilegeHandler();
-		if (container.hasComponent(OperationsLog.class))
-			this.operationsLog = container.getComponent(OperationsLog.class);
 		this.realm = (InternalStrolchRealm) realm;
 		this.action = action;
 		this.certificate = certificate;
@@ -115,7 +112,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.commands = new ArrayList<>();
 		this.flushedCommands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
-		this.closeStrategy = TransactionCloseStrategy.READ_ONLY;
+		this.closeStrategy = readOnly ? TransactionCloseStrategy.READ_ONLY : TransactionCloseStrategy.DEFAULT;
 		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
 		this.txResult.setState(TransactionState.OPEN);
 	}
@@ -200,18 +197,27 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void doNothingOnClose() {
+	public StrolchTransaction readOnly() {
 		setCloseStrategy(TransactionCloseStrategy.READ_ONLY);
+		return this;
 	}
 
 	@Override
-	public void commitOnClose() {
+	public StrolchTransaction doNothingOnClose() {
+		setCloseStrategy(TransactionCloseStrategy.READ_ONLY);
+		return this;
+	}
+
+	@Override
+	public StrolchTransaction commitOnClose() {
 		setCloseStrategy(TransactionCloseStrategy.COMMIT);
+		return this;
 	}
 
 	@Override
-	public void rollbackOnClose() {
+	public StrolchTransaction rollbackOnClose() {
 		setCloseStrategy(TransactionCloseStrategy.ROLLBACK);
+		return this;
 	}
 
 	@Override
@@ -1267,16 +1273,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
 
-			if (!this.commands.isEmpty()) {
-				autoCloseableRollback();
-				String msg = "There are commands registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
-				throw new IllegalStateException(msg);
-			}
+			if (this.closeStrategy == TransactionCloseStrategy.READ_ONLY) {
+				if (!this.commands.isEmpty()) {
+					autoCloseableRollback();
+					String msg = "There are commands registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
+					throw new IllegalStateException(msg);
+				}
 
-			if (this.objectFilter != null && !this.objectFilter.isEmpty()) {
-				autoCloseableRollback();
-				String msg = "There are modified objects registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
-				throw new IllegalStateException(msg);
+				if (this.objectFilter != null && !this.objectFilter.isEmpty()) {
+					autoCloseableRollback();
+					String msg = "There are modified objects registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
+					throw new IllegalStateException(msg);
+				}
 			}
 
 			long auditTrailDuration = writeAuditTrail();
@@ -1286,6 +1294,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			handleReadOnly(start, auditTrailDuration);
 			this.txResult.setState(TransactionState.CLOSED);
+
 		} catch (Exception e) {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
 			try {
@@ -1441,8 +1450,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			sb.append(StringHelper.formatNanoDuration(closeDuration));
 		}
 
-		if (this.operationsLog != null) {
-			this.operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
+		if (this.container.hasComponent(OperationsLog.class)) {
+			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
+			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
 					Locator.valueOf(AGENT, "tx", this.action, StrolchAgent.getUniqueId()), LogSeverity.Exception,
 					ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed").withException(e).value("reason", e));
 		}
