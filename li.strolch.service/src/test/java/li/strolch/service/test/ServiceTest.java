@@ -45,13 +45,6 @@ public class ServiceTest extends AbstractServiceTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
-	public void shouldFailNoCertificate() {
-		TestService testService = new TestService();
-		ServiceResult svcResult = getServiceHandler().doService(null, testService);
-		assertThat(svcResult.getThrowable(), instanceOf(PrivilegeException.class));
-	}
-
-	@Test
 	public void shouldFailInvalidCertificate1() {
 		this.thrown.expect(PrivilegeException.class);
 		TestService testService = new TestService();

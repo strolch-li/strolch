@@ -204,7 +204,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 			Resource resource = ModelGenerator.createResource(id, id, id);
 
 			boolean txFailed = false;
-			try (StrolchTransaction tx = openTx(arg.realm)) {
+			try (StrolchTransaction tx = openTx(arg.realm, true)) {
 				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);

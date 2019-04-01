@@ -142,6 +142,22 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		}
 	}
 
+	private String getRealmName(ServiceArgument arg, Certificate certificate) {
+		if (arg == null) {
+			return isNotEmpty(certificate.getRealm()) ?
+					certificate.getRealm() :
+					getContainer().getRealmNames().iterator().next();
+		}
+
+		if (isNotEmpty(arg.realm))
+			return arg.realm;
+
+		if (isNotEmpty(certificate.getRealm()))
+			return certificate.getRealm();
+
+		return getContainer().getRealmNames().iterator().next();
+	}
+
 	private void logResult(Service<?, ?> service, ServiceArgument arg, long start, Certificate certificate,
 			ServiceResult serviceResult) {
 
@@ -150,11 +166,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
 		String username = certificate.getUsername();
 		String svcName = service.getClass().getName();
-		String realmName = isNotEmpty(arg.realm) ?
-				arg.realm :
-				isNotEmpty(certificate.getRealm()) ?
-						certificate.getRealm() :
-						getContainer().getRealmNames().iterator().next();
+
+		String realmName = getRealmName(arg, certificate);
 
 		msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(end - start));
 
