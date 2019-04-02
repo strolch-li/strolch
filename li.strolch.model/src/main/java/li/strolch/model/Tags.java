@@ -147,6 +147,7 @@ public class Tags {
 		public static final String FLAT = "flat";
 
 		public static final String APP_VERSION = "appVersion";
+		public static final String SYSTEM_STATE = "systemState";
 		public static final String AGENT_VERSION = "agentVersion";
 		public static final String COMPONENT_VERSIONS = "componentVersions";
 		public static final String ERRORS = "errors";
