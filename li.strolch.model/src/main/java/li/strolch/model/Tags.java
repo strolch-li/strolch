@@ -145,6 +145,11 @@ public class Tags {
 		public static final String EXCEPTION = "exception";
 		public static final String FORMAT = "format";
 		public static final String FLAT = "flat";
+
+		public static final String APP_VERSION = "appVersion";
+		public static final String AGENT_VERSION = "agentVersion";
+		public static final String COMPONENT_VERSIONS = "componentVersions";
+		public static final String ERRORS = "errors";
 	}
 
 	public static class Audit {

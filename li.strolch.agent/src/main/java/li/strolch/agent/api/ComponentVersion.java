@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
  */
 public class ComponentVersion extends StrolchVersion {
 
-	private static final String COMPONENT_VERSION = "componentName";
+	public static final String COMPONENT_VERSION = "componentName";
 
 	private String componentName;
 
