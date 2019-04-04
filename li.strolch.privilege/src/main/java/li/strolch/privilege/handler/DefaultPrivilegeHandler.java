@@ -579,6 +579,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_REMOVE_USER, new Tuple(null, existingUser)));
 
 		// delegate user removal to persistence handler
+		invalidSessionsFor(existingUser);
 		this.persistenceHandler.removeUser(username);
 
 		logger.info("Removed user " + username);
@@ -1066,6 +1067,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, user);
 					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 				}
+			}
+		}
+	}
+
+	private void invalidSessionsFor(User user) {
+		List<PrivilegeContext> ctxs;
+		synchronized (this.privilegeContextMap) {
+			ctxs = new ArrayList<>(this.privilegeContextMap.values());
+		}
+
+		for (PrivilegeContext ctx : ctxs) {
+			if (ctx.getUserRep().getUsername().equals(user.getUsername())) {
+				invalidate(ctx.getCertificate());
 			}
 		}
 	}
