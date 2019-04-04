@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.api;
 
+import static li.strolch.model.Tags.Json.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -330,52 +332,52 @@ public class StrolchAgent {
 			this.systemState = new JsonObject();
 
 			JsonObject osJ = new JsonObject();
-			this.systemState.add("os", osJ);
-			osJ.addProperty("osName", SystemHelper.osName);
-			osJ.addProperty("osArch", SystemHelper.osArch);
-			osJ.addProperty("osVersion", SystemHelper.osVersion);
-			osJ.addProperty("javaVendor", SystemHelper.javaVendor);
-			osJ.addProperty("javaVersion", SystemHelper.javaVersion);
+			this.systemState.add(OPERATING_SYSTEM, osJ);
+			osJ.addProperty(OS_NAME, SystemHelper.osName);
+			osJ.addProperty(OS_ARCH, SystemHelper.osArch);
+			osJ.addProperty(OS_VERSION, SystemHelper.osVersion);
+			osJ.addProperty(JAVA_VENDOR, SystemHelper.javaVendor);
+			osJ.addProperty(JAVA_VERSION, SystemHelper.javaVersion);
 
 			OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
-			osJ.addProperty("availableProcessors", osMXBean.getAvailableProcessors());
-			osJ.addProperty("systemLoadAverage", osMXBean.getSystemLoadAverage());
+			osJ.addProperty(AVAILABLE_PROCESSORS, osMXBean.getAvailableProcessors());
+			osJ.addProperty(SYSTEM_LOAD_AVERAGE, osMXBean.getSystemLoadAverage());
 
 			RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-			osJ.addProperty("startTime", ISO8601.toString(new Date(runtimeMXBean.getStartTime())));
-			osJ.addProperty("uptime", runtimeMXBean.getUptime());
+			osJ.addProperty(START_TIME, ISO8601.toString(new Date(runtimeMXBean.getStartTime())));
+			osJ.addProperty(UPTIME, runtimeMXBean.getUptime());
 
 			// memory
 			JsonObject memoryJ = new JsonObject();
-			this.systemState.add("memory", memoryJ);
+			this.systemState.add(MEMORY, memoryJ);
 
 			if (osMXBean instanceof com.sun.management.OperatingSystemMXBean) {
 				com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) osMXBean;
-				memoryJ.addProperty("totalPhysicalMemorySize", os.getTotalPhysicalMemorySize());
-				memoryJ.addProperty("freePhysicalMemorySize", os.getFreePhysicalMemorySize());
-				memoryJ.addProperty("freeSwapSpaceSize", os.getFreeSwapSpaceSize());
-				memoryJ.addProperty("committedVirtualMemorySize", os.getCommittedVirtualMemorySize());
+				memoryJ.addProperty(TOTAL_PHYSICAL_MEMORY_SIZE, os.getTotalPhysicalMemorySize());
+				memoryJ.addProperty(FREE_PHYSICAL_MEMORY_SIZE, os.getFreePhysicalMemorySize());
+				memoryJ.addProperty(FREE_SWAP_SPACE_SIZE, os.getFreeSwapSpaceSize());
+				memoryJ.addProperty(COMMITTED_VIRTUAL_MEMORY_SIZE, os.getCommittedVirtualMemorySize());
 			}
 
 			MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 			MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
-			memoryJ.addProperty("heapMemoryUsageInit", heapMemoryUsage.getInit());
-			memoryJ.addProperty("heapMemoryUsageUsed", heapMemoryUsage.getUsed());
-			memoryJ.addProperty("heapMemoryUsageMax", heapMemoryUsage.getMax());
-			memoryJ.addProperty("heapMemoryUsageCommitted", heapMemoryUsage.getCommitted());
+			memoryJ.addProperty(HEAP_MEMORY_USAGE_INIT, heapMemoryUsage.getInit());
+			memoryJ.addProperty(HEAP_MEMORY_USAGE_USED, heapMemoryUsage.getUsed());
+			memoryJ.addProperty(HEAP_MEMORY_USAGE_MAX, heapMemoryUsage.getMax());
+			memoryJ.addProperty(HEAP_MEMORY_USAGE_COMMITTED, heapMemoryUsage.getCommitted());
 
 			// disk space
 			JsonArray rootsJ = new JsonArray();
-			this.systemState.add("roots", rootsJ);
+			this.systemState.add(ROOTS, rootsJ);
 			File[] roots = File.listRoots();
 			for (File root : roots) {
 				JsonObject rootJ = new JsonObject();
 				rootsJ.add(rootJ);
-				rootJ.addProperty("path", root.getAbsolutePath());
-				rootJ.addProperty("usableSpace", root.getUsableSpace());
-				rootJ.addProperty("usedSpace", root.getTotalSpace() - root.getFreeSpace());
-				rootJ.addProperty("freeSpace", root.getFreeSpace());
-				rootJ.addProperty("totalSpace", root.getTotalSpace());
+				rootJ.addProperty(PATH, root.getAbsolutePath());
+				rootJ.addProperty(USABLE_SPACE, root.getUsableSpace());
+				rootJ.addProperty(USED_SPACE, root.getTotalSpace() - root.getFreeSpace());
+				rootJ.addProperty(FREE_SPACE, root.getFreeSpace());
+				rootJ.addProperty(TOTAL_SPACE, root.getTotalSpace());
 			}
 
 			this.systemStateUpdateTime = System.currentTimeMillis();
