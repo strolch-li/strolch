@@ -151,6 +151,35 @@ public class Tags {
 		public static final String AGENT_VERSION = "agentVersion";
 		public static final String COMPONENT_VERSIONS = "componentVersions";
 		public static final String ERRORS = "errors";
+
+		public static final String OPERATING_SYSTEM = "operatingSystem";
+		public static final String OS_NAME = "osName";
+		public static final String OS_ARCH = "osArch";
+		public static final String OS_VERSION = "osVersion";
+		public static final String JAVA_VENDOR = "javaVendor";
+		public static final String JAVA_VERSION = "javaVersion";
+
+		public static final String AVAILABLE_PROCESSORS = "availableProcessors";
+		public static final String SYSTEM_LOAD_AVERAGE = "systemLoadAverage";
+
+		public static final String START_TIME = "startTime";
+		public static final String UPTIME = "uptime";
+
+		public static final String MEMORY = "memory";
+		public static final String TOTAL_PHYSICAL_MEMORY_SIZE = "totalPhysicalMemorySize";
+		public static final String FREE_PHYSICAL_MEMORY_SIZE = "freePhysicalMemorySize";
+		public static final String FREE_SWAP_SPACE_SIZE = "freeSwapSpaceSize";
+		public static final String COMMITTED_VIRTUAL_MEMORY_SIZE = "committedVirtualMemorySize";
+		public static final String HEAP_MEMORY_USAGE_INIT = "heapMemoryUsageInit";
+		public static final String HEAP_MEMORY_USAGE_USED = "heapMemoryUsageUsed";
+		public static final String HEAP_MEMORY_USAGE_MAX = "heapMemoryUsageMax";
+		public static final String HEAP_MEMORY_USAGE_COMMITTED = "heapMemoryUsageCommitted";
+		public static final String ROOTS = "roots";
+		public static final String PATH = "path";
+		public static final String USABLE_SPACE = "usableSpace";
+		public static final String USED_SPACE = "usedSpace";
+		public static final String FREE_SPACE = "freeSpace";
+		public static final String TOTAL_SPACE = "totalSpace";
 	}
 
 	public static class Audit {

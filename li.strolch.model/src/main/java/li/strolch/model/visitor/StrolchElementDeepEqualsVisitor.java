@@ -476,6 +476,13 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	}
 
 	@Override
+	public List<Locator> visitLongState(LongTimedState state) {
+		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
+		deepEquals((StrolchTimedState<?>) this.srcElement, state);
+		return getMismatchedLocators();
+	}
+
+	@Override
 	public List<Locator> visitStringState(StringSetTimedState state) {
 		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
 		deepEquals((StrolchTimedState<?>) this.srcElement, state);

@@ -62,6 +62,7 @@ public class StrolchModelConstants {
 	public static final String SUFFIX_REF = "-Ref";
 	public static final String BAG_RELATIONS = "relations";
 	public static final String BAG_PARAMETERS = "parameters";
+	public static final String TYPE_PARAMETERS = "Parameters";
 
 	/**
 	 * ID of the admin role which has access to all resources

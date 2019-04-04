@@ -20,6 +20,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
@@ -173,5 +174,57 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 */
 	default Activity asActivity() {
 		return (Activity) this;
+	}
+
+	/**
+	 * Set or add a parameter to this element from a {@link JsonObject}
+	 *
+	 * @param jsonObject
+	 * 		the object from which to get the value
+	 * @param bagId
+	 * 		the bag ID on which to set the value
+	 * @param bagName
+	 * 		the name of the bag, if the bag is to be created
+	 * @param bagType
+	 * 		the type of the bag, if the bag is to be created
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName
+	 * 		the name of the parameter, if the parameter is to be created
+	 * @param type
+	 * 		the type of Parameter to create
+	 * @param ignoreOnEmpty
+	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
+	 * 		is cleared if the json field is missing or null
+	 */
+	default void setOrAddParamFromFlatJson(JsonObject jsonObject, String bagId, String bagName, String bagType,
+			String paramId, String paramName, StrolchValueType type, boolean ignoreOnEmpty) {
+
+		if (!jsonObject.has(paramId) && ignoreOnEmpty)
+			return;
+
+		ParameterBag bag = getParameterBag(bagId);
+		if (bag == null) {
+			bag = new ParameterBag(bagId, bagName, bagType);
+			addParameterBag(bag);
+		}
+
+		Parameter<?> param = bag.getParameter(paramId);
+		boolean valueNotSet = !jsonObject.has(paramId) || jsonObject.get(paramId).isJsonNull();
+		if (param == null && valueNotSet)
+			return;
+
+		if (param == null) {
+			param = type.parameterInstance();
+			param.setId(paramId);
+			param.setName(paramName);
+			bag.addParameter(param);
+		}
+
+		if (valueNotSet) {
+			param.clear();
+		} else {
+			param.setValueFromString(jsonObject.get(paramId).getAsString());
+		}
 	}
 }

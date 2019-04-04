@@ -106,6 +106,11 @@ public interface StrolchRootElementVisitor<U> extends StrolchElementVisitor<U> {
 	}
 
 	@Override
+	default U visitLongState(LongTimedState state) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
+	}
+
+	@Override
 	default U visitStringState(StringSetTimedState state) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
 	}
