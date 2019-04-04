@@ -1,5 +1,7 @@
 package li.strolch.model.json;
 
+import static java.util.Arrays.asList;
+import static li.strolch.model.Tags.Json.PARAMETER_BAGS;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import java.util.*;
@@ -41,6 +43,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private BiConsumer<Action, JsonObject> actionHook;
 
 	private boolean flat;
+	private Set<String> flatBags;
 	private boolean withoutElementName;
 	private boolean withLocator;
 	private boolean withoutVersion;
@@ -51,10 +54,15 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		this.ignoredKeys = new MapOfSets<>();
 		this.ignoredTimedStates = new HashSet<>();
 		this.ignoredBagTypes = new HashSet<>();
+		this.flatBags = new HashSet<>();
 	}
 
 	public boolean isFlat() {
 		return this.flat;
+	}
+
+	public boolean isBagFlat(String badId) {
+		return this.flatBags.contains(badId);
 	}
 
 	public boolean isWithVersion() {
@@ -119,6 +127,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public StrolchElementToJsonVisitor flat() {
 		this.flat = true;
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor flatBags(String... bagIds) {
+		this.flatBags.addAll(asList(bagIds));
 		return this;
 	}
 
@@ -302,7 +315,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	@Override
 	public JsonObject visitParameterBag(ParameterBag bag) {
 
-		if (isFlat()) {
+		if (isFlat() || isBagFlat(bag.getId())) {
 
 			JsonObject bagJ = new JsonObject();
 
@@ -486,16 +499,14 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	protected void addParameterizedElements(GroupedParameterizedElement element, JsonObject rootJ) {
-		if (isFlat())
-			addParameterizedElementsFlat(element, rootJ);
-		else
-			addParameterizedElementsFull(element, rootJ);
-	}
 
-	protected void addParameterizedElementsFlat(GroupedParameterizedElement element, JsonObject rootJ) {
+		if (!element.hasParameterBags())
+			return;
 
-		Set<String> bagKeySet = element.getParameterBagKeySet();
-		for (String bagId : bagKeySet) {
+		for (String bagId : element.getParameterBagKeySet()) {
+			ParameterBag bag = element.getParameterBag(bagId);
+			if (!bag.hasParameters())
+				continue;
 
 			// see if we have to ignore this bag i.e. empty set existing
 			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bagId);
@@ -503,10 +514,25 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 				continue;
 
 			ParameterBag parameterBag = element.getParameterBag(bagId);
-			if (ignoredBagTypes.contains(parameterBag.getType()))
+			if (this.ignoredBagTypes.contains(parameterBag.getType()))
 				continue;
 
-			addParameterBagFlat(rootJ, ignoredParamIds, parameterBag);
+			if (isFlat() || isBagFlat(bagId)) {
+
+				addParameterBagFlat(rootJ, ignoredParamIds, parameterBag);
+
+			} else {
+
+				JsonObject parameterBagsJ;
+				if (rootJ.has(PARAMETER_BAGS)) {
+					parameterBagsJ = rootJ.get(PARAMETER_BAGS).getAsJsonObject();
+				} else {
+					parameterBagsJ = new JsonObject();
+					rootJ.add(PARAMETER_BAGS, parameterBagsJ);
+				}
+
+				parameterBagsJ.add(bagId, parameterBagToJsonFull(bag));
+			}
 		}
 	}
 
@@ -534,24 +560,6 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			} else {
 				rootJ.addProperty(paramId, param.getValueAsString());
 			}
-		}
-	}
-
-	protected void addParameterizedElementsFull(GroupedParameterizedElement element, JsonObject rootJ) {
-
-		if (!element.hasParameterBags())
-			return;
-
-		JsonObject parameterBagsJ = new JsonObject();
-		rootJ.add(Json.PARAMETER_BAGS, parameterBagsJ);
-
-		for (String bagKey : element.getParameterBagKeySet()) {
-			ParameterBag bag = element.getParameterBag(bagKey);
-
-			if (!bag.hasParameters())
-				continue;
-
-			parameterBagsJ.add(bagKey, parameterBagToJsonFull(bag));
 		}
 	}
 
