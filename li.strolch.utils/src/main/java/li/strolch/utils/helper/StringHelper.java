@@ -15,6 +15,8 @@
  */
 package li.strolch.utils.helper;
 
+import static li.strolch.utils.helper.ByteHelper.setBit;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -190,6 +192,44 @@ public class StringHelper {
 		}
 
 		return result;
+	}
+
+	public static byte binaryToByte(String binary) {
+		if (binary.length() != Byte.SIZE)
+			throw new IllegalArgumentException("Byte as binary must be 8 chars long!");
+		byte b = 0;
+		for (int i = 0; i < Byte.SIZE; i++) {
+			if (binary.charAt(i) == '1')
+				b = setBit(b, i);
+		}
+
+		return b;
+	}
+
+	public static short binaryToShort(String binary) {
+		binary = binary.replaceAll(" ", "");
+		if (binary.length() != Short.SIZE)
+			throw new IllegalArgumentException("Short as binary must be 8 chars long!");
+		short b = 0;
+		for (int i = 0; i < Short.SIZE; i++) {
+			if (binary.charAt(i) == '1')
+				b = setBit(b, i);
+		}
+
+		return b;
+	}
+
+	public static int binaryToInt(String binary) {
+		binary = binary.replaceAll(" ", "");
+		if (binary.length() != Integer.SIZE)
+			throw new IllegalArgumentException("Integer as binary must be 8 chars long!");
+		int b = 0;
+		for (int i = 0; i < Integer.SIZE; i++) {
+			if (binary.charAt(i) == '1')
+				b = setBit(b, i);
+		}
+
+		return b;
 	}
 
 	/**
