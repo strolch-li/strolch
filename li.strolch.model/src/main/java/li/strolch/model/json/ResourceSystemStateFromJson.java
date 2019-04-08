@@ -1,5 +1,7 @@
 package li.strolch.model.json;
 
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 import static li.strolch.model.StrolchValueType.DATE;
 import static li.strolch.model.StrolchValueType.*;
 import static li.strolch.model.Tags.Json.*;
@@ -13,10 +15,16 @@ import li.strolch.model.Resource;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.model.visitor.SetStateValueVisitor;
+import li.strolch.utils.DataUnit;
 
 public class ResourceSystemStateFromJson {
 
 	private long stateTime = System.currentTimeMillis();
+
+	private DataUnit memoryRoundingUnit = DataUnit.Bytes;
+	private DataUnit storageSpaceRoundingUnit = DataUnit.Bytes;
+
 	private boolean systemLoadAverageState;
 	private boolean usableSpaceState;
 	private boolean usedSpaceState;
@@ -29,6 +37,16 @@ public class ResourceSystemStateFromJson {
 	private boolean heapMemoryUsageMaxState;
 	private boolean heapMemoryUsageCommittedState;
 	private boolean compactStates;
+
+	public ResourceSystemStateFromJson withMemoryRounding(DataUnit dataUnit) {
+		this.memoryRoundingUnit = dataUnit;
+		return this;
+	}
+
+	public ResourceSystemStateFromJson withStorageSpaceRounding(DataUnit dataUnit) {
+		this.storageSpaceRoundingUnit = dataUnit;
+		return this;
+	}
 
 	public ResourceSystemStateFromJson compactStates() {
 		this.compactStates = true;
@@ -97,155 +115,211 @@ public class ResourceSystemStateFromJson {
 
 	public void fillElement(JsonObject systemStateJ, Resource resource) {
 
-		if (systemStateJ.has(OPERATING_SYSTEM)) {
-			JsonObject osJ = systemStateJ.get(OPERATING_SYSTEM).getAsJsonObject();
+		if (systemStateJ.has(OPERATING_SYSTEM))
+			handleOperatingSystem(systemStateJ, resource);
 
-			String bagId = OPERATING_SYSTEM;
-			String bagName = "Operating System";
-			String bagType = "OperatingSystem";
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, OS_NAME, "OS Name", STRING, true);
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, OS_ARCH, "OS Arch", STRING, true);
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, OS_VERSION, "OS Version", STRING, true);
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, JAVA_VENDOR, "Java Vendor", STRING, true);
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, JAVA_VERSION, "Java Version", STRING,
-					true);
+		if (systemStateJ.has(MEMORY))
+			handleMemory(systemStateJ, resource);
 
-			//
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, AVAILABLE_PROCESSORS,
-					"Available Processors", INTEGER, true);
+		if (systemStateJ.has(ROOTS))
+			handleRoots(systemStateJ, resource);
+	}
 
-			//
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, SYSTEM_LOAD_AVERAGE, "System Load Average",
-					FLOAT, true);
+	private void handleOperatingSystem(JsonObject systemStateJ, Resource resource) {
+		JsonObject osJ = systemStateJ.get(OPERATING_SYSTEM).getAsJsonObject();
+
+		String bagId = OPERATING_SYSTEM;
+		String bagName = "Operating System";
+		String bagType = "OperatingSystem";
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, OS_NAME, "OS Name", STRING, true);
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, OS_ARCH, "OS Arch", STRING, true);
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, OS_VERSION, "OS Version", STRING, true);
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, JAVA_VENDOR, "Java Vendor", STRING, true);
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, JAVA_VERSION, "Java Version", STRING, true);
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, START_TIME, "Start Time", DATE, true);
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, UPTIME, "Uptime", LONG, true);
+
+		//
+		resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, AVAILABLE_PROCESSORS, "Available Processors",
+				INTEGER, true);
+
+		//
+		if (osJ.has(SYSTEM_LOAD_AVERAGE) && !osJ.get(SYSTEM_LOAD_AVERAGE).isJsonNull()) {
+			double value = osJ.get(SYSTEM_LOAD_AVERAGE).getAsDouble();
+			resource.setOrAddParam(bagId, bagName, bagType, SYSTEM_LOAD_AVERAGE, "System Load Average", "SystemLoad",
+					"SystemLoad", FLOAT, value, true);
 			if (this.systemLoadAverageState)
-				setOrAddState(osJ, resource, SYSTEM_LOAD_AVERAGE, SYSTEM_LOAD_AVERAGE + "State", "System Load Average",
-						FLOAT);
+				setOrAddState(resource, SYSTEM_LOAD_AVERAGE + "State", "System Load Average", INTERPRETATION_NONE,
+						UOM_NONE, FLOAT, value);
+		}
+	}
 
-			//
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, START_TIME, "Start Time", DATE, true);
+	private void handleMemory(JsonObject systemStateJ, Resource resource) {
+		JsonObject memoryJ = systemStateJ.get(MEMORY).getAsJsonObject();
 
-			//
-			resource.setOrAddParamFromFlatJson(osJ, bagId, bagName, bagType, UPTIME, "Uptime", LONG, true);
+		String bagId = MEMORY;
+		String bagName = "Memory";
+		String bagType = "Memory";
+
+		//
+		if (memoryJ.has(TOTAL_PHYSICAL_MEMORY_SIZE) && !memoryJ.get(TOTAL_PHYSICAL_MEMORY_SIZE).isJsonNull()) {
+			long value = this.memoryRoundingUnit.roundBytesToUnit(memoryJ.get(TOTAL_PHYSICAL_MEMORY_SIZE).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, TOTAL_PHYSICAL_MEMORY_SIZE, "Total Physical Memory Size",
+					this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value, true);
 		}
 
-		if (systemStateJ.has(MEMORY)) {
-			JsonObject memoryJ = systemStateJ.get(MEMORY).getAsJsonObject();
-
-			String bagId = MEMORY;
-			String bagName = "Memory";
-			String bagType = "Memory";
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, TOTAL_PHYSICAL_MEMORY_SIZE,
-					"Total Physical Memory Size", LONG, true);
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, FREE_PHYSICAL_MEMORY_SIZE,
-					"Free Physical Memory Size", LONG, true);
+		//
+		if (memoryJ.has(FREE_PHYSICAL_MEMORY_SIZE) && !memoryJ.get(FREE_PHYSICAL_MEMORY_SIZE).isJsonNull()) {
+			long value = this.memoryRoundingUnit.roundBytesToUnit(memoryJ.get(FREE_PHYSICAL_MEMORY_SIZE).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, FREE_PHYSICAL_MEMORY_SIZE, "Free Physical Memory Size",
+					this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value, true);
 			if (this.freePhysicalMemorySizeState)
-				setOrAddState(memoryJ, resource, FREE_PHYSICAL_MEMORY_SIZE, FREE_PHYSICAL_MEMORY_SIZE + "State",
-						"Free Physical Memory Size", LONG);
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, FREE_SWAP_SPACE_SIZE,
-					"Free Swap Space Size", LONG, true);
-			if (this.freeSwapSpaceSizeState)
-				setOrAddState(memoryJ, resource, FREE_SWAP_SPACE_SIZE, FREE_SWAP_SPACE_SIZE + "State",
-						"Free Swap Space Size", LONG);
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, COMMITTED_VIRTUAL_MEMORY_SIZE,
-					"Committed Virtual Memory Size", LONG, true);
-			if (this.committedVirtualMemorySizeState)
-				setOrAddState(memoryJ, resource, COMMITTED_VIRTUAL_MEMORY_SIZE, COMMITTED_VIRTUAL_MEMORY_SIZE + "State",
-						"Committed Virtual Memory Size", LONG);
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, HEAP_MEMORY_USAGE_INIT,
-					"Heap Memory Usage Init", LONG, true);
-			if (this.heapMemoryUsageInitState)
-				setOrAddState(memoryJ, resource, HEAP_MEMORY_USAGE_INIT, HEAP_MEMORY_USAGE_INIT + "State",
-						"Heap Memory Usage Init", LONG);
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, HEAP_MEMORY_USAGE_USED,
-					"Heap Memory Usage Used", LONG, true);
-			if (this.heapMemoryUsageUsedState)
-				setOrAddState(memoryJ, resource, HEAP_MEMORY_USAGE_USED, HEAP_MEMORY_USAGE_USED + "State",
-						"Heap Memory Usage Used", LONG);
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, HEAP_MEMORY_USAGE_MAX,
-					"Heap Memory Usage Max", LONG, true);
-			if (this.heapMemoryUsageMaxState)
-				setOrAddState(memoryJ, resource, HEAP_MEMORY_USAGE_MAX, HEAP_MEMORY_USAGE_MAX + "State",
-						"Heap Memory Usage Max", LONG);
-
-			//
-			resource.setOrAddParamFromFlatJson(memoryJ, bagId, bagName, bagType, HEAP_MEMORY_USAGE_COMMITTED,
-					"Heap Memory Usage Committed", LONG, true);
-			if (this.heapMemoryUsageCommittedState)
-				setOrAddState(memoryJ, resource, HEAP_MEMORY_USAGE_COMMITTED, HEAP_MEMORY_USAGE_COMMITTED + "State",
-						"Heap Memory Usage Committed", LONG);
+				setOrAddState(resource, FREE_PHYSICAL_MEMORY_SIZE + "State", "Free Physical Memory Size",
+						this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value);
 		}
 
-		if (systemStateJ.has(ROOTS)) {
-			JsonArray rootsJ = systemStateJ.get(ROOTS).getAsJsonArray();
-			for (JsonElement rootE : rootsJ) {
-				JsonObject rootJ = rootE.getAsJsonObject();
+		//
+		if (memoryJ.has(FREE_SWAP_SPACE_SIZE) && !memoryJ.get(FREE_SWAP_SPACE_SIZE).isJsonNull()) {
+			long value = this.memoryRoundingUnit.roundBytesToUnit(memoryJ.get(FREE_SWAP_SPACE_SIZE).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, FREE_SWAP_SPACE_SIZE, "Free Swap Space Size",
+					this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value, true);
+			if (this.freeSwapSpaceSizeState)
+				setOrAddState(resource, FREE_SWAP_SPACE_SIZE + "State", "Free Swap Space Size",
+						this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value);
+		}
 
-				String path = rootJ.get(PATH).getAsString();
-				if (path.equals("/"))
-					path = "root";
+		//
+		if (memoryJ.has(COMMITTED_VIRTUAL_MEMORY_SIZE) && !memoryJ.get(COMMITTED_VIRTUAL_MEMORY_SIZE).isJsonNull()) {
+			long value = this.memoryRoundingUnit
+					.roundBytesToUnit(memoryJ.get(COMMITTED_VIRTUAL_MEMORY_SIZE).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, COMMITTED_VIRTUAL_MEMORY_SIZE,
+					"Committed Virtual Memory Size", this.memoryRoundingUnit.getInterpretation(),
+					this.memoryRoundingUnit.getUom(), LONG, value, true);
+			if (this.committedVirtualMemorySizeState)
+				setOrAddState(resource, COMMITTED_VIRTUAL_MEMORY_SIZE + "State", "Committed Virtual Memory Size",
+						this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value);
+		}
 
-				String bagId = path;
-				String bagName = "Root " + path;
-				String bagType = "Root";
+		//
+		if (memoryJ.has(HEAP_MEMORY_USAGE_INIT) && !memoryJ.get(HEAP_MEMORY_USAGE_INIT).isJsonNull()) {
+			long value = this.memoryRoundingUnit.roundBytesToUnit(memoryJ.get(HEAP_MEMORY_USAGE_INIT).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, HEAP_MEMORY_USAGE_INIT, "Heap Memory Usage Init",
+					this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value, true);
+			if (this.heapMemoryUsageInitState)
+				setOrAddState(resource, HEAP_MEMORY_USAGE_INIT + "State", "Heap Memory Usage Init",
+						this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value);
+		}
 
-				resource.setOrAddParamFromFlatJson(rootJ, bagId, bagName, bagType, PATH, "Path", STRING, true);
+		//
+		if (memoryJ.has(HEAP_MEMORY_USAGE_USED) && !memoryJ.get(HEAP_MEMORY_USAGE_USED).isJsonNull()) {
+			long value = this.memoryRoundingUnit.roundBytesToUnit(memoryJ.get(HEAP_MEMORY_USAGE_USED).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, HEAP_MEMORY_USAGE_USED, "Heap Memory Usage Used",
+					this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value, true);
+			if (this.heapMemoryUsageUsedState)
+				setOrAddState(resource, HEAP_MEMORY_USAGE_USED + "State", "Heap Memory Usage Used",
+						this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value);
+		}
 
-				//
-				resource.setOrAddParamFromFlatJson(rootJ, bagId, bagName, bagType, USABLE_SPACE, "Usable Space", LONG,
-						true);
+		//
+		if (memoryJ.has(HEAP_MEMORY_USAGE_MAX) && !memoryJ.get(HEAP_MEMORY_USAGE_MAX).isJsonNull()) {
+			long value = this.memoryRoundingUnit.roundBytesToUnit(memoryJ.get(HEAP_MEMORY_USAGE_MAX).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, HEAP_MEMORY_USAGE_MAX, "Heap Memory Usage Max",
+					this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value, true);
+			if (this.heapMemoryUsageMaxState)
+				setOrAddState(resource, HEAP_MEMORY_USAGE_MAX + "State", "Heap Memory Usage Max",
+						this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value);
+		}
+
+		//
+		if (memoryJ.has(HEAP_MEMORY_USAGE_COMMITTED) && !memoryJ.get(HEAP_MEMORY_USAGE_COMMITTED).isJsonNull()) {
+			long value = this.memoryRoundingUnit.roundBytesToUnit(memoryJ.get(HEAP_MEMORY_USAGE_COMMITTED).getAsLong());
+			resource.setOrAddParam(bagId, bagName, bagType, HEAP_MEMORY_USAGE_COMMITTED, "Heap Memory Usage Committed",
+					this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value, true);
+			if (this.heapMemoryUsageCommittedState)
+				setOrAddState(resource, HEAP_MEMORY_USAGE_COMMITTED + "State", "Heap Memory Usage Committed",
+						this.memoryRoundingUnit.getInterpretation(), this.memoryRoundingUnit.getUom(), LONG, value);
+		}
+	}
+
+	private void handleRoots(JsonObject systemStateJ, Resource resource) {
+		JsonArray rootsJ = systemStateJ.get(ROOTS).getAsJsonArray();
+		for (JsonElement rootE : rootsJ) {
+			JsonObject rootJ = rootE.getAsJsonObject();
+
+			String path = rootJ.get(PATH).getAsString();
+			if (path.equals("/"))
+				path = "root";
+
+			String bagId = path;
+			String bagName = "Root " + path;
+			String bagType = "Root";
+
+			resource.setOrAddParamFromFlatJson(rootJ, bagId, bagName, bagType, PATH, "Path", STRING, true);
+
+			//
+			if (rootJ.has(TOTAL_SPACE) && !rootJ.get(TOTAL_SPACE).isJsonNull()) {
+				long value = this.storageSpaceRoundingUnit.roundBytesToUnit(rootJ.get(TOTAL_SPACE).getAsLong());
+				resource.setOrAddParam(bagId, bagName, bagType, TOTAL_SPACE, "Total Space",
+						this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(), LONG,
+						value, true);
+			}
+
+			//
+			if (rootJ.has(USABLE_SPACE) && !rootJ.get(USABLE_SPACE).isJsonNull()) {
+				long value = this.storageSpaceRoundingUnit.roundBytesToUnit(rootJ.get(USABLE_SPACE).getAsLong());
+				resource.setOrAddParam(bagId, bagName, bagType, USABLE_SPACE, "Usable Space",
+						this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(), LONG,
+						value, true);
 				if (this.usableSpaceState)
-					setOrAddState(rootJ, resource, USABLE_SPACE, bagId + USABLE_SPACE + "State", "Usable Space", LONG);
+					setOrAddState(resource, bagId + USABLE_SPACE + "State", "Usable Space",
+							this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(),
+							LONG, value);
+			}
 
-				//
-				resource.setOrAddParamFromFlatJson(rootJ, bagId, bagName, bagType, USED_SPACE, "Used Space", LONG,
-						true);
+			//
+			if (rootJ.has(USED_SPACE) && !rootJ.get(USED_SPACE).isJsonNull()) {
+				long value = this.storageSpaceRoundingUnit.roundBytesToUnit(rootJ.get(USED_SPACE).getAsLong());
+				resource.setOrAddParam(bagId, bagName, bagType, USED_SPACE, "Used Space",
+						this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(), LONG,
+						value, true);
 				if (this.usedSpaceState)
-					setOrAddState(rootJ, resource, USED_SPACE, bagId + USED_SPACE + "State", "Used Space", LONG);
+					setOrAddState(resource, bagId + USED_SPACE + "State", "Used Space",
+							this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(),
+							LONG, value);
+			}
 
-				//
-				resource.setOrAddParamFromFlatJson(rootJ, bagId, bagName, bagType, FREE_SPACE, "Free Space", LONG,
-						true);
+			//
+			if (rootJ.has(FREE_SPACE) && !rootJ.get(FREE_SPACE).isJsonNull()) {
+				long value = this.storageSpaceRoundingUnit.roundBytesToUnit(rootJ.get(FREE_SPACE).getAsLong());
+				resource.setOrAddParam(bagId, bagName, bagType, FREE_SPACE, "Free Space",
+						this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(), LONG,
+						value, true);
 				if (this.freeSpaceState)
-					setOrAddState(rootJ, resource, FREE_SPACE, bagId + FREE_SPACE + "State", "Free Space", LONG);
-
-				//
-				resource.setOrAddParamFromFlatJson(rootJ, bagId, bagName, bagType, TOTAL_SPACE, "Total Space", LONG,
-						true);
+					setOrAddState(resource, bagId + FREE_SPACE + "State", "Free Space",
+							this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(),
+							LONG, value);
 			}
 		}
 	}
 
-	private void setOrAddState(JsonObject jsonObject, Resource resource, String jsonId, String stateId,
-			String stateName, StrolchValueType type) {
+	private void setOrAddState(Resource resource, String stateId, String stateName, String interpretation, String uom,
+			StrolchValueType type, Object value) {
+
+		if (value == null)
+			return;
 
 		StrolchTimedState<? extends IValue<?>> state = resource.getTimedState(stateId);
 		if (state == null) {
 			state = type.timedStateInstance();
 			state.setId(stateId);
 			state.setName(stateName);
+			state.setInterpretation(interpretation);
+			state.setUom(uom);
 
 			resource.addTimedState(state);
 		}
 
-		boolean valueNotSet = !jsonObject.has(jsonId) || jsonObject.get(jsonId).isJsonNull();
-		if (valueNotSet)
-			return;
-
-		state.setStateFromStringAt(this.stateTime, jsonObject.get(jsonId).getAsString());
+		state.accept(new SetStateValueVisitor(this.stateTime, value));
 
 		if (this.compactStates)
 			state.getTimeEvolution().compact();
