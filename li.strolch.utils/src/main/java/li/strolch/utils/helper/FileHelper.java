@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import li.strolch.utils.DataUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -459,8 +460,8 @@ public class FileHelper {
 	 *
 	 * @return the humanized form of the files size
 	 */
-	public final static String humanizeFileSize(File file) {
-		return FileHelper.humanizeFileSize(file.length());
+	public static String humanizeFileSize(File file) {
+		return humanizeFileSize(file.length());
 	}
 
 	/**
@@ -473,17 +474,8 @@ public class FileHelper {
 	 * @return the humanized form of the files size
 	 */
 	@SuppressWarnings("nls")
-	public final static String humanizeFileSize(long fileSize) {
-		if (fileSize < 1024)
-			return String.format("%d bytes", fileSize);
-
-		if (fileSize < 1048576)
-			return String.format("%.1f KB", (fileSize / 1024.0d));
-
-		if (fileSize < 1073741824)
-			return String.format("%.1f MB", (fileSize / 1048576.0d));
-
-		return String.format("%.1f GB", (fileSize / 1073741824.0d));
+	public static String humanizeFileSize(long fileSize) {
+		return DataUnit.Bytes.humanizeBytesValue(fileSize);
 	}
 
 	/**
