@@ -15,12 +15,16 @@
  */
 package li.strolch.model;
 
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.visitor.SetParameterValueVisitor;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
@@ -199,6 +203,38 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 */
 	default void setOrAddParamFromFlatJson(JsonObject jsonObject, String bagId, String bagName, String bagType,
 			String paramId, String paramName, StrolchValueType type, boolean ignoreOnEmpty) {
+		setOrAddParamFromFlatJson(jsonObject, bagId, bagName, bagType, paramId, paramName, INTERPRETATION_NONE,
+				UOM_NONE, type, ignoreOnEmpty);
+	}
+
+	/**
+	 * Set or add a parameter to this element from a {@link JsonObject}
+	 *
+	 * @param jsonObject
+	 * 		the object from which to get the value
+	 * @param bagId
+	 * 		the bag ID on which to set the value
+	 * @param bagName
+	 * 		the name of the bag, if the bag is to be created
+	 * @param bagType
+	 * 		the type of the bag, if the bag is to be created
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName
+	 * 		the name of the parameter, if the parameter is to be created
+	 * @param interpretation
+	 * 		the interpretation
+	 * @param uom
+	 * 		the uom
+	 * @param type
+	 * 		the type of Parameter to create
+	 * @param ignoreOnEmpty
+	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
+	 * 		is cleared if the json field is missing or null
+	 */
+	default void setOrAddParamFromFlatJson(JsonObject jsonObject, String bagId, String bagName, String bagType,
+			String paramId, String paramName, String interpretation, String uom, StrolchValueType type,
+			boolean ignoreOnEmpty) {
 
 		if (!jsonObject.has(paramId) && ignoreOnEmpty)
 			return;
@@ -218,6 +254,8 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 			param = type.parameterInstance();
 			param.setId(paramId);
 			param.setName(paramName);
+			param.setInterpretation(interpretation);
+			param.setUom(uom);
 			bag.addParameter(param);
 		}
 
@@ -225,6 +263,90 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 			param.clear();
 		} else {
 			param.setValueFromString(jsonObject.get(paramId).getAsString());
+		}
+	}
+
+	/**
+	 * Set or add a parameter to this element with the given value
+	 *
+	 * @param bagId
+	 * 		the bag ID on which to set the value
+	 * @param bagName
+	 * 		the name of the bag, if the bag is to be created
+	 * @param bagType
+	 * 		the type of the bag, if the bag is to be created
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName
+	 * 		the name of the parameter, if the parameter is to be created
+	 * @param type
+	 * 		the type of Parameter to create
+	 * @param value
+	 * 		the value to set
+	 * @param ignoreOnEmpty
+	 * 		if true, and the value is null, then the parameter is not changed, otherwise the parameter is cleared if the
+	 * 		value is null
+	 */
+	default void setOrAddParam(String bagId, String bagName, String bagType, String paramId, String paramName,
+			StrolchValueType type, Object value, boolean ignoreOnEmpty) {
+		setOrAddParam(bagId, bagName, bagType, paramId, paramName, INTERPRETATION_NONE, UOM_NONE, type, value,
+				ignoreOnEmpty);
+	}
+
+	/**
+	 * Set or add a parameter to this element with the given value
+	 *
+	 * @param bagId
+	 * 		the bag ID on which to set the value
+	 * @param bagName
+	 * 		the name of the bag, if the bag is to be created
+	 * @param bagType
+	 * 		the type of the bag, if the bag is to be created
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName
+	 * 		the name of the parameter, if the parameter is to be created
+	 * @param interpretation
+	 * 		the interpretation
+	 * @param uom
+	 * 		the uom
+	 * @param type
+	 * 		the type of Parameter to create
+	 * @param value
+	 * 		the value to set
+	 * @param ignoreOnEmpty
+	 * 		if true, and the value is null, then the parameter is not changed, otherwise the parameter is cleared if the
+	 * 		value is null
+	 */
+	default void setOrAddParam(String bagId, String bagName, String bagType, String paramId, String paramName,
+			String interpretation, String uom, StrolchValueType type, Object value, boolean ignoreOnEmpty) {
+
+		if (value == null && ignoreOnEmpty)
+			return;
+
+		ParameterBag bag = getParameterBag(bagId);
+		if (bag == null) {
+			bag = new ParameterBag(bagId, bagName, bagType);
+			addParameterBag(bag);
+		}
+
+		Parameter<?> param = bag.getParameter(paramId);
+		if (param == null && value == null)
+			return;
+
+		if (param == null) {
+			param = type.parameterInstance();
+			param.setId(paramId);
+			param.setName(paramName);
+			param.setInterpretation(interpretation);
+			param.setUom(uom);
+			bag.addParameter(param);
+		}
+
+		if (value == null) {
+			param.clear();
+		} else {
+			param.accept(new SetParameterValueVisitor(value));
 		}
 	}
 }
