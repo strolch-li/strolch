@@ -271,7 +271,7 @@ public class ResourceSystemStateFromJson {
 						this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(), LONG,
 						value, true);
 				if (this.usableSpaceState)
-					setOrAddState(resource, bagId + USABLE_SPACE + "State", "Usable Space",
+					setOrAddState(resource, bagId + "_" + USABLE_SPACE + "State", "Usable Space",
 							this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(),
 							LONG, value);
 			}
@@ -283,7 +283,7 @@ public class ResourceSystemStateFromJson {
 						this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(), LONG,
 						value, true);
 				if (this.usedSpaceState)
-					setOrAddState(resource, bagId + USED_SPACE + "State", "Used Space",
+					setOrAddState(resource, bagId + "_" + USED_SPACE + "State", "Used Space",
 							this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(),
 							LONG, value);
 			}
@@ -295,7 +295,7 @@ public class ResourceSystemStateFromJson {
 						this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(), LONG,
 						value, true);
 				if (this.freeSpaceState)
-					setOrAddState(resource, bagId + FREE_SPACE + "State", "Free Space",
+					setOrAddState(resource, bagId + "_" + FREE_SPACE + "State", "Free Space",
 							this.storageSpaceRoundingUnit.getInterpretation(), this.storageSpaceRoundingUnit.getUom(),
 							LONG, value);
 			}
