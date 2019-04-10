@@ -15,6 +15,7 @@
  */
 package li.strolch.model.parameter;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,6 +27,14 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 
 	String VALUE_SEPARATOR1 = ";"; //$NON-NLS-1$
 	String VALUE_SEPARATOR2 = ","; //$NON-NLS-1$
+
+	/**
+	 * Set the internal value to have the content of the collection
+	 *
+	 * @param values
+	 * 		the values to set
+	 */
+	void setValue(Collection<E> values);
 
 	/**
 	 * Adds a single value to the {@link List} of values

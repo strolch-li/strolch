@@ -17,20 +17,16 @@ package li.strolch.model.parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class IntegerListParameter extends AbstractParameter<List<Integer>> implements ListParameter<Integer> {
-
-	protected List<Integer> value;
+public class IntegerListParameter extends AbstractListParameter<Integer> implements ListParameter<Integer> {
 
 	/**
 	 * Empty constructor
@@ -56,131 +52,13 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 	}
 
 	@Override
-	public String getValueAsString() {
-		if (this.value.isEmpty()) {
-			return StringHelper.EMPTY;
-		}
-
-		StringBuilder sb = new StringBuilder();
-		Iterator<Integer> iter = this.value.iterator();
-		while (iter.hasNext()) {
-
-			sb.append(iter.next());
-
-			if (iter.hasNext()) {
-				sb.append(VALUE_SEPARATOR2);
-				sb.append(" ");
-			}
-		}
-
-		return sb.toString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Integer> getValue() {
-		return new ArrayList<>(this.value);
+	protected String elementToString(Integer element) {
+		return element.toString();
 	}
 
 	@Override
-	public void setValue(List<Integer> values) {
-		assertNotReadonly();
-		validateValue(values);
-		for (Integer value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-		}
-		this.value = new ArrayList<>(values);
-	}
-
-	@Override
-	public void setValueFrom(Parameter<List<Integer>> parameter) {
-		assertNotReadonly();
-		this.value = new ArrayList<>(parameter.getValue());
-	}
-
-	@Override
-	public void setValueFromString(String valueAsString) {
-		setValue(parseFromString(valueAsString));
-	}
-
-	@Override
-	public void addValue(Integer value) {
-		assertNotReadonly();
+	protected void validateElement(Integer value) {
 		DBC.PRE.assertNotNull("null values not allowed!", value);
-		this.value.add(value);
-	}
-
-	@Override
-	public void addAllValues(List<Integer> values) {
-		assertNotReadonly();
-		for (Integer value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-			this.value.add(value);
-		}
-	}
-
-	@Override
-	public void addAllValuesIfNotContains(List<Integer> values) {
-		assertNotReadonly();
-		for (Integer value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-			if (!this.value.contains(value))
-				this.value.add(value);
-		}
-	}
-
-	@Override
-	public boolean addValueIfNotContains(Integer value) {
-		assertNotReadonly();
-		DBC.PRE.assertNotNull("null values not allowed!", value);
-
-		if (this.value.contains(value))
-			return false;
-
-		this.value.add(value);
-		return true;
-	}
-
-	@Override
-	public boolean removeValue(Integer value) {
-		assertNotReadonly();
-		return this.value.remove(value);
-	}
-
-	@Override
-	public void clear() {
-		assertNotReadonly();
-		this.value.clear();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return this.value.isEmpty();
-	}
-
-	@Override
-	public boolean isEqualTo(Parameter<List<Integer>> otherValue) {
-		return this.value.equals(otherValue.getValue());
-	}
-
-	@Override
-	public boolean isEqualTo(List<Integer> otherValue) {
-		return this.value.equals(otherValue);
-	}
-
-	@Override
-	public int size() {
-		return this.value.size();
-	}
-
-	@Override
-	public boolean contains(Integer value) {
-		return this.value.contains(value);
-	}
-
-	@Override
-	public boolean containsAll(List<Integer> values) {
-		return this.value.containsAll(values);
 	}
 
 	@Override
@@ -209,6 +87,11 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 		return visitor.visitIntegerListParam(this);
 	}
 
+	@Override
+	protected List<Integer> parseString(String value) {
+		return parseFromString(value);
+	}
+
 	public static List<Integer> parseFromString(String value) {
 		if (value.isEmpty()) {
 			return Collections.emptyList();
@@ -232,5 +115,4 @@ public class IntegerListParameter extends AbstractParameter<List<Integer>> imple
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((IntegerListParameter) o).getValue().size());
 	}
-
 }

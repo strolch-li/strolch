@@ -17,20 +17,16 @@ package li.strolch.model.parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class FloatListParameter extends AbstractParameter<List<Double>> implements ListParameter<Double> {
-
-	protected List<Double> value;
+public class FloatListParameter extends AbstractListParameter<Double> implements ListParameter<Double> {
 
 	/**
 	 * Empty constructor
@@ -56,131 +52,13 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	}
 
 	@Override
-	public String getValueAsString() {
-		if (this.value.isEmpty()) {
-			return StringHelper.EMPTY;
-		}
-
-		StringBuilder sb = new StringBuilder();
-		Iterator<Double> iter = this.value.iterator();
-		while (iter.hasNext()) {
-
-			sb.append(iter.next());
-
-			if (iter.hasNext()) {
-				sb.append(VALUE_SEPARATOR2);
-				sb.append(" ");
-			}
-		}
-
-		return sb.toString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Double> getValue() {
-		return new ArrayList<>(this.value);
+	protected String elementToString(Double element) {
+		return element.toString();
 	}
 
 	@Override
-	public void setValue(List<Double> values) {
-		assertNotReadonly();
-		validateValue(values);
-		for (Double value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-		}
-		this.value = new ArrayList<>(values);
-	}
-
-	@Override
-	public void setValueFrom(Parameter<List<Double>> parameter) {
-		assertNotReadonly();
-		this.value = new ArrayList<>(parameter.getValue());
-	}
-
-	@Override
-	public void setValueFromString(String valueAsString) {
-		setValue(parseFromString(valueAsString));
-	}
-
-	@Override
-	public void addValue(Double value) {
-		assertNotReadonly();
+	protected void validateElement(Double value) {
 		DBC.PRE.assertNotNull("null values not allowed!", value);
-		this.value.add(value);
-	}
-
-	@Override
-	public void addAllValues(List<Double> values) {
-		assertNotReadonly();
-		for (Double value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-			this.value.add(value);
-		}
-	}
-
-	@Override
-	public void addAllValuesIfNotContains(List<Double> values) {
-		assertNotReadonly();
-		for (Double value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-			if (!this.value.contains(value))
-				this.value.add(value);
-		}
-	}
-
-	@Override
-	public boolean addValueIfNotContains(Double value) {
-		assertNotReadonly();
-		DBC.PRE.assertNotNull("null values not allowed!", value);
-
-		if (this.value.contains(value))
-			return false;
-
-		this.value.add(value);
-		return true;
-	}
-
-	@Override
-	public boolean removeValue(Double value) {
-		assertNotReadonly();
-		return this.value.remove(value);
-	}
-
-	@Override
-	public void clear() {
-		assertNotReadonly();
-		this.value.clear();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return this.value.isEmpty();
-	}
-
-	@Override
-	public boolean isEqualTo(Parameter<List<Double>> otherValue) {
-		return this.value.equals(otherValue.getValue());
-	}
-
-	@Override
-	public boolean isEqualTo(List<Double> otherValue) {
-		return this.value.equals(otherValue);
-	}
-
-	@Override
-	public int size() {
-		return this.value.size();
-	}
-
-	@Override
-	public boolean contains(Double value) {
-		return this.value.contains(value);
-	}
-
-	@Override
-	public boolean containsAll(List<Double> values) {
-		return this.value.containsAll(values);
 	}
 
 	@Override
@@ -207,6 +85,11 @@ public class FloatListParameter extends AbstractParameter<List<Double>> implemen
 	@Override
 	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitFloatListParam(this);
+	}
+
+	@Override
+	protected List<Double> parseString(String value) {
+		return parseFromString(value);
 	}
 
 	public static List<Double> parseFromString(String value) {

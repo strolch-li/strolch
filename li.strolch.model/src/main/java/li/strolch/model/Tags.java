@@ -131,6 +131,7 @@ public class Tags {
 		public static final String MESSAGE = "message";
 		public static final String MESSAGES = "messages";
 		public static final String REALM = "realm";
+		public static final String ROLES = "roles";
 
 		// miscellaneous
 

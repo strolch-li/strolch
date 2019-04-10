@@ -17,20 +17,16 @@ package li.strolch.model.parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class LongListParameter extends AbstractParameter<List<Long>> implements ListParameter<Long> {
-
-	protected List<Long> value;
+public class LongListParameter extends AbstractListParameter<Long> implements ListParameter<Long> {
 
 	/**
 	 * Empty constructor
@@ -56,132 +52,13 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 	}
 
 	@Override
-	public String getValueAsString() {
-		if (this.value.isEmpty()) {
-			return StringHelper.EMPTY;
-		}
-
-		StringBuilder sb = new StringBuilder();
-		Iterator<Long> iter = this.value.iterator();
-		while (iter.hasNext()) {
-
-			sb.append(iter.next());
-
-			if (iter.hasNext()) {
-				sb.append(VALUE_SEPARATOR2);
-				sb.append(" ");
-			}
-		}
-
-		return sb.toString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Long> getValue() {
-		return new ArrayList<>(this.value);
+	protected String elementToString(Long element) {
+		return element.toString();
 	}
 
 	@Override
-	public void setValue(List<Long> values) {
-		assertNotReadonly();
-		validateValue(values);
-		for (Long value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-		}
-		this.value = new ArrayList<>(values);
-	}
-
-	@Override
-	public void setValueFrom(Parameter<List<Long>> parameter) {
-		assertNotReadonly();
-		this.value = new ArrayList<>(parameter.getValue());
-	}
-
-	@Override
-	public void setValueFromString(String valueAsString) {
-		setValue(parseFromString(valueAsString));
-	}
-
-	@Override
-	public void addValue(Long value) {
-		assertNotReadonly();
+	protected void validateElement(Long value) {
 		DBC.PRE.assertNotNull("null values not allowed!", value);
-		this.value.add(value);
-	}
-
-	@Override
-	public void addAllValues(List<Long> values) {
-		assertNotReadonly();
-		for (Long value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-			this.value.add(value);
-		}
-		this.value.addAll(values);
-	}
-
-	@Override
-	public void addAllValuesIfNotContains(List<Long> values) {
-		assertNotReadonly();
-		for (Long value : values) {
-			DBC.PRE.assertNotNull("null values not allowed!", value);
-			if (!this.value.contains(value))
-				this.value.add(value);
-		}
-	}
-
-	@Override
-	public boolean addValueIfNotContains(Long value) {
-		assertNotReadonly();
-		DBC.PRE.assertNotNull("null values not allowed!", value);
-
-		if (this.value.contains(value))
-			return false;
-
-		this.value.add(value);
-		return true;
-	}
-
-	@Override
-	public boolean removeValue(Long value) {
-		assertNotReadonly();
-		return this.value.remove(value);
-	}
-
-	@Override
-	public void clear() {
-		assertNotReadonly();
-		this.value.clear();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return this.value.isEmpty();
-	}
-
-	@Override
-	public boolean isEqualTo(Parameter<List<Long>> otherValue) {
-		return this.value.equals(otherValue.getValue());
-	}
-
-	@Override
-	public boolean isEqualTo(List<Long> otherValue) {
-		return this.value.equals(otherValue);
-	}
-
-	@Override
-	public int size() {
-		return this.value.size();
-	}
-
-	@Override
-	public boolean contains(Long value) {
-		return this.value.contains(value);
-	}
-
-	@Override
-	public boolean containsAll(List<Long> values) {
-		return this.value.containsAll(values);
 	}
 
 	@Override
@@ -210,6 +87,11 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 		return visitor.visitLongListParam(this);
 	}
 
+	@Override
+	protected List<Long> parseString(String value) {
+		return parseFromString(value);
+	}
+
 	public static List<Long> parseFromString(String value) {
 		if (value.isEmpty()) {
 			return Collections.emptyList();
@@ -233,5 +115,4 @@ public class LongListParameter extends AbstractParameter<List<Long>> implements 
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return Integer.compare(this.getValue().size(), ((LongListParameter) o).getValue().size());
 	}
-
 }

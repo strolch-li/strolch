@@ -17,20 +17,16 @@ package li.strolch.model.parameter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class StringListParameter extends AbstractParameter<List<String>> implements ListParameter<String> {
-
-	protected List<String> value;
+public class StringListParameter extends AbstractListParameter<String> implements ListParameter<String> {
 
 	/**
 	 * Empty constructor
@@ -56,131 +52,13 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	}
 
 	@Override
-	public String getValueAsString() {
-		if (this.value.isEmpty()) {
-			return StringHelper.EMPTY;
-		}
-
-		StringBuilder sb = new StringBuilder();
-		Iterator<String> iter = this.value.iterator();
-		while (iter.hasNext()) {
-
-			sb.append(iter.next());
-
-			if (iter.hasNext()) {
-				sb.append(VALUE_SEPARATOR2);
-				sb.append(" ");
-			}
-		}
-
-		return sb.toString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<String> getValue() {
-		return new ArrayList<>(this.value);
+	protected String elementToString(String element) {
+		return element;
 	}
 
 	@Override
-	public void setValue(List<String> values) {
-		assertNotReadonly();
-		validateValue(values);
-		for (String value : values) {
-			DBC.PRE.assertNotEmpty("empty values not allowed!", value);
-		}
-		this.value = new ArrayList<>(values);
-	}
-
-	@Override
-	public void setValueFrom(Parameter<List<String>> parameter) {
-		assertNotReadonly();
-		this.value = new ArrayList<>(parameter.getValue());
-	}
-
-	@Override
-	public void setValueFromString(String valueAsString) {
-		setValue(parseFromString(valueAsString));
-	}
-
-	@Override
-	public void addValue(String value) {
-		assertNotReadonly();
+	protected void validateElement(String value) {
 		DBC.PRE.assertNotEmpty("empty values not allowed!", value);
-		this.value.add(value);
-	}
-
-	@Override
-	public void addAllValues(List<String> values) {
-		assertNotReadonly();
-		for (String value : values) {
-			DBC.PRE.assertNotEmpty("empty values not allowed!", value);
-			this.value.add(value);
-		}
-	}
-
-	@Override
-	public void addAllValuesIfNotContains(List<String> values) {
-		assertNotReadonly();
-		for (String value : values) {
-			DBC.PRE.assertNotEmpty("empty values not allowed!", value);
-			if (!this.value.contains(value))
-				this.value.add(value);
-		}
-	}
-
-	@Override
-	public boolean addValueIfNotContains(String value) {
-		assertNotReadonly();
-		DBC.PRE.assertNotEmpty("empty values not allowed!", value);
-
-		if (this.value.contains(value))
-			return false;
-
-		this.value.add(value);
-		return true;
-	}
-
-	@Override
-	public boolean removeValue(String value) {
-		assertNotReadonly();
-		return this.value.remove(value);
-	}
-
-	@Override
-	public void clear() {
-		assertNotReadonly();
-		this.value.clear();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return this.value.isEmpty();
-	}
-
-	@Override
-	public boolean isEqualTo(Parameter<List<String>> otherValue) {
-		return this.value.equals(otherValue.getValue());
-	}
-
-	@Override
-	public boolean isEqualTo(List<String> otherValue) {
-		return this.value.equals(otherValue);
-	}
-
-	@Override
-	public int size() {
-		return this.value.size();
-	}
-
-	@Override
-	public boolean contains(String value) {
-		return this.value.contains(value);
-	}
-
-	@Override
-	public boolean containsAll(List<String> values) {
-		return this.value.containsAll(values);
 	}
 
 	@Override
@@ -207,6 +85,11 @@ public class StringListParameter extends AbstractParameter<List<String>> impleme
 	@Override
 	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitStringListParam(this);
+	}
+
+	@Override
+	protected List<String> parseString(String value) {
+		return parseFromString(value);
 	}
 
 	public static List<String> parseFromString(String value) {
