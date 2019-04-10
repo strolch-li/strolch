@@ -37,7 +37,7 @@ public class StrolchEnum {
 
 	public StrolchEnum(String name, Locale locale, Map<String, String> values) {
 		this.name = name;
-		this.locale = locale.toString();
+		this.locale = locale.toLanguageTag();
 		this.localeL = locale;
 		this.values = values;
 	}

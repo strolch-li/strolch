@@ -5,7 +5,7 @@
         <Firstname>System User</Firstname>
         <Lastname>Administrator</Lastname>
         <State>ENABLED</State>
-        <Locale>en_GB</Locale>
+        <Locale>en-GB</Locale>
         <Roles>
             <Role>RoleA1</Role>
             <Role>RoleA2</Role>
@@ -16,7 +16,7 @@
         <Firstname>System User</Firstname>
         <Lastname>Administrator</Lastname>
         <State>ENABLED</State>
-        <Locale>en_GB</Locale>
+        <Locale>en-GB</Locale>
         <Roles>
             <Role>RoleB1</Role>
             <Role>RoleB2</Role>

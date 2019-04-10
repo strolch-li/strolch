@@ -10,7 +10,7 @@
 		<Firstname>Application</Firstname>
 		<Lastname>Administrator</Lastname>
 		<State>ENABLED</State>
-		<Locale>en_GB</Locale>
+		<Locale>en-GB</Locale>
 		<Roles>
 			<Role>AppUser</Role>
 		</Roles>
@@ -19,7 +19,7 @@
 		<Firstname>Application</Firstname>
 		<Lastname>Administrator</Lastname>
 		<State>ENABLED</State>
-		<Locale>en_GB</Locale>
+		<Locale>en-GB</Locale>
 		<Roles>
 			<Role>AppUser</Role>
 			<Role>PrivilegeAdmin</Role>

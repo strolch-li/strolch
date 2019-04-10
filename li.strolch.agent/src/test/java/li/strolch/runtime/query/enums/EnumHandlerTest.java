@@ -51,13 +51,13 @@ public class EnumHandlerTest {
 
 			StrolchEnum salutationsEnum = enumHandler.getEnum(certificate, "salutations", Locale.UK);
 			assertEquals("salutations", salutationsEnum.getName());
-			assertEquals("en_GB", salutationsEnum.getLocale());
+			assertEquals("en-GB", salutationsEnum.getLocale());
 			assertEquals(3, salutationsEnum.size());
 			assertEquals("Mr", salutationsEnum.getValue("mr"));
 
 			StrolchEnum religionsEnum = enumHandler.getEnum(certificate, "religions", Locale.CANADA);
 			assertEquals("religions", religionsEnum.getName());
-			assertEquals("en_CA", religionsEnum.getLocale());
+			assertEquals("en-CA", religionsEnum.getLocale());
 			assertEquals(9, religionsEnum.size());
 			assertEquals("Atheist", religionsEnum.getValue("Atheist"));
 		});

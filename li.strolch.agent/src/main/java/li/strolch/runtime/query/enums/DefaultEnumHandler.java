@@ -16,7 +16,8 @@
 package li.strolch.runtime.query.enums;
 
 import static li.strolch.model.StrolchModelConstants.TYPE_ENUMERATION;
-import static li.strolch.utils.helper.StringHelper.UNDERLINE;
+import static li.strolch.utils.helper.StringHelper.DASH;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -66,15 +67,19 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 
 	private ParameterBag findParameterBagByLanguage(Resource enumeration, Locale locale) {
 
-		String localeS = locale.getLanguage() + UNDERLINE + locale.getCountry() + UNDERLINE + locale.getVariant();
-		if (enumeration.hasParameterBag(localeS))
-			return enumeration.getParameterBag(localeS);
+		if (isNotEmpty(locale.getVariant())) {
+			String localeS = locale.getLanguage() + DASH + locale.getCountry() + DASH + locale.getVariant();
+			if (enumeration.hasParameterBag(localeS))
+				return enumeration.getParameterBag(localeS);
+		}
 
-		localeS = locale.getLanguage() + UNDERLINE + locale.getCountry();
-		if (enumeration.hasParameterBag(localeS))
-			return enumeration.getParameterBag(localeS);
+		if (isNotEmpty(locale.getCountry())) {
+			String localeS = locale.getLanguage() + DASH + locale.getCountry();
+			if (enumeration.hasParameterBag(localeS))
+				return enumeration.getParameterBag(localeS);
+		}
 
-		localeS = locale.getLanguage();
+		String localeS = locale.getLanguage();
 		if (enumeration.hasParameterBag(localeS))
 			return enumeration.getParameterBag(localeS);
 

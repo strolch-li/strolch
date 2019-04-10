@@ -78,7 +78,7 @@ public class PrivilegeUsersDomWriter {
 
 			// add locale element
 			Element localeElement = doc.createElement(XmlConstants.XML_LOCALE);
-			localeElement.setTextContent(user.getLocale().toString());
+			localeElement.setTextContent(user.getLocale().toLanguageTag());
 			userElement.appendChild(localeElement);
 
 			// add all the role elements

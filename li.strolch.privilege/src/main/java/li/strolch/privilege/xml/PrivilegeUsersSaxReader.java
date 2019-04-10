@@ -89,7 +89,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 //	  <Firstname>Application</Firstname>
 //	  <Lastname>Administrator</Lastname>
 //	  <State>ENABLED</State>
-//	  <Locale>en_GB</Locale>
+//	  <Locale>en-GB</Locale>
 //	  <Roles>
 //	    <Role>PrivilegeAdmin</Role>
 //	    <Role>AppUser</Role>
@@ -200,7 +200,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 			case XmlConstants.XML_LOCALE:
 
-				this.locale = new Locale(this.text.toString().trim());
+				this.locale = Locale.forLanguageTag(this.text.toString().trim());
 				break;
 
 			case XmlConstants.XML_ROLE:

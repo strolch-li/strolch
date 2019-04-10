@@ -67,7 +67,7 @@ public class CertificateStubsDomWriter {
 			certElement.setAttribute(XmlConstants.XML_ATTR_SOURCE, cert.getSource());
 
 			// locale;
-			certElement.setAttribute(XmlConstants.XML_ATTR_LOCALE, cert.getLocale().toString());
+			certElement.setAttribute(XmlConstants.XML_ATTR_LOCALE, cert.getLocale().toLanguageTag());
 
 			// loginTime;
 			certElement.setAttribute(XmlConstants.XML_ATTR_LOGIN_TIME,

@@ -172,7 +172,7 @@ public class XmlTest {
 		assertEquals("Application", admin.getFirstname());
 		assertEquals("Administrator", admin.getLastname());
 		assertEquals(UserState.ENABLED, admin.getUserState());
-		assertEquals("en_gb", admin.getLocale().toString());
+		assertEquals("en-GB", admin.getLocale().toString());
 		assertThat(admin.getRoles(), containsInAnyOrder("PrivilegeAdmin", "AppUser"));
 		Map<String, String> properties = admin.getProperties();
 		assertEquals(new HashSet<>(Arrays.asList("organization", "organizationalUnit")), properties.keySet());
@@ -188,7 +188,7 @@ public class XmlTest {
 		assertEquals("System User", systemAdmin.getFirstname());
 		assertEquals("Administrator", systemAdmin.getLastname());
 		assertEquals(UserState.SYSTEM, systemAdmin.getUserState());
-		assertEquals("en_gb", systemAdmin.getLocale().toString());
+		assertEquals("en-GB", systemAdmin.getLocale().toString());
 		assertThat(systemAdmin.getRoles(), containsInAnyOrder("system_admin_privileges"));
 		assertTrue(systemAdmin.getProperties().isEmpty());
 	}
