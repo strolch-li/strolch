@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,14 +57,13 @@ public class EnumTest extends AbstractRestfulTest {
 				.path(ROOT_PATH + "/sex") //
 				.request(MediaType.APPLICATION_JSON) //
 				.header(HttpHeaders.AUTHORIZATION, this.authToken) //
-				.acceptLanguage(Locale.ENGLISH) //
 				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
 		assertNotNull(strolchEnumS);
 		JsonObject strolchEnumJ = new JsonParser().parse(strolchEnumS).getAsJsonObject();
 		assertEquals("sex", strolchEnumJ.get("name").getAsString());
-		assertEquals(4, strolchEnumJ.get("values").getAsJsonObject().size());
+		assertEquals(4, strolchEnumJ.get("values").getAsJsonArray().size());
 	}
 
 	@Test
@@ -75,15 +74,15 @@ public class EnumTest extends AbstractRestfulTest {
 				.path(ROOT_PATH + "/salutation") //
 				.request(MediaType.APPLICATION_JSON) //
 				.header(HttpHeaders.AUTHORIZATION, this.authToken) //
-				.acceptLanguage(Locale.ENGLISH) //
 				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
 		assertNotNull(strolchEnumS);
 		JsonObject strolchEnumJ = new JsonParser().parse(strolchEnumS).getAsJsonObject();
 		assertEquals("salutation", strolchEnumJ.get("name").getAsString());
-		assertEquals(3, strolchEnumJ.get("values").getAsJsonObject().size());
-		assertEquals("Mrs", strolchEnumJ.get("values").getAsJsonObject().get("mrs").getAsString());
+		assertEquals(3, strolchEnumJ.get("values").getAsJsonArray().size());
+		assertEquals("Mr",
+				strolchEnumJ.get("values").getAsJsonArray().get(0).getAsJsonObject().get("value").getAsString());
 	}
 
 	@Test
@@ -91,17 +90,17 @@ public class EnumTest extends AbstractRestfulTest {
 
 		// query
 		Response result = target() //
-				.path(ROOT_PATH + "/salutation") //
+				.path(ROOT_PATH + "/salutation/" + Locale.GERMAN.toLanguageTag()) //
 				.request(MediaType.APPLICATION_JSON) //
 				.header(HttpHeaders.AUTHORIZATION, this.authToken) //
-				.acceptLanguage(Locale.GERMAN) //
 				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
 		assertNotNull(strolchEnumS);
 		JsonObject strolchEnumJ = new JsonParser().parse(strolchEnumS).getAsJsonObject();
 		assertEquals("salutation", strolchEnumJ.get("name").getAsString());
-		assertEquals(3, strolchEnumJ.get("values").getAsJsonObject().size());
-		assertEquals("Frau", strolchEnumJ.get("values").getAsJsonObject().get("mrs").getAsString());
+		assertEquals(3, strolchEnumJ.get("values").getAsJsonArray().size());
+		assertEquals("Herr", strolchEnumJ.get("values").getAsJsonArray().get(0).getAsJsonObject().get("value").
+				getAsString());
 	}
 }
