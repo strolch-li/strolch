@@ -15,6 +15,7 @@
  */
 package li.strolch.runtime.query.enums;
 
+import static li.strolch.model.StrolchModelConstants.TYPE_ENUMERATION;
 import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 import java.text.MessageFormat;
@@ -26,14 +27,11 @@ import java.util.Set;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Locator;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -41,34 +39,8 @@ import li.strolch.utils.dbc.DBC;
  */
 public class DefaultEnumHandler extends StrolchComponent implements EnumHandler {
 
-	private static final String PROP_REALM = "realm"; //$NON-NLS-1$
-
-	private String realm;
-	private Map<String, Locator> enumLocators;
-
 	public DefaultEnumHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
-	}
-
-	@Override
-	public void initialize(ComponentConfiguration configuration) throws Exception {
-
-		this.enumLocators = new HashMap<>();
-		this.realm = configuration.getString(PROP_REALM, StrolchConstants.DEFAULT_REALM);
-
-		Set<String> enumNames = configuration.getPropertyKeys();
-		for (String enumName : enumNames) {
-			if (enumName.equals(PROP_REALM)) {
-				continue;
-			}
-
-			String enumLocatorS = configuration.getString(enumName, null);
-			Locator enumLocator = Locator.valueOf(enumLocatorS);
-			logger.info(MessageFormat.format("Registered enum {0} at {1}", enumName, enumLocator)); //$NON-NLS-1$
-			this.enumLocators.put(enumName, enumLocator);
-		}
-
-		super.initialize(configuration);
 	}
 
 	@Override
@@ -77,13 +49,8 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 		DBC.PRE.assertNotEmpty("Enum name must be given!", name); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Locale must be given!", locale); //$NON-NLS-1$
 
-		Locator enumLocator = this.enumLocators.get(name);
-		if (enumLocator == null)
-			throw new StrolchException(
-					MessageFormat.format("No enumeration is configured for the name {0}", name)); //$NON-NLS-1$
-
-		try (StrolchTransaction tx = getContainer().getRealm(this.realm).openTx(certificate, EnumHandler.class, true)) {
-			Resource enumeration = tx.findElement(enumLocator);
+		try (StrolchTransaction tx = openTx(certificate, true)) {
+			Resource enumeration = tx.getResourceBy(TYPE_ENUMERATION, name, true);
 			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 
 			Set<String> parameterKeySet = enumValuesByLanguage.getParameterKeySet();

@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Locale;
@@ -29,7 +28,6 @@ import java.util.Locale;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.runtime.query.enums.EnumHandler;
 import li.strolch.runtime.query.enums.StrolchEnum;
 import org.slf4j.Logger;
@@ -46,8 +44,7 @@ public class EnumQuery {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}")
-	public Response getEnum(@PathParam("name") String name, @Context HttpServletRequest request,
-			@Context HttpHeaders headers) {
+	public Response getEnum(@PathParam("name") String name, @Context HttpServletRequest request) {
 
 		try {
 
@@ -55,8 +52,28 @@ public class EnumQuery {
 					.getComponent(EnumHandler.class);
 
 			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-			Locale locale = RestfulHelper.getLocale(headers);
-			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, locale);
+			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, cert.getLocale());
+			return Response.ok().entity(strolchEnum.toJson().toString()).build();
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return Response.serverError().entity(e.getMessage()).build();
+		}
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{name}/{locale}")
+	public Response getEnumBySpecificLocale(@PathParam("name") String name, @PathParam("locale") String locale,
+			@Context HttpServletRequest request) {
+
+		try {
+
+			EnumHandler enumHandler = RestfulStrolchComponent.getInstance().getContainer()
+					.getComponent(EnumHandler.class);
+
+			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, Locale.forLanguageTag(locale));
 			return Response.ok().entity(strolchEnum.toJson().toString()).build();
 
 		} catch (Exception e) {

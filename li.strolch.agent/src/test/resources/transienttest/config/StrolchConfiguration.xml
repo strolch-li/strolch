@@ -54,12 +54,6 @@
 			<api>li.strolch.runtime.query.enums.EnumHandler</api>
 			<impl>li.strolch.runtime.query.enums.DefaultEnumHandler</impl>
 			<depends>RealmHandler</depends>
-			<Properties>
-				<realm>defaultRealm</realm>
-				<salutations>Resource/Enumeration/salutations</salutations>
-				<sex>Resource/Enumeration/sex</sex>
-				<religions>Resource/Enumeration/religions</religions>
-			</Properties>
 		</Component>
 		<Component>
 			<name>PolicyHandler</name>
