@@ -33,6 +33,11 @@
             <artifactId>li.strolch.utils</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
