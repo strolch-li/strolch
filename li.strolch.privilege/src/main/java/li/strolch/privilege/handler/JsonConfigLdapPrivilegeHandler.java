@@ -95,6 +95,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	@Override
 	protected Set<String> getLdapGroups(String username, Attributes attrs) throws NamingException {
 		Set<String> ldapGroups = LdapHelper.getLdapGroups(attrs);
+		logger.info("User " + username + " has LDAP Groups: ");
+		ldapGroups.forEach(s -> logger.info("- " + s));
 
 		Set<String> relevantLdapGroups = ldapGroups.stream().filter(s -> this.ldapGroupNames.contains(s))
 				.collect(toSet());

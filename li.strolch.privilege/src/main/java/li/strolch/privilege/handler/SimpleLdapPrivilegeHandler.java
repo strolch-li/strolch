@@ -72,7 +72,10 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	@Override
 	protected Set<String> getLdapGroups(String username, Attributes attrs) throws NamingException {
-		return LdapHelper.getLdapGroups(attrs);
+		Set<String> ldapGroups = LdapHelper.getLdapGroups(attrs);
+		logger.info("User " + username + " has LDAP Groups: ");
+		ldapGroups.forEach(s -> logger.info("- " + s));
+		return ldapGroups;
 	}
 
 	@Override
