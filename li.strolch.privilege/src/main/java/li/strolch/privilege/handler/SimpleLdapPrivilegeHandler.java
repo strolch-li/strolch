@@ -1,8 +1,8 @@
 package li.strolch.privilege.handler;
 
-import static com.sun.xml.internal.fastinfoset.stax.events.Util.isEmptyString;
 import static li.strolch.privilege.base.PrivilegeConstants.LOCATION;
 import static li.strolch.privilege.base.PrivilegeConstants.REALM;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -46,13 +46,13 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	@Override
 	protected String getFirstName(String username, Attributes attrs) throws NamingException {
 		String value = getLdapString(attrs, "givenName");
-		return isEmptyString(value) ? username : value;
+		return isEmpty(value) ? username : value;
 	}
 
 	@Override
 	protected String getLastName(String username, Attributes attrs) throws NamingException {
 		String value = getLdapString(attrs, "sn");
-		return isEmptyString(value) ? username : value;
+		return isEmpty(value) ? username : value;
 	}
 
 	@Override
