@@ -191,11 +191,6 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return instance;
 	}
 
-	@Override
-	public ComponentContainer getContainer() {
-		return super.getContainer();
-	}
-
 	public StrolchAgent getAgent() {
 		return super.getContainer().getAgent();
 	}

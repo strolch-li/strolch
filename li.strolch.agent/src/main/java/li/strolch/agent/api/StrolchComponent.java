@@ -101,7 +101,7 @@ public class StrolchComponent {
 	 *
 	 * @return the reference to the container
 	 */
-	protected ComponentContainer getContainer() {
+	public ComponentContainer getContainer() {
 		DBC.PRE.assertNotNull("container is null!", this.container);
 		return this.container;
 	}
@@ -111,7 +111,7 @@ public class StrolchComponent {
 	 *
 	 * @return the component's configuration
 	 */
-	protected ComponentConfiguration getConfiguration() {
+	public ComponentConfiguration getConfiguration() {
 		return this.configuration;
 	}
 
