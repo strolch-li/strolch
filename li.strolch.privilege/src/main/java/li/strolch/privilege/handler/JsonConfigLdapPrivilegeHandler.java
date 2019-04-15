@@ -1,9 +1,9 @@
 package li.strolch.privilege.handler;
 
-import static com.sun.xml.internal.fastinfoset.stax.events.Util.isEmptyString;
 import static java.lang.String.join;
 import static java.util.stream.Collectors.toSet;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -78,13 +78,13 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	@Override
 	protected String getFirstName(String username, Attributes attrs) throws NamingException {
 		String value = getLdapString(attrs, "givenName");
-		return isEmptyString(value) ? username : value;
+		return isEmpty(value) ? username : value;
 	}
 
 	@Override
 	protected String getLastName(String username, Attributes attrs) throws NamingException {
 		String value = getLdapString(attrs, "sn");
-		return isEmptyString(value) ? username : value;
+		return isEmpty(value) ? username : value;
 	}
 
 	@Override
