@@ -24,6 +24,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	private JsonObject configJ;
 	private Set<String> ldapGroupNames;
 	private String realm;
+	private HashMap<String, String> userLdapGroupOverrides;
 
 	@Override
 	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
@@ -56,6 +57,9 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		}
 
 		// validate the configuration
+		if (!this.configJ.has("ldapGroupConfigs") || !this.configJ.get("ldapGroupConfigs").isJsonObject())
+			throw new IllegalStateException("JSON config is missing ldapGroupConfigs element!");
+
 		this.ldapGroupNames = this.configJ.keySet();
 		if (this.ldapGroupNames.isEmpty())
 			throw new IllegalStateException(
@@ -72,6 +76,16 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 					|| config.get(LOCATION).getAsJsonArray().size() == 0)
 				throw new IllegalStateException("LDAP Group " + name
 						+ " is missing a roles attribute, or it is not an array or the array is empty");
+		}
+
+		this.userLdapGroupOverrides = new HashMap<>();
+		if (this.configJ.has("userLdapGroupOverrides")) {
+			JsonObject userLdapGroupOverrides = this.configJ.get("userLdapGroupOverrides").getAsJsonObject();
+			for (String username : userLdapGroupOverrides.keySet()) {
+				String group = userLdapGroupOverrides.get(username).getAsString();
+				logger.info("Registered LDAP group override for user " + username + " to group " + group);
+				this.userLdapGroupOverrides.put(username, group);
+			}
 		}
 	}
 
@@ -97,6 +111,13 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		Set<String> ldapGroups = LdapHelper.getLdapGroups(attrs);
 		logger.info("User " + username + " has LDAP Groups: ");
 		ldapGroups.forEach(s -> logger.info("- " + s));
+
+		if (this.userLdapGroupOverrides.containsKey(username)) {
+			String overrideGroup = this.userLdapGroupOverrides.get(username);
+			ldapGroups.clear();
+			ldapGroups.add(overrideGroup);
+			logger.info("Overriding LDAP group for user " + username + " to " + overrideGroup);
+		}
 
 		Set<String> relevantLdapGroups = ldapGroups.stream().filter(s -> this.ldapGroupNames.contains(s))
 				.collect(toSet());
