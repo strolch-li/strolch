@@ -21,7 +21,7 @@ import li.strolch.utils.dbc.DBC;
 public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	private Locale defaultLocale;
-	private JsonObject configJ;
+	private JsonObject ldapGroupConfigs;
 	private Set<String> ldapGroupNames;
 	private String realm;
 	private HashMap<String, String> userLdapGroupOverrides;
@@ -50,24 +50,26 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 							.getAbsolutePath());
 
 		// parse the configuration file
+		JsonObject configJ;
 		try (FileReader reader = new FileReader(configFile)) {
-			this.configJ = new JsonParser().parse(reader).getAsJsonObject();
+			configJ = new JsonParser().parse(reader).getAsJsonObject();
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to read config file " + configFile.getAbsolutePath(), e);
 		}
 
 		// validate the configuration
-		if (!this.configJ.has("ldapGroupConfigs") || !this.configJ.get("ldapGroupConfigs").isJsonObject())
+		if (!configJ.has("ldapGroupConfigs") || !configJ.get("ldapGroupConfigs").isJsonObject())
 			throw new IllegalStateException("JSON config is missing ldapGroupConfigs element!");
 
-		this.ldapGroupNames = this.configJ.keySet();
+		this.ldapGroupConfigs = configJ.get("ldapGroupConfigs").getAsJsonObject();
+		this.ldapGroupNames = ldapGroupConfigs.keySet();
 		if (this.ldapGroupNames.isEmpty())
 			throw new IllegalStateException(
 					"No LDAP group names are defined in config file " + configFile.getAbsolutePath());
 
 		// validate the configuration
 		for (String name : this.ldapGroupNames) {
-			JsonObject config = this.configJ.get(name).getAsJsonObject();
+			JsonObject config = ldapGroupConfigs.get(name).getAsJsonObject();
 			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray()
 					|| config.get(LOCATION).getAsJsonArray().size() == 0)
 				throw new IllegalStateException("LDAP Group " + name
@@ -79,8 +81,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		}
 
 		this.userLdapGroupOverrides = new HashMap<>();
-		if (this.configJ.has("userLdapGroupOverrides")) {
-			JsonObject userLdapGroupOverrides = this.configJ.get("userLdapGroupOverrides").getAsJsonObject();
+		if (configJ.has("userLdapGroupOverrides")) {
+			JsonObject userLdapGroupOverrides = configJ.get("userLdapGroupOverrides").getAsJsonObject();
 			for (String username : userLdapGroupOverrides.keySet()) {
 				String group = userLdapGroupOverrides.get(username).getAsString();
 				logger.info("Registered LDAP group override for user " + username + " to group " + group);
@@ -140,7 +142,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		Set<String> strolchRoles = new HashSet<>();
 
 		for (String relevantLdapGroup : ldapGroups) {
-			JsonObject mappingJ = this.configJ.get(relevantLdapGroup).getAsJsonObject();
+			JsonObject mappingJ = this.ldapGroupConfigs.get(relevantLdapGroup).getAsJsonObject();
 			mappingJ.get(ROLES).getAsJsonArray().forEach(e -> strolchRoles.add(e.getAsString()));
 		}
 
@@ -155,7 +157,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		Set<String> locations = new HashSet<>();
 
 		for (String ldapGroup : ldapGroups) {
-			JsonObject mappingJ = this.configJ.get(ldapGroup).getAsJsonObject();
+			JsonObject mappingJ = this.ldapGroupConfigs.get(ldapGroup).getAsJsonObject();
 			mappingJ.get(LOCATION).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
 			JsonElement defaultLocationJ = mappingJ.get(DEFAULT_LOCATION);
 			if (defaultLocationJ != null && !defaultLocationJ.isJsonNull()) {
