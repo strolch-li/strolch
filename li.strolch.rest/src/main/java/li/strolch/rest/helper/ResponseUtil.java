@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
+import li.strolch.service.JsonServiceResult;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.helper.ExceptionHelper;
@@ -104,6 +105,12 @@ public class ResponseUtil {
 		String json = new Gson().toJson(response);
 
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
+	public static Response toResponse(JsonServiceResult svcResult) {
+		if (svcResult.isOk())
+			return toResponse(DATA, svcResult.getResult());
+		return toResponse((ServiceResult) svcResult);
 	}
 
 	public static Response toResponse(ServiceResult svcResult) {
