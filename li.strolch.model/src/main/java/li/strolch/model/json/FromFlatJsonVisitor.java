@@ -1,6 +1,7 @@
 package li.strolch.model.json;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gson.JsonElement;
@@ -24,7 +25,7 @@ import li.strolch.utils.dbc.DBC;
  * </p>
  * <p>
  * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the {@link #ignoreParameter(String,
- * * String)} and {@link #ignoreBag(String)} methods
+ * String)} and {@link #ignoreBag(String)} methods
  * </p>
  * <p>
  * {@link Parameter} can be made optional by using the {@link #optionalParameter(String, String)} method
@@ -34,18 +35,25 @@ import li.strolch.utils.dbc.DBC;
  */
 public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
+	private Set<String> ignoredBagTypes;
 	private MapOfSets<String, String> ignoredKeys;
 	private MapOfSets<String, String> optionalKeys;
+	private MapOfSets<String, String> nonEmptyParameters;
 
 	private JsonObject srcObject;
 
 	public FromFlatJsonVisitor() {
+		this.ignoredBagTypes = new HashSet<>();
+		this.nonEmptyParameters = new MapOfSets<>();
 		this.ignoredKeys = new MapOfSets<>();
 		this.optionalKeys = new MapOfSets<>();
+		this.nonEmptyParameters = new MapOfSets<>();
 	}
 
 	public FromFlatJsonVisitor(JsonObject srcObject) {
 		this.srcObject = srcObject;
+		this.ignoredBagTypes = new HashSet<>();
+		this.nonEmptyParameters = new MapOfSets<>();
 		this.ignoredKeys = new MapOfSets<>();
 		this.optionalKeys = new MapOfSets<>();
 	}
@@ -53,6 +61,16 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 	public FromFlatJsonVisitor(MapOfSets<String, String> ignoredParams) {
 		this.ignoredKeys = new MapOfSets<>();
 		this.optionalKeys = new MapOfSets<>();
+	}
+
+	public FromFlatJsonVisitor nonEmptyParameter(String bagId, String paramId) {
+		this.nonEmptyParameters.addElement(bagId, paramId);
+		return this;
+	}
+
+	public FromFlatJsonVisitor ignoreBagsOfType(String bagType) {
+		this.ignoredBagTypes.add(bagType);
+		return this;
 	}
 
 	public FromFlatJsonVisitor ignoreBag(String bagId) {
@@ -131,6 +149,10 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 			ParameterBag parameterBag = dstElement.getParameterBag(bagId);
 
+			// see if we want to ignore bags of this type
+			if (this.ignoredBagTypes.contains(parameterBag.getType()))
+				continue;
+
 			Set<String> parameterKeySet = parameterBag.getParameterKeySet();
 			for (String paramId : parameterKeySet) {
 
@@ -140,8 +162,10 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 				JsonElement jsonElement = this.srcObject.get(paramId);
 				if (jsonElement == null) {
+
 					if (this.optionalKeys.containsElement(bagId, paramId))
 						continue;
+
 					throw new StrolchModelException(
 							"JsonObject is missing member " + paramId + " for " + parameterBag.getLocator() + "/"
 									+ paramId);
@@ -154,8 +178,16 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 				}
 
 				Parameter<?> parameter = parameterBag.getParameter(paramId);
+
+				String asString = jsonElement.getAsString();
+				if (asString.isEmpty() && this.nonEmptyParameters.containsElement(bagId, paramId)) {
+					throw new StrolchModelException(
+							"JsonElement " + paramId + " is required to be a non empty value for " + parameter
+									.getLocator());
+				}
+
 				try {
-					parameter.setValueFromString(jsonElement.getAsString());
+					parameter.setValueFromString(asString);
 				} catch (Exception e) {
 					throw new IllegalStateException("Failed to set parameter " + parameter.getLocator(), e);
 				}
