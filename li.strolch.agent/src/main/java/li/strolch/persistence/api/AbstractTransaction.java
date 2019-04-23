@@ -311,7 +311,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void addCommand(Command command) {
+		assertNotReadOnly();
 		this.commands.add(command);
+	}
+
+	private void assertNotReadOnly() {
+		DBC.PRE.assertFalse("TX is marked as read-only, can not add commands!",
+				this.closeStrategy == TransactionCloseStrategy.READ_ONLY);
 	}
 
 	@Override
@@ -958,6 +964,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void addOrUpdate(Resource resource) throws StrolchModelException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		if (hasResource(resource.getType(), resource.getId()) && !getObjectFilter()
 				.hasElement(Tags.RESOURCE, resource.getLocator()))
@@ -968,6 +975,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void addOrUpdate(Order order) throws StrolchModelException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("order must not be null", order);
 		if (hasOrder(order.getType(), order.getId()) && !getObjectFilter().hasElement(Tags.ORDER, order.getLocator()))
 			getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
@@ -977,6 +985,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void addOrUpdate(Activity activity) throws StrolchModelException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		if (hasActivity(activity.getType(), activity.getId()) && !getObjectFilter()
 				.hasElement(Tags.ACTIVITY, activity.getLocator()))
@@ -987,42 +996,49 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void add(Resource resource) throws StrolchModelException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().add(Tags.RESOURCE, resource.getLocator(), resource);
 	}
 
 	@Override
 	public void add(Order order) throws StrolchException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().add(Tags.ORDER, order.getLocator(), order);
 	}
 
 	@Override
 	public void add(Activity activity) throws StrolchException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().add(Tags.ACTIVITY, activity.getLocator(), activity);
 	}
 
 	@Override
 	public void update(Resource resource) throws StrolchException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().update(Tags.RESOURCE, resource.getLocator(), resource);
 	}
 
 	@Override
 	public void update(Order order) {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
 	}
 
 	@Override
 	public void update(Activity activity) throws StrolchException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().update(Tags.ACTIVITY, activity.getLocator(), activity);
 	}
 
 	@Override
 	public void remove(Resource resource) throws StrolchException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().remove(Tags.RESOURCE, resource.getLocator(), resource);
 		if (this.resourceCache != null) {
@@ -1032,6 +1048,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void remove(Order order) throws StrolchException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().remove(Tags.ORDER, order.getLocator(), order);
 		if (this.orderCache != null) {
@@ -1041,6 +1058,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void remove(Activity activity) throws StrolchException {
+		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().remove(Tags.ACTIVITY, activity.getLocator(), activity);
 		if (this.activityCache != null) {
@@ -1273,7 +1291,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		try {
 			this.txResult.setState(TransactionState.CLOSING);
 
-			if (this.closeStrategy == TransactionCloseStrategy.READ_ONLY) {
+			if (this.closeStrategy != TransactionCloseStrategy.READ_ONLY) {
 				if (!this.commands.isEmpty()) {
 					autoCloseableRollback();
 					String msg = "There are commands registered on a read-only transaction. Changing to rollback! Did you forget to commit?";

@@ -1,5 +1,6 @@
 package li.strolch.runtime.query.inmemory;
 
+import static java.util.Arrays.asList;
 import static li.strolch.agent.ComponentContainerTest.PATH_EMPTY_CONTAINER;
 import static li.strolch.model.query.ParameterSelection.*;
 import static li.strolch.utils.StringMatchMode.ci;
@@ -7,7 +8,6 @@ import static li.strolch.utils.StringMatchMode.es;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import li.strolch.RuntimeMock;
@@ -48,16 +48,16 @@ public class InMemoryActivityQueryTest {
 
 		certificate = login(runtimeMock.getAgent());
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(false)) {
 			getActivities().forEach(tx::add);
 			tx.add(getBallActivity());
 			tx.commitOnClose();
 		}
 	}
 
-	private static StrolchTransaction openTx() {
+	private static StrolchTransaction openTx(boolean readOnly) {
 		return runtimeMock.getAgent().getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
-				.openTx(certificate, "test", true);
+				.openTx(certificate, "test", readOnly);
 	}
 
 	@AfterClass
@@ -69,7 +69,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryById() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType1");
 			activityQuery.with(new IdSelection("@1"));
@@ -83,7 +83,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByIdOr() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType2");
 			activityQuery.or().with(new IdSelection("@3"), new IdSelection("@4"));
@@ -98,7 +98,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByIdAnd() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType2");
 			activityQuery.and().with(new IdSelection("@3"), new NameSelection("Activity 3", es()));
@@ -112,7 +112,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldNotQueryByIdAnd() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> activityQuery = ActivityQuery.query("MyType1");
 			activityQuery.and().with(new IdSelection("@3"), new NameSelection("@4", es()));
@@ -125,7 +125,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByParameter() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
 			ballQuery.and().with(
@@ -142,7 +142,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByListParameter() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> ballQuery;
 			List<Activity> result;
@@ -150,18 +150,17 @@ public class InMemoryActivityQueryTest {
 			// string list
 			{
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a", "z")));
+				ballQuery.and().with(stringListSelection("parameters", "stringListValues", asList("a", "z")));
 				result = tx.doQuery(ballQuery);
 				assertEquals(0, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(stringListSelection("parameters", "stringListValues", Arrays.asList("a")));
+				ballQuery.and().with(stringListSelection("parameters", "stringListValues", asList("a")));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and()
-						.with(stringListSelection("parameters", "stringListValues", Arrays.asList("c", "b", "a")));
+				ballQuery.and().with(stringListSelection("parameters", "stringListValues", asList("c", "b", "a")));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 			}
@@ -169,17 +168,17 @@ public class InMemoryActivityQueryTest {
 			// integer list
 			{
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1, 5)));
+				ballQuery.and().with(integerListSelection("parameters", "intListValues", asList(1, 5)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(0, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(1)));
+				ballQuery.and().with(integerListSelection("parameters", "intListValues", asList(1)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(integerListSelection("parameters", "intListValues", Arrays.asList(3, 2, 1)));
+				ballQuery.and().with(integerListSelection("parameters", "intListValues", asList(3, 2, 1)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 			}
@@ -187,17 +186,17 @@ public class InMemoryActivityQueryTest {
 			// float list
 			{
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0, 8.0)));
+				ballQuery.and().with(floatListSelection("parameters", "floatListValues", asList(4.0, 8.0)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(0, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(4.0)));
+				ballQuery.and().with(floatListSelection("parameters", "floatListValues", asList(4.0)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(floatListSelection("parameters", "floatListValues", Arrays.asList(6.2, 5.1, 4.0)));
+				ballQuery.and().with(floatListSelection("parameters", "floatListValues", asList(6.2, 5.1, 4.0)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 			}
@@ -205,17 +204,17 @@ public class InMemoryActivityQueryTest {
 			// long list
 			{
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L, 11L)));
+				ballQuery.and().with(longListSelection("parameters", "longListValues", asList(8L, 11L)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(0, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(8L)));
+				ballQuery.and().with(longListSelection("parameters", "longListValues", asList(8L)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 
 				ballQuery = ActivityQuery.query("Ball");
-				ballQuery.and().with(longListSelection("parameters", "longListValues", Arrays.asList(10L, 9L, 8L)));
+				ballQuery.and().with(longListSelection("parameters", "longListValues", asList(10L, 9L, 8L)));
 				result = tx.doQuery(ballQuery);
 				assertEquals(1, result.size());
 			}
@@ -225,7 +224,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByNullParameter1() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
 			ballQuery.and().with( //
@@ -238,7 +237,7 @@ public class InMemoryActivityQueryTest {
 
 	@Test
 	public void shouldQueryByNullParameter2() {
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
 			ballQuery.and().with( //
@@ -251,7 +250,7 @@ public class InMemoryActivityQueryTest {
 
 	@Test
 	public void shouldQueryByNullParameter3() {
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
 			ballQuery.and().with( //
@@ -265,7 +264,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByName() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> ballQuery = ActivityQuery.query("Ball");
 			ballQuery.with(new NameSelection("ball ", ci()));
@@ -278,7 +277,7 @@ public class InMemoryActivityQueryTest {
 	@Test
 	public void shouldQueryByState() {
 
-		try (StrolchTransaction tx = openTx()) {
+		try (StrolchTransaction tx = openTx(true)) {
 
 			ActivityQuery<Activity> ballQuery = ActivityQuery.query("MyType1");
 			ballQuery.with(new ActivityStateSelection(State.STOPPED));
@@ -300,12 +299,10 @@ public class InMemoryActivityQueryTest {
 		bag.addParameter(new StringParameter("color", "Color", "red"));
 		bag.addParameter(new BooleanParameter("forChildren", "Color", true));
 		bag.addParameter(new FloatParameter("diameter", "Color", 22.0));
-		bag.addParameter(
-				new StringListParameter("stringListValues", "List of String Values", Arrays.asList("a", "b", "c")));
-		bag.addParameter(new IntegerListParameter("intListValues", "List of Integer Values", Arrays.asList(1, 2, 3)));
-		bag.addParameter(
-				new FloatListParameter("floatListValues", "List of Float Values", Arrays.asList(4.0, 5.1, 6.2)));
-		bag.addParameter(new LongListParameter("longListValues", "List of Long Values", Arrays.asList(8L, 9L, 10L)));
+		bag.addParameter(new StringListParameter("stringListValues", "List of String Values", asList("a", "b", "c")));
+		bag.addParameter(new IntegerListParameter("intListValues", "List of Integer Values", asList(1, 2, 3)));
+		bag.addParameter(new FloatListParameter("floatListValues", "List of Float Values", asList(4.0, 5.1, 6.2)));
+		bag.addParameter(new LongListParameter("longListValues", "List of Long Values", asList(8L, 9L, 10L)));
 		res1.addParameterBag(bag);
 		return res1;
 	}
