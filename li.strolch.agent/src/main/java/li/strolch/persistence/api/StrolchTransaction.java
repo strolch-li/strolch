@@ -32,6 +32,7 @@ import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.query.ActivityQuery;
 import li.strolch.model.query.AuditQuery;
 import li.strolch.model.query.OrderQuery;
@@ -39,6 +40,7 @@ import li.strolch.model.query.ResourceQuery;
 import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.model.visitor.ResourceVisitor;
+import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
@@ -160,6 +162,18 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the reference to the container
 	 */
 	ComponentContainer getContainer();
+
+	/**
+	 * Instantiates the policy using the given {@link PolicyDef}
+	 *
+	 * @param policyDef
+	 * 		the policy definition
+	 * @param <T>
+	 * 		the type of policy to return
+	 *
+	 * @return the policy
+	 */
+	<T extends StrolchPolicy> T getPolicy(PolicyDef policyDef);
 
 	/**
 	 * Returns the currently set {@link TransactionCloseStrategy}

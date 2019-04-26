@@ -39,9 +39,12 @@ import li.strolch.model.audit.Audit;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.query.*;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.policy.PolicyHandler;
+import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
@@ -358,6 +361,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public ComponentContainer getContainer() {
 		return this.container;
+	}
+
+	@Override
+	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef) {
+		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, this);
 	}
 
 	private void assertQueryAllowed(StrolchQuery query) {

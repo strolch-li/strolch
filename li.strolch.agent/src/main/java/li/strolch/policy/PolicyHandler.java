@@ -25,17 +25,6 @@ import li.strolch.persistence.api.StrolchTransaction;
  * </p>
  *
  * <p>
- * Objects which require delegation can use a {@link PolicyConfiguration} element and then retrieve a StrolchPolicy
- * instance from this {@link PolicyHandler}.
- * </p>
- *
- * <p>
- * {@link PolicyConfiguration} have a mapping of a policy type, i.e. an interface for a specific delegation. This
- * interface has concrete implementations which are then returned by the {@link PolicyHandler} depending on the current
- * configuration
- * </p>
- *
- * <p>
  * The resolving of a policy instance is handled by a {@link PolicyDefVisitor}
  * <p>
  *
