@@ -78,8 +78,15 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 
 	private void updateVersion(StrolchTransaction tx, T element, boolean deleted) {
 		if (this.realm.isVersioningEnabled()) {
-			if (!element.hasVersion())
-				element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
+			if (!element.hasVersion()) {
+				T current = getBy(tx, element.getType(), element.getId(), true);
+				if (current.hasVersion()) {
+					element.setVersion(current.getVersion());
+				} else {
+					int currentVersion = getLatestVersionFor(tx, element.getType(), element.getId());
+					Version.updateVersionFor(element, currentVersion, tx.getCertificate().getUsername(), deleted);
+				}
+			}
 			Version.updateVersionFor(element, tx.getCertificate().getUsername(), deleted);
 		} else {
 			element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
