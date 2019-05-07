@@ -66,6 +66,22 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		this.privilegeHandler = initializeFromXml(configuration, privilegeConfigFile);
 	}
 
+	@Override
+	public void reloadConfiguration() {
+
+		try {
+			runAsAgent(ctx -> this.privilegeHandler.persistSessions(ctx.getCertificate(), getClass().getName()));
+		} catch (Exception e) {
+			logger.error("Failed to persist sessions", e);
+		}
+
+		ComponentConfiguration configuration = getConfiguration();
+		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
+		File privilegeConfigFile = configuration
+				.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML, runtimeConfiguration);
+		this.privilegeHandler = initializeFromXml(configuration, privilegeConfigFile);
+	}
+
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
 	 *

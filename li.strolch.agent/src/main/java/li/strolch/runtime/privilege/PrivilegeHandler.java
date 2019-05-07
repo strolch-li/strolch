@@ -30,6 +30,11 @@ import li.strolch.runtime.StrolchConstants;
 public interface PrivilegeHandler {
 
 	/**
+	 * Reloads the configuration, by re-initializing the underlying privilege handler
+	 */
+	void reloadConfiguration();
+
+	/**
 	 * Authenticate a user
 	 *
 	 * @param username
