@@ -381,6 +381,7 @@ public class StrolchElementFromJsonVisitor {
 
 		int v = versionJ.get(Json.VERSION).getAsInt();
 		String createdBy = versionJ.get(Json.CREATED_BY).getAsString();
+		String updatedBy = versionJ.has(Json.UPDATED_BY) ? versionJ.get(Json.UPDATED_BY).getAsString() : createdBy;
 
 		String createdS;
 		if (versionJ.has("createdAt"))
@@ -399,7 +400,7 @@ public class StrolchElementFromJsonVisitor {
 
 		boolean deleted = versionJ.get(Json.DELETED).getAsBoolean();
 
-		Version version = new Version(rootElement.getLocator(), v, createdBy, created, updated, deleted);
+		Version version = new Version(rootElement.getLocator(), v, createdBy, updatedBy, created, updated, deleted);
 		rootElement.setVersion(version);
 	}
 }

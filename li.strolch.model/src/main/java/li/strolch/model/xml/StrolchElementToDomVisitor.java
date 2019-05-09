@@ -232,6 +232,7 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 		Element element = document.createElement(Tags.VERSION);
 		element.setAttribute(Tags.VERSION, Integer.toString(version.getVersion()));
 		element.setAttribute(Tags.CREATED_BY, version.getCreatedBy());
+		element.setAttribute(Tags.UPDATED_BY, version.getUpdatedBy());
 		element.setAttribute(Tags.CREATED, ISO8601FormatFactory.getInstance().formatDate(version.getCreated()));
 		element.setAttribute(Tags.UPDATED, ISO8601FormatFactory.getInstance().formatDate(version.getUpdated()));
 		element.setAttribute(Tags.DELETED, Boolean.toString(version.isDeleted()));

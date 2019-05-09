@@ -32,6 +32,7 @@ public class Version {
 	private final Locator locator;
 	private final int version;
 	private final String createdBy;
+	private final String updatedBy;
 	private final Date created;
 	private final Date updated;
 	private final boolean deleted;
@@ -41,11 +42,13 @@ public class Version {
 	 *
 	 * @param version
 	 * 		the integer version which must be >= 0 and should be incremented for each new version of an object
-	 * @param created
+	 * @param createdBy
 	 * 		the username of the creator of this object
+	 * @param updatedBy
+	 * 		the username of the updater of this object
 	 */
-	public Version(Locator locator, int version, String created, boolean deleted) {
-		this(locator, version, created, new Date(), new Date(), deleted);
+	public Version(Locator locator, int version, String createdBy, String updatedBy, boolean deleted) {
+		this(locator, version, createdBy, updatedBy, new Date(), new Date(), deleted);
 	}
 
 	/**
@@ -55,19 +58,24 @@ public class Version {
 	 * 		the integer version which must be >= 0 and should be incremented for each new version of an object
 	 * @param createdBy
 	 * 		the username of the creator of this object
+	 * @param updatedBy
+	 * 		the username of the updater of this object
 	 * @param created
 	 * 		date when the version was created
 	 * @param updated
 	 * 		date when the version was updated
 	 */
-	public Version(Locator locator, int version, String createdBy, Date created, Date updated, boolean deleted) {
+	public Version(Locator locator, int version, String createdBy, String updatedBy, Date created, Date updated,
+			boolean deleted) {
 		DBC.PRE.assertTrue("Version must by >= 0", version >= 0);
 		DBC.PRE.assertNotNull("locator must be set!", locator);
 		DBC.PRE.assertNotNull("createdBy must be set!", createdBy);
+		DBC.PRE.assertNotNull("updatedBy must be set!", updatedBy);
 		DBC.PRE.assertNotNull("createdAt must be set!", created);
 		this.locator = locator;
 		this.version = version;
 		this.createdBy = createdBy;
+		this.updatedBy = updatedBy;
 		this.created = created;
 		this.updated = updated;
 		this.deleted = deleted;
@@ -129,6 +137,15 @@ public class Version {
 	}
 
 	/**
+	 * Returns the username of the updater
+	 *
+	 * @return the username of the updater
+	 */
+	public String getUpdatedBy() {
+		return this.updatedBy;
+	}
+
+	/**
 	 * Returns the date when this version was created
 	 *
 	 * @return the date when this version was created
@@ -187,6 +204,8 @@ public class Version {
 		builder.append(this.locator);
 		builder.append(", createdBy=");
 		builder.append(this.createdBy);
+		builder.append(", updatedBy=");
+		builder.append(this.updatedBy);
 		builder.append(", created=");
 		builder.append(ISO8601FormatFactory.getInstance().formatDate(this.created));
 		builder.append(", updated=");
@@ -200,15 +219,15 @@ public class Version {
 	/**
 	 * Returns the next version, i.e. this version incremented by 1
 	 *
-	 * @param username
-	 * 		the username to set
+	 * @param updatedBy
+	 * 		the updatedBy to set
 	 * @param deleted
 	 * 		the deleted flag to set
 	 *
 	 * @return the next version
 	 */
-	public Version next(String username, boolean deleted) {
-		return new Version(this.locator, getNextVersion(), username, deleted);
+	public Version next(String updatedBy, boolean deleted) {
+		return new Version(this.locator, getNextVersion(), this.createdBy, updatedBy, deleted);
 	}
 
 	/**
@@ -220,7 +239,7 @@ public class Version {
 	 * 		the username of the user who created this version of the object
 	 */
 	public static void setInitialVersionFor(StrolchRootElement element, String username) {
-		Version version = new Version(element.getLocator(), 0, username, false);
+		Version version = new Version(element.getLocator(), 0, username, username, false);
 		element.setVersion(version);
 	}
 
@@ -230,19 +249,21 @@ public class Version {
 	 *
 	 * @param element
 	 * 		the element for which to create a new version
-	 * @param username
+	 * @param updatedBy
 	 * 		the username of the user who created this version of the object
 	 * @param deleted
 	 * 		if true, then the version will be marked as deleted, i.e. this object was removed from the element maps
 	 */
-	public static void updateVersionFor(StrolchRootElement element, String username, boolean deleted) {
+	public static void updateVersionFor(StrolchRootElement element, String updatedBy, boolean deleted) {
 		Version version;
 		if (element.hasVersion()) {
-			int v = element.getVersion().getVersion() + 1;
-			Date created = element.getVersion().getCreated();
-			version = new Version(element.getLocator(), v, username, created, new Date(), deleted);
+			Version lastV = element.getVersion();
+			int v = lastV.getVersion() + 1;
+			Date created = lastV.getCreated();
+			version = new Version(element.getLocator(), v, lastV.getCreatedBy(), updatedBy, created, new Date(),
+					deleted);
 		} else {
-			version = new Version(element.getLocator(), 0, username, deleted);
+			version = new Version(element.getLocator(), 0, updatedBy, updatedBy, deleted);
 		}
 
 		element.setVersion(version);
@@ -254,22 +275,24 @@ public class Version {
 	 *
 	 * @param element
 	 * 		the element for which to create a new version
-	 * @param username
+	 * @param updatedBy
 	 * 		the username of the user who created this version of the object
 	 * @param version
 	 * 		the version to use
 	 * @param deleted
 	 * 		if true, then the version will be marked as deleted, i.e. this object was removed from the element maps
 	 */
-	public static void updateVersionFor(StrolchRootElement element, int version, String username, boolean deleted) {
+	public static void updateVersionFor(StrolchRootElement element, int version, String updatedBy, boolean deleted) {
 		if (version == -1)
 			version = 0;
 		Version v;
 		if (element.hasVersion()) {
-			Date created = element.getVersion().getCreated();
-			v = new Version(element.getLocator(), version, username, created, new Date(), deleted);
+			Version lastV = element.getVersion();
+			Date created = lastV.getCreated();
+			v = new Version(element.getLocator(), version, lastV.getCreatedBy(), updatedBy, created, new Date(),
+					deleted);
 		} else {
-			v = new Version(element.getLocator(), version, username, deleted);
+			v = new Version(element.getLocator(), version, updatedBy, updatedBy, deleted);
 		}
 
 		element.setVersion(v);

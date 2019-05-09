@@ -176,6 +176,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 		Version version = rootElement.getVersion();
 		this.writer.writeAttribute(Tags.VERSION, Integer.toString(version.getVersion()));
 		this.writer.writeAttribute(Tags.CREATED_BY, version.getCreatedBy());
+		this.writer.writeAttribute(Tags.UPDATED_BY, version.getUpdatedBy());
 		this.writer.writeAttribute(Tags.CREATED, ISO8601FormatFactory.getInstance().formatDate(version.getCreated()));
 		this.writer.writeAttribute(Tags.UPDATED, ISO8601FormatFactory.getInstance().formatDate(version.getUpdated()));
 		this.writer.writeAttribute(Tags.DELETED, Boolean.toString(version.isDeleted()));

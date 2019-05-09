@@ -27,7 +27,9 @@
     <xs:complexType name="VersionType">
         <xs:attribute type="xs:int" name="Version" use="required"/>
         <xs:attribute type="xs:string" name="CreatedBy" use="required"/>
-        <xs:attribute type="xs:dateTime" name="CreatedAt" use="required"/>
+        <xs:attribute type="xs:string" name="UpdatedBy" use="required"/>
+        <xs:attribute type="xs:dateTime" name="Created" use="required"/>
+        <xs:attribute type="xs:dateTime" name="Updated" use="required"/>
         <xs:attribute type="xs:string" name="Deleted" use="required"/>
     </xs:complexType>
 
@@ -186,6 +188,7 @@
             <xs:enumeration value="Boolean"/>
             <xs:enumeration value="Integer"/>
             <xs:enumeration value="Float"/>
+            <xs:enumeration value="Long"/>
             <xs:enumeration value="FloatList"/>
             <xs:enumeration value="StringSet"/>
         </xs:restriction>

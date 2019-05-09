@@ -708,6 +708,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		JsonObject versionJ = new JsonObject();
 		versionJ.addProperty(Json.VERSION, version.getVersion());
 		versionJ.addProperty(Json.CREATED_BY, version.getCreatedBy());
+		versionJ.addProperty(Json.UPDATED_BY, version.getUpdatedBy());
 		versionJ.addProperty(Json.CREATED, formatDate(version.getCreated()));
 		versionJ.addProperty(Json.UPDATED, formatDate(version.getUpdated()));
 		versionJ.addProperty(Json.DELETED, version.isDeleted());

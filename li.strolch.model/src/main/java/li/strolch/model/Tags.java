@@ -55,6 +55,7 @@ public class Tags {
 	public static final String CREATED = "Created";
 	public static final String UPDATED = "Updated";
 	public static final String CREATED_BY = "CreatedBy";
+	public static final String UPDATED_BY = "UpdatedBy";
 	public static final String DELETED = "Deleted";
 
 	public static final String TIME_ORDERING = "TimeOrdering";
@@ -123,6 +124,7 @@ public class Tags {
 		public static final String CREATED = "created";
 		public static final String UPDATED = "updated";
 		public static final String CREATED_BY = "createdBy";
+		public static final String UPDATED_BY = "updatedBy";
 		public static final String DELETED = "deleted";
 
 		public static final String LOCATOR = "locator";

@@ -366,6 +366,10 @@ public class StrolchElementFromDomVisitor {
 			int v = Integer.parseInt(versionElem.getAttribute(Tags.VERSION));
 			String createdBy = versionElem.getAttribute(Tags.CREATED_BY);
 
+			String updatedBy = versionElem.hasAttribute(Tags.UPDATED_BY) ?
+					versionElem.getAttribute(Tags.UPDATED_BY) :
+					createdBy;
+
 			String createdS;
 			if (versionElem.hasAttribute("CreatedAt"))
 				createdS = versionElem.getAttribute("CreatedAt");
@@ -382,7 +386,7 @@ public class StrolchElementFromDomVisitor {
 			}
 
 			boolean deleted = StringHelper.parseBoolean(versionElem.getAttribute(Tags.DELETED));
-			Version version = new Version(rootElement.getLocator(), v, createdBy, created, updated, deleted);
+			Version version = new Version(rootElement.getLocator(), v, createdBy, updatedBy, created, updated, deleted);
 
 			rootElement.setVersion(version);
 		}
