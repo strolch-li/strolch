@@ -20,16 +20,14 @@ import static li.strolch.utils.helper.StringHelper.DASH;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
+import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -54,11 +52,12 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 			Resource enumeration = tx.getResourceBy(TYPE_ENUMERATION, name, true);
 			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 
-			Set<String> parameterKeySet = enumValuesByLanguage.getParameterKeySet();
-			Map<String, String> values = new HashMap<>(parameterKeySet.size());
-			for (String paramKey : parameterKeySet) {
-				StringParameter enumParam = enumValuesByLanguage.getParameter(paramKey);
-				values.put(paramKey, enumParam.getValue());
+			List<Parameter<?>> parameters = enumValuesByLanguage.getParameters();
+			parameters.sort(Comparator.comparing(Parameter::getIndex));
+			Map<String, String> values = new HashMap<>(parameters.size());
+			for (Parameter<?> param : parameters) {
+				StringParameter enumParam = (StringParameter) param;
+				values.put(enumParam.getId(), enumParam.getValue());
 			}
 
 			return new StrolchEnum(name, locale, values);
