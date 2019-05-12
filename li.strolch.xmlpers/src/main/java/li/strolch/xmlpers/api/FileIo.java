@@ -50,16 +50,18 @@ public class FileIo {
 	private static final Logger logger = LoggerFactory.getLogger(FileIo.class);
 
 	private final File path;
+	private final File tmpPath;
 
 	public FileIo(File path) {
 		this.path = path;
+		this.tmpPath = new File(this.path.getParentFile(), ".tmp_" + this.path.getName());
 	}
 
 	public <T> void writeSax(PersistenceContext<T> ctx) {
 
-		XMLStreamWriter writer = null;
+		XMLStreamWriter writer;
 		try {
-			try (FileWriter fileWriter = new FileWriter(this.path);) {
+			try (FileWriter fileWriter = new FileWriter(this.tmpPath)) {
 
 				XMLOutputFactory factory = XMLOutputFactory.newInstance();
 				writer = factory.createXMLStreamWriter(fileWriter);
@@ -78,9 +80,16 @@ public class FileIo {
 				writer.flush();
 			}
 
+			if (!this.tmpPath.renameTo(this.path)) {
+				throw new IllegalStateException(
+						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
+			}
+
 		} catch (FactoryConfigurationError | XMLStreamException | IOException e) {
-			if (this.path.exists())
-				this.path.delete();
+			if (this.tmpPath.exists()) {
+				if (!this.tmpPath.delete())
+					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
+			}
 			String msg = "Writing to file failed due to internal error: {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, e.getMessage());
 			throw new XmlException(msg, e);
@@ -149,20 +158,25 @@ public class FileIo {
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
-			StreamResult result = new StreamResult(this.path);
+			StreamResult result = new StreamResult(this.tmpPath);
 			Source xmlSource = new DOMSource(document);
 			transformer.transform(xmlSource, result);
 
 			if (logger.isDebugEnabled()) {
-				String msg = MessageFormat.format("Wrote DOM to {0}", this.path.getAbsolutePath()); //$NON-NLS-1$
+				String msg = MessageFormat.format("Wrote DOM to {0}", this.tmpPath.getAbsolutePath()); //$NON-NLS-1$
 				logger.info(msg);
 			}
 
+			if (!this.tmpPath.renameTo(this.path)) {
+				throw new IllegalStateException(
+						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
+			}
+
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
-
-			if (this.path.exists())
-				this.path.delete();
-
+			if (this.tmpPath.exists()) {
+				if (!this.tmpPath.delete())
+					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
+			}
 			String msg = "Writing to file failed due to internal error: {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, e.getMessage());
 			throw new XmlException(msg, e);
