@@ -287,7 +287,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 							false)) {
 						tx.lock(activityLoc);
 
-						Activity activity = tx.findElement(activityLoc);
+						Activity activity = tx.findElement(activityLoc, true);
+						if (activity == null) {
+							return;
+						}
 
 						logger.info("Activity " + activity.getLocator() + " is in state " + activity.getState());
 
