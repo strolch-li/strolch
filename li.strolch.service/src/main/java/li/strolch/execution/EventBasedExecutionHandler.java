@@ -334,12 +334,25 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				return;
 			}
 
-			ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
-			command.setActivity(activity);
-			command.validate();
-			command.doCommand();
+			if (activity.getState().isExecuted()) {
 
-			tx.commitOnClose();
+				synchronized (this.registeredActivities) {
+					if (!this.registeredActivities.removeElement(realm, activityLoc))
+						logger.warn("Activity " + activityLoc + " already removed from registered activities!");
+				}
+
+				logger.info("Archiving activity " + activityLoc + " with state " + activity.getState());
+				archiveActivity(realm, activity.getLocator());
+
+			} else {
+
+				ExecuteActivityCommand command = new ExecuteActivityCommand(getContainer(), tx);
+				command.setActivity(activity);
+				command.validate();
+				command.doCommand();
+
+				tx.commitOnClose();
+			}
 		}
 	}
 
