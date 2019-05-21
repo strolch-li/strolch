@@ -1,5 +1,7 @@
 package li.strolch.search;
 
+import java.util.function.Supplier;
+
 import li.strolch.model.StrolchRootElement;
 
 /**
@@ -11,6 +13,10 @@ public interface SearchExpressions {
 
 	default <T extends StrolchRootElement> SearchExpression<T> not(SearchExpression<T> expression) {
 		return element -> !expression.matches(element);
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> predicate(Supplier<Boolean> predicate) {
+		return ExpressionsSupport.predicate(predicate);
 	}
 
 	default ExpressionBuilder id() {

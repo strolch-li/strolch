@@ -1,5 +1,7 @@
 package li.strolch.search;
 
+import java.util.function.Supplier;
+
 import li.strolch.model.*;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
@@ -12,6 +14,10 @@ public class ExpressionsSupport {
 
 	public static <T extends StrolchRootElement> SearchExpression<T> not(SearchExpression<T> expression) {
 		return element -> !expression.matches(element);
+	}
+
+	public static <T extends StrolchRootElement> SearchExpression<T> predicate(Supplier<Boolean> predicate) {
+		return element -> predicate.get();
 	}
 
 	public static <T extends StrolchRootElement> SearchExpression<T> id(SearchPredicate predicate) {
