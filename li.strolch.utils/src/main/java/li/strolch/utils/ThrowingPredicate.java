@@ -1,5 +1,7 @@
 package li.strolch.utils;
 
+import java.util.function.Predicate;
+
 @FunctionalInterface
 public interface ThrowingPredicate<T> extends Predicate<T> {
 
