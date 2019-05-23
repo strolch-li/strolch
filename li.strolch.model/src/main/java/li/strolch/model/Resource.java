@@ -144,7 +144,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		return new HashSet<>(this.timedStateMap.keySet());
 	}
 
-	public List<StrolchTimedState<IValue<?>>> getTimedStates() {
+	public List<StrolchTimedState<? extends IValue<?>>> getTimedStates() {
 		if (this.timedStateMap == null) {
 			return Collections.emptyList();
 		}

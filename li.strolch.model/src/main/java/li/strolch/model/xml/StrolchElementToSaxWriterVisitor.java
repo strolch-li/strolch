@@ -230,10 +230,10 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeTimedStates(Resource resource) throws XMLStreamException {
-		List<StrolchTimedState<IValue<?>>> timedStates = resource.getTimedStates();
-		for (StrolchTimedState<IValue<?>> timedState : timedStates) {
-			ITimeVariable<IValue<?>> timeEvolution = timedState.getTimeEvolution();
-			SortedSet<ITimeValue<IValue<?>>> values = timeEvolution.getValues();
+		List<StrolchTimedState<? extends IValue<?>>> timedStates = resource.getTimedStates();
+		for (StrolchTimedState<? extends IValue<?>> timedState : timedStates) {
+			ITimeVariable<? extends IValue<?>> timeEvolution = timedState.getTimeEvolution();
+			SortedSet<? extends ITimeValue<? extends IValue<?>>> values = timeEvolution.getValues();
 
 			writeStartStrolchElement(Tags.TIMED_STATE, values.isEmpty(), timedState);
 
@@ -246,7 +246,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 			if (timedState.getIndex() != 0)
 				this.writer.writeAttribute(Tags.INDEX, Integer.toString(timedState.getIndex()));
 
-			for (ITimeValue<IValue<?>> timeValue : values) {
+			for (ITimeValue<? extends IValue<?>> timeValue : values) {
 				this.writer.writeEmptyElement(Tags.VALUE);
 				this.writer
 						.writeAttribute(Tags.TIME, ISO8601FormatFactory.getInstance().formatDate(timeValue.getTime()));
