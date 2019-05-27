@@ -295,8 +295,10 @@ public class StrolchAgent {
 
 			try (InputStream stream = getClass().getResourceAsStream(AGENT_VERSION_PROPERTIES)) {
 				properties.load(stream);
-				AgentVersion agentVersion = new AgentVersion(
-						getStrolchConfiguration().getRuntimeConfiguration().getApplicationName(), properties);
+				RuntimeConfiguration runtimeConfiguration = getStrolchConfiguration().getRuntimeConfiguration();
+				AgentVersion agentVersion = new AgentVersion(runtimeConfiguration.getApplicationName(),
+						runtimeConfiguration.getEnvironment(), runtimeConfiguration.getLocale(),
+						runtimeConfiguration.getTimezone(), properties);
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
 				String msg = MessageFormat

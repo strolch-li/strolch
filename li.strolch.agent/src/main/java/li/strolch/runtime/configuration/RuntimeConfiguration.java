@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -93,16 +93,20 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		return this.locale;
 	}
 
+	public String getTimezone() {
+		return getString(RuntimeConfiguration.PROP_TIMEZONE, System.getProperty("user.timezone"));
+	}
+
 	/**
 	 * Returns the file in the config directory of the root of the application
-	 * 
+	 *
 	 * @param context
-	 *            short name to define who requires this file for error handling
+	 * 		short name to define who requires this file for error handling
 	 * @param fileName
-	 *            the relative name of the config file to return
+	 * 		the relative name of the config file to return
 	 * @param checkExists
-	 *            if true, then an exception is thrown, using the context as info, if the config file does not exist
-	 * 
+	 * 		if true, then an exception is thrown, using the context as info, if the config file does not exist
+	 *
 	 * @return the file in the config directory of the root of the application
 	 */
 	public File getConfigFile(String context, String fileName, boolean checkExists) {
@@ -117,14 +121,14 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	/**
 	 * Returns the file in the data directory of the root of the application
-	 * 
+	 *
 	 * @param context
-	 *            short name to define who requires this file for error handling
+	 * 		short name to define who requires this file for error handling
 	 * @param fileName
-	 *            the relative name of the data file to return
+	 * 		the relative name of the data file to return
 	 * @param checkExists
-	 *            if true, then an exception is thrown, using the context as info, if the data file does not exist
-	 * 
+	 * 		if true, then an exception is thrown, using the context as info, if the data file does not exist
+	 *
 	 * @return the file in the data directory of the root of the application
 	 */
 	public File getDataFile(String context, String fileName, boolean checkExists) {
@@ -139,14 +143,14 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	/**
 	 * Returns the directory in the data directory of the root of the application
-	 * 
+	 *
 	 * @param context
-	 *            short name to define who requires this directory for error handling
+	 * 		short name to define who requires this directory for error handling
 	 * @param dirName
-	 *            the relative name of the data directory to return
+	 * 		the relative name of the data directory to return
 	 * @param checkExists
-	 *            if true, then an exception is thrown, using the context as info, if the data directory does not exist
-	 * 
+	 * 		if true, then an exception is thrown, using the context as info, if the data directory does not exist
+	 *
 	 * @return the directory in the data directory of the root of the application
 	 */
 	public File getDataDir(String context, String dirName, boolean checkExists) {
