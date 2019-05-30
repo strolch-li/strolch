@@ -78,7 +78,10 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 		try {
 
 			Class<T> clazz = policyDef.accept(this);
-			Constructor<T> constructor = clazz.getConstructor(ComponentContainer.class, StrolchTransaction.class);
+			@SuppressWarnings("unchecked")
+			Constructor<T> constructor = (Constructor<T>) getConstructorForPolicy(clazz);
+			if (constructor.getParameterCount() == 1)
+				return constructor.newInstance(tx);
 			return constructor.newInstance(getContainer(), tx);
 
 		} catch (Exception e) {
@@ -190,12 +193,12 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 						Constructor<?> constructor;
 						try {
-							constructor = implClass.getConstructor(ComponentContainer.class, StrolchTransaction.class);
+							constructor = getConstructorForPolicy(implClass);
 						} catch (NoSuchMethodException e) {
 							throw new IllegalStateException(
 									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
 											+ " Key=" + key
-											+ " as constructor (ComponentContainer, StrolchTransaction) does not exist!");
+											+ " as constructor (StrolchTransaction) or (ComponentContainer, StrolchTransaction) does not exist!");
 						}
 
 						if (Modifier.isAbstract(constructor.getModifiers()) || Modifier
@@ -220,5 +223,28 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 								+ " due to " + e.getMessage(), e);
 			}
 		}
+	}
+
+	private Constructor<?> getConstructorForPolicy(Class<?> implClass) throws NoSuchMethodException {
+		Constructor<?> constructor = null;
+		Constructor<?>[] constructors = implClass.getConstructors();
+		for (Constructor<?> c : constructors) {
+			Class<?>[] parameterTypes = c.getParameterTypes();
+			if (parameterTypes.length == 1 && parameterTypes[0] == StrolchTransaction.class) {
+				constructor = c;
+				break;
+			}
+
+			if (parameterTypes.length == 2 && parameterTypes[0] == ComponentContainer.class
+					&& parameterTypes[1] == StrolchTransaction.class) {
+				constructor = c;
+				break;
+			}
+		}
+
+		if (constructor == null)
+			throw new NoSuchMethodException();
+
+		return constructor;
 	}
 }

@@ -55,6 +55,17 @@ public abstract class StrolchPolicy {
 	}
 
 	/**
+	 * Instantiate a new {@link StrolchPolicy}
+	 *
+	 * @param tx
+	 * 		the transaction for this policy
+	 */
+	public StrolchPolicy(StrolchTransaction tx) {
+		this.container = tx.getContainer();
+		this.tx = tx;
+	}
+
+	/**
 	 * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
 	 * runtime
 	 *
