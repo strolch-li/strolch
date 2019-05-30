@@ -48,9 +48,7 @@ public class ObjectHelper {
 				String[] rightArr = (String[]) right;
 
 				int i = 0;
-				Iterator<?> leftIter = leftCollection.iterator();
-				while (leftIter.hasNext()) {
-					Object l = leftIter.next();
+				for (Object l : leftCollection) {
 					Object r = rightArr[i];
 
 					// since we ignore case, we can toString()
