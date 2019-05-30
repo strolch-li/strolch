@@ -121,7 +121,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		}
 	}
 
-	protected User buildUserFromSearchResult(String username, SearchResult sr) throws NamingException {
+	protected User buildUserFromSearchResult(String username, SearchResult sr) throws Exception {
 		Attributes attrs = sr.getAttributes();
 
 		validateLdapUsername(username, attrs);
@@ -143,7 +143,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	}
 
 	protected abstract Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
-			Set<String> strolchRoles) throws NamingException;
+			Set<String> strolchRoles) throws Exception;
 
 	protected void validateLdapUsername(String username, Attributes attrs) throws NamingException {
 		Attribute sAMAccountName = attrs.get("sAMAccountName");

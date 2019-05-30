@@ -10,7 +10,8 @@ public class PrivilegeConstants {
 
 	public static final String REALM = "realm";
 	public static final String LOCATION = "location";
-	public static final String DEFAULT_LOCATION = "defaultLocation";
+	public static final String PRIMARY_LOCATION = "primaryLocation";
+	public static final String SECONDARY_LOCATIONS = "secondaryLocations";
 	public static final String ROLES = "roles";
 	public static final String EMAIL = "email";
 }

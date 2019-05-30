@@ -151,27 +151,39 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	@Override
 	protected Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
-			Set<String> strolchRoles) throws NamingException {
+			Set<String> strolchRoles) {
 
-		String defaultLocation = "";
+		String primaryLocation = "";
+		String secondaryLocations = "";
 		Set<String> locations = new HashSet<>();
 
 		for (String ldapGroup : ldapGroups) {
 			JsonObject mappingJ = this.ldapGroupConfigs.get(ldapGroup).getAsJsonObject();
 			mappingJ.get(LOCATION).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
-			JsonElement defaultLocationJ = mappingJ.get(DEFAULT_LOCATION);
-			if (defaultLocationJ != null && !defaultLocationJ.isJsonNull()) {
-				if (!defaultLocation.isEmpty())
-					logger.warn("Default location already set by previous LDAP Group config, overriding for LDAP Group "
+
+			JsonElement primaryLocationJ = mappingJ.get(PRIMARY_LOCATION);
+			if (primaryLocationJ != null && !primaryLocationJ.isJsonNull()) {
+				if (!primaryLocation.isEmpty())
+					logger.warn("Primary location already set by previous LDAP Group config, overriding for LDAP Group "
 							+ ldapGroup);
-				defaultLocation = defaultLocationJ.getAsString();
+				primaryLocation = primaryLocationJ.getAsString();
+			}
+
+			JsonElement secondaryLocationsJ = mappingJ.get(SECONDARY_LOCATIONS);
+			if (secondaryLocationsJ != null && !secondaryLocationsJ.isJsonNull()) {
+				if (!secondaryLocations.isEmpty())
+					logger.warn(
+							"Secondary locations already set by previous LDAP Group config, overriding for LDAP Group "
+									+ ldapGroup);
+				secondaryLocations = secondaryLocationsJ.getAsString();
 			}
 		}
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put(REALM, this.realm);
 		properties.put(LOCATION, join(",", locations));
-		properties.put(DEFAULT_LOCATION, defaultLocation);
+		properties.put(PRIMARY_LOCATION, primaryLocation);
+		properties.put(SECONDARY_LOCATIONS, secondaryLocations);
 		return properties;
 	}
 }
