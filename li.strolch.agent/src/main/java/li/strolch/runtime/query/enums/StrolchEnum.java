@@ -68,6 +68,10 @@ public class StrolchEnum {
 		this.localeL = localeL;
 	}
 
+	public boolean hasValue(String id) {
+		return this.values.containsKey(id);
+	}
+
 	public String getValue(String id) {
 		return this.values.get(id);
 	}
