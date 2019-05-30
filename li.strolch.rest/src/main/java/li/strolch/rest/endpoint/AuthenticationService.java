@@ -293,7 +293,7 @@ public class AuthenticationService {
 		loginResult.addProperty("username", certificate.getUsername());
 		loginResult.addProperty("firstname", certificate.getFirstname());
 		loginResult.addProperty("lastname", certificate.getLastname());
-		loginResult.addProperty("locale", certificate.getLocale().toString());
+		loginResult.addProperty("locale", certificate.getLocale().toLanguageTag());
 
 		if (!certificate.getPropertyMap().isEmpty()) {
 			JsonObject propObj = new JsonObject();

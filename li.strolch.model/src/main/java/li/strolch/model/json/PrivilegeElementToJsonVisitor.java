@@ -19,7 +19,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.addProperty("firstname", userRep.getFirstname());
 		jsonObject.addProperty("lastname", userRep.getLastname());
 		jsonObject.addProperty("userState", userRep.getUserState().name());
-		jsonObject.addProperty("locale", userRep.getLocale().toString());
+		jsonObject.addProperty("locale", userRep.getLocale().toLanguageTag());
 
 		JsonArray rolesArr = new JsonArray();
 		jsonObject.add("roles", rolesArr);

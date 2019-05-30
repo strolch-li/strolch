@@ -101,8 +101,8 @@ public class ReportResource {
 		if (localesF.exists()) {
 			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toString()))
-				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
+			if (localesJ.has(cert.getLocale().toLanguageTag()))
+				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
 		}
 
 		JsonArray result = new JsonArray();
@@ -156,8 +156,8 @@ public class ReportResource {
 		if (localesF.exists()) {
 			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toString()))
-				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
+			if (localesJ.has(cert.getLocale().toLanguageTag()))
+				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
 		}
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
@@ -255,8 +255,8 @@ public class ReportResource {
 		if (localesF.exists()) {
 			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toString()))
-				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
+			if (localesJ.has(cert.getLocale().toLanguageTag()))
+				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
 		}
 
 		long start = System.nanoTime();
@@ -375,8 +375,8 @@ public class ReportResource {
 		if (localesF.exists()) {
 			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toString()))
-				localeJ = localesJ.get(cert.getLocale().toString()).getAsJsonObject();
+			if (localesJ.has(cert.getLocale().toLanguageTag()))
+				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
 		}
 
 		// create CSV printer with header
