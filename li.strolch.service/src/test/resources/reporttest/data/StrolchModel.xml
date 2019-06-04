@@ -2,6 +2,50 @@
 <StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
               xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
 
+    <Resource Id="slotsByOrderUsageReport" Name="Slots by order usage report" Type="Report">
+
+        <ParameterBag Id="parameters" Name="parameters" Type="Parameters">
+            <Parameter Id="objectType" Hidden="true" Name="Object Type" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Slot"/>
+            <Parameter Id="descending" Name="Descending order" Type="Boolean" Value="true"/>
+        </ParameterBag>
+
+        <ParameterBag Id="joins" Name="Joins" Type="Joins">
+            <Parameter Id="Product" Index="0" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Slot"/>
+            <Parameter Id="Section" Index="10" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="Slot"/>
+            <Parameter Id="Storage" Index="5" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="Section"/>
+            <Parameter Id="Location" Hidden="true" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="Storage"/>
+        </ParameterBag>
+
+        <ParameterBag Id="additionalType" Name="Additional Type" Type="AdditionalType">
+            <Parameter Id="objectType" Hidden="true" Name="Object Type" Type="String" Interpretation="Order-Ref" Uom="Order" Value="Order"/>
+            <Parameter Id="joinParam" Name="Join Param" Type="String" Value="Bags/relations/product"/>
+            <Parameter Id="joinWith" Name="Join With" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/relations/product"/>
+        </ParameterBag>
+
+        <ParameterBag Id="additionalJoins" Name="Joins" Type="Joins">
+            <Parameter Id="Customer" Hidden="true" Name="Customer" Type="String" Interpretation="Resource-Ref" Uom="Customer" Value="Order"/>
+        </ParameterBag>
+
+        <ParameterBag Id="ordering" Name="Ordering" Type="Ordering">
+            <Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity"/>
+        </ParameterBag>
+
+        <ParameterBag Id="columns" Name="Display Columns" Type="Display">
+            <Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="$name"/>
+            <Parameter Id="storage" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="$name"/>
+            <Parameter Id="section" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="$name"/>
+            <Parameter Id="slot" Name="Slot" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="$name"/>
+            <Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="$name"/>
+            <Parameter Id="quantity" Name="Quantity" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/quantity"/>
+            <Parameter Id="firstName" Name="First Name" Type="String" Interpretation="Resource-Ref" Uom="Customer" Value="Bags/parameters/firstName"/>
+            <Parameter Id="lastName" Name="Last Name" Type="String" Interpretation="Resource-Ref" Uom="Customer" Value="Bags/parameters/lastName"/>
+        </ParameterBag>
+
+        <Policies>
+            <Policy Type="ReportPolicy" Value="java:li.strolch.report.policy.GenericReport"/>
+        </Policies>
+    </Resource>
+
     <Resource Id="stockReport" Name="Stock Report" Type="Report">
 
         <ParameterBag Id="parameters" Name="parameters" Type="Parameters">
@@ -232,7 +276,7 @@
         </ParameterBag>
     </Resource>
 
-    <Resource Id="slot005" Name="Slot 4" Type="Slot">
+    <Resource Id="slot005" Name="Slot 5" Type="Slot">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="0.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
@@ -244,7 +288,7 @@
         </ParameterBag>
     </Resource>
 
-    <Resource Id="slot006" Name="Slot 4" Type="Slot">
+    <Resource Id="slot006" Name="Slot 6" Type="Slot">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="22.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
@@ -255,5 +299,32 @@
             <Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value=""/>
         </ParameterBag>
     </Resource>
+
+    <Resource Id="customer1" Name="Customer Harry Barns" Type="Customer">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="firstName" Name="firstName" Type="String" Value="Harry"/>
+            <Parameter Id="lastName" Name="lastName" Type="String" Value="Barns"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="customer2" Name="Customer Geoffrey Bobcat" Type="Customer">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="firstName" Name="firstName" Type="String" Value="Geoffrey"/>
+            <Parameter Id="lastName" Name="lastName" Type="String" Value="Bobcat"/>
+        </ParameterBag>
+    </Resource>
+
+    <Order Id="order1" Name="Customer Order 01" Type="Order">
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product01"/>
+            <Parameter Id="customer" Name="Customer" Type="String" Interpretation="Resource-Ref" Uom="Customer" Value="customer1"/>
+        </ParameterBag>
+    </Order>
+
+    <Order Id="order2" Name="Customer Order 02" Type="Order">
+        <ParameterBag Id="relations" Name="Relations" Type="Parameters">
+            <Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="product02"/>
+            <Parameter Id="customer" Name="Customer" Type="String" Interpretation="Resource-Ref" Uom="Customer" Value="customer2"/>
+        </ParameterBag>
+    </Order>
 
 </StrolchModel>

@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
@@ -292,6 +293,47 @@ public class GenericReportTest {
 					.generateFilterCriteria();
 
 			assertTrue(filterCriteria.isEmpty());
+		}
+	}
+
+	@Test
+	public void shouldDoAdditionalJoin() {
+
+		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
+				Report report = new Report(tx, "slotsByOrderUsageReport")) {
+
+			AtomicInteger slotsFound = new AtomicInteger();
+			report.doReportAsJson().forEach(e -> {
+
+				switch (e.get("slot").getAsString()) {
+
+				case "Slot 1":
+				case "Slot 3": {
+					assertEquals("Harry", e.get("firstName").getAsString());
+					assertEquals("Barns", e.get("lastName").getAsString());
+					slotsFound.getAndIncrement();
+					break;
+				}
+
+				case "Slot 2":
+				case "Slot 4":
+				case "Slot 5": {
+					assertEquals("Geoffrey", e.get("firstName").getAsString());
+					assertEquals("Bobcat", e.get("lastName").getAsString());
+					slotsFound.getAndIncrement();
+					break;
+				}
+
+				case "Slot 6": {
+					assertEquals("", e.get("firstName").getAsString());
+					slotsFound.getAndIncrement();
+					break;
+				}
+
+				}
+			});
+
+			assertEquals(6, slotsFound.get());
 		}
 	}
 }
