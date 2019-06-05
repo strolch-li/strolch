@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import li.strolch.privilege.helper.XmlConstants;
-import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.utils.helper.XmlHelper;
 import org.w3c.dom.Document;
@@ -37,6 +36,8 @@ public class PrivilegeRolesDomWriter {
 	public PrivilegeRolesDomWriter(List<Role> roles, File modelFile) {
 		this.roles = roles;
 		this.modelFile = modelFile;
+
+		this.roles.sort(Comparator.comparing(Role::getName));
 	}
 
 	public void write() {
@@ -46,7 +47,7 @@ public class PrivilegeRolesDomWriter {
 		Element rootElement = doc.createElement(XmlConstants.XML_ROLES);
 		doc.appendChild(rootElement);
 
-		this.roles.stream().sorted(Comparator.comparing(Role::getName)).forEach(role -> {
+		this.roles.forEach(role -> {
 
 			// create the role element
 			Element roleElement = doc.createElement(XmlConstants.XML_ROLE);
@@ -54,37 +55,30 @@ public class PrivilegeRolesDomWriter {
 
 			roleElement.setAttribute(XmlConstants.XML_ATTR_NAME, role.getName());
 
-			for (String privilegeName : role.getPrivilegeNames()) {
-				IPrivilege privilege = role.getPrivilege(privilegeName);
-
-				// create the privilege element
+			role.getPrivilegeNames().stream().sorted().map(role::getPrivilege).forEach(privilege -> {
 				Element privilegeElement = doc.createElement(XmlConstants.XML_PRIVILEGE);
 				roleElement.appendChild(privilegeElement);
-
 				privilegeElement.setAttribute(XmlConstants.XML_ATTR_NAME, privilege.getName());
 				privilegeElement.setAttribute(XmlConstants.XML_ATTR_POLICY, privilege.getPolicy());
 
-				// add the all allowed element
 				if (privilege.isAllAllowed()) {
 					Element allAllowedElement = doc.createElement(XmlConstants.XML_ALL_ALLOWED);
 					allAllowedElement.setTextContent(Boolean.toString(privilege.isAllAllowed()));
 					privilegeElement.appendChild(allAllowedElement);
 				}
 
-				// add all the deny values
-				for (String denyValue : privilege.getDenyList()) {
+				privilege.getDenyList().stream().sorted().forEach(denyValue -> {
 					Element denyValueElement = doc.createElement(XmlConstants.XML_DENY);
 					denyValueElement.setTextContent(denyValue);
 					privilegeElement.appendChild(denyValueElement);
-				}
+				});
 
-				// add all the allow values
-				for (String allowValue : privilege.getAllowList()) {
+				privilege.getAllowList().stream().sorted().forEach(allowValue -> {
 					Element allowValueElement = doc.createElement(XmlConstants.XML_ALLOW);
 					allowValueElement.setTextContent(allowValue);
 					privilegeElement.appendChild(allowValueElement);
-				}
-			}
+				});
+			});
 		});
 
 		// write the container file to disk

@@ -15,10 +15,11 @@
  */
 package li.strolch.privilege.xml;
 
+import static java.util.Comparator.comparing;
+
 import java.io.File;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.User;
@@ -38,6 +39,8 @@ public class PrivilegeUsersDomWriter {
 	public PrivilegeUsersDomWriter(List<User> users, File modelFile) {
 		this.users = users;
 		this.modelFile = modelFile;
+
+		this.users.sort(comparing(User::getUsername));
 	}
 
 	public void write() {
@@ -47,7 +50,7 @@ public class PrivilegeUsersDomWriter {
 		Element rootElement = doc.createElement(XmlConstants.XML_USERS);
 		doc.appendChild(rootElement);
 
-		this.users.stream().sorted(Comparator.comparing(User::getUserId)).forEach(user -> {
+		this.users.forEach(user -> {
 
 			// create the user element
 			Element userElement = doc.createElement(XmlConstants.XML_USER);
@@ -84,22 +87,22 @@ public class PrivilegeUsersDomWriter {
 			// add all the role elements
 			Element rolesElement = doc.createElement(XmlConstants.XML_ROLES);
 			userElement.appendChild(rolesElement);
-			for (String roleName : user.getRoles()) {
+			user.getRoles().stream().sorted().forEach(roleName -> {
 				Element roleElement = doc.createElement(XmlConstants.XML_ROLE);
 				roleElement.setTextContent(roleName);
 				rolesElement.appendChild(roleElement);
-			}
+			});
 
 			// add the parameters
 			if (!user.getProperties().isEmpty()) {
 				Element parametersElement = doc.createElement(XmlConstants.XML_PROPERTIES);
 				userElement.appendChild(parametersElement);
-				for (Entry<String, String> entry : user.getProperties().entrySet()) {
+				user.getProperties().entrySet().stream().sorted(comparing(Map.Entry::getKey)).forEach(entry -> {
 					Element paramElement = doc.createElement(XmlConstants.XML_PROPERTY);
 					paramElement.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
 					paramElement.setAttribute(XmlConstants.XML_ATTR_VALUE, entry.getValue());
 					parametersElement.appendChild(paramElement);
-				}
+				});
 			}
 		});
 

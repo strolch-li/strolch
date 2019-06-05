@@ -18,11 +18,11 @@ package li.strolch.privilege.xml;
 import static li.strolch.privilege.helper.XmlConstants.*;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
-import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.helper.XmlHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -101,12 +101,13 @@ public class PrivilegeConfigDomWriter {
 		// Policies
 		Element policiesElem = doc.createElement(XML_POLICIES);
 		rootElement.appendChild(policiesElem);
-		for (Entry<String, Class<PrivilegePolicy>> entry : this.containerModel.getPolicies().entrySet()) {
-			Element policyElem = doc.createElement(XML_POLICY);
-			policyElem.setAttribute(XML_ATTR_NAME, entry.getKey());
-			policyElem.setAttribute(XML_ATTR_CLASS, entry.getValue().getName());
-			policiesElem.appendChild(policyElem);
-		}
+		this.containerModel.getPolicies().entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+				.forEach(entry -> {
+					Element policyElem = doc.createElement(XML_POLICY);
+					policyElem.setAttribute(XML_ATTR_NAME, entry.getKey());
+					policyElem.setAttribute(XML_ATTR_CLASS, entry.getValue().getName());
+					policiesElem.appendChild(policyElem);
+				});
 
 		// write the container file to disk
 		XmlHelper.writeDocument(doc, this.configFile);
