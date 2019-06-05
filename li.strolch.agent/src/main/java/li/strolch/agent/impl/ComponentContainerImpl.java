@@ -118,8 +118,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 				realmName = DEFAULT_REALM;
 			} else {
 				String msg = "The User {0} is missing the property {1} and the Realm {2} can not be used as it does not exist!";
-				throw new StrolchException(MessageFormat.format(msg, certificate.getUsername(), PROP_REALM,
-						DEFAULT_REALM));
+				throw new StrolchException(
+						MessageFormat.format(msg, certificate.getUsername(), PROP_REALM, DEFAULT_REALM));
 			}
 		}
 
@@ -165,8 +165,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			@SuppressWarnings("unchecked")
 			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
-			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainer.class,
-					String.class);
+			Constructor<StrolchComponent> constructor = strolchComponentClass
+					.getConstructor(ComponentContainer.class, String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 			strolchComponent.setup(componentConfiguration);
 
@@ -179,8 +179,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
 			throw new StrolchConfigurationException(msg, e);
 
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException
-				| IllegalArgumentException | InvocationTargetException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
 
 			String msg = "Could not load class for component {0} due to: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
@@ -199,8 +198,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		System.setProperty("user.timezone", getTimezone());
-		logger.info(MessageFormat.format(msg, applicationName, environment, Locale.getDefault(),
-				System.getProperty("user.timezone")));
+		logger.info(MessageFormat
+				.format(msg, applicationName, environment, Locale.getDefault(), System.getProperty("user.timezone")));
 
 		// set up the container itself
 		this.strolchConfiguration = strolchConfiguration;
@@ -232,8 +231,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size(),
-				formatNanoDuration(took)));
+		logger.info(MessageFormat
+				.format(msg, applicationName, environment, this.componentMap.size(), formatNanoDuration(took)));
 	}
 
 	public void initialize() {
@@ -254,8 +253,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} All {2} Strolch Components have been initialized. Took {3}"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-				formatNanoDuration(took)));
+		logger.info(MessageFormat
+				.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
 	}
 
 	public void start() {
@@ -277,18 +276,21 @@ public class ComponentContainerImpl implements ComponentContainer {
 		msg = "{0}:{1} All {2} Strolch Components started. Took {3}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
 		String tookS = formatNanoDuration(took);
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(), tookS));
-		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString())); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary())); //$NON-NLS-1$
+		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString()));
+		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary()));
+		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",
+				getAgent().getStrolchConfiguration().getRuntimeConfiguration().getLocale().toLanguageTag(),
+				getTimezone()));
 
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
 						ResourceBundle.getBundle("strolch-agent"), "agent.started") //
-								.value("applicationName", applicationName) //
-								.value("environment", environment) //
-								.value("components", "" + this.controllerMap.size()) //
-								.value("took", tookS));
+						.value("applicationName", applicationName) //
+						.value("environment", environment) //
+						.value("components", "" + this.controllerMap.size()) //
+						.value("took", tookS));
 			}
 		}
 	}
@@ -306,9 +308,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
 						ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
-								.value("applicationName", applicationName) //
-								.value("environment", environment) //
-								.value("components", "" + this.controllerMap.size()));
+						.value("applicationName", applicationName) //
+						.value("environment", environment) //
+						.value("components", "" + this.controllerMap.size()));
 			}
 		}
 
@@ -323,8 +325,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			long took = System.nanoTime() - start;
 			msg = "{0}:{1} All {2} Strolch Components have been stopped. Took {3}"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-					formatNanoDuration(took)));
+			logger.info(MessageFormat
+					.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
 		}
 
 		this.state = ComponentState.STOPPED;
@@ -348,8 +350,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			long took = System.nanoTime() - start;
 			msg = "{0}:{1} All {2} Strolch Components have been destroyed! Took {3}"; //$NON-NLS-1$
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-					formatNanoDuration(took)));
+			logger.info(MessageFormat
+					.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
 			this.controllerMap.clear();
 			this.componentMap.clear();
 		}
