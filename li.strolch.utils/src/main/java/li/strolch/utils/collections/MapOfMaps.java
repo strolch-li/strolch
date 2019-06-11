@@ -17,6 +17,8 @@ package li.strolch.utils.collections;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -161,5 +163,40 @@ public class MapOfMaps<T, U, V> {
 			addMap(key, other.getMap(key));
 		}
 		return this;
+	}
+
+	Map<U, V> getMapOrDefault(T key, Map<U, V> defaultValue) {
+		Map<U, V> u;
+		return (((u = getMap(key)) != null) || containsMap(key)) ? u : defaultValue;
+	}
+
+	public Map<U, V> computeIfAbsent(T key, Function<? super T, ? extends Map<U, V>> mappingFunction) {
+		Objects.requireNonNull(mappingFunction);
+		Map<U, V> u;
+		if ((u = getMap(key)) == null) {
+			Map<U, V> newValue;
+			if ((newValue = mappingFunction.apply(key)) != null) {
+				addMap(key, newValue);
+				return newValue;
+			}
+		}
+
+		return u;
+	}
+
+	void forEach(BiConsumer<? super T, ? super Map<U, V>> action) {
+		Objects.requireNonNull(action);
+		for (Map.Entry<T, Map<U, V>> entry : this.mapOfMaps.entrySet()) {
+			T k;
+			Map<U, V> u;
+			try {
+				k = entry.getKey();
+				u = entry.getValue();
+			} catch (IllegalStateException ise) {
+				// this usually means the entry is no longer in the map.
+				throw new ConcurrentModificationException(ise);
+			}
+			action.accept(k, u);
+		}
 	}
 }
