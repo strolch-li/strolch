@@ -48,6 +48,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private boolean withLocator;
 	private boolean withoutVersion;
 	private boolean withoutPolicies;
+	private boolean withoutStateVariables;
 	private int activityDepth = Integer.MAX_VALUE;
 
 	public StrolchElementToJsonVisitor() {
@@ -85,6 +86,10 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this.withoutPolicies;
 	}
 
+	public boolean isWithoutStateVariables() {
+		return this.withoutStateVariables;
+	}
+
 	public StrolchElementToJsonVisitor withLocator() {
 		this.withLocator = true;
 		return this;
@@ -117,6 +122,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public StrolchElementToJsonVisitor withPolicies() {
 		this.withoutPolicies = false;
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor withoutStateVariables() {
+		this.withoutStateVariables = true;
 		return this;
 	}
 
@@ -611,6 +621,9 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	protected void addStates(Resource resource, JsonObject rootJ) {
+		if (isWithoutStateVariables())
+			return;
+
 		if (isFlat())
 			addTimedStatesFlat(resource, rootJ);
 		else
