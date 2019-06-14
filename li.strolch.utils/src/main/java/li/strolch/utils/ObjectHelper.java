@@ -70,6 +70,9 @@ public class ObjectHelper {
 			return false;
 		}
 
+		if (left instanceof String && right.getClass().isEnum())
+			right = ((Enum<?>) right).name();
+
 		if (left.getClass() != right.getClass())
 			return false;
 
@@ -170,6 +173,9 @@ public class ObjectHelper {
 				}
 			}
 
+			if (right.getClass().isEnum())
+				right = ((Enum<?>) right).name();
+
 			if (right instanceof String) {
 				String rightString = (String) right;
 
@@ -221,7 +227,7 @@ public class ObjectHelper {
 				Collection<?> collectionleft = (Collection) left;
 				for (Object oLeft : collectionleft) {
 					for (Object oRight : collectionRight) {
-						if (equals(oLeft, oRight, ignoreCase))
+						if (equals(oRight, oLeft, ignoreCase))
 							return true;
 					}
 				}
@@ -229,7 +235,7 @@ public class ObjectHelper {
 			} else {
 				Collection<?> collection = (Collection) right;
 				for (Object o : collection) {
-					if (equals(left, o, ignoreCase))
+					if (equals(o, left, ignoreCase))
 						return true;
 				}
 

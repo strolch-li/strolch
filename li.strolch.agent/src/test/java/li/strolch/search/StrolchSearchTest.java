@@ -22,6 +22,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -72,6 +73,10 @@ public class StrolchSearchTest {
 
 				bag.addParameter(new StringParameter("status", "Status", "STATUS"));
 				bag.addParameter(new StringParameter("color", "Color", "green"));
+
+				bag.addParameter(new StringParameter("state", "State", State.EXECUTION.name()));
+				bag.addParameter(new StringListParameter("stateList", "Status",
+						asList(State.EXECUTION.name(), State.EXECUTED.name())));
 
 				tx.add(ball);
 			}
@@ -355,8 +360,17 @@ public class StrolchSearchTest {
 
 		@Override
 		public void define() {
-			types("Ball").where(id(isEqualTo(this.id)).or(param("parameters", "status", isEqualTo(this.status))
+			types("Ball").where(id(isEqualTo(this.id)).or( //
+
+					param("parameters", "status", isEqualTo(this.status))
 							.and(not(param("parameters", "color", isEqualTo(this.color))))
+
+							.and(param("parameters", "state", isEqualTo(State.EXECUTION)))
+							.and(param("parameters", "state", isEqualToIgnoreCase(State.EXECUTION)))
+							.and(param("parameters", "state", isIn(State.EXECUTION, State.CREATED)))
+							.and(param("parameters", "state", contains(State.EXECUTION)))
+							.and(param("parameters", "state", containsIgnoreCase(State.EXECUTION)))
+							.and(param("parameters", "stateList", listContains(State.EXECUTED)))
 
 							.and(param(BAG_ID, PARAM_FLOAT_ID, isEqualTo(44.3D)))
 
