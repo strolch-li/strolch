@@ -15,6 +15,8 @@
  */
 package li.strolch.policy;
 
+import java.util.Set;
+
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -31,6 +33,33 @@ import li.strolch.persistence.api.StrolchTransaction;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface PolicyHandler {
+
+	/**
+	 * The type of policies known by this {@link PolicyHandler}
+	 *
+	 * @return types of policies known by this {@link PolicyHandler}
+	 */
+	Set<String> getPolicyTypes();
+
+	/**
+	 * Returns the keys defined for the given policy type
+	 *
+	 * @param type
+	 * 		the type of policy for which to return the keys
+	 *
+	 * @return the keys defined for the given policy type
+	 */
+	Set<String> getPolicyKeysByType(Class<?> type);
+
+	/**
+	 * Returns the keys defined for the given policy type
+	 *
+	 * @param type
+	 * 		the type of policy for which to return the keys
+	 *
+	 * @return the keys defined for the given policy type
+	 */
+	Set<String> getPolicyKeysByType(String type);
 
 	/**
 	 * Instantiates the actual policy by resolving the {@link PolicyDef} using a {@link PolicyDefVisitor}

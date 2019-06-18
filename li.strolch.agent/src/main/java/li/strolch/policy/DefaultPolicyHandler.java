@@ -19,7 +19,10 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -69,6 +72,24 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 		reloadPolicies(configuration);
 		super.initialize(configuration);
+	}
+
+	public Set<String> getPolicyTypes() {
+		return new HashSet<>(this.classByTypeMap.keySet());
+	}
+
+	public Set<String> getPolicyKeysByType(String type) {
+		Map<String, Class<? extends StrolchPolicy>> byType = this.classByTypeMap.getMap(type);
+		if (byType == null)
+			return Collections.emptySet();
+		return new HashSet<>(byType.keySet());
+	}
+
+	public Set<String> getPolicyKeysByType(Class<?> clazz) {
+		Map<String, Class<? extends StrolchPolicy>> byType = this.classByTypeMap.getMap(clazz.getSimpleName());
+		if (byType == null)
+			return Collections.emptySet();
+		return new HashSet<>(byType.keySet());
 	}
 
 	@Override
