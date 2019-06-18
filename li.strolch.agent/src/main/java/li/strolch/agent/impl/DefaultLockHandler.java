@@ -127,6 +127,22 @@ public class DefaultLockHandler implements LockHandler {
 			if (!tuple.getFirst().tryLock(tryLockTime, timeUnit)) {
 				String msg = "Failed to acquire lock after {0}s for {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, timeUnit.toSeconds(tryLockTime), locator);
+
+				try {
+					logger.error(msg);
+					logger.error("Listing all active threads: ");
+					Map<Thread, StackTraceElement[]> allStackTraces = Thread.getAllStackTraces();
+					for (Thread thread : allStackTraces.keySet()) {
+						StackTraceElement[] trace = allStackTraces.get(thread);
+						StringBuilder sb = new StringBuilder();
+						for (StackTraceElement traceElement : trace)
+							sb.append("\tat ").append(traceElement);
+						logger.error(thread.getName() + "\n" + sb.toString());
+					}
+				} catch (Exception e) {
+					logger.error("Failed to log active threads: " + e.getMessage(), e);
+				}
+
 				throw new StrolchLockException(msg);
 			}
 
