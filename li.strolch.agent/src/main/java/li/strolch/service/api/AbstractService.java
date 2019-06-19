@@ -207,6 +207,27 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 *
 	 * @param arg
 	 * 		the {@link ServiceArgument}
+	 * @param readOnly
+	 * 		flag to denote if this TX should be read only
+	 *
+	 * @return the open {@link StrolchTransaction}
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, boolean readOnly) throws StrolchException {
+		if (isEmpty(arg.realm))
+			return openUserTx(readOnly);
+		return openTx(arg.realm, readOnly);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} by evaluating if the given argument has a realm defined, if not, then the
+	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
+	 * transaction should be used in a try-with-resource clause so it is properly closed
+	 *
+	 * @param arg
+	 * 		the {@link ServiceArgument}
 	 * @param action
 	 * 		the action to use for the opened TX
 	 *
@@ -219,6 +240,50 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 		if (isEmpty(arg.realm))
 			return openUserTx();
 		return openTx(arg.realm, action);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} by evaluating if the given argument has a realm defined, if not, then the
+	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
+	 * transaction should be used in a try-with-resource clause so it is properly closed
+	 *
+	 * @param arg
+	 * 		the {@link ServiceArgument}
+	 * @param action
+	 * 		the action to use for the opened TX
+	 * @param readOnly
+	 * 		flag to denote if this TX should be read only
+	 *
+	 * @return the open {@link StrolchTransaction}
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, String action, boolean readOnly)
+			throws StrolchException {
+		if (isEmpty(arg.realm))
+			return openUserTx(readOnly);
+		return openTx(arg.realm, action, readOnly);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} for the given realm. This transaction should be used in a try-with-resource
+	 * clause so it is properly closed
+	 *
+	 * @param realm
+	 * 		the name of the realm
+	 * @param action
+	 * 		the action to use for the opened TX
+	 * @param readOnly
+	 * 		flag to denote if this TX should be read only
+	 *
+	 * @return the open {@link StrolchTransaction}
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openTx(String realm, String action, boolean readOnly) throws StrolchException {
+		return this.container.getRealm(realm).openTx(getCertificate(), action, readOnly);
 	}
 
 	/**
@@ -250,6 +315,23 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx() throws StrolchException {
+		return this.container.getRealm(getCertificate()).openTx(getCertificate(), getClass(), false);
+	}
+
+	/**
+	 * Opens a {@link StrolchTransaction} where the realm retrieved using {@link ComponentContainer#getRealm(Certificate)},
+	 * the action for the TX is this implementation's class name. This transaction should be used in a try-with-resource
+	 * clause so it is properly closed
+	 *
+	 * @param readOnly
+	 * 		flag to denote if this TX should be read only
+	 *
+	 * @return the open {@link StrolchTransaction}
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 */
+	protected StrolchTransaction openUserTx(boolean readOnly) throws StrolchException {
 		return this.container.getRealm(getCertificate()).openTx(getCertificate(), getClass(), false);
 	}
 
