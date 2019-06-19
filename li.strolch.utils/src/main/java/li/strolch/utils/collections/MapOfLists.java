@@ -120,7 +120,7 @@ public class MapOfLists<T, U> {
 		return this;
 	}
 
-	List<U> getListOrDefault(T key, List<U> defaultValue) {
+	public List<U> getListOrDefault(T key, List<U> defaultValue) {
 		List<U> u;
 		return (((u = getList(key)) != null) || containsList(key)) ? u : defaultValue;
 	}
@@ -139,7 +139,7 @@ public class MapOfLists<T, U> {
 		return u;
 	}
 
-	void forEach(BiConsumer<? super T, ? super List<U>> action) {
+	public void forEach(BiConsumer<? super T, ? super List<U>> action) {
 		Objects.requireNonNull(action);
 		for (Map.Entry<T, List<U>> entry : this.mapOfLists.entrySet()) {
 			T k;

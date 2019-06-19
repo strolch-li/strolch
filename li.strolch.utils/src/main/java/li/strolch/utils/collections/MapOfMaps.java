@@ -165,7 +165,7 @@ public class MapOfMaps<T, U, V> {
 		return this;
 	}
 
-	Map<U, V> getMapOrDefault(T key, Map<U, V> defaultValue) {
+	public Map<U, V> getMapOrDefault(T key, Map<U, V> defaultValue) {
 		Map<U, V> u;
 		return (((u = getMap(key)) != null) || containsMap(key)) ? u : defaultValue;
 	}
@@ -184,7 +184,7 @@ public class MapOfMaps<T, U, V> {
 		return u;
 	}
 
-	void forEach(BiConsumer<? super T, ? super Map<U, V>> action) {
+	public void forEach(BiConsumer<? super T, ? super Map<U, V>> action) {
 		Objects.requireNonNull(action);
 		for (Map.Entry<T, Map<U, V>> entry : this.mapOfMaps.entrySet()) {
 			T k;

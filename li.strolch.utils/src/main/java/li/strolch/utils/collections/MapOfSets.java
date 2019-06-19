@@ -120,7 +120,7 @@ public class MapOfSets<T, U> {
 		return this;
 	}
 
-	Set<U> getSetOrDefault(T key, Set<U> defaultValue) {
+	public Set<U> getSetOrDefault(T key, Set<U> defaultValue) {
 		Set<U> u;
 		return (((u = getSet(key)) != null) || containsSet(key)) ? u : defaultValue;
 	}
@@ -139,7 +139,7 @@ public class MapOfSets<T, U> {
 		return u;
 	}
 
-	void forEach(BiConsumer<? super T, ? super Set<U>> action) {
+	public void forEach(BiConsumer<? super T, ? super Set<U>> action) {
 		Objects.requireNonNull(action);
 		for (Map.Entry<T, Set<U>> entry : this.mapOfSets.entrySet()) {
 			T k;
