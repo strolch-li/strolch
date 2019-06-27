@@ -136,7 +136,7 @@ public class DefaultLockHandler implements LockHandler {
 						StackTraceElement[] trace = allStackTraces.get(thread);
 						StringBuilder sb = new StringBuilder();
 						for (StackTraceElement traceElement : trace)
-							sb.append("\tat ").append(traceElement);
+							sb.append("\n\tat ").append(traceElement);
 						logger.error(thread.getName() + "\n" + sb.toString());
 					}
 				} catch (Exception e) {
