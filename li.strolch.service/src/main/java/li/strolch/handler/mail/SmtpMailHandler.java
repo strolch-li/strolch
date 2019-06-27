@@ -30,7 +30,7 @@ public class SmtpMailHandler extends MailHandler {
 	}
 
 	@Override
-	public void sendMail(String subject, String text, String recipient) {
-		SmtpMailer.getInstance().sendMail(subject, text, recipient);
+	public void sendMail(String subject, String text, String recipients) {
+		SmtpMailer.getInstance().sendMail(subject, text, recipients);
 	}
 }

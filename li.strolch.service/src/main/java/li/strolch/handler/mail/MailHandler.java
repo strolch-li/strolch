@@ -1,5 +1,7 @@
 package li.strolch.handler.mail;
 
+import javax.mail.internet.InternetAddress;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 
@@ -21,8 +23,8 @@ public abstract class MailHandler extends StrolchComponent {
 	 * 		the subject of the e-mail
 	 * @param text
 	 * 		the test of the e-mail
-	 * @param recipient
-	 * 		the address to whom to send the e-mail
+	 * @param recipients
+	 * 		the comma separated list of addresses to whom to send the e-mail see {@link InternetAddress#parse(String)}
 	 */
-	public abstract void sendMail(String subject, String text, String recipient);
+	public abstract void sendMail(String subject, String text, String recipients);
 }
