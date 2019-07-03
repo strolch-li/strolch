@@ -15,7 +15,7 @@
  */
 package li.strolch.model.parameter;
 
-import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE;
+import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE_ZONED_DATE;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,7 +32,7 @@ import li.strolch.utils.iso8601.ISO8601;
  */
 public class DateParameter extends AbstractParameter<Date> {
 
-	private Date value;
+	private ZonedDateTime value;
 
 	/**
 	 * Empty constructor
@@ -64,20 +64,21 @@ public class DateParameter extends AbstractParameter<Date> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Date getValue() {
-		return this.value;
+		return Date.from(this.value.toInstant());
 	}
 
 	@Override
 	public void setValue(Date value) {
 		assertNotReadonly();
 		validateValue(value);
-		this.value = value;
+		this.value = ZonedDateTime.ofInstant(value.toInstant(), ZoneId.systemDefault());
 	}
 
 	@Override
 	public void setValueFrom(Parameter<Date> parameter) {
 		assertNotReadonly();
-		this.value = parameter.getValue();
+		DateParameter other = (DateParameter) parameter;
+		this.value = other.toZonedDateTime();
 	}
 
 	@Override
@@ -93,46 +94,47 @@ public class DateParameter extends AbstractParameter<Date> {
 	@Override
 	public void clear() {
 		assertNotReadonly();
-		this.value = EMPTY_VALUE;
+		this.value = EMPTY_VALUE_ZONED_DATE;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return this.value.equals(EMPTY_VALUE);
+		return this.value.equals(EMPTY_VALUE_ZONED_DATE);
 	}
 
 	@Override
 	public boolean isEqualTo(Parameter<Date> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		DateParameter other = (DateParameter) otherValue;
+		return this.value.equals(other.toZonedDateTime());
 	}
 
 	@Override
 	public boolean isEqualTo(Date otherValue) {
-		return this.value.equals(otherValue);
+		return getValue().equals(otherValue);
 	}
 
 	public boolean isEqualTo(LocalDateTime otherValue) {
-		return this.value.equals(Date.from(otherValue.atZone(ZoneId.systemDefault()).toInstant()));
+		return this.value.toLocalDateTime().equals(otherValue);
 	}
 
 	public boolean isEqualTo(ZonedDateTime otherValue) {
-		return this.value.equals(Date.from(otherValue.toInstant()));
+		return this.value.equals(otherValue);
 	}
 
 	public ZonedDateTime toZonedDateTime() {
-		return ZonedDateTime.ofInstant(this.value.toInstant(), ZoneId.systemDefault());
+		return this.value;
 	}
 
 	public LocalDateTime toLocalDateTime() {
-		return LocalDateTime.ofInstant(this.value.toInstant(), ZoneId.systemDefault());
+		return this.value.toLocalDateTime();
 	}
 
 	public void setValueFromLocalDateTime(LocalDateTime localDateTime) {
-		this.value = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+		this.value = localDateTime.atZone(ZoneId.systemDefault());
 	}
 
 	public void setValueFromZonedDateTime(ZonedDateTime zonedDateTime) {
-		this.value = Date.from(zonedDateTime.toInstant());
+		this.value = zonedDateTime;
 	}
 
 	@Override
@@ -151,7 +153,7 @@ public class DateParameter extends AbstractParameter<Date> {
 
 		super.fillClone(clone);
 
-		clone.setValue(this.value);
+		clone.setValueFromZonedDateTime(this.value);
 
 		return clone;
 	}

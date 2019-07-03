@@ -34,6 +34,8 @@ public class ISO8601 implements DateFormat {
 	private static final Logger logger = LoggerFactory.getLogger(ISO8601.class);
 
 	public static final Date EMPTY_VALUE = parseToDate("-");
+	public static final ZonedDateTime EMPTY_VALUE_ZONED_DATE = ZonedDateTime
+			.ofInstant(EMPTY_VALUE.toInstant(), ZoneId.systemDefault());
 
 	@Override
 	public String format(long timePoint) {
