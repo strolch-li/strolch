@@ -137,7 +137,7 @@ public class DefaultLockHandler implements LockHandler {
 						StringBuilder sb = new StringBuilder();
 						for (StackTraceElement traceElement : trace)
 							sb.append("\n\tat ").append(traceElement);
-						logger.error(thread.getName() + "\n" + sb.toString());
+						logger.error(thread.getName() + "\n" + sb.toString() + "\n");
 					}
 				} catch (Exception e) {
 					logger.error("Failed to log active threads: " + e.getMessage(), e);
