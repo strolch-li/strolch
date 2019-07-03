@@ -27,6 +27,8 @@ public class LogMessage extends I18nMessage {
 		super(bundle, key);
 		this.id = StrolchAgent.getUniqueId();
 		this.zonedDateTime = ZonedDateTime.now();
+		// persisting in the DB only handles millisecond precision, not nano precision
+		this.zonedDateTime = this.zonedDateTime.withNano((this.zonedDateTime.getNano() / 1000000) * 1000000);
 		this.realm = realm;
 		this.username = username;
 		this.locator = locator;
