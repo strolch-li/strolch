@@ -100,7 +100,7 @@ public class SmtpMailer {
 		} else {
 			String whiteListProp = properties.getProperty("recipientWhitelist");
 			this.recipientWhitelist = Arrays.stream(whiteListProp.split(",")) //
-					.map(s -> s.trim()) //
+					.map(String::trim) //
 					.map(s -> Arrays.asList(parseAddress(s))) //
 					.flatMap(List::stream) //
 					.collect(Collectors.toSet());
@@ -149,8 +149,8 @@ public class SmtpMailer {
 				// override, with no white list, so send to override
 				text = "Override recipient. Original recipients: " + recipients + ".\n\n" + text;
 				send(subject, text, this.overrideRecipients);
-				logger.info(MessageFormat.format("Sent E-mail to override recipient {0}: {1}",
-						Arrays.asList(this.overrideRecipients).stream() //
+				logger.info(MessageFormat
+						.format("Sent E-mail to override recipient {0}: {1}", Arrays.stream(this.overrideRecipients) //
 								.map(Object::toString) //
 								.collect(Collectors.joining(",")), subject));
 
@@ -182,13 +182,15 @@ public class SmtpMailer {
 					text = "Override recipient. Original recipients: " + recipients + ".\n\n" + text;
 					send(subject, text, this.overrideRecipients);
 					logger.info(MessageFormat.format("Sent E-mail to override recipient {0}: {1}",
-							Arrays.asList(this.overrideRecipients).stream() //
+							Arrays.stream(this.overrideRecipients) //
 									.map(Object::toString) //
 									.collect(Collectors.joining(",")), subject));
 				}
 			}
 
 		} catch (MessagingException e) {
+			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nRecipients: " + recipients
+					+ "\n\nBody:\n" + text);
 			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
 		}
 	}
