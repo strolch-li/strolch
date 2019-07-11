@@ -66,7 +66,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		this.dataPath = dataPathF;
 		this.tempPath = tempPathF;
 
-		this.locale = new Locale(getString(PROP_LOCALE, Locale.getDefault().toString()));
+		this.locale = new Locale(getString(PROP_LOCALE, Locale.getDefault().toLanguageTag()));
 	}
 
 	public String getApplicationName() {
