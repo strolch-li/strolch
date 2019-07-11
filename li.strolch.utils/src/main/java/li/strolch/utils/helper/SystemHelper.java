@@ -37,6 +37,7 @@ public class SystemHelper {
 	public static final String osVersion = System.getProperty("os.version"); //$NON-NLS-1$
 	public static final String javaVendor = System.getProperty("java.vendor"); //$NON-NLS-1$
 	public static final String javaVersion = System.getProperty("java.version"); //$NON-NLS-1$
+	private static final int nrOfCores = Runtime.getRuntime().availableProcessors(); //$NON-NLS-1$
 
 	/**
 	 * private constructor
@@ -58,42 +59,37 @@ public class SystemHelper {
 	 */
 	public static String asString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(SystemHelper.osName);
-		sb.append(StringHelper.SPACE);
-		sb.append(SystemHelper.osArch);
-		sb.append(StringHelper.SPACE);
-		sb.append(SystemHelper.osVersion);
-		sb.append(StringHelper.SPACE);
-		sb.append("on Java "); //$NON-NLS-1$
-		sb.append(SystemHelper.javaVendor);
-		sb.append(" version "); //$NON-NLS-1$
-		sb.append(SystemHelper.javaVersion);
+		sb.append("OS: ").append(osName);
+		sb.append(" ").append(osVersion);
+		sb.append(" Arch: ").append(osArch);
+		sb.append(" on Java ").append(javaVendor);
+		sb.append(" ").append(javaVersion);
+		sb.append(" CPU Cores: ").append(nrOfCores);
 		return sb.toString();
 	}
 
 	public static String getUserDir() {
-		return System.getProperty("user.dir"); //$NON-NLS-1$
+		return System.getProperty("user.dir");
 	}
 
 	public static boolean isMacOS() {
-		return SystemHelper.osName.startsWith("Mac"); //$NON-NLS-1$
+		return SystemHelper.osName.startsWith("Mac");
 	}
 
 	public static boolean isWindows() {
-		return SystemHelper.osName.startsWith("Win"); //$NON-NLS-1$
+		return SystemHelper.osName.startsWith("Win");
 	}
 
 	public static boolean isLinux() {
-		return SystemHelper.osName.startsWith("Lin"); //$NON-NLS-1$
+		return SystemHelper.osName.startsWith("Lin");
 	}
 
 	public static boolean is32bit() {
-		return SystemHelper.osArch.equals("x86") || SystemHelper.osArch.equals("i386") //$NON-NLS-1$ //$NON-NLS-2$
-				|| SystemHelper.osArch.equals("i686"); //$NON-NLS-1$
+		return !SystemHelper.is64bit();
 	}
 
 	public static boolean is64bit() {
-		return SystemHelper.osArch.equals("x86_64") || SystemHelper.osArch.equals("amd64"); //$NON-NLS-1$ //$NON-NLS-2$
+		return System.getProperty("sun.arch.data.model").equals("64");
 	}
 
 	public static String getMaxMemory() {
@@ -117,5 +113,9 @@ public class SystemHelper {
 		sb.append(" / Free: "); //$NON-NLS-1$
 		sb.append(SystemHelper.getFreeMemory());
 		return sb.toString();
+	}
+
+	public static void main(String[] args) {
+		System.getProperties().list(System.out);
 	}
 }
