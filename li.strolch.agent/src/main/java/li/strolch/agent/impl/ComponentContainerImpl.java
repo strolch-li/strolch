@@ -281,6 +281,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",
 				getAgent().getStrolchConfiguration().getRuntimeConfiguration().getLocale().toLanguageTag(),
 				getTimezone()));
+		logger.info(MessageFormat
+				.format("file.encoding: {0} / sun.jnu.encoding {1}", System.getProperty("file.encoding"),
+						System.getProperty("sun.jnu.encoding")));
 
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
