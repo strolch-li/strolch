@@ -82,10 +82,13 @@ public class SearchBuilder {
 	public static <T> ValueSearch<T> buildSimpleValueSearch(ValueSearch<T> search, String query,
 			List<Function<T, Object>> extractors) {
 
-		if (extractors.isEmpty())
+		if (extractors.isEmpty() || query == null)
 			return search;
 
 		query = query.trim();
+		if (query.isEmpty())
+			return search;
+
 		boolean negate = false;
 		if (query.startsWith("!")) {
 			negate = true;
