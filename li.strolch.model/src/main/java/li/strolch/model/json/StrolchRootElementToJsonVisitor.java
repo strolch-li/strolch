@@ -37,6 +37,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this.visitor.visitAction(action).getAsJsonObject();
 	}
 
+	@Override
+	public JsonObject visitParameterBag(ParameterBag bag) {
+		return this.visitor.visitParameterBag(bag).getAsJsonObject();
+	}
+
 	public OrderVisitor<JsonObject> asOrderVisitor() {
 		return this::visitOrder;
 	}
