@@ -4,6 +4,7 @@ import java.util.function.BiConsumer;
 
 import com.google.gson.JsonObject;
 import li.strolch.model.Order;
+import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -120,6 +121,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 
 	public StrolchRootElementToJsonVisitor ignoreBagByType(String type) {
 		this.visitor.ignoreBagByType(type);
+		return this;
+	}
+
+	public StrolchRootElementToJsonVisitor bagHook(BiConsumer<ParameterBag, JsonObject> hook) {
+		this.visitor.bagHook(hook);
 		return this;
 	}
 
