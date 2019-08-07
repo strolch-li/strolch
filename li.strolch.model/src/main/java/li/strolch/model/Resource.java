@@ -15,8 +15,11 @@
  */
 package li.strolch.model;
 
+import static java.util.stream.Collectors.toList;
+
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -149,6 +152,79 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 			return Collections.emptyList();
 		}
 		return new ArrayList<>(this.timedStateMap.values());
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link StrolchTimedState StrolchTimedStates}
+	 *
+	 * @return the timed states as a stream
+	 */
+	public Stream<? extends StrolchTimedState<?>> streamOfTimedStates() {
+		if (this.timedStateMap == null || this.timedStateMap.isEmpty())
+			return Stream.empty();
+
+		return this.timedStateMap.values().stream();
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
+	 *
+	 * @param interpretation
+	 * 		the interpretation for which the timed states are to be returned
+	 *
+	 * @return the timed states with the given interpretation
+	 */
+	public Stream<? extends StrolchTimedState<?>> streamOfTimedStatesByInterpretation(String interpretation) {
+		if (this.timedStateMap == null || this.timedStateMap.isEmpty())
+			return Stream.empty();
+
+		return this.timedStateMap.values().stream().filter(s -> s.getInterpretation().equals(interpretation));
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
+	 *
+	 * @param interpretation
+	 * 		the interpretation for which the timed states are to be returned
+	 * @param uom
+	 * 		the uom for which the timed states are to be returned
+	 *
+	 * @return the timed states with the given interpretation
+	 */
+	public Stream<? extends StrolchTimedState<?>> streamOfTimedStatesByInterpretationAndUom(String interpretation,
+			String uom) {
+		if (this.timedStateMap == null || this.timedStateMap.isEmpty())
+			return Stream.empty();
+
+		return this.timedStateMap.values().stream()
+				.filter(s -> s.getInterpretation().equals(interpretation) && s.getUom().equals(uom));
+	}
+
+	/**
+	 * Returns a list of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
+	 *
+	 * @param interpretation
+	 * 		the interpretation for which the timed states are to be returned
+	 *
+	 * @return the timed states with the given interpretation
+	 */
+	public List<? extends StrolchTimedState<?>> getTimedStatesByInterpretation(String interpretation) {
+		return streamOfTimedStatesByInterpretation(interpretation).collect(toList());
+	}
+
+	/**
+	 * Returns a list of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
+	 *
+	 * @param interpretation
+	 * 		the interpretation for which the timed states are to be returned
+	 * @param uom
+	 * 		the uom for which the timed states are to be returned
+	 *
+	 * @return the timed states with the given interpretation
+	 */
+	public List<? extends StrolchTimedState<?>> getTimedStatesByInterpretationAndUom(String interpretation,
+			String uom) {
+		return streamOfTimedStatesByInterpretationAndUom(interpretation, uom).collect(toList());
 	}
 
 	public boolean hasTimedStates() {

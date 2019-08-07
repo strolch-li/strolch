@@ -15,9 +15,11 @@
  */
 package li.strolch.model;
 
+import static java.util.stream.Collectors.toList;
+
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -130,9 +132,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 */
 	public void addParameter(Parameter<?> parameter) {
 		assertNotReadonly();
-		if (this.parameterMap == null) {
+		if (this.parameterMap == null)
 			this.parameterMap = new HashMap<>(1, 1.0F);
-		}
 
 		if (this.parameterMap.containsKey(parameter.getId())) {
 			String msg = "A Parameter already exists with id {0} on {1}";
@@ -153,22 +154,65 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	@SuppressWarnings("unchecked")
 	public <U, T extends Parameter<U>> T removeParameter(String key) {
 		assertNotReadonly();
-		if (this.parameterMap == null) {
+		if (this.parameterMap == null)
 			return null;
-		}
 		return (T) this.parameterMap.remove(key);
 	}
 
 	/**
-	 * Returns a list of all the {@link Parameter}s in this {@link ParameterizedElement}
+	 * Returns a list of all the {@link Parameter Parameter} in this {@link ParameterizedElement}
 	 *
-	 * @return a list of all the {@link Parameter}s in this {@link ParameterizedElement}
+	 * @return a list of all the {@link Parameter Parameter} in this {@link ParameterizedElement}
 	 */
 	public List<Parameter<?>> getParameters() {
-		if (this.parameterMap == null) {
+		if (this.parameterMap == null)
 			return Collections.emptyList();
-		}
 		return new ArrayList<>(this.parameterMap.values());
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters}
+	 *
+	 * @return the parameters
+	 */
+	public Stream<Parameter<?>> streamOfParameters() {
+		if (this.parameterMap == null)
+			return Stream.empty();
+
+		return this.parameterMap.values().stream();
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	public Stream<Parameter<?>> streamOfParametersByInterpretation(String interpretation) {
+		if (this.parameterMap == null)
+			return Stream.empty();
+
+		return this.parameterMap.values().stream().filter(p -> p.getInterpretation().equals(interpretation));
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 * @param uom
+	 * 		the uom for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	public Stream<Parameter<?>> streamOfParametersByInterpretationAndUom(String interpretation, String uom) {
+		if (this.parameterMap == null)
+			return Stream.empty();
+
+		return this.parameterMap.values().stream()
+				.filter(p -> p.getInterpretation().equals(interpretation) && p.getUom().equals(uom));
 	}
 
 	/**
@@ -180,12 +224,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @return the parameters with the given interpretation
 	 */
 	public List<Parameter<?>> getParametersByInterpretation(String interpretation) {
-		if (this.parameterMap == null) {
-			return Collections.emptyList();
-		}
-
-		return this.parameterMap.values().stream().filter(p -> p.getInterpretation().equals(interpretation))
-				.collect(Collectors.toList());
+		return streamOfParametersByInterpretation(interpretation).collect(toList());
 	}
 
 	/**
@@ -199,13 +238,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @return the parameters with the given interpretation
 	 */
 	public List<Parameter<?>> getParametersByInterpretationAndUom(String interpretation, String uom) {
-		if (this.parameterMap == null) {
-			return Collections.emptyList();
-		}
-
-		return this.parameterMap.values().stream()
-				.filter(p -> p.getInterpretation().equals(interpretation) && p.getUom().equals(uom))
-				.collect(Collectors.toList());
+		return streamOfParametersByInterpretationAndUom(interpretation, uom).collect(toList());
 	}
 
 	/**
@@ -226,9 +259,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @return true, if the {@link Parameter} exists with the given key, false otherwise
 	 */
 	public boolean hasParameter(String key) {
-		if (this.parameterMap == null) {
+		if (this.parameterMap == null)
 			return false;
-		}
 		return this.parameterMap.containsKey(key);
 	}
 
@@ -238,9 +270,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * @return a {@link Set} of all the {@link Parameter} keys in this {@link ParameterizedElement}
 	 */
 	public Set<String> getParameterKeySet() {
-		if (this.parameterMap == null) {
+		if (this.parameterMap == null)
 			return Collections.emptySet();
-		}
 		return new HashSet<>(this.parameterMap.keySet());
 	}
 

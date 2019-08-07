@@ -15,9 +15,11 @@
  */
 package li.strolch.model;
 
+import static java.util.stream.Collectors.toList;
+
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -140,6 +142,64 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters}
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	@Override
+	public Stream<Parameter<?>> streamOfParameters(String bagKey) {
+		ParameterBag bag = getParameterBag(bagKey);
+		if (bag == null)
+			return Stream.empty();
+
+		return bag.streamOfParameters();
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	@Override
+	public Stream<Parameter<?>> streamOfParametersByInterpretation(String bagKey, String interpretation) {
+		ParameterBag bag = getParameterBag(bagKey);
+		if (bag == null)
+			return Stream.empty();
+
+		return bag.streamOfParametersByInterpretation(interpretation);
+	}
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 * @param uom
+	 * 		the uom for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	@Override
+	public Stream<Parameter<?>> streamOfParametersByInterpretationAndUom(String bagKey, String interpretation,
+			String uom) {
+		ParameterBag bag = getParameterBag(bagKey);
+		if (bag == null)
+			return Stream.empty();
+
+		return bag.streamOfParametersByInterpretationAndUom(interpretation, uom);
+	}
+
+	/**
 	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
 	 *
 	 * @param bagKey
@@ -151,11 +211,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	@Override
 	public List<Parameter<?>> getParametersByInterpretation(String bagKey, String interpretation) {
-		ParameterBag bag = getParameterBag(bagKey);
-		if (bag == null)
-			return Collections.emptyList();
-
-		return bag.getParametersByInterpretation(interpretation);
+		return streamOfParametersByInterpretation(bagKey, interpretation).collect(toList());
 	}
 
 	/**
@@ -172,11 +228,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	@Override
 	public List<Parameter<?>> getParametersByInterpretationAndUom(String bagKey, String interpretation, String uom) {
-		ParameterBag bag = getParameterBag(bagKey);
-		if (bag == null)
-			return Collections.emptyList();
-
-		return bag.getParametersByInterpretationAndUom(interpretation, uom);
+		return streamOfParametersByInterpretationAndUom(bagKey, interpretation, uom).collect(toList());
 	}
 
 	/**
@@ -193,9 +245,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	@Override
 	public void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException {
 		assertNotReadonly();
-		if (this.parameterBagMap == null) {
+		if (this.parameterBagMap == null)
 			this.parameterBagMap = new HashMap<>(1, 1.0F);
-		}
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
 		if (bag == null) {
 			String msg = "No parameter bag exists with key {0}"; //$NON-NLS-1$
@@ -219,9 +270,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	@Override
 	public <U, T extends Parameter<U>> T removeParameter(String bagKey, String paramKey) {
 		assertNotReadonly();
-		if (this.parameterBagMap == null) {
+		if (this.parameterBagMap == null)
 			return null;
-		}
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
 		if (bag == null) {
 			return null;
@@ -273,6 +323,35 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
+	 * Returns a {@link Stream} of {@link ParameterBag ParameterBags}
+	 *
+	 * @return the {@link ParameterBag ParameterBags}
+	 */
+	@Override
+	public Stream<ParameterBag> streamOfParameterBags() {
+		if (this.parameterBagMap == null || this.parameterBagMap.isEmpty())
+			return Stream.empty();
+		return this.parameterBagMap.values().stream();
+	}
+
+	/**
+	 * Returns a {@link Stream} of {@link ParameterBag ParameterBags} of the given type
+	 *
+	 * @param type
+	 * 		the type of {@link ParameterBag} to return
+	 *
+	 * @return the {@link ParameterBag ParameterBags} of the given type
+	 */
+	@Override
+	public Stream<ParameterBag> streamOfParameterBagsByType(String type) {
+		if (this.parameterBagMap == null || this.parameterBagMap.isEmpty())
+			return Stream.empty();
+		return this.parameterBagMap.values() //
+				.stream() //
+				.filter(map -> map.getType().equals(type));
+	}
+
+	/**
 	 * Returns the {@link ParameterBag ParameterBags} of the given type
 	 *
 	 * @param type
@@ -282,10 +361,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	@Override
 	public List<ParameterBag> getParameterBagsByType(String type) {
-		return this.parameterBagMap.values() //
-				.stream() //
-				.filter(map -> map.getType().equals(type)) //
-				.collect(Collectors.toList());
+		return streamOfParameterBagsByType(type).collect(toList());
 	}
 
 	/**

@@ -35,7 +35,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 *
 	 * @return the hidden value
 	 */
-	public boolean isHidden();
+	boolean isHidden();
 
 	/**
 	 * set the hidden attribute
@@ -43,14 +43,14 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * @param hidden
 	 * 		the new hidden value
 	 */
-	public void setHidden(boolean hidden);
+	void setHidden(boolean hidden);
 
 	/**
 	 * Get the UOM of this {@link Parameter}
 	 *
 	 * @return the UOM
 	 */
-	public String getUom();
+	String getUom();
 
 	/**
 	 * Set the UOM of this {@link Parameter}
@@ -58,14 +58,14 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * @param uom
 	 * 		the new UOM
 	 */
-	public void setUom(String uom);
+	void setUom(String uom);
 
 	/**
 	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 *
 	 * @return the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 */
-	public int getIndex();
+	int getIndex();
 
 	/**
 	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
@@ -73,7 +73,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * @param index
 	 * 		the index to set
 	 */
-	public void setIndex(int index);
+	void setIndex(int index);
 
 	/**
 	 * Returns the interpretation of this {@link Parameter}. The interpretation semantic describes what the value of
@@ -86,7 +86,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 *
 	 * @return string value
 	 */
-	public String getInterpretation();
+	String getInterpretation();
 
 	/**
 	 * Set the interpretation of this {@link Parameter}. The interpretation semantic describes what the value of this
@@ -100,15 +100,15 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * @param interpretation
 	 * 		the interpretation
 	 */
-	public void setInterpretation(String interpretation);
+	void setInterpretation(String interpretation);
 
-	public ITimeValue<T> getNextMatch(Long time, T value);
+	ITimeValue<T> getNextMatch(Long time, T value);
 
-	public ITimeValue<T> getPreviousMatch(Long time, T value);
+	ITimeValue<T> getPreviousMatch(Long time, T value);
 
-	public <U extends IValueChange<T>> void applyChange(U change, boolean compact);
+	<U extends IValueChange<T>> void applyChange(U change, boolean compact);
 
-	public ITimeValue<T> getStateAt(Long time);
+	ITimeValue<T> getStateAt(Long time);
 
 	/**
 	 * set the value at a point in time to a given time value object from a string value
@@ -120,10 +120,10 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 */
 	void setStateFromStringAt(final Long time, final String value);
 
-	public ITimeVariable<T> getTimeEvolution();
+	ITimeVariable<T> getTimeEvolution();
 
-	public void setParent(Resource aThis);
+	void setParent(Resource aThis);
 
 	@Override
-	public StrolchTimedState<T> getClone();
+	StrolchTimedState<T> getClone();
 }

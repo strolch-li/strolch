@@ -2,6 +2,7 @@ package li.strolch.model;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -42,6 +43,42 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
 	<U, T extends Parameter<U>> T getParameter(String bagKey, String paramKey, boolean assertExists);
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters} for the given {@link ParameterBag}
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter Parameters} are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	Stream<Parameter<?>> streamOfParameters(String bagKey);
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	Stream<Parameter<?>> streamOfParametersByInterpretation(String bagKey, String interpretation);
+
+	/**
+	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
+	 *
+	 * @param bagKey
+	 * 		the key of the {@link ParameterBag} from which the {@link Parameter} is to be returned
+	 * @param interpretation
+	 * 		the interpretation for which the parameters are to be returned
+	 * @param uom
+	 * 		the uom for which the parameters are to be returned
+	 *
+	 * @return the parameters with the given interpretation
+	 */
+	Stream<Parameter<?>> streamOfParametersByInterpretationAndUom(String bagKey, String interpretation, String uom);
 
 	/**
 	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
@@ -115,6 +152,23 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @return the {@link ParameterBag} with the given key, or null if it does not exist
 	 */
 	ParameterBag getParameterBag(String key, boolean assertExists);
+
+	/**
+	 * Returns a {@link Stream} of {@link ParameterBag ParameterBags}
+	 *
+	 * @return the {@link ParameterBag ParameterBags}
+	 */
+	Stream<ParameterBag> streamOfParameterBags();
+
+	/**
+	 * Returns a {@link Stream} of {@link ParameterBag ParameterBags} of the given type
+	 *
+	 * @param type
+	 * 		the type of {@link ParameterBag} to return
+	 *
+	 * @return the {@link ParameterBag ParameterBags} of the given type
+	 */
+	Stream<ParameterBag> streamOfParameterBagsByType(String type);
 
 	/**
 	 * Returns the {@link ParameterBag ParameterBags} of the given type
