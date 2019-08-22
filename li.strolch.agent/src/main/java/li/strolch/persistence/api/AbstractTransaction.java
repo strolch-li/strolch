@@ -974,8 +974,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void addOrUpdate(Resource resource) throws StrolchModelException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
-		if (hasResource(resource.getType(), resource.getId()) && !getObjectFilter()
-				.hasElement(Tags.RESOURCE, resource.getLocator()))
+		if (hasResource(resource.getType(), resource.getId()))
 			getObjectFilter().update(Tags.RESOURCE, resource.getLocator(), resource);
 		else
 			getObjectFilter().add(Tags.RESOURCE, resource.getLocator(), resource);
@@ -985,7 +984,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void addOrUpdate(Order order) throws StrolchModelException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("order must not be null", order);
-		if (hasOrder(order.getType(), order.getId()) && !getObjectFilter().hasElement(Tags.ORDER, order.getLocator()))
+		if (hasOrder(order.getType(), order.getId()))
 			getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
 		else
 			getObjectFilter().add(Tags.ORDER, order.getLocator(), order);
@@ -995,8 +994,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void addOrUpdate(Activity activity) throws StrolchModelException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
-		if (hasActivity(activity.getType(), activity.getId()) && !getObjectFilter()
-				.hasElement(Tags.ACTIVITY, activity.getLocator()))
+		if (hasActivity(activity.getType(), activity.getId()))
 			getObjectFilter().update(Tags.ACTIVITY, activity.getLocator(), activity);
 		else
 			getObjectFilter().add(Tags.ACTIVITY, activity.getLocator(), activity);
