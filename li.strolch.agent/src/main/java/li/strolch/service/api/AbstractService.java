@@ -148,6 +148,24 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Return the Realm for the current certificate
+	 *
+	 * @return the realm
+	 */
+	protected StrolchRealm getRealm() {
+		return this.container.getRealm(getCertificate());
+	}
+
+	/**
+	 * Return the realm name for the current certificate
+	 *
+	 * @return the realm
+	 */
+	protected String getRealmName() {
+		return this.container.getRealm(getCertificate()).getRealm();
+	}
+
+	/**
 	 * Opens a {@link StrolchTransaction} for the given realm, the action for the TX is this implementation's class
 	 * name. This transaction should be used in a try-with-resource clause so it is properly closed
 	 *
@@ -160,7 +178,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm) throws StrolchException {
-		return this.container.getRealm(realm).openTx(getCertificate(), getClass(), false);
+		return getRealm(realm).openTx(getCertificate(), getClass(), false);
 	}
 
 	/**
@@ -178,7 +196,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm, boolean readOnly) throws StrolchException {
-		return this.container.getRealm(realm).openTx(getCertificate(), getClass(), readOnly);
+		return getRealm(realm).openTx(getCertificate(), getClass(), readOnly);
 	}
 
 	/**
@@ -283,7 +301,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm, String action, boolean readOnly) throws StrolchException {
-		return this.container.getRealm(realm).openTx(getCertificate(), action, readOnly);
+		return getRealm(realm).openTx(getCertificate(), action, readOnly);
 	}
 
 	/**
@@ -301,7 +319,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm, String action) throws StrolchException {
-		return this.container.getRealm(realm).openTx(getCertificate(), action, false);
+		return getRealm(realm).openTx(getCertificate(), action, false);
 	}
 
 	/**
@@ -315,7 +333,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx() throws StrolchException {
-		return this.container.getRealm(getCertificate()).openTx(getCertificate(), getClass(), false);
+		return getRealm().openTx(getCertificate(), getClass(), false);
 	}
 
 	/**
@@ -332,7 +350,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx(boolean readOnly) throws StrolchException {
-		return this.container.getRealm(getCertificate()).openTx(getCertificate(), getClass(), false);
+		return getRealm().openTx(getCertificate(), getClass(), readOnly);
 	}
 
 	/**
@@ -348,7 +366,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx(String action) throws StrolchException {
-		return this.container.getRealm(getCertificate()).openTx(getCertificate(), action, false);
+		return getRealm().openTx(getCertificate(), action, false);
 	}
 
 	/**
@@ -365,7 +383,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if anything else goes wrong during execution
 	 */
 	protected void runAs(String username, SystemAction action) throws PrivilegeException, Exception {
-		this.container.getPrivilegeHandler().runAs(username, action);
+		getPrivilegeHandler().runAs(username, action);
 	}
 
 	/**
@@ -385,7 +403,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected <V> V runWithResult(String username, SystemActionWithResult<V> action)
 			throws PrivilegeException, Exception {
-		return this.container.getPrivilegeHandler().runWithResult(username, action);
+		return getPrivilegeHandler().runWithResult(username, action);
 	}
 
 	/**
@@ -402,7 +420,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if anything else goes wrong during execution
 	 */
 	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
-		this.container.getPrivilegeHandler().runAs(username, runnable);
+		getPrivilegeHandler().runAs(username, runnable);
 	}
 
 	/**
@@ -422,7 +440,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected <V> V runWithResult(String username, PrivilegedRunnableWithResult<V> runnable)
 			throws PrivilegeException, Exception {
-		return this.container.getPrivilegeHandler().runWithResult(username, runnable);
+		return getPrivilegeHandler().runWithResult(username, runnable);
 	}
 
 	/**
@@ -437,7 +455,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(SystemAction action) throws PrivilegeException, Exception {
-		this.container.getPrivilegeHandler().runAsAgent(action);
+		getPrivilegeHandler().runAsAgent(action);
 	}
 
 	/**
@@ -454,7 +472,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if anything else goes wrong during execution
 	 */
 	protected <V> V runAsAgentWithResult(SystemActionWithResult<V> action) throws PrivilegeException, Exception {
-		return this.container.getPrivilegeHandler().runAsAgentWithResult(action);
+		return getPrivilegeHandler().runAsAgentWithResult(action);
 	}
 
 	/**
@@ -470,7 +488,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
-		this.container.getPrivilegeHandler().runAsAgent(runnable);
+		getPrivilegeHandler().runAsAgent(runnable);
 	}
 
 	/**
@@ -489,7 +507,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected <V> V runAsAgentWithResult(PrivilegedRunnableWithResult<V> runnable)
 			throws PrivilegeException, Exception {
-		return this.container.getPrivilegeHandler().runAsAgentWithResult(runnable);
+		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
 	/**

@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,7 +15,13 @@
  */
 package li.strolch.service.api;
 
+import static li.strolch.utils.helper.ExceptionHelper.formatException;
+
+import java.util.ResourceBundle;
+
 import com.google.gson.JsonObject;
+import li.strolch.model.i18n.I18nMessageToJsonVisitor;
+import li.strolch.utils.I18nMessage;
 import li.strolch.utils.helper.ExceptionHelper;
 
 /**
@@ -26,6 +32,8 @@ public class ServiceResult {
 	private ServiceResultState state;
 	private String message;
 	private Throwable throwable;
+
+	private I18nMessage i18nMessage;
 
 	public ServiceResult() {
 		//
@@ -129,12 +137,42 @@ public class ServiceResult {
 		return new ServiceResult(ServiceResultState.FAILED, error, t);
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key) {
+		this.i18nMessage = new I18nMessage(bundle, key);
+		return (T) this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key, String prop, Object value) {
+		this.i18nMessage = new I18nMessage(bundle, key).value(prop, value);
+		return (T) this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key, String prop1, Object value1,
+			String prop2, Object value2) {
+		this.i18nMessage = new I18nMessage(bundle, key).value(prop1, value1).value(prop2, value2);
+		return (T) this;
+	}
+
+	public I18nMessage getI18nMessage() {
+		return this.i18nMessage;
+	}
+
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 
-		json.addProperty("state", state.name());
-		json.addProperty("message", message);
-		json.addProperty("throwable", ExceptionHelper.formatException(throwable));
+		json.addProperty("state", this.state.name());
+		json.addProperty("msg", this.message);
+
+		if (this.throwable != null) {
+			json.addProperty("exceptionMsg", ExceptionHelper.getExceptionMessageWithCauses(this.throwable));
+			json.addProperty("throwable", formatException(this.throwable));
+		}
+
+		if (this.i18nMessage != null)
+			json.add("i18n", this.i18nMessage.accept(new I18nMessageToJsonVisitor()));
 
 		return json;
 	}
