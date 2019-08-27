@@ -1,11 +1,9 @@
 package li.strolch.execution;
 
+import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -16,13 +14,17 @@ import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
+import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.collections.MapOfSets;
@@ -39,6 +41,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	private static final String KEY_DEFAULT_ACTIVITY_ARCHIVAL = "key:DefaultActivityArchival";
 	private static final String PROP_RESTART_EXECUTION = "restartExecution";
 
+	private Map<String, ExecutionHandlerState> statesByRealm;
 	private MapOfSets<String, Locator> registeredActivities;
 
 	private DelayedExecutionTimer delayedExecutionTimer;
@@ -57,6 +60,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void start() throws Exception {
+
+		evaluateStateByRealm();
 
 		this.delayedExecutionTimer = new SimpleDurationExecutionTimer(getContainer().getAgent());
 
@@ -94,6 +99,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void addForExecution(String realm, Locator activityLoc) {
+
+		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+		if (state == ExecutionHandlerState.HaltNew)
+			throw new IllegalStateException(
+					"ExecutionHandler state is " + state + ", can not add activities for execution!");
+
 		Locator rootElemLoc = activityLoc.trim(3);
 		synchronized (this.registeredActivities) {
 			this.registeredActivities.addElement(realm, rootElemLoc);
@@ -163,6 +174,13 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void triggerExecution(String realm) {
+
+		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+		if (state == ExecutionHandlerState.Paused) {
+			logger.warn("Ignoring trigger for paused realm " + realm);
+			return;
+		}
+
 		synchronized (this.registeredActivities) {
 			Set<Locator> locators = this.registeredActivities.getSet(realm);
 			if (locators != null) {
@@ -175,7 +193,85 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public ExecutionHandlerState getState(String realm) {
+		return this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+	}
+
+	private void evaluateStateByRealm() throws Exception {
+
+		this.statesByRealm = Collections.synchronizedMap(new HashMap<>());
+
+		runAsAgent(ctx -> getContainer().getRealmNames().forEach(realm -> {
+			try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), false)) {
+				Resource executionHandlerConfig = tx
+						.getResourceBy(TYPE_CONFIGURATION, ExecutionHandler.class.getSimpleName());
+				if (executionHandlerConfig == null) {
+					this.statesByRealm.put(realm, ExecutionHandlerState.Running);
+				} else {
+					ParameterBag parameters = executionHandlerConfig.getParameterBag(BAG_PARAMETERS);
+					if (parameters == null) {
+						this.statesByRealm.put(realm, ExecutionHandlerState.Running);
+					} else {
+						StringParameter stateP = parameters.getParameter(PARAM_STATE);
+						if (stateP == null) {
+							this.statesByRealm.put(realm, ExecutionHandlerState.Running);
+						} else {
+							ExecutionHandlerState state;
+							try {
+								state = ExecutionHandlerState.valueOf(stateP.getValue());
+							} catch (Exception e) {
+								state = ExecutionHandlerState.Running;
+								stateP.setValue(ExecutionHandlerState.Running.name());
+								tx.update(executionHandlerConfig);
+								tx.commitOnClose();
+								logger.error("Failed to read unhandled state " + stateP.getValue(), e);
+							}
+							this.statesByRealm.put(realm, state);
+						}
+					}
+				}
+			}
+		}));
+	}
+
+	@Override
+	public void setState(Certificate cert, String realm, ExecutionHandlerState state) {
+		try (StrolchTransaction tx = openTx(realm, cert, false)) {
+			Resource executionHandlerConfig = tx
+					.getResourceBy(TYPE_CONFIGURATION, ExecutionHandler.class.getSimpleName());
+			if (executionHandlerConfig == null) {
+				executionHandlerConfig = new Resource(ExecutionHandler.class.getSimpleName(),
+						"ExecutionHandler Configuration", TYPE_CONFIGURATION);
+			}
+			ParameterBag parameters = executionHandlerConfig.getParameterBag(BAG_PARAMETERS);
+			if (parameters == null) {
+				parameters = new ParameterBag(BAG_PARAMETERS, "Parameters", TYPE_PARAMETERS);
+				executionHandlerConfig.addParameterBag(parameters);
+			}
+			StringParameter stateP = parameters.getParameter(PARAM_STATE);
+			if (stateP == null) {
+				stateP = new StringParameter(PARAM_STATE, "State", state);
+				parameters.addParameter(stateP);
+			}
+
+			stateP.setValueE(state);
+
+			tx.addOrUpdate(executionHandlerConfig);
+			tx.commitOnClose();
+
+			this.statesByRealm.put(realm, state);
+		}
+	}
+
+	@Override
 	public void toExecution(String realm, Locator locator) {
+
+		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+		if (state == ExecutionHandlerState.Paused) {
+			logger.warn("Ignoring execution of " + locator + " for paused realm " + realm);
+			return;
+		}
+
 		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
@@ -392,15 +488,21 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			} else {
 
-				// otherwise execute any next action(s) for this action's activity
+				ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+				if (state == ExecutionHandlerState.Paused) {
+					logger.warn("Ignoring trigger for paused realm " + realm);
+				} else {
 
-				ExecuteActivityCommand execCommand = new ExecuteActivityCommand(getContainer(), tx);
-				execCommand.setActivity(activity);
-				execCommand.validate();
-				execCommand.doCommand();
+					// otherwise execute any next action(s) for this action's activity
 
-				// flush so we can see the changes performed
-				tx.flush();
+					ExecuteActivityCommand execCommand = new ExecuteActivityCommand(getContainer(), tx);
+					execCommand.setActivity(activity);
+					execCommand.validate();
+					execCommand.doCommand();
+
+					// flush so we can see the changes performed
+					tx.flush();
+				}
 			}
 
 			tx.commitOnClose();

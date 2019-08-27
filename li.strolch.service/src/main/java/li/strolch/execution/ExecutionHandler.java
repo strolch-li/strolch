@@ -11,6 +11,7 @@ import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 
 /**
@@ -36,6 +37,8 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public ExecutionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
+
+	public static final String PARAM_STATE = "state";
 
 	/**
 	 * Registers the given {@link Locator} of an {@link Activity} for execution, and submits it for execution
@@ -83,6 +86,28 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * 		the realm to trigger execution for
 	 */
 	public abstract void triggerExecution(String realm);
+
+	/**
+	 * Get the sate of the execution handler
+	 *
+	 * @param realm
+	 * 		the realm for which to get the state
+	 *
+	 * @return the state of the execution handler
+	 */
+	public abstract ExecutionHandlerState getState(String realm);
+
+	/**
+	 * Set the state for the given realm
+	 *
+	 * @param cert
+	 * 		certificate to use
+	 * @param realm
+	 * 		the realm to halt execution for
+	 * @param state
+	 * 		the state to set
+	 */
+	public abstract void setState(Certificate cert, String realm, ExecutionHandlerState state);
 
 	/**
 	 * Archives the given {@link Activity}

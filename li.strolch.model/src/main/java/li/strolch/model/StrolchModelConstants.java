@@ -64,6 +64,7 @@ public class StrolchModelConstants {
 	public static final String BAG_PARAMETERS = "parameters";
 	public static final String TYPE_PARAMETERS = "Parameters";
 	public static final String TYPE_ENUMERATION = "Enumeration";
+	public static final String TYPE_CONFIGURATION = "Configuration";
 
 	/**
 	 * ID of the admin role which has access to all resources
