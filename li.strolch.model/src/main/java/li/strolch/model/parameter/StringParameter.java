@@ -15,6 +15,9 @@
  */
 package li.strolch.model.parameter;
 
+import java.text.MessageFormat;
+
+import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
@@ -48,6 +51,21 @@ public class StringParameter extends AbstractParameter<String> {
 		setValue(value);
 	}
 
+	/**
+	 * Default constructor
+	 *
+	 * @param id
+	 * 		the id
+	 * @param name
+	 * 		the name
+	 * @param value
+	 * 		the value
+	 */
+	public StringParameter(String id, String name, Enum<?> value) {
+		super(id, name);
+		setValueE(value);
+	}
+
 	@Override
 	public String getType() {
 		return StrolchValueType.STRING.getType();
@@ -74,6 +92,17 @@ public class StringParameter extends AbstractParameter<String> {
 		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
+	}
+
+	public void setValueE(Enum<?> value) {
+		assertNotReadonly();
+		if (value == null) {
+			String msg = "Can not set null value on Parameter {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, getLocator());
+			throw new StrolchException(msg);
+		}
+		validateValue(value.name());
+		this.value = value.name();
 	}
 
 	@Override
