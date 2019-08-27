@@ -66,6 +66,17 @@ public class ResponseUtil {
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
+	public static Response toResponse(String prop1, String value1, JsonArray data) {
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, StringHelper.DASH);
+		response.addProperty(prop1, value1);
+		response.add(DATA, data);
+
+		String json = new Gson().toJson(response);
+
+		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
 	public static <T> Response toResponse(String member, T t, Function<T, JsonObject> toJson) {
 		return toResponse(member, toJson.apply(t));
 	}
@@ -115,24 +126,8 @@ public class ResponseUtil {
 
 	public static Response toResponse(ServiceResult svcResult) {
 
-		String msg = StringHelper.DASH;
-		String exceptionMsg = StringHelper.DASH;
-
 		Throwable t = svcResult.getThrowable();
-		if (svcResult.isNok()) {
-			msg = svcResult.getMessage();
-			if (t != null) {
-				exceptionMsg = StringHelper.formatExceptionMessage(t);
-				if (StringHelper.isEmpty(msg))
-					msg = exceptionMsg;
-			}
-		}
-
-		JsonObject response = new JsonObject();
-		response.addProperty(MSG, msg);
-		if (!exceptionMsg.equals(StringHelper.DASH))
-			response.addProperty(EXCEPTION_MSG, exceptionMsg);
-
+		JsonObject response = svcResult.toJson();
 		String json = new Gson().toJson(response);
 
 		if (svcResult.isOk())
