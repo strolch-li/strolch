@@ -48,9 +48,9 @@ public class I18nMessage {
 		return formatMessage();
 	}
 
-	public I18nMessage value(String key, String value) {
+	public I18nMessage value(String key, Object value) {
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
-		this.values.setProperty(key, value == null ? "(null)" : value);
+		this.values.setProperty(key, value == null ? "(null)" : value.toString());
 		return this;
 	}
 
@@ -67,6 +67,10 @@ public class I18nMessage {
 		}
 
 		return this.message;
+	}
+
+	public <T> T accept(I18nMessageVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 	@Override
