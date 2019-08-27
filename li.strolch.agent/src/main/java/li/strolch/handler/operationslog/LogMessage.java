@@ -81,7 +81,7 @@ public class LogMessage extends I18nMessage {
 	}
 
 	@Override
-	public LogMessage value(String key, String value) {
+	public LogMessage value(String key, Object value) {
 		super.value(key, value);
 		return this;
 	}
