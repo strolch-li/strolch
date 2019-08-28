@@ -145,14 +145,38 @@ public class ServiceResult {
 
 	@SuppressWarnings("unchecked")
 	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key, String prop, Object value) {
-		this.i18nMessage = new I18nMessage(bundle, key).value(prop, value);
+		this.i18nMessage = new I18nMessage(bundle, key) //
+				.value(prop, value);
 		return (T) this;
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key, String prop1, Object value1,
 			String prop2, Object value2) {
-		this.i18nMessage = new I18nMessage(bundle, key).value(prop1, value1).value(prop2, value2);
+		this.i18nMessage = new I18nMessage(bundle, key) //
+				.value(prop1, value1) //
+				.value(prop2, value2);
+		return (T) this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key, String prop1, Object value1,
+			String prop2, Object value2, String prop3, Object value3) {
+		this.i18nMessage = new I18nMessage(bundle, key) //
+				.value(prop1, value1) //
+				.value(prop2, value2) //
+				.value(prop3, value3);
+		return (T) this;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key, String prop1, Object value1,
+			String prop2, Object value2, String prop3, Object value3, String prop4, Object value4) {
+		this.i18nMessage = new I18nMessage(bundle, key) //
+				.value(prop1, value1) //
+				.value(prop2, value2) //
+				.value(prop3, value3) //
+				.value(prop4, value4);
 		return (T) this;
 	}
 
