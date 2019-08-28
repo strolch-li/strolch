@@ -99,7 +99,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				@SuppressWarnings("unchecked")
 				U arg = (U) abstractService.getResultInstance();
 				arg.setState(e instanceof PrivilegeModelException ?
-						ServiceResultState.FAILED :
+						ServiceResultState.EXCEPTION :
 						ServiceResultState.ACCESS_DENIED);
 				arg.setMessage(e.getMessage());
 				arg.setThrowable(e);
@@ -187,6 +187,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			}
 
 		} else if (serviceResult.getState() == ServiceResultState.FAILED
+				|| serviceResult.getState() == ServiceResultState.EXCEPTION
 				|| serviceResult.getState() == ServiceResultState.ACCESS_DENIED) {
 
 			msg = serviceResult.getState() + ": " + msg;
@@ -203,9 +204,15 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				reason = serviceResult.getThrowable().getMessage();
 				throwable = serviceResult.getThrowable();
 			}
-			logger.error("Reason: " + reason, throwable);
 
-			if (getContainer().hasComponent(OperationsLog.class)) {
+			if (throwable == null)
+				logger.error("Reason: " + reason);
+			else
+				logger.error("Reason: " + reason, throwable);
+
+			if ((serviceResult.getState() == ServiceResultState.EXCEPTION
+					|| serviceResult.getState() == ServiceResultState.ACCESS_DENIED) //
+					&& getContainer().hasComponent(OperationsLog.class)) {
 
 				LogMessage logMessage;
 

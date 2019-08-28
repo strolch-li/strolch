@@ -525,7 +525,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 			logger.error(msg);
 
 			U result = getResultInstance();
-			result.setState(ServiceResultState.FAILED);
+			result.setState(ServiceResultState.EXCEPTION);
 			result.setMessage(msg);
 			return result;
 		}
@@ -543,7 +543,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 
 		} catch (Exception e) {
 			U result = getResultInstance();
-			result.setState(ServiceResultState.FAILED);
+			result.setState(ServiceResultState.EXCEPTION);
 			result.setMessage(e.getMessage());
 			result.setThrowable(e);
 			return result;
