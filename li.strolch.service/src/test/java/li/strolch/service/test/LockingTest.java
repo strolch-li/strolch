@@ -110,7 +110,7 @@ public class LockingTest {
 		assertEquals(ServiceResultState.SUCCESS, runners.get(0).getResult().getState());
 		for (int i = 1; i < runners.size(); i++) {
 			ServiceResult result = runners.get(i).getResult();
-			assertEquals(ServiceResultState.FAILED, result.getState());
+			assertEquals(ServiceResultState.EXCEPTION, result.getState());
 			assertThat(result.getMessage(), containsString("Failed to acquire lock after"));
 		}
 	}
