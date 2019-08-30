@@ -174,7 +174,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Certificate getCertificate() {
-		return certificate;
+		return this.certificate;
+	}
+
+	@Override
+	public Locale getLocale() {
+		return this.certificate.getLocale();
 	}
 
 	@Override

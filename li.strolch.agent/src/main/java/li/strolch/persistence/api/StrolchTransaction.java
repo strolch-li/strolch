@@ -16,6 +16,7 @@
 package li.strolch.persistence.api;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -109,6 +110,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the {@link Certificate} which allowed this TX to be opened
 	 */
 	Certificate getCertificate();
+
+	/**
+	 * Returns the {@link Locale} for the {@link Certificate}
+	 *
+	 * @return the {@link Locale} for the {@link Certificate}
+	 */
+	Locale getLocale();
 
 	/**
 	 * Returns the {@link PrivilegeContext} for this TX's certificate
