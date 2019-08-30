@@ -66,7 +66,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			stub.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
 			stub.authToken = attributes.getValue(XmlConstants.XML_ATTR_AUTH_TOKEN);
 			stub.source = attributes.getValue(XmlConstants.XML_ATTR_SOURCE);
-			stub.locale = new Locale(attributes.getValue(XmlConstants.XML_ATTR_LOCALE));
+			stub.locale = Locale.forLanguageTag(attributes.getValue(XmlConstants.XML_ATTR_LOCALE));
 			stub.loginTime = ISO8601FormatFactory.getInstance()
 					.parseDate(attributes.getValue(XmlConstants.XML_ATTR_LOGIN_TIME));
 			stub.lastAccess = ISO8601FormatFactory.getInstance()

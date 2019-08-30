@@ -1038,7 +1038,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				if (ctx.getUserRep().getUsername().equals(newUser.getUsername())) {
 					Certificate cert = ctx.getCertificate();
 					cert = buildCertificate(cert.getUsage(), newUser, cert.getAuthToken(), cert.getSessionId(),
-							cert.getSource());
+							cert.getSource(), cert.getLoginTime());
 					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, newUser);
 					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 				}
@@ -1063,7 +1063,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 					Certificate cert = ctx.getCertificate();
 					cert = buildCertificate(cert.getUsage(), user, cert.getAuthToken(), cert.getSessionId(),
-							cert.getSource());
+							cert.getSource(), cert.getLoginTime());
 					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, user);
 					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 				}
@@ -1127,7 +1127,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Usage usage = userChallenge.getUsage();
-		Certificate certificate = buildCertificate(usage, user, authToken, sessionId, userChallenge.getSource());
+		Certificate certificate = buildCertificate(usage, user, authToken, sessionId, userChallenge.getSource(),
+				new Date());
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1177,7 +1178,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = UUID.randomUUID().toString();
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source);
+			Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source, new Date());
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1233,7 +1234,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
-		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source);
+		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source, new Date());
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1246,15 +1247,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return certificate;
 	}
 
-	private Certificate buildCertificate(Usage usage, User user, String authToken, String sessionId, String source) {
+	private Certificate buildCertificate(Usage usage, User user, String authToken, String sessionId, String source,
+			Date loginTime) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		Set<String> userRoles = user.getRoles();
 		return new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(), user.getLastname(),
-				user.getUserState(), authToken, source, new Date(), user.getLocale(), userRoles,
+				user.getUserState(), authToken, source, loginTime, user.getLocale(), userRoles,
 				new HashMap<>(user.getProperties()));
 	}
 
-	private boolean persistSessions() {
+	private synchronized boolean persistSessions() {
 		if (!this.persistSessions)
 			return false;
 
@@ -1315,12 +1317,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			return;
 		}
 
-		for (CertificateStub certificateStub : certificateStubs) {
-			Usage usage = certificateStub.getUsage();
-			String username = certificateStub.getUsername();
-			String sessionId = certificateStub.getSessionId();
-			String authToken = certificateStub.getAuthToken();
-			String source = certificateStub.getSource();
+		for (CertificateStub stub : certificateStubs) {
+			Usage usage = stub.getUsage();
+			String username = stub.getUsername();
+			String sessionId = stub.getSessionId();
+			String authToken = stub.getAuthToken();
+			String source = stub.getSource();
 			User user = this.persistenceHandler.getUser(username);
 			if (user == null) {
 				logger.error("Ignoring session data for missing user " + username);
@@ -1339,8 +1341,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source);
-			certificate.setLastAccess(certificateStub.getLastAccess());
+			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, stub.getLoginTime());
+			certificate.setLocale(stub.getLocale());
+			certificate.setLastAccess(stub.getLastAccess());
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -2002,7 +2005,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
-		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId, this.identifier);
+		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId, this.identifier,
+				new Date());
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);

@@ -104,7 +104,7 @@ public class UserSessionsService {
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 		Locale locale;
 		try {
-			locale = new Locale(localeS);
+			locale = Locale.forLanguageTag(localeS);
 		} catch (Exception e) {
 			String msg = MessageFormat.format("Locale {0} is not valid!", localeS);
 			return Response.serverError().entity(ResponseUtil.toResponse(msg)).type(MediaType.APPLICATION_JSON).build();

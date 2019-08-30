@@ -234,7 +234,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	private void persistSessions() {
 		try {
-			runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler().persistSessions(ctx.getCertificate(), ctx.getCertificate().getSource()));
+			runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler()
+					.persistSessions(ctx.getCertificate(), ctx.getCertificate().getSource()));
 		} catch (Exception e) {
 			logger.error("Failed to persist sessions", e);
 		} finally {
@@ -390,7 +391,11 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		synchronized (this.certificateMap) {
 			for (Certificate cert : certificateMap.values()) {
 				if (cert.getSessionId().equals(sessionId)) {
-					cert.setLocale(locale);
+					if (!cert.getLocale().equals(locale)) {
+						cert.setLocale(locale);
+						persistSessions();
+					}
+					break;
 				}
 			}
 		}
