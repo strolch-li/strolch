@@ -15,8 +15,13 @@
  */
 package li.strolch.utils.helper;
 
+import static li.strolch.utils.helper.XmlHelper.PROP_LINE_SEPARATOR;
+import static li.strolch.utils.helper.XmlHelper.UNIX_LINE_SEP;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import li.strolch.utils.RemoveCRFilterWriter;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -74,10 +79,18 @@ public class ExceptionHelper {
 	 * @return a string representation of the given {@link Throwable}'s stack trace
 	 */
 	public static String formatException(Throwable t) {
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter writer = new PrintWriter(stringWriter);
-		t.printStackTrace(writer);
-		return stringWriter.toString();
+		String ls = System.getProperty(PROP_LINE_SEPARATOR);
+		if (!ls.equals(UNIX_LINE_SEP))
+			System.setProperty(PROP_LINE_SEPARATOR, UNIX_LINE_SEP);
+		try {
+			StringWriter stringWriter = new StringWriter();
+			PrintWriter writer = new PrintWriter(new RemoveCRFilterWriter(stringWriter));
+			t.printStackTrace(writer);
+			return stringWriter.toString();
+		} finally {
+			if (!ls.equals(UNIX_LINE_SEP))
+				System.setProperty(PROP_LINE_SEPARATOR, ls);
+		}
 	}
 
 	/**
