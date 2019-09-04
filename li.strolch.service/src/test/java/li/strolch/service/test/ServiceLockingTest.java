@@ -35,7 +35,7 @@ import org.junit.Test;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class LockingTest {
+public class ServiceLockingTest {
 
 	private static final String RUNTIME_PATH = "target/lockingTest/"; //$NON-NLS-1$
 	private static final String CONFIG_SRC = "src/test/resources/transienttest"; //$NON-NLS-1$
@@ -111,7 +111,7 @@ public class LockingTest {
 		for (int i = 1; i < runners.size(); i++) {
 			ServiceResult result = runners.get(i).getResult();
 			assertEquals(ServiceResultState.EXCEPTION, result.getState());
-			assertThat(result.getMessage(), containsString("Failed to acquire lock after"));
+			assertThat(result.getMessage(), containsString("failed to acquire lock after"));
 		}
 	}
 
@@ -158,7 +158,7 @@ public class LockingTest {
 		@Override
 		public void run() {
 
-			while (!LockingTest.this.run) {
+			while (!ServiceLockingTest.this.run) {
 				// spin lock
 			}
 
