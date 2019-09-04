@@ -29,6 +29,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 
+import li.strolch.utils.RemoveCRFilterWriter;
 import li.strolch.utils.exceptions.XmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class XmlHelper {
 	/**
 	 * UNIX_LINE_SEP = "\n" : mostly we want this line separator, instead of the windows version
 	 */
-	private static final String UNIX_LINE_SEP = "\n"; //$NON-NLS-1$
+	public static final String UNIX_LINE_SEP = "\n"; //$NON-NLS-1$
 
 	/**
 	 * DEFAULT_ENCODING = "utf-8" : defines the default UTF-8 encoding expected of XML files
@@ -209,7 +210,12 @@ public class XmlHelper {
 	 * 		if something went wrong while creating the XML configuration, or writing the element
 	 */
 	public static void writeDocument(Document document, File file, String encoding) throws RuntimeException {
-		writeDocument(document, new StreamResult(file), encoding);
+		try (FileOutputStream out = new FileOutputStream(file)) {
+			writeDocument(document, new StreamResult(new RemoveCRFilterWriter(new OutputStreamWriter(out, encoding))),
+					encoding);
+		} catch (IOException e) {
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -217,14 +223,15 @@ public class XmlHelper {
 	 *
 	 * @param document
 	 * 		the {@link Document} to write to the file system
-	 * @param outputStream
+	 * @param out
 	 * 		stream to write document to
 	 *
 	 * @throws RuntimeException
 	 * 		if something went wrong while creating the XML configuration, or writing the element
 	 */
-	public static void writeDocument(Document document, OutputStream outputStream) throws RuntimeException {
-		writeDocument(document, new StreamResult(outputStream), DEFAULT_ENCODING);
+	public static void writeDocument(Document document, OutputStream out) throws RuntimeException {
+		writeDocument(document, new StreamResult(new RemoveCRFilterWriter(new OutputStreamWriter(out))),
+				DEFAULT_ENCODING);
 	}
 
 	/**
@@ -239,7 +246,8 @@ public class XmlHelper {
 	public static String writeToString(Document document) throws RuntimeException {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			writeDocument(document, new StreamResult(out), DEFAULT_ENCODING);
+			writeDocument(document, new StreamResult(new RemoveCRFilterWriter(new OutputStreamWriter(out))),
+					DEFAULT_ENCODING);
 			return out.toString(DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
 			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
