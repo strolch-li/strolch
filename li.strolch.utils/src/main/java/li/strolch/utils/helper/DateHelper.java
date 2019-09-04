@@ -34,24 +34,29 @@ public class DateHelper {
 	 * @return the string in the locale' format using {@link FormatStyle#MEDIUM}
 	 */
 	public static String formatDate(Locale locale, String isoDate, boolean withTimeIfNonZero) {
-		LocalDateTime parse = LocalDateTime.parse(isoDate, DateTimeFormatter.ISO_DATE_TIME);
+		LocalDateTime ldt = LocalDateTime.parse(isoDate, DateTimeFormatter.ISO_DATE_TIME);
 
-		if (parse.getYear() > 2100)
+		if (ldt.getYear() > 2100)
 			return "-";
 
-		DateTimeFormatter formatter;
-		if (withTimeIfNonZero && (parse.getHour() != 0 || parse.getMinute() != 0)) {
+		if (locale.getCountry().equals("CH")) {
+			if (withTimeIfNonZero && (ldt.getHour() != 0 || ldt.getMinute() != 0)) {
+				return ldt.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss", locale));
+			} else {
+				return ldt.format(DateTimeFormatter.ofPattern("dd.MM.yyyy", locale));
+			}
+		}
+
+		if (withTimeIfNonZero && (ldt.getHour() != 0 || ldt.getMinute() != 0)) {
 			String pattern = DateTimeFormatterBuilder
 					.getLocalizedDateTimePattern(FormatStyle.MEDIUM, FormatStyle.MEDIUM, Chronology.ofLocale(locale),
 							locale);
-			formatter = DateTimeFormatter.ofPattern(pattern);
+			return ldt.format(DateTimeFormatter.ofPattern(pattern, locale));
 		} else {
 			String pattern = DateTimeFormatterBuilder
 					.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale);
-			formatter = DateTimeFormatter.ofPattern(pattern);
+			return ldt.format(DateTimeFormatter.ofPattern(pattern, locale));
 		}
-
-		return parse.format(formatter);
 	}
 
 	/**
