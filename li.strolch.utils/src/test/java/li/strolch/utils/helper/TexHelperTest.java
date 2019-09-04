@@ -7,12 +7,16 @@ import java.io.File;
 import java.util.Locale;
 import java.util.Properties;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.Assume;
 import org.junit.Test;
 
 public class TexHelperTest {
 
 	@Test
 	public void test() {
+		Assume.assumeThat(true, new PdfLatexChecker());
 
 		File texDir = new File("src/test/resources");
 		String templateName = "tex.tpl";
@@ -39,5 +43,26 @@ public class TexHelperTest {
 		File renderFile = helper.renderFile(properties, fileName);
 		assertNotNull(renderFile);
 		assertTrue(renderFile.exists());
+	}
+
+	private static class PdfLatexChecker extends TypeSafeMatcher<Boolean> {
+		@Override
+		protected boolean matchesSafely(Boolean b) {
+
+			int result;
+			try {
+				Process exec = Runtime.getRuntime().exec("pdflatex --version");
+				result = exec.waitFor();
+			} catch (Exception e) {
+				result = 99;
+			}
+
+			return b ? result == 0 : result > 1;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("validate PDF Latex is installed");
+		}
 	}
 }
