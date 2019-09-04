@@ -15,6 +15,9 @@
  */
 package li.strolch.xmlpers.impl;
 
+import static li.strolch.utils.helper.PropertiesHelper.*;
+import static li.strolch.xmlpers.api.PersistenceConstants.*;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
@@ -49,25 +52,14 @@ public class DefaultPersistenceManager implements PersistenceManager {
 		String context = DefaultPersistenceManager.class.getSimpleName();
 
 		// get properties
-		boolean verbose = PropertiesHelper
-				.getPropertyBool(properties, context, PersistenceConstants.PROP_VERBOSE, Boolean.FALSE);
-		String ioModeS = PropertiesHelper
-				.getProperty(properties, context, PersistenceConstants.PROP_XML_IO_MOD, IoMode.DOM.name());
-		IoMode ioMode = IoMode.valueOf(ioModeS);
-		long lockTime = PropertiesHelper
-				.getPropertyLong(properties, context, PersistenceConstants.PROP_LOCK_TIME_MILLIS, 10000L);
-		String basePath = PropertiesHelper.getProperty(properties, context, PersistenceConstants.PROP_BASEPATH, null);
+		boolean verbose = getPropertyBool(properties, context, PROP_VERBOSE, Boolean.FALSE);
+		IoMode ioMode = IoMode.valueOf(getProperty(properties, context, PROP_XML_IO_MOD, IoMode.DOM.name()));
+		long lockTime = getPropertyLong(properties, context, PROP_LOCK_TIME_MILLIS, LockableObject.getLockTime());
+		String basePath = getProperty(properties, context, PROP_BASEPATH, null);
 
 		// set lock time on LockableObject
-		try {
-			Field lockTimeField = LockableObject.class.getDeclaredField("tryLockTime");//$NON-NLS-1$
-			lockTimeField.setAccessible(true);
-			lockTimeField.setLong(null, lockTime);
-			logger.info("Using a max lock acquire time of " + StringHelper
-					.formatMillisecondsDuration(lockTime)); //$NON-NLS-1$
-		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
-			throw new RuntimeException("Failed to configure tryLockTime on LockableObject!", e); //$NON-NLS-1$
-		}
+		if (lockTime != LockableObject.getLockTime())
+			LockableObject.setTryLockTime(lockTime);
 
 		// validate base path exists and is writable
 		File basePathF = new File(basePath).getAbsoluteFile();

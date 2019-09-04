@@ -26,9 +26,8 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
@@ -59,27 +58,29 @@ public class FileIo {
 
 	public <T> void writeSax(PersistenceContext<T> ctx) {
 
-		XMLStreamWriter writer;
+		XMLStreamWriter xmlWriter;
 		try {
-			try (FileWriter fileWriter = new FileWriter(this.tmpPath)) {
+			try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.tmpPath), DEFAULT_ENCODING)) {
 
 				XMLOutputFactory factory = XMLOutputFactory.newInstance();
-				writer = factory.createXMLStreamWriter(fileWriter);
-				writer = new IndentingXMLStreamWriter(writer);
+				xmlWriter = factory.createXMLStreamWriter(ioWriter);
+				xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
 
 				// start document
-				writer.writeStartDocument(DEFAULT_ENCODING, DEFAULT_XML_VERSION);
+				xmlWriter.writeStartDocument(DEFAULT_ENCODING, DEFAULT_XML_VERSION);
 
 				// then delegate object writing to caller
 				SaxParser<T> saxParser = ctx.getParserFactor().getSaxParser();
 				saxParser.setObject(ctx.getObject());
-				saxParser.write(writer);
+				saxParser.write(xmlWriter);
 
 				// and now end
-				writer.writeEndDocument();
-				writer.flush();
+				xmlWriter.writeEndDocument();
+				xmlWriter.flush();
 			}
 
+			if (this.path.exists() && !this.path.delete())
+				throw new IllegalStateException("Failed to delete existing file " + this.path.getAbsolutePath());
 			if (!this.tmpPath.renameTo(this.path)) {
 				throw new IllegalStateException(
 						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
@@ -158,21 +159,25 @@ public class FileIo {
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
-			StreamResult result = new StreamResult(this.tmpPath);
-			Source xmlSource = new DOMSource(document);
-			transformer.transform(xmlSource, result);
+			try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.tmpPath), encoding)) {
+				StreamResult result = new StreamResult(this.tmpPath);
+				Source xmlSource = new DOMSource(document);
+				transformer.transform(xmlSource, result);
+			}
 
 			if (logger.isDebugEnabled()) {
 				String msg = MessageFormat.format("Wrote DOM to {0}", this.tmpPath.getAbsolutePath()); //$NON-NLS-1$
 				logger.info(msg);
 			}
 
+			if (this.path.exists() && !this.path.delete())
+				throw new IllegalStateException("Failed to delete existing file " + this.path.getAbsolutePath());
 			if (!this.tmpPath.renameTo(this.path)) {
 				throw new IllegalStateException(
 						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
 			}
 
-		} catch (TransformerFactoryConfigurationError | TransformerException e) {
+		} catch (IOException | TransformerFactoryConfigurationError | TransformerException e) {
 			if (this.tmpPath.exists()) {
 				if (!this.tmpPath.delete())
 					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());

@@ -22,6 +22,7 @@ import java.util.*;
 
 import li.strolch.utils.objectfilter.ObjectFilter;
 import li.strolch.xmlpers.api.*;
+import li.strolch.xmlpers.objref.LockableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	private Date startTimeDate;
 	private TransactionResult txResult;
 
+	private Set<LockableObject> lockedObjects;
+
 	public DefaultPersistenceTransaction(PersistenceManager manager, IoMode ioMode, boolean verbose) {
 		this.startTime = System.nanoTime();
 		this.startTimeDate = new Date();
@@ -60,6 +63,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 		this.closeStrategy = TransactionCloseStrategy.COMMIT;
 		this.state = TransactionState.OPEN;
+		this.lockedObjects = new HashSet<>();
 	}
 
 	@Override
@@ -113,27 +117,31 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 	@Override
 	public void autoCloseableRollback() {
-		long start = System.nanoTime();
-		if (this.state == TransactionState.COMMITTED)
-			throw new IllegalStateException("Transaction has already been committed!"); //$NON-NLS-1$
+		try {
+			long start = System.nanoTime();
+			if (this.state == TransactionState.COMMITTED)
+				throw new IllegalStateException("Transaction has already been committed!"); //$NON-NLS-1$
 
-		if (this.state != TransactionState.ROLLED_BACK) {
-			unlockObjectRefs();
-			this.state = TransactionState.ROLLED_BACK;
-			this.objectFilter.clearCache();
+			if (this.state != TransactionState.ROLLED_BACK) {
+				this.state = TransactionState.ROLLED_BACK;
 
-			long end = System.nanoTime();
-			long txDuration = end - this.startTime;
-			long closeDuration = end - start;
+				long end = System.nanoTime();
+				long txDuration = end - this.startTime;
+				long closeDuration = end - start;
 
-			if (this.txResult != null) {
-				this.txResult.clear();
-				this.txResult.setState(this.state);
-				this.txResult.setStartTime(this.startTimeDate);
-				this.txResult.setTxDuration(txDuration);
-				this.txResult.setCloseDuration(closeDuration);
-				this.txResult.setModificationByKey(Collections.emptyMap());
+				if (this.txResult != null) {
+					this.txResult.clear();
+					this.txResult.setState(this.state);
+					this.txResult.setStartTime(this.startTimeDate);
+					this.txResult.setTxDuration(txDuration);
+					this.txResult.setCloseDuration(closeDuration);
+					this.txResult.setModificationByKey(Collections.emptyMap());
+				}
 			}
+		} finally {
+			// clean up
+			this.objectFilter.clearCache();
+			releaseAllLocks();
 		}
 	}
 
@@ -242,10 +250,9 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			this.txResult.setFailCause(e);
 
 		} finally {
-
 			// clean up
-			unlockObjectRefs();
 			this.objectFilter.clearCache();
+			releaseAllLocks();
 		}
 
 		long end = System.nanoTime();
@@ -274,16 +281,21 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
-	private void unlockObjectRefs() {
-		List<PersistenceContext> lockedObjects = this.objectFilter.getAll(PersistenceContext.class);
-		for (PersistenceContext lockedObject : lockedObjects) {
-			lockedObject.getObjectRef().unlock();
+	private void releaseAllLocks() {
+		for (LockableObject lockedObject : this.lockedObjects) {
+			lockedObject.releaseLock();
 		}
+		this.lockedObjects.clear();
 	}
 
 	@Override
 	public boolean isOpen() {
 		return this.state == TransactionState.OPEN;
+	}
+
+	@Override
+	public void lock(LockableObject lockableObject) {
+		lockableObject.lock();
+		this.lockedObjects.add(lockableObject);
 	}
 }

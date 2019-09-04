@@ -49,21 +49,17 @@ public class MetadataDao {
 		assertNotClosed(this.tx);
 		assertNotIdRef(parentRef);
 
-		parentRef.lock();
-		try {
-			File queryPath = parentRef.getPath(this.pathBuilder);
-			Set<String> keySet = queryTypeSet(queryPath);
+		this.tx.lock(parentRef);
+		File queryPath = parentRef.getPath(this.pathBuilder);
+		Set<String> keySet = queryTypeSet(queryPath);
 
-			if (this.verbose) {
-				String msg = "Found {0} types for {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, keySet.size(), parentRef.getName());
-				logger.info(msg);
-			}
-
-			return keySet;
-		} finally {
-			parentRef.unlock();
+		if (this.verbose) {
+			String msg = "Found {0} types for {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, keySet.size(), parentRef.getName());
+			logger.info(msg);
 		}
+
+		return keySet;
 	}
 
 	public Set<String> queryKeySet(ObjectRef parentRef) {
@@ -75,21 +71,17 @@ public class MetadataDao {
 		assertNotRootRef(parentRef);
 		assertNotIdRef(parentRef);
 
-		parentRef.lock();
-		try {
-			File queryPath = parentRef.getPath(this.pathBuilder);
-			Set<String> keySet = queryKeySet(queryPath, reverse);
+		this.tx.lock(parentRef);
+		File queryPath = parentRef.getPath(this.pathBuilder);
+		Set<String> keySet = queryKeySet(queryPath, reverse);
 
-			if (this.verbose) {
-				String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, keySet.size(), parentRef.getName());
-				logger.info(msg);
-			}
-
-			return keySet;
-		} finally {
-			parentRef.unlock();
+		if (this.verbose) {
+			String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, keySet.size(), parentRef.getName());
+			logger.info(msg);
 		}
+
+		return keySet;
 	}
 
 	public long queryTypeSize(ObjectRef parentRef) {
@@ -97,41 +89,33 @@ public class MetadataDao {
 		assertNotRootRef(parentRef);
 		assertNotIdRef(parentRef);
 
-		parentRef.lock();
-		try {
-			File queryPath = parentRef.getPath(this.pathBuilder);
-			long numberOfFiles = queryTypeSize(queryPath);
+		this.tx.lock(parentRef);
+		File queryPath = parentRef.getPath(this.pathBuilder);
+		long numberOfFiles = queryTypeSize(queryPath);
 
-			if (this.verbose) {
-				String msg = "Found {0} types for {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, numberOfFiles, parentRef.getName());
-				logger.info(msg);
-			}
-
-			return numberOfFiles;
-		} finally {
-			parentRef.unlock();
+		if (this.verbose) {
+			String msg = "Found {0} types for {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, numberOfFiles, parentRef.getName());
+			logger.info(msg);
 		}
+
+		return numberOfFiles;
 	}
 
 	public long querySize(ObjectRef parentRef) {
 		assertNotClosed(this.tx);
 
-		parentRef.lock();
-		try {
-			File queryPath = parentRef.getPath(this.pathBuilder);
-			long numberOfFiles = querySize(queryPath);
+		this.tx.lock(parentRef);
+		File queryPath = parentRef.getPath(this.pathBuilder);
+		long numberOfFiles = querySize(queryPath);
 
-			if (this.verbose) {
-				String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, numberOfFiles, parentRef.getName());
-				logger.info(msg);
-			}
-
-			return numberOfFiles;
-		} finally {
-			parentRef.unlock();
+		if (this.verbose) {
+			String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, numberOfFiles, parentRef.getName());
+			logger.info(msg);
 		}
+
+		return numberOfFiles;
 	}
 
 	/**

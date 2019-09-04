@@ -15,10 +15,14 @@
  */
 package li.strolch.xmlpers.test;
 
+import static li.strolch.utils.helper.SystemHelper.isLinux;
+import static li.strolch.utils.helper.SystemHelper.isWindows;
+
 import java.io.File;
 import java.util.Properties;
 
 import li.strolch.utils.helper.FileHelper;
+import li.strolch.utils.helper.SystemHelper;
 import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.PersistenceConstants;
 import li.strolch.xmlpers.api.PersistenceManager;
@@ -42,8 +46,14 @@ public abstract class AbstractPersistenceTest {
 
 		File file = new File(path).getAbsoluteFile();
 		File parent = file.getParentFile();
-		if (!parent.getAbsolutePath().endsWith("/target/db"))
-			throw new RuntimeException("Bad parent! Must be /target/db/: " + parent);
+		if (isWindows()) {
+			if (!parent.getAbsolutePath().endsWith("\\target\\db"))
+				throw new RuntimeException("Bad parent! Must be \\target\\db: " + parent);
+		} else {
+			if (!parent.getAbsolutePath().endsWith("/target/db"))
+				throw new RuntimeException("Bad parent! Must be /target/db: " + parent);
+		}
+
 		if (!parent.exists() && !parent.mkdirs())
 			throw new RuntimeException("Failed to create path " + parent);
 
@@ -51,7 +61,7 @@ public abstract class AbstractPersistenceTest {
 			if (!FileHelper.deleteFiles(file.listFiles(), true))
 				throw new RuntimeException("Could not clean up path " + file.getAbsolutePath());
 
-		if (!file.exists() && !file.mkdir())
+		if (!file.exists() && !file.mkdirs())
 			throw new RuntimeException("Failed to create path " + file);
 
 		File domFile = new File(file, IoMode.DOM.name());

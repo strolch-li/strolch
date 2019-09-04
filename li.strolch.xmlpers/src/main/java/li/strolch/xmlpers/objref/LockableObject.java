@@ -15,7 +15,12 @@
  */
 package li.strolch.xmlpers.objref;
 
+import static java.lang.Thread.currentThread;
+import static java.text.MessageFormat.format;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
+
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -29,10 +34,20 @@ public class LockableObject {
 	private static final Logger logger = LoggerFactory.getLogger(LockableObject.class);
 	private static long tryLockTime = 10000L;
 
-	private final ReentrantLock lock;
+	public static void setTryLockTime(long tryLockTime) {
+		LockableObject.tryLockTime = tryLockTime;
+	}
 
-	public LockableObject() {
+	private final ReentrantLock lock;
+	protected final String name;
+
+	public LockableObject(String name) {
+		this.name = name;
 		this.lock = new ReentrantLock(true);
+	}
+
+	public String getName() {
+		return this.name;
 	}
 
 	public static long getLockTime() {
@@ -43,11 +58,32 @@ public class LockableObject {
 	 * @see java.util.concurrent.locks.ReentrantLock#tryLock(long, TimeUnit)
 	 */
 	public void lock() {
+
+		// don't lock multiple times
+		if (this.lock.isHeldByCurrentThread() && this.lock.isLocked())
+			return;
+
 		try {
 
 			if (!this.lock.tryLock(tryLockTime, TimeUnit.MILLISECONDS)) {
-				String msg = "Failed to acquire lock after {0} for {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, StringHelper.formatMillisecondsDuration(tryLockTime), toString());
+				String msg = "Thread {0} failed to acquire lock after {1} for {2}"; //$NON-NLS-1$
+				msg = format(msg, currentThread().getName(), formatMillisecondsDuration(tryLockTime), this);
+
+				try {
+					logger.error(msg);
+					logger.error("Listing all active threads: ");
+					Map<Thread, StackTraceElement[]> allStackTraces = Thread.getAllStackTraces();
+					for (Thread thread : allStackTraces.keySet()) {
+						StackTraceElement[] trace = allStackTraces.get(thread);
+						StringBuilder sb = new StringBuilder();
+						for (StackTraceElement traceElement : trace)
+							sb.append("\n\tat ").append(traceElement);
+						logger.error("\nThread " + thread.getName() + ":\n" + sb.toString() + "\n");
+					}
+				} catch (Exception e) {
+					logger.error("Failed to log active threads: " + e.getMessage(), e);
+				}
+
 				throw new XmlPersistenceException(msg);
 			}
 			if (logger.isDebugEnabled())
@@ -60,9 +96,11 @@ public class LockableObject {
 	/**
 	 * @see java.util.concurrent.locks.ReentrantLock#unlock()
 	 */
-	public void unlock() {
-		this.lock.unlock();
-		if (logger.isDebugEnabled())
-			logger.debug("unlocking " + toString()); //$NON-NLS-1$
+	public void releaseLock() {
+		while (this.lock.isHeldByCurrentThread() && this.lock.isLocked()) {
+			if (logger.isDebugEnabled())
+				logger.debug("unlocking " + toString()); //$NON-NLS-1$
+			this.lock.unlock();
+		}
 	}
 }

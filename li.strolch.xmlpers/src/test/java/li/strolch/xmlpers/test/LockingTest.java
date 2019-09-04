@@ -57,7 +57,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		properties.setProperty(PersistenceConstants.PROP_LOCK_TIME_MILLIS, Long.toString(500L));
 		setup(properties);
 
-		this.waitForWorkersTime = LockableObject.getLockTime() + getWaitForWorkersTime() + 300L;
+		this.waitForWorkersTime = LockableObject.getLockTime() + 300L;
 	}
 
 	@Test
@@ -112,15 +112,18 @@ public class LockingTest extends AbstractPersistenceTest {
 			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
 		}
 
-		// create resource which is to be updated
+		int nrOfSuccess;
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+
+			// create resource which is to be updated
 			MyModel resource = createResource(resourceId);
 			tx.getObjectDao().add(resource);
+
+			// and before closing the TX, run the workers, which should fail as we are still holding the locks
+			nrOfSuccess = runWorkers(workers);
 		}
 
-		int nrOfSuccess = runWorkers(workers);
-
-		assertEquals("Only one thread should be able to perform the TX!", 1, nrOfSuccess); //$NON-NLS-1$
+		assertEquals("Only one thread should be able to perform the TX!", 0, nrOfSuccess); //$NON-NLS-1$
 	}
 
 	private int runWorkers(List<? extends AbstractWorker> workers) throws InterruptedException {
@@ -128,7 +131,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		setRun(true);
 
 		for (AbstractWorker worker : workers) {
-			worker.join(getWaitForWorkersTime() + 2000L);
+			worker.join(getWaitForWorkersTime() + 5000L);
 		}
 
 		int nrOfSuccess = 0;
@@ -177,16 +180,9 @@ public class LockingTest extends AbstractPersistenceTest {
 			logger.info("Starting work..."); //$NON-NLS-1$
 			try (PersistenceTransaction tx = LockingTest.this.persistenceManager.openTx()) {
 				doWork(tx);
-
-				try {
-					Thread.sleep(getWaitForWorkersTime());
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-
-				this.success = true;
 			}
 
+			this.success = true;
 			logger.info("Work completed."); //$NON-NLS-1$
 		}
 

@@ -45,19 +45,22 @@ public class ObjectDao {
 		assertNotClosed();
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
-		ctx.getObjectRef().lock();
+		this.tx.lock(ctx.getObjectRef().getParent(this.tx));
+		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.add(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void addAll(List<T> objects) {
 		assertNotClosed();
 		assertNotNull(objects);
-		if (!objects.isEmpty()) {
-			for (T object : objects) {
-				PersistenceContext<T> ctx = createCtx(object);
-				ctx.getObjectRef().lock();
-				this.objectFilter.add(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
-			}
+		if (objects.isEmpty())
+			return;
+
+		for (T object : objects) {
+			PersistenceContext<T> ctx = createCtx(object);
+			this.tx.lock(ctx.getObjectRef().getParent(this.tx));
+			this.tx.lock(ctx.getObjectRef());
+			this.objectFilter.add(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 		}
 	}
 
@@ -65,19 +68,20 @@ public class ObjectDao {
 		assertNotClosed();
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
-		ctx.getObjectRef().lock();
+		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.update(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void updateAll(List<T> objects) {
 		assertNotClosed();
 		assertNotNull(objects);
-		if (!objects.isEmpty()) {
-			for (T object : objects) {
-				PersistenceContext<T> ctx = createCtx(object);
-				ctx.getObjectRef().lock();
-				this.objectFilter.update(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
-			}
+		if (objects.isEmpty())
+			return;
+
+		for (T object : objects) {
+			PersistenceContext<T> ctx = createCtx(object);
+			this.tx.lock(ctx.getObjectRef());
+			this.objectFilter.update(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 		}
 	}
 
@@ -85,19 +89,22 @@ public class ObjectDao {
 		assertNotClosed();
 		assertNotNull(object);
 		PersistenceContext<T> ctx = createCtx(object);
-		ctx.getObjectRef().lock();
+		this.tx.lock(ctx.getObjectRef().getParent(this.tx));
+		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void removeAll(List<T> objects) {
 		assertNotClosed();
 		assertNotNull(objects);
-		if (!objects.isEmpty()) {
-			for (T object : objects) {
-				PersistenceContext<T> ctx = createCtx(object);
-				ctx.getObjectRef().lock();
-				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
-			}
+		if (objects.isEmpty())
+			return;
+
+		for (T object : objects) {
+			PersistenceContext<T> ctx = createCtx(object);
+			this.tx.lock(ctx.getObjectRef().getParent(this.tx));
+			this.tx.lock(ctx.getObjectRef());
+			this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 		}
 	}
 
@@ -106,31 +113,22 @@ public class ObjectDao {
 
 		long removed = 0;
 
-		Set<ObjectRef> refs = new TreeSet<>();
-		typeRef.lock();
-		refs.add(typeRef);
-		try {
+		this.tx.lock(typeRef);
 
-			Set<String> types = this.tx.getMetadataDao().queryTypeSet(typeRef);
-			for (String type : types) {
-				ObjectRef childTypeRef = typeRef.getChildTypeRef(this.tx, type);
-				childTypeRef.lock();
-				refs.add(childTypeRef);
+		Set<String> types = this.tx.getMetadataDao().queryTypeSet(typeRef);
+		for (String type : types) {
+			ObjectRef childTypeRef = typeRef.getChildTypeRef(this.tx, type);
+			this.tx.lock(childTypeRef);
 
-				Set<String> ids = queryKeySet(childTypeRef, false);
-				for (String id : ids) {
+			Set<String> ids = queryKeySet(childTypeRef, false);
+			for (String id : ids) {
 
-					ObjectRef idRef = childTypeRef.getChildIdRef(this.tx, id);
+				ObjectRef idRef = childTypeRef.getChildIdRef(this.tx, id);
 
-					PersistenceContext<T> ctx = createCtx(idRef);
-					ctx.getObjectRef().lock();
-					this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
-					removed++;
-				}
-			}
-		} finally {
-			for (ObjectRef ref : refs) {
-				ref.unlock();
+				PersistenceContext<T> ctx = createCtx(idRef);
+				this.tx.lock(ctx.getObjectRef());
+				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
+				removed++;
 			}
 		}
 
@@ -144,20 +142,17 @@ public class ObjectDao {
 
 		long removed = 0;
 
-		subTypeRef.lock();
-		try {
-			Set<String> ids = queryKeySet(subTypeRef, false);
-			for (String id : ids) {
+		this.tx.lock(subTypeRef);
 
-				ObjectRef idRef = subTypeRef.getChildIdRef(this.tx, id);
+		Set<String> ids = queryKeySet(subTypeRef, false);
+		for (String id : ids) {
 
-				PersistenceContext<T> ctx = createCtx(idRef);
-				ctx.getObjectRef().lock();
-				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
-				removed++;
-			}
-		} finally {
-			subTypeRef.unlock();
+			ObjectRef idRef = subTypeRef.getChildIdRef(this.tx, id);
+
+			PersistenceContext<T> ctx = createCtx(idRef);
+			this.tx.lock(ctx.getObjectRef());
+			this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
+			removed++;
 		}
 
 		return removed;
@@ -167,7 +162,8 @@ public class ObjectDao {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
 		PersistenceContext<T> ctx = createCtx(objectRef);
-		ctx.getObjectRef().lock();
+		this.tx.lock(ctx.getObjectRef().getParent(this.tx));
+		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.remove(objectRef.getType(), ctx.getObjectRef(), ctx);
 	}
 
@@ -176,19 +172,15 @@ public class ObjectDao {
 		assertIsNotIdRef(parentRef);
 		assertIsNotRootRef(parentRef);
 
-		parentRef.lock();
-		try {
+		this.tx.lock(parentRef);
 
-			Set<String> keySet = queryKeySet(parentRef, false);
-			for (String id : keySet) {
+		Set<String> keySet = queryKeySet(parentRef, false);
+		for (String id : keySet) {
 
-				ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
-				PersistenceContext<T> ctx = createCtx(childRef);
-				ctx.getObjectRef().lock();
-				this.objectFilter.remove(childRef.getType(), ctx.getObjectRef(), ctx);
-			}
-		} finally {
-			parentRef.unlock();
+			ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
+			PersistenceContext<T> ctx = createCtx(childRef);
+			this.tx.lock(ctx.getObjectRef());
+			this.objectFilter.remove(childRef.getType(), ctx.getObjectRef(), ctx);
 		}
 	}
 
@@ -196,27 +188,19 @@ public class ObjectDao {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
 
-		objectRef.lock();
-		try {
-			PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
-			return this.fileDao.exists(ctx);
-		} finally {
-			objectRef.unlock();
-		}
+		this.tx.lock(objectRef);
+		PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
+		return this.fileDao.exists(ctx);
 	}
 
 	public <T> T queryById(ObjectRef objectRef) {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
 
-		objectRef.lock();
-		try {
-			PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
-			this.fileDao.performRead(ctx);
-			return ctx.getObject();
-		} finally {
-			objectRef.unlock();
-		}
+		this.tx.lock(objectRef);
+		PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
+		this.fileDao.performRead(ctx);
+		return ctx.getObject();
 	}
 
 	public <T> List<T> queryAll(ObjectRef parentRef) {
@@ -227,62 +211,45 @@ public class ObjectDao {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
-		parentRef.lock();
-		try {
+		this.tx.lock(parentRef);
 
-			MetadataDao metadataDao = this.tx.getMetadataDao();
-			Set<String> keySet = metadataDao.queryKeySet(parentRef, reverse);
+		MetadataDao metadataDao = this.tx.getMetadataDao();
+		Set<String> keySet = metadataDao.queryKeySet(parentRef, reverse);
 
-			int i = 0;
-			List<T> result = new ArrayList<>();
-			for (String id : keySet) {
+		int i = 0;
+		List<T> result = new ArrayList<>();
+		for (String id : keySet) {
 
-				ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
-				PersistenceContext<T> childCtx = childRef.createPersistenceContext(this.tx);
-				childCtx.getObjectRef().lock();
-				try {
-					this.fileDao.performRead(childCtx);
-					assertObjectRead(childCtx);
-					result.add(childCtx.getObject());
-				} finally {
-					childCtx.getObjectRef().unlock();
-				}
+			ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
+			PersistenceContext<T> childCtx = childRef.createPersistenceContext(this.tx);
+			this.tx.lock(childCtx.getObjectRef());
+			this.fileDao.performRead(childCtx);
+			assertObjectRead(childCtx);
+			result.add(childCtx.getObject());
 
-				if (maxSize != Integer.MAX_VALUE && i >= maxSize)
-					break;
-			}
-
-			return result;
-
-		} finally {
-			parentRef.unlock();
+			if (maxSize != Integer.MAX_VALUE && i >= maxSize)
+				break;
 		}
+
+		return result;
 	}
 
 	private Set<String> queryKeySet(ObjectRef parentRef, boolean reverse) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
-		parentRef.lock();
-		try {
-			MetadataDao metadataDao = this.tx.getMetadataDao();
-			return metadataDao.queryKeySet(parentRef, reverse);
-		} finally {
-			parentRef.unlock();
-		}
+		this.tx.lock(parentRef);
+		MetadataDao metadataDao = this.tx.getMetadataDao();
+		return metadataDao.queryKeySet(parentRef, reverse);
 	}
 
 	public long querySize(ObjectRef parentRef) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
-		parentRef.lock();
-		try {
-			MetadataDao metadataDao = this.tx.getMetadataDao();
-			return metadataDao.querySize(parentRef);
-		} finally {
-			parentRef.unlock();
-		}
+		this.tx.lock(parentRef);
+		MetadataDao metadataDao = this.tx.getMetadataDao();
+		return metadataDao.querySize(parentRef);
 	}
 
 	public <T> PersistenceContext<T> createCtx(T object) {

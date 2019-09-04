@@ -24,14 +24,8 @@ import li.strolch.xmlpers.impl.PathBuilder;
 
 public abstract class ObjectRef extends LockableObject implements Comparable<ObjectRef> {
 
-	protected final String name;
-
 	protected ObjectRef(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return this.name;
+		super(name);
 	}
 
 	public File getPath(PathBuilder pathBuilder) {

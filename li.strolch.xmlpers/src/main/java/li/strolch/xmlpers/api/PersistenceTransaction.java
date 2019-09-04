@@ -15,6 +15,8 @@
  */
 package li.strolch.xmlpers.api;
 
+import li.strolch.xmlpers.objref.LockableObject;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -61,4 +63,6 @@ public interface PersistenceTransaction extends AutoCloseable {
 	public FileDao getFileDao();
 
 	public PersistenceManager getManager();
+
+	void lock(LockableObject lockableObject);
 }
