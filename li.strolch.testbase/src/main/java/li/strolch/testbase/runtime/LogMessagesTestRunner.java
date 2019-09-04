@@ -49,7 +49,7 @@ public class LogMessagesTestRunner {
 			this.operationsLog.addMessage(logMessage);
 
 			// default is async persisting...
-			Thread.sleep(50L);
+			Thread.sleep(100L);
 
 			StrolchRealm realm = this.container.getRealm(this.realmName);
 
@@ -89,7 +89,7 @@ public class LogMessagesTestRunner {
 			}
 
 			// default is async persisting...
-			Thread.sleep(1000L);
+			Thread.sleep(1500L);
 
 			int trimSize = (int) (MAX_MESSAGES * 0.1);
 			int expectedSize = MAX_MESSAGES - trimSize + 2; // +2 => startup and first message
