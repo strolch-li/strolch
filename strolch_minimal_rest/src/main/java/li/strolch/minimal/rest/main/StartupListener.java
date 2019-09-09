@@ -28,7 +28,7 @@ public class StartupListener implements ServletContextListener {
 			String boostrapFileName = "/WEB-INF/" + StrolchBootstrapper.FILE_BOOTSTRAP;
 			InputStream bootstrapFile = sce.getServletContext().getResourceAsStream(boostrapFileName);
 			StrolchBootstrapper bootstrapper = new StrolchBootstrapper(StartupListener.class);
-			this.agent = bootstrapper.setupByBoostrapFile(StartupListener.class, bootstrapFile);
+			this.agent = bootstrapper.setupByBootstrapFile(StartupListener.class, bootstrapFile);
 			this.agent.initialize();
 			this.agent.start();
 		} catch (Throwable e) {

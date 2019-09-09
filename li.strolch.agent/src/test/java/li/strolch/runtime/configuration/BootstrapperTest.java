@@ -90,7 +90,7 @@ public class BootstrapperTest {
 		}
 
 		File bootstrapFile = new File("src/test/resources/bootstraptest/StrolchBootstrap.xml");
-		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByBoostrapFile("dev",
+		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByBootstrapFile("dev",
 				bootstrapFile);
 		assertEquals("dev", agent.getStrolchConfiguration().getRuntimeConfiguration().getEnvironment());
 		agent.destroy();
@@ -120,7 +120,7 @@ public class BootstrapperTest {
 
 		File bootstrapFile = new File("src/test/resources/bootstraptest/StrolchBootstrap.xml");
 
-		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByBoostrapFile("test.next",
+		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByBootstrapFile("test.next",
 				bootstrapFile);
 		assertEquals("test", agent.getStrolchConfiguration().getRuntimeConfiguration().getEnvironment());
 		agent.destroy();

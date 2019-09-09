@@ -192,7 +192,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 	/**
 	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
-	 * and then delegating to {@link #setupByBoostrapFile(String, File)}
+	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
 	 * 
 	 * @param clazz
 	 *            the class from which to load the resource as stream
@@ -201,7 +201,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * 
 	 * @return the Agent which is setup
 	 */
-	public StrolchAgent setupByBoostrapFile(Class<?> clazz, File bootstrapFile) {
+	public StrolchAgent setupByBootstrapFile(Class<?> clazz, File bootstrapFile) {
 		DBC.PRE.assertNotNull("clazz must be set!", clazz);
 		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
 		this.environment = StrolchEnvironment.getEnvironmentFromResourceEnv(clazz);
@@ -211,7 +211,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 	/**
 	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
-	 * and then delegating to {@link #setupByBoostrapFile(String, File)}
+	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
 	 * 
 	 * @param clazz
 	 *            the class from which to load the resource as stream
@@ -220,7 +220,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * 
 	 * @return the Agent which is setup
 	 */
-	public StrolchAgent setupByBoostrapFile(Class<?> clazz, InputStream bootstrapFile) {
+	public StrolchAgent setupByBootstrapFile(Class<?> clazz, InputStream bootstrapFile) {
 		DBC.PRE.assertNotNull("clazz must be set!", clazz);
 		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
 		this.environment = StrolchEnvironment.getEnvironmentFromResourceEnv(clazz);
@@ -238,7 +238,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * 
 	 * @return the Agent which is setup
 	 */
-	public StrolchAgent setupByBoostrapFile(String environment, File bootstrapFile) {
+	public StrolchAgent setupByBootstrapFile(String environment, File bootstrapFile) {
 		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
 		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
 		this.environment = environment;
@@ -256,7 +256,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * 
 	 * @return the Agent which is setup
 	 */
-	public StrolchAgent setupByBoostrapFile(String environment, InputStream bootstrapFile) {
+	public StrolchAgent setupByBootstrapFile(String environment, InputStream bootstrapFile) {
 		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
 		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
 		this.environment = environment;
