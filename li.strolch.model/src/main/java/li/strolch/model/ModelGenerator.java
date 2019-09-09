@@ -29,7 +29,7 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.impl.*;
 import li.strolch.utils.helper.StringHelper;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.time.PeriodDuration;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then
@@ -479,7 +479,7 @@ public class ModelGenerator {
 		bag.addParameter(stringListP);
 
 		DurationParameter durationParam = new DurationParameter(PARAM_DURATION_ID, PARAM_DURATION_NAME,
-				ISO8601FormatFactory.getInstance().getDurationFormat().parse("P1D"));
+				PeriodDuration.parse("P1D"));
 		durationParam.setIndex(8);
 		bag.addParameter(durationParam);
 

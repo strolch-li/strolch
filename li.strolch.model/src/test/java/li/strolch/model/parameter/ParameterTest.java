@@ -11,7 +11,7 @@ import java.util.Date;
 
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.time.PeriodDuration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -187,11 +187,12 @@ public class ParameterTest {
 		DurationParameter other = new DurationParameter("other", "other", 42L);
 		DurationParameter p = resource.getParameter(BAG_ID, PARAM_DURATION_ID, true);
 
-		assertEquals(Long.valueOf(ISO8601FormatFactory.getInstance().getDurationFormat().parse("P1D")), p.getValue());
+		assertEquals(PeriodDuration.parse("P1D"), p.getValue());
 
 		p.clear();
 		assertTrue(p.isEmpty());
-		assertEquals(Long.valueOf(0L), p.getValue());
+		assertEquals(PeriodDuration.ZERO, p.getValue());
+		assertEquals(0L, p.toMillis());
 
 		p.setValueFrom(other);
 		assertTrue(p.isEqualTo(other.getValue()));

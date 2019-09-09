@@ -22,7 +22,6 @@ import java.util.List;
 import li.strolch.utils.StringMatchMode;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -98,15 +97,6 @@ public abstract class ParameterSelection implements Selection {
 
 	public static DateParameterSelection dateSelection(String bagKey, String paramKey, Date value) {
 		return new DateParameterSelection(bagKey, paramKey, value);
-	}
-
-	public static DurationParameterSelection durationSelection(String bagKey, String paramKey, String valueAsString) {
-		return durationSelection(bagKey, paramKey,
-				ISO8601FormatFactory.getInstance().getDurationFormat().parse(valueAsString));
-	}
-
-	public static DurationParameterSelection durationSelection(String bagKey, String paramKey, long value) {
-		return new DurationParameterSelection(bagKey, paramKey, value);
 	}
 
 	public static DateRangeParameterSelection dateRangeSelection(String bagKey, String paramKey, DateRange dateRange) {

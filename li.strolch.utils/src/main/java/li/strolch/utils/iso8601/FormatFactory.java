@@ -28,23 +28,9 @@ public interface FormatFactory {
 	/**
 	 * return the formatter for dates
 	 *
-	 * @return {@link DurationFormat}
+	 * @return {@link DateFormat}
 	 */
 	public DateFormat getDateFormat();
-
-	/**
-	 * return the formatter for durations
-	 *
-	 * @return {@link DurationFormat}
-	 */
-	public DurationFormat getDurationFormat();
-
-	/**
-	 * return the formatter for work time
-	 *
-	 * @return {@link WorktimeFormat}
-	 */
-	public WorktimeFormat getWorktimeFormat();
 
 	/**
 	 * the date format used in xml import and export
@@ -52,13 +38,6 @@ public interface FormatFactory {
 	 * @return {@link DateFormat}
 	 */
 	public DateFormat getXmlDateFormat();
-
-	/**
-	 * the duration format used in xml import and export
-	 *
-	 * @return {@link DurationFormat}
-	 */
-	public DurationFormat getXmlDurationFormat();
 
 	/**
 	 * Formats a date using {@link #getDateFormat()}
@@ -81,26 +60,6 @@ public interface FormatFactory {
 	public String formatDate(long date);
 
 	/**
-	 * Formats a duration using {@link #getDateFormat()}
-	 *
-	 * @param duration
-	 * 		the duration to format to string
-	 *
-	 * @return String representation of the duration
-	 */
-	public String formatDuration(long duration);
-
-	/**
-	 * Formats a work time duration using {@link #getDateFormat()}
-	 *
-	 * @param worktime
-	 * 		the work time duration to format to string
-	 *
-	 * @return String representation of the work time duration
-	 */
-	public String formatWorktime(long worktime);
-
-	/**
 	 * Formats a floating point number to have the configured number of decimals
 	 *
 	 * @param value
@@ -119,24 +78,4 @@ public interface FormatFactory {
 	 * @return the date
 	 */
 	public Date parseDate(String date);
-
-	/**
-	 * Parses a duration using {@link #getDateFormat()}
-	 *
-	 * @param duration
-	 * 		the string to parse to duration
-	 *
-	 * @return the duration
-	 */
-	public long parseDuration(String duration);
-
-	/**
-	 * Parses a work time duration using {@link #getDateFormat()}
-	 *
-	 * @param worktime
-	 * 		the string duration to parse to work time
-	 *
-	 * @return the work time
-	 */
-	public long parseWorktime(String worktime);
 }

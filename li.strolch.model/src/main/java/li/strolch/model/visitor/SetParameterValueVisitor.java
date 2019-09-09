@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import li.strolch.model.parameter.*;
+import li.strolch.utils.time.PeriodDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -45,7 +46,7 @@ public class SetParameterValueVisitor implements ParameterVisitor<Void> {
 
 	@Override
 	public Void visitDurationParam(DurationParameter param) {
-		param.setValue((Long) this.value);
+		param.setValue((PeriodDuration) this.value);
 		return null;
 	}
 

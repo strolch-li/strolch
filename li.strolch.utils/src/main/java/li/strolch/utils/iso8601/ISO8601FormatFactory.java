@@ -48,23 +48,8 @@ public class ISO8601FormatFactory implements FormatFactory {
 	}
 
 	@Override
-	public ISO8601Duration getDurationFormat() {
-		return new ISO8601Duration();
-	}
-
-	@Override
-	public ISO8601Worktime getWorktimeFormat() {
-		return new ISO8601Worktime();
-	}
-
-	@Override
 	public ISO8601 getXmlDateFormat() {
 		return new ISO8601();
-	}
-
-	@Override
-	public ISO8601Duration getXmlDurationFormat() {
-		return new ISO8601Duration();
 	}
 
 	@Override
@@ -78,16 +63,6 @@ public class ISO8601FormatFactory implements FormatFactory {
 	}
 
 	@Override
-	public String formatDuration(long duration) {
-		return getDurationFormat().format(duration);
-	}
-
-	@Override
-	public String formatWorktime(long worktime) {
-		return getDurationFormat().format(worktime);
-	}
-
-	@Override
 	public String formatFloat(double value) {
 		return Double.toString(MathHelper.toPrecision(value));
 	}
@@ -95,15 +70,5 @@ public class ISO8601FormatFactory implements FormatFactory {
 	@Override
 	public Date parseDate(String date) {
 		return getDateFormat().parse(date);
-	}
-
-	@Override
-	public long parseDuration(String duration) {
-		return getDurationFormat().parse(duration);
-	}
-
-	@Override
-	public long parseWorktime(String worktime) {
-		return getDurationFormat().parse(worktime);
 	}
 }

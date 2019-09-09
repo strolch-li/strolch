@@ -15,17 +15,20 @@
  */
 package li.strolch.model.parameter;
 
+import java.time.Duration;
+import java.time.Period;
+
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.time.PeriodDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class DurationParameter extends AbstractParameter<Long> {
+public class DurationParameter extends AbstractParameter<PeriodDuration> {
 
-	private Long value;
+	private PeriodDuration value;
 
 	/**
 	 * Empty constructor
@@ -44,31 +47,61 @@ public class DurationParameter extends AbstractParameter<Long> {
 	 * @param value
 	 * 		the value
 	 */
-	public DurationParameter(String id, String name, Long value) {
+	public DurationParameter(String id, String name, PeriodDuration value) {
 		super(id, name);
 		setValue(value);
 	}
 
+	/**
+	 * Default Constructor
+	 *
+	 * @param id
+	 * 		the id
+	 * @param name
+	 * 		the name
+	 * @param millis
+	 * 		the value as milliseconds
+	 */
+	public DurationParameter(String id, String name, long millis) {
+		super(id, name);
+		setValue(PeriodDuration.of(Period.ZERO, Duration.ofMillis(millis)));
+	}
+
 	@Override
 	public String getValueAsString() {
-		return ISO8601FormatFactory.getInstance().formatDuration(this.value);
+		return this.value.toString();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Long getValue() {
+	public PeriodDuration getValue() {
 		return this.value;
 	}
 
 	@Override
-	public void setValue(Long value) {
+	public void setValue(PeriodDuration value) {
 		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
 	}
 
+	public void setValueFrom(long millis) {
+		assertNotReadonly();
+		this.value = PeriodDuration.of(Period.ZERO, Duration.ofMillis(millis));
+	}
+
+	public void setValueFrom(Period value) {
+		assertNotReadonly();
+		this.value = PeriodDuration.of(value);
+	}
+
+	public void setValueFrom(Duration duration) {
+		assertNotReadonly();
+		this.value = PeriodDuration.of(duration);
+	}
+
 	@Override
-	public void setValueFrom(Parameter<Long> parameter) {
+	public void setValueFrom(Parameter<PeriodDuration> parameter) {
 		assertNotReadonly();
 		this.value = parameter.getValue();
 	}
@@ -81,22 +114,26 @@ public class DurationParameter extends AbstractParameter<Long> {
 	@Override
 	public void clear() {
 		assertNotReadonly();
-		this.value = 0L;
+		this.value = PeriodDuration.ZERO;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return this.value == 0L;
+		return this.value.equals(PeriodDuration.ZERO);
 	}
 
 	@Override
-	public boolean isEqualTo(Parameter<Long> otherValue) {
+	public boolean isEqualTo(Parameter<PeriodDuration> otherValue) {
 		return this.value.equals(otherValue.getValue());
 	}
 
 	@Override
-	public boolean isEqualTo(Long otherValue) {
+	public boolean isEqualTo(PeriodDuration otherValue) {
 		return this.value.equals(otherValue);
+	}
+
+	public long toMillis() {
+		return this.value.toMillis();
 	}
 
 	@Override
@@ -130,8 +167,8 @@ public class DurationParameter extends AbstractParameter<Long> {
 		return visitor.visitDurationParam(this);
 	}
 
-	public static Long parseFromString(String valueS) {
-		return ISO8601FormatFactory.getInstance().getDurationFormat().parse(valueS);
+	public static PeriodDuration parseFromString(String valueS) {
+		return PeriodDuration.parse(valueS);
 	}
 
 	@Override
@@ -139,5 +176,4 @@ public class DurationParameter extends AbstractParameter<Long> {
 		DBC.PRE.assertEquals("Not same Parameter types!", this.getType(), o.getType());
 		return this.getValue().compareTo(((DurationParameter) o).getValue());
 	}
-
 }
