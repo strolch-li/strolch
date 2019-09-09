@@ -74,7 +74,7 @@ public class PeriodHelperTest {
 		PeriodDuration periodDuration = PeriodDuration.parse("P1M");
 		ZonedDateTime shiftedDate = shiftByMultipleOfPeriod(past, now, periodDuration);
 
-		assertTrue(shiftedDate.isAfter(now.minusDays(29)));
+		assertTrue(shiftedDate.isAfter(now.minusDays(10)));
 		assertTrue(shiftedDate.isBefore(now));
 	}
 
@@ -86,9 +86,11 @@ public class PeriodHelperTest {
 		PeriodDuration periodDuration = PeriodDuration.parse("P1M");
 		ZonedDateTime shiftedDate = shiftByMultipleOfPeriod(past, now, periodDuration);
 
-		// since P1M ist = 28 days, we have a rather inexact match, but it must certainly be before now() - P1M
-		assertTrue(shiftedDate.isAfter(now.minusDays(56)));
-		assertTrue(shiftedDate.isBefore(now.minusDays(28)));
+		// since P1M ist = 30 days, we have a rather inexact match, but it must certainly be
+		// after now() - P1M + 5
+		// before now()
+		assertTrue(shiftedDate.isAfter(now.minusDays(35)));
+		assertTrue(shiftedDate.isBefore(now));
 	}
 
 	@Test
