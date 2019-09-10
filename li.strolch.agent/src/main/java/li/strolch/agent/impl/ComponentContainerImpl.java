@@ -272,10 +272,6 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.STARTED;
 
-		long took = System.nanoTime() - start;
-		msg = "{0}:{1} All {2} Strolch Components started. Took {3}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
-		String tookS = formatNanoDuration(took);
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(), tookS));
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString()));
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary()));
 		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",
@@ -284,6 +280,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		logger.info(MessageFormat
 				.format("file.encoding: {0} / sun.jnu.encoding {1}", System.getProperty("file.encoding"),
 						System.getProperty("sun.jnu.encoding")));
+
+		String tookS = formatNanoDuration(System.nanoTime() - start);
 
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
@@ -296,6 +294,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 						.value("took", tookS));
 			}
 		}
+
+		msg = "{0}:{1} All {2} Strolch Components started. Took {3}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(), tookS));
 	}
 
 	public void stop() {
