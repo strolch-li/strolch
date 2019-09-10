@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+		   xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+		   elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xs:annotation>
+		<xs:documentation>This is Version 1.6.x of the StrolchModel XSD.</xs:documentation>
+	</xs:annotation>
+
+	<xs:element name="StrolchModel" type="StrolchModelType"/>
+
+	<xs:complexType name="StrolchModelType">
+		<xs:sequence maxOccurs="unbounded" minOccurs="0">
+			<xs:choice>
+				<xs:element type="IncludeFileType" name="IncludeFile" maxOccurs="unbounded" minOccurs="0"/>
+				<xs:element type="OrderType" name="Order" maxOccurs="unbounded" minOccurs="0"/>
+				<xs:element type="ResourceType" name="Resource" maxOccurs="unbounded" minOccurs="0"/>
+				<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IncludeFileType">
+		<xs:attribute type="xs:string" name="file"/>
+	</xs:complexType>
+
+	<xs:complexType name="VersionType">
+		<xs:attribute type="xs:int" name="Version" use="required"/>
+		<xs:attribute type="xs:string" name="CreatedBy" use="required"/>
+		<xs:attribute type="xs:string" name="UpdatedBy" use="required"/>
+		<xs:attribute type="xs:dateTime" name="Created" use="required"/>
+		<xs:attribute type="xs:dateTime" name="Updated" use="required"/>
+		<xs:attribute type="xs:string" name="Deleted" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="OrderType">
+		<xs:sequence>
+			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0"/>
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" use="required"/>
+		<xs:attribute type="xs:string" name="Name" use="required"/>
+		<xs:attribute type="xs:string" name="Type" use="required"/>
+		<xs:attribute type="xs:dateTime" name="Date" use="optional"/>
+		<xs:attribute type="StateType" name="State" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="ResourceType">
+		<xs:sequence>
+			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0"/>
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="TimedStateType" name="TimedState" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" use="required"/>
+		<xs:attribute type="xs:string" name="Name" use="required"/>
+		<xs:attribute type="xs:string" name="Type" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="ActivityType">
+		<xs:sequence>
+			<xs:element type="VersionType" name="Version" maxOccurs="1" minOccurs="0"/>
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:sequence maxOccurs="unbounded" minOccurs="0">
+				<xs:choice>
+					<xs:element type="ActionType" name="Action" maxOccurs="unbounded" minOccurs="0"/>
+					<xs:element type="ActivityType" name="Activity" maxOccurs="unbounded" minOccurs="0"/>
+				</xs:choice>
+			</xs:sequence>
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" use="required"/>
+		<xs:attribute type="xs:string" name="Name" use="required"/>
+		<xs:attribute type="xs:string" name="Type" use="required"/>
+		<xs:attribute type="TimeOrderingType" name="TimeOrdering" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="ActionType">
+		<xs:sequence>
+			<xs:element type="ParameterBagType" name="ParameterBag" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element type="PoliciesType" name="Policies" maxOccurs="1" minOccurs="0"/>
+			<xs:element type="ValueChangeType" name="ValueChange" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" use="required"/>
+		<xs:attribute type="xs:string" name="Name" use="required"/>
+		<xs:attribute type="xs:string" name="ResourceId" use="optional"/>
+		<xs:attribute type="xs:string" name="ResourceType" use="optional"/>
+		<xs:attribute type="StateType" name="State" use="optional"/>
+		<xs:attribute type="xs:string" name="Type" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="ParameterBagType">
+		<xs:sequence>
+			<xs:element type="ParameterType" name="Parameter" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" use="required"/>
+		<xs:attribute type="xs:string" name="Name" use="required"/>
+		<xs:attribute type="xs:string" name="Type" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="ParameterType">
+		<xs:attribute type="xs:string" name="Id" use="required"/>
+		<xs:attribute type="xs:string" name="Name" use="required"/>
+		<xs:attribute type="ParameterValueType" name="Type" use="required"/>
+		<xs:attribute type="xs:string" name="Value" use="required"/>
+		<xs:attribute type="xs:string" name="Interpretation" use="optional"/>
+		<xs:attribute type="xs:string" name="Uom" use="optional"/>
+		<xs:attribute type="xs:boolean" name="Hidden" use="optional"/>
+		<xs:attribute type="xs:int" name="Index" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="PoliciesType">
+		<xs:sequence>
+			<xs:element type="PolicyType" name="Policy" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="PolicyType">
+		<xs:attribute type="xs:string" name="Type" use="required"/>
+		<xs:attribute type="xs:string" name="Value" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="TimedStateType">
+		<xs:sequence>
+			<xs:element type="ValueType" name="Value" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="Id" use="required"/>
+		<xs:attribute type="xs:string" name="Name" use="required"/>
+		<xs:attribute type="TimedStateTypeType" name="Type" use="required"/>
+		<xs:attribute type="xs:string" name="Interpretation" use="optional"/>
+		<xs:attribute type="xs:string" name="Uom" use="optional"/>
+		<xs:attribute type="xs:boolean" name="Hidden" use="optional"/>
+		<xs:attribute type="xs:int" name="Index" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="ValueType">
+		<xs:attribute type="xs:dateTime" name="Time" use="required"/>
+		<xs:attribute type="xs:string" name="Value" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="ValueChangeType">
+		<xs:attribute type="xs:string" name="StateId" use="optional"/>
+		<xs:attribute type="xs:dateTime" name="Time" use="required"/>
+		<xs:attribute type="xs:string" name="Value" use="required"/>
+		<xs:attribute type="TimedStateTypeType" name="Type" use="required"/>
+	</xs:complexType>
+
+	<xs:simpleType name="StateType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Created"/>
+			<xs:enumeration value="Planning"/>
+			<xs:enumeration value="Planned"/>
+			<xs:enumeration value="Execution"/>
+			<xs:enumeration value="Stopped"/>
+			<xs:enumeration value="Warning"/>
+			<xs:enumeration value="Error"/>
+			<xs:enumeration value="Executed"/>
+			<xs:enumeration value="Closed"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="TimeOrderingType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Series"/>
+			<xs:enumeration value="Parallel"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ParameterValueType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Boolean"/>
+			<xs:enumeration value="String"/>
+			<xs:enumeration value="Integer"/>
+			<xs:enumeration value="Long"/>
+			<xs:enumeration value="Float"/>
+			<xs:enumeration value="Date"/>
+			<xs:enumeration value="Duration"/>
+			<xs:enumeration value="StringList"/>
+			<xs:enumeration value="IntegerList"/>
+			<xs:enumeration value="FloatList"/>
+			<xs:enumeration value="LongList"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="TimedStateTypeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Boolean"/>
+			<xs:enumeration value="Integer"/>
+			<xs:enumeration value="Float"/>
+			<xs:enumeration value="Long"/>
+			<xs:enumeration value="FloatList"/>
+			<xs:enumeration value="StringSet"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

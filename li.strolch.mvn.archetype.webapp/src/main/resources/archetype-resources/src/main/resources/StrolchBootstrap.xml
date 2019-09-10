@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchBootstrap>
+
+	<!-- use attribute default="true" to allow optional values -->
+	<env id="dev" default="true">
+
+		<!-- optional, to load different environment -->
+		<environment>dev</environment>
+
+		<!-- always optional root tag, default: system property user.dir -->
+		<root>runtime</root>
+
+		<!-- optional config tag, if default="true": config/ -->
+		<!-- <config>config</config> -->
+
+		<!-- optional data tag, if default="true": data/ -->
+		<!-- <data>data</data> -->
+
+		<!-- optional temp tag, if default="true": temp/ -->
+		<!-- <temp>temp</temp> -->
+	</env>
+
+	<env id="dev.local" default="true">
+		<root>${project.basedir}/runtime</root>
+		<environment>dev</environment>
+	</env>
+
+</StrolchBootstrap>

@@ -1,0 +1,463 @@
+<script>
+    CustomComputeBehavior = {
+
+        properties: {
+            baseRestPath: {
+                type: String,
+                value: function () {
+                    return CustomWeb.baseRestPath;
+                }
+            },
+            localesPath: {
+                type: String,
+                value: '../../locales.json'
+            }
+        },
+
+        /*
+         * Strolch functions
+         */
+        hasQueryPrivilege: function (privilegeValue) {
+            return Strolch.hasRole('StrolchAdmin') || Strolch.hasQueryPrivilege(privilegeValue);
+        },
+        hasSearchPrivilege: function (privilegeValue) {
+            return Strolch.hasRole('StrolchAdmin') || Strolch.hasSearchPrivilege(privilegeValue);
+        },
+        hasServicePrivilege: function (privilegeValue) {
+            return Strolch.hasRole('StrolchAdmin') || Strolch.hasServicePrivilege(privilegeValue);
+        },
+        hasPrivilege: function (privilege, value) {
+            return Strolch.hasRole('StrolchAdmin') || Strolch.hasPrivilege(privilege, value);
+        },
+        hasRole: function (name) {
+            return Strolch.hasRole('StrolchAdmin') || Strolch.hasRole(name);
+        },
+        hasComponent: function (name) {
+            return Strolch.hasComponent(name);
+        },
+
+        /*
+         * Compute functions
+         */
+        hasMsg: function (value) {
+            return Strolch.isNotEmptyString(value) && value != "-";
+        },
+
+        isEqual: function (v1, v2) {
+            return v1 === v2;
+        },
+        stringToArray: function (string) {
+            if (string == null || string.length == 0)
+                return [];
+            var a = [];
+            var b = string.split(',');
+            for (var i = 0; i < b.length; i++) {
+                a.push(b[i].trim());
+            }
+            return a;
+        },
+        stringArrayLength: function (string) {
+            if (string == null || string.length == 0)
+                return 0;
+            return string.split(',').length;
+        },
+
+        isDefined: function (arg0) {
+            return arg0 != undefined;
+        },
+        isNull: function (arg0) {
+            return arg0 == undefined || arg0 == null;
+        },
+        isNotNull: function (arg0) {
+            return arg0 != undefined && arg0 != null;
+        },
+        isNaN: function (arg0) {
+            return this.stringEmpty(arg0) || isNaN(arg0);
+        },
+        equal: function (arg0, arg1) {
+            return arg0 == arg1;
+        },
+        notEqual: function (arg0, arg1) {
+            return arg0 != arg1;
+        },
+        defined: function (arg0) {
+            return !!arg0;
+        },
+        greater: function (arg0, arg1) {
+            return arg0 > arg1;
+        },
+        greaterEqual: function (arg0, arg1) {
+            return arg0 >= arg1;
+        },
+        lesser: function (arg0, arg1) {
+            return arg0 < arg1;
+        },
+        lesserEqual: function (arg0, arg1) {
+            return arg0 <= arg1;
+        },
+        and: function (arg0, arg1) {
+            return !!(arg0 && arg1);
+        },
+        or: function (arg0, arg1) {
+            return !!(arg0 || arg1);
+        },
+        arrayLength: function (array) {
+            return (array && array.length) ? array.length : 0;
+        },
+        arrayFilled: function (array) {
+            return !!(array && array.length && array.length > 0);
+        },
+        arraySizeLessThan: function (array, size) {
+            return array != null && array.length < size;
+        },
+        arraySizeGreaterThanOrEq: function (array, size) {
+            return array != null && array.length >= size;
+        },
+        arrayEquals: function (array1, array2) {
+            if (array1 == null && array2 == null)
+                return true;
+            if (array1 == null && array2 != null)
+                return false;
+            if (array2 == null && array1 != null)
+                return false;
+            return (array1.length == array2.length) && array1.every(function (element, index) {
+                return element === array2[index];
+            });
+        },
+        add: function (arg0, arg1) {
+            return Number(arg0) + Number(arg1);
+        },
+        sub: function (arg0, arg1) {
+            return Number(arg0) - Number(arg1);
+        },
+        round: function (value) {
+            return Math.round(value * 1000) / 1000;
+        },
+        stringEmpty: function () {
+            for (var i in arguments) {
+                var arg = arguments[i];
+                if (!arg || arg.length == 0) return true;
+            }
+            return false;
+        },
+        isEmptyString: function (val) {
+            return typeof val == 'undefined' || val == null || val === '';
+        },
+        isNotEmptyString: function (val) {
+            return !this.isEmptyString(val);
+        },
+
+        isChrome: function () {
+            var isChromium = window.chrome, //
+                winNav = window.navigator, //
+                vendorName = winNav.vendor, //
+                isOpera = winNav.userAgent.indexOf("OPR") > -1, //
+                isIEedge = winNav.userAgent.indexOf("Edge") > -1, //
+                isIOSChrome = winNav.userAgent.match("CriOS");
+
+            if (isIOSChrome) {
+                return true;
+            } else if (isChromium !== null && //
+                typeof isChromium !== "undefined" && //
+                vendorName === "Google Inc." && //
+                isOpera === false && //
+                isIEedge === false) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        isFirefox: function () {
+            return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        },
+        isIE: function () {
+            var isIE = /*@cc_on!@*/false || !!document.documentMode;
+            return isIE;
+        },
+        isEdge: function () {
+            return !Susi.Compute.isIE() && !!window.StyleMedia;
+        },
+
+        /*
+         * Date Time functions
+         */
+        formatDateTime: function (string) {
+            return Strolch.toLocalDateTime(string);
+        },
+
+        // gets the clock time as displayed in the UI
+        getTimeString: function (datetime) {
+            var hour = datetime.getHours().toString();
+            var min = datetime.getMinutes().toString();
+
+            hour = hour.length < 2 ? "0" + hour : hour;
+            min = min.length < 2 ? "0" + min : min;
+            return hour + ":" + min;
+        },
+
+        // gets the calendar date as displayed in the UI
+        getDateString: function (datetime, addCentury) {
+            if (typeof (datetime) == 'string') {
+                datetime = new Date(datetime);
+            }
+
+            var day = (datetime.getDate()).toString();
+            var month = (datetime.getMonth() + 1).toString();
+            var year = (datetime.getFullYear()).toString();
+
+            day = day.length < 2 ? "0" + day : day;
+            month = month.length < 2 ? "0" + month : month;
+            year = addCentury ? year : year.slice(-2);
+            return day + "." + month + "." + year;
+        },
+
+        // gets the date of a date string from getDateString()
+        getDate: function (datetimeString) {
+            var splitString = datetimeString.split(".");
+            if (splitString.length != 3) return null;
+
+            var year = Number(splitString[2]);
+            var month = Number(splitString[1]) - 1;
+            var day = Number(splitString[0]);
+            return new Date(year, month, day);
+        },
+
+        // gets the clock time of the current time
+        getCurrentTimeString: function () {
+            return Susi.Datetime.getTimeString(new Date());
+        },
+
+        toDateTime: function (val) {
+
+            function pad10(i) {
+                if (i < 10) return '0' + i;
+                return i;
+            }
+
+            function pad100(i) {
+                if (i < 10) return '00' + i;
+                if (i < 100) return '0' + i;
+                return i;
+            }
+
+            if (Strolch.isEmptyString(val) || val == '-') return '-';
+            var date = new Date(val);
+
+            var y = date.getFullYear();
+            var m = pad10(date.getMonth() + 1);
+            var d = pad10(date.getDate());
+            var h = pad10(date.getHours());
+            var mi = pad10(date.getMinutes());
+            var s = pad10(date.getSeconds());
+            var mil = pad100(date.getMilliseconds());
+
+            return y + m + d + h + mi + s;
+        },
+
+        // gets the calendar date of the current time
+        getCurrentDateString: function () {
+            return Susi.Datetime.getDateString(new Date());
+        },
+
+        clearTime: function (date) {
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+
+            return date;
+        },
+        dateToJson: function (date) {
+            date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+            return date.toJSON();
+        },
+
+        // returns true if a datetime has past
+        isPast: function (datetime) {
+            return Date.now() > datetime.getTime();
+        },
+
+        // returns true if a datetime is future
+        isFuture: function (datetime) {
+            return Date.now() < datetime.getTime();
+        },
+
+        // turns hours into milliseconds
+        hToMs: function (hour) {
+            return hour * 3600000;
+        },
+
+        // turns milliseconds into hours
+        msToH: function (milliseconds) {
+            return milliseconds / 3600000;
+        },
+
+        getCookie: function (cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return null;
+        },
+        setCookie: function (cname, cvalue, validDays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (validDays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        },
+        deleteCookie: function (cname) {
+            document.cookie = cname + '=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        },
+
+        // fires an event that will change the page of the app
+        changePage: function (page, keepQueryParams) {
+            if (typeof keepQueryParams !== 'boolean')
+                keepQueryParams = false;
+
+            this.fire("cx-page-change", {
+                page: page,
+                keepQueryParams: keepQueryParams
+            });
+        },
+
+        // convenience function to get the error message from responses
+        onRequestError: function (event) {
+            var readyState = event.detail.request.xhr.readyState;
+            var response = event.detail.request.xhr.response;
+            var status = event.detail.request.xhr.status;
+            var isError = status && status >= 500;
+
+            if (readyState === 4 && status === 0) {
+                this.fire("cx-server-not-available", event);
+            } else if (status == 401) {
+                this.fire("cx-session-invalid", event);
+            } else if (status == 403) {
+                this.fire("cx-privilege-denied", event);
+            } else {
+                this.requestErrorToMsg(event);
+            }
+        },
+
+        requestEventToUrl: function (event) {
+            return event.detail.detail.request.url;
+        },
+
+        requestErrorToMsg: function (event) {
+
+            var response;
+            if (event.detail.request)
+                response = event.detail.request.xhr.response;
+            else
+                response = event.detail.detail.error.message;
+
+            var msg = "";
+            var isError = false;
+
+            if (response && response.state) {
+                isError = response.state === "EXCEPTION";
+            }
+
+            if (response && response.i18n) {
+                var args = [response.i18n.key];
+                Object.keys(response.i18n.values).forEach(function (key) {
+                    args.push(key);
+                    args.push(response.i18n.values[key]);
+                });
+                msg = this.localize.apply(this, args);
+            } else {
+
+                if (response && response.msg) {
+                    msg = response.msg;
+                } else if (typeof (response) == 'string') {
+                    if (response.trim().charAt(0) == '{') {
+                        var json = JSON.parse(response);
+
+                        if (json && json.i18n) {
+                            var args = [json.i18n.key];
+                            Object.keys(json.i18n.values).forEach(function (key) {
+                                args.push(key);
+                                args.push(json.i18n.values[key]);
+                            });
+                            msg = this.localize.apply(this, args);
+                        } else if (json.msg) {
+                            msg = json.msg;
+                        } else {
+                            msg = response;
+                        }
+                    } else {
+                        msg = response;
+                    }
+                } else if (event.detail && event.detail.error && event.detail.error.message && event.detail.request && event.detail.request.url) {
+                    msg = event.detail.error.message + ": " + event.detail.request.url;
+                } else if (event.detail && event.detail.error && event.detail.error.message) {
+                    msg = event.detail.error.message;
+                } else {
+                    console.error("Missing error message on request error", event);
+                    msg = "Request Failed and no message available!";
+                }
+            }
+
+            this.showDialog(msg, isError);
+        },
+
+        // fires an event that will show a dialog
+        showDialog: function (message, isError) {
+            this.fire("cx-show-dialog", {
+                message: message,
+                isError: isError
+            });
+        },
+        // fires an event that will show a dialog
+        showDialogTitle: function (title, message) {
+            this.fire("cx-show-dialog", {
+                title: title,
+                message: message
+            });
+        },
+
+        // fires an event that will show a confirmation dialog
+        showConfirmation: function (title, text, callback) {
+            this.fire("cx-show-confirmation", {
+                title: title,
+                text: text,
+                callback: callback
+            });
+        },
+
+        // fires an event that will show a notification below the toolbar
+        showNotification: function (id, message, faIcon, action1, callback1, action2, callback2, action3, callback3) {
+            this.fire("cx-show-notification", {
+                id: id,
+                message: message,
+                faIcon: faIcon,
+                action1: action1,
+                callback1: callback1,
+                action2: action2,
+                callback2: callback2,
+                action3: action3,
+                callback3: callback3
+            });
+        },
+        clearNotification: function (id) {
+            this.fire("cx-clear-notification", {
+                id: id
+            });
+        },
+
+        showError: function (title, text) {
+            this.showDialogTitle(title, text, true);
+        },
+
+        showToast: function (text) {
+            this.fire('cx-show-toast', {text: text});
+        }
+    };
+</script>

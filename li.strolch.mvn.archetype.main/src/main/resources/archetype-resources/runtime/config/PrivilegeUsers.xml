@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Users>
+    <User userId="0" username="agent">
+        <State>SYSTEM</State>
+        <Roles>
+            <Role>agent</Role>
+        </Roles>
+    </User>
+
+    <!-- Password: admin -->
+    <User userId="1" username="admin" password="cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344" salt="61646d696e">
+        <Firstname>Application</Firstname>
+        <Lastname>Administrator</Lastname>
+        <State>ENABLED</State>
+        <Locale>en-GB</Locale>
+        <Roles>
+            <Role>AppUser</Role>
+        </Roles>
+        <Properties>
+            <Property name="organization" value="strolch.li"/>
+            <Property name="organizationalUnit" value="Development"/>
+        </Properties>
+    </User>
+</Users>

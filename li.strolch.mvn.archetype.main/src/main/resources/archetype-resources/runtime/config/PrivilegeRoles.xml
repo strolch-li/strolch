@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Roles>
+    <Role name="agent">
+        <Privilege name="li.strolch.privilege.handler.SystemAction" policy="DefaultPrivilege">
+            <Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
+            <Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
+        </Privilege>
+        <Privilege name="PrivilegeAction" policy="DefaultPrivilege">
+            <Allow>PersistSessions</Allow>
+            <Allow>GetCertificates</Allow>
+        </Privilege>
+
+        <Privilege name="GetResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="GetOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="GetActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="AddResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="AddOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="AddActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="UpdateResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="UpdateOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="UpdateActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="RemoveResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="RemoveOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="RemoveActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+    </Role>
+
+    <Role name="AppUser">
+        <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.report.ReportSearch" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+
+        <Privilege name="GetResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="GetOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="GetActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="AddResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="AddOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="AddActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="UpdateResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="UpdateOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="UpdateActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="RemoveResource" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="RemoveOrder" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="RemoveActivity" policy="ModelPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+    </Role>
+
+    <Role name="StrolchAdmin">
+        <Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.handler.operationslog.OperationsLog" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.report.ReportSearch" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.job.StrolchJob" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.job.StrolchJobsHandler" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+    </Role>
+
+	<Role name="PrivilegeAdmin">
+		<Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeRemoveUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="InvalidateSession" policy="UserSessionAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeSetUserLocale" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeAction" policy="DefaultPrivilege">
+			<Allow>Reload</Allow>
+			<Allow>GetPolicies</Allow>
+			<Allow>Persist</Allow>
+			<Allow>GetCertificates</Allow>
+			<Allow>PersistSessions</Allow>
+		</Privilege>
+		<Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeSetUserState" policy="UserAccessPrivilege">
+			<Deny>SYSTEM</Deny>
+			<Allow>DISABLED</Allow>
+			<Allow>ENABLED</Allow>
+		</Privilege>
+		<Privilege name="PrivilegeAddRoleToUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeGetRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="GetSession" policy="UserSessionAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeModifyUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeRemoveRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeRemoveRoleFromUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeModifyRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeAddRole" policy="RoleAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+	</Role>
+</Roles>

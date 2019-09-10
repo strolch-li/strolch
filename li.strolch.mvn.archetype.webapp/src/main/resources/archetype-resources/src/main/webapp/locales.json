@@ -1,0 +1,42 @@
+{
+  "de": {
+    "appTitle": "${appName}",
+    "language": "Sprache",
+    "reports": "Berichte",
+    "operations-log": "Betriebsnachrichten",
+    "jobs": "Jobs",
+    "sessions": "Sitzungen",
+    "users": "Benutzer",
+    "roles": "Rollen",
+    "control": "Control",
+    "inspector": "Inspector",
+    "newVersionAvailableRefreshRequired": "Eine neue Version steht zur Verfügung",
+    "refresh": "Aktualisieren",
+    "close": "Schliessen",
+    "cancel": "Abbrechen",
+    "ok": "Ok",
+    "reconnect": "Wiederhestellen",
+    "serverNotAvailable": "Server nicht erreichbar",
+    "serverNotAvailableMsg": "Die Verbindung zum Server ist zur Zeit unterbrochen"
+  },
+  "en": {
+    "appTitle": "${appName}",
+    "language": "Language",
+    "reports": "Reports",
+    "operations-log": "Operation Logs",
+    "jobs": "Jobs",
+    "sessions": "Sessions",
+    "users": "Users",
+    "roles": "Roles",
+    "control": "Control",
+    "inspector": "Inspector",
+    "newVersionAvailableRefreshRequired": "A new version is available",
+    "refresh": "Refresh",
+    "close": "Close",
+    "cancel": "Cancel",
+    "ok": "Ok",
+    "reconnect": "Reconnect",
+    "serverNotAvailable": "Server not available",
+    "serverNotAvailableMsg": "The connection to the server is currently not available"
+  }
+}

@@ -1,0 +1,592 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../bower_components/paper-styles/shadow.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../bower_components/strolch-wc-localize-behavior/strolch-wc-localize-behavior.html">
+<link rel="import" href="../bower_components/strolch-wc-styles/strolch-wc-styles.html">
+<link rel="import" href="../bower_components/strolch-wc-auth/strolch-wc-auth.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-inspector.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-users.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-roles.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-sessions.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-jobs.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-operations-log.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-inspector-menu.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-control.html">
+<link rel="import" href="../bower_components/strolch-wc-reports/strolch-wc-reports.html">
+
+<link rel="import" href="./c-compute-behavior.html">
+<link rel="import" href="./c-app-routing.html">
+<link rel="import" href="./c-app-menu.html">
+
+<link rel="import" href="./c-view404.html">
+
+<dom-module id="c-app">
+
+    <template>
+
+        <style is="custom-styles" include="strolch-wc-styles">
+
+            :host {
+                --app-primary-color: var(--paper-blue-900);
+                --app-secondary-color: black;
+                display: block;
+                margin: 0;
+                padding: 0;
+                font-size: 14px;
+            }
+
+            app-header {
+                color: #fff;
+                background-color: var(--app-primary-color);
+            }
+
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
+            app-toolbar {
+                background-color: var(--paper-blue-900);
+                color: #fff;
+            }
+
+            strolch-wc-reports {
+                --app-pages-content-padding: 0 0;
+            }
+
+            .padded-view {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            paper-toast {
+                max-width: 500px !important;
+            }
+
+        </style>
+
+        <!-- Routing -->
+        <c-app-routing id="appRouting"
+                       login-page="login"
+                       default-page="maintenance"
+                       auth-valid="[[authTokenValid]]"
+                       page="{{page}}"
+                       route-tail="{{routeTail}}"
+                       use-hash-as-path></c-app-routing>
+
+        <!-- Content -->
+        <app-drawer-layout fullbleed force-narrow>
+            <!-- Drawer content -->
+            <app-drawer id="drawer" opened="false">
+                <app-toolbar>Menu</app-toolbar>
+
+                <div style="height: 100%; overflow: auto;">
+
+                    <c-app-menu page="[[page]]"
+                                version="[[appVersion]]"
+                                user-config="[[userConfig]]"
+                                user-locale="{{userLocale}}"
+                                on-menu-tap="onMenuTap"></c-app-menu>
+
+                </div>
+
+            </app-drawer>
+
+            <!-- Main content -->
+            <app-header-layout has-scrolling-region>
+
+                <div class="g-row">
+                    <div class="g-12">
+
+                        <app-header condenses reveals effects="waterfall">
+                            <app-toolbar hidden="[[!authTokenValid]]">
+                                <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+                                <div main-title>[[localize(page)]]</div>
+                            </app-toolbar>
+                        </app-header>
+
+                    </div>
+                </div>
+
+                <div class="g-row">
+                    <div class="g-12">
+                        <iron-pages selected="[[page]]" attr-for-selected="id">
+
+                            <strolch-wc-auth id="login"
+                                             app-title="[[localize('appTitle')]]"
+                                             base-path="../"
+                                             show-version
+                                             on-strolch-session-valid="sessionValidated"></strolch-wc-auth>
+
+                            <template is="dom-if" if="[[equal(page, 'inspector')]]" restamp>
+                                <strolch-wc-inspector id="inspector"
+                                                      base-path="../"
+                                                      route="{{subroute}}"></strolch-wc-inspector>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'operations-log')]]" restamp>
+                                <strolch-wc-operations-log id="operations-log"
+                                                           base-path="../"
+                                                           route="{{subroute}}"></strolch-wc-operations-log>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'jobs')]]" restamp>
+                                <strolch-wc-jobs id="jobs" base-path="../" route="{{subroute}}"></strolch-wc-jobs>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'reports')]]" restamp>
+                                <strolch-wc-reports id="reports"
+                                                    base-path="../"
+                                                    base-rest-path="[[baseRestPath]]"
+                                                    locales-path="../../../locales.json"
+                                                    route="{{subroute}}"
+                                                    facet-limit="[[reportFacetLimit]]"
+                                                    propagate-show-dialog></strolch-wc-reports>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'users')]]" restamp>
+                                <strolch-wc-users id="users" base-path="../" route="{{subroute}}"></strolch-wc-users>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'roles')]]" restamp>
+                                <strolch-wc-roles id="roles" base-path="../" route="{{subroute}}"></strolch-wc-roles>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'sessions')]]" restamp>
+                                <strolch-wc-sessions id="sessions"
+                                                     base-path="../"
+                                                     route="{{subroute}}"></strolch-wc-sessions>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'control')]]" restamp>
+                                <strolch-wc-control id="control"
+                                                    class="padded-view"
+                                                    base-path="../"
+                                                    toolbar-config="{{toolbarConfig}}"
+                                                    search-term="{{searchTerm}}"
+                                                    user-location="{{userLocation}}"
+                                                    route="{{routeTail}}"
+                                                    propagate-show-dialog></strolch-wc-control>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'view404')]]" restamp>
+                                <c-view404 id="view404"></c-view404>
+                            </template>
+
+                        </iron-pages>
+
+                    </div>
+                </div>
+
+                <paper-toast id="toast"
+                             text="[[toastText]]"
+                             duration="1750"
+                             on-iron-overlay-closed="_onToastClosed"></paper-toast>
+
+                <paper-toast id="newVersionAvailableToast"
+                             text="[[localize('newVersionAvailableRefreshRequired')]]"
+                             duration="0">
+                    <paper-button class="refresh" on-tap="refreshBrowser">[[localize('refresh')]]</paper-button>
+                </paper-toast>
+
+            </app-header-layout>
+        </app-drawer-layout>
+
+        <paper-dialog id="dlg" modal>
+            <h2>[[dlgTitle]]</h2>
+            <p id="dlgText"></p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>{{localize('close')}}</paper-button>
+            </div>
+        </paper-dialog>
+        <paper-dialog id="confirmationDlg" modal>
+            <h2>[[dlgTitle]]</h2>
+            <p id="confirmationDlgText"></p>
+            <div class="buttons">
+                <paper-button dialog-dismiss>{{localize('cancel')}}</paper-button>
+                <paper-button dialog-confirm autofocus>{{localize('ok')}}</paper-button>
+            </div>
+        </paper-dialog>
+        <paper-dialog id="serverNotConnectedDlg" modal>
+            <h2>[[localize('serverNotAvailable')]]</h2>
+            <p>[[localize('serverNotAvailableMsg')]]</p>
+            <div class="buttons">
+                <paper-button autofocus on-tap="reconnect">{{localize('reconnect')}}</paper-button>
+            </div>
+        </paper-dialog>
+
+        <iron-ajax id="ajaxGetVersion"
+                   url="[[baseRestPath]]/strolch/version"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="GET"
+                   on-response="onGetVersionResponse"
+                   on-error="onGetVersionError"
+                   auto></iron-ajax>
+        <iron-ajax id="ajaxPutLocale" content-type="application/json" handle-as="json" method="PUT"></iron-ajax>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'c-app',
+
+            behaviors: [
+                CustomComputeBehavior, StrolchLocalizeBehavior
+            ],
+
+            properties: {
+                page: {
+                    type: String,
+                    observer: 'observePage'
+                },
+                authToken: {
+                    type: String
+                },
+                authTokenValid: {
+                    type: Boolean,
+                    value: false
+                },
+                userConfig: {
+                    type: Object,
+                    value: function () {
+                        return Strolch.getUserConfig();
+                    }
+                },
+                userLocale: {
+                    type: String,
+                    observer: "userLocaleChanged",
+                    value: function () {
+                        return Strolch.getUserLocale();
+                    }
+                },
+                appVersion: {
+                    type: Object
+                },
+                route: {
+                    type: Object
+                },
+                dlgTitle: {
+                    type: String
+                },
+                dlgText: {
+                    type: String
+                },
+                queuedToasts: {
+                    type: Array,
+                    value: []
+                },
+                toastText: {
+                    type: String,
+                    value: 'default-toast-text'
+                },
+                reportFacetLimit: {
+                    type: Number,
+                    value: function () {
+                        return 25;
+                    }
+                }
+            },
+
+            observers: [],
+
+            listeners: {
+                "cx-show-toast": "onShowToast",
+                "cx-server-not-available": "onServerNotAvailable",
+                "cx-session-invalid": "onSessionInvalid",
+                "cx-privilege-denied": "onPrivilegeDenied",
+                "cx-page-change": "onPageChange",
+                "cx-show-dialog": "onShowDialog",
+                "strolch-show-dialog": "onShowStrolchDialog",
+                "cx-show-confirmation": "onShowConfirmation",
+                "cx-show-notification": "onShowNotification",
+                "cx-clear-notification": "onClearNotification",
+                "cx-log-out": "onLogOut",
+            },
+
+            observePage: function (newValue, oldValue) {
+                if (newValue) {
+                    this._reloadPage(newValue);
+                }
+            },
+            onPageChange: function (event) {
+                if (event && event.detail && event.detail.page) {
+                    var pageName = event.detail.page;
+
+                    // set the next page
+                    this.$.appRouting.pushNextPage(pageName, event.detail.keepQueryParams);
+                } else {
+                    console.log("received page change without new value");
+                }
+            },
+            onMenuTap: function (event) {
+                var action = event.detail.target.id;
+                this.closeDrawer();
+
+                // depending on the action either navigate or log out
+                switch (action) {
+                    case "logout":
+                        this.fire("cx-log-out");
+                        break;
+                    default:
+                        this.changePage(action);
+                }
+            },
+            toggleDrawer: function () {
+                this.$$("#drawer").toggle();
+            },
+            closeDrawer: function () {
+                this.$$("#drawer").close();
+            },
+
+            onShowToast: function (e) {
+                if (this.$.toast.opened) {
+                    // purge if we have too many
+                    if (this.queuedToasts.length > 5)
+                        this.queuedToasts = [];
+                    this.queuedToasts.push(e.detail.text);
+                } else {
+                    this.toastText = e.detail.text;
+                    this.$.toast.open();
+                }
+            },
+
+            _onToastClosed: function (e) {
+                if (this.queuedToasts.length > 0) {
+                    this.toastText = this.queuedToasts.splice(0, 1)[0];
+                    this.$.toast.open();
+                }
+            },
+
+            onShowStrolchDialog: function (event) {
+                var dlgTitle;
+                if (event.detail.title != null)
+                    dlgTitle = event.detail.title;
+                else
+                    dlgTitle = event.detail.isError ? 'errorOccurred' : 'info';
+                var dlgText = event.detail.text;
+                this._showDialog(dlgTitle, dlgText);
+            },
+            onShowDialog: function (event) {
+                var dlgTitle;
+                if (event.detail.title != null)
+                    dlgTitle = event.detail.title;
+                else
+                    dlgTitle = event.detail.isError ? 'errorOccurred' : 'info';
+                var dlgText = event.detail.message;
+                this._showDialog(dlgTitle, dlgText);
+            },
+            onShowConfirmation: function (event) {
+                var dlgTitle = event.detail.title;
+                var dlgText = event.detail.text;
+                var dlgCallback = event.detail.callback;
+                this._showConfirmation(dlgTitle, dlgText, dlgCallback);
+            },
+            onShowNotification: function (event) {
+                this.$.toolBar.showNotification(event.detail);
+            },
+            onClearNotification: function (event) {
+                this.$.toolBar.clearNotification(event.detail);
+            },
+            onLogOut: function (event) {
+                this.$.login.logout();
+                this.set("authTokenValid", false);
+            },
+            onServerNotAvailable: function (event) {
+                clearInterval(this.checkForNewVersionInterval);
+                this.$.dlg.close();
+                this.$.confirmationDlg.close();
+                this.$.serverNotConnectedDlg.open();
+            },
+            onSessionInvalid: function (event) {
+                var that = this;
+                console.log(this.routeTail);
+                if (this.routeTail.prefix != '/login') {
+                    this._showConfirmation('sessionInvalid', 'sessionInvalidConfirmNavToLogin', function () {
+                        that.deleteCookie('strolch.authorization');
+                        that.set("authTokenValid", false);
+                    });
+                }
+            },
+            onPrivilegeDenied: function (event) {
+                if (this.authTokenValid) {
+                    this._showDialog('privilegeDenied', 'privilegeDeniedText', this.requestEventToUrl(event));
+                } else {
+                    console.warn("Privilege denied to URL " + this.requestEventToUrl(event), this.requestErrorToMsg(event));
+                }
+            },
+            userLocaleChanged: function (newValue, oldValue) {
+                if (newValue && oldValue) {
+                    console.log('User locale changed to ' + newValue);
+                    this.$.ajaxPutLocale.generateRequest();
+                    Strolch.setUserLocale(newValue);
+                    window.location.reload();
+                } else if (this.userConfig == null && Strolch.getUserConfig() != null && Strolch.getUserConfig().locale != newValue) {
+                    this.userConfig = Strolch.getUserConfig();
+                    this.userConfig.locale = newValue;
+                    Strolch.setUserConfig(this.userConfig);
+                    this.$.ajaxPutLocale.generateRequest();
+                }
+            },
+
+            sessionValidated: function () {
+                console.log("Session validated.");
+                var userLocale = Strolch.getUserLocale();
+                var userConfig = Strolch.getUserConfig();
+                if (userLocale !== userConfig.locale) {
+                    console.log("Updating server side locale for user " + userConfig.username + " to " + userLocale);
+                    userConfig.locale = userLocale;
+                    Strolch.setUserConfig(userConfig);
+                    this.$.ajaxPutLocale.url = this.baseRestPath + "/strolch/sessions/" + userConfig.sessionId + "/locale/" + userLocale;
+                    this.$.ajaxPutLocale.generateRequest();
+                }
+                this.set("authToken", Strolch.getAuthToken());
+                this.set("authTokenValid", true);
+                this.set("userConfig", userConfig);
+            },
+            logout: function () {
+                sessionStorage.clear();
+                Polymer.dom(this.root).querySelectorAll('#auth')[0].logout();
+                Strolch.clearStorageData();
+                this.deleteCookie("strolch.authorization");
+            },
+
+            _showDialog: function (dlgTitle, dlgText, dlgReason) {
+                if (this.localize) {
+                    this.dlgTitle = this.localize(dlgTitle);
+                    dlgText = this.localize(dlgText);
+                    if (dlgReason)
+                        dlgText += ": " + dlgReason;
+                    console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                    this.$.dlgText.innerHTML = this.localize(dlgText);
+                    this.$.dlg.open();
+                } else {
+                    this.debounce('show-dlg', function () {
+                        this.dlgTitle = this.localize(dlgTitle);
+                        dlgText = this.localize(dlgText);
+                        if (dlgReason)
+                            dlgText += ": " + dlgReason;
+                        console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                        this.$.dlgText.innerHTML = this.localize(dlgText);
+                        this.$.dlg.open();
+                    }, 250);
+                }
+            },
+            _showConfirmation: function (dlgTitle, dlgText, dlgCallback) {
+                if (this.localize) {
+                    this.dlgTitle = this.localize(dlgTitle);
+                    dlgText = this.localize(dlgText);
+                    console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                    this.$.confirmationDlgText.innerHTML = this.localize(dlgText);
+                    var dlg = this.$.confirmationDlg;
+                    var onClose = function (event) {
+                        dlgCallback(event.detail.confirmed);
+                        dlg.removeEventListener("iron-overlay-closed", onClose);
+                    };
+                    dlg.addEventListener("iron-overlay-closed", onClose);
+                    dlg.open();
+                } else {
+                    this.debounce('show-dlg', function () {
+                        this.dlgTitle = this.localize(dlgTitle);
+                        dlgText = this.localize(dlgText);
+                        console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                        this.$.confirmationDlgText.innerHTML = this.localize(dlgText);
+                        var dlg = this.$.confirmationDlg;
+                        var onClose = function (event) {
+                            dlgCallback(event.detail.confirmed);
+                            dlg.removeEventListener("iron-overlay-closed", onClose);
+                        };
+                        dlg.addEventListener("iron-overlay-closed", onClose);
+                        dlg.open();
+                    }, 250);
+                }
+            },
+
+            refreshBrowser: function () {
+                localStorage['appScmRevision'] = this.scmRevision;
+                document.location.reload();
+            },
+            checkForNewVersion: function () {
+                this.$.ajaxGetVersion.generateRequest();
+            },
+            reconnect: function () {
+                this.$.serverNotConnectedDlg.close();
+                this.onGetVersionResponse = function (event) {
+                    var version = event.detail.response;
+                    this.scmRevision = version.appVersion.scmRevision;
+                    localStorage['appScmRevision'] = this.scmRevision;
+                    document.location.reload();
+                };
+                this.$.ajaxGetVersion.generateRequest();
+            },
+
+            onGetVersionResponse: function (event) {
+                var version = event.detail.response;
+                Strolch.setAppVersion(version);
+                this.scmRevision = version.appVersion.scmRevision;
+
+                if (localStorage['appScmRevision'] == null) {
+                    localStorage['appScmRevision'] = this.scmRevision;
+                } else if (this.scmRevision != localStorage['appScmRevision']) {
+                    console.log("App SCM Revision has changed from " + localStorage['appScmRevision'] + " to " + this.scmRevision + ". Need to refresh browser...");
+                    this.$.newVersionAvailableToast.open();
+                }
+                this.appVersion = version;
+            },
+
+            onGetVersionError: function (event) {
+                console.log(event);
+                var readyState = event.detail.request.xhr.readyState;
+                var status = event.detail.request.xhr.status;
+                if (readyState === 4 && status === 404) {
+                    console.log("Ignoring 404 for get version, as server is probably still starting...");
+                } else {
+                    this.onRequestError(event);
+                }
+            },
+
+            /* Lifecycle */
+            attached: function () {
+                var that = this;
+                setTimeout(function () {
+                    that.checkForNewVersion();
+                }, 3000);
+                this.checkForNewVersionInterval = setInterval(function () {
+                    that.checkForNewVersion();
+                }, 10000);
+            },
+
+            _reloadPage: function (pageName) {
+                this.debounce('page-reload', function () {
+                    var page = this.$$('#' + pageName);
+                    if (page && page.reload) {
+                        console.log('Reloading ' + pageName);
+                        page.reload();
+                    }
+                }, 100);
+            },
+        });
+
+    </script>
+
+</dom-module>

@@ -1,0 +1,149 @@
+<!-- Components -->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-styles/color.html">
+
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-inspector-menu.html">
+
+<link rel="import" href="./c-compute-behavior.html">
+
+<dom-module id="c-app-menu">
+    <template>
+
+        <style is="custom-style">
+
+            paper-menu {
+                --paper-menu-selected-item: {
+                    background-color: var(--paper-indigo-50);
+                };
+            }
+
+            paper-menu paper-item {
+                cursor: pointer;
+            }
+
+            paper-menu paper-item:hover {
+                background-color: var(--paper-indigo-100);
+            }
+
+            paper-menu paper-item:focus:before,
+            paper-menu paper-item:focus:after {
+                background: unset;
+            }
+
+            paper-item {
+                display: flex;
+                flex-direction: row;
+                align-content: center;
+                justify-content: flex-start;
+                height: 1px;
+            }
+
+            .menu-item {
+                min-width: 160px;
+            }
+
+            .info-div {
+                display: block !important;
+                font-size: small;
+                color: darkgray;
+            }
+
+            .container {
+                padding-bottom: 20px;
+                padding-left: 15px;
+                padding-right: 15px;
+                @apply --layout-horizontal;
+                @apply --layout-start-justified;
+            }
+
+            .strolch {
+                color: #7f7f7f;
+                font-family: monospace;
+                font-weight: 600;
+                font-size: 30px;
+                text-shadow: 2px 2px 3px #7f7f7f;
+                margin: auto;
+            }
+
+        </style>
+
+        <paper-menu id="menu" selected="{{page}}" attr-for-selected="id" on-tap="onMenuTap" hidden="[[sessionInvalid]]">
+
+            <paper-item id="reports" class="menu-item">Reports</paper-item>
+
+        </paper-menu>
+
+        <strolch-wc-inspector-menu selected-page="[[page]]"
+                                   on-menu-tap="onInspectorMenuTap"></strolch-wc-inspector-menu>
+
+        <paper-menu on-tap="onMenuTap">
+            <paper-item id="logout" class="menu-item">Logout</paper-item>
+        </paper-menu>
+
+
+        <paper-material id="container" class="container info-div" elevation="0">
+            <p>[[userConfig.firstname]] [[userConfig.lastname]] / [[userConfig.username]]</p>
+            <p title="[[version.appVersion.scmRevision]]">[[version.appVersion.artifactVersion]]</p>
+        </paper-material>
+
+        <paper-material id="container" class="container" elevation="0">
+            <paper-dropdown-menu label="[[localize('language')]]">
+                <paper-listbox class="dropdown-content" selected="{{userLocale}}" attr-for-selected="data">
+                    <paper-item data="de">Deutsch</paper-item>
+                    <paper-item data="en">English</paper-item>
+                </paper-listbox>
+            </paper-dropdown-menu>
+        </paper-material>
+
+        <paper-material id="container" class="container" elevation="0">
+            <p class="strolch">Strolch</p>
+        </paper-material>
+
+
+    </template>
+
+    <script>
+        Polymer({
+            is: "c-app-menu",
+
+            properties: {
+                userConfig: {
+                    type: Object
+                },
+                version: {
+                    type: Object
+                },
+                userLocale: {
+                    type: String,
+                    notify: true
+                }
+            },
+
+            observers: [
+                "observePageChange(page)"
+            ],
+
+            observePageChange: function (page) {
+                if (this.selectedPage != page) {
+                    this.$.menu.select(page);
+                }
+            },
+
+            behaviors: [
+                CustomComputeBehavior, StrolchLocalizeBehavior
+            ],
+
+            onInspectorMenuTap: function (event) {
+                this.selectedPage = event.detail.target.id;
+                this.fire('menu-tap', {target: event.detail.target});
+            },
+
+            onMenuTap: function (event) {
+                this.selectedPage = event.detail.sourceEvent.target.id;
+                this.fire('menu-tap', {target: event.detail.sourceEvent.target});
+            }
+        });
+    </script>
+</dom-module>

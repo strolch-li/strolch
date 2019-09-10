@@ -144,12 +144,12 @@
         <module>li.strolch.websocket</module>
 
         <module>li.strolch.performancetest</module>
-        <module>strolch_minimal_rest</module>
 
         <module>li.strolch.website</module>
 
-        <!-- keep a module as last which is deployable to central -->
         <module>li.strolch.bom</module>
+        <module>li.strolch.mvn.archetype.main</module>
+        <module>li.strolch.mvn.archetype.webapp</module>
 
     </modules>
 
@@ -338,12 +338,6 @@
     </dependencyManagement>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
 
         <pluginManagement>
             <plugins>

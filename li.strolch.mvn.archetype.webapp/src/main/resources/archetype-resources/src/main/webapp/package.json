@@ -1,0 +1,33 @@
+{
+  "name": "ipsc-gateway-web",
+  "description": "IPSC Gateway Web",
+  "version": "0.1.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:4trees/ipsc.git"
+  },
+  "author": "Robert von Burg <robert.vonburg@4trees.ch>",
+  "license": "Proprietary",
+  "keywords": [],
+  "bugs": {
+    "url": "https://bitbucket.org/4trees/ipsc/issues"
+  },
+  "homepage": "www.ipsc.ch",
+  "devDependencies": {
+    "bower": "^1.8.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-crisper": "^1.1.0",
+    "gulp-imagemin": "^3.1.1",
+    "gulp-load-plugins": "^1.4.0",
+    "gulp-minify": "0.0.15",
+    "gulp-rename": "^1.2.2",
+    "gulp-shell": "^0.5.2",
+    "gulp-size": "^2.1.0",
+    "gulp-vulcanize": "^6.1.0",
+    "merge-stream": "^1.0.0",
+    "run-sequence": "^1.2.2",
+    "vulcanize": "^1.15.3"
+  }
+}

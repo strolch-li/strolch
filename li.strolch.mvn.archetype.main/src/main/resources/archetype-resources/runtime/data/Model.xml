@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel.xsd">
+
+    <Resource Id="yellowBall" Name="Yellow Ball" Type="Ball">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="color" Name="Color" Type="String" Value="yellow"/>
+        </ParameterBag>
+    </Resource>
+
+</StrolchModel>

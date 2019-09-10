@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
+              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel.xsd">
+
+    <!-- include root model here -->
+    <IncludeFile file="../../../runtime/data/Model.xml"/>
+
+    <!-- add test specific model data here -->
+
+</StrolchModel>
