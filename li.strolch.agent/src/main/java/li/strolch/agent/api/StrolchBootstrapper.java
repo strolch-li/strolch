@@ -72,7 +72,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * Bootstrap Strolch using the given app {@link StrolchVersion}. This version is used for information on the code
 	 * base from which the agent is instantiated.
 	 * </p>
-	 * 
+	 *
 	 * @param appVersion
 	 */
 	public StrolchBootstrapper(StrolchVersion appVersion) {
@@ -85,9 +85,9 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * Bootstrap Strolch using the given {@link Class} from which to get the {@link #APP_VERSION_PROPERTIES} resource
 	 * stream. The version is used for information on the code base from which the agent is instantiated.
 	 * </p>
-	 * 
+	 *
 	 * @param appClass
-	 *            the class where the {@link #APP_VERSION_PROPERTIES} resource resides
+	 * 		the class where the {@link #APP_VERSION_PROPERTIES} resource resides
 	 */
 	public StrolchBootstrapper(Class<?> appClass) {
 		DBC.PRE.assertNotNull("appClass must be set!", appClass);
@@ -108,11 +108,12 @@ public class StrolchBootstrapper extends DefaultHandler {
 		this.environmentOverride = environmentOverride;
 	}
 
-	public StrolchAgent setupByUserDir(String environment) {
+	public StrolchAgent setupByUserDir(String environment, String subPath) {
 		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
+		DBC.PRE.assertNotEmpty("Sub Path must be set!", subPath);
 		this.environment = environment;
 
-		File rootPathF = new File(System.getProperty(SYS_PROP_USER_DIR));
+		File rootPathF = new File(System.getProperty(SYS_PROP_USER_DIR), subPath);
 		this.configPathF = new File(rootPathF, PATH_CONFIG);
 		this.dataPathF = new File(rootPathF, PATH_DATA);
 		this.tempPathF = new File(rootPathF, PATH_TEMP);
@@ -193,12 +194,12 @@ public class StrolchBootstrapper extends DefaultHandler {
 	/**
 	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
 	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
-	 * 
+	 *
 	 * @param clazz
-	 *            the class from which to load the resource as stream
+	 * 		the class from which to load the resource as stream
 	 * @param bootstrapFile
-	 *            the bootstrap file to load
-	 * 
+	 * 		the bootstrap file to load
+	 *
 	 * @return the Agent which is setup
 	 */
 	public StrolchAgent setupByBootstrapFile(Class<?> clazz, File bootstrapFile) {
@@ -212,12 +213,12 @@ public class StrolchBootstrapper extends DefaultHandler {
 	/**
 	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
 	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
-	 * 
+	 *
 	 * @param clazz
-	 *            the class from which to load the resource as stream
+	 * 		the class from which to load the resource as stream
 	 * @param bootstrapFile
-	 *            the input stream to the bootstrap file to load
-	 * 
+	 * 		the input stream to the bootstrap file to load
+	 *
 	 * @return the Agent which is setup
 	 */
 	public StrolchAgent setupByBootstrapFile(Class<?> clazz, InputStream bootstrapFile) {
@@ -230,12 +231,12 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 	/**
 	 * Set up Strolch by loading the given bootstrap file for configuration
-	 * 
+	 *
 	 * @param environment
-	 *            the environment to load from the boostrap file
+	 * 		the environment to load from the boostrap file
 	 * @param bootstrapFile
-	 *            the bootstrap file to load
-	 * 
+	 * 		the bootstrap file to load
+	 *
 	 * @return the Agent which is setup
 	 */
 	public StrolchAgent setupByBootstrapFile(String environment, File bootstrapFile) {
@@ -248,12 +249,12 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 	/**
 	 * Set up Strolch by loading the given bootstrap file for configuration
-	 * 
+	 *
 	 * @param environment
-	 *            the environment to load from the boostrap file
+	 * 		the environment to load from the boostrap file
 	 * @param bootstrapFile
-	 *            the input stream to the bootstrap file to load
-	 * 
+	 * 		the input stream to the bootstrap file to load
+	 *
 	 * @return the Agent which is setup
 	 */
 	public StrolchAgent setupByBootstrapFile(String environment, InputStream bootstrapFile) {
@@ -332,8 +333,9 @@ public class StrolchBootstrapper extends DefaultHandler {
 		XmlHelper.parseDocument(bootstrapFile, this);
 
 		if (!this.envFound) {
-			throw new StrolchConfigurationException("Environment " + this.environment
-					+ " not configured in bootstrap configuration " + bootstrapFile.getAbsolutePath());
+			throw new StrolchConfigurationException(
+					"Environment " + this.environment + " not configured in bootstrap configuration " + bootstrapFile
+							.getAbsolutePath());
 		}
 
 		evaluatePaths();
@@ -356,8 +358,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 		// validate the parsed data
 		if (!this.defaultAllowed) {
-			if (StringHelper.isEmpty(this.configS) || StringHelper.isEmpty(this.dataS)
-					|| StringHelper.isEmpty(this.tempS)) {
+			if (StringHelper.isEmpty(this.configS) || StringHelper.isEmpty(this.dataS) || StringHelper
+					.isEmpty(this.tempS)) {
 				String msg = "One element of " + Arrays.toString(new String[] { CONFIG, DATA, TEMP })
 						+ " is not set and environment " + this.environment + " does not have attribute " + DEFAULT
 						+ "=\"true\". Either set the value or allow using default values!";
@@ -365,9 +367,9 @@ public class StrolchBootstrapper extends DefaultHandler {
 			}
 		}
 
-		String root = StringHelper.isEmpty(this.rootS)
-				? new File(System.getProperty(SYS_PROP_USER_DIR)).getAbsolutePath()
-				: this.rootS;
+		String root = StringHelper.isEmpty(this.rootS) ?
+				new File(System.getProperty(SYS_PROP_USER_DIR)).getAbsolutePath() :
+				this.rootS;
 		String config = StringHelper.isEmpty(this.configS) ? PATH_CONFIG : this.configS;
 		String data = StringHelper.isEmpty(this.dataS) ? PATH_DATA : this.dataS;
 		String temp = StringHelper.isEmpty(this.tempS) ? PATH_TEMP : this.tempS;
