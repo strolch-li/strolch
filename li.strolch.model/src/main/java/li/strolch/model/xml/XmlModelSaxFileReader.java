@@ -68,7 +68,7 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 			File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
 			if (!includeFile.exists() || !includeFile.canRead()) {
 				String msg = "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, this.modelFile.getName(), includeFileS);
+				msg = MessageFormat.format(msg, this.modelFile.getAbsolutePath(), includeFileS);
 				throw new IllegalArgumentException(msg);
 			}
 
