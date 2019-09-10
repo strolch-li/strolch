@@ -16,6 +16,7 @@
 package li.strolch.service.api;
 
 import static li.strolch.utils.helper.ExceptionHelper.formatException;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.util.ResourceBundle;
 
@@ -188,7 +189,7 @@ public class ServiceResult {
 		JsonObject json = new JsonObject();
 
 		json.addProperty("state", this.state.name());
-		json.addProperty("msg", this.message);
+		json.addProperty("msg", isEmpty(this.message) ? "-" : this.message);
 
 		if (this.throwable != null) {
 			json.addProperty("exceptionMsg", ExceptionHelper.getExceptionMessageWithCauses(this.throwable));
