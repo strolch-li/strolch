@@ -15,11 +15,15 @@
  */
 package li.strolch.model.xml;
 
+import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.Date;
 
@@ -27,6 +31,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -34,11 +39,32 @@ import org.xml.sax.SAXException;
  */
 public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
-	private InputStream stream;
+	private InputSource source;
 
 	public XmlModelSaxStreamReader(StrolchElementListener listener, InputStream stream) {
+		this(listener, stream, DEFAULT_ENCODING);
+	}
+
+	public XmlModelSaxStreamReader(StrolchElementListener listener, InputStreamReader reader) {
+		this(listener, reader, DEFAULT_ENCODING);
+	}
+
+	public XmlModelSaxStreamReader(StrolchElementListener listener, InputStream stream, String encoding) {
 		super(listener);
-		this.stream = stream;
+
+		try {
+			this.source = new InputSource(new InputStreamReader(stream, encoding));
+			this.source.setEncoding(encoding);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("Encoding " + encoding + " unsupported!");
+		}
+	}
+
+	public XmlModelSaxStreamReader(StrolchElementListener listener, InputStreamReader reader, String encoding) {
+		super(listener);
+
+		this.source = new InputSource(reader);
+		this.source.setEncoding(encoding);
 	}
 
 	@Override
@@ -64,7 +90,7 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 			SAXParser sp = spf.newSAXParser();
 
-			sp.parse(this.stream, this);
+			sp.parse(this.source, this);
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;

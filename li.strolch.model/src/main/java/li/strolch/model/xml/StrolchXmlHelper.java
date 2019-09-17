@@ -4,10 +4,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
@@ -46,9 +43,9 @@ public class StrolchXmlHelper {
 		return elementListener.getElements();
 	}
 
-	public static List<StrolchRootElement> parseStream(InputStream stream) {
+	public static List<StrolchRootElement> parseStream(InputStream stream, String encoding) {
 		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
-		new XmlModelSaxStreamReader(elementListener, stream).parseStream();
+		new XmlModelSaxStreamReader(elementListener, stream, encoding).parseStream();
 		return elementListener.getElements();
 	}
 
