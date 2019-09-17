@@ -5,6 +5,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -42,6 +43,12 @@ public class StrolchXmlHelper {
 	public static List<StrolchRootElement> parseFile(File file) {
 		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
 		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
+		return elementListener.getElements();
+	}
+
+	public static List<StrolchRootElement> parseStream(InputStream stream) {
+		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+		new XmlModelSaxStreamReader(elementListener, stream).parseStream();
 		return elementListener.getElements();
 	}
 
