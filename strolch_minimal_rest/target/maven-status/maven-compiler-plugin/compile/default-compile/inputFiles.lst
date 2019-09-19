@@ -1,0 +1,6 @@
+/home/eitch/src/git/strolch/strolch_minimal_rest/src/main/java/li/strolch/minimal/rest/resources/RestfulApplication.java
+/home/eitch/src/git/strolch/strolch_minimal_rest/src/main/java/li/strolch/minimal/rest/util/Result.java
+/home/eitch/src/git/strolch/strolch_minimal_rest/src/main/java/li/strolch/minimal/rest/postinitializer/PostInitializer.java
+/home/eitch/src/git/strolch/strolch_minimal_rest/src/main/java/li/strolch/minimal/rest/resources/GreetingsResource.java
+/home/eitch/src/git/strolch/strolch_minimal_rest/src/main/java/li/strolch/minimal/rest/main/StartupListener.java
+/home/eitch/src/git/strolch/strolch_minimal_rest/src/main/java/li/strolch/minimal/rest/util/RestfulExceptionMapper.java

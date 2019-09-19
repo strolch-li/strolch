@@ -1,0 +1,6 @@
+li/strolch/minimal/rest/resources/GreetingsResource.class
+li/strolch/minimal/rest/util/Result.class
+li/strolch/minimal/rest/main/StartupListener.class
+li/strolch/minimal/rest/resources/RestfulApplication.class
+li/strolch/minimal/rest/util/RestfulExceptionMapper.class
+li/strolch/minimal/rest/postinitializer/PostInitializer.class
