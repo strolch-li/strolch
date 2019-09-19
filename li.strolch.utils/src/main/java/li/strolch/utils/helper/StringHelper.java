@@ -206,13 +206,27 @@ public class StringHelper {
 		return b;
 	}
 
+	public static char binaryToChar(String binary) {
+		if (binary.indexOf(' ') != -1)
+			binary = binary.replaceAll(" ", "");
+		if (binary.length() != Byte.SIZE && binary.length() != Short.SIZE)
+			throw new IllegalArgumentException("char as binary must be 8 or 16 chars long!");
+		int b = 0;
+		for (int i = 0; i < binary.length(); i++) {
+			if (binary.charAt((binary.length() - 1) - i) == '1')
+				b = setBit(b, i);
+		}
+
+		return (char) b;
+	}
+
 	public static short binaryToShort(String binary) {
 		binary = binary.replaceAll(" ", "");
 		if (binary.length() != Short.SIZE)
 			throw new IllegalArgumentException("Short as binary must be 8 chars long!");
 		short b = 0;
 		for (int i = 0; i < Short.SIZE; i++) {
-			if (binary.charAt(i) == '1')
+			if (binary.charAt((Short.SIZE - 1) - i) == '1')
 				b = setBit(b, i);
 		}
 
@@ -225,7 +239,7 @@ public class StringHelper {
 			throw new IllegalArgumentException("Integer as binary must be 8 chars long!");
 		int b = 0;
 		for (int i = 0; i < Integer.SIZE; i++) {
-			if (binary.charAt(i) == '1')
+			if (binary.charAt((Integer.SIZE - 1) - i) == '1')
 				b = setBit(b, i);
 		}
 
@@ -868,6 +882,5 @@ public class StringHelper {
 		uniqueId += 1;
 		return uniqueId;
 	}
-
 
 }
