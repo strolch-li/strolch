@@ -1548,13 +1548,56 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public PrivilegeContext validate(Certificate certificate) throws PrivilegeException, NotAuthenticatedException {
+	public PrivilegeContext validate(Certificate certificate) throws PrivilegeException {
 		return validate(certificate, "unknown");
 	}
 
 	@Override
-	public PrivilegeContext validate(Certificate certificate, String source)
-			throws PrivilegeException, NotAuthenticatedException {
+	public void validateSystemSession(PrivilegeContext ctx) throws PrivilegeException {
+		// ctx  must not be null
+		if (ctx == null)
+			throw new PrivilegeException("PrivilegeContext may not be null!"); //$NON-NLS-1$
+
+		// validate user state is system
+		if (ctx.getUserRep().getUserState() != UserState.SYSTEM) {
+			String msg = "The PrivilegeContext's user {0} does not have expected user state {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, ctx.getUserRep().getUsername(), UserState.SYSTEM);
+			throw new PrivilegeException(msg);
+		}
+
+		// see if a session exists for this certificate
+		Certificate certificate = ctx.getCertificate();
+		PrivilegeContext privilegeContext = this.privilegeContextMap.get(certificate.getSessionId());
+		if (privilegeContext == null) {
+			String msg = MessageFormat.format("There is no session information for {0}", certificate); //$NON-NLS-1$
+			throw new NotAuthenticatedException(msg);
+		}
+
+		// validate same privilege contexts
+		if (ctx != privilegeContext) {
+			String msg = MessageFormat
+					.format("The given PrivilegeContext {0} is not the same as registered under the sessionId {1}",
+							ctx.getCertificate().getSessionId(), privilegeContext.getCertificate().getSessionId());
+			throw new PrivilegeException(msg);
+		}
+
+		// validate certificate has not been tampered with
+		Certificate sessionCertificate = privilegeContext.getCertificate();
+		if (!sessionCertificate.equals(certificate)) {
+			String msg = "Received illegal certificate for session id {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, certificate.getSessionId());
+			throw new PrivilegeException(msg);
+		}
+
+		certificate.setLastAccess(new Date());
+
+		if (!certificate.getSource().equals(this.identifier))
+			throw new IllegalStateException(
+					"Source has changed for certificate " + certificate + " to " + certificate.getSource());
+	}
+
+	@Override
+	public PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		// certificate  must not be null
@@ -1927,22 +1970,23 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
+	@Override
+	public PrivilegeContext openSystemUserContext(String username) throws PrivilegeException {
+
+		// get privilegeContext for this system user
+		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(username);
+
+		String sessionId = systemUserPrivilegeContext.getCertificate().getSessionId();
+		this.privilegeContextMap.put(sessionId, systemUserPrivilegeContext);
+
+		return systemUserPrivilegeContext;
+	}
+
 	private PrivilegeContext initiateSystemPrivilege(String username, Restrictable restrictable) {
 		if (username == null)
 			throw new PrivilegeException("systemUsername may not be null!"); //$NON-NLS-1$
 		if (restrictable == null)
 			throw new PrivilegeException("action may not be null!"); //$NON-NLS-1$
-
-		// get the system user
-		User systemUser = this.persistenceHandler.getUser(username);
-		if (systemUser == null)
-			throw new PrivilegeException(
-					MessageFormat.format("System user {0} does not exist!", username)); //$NON-NLS-1$
-
-		// validate this is a system user
-		if (systemUser.getUserState() != UserState.SYSTEM)
-			throw new PrivilegeException(
-					MessageFormat.format("User {0} is not a System user!", username)); //$NON-NLS-1$
 
 		// get privilegeContext for this system user
 		PrivilegeContext systemUserPrivilegeContext = getSystemUserPrivilegeContext(username);
@@ -1969,6 +2013,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get user object
 		User user = this.persistenceHandler.getUser(systemUsername);
+
 		// no user means no authentication
 		if (user == null) {
 			String msg = MessageFormat
@@ -1980,21 +2025,21 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		byte[] pwHash = user.getPassword();
 		if (pwHash != null) {
 			String msg = MessageFormat
-					.format("System users must not have a password: {0}", systemUsername); //$NON-NLS-1$
+					.format("System users must not have a password: {0}", user.getUsername()); //$NON-NLS-1$
 			throw new AccessDeniedException(msg);
 		}
 
 		// validate user state is system
 		if (user.getUserState() != UserState.SYSTEM) {
 			String msg = "The system {0} user does not have expected user state {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, systemUsername, UserState.SYSTEM);
+			msg = MessageFormat.format(msg, user.getUsername(), UserState.SYSTEM);
 			throw new PrivilegeException(msg);
 		}
 
 		// validate user has at least one role
 		if (user.getRoles().isEmpty()) {
 			String msg = MessageFormat
-					.format("The system user {0} does not have any roles defined!", systemUsername); //$NON-NLS-1$
+					.format("The system user {0} does not have any roles defined!", user.getUsername()); //$NON-NLS-1$
 			throw new PrivilegeException(msg);
 		}
 
@@ -2014,7 +2059,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// log
 		if (logger.isDebugEnabled()) {
 			String msg = "The system user ''{0}'' is logged in with session {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, systemUsername, systemUserCertificate.getSessionId());
+			msg = MessageFormat.format(msg, user.getUsername(), systemUserCertificate.getSessionId());
 			logger.info(msg);
 		}
 

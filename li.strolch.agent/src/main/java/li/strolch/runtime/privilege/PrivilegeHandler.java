@@ -123,6 +123,16 @@ public interface PrivilegeHandler {
 	PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException;
 
 	/**
+	 * Validates that the given {@link PrivilegeContext} is still valid
+	 *
+	 * @param ctx
+	 * 		the {@link PrivilegeContext} to validate
+	 *
+	 * @throws PrivilegeException
+	 */
+	void validateSystemSession(PrivilegeContext ctx) throws PrivilegeException;
+
+	/**
 	 * Invalidates the given certificate
 	 *
 	 * @param certificate
@@ -263,6 +273,14 @@ public interface PrivilegeHandler {
 	 * 		if anything else goes wrong during execution
 	 */
 	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception;
+
+	/**
+	 * Opens a {@link PrivilegeContext} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
+	 *
+	 * @throws PrivilegeException
+	 * 		if there is something wrong
+	 */
+	PrivilegeContext openAgentSystemUserContext() throws PrivilegeException;
 
 	/**
 	 * Returns the {@link li.strolch.privilege.handler.PrivilegeHandler}

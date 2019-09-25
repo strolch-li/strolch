@@ -189,6 +189,11 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
+	public void validateSystemSession(PrivilegeContext ctx) throws PrivilegeException {
+		this.privilegeHandler.validateSystemSession(ctx);
+	}
+
+	@Override
 	public boolean invalidate(Certificate certificate) {
 		boolean invalidateSession = this.privilegeHandler.invalidate(certificate);
 		writeAudit(certificate, StrolchPrivilegeConstants.LOGOUT, AccessType.DELETE, certificate.getUsername());
@@ -244,6 +249,11 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
 		return this.privilegeHandler
 				.runWithResult(StrolchConstants.SYSTEM_USER_AGENT, new StrolchSystemActionWithResult<>(runnable));
+	}
+
+	@Override
+	public PrivilegeContext openAgentSystemUserContext() throws PrivilegeException {
+		return this.privilegeHandler.openSystemUserContext(StrolchConstants.SYSTEM_USER_AGENT);
 	}
 
 	@Override

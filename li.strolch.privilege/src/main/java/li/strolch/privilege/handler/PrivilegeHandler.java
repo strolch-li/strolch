@@ -695,6 +695,21 @@ public interface PrivilegeHandler {
 	PrivilegeContext validate(Certificate certificate) throws PrivilegeException;
 
 	/**
+	 * Checks if the given {@link PrivilegeContext} is valid. This means that the privilege context is for a valid
+	 * system user session and that the user exists for the certificate. This method checks if the {@link Certificate}
+	 * has been tampered with
+	 *
+	 * @param ctx
+	 * 		the {@link PrivilegeContext} to check
+	 *
+	 * @throws PrivilegeException
+	 * 		if there is anything wrong with this privilege context
+	 * @throws NotAuthenticatedException
+	 * 		if the privilege context has expired
+	 */
+	void validateSystemSession(PrivilegeContext ctx) throws PrivilegeException;
+
+	/**
 	 * Checks if the given {@link Certificate} is valid. This means that the certificate is for a valid session and that
 	 * the user exists for the certificate. This method checks if the {@link Certificate} has been tampered with
 	 *
@@ -811,6 +826,22 @@ public interface PrivilegeHandler {
 	 * 		if anything else goes wrong during execution
 	 */
 	<T> T runWithResult(String systemUsername, SystemActionWithResult<T> action) throws PrivilegeException, Exception;
+
+	/**
+	 * Special method to open a {@link PrivilegeContext} as a System user, meaning the given systemUsername corresponds
+	 * to an account which has the state {@link UserState#SYSTEM}. This is used in cases where a system user's {@link
+	 * PrivilegeContext} should be open for a longer period of time, or where opening many {@link PrivilegeContext} is
+	 * resource intensive e.g. on low power devices.
+	 *
+	 * @param systemUsername
+	 * 		the username of the system user to perform the action as
+	 *
+	 * @return the action
+	 *
+	 * @throws PrivilegeException
+	 * 		if the user does not exist, or the system action is not allowed
+	 */
+	PrivilegeContext openSystemUserContext(String systemUsername) throws PrivilegeException;
 
 	/**
 	 * Returns the {@link EncryptionHandler} instance
