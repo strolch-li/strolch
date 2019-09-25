@@ -16,9 +16,11 @@
 package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
@@ -273,6 +275,18 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		if (this.parameterMap == null)
 			return Collections.emptySet();
 		return new HashSet<>(this.parameterMap.keySet());
+	}
+
+	/**
+	 * Returns a simple map where the keys are the IDs of the parameters and the values are the values of the
+	 * Parameters
+	 *
+	 * @return a simple map where the keys are the IDs of the parameters and the values are the values of the *
+	 * Parameters
+	 */
+	public Map<String, Object> toObjectMap() {
+		return this.parameterMap.values().stream()
+				.collect(toMap(StrolchElement::getId, (Function<Parameter<?>, Object>) Parameter::getValue));
 	}
 
 	@Override
