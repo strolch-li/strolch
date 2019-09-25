@@ -24,6 +24,13 @@ public class PostInitializer extends SimplePostInitializer {
 	@Override
 	public void start() throws Exception {
 
+		registerJobs();
+		notifyStart();
+
+		super.start();
+	}
+
+	private void registerJobs() throws Exception {
 		if (!getContainer().hasComponent(StrolchJobsHandler.class))
 			return;
 
@@ -45,10 +52,6 @@ public class PostInitializer extends SimplePostInitializer {
 					JobMode.Recurring, 5, TimeUnit.MINUTES, 6, TimeUnit.HOURS);
 			jobsHandler.register(archiveExecutedActivitiesJob).runNow();
 		}
-
-		notifyStart();
-
-		super.start();
 	}
 
 	private void notifyStart() {

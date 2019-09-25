@@ -33,18 +33,16 @@ public class Main {
 			throw e;
 		}
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				try {
-					Thread.sleep(200);
-					System.out.println("Shutting down ...");
-					Main.agent.stop();
-					Main.agent.destroy();
-				} catch (InterruptedException e) {
-					logger.error("Failed to stop " + APP_NAME + " due to " + e.getMessage(), e);
-				}
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			try {
+				Thread.sleep(200);
+				System.out.println("Shutting down ...");
+				Main.agent.stop();
+				Main.agent.destroy();
+			} catch (InterruptedException e) {
+				logger.error("Failed to stop " + APP_NAME + " due to " + e.getMessage(), e);
 			}
-		});
+		}));
 
 		long took = System.currentTimeMillis() - start;
 		logger.info("Started " + APP_NAME + " in " + (StringHelper.formatMillisecondsDuration(took)));
