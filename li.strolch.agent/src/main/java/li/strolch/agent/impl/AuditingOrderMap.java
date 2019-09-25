@@ -15,6 +15,7 @@
  */
 package li.strolch.agent.impl;
 
+import java.util.HashSet;
 import java.util.List;
 
 import li.strolch.agent.api.AuditTrail;
@@ -55,6 +56,8 @@ public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements
 		OrderVisitor<U> orderVisitor = query.getVisitor();
 		DBC.PRE.assertNotNull("orderVisitor on query", orderVisitor);
 		query.setVisitor(order -> {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(order);
 			return order.accept(orderVisitor);
 		});

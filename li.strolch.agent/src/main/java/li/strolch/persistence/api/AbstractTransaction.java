@@ -1510,34 +1510,45 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ObserverEvent event = new ObserverEvent();
 
 		if (this.resourceMap != null) {
-			if (!this.resourceMap.getCreated().isEmpty())
-				event.added.addList(Tags.RESOURCE, new ArrayList<>(this.resourceMap.getCreated()));
-			if (!this.resourceMap.getUpdated().isEmpty())
-				event.updated.addList(Tags.RESOURCE, new ArrayList<>(this.resourceMap.getUpdated()));
-			if (!this.resourceMap.getDeleted().isEmpty())
-				event.removed.addList(Tags.RESOURCE, new ArrayList<>(this.resourceMap.getDeleted()));
+			Set<Resource> created = this.resourceMap.getCreated();
+			if (!created.isEmpty())
+				event.added.addList(Tags.RESOURCE, new ArrayList<>(created));
+			Set<Resource> updated = this.resourceMap.getUpdated();
+			if (!updated.isEmpty())
+				event.updated.addList(Tags.RESOURCE, new ArrayList<>(updated));
+			Set<Resource> deleted = this.resourceMap.getDeleted();
+			if (!deleted.isEmpty())
+				event.removed.addList(Tags.RESOURCE, new ArrayList<>(deleted));
 		}
 
 		if (this.orderMap != null) {
-			if (!this.orderMap.getCreated().isEmpty())
-				event.added.addList(Tags.ORDER, new ArrayList<>(this.orderMap.getCreated()));
-			if (!this.orderMap.getUpdated().isEmpty())
-				event.updated.addList(Tags.ORDER, new ArrayList<>(this.orderMap.getUpdated()));
-			if (!this.orderMap.getDeleted().isEmpty())
-				event.removed.addList(Tags.ORDER, new ArrayList<>(this.orderMap.getDeleted()));
+			Set<Order> created = this.orderMap.getCreated();
+			if (!created.isEmpty())
+				event.added.addList(Tags.ORDER, new ArrayList<>(created));
+			Set<Order> updated = this.orderMap.getUpdated();
+			if (!updated.isEmpty())
+				event.updated.addList(Tags.ORDER, new ArrayList<>(updated));
+			Set<Order> deleted = this.orderMap.getDeleted();
+			if (!deleted.isEmpty())
+				event.removed.addList(Tags.ORDER, new ArrayList<>(deleted));
 		}
 
 		if (this.activityMap != null) {
-			if (!this.activityMap.getCreated().isEmpty())
-				event.added.addList(Tags.ACTIVITY, new ArrayList<>(this.activityMap.getCreated()));
-			if (!this.activityMap.getUpdated().isEmpty())
-				event.updated.addList(Tags.ACTIVITY, new ArrayList<>(this.activityMap.getUpdated()));
-			if (!this.activityMap.getDeleted().isEmpty())
-				event.removed.addList(Tags.ACTIVITY, new ArrayList<>(this.activityMap.getDeleted()));
+			Set<Activity> created = this.activityMap.getCreated();
+			if (!created.isEmpty())
+				event.added.addList(Tags.ACTIVITY, new ArrayList<>(created));
+			Set<Activity> updated = this.activityMap.getUpdated();
+			if (!updated.isEmpty())
+				event.updated.addList(Tags.ACTIVITY, new ArrayList<>(updated));
+			Set<Activity> deleted = this.activityMap.getDeleted();
+			if (!deleted.isEmpty())
+				event.removed.addList(Tags.ACTIVITY, new ArrayList<>(deleted));
 		}
 
-		ObserverHandler observerHandler = this.realm.getObserverHandler();
-		observerHandler.notify(event);
+		if (!(event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty())) {
+			ObserverHandler observerHandler = this.realm.getObserverHandler();
+			observerHandler.notify(event);
+		}
 
 		return System.nanoTime() - observerUpdateStart;
 	}

@@ -89,8 +89,8 @@ public class ObjectFilter {
 	 * Default constructor initializing the filter
 	 */
 	public ObjectFilter() {
-		this.cache = new MapOfMaps<>(1);
-		this.keySet = new HashSet<>(1);
+		this.cache = new MapOfMaps<>();
+		this.keySet = new HashSet<>();
 	}
 
 	private void replaceKey(ObjectCache cached, Object newObjectKey, Object newObject) {
@@ -455,6 +455,8 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public List<Object> getAdded(String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<Object> addedObjects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -476,6 +478,8 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public <V> List<V> getAdded(Class<V> clazz, String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<V> addedObjects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -499,6 +503,8 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public List<Object> getUpdated(String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<Object> updatedObjects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -520,6 +526,8 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public <V> List<V> getUpdated(Class<V> clazz, String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<V> updatedObjects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -543,6 +551,8 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public List<Object> getRemoved(String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<Object> removedObjects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -564,6 +574,8 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public <V> List<V> getRemoved(Class<V> clazz, String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<V> removedObjects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -589,6 +601,8 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public <V> List<V> getAll(Class<V> clazz, String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<V> objects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -632,6 +646,8 @@ public class ObjectFilter {
 	 * @return The list of objects matching the given key.
 	 */
 	public List<Object> getAll(String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		List<Object> allObjects = new LinkedList<>();
 		List<ObjectCache> allObjs = this.cache.getAllElements(key);
 		for (ObjectCache objectCache : allObjs) {
@@ -650,6 +666,8 @@ public class ObjectFilter {
 	 * @return The list of objects matching the given key.
 	 */
 	public List<ObjectCache> getCache(String key) {
+		if (!this.cache.containsMap(key))
+			return Collections.emptyList();
 		return this.cache.getAllElements(key);
 	}
 

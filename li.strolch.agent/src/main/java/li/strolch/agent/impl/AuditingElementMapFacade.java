@@ -15,11 +15,10 @@
  */
 package li.strolch.agent.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+
+import java.util.*;
 import java.util.stream.Stream;
 
 import li.strolch.agent.api.AuditTrail;
@@ -65,12 +64,6 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 		DBC.PRE.assertNotNull("ElementMap must be set!", elementMap); //$NON-NLS-1$
 		this.elementMap = elementMap;
 		this.observeAccessReads = observeAccessReads;
-
-		this.created = new HashSet<>();
-		this.read = new HashSet<>();
-		this.updated = new HashSet<>();
-		this.deleted = new HashSet<>();
-		this.deletedAllByType = new HashMap<>();
 	}
 
 	protected ElementMap<T> getElementMap() {
@@ -81,6 +74,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	 * @return the read
 	 */
 	public Set<T> getRead() {
+		if (this.read == null)
+			return emptySet();
 		return this.read;
 	}
 
@@ -88,6 +83,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	 * @return the created
 	 */
 	public Set<T> getCreated() {
+		if (this.created == null)
+			return emptySet();
 		return this.created;
 	}
 
@@ -95,6 +92,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	 * @return the updated
 	 */
 	public Set<T> getUpdated() {
+		if (this.updated == null)
+			return emptySet();
 		return this.updated;
 	}
 
@@ -102,6 +101,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	 * @return the deleted
 	 */
 	public Set<T> getDeleted() {
+		if (this.deleted == null)
+			return emptySet();
 		return this.deleted;
 	}
 
@@ -116,6 +117,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	 * @return the deletedAllByType
 	 */
 	public Map<String, Long> getDeletedAllByType() {
+		if (this.deletedAllByType == null)
+			return emptyMap();
 		return this.deletedAllByType;
 	}
 
@@ -142,24 +145,33 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public T getTemplate(StrolchTransaction tx, String type) {
 		T template = this.elementMap.getTemplate(tx, type);
-		if (this.observeAccessReads && template != null)
+		if (this.observeAccessReads && template != null) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(template);
+		}
 		return template;
 	}
 
 	@Override
 	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) throws StrolchException {
 		T template = this.elementMap.getTemplate(tx, type, assertExists);
-		if (this.observeAccessReads && template != null)
+		if (this.observeAccessReads && template != null) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(template);
+		}
 		return template;
 	}
 
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id) {
 		T element = this.elementMap.getBy(tx, type, id);
-		if (this.observeAccessReads && element != null)
+		if (this.observeAccessReads && element != null) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(element);
+		}
 		return element;
 	}
 
@@ -168,16 +180,22 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException {
 		T element = this.elementMap.getBy(tx, type, id, assertExists);
-		if (this.observeAccessReads && element != null)
+		if (this.observeAccessReads && element != null) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(element);
+		}
 		return element;
 	}
 
 	@Override
 	public T getBy(StrolchTransaction tx, String type, String id, int version) {
 		T element = this.elementMap.getBy(tx, type, id, version);
-		if (this.observeAccessReads && element != null)
+		if (this.observeAccessReads && element != null) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(element);
+		}
 		return element;
 	}
 
@@ -185,16 +203,22 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	public T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
 			throws StrolchException {
 		T element = this.elementMap.getBy(tx, type, id, version, assertExists);
-		if (this.observeAccessReads && element != null)
+		if (this.observeAccessReads && element != null) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(element);
+		}
 		return element;
 	}
 
 	@Override
 	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException {
 		T element = this.elementMap.getBy(tx, refP, assertExists);
-		if (this.observeAccessReads && element != null)
+		if (this.observeAccessReads && element != null) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(element);
+		}
 		return element;
 	}
 
@@ -202,16 +226,22 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists)
 			throws StrolchException {
 		List<T> elements = this.elementMap.getBy(tx, refP, assertExists);
-		if (this.observeAccessReads && !elements.isEmpty())
+		if (this.observeAccessReads && !elements.isEmpty()) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.addAll(elements);
+		}
 		return elements;
 	}
 
 	@Override
 	public List<T> getVersionsFor(StrolchTransaction tx, String type, String id) {
 		List<T> versions = this.elementMap.getVersionsFor(tx, type, id);
-		if (this.observeAccessReads && !versions.isEmpty())
+		if (this.observeAccessReads && !versions.isEmpty()) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.add(versions.get(versions.size() - 1));
+		}
 		return versions;
 	}
 
@@ -223,24 +253,33 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public List<T> getAllElements(StrolchTransaction tx) {
 		List<T> elements = this.elementMap.getAllElements(tx);
-		if (this.observeAccessReads && !elements.isEmpty())
+		if (this.observeAccessReads && !elements.isEmpty()) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.addAll(elements);
+		}
 		return elements;
 	}
 
 	@Override
 	public List<T> getElementsBy(StrolchTransaction tx, String type) {
 		List<T> elements = this.elementMap.getElementsBy(tx, type);
-		if (this.observeAccessReads && !elements.isEmpty())
+		if (this.observeAccessReads && !elements.isEmpty()) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			this.read.addAll(elements);
+		}
 		return elements;
 	}
 
 	@Override
 	public Stream<T> stream(StrolchTransaction tx, String... types) {
 		Stream<T> stream = this.elementMap.stream(tx, types);
-		if (this.observeAccessReads)
+		if (this.observeAccessReads) {
+			if (this.read == null)
+				this.read = new HashSet<>();
 			stream = stream.peek(e -> this.read.add(e));
+		}
 		return stream;
 	}
 
@@ -262,36 +301,48 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public void add(StrolchTransaction tx, T element) {
 		this.elementMap.add(tx, element);
+		if (this.created == null)
+			this.created = new HashSet<>();
 		this.created.add(element);
 	}
 
 	@Override
 	public void addAll(StrolchTransaction tx, List<T> elements) {
 		this.elementMap.addAll(tx, elements);
+		if (this.created == null)
+			this.created = new HashSet<>();
 		this.created.addAll(elements);
 	}
 
 	@Override
 	public void update(StrolchTransaction tx, T element) {
 		this.elementMap.update(tx, element);
+		if (this.updated == null)
+			this.updated = new HashSet<>();
 		this.updated.add(element);
 	}
 
 	@Override
 	public void updateAll(StrolchTransaction tx, List<T> elements) {
 		this.elementMap.updateAll(tx, elements);
+		if (this.updated == null)
+			this.updated = new HashSet<>();
 		this.updated.addAll(elements);
 	}
 
 	@Override
 	public void remove(StrolchTransaction tx, T element) {
 		this.elementMap.remove(tx, element);
+		if (this.deleted == null)
+			this.deleted = new HashSet<>();
 		this.deleted.add(element);
 	}
 
 	@Override
 	public void removeAll(StrolchTransaction tx, List<T> elements) {
 		this.elementMap.removeAll(tx, elements);
+		if (this.deleted == null)
+			this.deleted = new HashSet<>();
 		this.deleted.addAll(elements);
 	}
 
@@ -306,6 +357,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	public long removeAllBy(StrolchTransaction tx, String type) {
 		long removed = this.elementMap.removeAllBy(tx, type);
 
+		if (this.deletedAllByType == null)
+			this.deletedAllByType = new HashMap<>();
 		Long byType = this.deletedAllByType.get(type);
 		if (byType == null)
 			byType = 0L;
@@ -318,6 +371,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException {
 		T element = this.elementMap.revertToVersion(tx, type, id, version);
+		if (this.updated == null)
+			this.updated = new HashSet<>();
 		this.updated.add(element);
 		return element;
 	}
@@ -325,6 +380,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public T revertToVersion(StrolchTransaction tx, T element) throws StrolchException {
 		T revertedElement = this.elementMap.revertToVersion(tx, element);
+		if (this.updated == null)
+			this.updated = new HashSet<>();
 		this.updated.add(revertedElement);
 		return revertedElement;
 	}
@@ -332,9 +389,14 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
 		this.elementMap.undoVersion(tx, element);
-		if (element.getVersion().isFirstVersion())
+		if (element.getVersion().isFirstVersion()) {
+			if (this.deleted == null)
+				this.deleted = new HashSet<>();
 			this.deleted.add(element);
-		else
+		} else {
+			if (this.updated == null)
+				this.updated = new HashSet<>();
 			this.updated.add(element);
+		}
 	}
 }

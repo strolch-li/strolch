@@ -6,6 +6,7 @@
 			<Properties>
 				<locale>en</locale>
 				<verbose>true</verbose>
+				<timezone>Europe/Zurich</timezone>
 			</Properties>
 		</Runtime>
 		<Component>
