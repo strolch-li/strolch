@@ -135,7 +135,7 @@ public class ServiceResult {
 	}
 
 	public static ServiceResult failed(String error, Throwable t) {
-		return new ServiceResult(ServiceResultState.FAILED, error, t);
+		return new ServiceResult(ServiceResultState.EXCEPTION, error, t);
 	}
 
 	@SuppressWarnings("unchecked")
