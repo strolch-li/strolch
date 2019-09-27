@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
@@ -140,6 +141,8 @@ public class ResponseUtil {
 			status = Status.INTERNAL_SERVER_ERROR;
 		} else if (t instanceof PrivilegeException) {
 			status = Status.UNAUTHORIZED;
+		} else if (t instanceof StrolchElementNotFoundException) {
+			status = Status.NOT_FOUND;
 		} else {
 			status = Status.INTERNAL_SERVER_ERROR;
 		}
@@ -150,6 +153,8 @@ public class ResponseUtil {
 	public static Response toResponse(Throwable t) {
 		if (t instanceof AccessDeniedException) {
 			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
+		} else if (t instanceof StrolchElementNotFoundException) {
+			return ResponseUtil.toResponse(Status.NOT_FOUND, t);
 		} else if (t instanceof PrivilegeModelException) {
 			return ResponseUtil.toResponse(Status.INTERNAL_SERVER_ERROR, t);
 		} else if (t instanceof PrivilegeException) {

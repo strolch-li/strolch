@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Version;
@@ -88,7 +89,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		T t = getBy(tx, StrolchConstants.TEMPLATE, type);
 		if (assertExists && t == null) {
 			String msg = "The template with type \"{0}\" does not exist!"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, type));
+			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type));
 		}
 
 		if (t == null)
@@ -117,7 +118,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		if (assertExists && t == null) {
 			String msg = "The element with type \"{0}\" and id \"{1}\" does not exist!"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, type, id));
+			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type, id));
 		}
 
 		if (t == null)
@@ -136,7 +137,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		T t = getBy(tx, type, id, false);
 		if (assertExists && t == null) {
 			String msg = "The element with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, type, id, refP.getLocator()));
+			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type, id, refP.getLocator()));
 		}
 		return t;
 	}
@@ -154,7 +155,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 					T t = getBy(tx, type, id, false);
 					if (assertExists && t == null) {
 						String msg = "The element with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
-						throw new StrolchException(MessageFormat.format(msg, type, id, refP.getLocator()));
+						throw new StrolchElementNotFoundException(MessageFormat.format(msg, type, id, refP.getLocator()));
 					}
 					return t;
 				}) //
