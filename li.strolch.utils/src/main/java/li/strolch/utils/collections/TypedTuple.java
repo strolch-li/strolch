@@ -16,13 +16,14 @@
 package li.strolch.utils.collections;
 
 /**
- *
  * Simple wrapper for two elements
  *
- * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
+ * @param <T>
+ * 		first object
+ * @param <U>
+ * 		second object
  *
- * @param <T> first object
- * @param <U> second object
+ * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
 public class TypedTuple<T, U> {
 
@@ -39,7 +40,7 @@ public class TypedTuple<T, U> {
 	}
 
 	public T getFirst() {
-		return (T) this.first;
+		return this.first;
 	}
 
 	public void setFirst(T first) {
@@ -47,7 +48,7 @@ public class TypedTuple<T, U> {
 	}
 
 	public U getSecond() {
-		return (U) this.second;
+		return this.second;
 	}
 
 	public void setSecond(U second) {

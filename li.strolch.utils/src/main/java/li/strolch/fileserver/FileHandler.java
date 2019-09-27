@@ -136,13 +136,6 @@ public class FileHandler {
 			// update request size to last part of file
 			long l = Math.min(requestSize, remaining);
 
-			// this is a fail safe
-			if (l > MAX_PART_SIZE) {
-				String msg = "Something went wrong. Min of requestSize and remaining is > MAX_PART_SIZE of {0}!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, MAX_PART_SIZE);
-				throw new RuntimeException(msg);
-			}
-
 			// this is the size of the array we want to return
 			requestSize = (int) l;
 			filePart.setPartLength(requestSize);
@@ -282,7 +275,7 @@ public class FileHandler {
 	/**
 	 * Validates that the file name is legal, i.e. not empty or contains references up the tree
 	 *
-	 * @param fileName
+	 * @param fileName the name to validate
 	 */
 	private void validateFileName(String fileName) {
 
@@ -298,7 +291,7 @@ public class FileHandler {
 	/**
 	 * Validates that the file type is legal, i.e. not empty or contains references up the tree
 	 *
-	 * @param fileType
+	 * @param fileType the file type to validate
 	 */
 	private void validateFileType(String fileType) {
 		if (fileType == null || fileType.isEmpty()) {

@@ -49,7 +49,8 @@ public class FileClientUtil {
 
 			int loops = 0;
 			int startLength = tmpPart.getPartLength();
-			while (true) {
+			boolean run = true;
+			while (run) {
 				loops += 1;
 
 				// get the next part
@@ -77,7 +78,7 @@ public class FileClientUtil {
 
 				// break if the offset is past the length of the file
 				if (tmpPart.getPartOffset() >= tmpPart.getFileLength())
-					break;
+					run = false;
 			}
 
 			String msg = "{0}: {1}: Requested {2} parts. StartSize: {3} EndSize: {4}"; //$NON-NLS-1$
@@ -140,7 +141,7 @@ public class FileClientUtil {
 			byte[] bytes = new byte[partLength];
 
 			// open the stream to the file
-			int read = 0;
+			int read;
 			int offset = 0;
 
 			// loop by reading the number of bytes needed for each part
@@ -210,7 +211,7 @@ public class FileClientUtil {
 		}
 	}
 
-	public static void deleteFile(FileClient rmiFileClient, FileDeletion fileDeletion, File dstFile) {
+	public static void deleteFile(FileClient rmiFileClient, FileDeletion fileDeletion) {
 
 		try {
 			rmiFileClient.deleteFile(fileDeletion);
