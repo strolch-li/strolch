@@ -13,18 +13,18 @@
     <artifactId>li.strolch.bom</artifactId>
     <packaging>pom</packaging>
     <name>li.strolch.bom</name>
-    <description>The default set of dependencies to start working with strolch projects</description>
+    <description>All of Strolch's dependencies for easy dependency management in Strolch projects</description>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.model</artifactId>
+                <artifactId>li.strolch.agent</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.agent</artifactId>
+                <artifactId>li.strolch.model</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -39,7 +39,37 @@
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.persistence.xml</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.privilege</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>li.strolch</groupId>
                 <artifactId>li.strolch.rest</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.soql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>li.strolch</groupId>
+                <artifactId>li.strolch.websocket</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
