@@ -10,6 +10,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import li.strolch.utils.collections.MapOfLists;
+import li.strolch.utils.collections.MapOfMaps;
+import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.collections.Paging;
 
 /**
@@ -117,6 +120,102 @@ public class SearchResult<T> {
 	 */
 	public <U, V> Map<U, V> toMap(Function<T, U> keyMapper, Function<T, V> valueMapper) {
 		return this.stream.collect(Collectors.toMap(keyMapper, valueMapper));
+	}
+
+	/**
+	 * Collects this stream to a {@link MapOfSets}, using the given key mapper. The value is returned as is
+	 *
+	 * @param keyMapper
+	 * 		function to get the key of the element
+	 *
+	 * @return a map of this stream
+	 */
+	public <U> MapOfSets<U, T> toMapOfSets(Function<T, U> keyMapper) {
+		return this.stream.collect(MapOfSets::new, //
+				(map, e) -> map.addElement(keyMapper.apply(e), e), //
+				MapOfSets::addAll);
+	}
+
+	/**
+	 * Collects this stream to a {@link MapOfSets}, using the given key mapper
+	 *
+	 * @param keyMapper
+	 * 		function to get the key of the element
+	 * @param valueMapper
+	 * 		function to get the value of the element
+	 *
+	 * @return a map of this stream
+	 */
+	public <U, V> MapOfSets<U, V> toMapOfSets(Function<T, U> keyMapper, Function<T, V> valueMapper) {
+		return this.stream.collect(MapOfSets::new, //
+				(map, e) -> map.addElement(keyMapper.apply(e), valueMapper.apply(e)), //
+				MapOfSets::addAll);
+	}
+
+	/**
+	 * Collects this stream to a {@link MapOfLists}, using the given key mapper. The value is returned as is
+	 *
+	 * @param keyMapper
+	 * 		function to get the key of the element
+	 *
+	 * @return a map of this stream
+	 */
+	public <U> MapOfLists<U, T> toMapOfLists(Function<T, U> keyMapper) {
+		return this.stream.collect(MapOfLists::new, //
+				(map, e) -> map.addElement(keyMapper.apply(e), e), //
+				MapOfLists::addAll);
+	}
+
+	/**
+	 * Collects this stream to a {@link MapOfLists}, using the given key mapper
+	 *
+	 * @param keyMapper
+	 * 		function to get the key of the element
+	 * @param valueMapper
+	 * 		function to get the value of the element
+	 *
+	 * @return a map of this stream
+	 */
+	public <U, V> MapOfLists<U, V> toMapOfLists(Function<T, U> keyMapper, Function<T, V> valueMapper) {
+		return this.stream.collect(MapOfLists::new, //
+				(map, e) -> map.addElement(keyMapper.apply(e), valueMapper.apply(e)), //
+				MapOfLists::addAll);
+	}
+
+	/**
+	 * Collects this stream to a {@link MapOfMaps}, using the given key mapper and sub key mapper. The value is returned
+	 * as is
+	 *
+	 * @param keyMapper
+	 * 		function to get the key of the element
+	 * @param subKeyMapper
+	 * 		function to get the sub key of the element
+	 *
+	 * @return a map of this stream
+	 */
+	public <U, V> MapOfMaps<U, V, T> toMapOfMaps(Function<T, U> keyMapper, Function<T, V> subKeyMapper) {
+		return this.stream.collect(MapOfMaps::new, //
+				(map, e) -> map.addElement(keyMapper.apply(e), subKeyMapper.apply(e), e), //
+				MapOfMaps::putAll);
+	}
+
+	/**
+	 * Collects this stream to a {@link MapOfLists}, using the given key mapper
+	 *
+	 * @param keyMapper
+	 * 		function to get the key of the element
+	 * @param subKeyMapper
+	 * 		function to get the sub key of the element
+	 * @param valueMapper
+	 * 		function to get the value of the element
+	 *
+	 * @return a map of this stream
+	 */
+	public <R, U, V> MapOfMaps<U, V, R> toMapOfMaps(Function<T, U> keyMapper, Function<T, V> subKeyMapper,
+			Function<T, R> valueMapper) {
+		return this.stream.collect(MapOfMaps::new, //
+				(map, e) -> map.addElement(keyMapper.apply(e), subKeyMapper.apply(e), valueMapper.apply(e)), //
+				MapOfMaps::putAll);
 	}
 
 	/**
