@@ -116,4 +116,8 @@ public class LongValue implements IValue<Long>, Serializable {
 		return true;
 	}
 
+	@Override
+	public int compareTo(IValue<Long> o) {
+		return Long.compare(this.value, o.getValue());
+	}
 }

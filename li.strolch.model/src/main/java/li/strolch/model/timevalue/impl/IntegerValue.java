@@ -116,4 +116,8 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 		return true;
 	}
 
+	@Override
+	public int compareTo(IValue<Integer> o) {
+		return Integer.compare(this.value, o.getValue());
+	}
 }

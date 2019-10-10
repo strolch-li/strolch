@@ -141,4 +141,12 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 		sb.append("]");
 		return sb.toString();
 	}
+
+	@Override
+	public int compareTo(IValue<Set<AString>> o) {
+		Set<AString> otherValues = o.getValue();
+		if (this.aStrings.equals(otherValues))
+			return 0;
+		return Integer.compare(this.aStrings.size(), otherValues.size());
+	}
 }

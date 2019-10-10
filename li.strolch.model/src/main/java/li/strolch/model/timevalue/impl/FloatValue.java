@@ -125,4 +125,8 @@ public class FloatValue implements IValue<Double>, Serializable {
 		return true;
 	}
 
+	@Override
+	public int compareTo(IValue<Double> o) {
+		return Double.compare(this.value, o.getValue());
+	}
 }

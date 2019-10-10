@@ -31,7 +31,9 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 
 	/**
 	 * @param time
+	 * 		the time for this value
 	 * @param value
+	 * 		the actual value for this value
 	 */
 	public TimeValue(final Long time, final T value) {
 		this.time = time;
@@ -41,7 +43,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 	@Override
 	@SuppressWarnings("unchecked")
 	public T getValue() {
-		return (T) this.value.getCopy();
+		return this.value == null ? null : (T) this.value.getCopy();
 	}
 
 	@Override
@@ -62,9 +64,19 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 		return this;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public int compareTo(final ITimeValue<T> arg0) {
-		return this.getTime().compareTo(arg0.getTime());
+		int i = getTime().compareTo(arg0.getTime());
+		if (i != 0)
+			return i;
+		if (this.value == null && arg0.getValue() == null)
+			return 0;
+		if (this.value == null)
+			return -1;
+		if (arg0.getValue() == null)
+			return 1;
+		return getValue().compareTo(arg0.getValue());
 	}
 
 	@SuppressWarnings("unchecked")

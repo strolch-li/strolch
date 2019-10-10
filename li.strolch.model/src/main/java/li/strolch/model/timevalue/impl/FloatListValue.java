@@ -153,4 +153,11 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 		return true;
 	}
 
+	@Override
+	public int compareTo(IValue<List<Double>> o) {
+		List<Double> otherValues = o.getValue();
+		if (this.value.equals(otherValues))
+			return 0;
+		return Integer.compare(this.value.size(), otherValues.size());
+	}
 }

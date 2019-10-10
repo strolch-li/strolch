@@ -24,7 +24,7 @@ package li.strolch.model.timevalue;
  *
  * @author Martin Smock <smock.martin@gmail.com>
  */
-public interface IValue<T> {
+public interface IValue<T> extends Comparable<IValue<T>> {
 
 	/**
 	 * @return the type of this {@link IValue}

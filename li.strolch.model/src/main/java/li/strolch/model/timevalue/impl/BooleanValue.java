@@ -115,4 +115,9 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 		}
 		return true;
 	}
+
+	@Override
+	public int compareTo(IValue<Boolean> o) {
+		return Boolean.compare(this.value, o.getValue());
+	}
 }
