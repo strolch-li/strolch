@@ -367,10 +367,12 @@
 
             if (response && response.i18n) {
                 var args = [response.i18n.key];
-                Object.keys(response.i18n.values).forEach(function (key) {
-                    args.push(key);
-                    args.push(response.i18n.values[key]);
-                });
+                if (response.i18n.values != null) {
+                    Object.keys(response.i18n.values).forEach(function (key) {
+                        args.push(key);
+                        args.push(response.i18n.values[key]);
+                    });
+                }
                 msg = this.localize.apply(this, args);
             } else {
 
@@ -382,10 +384,12 @@
 
                         if (json && json.i18n) {
                             var args = [json.i18n.key];
-                            Object.keys(json.i18n.values).forEach(function (key) {
-                                args.push(key);
-                                args.push(json.i18n.values[key]);
-                            });
+                            if (json.i18n.values != null) {
+                                Object.keys(json.i18n.values).forEach(function (key) {
+                                    args.push(key);
+                                    args.push(json.i18n.values[key]);
+                                });
+                            }
                             msg = this.localize.apply(this, args);
                         } else if (json.msg) {
                             msg = json.msg;
