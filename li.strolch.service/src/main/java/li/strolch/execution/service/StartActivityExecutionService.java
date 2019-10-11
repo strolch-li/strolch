@@ -1,6 +1,6 @@
 package li.strolch.execution.service;
 
-import static li.strolch.service.I18nServiceBundle.i18nServiceBundle;
+import static li.strolch.service.I18nService.i18nService;
 
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.ExecutionHandlerState;
@@ -34,7 +34,7 @@ public class StartActivityExecutionService extends AbstractService<LocatorArgume
 		if (executionHandlerState != ExecutionHandlerState.Running)
 			return new StrolchRootElementResult(ServiceResultState.WARNING,
 					"ExecutionHandler is not running, can not start new jobs!")
-					.i18n(i18nServiceBundle, "execution.handler.invalidState", "state", executionHandlerState);
+					.i18n(i18nService, "execution.handler.invalidState", "state", executionHandlerState);
 
 		executionHandler.addForExecution(realm, arg.locator);
 
