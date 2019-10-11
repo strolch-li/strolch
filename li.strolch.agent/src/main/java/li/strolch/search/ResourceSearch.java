@@ -19,4 +19,10 @@ public class ResourceSearch extends StrolchSearch<Resource> {
 		this.navigator = tx -> tx.streamResources(types);
 		return this;
 	}
+
+	@Override
+	public ResourceSearch where(SearchExpression<Resource> expression) {
+		super.where(expression);
+		return this;
+	}
 }

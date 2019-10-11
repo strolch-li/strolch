@@ -19,4 +19,10 @@ public class ActivitySearch extends StrolchSearch<Activity> {
 		this.navigator = tx -> tx.streamActivities(types);
 		return this;
 	}
+
+	@Override
+	public ActivitySearch where(SearchExpression<Activity> expression) {
+		super.where(expression);
+		return this;
+	}
 }

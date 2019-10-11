@@ -19,4 +19,10 @@ public class OrderSearch extends StrolchSearch<Order> {
 		this.navigator = tx -> tx.streamOrders(types);
 		return this;
 	}
+
+	@Override
+	public OrderSearch where(SearchExpression<Order> expression) {
+		super.where(expression);
+		return this;
+	}
 }
