@@ -139,6 +139,12 @@ public class ServiceResult {
 	}
 
 	@SuppressWarnings("unchecked")
+	public <T extends ServiceResult> T i18n(I18nMessage message) {
+		this.i18nMessage = message;
+		return (T) this;
+	}
+
+	@SuppressWarnings("unchecked")
 	public <T extends ServiceResult> T i18n(ResourceBundle bundle, String key) {
 		this.i18nMessage = new I18nMessage(bundle, key);
 		return (T) this;
