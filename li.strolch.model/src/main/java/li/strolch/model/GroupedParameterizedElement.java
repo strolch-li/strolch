@@ -16,6 +16,7 @@
 package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -24,6 +25,8 @@ import java.util.stream.Stream;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.utils.helper.StringHelper;
 
 /**
@@ -139,6 +142,22 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.BAG, bagKey, paramKey)));
 		}
 		return parameter;
+	}
+
+	public StringParameter getRelationParam(String paramKey) {
+		return getParameter(BAG_RELATIONS, paramKey, false);
+	}
+
+	public StringParameter getRelationParam(String paramKey, boolean assertExists) {
+		return getParameter(BAG_RELATIONS, paramKey, assertExists);
+	}
+
+	public StringListParameter getRelationsParam(String paramKey) {
+		return getParameter(BAG_RELATIONS, paramKey, false);
+	}
+
+	public StringListParameter getRelationsParam(String paramKey, boolean assertExists) {
+		return getParameter(BAG_RELATIONS, paramKey, assertExists);
 	}
 
 	/**
