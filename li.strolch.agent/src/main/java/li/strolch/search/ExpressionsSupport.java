@@ -1,10 +1,15 @@
 package li.strolch.search;
 
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.runtime.StrolchConstants.*;
+
 import java.util.function.Supplier;
 
 import li.strolch.model.*;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringParameter;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -103,15 +108,7 @@ public class ExpressionsSupport {
 					if (!(e instanceof String))
 						return e;
 
-					ParameterBag bag = context.getParameterBag(bagId);
-					if (bag == null)
-						return e;
-
-					Parameter<?> param = bag.getParameter(paramId);
-					if (param == null)
-						return e;
-
-					return param.getValueType().parseValue((String) e);
+					return getParamValue(e, context, bagId, paramId);
 				};
 			}
 
@@ -128,13 +125,110 @@ public class ExpressionsSupport {
 	}
 
 	public static <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
-		return element -> {
-			ParameterBag bag = element.getParameterBag(bagId);
-			if (bag == null)
-				return true;
+		return element -> !element.hasParameter(bagId, paramId);
+	}
 
-			Parameter<?> param = bag.getParameter(paramId);
-			return param == null;
+	public static <T extends StrolchRootElement> SearchExpression<T> relationName(StrolchTransaction tx,
+			String relationParamId, SearchPredicate predicate) {
+		ExpressionBuilder eb = relationName(tx, relationParamId);
+		return element -> predicate.coerce(eb.getValueCoercer(element)).matches(eb.extract(element));
+	}
+
+	public static <T extends StrolchRootElement> ExpressionBuilder relationName(StrolchTransaction tx,
+			String relationParamId) {
+		return new ExpressionBuilder() {
+
+			@Override
+			public ValueCoercer getValueCoercer(StrolchRootElement context) {
+				return e -> {
+					if (!(e instanceof String))
+						return e;
+
+					StrolchRootElement relation = getRelation(context, tx, relationParamId);
+					return relation == null ? e : relation.getName();
+				};
+			}
+
+			@Override
+			public Object extract(StrolchRootElement element) {
+				StrolchRootElement relation = getRelation(element, tx, relationParamId);
+				return relation == null ? null : relation.getName();
+			}
 		};
+	}
+
+	public static <T extends StrolchRootElement> SearchExpression<T> relationParam(StrolchTransaction tx,
+			String relationParamId, String bagId, String paramId, SearchPredicate predicate) {
+		ExpressionBuilder eb = relationParam(tx, relationParamId, bagId, paramId);
+		return element -> predicate.coerce(eb.getValueCoercer(element)).matches(eb.extract(element));
+	}
+
+	public static <T extends StrolchRootElement> ExpressionBuilder relationParam(StrolchTransaction tx,
+			String relationParamId, String bagId, String paramId) {
+		return new ExpressionBuilder() {
+
+			@Override
+			public ValueCoercer getValueCoercer(StrolchRootElement context) {
+				return e -> {
+					if (!(e instanceof String))
+						return e;
+
+					StrolchRootElement relation = getRelation(context, tx, relationParamId);
+					if (relation == null)
+						return e;
+
+					return getParamValue(e, relation, bagId, paramId);
+				};
+			}
+
+			@Override
+			public Object extract(StrolchRootElement element) {
+				StrolchRootElement relation = getRelation(element, tx, relationParamId);
+				if (relation == null)
+					return null;
+
+				ParameterBag bag = relation.getParameterBag(bagId);
+				if (bag == null)
+					return null;
+
+				Parameter<?> param = bag.getParameter(paramId);
+				return param == null ? null : param.getValue();
+			}
+		};
+	}
+
+	private static Object getParamValue(Object e, StrolchRootElement relation, String bagId, String paramId) {
+		ParameterBag bag = relation.getParameterBag(bagId);
+		if (bag == null)
+			return e;
+
+		Parameter<?> param = bag.getParameter(paramId);
+		if (param == null)
+			return e;
+
+		return param.getValueType().parseValue((String) e);
+	}
+
+	private static StrolchRootElement getRelation(StrolchRootElement element, StrolchTransaction tx, String paramId) {
+
+		ParameterBag bag = element.getParameterBag(BAG_RELATIONS);
+		if (bag == null)
+			return null;
+
+		Parameter<?> param = bag.getParameter(paramId);
+		if (param == null || param.isEmpty() || !StrolchValueType.STRING.getType().equals(param.getType()))
+			return null;
+
+		StrolchRootElement relation;
+		switch (param.getInterpretation()) {
+		case INTERPRETATION_RESOURCE_REF:
+			return tx.getResourceBy((StringParameter) param);
+		case INTERPRETATION_ORDER_REF:
+			return tx.getOrderBy((StringParameter) param);
+		case INTERPRETATION_ACTIVITY_REF:
+			return tx.getActivityBy((StringParameter) param);
+		}
+
+		return null;
 	}
 }

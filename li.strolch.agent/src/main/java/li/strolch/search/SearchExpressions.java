@@ -3,11 +3,10 @@ package li.strolch.search;
 import java.util.function.Supplier;
 
 import li.strolch.model.StrolchRootElement;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * Declares specific search expressions, i.e. extracting the relevant data for a where clause
- *
- * @param <T>
  */
 public interface SearchExpressions {
 
@@ -62,5 +61,24 @@ public interface SearchExpressions {
 
 	default <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
 		return ExpressionsSupport.paramNull(bagId, paramId);
+	}
+
+	default ExpressionBuilder relationName(StrolchTransaction tx, String paramId) {
+		return ExpressionsSupport.relationName(tx, paramId);
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> relationName(StrolchTransaction tx,
+			String relationParamId, SearchPredicate predicate) {
+		return ExpressionsSupport.relationName(tx, relationParamId, predicate);
+	}
+
+	default ExpressionBuilder relationParam(StrolchTransaction tx, String relationParamId, String bagId,
+			String paramId) {
+		return ExpressionsSupport.relationParam(tx, relationParamId, bagId, paramId);
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> relationParam(StrolchTransaction tx,
+			String relationParamId, String bagId, String paramId, SearchPredicate predicate) {
+		return ExpressionsSupport.relationParam(tx, relationParamId, bagId, paramId, predicate);
 	}
 }

@@ -184,7 +184,7 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
 
-			assertEquals(7, new ResourceSearch().types().search(tx).toList().size());
+			assertEquals(8, new ResourceSearch().types().search(tx).toList().size());
 		}
 	}
 
@@ -196,6 +196,24 @@ public class StrolchSearchTest {
 			assertEquals(2, new ResourceSearch().types("sdf", "Ball").search(tx).toList().size());
 			assertEquals(2, new ResourceSearch().types("Ball", "sdf").search(tx).toList().size());
 			assertEquals(2, new ResourceSearch().types("4gdf", "Ball", "sdf").search(tx).toList().size());
+		}
+	}
+
+	@Test
+	public void shouldSearchResources6() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+
+			assertEquals(1, new ResourceSearch().types("TestType") //
+					.where(relationName(tx, "other").isEqualTo("Yellow")) //
+					.search(tx).toList().size());
+			assertEquals(1, new ResourceSearch().types("TestType") //
+					.where(relationName(tx, "other", isEqualTo("Yellow"))) //
+					.search(tx).toList().size());
+
+			assertEquals(1, new ResourceSearch().types("TestType") //
+					.where(relationParam(tx, "other", "parameters", "color", isEqualTo("yellow"))) //
+					.search(tx).toList().size());
 		}
 	}
 
@@ -318,7 +336,7 @@ public class StrolchSearchTest {
 
 			assertEquals(9,
 					new RootElementSearch().types("SortingType", "Ball", "ActivityType").search(tx).toList().size());
-			assertEquals(16, new RootElementSearch().types().search(tx).toList().size());
+			assertEquals(17, new RootElementSearch().types().search(tx).toList().size());
 			assertEquals(2, new RootElementSearch().types("ActivityType").search(tx).toList().size());
 		}
 	}
