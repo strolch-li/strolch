@@ -735,6 +735,44 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public Order getOrderByRelation(StrolchRootElement element, String refId) throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringParameter refP = element.getParameter(BAG_RELATIONS, refId);
+		if (refP == null)
+			return null;
+		return getOrderBy(refP);
+	}
+
+	@Override
+	public Order getOrderByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringParameter refP = element.getParameter(BAG_RELATIONS, refId, assertExists);
+		return getOrderBy(refP, assertExists);
+	}
+
+	@Override
+	public List<Order> getOrdersByRelation(StrolchRootElement element, String refId) throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId);
+		if (refsP == null)
+			return null;
+		return getOrdersBy(refsP);
+	}
+
+	@Override
+	public List<Order> getOrdersByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId, assertExists);
+		return getOrdersBy(refsP, assertExists);
+	}
+
+	@Override
 	public Resource getResourceBy(String type, String id) {
 		return getResourceBy(type, id, false);
 	}
@@ -814,6 +852,44 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				elements.add(element);
 		}
 		return elements;
+	}
+
+	@Override
+	public Resource getResourceByRelation(StrolchRootElement element, String refId) throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringParameter refP = element.getParameter(BAG_RELATIONS, refId);
+		if (refP == null)
+			return null;
+		return getResourceBy(refP);
+	}
+
+	@Override
+	public Resource getResourceByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringParameter refP = element.getParameter(BAG_RELATIONS, refId, assertExists);
+		return getResourceBy(refP, assertExists);
+	}
+
+	@Override
+	public List<Resource> getResourcesByRelation(StrolchRootElement element, String refId) throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId);
+		if (refsP == null)
+			return null;
+		return getResourcesBy(refsP);
+	}
+
+	@Override
+	public List<Resource> getResourcesByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId, assertExists);
+		return getResourcesBy(refsP, assertExists);
 	}
 
 	@Override
@@ -908,6 +984,44 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				elements.add(element);
 		}
 		return elements;
+	}
+
+	@Override
+	public Activity getActivityByRelation(StrolchRootElement element, String refId) throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringParameter refP = element.getParameter(BAG_RELATIONS, refId);
+		if (refP == null)
+			return null;
+		return getActivityBy(refP);
+	}
+
+	@Override
+	public Activity getActivityByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringParameter refP = element.getParameter(BAG_RELATIONS, refId, assertExists);
+		return getActivityBy(refP, assertExists);
+	}
+
+	@Override
+	public List<Activity> getActivitiesByRelation(StrolchRootElement element, String refId) throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId);
+		if (refsP == null)
+			return null;
+		return getActivitiesBy(refsP);
+	}
+
+	@Override
+	public List<Activity> getActivitiesByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException {
+		DBC.PRE.assertNotNull("element", element);
+		DBC.PRE.assertNotEmpty("refId", refId);
+		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId, assertExists);
+		return getActivitiesBy(refsP, assertExists);
 	}
 
 	@Override

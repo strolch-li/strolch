@@ -123,5 +123,6 @@ public class StrolchConstants {
 
 		public static final String PARAM_QUANTITY = "quantity";
 		public static final String PARAM_DURATION = "duration";
+		public static final String PARAM_ORDER = "order";
 	}
 }

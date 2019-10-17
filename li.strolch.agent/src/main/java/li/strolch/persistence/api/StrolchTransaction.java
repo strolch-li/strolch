@@ -855,6 +855,100 @@ public interface StrolchTransaction extends AutoCloseable {
 	List<Resource> getResourcesBy(StringListParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
+	 * Returns the {@link Resource} which is referenced by the given {@link StrolchRootElement}. The element must have a
+	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
+	 * with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value is the
+	 * id of the resource to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @return the resource referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	Resource getResourceByRelation(StrolchRootElement element, String refId) throws StrolchException;
+
+	/**
+	 * Returns the {@link Resource} which is referenced by the given {@link StrolchRootElement}. The element must have a
+	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
+	 * with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value is the
+	 * id of the resource to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * @param assertExists
+	 * 		if true, and referenced resource does not exist, then a {@link StrolchException} is thrown
+	 *
+	 * @return the resource referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	Resource getResourceByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException;
+
+	/**
+	 * Returns all {@link Resource Resources} which are referenced by the given {@link StrolchRootElement}. The element
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
+	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value is the
+	 * id of the resource to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringListParameter} with
+	 * 		the given refId
+	 * @param refId
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @return the resources referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter}
+	 * or referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	List<Resource> getResourcesByRelation(StrolchRootElement element, String refId) throws StrolchException;
+
+	/**
+	 * Returns all {@link Resource Resources} which are referenced by the given {@link StrolchRootElement}. The element
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
+	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value is the
+	 * id of the resource to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringListParameter} with
+	 * 		the given refId
+	 * @param refId
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * @param assertExists
+	 * 		if true, and referenced resource does not exist, then a {@link StrolchException} is thrown
+	 *
+	 * @return the resources referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter}
+	 * or referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	List<Resource> getResourcesByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException;
+
+	/**
 	 * <p>Returns the {@link Resource} for the given {@link Action}. This is done by getting the resource by {@link
 	 * Action#getResourceType()} and {@link Action#getResourceId()}</p>
 	 *
@@ -985,6 +1079,100 @@ public interface StrolchTransaction extends AutoCloseable {
 	List<Activity> getActivitiesBy(StringListParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
+	 * Returns the {@link Activity} which is referenced by the given {@link StrolchRootElement}. The element must have a
+	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
+	 * with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value is the
+	 * id of the activity to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @return the activity referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	Activity getActivityByRelation(StrolchRootElement element, String refId) throws StrolchException;
+
+	/**
+	 * Returns the {@link Activity} which is referenced by the given {@link StrolchRootElement}. The element must have a
+	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
+	 * with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value is the
+	 * id of the activity to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * @param assertExists
+	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
+	 *
+	 * @return the activity referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	Activity getActivityByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException;
+
+	/**
+	 * Returns all {@link Activity Activities} which are referenced by the given {@link StrolchRootElement}. The element
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
+	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the values are
+	 * the ids of the activities to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringListParameter} with
+	 * 		the given refId
+	 * @param refId
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @return the activity referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter}
+	 * or referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	List<Activity> getActivitiesByRelation(StrolchRootElement element, String refId) throws StrolchException;
+
+	/**
+	 * Returns all {@link Activity Activities} which are referenced by the given {@link StrolchRootElement}. The element
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
+	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the values are
+	 * the ids of the activities to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringListParameter} with
+	 * 		the given refId
+	 * @param refId
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * @param assertExists
+	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
+	 *
+	 * @return the activities referenced by the element, or null if the {@link ParameterBag}, {@link
+	 * StringListParameter} or referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	List<Activity> getActivitiesByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException;
+
+	/**
 	 * Returns the {@link Order} with the given type and id, or null if it does not exist
 	 *
 	 * @param type
@@ -1079,6 +1267,99 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
 	 */
 	List<Order> getOrdersBy(StringListParameter refP, boolean assertExists) throws StrolchException;
+
+	/**
+	 * Returns the {@link Order} which is referenced by the given {@link StrolchRootElement}. The element must have a
+	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
+	 * with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the value is the id of
+	 * the order to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @return the order referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	Order getOrderByRelation(StrolchRootElement element, String refId) throws StrolchException;
+
+	/**
+	 * Returns the {@link Order} which is referenced by the given {@link StrolchRootElement}. The element must have a
+	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
+	 * with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the value is the id of
+	 * the order to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * @param assertExists
+	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
+	 *
+	 * @return the order referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
+	 */
+	Order getOrderByRelation(StrolchRootElement element, String refId, boolean assertExists) throws StrolchException;
+
+	/**
+	 * Returns all {@link Order Orders} which are referenced by the given {@link StrolchRootElement}. The element must
+	 * have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
+	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the values are the ids
+	 * of the orders to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringListParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @return the orders referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	List<Order> getOrdersByRelation(StrolchRootElement element, String refId) throws StrolchException;
+
+	/**
+	 * Returns all {@link Order Orders} which are referenced by the given {@link StrolchRootElement}. The element must
+	 * have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
+	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
+	 * StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the values are the ids
+	 * of the orders to return
+	 *
+	 * @param element
+	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringListParameter} with the
+	 * 		given refId
+	 * @param refId
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
+	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * @param assertExists
+	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
+	 *
+	 * @return the orders referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter} or
+	 * referenced element do not exist
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
+	 */
+	List<Order> getOrdersByRelation(StrolchRootElement element, String refId, boolean assertExists)
+			throws StrolchException;
 
 	/**
 	 * Returns the cached resource with the given type and id, or null if not yet fetched
