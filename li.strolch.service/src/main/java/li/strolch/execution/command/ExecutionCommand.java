@@ -1,5 +1,6 @@
 package li.strolch.execution.command;
 
+import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_ORDER;
 import static li.strolch.utils.helper.StringHelper.DASH;
 
 import java.util.Iterator;
@@ -56,12 +57,16 @@ public abstract class ExecutionCommand extends Command implements TimeOrderingVi
 		if (currentState == newState)
 			return;
 
-		String type = rootElement.getType();
-		String id = rootElement.getId();
-
-		Order order = tx().getOrderBy(type, id);
-		if (order == null)
-			return;
+		Order order = tx().getOrderByRelation(rootElement, PARAM_ORDER);
+		if (order == null) {
+			logger.warn("Did not find activity order by relation " + PARAM_ORDER + " for activity " + rootElement
+					.getLocator() + ", trying by Activity type and id");
+			order = tx().getOrderBy(rootElement.getType(), rootElement.getId());
+			if (order == null) {
+				logger.error("Could not find order by Activity type and id either, not updating order state!");
+				return;
+			}
+		}
 
 		order.setState(rootElement.getState());
 

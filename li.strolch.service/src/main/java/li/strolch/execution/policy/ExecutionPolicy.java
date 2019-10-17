@@ -206,4 +206,9 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 			throws PrivilegeException, Exception {
 		return getContainer().getPrivilegeHandler().runWithResult(StrolchConstants.SYSTEM_USER_AGENT, runnable);
 	}
+
+	@Override
+	public void undo() {
+		// do nothing
+	}
 }
