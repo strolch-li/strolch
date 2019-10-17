@@ -131,6 +131,18 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
+	 * Sets the resource type and id from the given {@link Resource}
+	 *
+	 * @param resource
+	 * 		the resource from which to get the type and id
+	 */
+	public void setResource(Resource resource) {
+		assertNotReadonly();
+		this.resourceType = resource.getType();
+		this.resourceId = resource.getId();
+	}
+
+	/**
 	 * Returns true if this {@link Action} contains any {@link IValueChange changes}, false if not
 	 *
 	 * @return true if this {@link Action} contains any {@link IValueChange changes}, false if not
@@ -141,7 +153,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	/**
 	 * @param change
-	 * 		{@code IValueChange} to be applied to the {@code Resource}
+	 *        {@code IValueChange} to be applied to the {@code Resource}
 	 *
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
