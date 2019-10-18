@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import li.strolch.exception.StrolchModelException;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
@@ -148,7 +149,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 	protected void assertNotReadonly() {
 		if (this.readonly) {
-			throw new IllegalStateException("The element " + this.getClass().getSimpleName()
+			throw new StrolchModelException("The element " + this.getClass().getSimpleName()
 					+ " is currently readOnly, to modify clone first!");
 		}
 	}
