@@ -307,7 +307,6 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public void add(StrolchTransaction tx, T element) {
 		assertNotReadOnly();
-		element.assertNotReadonly();
 		this.elementMap.add(tx, element);
 		if (this.created == null)
 			this.created = new HashSet<>();
@@ -317,10 +316,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	@Override
 	public void addAll(StrolchTransaction tx, List<T> elements) {
 		assertNotReadOnly();
-		for (T element : elements) {
-			element.assertNotReadonly();
-			this.elementMap.add(tx, element);
-		}
+		this.elementMap.addAll(tx, elements);
 		if (this.created == null)
 			this.created = new HashSet<>();
 		this.created.addAll(elements);

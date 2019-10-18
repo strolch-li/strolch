@@ -141,7 +141,7 @@ public class ActivityModelTestRunner {
 		}
 		assertNotNull("Should read Activity with id " + ID, updatedActivity);
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
-			assertFalse("Objects can't be the same reference after re-reading!", readActivity == updatedActivity);
+			assertNotSame("Objects can't be the same reference after re-reading!", readActivity, updatedActivity);
 		StringParameter updatedParam = readActivity.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 
@@ -156,7 +156,7 @@ public class ActivityModelTestRunner {
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Activity activity = tx.getActivityBy(TYPE, ID);
-			assertNull("Should no read Activity with id " + ID, activity);
+			assertNull("Should not read Activity with id " + ID, activity);
 		}
 	}
 

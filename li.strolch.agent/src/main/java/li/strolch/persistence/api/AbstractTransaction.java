@@ -1207,7 +1207,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void remove(Activity activity) throws StrolchException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
-		activity.assertNotReadonly();
+		getObjectFilter().remove(Tags.ACTIVITY, activity.getLocator(), activity);
 		if (this.activityCache != null) {
 			this.activityCache.removeElement(activity.getType(), activity.getId());
 		}
