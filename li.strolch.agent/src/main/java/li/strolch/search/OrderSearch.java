@@ -50,4 +50,9 @@ public class OrderSearch extends StrolchSearch<Order> {
 		super.where(state().isIn(states));
 		return this;
 	}
+
+	public OrderSearch withState(State state) {
+		super.where(state().isEqualTo(state));
+		return this;
+	}
 }
