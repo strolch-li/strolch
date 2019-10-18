@@ -106,6 +106,8 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 			return constructor.newInstance(getContainer(), tx);
 
 		} catch (Exception e) {
+			if (e instanceof StrolchPolicyException)
+				throw (StrolchPolicyException) e;
 			throw new StrolchPolicyException(
 					MessageFormat.format("Failed to instantiate policy {0} due to {1}", policyDef, e.getMessage()), e);
 		}
