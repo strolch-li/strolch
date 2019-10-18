@@ -15,6 +15,7 @@
  */
 package li.strolch.command;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class UpdateResourceCollectionCommandTest extends AbstractRealmCommandTes
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(container, tx);
-		command.setResources(this.resources);
+		command.setResources(this.resources.stream().map(e -> e.getClone(true)).collect(toList()));
 		return command;
 	}
 

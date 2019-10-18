@@ -41,7 +41,7 @@ public class UpdateResourceCommandTest extends AbstractRealmCommandTest {
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		UpdateResourceCommand command = new UpdateResourceCommand(container, tx);
-		command.setResource(this.resource);
+		command.setResource(this.resource.getClone(true));
 		return command;
 	}
 

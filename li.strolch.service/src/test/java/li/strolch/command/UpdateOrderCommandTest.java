@@ -41,7 +41,7 @@ public class UpdateOrderCommandTest extends AbstractRealmCommandTest {
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		UpdateOrderCommand command = new UpdateOrderCommand(container, tx);
-		command.setOrder(this.order);
+		command.setOrder(this.order.getClone(true));
 		return command;
 	}
 

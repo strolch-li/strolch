@@ -15,6 +15,7 @@
  */
 package li.strolch.command;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class UpdateOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
 
 		UpdateOrderCollectionCommand command = new UpdateOrderCollectionCommand(container, tx);
-		command.setOrders(this.orders);
+		command.setOrders(this.orders.stream().map(e -> e.getClone(true)).collect(toList()));
 		return command;
 	}
 
