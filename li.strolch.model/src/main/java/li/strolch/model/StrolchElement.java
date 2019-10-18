@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import li.strolch.exception.StrolchModelException;
 import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
@@ -106,6 +107,14 @@ public interface StrolchElement {
 	 * @return a clone of this {@link StrolchElement}
 	 */
 	public StrolchElement getClone();
+
+	/**
+	 * Asserts that this element is not read-only, throwing {@link StrolchModelException} if it is read-only
+	 *
+	 * @throws StrolchModelException
+	 * 		if this element is read-only
+	 */
+	public void assertNotReadonly() throws StrolchModelException;
 
 	/**
 	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it,

@@ -36,8 +36,8 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingResourceMap extends AuditingElementMapFacade<Resource> implements ResourceMap {
 
-	public AuditingResourceMap(ElementMap<Resource> elementMap, boolean observeAccessReads) {
-		super(elementMap, observeAccessReads);
+	public AuditingResourceMap(ElementMap<Resource> elementMap, boolean readOnly, boolean observeAccessReads) {
+		super(elementMap, readOnly, observeAccessReads);
 	}
 
 	@Override

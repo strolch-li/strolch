@@ -36,8 +36,8 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingActivityMap extends AuditingElementMapFacade<Activity> implements ActivityMap {
 
-	public AuditingActivityMap(ElementMap<Activity> elementMap, boolean observeAccessReads) {
-		super(elementMap, observeAccessReads);
+	public AuditingActivityMap(ElementMap<Activity> elementMap, boolean readOnly, boolean observeAccessReads) {
+		super(elementMap, readOnly, observeAccessReads);
 	}
 
 	@Override

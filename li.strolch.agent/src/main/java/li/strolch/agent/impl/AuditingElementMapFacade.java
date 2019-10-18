@@ -50,6 +50,7 @@ import li.strolch.utils.dbc.DBC;
 public abstract class AuditingElementMapFacade<T extends StrolchRootElement> implements ElementMap<T> {
 
 	protected ElementMap<T> elementMap;
+	private final boolean readOnly;
 
 	protected Set<T> read;
 	protected Set<T> created;
@@ -60,9 +61,10 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	protected boolean observeAccessReads;
 
-	public AuditingElementMapFacade(ElementMap<T> elementMap, boolean observeAccessReads) {
+	public AuditingElementMapFacade(ElementMap<T> elementMap, boolean readOnly, boolean observeAccessReads) {
 		DBC.PRE.assertNotNull("ElementMap must be set!", elementMap); //$NON-NLS-1$
 		this.elementMap = elementMap;
+		this.readOnly = readOnly;
 		this.observeAccessReads = observeAccessReads;
 	}
 
@@ -298,8 +300,14 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 		return this.elementMap.getKeysBy(tx, type);
 	}
 
+	private void assertNotReadOnly() {
+		DBC.PRE.assertFalse("TX is marked as read-only, can not modify elements!", this.readOnly);
+	}
+
 	@Override
 	public void add(StrolchTransaction tx, T element) {
+		assertNotReadOnly();
+		element.assertNotReadonly();
 		this.elementMap.add(tx, element);
 		if (this.created == null)
 			this.created = new HashSet<>();
@@ -308,7 +316,11 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public void addAll(StrolchTransaction tx, List<T> elements) {
-		this.elementMap.addAll(tx, elements);
+		assertNotReadOnly();
+		for (T element : elements) {
+			element.assertNotReadonly();
+			this.elementMap.add(tx, element);
+		}
 		if (this.created == null)
 			this.created = new HashSet<>();
 		this.created.addAll(elements);
@@ -316,6 +328,8 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public void update(StrolchTransaction tx, T element) {
+		assertNotReadOnly();
+		element.assertNotReadonly();
 		this.elementMap.update(tx, element);
 		if (this.updated == null)
 			this.updated = new HashSet<>();
@@ -324,7 +338,11 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public void updateAll(StrolchTransaction tx, List<T> elements) {
-		this.elementMap.updateAll(tx, elements);
+		assertNotReadOnly();
+		for (T element : elements) {
+			element.assertNotReadonly();
+			this.elementMap.update(tx, element);
+		}
 		if (this.updated == null)
 			this.updated = new HashSet<>();
 		this.updated.addAll(elements);
@@ -332,6 +350,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public void remove(StrolchTransaction tx, T element) {
+		assertNotReadOnly();
 		this.elementMap.remove(tx, element);
 		if (this.deleted == null)
 			this.deleted = new HashSet<>();
@@ -340,6 +359,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public void removeAll(StrolchTransaction tx, List<T> elements) {
+		assertNotReadOnly();
 		this.elementMap.removeAll(tx, elements);
 		if (this.deleted == null)
 			this.deleted = new HashSet<>();
@@ -348,6 +368,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public long removeAll(StrolchTransaction tx) {
+		assertNotReadOnly();
 		long removed = this.elementMap.removeAll(tx);
 		this.deletedAll += removed;
 		return removed;
@@ -355,6 +376,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public long removeAllBy(StrolchTransaction tx, String type) {
+		assertNotReadOnly();
 		long removed = this.elementMap.removeAllBy(tx, type);
 
 		if (this.deletedAllByType == null)
@@ -370,6 +392,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException {
+		assertNotReadOnly();
 		T element = this.elementMap.revertToVersion(tx, type, id, version);
 		if (this.updated == null)
 			this.updated = new HashSet<>();
@@ -379,6 +402,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public T revertToVersion(StrolchTransaction tx, T element) throws StrolchException {
+		assertNotReadOnly();
 		T revertedElement = this.elementMap.revertToVersion(tx, element);
 		if (this.updated == null)
 			this.updated = new HashSet<>();
@@ -388,6 +412,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 
 	@Override
 	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
+		assertNotReadOnly();
 		this.elementMap.undoVersion(tx, element);
 		if (element.getVersion().isFirstVersion()) {
 			if (this.deleted == null)

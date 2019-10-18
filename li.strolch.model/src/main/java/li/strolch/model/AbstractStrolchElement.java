@@ -18,6 +18,7 @@ package li.strolch.model;
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.utils.helper.StringHelper;
 
@@ -123,9 +124,10 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 		this.readOnly = true;
 	}
 
-	protected void assertNotReadonly() {
+	@Override
+	public void assertNotReadonly() throws StrolchModelException {
 		if (this.readOnly) {
-			throw new IllegalStateException(
+			throw new StrolchModelException(
 					"The element " + getLocator() + " is currently readOnly, to modify clone first!");
 		}
 	}

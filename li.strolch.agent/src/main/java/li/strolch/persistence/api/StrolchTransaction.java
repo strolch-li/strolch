@@ -1489,7 +1489,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void add(Order order) throws StrolchException;
 
 	/**
-	 * Adds and thus persists the given {@link Activity} by calling the relevant {@link Command}
+	 * Adds and thus persists the given {@link Activity} by calling the relevant {@link Command}.
 	 *
 	 * @param activity
 	 * 		the activity to add
