@@ -286,4 +286,26 @@ public class SearchResult<T> {
 	public void forEach(Consumer<T> consumer) {
 		this.stream.forEach(consumer);
 	}
+
+	/**
+	 * <p>Returns true if this search result is empty</p>
+	 *
+	 * <p><b>Note:</b> This is a terminal operation, and the underlying stream is closed after calling this method</p>
+	 *
+	 * @return true if this search result is empty
+	 */
+	public boolean isEmpty() {
+		return this.stream.count() == 0;
+	}
+
+	/**
+	 * <p>Returns true if this search result is <b>NOT</b> empty</p>
+	 *
+	 * <p><b>Note:</b> This is a terminal operation, and the underlying stream is closed after calling this method</p>
+	 *
+	 * @return true if this search result is <b>NOT</b> empty
+	 */
+	public boolean isNotEmpty() {
+		return this.stream.count() != 0;
+	}
 }
