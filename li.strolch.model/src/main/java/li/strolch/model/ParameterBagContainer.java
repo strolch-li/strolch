@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
+import li.strolch.model.parameter.StringParameter;
 
 /**
  * A {@link ParameterBagContainer} has a map of {@link ParameterBag ParameterBags} where the key is the id of the
@@ -15,6 +17,84 @@ import li.strolch.model.parameter.Parameter;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ParameterBagContainer extends StrolchElement {
+
+	/**
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link *
+	 * StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	<U, T extends Parameter<U>> T getParameter(String paramKey);
+
+	/**
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 * @param assertExists
+	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	<U, T extends Parameter<U>> T getParameter(String paramKey, boolean assertExists);
+
+	/**
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	StringParameter getRelationParam(String paramKey);
+
+	/**
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 * @param assertExists
+	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	StringParameter getRelationParam(String paramKey, boolean assertExists);
+
+	/**
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	StringListParameter getRelationsParam(String paramKey);
+
+	/**
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 * @param assertExists
+	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	StringListParameter getRelationsParam(String paramKey, boolean assertExists);
 
 	/**
 	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or null if

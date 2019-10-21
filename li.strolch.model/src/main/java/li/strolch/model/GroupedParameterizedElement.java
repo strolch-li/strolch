@@ -16,6 +16,7 @@
 package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
 import java.text.MessageFormat;
@@ -144,18 +145,98 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		return parameter;
 	}
 
+	/**
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	@Override
+	public <U, T extends Parameter<U>> T getParameter(String paramKey) {
+		return getParameter(BAG_PARAMETERS, paramKey, false);
+	}
+
+	/**
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 * @param assertExists
+	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	@Override
+	public <U, T extends Parameter<U>> T getParameter(String paramKey, boolean assertExists) {
+		return getParameter(BAG_PARAMETERS, paramKey, assertExists);
+	}
+
+	/**
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	@Override
 	public StringParameter getRelationParam(String paramKey) {
 		return getParameter(BAG_RELATIONS, paramKey, false);
 	}
 
+	/**
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 * @param assertExists
+	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	@Override
 	public StringParameter getRelationParam(String paramKey, boolean assertExists) {
 		return getParameter(BAG_RELATIONS, paramKey, assertExists);
 	}
 
+	/**
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	@Override
 	public StringListParameter getRelationsParam(String paramKey) {
 		return getParameter(BAG_RELATIONS, paramKey, false);
 	}
 
+	/**
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
+	 * exist
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 * @param assertExists
+	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 *
+	 * @return the found {@link Parameter} or null if it was not found
+	 */
+	@Override
 	public StringListParameter getRelationsParam(String paramKey, boolean assertExists) {
 		return getParameter(BAG_RELATIONS, paramKey, assertExists);
 	}
