@@ -33,7 +33,9 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 		State state = State.parse(arg.map.get("state"));
 		Locator locator = Locator.valueOf(arg.map.get("locator"));
 
+		String realm;
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+			realm = tx.getRealmName();
 
 			Action action = tx.findElement(locator);
 
@@ -133,6 +135,9 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			tx.commitOnClose();
 		}
+
+		ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
+		executionHandler.triggerExecution(realm);
 
 		return ServiceResult.success();
 	}
