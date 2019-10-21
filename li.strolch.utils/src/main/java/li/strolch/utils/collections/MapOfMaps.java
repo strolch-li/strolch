@@ -63,6 +63,12 @@ public class MapOfMaps<T, U, V> {
 		return this.mapOfMaps.keySet();
 	}
 
+	public List<V> values() {
+		List<V> values = new ArrayList<>();
+		forEach((t, us) -> values.addAll(us.values()));
+		return values;
+	}
+
 	public Map<U, V> getMap(T t) {
 		return this.mapOfMaps.get(t);
 	}

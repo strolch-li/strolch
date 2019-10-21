@@ -39,6 +39,12 @@ public class MapOfLists<T, U> {
 		return this.mapOfLists.keySet();
 	}
 
+	public List<U> values() {
+		List<U> values = new ArrayList<>();
+		forEach((t, us) -> values.addAll(us));
+		return values;
+	}
+
 	public List<U> getList(T t) {
 		return this.mapOfLists.get(t);
 	}
