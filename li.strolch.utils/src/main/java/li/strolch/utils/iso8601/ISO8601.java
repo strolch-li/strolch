@@ -15,6 +15,7 @@
  */
 package li.strolch.utils.iso8601;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -86,11 +87,18 @@ public class ISO8601 implements DateFormat {
 		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()).format(zonedDateTime);
 	}
 
+	public static String toString(LocalDateTime localDateTime) {
+		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault())
+				.format(localDateTime.atZone(ZoneId.systemDefault()));
+	}
+
 	public static String toString(Date date) {
 		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()).format(date.toInstant());
 	}
 
 	public static void main(String[] args) {
 		System.out.println(toString(ISO8601.parseToZdt("-")));
+		System.out.println(toString(ZonedDateTime.now()));
+		System.out.println(toString(LocalDateTime.now()));
 	}
 }
