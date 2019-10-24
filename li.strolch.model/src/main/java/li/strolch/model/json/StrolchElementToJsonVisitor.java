@@ -28,6 +28,7 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
@@ -171,21 +172,29 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	public StrolchElementToJsonVisitor resourceHook(BiConsumer<Resource, JsonObject> hook) {
+		DBC.PRE.assertNotNull("hook must not be null", hook);
+		DBC.PRE.assertNull("resourceHook already set!", this.resourceHook);
 		this.resourceHook = hook;
 		return this;
 	}
 
 	public StrolchElementToJsonVisitor orderHook(BiConsumer<Order, JsonObject> hook) {
+		DBC.PRE.assertNotNull("hook must not be null", hook);
+		DBC.PRE.assertNull("orderHook already set!", this.orderHook);
 		this.orderHook = hook;
 		return this;
 	}
 
 	public StrolchElementToJsonVisitor activityHook(BiConsumer<Activity, JsonObject> hook) {
+		DBC.PRE.assertNotNull("hook must not be null", hook);
+		DBC.PRE.assertNull("activityHook already set!", this.activityHook);
 		this.activityHook = hook;
 		return this;
 	}
 
 	public StrolchElementToJsonVisitor actionHook(BiConsumer<Action, JsonObject> hook) {
+		DBC.PRE.assertNotNull("hook must not be null", hook);
+		DBC.PRE.assertNull("actionHook already set!", this.actionHook);
 		this.actionHook = hook;
 		return this;
 	}
