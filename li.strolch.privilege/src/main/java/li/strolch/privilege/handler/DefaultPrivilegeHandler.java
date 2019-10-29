@@ -1470,6 +1470,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// get a cache of the privileges and policies for this user
 		for (String roleName : userRoles) {
 			Role role = this.persistenceHandler.getRole(roleName);
+			if (role == null)
+				throw new IllegalStateException("Role " + roleName + " does not exist for user " + user.getUsername());
+
 			Set<String> privilegeNames = role.getPrivilegeNames();
 			for (String privilegeName : privilegeNames) {
 
