@@ -4,9 +4,10 @@
 		<Policy Key="Contains" Class="li.strolch.report.policy.ContainsReportFilter" />
 		<Policy Key="IsIn" Class="li.strolch.report.policy.IsInReportFilter" />
 		<Policy Key="GreaterThan" Class="li.strolch.report.policy.GreaterThanReportFilter" />
-		<Policy Key="GreaterThan" Class="li.strolch.report.policy.GreaterThanReportFilter" />
 		<Policy Key="LessThan" Class="li.strolch.report.policy.LessThanReportFilter" />
 		<Policy Key="Equals" Class="li.strolch.report.policy.EqualsReportFilter" />
+		<Policy Key="ValueRef" Class="li.strolch.report.policy.ValueRefReportFilter" />
+		<Policy Key="Packable" Class="li.strolch.report.PackableFilterPolicy" />
 	</PolicyType>
 
 </StrolchPolicies>

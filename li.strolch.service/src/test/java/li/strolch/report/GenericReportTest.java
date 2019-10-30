@@ -1,6 +1,7 @@
 package li.strolch.report;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
 
@@ -9,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
 import li.strolch.model.StrolchElement;
@@ -241,11 +241,11 @@ public class GenericReportTest {
 
 			assertFalse(filterCriteria.containsSet("Location"));
 			assertFalse(filterCriteria.containsSet("Slot"));
-			assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
+			assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(toSet()),
 					containsInAnyOrder("product01", "product02"));
-			assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
+			assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(toSet()),
 					containsInAnyOrder("storage01", "storage02"));
-			assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
+			assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(toSet()),
 					containsInAnyOrder("section001", "section002"));
 		}
 	}
@@ -268,11 +268,11 @@ public class GenericReportTest {
 
 			assertFalse(filterCriteria.containsSet("Location"));
 			assertFalse(filterCriteria.containsSet("Slot"));
-			assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
+			assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(toSet()),
 					containsInAnyOrder("product01"));
-			assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
+			assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(toSet()),
 					containsInAnyOrder("storage01", "storage02"));
-			assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(Collectors.toSet()),
+			assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(toSet()),
 					containsInAnyOrder("section001", "section002"));
 		}
 	}
