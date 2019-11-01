@@ -17,9 +17,12 @@ package li.strolch.agent.impl;
 
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.*;
+import static li.strolch.runtime.configuration.RuntimeConfiguration.PROP_DEFAULT_ENCODING;
+import static li.strolch.runtime.configuration.RuntimeConfiguration.PROP_TIMEZONE;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
+import java.io.ObjectInputStream.GetField;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -198,6 +201,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		System.setProperty("user.timezone", getTimezone());
+		System.setProperty("file.encoding", getDefaultEncoding());
 		logger.info(MessageFormat
 				.format(msg, applicationName, environment, Locale.getDefault(), System.getProperty("user.timezone")));
 
@@ -376,6 +380,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	private String getTimezone() {
 		return getAgent().getStrolchConfiguration().getRuntimeConfiguration()
-				.getString(RuntimeConfiguration.PROP_TIMEZONE, System.getProperty("user.timezone"));
+				.getString(PROP_TIMEZONE, System.getProperty("user.timezone"));
+	}
+	
+	private String getDefaultEncoding() {
+		return getAgent().getStrolchConfiguration().getRuntimeConfiguration()
+				.getString(PROP_DEFAULT_ENCODING, System.getProperty("file.encoding"));
 	}
 }

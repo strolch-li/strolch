@@ -25,6 +25,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public static final String PROP_LOCALE = "locale"; //$NON-NLS-1$
 	public static final String RUNTIME = "Runtime"; //$NON-NLS-1$
 	public static final String PROP_TIMEZONE = "timezone"; //$NON-NLS-1$
+	public static final String PROP_DEFAULT_ENCODING = "defaultEncoding"; //$NON-NLS-1$
 
 	private final String applicationName;
 	private final String environment;
