@@ -15,6 +15,8 @@ public class ReportConstants {
 	public static final String PARAM_DESCENDING = "descending";
 	public static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
 	public static final String PARAM_FIELD_REF = "fieldRef";
+	public static final String PARAM_FIELD_REF1 = "fieldRef1";
+	public static final String PARAM_FIELD_REF2 = "fieldRef2";
 	public static final String PARAM_ALLOW_MISSING_COLUMNS = "allowMissingColumns";
 	public static final String PARAM_POLICY = "policy";
 

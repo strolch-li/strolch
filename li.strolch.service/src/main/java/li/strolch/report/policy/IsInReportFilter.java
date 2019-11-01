@@ -10,6 +10,7 @@ import li.strolch.model.StrolchValueType;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.ObjectHelper;
+import li.strolch.utils.dbc.DBC;
 
 public class IsInReportFilter extends ReportFilterPolicy {
 
@@ -19,6 +20,7 @@ public class IsInReportFilter extends ReportFilterPolicy {
 
 	@Override
 	public boolean filter(Object value) {
+		DBC.PRE.assertNotNull("value required!", value);
 
 		Object left;
 		if (value instanceof Date) {

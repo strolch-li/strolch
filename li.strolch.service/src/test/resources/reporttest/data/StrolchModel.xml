@@ -71,6 +71,21 @@
             <Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:Equals" Value="!"/>
             <Parameter Id="fieldRef" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/relations/product"/>
         </ParameterBag>
+        <ParameterBag Id="valueRef1Filter" Name="Filter" Type="Filter">
+            <Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:ValueRef" Value="GreaterThan"/>
+            <Parameter Id="fieldRef1" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/maxQuantity"/>
+            <Parameter Id="fieldRef2" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="$search:parent:Bags/parameters/minQuantity"/>
+        </ParameterBag>
+        <ParameterBag Id="valueRef2Filter" Name="Filter" Type="Filter">
+            <Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:ValueRef" Value="!Equals"/>
+            <Parameter Id="fieldRef1" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="$search:parent:Bags/parameters/minQuantity"/>
+            <Parameter Id="fieldRef2" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Slot" Value="Bags/parameters/maxQuantity"/>
+        </ParameterBag>
+        <ParameterBag Id="packableFilter" Name="Filter" Type="Filter">
+            <Parameter Id="policy" Name="Filter Policy" Type="String" Interpretation="ReportFilterPolicy" Uom="key:Packable" Value=""/>
+            <Parameter Id="fieldRef1" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Bags/parameters/packable"/>
+            <Parameter Id="fieldRef2" Name="Field reference" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="$object"/>
+        </ParameterBag>
 
         <ParameterBag Id="columns" Name="Display Columns" Type="Display">
             <Parameter Id="location" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="$name"/>
@@ -137,11 +152,13 @@
     <Resource Id="product01" Name="Product 01" Type="Product">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="expirationDate" Name="Expiration Date" Type="Date" Value="2017-02-01T10:00:00.000+01:00"/>
+            <Parameter Id="packable" Name="Packable" Type="Boolean" Value="true"/>
         </ParameterBag>
     </Resource>
     <Resource Id="product02" Name="Product 02" Type="Product">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="expirationDate" Name="Expiration Date" Type="Date" Value="2017-03-01T10:00:00.000+01:00"/>
+            <Parameter Id="packable" Name="Packable" Type="Boolean" Value="true"/>
         </ParameterBag>
     </Resource>
 
@@ -185,11 +202,13 @@
     <Resource Id="location01" Name="Location 01" Type="Location">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="description" Name="Description" Type="String" Value="Just a location"/>
+            <Parameter Id="packingLocation" Name="Packing Location" Type="Boolean" Value="true"/>
         </ParameterBag>
     </Resource>
     <Resource Id="location02" Name="Location 02" Type="Location">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="description" Name="Description" Type="String" Value="Just a location"/>
+            <Parameter Id="packingLocation" Name="Packing Location" Type="Boolean" Value="true"/>
         </ParameterBag>
     </Resource>
 
@@ -232,6 +251,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="20.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="40.0"/>
+            <Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="4.0"/>
             <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
@@ -244,6 +264,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="18.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="10.0"/>
             <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
@@ -256,6 +277,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="11.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="40.0"/>
+            <Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="6.0"/>
             <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
@@ -268,6 +290,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="16.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="6.0"/>
             <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
@@ -280,6 +303,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="0.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="6.0"/>
             <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">
@@ -292,6 +316,7 @@
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
             <Parameter Id="quantity" Name="Quantity" Type="Float" Value="22.0"/>
             <Parameter Id="maxQuantity" Name="max. quantity of items" Type="Float" Value="20.0"/>
+            <Parameter Id="minQuantity" Name="Min Quantity" Type="Float" Value="6.0"/>
             <Parameter Id="state" Name="State" Type="String" Value="valid"/>
         </ParameterBag>
         <ParameterBag Id="relations" Name="Relations" Type="Parameters">

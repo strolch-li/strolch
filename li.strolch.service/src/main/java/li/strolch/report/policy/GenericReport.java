@@ -30,6 +30,7 @@ import li.strolch.utils.ObjectHelper;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.collections.TypedTuple;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -51,7 +52,7 @@ public class GenericReport extends ReportPolicy {
 	private StringParameter dateRangeSelP;
 
 	private DateRange dateRange;
-	private Map<ReportFilterPolicy, StringParameter> filtersByPolicy;
+	private Map<ReportFilterPolicy, TypedTuple<StringParameter, StringParameter>> filtersByPolicy;
 	private MapOfSets<String, String> filtersById;
 
 	private long counter;
@@ -128,6 +129,23 @@ public class GenericReport extends ReportPolicy {
 		List<ParameterBag> filterBags = this.reportRes.getParameterBagsByType(TYPE_FILTER);
 		for (ParameterBag filterBag : filterBags) {
 
+			if (filterBag.hasParameter(PARAM_FIELD_REF) && (filterBag.hasParameter(PARAM_FIELD_REF1) || filterBag
+					.hasParameter(PARAM_FIELD_REF2))) {
+				throw new IllegalArgumentException(
+						"Filter " + filterBag.getLocator() + " can not have combination of " + PARAM_FIELD_REF
+								+ " and any of " + PARAM_FIELD_REF1 + ", " + PARAM_FIELD_REF2);
+			} else if ((filterBag.hasParameter(PARAM_FIELD_REF1) && !filterBag.hasParameter(PARAM_FIELD_REF2)) || (
+					!filterBag.hasParameter(PARAM_FIELD_REF1) && filterBag.hasParameter(PARAM_FIELD_REF2))) {
+				throw new IllegalArgumentException(
+						"Filter " + filterBag.getLocator() + " must have both " + PARAM_FIELD_REF1 + " and "
+								+ PARAM_FIELD_REF2);
+			} else if (!filterBag.hasParameter(PARAM_FIELD_REF) && (!filterBag.hasParameter(PARAM_FIELD_REF1)
+					|| !filterBag.hasParameter(PARAM_FIELD_REF2))) {
+				throw new IllegalArgumentException(
+						"Filter " + filterBag.getLocator() + " is missing the " + PARAM_FIELD_REF + " or "
+								+ PARAM_FIELD_REF1 + ", " + PARAM_FIELD_REF2 + " combination!");
+			}
+
 			// prepare filter function policy
 			StringParameter functionP = filterBag.getParameter(PARAM_POLICY);
 			PolicyHandler policyHandler = getContainer().getComponent(PolicyHandler.class);
@@ -135,8 +153,15 @@ public class GenericReport extends ReportPolicy {
 			ReportFilterPolicy filterFunction = policyHandler.getPolicy(policyDef, tx());
 			filterFunction.init(functionP.getValue());
 
-			StringParameter fieldRefP = filterBag.getParameter(PARAM_FIELD_REF);
-			this.filtersByPolicy.put(filterFunction, fieldRefP);
+			TypedTuple<StringParameter, StringParameter> refTuple = new TypedTuple<>();
+			if (filterBag.hasParameter(PARAM_FIELD_REF)) {
+				refTuple.setFirst(filterBag.getParameter(PARAM_FIELD_REF));
+			} else {
+				refTuple.setFirst(filterBag.getParameter(PARAM_FIELD_REF1));
+				refTuple.setSecond(filterBag.getParameter(PARAM_FIELD_REF2));
+			}
+
+			this.filtersByPolicy.put(filterFunction, refTuple);
 		}
 	}
 
@@ -374,7 +399,7 @@ public class GenericReport extends ReportPolicy {
 
 		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
 			StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
-			Object value = evaluateColumnValue(columnDefP, e);
+			Object value = evaluateColumnValue(columnDefP, e, false);
 			if (value instanceof Date)
 				return ISO8601FormatFactory.getInstance().formatDate((Date) value);
 			if (value instanceof Parameter)
@@ -474,8 +499,8 @@ public class GenericReport extends ReportPolicy {
 
 			int sortVal;
 			if (fieldRefP.getValue().startsWith("$")) {
-				Object columnValue1 = evaluateColumnValue(fieldRefP, row1);
-				Object columnValue2 = evaluateColumnValue(fieldRefP, row2);
+				Object columnValue1 = evaluateColumnValue(fieldRefP, row1, false);
+				Object columnValue2 = evaluateColumnValue(fieldRefP, row2, false);
 
 				if (this.descending) {
 					sortVal = ObjectHelper.compare(columnValue2, columnValue1, true);
@@ -531,23 +556,18 @@ public class GenericReport extends ReportPolicy {
 
 		// do filtering by policies
 		for (ReportFilterPolicy filterPolicy : this.filtersByPolicy.keySet()) {
-			StringParameter fieldRefP = this.filtersByPolicy.get(filterPolicy);
+			TypedTuple<StringParameter, StringParameter> refTuple = this.filtersByPolicy.get(filterPolicy);
 
-			String type = fieldRefP.getUom();
+			if (refTuple.hasFirst() && refTuple.hasSecond()) {
+				Object value1 = evaluateColumnValue(refTuple.getFirst(), row, true);
+				Object value2 = evaluateColumnValue(refTuple.getSecond(), row, true);
 
-			StrolchRootElement column = row.get(type);
-
-			// if column is null, then don't include in result
-			if (column == null)
-				return false;
-
-			if (fieldRefP.getValue().startsWith("$")) {
-				Object value = evaluateColumnValue(fieldRefP, row);
-				if (!filterPolicy.filter(value))
+				if (value1 == null || value2 == null || !filterPolicy.filter(value1, value2))
 					return false;
+
 			} else {
-				Optional<Parameter<?>> param = lookupParameter(fieldRefP, column);
-				if (param.isPresent() && !filterPolicy.filter(param.get()))
+				Object value = evaluateColumnValue(refTuple.getFirst(), row, true);
+				if (value == null || !filterPolicy.filter(value))
 					return false;
 			}
 		}
@@ -605,10 +625,14 @@ public class GenericReport extends ReportPolicy {
 	 * 		the column definition
 	 * @param row
 	 * 		the row
+	 * @param allowNull
+	 * 		handles the return value if the lookup fails. If true, then null is returned, else the empty string is
+	 * 		returned
 	 *
 	 * @return the column value
 	 */
-	protected Object evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row) {
+	protected Object evaluateColumnValue(StringParameter columnDefP, Map<String, StrolchRootElement> row,
+			boolean allowNull) {
 
 		String columnDef = columnDefP.getValue();
 		String refType = columnDefP.getUom();
@@ -619,7 +643,7 @@ public class GenericReport extends ReportPolicy {
 		Object columnValue;
 
 		if (column == null) {
-			columnValue = EMPTY;
+			columnValue = allowNull ? null : EMPTY;
 		} else if (columnDef.equals(COL_OBJECT)) {
 			columnValue = column;
 		} else if (columnDef.equals(COL_ID)) {
@@ -756,7 +780,9 @@ public class GenericReport extends ReportPolicy {
 		// and add the starting point
 		refs.put(element.getType(), element);
 
+		// now add all the joins
 		handleJoins(refs, BAG_JOINS);
+
 		return refs;
 	}
 

@@ -45,6 +45,7 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 	}
 
 	public boolean filter(Object value) {
+		DBC.PRE.assertNotNull("value required!", value);
 
 		Object left;
 		if (value instanceof Date) {
@@ -75,6 +76,10 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 		}
 
 		return filter(left, this.right, this.negate);
+	}
+
+	public boolean filter(Object value1, Object value2) {
+		throw new UnsupportedOperationException("Handling multiple values not supported!");
 	}
 
 	protected Date parseFilterValueToDate(String filterValue) {

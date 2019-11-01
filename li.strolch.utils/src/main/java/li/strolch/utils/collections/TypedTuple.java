@@ -54,4 +54,12 @@ public class TypedTuple<T, U> {
 	public void setSecond(U second) {
 		this.second = second;
 	}
+
+	public boolean hasFirst() {
+		return this.first != null;
+	}
+
+	public boolean hasSecond() {
+		return this.second != null;
+	}
 }
