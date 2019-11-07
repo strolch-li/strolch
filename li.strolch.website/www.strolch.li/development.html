@@ -56,7 +56,7 @@
             <li>Apache Maven 3</li>
         </ul>
 
-        <h2>Getting Started</h2>
+        <h2>Building Strolch</h2>
         <p>Setting up Strolch is just a few lines:</p>
         <pre class="pre">
 git clone https://github.com/4treesCH/strolch.git
@@ -70,212 +70,71 @@ mvn clean install -DskipTests</pre>
            modifying the projects, and add your own features, or, far more interesting, start developing your projects
            using the Strolch agent.</p>
 
-        <h2>Strolch Project Configuration</h2>
-        <p>To use Strolch in your own projects, look at the two tutorial apps on how they are configured. You can also
-           simply copy the projects, modify the Maven POMs and remove what ever you do not need.</p>
+        <h2>Creating a Strolch App</h2>
+        <p>To create your own Strolch App, you can use Maven's archetype generation. There are two versions, one is a
+           simple Java App which you can use to directly access the Strolch runtime, and the second is to create a Java
+           Web App, which is the usual way to run Strolch runtimes.</p>
 
-        <p>The following sections describe the Strolch configuration files and folder structure.</p>
+        <p><b>Note:</b> you need to have installed Strolch to your local maven repo, otherwise the archetype won't be
+                        available.</p>
 
-        <p>You can also use the minimal project structure:
-            <a href="https://github.com/4treesCH/strolch/tree/develop/strolch_minimal_rest">strolch_minimal_rest</a></p>
+        <h3>Creating a simple Java Strolch App</h3>
+        <p>The following shows the maven command to create the new maven project. Note that you should replace the
+           placeholders in the brackets:</p>
+        <pre>
+mvn archetype:generate
+  -DarchetypeGroupId=li.strolch
+  -DarchetypeArtifactId=li.strolch.mvn.archetype.main
+  -DarchetypeVersion=1.6.0-SNAPSHOT
+  -DgroupId=&lt;my.groupid&gt;
+  -DartifactId=&lt;my-artifactId&gt;
+  -Dversion=&lt;my.version&gt;
+  -DappName="&lt;my app name&gt;"</pre>
 
-        <h3>Project Structure</h3>
-        <p>Strolch requires two main directories under the Strolch root:</p>
-        <ul>
-            <li>../config/ &rarr; contains the Strolch runtime configuration
-                <ul>
-                    <li>StrolchConfiguration.xml &rarr; Main Strolch configuration file. There you configure the
-                        different realms, environments etc.
-                    </li>
-                    <li>PrivilegeConfig.xml &rarr; Configuration of the privilege management.</li>
-                    <li>PrivilegeUsers.xml &rarr; Configuration file with the different users and their role
-                        associations.
-                    </li>
-                    <li>PrivilegeRoles.xml &rarr; Configuration file with the different roles and privileges.</li>
-                </ul>
-            </li>
-            <li>../data/ &rarr; contains the Strolch model and any other data which is modified at runtime.
-                <ul>
-                    <li>StrolchModel.xml &rarr; main model file which is read when Strolch is in <i>TRANSIENT</i> mode.
-                    </li>
-                </ul>
-            </li>
-            <li>../tmp/ &rarr; contains any temporary files, e.g. log files etc.</li>
-        </ul>
+        <p>You change into the directory of the new project and then build the project by calling:</p>
+        <pre>
+cd &lt;my-artifactId&gt;
+mvn clean package</pre>
 
-        <h3>Maven POM</h3>
-        <p>Strolch is built using Maven, so here we show the minimum Maven POM for a web application:</p>
+        <p>Start the program using:</p>
+        <pre>
+mvn exec:java</pre>
 
-        <pre class="pre-scrollable">
-&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"&gt;
-  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+        <p>Happy coding =))</p>
 
-  &lt;properties&gt;
-    &lt;strolch.version&gt;1.6.47&lt;/strolch.version&gt;
-    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
-    &lt;warFinalName&gt;strolch_webapp&lt;/warFinalName&gt;
-    &lt;m2eclipse.wtp.contextRoot&gt;${warFinalName}&lt;/m2eclipse.wtp.contextRoot&gt;
-    &lt;buildTimestamp&gt;${maven.build.timestamp}&lt;/buildTimestamp&gt;
-  &lt;/properties&gt;
+        <h3>Creating a Java Strolch Web App</h3>
+        <p>The following shows the maven command to create the new maven project. Note that you should replace the
+           placeholders in the brackets:</p>
+        <pre>
+mvn archetype:generate
+  -DarchetypeGroupId=li.strolch
+  -DarchetypeArtifactId=li.strolch.mvn.archetype.webapp
+  -DarchetypeVersion=1.6.0-SNAPSHOT
+  -DgroupId=&lt;my.groupid&gt;
+  -DartifactId=&lt;my-artifactId&gt;
+  -Dversion=&lt;my.version&gt;
+  -DappName="&lt;my app name&gt;"</pre>
 
-  &lt;groupId&gt;org.example&lt;/groupId&gt;
-  &lt;artifactId&gt;org.example.strolch.webapp&lt;/artifactId&gt;
-  &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
-  &lt;name&gt;org.example.strolch.webapp&lt;/name&gt;
-  &lt;packaging&gt;war&lt;/packaging&gt;
+        <h4>Install the web dependencies</h4>
+        <p>The Strolch Web App uses <a href="https://nodejs.org/download/release/v11.15.0/">NodeJS v11.x</a> to build
+           the web dependencies. Please download the relevant platform's package, unpack it, and add the
+            <code>bin</code> directory to your path variable. </p>
+        <p>Once NodeJS is installed, then you can prepare the web dependencies:</p>
+        <pre>
+cd src/main/webapp/
+npm install gulp -g
+npm install
+gulp</pre>
 
-  &lt;scm&gt;
-    &lt;developerConnection&gt;scm:git:https://git.example.org/strolch_webapp.git&lt;/developerConnection&gt;
-  &lt;/scm&gt;
+        <p><b>Note:</b> Whenever the <code>bower.json</code> is changed then you should again call <code>npm
+                                                                                                         install</code>
+                        inside the webapp folder.</p>
 
-  &lt;dependencyManagement&gt;
-    &lt;dependencies&gt;
-      &lt;dependency&gt;
-        &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-        &lt;artifactId&gt;li.strolch.bom&lt;/artifactId&gt;
-        &lt;type&gt;pom&lt;/type&gt;
-        &lt;version&gt;${strolch.version}&lt;/version&gt;
-      &lt;/dependency&gt;
-    &lt;/dependencies&gt;
-  &lt;/dependencyManagement&gt;
-
-  &lt;dependencies&gt;
-    &lt;!-- main --&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-      &lt;artifactId&gt;li.strolch.model&lt;/artifactId&gt;
-      &lt;version&gt;${strolch.version}&lt;/version&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-      &lt;artifactId&gt;li.strolch.agent&lt;/artifactId&gt;
-      &lt;version&gt;${strolch.version}&lt;/version&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-      &lt;artifactId&gt;li.strolch.service&lt;/artifactId&gt;
-      &lt;version&gt;${strolch.version}&lt;/version&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;li.strolch&lt;/groupId&gt;
-      &lt;artifactId&gt;li.strolch.rest&lt;/artifactId&gt;
-      &lt;version&gt;${strolch.version}&lt;/version&gt;
-    &lt;/dependency&gt;
-
-    &lt;dependency&gt;
-      &lt;groupId&gt;org.slf4j&lt;/groupId&gt;
-      &lt;artifactId&gt;slf4j-log4j12&lt;/artifactId&gt;
-      &lt;scope&gt;runtime&lt;/scope&gt;
-      &lt;version&gt;1.7.2&lt;/version&gt;
-    &lt;/dependency&gt;
-
-    &lt;dependency&gt;
-      &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
-      &lt;artifactId&gt;javax.servlet-api&lt;/artifactId&gt;
-      &lt;version&gt;3.0.1&lt;/version&gt;
-      &lt;scope&gt;provided&lt;/scope&gt;
-    &lt;/dependency&gt;
-
-    &lt;!-- test dependencies --&gt;
-    &lt;dependency&gt;
-      &lt;groupId&gt;junit&lt;/groupId&gt;
-      &lt;artifactId&gt;junit&lt;/artifactId&gt;
-      &lt;scope&gt;test&lt;/scope&gt;
-      &lt;version&gt;4.11&lt;/version&gt;
-    &lt;/dependency&gt;
-
-  &lt;/dependencies&gt;
-
-  &lt;build&gt;
-    &lt;finalName&gt;${warFinalName}&lt;/finalName&gt;
-    &lt;resources&gt;
-      &lt;resource&gt;
-        &lt;directory&gt;src/main/resources&lt;/directory&gt;
-        &lt;filtering&gt;true&lt;/filtering&gt;
-        &lt;includes&gt;
-          &lt;include&gt;**/componentVersion.properties&lt;/include&gt;
-        &lt;/includes&gt;
-      &lt;/resource&gt;
-      &lt;resource&gt;
-        &lt;directory&gt;src/main/resources&lt;/directory&gt;
-        &lt;filtering&gt;false&lt;/filtering&gt;
-        &lt;excludes&gt;
-          &lt;exclude&gt;**/componentVersion.properties&lt;/exclude&gt;
-        &lt;/excludes&gt;
-      &lt;/resource&gt;
-    &lt;/resources&gt;
-
-    &lt;plugins&gt;
-
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.0&lt;/version&gt;
-        &lt;configuration&gt;
-          &lt;source&gt;1.7&lt;/source&gt;
-          &lt;target&gt;1.7&lt;/target&gt;
-          &lt;showDeprecation&gt;true&lt;/showDeprecation&gt;
-          &lt;showWarnings&gt;true&lt;/showWarnings&gt;
-          &lt;compilerArgument&gt;-Xlint:all&lt;/compilerArgument&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;
-
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
-        &lt;artifactId&gt;buildnumber-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;1.2&lt;/version&gt;
-        &lt;executions&gt;
-          &lt;execution&gt;
-            &lt;phase&gt;validate&lt;/phase&gt;
-            &lt;goals&gt;
-              &lt;goal&gt;create&lt;/goal&gt;
-            &lt;/goals&gt;
-          &lt;/execution&gt;
-        &lt;/executions&gt;
-        &lt;configuration&gt;
-          &lt;doCheck&gt;false&lt;/doCheck&gt;
-          &lt;doUpdate&gt;false&lt;/doUpdate&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;
-
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
-        &lt;configuration&gt;
-          &lt;failOnMissingWebXml&gt;false&lt;/failOnMissingWebXml&gt;
-          &lt;warName&gt;${warFinalName}&lt;/warName&gt;
-          &lt;webResources&gt;
-            &lt;resource&gt;
-              &lt;directory&gt;src/main/non-packaged-resources&lt;/directory&gt;
-              &lt;targetPath&gt;WEB-INF&lt;/targetPath&gt;
-              &lt;filtering&gt;true&lt;/filtering&gt;
-              &lt;includes&gt;
-                &lt;include&gt;**/ENV.properties&lt;/include&gt;
-              &lt;/includes&gt;
-            &lt;/resource&gt;
-          &lt;/webResources&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;
-
-    &lt;/plugins&gt;
-  &lt;/build&gt;
-
-  &lt;profiles&gt;
-    &lt;profile&gt;
-      &lt;id&gt;m2e&lt;/id&gt;
-      &lt;!-- This profile is only activated when building in Eclipse with m2e --&gt;
-      &lt;activation&gt;
-        &lt;property&gt;
-          &lt;name&gt;m2e.version&lt;/name&gt;
-        &lt;/property&gt;
-      &lt;/activation&gt;
-      &lt;properties&gt;
-        &lt;strolch.env&gt;dev&lt;/strolch.env&gt;
-      &lt;/properties&gt;
-    &lt;/profile&gt;
-  &lt;/profiles&gt;
-&lt;/project&gt;</pre>
+        <h4>Building the WAR</h4>
+        <p>Building the WAR uses the <code>package</code> maven goal, but to have the optimized WAR use the <code>release</code>
+           profile:</p>
+        <pre>
+mvn clean package -Prelease</pre>
 
         <p>Happy coding =))</p>
 
@@ -284,10 +143,6 @@ mvn clean install -DskipTests</pre>
         <h3>Tools used</h3>
         The following tools are used to develop Strolch and Strolch-based projects:
         <ul class="list-unstyled">
-            <li><a href="https://www.eclipse.org/downloads/"><img style="height: 50px"
-                                                                  class="img-thumbnail"
-                                                                  src="https://www.eclipse.org/downloads/packages/sites/all/themes/solstice/_themes/solstice_packages/logo.png"
-                                                                  alt="Eclipse Luna JEE version" /></a></li>
             <li><a href="https://www.jetbrains.com/idea/download/#section=linux"><img style="height: 50px"
                                                                                       class="img-thumbnail"
                                                                                       src="https://upload.wikimedia.org/wikipedia/commons/d/d5/IntelliJ_IDEA_Logo.svg"

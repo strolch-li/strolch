@@ -30,48 +30,7 @@ Or install locally first:
 
 Then you can create your own project. Please read the README files in the generated projects.
 
-Java App:
-
-    mvn archetype:generate                                  \
-      -DarchetypeGroupId=li.strolch                         \
-      -DarchetypeArtifactId=li.strolch.mvn.archetype.main   \
-      -DarchetypeVersion=1.6.0-SNAPSHOT                     \
-      -DgroupId=<my.groupid>                                \
-      -DartifactId=<my-artifactId>                          \
-      -Dversion=<my.version>                                \
-      -DappName="<my app name>"
-
-
-    mvn archetype:generate                                  \
-      -DarchetypeGroupId=li.strolch                         \
-      -DarchetypeArtifactId=li.strolch.mvn.archetype.main   \
-      -DarchetypeVersion=1.6.0-SNAPSHOT                     \
-      -DgroupId=com.example                                 \
-      -DartifactId=strolch-test-app                         \
-      -Dversion=0.1.0-SNAPSHOT                              \
-      -DappName="My Test App"
-
-WebApp:
-
-    mvn archetype:generate                                  \
-      -DarchetypeGroupId=li.strolch                         \
-      -DarchetypeArtifactId=li.strolch.mvn.archetype.webapp \
-      -DarchetypeVersion=1.6.0-SNAPSHOT                     \
-      -DgroupId=<my.groupid>                                \
-      -DartifactId=<my-artifactId>                          \
-      -Dversion=<my.version>                                \
-      -DappName="<my app name>"
-
-
-    mvn archetype:generate                                  \
-      -DarchetypeGroupId=li.strolch                         \
-      -DarchetypeArtifactId=li.strolch.mvn.archetype.webapp \
-      -DarchetypeVersion=1.6.0-SNAPSHOT                     \
-      -DgroupId=com.example                                 \
-      -DartifactId=strolch-test-webapp                      \
-      -Dversion=0.1.0-SNAPSHOT                              \
-      -DappName="My Test Web App"
-
+To create a Strolch project see https://strolch.li/development.html
 
 More Information
 -----------------
