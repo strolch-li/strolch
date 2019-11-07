@@ -37,7 +37,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	private boolean readonly;
 
 	@Override
-	public ITimeValue<T> getValueAt(final Long time) {
+	public ITimeValue<T> getValueAt(long time) {
 		ITimeValue<T> tmp = null;
 		for (ITimeValue<T> value : this.container) {
 			if (value.getTime() <= time) {
@@ -50,7 +50,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
-	public void setValueAt(final Long time, final T targetValue) {
+	public void setValueAt(long time, final T targetValue) {
 		assertNotReadonly();
 		ITimeValue<T> current = getValueAt(time);
 		if (current != null && current.getTime().equals(time)) {
@@ -61,15 +61,31 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
-	public SortedSet<ITimeValue<T>> getFutureValues(final Long time) {
-		TimeValue<T> picker = new TimeValue<>(time, null);
-		return new TreeSet<>(this.container.tailSet(picker));
+	public SortedSet<ITimeValue<T>> getFutureValues(long time) {
+		return new TreeSet<>(this.container.tailSet(new TimeValue<>(time, null)));
 	}
 
 	@Override
-	public Collection<ITimeValue<T>> getPastValues(final Long time) {
-		TimeValue<T> picker = new TimeValue<>(time, null);
-		return new TreeSet<>(this.container.headSet(picker));
+	public Collection<ITimeValue<T>> removeFutureValues(long time) {
+		assertNotReadonly();
+		SortedSet<ITimeValue<T>> values = this.container.tailSet(new TimeValue<>(time, null));
+		TreeSet<ITimeValue<T>> result = new TreeSet<>(values);
+		values.clear();
+		return result;
+	}
+
+	@Override
+	public Collection<ITimeValue<T>> getPastValues(long time) {
+		return new TreeSet<>(this.container.headSet(new TimeValue<>(time, null)));
+	}
+
+	@Override
+	public Collection<ITimeValue<T>> removePastValues(long time) {
+		assertNotReadonly();
+		SortedSet<ITimeValue<T>> values = this.container.headSet(new TimeValue<>(time, null));
+		TreeSet<ITimeValue<T>> result = new TreeSet<>(values);
+		values.clear();
+		return result;
 	}
 
 	@Override
@@ -103,6 +119,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	@SuppressWarnings("unchecked")
 	@Override
 	public void compact() {
+		assertNotReadonly();
 
 		if (this.container.size() < 2) {
 			return;

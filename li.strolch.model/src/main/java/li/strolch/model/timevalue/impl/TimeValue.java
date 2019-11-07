@@ -26,7 +26,7 @@ import li.strolch.model.timevalue.IValue;
 @SuppressWarnings("rawtypes")
 public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable {
 
-	protected final Long time;
+	protected final long time;
 	protected T value;
 
 	/**
@@ -35,7 +35,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 	 * @param value
 	 * 		the actual value for this value
 	 */
-	public TimeValue(final Long time, final T value) {
+	public TimeValue(final long time, final T value) {
 		this.time = time;
 		this.value = value;
 	}
@@ -101,7 +101,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.time == null) ? 0 : this.time.hashCode());
+		result = prime * result + Long.hashCode(this.time);
 		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
 		return result;
 	}
@@ -119,11 +119,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 		}
 		@SuppressWarnings("unchecked")
 		TimeValue<T> other = (TimeValue<T>) obj;
-		if (this.time == null) {
-			if (other.time != null) {
-				return false;
-			}
-		} else if (!this.time.equals(other.time)) {
+		if (this.time != other.time) {
 			return false;
 		}
 		if (this.value == null) {

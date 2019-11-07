@@ -37,12 +37,12 @@ public interface ITimeVariable<T extends IValue> {
 	 * @param value
 	 * 		the {@link IValue} to set
 	 */
-	void setValueAt(final Long time, final T value);
+	void setValueAt(long time, final T value);
 
 	/**
 	 * get the latest {@link ITimeValue} whose time field is less or equal to the time given
 	 */
-	ITimeValue<T> getValueAt(final Long time);
+	ITimeValue<T> getValueAt(long time);
 
 	/**
 	 * Applies a {@link IValueChange} propagating the change to all future values starting from the time of the change.
@@ -62,7 +62,17 @@ public interface ITimeVariable<T extends IValue> {
 	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
-	Collection<ITimeValue<T>> getFutureValues(final Long time);
+	Collection<ITimeValue<T>> getFutureValues(long time);
+
+	/**
+	 * Removes all {@link ITimeValue} objects whose time field is greater or equal to the given time
+	 *
+	 * @param time
+	 * 		the time the sequence starts with
+	 *
+	 * @return the sequence of {@link ITimeValue} objects removed
+	 */
+	Collection<ITimeValue<T>> removeFutureValues(long time);
 
 	/**
 	 * Get all {@link ITimeValue} objects whose time field is strictly smaller than the given time
@@ -72,7 +82,17 @@ public interface ITimeVariable<T extends IValue> {
 	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
-	Collection<ITimeValue<T>> getPastValues(final Long time);
+	Collection<ITimeValue<T>> getPastValues(long time);
+
+	/**
+	 * Remove all {@link ITimeValue} objects whose time field is strictly smaller than the given time
+	 *
+	 * @param time
+	 * 		the time the sequence starts with
+	 *
+	 * @return the sequence of {@link ITimeValue} objects removed
+	 */
+	Collection<ITimeValue<T>> removePastValues(long time);
 
 	/**
 	 * Get all {@link ITimeValue} objects
