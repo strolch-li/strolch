@@ -207,6 +207,41 @@ public enum StrolchValueType {
 	 * <li>{@link Parameter}</li>
 	 * </ul>
 	 */
+	TEXT("Text") {
+		@Override
+		public Object parseValue(String value) {
+			return value;
+		}
+
+		@Override
+		public Parameter<?> parameterInstance() {
+			return new TextParameter();
+		}
+
+		@Override
+		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+		}
+
+		@Override
+		public IValue<?> valueInstance(String valueAsString) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+		}
+
+		@Override
+		public boolean isString() {
+			return true;
+		}
+	},
+
+	/**
+	 * Can be used for:
+	 * <ul>
+	 * <li>{@link Parameter}</li>
+	 * </ul>
+	 */
 	DATE("Date") {
 		@Override
 		public Object parseValue(String value) {

@@ -207,6 +207,10 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 			for (String paramKey : parameterKeySet) {
 				Parameter<?> parameter = parameterBag.getParameter(paramKey);
 				this.contentHandler.startElement(null, null, Tags.PARAMETER, attributesFor(parameter));
+				if (parameter.getValueType() == StrolchValueType.TEXT) {
+					String valueAsString = parameter.getValueAsString();
+					this.contentHandler.characters(valueAsString.toCharArray(), 0, valueAsString.length());
+				}
 				this.contentHandler.endElement(null, null, Tags.PARAMETER);
 			}
 
@@ -283,7 +287,8 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 	protected AttributesImpl attributesFor(Parameter<?> parameter) {
 		AttributesImpl attributes = attributesFor((StrolchElement) parameter);
 
-		attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, parameter.getValueAsString());
+		if (parameter.getValueType() != StrolchValueType.TEXT)
+			attributes.addAttribute(null, null, Tags.VALUE, Tags.CDATA, parameter.getValueAsString());
 
 		if (!UOM_NONE.equals(parameter.getUom()))
 			attributes.addAttribute(null, null, Tags.UOM, Tags.CDATA, parameter.getUom());

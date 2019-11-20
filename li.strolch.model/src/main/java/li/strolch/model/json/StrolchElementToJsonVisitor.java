@@ -269,6 +269,13 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	@Override
+	public JsonElement visitTextParam(TextParameter param) {
+		if (isFlat())
+			return new JsonPrimitive(param.getValueAsString());
+		return paramToJsonFull(param);
+	}
+
+	@Override
 	public JsonElement visitStringListParam(StringListParameter param) {
 		if (isFlat())
 			return new JsonPrimitive(param.getValueAsString());

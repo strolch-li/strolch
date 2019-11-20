@@ -71,6 +71,12 @@ public class SetParameterValueFromStringVisitor implements ParameterVisitor<Void
 	}
 
 	@Override
+	public Void visitTextParam(TextParameter param) {
+		param.setValue(this.value);
+		return null;
+	}
+
+	@Override
 	public Void visitStringListParam(StringListParameter param) {
 		param.setValueFromString(this.value);
 		return null;

@@ -42,6 +42,24 @@ public class ParameterTest {
 	}
 
 	@Test
+	public void testTextParam() {
+
+		TextParameter other = new TextParameter("other", "other",
+				"here we have the content\n\nand some more\n\n\ncontent over multiple lines");
+		TextParameter p = resource.getParameter(BAG_ID, PARAM_TEXT_ID, true);
+
+		assertEquals("Strolch\n\nmulti\n\n\nline", p.getValue());
+
+		p.clear();
+		assertTrue(p.isEmpty());
+		assertEquals("", p.getValue());
+
+		p.setValueFrom(other);
+		assertTrue(p.isEqualTo(other.getValue()));
+		assertTrue(p.isEqualTo(other));
+	}
+
+	@Test
 	public void testIntegerParam() {
 
 		IntegerParameter other = new IntegerParameter("other", "other", 42);

@@ -6,6 +6,12 @@
 
     <Resource Id="MyTestResource" Name="Test Name" Type="TestType">
         <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+            <Parameter Id="@param9" Name="Text Param" Type="Text"><![CDATA[here we have the content
+
+and some more
+
+
+content over multiple lines]]></Parameter>
             <Parameter Id="@param8" Name="Duration Param" Type="Duration" Value="P1D"/>
             <Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World"/>
             <Parameter Id="@param6" Name="Date Param" Type="Date" Value="2012-11-30T18:12:05.628+01:00"/>

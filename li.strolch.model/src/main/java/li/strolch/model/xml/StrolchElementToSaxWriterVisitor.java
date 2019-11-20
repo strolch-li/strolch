@@ -288,7 +288,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 		List<Parameter<?>> parameters = new ArrayList<>(element.getParameters());
 		parameters.sort(Comparator.comparingInt(Parameter::getIndex));
 		for (Parameter<?> parameter : parameters) {
-			writeStartStrolchElement(Tags.PARAMETER, true, parameter);
+			boolean isTextParam = parameter.getValueType() == StrolchValueType.TEXT;
+			writeStartStrolchElement(Tags.PARAMETER, !isTextParam, parameter);
 
 			if (!INTERPRETATION_NONE.equals(parameter.getInterpretation()))
 				this.writer.writeAttribute(Tags.INTERPRETATION, parameter.getInterpretation());
@@ -299,7 +300,12 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 			if (parameter.getIndex() != 0)
 				this.writer.writeAttribute(Tags.INDEX, Integer.toString(parameter.getIndex()));
 
-			this.writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
+			if (isTextParam) {
+				this.writer.writeCData(parameter.getValueAsString());
+				this.writer.writeEndElement();
+			} else {
+				this.writer.writeAttribute(Tags.VALUE, parameter.getValueAsString());
+			}
 		}
 	}
 }

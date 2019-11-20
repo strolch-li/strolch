@@ -117,13 +117,12 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 			Iterator<Entry<String, IActivityElement>> iter = activity.elementIterator();
 			while (iter.hasNext()) {
 				IActivityElement activityElement = iter.next().getValue();
-				if (activityElement instanceof Activity) {
+				if (activityElement instanceof Activity)
 					element.appendChild(toDom((Activity) activityElement));
-				} else if (activityElement instanceof Action) {
+				else if (activityElement instanceof Action)
 					element.appendChild(toDom((Action) activityElement));
-				} else {
+				else
 					throw new IllegalArgumentException("Unhandled element " + activityElement.getClass());
-				}
 			}
 		}
 
@@ -171,12 +170,10 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 		Element element = document.createElement(Tags.TIMED_STATE);
 		fillElement(element, (AbstractStrolchElement) timedState);
 
-		if (!timedState.getInterpretation().equals(StrolchModelConstants.INTERPRETATION_NONE)) {
+		if (!timedState.getInterpretation().equals(StrolchModelConstants.INTERPRETATION_NONE))
 			element.setAttribute(Tags.INTERPRETATION, timedState.getInterpretation());
-		}
-		if (!timedState.getUom().equals(StrolchModelConstants.UOM_NONE)) {
+		if (!timedState.getUom().equals(StrolchModelConstants.UOM_NONE))
 			element.setAttribute(Tags.UOM, timedState.getUom());
-		}
 		if (timedState.isHidden()) {
 			element.setAttribute(Tags.HIDDEN, Boolean.toString(timedState.isHidden()));
 		}
@@ -210,20 +207,19 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 		Element element = document.createElement(Tags.PARAMETER);
 		fillElement(element, (AbstractStrolchElement) param);
 
-		element.setAttribute(Tags.VALUE, param.getValueAsString());
-
-		if (!param.getInterpretation().equals(StrolchModelConstants.INTERPRETATION_NONE)) {
+		if (!param.getInterpretation().equals(StrolchModelConstants.INTERPRETATION_NONE))
 			element.setAttribute(Tags.INTERPRETATION, param.getInterpretation());
-		}
-		if (!param.getUom().equals(StrolchModelConstants.UOM_NONE)) {
+		if (!param.getUom().equals(StrolchModelConstants.UOM_NONE))
 			element.setAttribute(Tags.UOM, param.getUom());
-		}
-		if (param.isHidden()) {
+		if (param.isHidden())
 			element.setAttribute(Tags.HIDDEN, Boolean.toString(param.isHidden()));
-		}
-		if (param.getIndex() != 0) {
+		if (param.getIndex() != 0)
 			element.setAttribute(Tags.INDEX, Integer.toString(param.getIndex()));
-		}
+
+		if (param.getValueType() == StrolchValueType.TEXT)
+			element.setTextContent(param.getValueAsString());
+		else
+			element.setAttribute(Tags.VALUE, param.getValueAsString());
 
 		return element;
 	}

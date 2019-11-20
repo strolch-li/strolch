@@ -18,7 +18,7 @@ public class StrolchXmlHelperTest {
 	@Test
 	public void shouldWriteAndReadXml() {
 
-		File outFile = new File("target/" + getClass().getSimpleName());
+		File outFile = new File("target/" + getClass().getSimpleName() + ".xml");
 
 		Activity activity = ModelGenerator.createActivity("activity", "Activity", "Activity", TimeOrdering.SERIES);
 		Resource resource = ModelGenerator.createResource("res", "Res", "Res");

@@ -92,7 +92,7 @@ public class StrolchElementFromDomVisitor {
 			if (StringHelper.isEmpty(index)) {
 				timedState.setIndex(0);
 			} else {
-				timedState.setIndex(Integer.valueOf(index));
+				timedState.setIndex(Integer.parseInt(index));
 			}
 
 			if (StringHelper.isEmpty(hidden)) {
@@ -245,7 +245,11 @@ public class StrolchElementFromDomVisitor {
 
 		fillElement(element, (AbstractStrolchElement) param);
 
-		String value = element.getAttribute(Tags.VALUE);
+		String value;
+		if (param.getValueType() == StrolchValueType.TEXT)
+			value = element.getTextContent();
+		else
+			value = element.getAttribute(Tags.VALUE);
 		param.setValueFromString(value);
 
 		String interpretation = element.getAttribute(Tags.INTERPRETATION);
@@ -259,7 +263,7 @@ public class StrolchElementFromDomVisitor {
 		if (StringHelper.isEmpty(index)) {
 			param.setIndex(0);
 		} else {
-			param.setIndex(Integer.valueOf(index));
+			param.setIndex(Integer.parseInt(index));
 		}
 
 		if (StringHelper.isEmpty(hidden)) {

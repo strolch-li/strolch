@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,7 +57,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 
 		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(order);
 		List<Locator> mismatches = parsedOrder.accept(visitor);
-		assertTrue("To DOM and back should equal same Order:\n" + mismatches, mismatches.isEmpty());
+		assertTrue("To SAX and back should equal same Order:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedOrder;
 	}
@@ -82,7 +82,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 
 		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(resource);
 		List<Locator> mismatches = parsedResource.accept(visitor);
-		assertTrue("To DOM and back should equal same Resource:\n" + mismatches, mismatches.isEmpty());
+		assertTrue("To SAX and back should equal same Resource:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedResource;
 	}
@@ -109,7 +109,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 
 		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(activity);
 		List<Locator> mismatches = parsedActivity.accept(visitor);
-		assertTrue("To DOM and back should equal same Activity:\n" + mismatches, mismatches.isEmpty());
+		assertTrue("To SAX and back should equal same Activity:\n" + mismatches, mismatches.isEmpty());
 
 		return parsedActivity;
 	}

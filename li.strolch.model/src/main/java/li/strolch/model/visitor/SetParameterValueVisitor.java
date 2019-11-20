@@ -74,6 +74,12 @@ public class SetParameterValueVisitor implements ParameterVisitor<Void> {
 		return null;
 	}
 
+	@Override
+	public Void visitTextParam(TextParameter param) {
+		param.setValue((String) this.value);
+		return null;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Void visitStringListParam(StringListParameter param) {

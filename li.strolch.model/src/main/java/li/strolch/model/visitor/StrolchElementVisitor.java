@@ -50,6 +50,8 @@ public interface StrolchElementVisitor<U> extends StrolchVisitor {
 
 	U visitStringParam(StringParameter param);
 
+	U visitTextParam(TextParameter param);
+
 	U visitStringListParam(StringListParameter param);
 
 	U visitIntegerListParam(IntegerListParameter param);

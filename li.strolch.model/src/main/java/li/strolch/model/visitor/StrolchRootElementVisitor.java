@@ -66,6 +66,11 @@ public interface StrolchRootElementVisitor<U> extends StrolchElementVisitor<U> {
 	}
 
 	@Override
+	default U visitTextParam(TextParameter param) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
+	}
+
+	@Override
 	default U visitStringListParam(StringListParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}

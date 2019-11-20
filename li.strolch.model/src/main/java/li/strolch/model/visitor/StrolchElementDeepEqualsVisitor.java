@@ -420,6 +420,13 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	}
 
 	@Override
+	public List<Locator> visitTextParam(TextParameter param) {
+		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		deepEquals((Parameter<?>) this.srcElement, param);
+		return getMismatchedLocators();
+	}
+
+	@Override
 	public List<Locator> visitStringListParam(StringListParameter param) {
 		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);

@@ -100,14 +100,18 @@
     </xs:complexType>
 
     <xs:complexType name="ParameterType">
-        <xs:attribute type="xs:string" name="Id" use="required"/>
-        <xs:attribute type="xs:string" name="Name" use="required"/>
-        <xs:attribute type="ParameterValueType" name="Type" use="required"/>
-        <xs:attribute type="xs:string" name="Value" use="required"/>
-        <xs:attribute type="xs:string" name="Interpretation" use="optional"/>
-        <xs:attribute type="xs:string" name="Uom" use="optional"/>
-        <xs:attribute type="xs:boolean" name="Hidden" use="optional"/>
-        <xs:attribute type="xs:int" name="Index" use="optional"/>
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="Id" use="required"/>
+                <xs:attribute type="xs:string" name="Name" use="required"/>
+                <xs:attribute type="ParameterValueType" name="Type" use="required"/>
+                <xs:attribute type="xs:string" name="Value" use="optional"/>
+                <xs:attribute type="xs:string" name="Interpretation" use="optional"/>
+                <xs:attribute type="xs:string" name="Uom" use="optional"/>
+                <xs:attribute type="xs:boolean" name="Hidden" use="optional"/>
+                <xs:attribute type="xs:int" name="Index" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="PoliciesType">
@@ -171,6 +175,7 @@
         <xs:restriction base="xs:string">
             <xs:enumeration value="Boolean"/>
             <xs:enumeration value="String"/>
+            <xs:enumeration value="Text"/>
             <xs:enumeration value="Integer"/>
             <xs:enumeration value="Long"/>
             <xs:enumeration value="Float"/>

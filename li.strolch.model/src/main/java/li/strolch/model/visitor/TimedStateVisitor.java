@@ -28,82 +28,87 @@ import li.strolch.model.parameter.*;
 public interface TimedStateVisitor<U> extends StrolchElementVisitor<U> {
 
 	@Override
-	public default U visitActivity(Activity activity) {
+	default U visitActivity(Activity activity) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + activity.getClass());
 	}
 
 	@Override
-	public default U visitOrder(Order order) {
+	default U visitOrder(Order order) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + order.getClass());
 	}
 
 	@Override
-	public default U visitResource(Resource resource) {
+	default U visitResource(Resource resource) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + resource.getClass());
 	}
 
 	@Override
-	public default U visitAction(Action action) {
+	default U visitAction(Action action) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + action.getClass());
 	}
 
 	@Override
-	public default U visitBooleanParam(BooleanParameter param) {
+	default U visitBooleanParam(BooleanParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitDateParam(DateParameter param) {
+	default U visitDateParam(DateParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitDurationParam(DurationParameter param) {
+	default U visitDurationParam(DurationParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitFloatParam(FloatParameter param) {
+	default U visitFloatParam(FloatParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitIntegerParam(IntegerParameter param) {
+	default U visitIntegerParam(IntegerParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitLongParam(LongParameter param) {
+	default U visitLongParam(LongParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitStringParam(StringParameter param) {
+	default U visitStringParam(StringParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitStringListParam(StringListParameter param) {
+	default U visitTextParam(TextParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitIntegerListParam(IntegerListParameter param) {
+	default U visitStringListParam(StringListParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitFloatListParam(FloatListParameter param) {
+	default U visitIntegerListParam(IntegerListParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitLongListParam(LongListParameter param) {
+	default U visitFloatListParam(FloatListParameter param) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
 	}
 
 	@Override
-	public default U visitParameterBag(ParameterBag bag) {
+	default U visitLongListParam(LongListParameter param) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + param.getClass());
+	}
+
+	@Override
+	default U visitParameterBag(ParameterBag bag) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + bag.getClass());
 	}
 }

@@ -27,7 +27,7 @@ import li.strolch.utils.dbc.DBC;
  */
 public class StringParameter extends AbstractParameter<String> {
 
-	private String value = "";
+	protected String value = "";
 
 	/**
 	 * Empty constructor

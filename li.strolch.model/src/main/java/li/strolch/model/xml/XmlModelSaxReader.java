@@ -27,6 +27,7 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.TextParameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
@@ -51,10 +52,13 @@ public class XmlModelSaxReader extends DefaultHandler {
 	protected ModelStatistics statistics;
 
 	private GroupedParameterizedElement parameterizedElement;
+	private TextParameter textParam;
 	private Deque<Activity> activityStack;
 	private ParameterBag pBag;
 	private StrolchTimedState<? extends IValue<?>> state;
 	private PolicyDefs policies;
+
+	private StringBuilder textBuffer;
 
 	public XmlModelSaxReader(StrolchElementListener listener) {
 		this.listener = listener;
@@ -72,7 +76,6 @@ public class XmlModelSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		// TODO split each root object into its own file
 		switch (qName) {
 
 		case Tags.STROLCH_MODEL:
@@ -171,11 +174,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 				String paramName = attributes.getValue(Tags.NAME);
 				String paramType = attributes.getValue(Tags.TYPE);
-				String paramValue = attributes.getValue(Tags.VALUE);
 				String paramHiddenS = attributes.getValue(Tags.HIDDEN);
 				String paramIndexS = attributes.getValue(Tags.INDEX);
 
-				int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.valueOf(paramIndexS);
+				int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.parseInt(paramIndexS);
 				boolean paramHidden = !StringHelper.isEmpty(paramHiddenS) && StringHelper.parseBoolean(paramHiddenS);
 				String paramUom = attributes.getValue(Tags.UOM);
 				String paramInterpretation = attributes.getValue(Tags.INTERPRETATION);
@@ -185,12 +187,19 @@ public class XmlModelSaxReader extends DefaultHandler {
 				Parameter<?> param = type.parameterInstance();
 				param.setId(paramId);
 				param.setName(paramName);
-				param.setValueFromString(paramValue);
 
 				param.setHidden(paramHidden);
 				param.setUom(paramUom);
 				param.setInterpretation(paramInterpretation);
 				param.setIndex(index);
+
+				if (type != StrolchValueType.TEXT) {
+					String paramValue = attributes.getValue(Tags.VALUE);
+					param.setValueFromString(paramValue);
+				} else {
+					this.textBuffer = new StringBuilder();
+					this.textParam = (TextParameter) param;
+				}
 
 				this.pBag.addParameter(param);
 
@@ -212,7 +221,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 				String stateIndexS = attributes.getValue(Tags.INDEX);
 				String stateUom = attributes.getValue(Tags.UOM);
 				String stateInterpretation = attributes.getValue(Tags.INTERPRETATION);
-				int stateIndex = StringHelper.isEmpty(stateIndexS) ? 0 : Integer.valueOf(stateIndexS);
+				int stateIndex = StringHelper.isEmpty(stateIndexS) ? 0 : Integer.parseInt(stateIndexS);
 				boolean stateHidden = !StringHelper.isEmpty(stateHiddenS) && StringHelper.parseBoolean(stateHiddenS);
 
 				StrolchValueType stateType = StrolchValueType.parse(stateTypeS);
@@ -304,6 +313,13 @@ public class XmlModelSaxReader extends DefaultHandler {
 	}
 
 	@Override
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		if (this.textBuffer != null) {
+			this.textBuffer.append(ch, start, length);
+		}
+	}
+
+	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 
 		switch (qName) {
@@ -374,9 +390,18 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 			break;
 
+		case Tags.PARAMETER:
+
+			if (this.textParam != null) {
+				this.textParam.setValue(this.textBuffer.toString());
+				this.textBuffer = null;
+				this.textParam = null;
+			}
+
+			break;
+
 		case Tags.POLICY:
 		case Tags.VERSION:
-		case Tags.PARAMETER:
 		case Tags.INCLUDE_FILE:
 		case Tags.VALUE:
 		case Tags.VALUE_CHANGE:

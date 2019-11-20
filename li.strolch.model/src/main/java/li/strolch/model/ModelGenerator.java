@@ -73,6 +73,9 @@ public class ModelGenerator {
 	public static final String PARAM_LIST_LONG_ID = "@param11";
 	public static final String PARAM_LIST_LONG_NAME = "LongList Param";
 
+	public static final String PARAM_TEXT_ID = "@param12";
+	public static final String PARAM_TEXT_NAME = "String Param";
+
 	public static final String STATE_FLOAT_ID = "@state1";
 	public static final String STATE_FLOAT_NAME = "Float State";
 
@@ -465,6 +468,10 @@ public class ModelGenerator {
 		StringParameter stringParam = new StringParameter(PARAM_STRING_ID, PARAM_STRING_NAME, "Strolch");
 		stringParam.setIndex(5);
 		bag.addParameter(stringParam);
+
+		TextParameter textParam = new TextParameter(PARAM_TEXT_ID, PARAM_TEXT_NAME, "Strolch\n\nmulti\n\n\nline");
+		textParam.setIndex(12);
+		bag.addParameter(textParam);
 
 		DateParameter dateParam = new DateParameter(PARAM_DATE_ID, PARAM_DATE_NAME, new Date(1354295525628L));
 		dateParam.setIndex(6);
