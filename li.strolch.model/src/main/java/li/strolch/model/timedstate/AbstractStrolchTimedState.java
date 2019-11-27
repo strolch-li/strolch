@@ -180,6 +180,12 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		super.setReadOnly();
 	}
 
+	@Override
+	public void clear() {
+		assertNotReadonly();
+		this.state.getTimeEvolution().clear();
+	}
+
 	@SuppressWarnings("nls")
 	@Override
 	public String toString() {

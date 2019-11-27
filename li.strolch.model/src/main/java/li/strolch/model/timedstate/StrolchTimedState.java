@@ -126,4 +126,6 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 
 	@Override
 	StrolchTimedState<T> getClone();
+
+	void clear();
 }
