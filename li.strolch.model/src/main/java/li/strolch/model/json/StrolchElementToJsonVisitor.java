@@ -131,6 +131,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this;
 	}
 
+	public StrolchElementToJsonVisitor withStateVariables() {
+		this.withoutStateVariables = false;
+		return this;
+	}
+
 	public StrolchElementToJsonVisitor activityDepth(int depth) {
 		this.activityDepth = depth;
 		return this;

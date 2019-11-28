@@ -84,6 +84,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this;
 	}
 
+	public StrolchRootElementToJsonVisitor withStateVariables() {
+		this.visitor.withStateVariables();
+		return this;
+	}
+
 	public StrolchRootElementToJsonVisitor withoutStateVariables() {
 		this.visitor.withoutStateVariables();
 		return this;
