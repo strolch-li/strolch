@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import li.strolch.privilege.helper.CryptHelper;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.helper.StringHelper;
@@ -115,11 +116,7 @@ public class PrivilegeUsersDomWriter {
 		if (user.getPassword() != null && user.getSalt() != null && user.getHashAlgorithm() != null
 				&& user.getHashIterations() != -1 && user.getHashKeyLength() != -1) {
 
-			String algo = user.getHashAlgorithm() + "," + user.getHashIterations() + "," + user.getHashKeyLength();
-			String hash = StringHelper.toHexString(user.getSalt());
-			String password = StringHelper.toHexString(user.getPassword());
-
-			String passwordS = "$" + algo + "$" + hash + "$" + password;
+			String passwordS = CryptHelper.buildPasswordString(user);
 			userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, passwordS);
 
 		} else {

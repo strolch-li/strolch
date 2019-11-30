@@ -16,6 +16,7 @@
 package li.strolch.privilege.helper;
 
 import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.privilege.helper.CryptHelper.buildPasswordString;
 
 import javax.crypto.SecretKeyFactory;
 import java.io.BufferedReader;
@@ -133,6 +134,9 @@ public class PasswordCreator {
 			System.out.println(
 					XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.XML_ATTR_SALT + "=\""
 							+ saltS + "\"");
+			System.out.println(
+					XmlConstants.XML_ATTR_PASSWORD + "=\"" + buildPasswordString(hashAlgorithm, iterations, keyLength,
+							salt, passwordHash) + "\"");
 			System.out.println();
 		}
 	}
