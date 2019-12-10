@@ -130,5 +130,7 @@ public abstract class StrolchPolicy {
 	/**
 	 * @see Command#undo()
 	 */
-	public abstract void undo();
+	public void undo() {
+		// empty implementation
+	}
 }
