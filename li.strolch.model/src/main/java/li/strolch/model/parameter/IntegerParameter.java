@@ -163,7 +163,7 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	}
 
 	public static Integer parseFromString(String valueS) {
-		return Integer.valueOf(valueS);
+		return Integer.decode(valueS);
 	}
 
 	@Override

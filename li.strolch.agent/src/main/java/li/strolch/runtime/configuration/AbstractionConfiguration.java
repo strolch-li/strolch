@@ -101,7 +101,7 @@ public abstract class AbstractionConfiguration {
 		if (StringHelper.isNotEmpty(value)) {
 
 			try {
-				return Integer.parseInt(value);
+				return Integer.decode(value);
 			} catch (NumberFormatException e) {
 				String msg = "Component {0} has non-integer configuration value for {1} = {2}!"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, this.name, key, value);
