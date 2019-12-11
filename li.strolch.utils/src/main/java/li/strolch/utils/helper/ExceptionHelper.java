@@ -15,6 +15,7 @@
  */
 package li.strolch.utils.helper;
 
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.XmlHelper.PROP_LINE_SEPARATOR;
 import static li.strolch.utils.helper.XmlHelper.UNIX_LINE_SEP;
 
@@ -44,7 +45,31 @@ public class ExceptionHelper {
 	 * @return the exception as string
 	 */
 	public static String getExceptionMessage(Throwable t) {
-		return t.getClass().getName() + ": " + t.getMessage();
+		return getExceptionMessage(t, true);
+	}
+
+	/**
+	 * <p>
+	 * Returns a message for the given {@link Throwable}
+	 * </p>
+	 *
+	 * <p>
+	 * A {@link NullPointerException} only has <code>null</code> as the message so this methods returns the class name
+	 * in such a case
+	 * </p>
+	 *
+	 * @param t
+	 * 		the {@link Throwable}
+	 * @param withClassName
+	 * 		if true, then exception class name is prepended to the exception message, if the exception message is null,
+	 * 		then this param is ignored
+	 *
+	 * @return the exception as string
+	 */
+	public static String getExceptionMessage(Throwable t, boolean withClassName) {
+		if (withClassName || isEmpty(t.getMessage()))
+			return t.getClass().getName() + ": " + t.getMessage();
+		return t.getMessage();
 	}
 
 	/**
@@ -63,11 +88,33 @@ public class ExceptionHelper {
 	 * @return the exception as string
 	 */
 	public static String getExceptionMessageWithCauses(Throwable t) {
-		if (t.getCause() == null)
-			return getExceptionMessage(t);
+		return getExceptionMessageWithCauses(t, true);
+	}
 
-		String root = getExceptionMessageWithCauses(t.getCause());
-		return getExceptionMessage(t) + "\n" + root;
+	/**
+	 * <p>
+	 * Returns a message for the given {@link Throwable}
+	 * </p>
+	 *
+	 * <p>
+	 * A {@link NullPointerException} only has <code>null</code> as the message so this methods returns the class name
+	 * in such a case
+	 * </p>
+	 *
+	 * @param t
+	 * 		the {@link Throwable}
+	 * @param withClassName
+	 * 		if true, then exception class name is prepended to the exception message, if the exception message is null,
+	 * 		then this param is ignored
+	 *
+	 * @return the exception as string
+	 */
+	public static String getExceptionMessageWithCauses(Throwable t, boolean withClassName) {
+		if (t.getCause() == null)
+			return getExceptionMessage(t, withClassName);
+
+		String root = getExceptionMessageWithCauses(t.getCause(), withClassName);
+		return getExceptionMessage(t, withClassName) + "\n" + root;
 	}
 
 	/**

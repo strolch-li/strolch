@@ -1,6 +1,7 @@
 package li.strolch.rest.helper;
 
 import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,7 +21,6 @@ import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.service.JsonServiceResult;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.collections.Paging;
-import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
 
 /**
@@ -174,7 +174,7 @@ public class ResponseUtil {
 
 	public static Response toResponse(Status status, Throwable t) {
 		JsonObject response = new JsonObject();
-		response.addProperty(MSG, ExceptionHelper.getExceptionMessageWithCauses(t));
+		response.addProperty(MSG, getExceptionMessageWithCauses(t, false));
 		String json = new Gson().toJson(response);
 
 		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();

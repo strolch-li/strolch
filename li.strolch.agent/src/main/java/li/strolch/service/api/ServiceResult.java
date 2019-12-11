@@ -16,6 +16,7 @@
 package li.strolch.service.api;
 
 import static li.strolch.utils.helper.ExceptionHelper.formatException;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.util.ResourceBundle;
@@ -23,7 +24,6 @@ import java.util.ResourceBundle;
 import com.google.gson.JsonObject;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.utils.I18nMessage;
-import li.strolch.utils.helper.ExceptionHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -198,7 +198,7 @@ public class ServiceResult {
 		json.addProperty("msg", isEmpty(this.message) ? "-" : this.message);
 
 		if (this.throwable != null) {
-			json.addProperty("exceptionMsg", ExceptionHelper.getExceptionMessageWithCauses(this.throwable));
+			json.addProperty("exceptionMsg", getExceptionMessageWithCauses(this.throwable, false));
 			json.addProperty("throwable", formatException(this.throwable));
 		}
 
