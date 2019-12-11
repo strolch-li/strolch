@@ -31,6 +31,12 @@ public enum DBC {
 	INTERIM,
 	POST;
 
+	public void fail(String msg) {
+		String ex = "Assertion failed: {0}"; //$NON-NLS-1$
+		ex = MessageFormat.format(ex, msg);
+		throw new DbcException(ex);
+	}
+
 	public <T> void assertEquals(String msg, T value1, T value2) {
 		if (value1 == null && value2 == null)
 			return;
