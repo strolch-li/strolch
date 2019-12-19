@@ -724,7 +724,14 @@ public class StringHelper {
 	 * @see ExceptionHelper#formatException(Throwable)
 	 */
 	public static String getExceptionMessage(Throwable t) {
-		return ExceptionHelper.getExceptionMessage(t);
+		return ExceptionHelper.getExceptionMessage(t, true);
+	}
+
+	/**
+	 * @see ExceptionHelper#formatException(Throwable)
+	 */
+	public static String getExceptionMessage(Throwable t, boolean withClassName) {
+		return ExceptionHelper.getExceptionMessage(t, withClassName);
 	}
 
 	/**
@@ -738,7 +745,14 @@ public class StringHelper {
 	 * @see ExceptionHelper#formatExceptionMessage(Throwable)
 	 */
 	public static String formatExceptionMessage(Throwable t) {
-		return ExceptionHelper.formatExceptionMessage(t);
+		return ExceptionHelper.formatExceptionMessage(t, true);
+	}
+
+	/**
+	 * @see ExceptionHelper#formatExceptionMessage(Throwable)
+	 */
+	public static String formatExceptionMessage(Throwable t, boolean withClassName) {
+		return ExceptionHelper.formatExceptionMessage(t, withClassName);
 	}
 
 	/**

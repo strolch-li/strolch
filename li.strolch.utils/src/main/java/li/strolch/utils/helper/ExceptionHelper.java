@@ -149,11 +149,26 @@ public class ExceptionHelper {
 	 * @return a string representation of the given {@link Throwable}'s messages including causes
 	 */
 	public static String formatExceptionMessage(Throwable t) {
-		if (t.getCause() == null)
-			return getExceptionMessage(t);
+		return formatExceptionMessage(t, true);
+	}
 
-		String root = formatExceptionMessage(t.getCause());
-		return getExceptionMessage(t) + "\ncause: " + root;
+	/**
+	 * Formats the given {@link Throwable}'s message including causes to a string
+	 *
+	 * @param t
+	 * 		the throwable for which the messages are to be formatted to a string
+	 * @param withClassName
+	 * 		if true, then exception class name is prepended to the exception message, if the exception message is null, *
+	 * 		then this param is ignored
+	 *
+	 * @return a string representation of the given {@link Throwable}'s messages including causes
+	 */
+	public static String formatExceptionMessage(Throwable t, boolean withClassName) {
+		if (t.getCause() == null)
+			return getExceptionMessage(t, withClassName);
+
+		String root = formatExceptionMessage(t.getCause(), withClassName);
+		return getExceptionMessage(t, withClassName) + "\ncause: " + root;
 	}
 
 	/**
