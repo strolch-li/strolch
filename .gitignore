@@ -2,6 +2,6 @@
 .settings
 .project
 .idea/
-/target/
+target/
 dependencies/
 *.iml

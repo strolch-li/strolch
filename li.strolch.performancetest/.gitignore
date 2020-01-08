@@ -1,5 +1,6 @@
 target/
-/.settings
-/.classpath
-/.project
-/data
+.project
+.settings
+.classpath
+*.iml
+data/
