@@ -24,9 +24,9 @@ import li.strolch.model.activity.Activity;
  */
 public interface StrolchElementListener {
 
-	public void notifyResource(Resource resource);
+	void notifyResource(Resource resource);
 
-	public void notifyOrder(Order order);
+	void notifyOrder(Order order);
 
-	public void notifyActivity(Activity activity);
+	void notifyActivity(Activity activity);
 }
