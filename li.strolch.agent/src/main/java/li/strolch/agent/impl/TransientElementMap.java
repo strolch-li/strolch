@@ -316,7 +316,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 			throw new StrolchPersistenceException(msg);
 		}
 
-		// assert no object already exists with this id
+		// assert object already exists with this id
 		if (!byType.containsKey(element.getId())) {
 			String msg = "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, element.getType(), element.getId());
