@@ -74,19 +74,20 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 
 	@Override
 	public void setup(ComponentConfiguration configuration) {
-
 		this.realms = new HashMap<>(1);
 		String[] realms = configuration.getStringArray(PROP_REALMS, StrolchConstants.DEFAULT_REALM);
 		for (String realmName : realms) {
-
 			String dataStoreModeKey = StrolchConstants.makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
 			String realmMode = configuration.getString(dataStoreModeKey, null);
-			DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(realmMode);
-
-			InternalStrolchRealm realm = dataStoreMode.createRealm(realmName);
+			InternalStrolchRealm realm = buildRealm(realmName, realmMode);
 			this.realms.put(realmName, realm);
 		}
 		super.setup(configuration);
+	}
+
+	protected InternalStrolchRealm buildRealm(String realmName, String realmMode) {
+		DataStoreMode dataStoreMode = DataStoreMode.parseDataStoreMode(realmMode);
+		return dataStoreMode.createRealm(realmName);
 	}
 
 	@Override
