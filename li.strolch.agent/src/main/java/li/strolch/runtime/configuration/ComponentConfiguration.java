@@ -63,4 +63,22 @@ public class ComponentConfiguration extends AbstractionConfiguration {
 	public File getDataFile(String key, String defValue, boolean checkExists) {
 		return super.getDataFile(key, defValue, getRuntimeConfiguration(), checkExists);
 	}
+
+	public File getDataOrAbsoluteDir(String key, String defValue, boolean writeable) {
+
+		String path = getString(key, defValue);
+
+		// check for import directory
+		File pathF = new File(path);
+		if (!pathF.isAbsolute())
+			return getDataDir(key, defValue, true);
+
+		if (!pathF.exists() || !pathF.isDirectory() || (writeable ? !pathF.canWrite() : !pathF.canRead()))
+			throw new IllegalStateException("The path " + path + " for key " + key + " is not a directory or " + (
+					writeable ?
+							"writeable" :
+							"readable") + "!");
+
+		return pathF;
+	}
 }
