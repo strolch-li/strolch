@@ -167,6 +167,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.secureCookie = configuration.getBoolean(PARAM_SECURE_COOKIE, true);
 		this.cookieMaxAge = configuration.getInt(PARAM_COOKIE_MAX_AGE, (int) TimeUnit.DAYS.toSeconds(1));
 
+		logger.info(
+				"Cookie max age is " + this.cookieMaxAge + "s and is " + (this.secureCookie ? "secure" : "not secure"));
+
 		super.initialize(configuration);
 	}
 
