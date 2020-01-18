@@ -28,7 +28,7 @@ public interface StrolchElement {
 	 *
 	 * @return the {@link Locator} for this element
 	 */
-	public Locator getLocator();
+	Locator getLocator();
 
 	/**
 	 * Set the semi unique id of this {@link StrolchElement}. This value should be unique for all concrete
@@ -36,7 +36,7 @@ public interface StrolchElement {
 	 *
 	 * @param id
 	 */
-	public void setId(String id);
+	void setId(String id);
 
 	/**
 	 * Returns the semi unique id of this {@link StrolchElement}. This value should be unique for all concrete
@@ -44,21 +44,21 @@ public interface StrolchElement {
 	 *
 	 * @return
 	 */
-	public String getId();
+	String getId();
 
 	/**
 	 * Set the name of this {@link StrolchElement}
 	 *
 	 * @param name
 	 */
-	public void setName(String name);
+	void setName(String name);
 
 	/**
 	 * Returns the name of this {@link StrolchElement}
 	 *
 	 * @return
 	 */
-	public String getName();
+	String getName();
 
 	/**
 	 * Set the currently set long value which defines the primary key for use in RDBM-Systems
@@ -66,47 +66,47 @@ public interface StrolchElement {
 	 * @param dbid
 	 * 		the dbid to set
 	 */
-	public void setDbid(long dbid);
+	void setDbid(long dbid);
 
 	/**
 	 * Returns the currently set long value which defines the primary key for use in RDBM-Systems
 	 *
 	 * @return the currently set long value which defines the primary key for use in RDBM-Systems
 	 */
-	public long getDbid();
+	long getDbid();
 
 	/**
 	 * Returns the type of this {@link StrolchElement}
 	 *
 	 * @return the type of this {@link StrolchElement}
 	 */
-	public String getType();
+	String getType();
 
 	/**
 	 * @return the direct parent of this element
 	 */
-	public StrolchElement getParent();
+	StrolchElement getParent();
 
 	/**
 	 * Returns the {@link StrolchRootElement} for this {@link StrolchElement}
 	 *
 	 * @return the {@link StrolchRootElement} for this {@link StrolchElement}
 	 */
-	public StrolchRootElement getRootElement();
+	StrolchRootElement getRootElement();
 
 	/**
 	 * Returns true if this element is a {@link StrolchRootElement}, false if not
 	 *
 	 * @return true if this element is a {@link StrolchRootElement}, false if not
 	 */
-	public boolean isRootElement();
+	boolean isRootElement();
 
 	/**
 	 * Return a clone of this {@link StrolchElement}
 	 *
 	 * @return a clone of this {@link StrolchElement}
 	 */
-	public StrolchElement getClone();
+	StrolchElement getClone();
 
 	/**
 	 * Asserts that this element is not read-only, throwing {@link StrolchModelException} if it is read-only
@@ -114,7 +114,7 @@ public interface StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if this element is read-only
 	 */
-	public void assertNotReadonly() throws StrolchModelException;
+	void assertNotReadonly() throws StrolchModelException;
 
 	/**
 	 * Returns true if this element is read only, in which case modifications will throw an exception. To modify it,
@@ -122,12 +122,12 @@ public interface StrolchElement {
 	 *
 	 * @return true if this element is read only
 	 */
-	public boolean isReadOnly();
+	boolean isReadOnly();
 
 	/**
 	 * Sets this element to readOnly, so that it may not be modified. To modify it, call {@link #getClone()}
 	 */
-	public void setReadOnly();
+	void setReadOnly();
 
 	/**
 	 * <p>
@@ -144,7 +144,7 @@ public interface StrolchElement {
 	 * @see Object#hashCode()
 	 */
 	@Override
-	public int hashCode();
+	int hashCode();
 
 	/**
 	 * <p>
@@ -164,7 +164,7 @@ public interface StrolchElement {
 	 * @see Object#equals(Object)
 	 */
 	@Override
-	public boolean equals(Object obj);
+	boolean equals(Object obj);
 
-	public <U> U accept(StrolchElementVisitor<U> visitor);
+	<U> U accept(StrolchElementVisitor<U> visitor);
 }
