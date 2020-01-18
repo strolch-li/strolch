@@ -548,7 +548,7 @@
 
                 if (localStorage['appScmRevision'] == null) {
                     localStorage['appScmRevision'] = this.scmRevision;
-                } else if (this.scmRevision != localStorage['appScmRevision']) {
+                } else if (this.scmRevision !== localStorage['appScmRevision']) {
                     console.log("App SCM Revision has changed from " + localStorage['appScmRevision'] + " to " + this.scmRevision + ". Need to refresh browser...");
                     this.$.newVersionAvailableToast.open();
                 }
