@@ -128,7 +128,7 @@
 
                 <div class="g-row">
                     <div class="g-12">
-                        <iron-pages selected="[[page]]" attr-for-selected="id">
+                        <iron-pages selected="[[selectedPage]]" attr-for-selected="id" fallback-selection="view404">
 
                             <strolch-wc-auth id="login"
                                              app-title="[[localize('appTitle')]]"
@@ -187,9 +187,7 @@
                                                     propagate-show-dialog></strolch-wc-control>
                             </template>
 
-                            <template is="dom-if" if="[[equal(page, 'view404')]]" restamp>
-                                <c-view404 id="view404"></c-view404>
-                            </template>
+                            <c-view404 id="view404"></c-view404>
 
                         </iron-pages>
 
@@ -259,6 +257,9 @@
                 page: {
                     type: String,
                     observer: 'observePage'
+                },
+                selectedPage: {
+                    type: String
                 },
                 authToken: {
                     type: String
@@ -578,6 +579,7 @@
 
             _reloadPage: function (pageName) {
                 this.debounce('page-reload', function () {
+                    this.selectedPage = pageName;
                     var page = this.$$('#' + pageName);
                     if (page && page.reload) {
                         console.log('Reloading ' + pageName);
