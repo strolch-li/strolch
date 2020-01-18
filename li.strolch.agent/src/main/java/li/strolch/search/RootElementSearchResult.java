@@ -1,14 +1,12 @@
 package li.strolch.search;
 
 import java.util.Comparator;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
-import li.strolch.utils.collections.CollectionsHelper;
 
 /**
  * A search result for {@link StrolchSearch} for {@link StrolchRootElement} adding methods specific to root element
@@ -35,6 +33,15 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 			comparator = comparator.reversed();
 		this.stream = this.stream.sorted(comparator);
 		return this;
+	}
+
+	/**
+	 * Appends a comparator to the stream of elements to compare by name
+	 *
+	 * @return this for chaining
+	 */
+	public RootElementSearchResult<T> orderByName() {
+		return orderByName(false);
 	}
 
 	/**
