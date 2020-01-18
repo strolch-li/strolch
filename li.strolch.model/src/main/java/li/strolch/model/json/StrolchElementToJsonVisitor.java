@@ -156,6 +156,13 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this;
 	}
 
+	public StrolchElementToJsonVisitor ignoreBags(String... bagIds) {
+		for (String bagId : bagIds) {
+			this.ignoredKeys.addSet(bagId, Collections.emptySet());
+		}
+		return this;
+	}
+
 	public StrolchElementToJsonVisitor ignoreParameter(String bagId, String paramId) {
 		this.ignoredKeys.addElement(bagId, paramId);
 		return this;

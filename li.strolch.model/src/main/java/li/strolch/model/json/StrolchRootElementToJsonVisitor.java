@@ -119,6 +119,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this;
 	}
 
+	public StrolchRootElementToJsonVisitor ignoreBags(String... bagIds) {
+		this.visitor.ignoreBags(bagIds);
+		return this;
+	}
+
 	public StrolchRootElementToJsonVisitor ignoreParameter(String bagId, String paramId) {
 		this.visitor.ignoreParameter(bagId, paramId);
 		return this;
