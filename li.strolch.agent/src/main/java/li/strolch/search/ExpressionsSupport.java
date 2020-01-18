@@ -1,5 +1,6 @@
 package li.strolch.search;
 
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 import static li.strolch.runtime.StrolchConstants.*;
 
@@ -97,6 +98,10 @@ public class ExpressionsSupport {
 			SearchPredicate predicate) {
 		ExpressionBuilder eb = param(bagId, paramId);
 		return element -> predicate.coerce(eb.getValueCoercer(element)).matches(eb.extract(element));
+	}
+
+	public static <T extends StrolchRootElement> ExpressionBuilder param(String paramId) {
+		return param(BAG_PARAMETERS, paramId);
 	}
 
 	public static <T extends StrolchRootElement> ExpressionBuilder param(String bagId, String paramId) {

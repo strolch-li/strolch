@@ -1,5 +1,7 @@
 package li.strolch.search;
 
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+
 import java.util.function.Supplier;
 
 import li.strolch.model.StrolchRootElement;
@@ -48,6 +50,10 @@ public interface SearchExpressions {
 
 	default <T extends StrolchRootElement> SearchExpression<T> state(SearchPredicate predicate) {
 		return ExpressionsSupport.state(predicate);
+	}
+
+	default ExpressionBuilder param(String paramId) {
+		return ExpressionsSupport.param(BAG_PARAMETERS, paramId);
 	}
 
 	default ExpressionBuilder param(String bagId, String paramId) {
