@@ -1,9 +1,13 @@
 package li.strolch.search;
 
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+
 import java.util.Comparator;
 import java.util.stream.Stream;
 
+import li.strolch.model.ParameterBag;
 import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
@@ -17,6 +21,16 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 
 	public RootElementSearchResult(Stream<T> stream) {
 		super(stream);
+	}
+
+	/**
+	 * Appends a comparator to the stream of elements to compare by ID
+	 *
+	 * @return this for chaining
+	 */
+	public RootElementSearchResult<T> orderById() {
+		orderById(false);
+		return this;
 	}
 
 	/**
@@ -57,6 +71,36 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 		if (reversed)
 			comparator = comparator.reversed();
 		this.stream = this.stream.sorted(comparator);
+		return this;
+	}
+
+	/**
+	 * Appends a comparator to the stream of elements to compare by a parameter on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramId
+	 * 		the ID of the parameter to use for comparing
+	 *
+	 * @return this for chaining
+	 */
+	public RootElementSearchResult<T> orderByParam(String paramId) {
+		orderByParam(BAG_PARAMETERS, paramId, false);
+		return this;
+	}
+
+	/**
+	 * Appends a comparator to the stream of elements to compare by a parameter on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramId
+	 * 		the ID of the parameter to use for comparing
+	 * @param reversed
+	 * 		flag to reverse the comparison
+	 *
+	 * @return this for chaining
+	 */
+	public RootElementSearchResult<T> orderByParam(String paramId, boolean reversed) {
+		orderByParam(BAG_PARAMETERS, paramId, reversed);
 		return this;
 	}
 
