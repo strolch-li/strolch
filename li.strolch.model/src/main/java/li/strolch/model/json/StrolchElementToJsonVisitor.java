@@ -234,7 +234,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	@Override
 	public JsonElement visitBooleanParam(BooleanParameter param) {
 		if (isFlat())
-			return new JsonPrimitive(param.getValueAsString());
+			return new JsonPrimitive(param.getValue());
 		return paramToJsonFull(param);
 	}
 
@@ -255,35 +255,35 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	@Override
 	public JsonElement visitFloatParam(FloatParameter param) {
 		if (isFlat())
-			return new JsonPrimitive(param.getValueAsString());
+			return new JsonPrimitive(param.getValue());
 		return paramToJsonFull(param);
 	}
 
 	@Override
 	public JsonElement visitIntegerParam(IntegerParameter param) {
 		if (isFlat())
-			return new JsonPrimitive(param.getValueAsString());
+			return new JsonPrimitive(param.getValue());
 		return paramToJsonFull(param);
 	}
 
 	@Override
 	public JsonElement visitLongParam(LongParameter param) {
 		if (isFlat())
-			return new JsonPrimitive(param.getValueAsString());
+			return new JsonPrimitive(param.getValue());
 		return paramToJsonFull(param);
 	}
 
 	@Override
 	public JsonElement visitStringParam(StringParameter param) {
 		if (isFlat())
-			return new JsonPrimitive(param.getValueAsString());
+			return new JsonPrimitive(param.getValue());
 		return paramToJsonFull(param);
 	}
 
 	@Override
 	public JsonElement visitTextParam(TextParameter param) {
 		if (isFlat())
-			return new JsonPrimitive(param.getValueAsString());
+			return new JsonPrimitive(param.getValue());
 		return paramToJsonFull(param);
 	}
 
