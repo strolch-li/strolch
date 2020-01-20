@@ -26,6 +26,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.utils.dbc.DBC;
 
@@ -196,6 +197,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	public StrolchAgent getAgent() {
 		return super.getContainer().getAgent();
+	}
+
+	public PrivilegeHandler getPrivilegeHandler() {
+		return super.getContainer().getAgent().getContainer().getPrivilegeHandler();
 	}
 
 	public <T> T getComponent(Class<T> clazz) {
