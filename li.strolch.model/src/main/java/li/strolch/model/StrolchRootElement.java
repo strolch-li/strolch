@@ -181,6 +181,33 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	}
 
 	/**
+	 * Returns true if this element is a {@link Resource}
+	 *
+	 * @return true if this element is a {@link Resource}
+	 */
+	default boolean isResource() {
+		return this.getClass() == Resource.class;
+	}
+
+	/**
+	 * Returns true if this element is a {@link Order}
+	 *
+	 * @return true if this element is a {@link Order}
+	 */
+	default boolean isOrder() {
+		return this.getClass() == Order.class;
+	}
+
+	/**
+	 * Returns true if this element is a {@link Activity}
+	 *
+	 * @return true if this element is a {@link Activity}
+	 */
+	default boolean isActivity() {
+		return this.getClass() == Activity.class;
+	}
+
+	/**
 	 * Set or add a parameter to this element from a {@link JsonObject}
 	 *
 	 * @param jsonObject
