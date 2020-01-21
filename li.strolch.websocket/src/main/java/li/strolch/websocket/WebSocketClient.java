@@ -116,8 +116,12 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		this.observerHandlersByRealm.computeIfAbsent(objectType, s -> {
 			ObserverHandler observerHandler = this.container.getRealm(realm).getObserverHandler();
-			return new WebSocketObserverHandler(observerHandler, this);
+			return getWebSocketObserverHandler(observerHandler);
 		}).register(objectType, type, flat);
+	}
+
+	protected WebSocketObserverHandler getWebSocketObserverHandler(ObserverHandler observerHandler) {
+		return new WebSocketObserverHandler(observerHandler, this);
 	}
 
 	private void handleUnregister(JsonObject jsonObject) {
@@ -165,17 +169,17 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	}
 
 	private void close(CloseReason.CloseCode code, String reason) {
+		close(new CloseReason(code, reason));
+	}
+
+	public void close(CloseReason closeReason) {
+		if (this.observerHandlersByRealm == null || this.observerHandlersByRealm.isEmpty())
+			return;
 		try {
-			this.session.close(new CloseReason(code, reason));
+			this.session.close(new CloseReason(closeReason.getCloseCode(), closeReason.getReasonPhrase()));
 		} catch (IOException e) {
 			logger.error("Failed to close client after invalid authentication!", e);
 		}
-	}
-
-	public void close() {
-		if (this.observerHandlersByRealm == null || this.observerHandlersByRealm.isEmpty())
-			return;
-
 		this.observerHandlersByRealm.keySet().forEach(realm -> {
 			this.observerHandlersByRealm.get(realm).unregisterAll();
 		});

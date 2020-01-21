@@ -24,7 +24,7 @@ public class WebSocketEndpoint {
 	public void onClose(Session session, CloseReason closeReason) {
 		WebSocketClient webSocketClient = this.clientMap.remove(session);
 		if (webSocketClient != null)
-			webSocketClient.close();
+			webSocketClient.close(closeReason);
 	}
 
 	@OnError

@@ -17,14 +17,18 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WebSocketObserverHandler implements Observer {
 
-	private ObserverHandler observerHandler;
-	private WebSocketClient client;
+	protected static final Logger logger = LoggerFactory.getLogger(WebSocketObserverHandler.class);
 
-	private MapOfSets<String, String> observedTypes;
-	private Map<String, Boolean> asFlat;
+	protected ObserverHandler observerHandler;
+	protected WebSocketClient client;
+
+	protected MapOfSets<String, String> observedTypes;
+	protected Map<String, Boolean> asFlat;
 
 	public WebSocketObserverHandler(ObserverHandler observerHandler, WebSocketClient client) {
 		this.observerHandler = observerHandler;
@@ -67,18 +71,17 @@ public class WebSocketObserverHandler implements Observer {
 		handleUpdate("ObserverRemove", key, elements);
 	}
 
-	private void handleUpdate(String updateType, String key, List<StrolchRootElement> elements) {
+	protected void handleUpdate(String updateType, String key, List<StrolchRootElement> elements) {
 		Set<String> observedTypesSet = this.observedTypes.getSet(key);
 		if (observedTypesSet == null)
 			return;
 
-		MapOfLists<String, JsonObject> data = elements.stream().filter(e -> observedTypesSet.contains(e.getType()))
-				.map(e -> {
-					if (this.asFlat.get(e.getType()))
-						return e.toFlatJsonObject();
-					else
-						return e.toJsonObject();
-				}).collect(MapOfLists::new, (mol, e) -> mol.addElement(e.get(Tags.Json.TYPE).getAsString(), e),
+		MapOfLists<String, JsonObject> data = elements //
+				.stream() //
+				.filter(e -> filter(observedTypesSet, e)) //
+				.map(this::toJson) //
+				.collect(MapOfLists::new, //
+						(mol, e) -> mol.addElement(e.get(Tags.Json.TYPE).getAsString(), e), //
 						MapOfLists::addAll);
 		if (data.isEmpty())
 			return;
@@ -94,5 +97,15 @@ public class WebSocketObserverHandler implements Observer {
 			jsonObject.add(DATA, elementsJ);
 			this.client.sendMessage(jsonObject.toString());
 		});
+	}
+
+	protected boolean filter(Set<String> observedTypesSet, StrolchRootElement e) {
+		return observedTypesSet.contains(e.getType());
+	}
+
+	protected JsonObject toJson(StrolchRootElement e) {
+		if (this.asFlat.get(e.getType()))
+			return e.toFlatJsonObject();
+		return e.toJsonObject();
 	}
 }
