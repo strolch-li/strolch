@@ -25,10 +25,10 @@ gulp.task('copy', function () {
     ])
         .pipe(gulp.dest('www/img/'));
 
-    var json = gulp.src([
-        'app/bower_components/strolch-wc-auth/locales.json'
+    var locales = gulp.src([
+        'app/bower_components/**/locales.json'
     ])
-        .pipe(gulp.dest('www/bower_components/strolch-wc-auth/'));
+        .pipe(gulp.dest('www/bower_components/'));
 
     var app_files = gulp.src([
         'app/bower.json', 'app/manifest.json', 'app/locales.json', '**/moment.min.js'
@@ -40,7 +40,7 @@ gulp.task('copy', function () {
     ])
         .pipe(gulp.dest('js'));
 
-    return merge(svg, imgs, json, app_files, js)
+    return merge(svg, imgs, locales, app_files, js)
         .pipe($.size({title: 'Copy app files to dist dir:'}));
 });
 
