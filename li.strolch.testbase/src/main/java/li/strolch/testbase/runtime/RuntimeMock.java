@@ -59,6 +59,10 @@ public class RuntimeMock {
 		return this.container.getComponent(ServiceHandler.class);
 	}
 
+	public <T> T getComponent(Class<T> clazz) {
+		return this.container.getComponent(clazz);
+	}
+
 	public StrolchRealm getRealm(String realm) {
 		return this.container.getRealm(realm);
 	}
@@ -229,5 +233,4 @@ public class RuntimeMock {
 		}
 		return new StrolchVersion(properties);
 	}
-
 }
