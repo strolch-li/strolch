@@ -21,7 +21,6 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
@@ -31,6 +30,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 	public static final Logger logger = LoggerFactory.getLogger(WebSocketClient.class);
 
+	private StrolchSessionHandler sessionHandler;
 	private ComponentContainer container;
 	private final Session session;
 	private final EndpointConfig config;
@@ -41,6 +41,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 	public WebSocketClient(ComponentContainer container, Session session, EndpointConfig config) {
 		this.container = container;
+		this.sessionHandler = container.getComponent(StrolchSessionHandler.class);
 		this.session = session;
 		this.config = config;
 		this.remoteIp = WebSocketRemoteIp.get();
@@ -74,7 +75,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		}
 	}
 
-	private void assertAuthenticated(String type) {
+	public void assertAuthenticated(String type) {
 
 		if (this.certificate == null) {
 			logger.error("Received " + type + " request, but not yet authed!");
@@ -83,8 +84,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		}
 
 		try {
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			sessionHandler.validate(this.certificate, this.remoteIp);
+			this.sessionHandler.validate(this.certificate, this.remoteIp);
 		} catch (RuntimeException e) {
 			logger.error("Received " + type + " request, but authentication is not valid anymore: " + ExceptionHelper
 					.getExceptionMessage(e));
@@ -150,8 +150,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		String username = jsonObject.get("username").getAsString();
 
 		try {
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-			this.certificate = sessionHandler.validate(authToken, this.remoteIp);
+			this.certificate = this.sessionHandler.validate(authToken, this.remoteIp);
 			if (!this.certificate.getUsername().equals(username)) {
 				logger.error("Invalid authentication for " + username);
 				close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
@@ -190,6 +189,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	}
 
 	public synchronized void sendMessage(String data) {
+		assertAuthenticated("sendMessage");
+
 		try {
 			this.session.getBasicRemote().sendText(data);
 		} catch (Exception e) {
