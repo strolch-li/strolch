@@ -1,9 +1,10 @@
 package li.strolch.model.parameter;
 
+import static java.util.stream.Collectors.joining;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import li.strolch.exception.StrolchException;
@@ -78,23 +79,9 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 
 	@Override
 	public String getValueAsString() {
-		if (this.value.isEmpty()) {
+		if (this.value.isEmpty())
 			return StringHelper.EMPTY;
-		}
-
-		StringBuilder sb = new StringBuilder();
-		Iterator<E> iter = this.value.iterator();
-		while (iter.hasNext()) {
-
-			sb.append(elementToString(iter.next()));
-
-			if (iter.hasNext()) {
-				sb.append(VALUE_SEPARATOR2);
-				sb.append(" ");
-			}
-		}
-
-		return sb.toString();
+		return this.value.stream().map(this::elementToString).collect(joining(", "));
 	}
 
 	@SuppressWarnings("unchecked")
