@@ -15,13 +15,23 @@
  */
 package li.strolch.model;
 
-import java.text.MessageFormat;
+import static java.util.stream.Collectors.joining;
 
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+import com.google.gson.JsonPrimitive;
 import li.strolch.model.parameter.*;
 import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.*;
+import li.strolch.utils.iso8601.ISO8601;
+import li.strolch.utils.time.PeriodDuration;
 
 public enum StrolchValueType {
 
@@ -35,6 +45,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	BOOLEAN("Boolean") {
+		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			return new JsonPrimitive(((Boolean) value).toString());
+		}
+
 		@Override
 		public Object parseValue(String value) {
 			return BooleanParameter.parseFromString(value);
@@ -72,6 +87,11 @@ public enum StrolchValueType {
 	 */
 	INTEGER("Integer") {
 		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			return new JsonPrimitive(((Integer) value).toString());
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return IntegerParameter.parseFromString(value);
 		}
@@ -108,6 +128,11 @@ public enum StrolchValueType {
 	 */
 	FLOAT("Float") {
 		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			return new JsonPrimitive(value.toString());
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return FloatParameter.parseFromString(value);
 		}
@@ -141,6 +166,11 @@ public enum StrolchValueType {
 	 */
 	LONG("Long") {
 		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			return new JsonPrimitive(value.toString());
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return LongParameter.parseFromString(value);
 		}
@@ -173,6 +203,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	STRING("String") {
+		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			return new JsonPrimitive((String) value);
+		}
+
 		@Override
 		public Object parseValue(String value) {
 			return value;
@@ -209,6 +244,11 @@ public enum StrolchValueType {
 	 */
 	TEXT("Text") {
 		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			return new JsonPrimitive((String) value);
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return value;
 		}
@@ -244,6 +284,17 @@ public enum StrolchValueType {
 	 */
 	DATE("Date") {
 		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			if (value instanceof Date)
+				return new JsonPrimitive(ISO8601.toString((Date) value));
+			else if (value instanceof LocalDateTime)
+				return new JsonPrimitive(ISO8601.toString((LocalDateTime) value));
+			if (value instanceof ZonedDateTime)
+				return new JsonPrimitive(ISO8601.toString((ZonedDateTime) value));
+			throw new ClassCastException("value " + value + " + has unexpected class " + value.getClass());
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return DateParameter.parseFromString(value);
 		}
@@ -273,6 +324,11 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	DURATION("Duration") {
+		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			return new JsonPrimitive(((PeriodDuration) value).toString());
+		}
+
 		@Override
 		public Object parseValue(String value) {
 			return DurationParameter.parseFromString(value);
@@ -307,6 +363,13 @@ public enum StrolchValueType {
 	 */
 	FLOAT_LIST("FloatList") {
 		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			@SuppressWarnings("unchecked")
+			List<Double> list = (List<Double>) value;
+			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return FloatListParameter.parseFromString(value);
 		}
@@ -334,6 +397,13 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	INTEGER_LIST("IntegerList") {
+		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			@SuppressWarnings("unchecked")
+			List<Integer> list = (List<Integer>) value;
+			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
+		}
+
 		@Override
 		public Object parseValue(String value) {
 			return IntegerListParameter.parseFromString(value);
@@ -365,6 +435,13 @@ public enum StrolchValueType {
 	 */
 	LONG_LIST("LongList") {
 		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			@SuppressWarnings("unchecked")
+			List<Long> list = (List<Long>) value;
+			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return LongListParameter.parseFromString(value);
 		}
@@ -394,6 +471,13 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	STRING_LIST("StringList") {
+		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			@SuppressWarnings("unchecked")
+			List<String> list = (List<String>) value;
+			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
+		}
+
 		@Override
 		public Object parseValue(String value) {
 			return StringListParameter.parseFromString(value);
@@ -426,6 +510,12 @@ public enum StrolchValueType {
 	 * </ul>
 	 */
 	STRING_SET("StringSet") {
+		@Override
+		public JsonPrimitive valueToJson(Object value) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("Formatting of type {0} is not supported!", getType())); //$NON-NLS-1$
+		}
+
 		@Override
 		public Object parseValue(String value) {
 			throw new UnsupportedOperationException(
@@ -470,6 +560,8 @@ public enum StrolchValueType {
 		}
 		throw new IllegalArgumentException("Type " + value + " does not exist!");
 	}
+
+	public abstract JsonPrimitive valueToJson(Object value);
 
 	public abstract Object parseValue(String value);
 
