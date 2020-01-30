@@ -1,6 +1,5 @@
 package li.strolch.execution.policy;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
@@ -13,8 +12,8 @@ import li.strolch.policy.StrolchPolicy;
  */
 public class ConfirmationPolicy extends StrolchPolicy {
 
-	public ConfirmationPolicy(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ConfirmationPolicy(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	public void toCreated(Action action) {

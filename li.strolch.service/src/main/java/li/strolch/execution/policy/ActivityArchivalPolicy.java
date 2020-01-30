@@ -1,6 +1,5 @@
 package li.strolch.execution.policy;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.State;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -15,8 +14,8 @@ import li.strolch.policy.StrolchPolicy;
  */
 public class ActivityArchivalPolicy extends StrolchPolicy {
 
-	public ActivityArchivalPolicy(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ActivityArchivalPolicy(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	public void archive(Activity activity) {

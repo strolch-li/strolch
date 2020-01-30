@@ -46,19 +46,6 @@ public abstract class StrolchPolicy {
 	/**
 	 * Instantiate a new {@link StrolchPolicy}
 	 *
-	 * @param container
-	 * 		the {@link ComponentContainer} to access components at runtime
-	 * @param tx
-	 * 		the transaction for this policy
-	 */
-	public StrolchPolicy(ComponentContainer container, StrolchTransaction tx) {
-		this.container = container;
-		this.tx = tx;
-	}
-
-	/**
-	 * Instantiate a new {@link StrolchPolicy}
-	 *
 	 * @param tx
 	 * 		the transaction for this policy
 	 */

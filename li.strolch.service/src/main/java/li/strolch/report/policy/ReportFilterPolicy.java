@@ -5,7 +5,6 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.Date;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -15,8 +14,8 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public abstract class ReportFilterPolicy extends StrolchPolicy {
 
-	public ReportFilterPolicy(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ReportFilterPolicy(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	protected boolean negate;
