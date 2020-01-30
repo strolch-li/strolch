@@ -15,7 +15,6 @@
  */
 package li.strolch.policytest;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -25,8 +24,8 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public class TestSimulatedExecutionPolicy extends TestExecutionPolicy {
 
-	public TestSimulatedExecutionPolicy(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public TestSimulatedExecutionPolicy(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

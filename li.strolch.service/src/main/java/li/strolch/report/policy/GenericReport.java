@@ -59,8 +59,8 @@ public class GenericReport extends ReportPolicy {
 
 	protected JsonObject i18nData;
 
-	public GenericReport(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public GenericReport(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

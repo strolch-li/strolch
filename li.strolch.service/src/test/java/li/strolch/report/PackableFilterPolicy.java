@@ -1,6 +1,5 @@
 package li.strolch.report;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -8,8 +7,9 @@ import li.strolch.report.policy.ReportFilterPolicy;
 import li.strolch.utils.dbc.DBC;
 
 public class PackableFilterPolicy extends ReportFilterPolicy {
-	public PackableFilterPolicy(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+
+	public PackableFilterPolicy(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package li.strolch.report.policy;
 
 import java.util.Date;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.KeyPolicyDef;
 import li.strolch.model.policy.PolicyDef;
@@ -13,8 +12,8 @@ public class ValueRefReportFilter extends ReportFilterPolicy {
 
 	private ReportFilterPolicy filterPolicy;
 
-	public ValueRefReportFilter(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ValueRefReportFilter(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

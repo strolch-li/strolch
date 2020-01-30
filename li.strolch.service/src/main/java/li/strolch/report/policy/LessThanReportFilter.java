@@ -1,13 +1,12 @@
 package li.strolch.report.policy;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.ObjectHelper;
 
 public class LessThanReportFilter extends ReportFilterPolicy {
 
-	public LessThanReportFilter(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public LessThanReportFilter(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

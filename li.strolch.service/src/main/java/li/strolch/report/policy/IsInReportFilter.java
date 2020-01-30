@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toList;
 import java.util.Arrays;
 import java.util.Date;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -14,8 +13,8 @@ import li.strolch.utils.dbc.DBC;
 
 public class IsInReportFilter extends ReportFilterPolicy {
 
-	public IsInReportFilter(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public IsInReportFilter(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override
