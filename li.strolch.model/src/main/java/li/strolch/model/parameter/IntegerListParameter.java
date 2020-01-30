@@ -105,7 +105,7 @@ public class IntegerListParameter extends AbstractListParameter<Integer> impleme
 
 		List<Integer> values = new ArrayList<>();
 		for (String val : valueArr) {
-			values.add(Integer.valueOf(val.trim()));
+			values.add(Integer.decode(val.trim()));
 		}
 		return values;
 	}
