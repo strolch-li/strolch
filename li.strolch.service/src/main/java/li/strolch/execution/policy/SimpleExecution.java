@@ -1,6 +1,5 @@
 package li.strolch.execution.policy;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
@@ -18,8 +17,8 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public class SimpleExecution extends ExecutionPolicy {
 
-	public SimpleExecution(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public SimpleExecution(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

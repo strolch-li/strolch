@@ -2,7 +2,6 @@ package li.strolch.execution.policy;
 
 import java.util.ResourceBundle;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.model.State;
@@ -18,8 +17,8 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public class ToErrorReservationExecution extends ReservationExection {
 
-	public ToErrorReservationExecution(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ToErrorReservationExecution(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

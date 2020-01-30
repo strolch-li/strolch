@@ -39,8 +39,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	private StrolchTransaction tx;
 
-	public ExecutionPolicy(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ExecutionPolicy(StrolchTransaction tx) {
+		super(tx);
 		this.tx = tx;
 	}
 

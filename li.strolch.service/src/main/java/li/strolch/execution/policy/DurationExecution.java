@@ -1,6 +1,5 @@
 package li.strolch.execution.policy;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.DurationParameter;
@@ -17,8 +16,8 @@ import li.strolch.runtime.StrolchConstants.PolicyConstants;
  */
 public class DurationExecution extends SimpleExecution {
 
-	public DurationExecution(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public DurationExecution(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

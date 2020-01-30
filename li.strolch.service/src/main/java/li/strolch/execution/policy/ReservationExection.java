@@ -2,7 +2,6 @@ package li.strolch.execution.policy;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
@@ -34,8 +33,8 @@ public class ReservationExection extends DurationExecution {
 	public static final String TYPE_RESERVE = "Reserve";
 	public static final String TYPE_RELEASE = "Release";
 
-	public ReservationExection(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ReservationExection(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override
