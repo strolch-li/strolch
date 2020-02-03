@@ -187,6 +187,18 @@ public interface ParameterBagContainer extends StrolchElement {
 	List<Parameter<?>> getParametersByInterpretationAndUom(String bagKey, String interpretation, String uom);
 
 	/**
+	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param parameter
+	 * 		the {@link Parameter} to be added to the {@link ParameterBag}
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link ParameterBag} does not exist
+	 */
+	void addParameter(Parameter<?> parameter) throws StrolchException;
+
+	/**
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
 	 *
 	 * @param bagKey
@@ -198,6 +210,17 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * 		if the {@link ParameterBag} does not exist
 	 */
 	void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException;
+
+	/**
+	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the key {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be removed
+	 *
+	 * @return the removed {@link Parameter} or null if it did not exist
+	 */
+	<U, T extends Parameter<U>> T removeParameter(String paramKey);
 
 	/**
 	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the given bagKey

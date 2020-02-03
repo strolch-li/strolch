@@ -332,6 +332,31 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
+	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the key {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param parameter
+	 * 		the {@link Parameter} to be added to the {@link ParameterBag}
+	 *
+	 * @throws StrolchException
+	 * 		if the {@link ParameterBag} does not exist
+	 */
+	@Override
+	public void addParameter(Parameter<?> parameter) throws StrolchException {
+		assertNotReadonly();
+		if (this.parameterBagMap == null)
+			this.parameterBagMap = new HashMap<>(1, 1.0F);
+		ParameterBag bag = this.parameterBagMap.get(BAG_PARAMETERS);
+		if (bag == null) {
+			String msg = "No parameter bag exists with key {0}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, BAG_PARAMETERS);
+			throw new StrolchException(msg);
+		}
+
+		bag.addParameter(parameter);
+	}
+
+	/**
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
 	 *
 	 * @param bagKey
@@ -355,6 +380,28 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		}
 
 		bag.addParameter(parameter);
+	}
+
+	/**
+	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the key {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be removed
+	 *
+	 * @return the removed {@link Parameter} or null if it did not exist
+	 */
+	@Override
+	public <U, T extends Parameter<U>> T removeParameter(String paramKey) {
+		assertNotReadonly();
+		if (this.parameterBagMap == null)
+			return null;
+		ParameterBag bag = this.parameterBagMap.get(BAG_PARAMETERS);
+		if (bag == null) {
+			return null;
+		}
+
+		return bag.removeParameter(paramKey);
 	}
 
 	/**
