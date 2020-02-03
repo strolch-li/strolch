@@ -4,10 +4,15 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.*;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.*;
@@ -35,6 +40,14 @@ public class StrolchXmlHelper {
 		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
 		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
 		return elementListener.getActivity(id);
+	}
+
+	public static Map<String, StrolchRootElement> parseToMap(File file) {
+		return parseFile(file).stream().collect(Collectors.toMap(StrolchRootElement::getId, e -> e));
+	}
+
+	public static Map<String, StrolchRootElement> parseToMap(InputStream stream, String encoding) {
+		return parseStream(stream, encoding).stream().collect(Collectors.toMap(StrolchRootElement::getId, e -> e));
 	}
 
 	public static List<StrolchRootElement> parseFile(File file) {
