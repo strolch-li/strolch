@@ -152,9 +152,7 @@ public class DefaultLockHandler implements LockHandler {
 			// logger.debug("locked " + locator); //$NON-NLS-1$
 
 		} catch (InterruptedException e) {
-			String msg = "Interrupted while trying to acquire lock for {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, locator);
-			throw new StrolchLockException(msg, e);
+			throw new StrolchLockException("Interrupted while trying to acquire lock for " + locator, e);
 		}
 	}
 
