@@ -8,9 +8,15 @@
                     return CustomWeb.baseRestPath;
                 }
             },
+            baseWsPath: {
+                type: String,
+                value: function () {
+                    return CustomWeb.baseWsPath;
+                }
+            },
             localesPath: {
                 type: String,
-                value: '../../locales.json'
+                value: '../../../locales.json'
             }
         },
 
@@ -432,7 +438,8 @@
             this.fire("cx-show-confirmation", {
                 title: title,
                 text: text,
-                callback: callback
+                callback: callback,
+                bind: this
             });
         },
 
@@ -447,7 +454,8 @@
                 action2: action2,
                 callback2: callback2,
                 action3: action3,
-                callback3: callback3
+                callback3: callback3,
+                bind: this
             });
         },
         clearNotification: function (id) {

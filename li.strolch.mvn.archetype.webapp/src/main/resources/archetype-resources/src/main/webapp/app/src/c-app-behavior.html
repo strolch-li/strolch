@@ -1,0 +1,235 @@
+<script>
+    CustomAppBehavior = {
+
+        /* Lifecycle */
+        attached: function () {
+            var that = this;
+            setTimeout(function () {
+                that.checkForNewVersion();
+            }, 3000);
+            this.checkForNewVersionInterval = setInterval(function () {
+                that.checkForNewVersion();
+            }, 10000);
+        },
+
+        reloadPage: function (pageName) {
+            this.debounce('page-reload', function () {
+                this.selectedPage = pageName;
+                var page = this.$$('#' + pageName);
+                if (page && page.reload) {
+                    console.log('Reloading ' + pageName);
+                    page.reload();
+                }
+            }, 100);
+        },
+
+        toggleDrawer: function () {
+            this.$$("#drawer").toggle();
+        },
+        closeDrawer: function () {
+            this.$$("#drawer").close();
+        },
+
+        onShowToast: function (e) {
+            if (this.$.toast.opened) {
+                // purge if we have too many
+                if (this.queuedToasts.length > 5)
+                    this.queuedToasts = [];
+                this.queuedToasts.push(e.detail.text);
+            } else {
+                this.toastText = e.detail.text;
+                this.$.toast.open();
+            }
+        },
+
+        onToastClosed: function (e) {
+            if (this.queuedToasts.length > 0) {
+                this.toastText = this.queuedToasts.splice(0, 1)[0];
+                this.$.toast.open();
+            }
+        },
+
+        onShowStrolchDialog: function (event) {
+            var dlgTitle;
+            if (event.detail.title != null)
+                dlgTitle = event.detail.title;
+            else
+                dlgTitle = event.detail.isError ? 'errorOccurred' : 'info';
+            var dlgText = event.detail.text;
+            this._showDialog(dlgTitle, dlgText);
+        },
+        onShowDialog: function (event) {
+            var dlgTitle;
+            if (event.detail.title != null)
+                dlgTitle = event.detail.title;
+            else
+                dlgTitle = event.detail.isError ? 'errorOccurred' : 'info';
+            var dlgText = event.detail.message;
+            this._showDialog(dlgTitle, dlgText);
+        },
+        onShowConfirmation: function (event) {
+            var dlgTitle = event.detail.title;
+            var dlgText = event.detail.text;
+            var dlgCallback = event.detail.callback;
+            var bind = event.detail.bind;
+            this._showConfirmation(dlgTitle, dlgText, dlgCallback, bind);
+        },
+        onShowNotification: function (event) {
+            this.$.toolBar.showNotification(event.detail);
+        },
+        onClearNotification: function (event) {
+            this.$.toolBar.clearNotification(event.detail);
+        },
+        onLogOut: function (event) {
+            this.$.login.logout();
+            this.set("authTokenValid", false);
+        },
+        onServerNotAvailable: function (event) {
+            clearInterval(this.checkForNewVersionInterval);
+            this.$.dlg.close();
+            this.$.confirmationDlg.close();
+            this.$.serverNotConnectedDlg.open();
+        },
+        onSessionInvalid: function (event) {
+            var that = this;
+            console.log(this.routeTail);
+            if (this.routeTail.prefix != '/login') {
+                this._showConfirmation('sessionInvalid', 'sessionInvalidConfirmNavToLogin', function () {
+                    that.deleteCookie('strolch.authorization');
+                    that.set("authTokenValid", false);
+                });
+            }
+        },
+        onPrivilegeDenied: function (event) {
+            if (this.authTokenValid) {
+                this._showDialog('privilegeDenied', 'privilegeDeniedText', this.requestEventToUrl(event));
+            } else {
+                console.warn("Privilege denied to URL " + this.requestEventToUrl(event), this.requestErrorToMsg(event));
+            }
+        },
+        userLocaleChanged: function (newValue, oldValue) {
+            if (newValue && oldValue) {
+                console.log('User locale changed to ' + newValue);
+                this.$.ajaxPutLocale.generateRequest();
+                Strolch.setUserLocale(newValue);
+                window.location.reload();
+            } else if (this.userConfig == null && Strolch.getUserConfig() != null && Strolch.getUserConfig().locale != newValue) {
+                this.userConfig = Strolch.getUserConfig();
+                this.userConfig.locale = newValue;
+                Strolch.setUserConfig(this.userConfig);
+                this.$.ajaxPutLocale.generateRequest();
+            }
+        },
+
+        sessionValidated: function () {
+            console.log("Session validated.");
+            var userLocale = Strolch.getUserLocale();
+            var userConfig = Strolch.getUserConfig();
+            if (userLocale !== userConfig.locale) {
+                console.log("Updating server side locale for user " + userConfig.username + " to " + userLocale);
+                userConfig.locale = userLocale;
+                Strolch.setUserConfig(userConfig);
+                this.$.ajaxPutLocale.url = this.baseRestPath + "/strolch/sessions/" + userConfig.sessionId + "/locale/" + userLocale;
+                this.$.ajaxPutLocale.generateRequest();
+            }
+            this.set("authToken", Strolch.getAuthToken());
+            this.set("authTokenValid", true);
+            this.set("userConfig", userConfig);
+        },
+        logout: function () {
+            sessionStorage.clear();
+            Polymer.dom(this.root).querySelectorAll('#auth')[0].logout();
+            Strolch.clearStorageData();
+            this.deleteCookie("strolch.authorization");
+        },
+
+        _showDialog: function (dlgTitle, dlgText, dlgReason) {
+            if (this.localize) {
+                this.dlgTitle = this.localize(dlgTitle);
+                dlgText = this.localize(dlgText);
+                if (dlgReason)
+                    dlgText += ": " + dlgReason;
+                console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                this.$.dlgText.innerHTML = this.localize(dlgText);
+                this.$.dlg.open();
+            } else {
+                this.debounce('show-dlg', function () {
+                    this.dlgTitle = this.localize(dlgTitle);
+                    dlgText = this.localize(dlgText);
+                    if (dlgReason)
+                        dlgText += ": " + dlgReason;
+                    console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                    this.$.dlgText.innerHTML = this.localize(dlgText);
+                    this.$.dlg.open();
+                }, 250);
+            }
+        },
+        _showConfirmation: function (dlgTitle, dlgText, dlgCallback, bind) {
+
+            function onClose(event) {
+                dlg.removeEventListener("iron-overlay-closed", onClose);
+                var bound = dlgCallback.bind(bind);
+                bound(event.detail.confirmed);
+            }
+
+            if (this.localize) {
+                this.dlgTitle = this.localize(dlgTitle);
+                dlgText = this.localize(dlgText);
+                console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                this.$.confirmationDlgText.innerHTML = this.localize(dlgText);
+                var dlg = this.$.confirmationDlg;
+                dlg.addEventListener("iron-overlay-closed", onClose);
+                dlg.open();
+            } else {
+                this.debounce('show-dlg', function () {
+                    this.dlgTitle = this.localize(dlgTitle);
+                    dlgText = this.localize(dlgText);
+                    console.log("Message: " + this.dlgTitle + ': ' + dlgText);
+                    this.$.confirmationDlgText.innerHTML = this.localize(dlgText);
+                    var dlg = this.$.confirmationDlg;
+                    dlg.addEventListener("iron-overlay-closed", onClose);
+                    dlg.open();
+                }, 250);
+            }
+        },
+
+        checkForNewVersion: function () {
+            this.$.ajaxGetVersion.generateRequest();
+        },
+        reconnect: function () {
+            this.$.serverNotConnectedDlg.close();
+            this.onGetVersionResponse = function (event) {
+                var version = event.detail.response;
+                this.scmRevision = version.appVersion.scmRevision;
+                localStorage['appScmRevision'] = this.scmRevision;
+                document.location.reload();
+            };
+            this.$.ajaxGetVersion.generateRequest();
+        },
+
+        onGetVersionResponse: function (event) {
+            var version = event.detail.response;
+            Strolch.setAppVersion(version);
+            this.scmRevision = version.appVersion.scmRevision;
+
+            if (localStorage['appScmRevision'] == null) {
+                localStorage['appScmRevision'] = this.scmRevision;
+            } else if (this.scmRevision !== localStorage['appScmRevision']) {
+                console.log("App SCM Revision has changed from " + localStorage['appScmRevision'] + " to " + this.scmRevision + ". Need to refresh browser...");
+                this.$.newVersionAvailableToast.open();
+            }
+            this.appVersion = version;
+        },
+
+        onGetVersionError: function (event) {
+            console.log(event);
+            var readyState = event.detail.request.xhr.readyState;
+            var status = event.detail.request.xhr.status;
+            if (readyState === 4 && status === 404) {
+                console.log("Ignoring 404 for get version, as server is probably still starting...");
+            } else {
+                this.onRequestError(event);
+            }
+        }
+    };
+</script>
