@@ -25,6 +25,7 @@ public class Tags {
 	public static final String RESOURCE = "Resource";
 	public static final String ORDER = "Order";
 	public static final String ACTIVITY = "Activity";
+	public static final String CONTROLLER = "Controller";
 
 	public static final String CDATA = "CDATA";
 	public static final String ID = "Id";
@@ -148,6 +149,9 @@ public class Tags {
 		public static final String EXCEPTION = "exception";
 		public static final String FORMAT = "format";
 		public static final String FLAT = "flat";
+		public static final String WITH_LOCATOR = "withLocator";
+		public static final String WITH_VERSION = "withVersion";
+		public static final String PARAMS = "params";
 
 		public static final String APP_VERSION = "appVersion";
 		public static final String SYSTEM_STATE = "systemState";
