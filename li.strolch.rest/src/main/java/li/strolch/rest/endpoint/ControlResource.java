@@ -50,9 +50,12 @@ public class ControlResource {
 
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ExecutionHandler executionHandler = tx.getContainer().getComponent(ExecutionHandler.class);
-			JsonArray activitiesJ = executionHandler.getActiveActivitiesLocator(realm).stream()
-					.map(locator -> tx.getActivityBy(locator.get(1), locator.get(2))).filter(Objects::nonNull)
-					.sorted(Comparator.comparing(Activity::getId)).map(activity -> activity.accept(visitor))
+			JsonArray activitiesJ = executionHandler.getActiveActivitiesLocator(realm) //
+					.stream() //
+					.map(locator -> tx.getActivityBy(locator.get(1), locator.get(2))) //
+					.filter(Objects::nonNull) //
+					.sorted(Comparator.comparing(Activity::getId)) //
+					.map(activity -> activity.accept(visitor)) //
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			ExecutionHandlerState state = executionHandler.getState(tx.getRealmName());
@@ -71,47 +74,6 @@ public class ControlResource {
 		ClearAllCurrentExecutionsService svc = new ClearAllCurrentExecutionsService();
 		ServiceArgument arg = svc.getArgumentInstance();
 		arg.realm = realm;
-
-		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
-
-		return ResponseUtil.toResponse(svcResult);
-	}
-
-	@POST
-	@Path("state")
-	public Response executeActivity(@Context HttpServletRequest request, @QueryParam("realm") String realm,
-			@QueryParam("locator") String locatorS, @QueryParam("state") String stateS) {
-
-		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
-
-		Locator locator = Locator.valueOf(locatorS);
-
-		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
-
-		StartActivityExecutionService svc = new StartActivityExecutionService();
-		LocatorArgument arg = svc.getArgumentInstance();
-		arg.locator = locator;
-
-		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
-
-		return ResponseUtil.toResponse(svcResult);
-	}
-
-	@DELETE
-	@Path("state")
-	public Response removeActivityFromExecution(@Context HttpServletRequest request, @QueryParam("realm") String realm,
-			@QueryParam("locator") String locatorS) {
-
-		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
-
-		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
-
-		Locator locator = Locator.valueOf(locatorS);
-
-		RemoveActivityFromExecutionService svc = new RemoveActivityFromExecutionService();
-		LocatorArgument arg = svc.getArgumentInstance();
-		arg.realm = realm;
-		arg.locator = locator;
 
 		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
 
@@ -145,6 +107,26 @@ public class ControlResource {
 		return ResponseUtil.toResponse(svcResult);
 	}
 
+	@POST
+	@Path("activity/state")
+	public Response executeActivity(@Context HttpServletRequest request, @QueryParam("realm") String realm,
+			@QueryParam("type") String type, @QueryParam("id") String id, @QueryParam("state") String stateS) {
+
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
+
+		Locator locator = Activity.locatorFor(type, id);
+
+		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
+
+		StartActivityExecutionService svc = new StartActivityExecutionService();
+		LocatorArgument arg = svc.getArgumentInstance();
+		arg.locator = locator;
+
+		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
+
+		return ResponseUtil.toResponse(svcResult);
+	}
+
 	@PUT
 	@Path("activity/state")
 	public Response setElementState(@Context HttpServletRequest request, @QueryParam("realm") String realm,
@@ -160,6 +142,27 @@ public class ControlResource {
 
 		ServiceHandler serviceHandler = RestfulStrolchComponent.getInstance().getServiceHandler();
 		ServiceResult svcResult = serviceHandler.doService(cert, svc, arg);
+		return ResponseUtil.toResponse(svcResult);
+	}
+
+	@DELETE
+	@Path("activity/state")
+	public Response removeActivityFromExecution(@Context HttpServletRequest request, @QueryParam("realm") String realm,
+			@QueryParam("type") String type, @QueryParam("id") String id) {
+
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
+
+		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
+
+		Locator locator = Activity.locatorFor(type, id);
+
+		RemoveActivityFromExecutionService svc = new RemoveActivityFromExecutionService();
+		LocatorArgument arg = svc.getArgumentInstance();
+		arg.realm = realm;
+		arg.locator = locator;
+
+		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
+
 		return ResponseUtil.toResponse(svcResult);
 	}
 }
