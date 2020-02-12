@@ -1434,6 +1434,66 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean hasActivity(String type, String id);
 
 	/**
+	 * Returns true if the @{@link Resource} was modified in this TX
+	 *
+	 * @param resource
+	 * 		the resource to check if modified
+	 *
+	 * @return true if the @{@link Resource} was modified in this TX
+	 */
+	boolean isUpdated(Resource resource);
+
+	/**
+	 * Returns true if the @{@link Order} was modified in this TX
+	 *
+	 * @param order
+	 * 		the order to check if modified
+	 *
+	 * @return true if the @{@link Order} was modified in this TX
+	 */
+	boolean isUpdated(Order order);
+
+	/**
+	 * Returns true if the @{@link Activity} was modified in this TX
+	 *
+	 * @param activity
+	 * 		the activity to check if modified
+	 *
+	 * @return true if the @{@link Activity} was modified in this TX
+	 */
+	boolean isUpdated(Activity activity);
+
+	/**
+	 * Returns true if the @{@link Resource} was removed in this TX
+	 *
+	 * @param resource
+	 * 		the resource to check if removed
+	 *
+	 * @return true if the @{@link Resource} was removed in this TX
+	 */
+	boolean isRemoved(Resource resource);
+
+	/**
+	 * Returns true if the @{@link Order} was removed in this TX
+	 *
+	 * @param order
+	 * 		the order to check if removed
+	 *
+	 * @return true if the @{@link Order} was removed in this TX
+	 */
+	boolean isRemoved(Order order);
+
+	/**
+	 * Returns true if the @{@link Activity} was removed in this TX
+	 *
+	 * @param activity
+	 * 		the activity to check if removed
+	 *
+	 * @return true if the @{@link Activity} was removed in this TX
+	 */
+	boolean isRemoved(Activity activity);
+
+	/**
 	 * Add or update and thus persist the given {@link Resource} by calling the relevant {@link Command}
 	 *
 	 * @param resource

@@ -590,6 +590,22 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return this.objectFilter != null && this.objectFilter.hasElement(key, locator);
 	}
 
+	private Operation getElementOperation(String key, Locator locator) {
+		if (this.objectFilter == null)
+			return Operation.GET;
+		li.strolch.utils.objectfilter.Operation op = this.objectFilter.getOperation(key, locator);
+		switch (op) {
+		case ADD:
+			return Operation.ADD;
+		case MODIFY:
+			return Operation.UPDATE;
+		case REMOVE:
+			return Operation.REMOVE;
+		default:
+			return Operation.GET;
+		}
+	}
+
 	@Override
 	public Stream<Resource> streamResources(String... types) {
 		return getResourceMap().stream(this, types).map(e -> {
@@ -1065,6 +1081,36 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public boolean hasActivity(String type, String id) {
 		boolean inFilter = hasElementInFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
 		return inFilter || getActivityMap().hasElement(this, type, id);
+	}
+
+	@Override
+	public boolean isUpdated(Resource resource) {
+		return getElementOperation(Tags.RESOURCE, resource.getLocator()) == Operation.UPDATE;
+	}
+
+	@Override
+	public boolean isUpdated(Order order) {
+		return getElementOperation(Tags.ORDER, order.getLocator()) == Operation.UPDATE;
+	}
+
+	@Override
+	public boolean isUpdated(Activity activity) {
+		return getElementOperation(Tags.ACTIVITY, activity.getLocator()) == Operation.UPDATE;
+	}
+
+	@Override
+	public boolean isRemoved(Resource resource) {
+		return getElementOperation(Tags.RESOURCE, resource.getLocator()) == Operation.REMOVE;
+	}
+
+	@Override
+	public boolean isRemoved(Order order) {
+		return getElementOperation(Tags.ORDER, order.getLocator()) == Operation.REMOVE;
+	}
+
+	@Override
+	public boolean isRemoved(Activity activity) {
+		return getElementOperation(Tags.ACTIVITY, activity.getLocator()) == Operation.REMOVE;
 	}
 
 	private ObjectFilter getObjectFilter() {

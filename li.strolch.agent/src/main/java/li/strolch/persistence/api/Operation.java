@@ -19,8 +19,7 @@ public enum Operation {
 		return this.privilegePrefix + element.getObjectType();
 	}
 
-	private Operation(String privilegePrefix) {
+	Operation(String privilegePrefix) {
 		this.privilegePrefix = privilegePrefix;
-
 	}
 }
