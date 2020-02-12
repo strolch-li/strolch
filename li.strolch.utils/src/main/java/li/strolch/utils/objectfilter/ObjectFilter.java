@@ -433,6 +433,23 @@ public class ObjectFilter {
 	}
 
 	/**
+	 * Return the {@link Operation} for the given keys
+	 *
+	 * @param key
+	 * 		the key under which it was registered
+	 * @param objectKey
+	 * 		the objectKey
+	 *
+	 * @return the {@link Operation} for the given keys
+	 */
+	public Operation getOperation(String key, Object objectKey) {
+		ObjectCache objectCache = this.cache.getElement(key, objectKey);
+		if (objectCache == null)
+			return null;
+		return objectCache.getOperation();
+	}
+
+	/**
 	 * Return true if the element with the given key and objectKey exist
 	 *
 	 * @param key
