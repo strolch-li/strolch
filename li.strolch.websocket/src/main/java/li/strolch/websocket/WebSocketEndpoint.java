@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.rest.RestfulStrolchComponent;
 
-@ServerEndpoint("/websocket/strolch")
+@ServerEndpoint("/websocket/strolch/observer")
 public class WebSocketEndpoint {
 
 	private ConcurrentHashMap<Session, WebSocketClient> clientMap = new ConcurrentHashMap<>();

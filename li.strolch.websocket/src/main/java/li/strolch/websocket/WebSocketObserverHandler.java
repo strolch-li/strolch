@@ -1,5 +1,6 @@
 package li.strolch.websocket;
 
+import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
 import static li.strolch.utils.helper.StringHelper.DASH;
@@ -15,6 +16,7 @@ import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
 import org.slf4j.Logger;
@@ -28,28 +30,26 @@ public class WebSocketObserverHandler implements Observer {
 	protected WebSocketClient client;
 
 	protected MapOfSets<String, String> observedTypes;
-	protected Map<String, Boolean> asFlat;
+	protected Map<String, JsonObject> params;
 
 	public WebSocketObserverHandler(ObserverHandler observerHandler, WebSocketClient client) {
 		this.observerHandler = observerHandler;
 		this.client = client;
 		this.observedTypes = new MapOfSets<>();
-		this.asFlat = new HashMap<>(1);
+		this.params = new HashMap<>(1);
 	}
 
-	public void register(String objectType, String type, boolean flat) {
-		if (!this.observedTypes.containsSet(objectType)) {
+	public void register(String objectType, String type, JsonObject params) {
+		if (!this.observedTypes.containsSet(objectType))
 			this.observerHandler.registerObserver(objectType, this);
-		}
 		this.observedTypes.addElement(objectType, type);
-		this.asFlat.put(type, flat);
+		this.params.put(type, params);
 	}
 
 	public void unregister(String objectType, String type) {
 		this.observedTypes.removeElement(objectType, type);
-		if (!this.observedTypes.containsSet(objectType)) {
+		if (!this.observedTypes.containsSet(objectType))
 			this.observerHandler.unregisterObserver(objectType, this);
-		}
 	}
 
 	public void unregisterAll() {
@@ -100,12 +100,26 @@ public class WebSocketObserverHandler implements Observer {
 	}
 
 	protected boolean filter(Set<String> observedTypesSet, StrolchRootElement e) {
-		return observedTypesSet.contains(e.getType());
+		return observedTypesSet.contains("*") || observedTypesSet.contains(e.getType());
 	}
 
 	protected JsonObject toJson(StrolchRootElement e) {
-		if (this.asFlat.get(e.getType()))
-			return e.toFlatJsonObject();
-		return e.toJsonObject();
+
+		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+
+		JsonObject params = this.params.get(e.getType());
+		if (params == null)
+			params = this.params.get("*");
+		if (params != null) {
+
+			if (params.has(FLAT) && params.get(FLAT).getAsBoolean())
+				visitor.flat();
+			if (params.has(WITH_LOCATOR) && params.get(WITH_LOCATOR).getAsBoolean())
+				visitor.withLocator();
+			if (params.has(WITH_VERSION) && params.get(WITH_VERSION).getAsBoolean())
+				visitor.withVersion();
+		}
+
+		return e.accept(visitor).getAsJsonObject();
 	}
 }

@@ -112,12 +112,15 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		String objectType = jsonObject.get(Tags.Json.OBJECT_TYPE).getAsString();
 		String type = jsonObject.get(Tags.Json.TYPE).getAsString();
-		boolean flat = jsonObject.has(FLAT) && jsonObject.get(FLAT).getAsBoolean();
+
+		JsonObject params = jsonObject.get(PARAMS).getAsJsonObject();
 
 		this.observerHandlersByRealm.computeIfAbsent(objectType, s -> {
 			ObserverHandler observerHandler = this.container.getRealm(realm).getObserverHandler();
 			return getWebSocketObserverHandler(observerHandler);
-		}).register(objectType, type, flat);
+		}).register(objectType, type, params);
+		logger.info(
+				this.certificate.getUsername() + " registered for " + objectType + " " + type + " params: " + params);
 	}
 
 	protected WebSocketObserverHandler getWebSocketObserverHandler(ObserverHandler observerHandler) {
@@ -156,6 +159,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 				close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 				return;
 			}
+			logger.info("User " + this.certificate.getUsername() + " authenticated on WebSocket with remote IP "
+					+ this.remoteIp);
 		} catch (Exception e) {
 			logger.error("Failed to authenticate user " + username, e);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
