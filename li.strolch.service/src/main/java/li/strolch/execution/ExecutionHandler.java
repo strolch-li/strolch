@@ -21,8 +21,9 @@ import li.strolch.privilege.model.PrivilegeContext;
  *
  * <p>
  * To start the execution of an {@link Activity} add it to the {@link ExecutionHandler} by calling {@link
- * #addForExecution(String, Locator)}. Actual execution is asynchronously performed and the {@link ExecutionPolicy} of
- * the resources of the {@link Action Actions} will perform the actual execution.
+ * #addForExecution(String, Activity)} or {@link #addForExecution(String, Locator)}. Actual execution is asynchronously
+ * performed and the {@link ExecutionPolicy} of the resources of the {@link Action Actions} will perform the actual
+ * execution.
  * </p>
  *
  * <p>
@@ -50,6 +51,17 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * 		the {@link Locator} of the {@link Activity}
 	 */
 	public abstract void addForExecution(String realm, Locator activityLoc);
+
+	/**
+	 * Registers the given {@link Activity} for execution, and submits it for execution immediately in an asynchronous
+	 * manner
+	 *
+	 * @param realm
+	 * 		the realm where the {@link Activity} resides
+	 * @param activity
+	 * 		the the {@link Activity}
+	 */
+	public abstract void addForExecution(String realm, Activity activity);
 
 	/**
 	 * Removes the given {@link Locator} for an {@link Activity} from execution, so it is not executed further

@@ -7,16 +7,14 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.ObserverEvent;
 import li.strolch.execution.command.*;
 import li.strolch.execution.policy.ActivityArchivalPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
-import li.strolch.model.Locator;
-import li.strolch.model.ParameterBag;
-import li.strolch.model.Resource;
-import li.strolch.model.State;
+import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -98,6 +96,23 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void addForExecution(String realm, Activity activity) {
+
+		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+		if (state == ExecutionHandlerState.HaltNew)
+			throw new IllegalStateException(
+					"ExecutionHandler state is " + state + ", can not add activities for execution!");
+
+		Locator rootElemLoc = activity.getLocator();
+		synchronized (this.registeredActivities) {
+			this.registeredActivities.addElement(realm, rootElemLoc);
+		}
+
+		notifyObserverAdd(realm, activity);
+		toExecution(realm, rootElemLoc);
+	}
+
+	@Override
 	public void addForExecution(String realm, Locator activityLoc) {
 
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
@@ -109,6 +124,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		synchronized (this.registeredActivities) {
 			this.registeredActivities.addElement(realm, rootElemLoc);
 		}
+
+		getExecutor().submit(() -> notifyObserverAdd(realm, activityLoc));
 		toExecution(realm, activityLoc);
 	}
 
@@ -118,11 +135,13 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		synchronized (this.registeredActivities) {
 			this.registeredActivities.removeElement(realm, rootElemLoc);
 		}
+		getExecutor().submit(() -> notifyObserverRemove(realm, activityLoc));
 	}
 
 	@Override
 	public void clearAllCurrentExecutions(String realm) {
-		this.registeredActivities.removeSet(realm);
+		Set<Locator> removed = this.registeredActivities.removeSet(realm);
+		getExecutor().submit(() -> notifyObserverRemove(realm, removed));
 	}
 
 	private void restartActivityExecution(PrivilegeContext ctx) {
@@ -430,6 +449,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				synchronized (this.registeredActivities) {
 					this.registeredActivities.removeElement(realm, activityLoc);
 				}
+				notifyObserverRemove(realm, activityLoc);
 				return;
 			}
 
@@ -439,6 +459,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					if (!this.registeredActivities.removeElement(realm, activityLoc))
 						logger.warn("Activity " + activityLoc + " already removed from registered activities!");
 				}
+
+				notifyObserverRemove(tx, activity);
 
 				logger.info("Archiving activity " + activityLoc + " with state " + activity.getState());
 				archiveActivity(realm, activity.getLocator());
@@ -450,6 +472,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				command.validate();
 				command.doCommand();
 
+				notifyObserverUpdate(tx, activity);
 				tx.commitOnClose();
 			}
 		}
@@ -471,6 +494,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			command.validate();
 			command.doCommand();
 
+			notifyObserverUpdate(tx, action.getRootElement());
+
 			// flush so we can see the changes performed
 			tx.flush();
 
@@ -482,6 +507,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					if (!this.registeredActivities.removeElement(realm, activityLoc))
 						logger.warn("Activity " + activityLoc + " already removed from registered activities!");
 				}
+
+				notifyObserverRemove(tx, action.getRootElement());
 
 				logger.info("Archiving activity " + activityLoc + " with state " + activity.getState());
 				archiveActivity(realm, activity.getLocator());
@@ -499,6 +526,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					execCommand.setActivity(activity);
 					execCommand.validate();
 					execCommand.doCommand();
+
+					notifyObserverUpdate(tx, action.getRootElement());
 
 					// flush so we can see the changes performed
 					tx.flush();
@@ -525,6 +554,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			command.validate();
 			command.doCommand();
 
+			notifyObserverUpdate(tx, elem.getRootElement());
 			tx.commitOnClose();
 		}
 	}
@@ -542,6 +572,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			command.validate();
 			command.doCommand();
 
+			notifyObserverUpdate(tx, elem.getRootElement());
 			tx.commitOnClose();
 		}
 	}
@@ -559,11 +590,99 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			command.validate();
 			command.doCommand();
 
+			notifyObserverUpdate(tx, elem.getRootElement());
 			tx.commitOnClose();
 		}
 
 		// now trigger a further execution of any other activities needed execution in this realm
 		triggerExecution(realm);
+	}
+
+	private void notifyObserverAdd(String realm, Locator activityLoc) {
+		try {
+			runAsAgent(ctx -> {
+				try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), true)) {
+					Activity activity = tx.findElement(activityLoc, true);
+					if (activity != null) {
+						ObserverEvent observerEvent = new ObserverEvent();
+						observerEvent.added.addElement(Tags.CONTROLLER, activity);
+						getContainer().getRealm(realm).getObserverHandler().notify(observerEvent);
+					}
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to notify observers of new controller " + activityLoc);
+		}
+	}
+
+	private void notifyObserverAdd(String realm, Activity rootElement) {
+		if (!getContainer().getRealm(realm).isUpdateObservers())
+			return;
+
+		ObserverEvent observerEvent = new ObserverEvent();
+		observerEvent.added.addElement(Tags.CONTROLLER, rootElement);
+		getContainer().getRealm(realm).getObserverHandler().notify(observerEvent);
+	}
+
+	private void notifyObserverUpdate(StrolchTransaction tx, Activity rootElement) {
+		if (!getContainer().getRealm(tx.getRealmName()).isUpdateObservers())
+			return;
+
+		ObserverEvent observerEvent = new ObserverEvent();
+		observerEvent.updated.addElement(Tags.CONTROLLER, rootElement);
+		tx.getContainer().getRealm(tx.getRealmName()).getObserverHandler().notify(observerEvent);
+	}
+
+	private void notifyObserverRemove(StrolchTransaction tx, Activity rootElement) {
+		if (!getContainer().getRealm(tx.getRealmName()).isUpdateObservers())
+			return;
+
+		ObserverEvent observerEvent = new ObserverEvent();
+		observerEvent.removed.addElement(Tags.CONTROLLER, rootElement);
+		tx.getContainer().getRealm(tx.getRealmName()).getObserverHandler().notify(observerEvent);
+	}
+
+	private void notifyObserverRemove(String realm, Locator activityLoc) {
+		if (!getContainer().getRealm(realm).isUpdateObservers())
+			return;
+
+		try {
+			runAsAgent(ctx -> {
+				try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), true)) {
+					Activity activity = tx.findElement(activityLoc, true);
+					if (activity != null) {
+						ObserverEvent observerEvent = new ObserverEvent();
+						observerEvent.removed.addElement(Tags.CONTROLLER, activity);
+						getContainer().getRealm(realm).getObserverHandler().notify(observerEvent);
+					}
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to notify observers of removed controller " + activityLoc);
+		}
+	}
+
+	private void notifyObserverRemove(String realm, Set<Locator> activityLocs) {
+		if (!getContainer().getRealm(realm).isUpdateObservers())
+			return;
+
+		try {
+			runAsAgent(ctx -> {
+				try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), true)) {
+					ObserverEvent observerEvent = new ObserverEvent();
+
+					for (Locator activityLoc : activityLocs) {
+						Activity activity = tx.findElement(activityLoc, true);
+						if (activity != null)
+							observerEvent.removed.addElement(Tags.CONTROLLER, activity);
+					}
+
+					getContainer().getRealm(realm).getObserverHandler().notify(observerEvent);
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to notify observers of removed controllers " + activityLocs);
+		}
 	}
 
 	@Override
