@@ -205,4 +205,21 @@ public class MapOfMaps<T, U, V> {
 			action.accept(k, u);
 		}
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		MapOfMaps<?, ?, ?> mapOfMaps1 = (MapOfMaps<?, ?, ?>) o;
+
+		return Objects.equals(this.mapOfMaps, mapOfMaps1.mapOfMaps);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.mapOfMaps != null ? this.mapOfMaps.hashCode() : 0;
+	}
 }

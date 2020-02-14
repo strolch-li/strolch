@@ -160,4 +160,21 @@ public class MapOfLists<T, U> {
 			action.accept(k, u);
 		}
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		MapOfLists<?, ?> that = (MapOfLists<?, ?>) o;
+
+		return Objects.equals(this.mapOfLists, that.mapOfLists);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.mapOfLists != null ? this.mapOfLists.hashCode() : 0;
+	}
 }

@@ -160,4 +160,21 @@ public class MapOfSets<T, U> {
 			action.accept(k, u);
 		}
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		MapOfSets<?, ?> mapOfSets1 = (MapOfSets<?, ?>) o;
+		return Objects.equals(this.mapOfSets, mapOfSets1.mapOfSets);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.mapOfSets != null ? this.mapOfSets.hashCode() : 0;
+	}
+
 }
