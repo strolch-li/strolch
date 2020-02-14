@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.planning;
+package li.strolch.execution;
 
 import static li.strolch.model.ModelGenerator.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 
 import java.util.SortedSet;
 
-import li.strolch.model.*;
+import li.strolch.execution.command.PlanActionCommand;
+import li.strolch.model.ModelGenerator;
+import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
+import li.strolch.model.State;
 import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.model.timedstate.StrolchTimedState;
@@ -34,14 +38,36 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
-import org.junit.Assert;
+import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
 public class PlanActionTest {
+
+	private static final String RUNTIME_PATH = "target/" + PlanActionTest.class.getSimpleName();
+	private static final String CONFIG_SRC = "src/test/resources/executiontest"; //$NON-NLS-1$
+	private static RuntimeMock runtimeMock;
+	private static StrolchTransaction tx;
+
+	@BeforeClass
+	public static void beforeClass() {
+		runtimeMock = new RuntimeMock();
+		runtimeMock.mockRuntime(RUNTIME_PATH, CONFIG_SRC);
+		runtimeMock.startContainer();
+
+		tx = runtimeMock.openUserTx(runtimeMock.loginTest(), false);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
+	}
 
 	private Resource resource;
 	private Action action;
@@ -55,66 +81,53 @@ public class PlanActionTest {
 		timedState.getTimeEvolution().clear();
 		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
+		Activity activity = new Activity("activity", "Test", "Test", TimeOrdering.SERIES);
 		this.action = new Action("action", "Action", "Use");
+		activity.addElement(this.action);
 
-		Assert.assertEquals(State.CREATED, this.action.getState());
+		assertEquals(State.CREATED, this.action.getState());
 
 		IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
-		this.action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		this.action.addParameter("objective", iP);
+		this.action.addParameterBag(new ParameterBag("objectives", "Objectives", "Objectives"));
+		this.action.addParameter("objectives", iP);
 
 		createChanges(this.action);
 
 		this.action.setResourceId(this.resource.getId());
 		this.action.setResourceType(this.resource.getType());
+
+		tx.add(this.resource);
+		tx.add(activity);
 	}
 
 	@Test
 	public void test() {
 
-		try (StrolchTransaction tx = mock(StrolchTransaction.class)) {
+		PlanActionCommand cmd = new PlanActionCommand(tx);
+		cmd.setAction(this.action);
+		cmd.doCommand();
 
-			Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-			when(tx.findElement(eq(locator))).thenReturn(this.resource);
+		// check the state
+		assertEquals(State.PLANNED, this.action.getState());
 
-			PlanActionCommand cmd = new PlanActionCommand(null, tx);
-			cmd.setAction(this.action);
-			cmd.doCommand();
+		// check the resource Id
+		assertEquals(this.resource.getId(), this.action.getResourceId());
 
-			// check the state
-			Assert.assertEquals(State.PLANNED, this.action.getState());
+		// check if we get the expected result
+		StrolchTimedState<IValue<Integer>> timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+		ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
+		SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
 
-			// check the resource Id
-			Assert.assertEquals(this.resource.getId(), this.action.getResourceId());
+		assertEquals(3, values.size());
 
-			// check if we get the expected result
-			StrolchTimedState<IValue<Integer>> timedState = this.resource.getTimedState(STATE_INTEGER_ID);
-			ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
-			SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
+		ITimeValue<IValue<Integer>> valueAt = timeEvolution.getValueAt(STATE_TIME_0);
+		assertEquals(new IntegerValue(0), valueAt.getValue());
 
-			Assert.assertEquals(3, values.size());
+		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
+		assertEquals(new IntegerValue(1), valueAt.getValue());
 
-			ITimeValue<IValue<Integer>> valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-
-			valueAt = timeEvolution.getValueAt(STATE_TIME_10);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
-
-			valueAt = timeEvolution.getValueAt(STATE_TIME_20);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-
-			// call undo to clean up
-			cmd.undo();
-
-			Assert.assertEquals(State.CREATED, this.action.getState());
-
-			// and check again
-			values = timeEvolution.getValues();
-			Assert.assertEquals(1, values.size());
-
-			valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-			Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-		}
+		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
+		assertEquals(new IntegerValue(0), valueAt.getValue());
 	}
 
 	/**
@@ -124,10 +137,11 @@ public class PlanActionTest {
 	 * </p>
 	 *
 	 * @param action
+	 * 		the action to create changes for
 	 */
 	protected static void createChanges(Action action) {
 
-		IntegerParameter parameter = action.getParameter("objective", "quantity");
+		IntegerParameter parameter = action.getParameter("objectives", "quantity");
 		Integer quantity = parameter.getValue();
 
 		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));

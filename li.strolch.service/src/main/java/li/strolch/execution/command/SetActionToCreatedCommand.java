@@ -53,7 +53,7 @@ public class SetActionToCreatedCommand extends ExecutionCommand {
 
 		getConfirmationPolicy(this.action).toCreated(this.action);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package li.strolch.planning;
+package li.strolch.execution.policy;
 
 import li.strolch.model.Order;
 import li.strolch.model.activity.Activity;

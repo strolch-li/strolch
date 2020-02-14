@@ -56,7 +56,7 @@
         </ParameterBag>
         <TimedState Id="quantity" Name="Quantity" Type="Integer"/>
         <Policies>
-            <Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.ReservationExection"/>
+            <Policy Type="ExecutionPolicy" Value="java:li.strolch.execution.policy.ReservationExecution"/>
             <Policy Type="ConfirmationPolicy" Value="key:DefaultConfirmation"/>
         </Policies>
     </Resource>

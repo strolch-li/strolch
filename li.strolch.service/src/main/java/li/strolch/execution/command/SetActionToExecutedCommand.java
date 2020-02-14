@@ -52,7 +52,7 @@ public class SetActionToExecutedCommand extends ExecutionCommand {
 		getExecutionPolicy(this.action).toExecuted(this.action);
 		getConfirmationPolicy(this.action).toExecuted(this.action);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

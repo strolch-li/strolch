@@ -53,7 +53,7 @@ public class SetActionToClosedCommand extends ExecutionCommand {
 
 		getConfirmationPolicy(this.action).toClosed(this.action);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

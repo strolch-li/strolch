@@ -32,7 +32,7 @@ public class ExecuteActivityCommand extends ExecutionCommand {
 		State currentState = rootElement.getState();
 		this.activity.accept(this);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

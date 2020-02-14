@@ -52,7 +52,7 @@ public class SetActionToErrorCommand extends ExecutionCommand {
 		getExecutionPolicy(this.action).toError(this.action);
 		getConfirmationPolicy(this.action).toError(this.action);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

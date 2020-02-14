@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.planning;
+package li.strolch.execution.command;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
+import static li.strolch.execution.command.ExecutionCommand.updateOrderState;
+import static li.strolch.execution.policy.NoPlanning.NO_PLANNING;
 
-import li.strolch.agent.api.ComponentContainer;
+import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.Resource;
+import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -31,7 +31,7 @@ import li.strolch.utils.dbc.DBC;
 
 /**
  * Command to plan an {@link Activity} to a {@link Resource}. This {@link Command} assumes that the {@link IValueChange}
- * objects of the action are already constructed and {@link Action#resourceId} is set.
+ * objects of the action are already constructed and {@link Action#getResourceId()} is set.
  *
  * <br>
  *
@@ -40,54 +40,40 @@ import li.strolch.utils.dbc.DBC;
  *
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class PlanActivityCommand extends AbstractPlanCommand {
+public class PlanActivityCommand extends PlanningCommand {
 
 	protected Activity activity;
 
-	/**
-	 * @param container
-	 * @param tx
-	 */
-	public PlanActivityCommand(final ComponentContainer container, final StrolchTransaction tx) {
-		super(container, tx);
-	}
-
-	@Override
-	public void validate() {
-		DBC.PRE.assertNotNull("Activity may not be null!", this.activity);
-		validate(activity);
-	}
-
-	private void validate(final Action action) {
-		DBC.PRE.assertNotNull("Action attribute resourceId may not be null!", action.getResourceId());
-		DBC.PRE.assertNotNull("Action attribute resourceType may not be null!", action.getResourceType());
-	}
-
-	private void validate(final Activity activity) {
-		final Iterator<Entry<String, IActivityElement>> elementIterator = activity.elementIterator();
-		while (elementIterator.hasNext()) {
-			final IActivityElement activityElement = elementIterator.next().getValue();
-			if (activityElement instanceof Activity)
-				validate((Activity) activityElement);
-			else if (activityElement instanceof Action)
-				validate((Action) activityElement);
-		}
-	}
-
-	@Override
-	public void doCommand() {
-		tx().lock(activity);
-		validate();
-		plan(activity);
-	}
-
-	@Override
-	public void undo() {
-		unplan(activity);
+	public PlanActivityCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	public void setActivity(Activity activity) {
 		this.activity = activity;
 	}
 
+	@Override
+	public void validate() {
+		DBC.PRE.assertNotNull("Activity may not be null!", this.activity);
+	}
+
+	@Override
+	public void doCommand() {
+		validate();
+
+		Activity rootElement = this.activity.getRootElement();
+		tx().lock(rootElement);
+
+		State currentState = rootElement.getState();
+		this.activity.accept(this);
+
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
+	}
+
+	@Override
+	public Void visitAction(Action action) {
+		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+		planningPolicy.plan(action);
+		return null;
+	}
 }

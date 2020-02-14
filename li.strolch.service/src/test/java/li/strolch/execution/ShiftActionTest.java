@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.planning;
+package li.strolch.execution;
 
 import static li.strolch.model.ModelGenerator.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 
 import java.util.SortedSet;
 
-import li.strolch.model.*;
+import li.strolch.execution.command.PlanActionCommand;
+import li.strolch.execution.command.ShiftActionCommand;
+import li.strolch.model.ModelGenerator;
+import li.strolch.model.ParameterBag;
+import li.strolch.model.Resource;
+import li.strolch.model.State;
 import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.timedstate.IntegerTimedState;
 import li.strolch.model.timedstate.StrolchTimedState;
@@ -34,8 +39,10 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
-import org.junit.Assert;
+import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -43,89 +50,93 @@ import org.junit.Test;
  */
 public class ShiftActionTest {
 
+	private static final String RUNTIME_PATH = "target/" + ShiftActionTest.class.getSimpleName();
+	private static final String CONFIG_SRC = "src/test/resources/executiontest"; //$NON-NLS-1$
+	private static RuntimeMock runtimeMock;
+	private static StrolchTransaction tx;
+
+	@BeforeClass
+	public static void beforeClass() {
+		runtimeMock = new RuntimeMock();
+		runtimeMock.mockRuntime(RUNTIME_PATH, CONFIG_SRC);
+		runtimeMock.startContainer();
+
+		tx = runtimeMock.openUserTx(runtimeMock.loginTest(), false);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
+	}
+
 	private Resource resource;
 	private Action action;
-	private IntegerTimedState timedState;
-	private StrolchTransaction tx;
 
 	@Before
 	public void init() {
 
 		// add a resource with integer state variable
 		this.resource = ModelGenerator.createResource("@1", "Test With States", "Stated");
-		this.timedState = this.resource.getTimedState(STATE_INTEGER_ID);
-		this.timedState.getTimeEvolution().clear();
-		this.timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
+		IntegerTimedState timedState = this.resource.getTimedState(STATE_INTEGER_ID);
+		timedState.getTimeEvolution().clear();
+		timedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerValue(STATE_INTEGER_TIME_0)), true);
 
+		Activity activity = new Activity("activity", "Test", "Test", TimeOrdering.SERIES);
 		this.action = new Action("action", "Action", "Use");
+		activity.addElement(this.action);
 
-		Assert.assertEquals(State.CREATED, this.action.getState());
+		assertEquals(State.CREATED, this.action.getState());
 
 		IntegerParameter iP = new IntegerParameter("quantity", "Occupation", 1);
-		this.action.addParameterBag(new ParameterBag("objective", "Objective", "Don't know"));
-		this.action.addParameter("objective", iP);
+		this.action.addParameterBag(new ParameterBag("objectives", "Objectives", "Objectives"));
+		this.action.addParameter("objectives", iP);
 
 		createChanges(this.action);
 
 		this.action.setResourceId(this.resource.getId());
 		this.action.setResourceType(this.resource.getType());
 
-		this.tx = mock(StrolchTransaction.class);
+		tx.add(this.resource);
+		tx.add(activity);
 
-		Locator locator = Locator.newBuilder(Tags.RESOURCE, "Stated", "@1").build();
-		when(this.tx.findElement(eq(locator))).thenReturn(this.resource);
-
-		PlanActionCommand cmd = new PlanActionCommand(null, this.tx);
+		PlanActionCommand cmd = new PlanActionCommand(tx);
 		cmd.setAction(this.action);
 		cmd.doCommand();
-
 	}
 
 	@Test
 	public void test() {
 
-		ShiftActionCommand cmd = new ShiftActionCommand(null, this.tx);
+		ShiftActionCommand cmd = new ShiftActionCommand(tx);
 		cmd.setAction(this.action);
 		cmd.setShift(10L);
 		cmd.doCommand();
 
 		// check the state
-		Assert.assertEquals(State.PLANNED, this.action.getState());
+		assertEquals(State.PLANNED, this.action.getState());
 
 		// check the resource Id
-		Assert.assertEquals(this.resource.getId(), this.action.getResourceId());
+		assertEquals(this.resource.getId(), this.action.getResourceId());
 
 		// check if we get the expected result
 		StrolchTimedState<IValue<Integer>> timedState = this.resource.getTimedState(STATE_INTEGER_ID);
 		ITimeVariable<IValue<Integer>> timeEvolution = timedState.getTimeEvolution();
 		SortedSet<ITimeValue<IValue<Integer>>> values = timeEvolution.getValues();
 
-		Assert.assertEquals(3, values.size());
+		assertEquals(3, values.size());
 
 		ITimeValue<IValue<Integer>> valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+		assertEquals(new IntegerValue(0), valueAt.getValue());
 
 		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
+		assertEquals(new IntegerValue(0), valueAt.getValue());
 
 		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
+		assertEquals(new IntegerValue(1), valueAt.getValue());
 
 		valueAt = timeEvolution.getValueAt(STATE_TIME_30);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-
-		// check the undo functionality
-		cmd.undo();
-
-		valueAt = timeEvolution.getValueAt(STATE_TIME_0);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-
-		valueAt = timeEvolution.getValueAt(STATE_TIME_10);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(1)));
-
-		valueAt = timeEvolution.getValueAt(STATE_TIME_20);
-		Assert.assertEquals(true, valueAt.getValue().equals(new IntegerValue(0)));
-
+		assertEquals(new IntegerValue(0), valueAt.getValue());
 	}
 
 	/**
@@ -135,10 +146,11 @@ public class ShiftActionTest {
 	 * </p>
 	 *
 	 * @param action
+	 * 		the action to create actions for
 	 */
 	protected static void createChanges(Action action) {
 
-		IntegerParameter parameter = action.getParameter("objective", "quantity");
+		IntegerParameter parameter = action.getParameter("objectives", "quantity");
 		Integer quantity = parameter.getValue();
 
 		IValueChange<IntegerValue> startChange = new ValueChange<>(STATE_TIME_10, new IntegerValue(quantity));

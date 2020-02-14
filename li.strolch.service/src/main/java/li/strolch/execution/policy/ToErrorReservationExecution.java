@@ -9,13 +9,13 @@ import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 
 /**
- * The {@link ToErrorReservationExecution} executes same as {@link ReservationExection} with the difference that {@link
+ * The {@link ToErrorReservationExecution} executes same as {@link ReservationExecution} with the difference that {@link
  * #isExecutable(Action)} always returns true, and if the action's resource is currently reserved, the execution fails
  * and the state is set to ERROR
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ToErrorReservationExecution extends ReservationExection {
+public class ToErrorReservationExecution extends ReservationExecution {
 
 	public ToErrorReservationExecution(StrolchTransaction tx) {
 		super(tx);

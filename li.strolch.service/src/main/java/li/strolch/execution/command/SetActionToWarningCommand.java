@@ -52,7 +52,7 @@ public class SetActionToWarningCommand extends ExecutionCommand {
 		getExecutionPolicy(this.action).toWarning(this.action);
 		getConfirmationPolicy(this.action).toWarning(this.action);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

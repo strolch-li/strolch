@@ -293,9 +293,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		getExecutor().execute(() -> {
 			try {
-				runAsAgent(ctx -> {
-					toExecution(realm, locator, ctx);
-				});
+				runAsAgent(ctx -> toExecution(realm, locator, ctx));
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
 
@@ -599,6 +597,9 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	private void notifyObserverAdd(String realm, Locator activityLoc) {
+		if (!getContainer().getRealm(realm).isUpdateObservers())
+			return;
+
 		try {
 			runAsAgent(ctx -> {
 				try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), true)) {

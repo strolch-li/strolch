@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.planning;
+package li.strolch.execution.command;
+
+import static li.strolch.execution.command.ExecutionCommand.updateOrderState;
+import static li.strolch.execution.policy.NoPlanning.NO_PLANNING;
 
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
+import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.State;
+import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -27,16 +32,13 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public class ShiftActionCommand extends PlanActionCommand {
+public class ShiftActionCommand extends PlanningCommand {
 
+	private Action action;
 	private Long shift;
 
-	/**
-	 * @param container
-	 * @param tx
-	 */
-	public ShiftActionCommand(final ComponentContainer container, final StrolchTransaction tx) {
-		super(container, tx);
+	public ShiftActionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override
@@ -47,14 +49,35 @@ public class ShiftActionCommand extends PlanActionCommand {
 		DBC.PRE.assertNotNull("The time to shift the action may not be null!", shift);
 	}
 
+	public void setAction(Action action) {
+		this.action = action;
+	}
+
+	public void setShift(Long shift) {
+		this.shift = shift;
+	}
+
 	@Override
 	public void doCommand() {
-
 		validate();
 
+		Activity rootElement = this.action.getRootElement();
+		tx().lock(rootElement);
+
+		State currentState = rootElement.getState();
+		this.action.accept(this);
+
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
+	}
+
+	@Override
+	public Void visitAction(Action action) {
+
 		// unplan the action
-		if (action.getState() == State.PLANNED)
-			unplan(action);
+		if (action.getState() == State.PLANNED) {
+			PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+			planningPolicy.unplan(action);
+		}
 
 		// iterate all changes and shift
 		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
@@ -63,28 +86,8 @@ public class ShiftActionCommand extends PlanActionCommand {
 		}
 
 		// finally plan the action
-		plan(action);
-
-	}
-
-	@Override
-	public void undo() {
-
-		// unplan the action
-		if (action.getState() == State.PLANNED)
-			unplan(action);
-
-		// iterate all changes and shift
-		final List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
-		for (final IValueChange<?> change : changes) {
-			change.setTime(change.getTime() - shift);
-		}
-
-		// finally plan the action
-		plan(action);
-	}
-
-	public void setShift(Long shift) {
-		this.shift = shift;
+		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+		planningPolicy.plan(action);
+		return null;
 	}
 }

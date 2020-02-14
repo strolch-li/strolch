@@ -52,7 +52,7 @@ public class SetActionToStoppedCommand extends ExecutionCommand {
 		getExecutionPolicy(this.action).toStopped(this.action);
 		getConfirmationPolicy(this.action).toStopped(this.action);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

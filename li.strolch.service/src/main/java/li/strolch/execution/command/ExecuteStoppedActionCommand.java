@@ -45,7 +45,7 @@ public class ExecuteStoppedActionCommand extends ExecutionCommand {
 		State currentState = rootElement.getState();
 		rootElement.accept(this);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

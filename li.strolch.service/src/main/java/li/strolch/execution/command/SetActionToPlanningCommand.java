@@ -53,7 +53,7 @@ public class SetActionToPlanningCommand extends ExecutionCommand {
 
 		getConfirmationPolicy(this.action).toPlanning(this.action);
 
-		updateOrderState(rootElement, currentState, rootElement.getState());
+		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package li.strolch.execution;
 
-import static li.strolch.execution.policy.ReservationExection.PARAM_RESERVED;
+import static li.strolch.execution.policy.ReservationExecution.PARAM_RESERVED;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static org.junit.Assert.*;
 
