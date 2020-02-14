@@ -20,6 +20,7 @@ import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.State;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.StrolchElementVisitor;
 
 /**
@@ -83,13 +84,51 @@ public interface IActivityElement extends StrolchElement {
 	 * </p>
 	 *
 	 * <p>
-	 * If the parameter does not exist and {@code assertExists} is true, then an
+	 * If the parameter does not exist and {@code assertExists} is true, then a {@link StrolchModelException} is thrown
 	 * </p>
-	 *
-	 * @see GroupedParameterizedElement#getParameter(String, String, boolean)
 	 */
 	<U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey, boolean assertExists)
 			throws StrolchModelException;
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link PolicyDef}, or otherwise queries its parent, until the root element is
+	 * reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the policy def does not exist and no default policy is passed, then a {@link StrolchModelException} is thrown
+	 * </p>
+	 *
+	 * @param className
+	 * 		the class name of the policy to find
+	 * @param defaultDef
+	 * 		default {@link PolicyDef} to return if not found
+	 *
+	 * @throws StrolchModelException
+	 * 		if no default policy, and policy not found
+	 */
+	PolicyDef findPolicy(String className, PolicyDef defaultDef) throws StrolchModelException;
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link PolicyDef}, or otherwise queries its parent, until the root element is
+	 * reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the policy def does not exist and no default policy is passed, then a {@link StrolchModelException} is thrown
+	 * </p>
+	 *
+	 * @param clazz
+	 * 		the class of the policy to find
+	 * @param defaultDef
+	 * 		default {@link PolicyDef} to return if not found
+	 *
+	 * @throws StrolchModelException
+	 * 		if no default policy, and policy not found
+	 */
+	PolicyDef findPolicy(Class<?> clazz, PolicyDef defaultDef) throws StrolchModelException;
 
 	@Override
 	Activity getParent();

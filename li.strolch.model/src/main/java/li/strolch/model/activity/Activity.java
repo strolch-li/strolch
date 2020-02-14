@@ -602,6 +602,27 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public PolicyDef findPolicy(Class<?> clazz, PolicyDef defaultDef) throws StrolchModelException {
+		return findPolicy(clazz.getSimpleName(), defaultDef);
+	}
+
+	@Override
+	public PolicyDef findPolicy(String className, PolicyDef defaultDef) throws StrolchModelException {
+		if (hasPolicyDef(className))
+			return getPolicyDef(className);
+
+		if (this.parent == null) {
+			if (defaultDef != null)
+				return defaultDef;
+
+			String msg = "The PolicyDef {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, className));
+		}
+
+		return this.parent.findPolicy(className, defaultDef);
+	}
+
+	@Override
 	public void setParent(Activity activity) {
 		assertNotReadonly();
 		this.parent = activity;

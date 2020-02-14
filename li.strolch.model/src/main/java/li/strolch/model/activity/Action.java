@@ -344,6 +344,27 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public PolicyDef findPolicy(Class<?> clazz, PolicyDef defaultDef) throws StrolchModelException {
+		return findPolicy(clazz.getSimpleName(), defaultDef);
+	}
+
+	@Override
+	public PolicyDef findPolicy(String className, PolicyDef defaultDef) throws StrolchModelException {
+		if (hasPolicyDef(className))
+			return getPolicyDef(className);
+
+		if (this.parent == null) {
+			if (defaultDef != null)
+				return defaultDef;
+
+			String msg = "The PolicyDef {0} does not exist";
+			throw new StrolchModelException(MessageFormat.format(msg, className));
+		}
+
+		return this.parent.findPolicy(className, defaultDef);
+	}
+
+	@Override
 	public <T> T accept(StrolchElementVisitor<T> visitor) {
 		return visitor.visitAction(this);
 	}
