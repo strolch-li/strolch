@@ -7,17 +7,17 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Stream;
 
-class SynchronizedCollections {
+public class SynchronizedCollections {
 
-	public <T, U> MapOfLists<T, U> synchronizedMapOfLists(MapOfLists<T, U> mapOfLists) {
+	public static <T, U> MapOfLists<T, U> synchronizedMapOfLists(MapOfLists<T, U> mapOfLists) {
 		return new SynchronizedMapOfLists<T, U>(mapOfLists);
 	}
 
-	public <T, U> MapOfSets<T, U> synchronizedMapOfSets(MapOfSets<T, U> mapOfSets) {
+	public static <T, U> MapOfSets<T, U> synchronizedMapOfSets(MapOfSets<T, U> mapOfSets) {
 		return new SynchronizedMapOfSets<T, U>(mapOfSets);
 	}
 
-	public <T, U, V> MapOfMaps<T, U, V> synchronizedMapOfMaps(MapOfMaps<T, U, V> mapOfMaps) {
+	public static <T, U, V> MapOfMaps<T, U, V> synchronizedMapOfMaps(MapOfMaps<T, U, V> mapOfMaps) {
 		return new SynchronizedMapOfMaps<T, U, V>(mapOfMaps);
 	}
 
