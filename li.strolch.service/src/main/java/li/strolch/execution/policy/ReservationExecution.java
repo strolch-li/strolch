@@ -1,6 +1,7 @@
 package li.strolch.execution.policy;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.runtime.StrolchConstants.PolicyConstants.*;
 
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator;
@@ -11,6 +12,7 @@ import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * <p>
@@ -21,17 +23,14 @@ import li.strolch.persistence.api.StrolchTransaction;
  * </p>
  *
  * <p>
- * <b>Note:</b> the reservation is done for {@link Action} of type {@link #TYPE_RESERVE} and releasing is done for
- * {@link Action} of type {@link #TYPE_RELEASE}
+ * <b>Note:</b> the reservation is done for {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RESERVE}
+ * and releasing is done for
+ * {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RELEASE}
  * </p>
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ReservationExecution extends DurationExecution {
-
-	public static final String PARAM_RESERVED = "reserved";
-	public static final String TYPE_RESERVE = "Reserve";
-	public static final String TYPE_RELEASE = "Release";
 
 	public ReservationExecution(StrolchTransaction tx) {
 		super(tx);

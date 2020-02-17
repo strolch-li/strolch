@@ -118,9 +118,12 @@ public class StrolchConstants {
 	public static class PolicyConstants {
 		public static final String TYPE_PRODUCE = "Produce";
 		public static final String TYPE_CONSUME = "Consume";
+		public static final String TYPE_RESERVE = "Reserve";
+		public static final String TYPE_RELEASE = "Release";
 
 		public static final String BAG_OBJECTIVES = "Objectives";
 
+		public static final String PARAM_RESERVED = "reserved";
 		public static final String PARAM_QUANTITY = "quantity";
 		public static final String PARAM_DURATION = "duration";
 		public static final String PARAM_ORDER = "order";
