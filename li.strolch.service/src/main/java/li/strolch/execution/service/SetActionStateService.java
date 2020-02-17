@@ -42,7 +42,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 			switch (state) {
 			case CREATED: {
 
-				SetActionToCreatedCommand command = new SetActionToCreatedCommand(getContainer(), tx);
+				SetActionToCreatedCommand command = new SetActionToCreatedCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 
@@ -51,7 +51,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			case PLANNING: {
 
-				SetActionToPlanningCommand command = new SetActionToPlanningCommand(getContainer(), tx);
+				SetActionToPlanningCommand command = new SetActionToPlanningCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 
@@ -60,7 +60,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			case PLANNED: {
 
-				SetActionToPlannedCommand command = new SetActionToPlannedCommand(getContainer(), tx);
+				SetActionToPlannedCommand command = new SetActionToPlannedCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 
@@ -72,7 +72,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 				tx.lock(locator);
 
 				IActivityElement element = tx.findElement(locator);
-				if (!element.getState().canSetToExecution()) {
+				if (element.getState().canNotSetToExecution()) {
 					String msg = "Current state is {0} and can not be changed to {1} for action {2}";
 					msg = MessageFormat.format(msg, element.getState(), State.EXECUTION, element.getLocator());
 					throw new StrolchException(msg);
@@ -86,7 +86,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			case WARNING: {
 
-				SetActionToWarningCommand command = new SetActionToWarningCommand(getContainer(), tx);
+				SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 
@@ -95,7 +95,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			case ERROR: {
 
-				SetActionToErrorCommand command = new SetActionToErrorCommand(getContainer(), tx);
+				SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 
@@ -104,7 +104,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			case STOPPED: {
 
-				SetActionToStoppedCommand command = new SetActionToStoppedCommand(getContainer(), tx);
+				SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 
@@ -113,7 +113,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			case EXECUTED: {
 
-				SetActionToExecutedCommand command = new SetActionToExecutedCommand(getContainer(), tx);
+				SetActionToExecutedCommand command = new SetActionToExecutedCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 
@@ -122,7 +122,7 @@ public class SetActionStateService extends AbstractService<StringMapArgument, Se
 
 			case CLOSED: {
 
-				SetActionToClosedCommand command = new SetActionToClosedCommand(getContainer(), tx);
+				SetActionToClosedCommand command = new SetActionToClosedCommand(tx);
 				command.setAction(action);
 				tx.addCommand(command);
 

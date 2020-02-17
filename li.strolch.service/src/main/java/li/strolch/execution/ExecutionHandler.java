@@ -11,8 +11,11 @@ import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.runtime.privilege.PrivilegedRunnable;
 
 /**
  * <p>
@@ -41,16 +44,13 @@ public abstract class ExecutionHandler extends StrolchComponent {
 
 	public static final String PARAM_STATE = "state";
 
-	/**
-	 * Registers the given {@link Locator} of an {@link Activity} for execution, and submits it for execution
-	 * immediately in an asynchronous manner
-	 *
-	 * @param realm
-	 * 		the realm where the {@link Activity} resides
-	 * @param activityLoc
-	 * 		the {@link Locator} of the {@link Activity}
-	 */
-	public abstract void addForExecution(String realm, Locator activityLoc);
+	public StrolchTransaction openTx(Certificate cert, Class<?> action, boolean readOnly) {
+		return super.openTx(cert, action.getName(), readOnly);
+	}
+
+	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+		super.runAsAgent(runnable);
+	}
 
 	/**
 	 * Registers the given {@link Activity} for execution, and submits it for execution immediately in an asynchronous
@@ -126,10 +126,10 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 *
 	 * @param realm
 	 * 		the realm where the activity resides
-	 * @param activityLoc
-	 * 		the {@link Locator} of the {@link Activity}
+	 * @param activity
+	 * 		the {@link Activity}
 	 */
-	public abstract void archiveActivity(String realm, Locator activityLoc);
+	public abstract void archiveActivity(String realm, Activity activity);
 
 	/**
 	 * Returns the {@link Set} of {@link Locator Locators} of {@link Activity Activities} which are registered for
@@ -157,14 +157,14 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public abstract DelayedExecutionTimer getDelayedExecutionTimer();
 
 	/**
-	 * Starts the execution of the given {@link Activity} with the given {@link Locator}
+	 * Starts the execution of the given {@link Activity}
 	 *
 	 * @param realm
 	 * 		the realm where the {@link Activity} resides
-	 * @param activityLoc
-	 * 		the {@link Locator} of the {@link Activity}
+	 * @param activity
+	 * 		the {@link Activity}
 	 */
-	public abstract void toExecution(String realm, Locator activityLoc);
+	public abstract void toExecution(String realm, Activity activity);
 
 	/**
 	 * Completes the execution of the given {@link Action} with the given {@link Locator}

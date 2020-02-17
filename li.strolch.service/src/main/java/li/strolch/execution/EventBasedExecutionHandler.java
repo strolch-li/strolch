@@ -1,7 +1,9 @@
 package li.strolch.execution;
 
+import static java.util.Collections.emptySet;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -9,7 +11,6 @@ import java.util.concurrent.ExecutorService;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverEvent;
 import li.strolch.execution.command.*;
-import li.strolch.execution.policy.ActivityArchivalPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.handler.operationslog.LogMessage;
 import li.strolch.handler.operationslog.LogSeverity;
@@ -19,13 +20,11 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.parameter.StringParameter;
-import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.policy.PolicyHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -36,11 +35,10 @@ import li.strolch.utils.dbc.DBC;
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
-	private static final String KEY_DEFAULT_ACTIVITY_ARCHIVAL = "key:DefaultActivityArchival";
 	private static final String PROP_RESTART_EXECUTION = "restartExecution";
 
 	private Map<String, ExecutionHandlerState> statesByRealm;
-	private MapOfSets<String, Locator> registeredActivities;
+	private MapOfMaps<String, Locator, Controller> controllers;
 
 	private DelayedExecutionTimer delayedExecutionTimer;
 
@@ -48,11 +46,23 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		super(container, componentName);
 	}
 
+	private ExecutorService getExecutor() {
+		return getExecutorService("ExecutionHandler");
+	}
+
+	@Override
+	public Set<Locator> getActiveActivitiesLocator(String realm) {
+		if (this.controllers == null)
+			return emptySet();
+		Map<Locator, Controller> activities = this.controllers.getMap(realm);
+		if (activities == null)
+			return emptySet();
+		return activities.keySet();
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
-
-		this.registeredActivities = new MapOfSets<>();
-
+		this.controllers = synchronizedMapOfMaps(new MapOfMaps<>());
 		super.initialize(configuration);
 	}
 
@@ -86,66 +96,33 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
-	public Set<Locator> getActiveActivitiesLocator(String realm) {
-		if (this.registeredActivities == null || !this.registeredActivities.containsSet(realm))
-			return Collections.emptySet();
-
-		synchronized (this.registeredActivities) {
-			return new HashSet<>(this.registeredActivities.getSet(realm));
-		}
-	}
-
-	@Override
 	public void addForExecution(String realm, Activity activity) {
-
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.HaltNew)
 			throw new IllegalStateException(
 					"ExecutionHandler state is " + state + ", can not add activities for execution!");
 
-		Locator rootElemLoc = activity.getLocator();
-		synchronized (this.registeredActivities) {
-			this.registeredActivities.addElement(realm, rootElemLoc);
-		}
-
-		notifyObserverAdd(realm, activity);
-		toExecution(realm, rootElemLoc);
-	}
-
-	@Override
-	public void addForExecution(String realm, Locator activityLoc) {
-
-		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
-		if (state == ExecutionHandlerState.HaltNew)
-			throw new IllegalStateException(
-					"ExecutionHandler state is " + state + ", can not add activities for execution!");
-
-		Locator rootElemLoc = activityLoc.trim(3);
-		synchronized (this.registeredActivities) {
-			this.registeredActivities.addElement(realm, rootElemLoc);
-		}
-
-		getExecutor().submit(() -> notifyObserverAdd(realm, activityLoc));
-		toExecution(realm, activityLoc);
+		Controller controller = new Controller(this, activity);
+		this.controllers.addElement(realm, activity.getLocator(), controller);
+		notifyObserverAdd(realm, controller);
+		toExecution(realm, activity);
 	}
 
 	@Override
 	public void removeFromExecution(String realm, Locator activityLoc) {
 		Locator rootElemLoc = activityLoc.trim(3);
-		synchronized (this.registeredActivities) {
-			this.registeredActivities.removeElement(realm, rootElemLoc);
-		}
-		getExecutor().submit(() -> notifyObserverRemove(realm, activityLoc));
+		Controller controller = this.controllers.removeElement(realm, rootElemLoc);
+		if (controller != null)
+			getExecutor().submit(() -> notifyObserverRemove(realm, controller));
 	}
 
 	@Override
 	public void clearAllCurrentExecutions(String realm) {
-		Set<Locator> removed = this.registeredActivities.removeSet(realm);
+		Map<Locator, Controller> removed = this.controllers.removeMap(realm);
 		getExecutor().submit(() -> notifyObserverRemove(realm, removed));
 	}
 
 	private void restartActivityExecution(PrivilegeContext ctx) {
-
 		// iterate the realms
 		for (String realmName : getContainer().getRealmNames()) {
 			reloadActivitiesInExecution(ctx, realmName);
@@ -180,7 +157,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				tx.update(activity);
 
 				// register for execution
-				this.registeredActivities.addElement(realmName, activity.getLocator());
+				Controller controller = new Controller(this, activity);
+				this.controllers.addElement(realmName, activity.getLocator(), controller);
 			});
 
 			// commit changes to state
@@ -200,12 +178,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
-		synchronized (this.registeredActivities) {
-			Set<Locator> locators = this.registeredActivities.getSet(realm);
-			if (locators != null) {
-				for (Locator locator : locators) {
+		synchronized (this.controllers) {
+			Map<Locator, Controller> controllers = this.controllers.getMap(realm);
+			if (controllers != null) {
+				for (Controller controller : controllers.values()) {
 					// execute async
-					toExecution(realm, locator);
+					toExecution(realm, controller);
 				}
 			}
 		}
@@ -283,23 +261,23 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
-	public void toExecution(String realm, Locator locator) {
+	public void toExecution(String realm, Activity activity) {
 
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.Paused) {
-			logger.warn("Ignoring execution of " + locator + " for paused realm " + realm);
+			logger.warn("Ignoring execution of " + activity.getLocator() + " for paused realm " + realm);
 			return;
 		}
 
 		getExecutor().execute(() -> {
 			try {
-				runAsAgent(ctx -> toExecution(realm, locator, ctx));
+				runAsAgent(ctx -> toExecution(realm, activity, ctx));
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to execution due to " + e.getMessage(), e);
+				logger.error("Failed to set " + activity.getLocator() + " to execution", e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
+							new LogMessage(realm, SYSTEM_USER_AGENT, activity.getLocator(), LogSeverity.Exception,
 									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.execution")
 									.withException(e).value("reason", e));
 				}
@@ -307,17 +285,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		});
 	}
 
-	private ExecutorService getExecutor() {
-		return getExecutorService("ExecutionHandler");
-	}
-
 	@Override
 	public void toExecuted(String realm, Locator locator) {
 		getExecutor().execute(() -> {
 			try {
-				runAsAgent(ctx -> {
-					toExecuted(realm, locator, ctx);
-				});
+				runAsAgent(ctx -> toExecuted(realm, locator, ctx));
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
 
@@ -335,9 +307,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	public void toStopped(String realm, Locator locator) {
 		getExecutor().execute(() -> {
 			try {
-				runAsAgent(ctx -> {
-					toStopped(realm, locator, ctx);
-				});
+				runAsAgent(ctx -> toStopped(realm, locator, ctx));
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to stopped due to " + e.getMessage(), e);
 
@@ -355,9 +325,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	public void toError(String realm, Locator locator) {
 		getExecutor().execute(() -> {
 			try {
-				runAsAgent(ctx -> {
-					toError(realm, locator, ctx);
-				});
+				runAsAgent(ctx -> toError(realm, locator, ctx));
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to error due to " + e.getMessage(), e);
 
@@ -375,9 +343,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	public void toWarning(String realm, Locator locator) {
 		getExecutor().execute(() -> {
 			try {
-				runAsAgent(ctx -> {
-					toWarning(realm, locator, ctx);
-				});
+				runAsAgent(ctx -> toWarning(realm, locator, ctx));
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to warning due to " + e.getMessage(), e);
 
@@ -392,42 +358,24 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
-	public void archiveActivity(String realm, Locator activityLoc) {
+	public void archiveActivity(String realm, Activity activity) {
 		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
-					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ActivityArchivalPolicy.class,
+					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ArchiveActivityCommand.class,
 							false)) {
-						tx.lock(activityLoc);
-
-						Activity activity = tx.findElement(activityLoc, true);
-						if (activity == null) {
-							return;
-						}
-
-						logger.info("Activity " + activity.getLocator() + " is in state " + activity.getState());
-
-						PolicyDef policyDef;
-						if (activity.hasPolicyDef(ActivityArchivalPolicy.class.getSimpleName())) {
-							policyDef = activity.getPolicyDef(ActivityArchivalPolicy.class.getSimpleName());
-						} else {
-							policyDef = PolicyDef.valueOf(ActivityArchivalPolicy.class.getSimpleName(),
-									KEY_DEFAULT_ACTIVITY_ARCHIVAL);
-						}
-
-						PolicyHandler policyHandler = getComponent(PolicyHandler.class);
-						ActivityArchivalPolicy archivalPolicy = policyHandler.getPolicy(policyDef, tx);
-						archivalPolicy.archive(activity);
-
+						ArchiveActivityCommand command = new ArchiveActivityCommand(tx);
+						command.setActivityLoc(activity.getLocator());
+						tx.addCommand(command);
 						tx.commitOnClose();
 					}
 				});
 			} catch (Exception e) {
-				logger.error("Failed to archive " + activityLoc + " due to " + e.getMessage(), e);
+				logger.error("Failed to archive " + activity.getLocator() + " due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, SYSTEM_USER_AGENT, activityLoc, LogSeverity.Exception,
+							new LogMessage(realm, SYSTEM_USER_AGENT, activity.getLocator(), LogSeverity.Exception,
 									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.archive")
 									.withException(e).value("reason", e));
 				}
@@ -596,27 +544,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		triggerExecution(realm);
 	}
 
-	private void notifyObserverAdd(String realm, Locator activityLoc) {
-		if (!getContainer().getRealm(realm).isUpdateObservers())
-			return;
-
-		try {
-			runAsAgent(ctx -> {
-				try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), true)) {
-					Activity activity = tx.findElement(activityLoc, true);
-					if (activity != null) {
-						ObserverEvent observerEvent = new ObserverEvent();
-						observerEvent.added.addElement(Tags.CONTROLLER, activity);
-						getContainer().getRealm(realm).getObserverHandler().notify(observerEvent);
-					}
-				}
-			});
-		} catch (Exception e) {
-			logger.error("Failed to notify observers of new controller " + activityLoc);
-		}
-	}
-
-	private void notifyObserverAdd(String realm, Activity rootElement) {
+	private void notifyObserverAdd(String realm, Controller controller) {
 		if (!getContainer().getRealm(realm).isUpdateObservers())
 			return;
 
@@ -625,7 +553,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		getContainer().getRealm(realm).getObserverHandler().notify(observerEvent);
 	}
 
-	private void notifyObserverUpdate(StrolchTransaction tx, Activity rootElement) {
+	private void notifyObserverUpdate(StrolchTransaction tx, Controller controller) {
 		if (!getContainer().getRealm(tx.getRealmName()).isUpdateObservers())
 			return;
 
@@ -634,7 +562,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		tx.getContainer().getRealm(tx.getRealmName()).getObserverHandler().notify(observerEvent);
 	}
 
-	private void notifyObserverRemove(StrolchTransaction tx, Activity rootElement) {
+	private void notifyObserverRemove(StrolchTransaction tx, Controller controller) {
 		if (!getContainer().getRealm(tx.getRealmName()).isUpdateObservers())
 			return;
 
@@ -643,7 +571,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		tx.getContainer().getRealm(tx.getRealmName()).getObserverHandler().notify(observerEvent);
 	}
 
-	private void notifyObserverRemove(String realm, Locator activityLoc) {
+	private void notifyObserverRemove(String realm, Controller controller) {
 		if (!getContainer().getRealm(realm).isUpdateObservers())
 			return;
 
@@ -663,7 +591,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 	}
 
-	private void notifyObserverRemove(String realm, Set<Locator> activityLocs) {
+	private void notifyObserverRemove(String realm, Map<Locator, Controller> removed) {
 		if (!getContainer().getRealm(realm).isUpdateObservers())
 			return;
 

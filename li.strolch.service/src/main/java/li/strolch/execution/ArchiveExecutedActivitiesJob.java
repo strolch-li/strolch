@@ -3,6 +3,7 @@ package li.strolch.execution;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.execution.command.ArchiveActivityCommand;
 import li.strolch.job.JobMode;
 import li.strolch.job.StrolchJob;
 import li.strolch.model.State;
@@ -23,13 +24,16 @@ public class ArchiveExecutedActivitiesJob extends StrolchJob {
 	@Override
 	protected void execute(PrivilegeContext ctx) {
 
-		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
-
-		try (StrolchTransaction tx = openTx(ctx.getCertificate(), true)) {
+		try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
 			tx.streamActivities().forEach(activity -> {
-				if (activity.getState() == State.EXECUTED)
-					executionHandler.archiveActivity(tx.getRealmName(), activity.getLocator());
+				if (activity.getState() == State.EXECUTED) {
+					ArchiveActivityCommand command = new ArchiveActivityCommand(tx);
+					command.setActivity(activity);
+					tx.addCommand(command);
+				}
 			});
+
+			tx.commitOnClose();
 		}
 	}
 }

@@ -27,7 +27,7 @@ public class SetActionToPlanningService extends AbstractService<LocatorArgument,
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToPlanningCommand command = new SetActionToPlanningCommand(getContainer(), tx);
+			SetActionToPlanningCommand command = new SetActionToPlanningCommand(tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

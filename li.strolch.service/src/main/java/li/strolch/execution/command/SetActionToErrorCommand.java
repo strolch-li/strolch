@@ -2,7 +2,6 @@ package li.strolch.execution.command;
 
 import java.text.MessageFormat;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -14,8 +13,8 @@ public class SetActionToErrorCommand extends ExecutionCommand {
 
 	private Action action;
 
-	public SetActionToErrorCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public SetActionToErrorCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	public void setAction(Action action) {
@@ -53,10 +52,5 @@ public class SetActionToErrorCommand extends ExecutionCommand {
 		getConfirmationPolicy(this.action).toError(this.action);
 
 		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
-	}
-
-	@Override
-	public void undo() {
-		// can not undo
 	}
 }

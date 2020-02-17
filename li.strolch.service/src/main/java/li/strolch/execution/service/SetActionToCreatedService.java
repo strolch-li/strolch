@@ -27,7 +27,7 @@ public class SetActionToCreatedService extends AbstractService<LocatorArgument, 
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToCreatedCommand command = new SetActionToCreatedCommand(getContainer(), tx);
+			SetActionToCreatedCommand command = new SetActionToCreatedCommand(tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

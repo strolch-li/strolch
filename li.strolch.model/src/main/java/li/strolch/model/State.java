@@ -30,6 +30,7 @@ public enum State {
 	CREATED("Created"), //$NON-NLS-1$
 	PLANNING("Planning"), //$NON-NLS-1$
 	PLANNED("Planned"), //$NON-NLS-1$
+	EXECUTABLE("Executable"), //$NON-NLS-1$
 	EXECUTION("Execution"), //$NON-NLS-1$
 	WARNING("Warning"), //$NON-NLS-1$
 	ERROR("Error"), //$NON-NLS-1$
@@ -39,7 +40,7 @@ public enum State {
 
 	private String state;
 
-	private State(String state) {
+	State(String state) {
 		this.state = state;
 	}
 
@@ -62,8 +63,8 @@ public enum State {
 	}
 
 	/**
-	 * @return true if the state is one of {@link #EXECUTION}, {@link #STOPPED}, {@link #WARNING}, {@link #ERROR} or
-	 * {@link #EXECUTED}
+	 * @return true if the state is one of {@link #EXECUTABLE} {@link #EXECUTION}, {@link #STOPPED}, {@link #WARNING},
+	 * {@link #ERROR} or {@link #EXECUTED}
 	 */
 	public boolean inExecutionPhase() {
 		return this == EXECUTION || this == STOPPED || this == WARNING || this == ERROR;
@@ -168,10 +169,17 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #CREATED} or {@link #PLANNING} or {@link #PLANNED} or {@link #EXECUTION} or {@link #STOPPED}
+	 * @return true if {@link #PLANNED} or {@link #EXECUTABLE} or {@link #EXECUTION}
 	 */
-	public boolean canSetToExecution() {
-		return this == CREATED || this == PLANNING || this == PLANNED || this == EXECUTION || this == State.STOPPED;
+	public boolean isExecutable() {
+		return this == PLANNED || this == EXECUTABLE || this == EXECUTION;
+	}
+
+	/**
+	 * @return true if state >= {@link #EXECUTED}
+	 */
+	public boolean canNotSetToExecution() {
+		return this.compareTo(State.EXECUTED) >= 0;
 	}
 
 	/**
@@ -249,7 +257,7 @@ public enum State {
 			return WARNING;
 
 		// execution
-		if (states.contains(EXECUTION))
+		if (states.contains(EXECUTABLE) || states.contains(EXECUTION))
 			return EXECUTION;
 		if (states.contains(EXECUTED) && (states.contains(CREATED) || states.contains(PLANNING) || states
 				.contains(PLANNED)))
@@ -275,4 +283,5 @@ public enum State {
 		// should never happen, unless new state is introduced
 		throw new IllegalStateException("Unhandled situation with states: " + states.stream().map(e -> e.state)
 				.collect(Collectors.joining(", ")));
-	}}
+	}
+}

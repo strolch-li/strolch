@@ -27,7 +27,7 @@ public class SetActionToWarningService extends AbstractService<LocatorArgument, 
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToWarningCommand command = new SetActionToWarningCommand(getContainer(), tx);
+			SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

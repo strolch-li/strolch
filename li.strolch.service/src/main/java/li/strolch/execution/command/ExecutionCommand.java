@@ -8,7 +8,6 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
 import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
@@ -29,8 +28,8 @@ import li.strolch.service.api.Command;
 
 public abstract class ExecutionCommand extends Command implements TimeOrderingVisitor, IActivityElementVisitor<Void> {
 
-	public ExecutionCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ExecutionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	protected Locator getResourceLocator(Action action) {

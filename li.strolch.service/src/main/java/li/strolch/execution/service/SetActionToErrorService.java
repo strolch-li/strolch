@@ -27,7 +27,7 @@ public class SetActionToErrorService extends AbstractService<LocatorArgument, Se
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToErrorCommand command = new SetActionToErrorCommand(getContainer(), tx);
+			SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

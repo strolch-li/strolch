@@ -425,7 +425,7 @@ public class StrolchComponent {
 	 * @return the newly created transaction
 	 */
 	protected StrolchTransaction openTx(Certificate cert, boolean readOnly) {
-		return getContainer().getRealm(cert).openTx(cert, this.getClass(), readOnly);
+		return getContainer().getRealm(cert).openTx(cert, getClass(), readOnly);
 	}
 
 	/**
@@ -457,7 +457,7 @@ public class StrolchComponent {
 	 * @return the newly created transaction
 	 */
 	protected StrolchTransaction openTx(String realm, Certificate cert, boolean readOnly) {
-		return getContainer().getRealm(realm).openTx(cert, this.getClass(), readOnly);
+		return getContainer().getRealm(realm).openTx(cert, getClass(), readOnly);
 	}
 
 	/**

@@ -27,7 +27,7 @@ public class SetActionToClosedService extends AbstractService<LocatorArgument, S
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToClosedCommand command = new SetActionToClosedCommand(getContainer(), tx);
+			SetActionToClosedCommand command = new SetActionToClosedCommand(tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

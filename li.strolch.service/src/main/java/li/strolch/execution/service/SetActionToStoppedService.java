@@ -27,7 +27,7 @@ public class SetActionToStoppedService extends AbstractService<LocatorArgument, 
 
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToStoppedCommand command = new SetActionToStoppedCommand(getContainer(), tx);
+			SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

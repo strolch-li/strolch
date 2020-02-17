@@ -72,8 +72,13 @@ public class PlanActionCommand extends PlanningCommand {
 
 	@Override
 	public Void visitAction(Action action) {
+
 		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
 		planningPolicy.plan(action);
+
+		if (action.getState() == State.PLANNED)
+			getConfirmationPolicy(action).toPlanned(action);
+
 		return null;
 	}
 }
