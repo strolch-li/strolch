@@ -36,6 +36,8 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toExecuted(Action action) {
+		stop();
+
 		setActionState(action, State.EXECUTED);
 
 		FloatValue value = new FloatValue(0.0D);
@@ -44,7 +46,8 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toStopped(Action action) {
-		getDelayedExecutionTimer().cancel(action.getLocator());
+		stop();
+
 		setActionState(action, State.STOPPED);
 
 		FloatValue value = new FloatValue(0.0D);
@@ -53,7 +56,8 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toError(Action action) {
-		getDelayedExecutionTimer().cancel(action.getLocator());
+		stop();
+
 		setActionState(action, State.ERROR);
 
 		FloatValue value = new FloatValue(0.0D);
@@ -68,18 +72,20 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void toError(LogMessage message) {
+		stop();
 		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
 		addMessage(message);
-		getExecutionHandler().toError(message.getRealm(), message.getLocator());
+		getController().asyncToError(message.getLocator());
 	}
 
 	protected void toWarning(LogMessage message) {
+		stop();
 		addMessage(message);
-		getExecutionHandler().toWarning(message.getRealm(), message.getLocator());
+		getController().asyncToWarning(message.getLocator());
 	}
 
 	@Override
-	public void undo() {
-		logger.error("Can not undo execution policy " + getClass());
+	protected void handleStopped() {
+		getDelayedExecutionTimer().cancel(this.actionLoc);
 	}
 }

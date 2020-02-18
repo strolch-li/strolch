@@ -16,6 +16,8 @@
 
 package li.strolch.model.activity;
 
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -142,6 +144,16 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		this.resourceId = resource.getId();
 	}
 
+	public boolean hasResourceDefined() {
+		return isNotEmpty(this.resourceType) && isNotEmpty(this.resourceId);
+	}
+
+	public Locator getResourceLocator() {
+		if (!hasResourceDefined())
+			throw new IllegalStateException("Resource not set on " + getLocator());
+		return Resource.locatorFor(this.resourceType, this.resourceId);
+	}
+
 	/**
 	 * Returns true if this {@link Action} contains any {@link IValueChange changes}, false if not
 	 *
@@ -243,6 +255,20 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	@Override
 	public PolicyDef getPolicyDef(Class<?> clazz) {
 		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName(), defaultDef);
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(String type, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(type, defaultDef);
 	}
 
 	@Override

@@ -304,11 +304,12 @@ public abstract class Command implements Restrictable {
 
 	/**
 	 * <p>
-	 * Should the transaction fail, either due to a {@link Command} throwing an exception when {@link #validate()} is
-	 * called, or while committing the transaction, then this method should properly undo any changes it has done. It is
-	 * imperative that this method does not throw further exceptions and that the state to be rolled back is remembered
-	 * in the Command during committing
+	 * This method can be used to undo actions peformed during the command, should the TX fail. In earlier versions of
+	 * Strolch this was important to undo model changes, but the model changes are only visible after a commit succeeds,
+	 * so this is no longer necessary.
 	 * </p>
 	 */
-	public abstract void undo();
+	public void undo() {
+		// do nothing
+	}
 }

@@ -446,6 +446,24 @@ public interface StrolchTransaction extends AutoCloseable {
 	void addCommand(Command command);
 
 	/**
+	 * Adds the given {@link Command} to the transaction. Using this method guarantees that a {@link Command} is
+	 * executed properly:
+	 * <ul>
+	 * <li>{@link Command#validate()}</li>
+	 * <li>{@link Command#doCommand()}</li>
+	 * </ul>
+	 *
+	 * and if an exception occurs:
+	 * <ul>
+	 * <li>{@link Command#undo()}</li>
+	 * </ul>
+	 *
+	 * @param command
+	 * 		the command to add
+	 */
+	void add(Command command);
+
+	/**
 	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling {@link
 	 * AuditTrail#add(StrolchTransaction, Audit)}
 	 *
@@ -534,11 +552,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * Used to find a {@link StrolchElement} by a {@link Locator}, throwing exception if the element is not found
 	 * </p>
 	 *
-	 * @throws StrolchException
+	 * @throws StrolchModelException
 	 * 		if the element could not be found
 	 * @see #findElement(Locator, boolean)
 	 */
-	<T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException;
+	<T extends StrolchElement> T findElement(Locator locator) throws StrolchModelException, ClassCastException;
 
 	/**
 	 * <p>
@@ -565,14 +583,14 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * an inexistant {@link Resource} or an inexistand {@link Parameter} on a Resource, then a {@link StrolchException}
 	 * is thrown
 	 *
-	 * @throws StrolchException
+	 * @throws StrolchModelException
 	 * 		if the element could not be found and {@code allowNull} is false
 	 * @throws ClassCastException
 	 * 		if the querying code is not asking for the correct instance. Do not query a {@link Parameter} if the variable
 	 * 		to which the result is to be is stored is a {@link Resource}, etc.
 	 */
 	<T extends StrolchElement> T findElement(Locator locator, boolean allowNull)
-			throws StrolchException, ClassCastException;
+			throws StrolchModelException, ClassCastException;
 
 	/**
 	 * <p>Finds a parameter with the given @bagKey and @paramKey on the given @element, but if it does not exists
@@ -1360,6 +1378,14 @@ public interface StrolchTransaction extends AutoCloseable {
 	 */
 	List<Order> getOrdersByRelation(StrolchRootElement element, String refId, boolean assertExists)
 			throws StrolchException;
+
+	/**
+	 * Allows to evict a {@link Locator} from the transaction's cache and object filter
+	 *
+	 * @param locator
+	 * 		the locator of the object to remove from cache
+	 */
+	void removeFromCache(Locator locator);
 
 	/**
 	 * Returns the cached resource with the given type and id, or null if not yet fetched

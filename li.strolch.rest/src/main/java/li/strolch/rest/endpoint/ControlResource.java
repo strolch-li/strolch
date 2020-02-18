@@ -16,6 +16,7 @@ import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.ExecutionHandlerState;
 import li.strolch.execution.service.*;
 import li.strolch.model.Locator;
+import li.strolch.model.State;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -133,15 +134,84 @@ public class ControlResource {
 			@QueryParam("locator") String locatorS, @QueryParam("state") String stateS) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
+		State state = State.parse(stateS);
+		Locator locator = Locator.valueOf(locatorS);
 
-		SetActionStateService svc = new SetActionStateService();
-		StringMapArgument arg = svc.getArgumentInstance();
-		arg.realm = realm;
-		arg.map.put("locator", locatorS);
-		arg.map.put("state", stateS);
+		LocatorArgument arg = new LocatorArgument();
+		arg.locator = locator;
 
 		ServiceHandler serviceHandler = RestfulStrolchComponent.getInstance().getServiceHandler();
-		ServiceResult svcResult = serviceHandler.doService(cert, svc, arg);
+		ServiceResult svcResult;
+
+		switch (state) {
+		case CREATED: {
+
+			SetActionToCreatedService svc = new SetActionToCreatedService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		case PLANNED: {
+
+			SetActionToPlannedService svc = new SetActionToPlannedService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		case EXECUTION: {
+
+			ExecuteActionService svc = new ExecuteActionService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		case WARNING: {
+
+			SetActionToWarningService svc = new SetActionToWarningService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		case ERROR: {
+
+			SetActionToErrorService svc = new SetActionToErrorService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		case STOPPED: {
+
+			SetActionToStoppedService svc = new SetActionToStoppedService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		case EXECUTED: {
+
+			SetActionToExecutedService svc = new SetActionToExecutedService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		case CLOSED: {
+
+			SetActionToClosedService svc = new SetActionToClosedService();
+			svcResult = serviceHandler.doService(cert, svc, arg);
+
+			break;
+		}
+
+		default:
+			throw new UnsupportedOperationException("Unhandled state " + state);
+		}
+
 		return ResponseUtil.toResponse(svcResult);
 	}
 

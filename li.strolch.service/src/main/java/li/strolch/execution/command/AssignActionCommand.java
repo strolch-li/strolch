@@ -15,8 +15,7 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.execution.command.ExecutionCommand.updateOrderState;
-import static li.strolch.execution.policy.NoPlanning.NO_PLANNING;
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
 
 import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.Resource;
@@ -69,14 +68,9 @@ public class AssignActionCommand extends PlanningCommand {
 
 	@Override
 	public void doCommand() {
-		validate();
-
 		Activity rootElement = this.action.getRootElement();
-		tx().lock(rootElement);
-
 		State currentState = rootElement.getState();
 		this.action.accept(this);
-
 		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
@@ -85,7 +79,7 @@ public class AssignActionCommand extends PlanningCommand {
 
 		// unplan the action
 		if (action.getState() == State.PLANNED) {
-			PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+			PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
 			planningPolicy.unplan(action);
 		}
 
@@ -94,7 +88,7 @@ public class AssignActionCommand extends PlanningCommand {
 		action.setResourceType(this.targetResourceType);
 
 		// finally plan the action to the assigned resource
-		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
 		planningPolicy.plan(action);
 
 		return null;

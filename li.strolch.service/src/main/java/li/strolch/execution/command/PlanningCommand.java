@@ -23,20 +23,14 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.service.api.Command;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public abstract class PlanningCommand extends Command implements IActivityElementVisitor<Void> {
+public abstract class PlanningCommand extends BasePlanningAndExecutionCommand implements IActivityElementVisitor<Void> {
 
 	public PlanningCommand(StrolchTransaction tx) {
 		super(tx);
-	}
-
-	@Override
-	public void undo() {
-		// do nothing
 	}
 
 	@Override

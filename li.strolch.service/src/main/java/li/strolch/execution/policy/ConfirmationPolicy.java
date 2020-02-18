@@ -1,6 +1,7 @@
 package li.strolch.execution.policy;
 
 import li.strolch.model.activity.Action;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
 
@@ -12,6 +13,9 @@ import li.strolch.policy.StrolchPolicy;
  */
 public class ConfirmationPolicy extends StrolchPolicy {
 
+	public static PolicyDef DEFAULT_CONFIRMATION = PolicyDef
+			.valueOf(ConfirmationPolicy.class.getSimpleName(), "key:DefaultConfirmation");
+
 	public ConfirmationPolicy(StrolchTransaction tx) {
 		super(tx);
 	}
@@ -20,11 +24,11 @@ public class ConfirmationPolicy extends StrolchPolicy {
 		// do nothing
 	}
 
-	public void toPlanning(Action action) {
+	public void toPlanned(Action action) {
 		// do nothing
 	}
 
-	public void toPlanned(Action action) {
+	public void toExecutable(Action action) {
 		// do nothing
 	}
 

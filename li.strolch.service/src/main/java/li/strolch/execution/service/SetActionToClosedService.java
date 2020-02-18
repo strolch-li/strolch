@@ -25,9 +25,11 @@ public class SetActionToClosedService extends AbstractService<LocatorArgument, S
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
+			tx.lock(arg.locator.trim(3));
 			Action action = tx.findElement(arg.locator);
+			tx.lock(action.getResourceLocator());
 
-			SetActionToClosedCommand command = new SetActionToClosedCommand(getContainer(), tx);
+			SetActionToClosedCommand command = new SetActionToClosedCommand(tx);
 			command.setAction(action);
 			tx.addCommand(command);
 

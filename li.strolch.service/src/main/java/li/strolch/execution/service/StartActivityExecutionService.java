@@ -4,6 +4,8 @@ import static li.strolch.service.I18nService.i18nService;
 
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.ExecutionHandlerState;
+import li.strolch.model.activity.Activity;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.LocatorArgument;
 import li.strolch.service.StrolchRootElementResult;
@@ -36,7 +38,12 @@ public class StartActivityExecutionService extends AbstractService<LocatorArgume
 					"ExecutionHandler is not running, can not start new jobs!")
 					.i18n(i18nService, "execution.handler.invalidState", "state", executionHandlerState);
 
-		executionHandler.addForExecution(realm, arg.locator);
+		Activity activity;
+		try (StrolchTransaction tx = openTx(realm, true)) {
+			activity = tx.getActivityBy(arg.locator.get(1), arg.locator.get(2), true);
+		}
+
+		executionHandler.toExecution(realm, activity);
 
 		return ServiceResult.success();
 	}

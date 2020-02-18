@@ -155,6 +155,20 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName(), defaultDef);
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(String type, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(type, defaultDef);
+	}
+
+	@Override
 	public boolean hasPolicyDefs() {
 		return this.policyDefs != null;
 	}

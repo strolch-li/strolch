@@ -16,20 +16,15 @@
 package li.strolch.policy;
 
 import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_ORDER;
-import static li.strolch.utils.helper.StringHelper.DASH;
-
-import li.strolch.model.Order;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Resource;
+import li.strolch.model.Order;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
-import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Interface for all Strolch policies, which are instantiated by the {@link PolicyHandler}
@@ -84,30 +79,6 @@ public abstract class StrolchPolicy {
 	 */
 	protected StrolchTransaction tx() {
 		return this.tx;
-	}
-
-	/**
-	 * Return the defined {@link Resource} on the given {@link Action}
-	 *
-	 * @param action
-	 * 		the action for which to get the {@link Resource}
-	 *
-	 * @return the {@link Resource}
-	 *
-	 * @throws IllegalArgumentException
-	 * 		if the resource is not defined on the action, i.e. fields are empty or a dash
-	 * @throws StrolchException
-	 * 		if the resource does not exist, which is referenced by the action
-	 */
-	protected Resource getResource(Action action) throws IllegalArgumentException, StrolchException {
-		String resourceId = action.getResourceId();
-		if (StringHelper.isEmpty(resourceId) || resourceId.equals(DASH))
-			throw new IllegalArgumentException("No resourceId defined on action " + action.getLocator());
-		String resourceType = action.getResourceType();
-		if (StringHelper.isEmpty(resourceType) || resourceType.equals(DASH))
-			throw new IllegalArgumentException("No resourceType defined on action " + action.getLocator());
-
-		return this.tx.getResourceBy(resourceType, resourceId, true);
 	}
 
 	protected Order getOrder(Action action) {

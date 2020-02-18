@@ -15,8 +15,7 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.execution.command.ExecutionCommand.updateOrderState;
-import static li.strolch.execution.policy.NoPlanning.NO_PLANNING;
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
 
 import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.Resource;
@@ -59,21 +58,18 @@ public class PlanActionCommand extends PlanningCommand {
 
 	@Override
 	public void doCommand() {
-		validate();
-
 		Activity rootElement = this.action.getRootElement();
-		tx().lock(rootElement);
-
 		State currentState = rootElement.getState();
 		this.action.accept(this);
-
 		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
 	@Override
 	public Void visitAction(Action action) {
-		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
 		planningPolicy.plan(action);
+		if (action.getState() == State.PLANNED)
+			getConfirmationPolicy(action).toPlanned(action);
 		return null;
 	}
 }

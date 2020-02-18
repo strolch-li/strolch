@@ -16,6 +16,8 @@ import li.strolch.runtime.StrolchConstants.PolicyConstants;
  */
 public class DurationExecution extends SimpleExecution {
 
+	protected Locator actionLoc;
+
 	public DurationExecution(StrolchTransaction tx) {
 		super(tx);
 	}
@@ -27,10 +29,15 @@ public class DurationExecution extends SimpleExecution {
 				.findParameter(PolicyConstants.BAG_OBJECTIVES, PolicyConstants.PARAM_DURATION, true);
 
 		String realmName = tx().getRealmName();
-		Locator locator = action.getLocator();
-		logger.info("Executing action " + action.getLocator() + " has a duration of " + durationP.getValueAsString());
-		getDelayedExecutionTimer().execute(realmName, getContainer(), locator, durationP.toMillis());
+		this.actionLoc = action.getLocator();
+		logger.info("Executing action " + actionLoc + " has a duration of " + durationP.getValueAsString());
+		getDelayedExecutionTimer().execute(realmName, getContainer(), this.actionLoc, durationP.toMillis());
 
 		super.toExecution(action);
+	}
+
+	@Override
+	protected void handleStopped() {
+		getDelayedExecutionTimer().cancel(this.actionLoc);
 	}
 }

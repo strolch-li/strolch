@@ -319,6 +319,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void addCommand(Command command) {
+		add(command);
+	}
+
+	public void add(Command command) {
 		assertNotReadOnly();
 		this.commands.add(command);
 	}
@@ -416,13 +420,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchException, ClassCastException {
+	public <T extends StrolchElement> T findElement(Locator locator) throws StrolchModelException, ClassCastException {
 		return findElement(locator, false);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends StrolchElement> T findElement(Locator locator, boolean allowNull) {
+	public <T extends StrolchElement> T findElement(Locator locator, boolean allowNull)
+			throws StrolchModelException, ClassCastException {
 
 		// Resource/<type>/<id>
 		// Resource/<type>/<id>/Bag/<id>
@@ -435,7 +440,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (locator.getSize() < 3) {
 			String msg = "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, locator.toString());
-			throw new StrolchException(msg);
+			throw new StrolchModelException(msg);
 		}
 
 		List<String> elements = locator.getPathElements();
@@ -454,14 +459,15 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			groupedParameterizedElement = getActivityBy(type, id);
 			break;
 		default:
-			throw new StrolchException(MessageFormat.format("Unknown object class {0}", objectClassType)); //$NON-NLS-1$
+			throw new StrolchModelException(
+					MessageFormat.format("Unknown object class {0}", objectClassType)); //$NON-NLS-1$
 		}
 
 		if (groupedParameterizedElement == null) {
 			if (allowNull)
 				return null;
 			String msg = "No top level object could be found with locator {0}"; //$NON-NLS-1$
-			throw new StrolchException(MessageFormat.format(msg, locator));
+			throw new StrolchModelException(MessageFormat.format(msg, locator));
 		}
 
 		if (elements.size() == 3)
@@ -477,7 +483,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				if (allowNull)
 					return null;
 				String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
-				throw new StrolchException(
+				throw new StrolchModelException(
 						MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
 			}
 
@@ -490,7 +496,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				if (allowNull)
 					return null;
 				String msg = "Could not find Parameter for locator {0} on element {1}"; //$NON-NLS-1$
-				throw new StrolchException(MessageFormat.format(msg, locator, bag.getLocator()));
+				throw new StrolchModelException(MessageFormat.format(msg, locator, bag.getLocator()));
 			}
 			return (T) parameter;
 
@@ -498,9 +504,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 			if (elements.size() != 5) {
 				String msg = "Missing state Id on locator {0}"; //$NON-NLS-1$
-				throw new StrolchException(MessageFormat.format(msg, locator));
+				throw new StrolchModelException(MessageFormat.format(msg, locator));
 			}
 
+			@SuppressWarnings("ConstantConditions")
 			Resource resource = (Resource) groupedParameterizedElement;
 			String stateId = elements.get(4);
 
@@ -518,7 +525,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 				if (!(element instanceof Activity)) {
 					String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified"; //$NON-NLS-1$
-					throw new StrolchException(MessageFormat.format(msg, locator, next));
+					throw new StrolchModelException(MessageFormat.format(msg, locator, next));
 				}
 
 				element = ((Activity) element).getElement(next);
@@ -531,7 +538,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return null;
 
 		String msg = "Invalid locator {0} with part {1}"; //$NON-NLS-1$
-		throw new StrolchException(MessageFormat.format(msg, locator, stateOrBagOrActivity));
+		throw new StrolchModelException(MessageFormat.format(msg, locator, stateOrBagOrActivity));
 	}
 
 	@Override
@@ -1042,6 +1049,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotEmpty("refId", refId);
 		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId, assertExists);
 		return getActivitiesBy(refsP, assertExists);
+	}
+
+	@Override
+	public void removeFromCache(Locator locator) {
+		if (this.resourceCache != null)
+			this.resourceCache.removeElement(locator.get(1), locator.get(2));
+		if (this.objectFilter != null)
+			this.objectFilter.removeObjectCache(locator.get(0), locator);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
+import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
@@ -381,6 +382,29 @@ public class Activity extends AbstractStrolchRootElement
 		}
 	}
 
+	public <T extends IActivityElement> T getElementByLocator(Locator locator) {
+		DBC.PRE.assertEquals("Locator is not for this activity!", getLocator(), locator.trim(3));
+		DBC.PRE.assertTrue("Locator must have at least 5 parts", locator.getSize() >= 4);
+
+		IActivityElement element = this;
+		for (int i = 3; i < locator.getSize(); i++) {
+			String next = locator.get(i);
+
+			if (!(element instanceof Activity)) {
+				String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified"; //$NON-NLS-1$
+				throw new StrolchModelException(MessageFormat.format(msg, locator, next));
+			}
+
+			element = ((Activity) element).getElement(next);
+			if (element == null)
+				throw new StrolchElementNotFoundException(locator + " does not exist!");
+		}
+
+		@SuppressWarnings("unchecked")
+		T t = (T) element;
+		return t;
+	}
+
 	/**
 	 * @return the iterator for entries, which include the id as key and the {@link IActivityElement} as value
 	 */
@@ -447,6 +471,20 @@ public class Activity extends AbstractStrolchRootElement
 	@Override
 	public PolicyDef getPolicyDef(String type) {
 		return getPolicyDefs().getPolicyDef(type);
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName(), defaultDef);
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(String type, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(type, defaultDef);
 	}
 
 	@Override

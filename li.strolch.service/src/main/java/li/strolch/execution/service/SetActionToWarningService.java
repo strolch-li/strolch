@@ -1,5 +1,7 @@
 package li.strolch.execution.service;
 
+import li.strolch.execution.Controller;
+import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.command.SetActionToWarningCommand;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -25,11 +27,19 @@ public class SetActionToWarningService extends AbstractService<LocatorArgument, 
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
+			tx.lock(arg.locator.trim(3));
 			Action action = tx.findElement(arg.locator);
+			tx.lock(action.getResourceLocator());
 
-			SetActionToWarningCommand command = new SetActionToWarningCommand(getContainer(), tx);
-			command.setAction(action);
-			tx.addCommand(command);
+			ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
+			Controller controller = executionHandler.getController(tx.getRealmName(), action.getRootElement());
+			if (controller != null) {
+				controller.toWarning(action.getLocator());
+			} else {
+				SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
+				command.setAction(action);
+				tx.addCommand(command);
+			}
 
 			tx.commitOnClose();
 		}

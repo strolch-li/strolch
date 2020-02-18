@@ -55,7 +55,14 @@ public class PolicyDefs {
 	}
 
 	public PolicyDef getPolicyDef(String type) {
+		return getPolicyDef(type, null);
+	}
+
+	public PolicyDef getPolicyDef(String type, PolicyDef defaultDef) {
 		if (!this.policyDefMap.containsKey(type)) {
+			if (defaultDef != null)
+				return defaultDef;
+
 			throw new StrolchPolicyException(
 					"The PolicyDef does not exist with type " + type + " on " + this.parent.getLocator());
 		}

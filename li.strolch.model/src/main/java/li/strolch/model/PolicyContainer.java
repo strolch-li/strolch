@@ -20,12 +20,12 @@ public interface PolicyContainer {
 	 * @throws StrolchPolicyException
 	 * 		if no {@link PolicyDefs} are available
 	 */
-	public PolicyDefs getPolicyDefs() throws StrolchPolicyException;
+	PolicyDefs getPolicyDefs() throws StrolchPolicyException;
 
 	/**
 	 * @return true if this container has {@link PolicyDefs}, false if not
 	 */
-	public boolean hasPolicyDefs();
+	boolean hasPolicyDefs();
 
 	/**
 	 * Returns true if this container has the {@link PolicyDef} with the given type, false if not
@@ -35,7 +35,7 @@ public interface PolicyContainer {
 	 *
 	 * @return true if this container has the {@link PolicyDef} with the given type, false if not
 	 */
-	public boolean hasPolicyDef(String type);
+	boolean hasPolicyDef(String type);
 
 	/**
 	 * Returns the {@link PolicyDef} for the given type
@@ -45,7 +45,19 @@ public interface PolicyContainer {
 	 *
 	 * @return the policy def of the given type
 	 */
-	public PolicyDef getPolicyDef(String type);
+	PolicyDef getPolicyDef(String type);
+
+	/**
+	 * Returns the {@link PolicyDef} for the given type
+	 *
+	 * @param type
+	 * 		the type of policy def to return
+	 * @param defaultDef
+	 * 		the default policy definition to return if the given type is not defined
+	 *
+	 * @return the policy def of the given type
+	 */
+	PolicyDef getPolicyDef(String type, PolicyDef defaultDef);
 
 	/**
 	 * Returns the {@link PolicyDef} for the given class
@@ -55,7 +67,19 @@ public interface PolicyContainer {
 	 *
 	 * @return the policy def of the given class
 	 */
-	public PolicyDef getPolicyDef(Class<?> clazz);
+	PolicyDef getPolicyDef(Class<?> clazz);
+
+	/**
+	 * Returns the {@link PolicyDef} for the given class
+	 *
+	 * @param clazz
+	 * 		the type of policy def to return
+	 * @param defaultDef
+	 * 		the default policy definition to return if the given type is not defined
+	 *
+	 * @return the policy def of the given class
+	 */
+	PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef);
 
 	/**
 	 * Set the reference to the {@link PolicyDefs}
@@ -63,5 +87,5 @@ public interface PolicyContainer {
 	 * @param policyDefs
 	 * 		the {@link PolicyDefs} to set
 	 */
-	public void setPolicyDefs(PolicyDefs policyDefs);
+	void setPolicyDefs(PolicyDefs policyDefs);
 }

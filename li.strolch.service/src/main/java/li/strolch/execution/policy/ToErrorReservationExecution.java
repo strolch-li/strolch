@@ -29,8 +29,6 @@ public class ToErrorReservationExecution extends ReservationExecution {
 	@Override
 	public boolean isExecutable(Action action) {
 
-		tx().lock(getResource(action));
-
 		if (action.getType().equals(TYPE_RESERVE)) {
 			return true;
 		}
@@ -41,14 +39,12 @@ public class ToErrorReservationExecution extends ReservationExecution {
 	@Override
 	public void toExecution(Action action) {
 
-		tx().lock(getResource(action));
-
 		if (action.getType().equals(TYPE_RESERVE) && isReserved(action)) {
 			setActionState(action, State.EXECUTION);
 			toError(new LogMessage(tx().getRealmName(), tx().getCertificate().getUsername(), action.getLocator(),
 					LogSeverity.Error, ResourceBundle.getBundle("strolch-service"),
 					"execution.policy.reservation.alreadyReserved")
-					.value("resourceLoc", getResource(action).getLocator().toString()));
+					.value("resourceLoc", action.getResourceLocator().toString()));
 		} else {
 			super.toExecution(action);
 		}

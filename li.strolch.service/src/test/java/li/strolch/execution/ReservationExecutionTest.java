@@ -23,8 +23,12 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReservationExecutionTest extends RuntimeMock {
+
+	private static final Logger logger = LoggerFactory.getLogger(ReservationExecutionTest.class);
 
 	@Before
 	public void before() {
@@ -83,6 +87,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 			// verify that the machine is not reserved
 			Resource machine = tx.getResourceBy("Machine", "machine1");
 			BooleanParameter reservedP = machine.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
+			logger.info("Checking machine is not reserved initially");
 			assertFalse(reservedP.getValue());
 		}
 
@@ -105,6 +110,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 			// verify that the machine is reserved
 			Resource machine = tx.getResourceBy("Machine", "machine1");
 			BooleanParameter reservedP = machine.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
+			logger.info("Checking machine is reserved, after reserve action is executed.");
 			assertTrue(reservedP.getValue());
 		}
 
@@ -120,6 +126,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 			// verify that the machine is not reserved anymore
 			Resource machine = tx.getResourceBy("Machine", "machine1");
 			BooleanParameter reservedP = machine.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
+			logger.info("Checking machine is released, after release action is executed.");
 			assertFalse(reservedP.getValue());
 		}
 	}
