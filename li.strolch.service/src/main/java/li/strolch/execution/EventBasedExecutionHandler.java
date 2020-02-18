@@ -118,10 +118,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void removeFromExecution(Controller controller) {
-		logger.info("Removing controller " + controller.getLocator() + " from execution...");
 		if (this.controllers.removeElement(controller.getRealm(), controller.getLocator()) != null) {
 			logger.info("Removed controller " + controller.getLocator() + " from execution.");
 			getExecutor().submit(() -> notifyObserverRemove(controller));
+		} else {
+			logger.error(
+					"Controller " + controller.getRealm() + " " + controller.getLocator() + " was already removed.");
 		}
 	}
 

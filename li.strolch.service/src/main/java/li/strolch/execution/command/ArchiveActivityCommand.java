@@ -29,6 +29,8 @@ public class ArchiveActivityCommand extends Command {
 
 	@Override
 	public void doCommand() {
+		tx().lock(this.activityLoc);
+
 		Activity activity = tx().getActivityBy(this.activityLoc.get(1), this.activityLoc.get(2));
 		if (activity == null) {
 			logger.error("Activity " + this.activityLoc + " does not exist anymore, can not archive!");

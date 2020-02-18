@@ -4,7 +4,6 @@ import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.runtime.StrolchConstants.PolicyConstants.*;
 
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -24,8 +23,7 @@ import li.strolch.runtime.StrolchConstants;
  *
  * <p>
  * <b>Note:</b> the reservation is done for {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RESERVE}
- * and releasing is done for
- * {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RELEASE}
+ * and releasing is done for {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RELEASE}
  * </p>
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -72,14 +70,8 @@ public class ReservationExecution extends DurationExecution {
 		case TYPE_RESERVE:
 		case TYPE_RELEASE:
 
-			boolean isReserve = action.getType().equals(TYPE_RESERVE);
-			setReservation(action, isReserve);
-
-			String realmName = tx().getRealmName();
-			Locator locator = action.getLocator();
-			getDelayedExecutionTimer().execute(realmName, getContainer(), locator, 0L);
-
-			setActionState(action, State.EXECUTION);
+			// async to executed only causes trouble =))
+			toExecuted(action);
 			break;
 
 		default:
