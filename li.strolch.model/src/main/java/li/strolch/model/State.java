@@ -169,6 +169,13 @@ public enum State {
 	}
 
 	/**
+	 * @return true if {@link #PLANNED} or {@link #EXECUTABLE} or {@link #STOPPED}
+	 */
+	public boolean canSetToExecutable() {
+		return this == PLANNED || this == EXECUTABLE || this == State.STOPPED;
+	}
+
+	/**
 	 * @return true if {@link #PLANNED} or {@link #EXECUTABLE} or {@link #EXECUTION}
 	 */
 	public boolean isExecutable() {

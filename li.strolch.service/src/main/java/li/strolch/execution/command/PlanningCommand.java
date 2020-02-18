@@ -15,37 +15,22 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.utils.helper.StringHelper.DASH;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.execution.policy.ConfirmationPolicy;
-import li.strolch.model.Resource;
 import li.strolch.model.State;
-import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
-import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.policy.PolicyHandler;
-import li.strolch.service.api.Command;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
  */
-public abstract class PlanningCommand extends Command implements IActivityElementVisitor<Void> {
+public abstract class PlanningCommand extends BasePlanningAndExecutionCommand implements IActivityElementVisitor<Void> {
 
 	public PlanningCommand(StrolchTransaction tx) {
 		super(tx);
-	}
-
-	@Override
-	public void undo() {
-		// do nothing
 	}
 
 	@Override
@@ -60,23 +45,5 @@ public abstract class PlanningCommand extends Command implements IActivityElemen
 				element.accept(this);
 		}
 		return null;
-	}
-
-	protected Resource getResource(Action action) {
-		String resourceId = action.getResourceId();
-		if (isEmpty(resourceId) || resourceId.equals(DASH))
-			throw new StrolchException("No resourceId defined on action " + action.getLocator());
-		String resourceType = action.getResourceType();
-		if (isEmpty(resourceType) || resourceType.equals(DASH))
-			throw new StrolchException("No resourceType defined on action " + action.getLocator());
-
-		return tx().getResourceBy(resourceType, resourceId, true);
-	}
-
-
-	protected ConfirmationPolicy getConfirmationPolicy(Action action) {
-		Resource resource = getResource(action);
-		PolicyDef executionPolicyDef = resource.getPolicyDefs().getPolicyDef(ConfirmationPolicy.class.getSimpleName());
-		return getComponent(PolicyHandler.class).getPolicy(executionPolicyDef, tx());
 	}
 }

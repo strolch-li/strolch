@@ -43,7 +43,7 @@ public class StartActivityExecutionService extends AbstractService<LocatorArgume
 			activity = tx.getActivityBy(arg.locator.get(1), arg.locator.get(2), true);
 		}
 
-		executionHandler.addForExecution(realm, activity);
+		executionHandler.toExecution(realm, activity);
 
 		return ServiceResult.success();
 	}

@@ -52,7 +52,10 @@ public class SynchronizedCollections {
 		@Override
 		public List<U> getList(T t) {
 			synchronized (this.mutex) {
-				return new SynchronizedList<>(this.m.getList(t), this.mutex);
+				List<U> list = this.m.getList(t);
+				if (list == null)
+					return null;
+				return new SynchronizedList<>(list, this.mutex);
 			}
 		}
 
@@ -194,7 +197,10 @@ public class SynchronizedCollections {
 		@Override
 		public Map<U, V> getMap(T t) {
 			synchronized (this.mutex) {
-				return new SynchronizedMap<>(this.m.getMap(t), this.mutex);
+				Map<U, V> map = this.m.getMap(t);
+				if (map == null)
+					return null;
+				return new SynchronizedMap<>(map, this.mutex);
 			}
 		}
 
@@ -358,7 +364,10 @@ public class SynchronizedCollections {
 		@Override
 		public Set<U> getSet(T t) {
 			synchronized (this.mutex) {
-				return new SynchronizedSet<>(this.m.getSet(t), this.mutex);
+				Set<U> set = this.m.getSet(t);
+				if (set == null)
+					return null;
+				return new SynchronizedSet<>(set, this.mutex);
 			}
 		}
 

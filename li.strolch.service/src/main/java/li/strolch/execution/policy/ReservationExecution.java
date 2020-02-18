@@ -53,8 +53,9 @@ public class ReservationExecution extends DurationExecution {
 	}
 
 	protected boolean isReserved(Action action) {
+
 		// get resource
-		Resource resource = getResource(action);
+		Resource resource = tx().getResourceFor(action, true);
 
 		if (!resource.hasParameter(BAG_PARAMETERS, PARAM_RESERVED))
 			throw new StrolchModelException(
@@ -67,55 +68,55 @@ public class ReservationExecution extends DurationExecution {
 
 	@Override
 	public void toExecution(Action action) {
+		switch (action.getType()) {
 
-		// only do if reserve or release
-		boolean isReserve = action.getType().equals(TYPE_RESERVE);
-		boolean isRelease = action.getType().equals(TYPE_RELEASE);
-		if (!isReserve && !isRelease) {
-			// otherwise delegate to super class
+		case TYPE_RESERVE:
+		case TYPE_RELEASE:
+
+			boolean isReserve = action.getType().equals(TYPE_RESERVE);
+			setReservation(action, isReserve);
+
+			String realmName = tx().getRealmName();
+			Locator locator = action.getLocator();
+			getDelayedExecutionTimer().execute(realmName, getContainer(), locator, 0L);
+
+			setActionState(action, State.EXECUTION);
+			break;
+
+		default:
 			super.toExecution(action);
-
-			return;
 		}
-
-		setReservation(action);
-
-		String realmName = tx().getRealmName();
-		Locator locator = action.getLocator();
-		getDelayedExecutionTimer().execute(realmName, getContainer(), locator, 0L);
-
-		setActionState(action, State.EXECUTION);
 	}
 
 	@Override
 	public void toExecuted(Action action) {
 
-		// only do if reserve or release
-		boolean isReserve = action.getType().equals(TYPE_RESERVE);
-		boolean isRelease = action.getType().equals(TYPE_RELEASE);
-		if (!isReserve && !isRelease) {
-			// otherwise delegate to super class
+		switch (action.getType()) {
+
+		case TYPE_RESERVE:
+		case TYPE_RELEASE:
+
+			boolean isReserve = action.getType().equals(TYPE_RESERVE);
+			setReservation(action, isReserve);
+
+			FloatValue value = new FloatValue(isReserve ? 1.0D : 0.0D);
+			action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
+
+			setActionState(action, State.EXECUTED);
+			break;
+
+		default:
 			super.toExecuted(action);
-
-			return;
 		}
-
-		setReservation(action);
-		setActionState(action, State.EXECUTED);
-
-		FloatValue value = new FloatValue(isReserve ? 1.0D : 0.0D);
-		action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
 	}
 
-	public void setReservation(Action action) {
+	private void setReservation(Action action, boolean isReserve) {
 
-		Resource resource = getResource(action);
-
-		boolean reserved = action.getType().equals(TYPE_RESERVE);
+		Resource resource = tx().getResourceFor(action, true);
 
 		// release the resource
 		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
-		reservedP.setValue(reserved);
+		reservedP.setValue(isReserve);
 
 		// save changes
 		tx().update(resource);

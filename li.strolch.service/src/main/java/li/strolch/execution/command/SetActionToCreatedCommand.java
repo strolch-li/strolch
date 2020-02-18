@@ -9,7 +9,7 @@ import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
-public class SetActionToCreatedCommand extends ExecutionCommand {
+public class SetActionToCreatedCommand extends BasePlanningAndExecutionCommand {
 
 	private Action action;
 
@@ -25,9 +25,6 @@ public class SetActionToCreatedCommand extends ExecutionCommand {
 	public void validate() {
 		DBC.PRE.assertNotNull("action can not be null", this.action);
 
-		tx().lock(this.action.getRootElement());
-		tx().lock(getResourceLocator(this.action));
-
 		if (!this.action.getState().canSetToCreated()) {
 			String msg = "Current state is {0} and can not be changed to {1} for action {2}";
 			msg = MessageFormat.format(msg, this.action.getState(), State.CREATED, this.action.getLocator());
@@ -37,15 +34,12 @@ public class SetActionToCreatedCommand extends ExecutionCommand {
 
 	@Override
 	public void doCommand() {
-		Activity rootElement = this.action.getRootElement();
-		tx().lock(rootElement);
-		tx().lock(getResourceLocator(this.action));
-
 		if (this.action.getState() == State.CREATED) {
 			logger.warn("Action " + this.action.getLocator() + " is already in state CREATED! Not changing.");
 			return;
 		}
 
+		Activity rootElement = this.action.getRootElement();
 		State currentState = rootElement.getState();
 
 		this.action.setState(State.CREATED);

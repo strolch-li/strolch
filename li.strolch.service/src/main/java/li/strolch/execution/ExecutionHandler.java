@@ -1,6 +1,7 @@
 package li.strolch.execution;
 
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -24,7 +25,7 @@ import li.strolch.runtime.privilege.PrivilegedRunnable;
  *
  * <p>
  * To start the execution of an {@link Activity} add it to the {@link ExecutionHandler} by calling {@link
- * #addForExecution(String, Activity)} or {@link #addForExecution(String, Locator)}. Actual execution is asynchronously
+ * #toExecution(String, Activity)} or {@link #toExecution(String, Activity)}. Actual execution is asynchronously
  * performed and the {@link ExecutionPolicy} of the resources of the {@link Action Actions} will perform the actual
  * execution.
  * </p>
@@ -44,13 +45,41 @@ public abstract class ExecutionHandler extends StrolchComponent {
 
 	public static final String PARAM_STATE = "state";
 
-	public StrolchTransaction openTx(Certificate cert, Class<?> action, boolean readOnly) {
-		return super.openTx(cert, action.getName(), readOnly);
+	public StrolchTransaction openTx(String realm, Certificate cert, Class<?> action, boolean readOnly) {
+		return super.openTx(realm, cert, action.getName(), readOnly);
 	}
 
 	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		super.runAsAgent(runnable);
 	}
+
+	public ExecutorService getExecutor() {
+		return getExecutorService("ExecutionHandler");
+	}
+
+	/**
+	 * Returns the controller for the given realm and activity, null if it does not exist
+	 *
+	 * @param realm
+	 * 		the realm for which to get the controller
+	 * @param activity
+	 * 		the activity for which to get the controller
+	 *
+	 * @return the controller, or null if it does not exist
+	 */
+	public abstract Controller getController(String realm, Activity activity);
+
+	/**
+	 * Returns the controller for the given realm and activity, null if it does not exist
+	 *
+	 * @param realm
+	 * 		the realm for which to get the controller
+	 * @param locator
+	 * 		the locator of the activity for which to get the controller
+	 *
+	 * @return the controller, or null if it does not exist
+	 */
+	public abstract Controller getController(String realm, Locator locator);
 
 	/**
 	 * Registers the given {@link Activity} for execution, and submits it for execution immediately in an asynchronous
@@ -61,7 +90,15 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * @param activity
 	 * 		the the {@link Activity}
 	 */
-	public abstract void addForExecution(String realm, Activity activity);
+	public abstract void toExecution(String realm, Activity activity);
+
+	/**
+	 * Removes the given {@link Controller} from execution, so it is not executed further
+	 *
+	 * @param controller
+	 * 		the controller to remove
+	 */
+	public abstract void removeFromExecution(Controller controller);
 
 	/**
 	 * Removes the given {@link Locator} for an {@link Activity} from execution, so it is not executed further
@@ -92,7 +129,7 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public abstract void clearAllCurrentExecutions(String realm);
 
 	/**
-	 * Triggers a to execution for all registered activities in the given realm
+	 * Triggers execution for all registered activities in the given realm
 	 *
 	 * @param realm
 	 * 		the realm to trigger execution for
@@ -148,23 +185,13 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * </p>
 	 *
 	 * <p>
-	 * The {@link DelayedExecutionTimer} allows to delay the {@link #toExecuted(String, Locator)} call by a given time.
-	 * See the {@link DurationExecution} policy
+	 * The {@link DelayedExecutionTimer} allows to delay the {@link Controller#toExecuted(Locator)} call by a given
+	 * time. See the {@link DurationExecution} policy
 	 * </p>
 	 *
 	 * @return the {@link DelayedExecutionTimer}
 	 */
 	public abstract DelayedExecutionTimer getDelayedExecutionTimer();
-
-	/**
-	 * Starts the execution of the given {@link Activity}
-	 *
-	 * @param realm
-	 * 		the realm where the {@link Activity} resides
-	 * @param activity
-	 * 		the {@link Activity}
-	 */
-	public abstract void toExecution(String realm, Activity activity);
 
 	/**
 	 * Completes the execution of the given {@link Action} with the given {@link Locator}

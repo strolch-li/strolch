@@ -15,8 +15,7 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.execution.command.ExecutionCommand.updateOrderState;
-import static li.strolch.execution.policy.NoPlanning.NO_PLANNING;
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
 
 import java.util.List;
 
@@ -59,14 +58,9 @@ public class ShiftActionCommand extends PlanningCommand {
 
 	@Override
 	public void doCommand() {
-		validate();
-
 		Activity rootElement = this.action.getRootElement();
-		tx().lock(rootElement);
-
 		State currentState = rootElement.getState();
 		this.action.accept(this);
-
 		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}
 
@@ -75,8 +69,10 @@ public class ShiftActionCommand extends PlanningCommand {
 
 		// unplan the action
 		if (action.getState() == State.PLANNED) {
-			PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+			PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
 			planningPolicy.unplan(action);
+			if (action.getState() == State.CREATED)
+				getConfirmationPolicy(action).toCreated(action);
 		}
 
 		// iterate all changes and shift
@@ -86,8 +82,10 @@ public class ShiftActionCommand extends PlanningCommand {
 		}
 
 		// finally plan the action
-		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, NO_PLANNING));
+		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
 		planningPolicy.plan(action);
+		if (action.getState() == State.PLANNED)
+			getConfirmationPolicy(action).toPlanned(action);
 		return null;
 	}
 }

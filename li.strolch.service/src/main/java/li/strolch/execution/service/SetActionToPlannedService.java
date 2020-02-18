@@ -25,7 +25,10 @@ public class SetActionToPlannedService extends AbstractService<LocatorArgument, 
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
+			tx.lock(arg.locator.trim(3));
 			Action action = tx.findElement(arg.locator);
+			if (!action.hasResourceDefined())
+				return ServiceResult.error("Resource not defined for " + action.getLocator());
 
 			SetActionToPlannedCommand command = new SetActionToPlannedCommand(tx);
 			command.setAction(action);

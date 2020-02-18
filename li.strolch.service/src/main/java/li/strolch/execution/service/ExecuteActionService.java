@@ -1,14 +1,16 @@
 package li.strolch.execution.service;
 
-import li.strolch.execution.command.SetActionToPlanningCommand;
+import li.strolch.execution.ExecutionHandler;
+import li.strolch.model.State;
 import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.LocatorArgument;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
-public class SetActionToPlanningService extends AbstractService<LocatorArgument, ServiceResult> {
+public class ExecuteActionService extends AbstractService<LocatorArgument, ServiceResult> {
 
 	@Override
 	protected ServiceResult getResultInstance() {
@@ -23,16 +25,26 @@ public class SetActionToPlanningService extends AbstractService<LocatorArgument,
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
+		String realm;
+		Activity activity;
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+			realm = tx.getRealmName();
 
+			tx.lock(arg.locator.trim(3));
 			Action action = tx.findElement(arg.locator);
 
-			SetActionToPlanningCommand command = new SetActionToPlanningCommand(tx);
-			command.setAction(action);
-			tx.addCommand(command);
+			// this is so we can re-execute stopped actions
+			if (action.getState() == State.STOPPED) {
+				action.setState(State.EXECUTABLE);
 
-			tx.commitOnClose();
+				tx.update(action.getRootElement());
+				tx.commitOnClose();
+			}
+
+			activity = action.getRootElement();
 		}
+
+		getComponent(ExecutionHandler.class).toExecution(realm, activity);
 
 		return ServiceResult.success();
 	}

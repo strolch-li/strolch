@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
+import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
@@ -395,6 +396,8 @@ public class Activity extends AbstractStrolchRootElement
 			}
 
 			element = ((Activity) element).getElement(next);
+			if (element == null)
+				throw new StrolchElementNotFoundException(locator + " does not exist!");
 		}
 
 		@SuppressWarnings("unchecked")
@@ -468,6 +471,20 @@ public class Activity extends AbstractStrolchRootElement
 	@Override
 	public PolicyDef getPolicyDef(String type) {
 		return getPolicyDefs().getPolicyDef(type);
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(clazz.getSimpleName(), defaultDef);
+	}
+
+	@Override
+	public PolicyDef getPolicyDef(String type, PolicyDef defaultDef) {
+		if (!hasPolicyDefs())
+			return defaultDef;
+		return getPolicyDefs().getPolicyDef(type, defaultDef);
 	}
 
 	@Override

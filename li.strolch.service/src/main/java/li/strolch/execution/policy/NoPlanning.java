@@ -9,7 +9,7 @@ import li.strolch.utils.dbc.DBC;
 
 public class NoPlanning extends PlanningPolicy {
 
-	public static PolicyDef NO_PLANNING = PolicyDef
+	public static PolicyDef DEFAULT_PLANNING = PolicyDef
 			.valueOf(PlanningPolicy.class.getSimpleName(), "key:DefaultPlanning");
 
 	public NoPlanning(StrolchTransaction tx) {

@@ -1,14 +1,20 @@
 package li.strolch.execution;
 
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +71,22 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 		this.simulationTasks.remove(locator);
 		ExecutionHandler executionHandler = container.getComponent(ExecutionHandler.class);
-		executionHandler.toExecuted(realm, locator);
+		Controller controller = executionHandler.getController(realm, locator);
+		if (controller != null) {
+			try {
+				if (!controller.isStopped(locator))
+					controller.toExecuted(locator);
+			} catch (Exception e) {
+				logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
+
+				if (this.agent.getContainer().hasComponent(OperationsLog.class)) {
+					this.agent.getContainer().getComponent(OperationsLog.class).addMessage(
+							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
+									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
+									.withException(e).value("reason", e));
+				}
+			}
+		}
 	}
 
 	private class SimulationTask implements Runnable {

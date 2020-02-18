@@ -3,8 +3,10 @@ package li.strolch.execution.policy;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
+import li.strolch.execution.Controller;
 import li.strolch.execution.DelayedExecutionTimer;
 import li.strolch.execution.ExecutionHandler;
+import li.strolch.model.Locator;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -33,6 +35,12 @@ import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
  */
 public abstract class ExecutionPolicy extends StrolchPolicy {
 
+	private Controller controller;
+	private boolean stopped;
+
+	protected String actionType;
+	protected Locator actionLoc;
+
 	/**
 	 * The TX for this execution policy. The TX needs to be updated when this execution policy has a longer life time
 	 * than the actual TX
@@ -42,6 +50,19 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	public ExecutionPolicy(StrolchTransaction tx) {
 		super(tx);
 		this.tx = tx;
+	}
+
+	public void setController(StrolchTransaction tx, Controller controller) {
+		this.tx = tx;
+		this.controller = controller;
+	}
+
+	public Controller getController() {
+		return this.controller;
+	}
+
+	public boolean isStopped() {
+		return this.stopped;
 	}
 
 	/**
@@ -74,6 +95,18 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	public boolean isExecutable(Action action) {
 		return true;
+	}
+
+	/**
+	 * Performs any initialization of this {@link ExecutionPolicy} for the given action, this method stores the {@link
+	 * Locator} of the action and its type
+	 *
+	 * @param action
+	 * 		the action for which to initialize
+	 */
+	public void initialize(Action action) {
+		this.actionType = action.getType();
+		this.actionLoc = action.getLocator();
 	}
 
 	/**
@@ -119,6 +152,21 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	public abstract void toWarning(Action action);
 
+	/**
+	 * Stops any active components in this {@link ExecutionPolicy}. This is used to notify the {@link ExecutionPolicy}
+	 * that any scheduled actions should be stopped, that listening and observing registrations can be taken back, etc.
+	 */
+	public void stop() {
+		this.stopped = true;
+		try {
+			handleStopped();
+		} catch (Exception e) {
+			logger.error("Stopping failed for " + this.actionLoc, e);
+		}
+	}
+
+	protected abstract void handleStopped();
+
 	protected void setActionState(Action action, State state) {
 
 		action.setState(state);
@@ -140,15 +188,6 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected DelayedExecutionTimer getDelayedExecutionTimer() {
 		return getComponent(ExecutionHandler.class).getDelayedExecutionTimer();
-	}
-
-	/**
-	 * Returns the execution handler instance
-	 *
-	 * @return the {@link ExecutionHandler} instance
-	 */
-	protected ExecutionHandler getExecutionHandler() {
-		return getComponent(ExecutionHandler.class);
 	}
 
 	/**
@@ -205,10 +244,5 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable)
 			throws PrivilegeException, Exception {
 		return getContainer().getPrivilegeHandler().runWithResult(StrolchConstants.SYSTEM_USER_AGENT, runnable);
-	}
-
-	@Override
-	public void undo() {
-		// do nothing
 	}
 }

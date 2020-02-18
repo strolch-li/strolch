@@ -319,6 +319,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void addCommand(Command command) {
+		add(command);
+	}
+
+	public void add(Command command) {
 		assertNotReadOnly();
 		this.commands.add(command);
 	}
@@ -1045,6 +1049,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotEmpty("refId", refId);
 		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId, assertExists);
 		return getActivitiesBy(refsP, assertExists);
+	}
+
+	@Override
+	public void removeFromCache(Locator locator) {
+		if (this.resourceCache != null)
+			this.resourceCache.removeElement(locator.get(1), locator.get(2));
+		if (this.objectFilter != null)
+			this.objectFilter.removeObjectCache(locator.get(0), locator);
 	}
 
 	@Override

@@ -446,6 +446,24 @@ public interface StrolchTransaction extends AutoCloseable {
 	void addCommand(Command command);
 
 	/**
+	 * Adds the given {@link Command} to the transaction. Using this method guarantees that a {@link Command} is
+	 * executed properly:
+	 * <ul>
+	 * <li>{@link Command#validate()}</li>
+	 * <li>{@link Command#doCommand()}</li>
+	 * </ul>
+	 *
+	 * and if an exception occurs:
+	 * <ul>
+	 * <li>{@link Command#undo()}</li>
+	 * </ul>
+	 *
+	 * @param command
+	 * 		the command to add
+	 */
+	void add(Command command);
+
+	/**
 	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling {@link
 	 * AuditTrail#add(StrolchTransaction, Audit)}
 	 *
@@ -1360,6 +1378,14 @@ public interface StrolchTransaction extends AutoCloseable {
 	 */
 	List<Order> getOrdersByRelation(StrolchRootElement element, String refId, boolean assertExists)
 			throws StrolchException;
+
+	/**
+	 * Allows to evict a {@link Locator} from the transaction's cache and object filter
+	 *
+	 * @param locator
+	 * 		the locator of the object to remove from cache
+	 */
+	void removeFromCache(Locator locator);
 
 	/**
 	 * Returns the cached resource with the given type and id, or null if not yet fetched

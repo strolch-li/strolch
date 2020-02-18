@@ -28,7 +28,7 @@ public class ArchiveExecutedActivitiesJob extends StrolchJob {
 			tx.streamActivities().forEach(activity -> {
 				if (activity.getState() == State.EXECUTED) {
 					ArchiveActivityCommand command = new ArchiveActivityCommand(tx);
-					command.setActivity(activity);
+					command.setActivityLoc(activity.getLocator());
 					tx.addCommand(command);
 				}
 			});

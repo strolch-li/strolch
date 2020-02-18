@@ -464,6 +464,19 @@ public class ObjectFilter {
 	}
 
 	/**
+	 * Allows clearing the object cache for an element
+	 *
+	 * @param key
+	 * 		the key under which it was registered
+	 * @param objectKey
+	 * 		the objectKey
+	 */
+	public void removeObjectCache(String key, Object objectKey) {
+		this.keySet.remove(key);
+		this.cache.removeElement(key, objectKey);
+	}
+
+	/**
 	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
 	 *
 	 * @param key
