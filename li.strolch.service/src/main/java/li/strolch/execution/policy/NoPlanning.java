@@ -3,14 +3,10 @@ package li.strolch.execution.policy;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
-import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
 public class NoPlanning extends PlanningPolicy {
-
-	public static PolicyDef DEFAULT_PLANNING = PolicyDef
-			.valueOf(PlanningPolicy.class.getSimpleName(), "key:DefaultPlanning");
 
 	public NoPlanning(StrolchTransaction tx) {
 		super(tx);
