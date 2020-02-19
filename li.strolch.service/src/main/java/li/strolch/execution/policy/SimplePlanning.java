@@ -19,8 +19,12 @@ public class SimplePlanning extends PlanningPolicy {
 
 	@Override
 	public Resource evaluateAndSetResource(Action action) {
-		tx().lock(Resource.locatorFor(action.getResourceType(), action.getResourceId()));
-		return tx().getResourceBy(action.getResourceType(), action.getResourceId());
+		if (action.hasResourceDefined()) {
+			tx().lock(action.getResourceLocator());
+			return tx().getResourceBy(action.getResourceType(), action.getResourceId());
+		}
+
+		return null;
 	}
 
 	/**
