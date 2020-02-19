@@ -15,13 +15,7 @@
  */
 package li.strolch.model.activity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.StringWriter;
-import java.util.List;
-import java.util.Optional;
+import static org.junit.Assert.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,17 +25,19 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.Optional;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.State;
 import li.strolch.model.xml.StrolchElementToDomVisitor;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class ActivityTest {
 
@@ -85,23 +81,23 @@ public class ActivityTest {
 
 		this.activity.addElement(this.childActivity);
 
-		Assert.assertEquals(2, this.activity.getElements().size());
-		Assert.assertEquals(2, this.childActivity.getElements().size());
+		assertEquals(2, this.activity.getElements().size());
+		assertEquals(2, this.childActivity.getElements().size());
 	}
 
 	@Test
 	public void testStart() {
-		Assert.assertEquals(this.action_1.getStart(), this.activity.getStart());
+		assertEquals(this.action_1.getStart(), this.activity.getStart());
 	}
 
 	@Test
 	public void testEnd() {
-		Assert.assertEquals(this.action_3.getEnd(), this.activity.getEnd());
+		assertEquals(this.action_3.getEnd(), this.activity.getEnd());
 	}
 
 	@Test
 	public void testState() {
-		Assert.assertEquals(State.PLANNING, this.activity.getState());
+		assertEquals(State.PLANNING, this.activity.getState());
 	}
 
 	@Test(expected = StrolchException.class)
@@ -271,29 +267,28 @@ public class ActivityTest {
 
 	@Test
 	public void getElementTest() {
-		Assert.assertNull(this.activity.getElement("not contained"));
-		Assert.assertEquals(this.action_1, this.activity.getElement(this.action_1.getId()));
+		assertEquals(this.action_1, this.activity.getElement(this.action_1.getId()));
 	}
 
 	@Test
 	public void cloneTest() {
 		Activity clone = this.activity.getClone();
-		Assert.assertEquals(this.activity.toString(), clone.toString());
-		Assert.assertEquals(this.activity.getElements().size(), clone.getElements().size());
+		assertEquals(this.activity.toString(), clone.toString());
+		assertEquals(this.activity.getElements().size(), clone.getElements().size());
 	}
 
 	@Test
 	public void parentTests() {
 		Assert.assertNull(this.activity.getParent());
-		Assert.assertEquals(this.activity, this.activity.getRootElement());
+		assertEquals(this.activity, this.activity.getRootElement());
 		Assert.assertTrue(this.activity.isRootElement());
 
-		Assert.assertEquals(this.activity, this.childActivity.getParent());
-		Assert.assertEquals(this.activity, this.childActivity.getRootElement());
+		assertEquals(this.activity, this.childActivity.getParent());
+		assertEquals(this.activity, this.childActivity.getRootElement());
 		Assert.assertFalse(this.childActivity.isRootElement());
 
-		Assert.assertEquals(this.childActivity, this.action_2.getParent());
-		Assert.assertEquals(this.activity, this.action_2.getRootElement());
+		assertEquals(this.childActivity, this.action_2.getParent());
+		assertEquals(this.activity, this.action_2.getRootElement());
 		Assert.assertFalse(this.action_2.isRootElement());
 	}
 

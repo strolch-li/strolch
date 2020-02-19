@@ -209,11 +209,14 @@ public class Activity extends AbstractStrolchRootElement
 	 *
 	 * @return IActivityElement
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends IActivityElement> T getElement(String id) {
 		if (this.elements == null)
-			return null;
-		return (T) this.elements.get(id);
+			throw new IllegalArgumentException("Element " + id + " does not exist on " + getLocator());
+		@SuppressWarnings("unchecked")
+		T t = (T) this.elements.get(id);
+		if (t == null)
+			throw new IllegalArgumentException("Element " + id + " does not exist on " + getLocator());
+		return t;
 	}
 
 	public Optional<IActivityElement> getPreviousElement(IActivityElement element) {
