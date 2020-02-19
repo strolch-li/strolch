@@ -110,6 +110,20 @@ public abstract class PolicyDef {
 	 * Returns a {@link PolicyDef} instance which handles the given type of XML Value
 	 *
 	 * @param type
+	 * 		the type, using the {@link Class#getSimpleName()} to delegate to {@link #valueOf(String, String)}
+	 * @param xmlValue
+	 * 		the XML formatted value with the prefix denoting the {@link PolicyDef} type
+	 *
+	 * @return a {@link PolicyDef} instance which handles the given type of XML Value
+	 */
+	public static PolicyDef valueOf(Class<?> type, String xmlValue) {
+		return valueOf(type.getSimpleName(), xmlValue);
+	}
+
+	/**
+	 * Returns a {@link PolicyDef} instance which handles the given type of XML Value
+	 *
+	 * @param type
 	 * 		the type
 	 * @param xmlValue
 	 * 		the XML formatted value with the prefix denoting the {@link PolicyDef} type
