@@ -8,5 +8,5 @@ CustomWeb = {
     CustomWeb.baseRestPath = basePath + '/rest';
     console.log('Base REST Path is ' + CustomWeb.baseRestPath);
     CustomWeb.baseWsPath = basePath + '/websocket';
-    console.log('Base WebSocket Path is ' + CustomWeb.baseRestPath);
+    console.log('Base WebSocket Path is ' + CustomWeb.baseWsPath);
 })();
