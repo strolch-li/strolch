@@ -220,6 +220,9 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 			}
 		}
 
+		if (this.policyDefs != null)
+			clone.setPolicyDefs(this.policyDefs.getClone());
+
 		return clone;
 	}
 
