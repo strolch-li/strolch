@@ -16,6 +16,9 @@
 package li.strolch.model;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import li.strolch.exception.StrolchPolicyException;
@@ -23,7 +26,7 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchElementVisitor;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 /**
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
@@ -39,7 +42,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	protected Locator locator;
 	protected Version version;
-	protected Date date;
+	protected ZonedDateTime date;
 	protected State state;
 	protected PolicyDefs policyDefs;
 
@@ -120,12 +123,28 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	public Date getDate() {
+		return Date.from(this.date.toInstant());
+	}
+
+	public ZonedDateTime getDateZdt() {
 		return this.date;
+	}
+
+	public LocalDateTime getDateLdt() {
+		return this.date.toLocalDateTime();
 	}
 
 	public void setDate(Date date) {
 		assertNotReadonly();
-		this.date = date;
+		this.date = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+	}
+
+	public void setDate(LocalDateTime localDateTime) {
+		this.date = localDateTime.atZone(ZoneId.systemDefault());
+	}
+
+	public void setDate(ZonedDateTime zonedDateTime) {
+		this.date = zonedDateTime;
 	}
 
 	public State getState() {
@@ -251,7 +270,6 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 		return visitor.visitOrder(this);
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 
@@ -266,7 +284,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 		builder.append(", state=");
 		builder.append(this.state);
 		builder.append(", date=");
-		builder.append(ISO8601FormatFactory.getInstance().formatDate(this.date));
+		builder.append(ISO8601.toString(this.date));
 		builder.append(", version=");
 		builder.append(this.version);
 		builder.append("]");
