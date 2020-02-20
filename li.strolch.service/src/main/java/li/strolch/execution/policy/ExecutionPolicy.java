@@ -1,5 +1,11 @@
 package li.strolch.execution.policy;
 
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
+
+import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
@@ -165,7 +171,9 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 		}
 	}
 
-	protected abstract void handleStopped();
+	protected void handleStopped() {
+		getDelayedExecutionTimer().cancel(this.actionLoc);
+	}
 
 	protected void setActionState(Action action, State state) {
 
@@ -183,10 +191,55 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Method to delay toExecuted() call for this action by the given duration
+	 *
+	 * @param duration
+	 * 		the delay duration
+	 */
+	protected void delayToExecutedBy(Duration duration) {
+		String realmName = tx().getRealmName();
+		long delayMs = duration.toMillis();
+		if (delayMs < 20) {
+			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
+			delayMs = 20;
+		}
+		logger.info("Delaying toExecuted of " + this.actionLoc + " by " + formatMillisecondsDuration(delayMs));
+		getDelayedExecutionTimer().execute(realmName, getContainer(), this.actionLoc, delayMs);
+	}
+
+	protected void delayToExecutedByRandom(long duration, double minFactor, double maxFactor, TimeUnit delayUnit) {
+		delayToExecutedByRandom((long) (duration * minFactor), (long) (duration * maxFactor), delayUnit);
+	}
+
+	protected void delayToExecutedByRandom(long min, long max, TimeUnit delayUnit) {
+		long delay = ThreadLocalRandom.current().nextLong(min, max + 1);
+		delayToExecutedBy(delay, delayUnit);
+	}
+
+	/**
+	 * Method to delay toExecuted() call for this action by the given amount
+	 *
+	 * @param delay
+	 * 		the delay time
+	 * @param delayUnit
+	 * 		the UOM of the delay time
+	 */
+	protected void delayToExecutedBy(long delay, TimeUnit delayUnit) {
+		String realmName = tx().getRealmName();
+		long delayMs = delayUnit.toMillis(delay);
+		if (delayMs < 20) {
+			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
+			delayMs = 20;
+		}
+		logger.info("Delaying toExecuted of " + this.actionLoc + " by " + formatMillisecondsDuration(delayMs));
+		getDelayedExecutionTimer().execute(realmName, getContainer(), this.actionLoc, delayMs);
+	}
+
+	/**
 	 * @return the {@link DelayedExecutionTimer} to simplify the delayed execution of an {@link Action}, e.g. for
 	 * simulated execution or simple wait tasks
 	 */
-	protected DelayedExecutionTimer getDelayedExecutionTimer() {
+	private DelayedExecutionTimer getDelayedExecutionTimer() {
 		return getComponent(ExecutionHandler.class).getDelayedExecutionTimer();
 	}
 
