@@ -4,5 +4,5 @@ import li.strolch.privilege.model.PrivilegeContext;
 
 public interface PrivilegedRunnable {
 
-	public void run(PrivilegeContext ctx) throws Exception;
+	void run(PrivilegeContext ctx) throws Exception;
 }
