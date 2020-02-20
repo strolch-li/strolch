@@ -15,6 +15,8 @@
  */
 package li.strolch.model.activity;
 
+import java.util.function.Predicate;
+
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.GroupedParameterizedElement;
 import li.strolch.model.State;
@@ -148,4 +150,16 @@ public interface IActivityElement extends StrolchElement {
 	 * @return the result of the visitor being accepted
 	 */
 	<T> T accept(StrolchElementVisitor<T> visitor);
+
+	default Activity findParent(Predicate<Activity> predicate) {
+
+		Activity parent = getParent();
+		while (parent != null && !predicate.test(parent))
+			parent = parent.getParent();
+
+		if (parent == null)
+			throw new StrolchModelException(getLocator() + " has no parent where predicate " + predicate + " is true!");
+
+		return parent;
+	}
 }
