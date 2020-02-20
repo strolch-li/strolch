@@ -136,6 +136,14 @@ public class DurationParameter extends AbstractParameter<PeriodDuration> {
 		return this.value.toMillis();
 	}
 
+	public Period getPeriod() {
+		return this.value.getPeriod();
+	}
+
+	public Duration getDuration() {
+		return this.value.getDuration();
+	}
+
 	@Override
 	public void setValueFromString(String valueAsString) {
 		setValue(parseFromString(valueAsString));
