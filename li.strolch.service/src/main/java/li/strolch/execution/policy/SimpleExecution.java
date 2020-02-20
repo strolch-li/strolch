@@ -83,9 +83,4 @@ public class SimpleExecution extends ExecutionPolicy {
 		addMessage(message);
 		getController().asyncToWarning(message.getLocator());
 	}
-
-	@Override
-	protected void handleStopped() {
-		getDelayedExecutionTimer().cancel(this.actionLoc);
-	}
 }

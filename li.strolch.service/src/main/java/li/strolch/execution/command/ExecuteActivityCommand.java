@@ -72,6 +72,10 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 
 		ConfirmationPolicy confirmationPolicy = getConfirmationPolicy(action);
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
+		if (executionPolicy.isStopped()) {
+			this.controller.removeExecutionPolicy(action);
+			executionPolicy = getExecutionPolicy(action);
+		}
 
 		if (!executionPolicy.isExecutable(action)) {
 			logger.info("Action " + action.getLocator() + " is not yet executable.");

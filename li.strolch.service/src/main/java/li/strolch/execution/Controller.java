@@ -1,8 +1,8 @@
 package li.strolch.execution;
 
+import static java.util.Collections.synchronizedMap;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -52,7 +52,7 @@ public class Controller {
 		this.activityType = activity.getType();
 		this.activityId = activity.getId();
 		this.activity = activity;
-		this.inExecution = Collections.synchronizedMap(new HashMap<>());
+		this.inExecution = synchronizedMap(new HashMap<>());
 	}
 
 	public String getRealm() {
@@ -81,6 +81,10 @@ public class Controller {
 		// always update the TX and controller
 		executionPolicy.setController(tx, this);
 		return executionPolicy;
+	}
+
+	public void removeExecutionPolicy(Action action) {
+		this.inExecution.remove(action.getLocator());
 	}
 
 	protected StrolchTransaction openTx(Certificate cert) {
@@ -145,7 +149,7 @@ public class Controller {
 		command.validate();
 		command.doCommand();
 
-		notifyObserverUpdate();
+		updateObservers();
 
 		return command.needsRetriggerOfExecution();
 	}
@@ -173,7 +177,7 @@ public class Controller {
 				command.validate();
 				command.doCommand();
 
-				notifyObserverUpdate();
+				updateObservers();
 
 				// flush so we can see the changes performed
 				tx.flush();
@@ -215,6 +219,8 @@ public class Controller {
 				tx.commitOnClose();
 			}
 		});
+
+		updateObservers();
 	}
 
 	/**
@@ -243,6 +249,8 @@ public class Controller {
 				tx.commitOnClose();
 			}
 		});
+
+		updateObservers();
 	}
 
 	/**
@@ -271,6 +279,8 @@ public class Controller {
 				tx.commitOnClose();
 			}
 		});
+
+		updateObservers();
 	}
 
 	/**
@@ -319,7 +329,7 @@ public class Controller {
 		});
 	}
 
-	private void notifyObserverUpdate() {
+	private void updateObservers() {
 		StrolchRealm realm = this.executionHandler.getContainer().getRealm(this.realm);
 		if (!realm.isUpdateObservers())
 			return;

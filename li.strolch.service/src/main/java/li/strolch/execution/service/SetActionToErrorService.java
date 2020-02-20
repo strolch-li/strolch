@@ -25,22 +25,22 @@ public class SetActionToErrorService extends AbstractService<LocatorArgument, Se
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
+		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
+		Controller controller = executionHandler.getController(getArgOrUserRealm(arg), arg.locator.trim(3));
+		if (controller != null) {
+			controller.toError(arg.locator);
+			return ServiceResult.success();
+		}
+
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			tx.lock(arg.locator.trim(3));
 			Action action = tx.findElement(arg.locator);
 			tx.lock(action.getResourceLocator());
 
-			ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
-			Controller controller = executionHandler.getController(tx.getRealmName(), action.getRootElement());
-			if (controller != null) {
-				controller.toError(action.getLocator());
-			} else {
-
-				SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
-				command.setAction(action);
-				tx.addCommand(command);
-			}
+			SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
+			command.setAction(action);
+			tx.addCommand(command);
 
 			tx.commitOnClose();
 		}

@@ -25,21 +25,22 @@ public class SetActionToStoppedService extends AbstractService<LocatorArgument, 
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
+		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
+		Controller controller = executionHandler.getController(getArgOrUserRealm(arg), arg.locator.trim(3));
+		if (controller != null) {
+			controller.toStopped(arg.locator);
+			return ServiceResult.success();
+		}
+
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			tx.lock(arg.locator.trim(3));
 			Action action = tx.findElement(arg.locator);
 			tx.lock(action.getResourceLocator());
 
-			ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
-			Controller controller = executionHandler.getController(tx.getRealmName(), action.getRootElement());
-			if (controller != null) {
-				controller.toStopped(action.getLocator());
-			} else {
-				SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
-				command.setAction(action);
-				tx.addCommand(command);
-			}
+			SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
+			command.setAction(action);
+			tx.addCommand(command);
 
 			tx.commitOnClose();
 		}

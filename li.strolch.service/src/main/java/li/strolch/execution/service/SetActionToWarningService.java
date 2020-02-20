@@ -25,21 +25,22 @@ public class SetActionToWarningService extends AbstractService<LocatorArgument, 
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
+		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
+		Controller controller = executionHandler.getController(getArgOrUserRealm(arg), arg.locator.trim(3));
+		if (controller != null) {
+			controller.toWarning(arg.locator);
+			return ServiceResult.success();
+		}
+
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			tx.lock(arg.locator.trim(3));
 			Action action = tx.findElement(arg.locator);
 			tx.lock(action.getResourceLocator());
 
-			ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
-			Controller controller = executionHandler.getController(tx.getRealmName(), action.getRootElement());
-			if (controller != null) {
-				controller.toWarning(action.getLocator());
-			} else {
-				SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
-				command.setAction(action);
-				tx.addCommand(command);
-			}
+			SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
+			command.setAction(action);
+			tx.addCommand(command);
 
 			tx.commitOnClose();
 		}

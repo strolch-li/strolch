@@ -1,10 +1,11 @@
 package li.strolch.execution.policy;
 
-import li.strolch.model.Locator;
+import static li.strolch.runtime.StrolchConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_DURATION;
+
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.DurationParameter;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants.PolicyConstants;
 
 /**
  * <p>
@@ -16,8 +17,6 @@ import li.strolch.runtime.StrolchConstants.PolicyConstants;
  */
 public class DurationExecution extends SimpleExecution {
 
-	protected Locator actionLoc;
-
 	public DurationExecution(StrolchTransaction tx) {
 		super(tx);
 	}
@@ -25,19 +24,9 @@ public class DurationExecution extends SimpleExecution {
 	@Override
 	public void toExecution(Action action) {
 
-		DurationParameter durationP = action
-				.findParameter(PolicyConstants.BAG_OBJECTIVES, PolicyConstants.PARAM_DURATION, true);
-
-		String realmName = tx().getRealmName();
-		this.actionLoc = action.getLocator();
-		logger.info("Executing action " + actionLoc + " has a duration of " + durationP.getValueAsString());
-		getDelayedExecutionTimer().execute(realmName, getContainer(), this.actionLoc, durationP.toMillis());
+		DurationParameter durationP = action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
+		delayToExecutedBy(durationP.getDuration());
 
 		super.toExecution(action);
-	}
-
-	@Override
-	protected void handleStopped() {
-		getDelayedExecutionTimer().cancel(this.actionLoc);
 	}
 }
