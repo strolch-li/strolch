@@ -15,7 +15,8 @@
  */
 package li.strolch.service.api;
 
-import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import java.text.MessageFormat;
 
@@ -165,6 +166,17 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 		return this.container.getRealm(getCertificate()).getRealm();
 	}
 
+	protected String getArgOrUserRealm(ServiceArgument arg) {
+		String realm;
+		if (isNotEmpty(arg.realm))
+			realm = arg.realm;
+		else if (isNotEmpty(getCertificate().getRealm()))
+			realm = getCertificate().getRealm();
+		else
+			realm = DEFAULT_REALM;
+		return realm;
+	}
+
 	/**
 	 * Opens a {@link StrolchTransaction} for the given realm, the action for the TX is this implementation's class
 	 * name. This transaction should be used in a try-with-resource clause so it is properly closed
@@ -213,9 +225,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg) throws StrolchException {
-		if (isEmpty(arg.realm))
-			return openUserTx();
-		return openTx(arg.realm);
+		return openTx(getArgOrUserRealm(arg));
 	}
 
 	/**
@@ -234,9 +244,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, boolean readOnly) throws StrolchException {
-		if (isEmpty(arg.realm))
-			return openUserTx(readOnly);
-		return openTx(arg.realm, readOnly);
+		return openTx(getArgOrUserRealm(arg), readOnly);
 	}
 
 	/**
@@ -255,9 +263,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, String action) throws StrolchException {
-		if (isEmpty(arg.realm))
-			return openUserTx();
-		return openTx(arg.realm, action);
+		return openTx(getArgOrUserRealm(arg), action);
 	}
 
 	/**
@@ -279,9 +285,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, String action, boolean readOnly)
 			throws StrolchException {
-		if (isEmpty(arg.realm))
-			return openUserTx(readOnly);
-		return openTx(arg.realm, action, readOnly);
+		return openTx(getArgOrUserRealm(arg), action, readOnly);
 	}
 
 	/**
