@@ -22,9 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.*;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -34,8 +35,7 @@ import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
-import li.strolch.utils.NamedThreadPoolFactory;
-import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.ExecutorPool;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
 import li.strolch.utils.iso8601.ISO8601;
@@ -55,8 +55,7 @@ public class StrolchAgent {
 	private StrolchConfiguration strolchConfiguration;
 	private StrolchVersion appVersion;
 
-	private Map<String, ExecutorService> executors;
-	private Map<String, ScheduledExecutorService> scheduledExecutors;
+	private ExecutorPool executorPool;
 
 	private JsonObject systemState;
 	private long systemStateUpdateTime;
@@ -100,14 +99,7 @@ public class StrolchAgent {
 	}
 
 	public synchronized ExecutorService getExecutor(String poolName) {
-		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
-		ExecutorService executor = this.executors.get(poolName);
-		if (executor == null) {
-			executor = Executors.newCachedThreadPool(new NamedThreadPoolFactory(poolName));
-			this.executors.put(poolName, executor);
-		}
-
-		return executor;
+		return this.executorPool.getExecutor(poolName);
 	}
 
 	/**
@@ -120,14 +112,7 @@ public class StrolchAgent {
 	}
 
 	public synchronized ExecutorService getSingleThreadExecutor(String poolName) {
-		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
-		ExecutorService executor = this.executors.get(poolName);
-		if (executor == null) {
-			executor = Executors.newSingleThreadExecutor(new NamedThreadPoolFactory(poolName));
-			this.executors.put(poolName, executor);
-		}
-
-		return executor;
+		return this.executorPool.getSingleThreadExecutor(poolName);
 	}
 
 	/**
@@ -140,14 +125,7 @@ public class StrolchAgent {
 	}
 
 	public synchronized ScheduledExecutorService getScheduledExecutor(String poolName) {
-		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
-		ScheduledExecutorService executor = this.scheduledExecutors.get(poolName);
-		if (executor == null) {
-			executor = Executors.newScheduledThreadPool(4, new NamedThreadPoolFactory(poolName));
-			this.scheduledExecutors.put(poolName, executor);
-		}
-
-		return executor;
+		return this.executorPool.getScheduledExecutor(poolName);
 	}
 
 	/**
@@ -158,9 +136,7 @@ public class StrolchAgent {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
 
-		this.executors = new HashMap<>();
-		this.scheduledExecutors = new HashMap<>();
-
+		this.executorPool = new ExecutorPool();
 		this.container.initialize();
 	}
 
@@ -181,36 +157,13 @@ public class StrolchAgent {
 			this.container.stop();
 	}
 
-	private <T extends ExecutorService> void shutdownExecutorService(Map<String, T> executors) {
-
-		for (String poolName : executors.keySet()) {
-			logger.info("Shutting down executor pool " + poolName);
-
-			T executor = executors.get(poolName);
-
-			try {
-				executor.shutdown();
-				executor.awaitTermination(5, TimeUnit.SECONDS);
-			} catch (InterruptedException e) {
-				logger.error("Was interrupted while shutting down tasks");
-			} finally {
-				if (!executor.isTerminated()) {
-					logger.error("Tasks not stopped after " + 5 + "s. Shutting down now.");
-					executor.shutdownNow();
-				}
-			}
-		}
-	}
-
 	/**
 	 * Destroys the container and the executor services
 	 */
 	public void destroy() {
 
-		if (this.executors != null)
-			shutdownExecutorService(this.executors);
-		if (this.scheduledExecutors != null)
-			shutdownExecutorService(this.scheduledExecutors);
+		if (this.executorPool != null)
+			this.executorPool.destroy();
 
 		if (this.container != null)
 			this.container.destroy();
