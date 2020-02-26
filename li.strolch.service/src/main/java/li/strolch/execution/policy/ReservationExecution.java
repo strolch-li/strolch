@@ -5,11 +5,8 @@ import static li.strolch.runtime.StrolchConstants.PolicyConstants.*;
 
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Resource;
-import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.BooleanParameter;
-import li.strolch.model.timevalue.impl.FloatValue;
-import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 
@@ -36,41 +33,24 @@ public class ReservationExecution extends DurationExecution {
 
 	@Override
 	public boolean isExecutable(Action action) {
+		switch (action.getType()) {
+		case TYPE_RESERVE:
+		case TYPE_RELEASE:
+			if (action.getType().equals(TYPE_RESERVE))
+				return !isReserved(tx(), action);
+			return isReserved(tx(), action);
 
-		// only check if reserve
-		if (!action.getType().equals(TYPE_RESERVE) && !action.getType().equals(TYPE_RELEASE)) {
-			// otherwise delegate to super class
+		default:
 			return super.isExecutable(action);
 		}
-
-		if (action.getType().equals(TYPE_RESERVE))
-			return !isReserved(action);
-		else
-			return isReserved(action);
-	}
-
-	protected boolean isReserved(Action action) {
-
-		// get resource
-		Resource resource = tx().getResourceFor(action, true);
-
-		if (!resource.hasParameter(BAG_PARAMETERS, PARAM_RESERVED))
-			throw new StrolchModelException(
-					"Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on " + resource
-							.getLocator());
-
-		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
-		return reservedP.getValue();
 	}
 
 	@Override
 	public void toExecution(Action action) {
 		switch (action.getType()) {
-
 		case TYPE_RESERVE:
 		case TYPE_RELEASE:
 
-			// async to executed only causes trouble =))
 			toExecuted(action);
 			break;
 
@@ -81,35 +61,39 @@ public class ReservationExecution extends DurationExecution {
 
 	@Override
 	public void toExecuted(Action action) {
-
 		switch (action.getType()) {
-
 		case TYPE_RESERVE:
 		case TYPE_RELEASE:
 
-			boolean isReserve = action.getType().equals(TYPE_RESERVE);
-			setReservation(action, isReserve);
-
-			FloatValue value = new FloatValue(isReserve ? 1.0D : 0.0D);
-			action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
-
-			setActionState(action, State.EXECUTED);
-			break;
+			setReservation(tx(), action, action.getType().equals(TYPE_RESERVE));
 
 		default:
 			super.toExecuted(action);
 		}
 	}
 
-	private void setReservation(Action action, boolean isReserve) {
+	public static boolean isReserved(StrolchTransaction tx, Action action) {
 
-		Resource resource = tx().getResourceFor(action, true);
+		// get resource
+		Resource resource = tx.getResourceFor(action, true);
+
+		if (!resource.hasParameter(BAG_PARAMETERS, PARAM_RESERVED))
+			throw new StrolchModelException(
+					"Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on " + resource
+							.getLocator());
+
+		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
+		return reservedP.getValue();
+	}
+
+	public static void setReservation(StrolchTransaction tx, Action action, boolean isReserve) {
+		Resource resource = tx.getResourceFor(action, true);
 
 		// release the resource
 		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
 		reservedP.setValue(isReserve);
 
 		// save changes
-		tx().update(resource);
+		tx.update(resource);
 	}
 }

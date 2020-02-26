@@ -39,7 +39,7 @@ public class ToErrorReservationExecution extends ReservationExecution {
 	@Override
 	public void toExecution(Action action) {
 
-		if (action.getType().equals(TYPE_RESERVE) && isReserved(action)) {
+		if (action.getType().equals(TYPE_RESERVE) && isReserved(tx(), action)) {
 			setActionState(action, State.EXECUTION);
 			toError(new LogMessage(tx().getRealmName(), tx().getCertificate().getUsername(), action.getLocator(),
 					LogSeverity.Error, ResourceBundle.getBundle("strolch-service"),
