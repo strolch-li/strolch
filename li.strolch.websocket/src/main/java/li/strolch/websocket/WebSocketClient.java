@@ -19,6 +19,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverHandler;
+import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.StrolchSessionHandler;
@@ -162,7 +163,10 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 			logger.info("User " + this.certificate.getUsername() + " authenticated on WebSocket with remote IP "
 					+ this.remoteIp);
 		} catch (Exception e) {
-			logger.error("Failed to authenticate user " + username, e);
+			if (e instanceof StrolchNotAuthenticatedException)
+				logger.error("Failed to authenticate user " + username + ": " + e.getMessage());
+			else
+				logger.error("Failed to authenticate user " + username, e);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}
