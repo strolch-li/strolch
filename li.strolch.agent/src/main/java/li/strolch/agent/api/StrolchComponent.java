@@ -274,6 +274,18 @@ public class StrolchComponent {
 	}
 
 	/**
+	 * Returns true if the given component is registered on the {@link ComponentContainer}
+	 *
+	 * @param clazz
+	 * 		the type of component to check for
+	 *
+	 * @return true if the component is available
+	 */
+	public boolean hasComponent(Class<?> clazz) {
+		return this.container.hasComponent(clazz);
+	}
+
+	/**
 	 * Performs the given {@link PrivilegedRunnable} as the given system user
 	 *
 	 * @param username
