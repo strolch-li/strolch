@@ -32,6 +32,7 @@ public class SetExecutionHandlerStateService extends AbstractService<StringMapAr
 
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
 			executionHandler.setState(getCertificate(), realm, ExecutionHandlerState.Running);
+			executionHandler.triggerExecution(realm);
 
 			break;
 		}
