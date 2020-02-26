@@ -44,6 +44,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	private Controller controller;
 	private boolean stopped;
 
+	protected String realm;
 	protected String actionType;
 	protected Locator actionLoc;
 
@@ -56,6 +57,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	public ExecutionPolicy(StrolchTransaction tx) {
 		super(tx);
 		this.tx = tx;
+		this.realm = tx.getRealmName();
 	}
 
 	public void setController(StrolchTransaction tx, Controller controller) {
