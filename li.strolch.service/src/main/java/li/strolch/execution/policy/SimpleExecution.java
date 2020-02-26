@@ -71,6 +71,11 @@ public class SimpleExecution extends ExecutionPolicy {
 		}
 	}
 
+	protected void toExecuted() throws Exception {
+		stop();
+		getController().toExecuted(this.actionLoc);
+	}
+
 	protected void toError(LogMessage message) {
 		stop();
 		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
