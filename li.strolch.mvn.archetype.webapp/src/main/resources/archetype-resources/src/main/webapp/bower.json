@@ -5,10 +5,10 @@
   ],
   "private": true,
   "dependencies": {
-    "strolchjs": "4treesCH/strolchjs#^0.2.8",
+    "strolchjs": "4treesCH/strolchjs#^0.3.0",
     "strolch-wc-styles": "4treesCH/strolch-wc-styles#^0.3.0",
     "strolch-wc-auth": "4treesCH/strolch-wc-auth#^0.7.7",
-    "strolch-wc-inspector": "4treesCH/strolch-wc-inspector#^0.19.1",
+    "strolch-wc-inspector": "4treesCH/strolch-wc-inspector#^0.19.2",
     "strolch-wc-localize-behavior": "4treesCH/strolch-wc-localize-behavior#^1.1.4",
     "strolch-wc-reports": "4treesCH/strolch-wc-reports#^0.2.4",
     "strolch-wc-paging": "4treesCH/strolch-wc-paging#^0.1.1",
