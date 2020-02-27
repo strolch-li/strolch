@@ -66,7 +66,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
-		this.controllers = synchronizedMapOfMaps(new MapOfMaps<>());
+		this.controllers = synchronizedMapOfMaps(new MapOfMaps<>(true));
 		super.initialize(configuration);
 	}
 
