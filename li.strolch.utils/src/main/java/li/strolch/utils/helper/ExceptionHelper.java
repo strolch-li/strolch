@@ -30,6 +30,16 @@ import li.strolch.utils.RemoveCRFilterWriter;
 public class ExceptionHelper {
 
 	/**
+	 * Returns the class name and method name of the caller
+	 *
+	 * @return the class name and method name of the caller
+	 */
+	public static String getCallerMethod() {
+		StackTraceElement element = new Throwable().getStackTrace()[1];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
+	/**
 	 * <p>
 	 * Returns a message for the given {@link Throwable}
 	 * </p>
