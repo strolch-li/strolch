@@ -15,8 +15,12 @@
  */
 package li.strolch.runtime.privilege;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
+import static li.strolch.privilege.helper.XmlConstants.XML_PARAM_BASE_PATH;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 import java.io.File;
 import java.io.InputStream;
@@ -33,7 +37,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.*;
 import li.strolch.privilege.helper.PrivilegeInitializationHelper;
-import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
@@ -112,7 +115,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			RuntimeConfiguration runtimeConfig = configuration.getRuntimeConfiguration();
 
 			// set sessions data path
-			if (Boolean.valueOf(parameterMap.get(PARAM_PERSIST_SESSIONS))) {
+			if (parseBoolean(parameterMap.get(PARAM_PERSIST_SESSIONS))) {
 				File dataPath = runtimeConfig.getTempPath();
 				String sessionsPath = new File(dataPath, "sessions.dat").getAbsolutePath();
 				parameterMap.put(PARAM_PERSIST_SESSIONS_PATH, sessionsPath);
@@ -122,7 +125,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			if (containerModel.getPersistenceHandlerClassName().equals(XmlPersistenceHandler.class.getName())) {
 				Map<String, String> xmlParams = containerModel.getPersistenceHandlerParameterMap();
 				File configPath = runtimeConfig.getConfigPath();
-				xmlParams.put(XmlConstants.XML_PARAM_BASE_PATH, configPath.getPath());
+				xmlParams.put(XML_PARAM_BASE_PATH, configPath.getPath());
 			}
 
 			return PrivilegeInitializationHelper.initializeFromXml(containerModel);
@@ -138,7 +141,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public Certificate authenticate(String username, char[] password) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticate(username, password);
-		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, username);
+		writeAudit(certificate, LOGIN, AccessType.CREATE, username);
 		return certificate;
 	}
 
@@ -146,7 +149,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public Certificate authenticate(String username, char[] password, String source) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticate(username, password, source);
-		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, username);
+		writeAudit(certificate, LOGIN, AccessType.CREATE, username);
 		return certificate;
 	}
 
@@ -154,7 +157,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public Certificate authenticateSingleSignOn(Object data) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
-		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, certificate.getUsername());
+		writeAudit(certificate, LOGIN, AccessType.CREATE, certificate.getUsername());
 		return certificate;
 	}
 
@@ -162,18 +165,15 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public Certificate authenticateSingleSignOn(Object data, String source) {
 		assertContainerStarted();
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, source);
-		writeAudit(certificate, StrolchPrivilegeConstants.LOGIN, AccessType.CREATE, certificate.getUsername());
+		writeAudit(certificate, LOGIN, AccessType.CREATE, certificate.getUsername());
 		return certificate;
 	}
 
 	private void writeAudit(Certificate certificate, String login, AccessType accessType, String username) {
 		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, login, false)) {
-			tx.setSuppressDoNothingLogging(true);
+		try (StrolchTransaction tx = realm.openTx(certificate, login, false).silentThreshold(1, NANOSECONDS)) {
 			tx.setSuppressAudits(true);
-			Audit audit = tx
-					.auditFrom(accessType, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.CERTIFICATE,
-							username);
+			Audit audit = tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username);
 			tx.getAuditTrail().add(tx, audit);
 		}
 	}
