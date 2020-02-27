@@ -25,14 +25,39 @@ import java.util.function.Function;
  */
 public class MapOfSets<T, U> {
 
+	private final boolean keepInsertionOrder;
 	private Map<T, Set<U>> mapOfSets;
 
 	public MapOfSets() {
-		this.mapOfSets = new HashMap<>();
+		this.keepInsertionOrder = false;
+		this.mapOfSets = getMapOfSets();
 	}
 
 	public MapOfSets(Map<T, Set<U>> mapOfSets) {
+		this.keepInsertionOrder = false;
 		this.mapOfSets = mapOfSets;
+	}
+
+	public MapOfSets(boolean keepInsertionOrder) {
+		this.keepInsertionOrder = keepInsertionOrder;
+		this.mapOfSets = getMapOfSets();
+	}
+
+	public MapOfSets(Map<T, Set<U>> mapOfSets, boolean keepInsertionOrder) {
+		this.keepInsertionOrder = keepInsertionOrder;
+		this.mapOfSets = mapOfSets;
+	}
+
+	private HashMap<T, Set<U>> getMapOfSets() {
+		if (this.keepInsertionOrder)
+			return new LinkedHashMap<>();
+		return new HashMap<>();
+	}
+
+	private HashSet<U> getSet() {
+		if (this.keepInsertionOrder)
+			return new LinkedHashSet<>();
+		return new HashSet<>();
 	}
 
 	public Set<T> keySet() {
@@ -50,11 +75,11 @@ public class MapOfSets<T, U> {
 	}
 
 	public boolean addElement(T t, U u) {
-		return this.mapOfSets.computeIfAbsent(t, k -> new HashSet<>()).add(u);
+		return this.mapOfSets.computeIfAbsent(t, k -> getSet()).add(u);
 	}
 
 	public boolean addSet(T t, Set<U> u) {
-		return this.mapOfSets.computeIfAbsent(t, k -> new HashSet<>()).addAll(u);
+		return this.mapOfSets.computeIfAbsent(t, k -> getSet()).addAll(u);
 	}
 
 	public boolean removeElement(T t, U u) {

@@ -31,6 +31,13 @@ public class MapOfLists<T, U> {
 		this.mapOfLists = new HashMap<>();
 	}
 
+	public MapOfLists(boolean keepInsertionOrder) {
+		if (keepInsertionOrder)
+			this.mapOfLists = new LinkedHashMap<>();
+		else
+			this.mapOfLists = new HashMap<>();
+	}
+
 	public MapOfLists(Map<T, List<U>> mapOfLists) {
 		this.mapOfLists = mapOfLists;
 	}

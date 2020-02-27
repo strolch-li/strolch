@@ -45,18 +45,55 @@ import java.util.function.Function;
  */
 public class MapOfMaps<T, U, V> {
 
+	private final boolean keepInsertionOrder;
 	private Map<T, Map<U, V>> mapOfMaps;
 
 	public MapOfMaps() {
+		this.keepInsertionOrder = false;
 		this.mapOfMaps = new HashMap<>();
 	}
 
 	public MapOfMaps(Map<T, Map<U, V>> mapOfMaps) {
+		this.keepInsertionOrder = false;
 		this.mapOfMaps = mapOfMaps;
 	}
 
+	public MapOfMaps(Map<T, Map<U, V>> mapOfMaps, boolean keepInsertionOrder) {
+		this.mapOfMaps = mapOfMaps;
+		this.keepInsertionOrder = keepInsertionOrder;
+	}
+
 	public MapOfMaps(int initialSize) {
+		this.keepInsertionOrder = false;
 		this.mapOfMaps = new HashMap<>(initialSize);
+	}
+
+	public MapOfMaps(boolean keepInsertionOrder) {
+		this.keepInsertionOrder = keepInsertionOrder;
+		this.mapOfMaps = getMapOfMaps();
+	}
+
+	public MapOfMaps(int initialSize, boolean keepInsertionOrder) {
+		this.keepInsertionOrder = keepInsertionOrder;
+		this.mapOfMaps = getMapOfMaps(initialSize);
+	}
+
+	private Map<T, Map<U, V>> getMapOfMaps() {
+		if (this.keepInsertionOrder)
+			return new LinkedHashMap<>();
+		return new HashMap<>();
+	}
+
+	private Map<T, Map<U, V>> getMapOfMaps(int initialSize) {
+		if (this.keepInsertionOrder)
+			return new LinkedHashMap<>(initialSize);
+		return new HashMap<>(initialSize);
+	}
+
+	private HashMap<U, V> getMap() {
+		if (this.keepInsertionOrder)
+			return new LinkedHashMap<>();
+		return new HashMap<>();
 	}
 
 	public Set<T> keySet() {
@@ -81,7 +118,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public V addElement(T t, U u, V v) {
-		return this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>()).put(u, v);
+		return this.mapOfMaps.computeIfAbsent(t, k -> getMap()).put(u, v);
 	}
 
 	public List<V> getAllElements() {
@@ -102,7 +139,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public void addMap(T t, Map<U, V> u) {
-		this.mapOfMaps.computeIfAbsent(t, k -> new HashMap<>()).putAll(u);
+		this.mapOfMaps.computeIfAbsent(t, k -> getMap()).putAll(u);
 	}
 
 	public V removeElement(T t, U u) {
