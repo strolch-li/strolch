@@ -15,6 +15,7 @@
  */
 package li.strolch.migrations;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static li.strolch.migrations.Migration.*;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
@@ -45,8 +46,7 @@ public class CurrentMigrationVersionQuery {
 
 		for (String realmName : this.container.getRealmNames()) {
 			StrolchRealm realm = this.container.getRealm(realmName);
-			try (StrolchTransaction tx = realm.openTx(cert, getClass(), false)) {
-				tx.setSuppressDoNothingLogging(true);
+			try (StrolchTransaction tx = realm.openTx(cert, getClass(), false).silentThreshold(1, NANOSECONDS)) {
 
 				Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);
 				if (migrationsRes == null) {

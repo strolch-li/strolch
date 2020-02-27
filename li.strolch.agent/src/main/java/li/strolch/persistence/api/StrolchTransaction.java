@@ -18,6 +18,7 @@ package li.strolch.persistence.api;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import li.strolch.agent.api.*;
@@ -311,6 +312,23 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean isFailed();
 
 	/**
+	 * Sets the TX to be silent if the duration is less than the given threshold if the TX was completed successfully
+	 *
+	 * @param silentThreshold
+	 * 		the threshold duration for the TX to be silent if TX duration is less than this value
+	 * @param timeUnit
+	 * 		the time unit for the given duration
+	 */
+	StrolchTransaction silentThreshold(long silentThreshold, TimeUnit timeUnit);
+
+	/**
+	 * Returns the threshold duration in milliseconds for the TX to be silent if TX duration is less than this value
+	 *
+	 * @return the threshold duration in milliseconds for the TX to be silent if TX duration is less than this value
+	 */
+	long getSilentThreshold();
+
+	/**
 	 * If the given argument is true, then no observer updates are performed
 	 *
 	 * @param suppressUpdates
@@ -356,21 +374,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return true if writing {@link Audit Audits} for Audits is currently suppressed
 	 */
 	boolean isSuppressAuditsForAudits();
-
-	/**
-	 * If the given argument is true, then logging of a {@link TransactionCloseStrategy#READ_ONLY} will be suppressed
-	 *
-	 * @param suppressDoNothingLogging
-	 * 		true to suppress logging of a {@link TransactionCloseStrategy#READ_ONLY}, false to enable logging
-	 */
-	void setSuppressDoNothingLogging(boolean suppressDoNothingLogging);
-
-	/**
-	 * Returns true if logging of a {@link TransactionCloseStrategy#READ_ONLY} should be suppressed
-	 *
-	 * @return true if logging of a {@link TransactionCloseStrategy#READ_ONLY} should be suppressed
-	 */
-	boolean isSuppressDoNothingLogging();
 
 	/**
 	 * Returns true if versioning is enabled on the {@link StrolchRealm} for which this transaction has been opened

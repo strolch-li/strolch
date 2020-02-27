@@ -15,11 +15,15 @@
  */
 package li.strolch.persistence.api;
 
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import li.strolch.agent.api.*;
@@ -56,7 +60,6 @@ import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.objectfilter.ObjectFilter;
 import org.slf4j.Logger;
@@ -80,10 +83,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private MapOfMaps<String, String, Activity> activityCache;
 
 	private TransactionCloseStrategy closeStrategy;
+	private long silentThreshold;
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
 	private boolean suppressAuditsForAudits;
-	private boolean suppressDoNothingLogging;
 	private TransactionResult txResult;
 
 	private List<Command> commands;
@@ -235,6 +238,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public StrolchTransaction silentThreshold(long silentThreshold, TimeUnit timeUnit) {
+		this.silentThreshold = timeUnit.toNanos(silentThreshold);
+		return this;
+	}
+
+	@Override
+	public long getSilentThreshold() {
+		return TimeUnit.NANOSECONDS.toMillis(this.silentThreshold);
+	}
+
+	@Override
 	public void setSuppressUpdates(boolean suppressUpdates) {
 		this.suppressUpdates = suppressUpdates;
 	}
@@ -262,16 +276,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public boolean isSuppressAuditsForAudits() {
 		return this.suppressAuditsForAudits;
-	}
-
-	@Override
-	public boolean isSuppressDoNothingLogging() {
-		return suppressDoNothingLogging;
-	}
-
-	@Override
-	public void setSuppressDoNothingLogging(boolean quietDoNothing) {
-		this.suppressDoNothingLogging = quietDoNothing;
 	}
 
 	@Override
@@ -387,7 +391,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		} catch (PrivilegeModelException e) {
 			throw e;
 		} catch (PrivilegeException e) {
-			throw new StrolchAccessDeniedException(this.certificate, query, ExceptionHelper.getExceptionMessage(e), e);
+			throw new StrolchAccessDeniedException(this.certificate, query, getExceptionMessage(e), e);
 		}
 	}
 
@@ -1404,7 +1408,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 
 			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e));
+			msg = MessageFormat.format(msg, getRealmName(), getExceptionMessage(e));
 			throw new StrolchTransactionException(msg, e);
 		}
 	}
@@ -1544,15 +1548,15 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private void handleReadOnly(long start, long auditTrailDuration) {
 
-		if (this.suppressDoNothingLogging)
-			return;
-
 		long end = System.nanoTime();
 		long txDuration = end - this.txResult.getStartNanos();
 		long closeDuration = end - start;
 
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
+
+		if (this.silentThreshold > 0L && txDuration < this.silentThreshold)
+			return;
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX user=");
@@ -1562,19 +1566,19 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(getRealmName());
 
 		sb.append(", took="); //$NON-NLS-1$
-		sb.append(StringHelper.formatNanoDuration(txDuration));
+		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
-			sb.append(StringHelper.formatNanoDuration(closeDuration));
+			sb.append(formatNanoDuration(closeDuration));
 		}
 
 		if (isAuditTrailEnabled() && auditTrailDuration >= 100000000L) {
 			sb.append(", auditTrail="); //$NON-NLS-1$
-			sb.append(StringHelper.formatNanoDuration(auditTrailDuration));
+			sb.append(formatNanoDuration(auditTrailDuration));
 		}
 
 		logger.info(sb.toString());
@@ -1589,6 +1593,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
 
+		if (this.silentThreshold > 0L && txDuration < this.silentThreshold)
+			return;
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX user=");
 		sb.append(this.certificate.getUsername());
@@ -1597,24 +1604,24 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(getRealmName());
 
 		sb.append(", took="); //$NON-NLS-1$
-		sb.append(StringHelper.formatNanoDuration(txDuration));
+		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
-			sb.append(StringHelper.formatNanoDuration(closeDuration));
+			sb.append(formatNanoDuration(closeDuration));
 		}
 
 		if (isAuditTrailEnabled() && auditTrailDuration >= 100000000L) {
 			sb.append(", auditTrail="); //$NON-NLS-1$
-			sb.append(StringHelper.formatNanoDuration(auditTrailDuration));
+			sb.append(formatNanoDuration(auditTrailDuration));
 		}
 
 		if (isObserverUpdatesEnabled() && observerUpdateDuration >= 100000000L) {
 			sb.append(", updates="); //$NON-NLS-1$
-			sb.append(StringHelper.formatNanoDuration(observerUpdateDuration));
+			sb.append(formatNanoDuration(observerUpdateDuration));
 		}
 		logger.info(sb.toString());
 	}
@@ -1636,14 +1643,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(getRealmName());
 
 		sb.append(" failed="); //$NON-NLS-1$
-		sb.append(StringHelper.formatNanoDuration(txDuration));
+		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
-			sb.append(StringHelper.formatNanoDuration(closeDuration));
+			sb.append(formatNanoDuration(closeDuration));
 		}
 		logger.error(sb.toString());
 	}
@@ -1666,25 +1673,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append(getRealmName());
 
 		sb.append(" failed="); //$NON-NLS-1$
-		sb.append(StringHelper.formatNanoDuration(txDuration));
+		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
 			sb.append(", close="); //$NON-NLS-1$
-			sb.append(StringHelper.formatNanoDuration(closeDuration));
+			sb.append(formatNanoDuration(closeDuration));
 		}
 
 		if (this.container.hasComponent(OperationsLog.class)) {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
-					Locator.valueOf(AGENT, "tx", this.action, StrolchAgent.getUniqueId()), LogSeverity.Exception,
+					Locator.valueOf(AGENT, "tx", this.action, getUniqueId()), LogSeverity.Exception,
 					ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed").withException(e).value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
-		msg = MessageFormat.format(msg, getRealmName(), ExceptionHelper.getExceptionMessage(e), sb.toString());
+		msg = MessageFormat.format(msg, getRealmName(), getExceptionMessage(e), sb.toString());
 		StrolchTransactionException ex = new StrolchTransactionException(msg, e);
 
 		if (throwEx)
