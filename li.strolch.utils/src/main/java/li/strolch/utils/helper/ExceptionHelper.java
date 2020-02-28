@@ -35,7 +35,16 @@ public class ExceptionHelper {
 	 * @return the class name and method name of the caller
 	 */
 	public static String getCallerMethod() {
-		StackTraceElement element = new Throwable().getStackTrace()[1];
+		return getCallerMethod(2);
+	}
+
+	public static String getCallerMethod(int depth) {
+		// TODO change to StackWalker:
+//		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+//		walker.walk(frames -> frames.skip(1)
+//				.map((StackWalker.StackFrame s) -> s.getDeclaringClass() + "." + s.getMethodName()).findFirst());
+
+		StackTraceElement element = new Throwable().getStackTrace()[depth];
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
