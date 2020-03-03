@@ -27,7 +27,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.text.MessageFormat;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
@@ -91,8 +90,8 @@ public class FileIo {
 				if (!this.tmpPath.delete())
 					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
 			}
-			String msg = "Writing to file failed due to internal error: {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, e.getMessage());
+			String msg = "Writing to file {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.path.getAbsolutePath(), e.getMessage());
 			throw new XmlException(msg, e);
 		}
 
@@ -122,8 +121,9 @@ public class FileIo {
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 
-			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
-			throw new XmlPersistenceException(MessageFormat.format(msg, e.getMessage()), e);
+			String msg = "Parsing of file {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			throw new XmlPersistenceException(MessageFormat.format(msg, this.path.getAbsolutePath(), e.getMessage()),
+					e);
 		}
 	}
 
@@ -182,8 +182,8 @@ public class FileIo {
 				if (!this.tmpPath.delete())
 					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
 			}
-			String msg = "Writing to file failed due to internal error: {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, e.getMessage());
+			String msg = "Writing to file {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.tmpPath.getAbsolutePath(), e.getMessage());
 			throw new XmlException(msg, e);
 
 		} finally {
@@ -209,8 +209,8 @@ public class FileIo {
 			ctx.setObject(domParser.getObject());
 
 		} catch (SAXException | IOException e) {
-			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, e.getMessage());
+			String msg = "Parsing {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, this.path.getAbsolutePath(), e.getMessage());
 			throw new XmlPersistenceException(msg, e);
 		}
 	}
