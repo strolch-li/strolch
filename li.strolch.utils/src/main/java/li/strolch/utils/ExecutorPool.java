@@ -18,9 +18,11 @@ public class ExecutorPool {
 	private static final Logger logger = LoggerFactory.getLogger(ExecutorPool.class);
 
 	private Map<String, ExecutorService> executors;
+	private Map<String, ScheduledExecutorService> scheduledExecutors;
 
 	public ExecutorPool() {
 		this.executors = Collections.synchronizedMap(new HashMap<>());
+		this.scheduledExecutors = Collections.synchronizedMap(new HashMap<>());
 	}
 
 	public ExecutorService getExecutor(String poolName) {
@@ -35,7 +37,7 @@ public class ExecutorPool {
 
 	public ScheduledExecutorService getScheduledExecutor(String poolName) {
 		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
-		return (ScheduledExecutorService) this.executors
+		return this.scheduledExecutors
 				.computeIfAbsent(poolName, p -> newScheduledThreadPool(4, new NamedThreadPoolFactory(p)));
 	}
 
@@ -45,16 +47,26 @@ public class ExecutorPool {
 			logger.info("Shutting down executor pool " + poolName);
 			ExecutorService executor = this.executors.get(poolName);
 
-			try {
-				executor.shutdown();
-				executor.awaitTermination(5, TimeUnit.SECONDS);
-			} catch (InterruptedException e) {
-				logger.error("Was interrupted while shutting down tasks");
-			} finally {
-				if (!executor.isTerminated()) {
-					logger.error("Tasks not stopped after " + 5 + "s. Shutting down now.");
-					executor.shutdownNow();
-				}
+			shutdownExecutor(executor);
+		}
+		for (String poolName : this.scheduledExecutors.keySet()) {
+			logger.info("Shutting down scheduled executor pool " + poolName);
+			ExecutorService executor = this.scheduledExecutors.get(poolName);
+
+			shutdownExecutor(executor);
+		}
+	}
+
+	private void shutdownExecutor(ExecutorService executor) {
+		try {
+			executor.shutdown();
+			executor.awaitTermination(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			logger.error("Was interrupted while shutting down tasks");
+		} finally {
+			if (!executor.isTerminated()) {
+				logger.error("Tasks not stopped after " + 5 + "s. Shutting down now.");
+				executor.shutdownNow();
 			}
 		}
 	}
