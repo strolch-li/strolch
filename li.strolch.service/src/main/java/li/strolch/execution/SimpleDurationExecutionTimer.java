@@ -72,19 +72,26 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 		this.simulationTasks.remove(locator);
 		ExecutionHandler executionHandler = container.getComponent(ExecutionHandler.class);
 		Controller controller = executionHandler.getController(realm, locator);
-		if (controller != null) {
-			try {
-				if (!controller.isStopped(locator))
-					controller.toExecuted(locator);
-			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
+		if (controller == null) {
+			logger.warn("Controller already remove for " + locator);
+			return;
+		}
 
-				if (this.agent.getContainer().hasComponent(OperationsLog.class)) {
-					this.agent.getContainer().getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
-									.withException(e).value("reason", e));
-				}
+		if (controller.isStopped(locator)) {
+			logger.warn("Execution for " + locator + " is already stopped.");
+			return;
+		}
+
+		try {
+			controller.toExecuted(locator);
+		} catch (Exception e) {
+			logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
+
+			if (this.agent.getContainer().hasComponent(OperationsLog.class)) {
+				this.agent.getContainer().getComponent(OperationsLog.class).addMessage(
+						new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
+								ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
+								.withException(e).value("reason", e));
 			}
 		}
 	}

@@ -72,7 +72,7 @@ public class Controller {
 		return this.activity;
 	}
 
-	public ExecutionPolicy getExecutionPolicy(StrolchTransaction tx, Action action) {
+	public ExecutionPolicy refreshExecutionPolicy(StrolchTransaction tx, Action action) {
 		ExecutionPolicy executionPolicy = this.inExecution.computeIfAbsent(action.getLocator(), e -> {
 			Resource resource = tx.getResourceFor(action, true);
 			return tx.getPolicy(resource.getPolicyDef(ExecutionPolicy.class));
@@ -80,6 +80,7 @@ public class Controller {
 
 		// always update the TX and controller
 		executionPolicy.setController(tx, this);
+		executionPolicy.setStopped(false);
 		return executionPolicy;
 	}
 
@@ -172,7 +173,7 @@ public class Controller {
 
 				// set this action to executed
 				SetActionToExecutedCommand command = new SetActionToExecutedCommand(tx);
-				command.setExecutionPolicy(getExecutionPolicy(tx, action));
+				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 				command.setAction(action);
 				command.validate();
 				command.doCommand();
@@ -211,7 +212,7 @@ public class Controller {
 
 				// set this action to executed
 				SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
-				command.setExecutionPolicy(getExecutionPolicy(tx, action));
+				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 				command.setAction(action);
 				command.validate();
 				command.doCommand();
@@ -241,7 +242,7 @@ public class Controller {
 
 				// set this action to executed
 				SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
-				command.setExecutionPolicy(getExecutionPolicy(tx, action));
+				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 				command.setAction(action);
 				command.validate();
 				command.doCommand();
@@ -271,7 +272,7 @@ public class Controller {
 
 				// set this action to executed
 				SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
-				command.setExecutionPolicy(getExecutionPolicy(tx, action));
+				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 				command.setAction(action);
 				command.validate();
 				command.doCommand();

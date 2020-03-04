@@ -30,7 +30,7 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 	}
 
 	private ExecutionPolicy getExecutionPolicy(Action action) {
-		return this.controller.getExecutionPolicy(tx(), action);
+		return this.controller.refreshExecutionPolicy(tx(), action);
 	}
 
 	public boolean needsRetriggerOfExecution() {

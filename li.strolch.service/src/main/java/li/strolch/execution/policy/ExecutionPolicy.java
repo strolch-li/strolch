@@ -73,6 +73,10 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 		return this.stopped;
 	}
 
+	public void setStopped(boolean stopped) {
+		this.stopped = stopped;
+	}
+
 	/**
 	 * Returns the TX which is defined on this class, not the one defined on {@link StrolchPolicy}
 	 */
@@ -199,14 +203,13 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * 		the delay duration
 	 */
 	protected void delayToExecutedBy(Duration duration) {
-		String realmName = tx().getRealmName();
 		long delayMs = duration.toMillis();
 		if (delayMs < 20) {
 			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
 			delayMs = 20;
 		}
 		logger.info("Delaying toExecuted of " + this.actionLoc + " by " + formatMillisecondsDuration(delayMs));
-		getDelayedExecutionTimer().execute(realmName, getContainer(), this.actionLoc, delayMs);
+		getDelayedExecutionTimer().execute(this.realm, getContainer(), this.actionLoc, delayMs);
 	}
 
 	protected void delayToExecutedByRandom(long duration, double minFactor, double maxFactor, TimeUnit delayUnit) {
@@ -227,14 +230,13 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * 		the UOM of the delay time
 	 */
 	protected void delayToExecutedBy(long delay, TimeUnit delayUnit) {
-		String realmName = tx().getRealmName();
 		long delayMs = delayUnit.toMillis(delay);
 		if (delayMs < 20) {
 			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
 			delayMs = 20;
 		}
 		logger.info("Delaying toExecuted of " + this.actionLoc + " by " + formatMillisecondsDuration(delayMs));
-		getDelayedExecutionTimer().execute(realmName, getContainer(), this.actionLoc, delayMs);
+		getDelayedExecutionTimer().execute(this.realm, getContainer(), this.actionLoc, delayMs);
 	}
 
 	/**
