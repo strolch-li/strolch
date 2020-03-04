@@ -1400,7 +1400,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void flush() {
 		try {
 			addModelChangeCommands();
-			validateCommands();
 			doCommands();
 			writeChanges();
 			clearCache();
@@ -1421,13 +1420,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.txResult.setState(TransactionState.COMMITTING);
 
 			addModelChangeCommands();
-			validateCommands();
 			doCommands();
 
 			// do it twice, since some commands might generate new model changes
 			if (this.objectFilter != null && !this.objectFilter.isEmpty()) {
 				addModelChangeCommands();
-				validateCommands();
 				doCommands();
 			}
 
@@ -1856,16 +1853,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	/**
-	 * Calls {@link Command#validate()} on all registered command. This is done before we perform any commands and thus
-	 * no rollback needs be done due to invalid input for a command
-	 */
-	private void validateCommands() {
-		for (Command command : this.commands) {
-			command.validate();
-		}
-	}
-
-	/**
 	 * Calls {@link Command#doCommand()} on all registered commands. This is done after the commands have been validated
 	 * so chance of a runtime exception should be small
 	 */
@@ -1880,6 +1867,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ListIterator<Command> iter = commands.listIterator();
 		while (iter.hasNext()) {
 			Command command = iter.next();
+			command.validate();
 			this.flushedCommands.add(command);
 			command.doCommand();
 			iter.remove();
