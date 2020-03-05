@@ -288,8 +288,6 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
-		logger.info("Adding async " + controller.getLocator() + " for execution!");
-
 		getExecutor().execute(() -> {
 			try {
 				controller.execute();
