@@ -118,6 +118,8 @@ public class Tags {
 		public static final String STATE_ID = "stateId";
 		public static final String VALUE = "value";
 		public static final String TIME = "time";
+		public static final String COMMAND = "command";
+		public static final String DATA = "data";
 
 		public static final String POLICIES = "policies";
 
@@ -140,6 +142,7 @@ public class Tags {
 
 		public static final String MSG_TYPE = "msgType";
 		public static final String USERNAME = "username";
+		public static final String PASSWORD = "password";
 		public static final String ELEMENTS = "elements";
 		public static final String NR_OF_ELEMENTS = "nrOfElements";
 		public static final String ELEMENT_MAPS = "elementMaps";
