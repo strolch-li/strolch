@@ -190,25 +190,27 @@ public class FileHelper {
 	 *
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
-	public final static boolean deleteFiles(File[] files, boolean log) {
-
+	public static boolean deleteFiles(File[] files, boolean log) {
 		boolean worked = true;
-		for (int i = 0; i < files.length; i++) {
-			File file = files[i];
+		for (File file : files) {
+
 			if (file.isDirectory()) {
-				boolean done = FileHelper.deleteFiles(file.listFiles(), log);
+				File[] children = file.listFiles();
+				if (children == null)
+					continue;
+
+				boolean done = FileHelper.deleteFiles(children, log);
 				if (!done) {
 					worked = false;
-					FileHelper.logger.warn("Could not empty the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
+					logger.warn("Could not empty the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
 				} else {
 					done = file.delete();
 					if (done) {
 						if (log)
-							FileHelper.logger.info("Deleted DIR  " + file.getAbsolutePath()); //$NON-NLS-1$
+							logger.info("Deleted DIR  " + file.getAbsolutePath()); //$NON-NLS-1$
 					} else {
 						worked = false;
-						FileHelper.logger
-								.warn("Could not delete the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
+						logger.warn("Could not delete the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
 					}
 				}
 			} else {
