@@ -46,13 +46,14 @@ public class FileIo {
 	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(FileIo.class);
+	public static final String TMP_PREFIX = ".tmp_";
 
 	private final File path;
 	private final File tmpPath;
 
 	public FileIo(File path) {
 		this.path = path;
-		this.tmpPath = new File(this.path.getParentFile(), ".tmp_" + this.path.getName());
+		this.tmpPath = new File(this.path.getParentFile(), TMP_PREFIX + this.path.getName());
 	}
 
 	public <T> void writeSax(PersistenceContext<T> ctx) {
@@ -160,7 +161,7 @@ public class FileIo {
 
 			// Transform to file
 			try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.tmpPath), encoding)) {
-				StreamResult result = new StreamResult(this.tmpPath);
+				StreamResult result = new StreamResult(ioWriter);
 				Source xmlSource = new DOMSource(document);
 				transformer.transform(xmlSource, result);
 			}

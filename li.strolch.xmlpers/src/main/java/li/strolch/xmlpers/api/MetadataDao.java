@@ -15,6 +15,8 @@
  */
 package li.strolch.xmlpers.api;
 
+import static li.strolch.xmlpers.api.FileIo.TMP_PREFIX;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -138,10 +140,12 @@ public class MetadataDao {
 
 		Set<String> keySet = new TreeSet<>();
 		File[] subTypeFiles = queryPath.listFiles();
-		for (File subTypeFile : subTypeFiles) {
-			if (subTypeFile.isDirectory()) {
-				String type = subTypeFile.getName();
-				keySet.add(type);
+		if (subTypeFiles != null) {
+			for (File subTypeFile : subTypeFiles) {
+				if (subTypeFile.isDirectory()) {
+					String type = subTypeFile.getName();
+					keySet.add(type);
+				}
 			}
 		}
 
@@ -178,7 +182,7 @@ public class MetadataDao {
 		}
 
 		for (File subTypeFile : subTypeFiles) {
-			if (subTypeFile.isFile()) {
+			if (subTypeFile.isFile() && !subTypeFile.getName().startsWith(TMP_PREFIX)) {
 				String filename = subTypeFile.getName();
 				String id = FilenameUtility.getId(filename);
 				keySet.add(id);
@@ -206,13 +210,15 @@ public class MetadataDao {
 			throw new IllegalArgumentException(msg);
 		}
 
-		long numberOfFiles = 0l;
+		long numberOfFiles = 0L;
 
 		File[] subTypeFiles = queryPath.listFiles();
-		for (File subTypeFile : subTypeFiles) {
+		if (subTypeFiles != null) {
+			for (File subTypeFile : subTypeFiles) {
 
-			if (subTypeFile.isDirectory())
-				numberOfFiles++;
+				if (subTypeFile.isDirectory())
+					numberOfFiles++;
+			}
 		}
 		return numberOfFiles;
 	}
@@ -235,13 +241,15 @@ public class MetadataDao {
 			throw new IllegalArgumentException(msg);
 		}
 
-		long numberOfFiles = 0l;
+		long numberOfFiles = 0L;
 
 		File[] subTypeFiles = queryPath.listFiles();
-		for (File subTypeFile : subTypeFiles) {
+		if (subTypeFiles != null) {
+			for (File subTypeFile : subTypeFiles) {
 
-			if (subTypeFile.isFile())
-				numberOfFiles++;
+				if (subTypeFile.isFile() && !subTypeFile.getName().startsWith(TMP_PREFIX))
+					numberOfFiles++;
+			}
 		}
 		return numberOfFiles;
 	}
