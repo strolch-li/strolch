@@ -56,6 +56,8 @@ public class OperationsLog extends StrolchComponent {
 					List<LogMessage> messages = logMessageDao.queryLatest(realmName, this.maxMessages);
 					logger.info("Loaded " + messages.size() + " messages for OperationsLog for realm " + realmName);
 					this.logMessagesByRealmAndId.put(realmName, messages);
+				} catch (RuntimeException e) {
+					logger.error("Failed to load operations log for realm " + realmName, e);
 				}
 			}
 		});
