@@ -1,16 +1,12 @@
 package li.strolch.agent.api;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
@@ -19,6 +15,11 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class StrolchBootstrapper extends DefaultHandler {
 
@@ -74,6 +75,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * </p>
 	 *
 	 * @param appVersion
+	 * 		the app's version
 	 */
 	public StrolchBootstrapper(StrolchVersion appVersion) {
 		DBC.PRE.assertNotNull("appVersion must be set!", appVersion);
@@ -100,8 +102,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 					"Could not find resource " + APP_VERSION_PROPERTIES + " on ClassLoader of class " + appClass);
 		}
 
-		StrolchVersion appVersion = new StrolchVersion(env);
-		this.appVersion = appVersion;
+		this.appVersion = new StrolchVersion(env);
 	}
 
 	public void setEnvironmentOverride(String environmentOverride) {
@@ -163,7 +164,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 				msg = MessageFormat.format(msg, environment, rootDstPath.getAbsolutePath());
 				throw new StrolchConfigurationException(msg);
 			}
-			if (rootDstPath.list().length != 0) {
+			if (requireNonNull(rootDstPath.list()).length != 0) {
 				String msg = "[{0}] Destination root exists and is not empty at {1}"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, environment, rootDstPath.getAbsolutePath());
 				throw new StrolchConfigurationException(msg);
@@ -328,7 +329,6 @@ public class StrolchBootstrapper extends DefaultHandler {
 	}
 
 	private void parseBoostrapFile(File bootstrapFile) {
-
 		// parse the document using ourselves as the DefaultHandler
 		XmlHelper.parseDocument(bootstrapFile, this);
 
