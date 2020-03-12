@@ -206,4 +206,23 @@ public class ExceptionHelper {
 
 		return t;
 	}
+
+	/**
+	 * Walks the causes for the given {@link Throwable} and sees if the given cause exists
+	 *
+	 * @param throwable
+	 * 		the {@link Throwable} for which to find the given cause type
+	 *
+	 * @return true if the cause was found, false if not
+	 */
+	public static boolean hasCause(Throwable throwable, Class<? extends Throwable> causeType) {
+		Throwable t = throwable;
+		while (t != null) {
+			if (t.getClass() == causeType)
+				return true;
+			t = t.getCause();
+		}
+
+		return false;
+	}
 }
