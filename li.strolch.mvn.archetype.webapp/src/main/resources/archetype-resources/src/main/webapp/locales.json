@@ -19,9 +19,15 @@
     "serverNotAvailable": "Server nicht erreichbar",
     "serverNotAvailableMsg": "Die Verbindung zum Server ist zur Zeit unterbrochen",
     "privilegeDenied": "Aktion verweigert",
-    "privilegeDeniedText": "Die Aktion wurde verweigert."
+    "privilegeDeniedText": "Die Aktion wurde verweigert.",
+    "sessionInvalid": "Sitzung ungültig",
+    "sessionInvalidConfirmNavToLogin": "Die Sitzung ist abgelaufen oder ungültig. Bitte neu anmelden.",
+    "sessionInvalidLoggingBackIn": "Die Sitzung ist ungültig oder abgelaufen, automatische Anmeldung wird ausgeführt..."
   },
   "en": {
+    "sessionInvalid": "Session Invalid",
+    "sessionInvalidConfirmNavToLogin": "The session has expired or is invalid. Please logon again.",
+    "sessionInvalidLoggingBackIn": "The session is invalid or has expired, automatic logon has commenced...",
     "privilegeDenied": "Action denied",
     "privilegeDeniedText": "The action has been denied",
     "appTitle": "${appName}",
