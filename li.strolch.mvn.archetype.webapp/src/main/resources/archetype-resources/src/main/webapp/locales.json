@@ -17,9 +17,13 @@
     "ok": "Ok",
     "reconnect": "Wiederhestellen",
     "serverNotAvailable": "Server nicht erreichbar",
-    "serverNotAvailableMsg": "Die Verbindung zum Server ist zur Zeit unterbrochen"
+    "serverNotAvailableMsg": "Die Verbindung zum Server ist zur Zeit unterbrochen",
+    "privilegeDenied": "Aktion verweigert",
+    "privilegeDeniedText": "Die Aktion wurde verweigert."
   },
   "en": {
+    "privilegeDenied": "Action denied",
+    "privilegeDeniedText": "The action has been denied",
     "appTitle": "${appName}",
     "language": "Language",
     "reports": "Reports",
