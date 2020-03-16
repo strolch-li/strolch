@@ -91,7 +91,7 @@ public class OperationsLog extends StrolchComponent {
 		// persist changes for non-transient realms
 		StrolchRealm realm = getContainer().getRealm(realmName);
 		if (!realm.getMode().isTransient())
-			this.executorService.submit(() -> this.persist(realm, logMessage, messagesToRemove));
+			this.executorService.submit(() -> persist(realm, logMessage, messagesToRemove));
 	}
 
 	private List<LogMessage> pruneMessages(List<LogMessage> logMessages) {
@@ -169,5 +169,10 @@ public class OperationsLog extends StrolchComponent {
 				return size() > maxMessages;
 			}
 		};
+	}
+
+	public void removeMessage(String realm, LogMessage message) {
+		List<LogMessage> messages = this.logMessagesByRealmAndId.get(realm);
+		messages.remove(message);
 	}
 }
