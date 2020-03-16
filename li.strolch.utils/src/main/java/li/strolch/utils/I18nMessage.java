@@ -44,6 +44,10 @@ public class I18nMessage {
 		return this.values;
 	}
 
+	public Object getValue(String key) {
+		return this.values.get(key);
+	}
+
 	public String getMessage() {
 		return formatMessage();
 	}
