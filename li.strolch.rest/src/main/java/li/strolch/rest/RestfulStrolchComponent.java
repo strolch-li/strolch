@@ -203,6 +203,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return super.getContainer().getAgent().getContainer().getPrivilegeHandler();
 	}
 
+	@Override
 	public <T> T getComponent(Class<T> clazz) {
 		return getContainer().getComponent(clazz);
 	}
