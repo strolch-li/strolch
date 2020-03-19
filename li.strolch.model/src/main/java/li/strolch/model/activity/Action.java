@@ -16,6 +16,7 @@
 
 package li.strolch.model.activity;
 
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import java.text.MessageFormat;
@@ -343,6 +344,16 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 			end = Math.max(end, change.getTime());
 		}
 		return end;
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findRelationParam(String paramKey) {
+		return findParameter(BAG_RELATIONS, paramKey);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findRelationParam(String paramKey, boolean assertExists) {
+		return findParameter(BAG_RELATIONS, paramKey, assertExists);
 	}
 
 	@Override

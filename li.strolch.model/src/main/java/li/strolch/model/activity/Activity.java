@@ -15,6 +15,8 @@
  */
 package li.strolch.model.activity;
 
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
@@ -609,6 +611,16 @@ public class Activity extends AbstractStrolchRootElement
 	@Override
 	public <T> T accept(StrolchElementVisitor<T> visitor) {
 		return visitor.visitActivity(this);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findRelationParam(String paramKey) {
+		return findParameter(BAG_RELATIONS, paramKey);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findRelationParam(String paramKey, boolean assertExists) {
+		return findParameter(BAG_RELATIONS, paramKey, assertExists);
 	}
 
 	@SuppressWarnings("unchecked")

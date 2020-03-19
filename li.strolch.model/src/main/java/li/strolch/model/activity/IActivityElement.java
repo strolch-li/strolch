@@ -18,9 +18,7 @@ package li.strolch.model.activity;
 import java.util.function.Predicate;
 
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.GroupedParameterizedElement;
-import li.strolch.model.State;
-import li.strolch.model.StrolchElement;
+import li.strolch.model.*;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.StrolchElementVisitor;
@@ -64,6 +62,34 @@ public interface IActivityElement extends StrolchElement {
 	 * 		the activity to set as parent
 	 */
 	void setParent(Activity activity);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or otherwise queries its parent, until the root element is reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the parameter does not exist, null is returned
+	 * </p>
+	 *
+	 * @see GroupedParameterizedElement#getRelationParam(String)
+	 */
+	<U, T extends Parameter<U>> T findRelationParam(String paramKey);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, or otherwise queries its parent, until the root element is reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the parameter does not exist and {@code assertExists} is true, then a {@link StrolchModelException} is thrown
+	 * </p>
+	 *
+	 * @see GroupedParameterizedElement#getRelationParam(String, boolean)
+	 */
+	<U, T extends Parameter<U>> T findRelationParam(String paramKey, boolean assertExists);
 
 	/**
 	 * <p>
