@@ -67,8 +67,6 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 	private void executed(String realm, ComponentContainer container, Locator locator) {
 
-		logger.info("Completing execution for " + locator);
-
 		this.simulationTasks.remove(locator);
 		ExecutionHandler executionHandler = container.getComponent(ExecutionHandler.class);
 		Controller controller = executionHandler.getController(realm, locator);
