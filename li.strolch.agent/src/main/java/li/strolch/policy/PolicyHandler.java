@@ -74,6 +74,21 @@ public interface PolicyHandler {
 	<T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, StrolchTransaction tx);
 
 	/**
+	 * Instantiates the actual policy by resolving the {@link PolicyDef} using a {@link PolicyDefVisitor}, or if not
+	 * available, using the default policy definition
+	 *
+	 * @param policyDef
+	 * 		the {@link PolicyDef} referencing a concrete policy
+	 * @param defaultDef
+	 * 		the default {@link PolicyDef} to use if the other is not available
+	 * @param tx
+	 * 		the current transaction for which the policy is instantiated
+	 *
+	 * @return the instantiated instance of the referenced policy
+	 */
+	<T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, PolicyDef defaultDef, StrolchTransaction tx);
+
+	/**
 	 * Returns true, if the policy definition is known
 	 *
 	 * @param policyDef

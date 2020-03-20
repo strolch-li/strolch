@@ -185,6 +185,20 @@ public interface StrolchTransaction extends AutoCloseable {
 	<T extends StrolchPolicy> T getPolicy(PolicyDef policyDef);
 
 	/**
+	 * Instantiates the policy using the given {@link PolicyDef}, or if not available, the default policy
+	 *
+	 * @param policyDef
+	 * 		the policy definition
+	 * @param defaultDef
+	 * 		the default policy definition if the given policy definition is unavailable
+	 * @param <T>
+	 * 		the type of policy to return
+	 *
+	 * @return the policy
+	 */
+	<T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, PolicyDef defaultDef);
+
+	/**
 	 * Returns the currently set {@link TransactionCloseStrategy}
 	 *
 	 * @return the currently set {@link TransactionCloseStrategy}

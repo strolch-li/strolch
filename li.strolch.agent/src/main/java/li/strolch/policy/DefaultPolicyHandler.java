@@ -94,11 +94,21 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 	@Override
 	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, StrolchTransaction tx) {
+		return getPolicy(policyDef, null, tx);
+	}
+
+	@Override
+	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, PolicyDef defaultDef, StrolchTransaction tx) {
 		DBC.PRE.assertNotNull("policyDef must not be null!", policyDef);
 		DBC.PRE.assertNotNull("tx must not be null!", tx);
 		try {
 
-			Class<T> clazz = policyDef.accept(this);
+			Class<T> clazz;
+			if (defaultDef != null && !isPolicyDefAvailable(policyDef))
+				clazz = defaultDef.accept(this);
+			else
+				clazz = policyDef.accept(this);
+
 			@SuppressWarnings("unchecked")
 			Constructor<T> constructor = (Constructor<T>) getConstructorForPolicy(clazz);
 			if (constructor.getParameterCount() == 1)

@@ -385,6 +385,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, this);
 	}
 
+	@Override
+	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, PolicyDef defaultDef) {
+		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, defaultDef, this);
+	}
+
 	private void assertQueryAllowed(StrolchQuery query) {
 		try {
 			getPrivilegeContext().validateAction(query);
