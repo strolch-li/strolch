@@ -61,10 +61,23 @@
         <ul>
             <li>Same programming model and language for server and PLC</li>
             <li>PLC has the same privilege handling as in Strolch</li>
-            <li>Simulating down to the PLC level is easily possible to quickly test the server logic</li>
+            <li>Simulating down to the PLC level is easily possible for easier testing of server logic</li>
         </ul>
 
+        <p>Of course using the Java language as a PLC has its limitations, we have manage to use it for customers and
+           are satisfied with the result. What follows is a description in how to set up your own Strolch based PLC.</p>
 
+        <h2>Example set up</h2>
+        <p>This example setup describes the movement of containers over conveyors. The conveyors have motors which can
+           be started and stopped by a GPIO output pin controlled on a Raspberry Pi and each conveyor has a light
+           barrier to detect the occupancy of a container and the Raspberry Pi detects this on GPIO input pins.</p>
+        <p>Further at each conveyor location is a barcode reader to read the ID of a container.</p>
+        <p>The general idea is that the PLC notifies a Strolch agent of changes, and only turns conveyors on, when the
+           agent gives the command. Thus the agent handles business logic and the PLC controls the I/Os.</p>
+
+        <img style="display:block;margin-left: auto;margin-right: auto"
+             src="images/Strolch-Plc-Example.png"
+             alt="Strolch PLC Conveyor Example" />
 
 
     </div>
