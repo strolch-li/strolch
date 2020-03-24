@@ -46,13 +46,12 @@ public class ExecutorPool {
 		for (String poolName : this.executors.keySet()) {
 			logger.info("Shutting down executor pool " + poolName);
 			ExecutorService executor = this.executors.get(poolName);
-
 			shutdownExecutor(executor);
 		}
+
 		for (String poolName : this.scheduledExecutors.keySet()) {
 			logger.info("Shutting down scheduled executor pool " + poolName);
 			ExecutorService executor = this.scheduledExecutors.get(poolName);
-
 			shutdownExecutor(executor);
 		}
 	}
