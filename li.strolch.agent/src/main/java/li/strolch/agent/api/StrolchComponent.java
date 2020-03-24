@@ -354,6 +354,26 @@ public class StrolchComponent {
 	 * @throws Exception
 	 * 		if anything else goes wrong during execution
 	 */
+	protected <T> T runAsWithResult(String username, PrivilegedRunnableWithResult<T> runnable)
+			throws PrivilegeException, Exception {
+		return this.container.getPrivilegeHandler().runWithResult(username, runnable);
+	}
+
+	/**
+	 * Performs the given {@link PrivilegedRunnable} as the given system user
+	 *
+	 * @param username
+	 * 		the name of the system user to perform the action as
+	 * @param runnable
+	 * 		the runnable to perform
+	 *
+	 * @return the result
+	 *
+	 * @throws PrivilegeException
+	 * 		if the given username is not allowed to perform the action
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
+	 */
 	protected <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable)
 			throws PrivilegeException, Exception {
 		return this.container.getPrivilegeHandler().runWithResult(username, runnable);
