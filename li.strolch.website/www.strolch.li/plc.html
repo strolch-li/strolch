@@ -67,6 +67,11 @@
         <p>Of course using the Java language as a PLC has its limitations, we have manage to use it for customers and
            are satisfied with the result. What follows is a description in how to set up your own Strolch based PLC.</p>
 
+        <h2>Architecture</h2>
+        <p>The Strolch PLC architecture sees the Strolch Agent as the server, managing logical devices, i.e. multiple
+           sensors and actors together and thus deciding </p>
+        <img class="image" src="images/Strolch-PLC-Architecture.png" alt="Strolch PLC Architecture">
+
         <h2>Example set up</h2>
         <p>This example setup describes the movement of containers over conveyors. The conveyors have motors which can
            be started and stopped by a GPIO output pin controlled on a Raspberry Pi and each conveyor has a light
@@ -75,9 +80,7 @@
         <p>The general idea is that the PLC notifies a Strolch agent of changes, and only turns conveyors on, when the
            agent gives the command. Thus the agent handles business logic and the PLC controls the I/Os.</p>
 
-        <img style="display:block;margin-left: auto;margin-right: auto"
-             src="images/Strolch-Plc-Example.png"
-             alt="Strolch PLC Conveyor Example" />
+        <img class="image" src="images/Strolch-Plc-Example.png" alt="Strolch PLC Conveyor Example" />
 
 
     </div>

@@ -7,7 +7,7 @@
  */
 
 .content {
-  padding: 0px 2em 3em;
+    padding: 0px 2em 3em;
 }
 
 blockquote {
@@ -23,12 +23,14 @@ blockquote {
 .page-header {
     padding-top: 20px;
 }
+
 .page-title {
     margin-top: 30px;
     margin-bottom: 0;
     font-size: 2.2em;
     font-weight: normal;
 }
+
 .page-description {
     padding-top: 20px;
     font-size: 1.6em;
@@ -37,4 +39,10 @@ blockquote {
 
 #footer {
     font-size: 0.8em;
+}
+
+.image {
+    display: block;
+    margin-left: auto;
+    margin-right: auto
 }
