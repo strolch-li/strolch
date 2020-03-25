@@ -1,6 +1,7 @@
 package li.strolch.model.json;
 
 import static java.util.Arrays.asList;
+import static java.util.Comparator.comparing;
 import static li.strolch.model.Tags.Json.PARAMETER_BAGS;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
@@ -582,20 +583,17 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	private void addParameterBagFlat(JsonObject rootJ, Set<String> ignoredParamIds, ParameterBag parameterBag) {
-
-		Set<String> parameterKeySet = parameterBag.getParameterKeySet();
-		for (String paramId : parameterKeySet) {
+		parameterBag.streamOfParameters().sorted(comparing(Parameter::getIndex)).forEach(param -> {
+			String paramId = param.getId();
 
 			// see if this parameter must be ignored
 			if (ignoredParamIds != null && ignoredParamIds.contains(paramId))
-				continue;
+				return;
 
 			if (rootJ.has(paramId)) {
 				throw new StrolchModelException(
 						"JsonObject already has a member with ID " + paramId + ": " + parameterBag.getLocator());
 			}
-
-			Parameter<?> param = parameterBag.getParameter(paramId);
 
 			StrolchValueType type = StrolchValueType.parse(param.getType());
 			if (type.isBoolean()) {
@@ -605,7 +603,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			} else {
 				rootJ.addProperty(paramId, param.getValueAsString());
 			}
-		}
+		});
 	}
 
 	private JsonObject parameterBagToJsonFull(ParameterBag bag) {
@@ -616,10 +614,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		JsonObject paramsJ = new JsonObject();
 		bagJ.add(Json.PARAMETERS, paramsJ);
 
-		for (String paramKey : bag.getParameterKeySet()) {
-			Parameter<?> param = bag.getParameter(paramKey);
-			paramsJ.add(paramKey, paramToJsonFull(param));
-		}
+		bag.streamOfParameters().sorted(comparing(Parameter::getIndex))
+				.forEach(param -> paramsJ.add(param.getId(), paramToJsonFull(param)));
 
 		if (this.bagHook != null)
 			this.bagHook.accept(bag, bagJ);
