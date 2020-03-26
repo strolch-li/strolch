@@ -32,7 +32,7 @@ public class IsInReportFilter extends ReportFilterPolicy {
 
 		} else if (value instanceof Parameter) {
 
-			Parameter parameter = (Parameter) value;
+			Parameter<?> parameter = (Parameter<?>) value;
 			if (this.right == null) {
 				StrolchValueType valueType = parameter.getValueType();
 				if (valueType == StrolchValueType.DATE)
