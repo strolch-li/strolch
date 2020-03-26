@@ -57,7 +57,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return true if the underlying persistence layer has elements with the given type
 	 */
-	public boolean hasType(StrolchTransaction tx, String type);
+	boolean hasType(StrolchTransaction tx, String type);
 
 	/**
 	 * Returns true if the underlying persistence layer has an element with the given type and ID
@@ -71,7 +71,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return true if the underlying persistence layer has an element with the given type and ID
 	 */
-	public boolean hasElement(StrolchTransaction tx, String type, String id);
+	boolean hasElement(StrolchTransaction tx, String type, String id);
 
 	/**
 	 * Returns the number of elements regardless of type in the underlying persistence layer
@@ -81,7 +81,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the number of elements regardless of type in the underlying persistence layer
 	 */
-	public long querySize(StrolchTransaction tx);
+	long querySize(StrolchTransaction tx);
 
 	/**
 	 * Returns the number of elements of the given type in the underlying persistence layer
@@ -93,7 +93,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the number of elements of the given type in the underlying persistence layer
 	 */
-	public long querySize(StrolchTransaction tx, String type);
+	long querySize(StrolchTransaction tx, String type);
 
 	/**
 	 * Returns a copy of the element with the type "Template" and the id = type
@@ -105,7 +105,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the template, or null if it does not exist
 	 */
-	public T getTemplate(StrolchTransaction tx, String type);
+	T getTemplate(StrolchTransaction tx, String type);
 
 	/**
 	 * Returns a copy of the element with the type "Template" and the id = type
@@ -122,7 +122,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 * 		if the template does not exist
 	 */
-	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) throws StrolchException;
+	T getTemplate(StrolchTransaction tx, String type, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Retrieves the element with the given type and id, or null if it does not exist
@@ -136,7 +136,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the element with the type and id, or null if it does not exist
 	 */
-	public T getBy(StrolchTransaction tx, String type, String id);
+	T getBy(StrolchTransaction tx, String type, String id);
 
 	/**
 	 * Retrieves the element with the given type and id, or null if it does not exist
@@ -155,7 +155,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 * 		if the element does not exist
 	 */
-	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException;
+	T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Retrieves the specific version of the element with the given type and id, or null if it does not exist
@@ -171,7 +171,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the element with the type and id, or null if it does not exist
 	 */
-	public T getBy(StrolchTransaction tx, String type, String id, int version);
+	T getBy(StrolchTransaction tx, String type, String id, int version);
 
 	/**
 	 * Retrieves the specific version of the element with the given type and id, or null if it does not exist
@@ -192,7 +192,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 * 		if the element does not exist
 	 */
-	public T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
+	T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
 			throws StrolchException;
 
 	/**
@@ -213,7 +213,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
-	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException;
+	T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Returns all elements which are referenced by the given {@link StringListParameter}. A reference {@link Parameter}
@@ -234,7 +234,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 * 		if the {@link StringParameter} is not a properly configured as a reference parameter
 	 */
-	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException;
+	List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists) throws StrolchException;
 
 	/**
 	 * Queries and returns all the versions of the element with the given type and ID
@@ -248,7 +248,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return all the versions of the element with the given type and ID
 	 */
-	public List<T> getVersionsFor(StrolchTransaction tx, String type, String id);
+	List<T> getVersionsFor(StrolchTransaction tx, String type, String id);
 
 	/**
 	 * Returns the latest version of the given element, or -1 if no version available
@@ -262,7 +262,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the latest version of the element, or -1 if no version available
 	 */
-	public int getLatestVersionFor(StrolchTransaction tx, String type, String id);
+	int getLatestVersionFor(StrolchTransaction tx, String type, String id);
 
 	/**
 	 * Returns all elements in the underlying persistence layer regardless of type
@@ -272,7 +272,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return all elements in the underlying persistence layer regardless of type
 	 */
-	public List<T> getAllElements(StrolchTransaction tx);
+	List<T> getAllElements(StrolchTransaction tx);
 
 	/**
 	 * Returns all elements in the underlying persistence layer of the given type
@@ -284,7 +284,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return all elements in the underlying persistence layer of the given type
 	 */
-	public List<T> getElementsBy(StrolchTransaction tx, String type);
+	List<T> getElementsBy(StrolchTransaction tx, String type);
 
 	/**
 	 * Returns a {@link Stream} for all elements for the given types
@@ -296,7 +296,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return a stream for the elements
 	 */
-	public Stream<T> stream(StrolchTransaction tx, String... types);
+	Stream<T> stream(StrolchTransaction tx, String... types);
 
 	/**
 	 * Returns all the types known in the underlying persistence layer
@@ -306,7 +306,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return all the types known in the underlying persistence layer
 	 */
-	public Set<String> getTypes(StrolchTransaction tx);
+	Set<String> getTypes(StrolchTransaction tx);
 
 	/**
 	 * Returns all keys/IDs of all elements in the underlying persistence layer, regardless of type
@@ -316,7 +316,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return all keys/IDs of all elements in the underlying persistence layer, regardless of type
 	 */
-	public Set<String> getAllKeys(StrolchTransaction tx);
+	Set<String> getAllKeys(StrolchTransaction tx);
 
 	/**
 	 * Returns all keys/IDs of all elements in the underlying persistence layer, of the given type
@@ -328,7 +328,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return all keys/IDs of all elements in the underlying persistence layer, of the given type
 	 */
-	public Set<String> getKeysBy(StrolchTransaction tx, String type);
+	Set<String> getKeysBy(StrolchTransaction tx, String type);
 
 	/**
 	 * Adds the given element to the underlying persistence layer. The element may not already exist
@@ -341,7 +341,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchPersistenceException
 	 * 		if an element already exists with the same ID
 	 */
-	public void add(StrolchTransaction tx, T element) throws StrolchPersistenceException;
+	void add(StrolchTransaction tx, T element) throws StrolchPersistenceException;
 
 	/**
 	 * Adds the given elements to the underlying persistence layer. None of the elements may already exist
@@ -354,7 +354,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchPersistenceException
 	 * 		if an element already exists with the same ID
 	 */
-	public void addAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
+	void addAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
 
 	/**
 	 * Updates the existing element
@@ -369,7 +369,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchPersistenceException
 	 * 		if the element does not exist
 	 */
-	public void update(StrolchTransaction tx, T element) throws StrolchPersistenceException;
+	void update(StrolchTransaction tx, T element) throws StrolchPersistenceException;
 
 	/**
 	 * Updates all the existing elements
@@ -384,7 +384,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchPersistenceException
 	 * 		if any of the elements don't yet exist
 	 */
-	public void updateAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
+	void updateAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
 
 	/**
 	 * Removes the given element
@@ -397,7 +397,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchPersistenceException
 	 * 		if the element does not exist
 	 */
-	public void remove(StrolchTransaction tx, T element) throws StrolchPersistenceException;
+	void remove(StrolchTransaction tx, T element) throws StrolchPersistenceException;
 
 	/**
 	 * Removes the given elements
@@ -410,7 +410,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchPersistenceException
 	 * 		if any of the elements don't yet exist
 	 */
-	public void removeAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
+	void removeAll(StrolchTransaction tx, List<T> elements) throws StrolchPersistenceException;
 
 	/**
 	 * <p>
@@ -426,7 +426,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the number of elements removed
 	 */
-	public long removeAll(StrolchTransaction tx);
+	long removeAll(StrolchTransaction tx);
 
 	/**
 	 * <p>
@@ -444,7 +444,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 *
 	 * @return the number of elements removed
 	 */
-	public long removeAllBy(StrolchTransaction tx, String type);
+	long removeAllBy(StrolchTransaction tx, String type);
 
 	/**
 	 * <p>
@@ -468,7 +468,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * 		if the version does not exist, if this version is not the latest version, if the previous version is
 	 * 		missing or other problems arise
 	 */
-	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException;
+	void undoVersion(StrolchTransaction tx, T element) throws StrolchException;
 
 	/**
 	 * <p>
@@ -492,7 +492,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 * 		if the version does not exist
 	 */
-	public T revertToVersion(StrolchTransaction tx, T element) throws StrolchException;
+	T revertToVersion(StrolchTransaction tx, T element) throws StrolchException;
 
 	/**
 	 * <p>
@@ -520,5 +520,5 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @throws StrolchException
 	 * 		if the version does not exist
 	 */
-	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException;
+	T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException;
 }
