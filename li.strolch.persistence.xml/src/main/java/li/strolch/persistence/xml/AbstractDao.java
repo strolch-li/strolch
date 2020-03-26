@@ -48,7 +48,7 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 		return this.tx.getManager().getObjectRefCache().getIdOfSubTypeRef(getClassType(), type, id);
 	}
 
-	private SubTypeRef getTypeRef(String type) {
+	protected SubTypeRef getTypeRef(String type) {
 		return this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), type);
 	}
 
@@ -58,7 +58,7 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 		Set<String> types = queryTypes();
 		for (String type : types) {
 			SubTypeRef subTypeRef = getTypeRef(type);
-			size += this.tx.getMetadataDao().querySize(subTypeRef);
+			size += this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
 		}
 		return size;
 	}
@@ -71,13 +71,13 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 
 		if (types.length == 1) {
 			SubTypeRef subTypeRef = getTypeRef(types[0]);
-			return this.tx.getMetadataDao().querySize(subTypeRef);
+			return this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
 		}
 
 		int size = 0;
 		for (String type : types) {
 			SubTypeRef subTypeRef = getTypeRef(type);
-			size += this.tx.getMetadataDao().querySize(subTypeRef);
+			size += this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
 		}
 
 		return size;
@@ -94,7 +94,7 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 		List<T> objects = new ArrayList<>();
 		Set<String> types = queryTypes();
 		for (String type : types) {
-			List<T> objectsByType = this.tx.getObjectDao().queryAll(getTypeRef(type));
+			List<T> objectsByType = this.tx.getObjectDao().queryAll(getTypeRef(type), file -> true);
 			objects.addAll(objectsByType);
 		}
 
@@ -107,12 +107,12 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 			return queryAll();
 
 		if (types.length == 1) {
-			return this.tx.getObjectDao().queryAll(getTypeRef(types[0]));
+			return this.tx.getObjectDao().queryAll(getTypeRef(types[0]), file -> true);
 		}
 
 		List<T> objects = new ArrayList<>();
 		for (String type : types) {
-			objects.addAll(this.tx.getObjectDao().queryAll(getTypeRef(type)));
+			objects.addAll(this.tx.getObjectDao().queryAll(getTypeRef(type), file -> true));
 		}
 
 		return objects;
@@ -151,13 +151,13 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	@Override
 	public long removeAll() {
 		TypeRef typeRef = this.tx.getManager().getObjectRefCache().getTypeRef(getClassType());
-		return this.tx.getObjectDao().removeAllBy(typeRef);
+		return this.tx.getObjectDao().removeAllBy(typeRef, file -> true);
 	}
 
 	@Override
 	public long removeAllBy(String type) {
 		SubTypeRef typeRef = getTypeRef(type);
-		return this.tx.getObjectDao().removeAllBy(typeRef);
+		return this.tx.getObjectDao().removeAllBy(typeRef, file -> true);
 	}
 
 	@Override

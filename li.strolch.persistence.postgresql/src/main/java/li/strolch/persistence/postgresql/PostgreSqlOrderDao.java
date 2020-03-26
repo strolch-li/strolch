@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -34,12 +36,27 @@ import li.strolch.model.xml.XmlModelSaxReader;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
+import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao {
 
 	public static final String ORDERS = "orders";
+
+	private static final String querySizeDrSqlS = "select count(*) from {0} where latest = true {1}";
+	private static final String querySizeOfTypeDrSqlS = "select count(*) from {0} where type = ANY(?) and latest = true {1}";
+
+	private static final String queryAllDrAsXmlSqlS = "select id, type, asxml from {0} where latest = true {1}";
+	private static final String queryAllDrAsXmlLimitSqlS = "select id, type, asxml from {0} where latest = true {1} order by id limit {2} offset {3}";
+	private static final String queryAllDrAsJsonSqlS = "select id, type, asjson from {0} where latest = true {1}";
+	private static final String queryAllDrAsJsonLimitSqlS = "select id, type, asjson from {0} where latest = true {1} order by id limit {2} offset {3}";
+
+	private static final String queryAllByTypeDrAsXmlSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true {1}";
+	private static final String queryAllByTypeDrAsXmlLimitSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true {1} order by id limit {2,number,#} offset {3,number,#}";
+	private static final String queryAllByTypeDrAsJsonSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true {1}";
+	private static final String queryAllByTypeDrAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true {1} order by id limit {2,number,#} offset {3,number,#}";
 
 	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
@@ -228,6 +245,180 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		} catch (SQLException | SAXException e) {
 			throw new StrolchPersistenceException(MessageFormat
 					.format("Failed to update Order {0} due to {1}", order.getLocator(), e.getLocalizedMessage()), e);
+		}
+	}
+
+	@Override
+	public long querySize(DateRange dateRange) {
+		String sql = MessageFormat.format(querySizeDrSqlS, getTableName(), buildDateRangeClaus(dateRange));
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public long querySize(DateRange dateRange, String... types) {
+		if (types.length == 0)
+			return querySize();
+
+		String sql = MessageFormat.format(querySizeOfTypeDrSqlS, getTableName(), buildDateRangeClaus(dateRange));
+
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
+
+			Array typesArray = statement.getConnection().createArrayOf("varchar", types);
+			statement.setArray(1, typesArray);
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public List<Order> queryAll(DateRange dateRange) throws StrolchPersistenceException {
+		return queryAll(dateRange, Integer.MAX_VALUE, 0);
+	}
+
+	@Override
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset) throws StrolchPersistenceException {
+
+		List<Order> list = new ArrayList<>();
+
+		String sql = getLimitSql(dateRange, limit, offset, queryAllDrAsXmlSqlS, queryAllDrAsJsonSqlS,
+				queryAllDrAsXmlLimitSqlS, queryAllDrAsJsonLimitSqlS);
+
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
+
+			try (ResultSet result = statement.executeQuery()) {
+				while (result.next()) {
+					String id = result.getString("id");
+					String type = result.getString("type");
+					list.add(parseDbObject(result, id, type));
+				}
+
+				return list;
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public List<Order> queryAll(DateRange dateRange, String... types) throws StrolchPersistenceException {
+		return queryAll(dateRange, Integer.MAX_VALUE, 0, types);
+	}
+
+	@Override
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset, String... types)
+			throws StrolchPersistenceException {
+		if (types.length == 0)
+			return queryAll(limit, offset);
+
+		List<Order> list = new ArrayList<>();
+
+		String sql = getLimitSql(dateRange, limit, offset, queryAllByTypeDrAsXmlSqlS, queryAllByTypeDrAsJsonSqlS,
+				queryAllByTypeDrAsXmlLimitSqlS, queryAllByTypeDrAsJsonLimitSqlS);
+
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
+
+			Array typesArray = statement.getConnection().createArrayOf("varchar", types);
+			statement.setArray(1, typesArray);
+
+			try (ResultSet result = statement.executeQuery()) {
+				while (result.next()) {
+					String id = result.getString("id");
+					String type = result.getString("type");
+					list.add(parseDbObject(result, id, type));
+				}
+
+				return list;
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+		}
+	}
+
+	protected String getLimitSql(DateRange dateRange, long limit, long offset, String xmlSql, String jsonSql,
+			String xmlLimitSql, String jsonLimitSql) {
+
+		String sql;
+		if (limit == Integer.MAX_VALUE) {
+			return getSql(dateRange, xmlSql, jsonSql);
+		}
+
+		if (this.dataType == DataType.xml)
+			sql = xmlLimitSql;
+		else if (this.dataType == DataType.json)
+			sql = jsonLimitSql;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+
+		String dateRangeClause = buildDateRangeClaus(dateRange);
+		return MessageFormat.format(sql, getTableName(), dateRangeClause, limit, offset);
+	}
+
+	protected String getSql(DateRange dateRange, String xmlSql, String jsonSql) {
+
+		String sql;
+		if (this.dataType == DataType.xml)
+			sql = xmlSql;
+		else if (this.dataType == DataType.json)
+			sql = jsonSql;
+		else
+			throw new IllegalStateException("Unhandled DataType " + this.dataType);
+
+		String dateRangeClause = buildDateRangeClaus(dateRange);
+		return MessageFormat.format(sql, getTableName(), dateRangeClause);
+	}
+
+	private String buildDateRangeClaus(DateRange dateRange) {
+
+		if (dateRange.isFromBounded() && dateRange.isToBounded()) {
+
+			String from = ISO8601.toString(dateRange.getFromDate());
+			String to = ISO8601.toString(dateRange.getToDate());
+
+			if (dateRange.isFromInclusive() && dateRange.isToInclusive())
+				return "and date >= '" + from + "' and date <= '" + to + "'";
+
+			if (dateRange.isFromInclusive())
+				return "and date >= '" + from + "' and date < '" + to + "'";
+
+			if (dateRange.isToInclusive())
+				return "and date > '" + from + "' and date <= '" + to + "'";
+
+			return "and date > '" + from + "' and date < '" + to + "'";
+
+		} else if (dateRange.isFromBounded()) {
+
+			String from = ISO8601.toString(dateRange.getFromDate());
+
+			if (dateRange.isFromInclusive())
+				return "and date >= '" + from + "'";
+
+			return "and date > '" + from + "'";
+
+		} else {
+
+			String to = ISO8601.toString(dateRange.getToDate());
+
+			if (dateRange.isToInclusive())
+				return "and date <= '" + to + "'";
+
+			return "and date < '" + to + "'";
 		}
 	}
 }

@@ -25,7 +25,7 @@ public class XmlLogMessageDao implements LogMessageDao {
 	@Override
 	public List<LogMessage> queryLatest(String realm, int maxNr) {
 		SubTypeRef subTypeRef = this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), realm);
-		return this.tx.getObjectDao().queryAll(subTypeRef, maxNr, true);
+		return this.tx.getObjectDao().queryAll(subTypeRef, true, file -> true, maxNr);
 	}
 
 	@Override

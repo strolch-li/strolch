@@ -15,9 +15,11 @@
  */
 package li.strolch.persistence.xml;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import li.strolch.model.Tags;
 import li.strolch.model.audit.Audit;
@@ -28,7 +30,6 @@ import li.strolch.utils.collections.DateRange;
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
-import li.strolch.xmlpers.objref.ObjectRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
 
@@ -77,20 +78,8 @@ public class XmlAuditDao implements AuditDao {
 
 	@Override
 	public long querySize(String type, DateRange dateRange) {
-		long size = 0;
-
-		// TODO re-think this nonsense... this might have a huge performance penalty
-		SubTypeRef subTypeRef = getTypeRef(type);
-		Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef);
-		for (String key : keySet) {
-			ObjectRef objectRef = subTypeRef.getChildIdRef(this.tx, key);
-			Audit audit = this.tx.getObjectDao().queryById(objectRef);
-			if (dateRange.contains(audit.getDate()))
-				size++;
-		}
-
-		// return this.tx.getMetadataDao().querySize(subTypeRef);
-		return size;
+		Predicate<File> predicate = file -> dateRange.contains(new Date(file.lastModified()));
+		return this.tx.getMetadataDao().querySize(getTypeRef(type), predicate);
 	}
 
 	@Override
@@ -106,82 +95,56 @@ public class XmlAuditDao implements AuditDao {
 
 	@Override
 	public List<Audit> queryAll(String type, DateRange dateRange) {
-
-		List<Audit> audits = new ArrayList<>();
-
-		SubTypeRef subTypeRef = getTypeRef(type);
-		Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef);
-		for (String key : keySet) {
-			ObjectRef objectRef = subTypeRef.getChildIdRef(this.tx, key);
-			Audit audit = this.tx.getObjectDao().queryById(objectRef);
-			if (dateRange.contains(audit.getDate()))
-				audits.add(audit);
-		}
-
-		// this.tx.getObjectDao().queryAll(getTypeRef(type));
-		return audits;
+		Predicate<File> predicate = file -> dateRange.contains(new Date(file.lastModified()));
+		return this.tx.getObjectDao().queryAll(getTypeRef(type), predicate);
 	}
 
 	@Override
 	public void save(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit);
+		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, -1L);
 		this.tx.getFileDao().performCreate(ctx);
 	}
 
 	@Override
 	public void saveAll(List<Audit> audits) {
 		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit);
+			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, -1L);
 			this.tx.getFileDao().performCreate(ctx);
 		}
 	}
 
 	@Override
 	public void update(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit);
+		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, -1L);
 		this.tx.getFileDao().performUpdate(ctx);
 	}
 
 	@Override
 	public void updateAll(List<Audit> audits) {
 		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit);
+			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, -1L);
 			this.tx.getFileDao().performUpdate(ctx);
 		}
 	}
 
 	@Override
 	public void remove(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit);
+		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, -1L);
 		this.tx.getFileDao().performDelete(ctx);
 	}
 
 	@Override
 	public void removeAll(List<Audit> audits) {
 		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit);
+			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, -1L);
 			this.tx.getFileDao().performDelete(ctx);
 		}
 	}
 
 	@Override
 	public long removeAll(String type, DateRange dateRange) {
-
-		long removed = 0L;
-
-		SubTypeRef subTypeRef = getTypeRef(type);
-		Set<String> keySet = this.tx.getMetadataDao().queryKeySet(subTypeRef);
-		for (String key : keySet) {
-			ObjectRef objectRef = subTypeRef.getChildIdRef(this.tx, key);
-			Audit audit = this.tx.getObjectDao().queryById(objectRef);
-			if (dateRange.contains(audit.getDate())) {
-				PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(objectRef);
-				this.tx.getFileDao().performDelete(ctx);
-				removed++;
-			}
-		}
-
-		return removed;
+		Predicate<File> predicate = file -> dateRange.contains(new Date(file.lastModified()));
+		return this.tx.getObjectDao().removeAllBy(getTypeRef(type), predicate);
 	}
 
 	@Override
