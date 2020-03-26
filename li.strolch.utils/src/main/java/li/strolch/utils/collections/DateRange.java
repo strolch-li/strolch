@@ -15,10 +15,14 @@
  */
 package li.strolch.utils.collections;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -27,18 +31,60 @@ public class DateRange {
 
 	private boolean fromInclusive;
 	private boolean toInclusive;
-	private Date fromDate;
-	private Date toDate;
+	private ZonedDateTime fromDate;
+	private ZonedDateTime toDate;
 
-	public DateRange from(Date from, boolean inclusive) {
+	public DateRange from(LocalDate from, boolean inclusive) {
+		this.fromDate = ZonedDateTime.of(from.atStartOfDay(), ZoneId.systemDefault());
+		this.fromInclusive = inclusive;
+		validate();
+		return this;
+	}
+
+	public DateRange to(LocalDate to, boolean inclusive) {
+		this.toDate = ZonedDateTime.of(to.atStartOfDay(), ZoneId.systemDefault());
+		this.toInclusive = inclusive;
+		validate();
+		return this;
+	}
+
+	public DateRange from(LocalDateTime from, boolean inclusive) {
+		this.fromDate = ZonedDateTime.of(from, ZoneId.systemDefault());
+		this.fromInclusive = inclusive;
+		validate();
+		return this;
+	}
+
+	public DateRange to(LocalDateTime to, boolean inclusive) {
+		this.toDate = ZonedDateTime.of(to, ZoneId.systemDefault());
+		this.toInclusive = inclusive;
+		validate();
+		return this;
+	}
+
+	public DateRange from(ZonedDateTime from, boolean inclusive) {
 		this.fromDate = from;
 		this.fromInclusive = inclusive;
 		validate();
 		return this;
 	}
 
-	public DateRange to(Date to, boolean inclusive) {
+	public DateRange to(ZonedDateTime to, boolean inclusive) {
 		this.toDate = to;
+		this.toInclusive = inclusive;
+		validate();
+		return this;
+	}
+
+	public DateRange from(Date from, boolean inclusive) {
+		this.fromDate = ZonedDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault());
+		this.fromInclusive = inclusive;
+		validate();
+		return this;
+	}
+
+	public DateRange to(Date to, boolean inclusive) {
+		this.toDate = ZonedDateTime.ofInstant(to.toInstant(), ZoneId.systemDefault());
 		this.toInclusive = inclusive;
 		validate();
 		return this;
@@ -49,18 +95,36 @@ public class DateRange {
 			DBC.INTERIM.assertTrue("From must be before to!", this.toDate.compareTo(this.fromDate) >= 0); //$NON-NLS-1$
 	}
 
-	/**
-	 * @return from date
-	 */
-	public Date getFromDate() {
+	public boolean isFromInclusive() {
+		return this.fromInclusive;
+	}
+
+	public boolean isToInclusive() {
+		return this.toInclusive;
+	}
+
+	public ZonedDateTime getFromDateZdt() {
 		return this.fromDate;
 	}
 
-	/**
-	 * @return to date
-	 */
-	public Date getToDate() {
+	public ZonedDateTime getToDateZdt() {
 		return this.toDate;
+	}
+
+	public LocalDateTime getFromDateLdt() {
+		return this.fromDate.toLocalDateTime();
+	}
+
+	public LocalDateTime getToDateLdt() {
+		return this.toDate.toLocalDateTime();
+	}
+
+	public Date getFromDate() {
+		return Date.from(this.fromDate.toInstant());
+	}
+
+	public Date getToDate() {
+		return Date.from(this.toDate.toInstant());
 	}
 
 	/**
@@ -99,6 +163,14 @@ public class DateRange {
 	}
 
 	public boolean contains(Date date) {
+		return contains(ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()));
+	}
+
+	public boolean contains(LocalDateTime date) {
+		return contains(ZonedDateTime.of(date, ZoneId.systemDefault()));
+	}
+
+	public boolean contains(ZonedDateTime date) {
 		DBC.PRE.assertNotNull("Date must be given!", date); //$NON-NLS-1$
 		if (this.fromDate == null && this.toDate == null)
 			return true;
@@ -126,12 +198,11 @@ public class DateRange {
 
 	@Override
 	public String toString() {
-		ISO8601FormatFactory df = ISO8601FormatFactory.getInstance();
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.fromDate == null ? "-" : df.formatDate(this.fromDate));
+		sb.append(this.fromDate == null ? "-" : ISO8601.toString(this.fromDate));
 		sb.append((this.fromInclusive ? " (inc)" : " (exc)"));
 		sb.append(" - ");
-		sb.append(this.toDate == null ? "-" : df.formatDate(this.toDate));
+		sb.append(this.toDate == null ? "-" : ISO8601.toString(this.toDate));
 		sb.append((this.toInclusive ? " (inc)" : " (exc)"));
 		return sb.toString();
 	}
