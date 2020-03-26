@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.*;
 import li.strolch.model.parameter.AbstractParameter;
 import li.strolch.model.parameter.DateParameter;
@@ -197,6 +196,15 @@ public class GenericReport extends ReportPolicy {
 	public GenericReport dateRange(DateRange dateRange) {
 		this.dateRange = dateRange;
 		return this;
+	}
+
+	/**
+	 * Returns the currently set {@link DateRange} or null if not set
+	 *
+	 * @return the date range, or null if not set
+	 */
+	public DateRange getDateRange() {
+		return this.dateRange;
 	}
 
 	/**
