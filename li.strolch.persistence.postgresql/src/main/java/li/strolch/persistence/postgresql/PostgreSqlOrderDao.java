@@ -411,7 +411,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 			return "and date > '" + from + "'";
 
-		} else {
+		} else if (dateRange.isToBounded()) {
 
 			String to = ISO8601.toString(dateRange.getToDate());
 
@@ -419,6 +419,10 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 				return "and date <= '" + to + "'";
 
 			return "and date < '" + to + "'";
+
 		}
+
+		// no date range
+		return "";
 	}
 }
