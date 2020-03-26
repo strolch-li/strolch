@@ -86,6 +86,9 @@ public class FileIo {
 						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
 			}
 
+			if (ctx.getLastModified() != -1L)
+				this.path.setLastModified(ctx.getLastModified());
+
 		} catch (FactoryConfigurationError | XMLStreamException | IOException e) {
 			if (this.tmpPath.exists()) {
 				if (!this.tmpPath.delete())
@@ -177,6 +180,9 @@ public class FileIo {
 				throw new IllegalStateException(
 						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
 			}
+
+			if (ctx.getLastModified() != -1L)
+				this.path.setLastModified(ctx.getLastModified());
 
 		} catch (IOException | TransformerFactoryConfigurationError | TransformerException e) {
 			if (this.tmpPath.exists()) {

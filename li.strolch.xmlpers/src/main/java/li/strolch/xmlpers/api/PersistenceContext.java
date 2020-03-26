@@ -21,14 +21,24 @@ public class PersistenceContext<T> {
 
 	private final ObjectRef objectRef;
 	private T object;
+	private long lastModified;
 	private ParserFactory<T> parserFactory;
 
 	public PersistenceContext(ObjectRef objectRef) {
 		this.objectRef = objectRef;
+		this.lastModified = -1;
 	}
 
 	public ObjectRef getObjectRef() {
 		return this.objectRef;
+	}
+
+	public long getLastModified() {
+		return this.lastModified;
+	}
+
+	public void setLastModified(long lastModified) {
+		this.lastModified = lastModified;
 	}
 
 	public T getObject() {

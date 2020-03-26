@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import li.strolch.xmlpers.impl.PathBuilder;
 import li.strolch.xmlpers.objref.ObjectRef;
@@ -64,18 +65,18 @@ public class MetadataDao {
 		return keySet;
 	}
 
-	public Set<String> queryKeySet(ObjectRef parentRef) {
-		return queryKeySet(parentRef, false);
+	public Set<String> queryKeySet(ObjectRef parentRef, Predicate<File> predicate) {
+		return queryKeySet(parentRef, false, predicate);
 	}
 
-	public Set<String> queryKeySet(ObjectRef parentRef, boolean reverse) {
+	public Set<String> queryKeySet(ObjectRef parentRef, boolean reverse, Predicate<File> predicate) {
 		assertNotClosed(this.tx);
 		assertNotRootRef(parentRef);
 		assertNotIdRef(parentRef);
 
 		this.tx.lock(parentRef);
 		File queryPath = parentRef.getPath(this.pathBuilder);
-		Set<String> keySet = queryKeySet(queryPath, reverse);
+		Set<String> keySet = queryKeySet(queryPath, reverse, predicate);
 
 		if (this.verbose) {
 			String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
@@ -104,12 +105,12 @@ public class MetadataDao {
 		return numberOfFiles;
 	}
 
-	public long querySize(ObjectRef parentRef) {
+	public long querySize(ObjectRef parentRef, Predicate<File> predicate) {
 		assertNotClosed(this.tx);
 
 		this.tx.lock(parentRef);
 		File queryPath = parentRef.getPath(this.pathBuilder);
-		long numberOfFiles = querySize(queryPath);
+		long numberOfFiles = querySize(queryPath, predicate);
 
 		if (this.verbose) {
 			String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
@@ -161,7 +162,7 @@ public class MetadataDao {
 	 *
 	 * @return a set of ids for the objects in the given query path
 	 */
-	private Set<String> queryKeySet(File queryPath, boolean reverse) {
+	private Set<String> queryKeySet(File queryPath, boolean reverse, Predicate<File> predicate) {
 		if (!queryPath.exists())
 			return Collections.emptySet();
 
@@ -182,7 +183,11 @@ public class MetadataDao {
 		}
 
 		for (File subTypeFile : subTypeFiles) {
-			if (subTypeFile.isFile() && !subTypeFile.getName().startsWith(TMP_PREFIX)) {
+
+			if (subTypeFile.isFile() //
+					&& !subTypeFile.getName().startsWith(TMP_PREFIX) //
+					&& predicate.test(subTypeFile)) {
+
 				String filename = subTypeFile.getName();
 				String id = FilenameUtility.getId(filename);
 				keySet.add(id);
@@ -231,7 +236,7 @@ public class MetadataDao {
 	 *
 	 * @return the number of objects in the given query path
 	 */
-	private long querySize(File queryPath) {
+	private long querySize(File queryPath, Predicate<File> predicate) {
 		if (!queryPath.exists())
 			return 0L;
 
@@ -247,8 +252,11 @@ public class MetadataDao {
 		if (subTypeFiles != null) {
 			for (File subTypeFile : subTypeFiles) {
 
-				if (subTypeFile.isFile() && !subTypeFile.getName().startsWith(TMP_PREFIX))
+				if (subTypeFile.isFile() //
+						&& !subTypeFile.getName().startsWith(TMP_PREFIX) //
+						&& predicate.test(subTypeFile)) {
 					numberOfFiles++;
+				}
 			}
 		}
 		return numberOfFiles;

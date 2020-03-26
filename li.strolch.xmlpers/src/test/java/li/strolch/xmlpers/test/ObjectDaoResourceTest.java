@@ -162,7 +162,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			SubTypeRef subTypeRef = tx.getManager().getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
 			ObjectDao objectDao = tx.getObjectDao();
-			resources = objectDao.queryAll(subTypeRef);
+			resources = objectDao.queryAll(subTypeRef, file -> true);
 			assertEquals("Expected to find 10 entries!", 10, resources.size()); //$NON-NLS-1$
 
 			// delete them all
@@ -173,7 +173,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			SubTypeRef subTypeRef = tx.getManager().getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
 			ObjectDao objectDao = tx.getObjectDao();
-			resources = objectDao.queryAll(subTypeRef);
+			resources = objectDao.queryAll(subTypeRef, file -> true);
 			assertEquals("Expected to find 0 entries!", 0, resources.size()); //$NON-NLS-1$
 		}
 	}

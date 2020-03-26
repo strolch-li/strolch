@@ -156,7 +156,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			TypeRef typeRef = tx.getManager().getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
 			ObjectDao objectDao = tx.getObjectDao();
-			books = objectDao.queryAll(typeRef);
+			books = objectDao.queryAll(typeRef, file -> true);
 			assertEquals("Expected to find 10 entries!", 10, books.size()); //$NON-NLS-1$
 
 			// delete them all
@@ -167,7 +167,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			TypeRef typeRef = tx.getManager().getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
 			ObjectDao objectDao = tx.getObjectDao();
-			books = objectDao.queryAll(typeRef);
+			books = objectDao.queryAll(typeRef, file -> true);
 			assertEquals("Expected to find 0 entries!", 0, books.size()); //$NON-NLS-1$
 		}
 	}

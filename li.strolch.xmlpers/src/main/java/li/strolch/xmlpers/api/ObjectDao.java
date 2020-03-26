@@ -17,7 +17,11 @@ package li.strolch.xmlpers.api;
 
 import static li.strolch.xmlpers.util.AssertionUtil.*;
 
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import li.strolch.utils.objectfilter.ObjectFilter;
 import li.strolch.xmlpers.objref.ObjectRef;
@@ -42,22 +46,30 @@ public class ObjectDao {
 	}
 
 	public <T> void add(T object) {
+		add(object, -1L);
+	}
+
+	public <T> void add(T object, long lastModified) {
 		assertNotClosed();
 		assertNotNull(object);
-		PersistenceContext<T> ctx = createCtx(object);
+		PersistenceContext<T> ctx = createCtx(object, lastModified);
 		this.tx.lock(ctx.getObjectRef().getParent(this.tx));
 		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.add(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void addAll(List<T> objects) {
+		addAll(objects, -1L);
+	}
+
+	public <T> void addAll(List<T> objects, long lastModified) {
 		assertNotClosed();
 		assertNotNull(objects);
 		if (objects.isEmpty())
 			return;
 
 		for (T object : objects) {
-			PersistenceContext<T> ctx = createCtx(object);
+			PersistenceContext<T> ctx = createCtx(object, lastModified);
 			this.tx.lock(ctx.getObjectRef().getParent(this.tx));
 			this.tx.lock(ctx.getObjectRef());
 			this.objectFilter.add(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
@@ -65,21 +77,29 @@ public class ObjectDao {
 	}
 
 	public <T> void update(T object) {
+		update(object, -1L);
+	}
+
+	public <T> void update(T object, long lastModified) {
 		assertNotClosed();
 		assertNotNull(object);
-		PersistenceContext<T> ctx = createCtx(object);
+		PersistenceContext<T> ctx = createCtx(object, lastModified);
 		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.update(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 	}
 
 	public <T> void updateAll(List<T> objects) {
+		updateAll(objects, -1L);
+	}
+
+	public <T> void updateAll(List<T> objects, long lastModified) {
 		assertNotClosed();
 		assertNotNull(objects);
 		if (objects.isEmpty())
 			return;
 
 		for (T object : objects) {
-			PersistenceContext<T> ctx = createCtx(object);
+			PersistenceContext<T> ctx = createCtx(object, lastModified);
 			this.tx.lock(ctx.getObjectRef());
 			this.objectFilter.update(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 		}
@@ -88,7 +108,7 @@ public class ObjectDao {
 	public <T> void remove(T object) {
 		assertNotClosed();
 		assertNotNull(object);
-		PersistenceContext<T> ctx = createCtx(object);
+		PersistenceContext<T> ctx = createCtx(object, -1L);
 		this.tx.lock(ctx.getObjectRef().getParent(this.tx));
 		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
@@ -101,14 +121,14 @@ public class ObjectDao {
 			return;
 
 		for (T object : objects) {
-			PersistenceContext<T> ctx = createCtx(object);
+			PersistenceContext<T> ctx = createCtx(object, -1L);
 			this.tx.lock(ctx.getObjectRef().getParent(this.tx));
 			this.tx.lock(ctx.getObjectRef());
 			this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 		}
 	}
 
-	public <T> long removeAllBy(TypeRef typeRef) {
+	public <T> long removeAllBy(TypeRef typeRef, Predicate<File> predicate) {
 		assertNotClosed();
 
 		long removed = 0;
@@ -120,12 +140,12 @@ public class ObjectDao {
 			ObjectRef childTypeRef = typeRef.getChildTypeRef(this.tx, type);
 			this.tx.lock(childTypeRef);
 
-			Set<String> ids = queryKeySet(childTypeRef, false);
+			Set<String> ids = queryKeySet(childTypeRef, false, predicate);
 			for (String id : ids) {
 
 				ObjectRef idRef = childTypeRef.getChildIdRef(this.tx, id);
 
-				PersistenceContext<T> ctx = createCtx(idRef);
+				PersistenceContext<T> ctx = createCtx(idRef, -1L);
 				this.tx.lock(ctx.getObjectRef());
 				this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 				removed++;
@@ -135,7 +155,7 @@ public class ObjectDao {
 		return removed;
 	}
 
-	public <T> long removeAllBy(SubTypeRef subTypeRef) {
+	public <T> long removeAllBy(SubTypeRef subTypeRef, Predicate<File> predicate) {
 		assertNotClosed();
 		assertIsNotRootRef(subTypeRef);
 		assertIsNotIdRef(subTypeRef);
@@ -144,12 +164,12 @@ public class ObjectDao {
 
 		this.tx.lock(subTypeRef);
 
-		Set<String> ids = queryKeySet(subTypeRef, false);
+		Set<String> ids = queryKeySet(subTypeRef, false, predicate);
 		for (String id : ids) {
 
 			ObjectRef idRef = subTypeRef.getChildIdRef(this.tx, id);
 
-			PersistenceContext<T> ctx = createCtx(idRef);
+			PersistenceContext<T> ctx = createCtx(idRef, -1L);
 			this.tx.lock(ctx.getObjectRef());
 			this.objectFilter.remove(ctx.getObjectRef().getType(), ctx.getObjectRef(), ctx);
 			removed++;
@@ -161,7 +181,7 @@ public class ObjectDao {
 	public <T> void removeById(ObjectRef objectRef) {
 		assertNotClosed();
 		assertIsIdRef(objectRef);
-		PersistenceContext<T> ctx = createCtx(objectRef);
+		PersistenceContext<T> ctx = createCtx(objectRef, -1L);
 		this.tx.lock(ctx.getObjectRef().getParent(this.tx));
 		this.tx.lock(ctx.getObjectRef());
 		this.objectFilter.remove(objectRef.getType(), ctx.getObjectRef(), ctx);
@@ -174,11 +194,11 @@ public class ObjectDao {
 
 		this.tx.lock(parentRef);
 
-		Set<String> keySet = queryKeySet(parentRef, false);
+		Set<String> keySet = queryKeySet(parentRef, false, file -> true);
 		for (String id : keySet) {
 
 			ObjectRef childRef = parentRef.getChildIdRef(this.tx, id);
-			PersistenceContext<T> ctx = createCtx(childRef);
+			PersistenceContext<T> ctx = createCtx(childRef, -1L);
 			this.tx.lock(ctx.getObjectRef());
 			this.objectFilter.remove(childRef.getType(), ctx.getObjectRef(), ctx);
 		}
@@ -203,18 +223,18 @@ public class ObjectDao {
 		return ctx.getObject();
 	}
 
-	public <T> List<T> queryAll(ObjectRef parentRef) {
-		return queryAll(parentRef, Integer.MAX_VALUE, false);
+	public <T> List<T> queryAll(ObjectRef parentRef, Predicate<File> predicate) {
+		return queryAll(parentRef, false, predicate, Integer.MAX_VALUE);
 	}
 
-	public <T> List<T> queryAll(ObjectRef parentRef, int maxSize, boolean reverse) {
+	public <T> List<T> queryAll(ObjectRef parentRef, boolean reverse, Predicate<File> predicate, int maxSize) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
 		this.tx.lock(parentRef);
 
 		MetadataDao metadataDao = this.tx.getMetadataDao();
-		Set<String> keySet = metadataDao.queryKeySet(parentRef, reverse);
+		Set<String> keySet = metadataDao.queryKeySet(parentRef, reverse, predicate);
 
 		int i = 0;
 		List<T> result = new ArrayList<>();
@@ -234,33 +254,37 @@ public class ObjectDao {
 		return result;
 	}
 
-	private Set<String> queryKeySet(ObjectRef parentRef, boolean reverse) {
+	private Set<String> queryKeySet(ObjectRef parentRef, boolean reverse, Predicate<File> predicate) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
 		this.tx.lock(parentRef);
 		MetadataDao metadataDao = this.tx.getMetadataDao();
-		return metadataDao.queryKeySet(parentRef, reverse);
+		return metadataDao.queryKeySet(parentRef, reverse, predicate);
 	}
 
-	public long querySize(ObjectRef parentRef) {
+	public long querySize(ObjectRef parentRef, Predicate<File> predicate) {
 		assertNotClosed();
 		assertIsNotIdRef(parentRef);
 
 		this.tx.lock(parentRef);
 		MetadataDao metadataDao = this.tx.getMetadataDao();
-		return metadataDao.querySize(parentRef);
+		return metadataDao.querySize(parentRef, predicate);
 	}
 
-	public <T> PersistenceContext<T> createCtx(T object) {
-		return this.ctxFactoryDelegator.<T>getCtxFactory(object.getClass())
+	public <T> PersistenceContext<T> createCtx(T object, long lastModified) {
+		PersistenceContext<T> ctx = this.ctxFactoryDelegator.<T>getCtxFactory(object.getClass())
 				.createCtx(this.tx.getManager().getObjectRefCache(), object);
+		ctx.setLastModified(lastModified);
+		return ctx;
 	}
 
-	public <T> PersistenceContext<T> createCtx(ObjectRef objectRef) {
+	public <T> PersistenceContext<T> createCtx(ObjectRef objectRef, long lastModified) {
 		String type = objectRef.getType();
 		PersistenceContextFactory<T> ctxFactory = this.ctxFactoryDelegator.<T>getCtxFactory(type);
-		return ctxFactory.createCtx(objectRef);
+		PersistenceContext<T> ctx = ctxFactory.createCtx(objectRef);
+		ctx.setLastModified(lastModified);
+		return ctx;
 	}
 
 	private void assertNotClosed() {
