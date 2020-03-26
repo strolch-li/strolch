@@ -16,7 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
-import java.util.Date;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
@@ -231,9 +232,9 @@ public class ReportResource {
 		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
 				rangeJ.get(PARAM_FROM).getAsString() :
 				null;
-		Date from;
+		ZonedDateTime from;
 		try {
-			from = fromS != null ? ISO8601FormatFactory.getInstance().parseDate(fromS) : null;
+			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
 		} catch (Exception e) {
 			logger.error("Could not parse 'from' date, setting it to null.", e);
 			from = null;
@@ -242,9 +243,9 @@ public class ReportResource {
 		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
 				rangeJ.get(PARAM_TO).getAsString() :
 				null;
-		Date to;
+		ZonedDateTime to;
 		try {
-			to = (toS != null) ? ISO8601FormatFactory.getInstance().parseDate(toS) : null;
+			to = (toS != null) ? ISO8601.parseToZdt(toS).with(LocalTime.MAX) : null;
 		} catch (Exception e) {
 			logger.error("Could not parse 'to' date, setting it to null.", e);
 			to = null;
@@ -272,7 +273,12 @@ public class ReportResource {
 
 			// add filters from request
 			if (report.hasDateRangeSelector()) {
-				DateRange dateRange = new DateRange().from(from, true).to(to, true);
+				DateRange dateRange = new DateRange();
+				if (from != null)
+					dateRange = dateRange.from(from, true);
+				if (to != null)
+					dateRange = dateRange.to(to, true);
+
 				report.dateRange(dateRange);
 			}
 			filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
@@ -351,9 +357,9 @@ public class ReportResource {
 		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
 				rangeJ.get(PARAM_FROM).getAsString() :
 				null;
-		Date from;
+		ZonedDateTime from;
 		try {
-			from = fromS != null ? ISO8601FormatFactory.getInstance().parseDate(fromS) : null;
+			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
 		} catch (Exception e) {
 			logger.error("Could not parse 'from' date, setting it to null.", e);
 			from = null;
@@ -362,9 +368,9 @@ public class ReportResource {
 		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
 				rangeJ.get(PARAM_TO).getAsString() :
 				null;
-		Date to;
+		ZonedDateTime to;
 		try {
-			to = (toS != null) ? ISO8601FormatFactory.getInstance().parseDate(toS) : null;
+			to = (toS != null) ? ISO8601.parseToZdt(toS).with(LocalTime.MAX) : null;
 		} catch (Exception e) {
 			logger.error("Could not parse 'to' date, setting it to null.", e);
 			to = null;
@@ -389,7 +395,7 @@ public class ReportResource {
 	}
 
 	private StreamingOutput getOut(Certificate cert, String realm, String reportId, JsonObject localeJ,
-			MapOfSets<String, String> filters, Date from, Date to) {
+			MapOfSets<String, String> filters, ZonedDateTime from, ZonedDateTime to) {
 
 		return out -> {
 
@@ -404,7 +410,12 @@ public class ReportResource {
 
 				// add filters from request
 				if (report.hasDateRangeSelector()) {
-					DateRange dateRange = new DateRange().from(from, true).to(to, true);
+					DateRange dateRange = new DateRange();
+					if (from != null)
+						dateRange = dateRange.from(from, true);
+					if (to != null)
+						dateRange = dateRange.to(to, true);
+
 					report.dateRange(dateRange);
 				}
 
