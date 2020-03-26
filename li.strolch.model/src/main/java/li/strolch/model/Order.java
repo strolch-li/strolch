@@ -16,9 +16,7 @@
 package li.strolch.model;
 
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Date;
 
 import li.strolch.exception.StrolchPolicyException;
@@ -137,6 +135,10 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	public void setDate(Date date) {
 		assertNotReadonly();
 		this.date = ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+	}
+
+	public void setDate(LocalDate localDate) {
+		this.date = localDate.atTime(LocalTime.MIN).atZone(ZoneId.systemDefault());
 	}
 
 	public void setDate(LocalDateTime localDateTime) {
