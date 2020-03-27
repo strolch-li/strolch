@@ -104,26 +104,38 @@ public class DateRange {
 	}
 
 	public ZonedDateTime getFromDateZdt() {
+		if (this.fromDate == null)
+			throw new IllegalStateException("fromDate is unbounded, check with isFromBounded()");
 		return this.fromDate;
 	}
 
 	public ZonedDateTime getToDateZdt() {
+		if (this.toDate == null)
+			throw new IllegalStateException("toDate is unbounded, check with isToBounded()");
 		return this.toDate;
 	}
 
 	public LocalDateTime getFromDateLdt() {
+		if (this.fromDate == null)
+			throw new IllegalStateException("fromDate is unbounded, check with isFromBounded()");
 		return this.fromDate.toLocalDateTime();
 	}
 
 	public LocalDateTime getToDateLdt() {
+		if (this.toDate == null)
+			throw new IllegalStateException("toDate is unbounded, check with isToBounded()");
 		return this.toDate.toLocalDateTime();
 	}
 
 	public Date getFromDate() {
+		if (this.fromDate == null)
+			throw new IllegalStateException("fromDate is unbounded, check with isFromBounded()");
 		return Date.from(this.fromDate.toInstant());
 	}
 
 	public Date getToDate() {
+		if (this.toDate == null)
+			throw new IllegalStateException("toDate is unbounded, check with isToBounded()");
 		return Date.from(this.toDate.toInstant());
 	}
 

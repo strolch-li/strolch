@@ -35,7 +35,13 @@ public class DateRangeTest {
 		DateRange dateRange = new DateRange();
 		dateRange.from(now, true);
 		assertEquals(now, dateRange.getFromDate());
-		assertNull(dateRange.getToDate());
+		try {
+			dateRange.getToDate();
+			fail("Should fail, as toDate is not set!");
+		} catch (IllegalStateException e) {
+			if (!e.getMessage().equals("toDate is unbounded, check with isToBounded()"))
+				fail("Should fail with different exception message, as toDate is not set!");
+		}
 		assertFalse(dateRange.isUnbounded());
 		assertFalse(dateRange.isBounded());
 	}
@@ -49,7 +55,13 @@ public class DateRangeTest {
 		DateRange dateRange = new DateRange();
 		dateRange.to(now, true);
 		assertEquals(now, dateRange.getToDate());
-		assertNull(dateRange.getFromDate());
+		try {
+			dateRange.getFromDate();
+			fail("Should fail, as fromDate is not set!");
+		} catch (IllegalStateException e) {
+			if (!e.getMessage().equals("fromDate is unbounded, check with isFromBounded()"))
+				fail("Should fail with different exception message, as fromDate is not set!");
+		}
 		assertFalse(dateRange.isUnbounded());
 		assertFalse(dateRange.isBounded());
 	}
