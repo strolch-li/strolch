@@ -83,13 +83,13 @@ mvn clean install -DskipTests</pre>
         <p>The following shows the maven command to create the new maven project. Note that you should replace the
            placeholders in the brackets:</p>
         <pre>
-mvn archetype:generate
-  -DarchetypeGroupId=li.strolch
-  -DarchetypeArtifactId=li.strolch.mvn.archetype.main
-  -DarchetypeVersion=1.6.0-SNAPSHOT
-  -DgroupId=&lt;my.groupid&gt;
-  -DartifactId=&lt;my-artifactId&gt;
-  -Dversion=&lt;my.version&gt;
+mvn archetype:generate \
+  -DarchetypeGroupId=li.strolch \
+  -DarchetypeArtifactId=li.strolch.mvn.archetype.main \
+  -DarchetypeVersion=1.6.0-SNAPSHOT \
+  -DgroupId=&lt;my.groupid&gt; \
+  -DartifactId=&lt;my-artifactId&gt; \
+  -Dversion=&lt;my.version&gt; \
   -DappName="&lt;my app name&gt;"</pre>
 
         <p>You change into the directory of the new project and then build the project by calling:</p>
@@ -107,13 +107,13 @@ mvn exec:java</pre>
         <p>The following shows the maven command to create the new maven project. Note that you should replace the
            placeholders in the brackets:</p>
         <pre>
-mvn archetype:generate
-  -DarchetypeGroupId=li.strolch
-  -DarchetypeArtifactId=li.strolch.mvn.archetype.webapp
-  -DarchetypeVersion=1.6.0-SNAPSHOT
-  -DgroupId=&lt;my.groupid&gt;
-  -DartifactId=&lt;my-artifactId&gt;
-  -Dversion=&lt;my.version&gt;
+mvn archetype:generate \
+  -DarchetypeGroupId=li.strolch \
+  -DarchetypeArtifactId=li.strolch.mvn.archetype.webapp \
+  -DarchetypeVersion=1.6.0-SNAPSHOT \
+  -DgroupId=&lt;my.groupid&gt; \
+  -DartifactId=&lt;my-artifactId&gt; \
+  -Dversion=&lt;my.version&gt; \
   -DappName="&lt;my app name&gt;"</pre>
 
         <h4>Install the web dependencies</h4>

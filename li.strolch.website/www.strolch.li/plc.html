@@ -68,9 +68,26 @@
            are satisfied with the result. What follows is a description in how to set up your own Strolch based PLC.</p>
 
         <h2>Architecture</h2>
+        <h3>Overview</h3>
+        <img class="image" src="images/Strolch-PLC-Architecture-Overview.png" alt="Strolch PLC Architecture Overview">
         <p>The Strolch PLC architecture sees the Strolch Agent as the server, managing logical devices, i.e. multiple
-           sensors and actors together and thus deciding </p>
+           sensors and actors together and thus deciding on further steps. With this architecture multiple PLCs can be
+           combined together in one agent for flow control.</p>
+
+        <h3>PLC Architecture</h3>
         <img class="image" src="images/Strolch-PLC-Architecture.png" alt="Strolch PLC Architecture">
+        <p>On the agent side the two main classes are the <code>PlcGwServerHandler</code> and the
+            <code>PlcGwService</code></p>
+        <p>The <code>PlcGwServerHandler</code> handles connections from remote PLCs over WebSockets and sends the
+           requests to these PLCs. A <code>PlcGwService</code> instance will be notified and can then decide on an
+           action. In an execution model with <code>Activities</code>, the <code>PlcNotificationListener</code>
+           interface can be implemented, or the <code>PlcExecutionPolicy</code> can be directly extended.</p>
+
+        <p>On the PLC side, the <code>PlcGwClientHandler</code> is optional if no agent is required. The <code>PlcHandler</code>
+           initializes the model and connections. The <code>Plc</code> class is Strolch agnostic and manages the
+           connections and notifies <code>PlcListener</code> instances on changes coming from the underlying
+           connections. The <code>PlcService</code> implementations implement business logic, and can also be notified
+           on updates from connections.</p>
 
         <h2>Example set up</h2>
         <p>This example setup describes the movement of containers over conveyors. The conveyors have motors which can
@@ -81,6 +98,453 @@
            agent gives the command. Thus the agent handles business logic and the PLC controls the I/Os.</p>
 
         <img class="image" src="images/Strolch-Plc-Example.png" alt="Strolch PLC Conveyor Example" />
+
+        <h2>New Project</h2>
+        <ol>
+            <li>First create a new Strolch Web project using the <a href="development.html">Strolch Maven archetype</a>
+            </li>
+            <li>Now add the following Maven dependencies:
+                <pre>
+&lt;properties&gt;
+  &lt;strolch.version&gt;1.6.0-SNAPSHOT&lt;/strolch.version&gt;
+  &lt;strolch.plc.version&gt;0.1.0-SNAPSHOT&lt;/strolch.plc.version&gt;
+&lt;/properties&gt;
+
+&lt;dependencyManagement&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+    &lt;artifactId&gt;li.strolch.bom&lt;/artifactId&gt;
+    &lt;type&gt;pom&lt;/type&gt;
+    &lt;version&gt;${strolch.version}&lt;/version&gt;
+    &lt;scope&gt;import&lt;/scope&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+    &lt;artifactId&gt;strolch-plc-bom&lt;/artifactId&gt;
+    &lt;type&gt;pom&lt;/type&gt;
+    &lt;version&gt;${strolch.plc.version}&lt;/version&gt;
+    &lt;scope&gt;import&lt;/scope&gt;
+  &lt;/dependency&gt;
+&lt;/dependencyManagement&gt;
+
+&lt;dependencies&gt;
+  &lt;!-- PLC --&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+    &lt;artifactId&gt;strolch-plc-core&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+    &lt;artifactId&gt;strolch-plc-rest&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;li.strolch&lt;/groupId&gt;
+    &lt;artifactId&gt;strolch-plc-gw-client&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+&lt;/dependencies&gt;</pre>
+            </li>
+
+            <li>
+                <p>Add a bower dependency: <code>"strolch-wc-plc": "4treesCH/strolch-wc-plc#^0.3.4"</code> to <code>src/main/webapp/bower.json</code>
+                </p>
+                <p>After adding the dependeny, run <code>gulp</code> in the webapp directory. Gulp should have been
+                   installed through the instructions from the <a href="development.html">development page</a>.</p>
+            </li>
+
+            <li>
+                <p>Now we need to add the PLC web views to our new project. This is added in the <code>src/main/webapp/app/src/c-app.html</code>
+                   file. Add the following:</p>
+
+                <pre>
+&lt;!-- HTML Imports --&gt;
+&lt;link rel="import" href="../bower_components/strolch-wc-plc/strolch-wc-plc-connections.html"&gt;
+&lt;link rel="import" href="../bower_components/strolch-wc-plc/strolch-wc-plc-logical-devices.html"&gt;
+
+&lt;!-- Change default-page to plcLogicalDevices --&gt;
+&lt;c-app-routing id="appRouting"
+         login-page="login"
+         default-page="plcLogicalDevices"
+         auth-valid="[[authTokenValid]]"
+         page="{{page}}"
+         route-tail="{{routeTail}}"
+         use-hash-as-path&gt;&lt;/c-app-routing&gt;
+
+&lt;!-- Add the new pages in the iron-pages element: --&gt;
+&lt;template is="dom-if" if="[[equal(page, 'plcConnections')]]" restamp&gt;
+    &lt;strolch-wc-plc-connections id="plcConnections"
+            base-path="../"
+            base-rest-path="[[baseRestPath]]"
+            route="{{subroute}}"&gt;&lt;/strolch-wc-plc-connections&gt;
+&lt;/template&gt;
+&lt;template is="dom-if" if="[[equal(page, 'plcLogicalDevices')]]" restamp&gt;
+    &lt;strolch-wc-plc-logical-devices id="plcLogicalDevices"
+            base-path="../"
+            base-rest-path="[[baseRestPath]]"
+            base-ws-path="[[baseWsPath]]"
+            route="{{subroute}}"&gt;&lt;/strolch-wc-plc-logical-devices&gt;
+&lt;/template&gt;
+
+// add a new property to the WebSocket path for observing changes on the PLC
+wsObserverPath: {
+    type: String,
+    value: function () {
+        return CustomWeb.baseWsPath + "/plc/observer";
+    }
+}</pre>
+            </li>
+
+            <li>
+                <p>Now we need to configure the PLC's runtime by modifying <code>runtime/StrolchConfiguration.xml</code>
+                   and adding the following:</p>
+                <pre>
+&lt;!--
+    This component configures the PlcHandler by
+    loading the PlcConnections, PlcAddresses and PlcTelegrams
+--&gt;
+&lt;Component&gt;
+  &lt;name&gt;PlcHandler&lt;/name&gt;
+  &lt;api&gt;li.strolch.plc.core.PlcHandler&lt;/api&gt;
+  &lt;impl&gt;li.strolch.plc.core.DefaultPlcHandler&lt;/impl&gt;
+  &lt;depends&gt;RealmHandler&lt;/depends&gt;
+  &lt;Properties&gt;
+    &lt;!-- The component handling the low level connections --&gt;
+    &lt;plcClass&gt;li.strolch.plc.core.hw.DefaultPlc&lt;/plcClass&gt;
+  &lt;/Properties&gt;
+&lt;/Component&gt;
+
+&lt;!--
+    This component handles registrations of the PlcServices, i.e. your PLC business logic
+--&gt;
+&lt;Component&gt;
+  &lt;name&gt;PlcServiceInitializer&lt;/name&gt;
+  &lt;api&gt;li.strolch.plc.core.PlcServiceInitializer&lt;/api&gt;
+  &lt;impl&gt;li.strolch.plc.example.CustomPlcServiceInitializer&lt;/impl&gt;
+  &lt;depends&gt;PlcHandler&lt;/depends&gt;
+  &lt;Properties&gt;
+  &lt;/Properties&gt;
+&lt;/Component&gt;
+
+&lt;!--
+    This component notifies a Strolch agent of changes on the PLC
+    only if you have a Strolch server with a configured
+    li.strolch.plc.gw.server.PlcServerWebSocketEndpoint ready to accept connections
+--&gt;
+&lt;Component&gt;
+  &lt;name&gt;PlcGwClientHandler&lt;/name&gt;
+  &lt;api&gt;li.strolch.plc.gw.client.PlcGwClientHandler&lt;/api&gt;
+  &lt;impl&gt;li.strolch.plc.gw.client.PlcGwClientHandler&lt;/impl&gt;
+  &lt;depends&gt;PlcHandler&lt;/depends&gt;
+  &lt;depends&gt;PlcServiceInitializer&lt;/depends&gt;
+  &lt;Properties&gt;
+    &lt;plcId&gt;plc-01&lt;/plcId&gt;
+    &lt;gwUsername&gt;plc-01&lt;/gwUsername&gt;
+    &lt;gwPassword&gt;plc-01&lt;/gwPassword&gt;
+    &lt;gwServerUrl&gt;ws://localhost:8080/agent/websocket/strolch/plc&lt;/gwServerUrl&gt;
+  &lt;/Properties&gt;
+&lt;/Component&gt;</pre>
+            </li>
+
+            <li>
+                <p>Now we add the custom classes we just declared.</p>
+
+                <p><b>PlcServiceInitializer</b></p>
+                <pre>
+import java.util.ArrayList;
+import java.util.List;
+
+import li.strolch.plc.example.services.*;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.plc.core.PlcHandler;
+import li.strolch.plc.core.PlcService;
+import li.strolch.plc.core.PlcServiceInitializer;
+
+public class CustomPlcServiceInitializer extends PlcServiceInitializer {
+
+  public CustomPlcServiceInitializer(ComponentContainer container, String componentName) {
+    super(container, componentName);
+  }
+
+  @Override
+  protected List&lt;PlcService&gt; getPlcServices(PlcHandler plcHandler) {
+    ArrayList&lt;PlcService&gt; plcServices = new ArrayList&lt;&gt;();
+
+    StartupPlcService startupPlcService = new StartupPlcService(plcHandler);
+    ConveyorPlcService conveyorPlcService = new ConveyorPlcService(plcHandler);
+
+    plcServices.add(conveyorPlcService);
+    plcServices.add(startupPlcService);
+
+    return plcServices;
+  }
+}</pre>
+
+                <p><b>PlcPostInitializer</b></p>
+                <pre>
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.plc.core.PlcPostInitializer;
+
+public class CustomPostInitializer extends PlcPostInitializer {
+  public CustomPostInitializer(ComponentContainer container, String componentName) {
+    super(container, componentName);
+  }
+
+  // override the initialize(), start(), stop() and destroy() methods as needed
+}</pre>
+            </li>
+
+            <li>
+                <p>In the <code>CustomPlcServiceInitializer</code> we added two PlcServices, for which the code is
+                   missing. The following are simple examples:</p>
+
+                <p><b>StartupPlcService</b></p>
+                <pre>
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.plc.core.PlcHandler;
+import li.strolch.plc.core.PlcService;
+
+public class StartupPlcService extends PlcService {
+
+  public static final String PLC = "PLC";
+  public static final String STARTED = "Started";
+  public static final String STOPPED = "Stopped";
+
+  public StartupPlcService(PlcHandler plcHandler) {
+    super(plcHandler);
+  }
+
+  @Override
+  public void start(StrolchTransaction tx) {
+    send(PLC, STARTED);
+    super.start(tx);
+  }
+
+  @Override
+  public void stop() {
+    send(PLC, STOPPED);
+    super.stop();
+  }
+}</pre>
+
+                <p><b>ConveyorPlcService</b></p>
+                <pre>
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import li.strolch.plc.core.PlcHandler;
+import li.strolch.plc.core.PlcService;
+import li.strolch.plc.model.PlcAddress;
+
+public class ConveyorPlcService extends PlcService {
+
+  public static final int BOX_TRANSFER_DURATION = 30;
+
+  private static final String R_CONVEYOR_01 = "Conveyor01";
+  private static final String A_START_BUTTON = "StartButton";
+  private static final String T_MOTOR_ON = "MotorOn";
+  private static final String T_MOTOR_OFF = "MotorOff";
+  private static final String A_BOX_DETECTED = "BoxDetected";
+
+  private boolean motorOn;
+  private ScheduledFuture&lt;?&gt; motorStopTask;
+
+  public ConveyorPlcService(PlcHandler plcHandler) {
+    super(plcHandler);
+  }
+
+  @Override
+  public void handleNotification(PlcAddress address, Object value) {
+    String resource = address.resource;
+    String action = address.action;
+
+    if (!resource.equals("Conveyor01"))
+      throw new IllegalStateException("Unexpected resource " + resource);
+
+    boolean active = (boolean) value;
+
+    if (action.equals(A_START_BUTTON)) {
+
+      if (active) {
+        logger.info("Start button pressed. Starting motors...");
+        send(R_CONVEYOR_01, T_MOTOR_ON);
+        this.motorOn = true;
+        scheduleStopTask();
+      }
+
+    } else if (action.equals(A_BOX_DETECTED)) {
+
+      if (active && this.motorOn) {
+        logger.info("Container detected, refreshing stop task...");
+        scheduleStopTask();
+      }
+
+    } else {
+      logger.info("Unhandled notification " + address.toKeyAddress());
+    }
+  }
+
+  private void scheduleStopTask() {
+    if (this.motorStopTask != null)
+      this.motorStopTask.cancel(false);
+    this.motorStopTask = schedule(this::stopMotor, BOX_TRANSFER_DURATION, TimeUnit.SECONDS);
+  }
+
+  private void stopMotor() {
+    send(R_CONVEYOR_01, T_MOTOR_OFF);
+  }
+
+  @Override
+  public void register() {
+    this.plcHandler.register(R_CONVEYOR_01, A_START_BUTTON, this);
+    this.plcHandler.register(R_CONVEYOR_01, A_BOX_DETECTED, this);
+    super.register();
+  }
+
+  @Override
+  public void unregister() {
+    this.plcHandler.unregister(R_CONVEYOR_01, A_START_BUTTON, this);
+    this.plcHandler.unregister(R_CONVEYOR_01, A_BOX_DETECTED, this);
+    super.unregister();
+  }
+}</pre>
+            </li>
+
+            <li>
+                <p>Now the last part is to add the model, i.e. PlcConnections, PlcAddresses and PlcTelegrams. To have
+                   less configuration files and make it easier to reconfigure at runtime, this data is stored in normal
+                   Strolch <code>Resources</code></p>
+                <p>In this example we will use simple Raspberry Pi GPIOs. For convenience, and also when sharing I/O
+                   definitions with external partners, it is easier to use a CSV file to define the I/Os and then use
+                   the <code>PlcAddressGenerator</code> to generate and validate the model.</p>
+                <p>For this purpose in this example, we will use one conveyor with 2 inputs and 1 output. The CSV file
+                   should have the following content:</p>
+                <pre>
+Description,Type,SubType,Device,Pin,Resource,Action1,Action2,Connection,DeviceId
+Material Flow,Group,,,,,,,,MaterialFlow
+Conveyor 1,Input,GPIO,,4,Conveyor,Occupied,,raspiBcmGpioInput
+Conveyor 1,Input,GPIO,,17,Conveyor,BoxDetected,,raspiBcmGpioInput
+Conveyor 1,Output,GPIO,,18,Conveyor,MotorOn,MotorOff,raspiBcmGpioOutput</pre>
+
+                <p>The CSV headers are as follows:</p>
+                <ul>
+                    <li>Description &rarr; a simple description for this PlcAddress</li>
+                    <li>Type &rarr;
+                        <ul>
+                            <li>Group &rarr; Must be the first line and generates a PlcLogicalDevice, all succeeding
+                                lines are grouped to this device. Add additional to group further devices
+                            </li>
+                            <li>Input &rarr; defines a boolean input</li>
+                            <li>Output &rarr; defines a boolean output</li>
+                            <li>Virtual &rarr; defines a virtual address which has no corresponding hardware connection.
+                                Used for internal communication.
+                            </li>
+                            <li>DataLogicScanner &rarr; defines an address to read barcodes from a DataLogic Scanner.
+                                The actions must be left empty as the keys Barcode (address), On and Off (telegrams)
+                                will be generated.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>SubType &rarr;
+                        <ul>
+                            <li>For Input and Output types &rarr;
+                                <ul>
+                                    <li>PCF8574 &rarr; For PCF8574 the Device and Pin values must be defined and will be
+                                        appended to the Connection. Define the device and pin values starting with 1,
+                                        the values will be decremented, to fit the hardware index
+                                    </li>
+                                    <li>GPIO &rarr; For GPIO the Pin will be appended to the Connection</li>
+                                </ul>
+                            </li>
+                            <li>For Virtual types &rarr;
+                                <ul>
+                                    <li>Boolean</li>
+                                    <li>String</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Device &rarr; Device number</li>
+                    <li>Pin &rarr; The pin number on the device</li>
+                    <li>Resource &rarr; The resource ID with which to notify the agent</li>
+                    <li>Action1 &rarr; The action ID</li>
+                    <li>Action2 &rarr; The second action ID if required</li>
+                    <li>Connection &rarr; The ID of the PlcConnection with which this I/O is attached</li>
+                    <li>DeviceId &rarr; For type Group: Set the ID of this PlcLogicalDevice being generated</li>
+                </ul>
+
+                <p>When you use this file as input for the <code>PlcAddressGenerator</code>, then it will generate
+                   PlcLogicalDevice, PlcAddress and PlcTelegram elements:</p>
+                <pre>
+&lt;Resource Id="D_MaterialFlow" Name="MaterialFlow" Type="PlcLogicalDevice"&gt;
+  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+    &lt;Parameter Id="description" Name="Description" Type="String" Value="Material Flow"/&gt;
+    &lt;Parameter Id="group" Name="Group" Type="String" Value="01 Material Flow"/&gt;
+    &lt;Parameter Id="index" Name="Index" Type="Integer" Value="10"/&gt;
+  &lt;/ParameterBag&gt;
+  &lt;ParameterBag Id="relations" Name="Relations" Type="Relations"&gt;
+    &lt;Parameter Id="addresses" Name="Addresses" Type="StringList" Interpretation="Resource-Ref" Uom="PlcAddress" Value="A_Conveyor-Occupied, A_Conveyor-BoxDetected, A_Conveyor-MotorOn"/&gt;
+    &lt;Parameter Id="telegrams" Name="Telegrams" Type="StringList" Interpretation="Resource-Ref" Uom="PlcTelegram" Value="T_Conveyor-MotorOn, T_Conveyor-MotorOff"/&gt;
+  &lt;/ParameterBag&gt;
+&lt;/Resource&gt;
+
+&lt;Resource Id="A_Conveyor-Occupied" Name="Conveyor - Occupied" Type="PlcAddress"&gt;
+  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+    &lt;Parameter Id="description" Name="Description" Type="String" Index="5" Value="Conveyor 1"/&gt;
+    &lt;Parameter Id="address" Name="HW Address" Type="String" Interpretation="PlcConnection" Index="10" Value="raspiBcmGpioInput.4"/&gt;
+    &lt;Parameter Id="resource" Name="Resource ID for PlcAddress" Type="String" Index="20" Value="Conveyor"/&gt;
+    &lt;Parameter Id="action" Name="Action ID for PlcAddress" Type="String" Index="30" Value="Occupied"/&gt;
+    &lt;Parameter Id="index" Name="Index" Type="Integer" Index="40" Value="10"/&gt;
+    &lt;Parameter Id="value" Name="Value" Type="Boolean" Index="100" Value="false"/&gt;
+  &lt;/ParameterBag&gt;
+&lt;/Resource&gt;
+
+&lt;Resource Id="T_Conveyor-MotorOn" Name="Conveyor - MotorOn" Type="PlcTelegram"&gt;
+  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+    &lt;Parameter Id="description" Name="Description" Type="String" Index="5" Value="Conveyor 1"/&gt;
+    &lt;Parameter Id="address" Name="HW Address" Type="String" Interpretation="PlcConnection" Index="10" Value="raspiBcmGpioOutput.18"/&gt;
+    &lt;Parameter Id="resource" Name="Resource ID for PlcAddress" Type="String" Index="20" Value="Conveyor"/&gt;
+    &lt;Parameter Id="action" Name="Action ID for PlcAddress" Type="String" Index="30" Value="MotorOn"/&gt;
+    &lt;Parameter Id="index" Name="Index" Type="Integer" Index="40" Value="10"/&gt;
+    &lt;Parameter Id="value" Name="Value" Type="Boolean" Index="100" Value="true"/&gt;
+  &lt;/ParameterBag&gt;
+&lt;/Resource&gt;</pre>
+
+                <p>The PlcLogicalDevice references the PlcAddress and PlcTelegram objects, and is then used in the UI
+                   for grouping.</p>
+                <p>The PlcAddress is used to store the current value and defines the keys with which the agent will be
+                   notified</p>
+                <p>The PlcTelegram is used to store default values to send, for specific keys. E.g. The action
+                    <code>On</code> would send true, and <code>Off</code> would send false. This is semantics, and is
+                   defined in each project depending on the hardware.</p>
+            </li>
+
+            <li>Now that we have a model, the PlcConnections are to be defined. In the previous example we used a
+                Raspberry Pi's GPIOs. This needs to be defined as a PlcConnection:
+                <pre>
+&lt;Resource Id="raspiBcmGpioOutput" Name="Raspi BCM GPIO Output" Type="PlcConnection"&gt;
+  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+    &lt;Parameter Id="className" Name="Connection Class" Type="String" Value="li.strolch.plc.core.hw.gpio.RaspiBcmGpioOutputConnection"/&gt;
+    &lt;Parameter Id="state" Name="Connection State" Type="String" Interpretation="Enumeration" Uom="ConnectionState" Value="Disconnected"/&gt;
+    &lt;Parameter Id="stateMsg" Name="Connection State Msg" Type="String" Interpretation="Enumeration" Uom="ConnectionState"
+           Value=""/&gt;
+    &lt;Parameter Id="inverted" Name="Inverted" Type="Boolean" Value="false"/&gt;
+    &lt;Parameter Id="bcmOutputPins" Name="BCM Output Pins" Type="IntegerList" Value="27"/&gt;
+  &lt;/ParameterBag&gt;
+&lt;/Resource&gt;
+&lt;Resource Id="raspiBcmGpioInput" Name="Raspi BCM GPIO Input" Type="PlcConnection"&gt;
+  &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+    &lt;Parameter Id="className" Name="Connection Class" Type="String" Value="li.strolch.plc.core.hw.gpio.RaspiBcmGpioInputConnection"/&gt;
+    &lt;Parameter Id="state" Name="Connection State" Type="String" Interpretation="Enumeration" Uom="ConnectionState" Value="Disconnected"/&gt;
+    &lt;Parameter Id="stateMsg" Name="Connection State Msg" Type="String" Interpretation="Enumeration" Uom="ConnectionState"
+           Value=""/&gt;
+    &lt;Parameter Id="inverted" Name="Inverted" Type="Boolean" Value="true"/&gt;
+    &lt;Parameter Id="bcmInputPins" Name="BCM Input Pins" Type="IntegerList" Value="4"/&gt;
+  &lt;/ParameterBag&gt;
+&lt;/Resource&gt;</pre>
+                <p>See
+                    <a href="https://github.com/4treesCH/strolch-plc/blob/develop/example/strolch-plc-example-connections.xml">strolch-plc-example-connections.xml</a>
+                   for further examples. </p>
+            </li>
+        </ol>
 
 
     </div>
