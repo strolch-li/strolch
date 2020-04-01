@@ -22,9 +22,11 @@
     "privilegeDeniedText": "Die Aktion wurde verweigert.",
     "sessionInvalid": "Sitzung ungültig",
     "sessionInvalidConfirmNavToLogin": "Die Sitzung ist abgelaufen oder ungültig. Bitte neu anmelden.",
-    "sessionInvalidLoggingBackIn": "Die Sitzung ist ungültig oder abgelaufen, automatische Anmeldung wird ausgeführt..."
+    "sessionInvalidLoggingBackIn": "Die Sitzung ist ungültig oder abgelaufen, automatische Anmeldung wird ausgeführt...",
+    "errorOccurred": "Ein Fehler ist aufgetreten"
   },
   "en": {
+    "errorOccurred": "An error occurred",
     "sessionInvalid": "Session Invalid",
     "sessionInvalidConfirmNavToLogin": "The session has expired or is invalid. Please logon again.",
     "sessionInvalidLoggingBackIn": "The session is invalid or has expired, automatic logon has commenced...",
