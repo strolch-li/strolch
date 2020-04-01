@@ -196,6 +196,25 @@ wsObserverPath: {
             </li>
 
             <li>
+                <p>Don't forget to add the PLC Rest classes to your <code>ResourceConfig</code></p>
+                <pre>
+@ApplicationPath("rest")
+public class RestfulApplication extends ResourceConfig {
+
+    public RestfulApplication() {
+
+        ...
+
+        // strolch plc services
+        packages(PlcConnectionsResource.class.getPackage().getName());
+
+        ...
+    }
+}
+</pre>
+            </li>
+
+            <li>
                 <p>Now we need to configure the PLC's runtime by modifying <code>runtime/StrolchConfiguration.xml</code>
                    and adding the following:</p>
                 <pre>
