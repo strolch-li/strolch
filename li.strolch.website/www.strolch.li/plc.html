@@ -449,11 +449,11 @@ Conveyor 1,Output,GPIO,,18,Conveyor,MotorOn,MotorOff,raspiBcmGpioOutput</pre>
                         <ul>
                             <li>For Input and Output types &rarr;
                                 <ul>
-                                    <li>PCF8574 &rarr; For PCF8574 the Device and Pin values must be defined and will be
-                                        appended to the Connection. Define the device and pin values starting with 1,
-                                        the values will be decremented, to fit the hardware index
+                                    <li>DevPin, DevPin0 &rarr; Generates the address as <code>&lt;Connection&gt;.&lt;Device&gt;.&lt;Pin&gt;</code>.
+                                        DevPin0 decrements the Device and Pin values by one.
                                     </li>
-                                    <li>GPIO &rarr; For GPIO the Pin will be appended to the Connection</li>
+                                    <li>Pin &rarr; Generates the address as <code>&lt;Connection&gt;.&lt;Pin&gt;</code>.
+                                    </li>
                                 </ul>
                             </li>
                             <li>For Virtual types &rarr;
@@ -517,6 +517,13 @@ Conveyor 1,Output,GPIO,,18,Conveyor,MotorOn,MotorOff,raspiBcmGpioOutput</pre>
                 <p>The PlcTelegram is used to store default values to send, for specific keys. E.g. The action
                     <code>On</code> would send true, and <code>Off</code> would send false. This is semantics, and is
                    defined in each project depending on the hardware.</p>
+            </li>
+
+            <li>
+                <p>Copy the file <a href="https://github.com/4treesCH/strolch-plc/blob/develop/example/plc-state.xml">plc-state.xml</a>
+                   to your runtime and reference it by use of a <code>&lt;IncludeFile file="plc-state.xml" /&gt;</code>
+                   element. Modify the PlcId to be the same as the one you defined in the
+                    <code>StrolchConfiguration.xml</code>. </p>
             </li>
 
             <li>Now that we have a model, the PlcConnections are to be defined. In the previous example we used a
