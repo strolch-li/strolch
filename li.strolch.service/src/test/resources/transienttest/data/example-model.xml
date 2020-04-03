@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StrolchModel xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd">
+
+    <Resource Id="Product" Name="Product Template" Type="Template">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="description" Name="Description" Type="String" Value=""/>
+            <Parameter Id="color" Name="Color" Type="String" Value=""/>
+            <Parameter Id="form" Name="Form" Type="String" Value=""/>
+        </ParameterBag>
+        <ParameterBag Id="relations" Name="Relations" Type="Relations">
+            <Parameter Id="articles" Name="Articles" Type="StringList" Interpretation="Resource-Ref" Uom="Article" Value=""/>
+        </ParameterBag>
+    </Resource>
+
+    <Resource Id="Article" Name="Article Template" Type="Template">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="description" Name="Description" Type="String" Value=""/>
+            <Parameter Id="barcode" Name="Barcode" Type="String" Value=""/>
+        </ParameterBag>
+        <ParameterBag Id="relations" Name="Relations" Type="Relations">
+            <Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value=""/>
+        </ParameterBag>
+    </Resource>
+
+    <Resource Id="Customer" Name="Customer Template" Type="Template">
+        <ParameterBag Id="address" Name="Address" Type="Address">
+            <Parameter Id="street" Name="Street" Type="String" Value=""/>
+            <Parameter Id="zip" Name="Zip" Type="String" Value=""/>
+            <Parameter Id="city" Name="City" Type="String" Value=""/>
+            <Parameter Id="country" Name="Country" Type="String" Value=""/>
+        </ParameterBag>
+    </Resource>
+
+    <Order Id="Order" Name="Order" Type="Template">
+        <ParameterBag Id="quantities" Name="Quantities per Article Id" Type="Quantities">
+            <Parameter Id="quantity" Name="Quantity" Type="Float" Value="0"/>
+        </ParameterBag>
+        <ParameterBag Id="relations" Name="Relations" Type="Relations">
+            <Parameter Id="articles" Name="Articles" Type="StringList" Interpretation="Resource-Ref" Uom="Article" Value=""/>
+            <Parameter Id="customer" Name="Customer" Type="String" Interpretation="Resource-Ref" Uom="Customer" Value=""/>
+        </ParameterBag>
+    </Order>
+
+</StrolchModel>

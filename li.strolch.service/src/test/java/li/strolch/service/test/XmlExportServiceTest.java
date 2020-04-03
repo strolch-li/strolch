@@ -80,7 +80,7 @@ public class XmlExportServiceTest {
 		arg.multiFile = true;
 		ServiceResult result = runtimeMock.getServiceHandler().doService(certificate, service, arg);
 		RuntimeMock.assertServiceResult(ServiceResultState.SUCCESS, ServiceResult.class, result);
-		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 6);
+		assertNumberOfFilesCreated(arg.modelFileName.split("\\.")[0], 7);
 
 		importModel(arg.modelFileName);
 	}
