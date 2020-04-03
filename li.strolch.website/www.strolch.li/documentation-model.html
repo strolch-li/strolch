@@ -53,6 +53,217 @@
 
     <div class="content">
 
+        <p>Before we dive into the entire model, let's show an example and how it would be modelled in Strolch and use
+           in Strolch:</p>
+        <img class="image" src="images/strolch-model-example.png" alt="Strolch model example">
+        <p>A possible model would look as follows:</p>
+        <pre>
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;StrolchModel xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"&gt;
+
+    &lt;Resource Id="Product" Name="Product Template" Type="Template"&gt;
+        &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+            &lt;Parameter Id="description" Name="Description" Type="String" Value=""/&gt;
+            &lt;Parameter Id="color" Name="Color" Type="String" Value=""/&gt;
+            &lt;Parameter Id="form" Name="Form" Type="String" Value=""/&gt;
+        &lt;/ParameterBag&gt;
+        &lt;ParameterBag Id="relations" Name="Relations" Type="Relations"&gt;
+            &lt;Parameter Id="articles" Name="Articles" Type="StringList" Interpretation="Resource-Ref" Uom="Article" Value=""/&gt;
+        &lt;/ParameterBag&gt;
+    &lt;/Resource&gt;
+
+    &lt;Resource Id="Article" Name="Article Template" Type="Template"&gt;
+        &lt;ParameterBag Id="parameters" Name="Parameters" Type="Parameters"&gt;
+            &lt;Parameter Id="description" Name="Description" Type="String" Value=""/&gt;
+            &lt;Parameter Id="barcode" Name="Barcode" Type="String" Value=""/&gt;
+        &lt;/ParameterBag&gt;
+        &lt;ParameterBag Id="relations" Name="Relations" Type="Relations"&gt;
+            &lt;Parameter Id="product" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value=""/&gt;
+        &lt;/ParameterBag&gt;
+    &lt;/Resource&gt;
+
+    &lt;Resource Id="Customer" Name="Customer Template" Type="Template"&gt;
+        &lt;ParameterBag Id="address" Name="Address" Type="Address"&gt;
+            &lt;Parameter Id="street" Name="Street" Type="String" Value=""/&gt;
+            &lt;Parameter Id="zip" Name="Zip" Type="String" Value=""/&gt;
+            &lt;Parameter Id="city" Name="City" Type="String" Value=""/&gt;
+            &lt;Parameter Id="country" Name="Country" Type="String" Value=""/&gt;
+        &lt;/ParameterBag&gt;
+    &lt;/Resource&gt;
+
+    &lt;Order Id="Order" Name="Order" Type="Template"&gt;
+        &lt;ParameterBag Id="quantities" Name="Quantities per Article Id" Type="Quantities"&gt;
+            &lt;Parameter Id="quantity" Name="Quantity" Type="Float" Value="0"/&gt;
+        &lt;/ParameterBag&gt;
+        &lt;ParameterBag Id="relations" Name="Relations" Type="Relations"&gt;
+            &lt;Parameter Id="articles" Name="Articles" Type="StringList" Interpretation="Resource-Ref" Uom="Article" Value=""/&gt;
+            &lt;Parameter Id="customer" Name="Customer" Type="String" Interpretation="Resource-Ref" Uom="Customer" Value=""/&gt;
+        &lt;/ParameterBag&gt;
+    &lt;/Order&gt;
+
+&lt;/StrolchModel&gt;</pre>
+        <p>Let's go through this model:</p>
+        <ul>
+            <li><p>In the above model we see that the <code>id</code> and <code>name</code> fields are always on the
+                   element, and thus aren't added as parameters. Further most elements have a <code>parameters</code>
+                   ParameterBag, with one or more parameters, modelling the fields.</p></li>
+            <li><p>Note that in this example the <code>Type</code> of all the elements is <code>Template</code>. Strolch
+                   has API support to create a clone of these elements, so that they have a unique ID, and the proper
+                   type for persistence.</p>
+            </li>
+            <li><p>The <code>Product</code> element has three parameters: <code>description</code>, <code>color</code>
+                   and <code>form</code>. In this case they are all of type String. Further the <code>relations</code>
+                   ParameterBag defines the relationships, i.e. the product knows its articles. Note how the relation is
+                   first defined in a <code>relations</code> ParameterBag and that the Parameter has <code>Interpretation="Resource-Ref"
+                                                                                                           Uom="Product"</code>
+                   attributes. Strolch has API support for this, making it trivial to retrieve a dependency.</p></li>
+            <li><p>The <code>Article</code> element has two parameters <code>description</code> and <code>barcode</code>.
+                   Further it has a reference to its Product.</p></li>
+            <li>The <code>Order</code> element doesn't model the <code>date</code> and <code>state</code> fields as
+                parameters, as these are inherently part of an Order element. The Order does define two references to
+                <code>customer</code> and <code>articles</code>. A special case is the <code>quantities</code>
+                ParameterBag. This bag of parameters is used to store the per article quantity for this order. With
+                ParameterBags, you can eliminate the use of simple aggregate classes, as is commonly used in
+                object-oriented programming.
+            </li>
+            <li>The <code>Customer</code> element models a <code>address</code> ParameterBag to store the address of a
+                customer. Using a separate bag allows for further more direct fields to stored on the default <code>parameters</code>
+                bag.
+            </li>
+        </ul>
+
+        <p>Now that we have a basic understanding of te model, it is of far more interest in how to create and interact
+           with these elements at runtime. The following listing will perform simple operations:</p>
+        <pre>
+try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, false)) {
+
+    /*
+     * create a new product
+     */
+    Resource dafalgan = tx.getResourceTemplate("Product", true);
+    dafalgan.setName("Dafalgan 100mg");
+    dafalgan.getParameter("description", true).setValue("Dafalgan is for pain.");
+    dafalgan.getParameter("color", true).setValue("Yellow");
+    dafalgan.getParameter("form", true).setValue("flat");
+
+    StringListParameter articlesP = dafalgan.getRelationsParam("articles", true);
+
+    /*
+     * create articles
+     */
+    Resource dafalgan1 = tx.getResourceTemplate("Article", true);
+    dafalgan1.setName("Dafalgan 100mg 10 pce");
+    dafalgan1.getParameter("description", true).setValue("This is pack with 10 pieces.");
+    dafalgan1.getParameter("barcode", true).setValue("654654");
+
+    Resource dafalgan2 = tx.getResourceTemplate("Article", true);
+    dafalgan2.setName("Dafalgan 100mg 20 pce");
+    dafalgan2.getParameter("description", true).setValue("This is pack with 20 pieces.");
+    dafalgan2.getParameter("barcode", true).setValue("654655");
+
+    /*
+     * add reference to product
+     */
+    dafalgan1.getRelationParam("product").setValue(dafalgan.getId());
+    articlesP.addValue(dafalgan1.getId());
+    dafalgan2.getRelationParam("product").setValue(dafalgan.getId());
+    articlesP.addValue(dafalgan2.getId());
+
+    /*
+     * create a new customer
+     */
+    Resource customer1 = tx.getResourceTemplate("Customer", true);
+    customer1.setName("John Doe");
+
+    // set address
+    ParameterBag addressBag = customer1.getParameterBag("address", true);
+    addressBag.getParameter("street", true).setValue("Main Str. 1");
+    addressBag.getParameter("zip", true).setValue("1234");
+    addressBag.getParameter("city", true).setValue("Hometown");
+    addressBag.getParameter("country", true).setValue("Switzerland");
+
+    /*
+     * create a new order
+     */
+    Order order = tx.getOrderTemplate("Order", true);
+    order.setName("Order for " + customer1.getName());
+    order.setDate(LocalDate.of(2021, 2, 1));
+    order.setState(State.PLANNED);
+
+    // store reference to customer
+    order.getRelationParam("customer", true).setValue(customer1.getId());
+
+    StringListParameter orderArticlesP = order.getRelationsParam("articles", true);
+    ParameterBag quantitiesBag = order.getParameterBag("quantities", true);
+    FloatParameter quantityT = quantitiesBag.removeParameter("quantity");
+
+    // order quantity of 20 for Dafalgan 1
+    FloatParameter q1P = quantityT.getClone();
+    q1P.setId(dafalgan1.getId());
+    q1P.setValue(20);
+    quantitiesBag.addParameter(q1P);
+    orderArticlesP.addValue(dafalgan1.getId());
+
+    // set order quantity of 10 for Dafalgan 2
+    FloatParameter q2P = quantityT.getClone();
+    orderArticlesP.addValue(dafalgan2.getId());
+    q2P.setId(dafalgan2.getId());
+    q2P.setValue(20);
+    quantitiesBag.addParameter(q2P);
+
+    // keep IDs for later use
+    dafalganId = dafalgan.getId();
+    dafalgan1Id = dafalgan1.getId();
+    dafalgan2Id = dafalgan2.getId();
+    customerId = customer1.getId();
+    orderId = order.getId();
+
+    /*
+     * persist
+     */
+    tx.add(dafalgan);
+    tx.add(dafalgan1);
+    tx.add(dafalgan2);
+    tx.add(customer1);
+    tx.add(order);
+
+    // commit
+    tx.commitOnClose();
+}
+
+try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true)) {
+
+    // get order
+    Order order = tx.getOrderBy("Order", orderId, true);
+    assertNotNull(orderId);
+    assertEquals("Order for John Doe", order.getName());
+
+    // get customer
+    Resource customer = tx.getResourceByRelation(order, "customer", true);
+    assertNotNull(customer);
+    assertEquals("John Doe", customer.getName());
+
+    // get articles
+    List&lt;Resource&gt; articles = tx.getResourcesByRelation(order, "articles", true);
+    assertEquals(2, articles.size());
+
+    // get products
+    List&lt;Resource&gt; products = articles.stream().map(a -&gt; tx.getResourceByRelation(a, "product", true))
+            .distinct().collect(Collectors.toList());
+    assertEquals(1, products.size());
+
+    // search for all orders in state PLANNED and with customer
+    List&lt;Order&gt; orders = new OrderSearch().types("Order").stateIsIn(State.PLANNED)
+            .where(ExpressionsSupport.relationParam("customer").isEqualTo(customerId)).search(tx).toList();
+    assertEquals(1, orders.size());
+}</pre>
+
+        <p><b>Note:</b> Checkout
+            <a href="https://github.com/4treesCH/strolch/blob/develop/li.strolch.service/src/test/resources/transienttest/data/example-model.xml">example-model.xml</a>
+                        and
+            <a href="https://github.com/4treesCH/strolch/blob/develop/li.strolch.service/src/test/java/li/strolch/service/SimpleModelTest.java">SimpleModelTest.java</a>
+                        for these examples. </p>
+
         <p>There is a XML Schema which defines the model in XML:
             <a href="xsd/StrolchModel-1.6.xsd">StrolchModel-1.6.xsd</a>
         </p>
