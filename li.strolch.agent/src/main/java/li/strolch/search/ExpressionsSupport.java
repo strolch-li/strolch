@@ -104,6 +104,10 @@ public class ExpressionsSupport {
 		return param(BAG_PARAMETERS, paramId);
 	}
 
+	public static <T extends StrolchRootElement> ExpressionBuilder relationParam(String paramId) {
+		return param(BAG_RELATIONS, paramId);
+	}
+
 	public static <T extends StrolchRootElement> ExpressionBuilder param(String bagId, String paramId) {
 		return new ExpressionBuilder() {
 
