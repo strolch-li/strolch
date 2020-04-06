@@ -29,7 +29,11 @@ import li.strolch.privilege.handler.PrivilegeHandler;
 @SuppressWarnings("nls")
 public class StrolchConstants {
 
+	public static final String STROLCH_ENV = "strolch.env";
+	public static final String STROLCH_PATH = "strolch.path";
+
 	public static final String ENV_STROLCH = "ENV_STROLCH";
+	public static final String ENV_STROLCH_PATH = "ENV_STROLCH_PATH";
 	public static final String PERSISTENCE_HANDLER = PersistenceHandler.class.getSimpleName();
 	public static final String OBSERVER_HANDLER = ObserverHandler.class.getSimpleName();
 
