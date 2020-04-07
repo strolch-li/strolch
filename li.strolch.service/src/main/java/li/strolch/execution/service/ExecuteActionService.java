@@ -31,17 +31,23 @@ public class ExecuteActionService extends AbstractService<LocatorArgument, Servi
 			realm = tx.getRealmName();
 
 			tx.lock(arg.locator.trim(3));
-			Action action = tx.findElement(arg.locator);
 
-			// this is so we can re-execute stopped actions
-			if (action.getState() == State.STOPPED) {
-				action.setState(State.EXECUTABLE);
+			if (arg.locator.getSize() == 3) {
+				activity = tx.findElement(arg.locator);
+			} else {
 
-				tx.update(action.getRootElement());
-				tx.commitOnClose();
+				Action action = tx.findElement(arg.locator);
+
+				// this is so we can re-execute stopped actions
+				if (action.getState() == State.STOPPED) {
+					action.setState(State.EXECUTABLE);
+
+					tx.update(action.getRootElement());
+					tx.commitOnClose();
+				}
+
+				activity = action.getRootElement();
 			}
-
-			activity = action.getRootElement();
 		}
 
 		getComponent(ExecutionHandler.class).toExecution(realm, activity);
