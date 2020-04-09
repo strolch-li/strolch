@@ -470,6 +470,22 @@
 
         showToast: function (text) {
             this.fire('cx-show-toast', {text: text});
+        },
+
+        localizeJsonMsg: function (jsonMsg) {
+            if (jsonMsg == null)
+                return jsonMsg;
+            if (jsonMsg.values == null || jsonMsg.values.length == 0)
+                return this.localize(jsonMsg.key);
+
+            var values = [jsonMsg.key];
+            var keys = Object.keys(jsonMsg.values);
+            for (var i = 0; i < keys.length; i++) {
+                var key = keys[i];
+                values.push(key);
+                values.push(jsonMsg.values[key]);
+            }
+            return this.localize.apply(null, values);
         }
     };
 </script>
