@@ -453,47 +453,49 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 
 		List<String> elements = locator.getPathElements();
-		GroupedParameterizedElement groupedParameterizedElement;
+		StrolchRootElement rootElement;
 		String objectClassType = elements.get(0);
 		String type = elements.get(1);
 		String id = elements.get(2);
 		switch (objectClassType) {
 		case Tags.RESOURCE:
-			groupedParameterizedElement = getResourceBy(type, id).getClone(true);
+			rootElement = getResourceBy(type, id);
 			break;
 		case Tags.ORDER:
-			groupedParameterizedElement = getOrderBy(type, id).getClone(true);
+			rootElement = getOrderBy(type, id);
 			break;
 		case Tags.ACTIVITY:
-			groupedParameterizedElement = getActivityBy(type, id).getClone(true);
+			rootElement = getActivityBy(type, id);
 			break;
 		default:
 			throw new StrolchModelException(
 					MessageFormat.format("Unknown object class {0}", objectClassType)); //$NON-NLS-1$
 		}
 
-		if (groupedParameterizedElement == null) {
+		if (rootElement == null) {
 			if (allowNull)
 				return null;
 			String msg = "No top level object could be found with locator {0}"; //$NON-NLS-1$
 			throw new StrolchModelException(MessageFormat.format(msg, locator));
 		}
 
+		if (rootElement.isReadOnly())
+			rootElement = rootElement.getClone(true);
+
 		if (elements.size() == 3)
-			return (T) groupedParameterizedElement;
+			return (T) rootElement;
 
 		// state or bag
 		String stateOrBagOrActivity = elements.get(3);
 		if (stateOrBagOrActivity.equals(Tags.BAG)) {
 
 			String parameterBagId = elements.get(4);
-			ParameterBag bag = groupedParameterizedElement.getParameterBag(parameterBagId);
+			ParameterBag bag = rootElement.getParameterBag(parameterBagId);
 			if (bag == null) {
 				if (allowNull)
 					return null;
 				String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
-				throw new StrolchModelException(
-						MessageFormat.format(msg, locator, groupedParameterizedElement.getLocator()));
+				throw new StrolchModelException(MessageFormat.format(msg, locator, rootElement.getLocator()));
 			}
 
 			if (elements.size() == 5)
@@ -517,15 +519,15 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			}
 
 			@SuppressWarnings("ConstantConditions")
-			Resource resource = (Resource) groupedParameterizedElement;
+			Resource resource = (Resource) rootElement;
 			String stateId = elements.get(4);
 
 			StrolchTimedState<IValue<?>> timedState = resource.getTimedState(stateId);
 			return (T) timedState;
 
-		} else if (groupedParameterizedElement instanceof Activity) {
+		} else if (rootElement instanceof Activity) {
 
-			Activity activity = (Activity) groupedParameterizedElement;
+			Activity activity = (Activity) rootElement;
 
 			Iterator<String> iter = elements.subList(3, elements.size()).iterator();
 			IActivityElement element = activity;
