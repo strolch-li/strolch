@@ -479,9 +479,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			throw new StrolchModelException(MessageFormat.format(msg, locator));
 		}
 
-		if (rootElement.isReadOnly())
-			rootElement = rootElement.getClone(true);
-
 		if (elements.size() == 3)
 			return (T) rootElement;
 
