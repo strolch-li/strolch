@@ -459,13 +459,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		String id = elements.get(2);
 		switch (objectClassType) {
 		case Tags.RESOURCE:
-			groupedParameterizedElement = getResourceBy(type, id);
+			groupedParameterizedElement = getResourceBy(type, id).getClone(true);
 			break;
 		case Tags.ORDER:
-			groupedParameterizedElement = getOrderBy(type, id);
+			groupedParameterizedElement = getOrderBy(type, id).getClone(true);
 			break;
 		case Tags.ACTIVITY:
-			groupedParameterizedElement = getActivityBy(type, id);
+			groupedParameterizedElement = getActivityBy(type, id).getClone(true);
 			break;
 		default:
 			throw new StrolchModelException(
