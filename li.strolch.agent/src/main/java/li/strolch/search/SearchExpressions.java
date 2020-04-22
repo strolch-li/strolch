@@ -1,6 +1,7 @@
 package li.strolch.search;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
 import java.util.function.Supplier;
 
@@ -54,6 +55,10 @@ public interface SearchExpressions {
 
 	default ExpressionBuilder param(String paramId) {
 		return ExpressionsSupport.param(BAG_PARAMETERS, paramId);
+	}
+
+	default ExpressionBuilder relation(String paramId) {
+		return ExpressionsSupport.param(BAG_RELATIONS, paramId);
 	}
 
 	default ExpressionBuilder param(String bagId, String paramId) {
