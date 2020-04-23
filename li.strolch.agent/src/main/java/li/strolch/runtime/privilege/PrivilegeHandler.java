@@ -20,6 +20,7 @@ import li.strolch.privilege.handler.SystemAction;
 import li.strolch.privilege.handler.SystemActionWithResult;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.Usage;
 import li.strolch.runtime.StrolchConstants;
 
 /**
@@ -57,12 +58,14 @@ public interface PrivilegeHandler {
 	 * 		the password
 	 * @param source
 	 * 		the source of the request
+	 * @param usage
+	 * 		the usage for this authentication
 	 *
 	 * @return the certificate
 	 *
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[])
 	 */
-	Certificate authenticate(String username, char[] password, String source);
+	Certificate authenticate(String username, char[] password, String source, Usage usage);
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the

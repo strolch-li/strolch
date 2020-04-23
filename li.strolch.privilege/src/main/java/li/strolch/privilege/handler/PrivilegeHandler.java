@@ -627,13 +627,15 @@ public interface PrivilegeHandler {
 	 * 		the requirements of the {@link #validatePassword(char[])}-method
 	 * @param source
 	 * 		the source of the authentication request, i.e. remote IP
+	 * @param usage
+	 * 		the usage type for this authentication
 	 *
 	 * @return a {@link Certificate} with which this user may then perform actions
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user credentials are not valid
 	 */
-	Certificate authenticate(String username, char[] password, String source) throws AccessDeniedException;
+	Certificate authenticate(String username, char[] password, String source, Usage usage) throws AccessDeniedException;
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the

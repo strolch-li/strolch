@@ -55,10 +55,12 @@ public interface StrolchSessionHandler {
 	 * 		the password
 	 * @param source
 	 * 		the source of the request
+	 * @param usage
+	 * 		the usage for this authentication
 	 *
 	 * @return the {@link Certificate} for the logged in user
 	 */
-	Certificate authenticate(String username, char[] password, String source);
+	Certificate authenticate(String username, char[] password, String source, Usage usage);
 
 	/**
 	 * Performs a single-sign-on with the given data, if SSO is enabled

@@ -39,6 +39,7 @@ import li.strolch.privilege.handler.*;
 import li.strolch.privilege.helper.PrivilegeInitializationHelper;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
 import li.strolch.runtime.StrolchConstants;
@@ -146,9 +147,9 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public Certificate authenticate(String username, char[] password, String source) {
+	public Certificate authenticate(String username, char[] password, String source, Usage usage) {
 		assertContainerStarted();
-		Certificate certificate = this.privilegeHandler.authenticate(username, password, source);
+		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage);
 		writeAudit(certificate, LOGIN, AccessType.CREATE, username);
 		return certificate;
 	}

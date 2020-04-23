@@ -91,7 +91,7 @@ public class AuthenticationService {
 
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
-			Certificate certificate = sessionHandler.authenticate(username, password, source);
+			Certificate certificate = sessionHandler.authenticate(username, password, source, Usage.ANY);
 
 			return getAuthenticationResponse(request, loginResult, certificate, source);
 

@@ -1146,11 +1146,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public Certificate authenticate(String username, char[] password) {
-		return authenticate(username, password, "unknown");
+		return authenticate(username, password, "unknown", Usage.ANY);
 	}
 
 	@Override
-	public Certificate authenticate(String username, char[] password, String source) {
+	public Certificate authenticate(String username, char[] password, String source, Usage usage) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		try {
@@ -1178,7 +1178,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = UUID.randomUUID().toString();
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source, new Date());
+			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, new Date());
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);

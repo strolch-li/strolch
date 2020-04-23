@@ -146,11 +146,11 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public Certificate authenticate(String username, char[] password, String source) {
+	public Certificate authenticate(String username, char[] password, String source, Usage usage) {
 		DBC.PRE.assertNotEmpty("Username must be set!", username); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
 
-		Certificate certificate = this.privilegeHandler.authenticate(username, password, source);
+		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
