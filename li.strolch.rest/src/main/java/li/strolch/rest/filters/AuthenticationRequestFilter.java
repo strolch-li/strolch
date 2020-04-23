@@ -26,7 +26,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.*;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ import java.util.Set;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
@@ -103,7 +105,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	}
 
 	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
+	public void filter(ContainerRequestContext requestContext) {
 		String remoteIp = getRemoteIp(this.request);
 		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " + requestContext.getUriInfo()
 				.getRequestUri());
@@ -152,8 +154,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	 */
 	protected Certificate validateSession(ContainerRequestContext requestContext, String remoteIp) {
 
-		String sessionId = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		if (StringHelper.isEmpty(sessionId)) {
+		String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+		if (StringHelper.isEmpty(authorization)) {
 
 			Cookie cookie = requestContext.getCookies().get(StrolchRestfulConstants.STROLCH_AUTHORIZATION);
 			if (cookie == null) {
@@ -166,7 +168,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 				return null;
 			}
 
-			sessionId = cookie.getValue();
+			String sessionId = cookie.getValue();
 			if (StringHelper.isEmpty(sessionId)) {
 				logger.error("Authorization Cookie value missing on request to URL " + requestContext.getUriInfo()
 						.getPath());
@@ -176,15 +178,47 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 						.build());
 				return null;
 			}
+
+			return validateCertificate(requestContext, sessionId, remoteIp);
 		}
 
-		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance()
-				.getComponent(StrolchSessionHandler.class);
-		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
+		authorization = authorization.trim();
+		if (authorization.startsWith("Basic ")) {
+			return authenticateBasic(requestContext, authorization, remoteIp);
+		}
+
+		return validateCertificate(requestContext, authorization, remoteIp);
+	}
+
+	private Certificate authenticateBasic(ContainerRequestContext requestContext, String authorization,
+			String remoteIp) {
+		String basicAuth = authorization.substring("Basic ".length());
+		basicAuth = new String(Base64.getDecoder().decode(basicAuth.getBytes()), StandardCharsets.UTF_8);
+		String[] parts = basicAuth.split(":");
+		if (parts.length != 2) {
+			requestContext.abortWith(
+					Response.status(Response.Status.BAD_REQUEST).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("Invalid Basic Authorization!") //$NON-NLS-1$
+							.build());
+			return null;
+		}
+
+		logger.info("Performing basic auth for user " + parts[0] + "...");
+		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+		Certificate certificate = sessionHandler.authenticate(parts[0], parts[1].toCharArray(), remoteIp, Usage.SINGLE);
 
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
 
+		return certificate;
+	}
+
+	private Certificate validateCertificate(ContainerRequestContext requestContext, String sessionId, String remoteIp) {
+		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
+
+		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
 		return certificate;
 	}
 
