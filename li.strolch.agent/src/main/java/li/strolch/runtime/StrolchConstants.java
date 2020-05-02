@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import li.strolch.privilege.handler.PrivilegeHandler;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @SuppressWarnings("nls")
-public class StrolchConstants {
+public class StrolchConstants extends StrolchModelConstants {
 
 	public static final String STROLCH_ENV = "strolch.env";
 	public static final String STROLCH_PATH = "strolch.path";
@@ -71,6 +71,13 @@ public class StrolchConstants {
 	 */
 	public static final String ROLE_STROLCH_ADMIN = StrolchModelConstants.ROLE_STROLCH_ADMIN;
 
+	public static final String TYPE_STROLCH_JOB = "StrolchJob";
+
+	public static final String PARAM_CLASS_NAME = "className";
+	public static final String PARAM_CRON = "cron";
+	public static final String PARAM_START_DATE = "startDate";
+	public static final String PARAM_MODE = "mode";
+
 	public static String makeRealmKey(String realmName, String key) {
 		String realmKey = key;
 		if (!realmName.equals(DEFAULT_REALM))
@@ -80,7 +87,7 @@ public class StrolchConstants {
 
 	/**
 	 * Constants used for Privilege management, configuration, etc.
-	 * 
+	 *
 	 * @author Robert von Burg <eitch@eitchnet.ch>
 	 */
 	public static class StrolchPrivilegeConstants {
@@ -111,10 +118,10 @@ public class StrolchConstants {
 		public static final String PRIVILEGE_INVALIDATE_SESSION = "InvalidateSession";
 		public static final String PRIVILEGE_GET_SESSION = "GetSession";
 
-		public static final String PRIVILEGE_ADD_PREFIX= "Add";
-		public static final String PRIVILEGE_UPDATE_PREFIX= "Update";
-		public static final String PRIVILEGE_REMOVE_PREFIX= "Remove";
-		public static final String PRIVILEGE_GET_PREFIX= "Get";
+		public static final String PRIVILEGE_ADD_PREFIX = "Add";
+		public static final String PRIVILEGE_UPDATE_PREFIX = "Update";
+		public static final String PRIVILEGE_REMOVE_PREFIX = "Remove";
+		public static final String PRIVILEGE_GET_PREFIX = "Get";
 
 		public static final String INTERNAL = StrolchModelConstants.INTERNAL;
 	}

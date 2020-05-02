@@ -93,6 +93,7 @@
         <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
         <csv.version>1.7</csv.version>
         <sax.version>2.0.1</sax.version>
+        <cron.version>1.6.2</cron.version>
 
         <!-- test time dependencies -->
         <junit.version>4.12</junit.version>
@@ -216,6 +217,11 @@
             </dependency>
 
             <!-- Miscellaneous -->
+            <dependency>
+                <groupId>ch.eitchnet</groupId>
+                <artifactId>cron</artifactId>
+                <version>${cron.version}</version>
+            </dependency>
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>

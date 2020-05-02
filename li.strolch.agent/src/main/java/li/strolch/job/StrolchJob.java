@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonObject;
+import fc.cron.CronExpression;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -32,6 +33,7 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.utils.helper.ExceptionHelper;
+import li.strolch.utils.time.PeriodDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +45,15 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchJob.class);
 
-	private StrolchAgent agent;
+	private final StrolchAgent agent;
+	private final String name;
+	private JobMode mode;
+
+	private String cron;
+	private CronExpression cronExpression;
+
 	private String realmName;
 
-	private final JobMode mode;
 	private long initialDelay;
 	private TimeUnit initialDelayTimeUnit;
 	private long delay;
@@ -61,37 +68,65 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	private ZonedDateTime lastExecution;
 	private Exception lastException;
 
-	public StrolchJob(StrolchAgent agent) {
+	private ConfigureMethod configureMethod;
+	private ZonedDateTime cronStartDate;
+
+	public StrolchJob(StrolchAgent agent, String name, JobMode jobMode) {
 		this.agent = agent;
-		this.mode = JobMode.Manual;
-
-		this.initialDelay = 0;
-		this.initialDelayTimeUnit = TimeUnit.SECONDS;
-		this.delay = 0;
-		this.delayTimeUnit = TimeUnit.SECONDS;
-
+		this.name = name;
+		this.mode = jobMode;
 		this.first = true;
 	}
 
-	public StrolchJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit, long delay,
-			TimeUnit delayTimeUnit) {
-		this.agent = agent;
-		this.mode = jobMode;
+	public StrolchJob setConfigureMethod(ConfigureMethod configureMethod) {
+		this.configureMethod = configureMethod;
+		return this;
+	}
 
+	public ConfigureMethod getConfigureMethod() {
+		return this.configureMethod;
+	}
+
+	public String getCron() {
+		return this.cron;
+	}
+
+	public StrolchJob setCronExpression(String cron, ZonedDateTime startDate) {
+		this.cronExpression = CronExpression.createWithoutSeconds(cron);
+		this.cron = cron;
+		this.cronStartDate = startDate.isBefore(ZonedDateTime.now()) ? ZonedDateTime.now() : startDate;
+
+		this.initialDelay = 0;
+		this.initialDelayTimeUnit = null;
+		this.delay = 0;
+		this.delayTimeUnit = null;
+		return this;
+	}
+
+	public StrolchJob setDelay(long initialDelay, TimeUnit initialDelayTimeUnit, long delay, TimeUnit delayTimeUnit) {
 		this.initialDelay = initialDelay;
 		this.initialDelayTimeUnit = initialDelayTimeUnit;
 		this.delay = delay;
 		this.delayTimeUnit = delayTimeUnit;
 
-		this.first = true;
+		this.cronExpression = null;
+		this.cron = null;
+		this.cronStartDate = null;
+
+		return this;
 	}
 
 	public JobMode getMode() {
 		return this.mode;
 	}
 
+	public StrolchJob setMode(JobMode mode) {
+		this.mode = mode;
+		return this;
+	}
+
 	public String getName() {
-		return getClass().getSimpleName();
+		return this.name;
 	}
 
 	protected StrolchAgent getAgent() {
@@ -218,7 +253,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		} catch (Exception e) {
 			this.running = false;
 			this.lastException = e;
-			logger.error("Execution of Job " + this.getClass().getSimpleName() + " failed.", e);
+			logger.error("Execution of Job " + getName() + " failed.", e);
 
 			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
 			if (operationsLog != null) {
@@ -291,18 +326,58 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		cancel(false);
 
 		if (this.first) {
-			long millis = this.initialDelayTimeUnit.toMillis(this.initialDelay);
-			logger.info("First execution of " + getClass().getSimpleName() + " will be at " + ZonedDateTime.now()
-					.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-			this.future = getScheduledExecutor().schedule(this, this.initialDelay, this.initialDelayTimeUnit);
+			if (this.cronExpression != null) {
+				ZonedDateTime executionTime;
+				try {
+					executionTime = this.cronExpression.nextTimeAfter(this.cronStartDate);
+				} catch (IllegalArgumentException e) {
+					logger.error("Can not schedule " + getName() + " after start date " + this.cronStartDate
+							+ " as no next time exists for cron expression " + this.cron);
+					return this;
+				}
+
+				logger.info("First execution of " + getName() + " will be at " + executionTime
+						.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
+				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
+
+			} else {
+
+				long millis = this.initialDelayTimeUnit.toMillis(this.initialDelay);
+				logger.info("First execution of " + getName() + " will be at " + ZonedDateTime.now()
+						.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+				this.future = getScheduledExecutor().schedule(this, this.initialDelay, this.initialDelayTimeUnit);
+			}
 
 		} else {
-			long millis = this.delayTimeUnit.toMillis(this.delay);
-			logger.info("Next execution of " + getClass().getSimpleName() + " will be at " + ZonedDateTime.now()
-					.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-			this.future = getScheduledExecutor().schedule(this, this.delay, this.delayTimeUnit);
+			if (this.cronExpression != null) {
+				ZonedDateTime executionTime;
+				try {
+					executionTime = this.cronExpression.nextTimeAfter(this.lastExecution);
+				} catch (IllegalArgumentException e) {
+					logger.error("Can not schedule " + getName() + " after start date " + this.cronStartDate
+							+ " as no next time exists for cron expression " + this.cron);
+					return this;
+				}
+
+				logger.info("Next execution of " + getName() + " will be at " + executionTime
+						.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
+				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
+
+			} else {
+
+				long millis = this.delayTimeUnit.toMillis(this.delay);
+				logger.info("Next execution of " + getName() + " will be at " + ZonedDateTime.now()
+						.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+				this.future = getScheduledExecutor().schedule(this, this.delay, this.delayTimeUnit);
+			}
 		}
 
 		return this;
@@ -326,14 +401,17 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		jsonObject.addProperty(Tags.Json.NAME, getName());
 		jsonObject.addProperty(Tags.Json.REALM, this.realmName);
 		jsonObject.addProperty("mode", this.mode.name());
+		jsonObject.addProperty("configureMethod", this.configureMethod == null ? "-" : this.configureMethod.name());
+		jsonObject.addProperty("cron", this.cron == null ? "-" : this.cron);
 		jsonObject.addProperty("initialDelay", this.initialDelay);
-		jsonObject.addProperty("initialDelayTimeUnit", this.initialDelayTimeUnit.name());
+		jsonObject.addProperty("initialDelayTimeUnit",
+				this.initialDelayTimeUnit == null ? "-" : this.initialDelayTimeUnit.name());
 		jsonObject.addProperty("delay", this.delay);
-		jsonObject.addProperty("delayTimeUnit", this.delayTimeUnit.name());
+		jsonObject.addProperty("delayTimeUnit", this.delayTimeUnit == null ? "-" : this.delayTimeUnit.name());
 
 		jsonObject.addProperty("running", this.running);
-		jsonObject.addProperty("totalDuration", formatMillisecondsDuration(totalDuration));
-		jsonObject.addProperty("lastDuration", formatMillisecondsDuration(lastDuration));
+		jsonObject.addProperty("totalDuration", formatMillisecondsDuration(this.totalDuration));
+		jsonObject.addProperty("lastDuration", formatMillisecondsDuration(this.lastDuration));
 
 		if (this.lastExecution == null) {
 			jsonObject.addProperty("lastExecution", "-");

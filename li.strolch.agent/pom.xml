@@ -38,6 +38,11 @@
             <artifactId>li.strolch.privilege</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>ch.eitchnet</groupId>
+            <artifactId>cron</artifactId>
+        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
