@@ -5,8 +5,8 @@ import li.strolch.privilege.model.PrivilegeContext;
 
 public class ReloadJobsJob extends StrolchJob {
 
-	public ReloadJobsJob(StrolchAgent agent, String name, JobMode mode) {
-		super(agent, name, mode);
+	public ReloadJobsJob(StrolchAgent agent, String id, String name, JobMode mode) {
+		super(agent, id, name, mode);
 	}
 
 	@Override

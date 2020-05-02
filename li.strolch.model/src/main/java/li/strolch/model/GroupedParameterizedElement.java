@@ -597,6 +597,30 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	/**
+	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} to be found
+	 *
+	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
+	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
+	 * the {@link ParameterBag}
+	 */
+	@Override
+	public boolean hasRelation(String paramKey) {
+		if (this.parameterBagMap == null) {
+			return false;
+		}
+		ParameterBag bag = this.parameterBagMap.get(BAG_RELATIONS);
+		if (bag == null) {
+			return false;
+		}
+
+		return bag.hasParameter(paramKey);
+	}
+
+	/**
 	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
 	 * bagKey
 	 *

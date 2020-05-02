@@ -46,6 +46,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchJob.class);
 
 	private final StrolchAgent agent;
+	private final String id;
 	private final String name;
 	private JobMode mode;
 
@@ -71,8 +72,9 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	private ConfigureMethod configureMethod;
 	private ZonedDateTime cronStartDate;
 
-	public StrolchJob(StrolchAgent agent, String name, JobMode jobMode) {
+	public StrolchJob(StrolchAgent agent, String id, String name, JobMode jobMode) {
 		this.agent = agent;
+		this.id = id;
 		this.name = name;
 		this.mode = jobMode;
 		this.first = true;
@@ -123,6 +125,10 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	public StrolchJob setMode(JobMode mode) {
 		this.mode = mode;
 		return this;
+	}
+
+	public String getId() {
+		return this.id;
 	}
 
 	public String getName() {
@@ -398,7 +404,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	public JsonObject toJson() {
 		JsonObject jsonObject = new JsonObject();
 
-		jsonObject.addProperty(Tags.Json.NAME, getName());
+		jsonObject.addProperty(Tags.Json.ID, this.id);
+		jsonObject.addProperty(Tags.Json.NAME, this.name);
 		jsonObject.addProperty(Tags.Json.REALM, this.realmName);
 		jsonObject.addProperty("mode", this.mode.name());
 		jsonObject.addProperty("configureMethod", this.configureMethod == null ? "-" : this.configureMethod.name());

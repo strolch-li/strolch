@@ -332,6 +332,19 @@ public interface ParameterBagContainer extends StrolchElement {
 	boolean hasParameter(String paramKey);
 
 	/**
+	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} to be found
+	 *
+	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
+	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
+	 * the {@link ParameterBag}
+	 */
+	boolean hasRelation(String paramKey);
+
+	/**
 	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
 	 * bagKey
 	 *

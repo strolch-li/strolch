@@ -75,6 +75,8 @@ public class StrolchConstants extends StrolchModelConstants {
 
 	public static final String PARAM_CLASS_NAME = "className";
 	public static final String PARAM_CRON = "cron";
+	public static final String PARAM_INITIAL_DELAY = "initialDelay";
+	public static final String PARAM_DELAY = "delay";
 	public static final String PARAM_START_DATE = "startDate";
 	public static final String PARAM_MODE = "mode";
 

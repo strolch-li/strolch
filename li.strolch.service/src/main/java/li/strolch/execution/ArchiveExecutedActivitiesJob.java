@@ -12,13 +12,14 @@ import li.strolch.privilege.model.PrivilegeContext;
 
 public class ArchiveExecutedActivitiesJob extends StrolchJob {
 
-	public ArchiveExecutedActivitiesJob(StrolchAgent agent, String name, JobMode jobMode) {
-		super(agent, name, jobMode);
+	public ArchiveExecutedActivitiesJob(StrolchAgent agent, String id, String name, JobMode jobMode) {
+		super(agent, id, name, jobMode);
 	}
 
 	public ArchiveExecutedActivitiesJob(StrolchAgent agent, JobMode jobMode, long initialDelay,
 			TimeUnit initialDelayTimeUnit, long delay, TimeUnit delayTimeUnit) {
-		super(agent, ArchiveExecutedActivitiesJob.class.getSimpleName(), jobMode);
+		super(agent, ArchiveExecutedActivitiesJob.class.getSimpleName(),
+				ArchiveExecutedActivitiesJob.class.getSimpleName(), jobMode);
 		setDelay(initialDelay, initialDelayTimeUnit, delay, delayTimeUnit);
 	}
 
