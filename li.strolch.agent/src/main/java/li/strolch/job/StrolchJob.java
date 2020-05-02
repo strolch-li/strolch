@@ -359,7 +359,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				try {
 					executionTime = this.cronExpression.nextTimeAfter(this.lastExecution);
 				} catch (IllegalArgumentException e) {
-					logger.error("Can not schedule " + getName() + " after start date " + this.cronStartDate
+					logger.error("Can not schedule " + getName() + " after start date " + this.lastExecution
 							+ " as no next time exists for cron expression " + this.cron);
 					return this;
 				}
