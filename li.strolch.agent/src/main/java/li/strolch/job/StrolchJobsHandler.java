@@ -98,7 +98,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 		StrolchAgent agent = getContainer().getAgent();
 		ReloadJobsJob reloadJobsJob = new ReloadJobsJob(agent, ReloadJobsJob.class.getSimpleName(),
 				ReloadJobsJob.class.getSimpleName(), JobMode.Manual);
-		reloadJobsJob.setConfigureMethod(ConfigureMethod.Programmatic);
+		reloadJobsJob.setConfigureMethod(ConfigureMethod.Model);
 		jobs.add(reloadJobsJob);
 
 		this.jobs = new HashMap<>();
