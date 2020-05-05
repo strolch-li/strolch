@@ -20,15 +20,16 @@ import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.parameter.*;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.time.PeriodDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -80,6 +81,462 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		}
 
 		this.type = type;
+	}
+
+	@Override
+	public String getString(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getString(paramKey);
+	}
+
+	@Override
+	public String getString(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getString(paramKey);
+	}
+
+	@Override
+	public boolean getBoolean(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getBoolean(paramKey);
+	}
+
+	@Override
+	public boolean getBoolean(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getBoolean(paramKey);
+	}
+
+	@Override
+	public int getInteger(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getInteger(paramKey);
+	}
+
+	@Override
+	public int getInteger(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getInteger(paramKey);
+	}
+
+	@Override
+	public double getDouble(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDouble(paramKey);
+	}
+
+	@Override
+	public double getDouble(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDouble(paramKey);
+	}
+
+	@Override
+	public long getLong(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getLong(paramKey);
+	}
+
+	@Override
+	public long getLong(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getLong(paramKey);
+	}
+
+	@Override
+	public ZonedDateTime getDate(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDate(paramKey);
+	}
+
+	@Override
+	public ZonedDateTime getDate(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDate(paramKey);
+	}
+
+	@Override
+	public LocalDateTime getLocalDate(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getLocalDate(paramKey);
+	}
+
+	@Override
+	public LocalDateTime getLocalDate(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getLocalDate(paramKey);
+	}
+
+	@Override
+	public String getText(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getText(paramKey);
+	}
+
+	@Override
+	public String getText(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getText(paramKey);
+	}
+
+	@Override
+	public PeriodDuration getDuration(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDuration(paramKey);
+	}
+
+	@Override
+	public PeriodDuration getDuration(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDuration(paramKey);
+	}
+
+	@Override
+	public List<String> getStringList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getStringList(paramKey);
+	}
+
+	@Override
+	public List<String> getStringList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getStringList(paramKey);
+	}
+
+	@Override
+	public List<Integer> getIntegerList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getIntegerList(paramKey);
+	}
+
+	@Override
+	public List<Integer> getIntegerList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getIntegerList(paramKey);
+	}
+
+	@Override
+	public List<Double> getDoubleList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDoubleList(paramKey);
+	}
+
+	@Override
+	public List<Double> getDoubleList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDoubleList(paramKey);
+	}
+
+	@Override
+	public List<Long> getLongList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getLongList(paramKey);
+	}
+
+	@Override
+	public List<Long> getLongList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getLongList(paramKey);
+	}
+
+	@Override
+	public void setString(String paramKey, String value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setString(paramKey, value);
+	}
+
+	@Override
+	public void setString(String bagKey, String paramKey, String value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setString(paramKey, value);
+	}
+
+	@Override
+	public void setBoolean(String paramKey, boolean value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setBoolean(paramKey, value);
+	}
+
+	@Override
+	public void setBoolean(String bagKey, String paramKey, boolean value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setBoolean(paramKey, value);
+	}
+
+	@Override
+	public void setInteger(String paramKey, int value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setInteger(paramKey, value);
+	}
+
+	@Override
+	public void setInteger(String bagKey, String paramKey, int value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setInteger(paramKey, value);
+	}
+
+	@Override
+	public void setDouble(String paramKey, double value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setDouble(paramKey, value);
+	}
+
+	@Override
+	public void setDouble(String bagKey, String paramKey, double value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDouble(paramKey, value);
+	}
+
+	@Override
+	public void setLong(String paramKey, long value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setLong(paramKey, value);
+	}
+
+	@Override
+	public void setLong(String bagKey, String paramKey, long value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setLong(paramKey, value);
+	}
+
+	@Override
+	public void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setDate(paramKey, value);
+	}
+
+	@Override
+	public void setDate(String bagKey, String paramKey, ZonedDateTime value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDate(paramKey, value);
+	}
+
+	@Override
+	public void setDate(String paramKey, LocalDateTime value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setDate(paramKey, value);
+	}
+
+	@Override
+	public void setDate(String bagKey, String paramKey, LocalDateTime value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDate(paramKey, value);
+	}
+
+	@Override
+	public void setText(String paramKey, String value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setText(paramKey, value);
+	}
+
+	@Override
+	public void setText(String bagKey, String paramKey, String value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setText(paramKey, value);
+	}
+
+	@Override
+	public void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setDuration(paramKey, value);
+	}
+
+	@Override
+	public void setDuration(String bagKey, String paramKey, PeriodDuration value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDuration(paramKey, value);
+	}
+
+	@Override
+	public void setStringList(String paramKey, List<String> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setStringList(paramKey, value);
+	}
+
+	@Override
+	public void setStringList(String bagKey, String paramKey, List<String> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setStringList(paramKey, value);
+	}
+
+	@Override
+	public void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setIntegerList(paramKey, value);
+	}
+
+	@Override
+	public void setIntegerList(String bagKey, String paramKey, List<Integer> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setIntegerList(paramKey, value);
+	}
+
+	@Override
+	public void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setDoubleList(paramKey, value);
+	}
+
+	@Override
+	public void setDoubleList(String bagKey, String paramKey, List<Double> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDoubleList(paramKey, value);
+	}
+
+	@Override
+	public void setLongList(String paramKey, List<Long> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		bag.setLongList(paramKey, value);
+	}
+
+	@Override
+	public void setLongList(String bagKey, String paramKey, List<Long> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setLongList(paramKey, value);
+	}
+
+	@Override
+	public StringParameter getStringP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getStringP(paramKey);
+	}
+
+	@Override
+	public StringParameter getStringP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getStringP(paramKey);
+	}
+
+	@Override
+	public BooleanParameter getBooleanP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getBooleanP(paramKey);
+	}
+
+	@Override
+	public BooleanParameter getBooleanP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getBooleanP(paramKey);
+	}
+
+	@Override
+	public IntegerParameter getIntegerP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getIntegerP(paramKey);
+	}
+
+	@Override
+	public IntegerParameter getIntegerP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getIntegerP(paramKey);
+	}
+
+	@Override
+	public FloatParameter getDoubleP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDoubleP(paramKey);
+	}
+
+	@Override
+	public FloatParameter getDoubleP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDoubleP(paramKey);
+	}
+
+	@Override
+	public LongParameter getLongP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getLongP(paramKey);
+	}
+
+	@Override
+	public LongParameter getLongP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getLongP(paramKey);
+	}
+
+	@Override
+	public DateParameter getDateP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDateP(paramKey);
+	}
+
+	@Override
+	public DateParameter getDateP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDateP(paramKey);
+	}
+
+	@Override
+	public TextParameter getTextP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getTextP(paramKey);
+	}
+
+	@Override
+	public TextParameter getTextP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getTextP(paramKey);
+	}
+
+	@Override
+	public DurationParameter getDurationP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDurationP(paramKey);
+	}
+
+	@Override
+	public DurationParameter getDurationP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDurationP(paramKey);
+	}
+
+	@Override
+	public StringListParameter getStringListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getStringListP(paramKey);
+	}
+
+	@Override
+	public StringListParameter getStringListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getStringListP(paramKey);
+	}
+
+	@Override
+	public IntegerListParameter getIntegerListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getIntegerListP(paramKey);
+	}
+
+	@Override
+	public IntegerListParameter getIntegerListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getIntegerListP(paramKey);
+	}
+
+	@Override
+	public FloatListParameter getDoubleListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDoubleListP(paramKey);
+	}
+
+	@Override
+	public FloatListParameter getDoubleListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDoubleListP(paramKey);
+	}
+
+	@Override
+	public LongListParameter getLongListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getLongListP(paramKey);
+	}
+
+	@Override
+	public LongListParameter getLongListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getLongListP(paramKey);
 	}
 
 	/**

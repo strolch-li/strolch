@@ -19,6 +19,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -26,8 +28,9 @@ import java.util.stream.Stream;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator.LocatorBuilder;
-import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.*;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.time.PeriodDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -81,6 +84,605 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		}
 
 		this.type = type;
+	}
+
+	/**
+	 * Returns the value of the {@link StringParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public String getString(String paramKey) throws StrolchModelException {
+		StringParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link BooleanParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public boolean getBoolean(String paramKey) throws StrolchModelException {
+		BooleanParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link IntegerParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public int getInteger(String paramKey) throws StrolchModelException {
+		IntegerParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link FloatParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public double getDouble(String paramKey) throws StrolchModelException {
+		FloatParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link LongParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public long getLong(String paramKey) throws StrolchModelException {
+		LongParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link DateParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public ZonedDateTime getDate(String paramKey) throws StrolchModelException {
+		DateParameter param = getParameter(paramKey, true);
+		return param.toZonedDateTime();
+	}
+
+	/**
+	 * Returns the value of the {@link DateParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public LocalDateTime getLocalDate(String paramKey) throws StrolchModelException {
+		DateParameter param = getParameter(paramKey, true);
+		return param.toLocalDateTime();
+	}
+
+	/**
+	 * Returns the value of the {@link TextParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public String getText(String paramKey) throws StrolchModelException {
+		TextParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link DurationParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public PeriodDuration getDuration(String paramKey) throws StrolchModelException {
+		DurationParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link StringListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public List<String> getStringList(String paramKey) throws StrolchModelException {
+		StringListParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link IntegerListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public List<Integer> getIntegerList(String paramKey) throws StrolchModelException {
+		IntegerListParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link FloatListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public List<Double> getDoubleList(String paramKey) throws StrolchModelException {
+		FloatListParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Returns the value of the {@link LongListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public List<Long> getLongList(String paramKey) throws StrolchModelException {
+		LongListParameter param = getParameter(paramKey, true);
+		return param.getValue();
+	}
+
+	/**
+	 * Sets the given value on the {@link StringParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setString(String paramKey, String value) throws StrolchModelException {
+		StringParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link BooleanParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setBoolean(String paramKey, boolean value) throws StrolchModelException {
+		BooleanParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link IntegerParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setInteger(String paramKey, int value) throws StrolchModelException {
+		IntegerParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link FloatParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setDouble(String paramKey, double value) throws StrolchModelException {
+		FloatParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link LongParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setLong(String paramKey, long value) throws StrolchModelException {
+		LongParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link DateParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException {
+		DateParameter param = getParameter(paramKey, true);
+		param.setValueFromZonedDateTime(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link DateParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setDate(String paramKey, LocalDateTime value) throws StrolchModelException {
+		DateParameter param = getParameter(paramKey, true);
+		param.setValueFromLocalDateTime(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link TextParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setText(String paramKey, String value) throws StrolchModelException {
+		TextParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link DurationParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException {
+		DurationParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link StringListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setStringList(String paramKey, List<String> value) throws StrolchModelException {
+		StringListParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link IntegerListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException {
+		IntegerListParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link FloatListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException {
+		FloatListParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	/**
+	 * Sets the given value on the {@link LongListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setLongList(String paramKey, List<Long> value) throws StrolchModelException {
+		LongListParameter param = getParameter(paramKey, true);
+		param.setValue(value);
+	}
+
+	///
+	///
+
+	/**
+	 * Returns the {@link StringParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public StringParameter getStringP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link BooleanParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public BooleanParameter getBooleanP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link IntegerParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public IntegerParameter getIntegerP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link FloatParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public FloatParameter getDoubleP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link LongParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public LongParameter getLongP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link DateParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public DateParameter getDateP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link TextParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public TextParameter getTextP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link DurationParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public DurationParameter getDurationP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link StringListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public StringListParameter getStringListP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link IntegerListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public IntegerListParameter getIntegerListP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link FloatListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public FloatListParameter getDoubleListP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
+	}
+
+	/**
+	 * Returns the {@link LongListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public LongListParameter getLongListP(String paramKey) throws StrolchModelException {
+		return getParameter(paramKey, true);
 	}
 
 	/**

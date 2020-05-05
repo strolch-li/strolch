@@ -18,9 +18,12 @@ package li.strolch.model;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.Tags.*;
 import static org.junit.Assert.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +39,7 @@ import li.strolch.model.timevalue.impl.BooleanValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
+import li.strolch.utils.time.PeriodDuration;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -515,5 +519,212 @@ public class ModelTest {
 		assertEquals(STATE_STRING_TIME_10, stringState.getStateAt(STATE_TIME_10).getValue().getValueAsString());
 		assertEquals(STATE_STRING_TIME_20, stringState.getStateAt(STATE_TIME_20).getValue().getValueAsString());
 		assertEquals(STATE_STRING_TIME_30, stringState.getStateAt(STATE_TIME_30).getValue().getValueAsString());
+	}
+
+	@Test
+	public void shouldGetSetValues() {
+
+		Resource resource = createResource("@res01", "Test resource", "MyType");
+		resource.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertGetSetParameterValues(resource);
+
+		Order order = createOrder("@ord01", "Test Order", "MyType");
+		order.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertGetSetParameterValues(order);
+
+		Activity activity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
+		activity.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertGetSetParameterValues(activity);
+
+		Action action = createAction("action", "Action", "Use");
+		action.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertGetSetParameterValues(action);
+	}
+
+	@Test
+	public void shouldGetParams() {
+
+		Resource resource = createResource("@res01", "Test resource", "MyType");
+		resource.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertParameters(resource);
+
+		Order order = createOrder("@ord01", "Test Order", "MyType");
+		order.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertParameters(order);
+
+		Activity activity = createActivity("@act01", "Test Activity", "MyType", TimeOrdering.SERIES);
+		activity.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertParameters(activity);
+
+		Action action = createAction("action", "Action", "Use");
+		action.addParameterBag(createParameterBag(BAG_PARAMETERS, "Parameters", "Parameters"));
+		assertParameters(action);
+	}
+
+	private void assertParameters(GroupedParameterizedElement e) {
+
+		// default "parameters" bag
+		assertEquals(StrolchValueType.BOOLEAN, e.getBooleanP(PARAM_BOOLEAN_ID).getValueType());
+		assertEquals(StrolchValueType.INTEGER, e.getIntegerP(PARAM_INTEGER_ID).getValueType());
+		assertEquals(StrolchValueType.FLOAT, e.getDoubleP(PARAM_FLOAT_ID).getValueType());
+		assertEquals(StrolchValueType.STRING, e.getStringP(PARAM_STRING_ID).getValueType());
+		assertEquals(StrolchValueType.LONG, e.getLongP(PARAM_LONG_ID).getValueType());
+		assertEquals(StrolchValueType.TEXT, e.getTextP(PARAM_TEXT_ID).getValueType());
+		assertEquals(StrolchValueType.DATE, e.getDateP(PARAM_DATE_ID).getValueType());
+		assertEquals(StrolchValueType.DURATION, e.getDurationP(PARAM_DURATION_ID).getValueType());
+		assertEquals(StrolchValueType.STRING_LIST, e.getStringListP(PARAM_LIST_STRING_ID).getValueType());
+		assertEquals(StrolchValueType.INTEGER_LIST, e.getIntegerListP(PARAM_LIST_INTEGER_ID).getValueType());
+		assertEquals(StrolchValueType.LONG_LIST, e.getLongListP(PARAM_LIST_LONG_ID).getValueType());
+		assertEquals(StrolchValueType.FLOAT_LIST, e.getDoubleListP(PARAM_LIST_FLOAT_ID).getValueType());
+
+		// explicit bag
+		assertEquals(StrolchValueType.BOOLEAN, e.getBooleanP(BAG_ID, PARAM_BOOLEAN_ID).getValueType());
+		assertEquals(StrolchValueType.INTEGER, e.getIntegerP(BAG_ID, PARAM_INTEGER_ID).getValueType());
+		assertEquals(StrolchValueType.FLOAT, e.getDoubleP(BAG_ID, PARAM_FLOAT_ID).getValueType());
+		assertEquals(StrolchValueType.STRING, e.getStringP(BAG_ID, PARAM_STRING_ID).getValueType());
+		assertEquals(StrolchValueType.LONG, e.getLongP(BAG_ID, PARAM_LONG_ID).getValueType());
+		assertEquals(StrolchValueType.TEXT, e.getTextP(BAG_ID, PARAM_TEXT_ID).getValueType());
+		assertEquals(StrolchValueType.DATE, e.getDateP(BAG_ID, PARAM_DATE_ID).getValueType());
+		assertEquals(StrolchValueType.DURATION, e.getDurationP(BAG_ID, PARAM_DURATION_ID).getValueType());
+		assertEquals(StrolchValueType.STRING_LIST, e.getStringListP(BAG_ID, PARAM_LIST_STRING_ID).getValueType());
+		assertEquals(StrolchValueType.INTEGER_LIST, e.getIntegerListP(BAG_ID, PARAM_LIST_INTEGER_ID).getValueType());
+		assertEquals(StrolchValueType.LONG_LIST, e.getLongListP(BAG_ID, PARAM_LIST_LONG_ID).getValueType());
+		assertEquals(StrolchValueType.FLOAT_LIST, e.getDoubleListP(BAG_ID, PARAM_LIST_FLOAT_ID).getValueType());
+	}
+
+	private void assertGetSetParameterValues(GroupedParameterizedElement e) {
+
+		/*
+		 * default "parameters" bag
+		 */
+
+		// boolean param
+		assertTrue(e.getBoolean(PARAM_BOOLEAN_ID));
+		e.setBoolean(PARAM_BOOLEAN_ID, false);
+		assertFalse(e.getBoolean(PARAM_BOOLEAN_ID));
+
+		// integer param
+		assertEquals(77, e.getInteger(PARAM_INTEGER_ID));
+		e.setInteger(PARAM_INTEGER_ID, 88);
+		assertEquals(88, e.getInteger(PARAM_INTEGER_ID));
+
+		// float param
+		assertEquals(44.3, e.getDouble(PARAM_FLOAT_ID), 0.0);
+		e.setDouble(PARAM_FLOAT_ID, 56.0);
+		assertEquals(56.0, e.getDouble(PARAM_FLOAT_ID), 0.0);
+
+		// string param
+		assertEquals("Strolch", e.getString(PARAM_STRING_ID));
+		e.setString(PARAM_STRING_ID, "aa");
+		assertEquals("aa", e.getString(PARAM_STRING_ID));
+
+		// long param
+		assertEquals(4453234566L, e.getLong(PARAM_LONG_ID));
+		e.setLong(PARAM_LONG_ID, 0L);
+		assertEquals(0L, e.getLong(PARAM_LONG_ID));
+
+		// text param
+		assertEquals("Strolch\n\nmulti\n\n\nline", e.getText(PARAM_TEXT_ID));
+		e.setText(PARAM_TEXT_ID, "bla");
+		assertEquals("bla", e.getText(PARAM_TEXT_ID));
+
+		// date param
+		assertEquals(ZonedDateTime.ofInstant(new Date(1354295525628L).toInstant(), ZoneId.systemDefault()),
+				e.getDate(PARAM_DATE_ID));
+		ZonedDateTime now = ZonedDateTime.now();
+		e.setDate(PARAM_DATE_ID, now);
+		assertEquals(now, e.getDate(PARAM_DATE_ID));
+
+		// duration param
+		assertEquals(PeriodDuration.parse("P1D"), e.getDuration(PARAM_DURATION_ID));
+		e.setDuration(PARAM_DURATION_ID, PeriodDuration.parse("PT1H"));
+		assertEquals(PeriodDuration.parse("PT1H"), e.getDuration(PARAM_DURATION_ID));
+
+		// string list param
+		assertEquals(asList("Hello", "World"), e.getStringList(PARAM_LIST_STRING_ID));
+		e.setStringList(PARAM_LIST_STRING_ID, asList("a", "b"));
+		assertEquals(asList("a", "b"), e.getStringList(PARAM_LIST_STRING_ID));
+
+		// integer list param
+		assertEquals(asList(5, 10, 15), e.getIntegerList(PARAM_LIST_INTEGER_ID));
+		e.setIntegerList(PARAM_LIST_INTEGER_ID, asList(6, 2));
+		assertEquals(asList(6, 2), e.getIntegerList(PARAM_LIST_INTEGER_ID));
+
+		// long list param
+		assertEquals(asList(7L, 12L, 17L), e.getLongList(PARAM_LIST_LONG_ID));
+		e.setLongList(PARAM_LIST_LONG_ID, asList(6L, 2L));
+		assertEquals(asList(6L, 2L), e.getLongList(PARAM_LIST_LONG_ID));
+
+		// float list param
+		assertEquals(asList(6.0, 11.0, 16.0), e.getDoubleList(PARAM_LIST_FLOAT_ID));
+		e.setDoubleList(PARAM_LIST_FLOAT_ID, asList(6.0, 2.0));
+		assertEquals(asList(6.0, 2.0), e.getDoubleList(PARAM_LIST_FLOAT_ID));
+
+
+		/*
+		 * explicit bag
+		 */
+
+		// boolean param
+		assertTrue(e.getBoolean(BAG_ID, PARAM_BOOLEAN_ID));
+		e.setBoolean(BAG_ID, PARAM_BOOLEAN_ID, false);
+		assertFalse(e.getBoolean(BAG_ID, PARAM_BOOLEAN_ID));
+
+		// integer param
+		assertEquals(77, e.getInteger(BAG_ID, PARAM_INTEGER_ID));
+		e.setInteger(BAG_ID, PARAM_INTEGER_ID, 188);
+		assertEquals(188, e.getInteger(BAG_ID, PARAM_INTEGER_ID));
+
+		// float param
+		assertEquals(44.3, e.getDouble(BAG_ID, PARAM_FLOAT_ID), 0.0);
+		e.setDouble(BAG_ID, PARAM_FLOAT_ID, 156.0);
+		assertEquals(156.0, e.getDouble(BAG_ID, PARAM_FLOAT_ID), 0.0);
+
+		// string param
+		assertEquals("Strolch", e.getString(BAG_ID, PARAM_STRING_ID));
+		e.setString(BAG_ID, PARAM_STRING_ID, "aaa");
+		assertEquals("aaa", e.getString(BAG_ID, PARAM_STRING_ID));
+
+		// long param
+		assertEquals(4453234566L, e.getLong(BAG_ID, PARAM_LONG_ID));
+		e.setLong(BAG_ID, PARAM_LONG_ID, 1L);
+		assertEquals(1L, e.getLong(BAG_ID, PARAM_LONG_ID));
+
+		// text param
+		assertEquals("Strolch\n\nmulti\n\n\nline", e.getText(BAG_ID, PARAM_TEXT_ID));
+		e.setText(BAG_ID, PARAM_TEXT_ID, "bla bla");
+		assertEquals("bla bla", e.getText(BAG_ID, PARAM_TEXT_ID));
+
+		// date param
+		assertEquals(ZonedDateTime.ofInstant(new Date(1354295525628L).toInstant(), ZoneId.systemDefault()),
+				e.getDate(BAG_ID, PARAM_DATE_ID));
+		now = ZonedDateTime.now().plusDays(1);
+		e.setDate(BAG_ID, PARAM_DATE_ID, now);
+		assertEquals(now, e.getDate(BAG_ID, PARAM_DATE_ID));
+
+		// duration param
+		assertEquals(PeriodDuration.parse("P1D"), e.getDuration(BAG_ID, PARAM_DURATION_ID));
+		e.setDuration(BAG_ID, PARAM_DURATION_ID, PeriodDuration.parse("PT2H"));
+		assertEquals(PeriodDuration.parse("PT2H"), e.getDuration(BAG_ID, PARAM_DURATION_ID));
+
+		// string list param
+		assertEquals(asList("Hello", "World"), e.getStringList(BAG_ID, PARAM_LIST_STRING_ID));
+		e.setStringList(BAG_ID, PARAM_LIST_STRING_ID, asList("aa", "b"));
+		assertEquals(asList("aa", "b"), e.getStringList(BAG_ID, PARAM_LIST_STRING_ID));
+
+		// integer list param
+		assertEquals(asList(5, 10, 15), e.getIntegerList(BAG_ID, PARAM_LIST_INTEGER_ID));
+		e.setIntegerList(BAG_ID, PARAM_LIST_INTEGER_ID, asList(76, 2));
+		assertEquals(asList(76, 2), e.getIntegerList(BAG_ID, PARAM_LIST_INTEGER_ID));
+
+		// long list param
+		assertEquals(asList(7L, 12L, 17L), e.getLongList(BAG_ID, PARAM_LIST_LONG_ID));
+		e.setLongList(BAG_ID, PARAM_LIST_LONG_ID, asList(76L, 2L));
+		assertEquals(asList(76L, 2L), e.getLongList(BAG_ID, PARAM_LIST_LONG_ID));
+
+		// float list param
+		assertEquals(asList(6.0, 11.0, 16.0), e.getDoubleList(BAG_ID, PARAM_LIST_FLOAT_ID));
+		e.setDoubleList(BAG_ID, PARAM_LIST_FLOAT_ID, asList(76.0, 2.0));
+		assertEquals(asList(76.0, 2.0), e.getDoubleList(BAG_ID, PARAM_LIST_FLOAT_ID));
 	}
 }

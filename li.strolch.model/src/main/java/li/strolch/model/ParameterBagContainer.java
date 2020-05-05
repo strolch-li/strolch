@@ -1,14 +1,15 @@
 package li.strolch.model;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.parameter.*;
+import li.strolch.utils.time.PeriodDuration;
 
 /**
  * A {@link ParameterBagContainer} has a map of {@link ParameterBag ParameterBags} where the key is the id of the
@@ -17,6 +18,1139 @@ import li.strolch.model.parameter.StringParameter;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ParameterBagContainer extends StrolchElement {
+
+	/**
+	 * Returns the value of the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	String getString(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	String getString(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	boolean getBoolean(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	boolean getBoolean(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	int getInteger(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	int getInteger(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	double getDouble(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	double getDouble(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	long getLong(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	long getLong(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	ZonedDateTime getDate(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	ZonedDateTime getDate(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	LocalDateTime getLocalDate(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	LocalDateTime getLocalDate(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	String getText(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	String getText(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	PeriodDuration getDuration(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	PeriodDuration getDuration(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<String> getStringList(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<String> getStringList(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<Integer> getIntegerList(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<Integer> getIntegerList(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<Double> getDoubleList(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<Double> getDoubleList(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<Long> getLongList(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return the value of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<Long> getLongList(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link StringParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setString(String paramKey, String value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link StringParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setString(String bagKey, String paramKey, String value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link BooleanParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setBoolean(String paramKey, boolean value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link BooleanParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setBoolean(String bagKey, String paramKey, boolean value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link IntegerParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setInteger(String paramKey, int value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link IntegerParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setInteger(String bagKey, String paramKey, int value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link FloatParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDouble(String paramKey, double value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link FloatParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDouble(String bagKey, String paramKey, double value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link LongParameter} with the given paramKey on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setLong(String paramKey, long value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link LongParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setLong(String bagKey, String paramKey, long value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDate(String bagKey, String paramKey, ZonedDateTime value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDate(String paramKey, LocalDateTime value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDate(String bagKey, String paramKey, LocalDateTime value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link TextParameter} with the given paramKey on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setText(String paramKey, String value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link TextParameter} with the given paramKey on the {@link ParameterBag} with the
+	 * given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setText(String bagKey, String paramKey, String value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link DurationParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link DurationParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDuration(String bagKey, String paramKey, PeriodDuration value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link StringListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setStringList(String paramKey, List<String> value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link StringListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setStringList(String bagKey, String paramKey, List<String> value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link IntegerListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link IntegerListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setIntegerList(String bagKey, String paramKey, List<Integer> value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link FloatListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link FloatListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setDoubleList(String bagKey, String paramKey, List<Double> value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link LongListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setLongList(String paramKey, List<Long> value) throws StrolchModelException;
+
+	/**
+	 * Sets the given value on the {@link LongListParameter} with the given paramKey on the {@link ParameterBag} with
+	 * the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setLongList(String bagKey, String paramKey, List<Long> value) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	StringParameter getStringP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	StringParameter getStringP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	BooleanParameter getBooleanP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	BooleanParameter getBooleanP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	IntegerParameter getIntegerP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	IntegerParameter getIntegerP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	FloatParameter getDoubleP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	FloatParameter getDoubleP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	LongParameter getLongP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	LongParameter getLongP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	DateParameter getDateP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	DateParameter getDateP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	TextParameter getTextP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	TextParameter getTextP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	DurationParameter getDurationP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the given
+	 * bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	DurationParameter getDurationP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	StringListParameter getStringListP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with the given
+	 * bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	StringListParameter getStringListP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	IntegerListParameter getIntegerListP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with the given
+	 * bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	IntegerListParameter getIntegerListP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	FloatListParameter getDoubleListP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with the given
+	 * bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	FloatListParameter getDoubleListP(String bagKey, String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	LongListParameter getLongListP(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the given
+	 * bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter
+	 *
+	 * @return the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	LongListParameter getLongListP(String bagKey, String paramKey) throws StrolchModelException;
 
 	/**
 	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link *
