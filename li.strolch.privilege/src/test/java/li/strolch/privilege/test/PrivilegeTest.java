@@ -390,7 +390,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 		}
 
 		// change password back
-		certificate = this.privilegeHandler.authenticate(ADMIN, PASS_TED);
+		certificate = this.privilegeHandler.authenticate(ADMIN, PASS_TED, false);
 		this.privilegeHandler.setUserPassword(certificate, ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 		this.privilegeHandler.invalidate(certificate);
 	}
@@ -742,7 +742,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 		try {
 			// testFailAuthAsBob
 			// Will fail because user bob is not yet enabled
-			this.privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB));
+			this.privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB), false);
 			fail("User Bob may not authenticate because the user is not yet enabled!");
 		} catch (PrivilegeException e) {
 			String msg = "User bob does not have state ENABLED and can not login!";

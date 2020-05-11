@@ -35,16 +35,25 @@ import li.strolch.rest.model.UserSession;
 public interface StrolchSessionHandler {
 
 	/**
-	 * Authenticates a user with the given credentials
+	 * Returns the time to live for a session in minutes
 	 *
-	 * @param username
-	 * 		the username
-	 * @param password
-	 * 		the password
-	 *
-	 * @return the {@link Certificate} for the logged in user
+	 * @return the time to live for a session in minutes
 	 */
-	Certificate authenticate(String username, char[] password);
+	int getSessionTtlMinutes();
+
+	/**
+	 * Returns the max keep alive for a session in minutes
+	 *
+	 * @return the max keep alive for a session in minutes
+	 */
+	int getSessionMaxKeepAliveMinutes();
+
+	/**
+	 * Return true if refreshing sessions is allowed
+	 *
+	 * @return true if refreshing sessions is allowed
+	 */
+	boolean isRefreshAllowed();
 
 	/**
 	 * Authenticates a user with the given credentials
@@ -57,10 +66,12 @@ public interface StrolchSessionHandler {
 	 * 		the source of the request
 	 * @param usage
 	 * 		the usage for this authentication
+	 * @param keepAlive
+	 * 		should the session have a keepAlive
 	 *
 	 * @return the {@link Certificate} for the logged in user
 	 */
-	Certificate authenticate(String username, char[] password, String source, Usage usage);
+	Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive);
 
 	/**
 	 * Performs a single-sign-on with the given data, if SSO is enabled
@@ -83,6 +94,18 @@ public interface StrolchSessionHandler {
 	 * @return the {@link Certificate} for the logged in user
 	 */
 	Certificate authenticateSingleSignOn(Object data, String source);
+
+	/**
+	 * Performs a refresh of the given certificate's session by returning a new certificate
+	 *
+	 * @param certificate
+	 * 		the certificate to refresh
+	 * @param source
+	 * 		the source of the request
+	 *
+	 * @return certificate a new certificate
+	 */
+	Certificate refreshSession(Certificate certificate, String source);
 
 	/**
 	 * Validates that a {@link Certificate} exists with the given auth token and is still valid

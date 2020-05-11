@@ -18,7 +18,11 @@ package li.strolch.privilege.model;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.base.PrivilegeException;
@@ -29,7 +33,7 @@ import li.strolch.utils.helper.StringHelper;
 /**
  * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
  * instance which is always used when performing an access and is returned when a user performs a login through {@link
- * PrivilegeHandler#authenticate(String, char[])}
+ * PrivilegeHandler#authenticate(String, char[], boolean)}
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -43,13 +47,14 @@ public final class Certificate implements Serializable {
 	private final UserState userState;
 	private final String authToken;
 	private final String source;
-	private final Date loginTime;
+	private final LocalDateTime loginTime;
+	private final boolean keepAlive;
 
 	private final Set<String> userRoles;
 	private final Map<String, String> propertyMap;
 
 	private Locale locale;
-	private Date lastAccess;
+	private LocalDateTime lastAccess;
 
 	/**
 	 * Default constructor initializing with all information needed for this certificate
@@ -65,9 +70,9 @@ public final class Certificate implements Serializable {
 	 * 		the users session id
 	 * @param username
 	 * 		the users login name
-	 * @param firstname
+	 * @param firstName
 	 * 		the users first name
-	 * @param lastname
+	 * @param lastName
 	 * 		the users last name
 	 * @param authToken
 	 * 		the authentication token defining the users unique session and is a private field of this certificate.
@@ -79,9 +84,9 @@ public final class Certificate implements Serializable {
 	 * 		a {@link Map} containing string value pairs of properties for the logged in user. These properties can be
 	 * 		edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(Usage usage, String sessionId, String username, String firstname, String lastname,
-			UserState userState, String authToken, String source, Date loginTime, Locale locale, Set<String> userRoles,
-			Map<String, String> propertyMap) {
+	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
+			UserState userState, String authToken, String source, LocalDateTime loginTime, boolean keepAlive,
+			Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
@@ -106,12 +111,13 @@ public final class Certificate implements Serializable {
 		this.usage = usage;
 		this.sessionId = sessionId;
 		this.username = username;
-		this.firstname = firstname;
-		this.lastname = lastname;
+		this.firstname = firstName;
+		this.lastname = lastName;
 		this.userState = userState;
 		this.authToken = authToken;
 		this.source = source;
 		this.loginTime = loginTime;
+		this.keepAlive = keepAlive;
 
 		// if no locale is given, set default
 		if (locale == null)
@@ -125,7 +131,7 @@ public final class Certificate implements Serializable {
 			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 
 		this.userRoles = Collections.unmodifiableSet(userRoles);
-		this.lastAccess = new Date();
+		this.lastAccess = LocalDateTime.now();
 	}
 
 	public Usage getUsage() {
@@ -224,8 +230,12 @@ public final class Certificate implements Serializable {
 		return userState;
 	}
 
-	public Date getLoginTime() {
+	public LocalDateTime getLoginTime() {
 		return this.loginTime;
+	}
+
+	public boolean isKeepAlive() {
+		return this.keepAlive;
 	}
 
 	public String getAuthToken() {
@@ -236,11 +246,11 @@ public final class Certificate implements Serializable {
 		return this.source;
 	}
 
-	public Date getLastAccess() {
+	public LocalDateTime getLastAccess() {
 		return this.lastAccess;
 	}
 
-	public void setLastAccess(Date lastAccess) {
+	public void setLastAccess(LocalDateTime lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 

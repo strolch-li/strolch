@@ -141,15 +141,15 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public Certificate authenticate(String username, char[] password) {
 		assertContainerStarted();
-		Certificate certificate = this.privilegeHandler.authenticate(username, password);
+		Certificate certificate = this.privilegeHandler.authenticate(username, password, false);
 		writeAudit(certificate, LOGIN, AccessType.CREATE, username);
 		return certificate;
 	}
 
 	@Override
-	public Certificate authenticate(String username, char[] password, String source, Usage usage) {
+	public Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive) {
 		assertContainerStarted();
-		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage);
+		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage, keepAlive);
 		writeAudit(certificate, LOGIN, AccessType.CREATE, username);
 		return certificate;
 	}
@@ -157,7 +157,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public Certificate authenticateSingleSignOn(Object data) {
 		assertContainerStarted();
-		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
+		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, false);
 		writeAudit(certificate, LOGIN, AccessType.CREATE, certificate.getUsername());
 		return certificate;
 	}
@@ -165,9 +165,22 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public Certificate authenticateSingleSignOn(Object data, String source) {
 		assertContainerStarted();
-		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, source);
+		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, source, false);
 		writeAudit(certificate, LOGIN, AccessType.CREATE, certificate.getUsername());
 		return certificate;
+	}
+
+	@Override
+	public Certificate refreshSession(Certificate certificate, String source) {
+		assertContainerStarted();
+		Certificate refreshedCert = this.privilegeHandler.refresh(certificate, source);
+		writeAudit(refreshedCert, LOGIN, AccessType.CREATE, refreshedCert.getUsername());
+		return refreshedCert;
+	}
+
+	@Override
+	public boolean isRefreshAllowed() {
+		return this.privilegeHandler.isRefreshAllowed();
 	}
 
 	private void writeAudit(Certificate certificate, String login, AccessType accessType, String username) {

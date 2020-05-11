@@ -184,6 +184,11 @@ public class XmlConstants {
 	public static final String XML_ATTR_LOGIN_TIME = "loginTime";
 
 	/**
+	 * XML_ATTR_KEEP_ALIVE = "keepAlive" :
+	 */
+	public static final String XML_ATTR_KEEP_ALIVE = "keepAlive";
+
+	/**
 	 * XML_ATTR_LAST_ACCESS = "lastAccess" :
 	 */
 	public static final String XML_ATTR_LAST_ACCESS = "lastAccess";

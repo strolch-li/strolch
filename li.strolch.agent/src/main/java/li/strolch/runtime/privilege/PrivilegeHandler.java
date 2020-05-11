@@ -45,7 +45,7 @@ public interface PrivilegeHandler {
 	 *
 	 * @return the certificate
 	 *
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[])
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[], boolean)
 	 */
 	Certificate authenticate(String username, char[] password);
 
@@ -60,12 +60,14 @@ public interface PrivilegeHandler {
 	 * 		the source of the request
 	 * @param usage
 	 * 		the usage for this authentication
+	 * @param keepAlive
+	 * 		should this session be kept alive
 	 *
 	 * @return the certificate
 	 *
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[])
+	 * @see li.strolch.privilege.handler.PrivilegeHandler#authenticate(String, char[], boolean)
 	 */
-	Certificate authenticate(String username, char[] password, String source, Usage usage);
+	Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive);
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
@@ -94,6 +96,25 @@ public interface PrivilegeHandler {
 	 * 		if something goes wrong with the SSO
 	 */
 	Certificate authenticateSingleSignOn(Object data, String source) throws PrivilegeException;
+
+	/**
+	 * Performs a refresh of the given certificate's session by returning a new certificate
+	 *
+	 * @param certificate
+	 * 		the certificate to refresh
+	 * @param source
+	 * 		the source of the request
+	 *
+	 * @return certificate a new certificate
+	 */
+	Certificate refreshSession(Certificate certificate, String source);
+
+	/**
+	 * Return true if refreshing sessions is allowed
+	 *
+	 * @return true if refreshing sessions is allowed
+	 */
+	boolean isRefreshAllowed();
 
 	/**
 	 * Returns the {@link PrivilegeContext} for the given certificate

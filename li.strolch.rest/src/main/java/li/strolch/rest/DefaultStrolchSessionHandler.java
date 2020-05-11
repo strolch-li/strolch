@@ -19,9 +19,7 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIV
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INVALIDATE_SESSION;
 
 import java.text.MessageFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -51,13 +49,15 @@ import org.slf4j.LoggerFactory;
 public class DefaultStrolchSessionHandler extends StrolchComponent implements StrolchSessionHandler {
 
 	public static final String PARAM_SESSION_TTL_MINUTES = "session.ttl.minutes"; //$NON-NLS-1$
+	public static final String PARAM_SESSION_MAX_KEEP_ALIVE_MINUTES = "session.maxKeepAlive.minutes"; //$NON-NLS-1$
 	public static final String PARAM_SESSION_RELOAD_SESSIONS = "session.reload"; //$NON-NLS-1$
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultStrolchSessionHandler.class);
 	private PrivilegeHandler privilegeHandler;
 	private Map<String, Certificate> certificateMap;
 	private boolean reloadSessions;
-	private long sessionTtl;
+	private int sessionTtlMinutes;
+	private int maxKeepAliveMinutes;
 
 	private ScheduledFuture<?> validateSessionsTask;
 	private Future<?> persistSessionsTask;
@@ -67,8 +67,25 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
+	public int getSessionTtlMinutes() {
+		return this.sessionTtlMinutes;
+	}
+
+	@Override
+	public int getSessionMaxKeepAliveMinutes() {
+		return this.maxKeepAliveMinutes;
+	}
+
+	@Override
+	public boolean isRefreshAllowed() {
+		return this.privilegeHandler.isRefreshAllowed();
+	}
+
+	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
-		this.sessionTtl = TimeUnit.MINUTES.toMillis(configuration.getInt(PARAM_SESSION_TTL_MINUTES, 30));
+		this.sessionTtlMinutes = configuration.getInt(PARAM_SESSION_TTL_MINUTES, 30);
+		this.maxKeepAliveMinutes = configuration
+				.getInt(PARAM_SESSION_MAX_KEEP_ALIVE_MINUTES, Math.max(this.sessionTtlMinutes, 30));
 		this.reloadSessions = configuration.getBoolean(PARAM_SESSION_RELOAD_SESSIONS, false);
 		super.initialize(configuration);
 	}
@@ -133,24 +150,11 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
-	public Certificate authenticate(String username, char[] password) {
+	public Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("Username must be set!", username); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
 
-		Certificate certificate = this.privilegeHandler.authenticate(username, password);
-
-		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
-
-		return certificate;
-	}
-
-	@Override
-	public Certificate authenticate(String username, char[] password, String source, Usage usage) {
-		DBC.PRE.assertNotEmpty("Username must be set!", username); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("Passwort must be set", password); //$NON-NLS-1$
-
-		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage);
+		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage, keepAlive);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
@@ -176,6 +180,17 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
 
 		return certificate;
+	}
+
+	@Override
+	public Certificate refreshSession(Certificate certificate, String source) {
+		Certificate refreshedSession = this.privilegeHandler.refreshSession(certificate, source);
+
+		invalidate(certificate);
+		this.certificateMap.put(refreshedSession.getAuthToken(), refreshedSession);
+		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size())); //$NON-NLS-1$
+
+		return refreshedSession;
 	}
 
 	@Override
@@ -298,15 +313,24 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			certificateMap = new HashMap<>(this.certificateMap);
 		}
 
-		LocalDateTime timeOutTime = LocalDateTime.now().minus(sessionTtl, ChronoUnit.MILLIS);
-		ZoneId systemDefault = ZoneId.systemDefault();
+		LocalDateTime maxKeepAliveTime = LocalDateTime.now().minus(this.maxKeepAliveMinutes, ChronoUnit.MINUTES);
+		LocalDateTime timeOutTime = LocalDateTime.now().minus(this.sessionTtlMinutes, ChronoUnit.MINUTES);
 
 		for (Certificate certificate : certificateMap.values()) {
-			Instant lastAccess = certificate.getLastAccess().toInstant();
-			if (timeOutTime.isAfter(LocalDateTime.ofInstant(lastAccess, systemDefault))) {
-				String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
-				logger.info(MessageFormat.format(msg, certificate.getSessionId(), certificate.getUsername()));
-				sessionTimeout(certificate);
+			if (certificate.isKeepAlive()) {
+
+				if (maxKeepAliveTime.isAfter(certificate.getLoginTime())) {
+					String msg = "KeepAlive for session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
+					logger.info(MessageFormat.format(msg, certificate.getSessionId(), certificate.getUsername()));
+					sessionTimeout(certificate);
+				}
+
+			} else {
+				if (timeOutTime.isAfter(certificate.getLastAccess())) {
+					String msg = "Session {0} for user {1} has expired, invalidating session..."; //$NON-NLS-1$
+					logger.info(MessageFormat.format(msg, certificate.getSessionId(), certificate.getUsername()));
+					sessionTimeout(certificate);
+				}
 			}
 		}
 	}

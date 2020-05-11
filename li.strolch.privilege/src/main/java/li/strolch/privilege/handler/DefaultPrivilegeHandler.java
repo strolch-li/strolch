@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -124,8 +123,18 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 */
 	protected SecretKey secretKey;
 
+	/**
+	 * flag if session refreshing is allowed
+	 */
+	protected boolean allowSessionRefresh;
+
 	protected PrivilegeConflictResolution privilegeConflictResolution;
 	private String identifier;
+
+	@Override
+	public boolean isRefreshAllowed() {
+		return this.allowSessionRefresh;
+	}
 
 	@Override
 	public EncryptionHandler getEncryptionHandler() throws PrivilegeException {
@@ -1038,7 +1047,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				if (ctx.getUserRep().getUsername().equals(newUser.getUsername())) {
 					Certificate cert = ctx.getCertificate();
 					cert = buildCertificate(cert.getUsage(), newUser, cert.getAuthToken(), cert.getSessionId(),
-							cert.getSource(), cert.getLoginTime());
+							cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
 					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, newUser);
 					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 				}
@@ -1063,7 +1072,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 					Certificate cert = ctx.getCertificate();
 					cert = buildCertificate(cert.getUsage(), user, cert.getAuthToken(), cert.getSessionId(),
-							cert.getSource(), cert.getLoginTime());
+							cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
 					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, user);
 					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 				}
@@ -1128,7 +1137,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create a new certificate, with details of the user
 		Usage usage = userChallenge.getUsage();
 		Certificate certificate = buildCertificate(usage, user, authToken, sessionId, userChallenge.getSource(),
-				new Date());
+				LocalDateTime.now(), false);
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1145,12 +1154,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public Certificate authenticate(String username, char[] password) {
-		return authenticate(username, password, "unknown", Usage.ANY);
+	public Certificate authenticate(String username, char[] password, boolean keepAlive) {
+		return authenticate(username, password, "unknown", Usage.ANY, keepAlive);
 	}
 
 	@Override
-	public Certificate authenticate(String username, char[] password, String source, Usage usage) {
+	public Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		try {
@@ -1178,7 +1187,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = UUID.randomUUID().toString();
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, new Date());
+			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, LocalDateTime.now(),
+					keepAlive);
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1204,12 +1214,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public Certificate authenticateSingleSignOn(Object data) throws PrivilegeException {
-		return authenticateSingleSignOn(data, "unknown");
+	public Certificate authenticateSingleSignOn(Object data, boolean keepAlive) throws PrivilegeException {
+		return authenticateSingleSignOn(data, "unknown", keepAlive);
 	}
 
 	@Override
-	public Certificate authenticateSingleSignOn(Object data, String source) throws PrivilegeException {
+	public Certificate authenticateSingleSignOn(Object data, String source, boolean keepAlive)
+			throws PrivilegeException {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		if (this.ssoHandler == null)
 			throw new IllegalStateException("The SSO Handler is not configured!");
@@ -1234,7 +1245,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
-		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source, new Date());
+		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source, LocalDateTime.now(),
+				keepAlive);
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1247,12 +1259,69 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return certificate;
 	}
 
+	@Override
+	public Certificate refresh(Certificate certificate, String source) throws AccessDeniedException {
+		DBC.PRE.assertNotNull("certificate must not be null!", certificate);
+
+		try {
+			// username must be at least 2 characters in length
+			if (!this.allowSessionRefresh)
+				throw new AccessDeniedException("Refreshing of sessions not allowed!");
+
+			validate(certificate);
+
+			if (!certificate.isKeepAlive())
+				throw new AccessDeniedException("Refreshing of session not allowed!");
+
+			if (!certificate.getSource().equals(source)) {
+				logger.error("Source of existing session {} is not the same as the refresh request's source {}",
+						certificate.getSource(), source);
+			}
+
+			// check the password
+			User user = this.persistenceHandler.getUser(certificate.getUsername());
+
+			// get 2 auth tokens
+			String authToken = this.encryptionHandler.nextToken();
+
+			// get next session id
+			String sessionId = UUID.randomUUID().toString();
+
+			// create a new certificate, with details of the user
+			Certificate refreshedCert = buildCertificate(certificate.getUsage(), user, authToken, sessionId, source,
+					LocalDateTime.now(), true);
+
+			PrivilegeContext privilegeContext = buildPrivilegeContext(refreshedCert, user);
+			this.privilegeContextMap.put(sessionId, privilegeContext);
+
+			// invalidate the previous session
+			invalidate(certificate);
+
+			persistSessions();
+
+			// log
+			logger.info(MessageFormat
+					.format("User {0} refreshed session: {1}", user.getUsername(), refreshedCert)); //$NON-NLS-1$
+
+			// return the certificate
+			return refreshedCert;
+
+		} catch (PrivilegeException e) {
+			throw e;
+		} catch (RuntimeException e) {
+			logger.error(e.getMessage(), e);
+			String msg = "User {0} failed to refresh session: {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, certificate.getUsername(), e.getMessage());
+			throw new PrivilegeException(msg, e);
+		}
+	}
+
 	private Certificate buildCertificate(Usage usage, User user, String authToken, String sessionId, String source,
-			Date loginTime) {
+			LocalDateTime loginTime, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		Set<String> userRoles = user.getRoles();
 		return new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(), user.getLastname(),
-				user.getUserState(), authToken, source, loginTime, user.getLocale(), userRoles,
+				user.getUserState(), authToken, source, loginTime, keepAlive, user.getLocale(), userRoles,
 				new HashMap<>(user.getProperties()));
 	}
 
@@ -1341,7 +1410,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, stub.getLoginTime());
+			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, stub.getLoginTime(),
+					stub.isKeepAlive());
 			certificate.setLocale(stub.getLocale());
 			certificate.setLastAccess(stub.getLastAccess());
 
@@ -1538,7 +1608,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
 
 		// persist sessions
-		persistSessions();
+		if (privilegeContext != null)
+			persistSessions();
 
 		// return true if object was really removed
 		boolean loggedOut = privilegeContext != null;
@@ -1592,7 +1663,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException(msg);
 		}
 
-		certificate.setLastAccess(new Date());
+		certificate.setLastAccess(LocalDateTime.now());
 
 		if (!certificate.getSource().equals(this.identifier))
 			throw new IllegalStateException(
@@ -1624,15 +1695,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate that challenge certificate is not expired (1 hour only) 
 		if (sessionCertificate.getUsage() != Usage.ANY) {
-			LocalDateTime dateTime = LocalDateTime
-					.ofInstant(sessionCertificate.getLoginTime().toInstant(), ZoneId.systemDefault());
+			LocalDateTime dateTime = sessionCertificate.getLoginTime();
 			if (dateTime.plusHours(1).isBefore(LocalDateTime.now())) {
 				invalidate(sessionCertificate);
 				throw new NotAuthenticatedException("Certificate has already expired!"); //$NON-NLS-1$
 			}
 		}
 
-		certificate.setLastAccess(new Date());
+		certificate.setLastAccess(LocalDateTime.now());
 
 		// TODO decide if we want to assert source did not change!
 		if (!source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
@@ -1727,6 +1797,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		handlePersistSessionsParam(parameterMap);
 		handleConflictResolutionParam(parameterMap);
 		handleSecretParams(parameterMap);
+
+		this.allowSessionRefresh = Boolean.parseBoolean(parameterMap.get(PARAM_ALLOW_SESSION_REFRESH));
 
 		// validate policies on privileges of Roles
 		for (Role role : persistenceHandler.getAllRoles()) {
@@ -1938,11 +2010,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 		the char array containing the passwort which is to be set to zeroes
 	 */
 	private void clearPassword(char[] password) {
-		if (password != null) {
-			for (int i = 0; i < password.length; i++) {
-				password[i] = 0;
-			}
-		}
+		if (password != null)
+			Arrays.fill(password, (char) 0);
 	}
 
 	@Override
@@ -2054,7 +2123,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId, this.identifier,
-				new Date());
+				LocalDateTime.now(), false);
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);

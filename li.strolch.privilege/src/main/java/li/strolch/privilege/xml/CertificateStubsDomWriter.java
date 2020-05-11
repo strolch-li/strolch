@@ -15,13 +15,15 @@
  */
 package li.strolch.privilege.xml;
 
+import static java.util.Comparator.comparing;
+import static li.strolch.privilege.helper.XmlConstants.*;
+
 import java.io.OutputStream;
 import java.util.List;
 
-import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.helper.XmlHelper;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -30,8 +32,8 @@ import org.w3c.dom.Element;
  */
 public class CertificateStubsDomWriter {
 
-	private List<Certificate> certificates;
-	private OutputStream outputStream;
+	private final List<Certificate> certificates;
+	private final OutputStream outputStream;
 
 	public CertificateStubsDomWriter(List<Certificate> certificates, OutputStream outputStream) {
 		this.certificates = certificates;
@@ -42,40 +44,41 @@ public class CertificateStubsDomWriter {
 
 		// create document root
 		Document doc = XmlHelper.createDocument();
-		Element rootElement = doc.createElement(XmlConstants.XML_ROOT_CERTIFICATES);
+		Element rootElement = doc.createElement(XML_ROOT_CERTIFICATES);
 		doc.appendChild(rootElement);
 
-		this.certificates.stream().sorted((c1, c2) -> c1.getSessionId().compareTo(c2.getSessionId())).forEach(cert -> {
+		this.certificates.stream().sorted(comparing(Certificate::getSessionId)).forEach(cert -> {
 
 			// create the certificate element
-			Element certElement = doc.createElement(XmlConstants.XML_CERTIFICATE);
+			Element certElement = doc.createElement(XML_CERTIFICATE);
 			rootElement.appendChild(certElement);
 
 			// sessionId;
-			certElement.setAttribute(XmlConstants.XML_ATTR_SESSION_ID, cert.getSessionId());
+			certElement.setAttribute(XML_ATTR_SESSION_ID, cert.getSessionId());
 
 			// usage;
-			certElement.setAttribute(XmlConstants.XML_ATTR_USAGE, cert.getUsage().name());
+			certElement.setAttribute(XML_ATTR_USAGE, cert.getUsage().name());
 
 			// username;
-			certElement.setAttribute(XmlConstants.XML_ATTR_USERNAME, cert.getUsername());
+			certElement.setAttribute(XML_ATTR_USERNAME, cert.getUsername());
 
 			// authToken;
-			certElement.setAttribute(XmlConstants.XML_ATTR_AUTH_TOKEN, cert.getAuthToken());
+			certElement.setAttribute(XML_ATTR_AUTH_TOKEN, cert.getAuthToken());
 
 			// source;
-			certElement.setAttribute(XmlConstants.XML_ATTR_SOURCE, cert.getSource());
+			certElement.setAttribute(XML_ATTR_SOURCE, cert.getSource());
 
 			// locale;
-			certElement.setAttribute(XmlConstants.XML_ATTR_LOCALE, cert.getLocale().toLanguageTag());
+			certElement.setAttribute(XML_ATTR_LOCALE, cert.getLocale().toLanguageTag());
 
 			// loginTime;
-			certElement.setAttribute(XmlConstants.XML_ATTR_LOGIN_TIME,
-					ISO8601FormatFactory.getInstance().formatDate(cert.getLoginTime()));
+			certElement.setAttribute(XML_ATTR_LOGIN_TIME, ISO8601.toString(cert.getLoginTime()));
 
 			// lastAccess;
-			certElement.setAttribute(XmlConstants.XML_ATTR_LAST_ACCESS,
-					ISO8601FormatFactory.getInstance().formatDate(cert.getLastAccess()));
+			certElement.setAttribute(XML_ATTR_LAST_ACCESS, ISO8601.toString(cert.getLastAccess()));
+
+			// keepAlive;
+			certElement.setAttribute(XML_ATTR_KEEP_ALIVE, String.valueOf(cert.isKeepAlive()));
 		});
 
 		// write the container file to disk

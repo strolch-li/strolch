@@ -42,7 +42,7 @@ public class SsoHandlerTest extends AbstractPrivilegeTest {
 			data.put("roles", "PrivilegeAdmin, AppUser");
 
 			// auth
-			Certificate cert = this.privilegeHandler.authenticateSingleSignOn(data);
+			Certificate cert = this.privilegeHandler.authenticateSingleSignOn(data, false);
 			this.ctx = this.privilegeHandler.validate(cert);
 
 			// validate action

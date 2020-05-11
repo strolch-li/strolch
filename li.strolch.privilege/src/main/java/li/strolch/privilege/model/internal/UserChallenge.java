@@ -9,8 +9,8 @@ public class UserChallenge {
 	private final String challenge;
 	private final String source;
 	private final LocalDateTime initiated;
+	private final Usage usage;
 	private boolean fulfilled;
-	private Usage usage;
 
 	public UserChallenge(Usage usage, User user, String challenge, String source) {
 		this.usage = usage;

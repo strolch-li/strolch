@@ -15,36 +15,38 @@
  */
 package li.strolch.rest.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Set;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 public class UserSession {
 
-	private String sessionId;
-	private Date loginTime;
-	private String username;
-	private String firstname;
-	private String lastname;
-	private String source;
-	private Set<String> userRoles;
-	private Locale locale;
-	private Date lastAccess;
+	private final boolean keepAlive;
+	private final String sessionId;
+	private final LocalDateTime loginTime;
+	private final String username;
+	private final String firstName;
+	private final String lastName;
+	private final String source;
+	private final Set<String> userRoles;
+	private final Locale locale;
+	private final LocalDateTime lastAccess;
 
 	public UserSession(Certificate certificate) {
 		this.sessionId = certificate.getSessionId();
 		this.loginTime = certificate.getLoginTime();
 		this.username = certificate.getUsername();
-		this.firstname = certificate.getFirstname();
-		this.lastname = certificate.getLastname();
+		this.firstName = certificate.getFirstname();
+		this.lastName = certificate.getLastname();
 		this.source = certificate.getSource();
 		this.userRoles = certificate.getUserRoles();
 		this.locale = certificate.getLocale();
+		this.keepAlive = certificate.isKeepAlive();
 		this.lastAccess = certificate.getLastAccess();
 	}
 
@@ -52,7 +54,7 @@ public class UserSession {
 		return locale;
 	}
 
-	public Date getLastAccess() {
+	public LocalDateTime getLastAccess() {
 		return lastAccess;
 	}
 
@@ -60,7 +62,7 @@ public class UserSession {
 		return sessionId;
 	}
 
-	public Date getLoginTime() {
+	public LocalDateTime getLoginTime() {
 		return loginTime;
 	}
 
@@ -69,11 +71,11 @@ public class UserSession {
 	}
 
 	public String getFirstname() {
-		return firstname;
+		return firstName;
 	}
 
 	public String getLastname() {
-		return lastname;
+		return lastName;
 	}
 
 	public String getSource() {
@@ -88,14 +90,15 @@ public class UserSession {
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty("sessionId", this.sessionId);
-		jsonObject.addProperty("loginTime", ISO8601FormatFactory.getInstance().formatDate(this.loginTime));
+		jsonObject.addProperty("loginTime", ISO8601.toString(this.loginTime));
 		jsonObject.addProperty("username", this.username);
-		jsonObject.addProperty("firstname", this.firstname);
-		jsonObject.addProperty("lastname", this.lastname);
+		jsonObject.addProperty("firstname", this.firstName);
+		jsonObject.addProperty("lastname", this.lastName);
 		jsonObject.addProperty("source", this.source);
+		jsonObject.addProperty("keepAlive", this.keepAlive);
 
 		jsonObject.addProperty("locale", this.locale.toString());
-		jsonObject.addProperty("lastAccess", ISO8601FormatFactory.getInstance().formatDate(this.lastAccess));
+		jsonObject.addProperty("lastAccess", ISO8601.toString(this.lastAccess));
 
 		JsonArray rolesJ = new JsonArray();
 		for (String role : this.userRoles) {

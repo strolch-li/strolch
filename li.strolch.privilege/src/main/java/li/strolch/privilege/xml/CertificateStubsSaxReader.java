@@ -16,20 +16,20 @@
 package li.strolch.privilege.xml;
 
 import static li.strolch.privilege.handler.DefaultPrivilegeHandler.SOURCE_UNKNOWN;
+import static li.strolch.privilege.helper.XmlConstants.*;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.Usage;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -39,7 +39,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class CertificateStubsSaxReader extends DefaultHandler {
 
-	private InputStream inputStream;
+	private final InputStream inputStream;
 	private List<CertificateStub> stubs;
 
 	public CertificateStubsSaxReader(InputStream inputStream) {
@@ -56,21 +56,20 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 		switch (qName) {
-		case XmlConstants.XML_ROOT_CERTIFICATES:
+		case XML_ROOT_CERTIFICATES:
 			break;
-		case XmlConstants.XML_CERTIFICATE:
+		case XML_CERTIFICATE:
 
 			CertificateStub stub = new CertificateStub();
-			stub.usage = Usage.valueOf(attributes.getValue(XmlConstants.XML_ATTR_USAGE));
-			stub.sessionId = attributes.getValue(XmlConstants.XML_ATTR_SESSION_ID);
-			stub.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
-			stub.authToken = attributes.getValue(XmlConstants.XML_ATTR_AUTH_TOKEN);
-			stub.source = attributes.getValue(XmlConstants.XML_ATTR_SOURCE);
-			stub.locale = Locale.forLanguageTag(attributes.getValue(XmlConstants.XML_ATTR_LOCALE));
-			stub.loginTime = ISO8601FormatFactory.getInstance()
-					.parseDate(attributes.getValue(XmlConstants.XML_ATTR_LOGIN_TIME));
-			stub.lastAccess = ISO8601FormatFactory.getInstance()
-					.parseDate(attributes.getValue(XmlConstants.XML_ATTR_LAST_ACCESS));
+			stub.usage = Usage.valueOf(attributes.getValue(XML_ATTR_USAGE));
+			stub.sessionId = attributes.getValue(XML_ATTR_SESSION_ID);
+			stub.username = attributes.getValue(XML_ATTR_USERNAME);
+			stub.authToken = attributes.getValue(XML_ATTR_AUTH_TOKEN);
+			stub.source = attributes.getValue(XML_ATTR_SOURCE);
+			stub.locale = Locale.forLanguageTag(attributes.getValue(XML_ATTR_LOCALE));
+			stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME)).toLocalDateTime();
+			stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS)).toLocalDateTime();
+			stub.keepAlive = Boolean.parseBoolean(attributes.getValue(XML_ATTR_KEEP_ALIVE));
 
 			DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
 			DBC.INTERIM.assertNotEmpty("username missing on sessions data!", stub.username);
@@ -87,15 +86,16 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		}
 	}
 
-	public class CertificateStub {
+	public static class CertificateStub {
 		private Usage usage;
 		private String sessionId;
 		private String username;
 		private String authToken;
 		private String source;
 		private Locale locale;
-		private Date loginTime;
-		private Date lastAccess;
+		private LocalDateTime loginTime;
+		private LocalDateTime lastAccess;
+		private boolean keepAlive;
 
 		public Usage getUsage() {
 			return this.usage;
@@ -121,12 +121,16 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			return locale;
 		}
 
-		public Date getLoginTime() {
+		public LocalDateTime getLoginTime() {
 			return loginTime;
 		}
 
-		public Date getLastAccess() {
+		public LocalDateTime getLastAccess() {
 			return lastAccess;
+		}
+
+		public boolean isKeepAlive() {
+			return this.keepAlive;
 		}
 	}
 }

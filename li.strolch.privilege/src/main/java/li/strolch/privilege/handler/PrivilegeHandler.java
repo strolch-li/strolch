@@ -167,6 +167,11 @@ public interface PrivilegeHandler {
 	String PARAM_SECRET_KEY = "secretKey"; //$NON-NLS-1$
 
 	/**
+	 * configuration parameter to define if session refreshing is allowed
+	 */
+	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh"; //$NON-NLS-1$
+
+	/**
 	 * configuration parameter to define a secret salt
 	 */
 	String PARAM_SECRET_SALT = "secretSalt"; //$NON-NLS-1$
@@ -608,13 +613,15 @@ public interface PrivilegeHandler {
 	 * @param password
 	 * 		the password with which this user is to be authenticated. Null passwords are not accepted and they must meet
 	 * 		the requirements of the {@link #validatePassword(char[])}-method
+	 * @param keepAlive
+	 * 		should this session be kept alive
 	 *
 	 * @return a {@link Certificate} with which this user may then perform actions
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user credentials are not valid
 	 */
-	Certificate authenticate(String username, char[] password) throws AccessDeniedException;
+	Certificate authenticate(String username, char[] password, boolean keepAlive) throws AccessDeniedException;
 
 	/**
 	 * Authenticates a user by validating that a {@link User} for the given username and password exist and then returns
@@ -629,26 +636,31 @@ public interface PrivilegeHandler {
 	 * 		the source of the authentication request, i.e. remote IP
 	 * @param usage
 	 * 		the usage type for this authentication
+	 * @param keepAlive
+	 * 		should this session be kept alive
 	 *
 	 * @return a {@link Certificate} with which this user may then perform actions
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user credentials are not valid
 	 */
-	Certificate authenticate(String username, char[] password, String source, Usage usage) throws AccessDeniedException;
+	Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive)
+			throws AccessDeniedException;
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
 	 *
 	 * @param data
 	 * 		the data to perform the SSO
+	 * @param keepAlive
+	 * 		should this session be kept alive
 	 *
 	 * @return the {@link Certificate} for the user
 	 *
 	 * @throws PrivilegeException
 	 * 		if something goes wrong with the SSO
 	 */
-	Certificate authenticateSingleSignOn(Object data) throws PrivilegeException;
+	Certificate authenticateSingleSignOn(Object data, boolean keepAlive) throws PrivilegeException;
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
@@ -657,13 +669,37 @@ public interface PrivilegeHandler {
 	 * 		the data to perform the SSO
 	 * @param source
 	 * 		the source of the SSO authentication
+	 * @param keepAlive
+	 * 		may the certificate be kept alive
 	 *
 	 * @return the {@link Certificate} for the user
 	 *
 	 * @throws PrivilegeException
 	 * 		if something goes wrong with the SSO
 	 */
-	Certificate authenticateSingleSignOn(Object data, String source) throws PrivilegeException;
+	Certificate authenticateSingleSignOn(Object data, String source, boolean keepAlive) throws PrivilegeException;
+
+	/**
+	 * Refreshes the given certificate's session with a new session, i.e. a new certificate
+	 *
+	 * @param certificate
+	 * 		the certificate for which to perform a refresh
+	 * @param source
+	 * 		the source of the refresh request
+	 *
+	 * @return a {@link Certificate} with which this user may then perform actions
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the certificate is now valid, or refreshing is not allowed
+	 */
+	Certificate refresh(Certificate certificate, String source) throws AccessDeniedException;
+
+	/**
+	 * Return true if refreshing sessions is allowed
+	 *
+	 * @return true if refreshing sessions is allowed
+	 */
+	boolean isRefreshAllowed();
 
 	/**
 	 * Invalidates the session for the given {@link Certificate}, effectively logging out the user who was authenticated
