@@ -35,6 +35,7 @@ public class DateRange {
 	private ZonedDateTime toDate;
 
 	public DateRange from(LocalDate from, boolean inclusive) {
+		DBC.PRE.assertNotNull("from must be set!", from);
 		this.fromDate = ZonedDateTime.of(from.atStartOfDay(), ZoneId.systemDefault());
 		this.fromInclusive = inclusive;
 		validate();
@@ -42,6 +43,7 @@ public class DateRange {
 	}
 
 	public DateRange to(LocalDate to, boolean inclusive) {
+		DBC.PRE.assertNotNull("to must be set!", to);
 		this.toDate = ZonedDateTime.of(to.atStartOfDay(), ZoneId.systemDefault());
 		this.toInclusive = inclusive;
 		validate();
@@ -49,6 +51,7 @@ public class DateRange {
 	}
 
 	public DateRange from(LocalDateTime from, boolean inclusive) {
+		DBC.PRE.assertNotNull("from must be set!", from);
 		this.fromDate = ZonedDateTime.of(from, ZoneId.systemDefault());
 		this.fromInclusive = inclusive;
 		validate();
@@ -56,6 +59,7 @@ public class DateRange {
 	}
 
 	public DateRange to(LocalDateTime to, boolean inclusive) {
+		DBC.PRE.assertNotNull("to must be set!", to);
 		this.toDate = ZonedDateTime.of(to, ZoneId.systemDefault());
 		this.toInclusive = inclusive;
 		validate();
@@ -63,6 +67,7 @@ public class DateRange {
 	}
 
 	public DateRange from(ZonedDateTime from, boolean inclusive) {
+		DBC.PRE.assertNotNull("from must be set!", from);
 		this.fromDate = from;
 		this.fromInclusive = inclusive;
 		validate();
@@ -70,6 +75,7 @@ public class DateRange {
 	}
 
 	public DateRange to(ZonedDateTime to, boolean inclusive) {
+		DBC.PRE.assertNotNull("to must be set!", to);
 		this.toDate = to;
 		this.toInclusive = inclusive;
 		validate();
@@ -77,6 +83,7 @@ public class DateRange {
 	}
 
 	public DateRange from(Date from, boolean inclusive) {
+		DBC.PRE.assertNotNull("from must be set!", from);
 		this.fromDate = ZonedDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault());
 		this.fromInclusive = inclusive;
 		validate();
@@ -84,6 +91,7 @@ public class DateRange {
 	}
 
 	public DateRange to(Date to, boolean inclusive) {
+		DBC.PRE.assertNotNull("to must be set!", to);
 		this.toDate = ZonedDateTime.ofInstant(to.toInstant(), ZoneId.systemDefault());
 		this.toInclusive = inclusive;
 		validate();
