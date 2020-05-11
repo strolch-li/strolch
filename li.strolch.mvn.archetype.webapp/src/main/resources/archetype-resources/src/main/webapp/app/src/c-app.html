@@ -86,7 +86,6 @@
         <!-- Routing -->
         <c-app-routing id="appRouting"
                        login-page="login"
-                       default-page="inspector"
                        auth-valid="[[authTokenValid]]"
                        page="{{page}}"
                        route-tail="{{routeTail}}"
@@ -134,6 +133,7 @@
                                              app-title="[[localize('appTitle')]]"
                                              base-path="../"
                                              show-version
+                                             show-keep-alive
                                              on-strolch-session-valid="sessionValidated"></strolch-wc-auth>
 
                             <template is="dom-if" if="[[equal(page, 'inspector')]]" restamp>

@@ -27,10 +27,6 @@
                     type: String,
                     value: "login"
                 },
-                defaultPage: {
-                    type: String,
-                    value: "default"
-                },
                 exposedPages: {
                     type: Array,
                     value: []
@@ -61,13 +57,26 @@
                 "observeRoutePath(route.path)",
                 "redirectApp(path, authValid)"
             ],
+
+            computeDefaultPage: function (userConfig) {
+                if (userConfig == null)
+                    return "inspector";
+
+                Strolch.setUserConfig(userConfig);
+
+                if (Strolch.hasRole("StrolchAdmin")) {
+                    return "inspector";
+                } else {
+                    return "reports";
+                }
+            },
+
             observeRouteData: function (routeData) {
                 // redirect to login or default if there is no page
                 if (!routeData.page) {
-                    var firstPage = this.authValid ? this.defaultPage : this.loginPage;
+                    var firstPage = this.authValid ? this.computeDefaultPage(Strolch.getUserConfig()) : this.loginPage;
                     this.replaceCurrentPage(firstPage);
-                }
-                else {
+                } else {
                     // this debounces multiple page changes by the app route component
                     this.set("page", routeData.page);
                 }
@@ -83,8 +92,11 @@
                 // prevent navigation to login if the auth is still valid
                 if (pathBase == this.loginPage && authValid == true) {
                     // instead return to a path that was tried to access before login or the default page
-                    if (this.returnPath) this.replaceCurrentPath(this.returnPath);
-                    else this.replaceCurrentPage(this.defaultPage);
+                    if (this.returnPath) {
+                        this.replaceCurrentPath(this.returnPath);
+                    } else {
+                        this.replaceCurrentPage(this.computeDefaultPage(Strolch.getUserConfig()));
+                    }
                 }
 
                 // prevent navigation to any page but exposed pages if the auth is invalid
