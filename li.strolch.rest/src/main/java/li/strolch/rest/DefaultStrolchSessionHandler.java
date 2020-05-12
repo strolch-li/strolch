@@ -408,7 +408,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public void setSessionLocale(Certificate certificate, String sessionId, Locale locale) {
 		if (!certificate.getSessionId().equals(sessionId)) {
-			String msg = "User's can only change their own session locale: {0} may not change locale of session {1}";
+			String msg = "Users can only change their own session locale: {0} may not change locale of session {1}";
 			throw new AccessDeniedException(MessageFormat.format(msg, certificate.getUsername(), sessionId));
 		}
 
