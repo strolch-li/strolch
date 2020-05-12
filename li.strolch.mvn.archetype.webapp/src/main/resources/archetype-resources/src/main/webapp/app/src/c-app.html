@@ -271,13 +271,11 @@
                 },
                 authTokenValid: {
                     type: Boolean,
-                    value: false
+                    value: false,
+                    observer: "authTokenValidObserver"
                 },
                 userConfig: {
-                    type: Object,
-                    value: function () {
-                        return Strolch.getUserConfig();
-                    }
+                    type: Object
                 },
                 userLocale: {
                     type: String,
@@ -317,6 +315,7 @@
             observers: [],
 
             listeners: {
+                "cx-reload": "reload",
                 "cx-show-toast": "onShowToast",
                 "cx-server-not-available": "onServerNotAvailable",
                 "cx-session-invalid": "onSessionInvalid",
@@ -329,6 +328,10 @@
                 "cx-show-notification": "onShowNotification",
                 "cx-clear-notification": "onClearNotification",
                 "cx-log-out": "onLogOut",
+            },
+
+            reload: function () {
+                this.reloadPage(this.selectedPage);
             },
 
             observePage: function (newValue, oldValue) {
@@ -357,6 +360,12 @@
                         break;
                     default:
                         this.changePage(action);
+                }
+            },
+
+            authTokenValidObserver: function (newValue, oldValue) {
+                if (newValue && !oldValue) {
+                    this.userConfig = Strolch.getUserConfig();
                 }
             },
 
