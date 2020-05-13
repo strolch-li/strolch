@@ -85,6 +85,7 @@
 			<depends>PrivilegeHandler</depends>
 			<Properties>
 				<session.ttl.minutes>30</session.ttl.minutes>
+				<session.maxKeepAlive.minutes>10080</session.maxKeepAlive.minutes>
 				<session.reload>true</session.reload>
 			</Properties>
 		</Component>
@@ -94,6 +95,7 @@
 			<impl>li.strolch.rest.RestfulStrolchComponent</impl>
 			<depends>SessionHandler</depends>
 			<Properties>
+				<cookieMaxAge>30</cookieMaxAge>
 				<secureCookie>false</secureCookie>
 			</Properties>
 		</Component>

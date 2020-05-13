@@ -10,6 +10,7 @@
 			<Parameter name="persistSessions" value="true"/>
 			<Parameter name="autoPersistOnUserChangesData" value="false"/>
 			<Parameter name="privilegeConflictResolution" value="MERGE"/>
+			<Parameter name="allowSessionRefresh" value="true"/>
 		</Parameters>
 
 		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
