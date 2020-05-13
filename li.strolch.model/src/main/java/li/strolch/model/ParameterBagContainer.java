@@ -1179,6 +1179,81 @@ public interface ParameterBagContainer extends StrolchElement {
 	<U, T extends Parameter<U>> T getParameter(String paramKey, boolean assertExists);
 
 	/**
+	 * Returns the value of the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist,
+	 * then a {@link StrolchModelException} is thrown
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link StringParameter} for which the value is to be returned
+	 *
+	 * @return the parameter's value
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	String getRelationId(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Returns the value of the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist,
+	 * then a {@link StrolchModelException} is thrown
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link StringParameter} for which the value is to be returned
+	 *
+	 * @return the parameter's value
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	List<String> getRelationIds(String paramKey) throws StrolchModelException;
+
+	/**
+	 * Sets the value of the {@link StringParameter} with the given key on the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist, then a
+	 * {@link StrolchModelException} is thrown
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link StringParameter} for which the value is to be returned
+	 * @param id
+	 * 		the id of the relation to set
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setRelationId(String paramKey, String id) throws StrolchModelException;
+
+	/**
+	 * Sets the value of the {@link StringListParameter} with the given key on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist,
+	 * then a {@link StrolchModelException} is thrown
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link StringParameter} for which the value is to be returned
+	 * @param ids
+	 * 		the ids of the relation to set
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setRelationIds(String paramKey, List<String> ids) throws StrolchModelException;
+
+	/**
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist, then a
+	 * {@link StrolchModelException} is thrown
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter}
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	StringParameter getRelationP(String paramKey) throws StrolchModelException;
+
+	/**
 	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
 	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
 	 * exist
@@ -1215,6 +1290,21 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
 	StringListParameter getRelationsParam(String paramKey);
+
+	/**
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
+	 * StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist, then a
+	 * {@link StrolchModelException} is thrown
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be returned
+	 *
+	 * @return the found {@link Parameter}
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	StringListParameter getRelationsP(String paramKey) throws StrolchModelException;
 
 	/**
 	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
