@@ -199,12 +199,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		synchronized (this.controllers) {
 			Map<Locator, Controller> controllers = this.controllers.getMap(realm);
-			if (controllers != null) {
-				for (Controller controller : controllers.values()) {
-					// execute async
-					toExecution(controller);
-				}
-			}
+			if (controllers != null)
+				controllers.values().forEach(this::toExecution);
 		}
 	}
 
