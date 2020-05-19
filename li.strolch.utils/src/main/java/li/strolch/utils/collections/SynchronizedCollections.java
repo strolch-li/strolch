@@ -29,7 +29,7 @@ public class SynchronizedCollections {
 
 		SynchronizedMapOfLists(MapOfLists<T, U> m) {
 			this.m = m;
-			this.mutex = new Object();
+			this.mutex = this;
 		}
 
 		@Override
@@ -174,7 +174,7 @@ public class SynchronizedCollections {
 
 		SynchronizedMapOfMaps(MapOfMaps<T, U, V> m) {
 			this.m = m;
-			this.mutex = new Object();
+			this.mutex = this;
 		}
 
 		@Override
@@ -341,7 +341,7 @@ public class SynchronizedCollections {
 
 		public SynchronizedMapOfSets(MapOfSets<T, U> m) {
 			this.m = m;
-			this.mutex = new Object();
+			this.mutex = this;
 		}
 
 		@Override
@@ -507,35 +507,35 @@ public class SynchronizedCollections {
 
 		@Override
 		public int size() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.size();
 			}
 		}
 
 		@Override
 		public boolean isEmpty() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.isEmpty();
 			}
 		}
 
 		@Override
 		public boolean contains(Object o) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.contains(o);
 			}
 		}
 
 		@Override
 		public Object[] toArray() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.toArray();
 			}
 		}
 
 		@Override
 		public <T> T[] toArray(T[] a) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.toArray(a);
 			}
 		}
@@ -547,70 +547,70 @@ public class SynchronizedCollections {
 
 		@Override
 		public boolean add(E e) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.add(e);
 			}
 		}
 
 		@Override
 		public boolean remove(Object o) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.remove(o);
 			}
 		}
 
 		@Override
 		public boolean containsAll(Collection<?> coll) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.containsAll(coll);
 			}
 		}
 
 		@Override
 		public boolean addAll(Collection<? extends E> coll) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.addAll(coll);
 			}
 		}
 
 		@Override
 		public boolean removeAll(Collection<?> coll) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.removeAll(coll);
 			}
 		}
 
 		@Override
 		public boolean retainAll(Collection<?> coll) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.retainAll(coll);
 			}
 		}
 
 		@Override
 		public void clear() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				c.clear();
 			}
 		}
 
 		@Override
 		public String toString() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.toString();
 			}
 		}
 
 		@Override
 		public void forEach(Consumer<? super E> consumer) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				c.forEach(consumer);
 			}
 		}
 
 		@Override
 		public boolean removeIf(Predicate<? super E> filter) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.removeIf(filter);
 			}
 		}
@@ -631,7 +631,7 @@ public class SynchronizedCollections {
 		}
 
 		private void writeObject(ObjectOutputStream s) throws IOException {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				s.defaultWriteObject();
 			}
 		}
@@ -650,63 +650,63 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.equals(o);
 			}
 		}
 
 		@Override
 		public int hashCode() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.hashCode();
 			}
 		}
 
 		@Override
 		public E get(int index) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.get(index);
 			}
 		}
 
 		@Override
 		public E set(int index, E element) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.set(index, element);
 			}
 		}
 
 		@Override
 		public void add(int index, E element) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				list.add(index, element);
 			}
 		}
 
 		@Override
 		public E remove(int index) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.remove(index);
 			}
 		}
 
 		@Override
 		public int indexOf(Object o) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.indexOf(o);
 			}
 		}
 
 		@Override
 		public int lastIndexOf(Object o) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.lastIndexOf(o);
 			}
 		}
 
 		@Override
 		public boolean addAll(int index, Collection<? extends E> c) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return list.addAll(index, c);
 			}
 		}
@@ -723,21 +723,21 @@ public class SynchronizedCollections {
 
 		@Override
 		public List<E> subList(int fromIndex, int toIndex) {
-			synchronized (mutex) {
-				return new SynchronizedList<>(list.subList(fromIndex, toIndex), mutex);
+			synchronized (this.mutex) {
+				return new SynchronizedList<>(list.subList(fromIndex, toIndex), this.mutex);
 			}
 		}
 
 		@Override
 		public void replaceAll(UnaryOperator<E> operator) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				list.replaceAll(operator);
 			}
 		}
 
 		@Override
 		public void sort(Comparator<? super E> c) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				list.sort(c);
 			}
 		}
@@ -753,14 +753,14 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.equals(o);
 			}
 		}
 
 		@Override
 		public int hashCode() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return c.hashCode();
 			}
 		}
@@ -777,42 +777,42 @@ public class SynchronizedCollections {
 
 		@Override
 		public Comparator<? super E> comparator() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return ss.comparator();
 			}
 		}
 
 		@Override
 		public SortedSet<E> subSet(E fromElement, E toElement) {
-			synchronized (mutex) {
-				return new SynchronizedSortedSet<>(ss.subSet(fromElement, toElement), mutex);
+			synchronized (this.mutex) {
+				return new SynchronizedSortedSet<>(ss.subSet(fromElement, toElement), this.mutex);
 			}
 		}
 
 		@Override
 		public SortedSet<E> headSet(E toElement) {
-			synchronized (mutex) {
-				return new SynchronizedSortedSet<>(ss.headSet(toElement), mutex);
+			synchronized (this.mutex) {
+				return new SynchronizedSortedSet<>(ss.headSet(toElement), this.mutex);
 			}
 		}
 
 		@Override
 		public SortedSet<E> tailSet(E fromElement) {
-			synchronized (mutex) {
-				return new SynchronizedSortedSet<>(ss.tailSet(fromElement), mutex);
+			synchronized (this.mutex) {
+				return new SynchronizedSortedSet<>(ss.tailSet(fromElement), this.mutex);
 			}
 		}
 
 		@Override
 		public E first() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return ss.first();
 			}
 		}
 
 		@Override
 		public E last() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return ss.last();
 			}
 		}
@@ -829,55 +829,55 @@ public class SynchronizedCollections {
 		}
 
 		public int size() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.size();
 			}
 		}
 
 		public boolean isEmpty() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.isEmpty();
 			}
 		}
 
 		public boolean containsKey(Object key) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.containsKey(key);
 			}
 		}
 
 		public boolean containsValue(Object value) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.containsValue(value);
 			}
 		}
 
 		public V get(Object key) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.get(key);
 			}
 		}
 
 		public V put(K key, V value) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.put(key, value);
 			}
 		}
 
 		public V remove(Object key) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.remove(key);
 			}
 		}
 
 		public void putAll(Map<? extends K, ? extends V> map) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				m.putAll(map);
 			}
 		}
 
 		public void clear() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				m.clear();
 			}
 		}
@@ -887,25 +887,25 @@ public class SynchronizedCollections {
 		private transient Collection<V> values;
 
 		public Set<K> keySet() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				if (keySet == null)
-					keySet = new SynchronizedSet<>(m.keySet(), mutex);
+					keySet = new SynchronizedSet<>(m.keySet(), this.mutex);
 				return keySet;
 			}
 		}
 
 		public Set<Map.Entry<K, V>> entrySet() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				if (entrySet == null)
-					entrySet = new SynchronizedSet<>(m.entrySet(), mutex);
+					entrySet = new SynchronizedSet<>(m.entrySet(), this.mutex);
 				return entrySet;
 			}
 		}
 
 		public Collection<V> values() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				if (values == null)
-					values = new SynchronizedCollection<>(m.values(), mutex);
+					values = new SynchronizedCollection<>(m.values(), this.mutex);
 				return values;
 			}
 		}
@@ -913,102 +913,102 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.equals(o);
 			}
 		}
 
 		public int hashCode() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.hashCode();
 			}
 		}
 
 		public String toString() {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.toString();
 			}
 		}
 
 		@Override
 		public V getOrDefault(Object k, V defaultValue) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.getOrDefault(k, defaultValue);
 			}
 		}
 
 		@Override
 		public void forEach(BiConsumer<? super K, ? super V> action) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				m.forEach(action);
 			}
 		}
 
 		@Override
 		public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				m.replaceAll(function);
 			}
 		}
 
 		@Override
 		public V putIfAbsent(K key, V value) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.putIfAbsent(key, value);
 			}
 		}
 
 		@Override
 		public boolean remove(Object key, Object value) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.remove(key, value);
 			}
 		}
 
 		@Override
 		public boolean replace(K key, V oldValue, V newValue) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.replace(key, oldValue, newValue);
 			}
 		}
 
 		@Override
 		public V replace(K key, V value) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.replace(key, value);
 			}
 		}
 
 		@Override
 		public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.computeIfAbsent(key, mappingFunction);
 			}
 		}
 
 		@Override
 		public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.computeIfPresent(key, remappingFunction);
 			}
 		}
 
 		@Override
 		public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.compute(key, remappingFunction);
 			}
 		}
 
 		@Override
 		public V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				return m.merge(key, value, remappingFunction);
 			}
 		}
 
 		private void writeObject(ObjectOutputStream s) throws IOException {
-			synchronized (mutex) {
+			synchronized (this.mutex) {
 				s.defaultWriteObject();
 			}
 		}
