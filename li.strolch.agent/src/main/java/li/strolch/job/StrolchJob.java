@@ -21,6 +21,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -266,7 +267,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				operationsLog.addMessage(
 						new LogMessage(this.realmName == null ? StrolchConstants.DEFAULT_REALM : this.realmName,
 								SYSTEM_USER_AGENT, Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()),
-								LogSeverity.Exception, ResourceBundle.getBundle("strolch-agent"), "strolchjob.failed")
+								LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "strolchjob.failed")
 								.withException(e).value("jobName", getClass().getName()).value("reason", e));
 			}
 		}

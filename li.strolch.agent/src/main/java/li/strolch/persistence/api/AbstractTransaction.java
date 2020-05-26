@@ -32,6 +32,7 @@ import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.*;
@@ -1692,7 +1693,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
 					Locator.valueOf(AGENT, "tx", this.action, getUniqueId()), LogSeverity.Exception,
-					ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed").withException(e).value("reason", e));
+					LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed").withException(e).value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$

@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.*;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -193,7 +194,7 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), SYSTEM_USER_AGENT,
 					Locator.valueOf(AGENT, ObserverHandler.class.getName(), type, StrolchAgent.getUniqueId()),
-					LogSeverity.Exception, ResourceBundle.getBundle("strolch-agent"), "agent.observers.update.failed")
+					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.observers.update.failed")
 					.withException(e).value("type", type).value("reason", e));
 		}
 	}

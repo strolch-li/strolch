@@ -28,6 +28,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Tags;
@@ -204,7 +205,7 @@ public class MigrationsHandler extends StrolchComponent {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(Tags.AGENT, SYSTEM_USER_AGENT,
 							getLocator().append(StrolchAgent.getUniqueId()), LogSeverity.Exception,
-							ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
+							LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
 							.withException(e).value("reason", e));
 				}
 			}

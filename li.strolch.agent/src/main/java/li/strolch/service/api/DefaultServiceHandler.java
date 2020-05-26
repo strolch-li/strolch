@@ -28,6 +28,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -219,11 +220,11 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				ResourceBundle bundle = ResourceBundle.getBundle("strolch-agent");
 				if (throwable == null) {
 					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
-							LogSeverity.Exception, bundle, "agent.service.failed").value("service", svcName)
+							LogSeverity.Exception, LogMessageState.Information, bundle, "agent.service.failed").value("service", svcName)
 							.value("reason", reason);
 				} else {
 					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
-							LogSeverity.Exception, bundle, "agent.service.failed.ex").withException(throwable)
+							LogSeverity.Exception, LogMessageState.Information, bundle, "agent.service.failed.ex").withException(throwable)
 							.value("service", svcName).value("reason", reason).value("exception", throwable);
 				}
 

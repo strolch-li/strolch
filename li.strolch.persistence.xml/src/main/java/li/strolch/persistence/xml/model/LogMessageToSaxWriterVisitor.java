@@ -44,6 +44,7 @@ public class LogMessageToSaxWriterVisitor {
 
 		writeElem(Tags.MESSAGE, logMessage.getMessage());
 		writeElem(Tags.SEVERITY, logMessage.getSeverity().name());
+		writeElem(Tags.STATE, logMessage.getState().name());
 		writeElem(Tags.USERNAME, logMessage.getUsername());
 		writeElem(Tags.LOCATOR, logMessage.getLocator().toString());
 		writeElem(Tags.KEY, logMessage.getKey());

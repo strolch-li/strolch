@@ -2,6 +2,7 @@ package li.strolch.handler.operationslog;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
@@ -11,32 +12,36 @@ import li.strolch.model.Locator;
 import li.strolch.model.Tags.Json;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.helper.ExceptionHelper;
+import li.strolch.utils.iso8601.ISO8601;
 
 public class LogMessage extends I18nMessage {
 
 	private final String id;
 	private final String username;
-	private ZonedDateTime zonedDateTime;
+	private final ZonedDateTime zonedDateTime;
 	private final String realm;
 	private final Locator locator;
 	private final LogSeverity severity;
+	private LogMessageState state;
 	private String stackTrace;
 
-	public LogMessage(String realm, String username, Locator locator, LogSeverity severity, ResourceBundle bundle,
-			String key) {
+	public LogMessage(String realm, String username, Locator locator, LogSeverity severity, LogMessageState state,
+			ResourceBundle bundle, String key) {
 		super(bundle, key);
 		this.id = StrolchAgent.getUniqueId();
-		this.zonedDateTime = ZonedDateTime.now();
 		// persisting in the DB only handles millisecond precision, not nano precision
-		this.zonedDateTime = this.zonedDateTime.withNano((this.zonedDateTime.getNano() / 1000000) * 1000000);
+		ZonedDateTime now = ZonedDateTime.now();
+		this.zonedDateTime = now.withNano((now.getNano() / 1000000) * 1000000);
 		this.realm = realm;
 		this.username = username;
 		this.locator = locator;
 		this.severity = severity;
+		this.state = state;
 	}
 
 	public LogMessage(String id, ZonedDateTime zonedDateTime, String realm, String username, Locator locator,
-			LogSeverity severity, String key, Properties values, String message, String stackTrace) {
+			LogSeverity severity, LogMessageState state, String key, Properties values, String message,
+			String stackTrace) {
 		super(key, values, message);
 		this.id = id;
 		this.zonedDateTime = zonedDateTime;
@@ -44,6 +49,7 @@ public class LogMessage extends I18nMessage {
 		this.username = username;
 		this.locator = locator;
 		this.severity = severity;
+		this.state = state;
 		this.stackTrace = stackTrace;
 	}
 
@@ -69,6 +75,14 @@ public class LogMessage extends I18nMessage {
 
 	public LogSeverity getSeverity() {
 		return this.severity;
+	}
+
+	public LogMessageState getState() {
+		return this.state;
+	}
+
+	public void setState(LogMessageState state) {
+		this.state = state;
 	}
 
 	public LogMessage withException(Throwable t) {
@@ -100,10 +114,12 @@ public class LogMessage extends I18nMessage {
 		jsonObject.addProperty(Json.KEY, getKey());
 		jsonObject.addProperty(Json.MESSAGE, formatMessage());
 		jsonObject.addProperty(Json.SEVERITY, this.severity.name());
+		jsonObject.addProperty(Json.STATE, this.state.name());
 		jsonObject.addProperty(Json.USERNAME, this.username);
 		jsonObject.addProperty(Json.REALM, this.realm);
 		jsonObject.addProperty(Json.LOCATOR, this.locator.toString());
-		jsonObject.addProperty(Json.EXCEPTION, this.stackTrace);
+		if (this.stackTrace != null)
+			jsonObject.addProperty(Json.EXCEPTION, this.stackTrace);
 		JsonObject values = new JsonObject();
 		for (String key : getValues().stringPropertyNames()) {
 			values.addProperty(key, getValues().getProperty(key));
@@ -113,37 +129,48 @@ public class LogMessage extends I18nMessage {
 		return jsonObject;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((this.locator == null) ? 0 : this.locator.hashCode());
-		result = prime * result + ((this.realm == null) ? 0 : this.realm.hashCode());
-		result = prime * result + ((this.severity == null) ? 0 : this.severity.hashCode());
-		return result;
+	public static LogMessage fromJson(JsonObject messageJ) {
+
+		String id = messageJ.get(Json.ID).getAsString();
+		ZonedDateTime zonedDateTime = ISO8601.parseToZdt(messageJ.get(Json.DATE).getAsString());
+		String realm = messageJ.get(Json.REALM).getAsString();
+		String username = messageJ.get(Json.USERNAME).getAsString();
+		Locator locator = Locator.valueOf(messageJ.get(Json.LOCATOR).getAsString());
+		LogSeverity severity = LogSeverity.valueOf(messageJ.get(Json.SEVERITY).getAsString());
+		LogMessageState state = LogMessageState.valueOf(messageJ.get(Json.STATE).getAsString());
+		String key = messageJ.get(Json.KEY).getAsString();
+		String message = messageJ.get(Json.MESSAGE).getAsString();
+		String stackTrace = messageJ.has(Json.EXCEPTION) ? messageJ.get(Json.EXCEPTION).getAsString() : "";
+
+		Properties properties = new Properties();
+		if (messageJ.has(Json.VALUES)) {
+			JsonObject valuesJ = messageJ.getAsJsonObject(Json.VALUES);
+			for (String propertyName : valuesJ.keySet()) {
+				properties.setProperty(propertyName, valuesJ.get(propertyName).getAsString());
+			}
+		}
+
+		return new LogMessage(id, zonedDateTime, realm, username, locator, severity, state, key, properties, message,
+				stackTrace);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(Object o) {
+		if (this == o)
 			return true;
-		if (!super.equals(obj))
+		if (o == null || getClass() != o.getClass())
 			return false;
-		if (getClass() != obj.getClass())
+		if (!super.equals(o))
 			return false;
-		LogMessage other = (LogMessage) obj;
-		if (this.locator == null) {
-			if (other.locator != null)
-				return false;
-		} else if (!this.locator.equals(other.locator))
-			return false;
-		if (this.realm == null) {
-			if (other.realm != null)
-				return false;
-		} else if (!this.realm.equals(other.realm))
-			return false;
-		if (this.severity != other.severity)
-			return false;
-		return true;
+
+		LogMessage that = (LogMessage) o;
+		return Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + (id != null ? id.hashCode() : 0);
+		return result;
 	}
 }

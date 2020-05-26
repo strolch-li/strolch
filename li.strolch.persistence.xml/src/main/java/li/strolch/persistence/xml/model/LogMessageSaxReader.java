@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
@@ -42,6 +43,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 	private String username;
 	private Locator locator;
 	private LogSeverity severity;
+	private LogMessageState state;
 	private String key;
 	private Properties properties;
 	private String message;
@@ -70,6 +72,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 		case Tags.KEY:
 		case Tags.MESSAGE:
 		case Tags.EXCEPTION:
+		case Tags.STATE:
 
 			this.sb = new StringBuilder();
 			break;
@@ -96,8 +99,11 @@ public class LogMessageSaxReader extends DefaultHandler {
 		switch (qName) {
 
 		case Tags.LOG_MESSAGE:
+			if (this.state == null)
+				this.state = LogMessageState.Information;
+
 			LogMessage logMessage = new LogMessage(this.id, this.dateTime, this.realm, this.username, this.locator,
-					this.severity, this.key, this.properties, this.message, this.exception);
+					this.severity, this.state, this.key, this.properties, this.message, this.exception);
 			this.logMessageConsumer.accept(logMessage);
 			break;
 
@@ -113,6 +119,11 @@ public class LogMessageSaxReader extends DefaultHandler {
 
 		case Tags.SEVERITY:
 			this.severity = LogSeverity.valueOf(this.sb.toString());
+			this.sb = null;
+			break;
+
+		case Tags.STATE:
+			this.state = LogMessageState.valueOf(this.sb.toString());
 			this.sb = null;
 			break;
 

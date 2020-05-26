@@ -1,5 +1,6 @@
 package li.strolch.persistence.xml;
 
+import java.util.Collection;
 import java.util.List;
 
 import li.strolch.handler.operationslog.LogMessage;
@@ -36,6 +37,16 @@ public class XmlLogMessageDao implements LogMessageDao {
 	@Override
 	public void saveAll(List<LogMessage> logMessages) {
 		this.tx.getObjectDao().addAll(logMessages);
+	}
+
+	@Override
+	public void updateState(LogMessage logMessage) {
+		this.tx.getObjectDao().update(logMessage);
+	}
+
+	@Override
+	public void updateStates(Collection<LogMessage> logMessages) {
+		logMessages.forEach(logMessage -> this.tx.getObjectDao().update(logMessage));
 	}
 
 	@Override

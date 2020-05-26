@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -88,7 +89,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 			if (this.agent.getContainer().hasComponent(OperationsLog.class)) {
 				this.agent.getContainer().getComponent(OperationsLog.class).addMessage(
 						new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-								ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
+								LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
 								.withException(e).value("reason", e));
 			}
 		}

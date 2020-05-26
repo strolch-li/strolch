@@ -13,6 +13,7 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.ArchiveActivityCommand;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.*;
@@ -293,7 +294,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, controller.getLocator(), LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.execution")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.execution")
 									.withException(e).value("reason", e));
 				}
 			}
@@ -315,7 +316,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
 									.withException(e).value("reason", e));
 				}
 			}
@@ -337,7 +338,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.stopped")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.stopped")
 									.withException(e).value("reason", e));
 				}
 			}
@@ -359,7 +360,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
 									.withException(e).value("reason", e));
 				}
 			}
@@ -381,7 +382,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
 									.withException(e).value("reason", e));
 				}
 			}
@@ -407,7 +408,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, activity.getLocator(), LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.archive")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.archive")
 									.withException(e).value("reason", e));
 				}
 			}

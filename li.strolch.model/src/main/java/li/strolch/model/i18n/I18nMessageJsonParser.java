@@ -1,24 +1,34 @@
 package li.strolch.model.i18n;
 
+import java.util.Properties;
+import java.util.Set;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.utils.I18nMessage;
 
 public class I18nMessageJsonParser {
 
-	public static I18nMessage parse(JsonObject messageJ) {
+	public I18nMessage parse(JsonObject messageJ) {
 
-		// TODO
+		String key = messageJ.get(Tags.Json.KEY).getAsString();
+		String message = messageJ.get(Tags.Json.MESSAGE).getAsString();
 
-//		String key = json.addProperty("key", message.getKey());
-//		json.addProperty("message", message.getMessage());
-//
-//		Properties values = message.getValues();
-//		if (!values.isEmpty()) {
-//			JsonObject valuesJ = new JsonObject();
-//			values.stringPropertyNames().forEach(key -> valuesJ.addProperty(key, values.getProperty(key)));
-//			json.add("values", valuesJ);
-//		}
+		Properties properties = new Properties();
+		if (messageJ.has(Tags.Json.VALUES)) {
+			JsonArray valuesJ = messageJ.getAsJsonArray(Tags.Json.VALUES);
+			for (JsonElement jsonElement : valuesJ) {
+				JsonObject valueJ = jsonElement.getAsJsonObject();
 
-		return null;
+				Set<String> keys = valueJ.keySet();
+				for (String propertyName : keys) {
+					properties.setProperty(propertyName, valueJ.get(propertyName).getAsString());
+				}
+			}
+		}
+
+		return new I18nMessage(key, properties, message);
 	}
 }

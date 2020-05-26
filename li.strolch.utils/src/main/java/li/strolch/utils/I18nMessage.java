@@ -15,17 +15,17 @@ public class I18nMessage {
 
 	private static final Logger logger = LoggerFactory.getLogger(I18nMessage.class);
 
-	private ResourceBundle bundle;
-	private String key;
-	private Properties values;
+	private final String key;
+	private final Properties values;
+	private final ResourceBundle bundle;
 	private String message;
 
 	public I18nMessage(ResourceBundle bundle, String key) {
 		DBC.INTERIM.assertNotNull("bundle must be set!", bundle);
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
-		this.bundle = bundle;
 		this.key = key;
 		this.values = new Properties();
+		this.bundle = bundle;
 	}
 
 	public I18nMessage(String key, Properties values, String message) {
@@ -34,6 +34,7 @@ public class I18nMessage {
 		this.key = key;
 		this.values = values == null ? new Properties() : values;
 		this.message = message;
+		this.bundle = null;
 	}
 
 	public String getKey() {
@@ -61,6 +62,11 @@ public class I18nMessage {
 	public String formatMessage() {
 		if (this.message != null)
 			return this.message;
+
+		if (this.bundle == null) {
+			this.message = this.key;
+			return this.message;
+		}
 
 		try {
 			String string = this.bundle.getString(this.key);

@@ -13,6 +13,7 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.*;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -300,7 +301,7 @@ public class Controller {
 				if (this.container.hasComponent(OperationsLog.class)) {
 					this.container.getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
 									.withException(e).value("reason", e));
 				}
 			}
@@ -323,7 +324,7 @@ public class Controller {
 				if (this.container.hasComponent(OperationsLog.class)) {
 					this.container.getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
 									.withException(e).value("reason", e));
 				}
 			}

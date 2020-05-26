@@ -29,6 +29,7 @@ import java.util.*;
 import li.strolch.agent.api.*;
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -287,7 +288,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			for (String realmName : getRealmNames()) {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
-						ResourceBundle.getBundle("strolch-agent"), "agent.started") //
+						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.started") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
 						.value("components", "" + this.controllerMap.size()) //
@@ -311,7 +312,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			for (String realmName : getRealmNames()) {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
-						ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
+						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
 						.value("components", "" + this.controllerMap.size()));

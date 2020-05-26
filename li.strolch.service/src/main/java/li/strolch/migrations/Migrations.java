@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -140,7 +141,7 @@ public class Migrations {
 				List<Version> list = migrationsRan.getList(realm);
 				for (Version version : list) {
 					LogMessage logMessage = new LogMessage(realm, SYSTEM_USER_AGENT,
-							locator.append(StrolchAgent.getUniqueId()), LogSeverity.Info,
+							locator.append(StrolchAgent.getUniqueId()), LogSeverity.Info, LogMessageState.Information,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.migrations.version")
 							.value("version", version.toString());
 					operationsLog.addMessage(logMessage);

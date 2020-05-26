@@ -5,6 +5,7 @@ import static li.strolch.runtime.StrolchConstants.PolicyConstants.TYPE_RESERVE;
 import java.util.ResourceBundle;
 
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -42,7 +43,7 @@ public class ToErrorReservationExecution extends ReservationExecution {
 		if (action.getType().equals(TYPE_RESERVE) && isReserved(tx(), action)) {
 			setActionState(action, State.EXECUTION);
 			toError(new LogMessage(tx().getRealmName(), tx().getCertificate().getUsername(), action.getLocator(),
-					LogSeverity.Error, ResourceBundle.getBundle("strolch-service"),
+					LogSeverity.Error, LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 					"execution.policy.reservation.alreadyReserved")
 					.value("resourceLoc", action.getResourceLocator().toString()));
 		} else {

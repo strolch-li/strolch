@@ -3,8 +3,9 @@ package li.strolch.testbase.runtime;
 import static java.util.stream.Collectors.toList;
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -12,6 +13,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.handler.operationslog.LogMessageState;
 import li.strolch.handler.operationslog.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -45,7 +47,7 @@ public class LogMessagesTestRunner {
 			ResourceBundle bundle = ResourceBundle.getBundle("li-strolch-testbase");
 			LogMessage logMessage = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
 					Locator.valueOf(AGENT, "li.strolch.testbase", StrolchAgent.getUniqueId()), LogSeverity.Exception,
-					bundle, "test-message").withException(ex).value("reason", ex);
+					LogMessageState.Information, bundle, "test-message").withException(ex).value("reason", ex);
 			this.operationsLog.addMessage(logMessage);
 
 			// default is async persisting...
@@ -83,7 +85,7 @@ public class LogMessagesTestRunner {
 			for (int i = 0; i < MAX_MESSAGES * 2; i++) {
 				LogMessage m = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "li.strolch.testbase", StrolchAgent.getUniqueId()),
-						LogSeverity.Exception, bundle, "test-message");
+						LogSeverity.Exception, LogMessageState.Information, bundle, "test-message");
 				this.operationsLog.addMessage(m);
 				ids.add(m.getId());
 			}
@@ -106,6 +108,49 @@ public class LogMessagesTestRunner {
 					assertEquals(expectedSize, logMessageIds.size());
 					assertEquals(ids.subList(ids.size() - expectedSize, ids.size()), logMessageIds);
 				}
+			}
+
+			// add a few more messages
+			LogMessage logMessage1 = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
+					Locator.valueOf(AGENT, "test", "@1"), LogSeverity.Error, LogMessageState.Active, bundle,
+					"test-message");
+			LogMessage logMessage2 = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
+					Locator.valueOf(AGENT, "test", "@2"), LogSeverity.Error, LogMessageState.Active, bundle,
+					"test-message");
+			LogMessage logMessage3 = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
+					Locator.valueOf(AGENT, "test", "@3"), LogSeverity.Error, LogMessageState.Active, bundle,
+					"test-message");
+
+			this.operationsLog.addMessage(logMessage1);
+			this.operationsLog.addMessage(logMessage2);
+			this.operationsLog.addMessage(logMessage3);
+
+			// update state of element
+			this.operationsLog.updateState(this.realmName, logMessage1.getLocator(), LogMessageState.Inactive);
+			assertEquals(LogMessageState.Inactive, logMessage1.getState());
+
+			this.operationsLog.updateState(this.realmName, logMessage1.getId(), LogMessageState.Active);
+			assertEquals(LogMessageState.Active, logMessage1.getState());
+
+			// now try and remove a single element
+			this.operationsLog.removeMessage(logMessage1);
+			assertFalse(this.operationsLog.getMessagesFor(this.realmName, logMessage1.getLocator()).isPresent());
+
+			// now remove bulk
+			List<LogMessage> toRemove = Arrays.asList(logMessage2, logMessage3);
+			this.operationsLog.removeMessages(toRemove);
+
+			// default is async persisting...
+			Thread.sleep(300L);
+
+			// assert all are removed
+			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
+				LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
+				List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE).stream()
+						.map(LogMessage::getId).sorted().collect(toList());
+				assertFalse(logMessageIds.contains(logMessage1.getId()));
+				assertFalse(logMessageIds.contains(logMessage2.getId()));
+				assertFalse(logMessageIds.contains(logMessage3.getId()));
 			}
 
 		} catch (InterruptedException e) {

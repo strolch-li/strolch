@@ -15,8 +15,8 @@
  */
 package li.strolch.persistence.api;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import li.strolch.handler.operationslog.LogMessage;
 
@@ -30,6 +30,10 @@ public interface LogMessageDao {
 	void save(LogMessage logMessage);
 
 	void saveAll(List<LogMessage> logMessages);
+
+	void updateState(LogMessage logMessage);
+
+	void updateStates(Collection<LogMessage> logMessages);
 
 	void remove(LogMessage logMessage);
 
