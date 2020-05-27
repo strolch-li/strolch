@@ -129,8 +129,14 @@ public class LogMessagesTestRunner {
 			this.operationsLog.updateState(this.realmName, logMessage1.getLocator(), LogMessageState.Inactive);
 			assertEquals(LogMessageState.Inactive, logMessage1.getState());
 
+			// default is async persisting...
+			Thread.sleep(50L);
+
 			this.operationsLog.updateState(this.realmName, logMessage1.getId(), LogMessageState.Active);
 			assertEquals(LogMessageState.Active, logMessage1.getState());
+
+			// default is async persisting...
+			Thread.sleep(50L);
 
 			// now try and remove a single element
 			this.operationsLog.removeMessage(logMessage1);

@@ -145,7 +145,7 @@ public class OperationsLog extends StrolchComponent {
 
 			StrolchRealm realm = getContainer().getRealm(realmName);
 			if (!realm.getMode().isTransient()) {
-				persist(realm, logMessages);
+				this.executorService.submit(() -> persist(realm, logMessages));
 			}
 		});
 	}
@@ -158,7 +158,7 @@ public class OperationsLog extends StrolchComponent {
 
 				StrolchRealm realm = getContainer().getRealm(realmName);
 				if (!realm.getMode().isTransient()) {
-					persist(realm, logMessages);
+					this.executorService.submit(() -> persist(realm, logMessages));
 				}
 			}
 		}
