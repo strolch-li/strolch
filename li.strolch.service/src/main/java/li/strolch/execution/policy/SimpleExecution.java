@@ -1,6 +1,6 @@
 package li.strolch.execution.policy;
 
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;

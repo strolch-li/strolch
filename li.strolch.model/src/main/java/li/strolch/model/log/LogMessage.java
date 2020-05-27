@@ -1,4 +1,4 @@
-package li.strolch.handler.operationslog;
+package li.strolch.model.log;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -7,11 +7,11 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 
 import com.google.gson.JsonObject;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags.Json;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.helper.ExceptionHelper;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
 
 public class LogMessage extends I18nMessage {
@@ -28,7 +28,7 @@ public class LogMessage extends I18nMessage {
 	public LogMessage(String realm, String username, Locator locator, LogSeverity severity, LogMessageState state,
 			ResourceBundle bundle, String key) {
 		super(bundle, key);
-		this.id = StrolchAgent.getUniqueId();
+		this.id = StringHelper.getUniqueId();
 		// persisting in the DB only handles millisecond precision, not nano precision
 		ZonedDateTime now = ZonedDateTime.now();
 		this.zonedDateTime = now.withNano((now.getNano() / 1000000) * 1000000);

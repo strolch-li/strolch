@@ -15,7 +15,7 @@
  */
 package li.strolch.persistence.xml.model;
 
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 import li.strolch.xmlpers.api.DomParser;
 import li.strolch.xmlpers.api.ParserFactory;
 import li.strolch.xmlpers.api.SaxParser;

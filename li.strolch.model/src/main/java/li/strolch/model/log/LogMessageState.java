@@ -1,4 +1,4 @@
-package li.strolch.handler.operationslog;
+package li.strolch.model.log;
 
 public enum LogMessageState {
 	Active,

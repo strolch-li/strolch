@@ -25,9 +25,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import li.strolch.agent.api.*;
-import li.strolch.handler.operationslog.LogMessage;
-import li.strolch.handler.operationslog.LogMessageState;
-import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.StrolchRootElement;

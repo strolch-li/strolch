@@ -4,9 +4,9 @@ import static li.strolch.runtime.StrolchConstants.PolicyConstants.TYPE_RESERVE;
 
 import java.util.ResourceBundle;
 
-import li.strolch.handler.operationslog.LogMessage;
-import li.strolch.handler.operationslog.LogMessageState;
-import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;

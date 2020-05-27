@@ -1,6 +1,6 @@
 package li.strolch.persistence.xml.model;
 
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 import li.strolch.model.Tags;
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceContextFactory;

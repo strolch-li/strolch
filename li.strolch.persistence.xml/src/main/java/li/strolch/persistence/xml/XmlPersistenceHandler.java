@@ -27,7 +27,7 @@ import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.StoreToDaoElementListener;
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;

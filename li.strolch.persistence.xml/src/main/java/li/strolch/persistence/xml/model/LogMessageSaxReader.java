@@ -20,9 +20,9 @@ import java.time.ZonedDateTime;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-import li.strolch.handler.operationslog.LogMessage;
-import li.strolch.handler.operationslog.LogMessageState;
-import li.strolch.handler.operationslog.LogSeverity;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
 import li.strolch.utils.iso8601.ISO8601;

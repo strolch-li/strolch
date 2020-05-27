@@ -18,7 +18,7 @@ package li.strolch.persistence.xml.model;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 import li.strolch.xmlpers.api.SaxParser;
 import org.xml.sax.helpers.DefaultHandler;
 

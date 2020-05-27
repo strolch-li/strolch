@@ -18,7 +18,7 @@ package li.strolch.persistence.api;
 import java.util.Collection;
 import java.util.List;
 
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

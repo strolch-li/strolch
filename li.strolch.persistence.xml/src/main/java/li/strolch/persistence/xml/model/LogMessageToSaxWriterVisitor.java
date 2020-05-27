@@ -9,7 +9,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 import li.strolch.model.Tags;
 import li.strolch.utils.iso8601.ISO8601;
 

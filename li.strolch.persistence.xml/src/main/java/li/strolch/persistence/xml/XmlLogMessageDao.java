@@ -3,7 +3,7 @@ package li.strolch.persistence.xml;
 import java.util.Collection;
 import java.util.List;
 
-import li.strolch.handler.operationslog.LogMessage;
+import li.strolch.model.log.LogMessage;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
