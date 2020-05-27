@@ -150,13 +150,20 @@ public class LogMessagesTestRunner {
 			Thread.sleep(300L);
 
 			// assert all are removed
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
-				LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-				List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE).stream()
-						.map(LogMessage::getId).sorted().collect(toList());
-				assertFalse(logMessageIds.contains(logMessage1.getId()));
-				assertFalse(logMessageIds.contains(logMessage2.getId()));
-				assertFalse(logMessageIds.contains(logMessage3.getId()));
+			if (realm.getMode().isTransient()) {
+				List<LogMessage> messages = this.operationsLog.getMessages(this.realmName);
+				assertFalse(messages.contains(logMessage1));
+				assertFalse(messages.contains(logMessage2));
+				assertFalse(messages.contains(logMessage3));
+			} else {
+				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
+					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
+					List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE).stream()
+							.map(LogMessage::getId).sorted().collect(toList());
+					assertFalse(logMessageIds.contains(logMessage1.getId()));
+					assertFalse(logMessageIds.contains(logMessage2.getId()));
+					assertFalse(logMessageIds.contains(logMessage3.getId()));
+				}
 			}
 
 		} catch (InterruptedException e) {

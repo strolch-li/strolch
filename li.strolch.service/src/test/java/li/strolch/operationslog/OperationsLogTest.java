@@ -44,8 +44,6 @@ public class OperationsLogTest extends AbstractRealmServiceTest<ServiceArgument,
 	}
 
 	public static class OperationsLogService extends AbstractService<ServiceArgument, ServiceResult> {
-		private static final long serialVersionUID = 1L;
-
 		@Override
 		protected ServiceResult getResultInstance() {
 			return new ServiceResult();
