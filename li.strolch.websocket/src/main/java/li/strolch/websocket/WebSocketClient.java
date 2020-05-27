@@ -153,6 +153,12 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		String authToken = jsonObject.get("authToken").getAsString();
 		String username = jsonObject.get("username").getAsString();
 
+		if (authToken.isEmpty() || username.isEmpty()) {
+			logger.error("Received invalid authentication request: " + jsonObject.toString());
+			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
+			return;
+		}
+
 		try {
 			this.certificate = this.sessionHandler.validate(authToken, this.remoteIp);
 			if (!this.certificate.getUsername().equals(username)) {
