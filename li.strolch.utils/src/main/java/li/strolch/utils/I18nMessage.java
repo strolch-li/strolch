@@ -49,6 +49,10 @@ public class I18nMessage {
 		return this.values.get(key);
 	}
 
+	public String getMessage(ResourceBundle bundle) {
+		return formatMessage(bundle);
+	}
+
 	public String getMessage() {
 		return formatMessage();
 	}
@@ -68,15 +72,20 @@ public class I18nMessage {
 			return this.message;
 		}
 
-		try {
-			String string = this.bundle.getString(this.key);
-			this.message = StringHelper.replacePropertiesIn(this.values, EMPTY, string);
-		} catch (MissingResourceException e) {
-			logger.error("Key " + this.key + " is missing in bundle " + this.bundle.getBaseBundleName());
-			this.message = this.key;
-		}
-
+		this.message = formatMessage(this.bundle);
 		return this.message;
+	}
+
+	public String formatMessage(ResourceBundle bundle) {
+		try {
+			String string = bundle.getString(this.key);
+			return StringHelper.replacePropertiesIn(this.values, EMPTY, string);
+		} catch (MissingResourceException e) {
+			String baseName = bundle.getBaseBundleName();
+			String languageTag = bundle.getLocale().toLanguageTag();
+			logger.error("Key " + this.key + " is missing in bundle " + baseName + " for locale " + languageTag);
+			return this.key;
+		}
 	}
 
 	public <T> T accept(I18nMessageVisitor<T> visitor) {
