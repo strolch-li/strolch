@@ -20,7 +20,7 @@ import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_ORDER;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.model.Order;
-import li.strolch.model.activity.Action;
+import li.strolch.model.activity.IActivityElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import org.slf4j.Logger;
@@ -81,8 +81,8 @@ public abstract class StrolchPolicy {
 		return this.tx;
 	}
 
-	protected Order getOrder(Action action) {
-		return tx().getOrderByRelation(action.getRootElement(), PARAM_ORDER, true);
+	protected Order getOrder(IActivityElement element) {
+		return tx().getOrderByRelation(element.getRootElement(), PARAM_ORDER, true);
 	}
 
 	/**
