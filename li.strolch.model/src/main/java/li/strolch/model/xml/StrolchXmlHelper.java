@@ -69,7 +69,7 @@ public class StrolchXmlHelper {
 			throw new RuntimeException("Failed to write elements to " + file, e);
 		}
 
-		logger.info("Wrote " + elements.size() + " to file " + file);
+		logger.info("Wrote " + elements.size() + " elements to file " + file);
 	}
 
 	public static void writeToWriter(Writer writer, Collection<? extends StrolchRootElement> elements) {
