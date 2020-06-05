@@ -1321,8 +1321,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		Set<String> userRoles = user.getRoles();
 		return new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(), user.getLastname(),
-				user.getUserState(), authToken, source, loginTime, keepAlive, user.getLocale(), userRoles,
-				new HashMap<>(user.getProperties()));
+				user.getUserState(), authToken, source, loginTime, keepAlive && this.allowSessionRefresh,
+				user.getLocale(), userRoles, new HashMap<>(user.getProperties()));
 	}
 
 	private synchronized boolean persistSessions() {
