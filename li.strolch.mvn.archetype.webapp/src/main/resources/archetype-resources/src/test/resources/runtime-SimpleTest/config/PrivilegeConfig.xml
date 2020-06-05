@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Privilege>
 
-	<Container>
+    <Container>
 
-		<Parameters>
-			<!-- parameters for the container itself -->
-			<Parameter name="secretKey" value="test-secret"/>
-			<Parameter name="secretSalt" value="test-secret"/>
-			<Parameter name="autoPersistOnUserChangesData" value="true" />
-		</Parameters>
+        <Parameters>
+            <!-- parameters for the container itself -->
+            <Parameter name="secretKey" value="CHANGE-ME-1"/>
+            <Parameter name="secretSalt" value="CHANGE-ME-2"/>
+            <Parameter name="persistSessions" value="true"/>
+            <Parameter name="autoPersistOnUserChangesData" value="true"/>
+            <Parameter name="privilegeConflictResolution" value="MERGE"/>
+            <Parameter name="allowSessionRefresh" value="true"/>
+        </Parameters>
 
-		<EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
-			<Parameters>
-				<!-- WARNING: If you change iterations or keyLength, then all passwords are invalid -->
-				<!-- default algorithm is: PBKDF2WithHmacSHA512 -->
-				<Parameter name="hashAlgorithm" value="PBKDF2WithHmacSHA512" />
-				<!-- default iterations: 200000 -->
-				<Parameter name="hashIterations" value="10000" />
-				<!-- default key length: 256 -->
-				<Parameter name="hashKeyLength" value="256" />
-			</Parameters>
-		</EncryptionHandler>
+        <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
+            <Parameters>
+                <!-- WARNING: If you change iterations or keyLength, then all passwords are invalid -->
+                <!-- default algorithm is: PBKDF2WithHmacSHA512 -->
+                <Parameter name="hashAlgorithm" value="PBKDF2WithHmacSHA512"/>
+                <!-- default iterations: 200000 -->
+                <Parameter name="hashIterations" value="10000"/>
+                <!-- default key length: 256 -->
+                <Parameter name="hashKeyLength" value="256"/>
+            </Parameters>
+        </EncryptionHandler>
 
-		<PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
-			<Parameters>
-				<Parameter name="usersXmlFile" value="PrivilegeUsers.xml" />
-				<Parameter name="rolesXmlFile" value="PrivilegeRoles.xml" />
-			</Parameters>
-		</PersistenceHandler>
+        <PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
+            <Parameters>
+                <Parameter name="usersXmlFile" value="PrivilegeUsers.xml"/>
+                <Parameter name="rolesXmlFile" value="PrivilegeRoles.xml"/>
+            </Parameters>
+        </PersistenceHandler>
 
-		<UserChallengeHandler class="li.strolch.privilege.handler.ConsoleUserChallengeHandler">
-		</UserChallengeHandler>
+        <UserChallengeHandler class="li.strolch.privilege.handler.ConsoleUserChallengeHandler">
+        </UserChallengeHandler>
 
-	</Container>
+    </Container>
 
-	<Policies>
-		<Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
-		<Policy name="ModelPrivilege" class="li.strolch.runtime.privilege.ModelPrivilege" />
-		<Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege" />
-		<Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
+    <Policies>
+        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege"/>
+        <Policy name="ModelPrivilege" class="li.strolch.runtime.privilege.ModelPrivilege"/>
+        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege"/>
+        <Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege"/>
         <Policy name="UserSessionAccessPrivilege" class="li.strolch.privilege.policy.UsernameFromCertificatePrivilege"/>
-	</Policies>
+    </Policies>
 
 </Privilege>
