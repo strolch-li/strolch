@@ -135,6 +135,19 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	}
 
 	/**
+	 * appends a comparator to this stream
+	 *
+	 * @param comparator
+	 * 		the comparator to append to the stream
+	 *
+	 * @return this for chaining
+	 */
+	public RootElementSearchResult<T> orderBy(Comparator<? super T> comparator) {
+		super.orderBy(comparator);
+		return this;
+	}
+
+	/**
 	 * <p>Appends a map to the stream which clones the elements in the stream with their version by calling {@link
 	 * StrolchRootElement#getClone(boolean)}</p>
 	 *
