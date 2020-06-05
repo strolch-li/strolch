@@ -1,5 +1,6 @@
 package li.strolch.execution.policy;
 
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 import java.time.Duration;
@@ -281,7 +282,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * 		if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
-		getContainer().getPrivilegeHandler().runAs(StrolchConstants.SYSTEM_USER_AGENT, runnable);
+		getContainer().getPrivilegeHandler().runAs(SYSTEM_USER_AGENT, runnable);
 	}
 
 	/**
@@ -300,6 +301,6 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable)
 			throws PrivilegeException, Exception {
-		return getContainer().getPrivilegeHandler().runWithResult(StrolchConstants.SYSTEM_USER_AGENT, runnable);
+		return getContainer().getPrivilegeHandler().runWithResult(SYSTEM_USER_AGENT, runnable);
 	}
 }
