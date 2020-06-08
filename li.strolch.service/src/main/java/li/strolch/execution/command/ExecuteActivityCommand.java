@@ -72,22 +72,24 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 
 		ConfirmationPolicy confirmationPolicy = getConfirmationPolicy(action);
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
-		if (executionPolicy.isStopped()) {
-			this.controller.removeExecutionPolicy(action);
-			executionPolicy = getExecutionPolicy(action);
-		}
-
-		if (!executionPolicy.isExecutable(action)) {
-			logger.info("Action " + action.getLocator() + " is not yet executable.");
-			return;
-		}
-
-		logger.info("Action " + action.getLocator() + " is now being executed...");
 
 		// we catch all exceptions because we can't undo, thus need to set the state to ERROR in this case
 		// this is only required because we execute actions in same TX as we set to executed any previous actions
 		try {
+
+			if (executionPolicy.isStopped()) {
+				this.controller.removeExecutionPolicy(action);
+				executionPolicy = getExecutionPolicy(action);
+			}
+
 			executionPolicy.initialize(action);
+			if (!executionPolicy.isExecutable(action)) {
+				logger.info("Action " + action.getLocator() + " is not yet executable.");
+				return;
+			}
+
+			logger.info("Action " + action.getLocator() + " is now being executed...");
+
 			executionPolicy.toExecution(action);
 			confirmationPolicy.toExecution(action);
 
