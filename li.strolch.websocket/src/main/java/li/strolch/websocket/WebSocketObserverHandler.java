@@ -3,8 +3,10 @@ package li.strolch.websocket;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.DASH;
 
+import javax.websocket.CloseReason;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +97,13 @@ public class WebSocketObserverHandler implements Observer {
 			JsonArray elementsJ = new JsonArray();
 			data.getList(type).forEach(elementsJ::add);
 			jsonObject.add(DATA, elementsJ);
-			this.client.sendMessage(jsonObject.toString());
+
+			try {
+				this.client.sendMessage(jsonObject.toString());
+			} catch (Exception e) {
+				logger.error("Failed to send data to client " + this.client);
+				this.client.close(new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, getExceptionMessage(e)));
+			}
 		});
 	}
 

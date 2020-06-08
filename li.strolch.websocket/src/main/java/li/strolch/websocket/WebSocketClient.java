@@ -31,14 +31,14 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 	public static final Logger logger = LoggerFactory.getLogger(WebSocketClient.class);
 
-	private StrolchSessionHandler sessionHandler;
-	private ComponentContainer container;
+	private final StrolchSessionHandler sessionHandler;
+	private final ComponentContainer container;
 	private final Session session;
 	private final EndpointConfig config;
-	private String remoteIp;
+	private final String remoteIp;
+	private final Map<String, WebSocketObserverHandler> observerHandlersByRealm;
 
 	private Certificate certificate;
-	private Map<String, WebSocketObserverHandler> observerHandlersByRealm;
 
 	public WebSocketClient(ComponentContainer container, Session session, EndpointConfig config) {
 		this.container = container;
@@ -47,6 +47,11 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		this.config = config;
 		this.remoteIp = WebSocketRemoteIp.get();
 		this.observerHandlersByRealm = new HashMap<>(1);
+	}
+
+	@Override
+	public String toString() {
+		return "WebSocket " + this.certificate.getUsername() + "@" + this.remoteIp;
 	}
 
 	@Override
@@ -179,7 +184,12 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		jsonObject.addProperty(MSG, DASH);
 
-		sendMessage(jsonObject.toString());
+		try {
+			sendMessage(jsonObject.toString());
+		} catch (Exception e) {
+			logger.error("Failed to send authentication response to client " + this, e);
+			close(new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, getExceptionMessage(e)));
+		}
 	}
 
 	private void close(CloseReason.CloseCode code, String reason) {
@@ -203,18 +213,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		logger.error("Socket error: " + t.getMessage(), t);
 	}
 
-	public synchronized void sendMessage(String data) {
+	public synchronized void sendMessage(String data) throws Exception {
 		assertAuthenticated("sendMessage");
-
-		try {
-			this.session.getBasicRemote().sendText(data);
-		} catch (Exception e) {
-			logger.error("Failed to communicate with client", e);
-			try {
-				this.session.close(new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, getExceptionMessage(e)));
-			} catch (Exception e1) {
-				logger.error("Failed to close", e1);
-			}
-		}
+		this.session.getBasicRemote().sendText(data);
 	}
 }
