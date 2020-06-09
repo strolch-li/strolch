@@ -15,11 +15,16 @@
  */
 package li.strolch.utils.iso8601;
 
+import static java.time.ZoneId.systemDefault;
+import static java.time.temporal.ChronoField.*;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.SignStyle;
 import java.util.Date;
 
 import li.strolch.utils.helper.StringHelper;
@@ -36,7 +41,98 @@ public class ISO8601 implements DateFormat {
 
 	public static final Date EMPTY_VALUE = parseToDate("-");
 	public static final ZonedDateTime EMPTY_VALUE_ZONED_DATE = ZonedDateTime
-			.ofInstant(EMPTY_VALUE.toInstant(), ZoneId.systemDefault());
+			.ofInstant(EMPTY_VALUE.toInstant(), systemDefault());
+
+	public static final DateTimeFormatter ISO_LOCAL_DATE;
+
+	static {
+		ISO_LOCAL_DATE = new DateTimeFormatterBuilder().appendValue(YEAR, 4, 10, SignStyle.EXCEEDS_PAD) //
+				.appendLiteral('-') //
+				.appendValue(MONTH_OF_YEAR, 2) //
+				.appendLiteral('-') //
+				.appendValue(DAY_OF_MONTH, 2) //
+				.toFormatter();
+	}
+
+	public static final DateTimeFormatter ISO_LOCAL_TIME;
+
+	static {
+		ISO_LOCAL_TIME = new DateTimeFormatterBuilder() //
+				.appendValue(HOUR_OF_DAY, 2) //
+				.appendLiteral(':') //
+				.appendValue(MINUTE_OF_HOUR, 2) //
+				.optionalStart() //
+				.appendLiteral(':') //
+				.appendValue(SECOND_OF_MINUTE, 2) //
+				.optionalStart() //
+				.appendFraction(NANO_OF_SECOND, 0, 3, true) //
+				.toFormatter();
+	}
+
+	public static final DateTimeFormatter ISO_LOCAL_TIME_NO_FRACTIONS;
+
+	static {
+		ISO_LOCAL_TIME_NO_FRACTIONS = new DateTimeFormatterBuilder() //
+				.appendValue(HOUR_OF_DAY, 2) //
+				.appendLiteral(':') //
+				.appendValue(MINUTE_OF_HOUR, 2) //
+				.optionalStart() //
+				.appendLiteral(':') //
+				.appendValue(SECOND_OF_MINUTE, 2) //
+				.toFormatter();
+	}
+
+	public static final DateTimeFormatter ISO_LOCAL_DATE_TIME;
+
+	static {
+		ISO_LOCAL_DATE_TIME = new DateTimeFormatterBuilder() //
+				.parseCaseInsensitive() //
+				.append(ISO_LOCAL_DATE) //
+				.appendLiteral('T') //
+				.append(ISO_LOCAL_TIME) //
+				.toFormatter();
+	}
+
+	public static final DateTimeFormatter ISO_LOCAL_DATE_TIME_NO_FRACTIONS;
+
+	static {
+		ISO_LOCAL_DATE_TIME_NO_FRACTIONS = new DateTimeFormatterBuilder() //
+				.parseCaseInsensitive() //
+				.append(ISO_LOCAL_DATE) //
+				.appendLiteral('T') //
+				.append(ISO_LOCAL_TIME_NO_FRACTIONS) //
+				.toFormatter();
+	}
+
+	public static final DateTimeFormatter ISO_OFFSET_DATE_TIME;
+
+	static {
+		ISO_OFFSET_DATE_TIME = new DateTimeFormatterBuilder() //
+				.parseCaseInsensitive() //
+				.append(ISO_LOCAL_DATE_TIME) //
+				.parseLenient() //
+				.appendOffsetId() //
+				.parseStrict() //
+				.toFormatter();
+	}
+
+	public static final DateTimeFormatter ISO_OFFSET_DATE_TIME_ZONE;
+
+	static {
+		ISO_OFFSET_DATE_TIME_ZONE = ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault());
+	}
+
+	public static final DateTimeFormatter ISO_OFFSET_DATE_TIME_ZONE_NO_FRACTIONS;
+
+	static {
+		ISO_OFFSET_DATE_TIME_ZONE_NO_FRACTIONS = new DateTimeFormatterBuilder() //
+				.parseCaseInsensitive() //
+				.append(ISO_LOCAL_DATE_TIME_NO_FRACTIONS) //
+				.parseLenient() //
+				.appendOffsetId() //
+				.parseStrict() //
+				.toFormatter();
+	}
 
 	@Override
 	public String format(long timePoint) {
@@ -76,24 +172,29 @@ public class ISO8601 implements DateFormat {
 
 		if (s.equals("-"))
 			return ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
-		return ZonedDateTime.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
+		return ZonedDateTime.parse(s, getIso8601Formatter(false));
 	}
 
 	public static Date parseToDate(String s) {
 		return Date.from(parseToZdt(s).toInstant());
 	}
 
-	public static String toString(ZonedDateTime zonedDateTime) {
-		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()).format(zonedDateTime);
+	public static String toString(LocalDateTime localDateTime) {
+		return toString(localDateTime.atZone(systemDefault()));
 	}
 
-	public static String toString(LocalDateTime localDateTime) {
-		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault())
-				.format(localDateTime.atZone(ZoneId.systemDefault()));
+	public static String toString(ZonedDateTime zonedDateTime) {
+		return getIso8601Formatter(false).format(zonedDateTime);
 	}
 
 	public static String toString(Date date) {
-		return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()).format(date.toInstant());
+		return getIso8601Formatter(false).format(date.toInstant());
+	}
+
+	public static DateTimeFormatter getIso8601Formatter(boolean noFractions) {
+		if (noFractions)
+			return ISO_OFFSET_DATE_TIME_ZONE_NO_FRACTIONS;
+		return ISO_OFFSET_DATE_TIME_ZONE;
 	}
 
 	public static void main(String[] args) {
