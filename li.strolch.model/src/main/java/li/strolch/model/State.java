@@ -15,8 +15,10 @@
  */
 package li.strolch.model;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
+
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
@@ -245,7 +247,7 @@ public enum State {
 
 	public static State getState(Activity activity) {
 
-		Set<State> states = activity.elementStream().map(e -> e.getValue().getState()).collect(Collectors.toSet());
+		Set<State> states = activity.elementStream().map(e -> e.getValue().getState()).collect(toSet());
 
 		// if only one state
 		if (states.size() == 1)
@@ -288,7 +290,7 @@ public enum State {
 			return CREATED;
 
 		// should never happen, unless new state is introduced
-		throw new IllegalStateException("Unhandled situation with states: " + states.stream().map(e -> e.state)
-				.collect(Collectors.joining(", ")));
+		throw new IllegalStateException(
+				"Unhandled situation with states: " + states.stream().map(e -> e.state).collect(joining(", ")));
 	}
 }
