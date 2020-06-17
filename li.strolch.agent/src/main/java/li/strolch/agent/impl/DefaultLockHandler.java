@@ -124,7 +124,7 @@ public class DefaultLockHandler implements LockHandler {
 			throws StrolchLockException {
 		try {
 
-			if (!tuple.getFirst().tryLock(tryLockTime, timeUnit)) {
+			if (!tuple.getFirst().tryLock() || !tuple.getFirst().tryLock(tryLockTime, timeUnit)) {
 				String msg = "Thread {0} failed to acquire lock after {1}s for {2}"; //$NON-NLS-1$
 				msg = MessageFormat
 						.format(msg, Thread.currentThread().getName(), timeUnit.toSeconds(tryLockTime), locator);
