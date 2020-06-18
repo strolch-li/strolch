@@ -62,14 +62,16 @@ public class ReservationExecution extends DurationExecution {
 	@Override
 	public void toExecuted(Action action) {
 		switch (action.getType()) {
+
 		case TYPE_RESERVE:
+			setReservation(tx(), action, true);
+			break;
 		case TYPE_RELEASE:
-
-			setReservation(tx(), action, action.getType().equals(TYPE_RESERVE));
-
-		default:
-			super.toExecuted(action);
+			setReservation(tx(), action, false);
+			break;
 		}
+
+		super.toExecuted(action);
 	}
 
 	public static boolean isReserved(StrolchTransaction tx, Action action) {
