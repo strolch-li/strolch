@@ -121,12 +121,8 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			ps.setString(1, logMessage.getState().name());
 			ps.setString(2, logMessage.getId());
 
-			int count = ps.executeUpdate();
-			if (count != 1) {
-				throw new StrolchPersistenceException(MessageFormat
-						.format("Expected to update 1 log_message record, but updated {0} for LogMessage {1}", count,
-								logMessage.getId())); //$NON-NLS-1$
-			}
+			// we ignore the number of updates, as the message might have been deleted meanwhile
+			ps.executeUpdate();
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(MessageFormat
