@@ -140,5 +140,6 @@ public class StrolchConstants extends StrolchModelConstants {
 		public static final String PARAM_QUANTITY = "quantity";
 		public static final String PARAM_DURATION = "duration";
 		public static final String PARAM_ORDER = "order";
+		public static final String PARAM_ACTIVITY = "activity";
 	}
 }
