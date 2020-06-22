@@ -1,5 +1,6 @@
 package li.strolch.execution;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -56,6 +57,16 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public ExecutorService getExecutor() {
 		return getExecutorService("ExecutionHandler");
 	}
+
+	/**
+	 * Returns the controllers for the given realm
+	 *
+	 * @param realm
+	 * 		the realm for which to get the controller
+	 *
+	 * @return the controllers
+	 */
+	public abstract Collection<Controller> getControllers(String realm);
 
 	/**
 	 * Returns the controller for the given realm and activity, null if it does not exist
