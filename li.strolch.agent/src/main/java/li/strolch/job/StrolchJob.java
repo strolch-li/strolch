@@ -3,6 +3,7 @@ package li.strolch.job;
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -267,8 +268,9 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				operationsLog.addMessage(
 						new LogMessage(this.realmName == null ? StrolchConstants.DEFAULT_REALM : this.realmName,
 								SYSTEM_USER_AGENT, Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()),
-								LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "strolchjob.failed")
-								.withException(e).value("jobName", getClass().getName()).value("reason", e));
+								LogSeverity.Exception, LogMessageState.Information,
+								ResourceBundle.getBundle("strolch-agent"), "strolchjob.failed").withException(e)
+								.value("jobName", getClass().getName()).value("reason", e));
 			}
 		}
 
@@ -445,5 +447,19 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			jsonObject.addProperty("lastException", ExceptionHelper.formatExceptionMessage(this.lastException));
 
 		return jsonObject;
+	}
+
+	@Override
+	public String toString() {
+		String schedule;
+		if (this.mode == JobMode.Manual)
+			schedule = this.mode.name();
+		else if (isEmpty(this.cron))
+			schedule = this.mode.name() + " Delay: " + this.initialDelay + " " + this.initialDelayTimeUnit + ", "
+					+ this.delay + " " + this.delayTimeUnit;
+		else
+			schedule = this.mode.name() + " " + this.cron;
+
+		return "Job " + this.id + " / " + this.name + " @ " + schedule;
 	}
 }

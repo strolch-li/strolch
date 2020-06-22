@@ -69,6 +69,8 @@ public class StrolchModelConstants {
 	public static final String TYPE_ENUMERATION = "Enumeration";
 	public static final String TYPE_CONFIGURATION = "Configuration";
 
+	public static final String RES_CONFIGURATION = "configuration";
+
 	/**
 	 * ID of the admin role which has access to all resources
 	 */
