@@ -8,7 +8,7 @@ import li.strolch.service.api.ServiceResultState;
 
 public class StrolchRootElementListResult extends ServiceResult {
 
-	private List<StrolchRootElement> rootElements;
+	private List<? extends StrolchRootElement> rootElements;
 
 	public StrolchRootElementListResult(ServiceResultState state) {
 		super(state);
@@ -18,12 +18,12 @@ public class StrolchRootElementListResult extends ServiceResult {
 		super(state, msg);
 	}
 
-	public StrolchRootElementListResult(List<StrolchRootElement> rootElements) {
+	public StrolchRootElementListResult(List<? extends StrolchRootElement> rootElements) {
 		super(ServiceResultState.SUCCESS);
 		this.rootElements = rootElements;
 	}
 
-	public List<StrolchRootElement> getRootElements() {
+	public List<? extends StrolchRootElement> getRootElements() {
 		return this.rootElements;
 	}
 }
