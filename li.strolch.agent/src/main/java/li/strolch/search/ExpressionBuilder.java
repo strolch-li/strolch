@@ -14,6 +14,10 @@ public interface ExpressionBuilder {
 		return e -> e;
 	}
 
+	default <T extends StrolchRootElement> SearchExpression<T> isEmpty() {
+		return element -> PredicatesSupport.isEmpty().matches(extract(element));
+	}
+
 	default <T extends StrolchRootElement> SearchExpression<T> isEqualTo(Object right) {
 		return element -> PredicatesSupport.isEqualTo(right).matches(extract(element));
 	}
@@ -48,14 +52,6 @@ public interface ExpressionBuilder {
 
 	default <T extends StrolchRootElement> SearchExpression<T> contains(Object right) {
 		return element -> PredicatesSupport.contains(right).matches(extract(element));
-	}
-
-	/**
-	 * @deprecated use {@link #collectionContains(Object)} instead
-	 */
-	@Deprecated
-	default <T extends StrolchRootElement> SearchExpression<T> listContains(Object right) {
-		return element -> PredicatesSupport.collectionContains(right).matches(extract(element));
 	}
 
 	default <T extends StrolchRootElement> SearchExpression<T> collectionContains(Object right) {

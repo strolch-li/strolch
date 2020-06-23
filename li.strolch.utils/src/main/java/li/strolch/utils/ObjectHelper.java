@@ -300,4 +300,17 @@ public class ObjectHelper {
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
 	}
+
+	public static boolean isEmpty(Object object) {
+		if (object == null)
+			return true;
+		if (object instanceof String)
+			return ((String) object).isEmpty();
+		if (object instanceof Boolean)
+			return !((Boolean) object);
+		if (object instanceof Number)
+			return ((Number) object).doubleValue() == 0.0D;
+
+		return false;
+	}
 }

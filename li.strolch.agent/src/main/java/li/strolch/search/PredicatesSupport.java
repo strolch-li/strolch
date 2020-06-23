@@ -8,6 +8,10 @@ import li.strolch.utils.collections.DateRange;
  */
 public class PredicatesSupport {
 
+	public static SearchPredicate isEmpty() {
+		return new IsEmptyPredicate();
+	}
+
 	public static SearchPredicate isEqualTo(Object right) {
 		return new IsEqualToPredicate(right, false);
 	}
