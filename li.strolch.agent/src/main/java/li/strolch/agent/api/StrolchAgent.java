@@ -32,9 +32,16 @@ import java.util.concurrent.TimeUnit;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.impl.ComponentContainerImpl;
+import li.strolch.exception.StrolchException;
+import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
+import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.runtime.privilege.PrivilegedRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.utils.ExecutorPool;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
@@ -80,6 +87,59 @@ public class StrolchAgent {
 	 */
 	public ComponentContainer getContainer() {
 		return this.container;
+	}
+
+	/**
+	 * @see ComponentContainer#hasComponent(Class)
+	 */
+	public boolean hasComponent(Class<?> clazz) {
+		return this.container.hasComponent(clazz);
+	}
+
+	/**
+	 * @see ComponentContainer#getComponent(Class)
+	 */
+	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
+		return this.container.getComponent(clazz);
+	}
+
+	public PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException {
+		return this.container.getPrivilegeHandler();
+	}
+
+	/**
+	 * @see ComponentContainer#getRealm(Certificate)
+	 */
+	public StrolchRealm getRealm(Certificate certificate) throws StrolchException {
+		return this.container.getRealm(certificate);
+	}
+
+	/**
+	 * @see StrolchRealm#openTx(Certificate, Class, boolean)
+	 */
+	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
+		return this.container.getRealm(certificate).openTx(certificate, clazz, readOnly);
+	}
+
+	/**
+	 * @see StrolchRealm#openTx(Certificate, String, boolean)
+	 */
+	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
+		return this.container.getRealm(certificate).openTx(certificate, action, readOnly);
+	}
+
+	/**
+	 * @see ComponentContainer#runAsAgent(PrivilegedRunnable)
+	 */
+	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+		getPrivilegeHandler().runAsAgent(runnable);
+	}
+
+	/**
+	 * @see ComponentContainer#runAsAgentWithResult(PrivilegedRunnableWithResult)
+	 */
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
+		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
 	/**

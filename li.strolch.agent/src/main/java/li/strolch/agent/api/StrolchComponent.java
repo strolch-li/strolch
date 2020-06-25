@@ -97,6 +97,16 @@ public class StrolchComponent {
 	}
 
 	/**
+	 * Returns the reference to the agent for sub classes
+	 *
+	 * @return the reference to the agent
+	 */
+	public StrolchAgent getAgent() {
+		DBC.PRE.assertNotNull("container is null!", this.container);
+		return this.container.getAgent();
+	}
+
+	/**
 	 * Returns the reference to the container for sub classes
 	 *
 	 * @return the reference to the container
