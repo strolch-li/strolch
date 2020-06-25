@@ -222,26 +222,38 @@ public class ObjectHelper {
 			return false;
 
 		if (right instanceof Collection) {
+			Collection<?> collectionRight = (Collection) right;
+
 			if (left instanceof Collection) {
-				Collection<?> collectionRight = (Collection) right;
-				Collection<?> collectionleft = (Collection) left;
-				for (Object oLeft : collectionleft) {
-					for (Object oRight : collectionRight) {
-						if (equals(oRight, oLeft, ignoreCase))
+				Collection<?> collectionLeft = (Collection) left;
+				for (Object l : collectionLeft) {
+					for (Object r : collectionRight) {
+						if (equals(r, l, ignoreCase))
 							return true;
 					}
 				}
+
 				return false;
+
+			} else if (left instanceof String[]) {
+				String[] leftArr = (String[]) left;
+				for (Object r : collectionRight) {
+					for (Object l : leftArr) {
+						if (equals(r, l, ignoreCase))
+							return true;
+					}
+				}
+
+				return false;
+
 			} else {
-				Collection<?> collection = (Collection) right;
-				for (Object o : collection) {
+				for (Object o : collectionRight) {
 					if (equals(o, left, ignoreCase))
 						return true;
 				}
 
 				return false;
 			}
-
 		}
 
 		if (right instanceof Object[]) {
