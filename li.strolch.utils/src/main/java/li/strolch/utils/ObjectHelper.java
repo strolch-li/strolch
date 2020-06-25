@@ -200,6 +200,8 @@ public class ObjectHelper {
 				rightO = Float.valueOf(rightString);
 			} else if (left instanceof Double) {
 				rightO = Double.valueOf(rightString);
+			} else if (left instanceof Boolean) {
+				rightO = Boolean.valueOf(rightString);
 			} else if (left instanceof Date) {
 				rightO = ISO8601.parseToDate(rightString);
 			} else {
@@ -266,7 +268,7 @@ public class ObjectHelper {
 			return false;
 		}
 
-		if (right instanceof String || right instanceof Number) {
+		if (right instanceof String || right instanceof Number || right instanceof Boolean) {
 			return equals(left, right, ignoreCase);
 		}
 
