@@ -539,9 +539,9 @@ public enum StrolchValueType {
 		}
 	};
 
-	private String type;
+	private final String type;
 
-	private StrolchValueType(String type) {
+	StrolchValueType(String type) {
 		this.type = type;
 	}
 
