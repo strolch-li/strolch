@@ -16,8 +16,7 @@
 package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.model.StrolchModelConstants.*;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -29,6 +28,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.*;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.time.PeriodDuration;
 
 /**
@@ -85,8 +85,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public String getString(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getString(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return "";
+		StringParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return "";
+		return param.getValue();
 	}
 
 	@Override
@@ -97,8 +102,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public boolean getBoolean(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getBoolean(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return false;
+		BooleanParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return false;
+		return param.getValue();
 	}
 
 	@Override
@@ -109,8 +119,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public int getInteger(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getInteger(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return 0;
+		IntegerParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return 0;
+		return param.getValue();
 	}
 
 	@Override
@@ -121,8 +136,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public double getDouble(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getDouble(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return 0.0D;
+		FloatParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return 0.0D;
+		return param.getValue();
 	}
 
 	@Override
@@ -133,8 +153,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public long getLong(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getLong(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return 0L;
+		LongParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return 0L;
+		return param.getValue();
 	}
 
 	@Override
@@ -145,8 +170,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public ZonedDateTime getDate(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getDate(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return ISO8601.EMPTY_VALUE_ZONED_DATE;
+		DateParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return ISO8601.EMPTY_VALUE_ZONED_DATE;
+		return param.toZonedDateTime();
 	}
 
 	@Override
@@ -157,8 +187,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public LocalDateTime getLocalDate(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getLocalDate(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return ISO8601.EMPTY_VALUE_LOCAL_DATE;
+		DateParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return ISO8601.EMPTY_VALUE_LOCAL_DATE;
+		return param.toLocalDateTime();
 	}
 
 	@Override
@@ -169,8 +204,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public String getText(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getText(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return "";
+		TextParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return "";
+		return param.getValue();
 	}
 
 	@Override
@@ -181,8 +221,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public PeriodDuration getDuration(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getDuration(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return PeriodDuration.ZERO;
+		DurationParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return PeriodDuration.ZERO;
+		return param.getValue();
 	}
 
 	@Override
@@ -193,8 +238,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public List<String> getStringList(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getStringList(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return Collections.emptyList();
+		StringListParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return Collections.emptyList();
+		return param.getValue();
 	}
 
 	@Override
@@ -205,8 +255,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public List<Integer> getIntegerList(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getIntegerList(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return Collections.emptyList();
+		IntegerListParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return Collections.emptyList();
+		return param.getValue();
 	}
 
 	@Override
@@ -217,8 +272,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public List<Double> getDoubleList(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getDoubleList(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return Collections.emptyList();
+		FloatListParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return Collections.emptyList();
+		return param.getValue();
 	}
 
 	@Override
@@ -229,8 +289,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public List<Long> getLongList(String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		return bag.getLongList(paramKey);
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null)
+			return Collections.emptyList();
+		LongListParameter param = bag.getParameter(paramKey);
+		if (param == null)
+			return Collections.emptyList();
+		return param.getValue();
 	}
 
 	@Override
@@ -241,8 +306,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setString(String paramKey, String value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setString(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		StringParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new StringParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -253,8 +323,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setBoolean(String paramKey, boolean value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setBoolean(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		BooleanParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new BooleanParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -265,8 +340,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setInteger(String paramKey, int value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setInteger(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		IntegerParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new IntegerParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -277,8 +357,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setDouble(String paramKey, double value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setDouble(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		FloatParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new FloatParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -289,8 +374,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setLong(String paramKey, long value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setLong(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		LongParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new LongParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -301,8 +391,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setDate(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		DateParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValueFromZonedDateTime(value);
+		} else {
+			bag.addParameter(new DateParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -313,8 +408,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setDate(String paramKey, LocalDateTime value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setDate(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		DateParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValueFromLocalDateTime(value);
+		} else {
+			bag.addParameter(new DateParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -325,8 +425,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setText(String paramKey, String value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setText(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		TextParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new TextParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -337,8 +442,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setDuration(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		DurationParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new DurationParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -349,8 +459,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setStringList(String paramKey, List<String> value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setStringList(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		StringListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new StringListParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -361,8 +476,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setIntegerList(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		IntegerListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new IntegerListParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -373,8 +493,13 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setDoubleList(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		FloatListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new FloatListParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
@@ -385,14 +510,28 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public void setLongList(String paramKey, List<Long> value) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
-		bag.setLongList(paramKey, value);
+		ParameterBag bag = getOrCreateDefaultParametersBag();
+		LongListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new LongListParameter(paramKey, paramKey, value));
+		}
 	}
 
 	@Override
 	public void setLongList(String bagKey, String paramKey, List<Long> value) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(bagKey, true);
 		bag.setLongList(paramKey, value);
+	}
+
+	private ParameterBag getOrCreateDefaultParametersBag() {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null) {
+			bag = new ParameterBag(BAG_PARAMETERS, TYPE_PARAMETERS, TYPE_PARAMETERS);
+			addParameterBag(bag);
+		}
+		return bag;
 	}
 
 	@Override
