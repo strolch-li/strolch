@@ -706,6 +706,18 @@ public interface StrolchTransaction extends AutoCloseable {
 	Resource getResourceTemplate(String type, boolean assertExists) throws StrolchException;
 
 	/**
+	 * <p>Returns the {@link Resource} with the type {@link StrolchConstants#TYPE_CONFIGURATION} and id {@link
+	 * StrolchConstants#RES_CONFIGURATION}.</p>
+	 *
+	 * <p>Should the configuration resource not exist, then it will be created without any parameters, as {@link
+	 * Resource#getBoolean(String)} methods et. al. will then just return empty values for their corresponding
+	 * types.</p>
+	 *
+	 * @return the configuration resource
+	 */
+	Resource getConfiguration();
+
+	/**
 	 * <p>
 	 * Returns a copy of the {@link Order} of Type {@link StrolchConstants#TEMPLATE} with the given type as id, or null
 	 * if it does not exist

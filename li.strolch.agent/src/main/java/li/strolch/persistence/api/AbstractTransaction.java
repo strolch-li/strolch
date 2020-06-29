@@ -663,6 +663,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public Resource getConfiguration() {
+		Resource configuration = getResourceBy(TYPE_CONFIGURATION, RES_CONFIGURATION, false);
+		if (configuration == null) {
+			configuration = new Resource(RES_CONFIGURATION, TYPE_CONFIGURATION, TYPE_CONFIGURATION);
+			if (!isReadOnly())
+				add(configuration);
+		}
+		return configuration;
+	}
+
+	@Override
 	public Order getOrderTemplate(String type) {
 		return getOrderTemplate(type, false);
 	}
@@ -1693,7 +1704,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
 					Locator.valueOf(AGENT, "tx", this.action, getUniqueId()), LogSeverity.Exception,
-					LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed").withException(e).value("reason", e));
+					LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
+					.withException(e).value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
