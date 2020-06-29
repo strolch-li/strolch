@@ -56,6 +56,36 @@ public class DateParameter extends AbstractParameter<Date> {
 		setValue(value);
 	}
 
+	/**
+	 * Default Constructor
+	 *
+	 * @param id
+	 * 		the id
+	 * @param name
+	 * 		the name
+	 * @param value
+	 * 		the value
+	 */
+	public DateParameter(String id, String name, LocalDateTime value) {
+		super(id, name);
+		setValueFromLocalDateTime(value);
+	}
+
+	/**
+	 * Default Constructor
+	 *
+	 * @param id
+	 * 		the id
+	 * @param name
+	 * 		the name
+	 * @param value
+	 * 		the value
+	 */
+	public DateParameter(String id, String name, ZonedDateTime value) {
+		super(id, name);
+		setValueFromZonedDateTime(value);
+	}
+
 	@Override
 	public String getValueAsString() {
 		return ISO8601.toString(this.value);
