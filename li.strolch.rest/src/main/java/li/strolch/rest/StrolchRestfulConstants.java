@@ -17,6 +17,8 @@ package li.strolch.rest;
 
 import javax.ws.rs.core.MediaType;
 
+import li.strolch.model.Tags;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -29,7 +31,7 @@ public class StrolchRestfulConstants {
 
 	public static final String MSG = "msg";
 	public static final String EXCEPTION_MSG = "exceptionMsg";
-	public static final String DATA = "data";
+	public static final String DATA = Tags.Json.DATA;
 	public static final String LAST_OFFSET = "lastOffset";
 	public static final String NEXT_OFFSET = "nextOffset";
 	public static final String PREVIOUS_OFFSET = "previousOffset";
