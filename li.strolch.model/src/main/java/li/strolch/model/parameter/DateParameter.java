@@ -97,6 +97,14 @@ public class DateParameter extends AbstractParameter<Date> {
 		return Date.from(this.value.toInstant());
 	}
 
+	public ZonedDateTime getValueZdt() {
+		return this.value;
+	}
+
+	public LocalDateTime getValueLdt() {
+		return this.value.toLocalDateTime();
+	}
+
 	@Override
 	public void setValue(Date value) {
 		assertNotReadonly();
