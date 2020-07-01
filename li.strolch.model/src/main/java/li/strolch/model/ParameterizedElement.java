@@ -30,6 +30,7 @@ import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.parameter.*;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.time.PeriodDuration;
 
 /**
@@ -86,6 +87,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		this.type = type;
 	}
 
+	///
+	///
+
 	/**
 	 * Returns the value of the {@link StringParameter} with the given paramKey
 	 *
@@ -98,7 +102,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public String getString(String paramKey) throws StrolchModelException {
-		StringParameter param = getParameter(paramKey, true);
+		StringParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return "";
 		return param.getValue();
 	}
 
@@ -114,7 +120,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public boolean getBoolean(String paramKey) throws StrolchModelException {
-		BooleanParameter param = getParameter(paramKey, true);
+		BooleanParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return false;
 		return param.getValue();
 	}
 
@@ -130,7 +138,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public int getInteger(String paramKey) throws StrolchModelException {
-		IntegerParameter param = getParameter(paramKey, true);
+		IntegerParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return 0;
 		return param.getValue();
 	}
 
@@ -146,7 +156,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public double getDouble(String paramKey) throws StrolchModelException {
-		FloatParameter param = getParameter(paramKey, true);
+		FloatParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return 0.0D;
 		return param.getValue();
 	}
 
@@ -162,7 +174,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public long getLong(String paramKey) throws StrolchModelException {
-		LongParameter param = getParameter(paramKey, true);
+		LongParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return 0L;
 		return param.getValue();
 	}
 
@@ -178,8 +192,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public ZonedDateTime getDate(String paramKey) throws StrolchModelException {
-		DateParameter param = getParameter(paramKey, true);
-		return param.toZonedDateTime();
+		DateParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return ISO8601.EMPTY_VALUE_ZONED_DATE;
+		return param.getValueZdt();
 	}
 
 	/**
@@ -194,8 +210,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public LocalDateTime getLocalDate(String paramKey) throws StrolchModelException {
-		DateParameter param = getParameter(paramKey, true);
-		return param.toLocalDateTime();
+		DateParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return ISO8601.EMPTY_VALUE_LOCAL_DATE;
+		return param.getValueLdt();
 	}
 
 	/**
@@ -210,7 +228,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public String getText(String paramKey) throws StrolchModelException {
-		TextParameter param = getParameter(paramKey, true);
+		TextParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return "";
 		return param.getValue();
 	}
 
@@ -226,7 +246,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public PeriodDuration getDuration(String paramKey) throws StrolchModelException {
-		DurationParameter param = getParameter(paramKey, true);
+		DurationParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return PeriodDuration.ZERO;
 		return param.getValue();
 	}
 
@@ -242,7 +264,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public List<String> getStringList(String paramKey) throws StrolchModelException {
-		StringListParameter param = getParameter(paramKey, true);
+		StringListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return Collections.emptyList();
 		return param.getValue();
 	}
 
@@ -258,7 +282,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public List<Integer> getIntegerList(String paramKey) throws StrolchModelException {
-		IntegerListParameter param = getParameter(paramKey, true);
+		IntegerListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return Collections.emptyList();
 		return param.getValue();
 	}
 
@@ -274,7 +300,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public List<Double> getDoubleList(String paramKey) throws StrolchModelException {
-		FloatListParameter param = getParameter(paramKey, true);
+		FloatListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return Collections.emptyList();
 		return param.getValue();
 	}
 
@@ -290,7 +318,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public List<Long> getLongList(String paramKey) throws StrolchModelException {
-		LongListParameter param = getParameter(paramKey, true);
+		LongListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return Collections.emptyList();
 		return param.getValue();
 	}
 
@@ -306,8 +336,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setString(String paramKey, String value) throws StrolchModelException {
-		StringParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		StringParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new StringParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -322,8 +355,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setBoolean(String paramKey, boolean value) throws StrolchModelException {
-		BooleanParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		BooleanParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new BooleanParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -338,8 +374,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setInteger(String paramKey, int value) throws StrolchModelException {
-		IntegerParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		IntegerParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new IntegerParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -354,8 +393,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setDouble(String paramKey, double value) throws StrolchModelException {
-		FloatParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		FloatParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new FloatParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -370,8 +412,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setLong(String paramKey, long value) throws StrolchModelException {
-		LongParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		LongParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new LongParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -386,8 +431,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException {
-		DateParameter param = getParameter(paramKey, true);
-		param.setValueFromZonedDateTime(value);
+		DateParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new DateParameter(paramKey, paramKey, value));
+		else
+			param.setValueFromZonedDateTime(value);
 	}
 
 	/**
@@ -402,8 +450,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setDate(String paramKey, LocalDateTime value) throws StrolchModelException {
-		DateParameter param = getParameter(paramKey, true);
-		param.setValueFromLocalDateTime(value);
+		DateParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new DateParameter(paramKey, paramKey, value));
+		else
+			param.setValueFromLocalDateTime(value);
 	}
 
 	/**
@@ -418,8 +469,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setText(String paramKey, String value) throws StrolchModelException {
-		TextParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		TextParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new TextParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -434,8 +488,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException {
-		DurationParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		DurationParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new DurationParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -450,8 +507,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setStringList(String paramKey, List<String> value) throws StrolchModelException {
-		StringListParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		StringListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new StringListParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -466,8 +526,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException {
-		IntegerListParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		IntegerListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new IntegerListParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -482,8 +545,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException {
-		FloatListParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		FloatListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new FloatListParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	/**
@@ -498,8 +564,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	public void setLongList(String paramKey, List<Long> value) throws StrolchModelException {
-		LongListParameter param = getParameter(paramKey, true);
-		param.setValue(value);
+		LongListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new LongListParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value);
 	}
 
 	///
