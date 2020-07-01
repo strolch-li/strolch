@@ -187,14 +187,14 @@ public class ParameterTest {
 
 		LocalDateTime now = LocalDateTime.now();
 		p.setValueFromLocalDateTime(now);
-		LocalDateTime localDateTime = p.toLocalDateTime();
+		LocalDateTime localDateTime = p.getValueLdt();
 		assertEquals(now, localDateTime);
 
 		assertTrue(p.isEqualTo(now));
 
 		ZonedDateTime now1 = ZonedDateTime.now();
 		p.setValueFromZonedDateTime(now1);
-		ZonedDateTime zonedDateTime = p.toZonedDateTime();
+		ZonedDateTime zonedDateTime = p.getValueZdt();
 		assertEquals(now1, zonedDateTime);
 		assertTrue(p.isEqualTo(now1));
 	}

@@ -116,7 +116,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	public void setValueFrom(Parameter<Date> parameter) {
 		assertNotReadonly();
 		DateParameter other = (DateParameter) parameter;
-		this.value = other.toZonedDateTime();
+		this.value = other.getValueZdt();
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	@Override
 	public boolean isEqualTo(Parameter<Date> otherValue) {
 		DateParameter other = (DateParameter) otherValue;
-		return this.value.equals(other.toZonedDateTime());
+		return this.value.equals(other.getValueZdt());
 	}
 
 	@Override
@@ -157,14 +157,6 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	public boolean isEqualTo(ZonedDateTime otherValue) {
 		return this.value.equals(otherValue);
-	}
-
-	public ZonedDateTime toZonedDateTime() {
-		return this.value;
-	}
-
-	public LocalDateTime toLocalDateTime() {
-		return this.value.toLocalDateTime();
 	}
 
 	public void setValueFromLocalDateTime(LocalDateTime localDateTime) {

@@ -76,7 +76,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 							if (jobRes.hasParameter(PARAM_CRON)) {
 								String cron = jobRes.getParameter(PARAM_CRON, true).getValue();
 								DateParameter startDateP = jobRes.getParameter(PARAM_START_DATE, true);
-								job.setCronExpression(cron, startDateP.toZonedDateTime());
+								job.setCronExpression(cron, startDateP.getValueZdt());
 							} else if (jobRes.hasParameter(PARAM_INITIAL_DELAY) && jobRes.hasParameter(PARAM_DELAY)) {
 								IntegerParameter initialDelayP = jobRes.getParameter(PARAM_INITIAL_DELAY, true);
 								IntegerParameter delayP = jobRes.getParameter(PARAM_DELAY, true);
