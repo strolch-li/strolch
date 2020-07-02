@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -241,6 +242,10 @@ public class MapOfMaps<T, U, V> {
 			}
 			action.accept(k, u);
 		}
+	}
+
+	public Stream<V> streamValues() {
+		return this.mapOfMaps.values().stream().flatMap(uvMap -> uvMap.values().stream());
 	}
 
 	@Override

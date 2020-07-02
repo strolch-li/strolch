@@ -24,7 +24,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.report.ReportConstants;
 import li.strolch.report.ReportElement;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.utils.ObjectHelper;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfLists;
@@ -757,11 +756,11 @@ public class GenericReport extends ReportPolicy {
 
 	private Stream<? extends StrolchRootElement> getStreamFor(StringParameter objectTypeP) {
 		switch (objectTypeP.getInterpretation()) {
-		case StrolchConstants.INTERPRETATION_RESOURCE_REF:
+		case INTERPRETATION_RESOURCE_REF:
 			return tx().streamResources(objectTypeP.getUom());
-		case StrolchConstants.INTERPRETATION_ORDER_REF:
+		case INTERPRETATION_ORDER_REF:
 			return tx().streamOrders(objectTypeP.getUom());
-		case StrolchConstants.INTERPRETATION_ACTIVITY_REF:
+		case INTERPRETATION_ACTIVITY_REF:
 			return tx().streamActivities(objectTypeP.getUom());
 		default:
 			throw new IllegalArgumentException("Unhandled element type " + objectTypeP.getInterpretation());

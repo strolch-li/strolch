@@ -18,7 +18,7 @@ package li.strolch.rest.endpoint;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
-import static li.strolch.runtime.StrolchConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;

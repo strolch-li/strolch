@@ -1,7 +1,7 @@
 package li.strolch.execution.policy;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.runtime.StrolchConstants.PolicyConstants.*;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.*;
 
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Resource;

@@ -1,7 +1,7 @@
 package li.strolch.execution;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_RESERVED;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_RESERVED;
 import static org.junit.Assert.*;
 
 import java.io.File;

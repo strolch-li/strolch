@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -184,6 +185,10 @@ public class MapOfSets<T, U> {
 			}
 			action.accept(k, u);
 		}
+	}
+
+	public Stream<U> streamValues() {
+		return this.mapOfSets.values().stream().flatMap(Collection::stream);
 	}
 
 	@Override

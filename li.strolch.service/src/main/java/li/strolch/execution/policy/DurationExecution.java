@@ -1,7 +1,7 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.runtime.StrolchConstants.PolicyConstants.BAG_OBJECTIVES;
-import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_DURATION;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
 
 import li.strolch.model.activity.Action;
 import li.strolch.model.parameter.DurationParameter;

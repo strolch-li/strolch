@@ -164,6 +164,22 @@ public class SynchronizedCollections {
 				this.m.forEach(action);
 			}
 		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			synchronized (this.mutex) {
+				return this.m.equals(o);
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			synchronized (this.mutex) {
+				return this.m.hashCode();
+			}
+		}
 	}
 
 	private static class SynchronizedMapOfMaps<T, U, V> extends MapOfMaps<T, U, V> {
@@ -328,6 +344,22 @@ public class SynchronizedCollections {
 		public void forEach(BiConsumer<? super T, ? super Map<U, V>> action) {
 			synchronized (this.mutex) {
 				this.m.forEach(action);
+			}
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			synchronized (this.mutex) {
+				return this.m.equals(o);
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			synchronized (this.mutex) {
+				return this.m.hashCode();
 			}
 		}
 	}
@@ -633,6 +665,22 @@ public class SynchronizedCollections {
 		private void writeObject(ObjectOutputStream s) throws IOException {
 			synchronized (this.mutex) {
 				s.defaultWriteObject();
+			}
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			synchronized (this.mutex) {
+				return this.c.equals(o);
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			synchronized (this.mutex) {
+				return this.c.hashCode();
 			}
 		}
 	}

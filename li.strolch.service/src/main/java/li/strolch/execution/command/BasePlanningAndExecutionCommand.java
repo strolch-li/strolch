@@ -2,7 +2,7 @@ package li.strolch.execution.command;
 
 import static li.strolch.execution.policy.ConfirmationPolicy.DEFAULT_CONFIRMATION;
 import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
-import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_ORDER;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.PlanningPolicy;
