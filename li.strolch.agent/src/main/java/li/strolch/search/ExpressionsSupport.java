@@ -2,7 +2,6 @@ package li.strolch.search;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
-import static li.strolch.runtime.StrolchConstants.*;
 
 import java.util.function.Supplier;
 
@@ -230,11 +229,11 @@ public class ExpressionsSupport {
 
 		StrolchRootElement relation;
 		switch (param.getInterpretation()) {
-		case INTERPRETATION_RESOURCE_REF:
+		case StrolchModelConstants.INTERPRETATION_RESOURCE_REF:
 			return tx.getResourceBy((StringParameter) param);
-		case INTERPRETATION_ORDER_REF:
+		case StrolchModelConstants.INTERPRETATION_ORDER_REF:
 			return tx.getOrderBy((StringParameter) param);
-		case INTERPRETATION_ACTIVITY_REF:
+		case StrolchModelConstants.INTERPRETATION_ACTIVITY_REF:
 			return tx.getActivityBy((StringParameter) param);
 		}
 

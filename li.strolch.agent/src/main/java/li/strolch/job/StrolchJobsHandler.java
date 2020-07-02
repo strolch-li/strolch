@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -66,20 +67,22 @@ public class StrolchJobsHandler extends StrolchComponent {
 				try (StrolchTransaction tx = openTx(ctx.getCertificate(), realmName, true)) {
 					tx.streamResources(TYPE_STROLCH_JOB).forEach(jobRes -> {
 
-						String className = jobRes.getParameter(PARAM_CLASS_NAME, true).getValue();
-						JobMode mode = JobMode.valueOf(jobRes.getParameter(PARAM_MODE, true).getValue());
+						String className = jobRes.getParameter(StrolchModelConstants.PARAM_CLASS_NAME, true).getValue();
+						JobMode mode = JobMode.valueOf(jobRes.getParameter(StrolchModelConstants.PARAM_MODE, true).getValue());
 
 						StrolchJob job = instantiateJob(className, jobRes.getId(), jobRes.getName(), mode);
 						job.setConfigureMethod(ConfigureMethod.Model).setMode(mode);
 
 						if (mode != JobMode.Manual) {
-							if (jobRes.hasParameter(PARAM_CRON)) {
-								String cron = jobRes.getParameter(PARAM_CRON, true).getValue();
-								DateParameter startDateP = jobRes.getParameter(PARAM_START_DATE, true);
+							if (jobRes.hasParameter(StrolchModelConstants.PARAM_CRON)) {
+								String cron = jobRes.getParameter(StrolchModelConstants.PARAM_CRON, true).getValue();
+								DateParameter startDateP = jobRes.getParameter(StrolchModelConstants.PARAM_START_DATE, true);
 								job.setCronExpression(cron, startDateP.getValueZdt());
-							} else if (jobRes.hasParameter(PARAM_INITIAL_DELAY) && jobRes.hasParameter(PARAM_DELAY)) {
-								IntegerParameter initialDelayP = jobRes.getParameter(PARAM_INITIAL_DELAY, true);
-								IntegerParameter delayP = jobRes.getParameter(PARAM_DELAY, true);
+							} else if (jobRes.hasParameter(StrolchModelConstants.PARAM_INITIAL_DELAY) && jobRes.hasParameter(
+									StrolchModelConstants.PARAM_DELAY)) {
+								IntegerParameter initialDelayP = jobRes.getParameter(
+										StrolchModelConstants.PARAM_INITIAL_DELAY, true);
+								IntegerParameter delayP = jobRes.getParameter(StrolchModelConstants.PARAM_DELAY, true);
 								TimeUnit initialDelayUnit = TimeUnit.valueOf(initialDelayP.getUom());
 								TimeUnit delayUnit = TimeUnit.valueOf(delayP.getUom());
 								job.setDelay(initialDelayP.getValue(), initialDelayUnit, delayP.getValue(), delayUnit);

@@ -31,23 +31,25 @@ public class StrolchModelConstants {
 	 */
 	public static final String TEMPLATE = "Template"; //$NON-NLS-1$
 
+	public static final String SUFFIX_REF = "-Ref";
+
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to a {@link Resource}
 	 */
-	public static final String INTERPRETATION_RESOURCE_REF = "Resource-Ref"; //$NON-NLS-1$
+	public static final String INTERPRETATION_RESOURCE_REF = Tags.RESOURCE + SUFFIX_REF; //$NON-NLS-1$
 
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to an {@link Order}
 	 */
-	public static final String INTERPRETATION_ORDER_REF = "Order-Ref"; //$NON-NLS-1$
+	public static final String INTERPRETATION_ORDER_REF = Tags.ORDER + SUFFIX_REF; //$NON-NLS-1$
 
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to an {@link Activity}
 	 */
-	public static final String INTERPRETATION_ACTIVITY_REF = "Activity-Ref"; //$NON-NLS-1$
+	public static final String INTERPRETATION_ACTIVITY_REF = Tags.ACTIVITY + SUFFIX_REF; //$NON-NLS-1$
 
 	/**
 	 * This interpretation value indicates that the {@link Parameter} has no defined interpretation
@@ -61,13 +63,13 @@ public class StrolchModelConstants {
 
 	public static final String INTERNAL = "internal";
 
-	public static final String SUFFIX_REF = "-Ref";
 	public static final String BAG_RELATIONS = "relations";
 	public static final String BAG_PARAMETERS = "parameters";
 	public static final String TYPE_PARAMETERS = "Parameters";
 	public static final String TYPE_RELATIONS = "Relations";
 	public static final String TYPE_ENUMERATION = "Enumeration";
 	public static final String TYPE_CONFIGURATION = "Configuration";
+	public static final String TYPE_OBJECTIVES = "Objectives";
 
 	public static final String RES_CONFIGURATION = "configuration";
 
@@ -75,4 +77,26 @@ public class StrolchModelConstants {
 	 * ID of the admin role which has access to all resources
 	 */
 	public static final String ROLE_STROLCH_ADMIN = "StrolchAdmin";
+
+	public static final String PARAM_CLASS_NAME = "className";
+	public static final String PARAM_CRON = "cron";
+	public static final String PARAM_INITIAL_DELAY = "initialDelay";
+	public static final String PARAM_DELAY = "delay";
+	public static final String PARAM_START_DATE = "startDate";
+	public static final String PARAM_MODE = "mode";
+
+	public static class PolicyConstants {
+		public static final String TYPE_PRODUCE = "Produce";
+		public static final String TYPE_CONSUME = "Consume";
+		public static final String TYPE_RESERVE = "Reserve";
+		public static final String TYPE_RELEASE = "Release";
+
+		public static final String BAG_OBJECTIVES = "Objectives";
+
+		public static final String PARAM_RESERVED = "reserved";
+		public static final String PARAM_QUANTITY = "quantity";
+		public static final String PARAM_DURATION = "duration";
+		public static final String PARAM_ORDER = "order";
+		public static final String PARAM_ACTIVITY = "activity";
+	}
 }

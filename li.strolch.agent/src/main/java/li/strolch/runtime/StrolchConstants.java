@@ -43,42 +43,7 @@ public class StrolchConstants extends StrolchModelConstants {
 	public static final String PROP_REALM = PrivilegeConstants.REALM;
 	public static final String DEFAULT_REALM = "defaultRealm";
 
-	public static final String DEFAULT_XML_VERSION = StrolchModelConstants.DEFAULT_XML_VERSION;
-	public static final String DEFAULT_ENCODING = StrolchModelConstants.DEFAULT_ENCODING;
-
-	/**
-	 * @see StrolchModelConstants#TEMPLATE
-	 */
-	public static final String TEMPLATE = StrolchModelConstants.TEMPLATE;
-
-	/**
-	 * @see StrolchModelConstants#INTERPRETATION_RESOURCE_REF
-	 */
-	public static final String INTERPRETATION_RESOURCE_REF = StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
-
-	/**
-	 * @see StrolchModelConstants#INTERPRETATION_ORDER_REF
-	 */
-	public static final String INTERPRETATION_ORDER_REF = StrolchModelConstants.INTERPRETATION_ORDER_REF;
-
-	/**
-	 * @see StrolchModelConstants#INTERPRETATION_ACTIVITY_REF
-	 */
-	public static final String INTERPRETATION_ACTIVITY_REF = StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
-
-	/**
-	 * @see StrolchModelConstants#ROLE_STROLCH_ADMIN
-	 */
-	public static final String ROLE_STROLCH_ADMIN = StrolchModelConstants.ROLE_STROLCH_ADMIN;
-
 	public static final String TYPE_STROLCH_JOB = "StrolchJob";
-
-	public static final String PARAM_CLASS_NAME = "className";
-	public static final String PARAM_CRON = "cron";
-	public static final String PARAM_INITIAL_DELAY = "initialDelay";
-	public static final String PARAM_DELAY = "delay";
-	public static final String PARAM_START_DATE = "startDate";
-	public static final String PARAM_MODE = "mode";
 
 	public static String makeRealmKey(String realmName, String key) {
 		String realmKey = key;
@@ -124,22 +89,5 @@ public class StrolchConstants extends StrolchModelConstants {
 		public static final String PRIVILEGE_UPDATE_PREFIX = "Update";
 		public static final String PRIVILEGE_REMOVE_PREFIX = "Remove";
 		public static final String PRIVILEGE_GET_PREFIX = "Get";
-
-		public static final String INTERNAL = StrolchModelConstants.INTERNAL;
-	}
-
-	public static class PolicyConstants {
-		public static final String TYPE_PRODUCE = "Produce";
-		public static final String TYPE_CONSUME = "Consume";
-		public static final String TYPE_RESERVE = "Reserve";
-		public static final String TYPE_RELEASE = "Release";
-
-		public static final String BAG_OBJECTIVES = "Objectives";
-
-		public static final String PARAM_RESERVED = "reserved";
-		public static final String PARAM_QUANTITY = "quantity";
-		public static final String PARAM_DURATION = "duration";
-		public static final String PARAM_ORDER = "order";
-		public static final String PARAM_ACTIVITY = "activity";
 	}
 }

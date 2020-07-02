@@ -1,6 +1,6 @@
 package li.strolch.agent.impl;
 
-import static li.strolch.runtime.StrolchConstants.INTERPRETATION_ORDER_REF;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ORDER_REF;
 
 import java.util.Date;
 import java.util.List;

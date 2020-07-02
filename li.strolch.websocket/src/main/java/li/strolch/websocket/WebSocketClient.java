@@ -3,7 +3,7 @@ package li.strolch.websocket;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
-import static li.strolch.runtime.StrolchConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.*;
 

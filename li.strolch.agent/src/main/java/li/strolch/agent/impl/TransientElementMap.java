@@ -26,6 +26,7 @@ import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Version;
 import li.strolch.model.parameter.Parameter;
@@ -33,7 +34,6 @@ import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +86,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) {
 
-		T t = getBy(tx, StrolchConstants.TEMPLATE, type);
+		T t = getBy(tx, StrolchModelConstants.TEMPLATE, type);
 		if (assertExists && t == null) {
 			String msg = "The template with type \"{0}\" does not exist!"; //$NON-NLS-1$
 			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type));

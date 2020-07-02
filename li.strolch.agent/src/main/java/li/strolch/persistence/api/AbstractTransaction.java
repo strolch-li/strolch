@@ -55,7 +55,6 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
@@ -570,13 +569,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				break;
 
 			switch (parentP.getInterpretation()) {
-			case StrolchConstants.INTERPRETATION_RESOURCE_REF:
+			case INTERPRETATION_RESOURCE_REF:
 				parent = getResourceBy(parentP);
 				break;
-			case StrolchConstants.INTERPRETATION_ORDER_REF:
+			case INTERPRETATION_ORDER_REF:
 				parent = getOrderBy(parentP);
 				break;
-			case StrolchConstants.INTERPRETATION_ACTIVITY_REF:
+			case INTERPRETATION_ACTIVITY_REF:
 				parent = getActivityBy(parentP);
 				break;
 			default:
@@ -656,7 +655,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Resource getResourceTemplate(String type, boolean assertExists) throws StrolchException {
-		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(StrolchConstants.TEMPLATE, type));
+		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(TEMPLATE, type));
 		if (element != null)
 			return element;
 		return getResourceMap().getTemplate(this, type, assertExists);
@@ -680,7 +679,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Order getOrderTemplate(String type, boolean assertExists) throws StrolchException {
-		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(StrolchConstants.TEMPLATE, type));
+		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(TEMPLATE, type));
 		if (element == null)
 			element = getOrderMap().getTemplate(this, type, assertExists);
 		return element;
@@ -693,7 +692,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public Activity getActivityTemplate(String type, boolean assertExists) throws StrolchException {
-		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(StrolchConstants.TEMPLATE, type));
+		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(TEMPLATE, type));
 		if (element != null)
 			return element;
 		return getActivityMap().getTemplate(this, type, assertExists);

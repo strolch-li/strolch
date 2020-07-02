@@ -1,6 +1,6 @@
 package li.strolch.agent.impl;
 
-import static li.strolch.runtime.StrolchConstants.INTERPRETATION_ACTIVITY_REF;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
 
 import java.util.List;
 

@@ -15,7 +15,7 @@
  */
 package li.strolch.policy;
 
-import static li.strolch.runtime.StrolchConstants.PolicyConstants.PARAM_ORDER;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;

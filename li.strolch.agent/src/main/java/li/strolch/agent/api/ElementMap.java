@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
@@ -27,7 +28,6 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.StrolchConstants;
 
 /**
  * <p>
@@ -198,7 +198,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	/**
 	 * Returns the element which is referenced by the given {@link StringParameter}. A reference {@link Parameter} must
 	 * have its interpretation set to the element type being referenced e.g. s
-	 * {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the element's type and the value is
+	 * {@link StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the element's type and the value is
 	 * the id of the element
 	 *
 	 * @param tx
@@ -218,7 +218,7 @@ public interface ElementMap<T extends StrolchRootElement> {
 	/**
 	 * Returns all elements which are referenced by the given {@link StringListParameter}. A reference {@link Parameter}
 	 * must have its interpretation set to the element type being referenced e.g. s
-	 * {@link StrolchConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the element's type and the value is
+	 * {@link StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the element's type and the value is
 	 * the id of the element
 	 *
 	 * @param tx
