@@ -26,7 +26,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class FloatListParameter extends AbstractListParameter<Double> implements ListParameter<Double> {
+public class FloatListParameter extends AbstractListParameter<Double> {
 
 	/**
 	 * Empty constructor

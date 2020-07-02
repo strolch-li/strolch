@@ -26,7 +26,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class IntegerListParameter extends AbstractListParameter<Integer> implements ListParameter<Integer> {
+public class IntegerListParameter extends AbstractListParameter<Integer> {
 
 	/**
 	 * Empty constructor

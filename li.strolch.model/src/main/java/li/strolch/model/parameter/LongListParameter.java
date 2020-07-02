@@ -26,7 +26,7 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class LongListParameter extends AbstractListParameter<Long> implements ListParameter<Long> {
+public class LongListParameter extends AbstractListParameter<Long> {
 
 	/**
 	 * Empty constructor
