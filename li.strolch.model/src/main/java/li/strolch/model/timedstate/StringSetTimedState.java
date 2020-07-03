@@ -44,6 +44,11 @@ public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValu
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.STRING_SET;
+	}
+
+	@Override
 	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitStringState(this);
 	}

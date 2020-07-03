@@ -44,6 +44,11 @@ public class IntegerTimedState extends AbstractStrolchTimedState<IntegerValue> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.INTEGER;
+	}
+
+	@Override
 	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitIntegerState(this);
 	}

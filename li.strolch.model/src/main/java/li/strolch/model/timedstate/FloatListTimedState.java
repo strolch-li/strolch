@@ -44,6 +44,11 @@ public class FloatListTimedState extends AbstractStrolchTimedState<FloatListValu
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.FLOAT_LIST;
+	}
+
+	@Override
 	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitFloatListState(this);
 	}

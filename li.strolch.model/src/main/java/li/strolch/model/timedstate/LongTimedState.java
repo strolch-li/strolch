@@ -44,6 +44,11 @@ public class LongTimedState extends AbstractStrolchTimedState<LongValue> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.LONG;
+	}
+
+	@Override
 	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitLongState(this);
 	}

@@ -18,6 +18,7 @@ package li.strolch.model.timedstate;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchModelConstants;
+import li.strolch.model.StrolchValueType;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
@@ -29,6 +30,11 @@ import li.strolch.model.timevalue.IValueChange;
  */
 @SuppressWarnings("rawtypes")
 public interface StrolchTimedState<T extends IValue> extends StrolchElement {
+
+	/**
+	 * @return the {@link StrolchValueType}
+	 */
+	StrolchValueType getValueType();
 
 	/**
 	 * get the hidden attribute

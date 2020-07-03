@@ -44,6 +44,11 @@ public class BooleanTimedState extends AbstractStrolchTimedState<BooleanValue> {
 	}
 
 	@Override
+	public StrolchValueType getValueType() {
+		return StrolchValueType.BOOLEAN;
+	}
+
+	@Override
 	public <U> U accept(StrolchElementVisitor<U> visitor) {
 		return visitor.visitBooleanState(this);
 	}
