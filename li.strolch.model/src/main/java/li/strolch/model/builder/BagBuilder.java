@@ -13,7 +13,7 @@ public class BagBuilder<T extends ParameterBagContainerBuilder<T>> {
 	private final String id;
 	private final String name;
 	private final String type;
-	private final List<ParameterBuilder<?, ?>> parameters;
+	private final List<ParameterBuilder<?, ?, ?>> parameters;
 
 	public BagBuilder(T builder, String id, String name, String type) {
 		this.builder = builder;

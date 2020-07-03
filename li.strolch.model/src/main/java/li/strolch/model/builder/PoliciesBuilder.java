@@ -26,6 +26,10 @@ public class PoliciesBuilder<T extends ParameterBagContainerBuilder<T>> {
 		return policy("ConfirmationPolicy", value);
 	}
 
+	public PoliciesBuilder<T> activityArchival(String value) {
+		return policy("ActivityArchivalPolicy", value);
+	}
+
 	public PoliciesBuilder<T> policy(String type, String value) {
 		this.policyDefs.addOrUpdate(PolicyDef.valueOf(type, value));
 		return this;

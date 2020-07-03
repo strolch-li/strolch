@@ -7,7 +7,7 @@ import li.strolch.model.builder.BagBuilder;
 import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.Parameter;
 
-public abstract class ParameterBuilder<S extends Parameter<?>, T extends ParameterBagContainerBuilder<T>> {
+public abstract class ParameterBuilder<R, S extends Parameter<R>, T extends ParameterBagContainerBuilder<T>> {
 
 	private final BagBuilder<T> builder;
 
@@ -19,29 +19,36 @@ public abstract class ParameterBuilder<S extends Parameter<?>, T extends Paramet
 	protected String interpretation = INTERPRETATION_NONE;
 	protected String uom = UOM_NONE;
 
+	protected R value;
+
 	public ParameterBuilder(BagBuilder<T> builder, String id, String name) {
 		this.builder = builder;
 		this.id = id;
 		this.name = name;
 	}
 
-	public ParameterBuilder<S, T> hidden(boolean hidden) {
+	public ParameterBuilder<R, S, T> hidden(boolean hidden) {
 		this.hidden = hidden;
 		return this;
 	}
 
-	public ParameterBuilder<S, T> index(int index) {
+	public ParameterBuilder<R, S, T> index(int index) {
 		this.index = index;
 		return this;
 	}
 
-	public ParameterBuilder<S, T> interpretation(String interpretation) {
+	public ParameterBuilder<R, S, T> interpretation(String interpretation) {
 		this.interpretation = interpretation;
 		return this;
 	}
 
-	public ParameterBuilder<S, T> uom(String uom) {
+	public ParameterBuilder<R, S, T> uom(String uom) {
 		this.uom = uom;
+		return this;
+	}
+
+	public ParameterBuilder<R, S, T> value(R value) {
+		this.value = value;
 		return this;
 	}
 
@@ -56,6 +63,10 @@ public abstract class ParameterBuilder<S extends Parameter<?>, T extends Paramet
 		parameter.setIndex(this.index);
 		parameter.setInterpretation(this.interpretation);
 		parameter.setUom(this.uom);
+		if (this.value != null)
+			parameter.setValue(this.value);
+		else
+			parameter.clear();
 		return parameter;
 	}
 

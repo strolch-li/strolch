@@ -8,10 +8,10 @@ import li.strolch.model.builder.states.*;
 
 public class ResourceBuilder extends RootElementBuilder<ResourceBuilder> {
 
-	private final TemplatesBuilder builder;
+	private final StrolchElementBuilder builder;
 	private final List<TimedStateBuilder<?>> timedStates;
 
-	public ResourceBuilder(TemplatesBuilder builder, String id, String name, String type) {
+	public ResourceBuilder(StrolchElementBuilder builder, String id, String name, String type) {
 		super(id, name, type);
 		this.builder = builder;
 		this.timedStates = new ArrayList<>();
@@ -53,7 +53,7 @@ public class ResourceBuilder extends RootElementBuilder<ResourceBuilder> {
 		return builder;
 	}
 
-	public TemplatesBuilder endResource() {
+	public StrolchElementBuilder endResource() {
 		return this.builder;
 	}
 

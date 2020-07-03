@@ -4,7 +4,8 @@ import li.strolch.model.builder.BagBuilder;
 import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.StringParameter;
 
-public class StringParamBuilder<T extends ParameterBagContainerBuilder<T>> extends ParameterBuilder<StringParameter,T> {
+public class StringParamBuilder<T extends ParameterBagContainerBuilder<T>>
+		extends ParameterBuilder<String, StringParameter, T> {
 
 	public StringParamBuilder(BagBuilder<T> builder, String id, String name) {
 		super(builder, id, name);

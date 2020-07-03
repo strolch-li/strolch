@@ -9,31 +9,31 @@ import li.strolch.utils.dbc.DBC;
 
 public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> implements ActivityElementBuilder {
 
-	private final TemplatesBuilder templatesBuilder;
+	private final StrolchElementBuilder builder;
 	private final ActivityBuilder parentBuilder;
 	private final TimeOrdering timeOrdering;
 
 	private final List<ActivityElementBuilder> builders;
 
-	public ActivityBuilder(TemplatesBuilder builder, String id, String name, String type, TimeOrdering timeOrdering) {
+	public ActivityBuilder(StrolchElementBuilder builder, String id, String name, String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
-		this.templatesBuilder = builder;
+		this.builder = builder;
 		this.parentBuilder = null;
 		this.timeOrdering = timeOrdering;
 		this.builders = new ArrayList<>();
 	}
 
-	public ActivityBuilder(TemplatesBuilder builder, ActivityBuilder parentBuilder, String id, String name, String type,
+	public ActivityBuilder(StrolchElementBuilder builder, ActivityBuilder parentBuilder, String id, String name, String type,
 			TimeOrdering timeOrdering) {
 		super(id, name, type);
-		this.templatesBuilder = builder;
+		this.builder = builder;
 		this.parentBuilder = parentBuilder;
 		this.timeOrdering = timeOrdering;
 		this.builders = new ArrayList<>();
 	}
 
 	public ActivityBuilder subActivity(String id, String name, String type, TimeOrdering timeOrdering) {
-		ActivityBuilder builder = new ActivityBuilder(this.templatesBuilder, this, id, name, type, timeOrdering);
+		ActivityBuilder builder = new ActivityBuilder(this.builder, this, id, name, type, timeOrdering);
 		this.builders.add(builder);
 		return builder;
 	}
@@ -49,8 +49,8 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 		return this.parentBuilder;
 	}
 
-	public TemplatesBuilder endActivity() {
-		return this.templatesBuilder;
+	public StrolchElementBuilder endActivity() {
+		return this.builder;
 	}
 
 	@Override

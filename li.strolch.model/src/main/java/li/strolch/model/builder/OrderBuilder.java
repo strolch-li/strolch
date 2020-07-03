@@ -6,14 +6,14 @@ import li.strolch.utils.iso8601.ISO8601;
 
 public class OrderBuilder extends RootElementBuilder<OrderBuilder> {
 
-	private final TemplatesBuilder builder;
+	private final StrolchElementBuilder builder;
 
-	public OrderBuilder(TemplatesBuilder builder, String id, String name, String type) {
+	public OrderBuilder(StrolchElementBuilder builder, String id, String name, String type) {
 		super(id, name, type);
 		this.builder = builder;
 	}
 
-	public TemplatesBuilder endOrder() {
+	public StrolchElementBuilder endOrder() {
 		return this.builder;
 	}
 

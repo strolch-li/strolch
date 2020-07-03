@@ -5,7 +5,7 @@ import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.BooleanParameter;
 
 public class BooleanParamBuilder<T extends ParameterBagContainerBuilder<T>>
-		extends ParameterBuilder<BooleanParameter, T> {
+		extends ParameterBuilder<Boolean, BooleanParameter, T> {
 
 	public BooleanParamBuilder(BagBuilder<T> builder, String id, String name) {
 		super(builder, id, name);

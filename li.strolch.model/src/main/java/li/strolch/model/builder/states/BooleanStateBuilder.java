@@ -2,6 +2,7 @@ package li.strolch.model.builder.states;
 
 import li.strolch.model.builder.ResourceBuilder;
 import li.strolch.model.timedstate.BooleanTimedState;
+import li.strolch.model.timevalue.impl.BooleanValue;
 
 public class BooleanStateBuilder extends TimedStateBuilder<BooleanTimedState> {
 
@@ -11,6 +12,9 @@ public class BooleanStateBuilder extends TimedStateBuilder<BooleanTimedState> {
 
 	@Override
 	public BooleanTimedState build() {
-		return build(new BooleanTimedState());
+		BooleanTimedState state = new BooleanTimedState();
+		build(state);
+		state.getTimeEvolution().setValueAt(0L, new BooleanValue(false));
+		return state;
 	}
 }

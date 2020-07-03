@@ -2,6 +2,7 @@ package li.strolch.model.builder.states;
 
 import li.strolch.model.builder.ResourceBuilder;
 import li.strolch.model.timedstate.FloatListTimedState;
+import li.strolch.model.timevalue.impl.FloatListValue;
 
 public class FloatListStateBuilder extends TimedStateBuilder<FloatListTimedState> {
 
@@ -11,6 +12,9 @@ public class FloatListStateBuilder extends TimedStateBuilder<FloatListTimedState
 
 	@Override
 	public FloatListTimedState build() {
-		return build(new FloatListTimedState());
+		FloatListTimedState state = new FloatListTimedState();
+		build(state);
+		state.getTimeEvolution().setValueAt(0L, new FloatListValue());
+		return state;
 	}
 }
