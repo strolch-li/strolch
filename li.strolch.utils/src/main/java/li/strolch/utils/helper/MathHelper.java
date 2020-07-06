@@ -127,4 +127,12 @@ public class MathHelper {
 			return "" + Double.POSITIVE_INFINITY;
 		return String.valueOf(BigDecimal.valueOf(value).setScale(decimals, RoundingMode.HALF_EVEN).doubleValue());
 	}
+
+	public static int getNumberOfDecimalPlaces(double value) {
+		return getNumberOfDecimalPlaces(BigDecimal.valueOf(value));
+	}
+
+	public static int getNumberOfDecimalPlaces(BigDecimal bigDecimal) {
+		return Math.max(0, bigDecimal.stripTrailingZeros().scale());
+	}
 }
