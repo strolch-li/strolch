@@ -66,6 +66,10 @@ public class StrolchModelConstants {
 	public static final String BAG_RELATIONS = "relations";
 	public static final String BAG_PARAMETERS = "parameters";
 	public static final String TYPE_PARAMETERS = "Parameters";
+	public static final String TYPE_VERSION = "Version";
+	public static final String TYPE_MEMORY = "Memory";
+	public static final String TYPE_OPERATING_SYSTEM = "OperatingSystem";
+	public static final String TYPE_ROOT = "Root";
 	public static final String TYPE_RELATIONS = "Relations";
 	public static final String TYPE_ENUMERATION = "Enumeration";
 	public static final String TYPE_CONFIGURATION = "Configuration";
