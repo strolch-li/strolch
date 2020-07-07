@@ -162,7 +162,10 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	@Override
 	public void clear() {
 		assertNotReadonly();
-		this.value.clear();
+		if (this.value == null)
+			this.value = new ArrayList<>();
+		else
+			this.value.clear();
 	}
 
 	@Override
