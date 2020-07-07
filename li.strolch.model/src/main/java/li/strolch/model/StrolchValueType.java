@@ -47,7 +47,7 @@ public enum StrolchValueType {
 	BOOLEAN("Boolean") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			return new JsonPrimitive(((Boolean) value).toString());
+			return new JsonPrimitive(((Boolean) value));
 		}
 
 		@Override
@@ -88,7 +88,7 @@ public enum StrolchValueType {
 	INTEGER("Integer") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			return new JsonPrimitive(((Integer) value).toString());
+			return new JsonPrimitive(((Integer) value));
 		}
 
 		@Override
@@ -129,7 +129,7 @@ public enum StrolchValueType {
 	FLOAT("Float") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			return new JsonPrimitive(value.toString());
+			return new JsonPrimitive((Double) value);
 		}
 
 		@Override
@@ -167,7 +167,7 @@ public enum StrolchValueType {
 	LONG("Long") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			return new JsonPrimitive(value.toString());
+			return new JsonPrimitive((Long) value);
 		}
 
 		@Override
