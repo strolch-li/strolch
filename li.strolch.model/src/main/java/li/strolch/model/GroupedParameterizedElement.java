@@ -17,6 +17,7 @@ package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
 import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -27,7 +28,6 @@ import java.util.stream.Stream;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.*;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.time.PeriodDuration;
 
@@ -74,7 +74,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	public void setType(String type) {
 		assertNotReadonly();
-		if (StringHelper.isEmpty(type)) {
+		if (isEmpty(type)) {
 			String msg = "Type may not be empty on element {0}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
@@ -778,6 +778,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	@Override
 	public void addParameter(Parameter<?> parameter) throws StrolchException {
 		assertNotReadonly();
+		if (isEmpty(parameter.getId()))
+			throw new IllegalArgumentException("ID can not be empty for parameter " + parameter);
 		if (this.parameterBagMap == null)
 			this.parameterBagMap = new HashMap<>(1, 1.0F);
 		ParameterBag bag = this.parameterBagMap.get(BAG_PARAMETERS);

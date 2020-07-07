@@ -17,6 +17,7 @@ package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
@@ -805,6 +806,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 */
 	public void addParameter(Parameter<?> parameter) {
 		assertNotReadonly();
+		if (isEmpty(parameter.getId()))
+			throw new IllegalArgumentException("ID can not be empty for parameter " + parameter);
 		if (this.parameterMap == null)
 			this.parameterMap = new HashMap<>(1, 1.0F);
 
