@@ -15,7 +15,7 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 
 public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisitor<JsonObject> {
 
-	private StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+	private final StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
 
 	@Override
 	public JsonObject visitOrder(Order order) {
@@ -114,6 +114,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this;
 	}
 
+	public StrolchRootElementToJsonVisitor flatBagsByType(String... bagTypes) {
+		this.visitor.flatBagsByType(bagTypes);
+		return this;
+	}
+
 	public StrolchRootElementToJsonVisitor ignoreBag(String bagId) {
 		this.visitor.ignoreBag(bagId);
 		return this;
@@ -134,7 +139,7 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this;
 	}
 
-	public StrolchRootElementToJsonVisitor ignoreBagByType(String type) {
+	public StrolchRootElementToJsonVisitor ignoreBagByType(String... type) {
 		this.visitor.ignoreBagByType(type);
 		return this;
 	}

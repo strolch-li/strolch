@@ -46,6 +46,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	private boolean flat;
 	private Set<String> flatBags;
+	private Set<String> flatBagsByType;
 	private boolean withoutElementName;
 	private boolean withLocator;
 	private boolean withoutVersion;
@@ -58,14 +59,15 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		this.ignoredTimedStates = new HashSet<>();
 		this.ignoredBagTypes = new HashSet<>();
 		this.flatBags = new HashSet<>();
+		this.flatBagsByType = new HashSet<>();
 	}
 
 	public boolean isFlat() {
 		return this.flat;
 	}
 
-	public boolean isBagFlat(String badId) {
-		return this.flatBags.contains(badId);
+	public boolean isBagFlat(ParameterBag bag) {
+		return this.flatBags.contains(bag.getId()) || this.flatBagsByType.contains(bag.getType());
 	}
 
 	public boolean isWithVersion() {
@@ -152,6 +154,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this;
 	}
 
+	public StrolchElementToJsonVisitor flatBagsByType(String... bagTypes) {
+		this.flatBagsByType.addAll(asList(bagTypes));
+		return this;
+	}
+
 	public StrolchElementToJsonVisitor ignoreBag(String bagId) {
 		this.ignoredKeys.addSet(bagId, Collections.emptySet());
 		return this;
@@ -174,8 +181,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this;
 	}
 
-	public StrolchElementToJsonVisitor ignoreBagByType(String type) {
-		this.ignoredBagTypes.add(type);
+	public StrolchElementToJsonVisitor ignoreBagByType(String... types) {
+		this.ignoredBagTypes.addAll(asList(types));
 		return this;
 	}
 
@@ -361,7 +368,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	@Override
 	public JsonObject visitParameterBag(ParameterBag bag) {
 
-		if (isFlat() || isBagFlat(bag.getId())) {
+		if (isFlat() || isBagFlat(bag)) {
 
 			JsonObject bagJ = new JsonObject();
 
@@ -563,7 +570,13 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			if (this.ignoredBagTypes.contains(parameterBag.getType()))
 				continue;
 
-			if (isFlat() || isBagFlat(bagId)) {
+			if (isBagFlat(bag)) {
+
+				JsonObject bagJ = new JsonObject();
+				addParameterBagFlat(bagJ, ignoredParamIds, parameterBag);
+				rootJ.add(bagId, bagJ);
+
+			} else if (isFlat()) {
 
 				addParameterBagFlat(rootJ, ignoredParamIds, parameterBag);
 
