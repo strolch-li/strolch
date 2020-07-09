@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.handler;
 
+import static li.strolch.privilege.helper.XmlConstants.*;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 import java.io.File;
@@ -56,6 +57,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private long rolesFileDate;
 	private File usersPath;
 	private File rolesPath;
+
+	@Override
+	public Map<String, String> getParameterMap() {
+		return this.parameterMap;
+	}
 
 	@Override
 	public List<User> getAllUsers() {
@@ -139,33 +145,31 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public void initialize(Map<String, String> paramsMap) {
-
-		// copy parameter map
 		this.parameterMap = Collections.unmodifiableMap(new HashMap<>(paramsMap));
 
 		// get and validate base bath
-		String basePath = this.parameterMap.get(XmlConstants.XML_PARAM_BASE_PATH);
+		String basePath = this.parameterMap.get(XML_PARAM_BASE_PATH);
 		File basePathF = new File(basePath);
 		if (!basePathF.exists() && !basePathF.isDirectory()) {
 			String msg = "[{0}] Defined parameter {1} does not point to a valid path at {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_BASE_PATH,
-					basePathF.getAbsolutePath());
+			msg = MessageFormat
+					.format(msg, PersistenceHandler.class.getName(), XML_PARAM_BASE_PATH, basePathF.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
 
 		// get users file name
-		String usersFileName = this.parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
+		String usersFileName = this.parameterMap.get(XML_PARAM_USERS_FILE);
 		if (StringHelper.isEmpty(usersFileName)) {
 			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_USERS_FILE);
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE);
 			throw new PrivilegeException(msg);
 		}
 
 		// get roles file name
-		String rolesFileName = this.parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
+		String rolesFileName = this.parameterMap.get(XML_PARAM_ROLES_FILE);
 		if (StringHelper.isEmpty(rolesFileName)) {
 			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_ROLES_FILE);
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE);
 			throw new PrivilegeException(msg);
 		}
 
@@ -174,8 +178,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		File usersPath = new File(usersPathS);
 		if (!usersPath.exists()) {
 			String msg = "[{0}] Defined parameter {1} is invalid as users file does not exist at path {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_USERS_FILE,
-					usersPath.getAbsolutePath());
+			msg = MessageFormat
+					.format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE, usersPath.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
 
@@ -184,8 +188,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		File rolesPath = new File(rolesPathS);
 		if (!rolesPath.exists()) {
 			String msg = "[{0}] Defined parameter {1} is invalid as roles file does not exist at path {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_ROLES_FILE,
-					rolesPath.getAbsolutePath());
+			msg = MessageFormat
+					.format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE, rolesPath.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
 
@@ -262,18 +266,18 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		long start = System.nanoTime();
 
 		// get users file name
-		String usersFileName = this.parameterMap.get(XmlConstants.XML_PARAM_USERS_FILE);
+		String usersFileName = this.parameterMap.get(XML_PARAM_USERS_FILE);
 		if (usersFileName == null || usersFileName.isEmpty()) {
 			String msg = "[{0}] Defined parameter {1} is invalid"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_USERS_FILE);
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE);
 			throw new PrivilegeException(msg);
 		}
 
 		// get roles file name
-		String rolesFileName = this.parameterMap.get(XmlConstants.XML_PARAM_ROLES_FILE);
+		String rolesFileName = this.parameterMap.get(XML_PARAM_ROLES_FILE);
 		if (rolesFileName == null || rolesFileName.isEmpty()) {
 			String msg = "[{0}] Defined parameter {1} is invalid"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XmlConstants.XML_PARAM_ROLES_FILE);
+			msg = MessageFormat.format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE);
 			throw new PrivilegeException(msg);
 		}
 

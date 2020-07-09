@@ -45,14 +45,14 @@ public interface PersistenceHandler {
 	 *
 	 * @return all currently known {@link User}s
 	 */
-	public List<User> getAllUsers();
+	List<User> getAllUsers();
 
 	/**
 	 * Returns all currently known {@link Role}s
 	 *
 	 * @return all currently known {@link Role}s
 	 */
-	public List<Role> getAllRoles();
+	List<Role> getAllRoles();
 
 	/**
 	 * Returns a {@link User} object from the underlying database
@@ -62,7 +62,7 @@ public interface PersistenceHandler {
 	 *
 	 * @return the {@link User} object, or null if it was not found
 	 */
-	public User getUser(String username);
+	User getUser(String username);
 
 	/**
 	 * Returns a {@link Role} object from the underlying database
@@ -72,7 +72,7 @@ public interface PersistenceHandler {
 	 *
 	 * @return the {@link Role} object, or null if it was not found
 	 */
-	public Role getRole(String roleName);
+	Role getRole(String roleName);
 
 	/**
 	 * Removes a {@link User} with the given name and returns the removed object if it existed
@@ -82,7 +82,7 @@ public interface PersistenceHandler {
 	 *
 	 * @return the {@link User} removed, or null if it did not exist
 	 */
-	public User removeUser(String username);
+	User removeUser(String username);
 
 	/**
 	 * Removes a {@link Role} with the given name and returns the removed object if it existed
@@ -92,7 +92,7 @@ public interface PersistenceHandler {
 	 *
 	 * @return the {@link Role} removed, or null if it did not exist
 	 */
-	public Role removeRole(String roleName);
+	Role removeRole(String roleName);
 
 	/**
 	 * Adds a {@link User} object to the underlying database
@@ -100,7 +100,7 @@ public interface PersistenceHandler {
 	 * @param user
 	 * 		the {@link User} object to add
 	 */
-	public void addUser(User user);
+	void addUser(User user);
 
 	/**
 	 * Replaces the existing {@link User} object in the underlying database
@@ -108,7 +108,7 @@ public interface PersistenceHandler {
 	 * @param user
 	 * 		the {@link User} object to add
 	 */
-	public void replaceUser(User user);
+	void replaceUser(User user);
 
 	/**
 	 * Adds a {@link Role} object to the underlying database
@@ -116,7 +116,7 @@ public interface PersistenceHandler {
 	 * @param role
 	 * 		the {@link User} object to add
 	 */
-	public void addRole(Role role);
+	void addRole(Role role);
 
 	/**
 	 * Replaces the {@link Role} object in the underlying database
@@ -124,21 +124,21 @@ public interface PersistenceHandler {
 	 * @param role
 	 * 		the {@link User} object to add
 	 */
-	public void replaceRole(Role role);
+	void replaceRole(Role role);
 
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved
 	 *
 	 * @return true if changes were persisted successfully, false if nothing needed to be persisted
 	 */
-	public boolean persist();
+	boolean persist();
 
 	/**
 	 * Informs this {@link PersistenceHandler} to reload the data from the backend
 	 *
 	 * @return true if the reload was successful, false if something went wrong
 	 */
-	public boolean reload();
+	boolean reload();
 
 	/**
 	 * Initialize the concrete {@link PersistenceHandler}. The passed parameter map contains any configuration the
@@ -147,5 +147,12 @@ public interface PersistenceHandler {
 	 * @param parameterMap
 	 * 		a map containing configuration properties
 	 */
-	public void initialize(Map<String, String> parameterMap);
+	void initialize(Map<String, String> parameterMap);
+
+	/**
+	 * Returns the configuration for this {@link PersistenceHandler}
+	 *
+	 * @return the configuration as a Map
+	 */
+	Map<String, String> getParameterMap();
 }

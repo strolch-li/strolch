@@ -882,9 +882,37 @@ public interface PrivilegeHandler {
 	PrivilegeContext openSystemUserContext(String systemUsername) throws PrivilegeException;
 
 	/**
+	 * Returns the configuration for this {@link PrivilegeHandler}
+	 *
+	 * @return the configuration as a Map
+	 */
+	Map<String, String> getParameterMap();
+
+	/**
 	 * Returns the {@link EncryptionHandler} instance
 	 *
 	 * @return the {@link EncryptionHandler} instance
 	 */
 	EncryptionHandler getEncryptionHandler() throws PrivilegeException;
+
+	/**
+	 * Returns the {@link PersistenceHandler}
+	 *
+	 * @return the {@link PersistenceHandler}
+	 */
+	PersistenceHandler getPersistenceHandler();
+
+	/**
+	 * Returns the {@link SingleSignOnHandler}
+	 *
+	 * @return the {@link SingleSignOnHandler}
+	 */
+	SingleSignOnHandler getSsoHandler();
+
+	/**
+	 * Returns the {@link UserChallengeHandler}
+	 *
+	 * @return the {@link UserChallengeHandler}
+	 */
+	UserChallengeHandler getUserChallengeHandler();
 }

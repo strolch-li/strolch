@@ -131,6 +131,28 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected PrivilegeConflictResolution privilegeConflictResolution;
 	private String identifier;
 
+	private Map<String, String> parameterMap;
+
+	@Override
+	public SingleSignOnHandler getSsoHandler() {
+		return this.ssoHandler;
+	}
+
+	@Override
+	public UserChallengeHandler getUserChallengeHandler() {
+		return this.userChallengeHandler;
+	}
+
+	@Override
+	public PersistenceHandler getPersistenceHandler() {
+		return this.persistenceHandler;
+	}
+
+	@Override
+	public Map<String, String> getParameterMap() {
+		return this.parameterMap;
+	}
+
 	@Override
 	public boolean isRefreshAllowed() {
 		return this.allowSessionRefresh;
@@ -1812,6 +1834,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		loadSessions();
 
+		this.parameterMap = parameterMap;
 		this.initialized = true;
 	}
 
@@ -1908,6 +1931,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// build our identifier
 		byte[] encrypt = AesCryptoHelper.encrypt(this.secretKey, "PrivilegeHandler".getBytes());
 		this.identifier = Base64.getEncoder().encodeToString(encrypt);
+
+		// remove secrets
+		parameterMap.remove(PARAM_SECRET_KEY);
+		parameterMap.remove(PARAM_SECRET_SALT);
 	}
 
 	private void validatePrivilegeConflicts() {

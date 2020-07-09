@@ -16,6 +16,16 @@ public abstract class UserChallengeHandler {
 	protected static final Logger logger = LoggerFactory.getLogger(ConsoleUserChallengeHandler.class);
 
 	protected Map<User, UserChallenge> challenges;
+	private Map<String, String> parameterMap;
+
+	/**
+	 * Returns the configuration for this {@link UserChallengeHandler}
+	 *
+	 * @return the configuration as a Map
+	 */
+	public Map<String, String> getParameterMap() {
+		return this.parameterMap;
+	}
 
 	/**
 	 * Initialize the concrete {@link UserChallengeHandler}. The passed parameter map contains any configuration the
@@ -25,6 +35,7 @@ public abstract class UserChallengeHandler {
 	 * 		a map containing configuration properties
 	 */
 	public void initialize(Map<String, String> parameterMap) {
+		this.parameterMap = parameterMap;
 		this.challenges = new HashMap<>();
 	}
 

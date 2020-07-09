@@ -10,9 +10,16 @@ import li.strolch.privilege.model.internal.User;
 
 public class DummySsoHandler implements SingleSignOnHandler {
 
+	private Map<String, String> parameterMap;
+
+	@Override
+	public Map<String, String> getParameterMap() {
+		return this.parameterMap;
+	}
+
 	@Override
 	public void initialize(Map<String, String> parameterMap) {
-		// do nothing
+		this.parameterMap = parameterMap;
 	}
 
 	@Override

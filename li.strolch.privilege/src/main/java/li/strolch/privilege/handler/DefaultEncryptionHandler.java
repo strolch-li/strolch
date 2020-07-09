@@ -15,7 +15,9 @@
  */
 package li.strolch.privilege.handler;
 
+import static java.lang.String.valueOf;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.privilege.helper.XmlConstants.*;
 
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -78,6 +80,12 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	 * The length of the secure key for the hashing
 	 */
 	private int keyLength;
+	private Map<String, String> parameterMap;
+
+	@Override
+	public Map<String, String> getParameterMap() {
+		return this.parameterMap;
+	}
 
 	@Override
 	public Crypt newCryptInstance() {
@@ -147,17 +155,18 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 	@Override
 	public void initialize(Map<String, String> parameterMap) {
+		this.parameterMap = parameterMap;
 
 		this.secureRandom = new SecureRandom();
 
 		// get hash algorithm parameters
-		this.algorithm = parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
+		this.algorithm = parameterMap.getOrDefault(XML_PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
 		this.nonSaltAlgorithm = parameterMap
-				.getOrDefault(XmlConstants.XML_PARAM_HASH_ALGORITHM_NON_SALT, DEFAULT_ALGORITHM_NON_SALT);
-		this.iterations = Integer.parseInt(
-				parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_ITERATIONS, String.valueOf(DEFAULT_ITERATIONS)));
-		this.keyLength = Integer.parseInt(
-				parameterMap.getOrDefault(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, String.valueOf(DEFAULT_KEY_LENGTH)));
+				.getOrDefault(XML_PARAM_HASH_ALGORITHM_NON_SALT, DEFAULT_ALGORITHM_NON_SALT);
+		this.iterations = Integer
+				.parseInt(parameterMap.getOrDefault(XML_PARAM_HASH_ITERATIONS, valueOf(DEFAULT_ITERATIONS)));
+		this.keyLength = Integer
+				.parseInt(parameterMap.getOrDefault(XML_PARAM_HASH_KEY_LENGTH, valueOf(DEFAULT_KEY_LENGTH)));
 
 		// test non-salt hash algorithm
 		try {
@@ -166,9 +175,8 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 					.format("Using non-salt hashing algorithm {0}", this.nonSaltAlgorithm)); //$NON-NLS-1$
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
-			msg = MessageFormat
-					.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM_NON_SALT,
-							e.getLocalizedMessage());
+			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XML_PARAM_HASH_ALGORITHM_NON_SALT,
+					e.getLocalizedMessage());
 			throw new PrivilegeException(msg, e);
 		}
 
@@ -179,8 +187,8 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 					.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm)); //$NON-NLS-1$
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XmlConstants.XML_PARAM_HASH_ALGORITHM,
-					e.getLocalizedMessage());
+			msg = MessageFormat
+					.format(msg, EncryptionHandler.class.getName(), XML_PARAM_HASH_ALGORITHM, e.getLocalizedMessage());
 			throw new PrivilegeException(msg, e);
 		}
 	}

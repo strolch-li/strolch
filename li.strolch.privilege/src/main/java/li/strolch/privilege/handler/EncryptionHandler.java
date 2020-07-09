@@ -117,4 +117,11 @@ public interface EncryptionHandler {
 	 * 		a map containing configuration properties
 	 */
 	void initialize(Map<String, String> parameterMap);
+
+	/**
+	 * Returns the configuration for this {@link EncryptionHandler}
+	 *
+	 * @return the configuration as a Map
+	 */
+	Map<String, String> getParameterMap();
 }

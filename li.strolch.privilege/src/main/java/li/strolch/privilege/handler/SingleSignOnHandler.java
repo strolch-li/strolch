@@ -28,4 +28,11 @@ public interface SingleSignOnHandler {
 	 * 		if the SSO can not be performed with the given data
 	 */
 	User authenticateSingleSignOn(Object data) throws PrivilegeException;
+
+	/**
+	 * Returns the configuration for this {@link SingleSignOnHandler}
+	 *
+	 * @return the configuration as a Map
+	 */
+	Map<String, String> getParameterMap();
 }
