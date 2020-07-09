@@ -21,6 +21,7 @@ import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
@@ -96,6 +97,15 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	protected final ComponentContainer getContainer() {
 		return this.container;
+	}
+
+	/**
+	 * Return the {@link StrolchAgent}
+	 *
+	 * @return the {@link StrolchAgent}
+	 */
+	protected final StrolchAgent getAgent() {
+		return this.container.getAgent();
 	}
 
 	/**
