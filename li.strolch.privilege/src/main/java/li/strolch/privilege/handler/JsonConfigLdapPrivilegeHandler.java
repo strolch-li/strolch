@@ -154,7 +154,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 			Set<String> strolchRoles) {
 
 		String primaryLocation = "";
-		String secondaryLocations = "";
+		Set<String> secondaryLocations = new HashSet<>();
 		Set<String> locations = new HashSet<>();
 
 		for (String ldapGroup : ldapGroups) {
@@ -163,19 +163,31 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 			JsonElement primaryLocationJ = mappingJ.get(PRIMARY_LOCATION);
 			if (primaryLocationJ != null && !primaryLocationJ.isJsonNull()) {
-				if (!primaryLocation.isEmpty())
-					logger.warn("Primary location already set by previous LDAP Group config, overriding for LDAP Group "
-							+ ldapGroup);
-				primaryLocation = primaryLocationJ.getAsString();
+				if (primaryLocation.isEmpty()) {
+					primaryLocation = primaryLocationJ.getAsString();
+				} else {
+					logger.warn("Primary location already set by previous LDAP Group config for LDAP Group " + ldapGroup
+							+ ", adding to secondary locations.");
+					secondaryLocations.add(primaryLocationJ.getAsString());
+				}
 			}
 
 			JsonElement secondaryLocationsJ = mappingJ.get(SECONDARY_LOCATIONS);
 			if (secondaryLocationsJ != null && !secondaryLocationsJ.isJsonNull()) {
-				if (!secondaryLocations.isEmpty())
+				if (secondaryLocations.isEmpty()) {
+					if (secondaryLocationsJ.isJsonPrimitive())
+						secondaryLocations.add(secondaryLocationsJ.getAsString());
+					else
+						secondaryLocationsJ.getAsJsonArray().forEach(s -> secondaryLocations.add(s.getAsString()));
+				} else {
 					logger.warn(
-							"Secondary locations already set by previous LDAP Group config, overriding for LDAP Group "
-									+ ldapGroup);
-				secondaryLocations = secondaryLocationsJ.getAsString();
+							"Secondary locations already set by previous LDAP Group config for LDAP Group " + ldapGroup
+									+ ", adding additional");
+					if (secondaryLocationsJ.isJsonPrimitive())
+						secondaryLocations.add(secondaryLocationsJ.getAsString());
+					else
+						secondaryLocationsJ.getAsJsonArray().forEach(s -> secondaryLocations.add(s.getAsString()));
+				}
 			}
 		}
 
@@ -183,7 +195,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		properties.put(REALM, this.realm);
 		properties.put(LOCATION, join(",", locations));
 		properties.put(PRIMARY_LOCATION, primaryLocation);
-		properties.put(SECONDARY_LOCATIONS, secondaryLocations);
+		properties.put(SECONDARY_LOCATIONS, join(",", secondaryLocations));
 		return properties;
 	}
 }
