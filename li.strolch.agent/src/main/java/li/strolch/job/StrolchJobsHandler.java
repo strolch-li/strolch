@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.model.Resource;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.IntegerParameter;
@@ -26,26 +27,21 @@ public class StrolchJobsHandler extends StrolchComponent {
 
 	protected Map<String, StrolchJob> jobs;
 
-	/**
-	 * Constructor which takes a reference to the container and the component's name under which it can be retrieved at
-	 * runtime (although one mostly retrieves the component by interface class for automatic casting)
-	 *
-	 * @param container
-	 * 		the container
-	 * @param componentName
-	 * 		the name of the component
-	 */
 	public StrolchJobsHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 
 	@Override
 	public void start() throws Exception {
-		reloadJobs();
+		reloadJobs(true);
 		super.start();
 	}
 
 	public void reloadJobs() throws Exception {
+		reloadJobs(false);
+	}
+
+	private void reloadJobs(boolean catchExceptions) throws Exception {
 
 		List<StrolchJob> jobs = new ArrayList<>();
 
@@ -66,35 +62,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 			for (String realmName : realmNames) {
 				try (StrolchTransaction tx = openTx(ctx.getCertificate(), realmName, true)) {
 					tx.streamResources(TYPE_STROLCH_JOB).forEach(jobRes -> {
-
-						String className = jobRes.getParameter(StrolchModelConstants.PARAM_CLASS_NAME, true).getValue();
-						JobMode mode = JobMode.valueOf(jobRes.getParameter(StrolchModelConstants.PARAM_MODE, true).getValue());
-
-						StrolchJob job = instantiateJob(className, jobRes.getId(), jobRes.getName(), mode);
-						job.setConfigureMethod(ConfigureMethod.Model).setMode(mode);
-
-						if (mode != JobMode.Manual) {
-							if (jobRes.hasParameter(StrolchModelConstants.PARAM_CRON)) {
-								String cron = jobRes.getParameter(StrolchModelConstants.PARAM_CRON, true).getValue();
-								DateParameter startDateP = jobRes.getParameter(StrolchModelConstants.PARAM_START_DATE, true);
-								job.setCronExpression(cron, startDateP.getValueZdt());
-							} else if (jobRes.hasParameter(StrolchModelConstants.PARAM_INITIAL_DELAY) && jobRes.hasParameter(
-									StrolchModelConstants.PARAM_DELAY)) {
-								IntegerParameter initialDelayP = jobRes.getParameter(
-										StrolchModelConstants.PARAM_INITIAL_DELAY, true);
-								IntegerParameter delayP = jobRes.getParameter(StrolchModelConstants.PARAM_DELAY, true);
-								TimeUnit initialDelayUnit = TimeUnit.valueOf(initialDelayP.getUom());
-								TimeUnit delayUnit = TimeUnit.valueOf(delayP.getUom());
-								job.setDelay(initialDelayP.getValue(), initialDelayUnit, delayP.getValue(), delayUnit);
-							} else {
-								logger.error("Job " + jobRes.getId()
-										+ " is inconsistent, as either cron, or initialDelay/delay is missing!");
-								return;
-							}
-						}
-
-						jobs.add(job);
-						logger.info("Added job " + job + " from model.");
+						loadJob(jobs, jobRes, catchExceptions);
 					});
 				}
 			}
@@ -108,6 +76,55 @@ public class StrolchJobsHandler extends StrolchComponent {
 
 		this.jobs = new HashMap<>();
 		jobs.forEach(job -> internalRegister(job).schedule());
+	}
+
+	private void loadJob(List<StrolchJob> jobs, Resource jobRes, boolean catchExceptions) {
+		try {
+			String className = jobRes.getParameter(StrolchModelConstants.PARAM_CLASS_NAME, true).getValue();
+			JobMode mode = JobMode.valueOf(jobRes.getParameter(StrolchModelConstants.PARAM_MODE, true).getValue());
+
+			StrolchJob job = instantiateJob(className, jobRes.getId(), jobRes.getName(), mode);
+			job.setConfigureMethod(ConfigureMethod.Model).setMode(mode);
+
+			if (mode == JobMode.Manual) {
+				jobs.add(job);
+				logger.info("Added job " + job + " from model.");
+				return;
+			}
+
+			if (jobRes.hasParameter(StrolchModelConstants.PARAM_CRON)) {
+				String cron = jobRes.getParameter(StrolchModelConstants.PARAM_CRON, true).getValue();
+				DateParameter startDateP = jobRes.getParameter(StrolchModelConstants.PARAM_START_DATE, true);
+				job.setCronExpression(cron, startDateP.getValueZdt());
+
+				jobs.add(job);
+				logger.info("Added job " + job + " from model.");
+
+				return;
+			}
+
+			if (jobRes.hasParameter(StrolchModelConstants.PARAM_INITIAL_DELAY) && jobRes
+					.hasParameter(StrolchModelConstants.PARAM_DELAY)) {
+				IntegerParameter initialDelayP = jobRes.getParameter(StrolchModelConstants.PARAM_INITIAL_DELAY, true);
+				IntegerParameter delayP = jobRes.getParameter(StrolchModelConstants.PARAM_DELAY, true);
+				TimeUnit initialDelayUnit = TimeUnit.valueOf(initialDelayP.getUom());
+				TimeUnit delayUnit = TimeUnit.valueOf(delayP.getUom());
+				job.setDelay(initialDelayP.getValue(), initialDelayUnit, delayP.getValue(), delayUnit);
+
+				jobs.add(job);
+				logger.info("Added job " + job + " from model.");
+
+				return;
+			}
+
+			logger.error(
+					"Job " + jobRes.getId() + " is inconsistent, as either cron, or initialDelay/delay is missing!");
+		} catch (RuntimeException e) {
+			if (catchExceptions)
+				logger.error("Failed to load StrolchJob " + jobRes.getId() + " from model", e);
+			else
+				throw new IllegalStateException("Failed to load StrolchJob " + jobRes.getId() + " from model", e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
