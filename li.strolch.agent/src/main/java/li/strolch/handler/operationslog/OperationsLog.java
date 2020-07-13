@@ -1,6 +1,7 @@
 package li.strolch.handler.operationslog;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
@@ -113,7 +114,7 @@ public class OperationsLog extends StrolchComponent {
 			// persist changes for non-transient realms
 			StrolchRealm realm = getContainer().getRealm(realmName);
 			if (!realm.getMode().isTransient())
-				this.executorService.submit(() -> persist(realm, null, Collections.singletonList(message)));
+				this.executorService.submit(() -> persist(realm, null, singletonList(message)));
 		}
 	}
 
@@ -146,7 +147,7 @@ public class OperationsLog extends StrolchComponent {
 
 			StrolchRealm realm = getContainer().getRealm(realmName);
 			if (!realm.getMode().isTransient()) {
-				this.executorService.submit(() -> persist(realm, logMessages));
+				this.executorService.submit(() -> updateStates(realm, logMessages));
 			}
 		});
 	}
@@ -159,7 +160,7 @@ public class OperationsLog extends StrolchComponent {
 
 				StrolchRealm realm = getContainer().getRealm(realmName);
 				if (!realm.getMode().isTransient()) {
-					this.executorService.submit(() -> persist(realm, logMessage, emptyList()));
+					this.executorService.submit(() -> updateStates(realm, singletonList(logMessage)));
 				}
 			}
 		}
@@ -214,7 +215,7 @@ public class OperationsLog extends StrolchComponent {
 		}
 	}
 
-	private void persist(StrolchRealm realm, Collection<LogMessage> logMessages) {
+	private void updateStates(StrolchRealm realm, Collection<LogMessage> logMessages) {
 		try {
 			runAsAgent(ctx -> {
 				try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass(), false)) {

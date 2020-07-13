@@ -133,7 +133,24 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 	@Override
 	public void updateStates(Collection<LogMessage> logMessages) {
-		logMessages.forEach(this::updateState);
+
+		try (PreparedStatement ps = this.tx.getConnection().prepareStatement(updateLogMessageStateSql)) {
+
+			// update state
+			for (LogMessage logMessage : logMessages) {
+				ps.setString(1, logMessage.getState().name());
+				ps.setString(2, logMessage.getId());
+				ps.addBatch();
+			}
+
+			// we ignore the number of updates, as the message might have been deleted meanwhile
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(MessageFormat
+					.format("Failed to update states for {0} LogMessages due to {1}", logMessages.size(),
+							e.getLocalizedMessage()), e);
+		}
 	}
 
 	@Override
