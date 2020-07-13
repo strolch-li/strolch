@@ -1,5 +1,6 @@
 package li.strolch.handler.operationslog;
 
+import static java.util.Collections.emptyList;
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
@@ -158,7 +159,7 @@ public class OperationsLog extends StrolchComponent {
 
 				StrolchRealm realm = getContainer().getRealm(realmName);
 				if (!realm.getMode().isTransient()) {
-					this.executorService.submit(() -> persist(realm, logMessages));
+					this.executorService.submit(() -> persist(realm, logMessage, emptyList()));
 				}
 			}
 		}
@@ -166,7 +167,7 @@ public class OperationsLog extends StrolchComponent {
 
 	private List<LogMessage> pruneMessages(List<LogMessage> logMessages) {
 		if (logMessages.size() < this.maxMessages)
-			return Collections.emptyList();
+			return emptyList();
 
 		List<LogMessage> messagesToRemove = new ArrayList<>();
 
@@ -252,7 +253,7 @@ public class OperationsLog extends StrolchComponent {
 	public synchronized List<LogMessage> getMessages(String realm) {
 		List<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
 		if (logMessages == null)
-			return Collections.emptyList();
+			return emptyList();
 
 		return new ArrayList<>(logMessages);
 	}
