@@ -1727,9 +1727,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		certificate.setLastAccess(LocalDateTime.now());
 
 		// TODO decide if we want to assert source did not change!
-		if (!source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
-			logger.warn("Source has changed for certificate " + certificate.toString() + " to " + source);
-		}
+		// if (!source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
+		// 	logger.warn("Source has changed for certificate " + certificate.toString() + " to " + source);
+		// }
 
 		return privilegeContext;
 	}
