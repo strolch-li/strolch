@@ -88,6 +88,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
+	public boolean isInterpretationDefined() {
+		return !INTERPRETATION_NONE.equals(this.interpretation);
+	}
+
+	@Override
 	public String getUom() {
 		return this.uom;
 	}
@@ -100,6 +105,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		} else {
 			this.uom = uom;
 		}
+	}
+
+	@Override
+	public boolean isUomDefined() {
+		return !UOM_NONE.equals(this.uom);
 	}
 
 	@Override
