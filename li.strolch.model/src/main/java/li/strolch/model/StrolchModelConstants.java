@@ -94,6 +94,7 @@ public class StrolchModelConstants {
 		public static final String TYPE_CONSUME = "Consume";
 		public static final String TYPE_RESERVE = "Reserve";
 		public static final String TYPE_RELEASE = "Release";
+		public static final String TYPE_WAIT = "Wait";
 
 		public static final String BAG_OBJECTIVES = "Objectives";
 
