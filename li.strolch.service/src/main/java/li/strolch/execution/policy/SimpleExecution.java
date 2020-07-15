@@ -1,12 +1,17 @@
 package li.strolch.execution.policy;
 
-import li.strolch.model.log.LogMessage;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
+import li.strolch.model.log.LogMessage;
 import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.PrivilegeContext;
 
 /**
  * <p>
@@ -87,5 +92,45 @@ public class SimpleExecution extends ExecutionPolicy {
 		stop();
 		addMessage(message);
 		getController().asyncToWarning(message.getLocator());
+	}
+
+	protected StrolchTransaction openLocalTx(PrivilegeContext ctx, boolean readOnly) throws StrolchException {
+		return getContainer().getRealm(ctx.getCertificate()).openTx(ctx.getCertificate(), getClass(), readOnly);
+	}
+
+	protected void runWithFreshAction(Consumer<Action> consumer) {
+		runWithFreshAction(consumer, true);
+	}
+
+	protected void runWithFreshAction(Consumer<Action> consumer, boolean readOnly) {
+		try {
+			runAsAgent(ctx -> {
+				try (StrolchTransaction tx = openLocalTx(ctx, readOnly)) {
+					tx.lock(this.actionLoc.trim(3));
+					Action action = tx.findElement(this.actionLoc);
+					consumer.accept(action);
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to perform consumer " + consumer.toString(), e);
+		}
+	}
+
+	protected void runWithFreshAction(BiConsumer<StrolchTransaction, Action> consumer) {
+		runWithFreshAction(consumer, true);
+	}
+
+	protected void runWithFreshAction(BiConsumer<StrolchTransaction, Action> consumer, boolean readOnly) {
+		try {
+			runAsAgent(ctx -> {
+				try (StrolchTransaction tx = openLocalTx(ctx, readOnly)) {
+					tx.lock(this.actionLoc.trim(3));
+					Action action = tx.findElement(this.actionLoc);
+					consumer.accept(tx, action);
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to perform consumer " + consumer.toString(), e);
+		}
 	}
 }
