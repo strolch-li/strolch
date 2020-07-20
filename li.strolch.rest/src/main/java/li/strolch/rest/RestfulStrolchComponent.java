@@ -23,6 +23,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
@@ -76,12 +77,21 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private String corsOrigin;
 	private boolean restLogging;
 	private boolean restLoggingEntity;
-	private String cacheMode;
 	private boolean secureCookie;
 	private int cookieMaxAge;
 
+	private String webPath;
+
 	public RestfulStrolchComponent(ComponentContainer container, String componentName) {
 		super(container, componentName);
+	}
+
+	public String getWebPath() {
+		return this.webPath;
+	}
+
+	public void setWebPath(String webPath) {
+		this.webPath = webPath;
 	}
 
 	/**
@@ -162,7 +172,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 				.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing, this.restTracingThreshold));
 
 		// set http cache mode
-		this.cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
+		String cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
 		logger.info("HTTP header cache mode is set to {}", cacheMode);
 
 		this.secureCookie = configuration.getBoolean(PARAM_SECURE_COOKIE, true);
@@ -214,6 +224,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	public ServiceHandler getServiceHandler() {
 		return getContainer().getComponent(ServiceHandler.class);
+	}
+
+	public PrivilegeContext validate(Certificate certificate) {
+		return getPrivilegeHandler().validate(certificate);
 	}
 
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
