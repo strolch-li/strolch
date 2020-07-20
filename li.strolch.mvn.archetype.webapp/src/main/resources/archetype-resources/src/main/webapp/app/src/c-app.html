@@ -31,6 +31,7 @@
 <link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-operations-log.html">
 <link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-inspector-menu.html">
 <link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-control.html">
+<link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-i18n-editor.html">
 <link rel="import" href="../bower_components/strolch-wc-reports/strolch-wc-reports.html">
 
 <link rel="import" href="./c-app-behavior.html">
@@ -140,6 +141,13 @@
                                 <strolch-wc-inspector id="inspector"
                                                       base-path="../"
                                                       route="{{subroute}}"></strolch-wc-inspector>
+                            </template>
+
+                            <template is="dom-if" if="[[equal(page, 'i18n-editor')]]" restamp>
+                                <strolch-wc-i18n-editor id="i18n-editor"
+                                                        base-path="../"
+                                                        base-rest-path="[[baseRestPath]]"
+                                                        route="{{subroute}}"></strolch-wc-i18n-editor>
                             </template>
 
                             <template is="dom-if" if="[[equal(page, 'operations-log')]]" restamp>
