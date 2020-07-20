@@ -13,13 +13,17 @@ public enum Operation {
 	UPDATE(PRIVILEGE_UPDATE_PREFIX), // 
 	REMOVE(PRIVILEGE_REMOVE_PREFIX);
 
-	private String privilegePrefix;
+	private final String privilegePrefix;
+
+	Operation(String privilegePrefix) {
+		this.privilegePrefix = privilegePrefix;
+	}
 
 	public String getPrivilegeName(StrolchRootElement element) {
 		return this.privilegePrefix + element.getObjectType();
 	}
 
-	Operation(String privilegePrefix) {
-		this.privilegePrefix = privilegePrefix;
+	public String getPrivilegePrefix() {
+		return this.privilegePrefix;
 	}
 }
