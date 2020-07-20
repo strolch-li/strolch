@@ -20,9 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import li.strolch.rest.endpoint.*;
-import li.strolch.rest.filters.AccessControlResponseFilter;
-import li.strolch.rest.filters.AuthenticationRequestFilter;
-import li.strolch.rest.filters.AuthenticationResponseFilter;
+import li.strolch.rest.filters.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,6 +39,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(ReportResource.class);
 		restfulClasses.add(ControlResource.class);
 		restfulClasses.add(Inspector.class);
+		restfulClasses.add(I18nService.class);
 		restfulClasses.add(VersionQuery.class);
 		restfulClasses.add(ModelQuery.class);
 		restfulClasses.add(EnumQuery.class);
@@ -58,6 +57,8 @@ public class StrolchRestfulClasses {
 		providerClasses.add(AccessControlResponseFilter.class);
 		providerClasses.add(AuthenticationRequestFilter.class);
 		providerClasses.add(AuthenticationResponseFilter.class);
+		providerClasses.add(CharsetResponseFilter.class);
+		providerClasses.add(HttpCacheResponseFilter.class);
 
 		StrolchRestfulClasses.restfulClasses = Collections.unmodifiableSet(restfulClasses);
 		StrolchRestfulClasses.providerClasses = Collections.unmodifiableSet(providerClasses);
