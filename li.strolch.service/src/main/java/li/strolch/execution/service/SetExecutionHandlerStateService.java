@@ -2,6 +2,7 @@ package li.strolch.execution.service;
 
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.ExecutionHandlerState;
+import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.StringMapArgument;
 import li.strolch.service.api.AbstractService;
@@ -26,6 +27,9 @@ public class SetExecutionHandlerStateService extends AbstractService<StringMapAr
 
 		String realm = StringHelper.isEmpty(arg.realm) ? StrolchConstants.DEFAULT_REALM : arg.realm;
 		String state = arg.map.get("state");
+
+		// validate user can perform this action
+		getPrivilegeContext().validateAction(new SimpleRestrictable(getPrivilegeValue(), state));
 
 		switch (state) {
 		case "Running": {
