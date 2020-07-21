@@ -31,9 +31,6 @@ import li.strolch.agent.impl.*;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
@@ -41,6 +38,9 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
@@ -55,6 +55,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
@@ -191,6 +192,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.privilegeContext = this.privilegeHandler.validate(this.certificate);
 		}
 		return this.privilegeContext;
+	}
+
+	@Override
+	public void validateAction(Restrictable restrictable) throws PrivilegeException {
+		getPrivilegeContext().validateAction(restrictable);
 	}
 
 	@Override
