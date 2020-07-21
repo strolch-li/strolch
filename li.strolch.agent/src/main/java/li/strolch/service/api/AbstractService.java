@@ -615,7 +615,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * @see li.strolch.privilege.model.Restrictable#getPrivilegeValue()
 	 */
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return this.getClass().getName();
 	}
 }

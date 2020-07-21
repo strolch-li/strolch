@@ -70,7 +70,7 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }

@@ -56,7 +56,7 @@ public class PrivilegeAddUserService extends AbstractService<PrivilegeUserArgume
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }

@@ -66,7 +66,7 @@ public class PrivilegeAddRoleToUserService
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }

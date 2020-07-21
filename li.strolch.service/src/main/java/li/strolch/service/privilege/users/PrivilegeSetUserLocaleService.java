@@ -66,7 +66,7 @@ public class PrivilegeSetUserLocaleService
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }

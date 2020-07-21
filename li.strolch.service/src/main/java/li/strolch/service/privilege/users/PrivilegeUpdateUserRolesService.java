@@ -92,7 +92,7 @@ public class PrivilegeUpdateUserRolesService extends AbstractService<JsonService
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }

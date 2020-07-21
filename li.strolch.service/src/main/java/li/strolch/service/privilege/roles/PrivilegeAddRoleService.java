@@ -64,7 +64,7 @@ public class PrivilegeAddRoleService extends AbstractService<PrivilegeRoleArgume
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }

@@ -65,7 +65,7 @@ public class PrivilegeRemoveRoleFromUserService
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }

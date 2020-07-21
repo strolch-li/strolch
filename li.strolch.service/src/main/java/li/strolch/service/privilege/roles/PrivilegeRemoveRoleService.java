@@ -65,7 +65,7 @@ public class PrivilegeRemoveRoleService extends AbstractService<PrivilegeRoleNam
 	}
 
 	@Override
-	public Object getPrivilegeValue() {
+	public String getPrivilegeValue() {
 		return null;
 	}
 }
