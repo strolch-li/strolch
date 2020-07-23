@@ -159,7 +159,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 	}
 
 	private void reloadPolicies(ComponentConfiguration configuration) {
-		if (configuration.getBoolean(PROP_READ_POLICY_FILE, Boolean.FALSE)) {
+		if (configuration.getBoolean(PROP_READ_POLICY_FILE, Boolean.TRUE)) {
 			File policyFile = configuration.getConfigFile(PROP_POLICY_CONFIG, DEF_STROLCH_POLICIES_XML,
 					configuration.getRuntimeConfiguration());
 			parsePolicyFile(policyFile);
