@@ -206,10 +206,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #EXECUTION} or {@link #WARNING} or {@link #ERROR}
+	 * @return true if {@link #PLANNED} or {@link #EXECUTION} or {@link #WARNING} or {@link #ERROR}
 	 */
 	public boolean canSetToError() {
-		return this == EXECUTION || this == WARNING || this == ERROR;
+		return this == PLANNED || this == EXECUTION || this == WARNING || this == ERROR;
 	}
 
 	/**
