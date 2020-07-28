@@ -46,6 +46,7 @@ public class GenericReport extends ReportPolicy {
 	private Map<String, StringParameter> filterCriteriaParams;
 	private boolean descending;
 	private boolean allowMissingColumns;
+	private boolean filterMissingValuesAsTrue;
 	private List<String> columnIds;
 	private StringParameter dateRangeSelP;
 
@@ -73,7 +74,7 @@ public class GenericReport extends ReportPolicy {
 		// get the reportRes
 		this.reportRes = tx().getResourceBy(TYPE_REPORT, reportId, true);
 
-		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE, true);
+		StringParameter objectTypeP = this.reportRes.getStringP(PARAM_OBJECT_TYPE);
 		String objectType = objectTypeP.getValue();
 
 		this.columnsBag = this.reportRes.getParameterBag(BAG_COLUMNS, true);
@@ -83,12 +84,9 @@ public class GenericReport extends ReportPolicy {
 				.map(StrolchElement::getId) //
 				.collect(Collectors.toList());
 
-		if (this.reportRes.hasParameter(BAG_PARAMETERS, PARAM_DESCENDING))
-			this.descending = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DESCENDING).getValue();
-		if (this.reportRes.hasParameter(BAG_PARAMETERS, PARAM_ALLOW_MISSING_COLUMNS))
-			this.allowMissingColumns = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_ALLOW_MISSING_COLUMNS)
-					.getValue();
-
+		this.descending = this.reportRes.getBoolean(PARAM_DESCENDING);
+		this.allowMissingColumns = this.reportRes.getBoolean(PARAM_ALLOW_MISSING_COLUMNS);
+		this.filterMissingValuesAsTrue = this.reportRes.getBoolean(PARAM_FILTER_MISSING_VALUES_AS_TRUE);
 		this.dateRangeSelP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 
 		// evaluate filter criteria params
@@ -574,7 +572,7 @@ public class GenericReport extends ReportPolicy {
 
 			} else {
 				Object value = evaluateColumnValue(refTuple.getFirst(), row, true);
-				if (value == null || !filterPolicy.filter(value))
+				if ((value == null && !this.filterMissingValuesAsTrue) || !filterPolicy.filter(value))
 					return false;
 			}
 		}

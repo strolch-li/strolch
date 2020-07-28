@@ -18,6 +18,7 @@ public class ReportConstants {
 	public static final String PARAM_FIELD_REF1 = "fieldRef1";
 	public static final String PARAM_FIELD_REF2 = "fieldRef2";
 	public static final String PARAM_ALLOW_MISSING_COLUMNS = "allowMissingColumns";
+	public static final String PARAM_FILTER_MISSING_VALUES_AS_TRUE = "filterMissingValuesAsTrue";
 	public static final String PARAM_POLICY = "policy";
 
 	public static final String PARAM_JOIN_PARAM = "joinParam";
