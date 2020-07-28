@@ -281,7 +281,9 @@ public class ReportResource {
 
 				report.dateRange(dateRange);
 			}
-			filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
+
+			if (!filters.isEmpty())
+				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
 
 			// get rows
 			Stream<JsonObject> json = report.doReportAsJson().skip(offset).limit(limit);

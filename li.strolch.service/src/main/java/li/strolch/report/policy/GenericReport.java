@@ -408,7 +408,7 @@ public class GenericReport extends ReportPolicy {
 			if (value instanceof Date)
 				return ISO8601FormatFactory.getInstance().formatDate((Date) value);
 			if (value instanceof Parameter)
-				return ((Parameter) value).getValueAsString();
+				return ((Parameter<?>) value).getValueAsString();
 			return value.toString();
 		}));
 	}
@@ -567,6 +567,8 @@ public class GenericReport extends ReportPolicy {
 				Object value1 = evaluateColumnValue(refTuple.getFirst(), row, true);
 				Object value2 = evaluateColumnValue(refTuple.getSecond(), row, true);
 
+				if (this.filterMissingValuesAsTrue && (value1 == null || value2 == null))
+					continue;
 				if (value1 == null || value2 == null || !filterPolicy.filter(value1, value2))
 					return false;
 
@@ -670,7 +672,7 @@ public class GenericReport extends ReportPolicy {
 			else
 				columnValue = parameter;
 		} else {
-			columnValue = lookupParameter(columnDefP, column).orElseGet(StringParameter::new);
+			columnValue = lookupParameter(columnDefP, column).orElseGet(() -> allowNull ? null : new StringParameter());
 		}
 
 		return columnValue;
