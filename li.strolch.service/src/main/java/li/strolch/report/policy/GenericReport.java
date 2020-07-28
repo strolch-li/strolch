@@ -572,7 +572,9 @@ public class GenericReport extends ReportPolicy {
 
 			} else {
 				Object value = evaluateColumnValue(refTuple.getFirst(), row, true);
-				if ((value == null && !this.filterMissingValuesAsTrue) || !filterPolicy.filter(value))
+				if (this.filterMissingValuesAsTrue && value == null)
+					continue;
+				if (value == null || !filterPolicy.filter(value))
 					return false;
 			}
 		}
