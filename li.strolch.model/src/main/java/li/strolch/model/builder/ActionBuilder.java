@@ -10,6 +10,10 @@ public class ActionBuilder extends PolicyContainerBuilder<ActionBuilder> impleme
 	private String resourceId;
 	private String resourceType;
 
+	public ActionBuilder(String id, String name, String type) {
+		super(id, name, type);
+		this.builder = null;
+	}
 	public ActionBuilder(ActivityBuilder builder, String id, String name, String type) {
 		super(id, name, type);
 		this.builder = builder;
