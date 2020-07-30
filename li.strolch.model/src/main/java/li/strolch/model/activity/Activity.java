@@ -204,6 +204,30 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	/**
+	 * Returns the {@link Action} with the given ID which is a direct child of this {@link Activity}
+	 *
+	 * @param id
+	 * 		the id of the {@link Action} to return
+	 *
+	 * @return the {@link Action} with the given ID
+	 */
+	public Action getAction(String id) {
+		return getElement(id);
+	}
+
+	/**
+	 * Returns the {@link Activity} with the given ID which is a direct child of this {@link Activity}
+	 *
+	 * @param id
+	 * 		the id of the {@link Activity} to return
+	 *
+	 * @return the {@link Activity} with the given ID
+	 */
+	public Activity getActivity(String id) {
+		return getElement(id);
+	}
+
+	/**
 	 * get {@code IActivityElement} by id
 	 *
 	 * @param id
