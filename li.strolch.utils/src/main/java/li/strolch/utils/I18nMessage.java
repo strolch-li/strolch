@@ -37,6 +37,13 @@ public class I18nMessage {
 		this.bundle = null;
 	}
 
+	public I18nMessage(I18nMessage i18nMessage) {
+		this.key = i18nMessage.key;
+		this.values = i18nMessage.values;
+		this.bundle = i18nMessage.bundle;
+		this.message = i18nMessage.message;
+	}
+
 	public String getKey() {
 		return this.key;
 	}

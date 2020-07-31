@@ -26,6 +26,20 @@ public class LogMessage extends I18nMessage {
 	private String stackTrace;
 
 	public LogMessage(String realm, String username, Locator locator, LogSeverity severity, LogMessageState state,
+			I18nMessage i18nMessage) {
+		super(i18nMessage);
+		this.id = StringHelper.getUniqueId();
+		// persisting in the DB only handles millisecond precision, not nano precision
+		ZonedDateTime now = ZonedDateTime.now();
+		this.zonedDateTime = now.withNano((now.getNano() / 1000000) * 1000000);
+		this.realm = realm;
+		this.username = username;
+		this.locator = locator;
+		this.severity = severity;
+		this.state = state;
+	}
+
+	public LogMessage(String realm, String username, Locator locator, LogSeverity severity, LogMessageState state,
 			ResourceBundle bundle, String key) {
 		super(bundle, key);
 		this.id = StringHelper.getUniqueId();
