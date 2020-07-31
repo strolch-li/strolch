@@ -1,5 +1,7 @@
 package li.strolch.model.builder.params;
 
+import static li.strolch.model.StrolchModelConstants.*;
+
 import java.util.List;
 
 import li.strolch.model.builder.BagBuilder;
@@ -11,6 +13,24 @@ public class StringListParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	public StringListParamBuilder(BagBuilder<T> builder, String id, String name) {
 		super(builder, id, name);
+	}
+
+	public StringListParamBuilder<T> resourceRef(String type) {
+		this.interpretation = INTERPRETATION_RESOURCE_REF;
+		this.uom = type;
+		return this;
+	}
+
+	public StringListParamBuilder<T> orderRef(String type) {
+		this.interpretation = INTERPRETATION_ORDER_REF;
+		this.uom = type;
+		return this;
+	}
+
+	public StringListParamBuilder<T> activityRef(String type) {
+		this.interpretation = INTERPRETATION_ACTIVITY_REF;
+		this.uom = type;
+		return this;
 	}
 
 	@Override
