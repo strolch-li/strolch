@@ -15,11 +15,15 @@
  */
 package li.strolch.model.activity;
 
+import static java.util.stream.Collectors.toList;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.utils.collections.CollectionsHelper.singletonCollector;
 
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchElementNotFoundException;
@@ -325,6 +329,29 @@ public class Activity extends AbstractStrolchRootElement
 		return Optional.empty();
 	}
 
+	public <T extends IActivityElement> T findElement(Predicate<IActivityElement> predicate,
+			Supplier<String> msgSupplier) {
+		@SuppressWarnings("unchecked")
+		T t = (T) this.elements.values().stream().filter(predicate).collect(singletonCollector(msgSupplier));
+		return t;
+	}
+
+	public List<IActivityElement> findElements(Predicate<IActivityElement> predicate) {
+		return this.elements.values().stream().filter(predicate).collect(toList());
+	}
+
+	public List<Action> findActions(Predicate<IActivityElement> predicate) {
+		return this.elements.values().stream() //
+				.filter(IActivityElement::isAction) //
+				.map(e -> (Action) e) //
+				.filter(predicate) //
+				.collect(toList());
+	}
+
+	public List<Action> findActionsDeep(Predicate<IActivityElement> predicate) {
+		return getActionsAsFlatList().stream().filter(predicate).collect(toList());
+	}
+
 	public List<IActivityElement> getElementsByType(String type) {
 		List<IActivityElement> elements = new ArrayList<>();
 		Iterator<Entry<String, IActivityElement>> iter = elementIterator();
@@ -343,6 +370,10 @@ public class Activity extends AbstractStrolchRootElement
 		if (this.elements == null)
 			return Collections.emptyMap();
 		return this.elements;
+	}
+
+	public Stream<IActivityElement> streamElements() {
+		return this.elements.values().stream();
 	}
 
 	/**
