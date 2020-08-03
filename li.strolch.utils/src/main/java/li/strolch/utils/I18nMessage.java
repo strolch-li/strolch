@@ -2,6 +2,7 @@ package li.strolch.utils;
 
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -56,8 +57,31 @@ public class I18nMessage {
 		return this.values.get(key);
 	}
 
+	private ResourceBundle getBundle(Locale locale) {
+		if (this.bundle.getLocale() == locale)
+			return this.bundle;
+		String baseName = this.bundle.getBaseBundleName();
+
+		try {
+
+			ClassLoader classLoader = this.bundle.getClass().getClassLoader();
+			if (classLoader == null)
+				return ResourceBundle.getBundle(baseName, locale);
+			return ResourceBundle.getBundle(baseName, locale, classLoader);
+
+		} catch (MissingResourceException e) {
+			logger.error("Failed to find resource bundle " + baseName + " " + locale.toLanguageTag()
+					+ ", returning current bundle " + this.bundle.getLocale().toLanguageTag());
+			return this.bundle;
+		}
+	}
+
 	public String getMessage(ResourceBundle bundle) {
 		return formatMessage(bundle);
+	}
+
+	public String getMessage(Locale locale) {
+		return formatMessage(getBundle(locale));
 	}
 
 	public String getMessage() {
