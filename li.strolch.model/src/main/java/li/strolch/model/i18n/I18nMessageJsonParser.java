@@ -14,6 +14,7 @@ public class I18nMessageJsonParser {
 	public I18nMessage parse(JsonObject messageJ) {
 
 		String key = messageJ.get(Tags.Json.KEY).getAsString();
+		String bundle = messageJ.get(Tags.Json.BUNDLE).getAsString();
 		String message = messageJ.get(Tags.Json.MESSAGE).getAsString();
 
 		Properties properties = new Properties();
@@ -29,6 +30,6 @@ public class I18nMessageJsonParser {
 			}
 		}
 
-		return new I18nMessage(key, properties, message);
+		return new I18nMessage(bundle, key, properties, message);
 	}
 }

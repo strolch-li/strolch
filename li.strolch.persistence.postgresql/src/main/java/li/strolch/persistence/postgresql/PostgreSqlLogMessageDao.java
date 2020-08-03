@@ -26,12 +26,13 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	private static final String USERNAME = "username";
 	private static final String SEVERITY = "severity";
 	private static final String LOCATOR = "locator";
+	private static final String BUNDLE = "bundle";
 	private static final String KEY = "key";
 	private static final String MESSAGE = "message";
 	private static final String STACK_TRACE = "stacktrace";
 	private static final String STATE = "state";
 
-	private static final String FIELDS = commaSeparated(ID, REALM, DATE_TIME, USERNAME, SEVERITY, STATE, LOCATOR, KEY,
+	private static final String FIELDS = commaSeparated(ID, REALM, DATE_TIME, USERNAME, SEVERITY, STATE, LOCATOR, BUNDLE, KEY,
 			MESSAGE, STACK_TRACE);
 
 	private static final String queryByRealmMaxSql =
@@ -39,7 +40,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	private static final String queryValuesSql = "select key, value from operations_log_values where id = ?";
 
 	private static final String insertLogMessageSql = "insert into operations_log (" + FIELDS
-			+ ") values (?, ?, ?, ?, ?::log_severity_type, ?::log_state_type, ?, ?, ?, ?)";
+			+ ") values (?, ?, ?, ?, ?::log_severity_type, ?::log_state_type, ?, ?, ?, ?, ?)";
 	private static final String insertValuesSql = "insert into operations_log_values (id, key, value) values (?, ?, ?)";
 
 	private static final String updateLogMessageStateSql = "update operations_log set state = ?::log_state_type where id = ?";
@@ -281,9 +282,10 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 		// 5  severity = ?,
 		// 6 state = ?
 		// 7  locator = ?,
-		// 8  key = ?,
-		// 9  message = ?,
-		// 10  stacktrace = ?,
+		// 8  bundle = ?,
+		// 9  key = ?,
+		// 10  message = ?,
+		// 11  stacktrace = ?,
 
 		ps.setString(1, logMessage.getId());
 		ps.setString(2, logMessage.getRealm());
@@ -293,9 +295,10 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 		ps.setString(5, logMessage.getSeverity().name());
 		ps.setString(6, logMessage.getState().name());
 		ps.setString(7, logMessage.getLocator().toString());
-		ps.setString(8, logMessage.getKey());
-		ps.setString(9, logMessage.getMessage());
-		ps.setString(10, logMessage.getStackTrace());
+		ps.setString(8, logMessage.getBundle());
+		ps.setString(9, logMessage.getKey());
+		ps.setString(10, logMessage.getMessage());
+		ps.setString(11, logMessage.getStackTrace());
 	}
 
 	private LogMessage logMessageFrom(ResultSet resultSet, ResultSet valuesResult) throws SQLException {
@@ -307,9 +310,10 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 		LogSeverity severity = LogSeverity.valueOf(resultSet.getString(5));
 		LogMessageState state = LogMessageState.valueOf(resultSet.getString(6));
 		Locator locator = Locator.valueOf(resultSet.getString(7));
-		String key = resultSet.getString(8);
-		String message = resultSet.getString(9);
-		String exception = resultSet.getString(10);
+		String bundle = resultSet.getString(8);
+		String key = resultSet.getString(9);
+		String message = resultSet.getString(10);
+		String exception = resultSet.getString(11);
 
 		Properties properties = new Properties();
 		while (valuesResult.next()) {
@@ -318,7 +322,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			properties.setProperty(valueK, valueV);
 		}
 
-		return new LogMessage(id, dateTime, realm, username, locator, severity, state, key, properties, message,
+		return new LogMessage(id, dateTime, realm, username, locator, severity, state, bundle, key, properties, message,
 				exception);
 	}
 }

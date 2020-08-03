@@ -76,6 +76,7 @@ public class Tags {
 	public static final String LOCATOR = "Locator";
 	public static final String SEVERITY = "Severity";
 	public static final String KEY = "Key";
+	public static final String BUNDLE = "Bundle";
 	public static final String LOG_MESSAGE = "LogMessage";
 	public static final String MESSAGE = "Message";
 	public static final String EXCEPTION = "Exception";
@@ -133,6 +134,7 @@ public class Tags {
 		public static final String LOCATOR = "locator";
 		public static final String SEVERITY = "severity";
 		public static final String KEY = "key";
+		public static final String BUNDLE = "bundle";
 		public static final String MESSAGE = "message";
 		public static final String MESSAGES = "messages";
 		public static final String REALM = "realm";

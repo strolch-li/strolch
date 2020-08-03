@@ -54,9 +54,9 @@ public class LogMessage extends I18nMessage {
 	}
 
 	public LogMessage(String id, ZonedDateTime zonedDateTime, String realm, String username, Locator locator,
-			LogSeverity severity, LogMessageState state, String key, Properties values, String message,
+			LogSeverity severity, LogMessageState state, String bundle, String key, Properties values, String message,
 			String stackTrace) {
-		super(key, values, message);
+		super(bundle, key, values, message);
 		this.id = id;
 		this.zonedDateTime = zonedDateTime;
 		this.realm = realm;
@@ -153,6 +153,7 @@ public class LogMessage extends I18nMessage {
 		LogSeverity severity = LogSeverity.valueOf(messageJ.get(Json.SEVERITY).getAsString());
 		LogMessageState state = LogMessageState.valueOf(messageJ.get(Json.STATE).getAsString());
 		String key = messageJ.get(Json.KEY).getAsString();
+		String bundle = messageJ.get(Json.BUNDLE).getAsString();
 		String message = messageJ.get(Json.MESSAGE).getAsString();
 		String stackTrace = messageJ.has(Json.EXCEPTION) ? messageJ.get(Json.EXCEPTION).getAsString() : "";
 
@@ -164,8 +165,8 @@ public class LogMessage extends I18nMessage {
 			}
 		}
 
-		return new LogMessage(id, zonedDateTime, realm, username, locator, severity, state, key, properties, message,
-				stackTrace);
+		return new LogMessage(id, zonedDateTime, realm, username, locator, severity, state, bundle, key, properties,
+				message, stackTrace);
 	}
 
 	@Override
