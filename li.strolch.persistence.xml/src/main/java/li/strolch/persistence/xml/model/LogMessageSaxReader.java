@@ -70,6 +70,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 		case Tags.USERNAME:
 		case Tags.LOCATOR:
 		case Tags.SEVERITY:
+		case Tags.BUNDLE:
 		case Tags.KEY:
 		case Tags.MESSAGE:
 		case Tags.EXCEPTION:
