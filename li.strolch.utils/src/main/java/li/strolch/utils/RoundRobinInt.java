@@ -1,8 +1,8 @@
 package li.strolch.utils;
 
 public class RoundRobinInt {
-	private int start;
-	private int stop;
+	private final int start;
+	private final int stop;
 	private int index;
 
 	public RoundRobinInt(int start, int stop) {
@@ -19,5 +19,9 @@ public class RoundRobinInt {
 		if (this.index > this.stop)
 			this.index = this.start;
 		return next;
+	}
+
+	public void toStart() {
+		this.index = this.start;
 	}
 }
