@@ -134,6 +134,18 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
+	 * Returns true if the given component is registered on the {@link ComponentContainer}
+	 *
+	 * @param clazz
+	 * 		the type of component to check for
+	 *
+	 * @return true if the component is available
+	 */
+	public boolean hasComponent(Class<?> clazz) {
+		return this.container.hasComponent(clazz);
+	}
+
+	/**
 	 * Returns the Strolch {@link RuntimeConfiguration}
 	 *
 	 * @return the Strolch {@link RuntimeConfiguration}
