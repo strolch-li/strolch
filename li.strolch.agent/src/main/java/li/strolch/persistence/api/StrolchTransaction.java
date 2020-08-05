@@ -293,6 +293,12 @@ public interface StrolchTransaction extends AutoCloseable {
 	void clearCache();
 
 	/**
+	 * Resets this TX so that all caches and changes are reverted, fetched objects might need to be re-fetched to have a
+	 * clean state. Locks are not released!
+	 */
+	void reset();
+
+	/**
 	 * <p>
 	 * Performs all registered commands
 	 * </p>

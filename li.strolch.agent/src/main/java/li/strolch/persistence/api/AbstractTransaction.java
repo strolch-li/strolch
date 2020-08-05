@@ -1429,6 +1429,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void reset() {
+		clearCache();
+		if (this.commands != null)
+			this.commands.clear();
+		if (this.objectFilter != null)
+			this.objectFilter.clearCache();
+		logger.info("Cache, commands and changes have been cleared!");
+	}
+
+	@Override
 	public void flush() {
 		try {
 			addModelChangeCommands();
