@@ -103,12 +103,19 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private Certificate certificate;
 	private PrivilegeContext privilegeContext;
 
+	private static final ThreadLocal<StrolchTransaction> threadLocalTx = new ThreadLocal<>();
+
 	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate, String action,
 			boolean readOnly) {
 		DBC.PRE.assertNotNull("container must be set!", container); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("certificate must be set!", certificate); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("action must be set!", action); //$NON-NLS-1$
+
+		if (threadLocalTx.get() != null)
+			logger.error("THIS THREAD HAS ALREADY OPENED A TX!");
+		else
+			threadLocalTx.set(this);
 
 		this.container = container;
 		this.privilegeHandler = container.getPrivilegeHandler();
@@ -1498,6 +1505,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		} finally {
 			releaseElementLocks();
+			threadLocalTx.remove();
 		}
 	}
 
@@ -1516,6 +1524,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.txResult.setState(TransactionState.FAILED);
 		} finally {
 			releaseElementLocks();
+			threadLocalTx.remove();
 		}
 	}
 
@@ -1559,6 +1568,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.txResult.setState(TransactionState.FAILED);
 		} finally {
 			releaseElementLocks();
+			threadLocalTx.remove();
 		}
 	}
 
