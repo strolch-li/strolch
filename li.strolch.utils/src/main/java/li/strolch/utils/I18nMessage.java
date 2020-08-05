@@ -104,7 +104,7 @@ public class I18nMessage {
 		if (bundle == null) {
 			logger.warn("No bundle found for " + this.bundleName + " " + locale);
 			logger.info("Available: ");
-			bundleMap.forEach((s, map) -> {
+			getBundleMap().forEach((s, map) -> {
 				logger.info("  " + s);
 				map.forEach((l, resourceBundle) -> logger.info("  " + l + ": " + map.keySet()));
 			});
@@ -187,13 +187,7 @@ public class I18nMessage {
 		if (baseName.isEmpty())
 			return null;
 
-		if (bundleMap == null) {
-			synchronized (I18nMessage.class) {
-				bundleMap = findAllBundles();
-			}
-		}
-
-		Map<Locale, ResourceBundle> bundlesByLocale = bundleMap.getMap(baseName);
+		Map<Locale, ResourceBundle> bundlesByLocale = getBundleMap().getMap(baseName);
 		if (bundlesByLocale == null || bundlesByLocale.isEmpty())
 			return null;
 
@@ -202,6 +196,16 @@ public class I18nMessage {
 			return bundle;
 
 		return bundlesByLocale.values().iterator().next();
+	}
+
+	private static MapOfMaps<String, Locale, ResourceBundle> getBundleMap() {
+		if (bundleMap == null) {
+			synchronized (I18nMessage.class) {
+				bundleMap = findAllBundles();
+			}
+		}
+
+		return bundleMap;
 	}
 
 	private static MapOfMaps<String, Locale, ResourceBundle> findAllBundles() {
