@@ -125,6 +125,7 @@ public class LogMessage extends I18nMessage {
 
 		jsonObject.addProperty(Json.ID, this.id);
 		jsonObject.addProperty(Json.DATE, this.zonedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+		jsonObject.addProperty(Json.BUNDLE, getBundle());
 		jsonObject.addProperty(Json.KEY, getKey());
 		jsonObject.addProperty(Json.MESSAGE, formatMessage());
 		jsonObject.addProperty(Json.SEVERITY, this.severity.name());
