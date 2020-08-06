@@ -48,14 +48,18 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 		DBC.PRE.assertNotNull("Locale must be given!", locale); //$NON-NLS-1$
 
 		try (StrolchTransaction tx = openTx(certificate, true)) {
-			return getEnum(tx, name);
+			return getEnum(tx, name, locale);
 		}
 	}
 
 	@Override
 	public StrolchEnum getEnum(StrolchTransaction tx, String name) {
+		return getEnum(tx, name, tx.getLocale());
+	}
+
+	private StrolchEnum getEnum(StrolchTransaction tx, String name, Locale locale) {
 		Resource enumeration = tx.getResourceBy(TYPE_ENUMERATION, name, true);
-		ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, tx.getLocale());
+		ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 
 		List<Parameter<?>> parameters = enumValuesByLanguage.getParameters();
 		parameters.sort(Comparator.comparing(Parameter::getIndex));
@@ -65,7 +69,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 			values.put(enumParam.getId(), enumParam.getValue());
 		}
 
-		return new StrolchEnum(name, tx.getLocale(), values);
+		return new StrolchEnum(name, locale, values);
 	}
 
 	private ParameterBag findParameterBagByLanguage(Resource enumeration, Locale locale) {
