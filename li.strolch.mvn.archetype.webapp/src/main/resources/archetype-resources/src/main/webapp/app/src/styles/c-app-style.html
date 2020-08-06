@@ -73,6 +73,35 @@
                 --paper-toggle-button-checked-button-color: var(--app-primary-color);
             }
 
+            paper-button {
+                background: var(--paper-grey-100);
+                color: var(--app-secondary-color);
+                height: 35px;
+            }
+
+            paper-checkbox {
+                padding: 8px;
+            }
+
+            paper-input.readonly {
+                --paper-input-container: {
+                    padding: 4px 0;
+                };
+                --paper-input-container-underline: {
+                    display: none;
+                };
+                --paper-input-container-underline-focus: {
+                    display: none;
+                };
+                --paper-input-container-underline-disabled: {
+                    display: none;
+                };
+            }
+
+            h3 {
+                margin-bottom: 0;
+            }
+
         </style>
     </template>
 </dom-module>

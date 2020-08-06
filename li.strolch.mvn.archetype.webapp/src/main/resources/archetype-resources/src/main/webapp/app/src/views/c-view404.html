@@ -19,7 +19,25 @@
 
     <script>
         Polymer({
-            is: 'c-view404'
+            is: 'c-view404',
+
+            behaviors: [
+                CustomComputeBehavior, StrolchLocalizeBehavior
+            ],
+
+            properties: {
+                viewOptions: {
+                    type: Object,
+                    value: {hasSearchTerm: false},
+                    notify: true
+                },
+                dataObj: {
+                    type: Object
+                },
+                messages: {
+                    type: Array
+                },
+            }
         });
     </script>
 </dom-module>

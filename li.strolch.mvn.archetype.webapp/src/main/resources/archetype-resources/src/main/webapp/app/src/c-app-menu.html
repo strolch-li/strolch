@@ -72,12 +72,26 @@
 
         <paper-menu id="menu" selected="{{page}}" attr-for-selected="id" on-tap="onMenuTap" hidden="[[sessionInvalid]]">
 
-            <paper-item id="reports" class="menu-item">Reports</paper-item>
+            <template is="dom-if" if="[[authTokenValid]]" restamp>
+
+                <template is="dom-if" if="[[hasPrivilege('li.strolch.report.ReportSearch')]]">
+                    <paper-item id="reports" class="menu-item">[[localize('reports')]]</paper-item>
+                </template>
+
+                <template is="dom-if" if="[[hasPrivilege('I18n', 'Get')]]">
+                    <paper-item id="i18n-editor" class="menu-item">[[localize('i18n-editor')]]</paper-item>
+                </template>
+
+            </template>
 
         </paper-menu>
 
+        <template is="dom-if" if="[[authTokenValid]]" restamp>
+            <template is="dom-if" if="[[hasRole('StrolchAdmin')]]">
         <strolch-wc-inspector-menu selected-page="[[page]]"
                                    on-menu-tap="onInspectorMenuTap"></strolch-wc-inspector-menu>
+            </template>
+        </template>
 
         <paper-menu on-tap="onMenuTap">
             <paper-item id="logout" class="menu-item">Logout</paper-item>
@@ -94,6 +108,7 @@
                 <paper-listbox class="dropdown-content" selected="{{userLocale}}" attr-for-selected="data">
                     <paper-item data="de">Deutsch</paper-item>
                     <paper-item data="en">English</paper-item>
+                    <paper-item data="fr">Français</paper-item>
                 </paper-listbox>
             </paper-dropdown-menu>
         </paper-material>
@@ -123,6 +138,9 @@
                 userLocale: {
                     type: String,
                     notify: true
+                },
+                authTokenValid: {
+                    type: Boolean
                 }
             },
 

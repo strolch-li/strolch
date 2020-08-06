@@ -9,16 +9,21 @@
             }, 3000);
             this.checkForNewVersionInterval = setInterval(function () {
                 that.checkForNewVersion();
-            }, 10000);
+            }, 120000);
         },
 
         reloadPage: function (pageName) {
             this.debounce('page-reload', function () {
                 this.selectedPage = pageName;
+                document.title = this.localize == null ? pageName : this.localize(pageName);
                 var page = this.$$('#' + pageName);
                 if (page && page.reload) {
                     console.log('Reloading ' + pageName);
                     page.reload();
+
+                    if (page.viewOptions != null && page.viewOptions.hasSearchTerm) {
+                        this.$$('#debouncedInput').focus();
+                    }
                 }
             }, 100);
         },

@@ -21,6 +21,7 @@
 <link rel="import" href="../bower_components/paper-styles/typography.html">
 
 <link rel="import" href="../bower_components/strolch-wc-localize-behavior/strolch-wc-localize-behavior.html">
+<link rel="import" href="../bower_components/strolch-wc-debounced-input/strolch-wc-debounced-input.html">
 <link rel="import" href="../bower_components/strolch-wc-styles/strolch-wc-styles.html">
 <link rel="import" href="../bower_components/strolch-wc-auth/strolch-wc-auth.html">
 <link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-inspector.html">
@@ -82,6 +83,14 @@
                 max-width: 500px !important;
             }
 
+            strolch-wc-debounced-input {
+                max-width: 200px;
+                display: inline-flex;
+
+                --regular-color: var(--app-light-highlight-bg-color);
+                --focus-color: var(--app-regular-highlight-fg-color);
+            }
+
         </style>
 
         <!-- Routing -->
@@ -104,6 +113,7 @@
                                 version="[[appVersion]]"
                                 user-config="[[userConfig]]"
                                 user-locale="{{userLocale}}"
+                                auth-token-valid="[[authTokenValid]]"
                                 on-menu-tap="onMenuTap"></c-app-menu>
 
                 </div>
@@ -120,6 +130,11 @@
                             <app-toolbar hidden="[[!authTokenValid]]">
                                 <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
                                 <div main-title>[[localize(page)]]</div>
+                                <template is="dom-if" if="[[viewOptions.hasSearchTerm]]">
+                                    <strolch-wc-debounced-input id="debouncedInput"
+                                                                class="g-pull-right"
+                                                                debounced-input="{{searchTerm}}"></strolch-wc-debounced-input>
+                                </template>
                             </app-toolbar>
                         </app-header>
 
@@ -132,6 +147,7 @@
 
                             <strolch-wc-auth id="login"
                                              app-title="[[localize('appTitle')]]"
+                                             view-options="{{viewOptions}}"
                                              base-path="../"
                                              show-version
                                              show-keep-alive
@@ -139,12 +155,14 @@
 
                             <template is="dom-if" if="[[equal(page, 'inspector')]]" restamp>
                                 <strolch-wc-inspector id="inspector"
+                                                      view-options="{{viewOptions}}"
                                                       base-path="../"
                                                       route="{{subroute}}"></strolch-wc-inspector>
                             </template>
 
                             <template is="dom-if" if="[[equal(page, 'i18n-editor')]]" restamp>
                                 <strolch-wc-i18n-editor id="i18n-editor"
+                                                        view-options="{{viewOptions}}"
                                                         base-path="../"
                                                         base-rest-path="[[baseRestPath]]"
                                                         route="{{subroute}}"></strolch-wc-i18n-editor>
@@ -152,16 +170,21 @@
 
                             <template is="dom-if" if="[[equal(page, 'operations-log')]]" restamp>
                                 <strolch-wc-operations-log id="operations-log"
+                                                           view-options="{{viewOptions}}"
                                                            base-path="../"
                                                            route="{{subroute}}"></strolch-wc-operations-log>
                             </template>
 
                             <template is="dom-if" if="[[equal(page, 'jobs')]]" restamp>
-                                <strolch-wc-jobs id="jobs" base-path="../" route="{{subroute}}"></strolch-wc-jobs>
+                                <strolch-wc-jobs id="jobs"
+                                                 view-options="{{viewOptions}}"
+                                                 base-path="../"
+                                                 route="{{subroute}}"></strolch-wc-jobs>
                             </template>
 
                             <template is="dom-if" if="[[equal(page, 'reports')]]" restamp>
                                 <strolch-wc-reports id="reports"
+                                                    view-options="{{viewOptions}}"
                                                     base-path="../"
                                                     base-rest-path="[[baseRestPath]]"
                                                     locales-path="../../../locales.json"
@@ -171,15 +194,22 @@
                             </template>
 
                             <template is="dom-if" if="[[equal(page, 'users')]]" restamp>
-                                <strolch-wc-users id="users" base-path="../" route="{{subroute}}"></strolch-wc-users>
+                                <strolch-wc-users id="users"
+                                                  view-options="{{viewOptions}}"
+                                                  base-path="../"
+                                                  route="{{subroute}}"></strolch-wc-users>
                             </template>
 
                             <template is="dom-if" if="[[equal(page, 'roles')]]" restamp>
-                                <strolch-wc-roles id="roles" base-path="../" route="{{subroute}}"></strolch-wc-roles>
+                                <strolch-wc-roles id="roles"
+                                                  view-options="{{viewOptions}}"
+                                                  base-path="../"
+                                                  route="{{subroute}}"></strolch-wc-roles>
                             </template>
 
                             <template is="dom-if" if="[[equal(page, 'sessions')]]" restamp>
                                 <strolch-wc-sessions id="sessions"
+                                                     view-options="{{viewOptions}}"
                                                      base-path="../"
                                                      route="{{subroute}}"></strolch-wc-sessions>
                             </template>
@@ -267,6 +297,9 @@
                     type: String,
                     value: '../../locales.json'
                 },
+                viewOptions: {
+                    type: Object
+                },
                 page: {
                     type: String,
                     observer: 'observePage'
@@ -352,6 +385,7 @@
                     var pageName = event.detail.page;
 
                     // set the next page
+                    document.title = this.localize == null ? pageName : this.localize(pageName);
                     this.$.appRouting.pushNextPage(pageName, event.detail.keepQueryParams);
                 } else {
                     console.log("received page change without new value");

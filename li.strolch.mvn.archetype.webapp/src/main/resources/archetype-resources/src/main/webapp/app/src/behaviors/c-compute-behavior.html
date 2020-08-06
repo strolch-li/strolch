@@ -46,142 +46,102 @@
          * Compute functions
          */
         hasMsg: function (value) {
-            return Strolch.isNotEmptyString(value) && value != "-";
+            return Strolch.isNotEmptyString(value) && value !== "-";
         },
 
         isEqual: function (v1, v2) {
-            return v1 === v2;
+            return Strolch.isEqual(v1, v2);
         },
         stringToArray: function (string) {
-            if (string == null || string.length == 0)
-                return [];
-            var a = [];
-            var b = string.split(',');
-            for (var i = 0; i < b.length; i++) {
-                a.push(b[i].trim());
-            }
-            return a;
+            return Strolch.stringToArray(string);
         },
         stringArrayLength: function (string) {
-            if (string == null || string.length == 0)
-                return 0;
-            return string.split(',').length;
+            return Strolch.stringArrayLength(string);
         },
-
         isDefined: function (arg0) {
-            return arg0 != undefined;
+            return Strolch.isDefined(arg0);
         },
         isNull: function (arg0) {
-            return arg0 == undefined || arg0 == null;
+            return Strolch.isNull(arg0);
         },
         isNotNull: function (arg0) {
-            return arg0 != undefined && arg0 != null;
+            return Strolch.isNotNull(arg0);
         },
         isNaN: function (arg0) {
-            return this.stringEmpty(arg0) || isNaN(arg0);
+            return Strolch.isNaN(arg0);
         },
         equal: function (arg0, arg1) {
-            return arg0 == arg1;
+            return Strolch.equal(arg0, arg1);
         },
         notEqual: function (arg0, arg1) {
-            return arg0 != arg1;
+            return Strolch.notEqual(arg0, arg1);
         },
         defined: function (arg0) {
-            return !!arg0;
+            return Strolch.defined(arg0);
         },
         greater: function (arg0, arg1) {
-            return arg0 > arg1;
+            return Strolch.greater(arg0, arg1);
         },
         greaterEqual: function (arg0, arg1) {
-            return arg0 >= arg1;
+            return Strolch.greaterEqual(arg0, arg1);
         },
         lesser: function (arg0, arg1) {
-            return arg0 < arg1;
+            return Strolch.lesser(arg0, arg1);
         },
         lesserEqual: function (arg0, arg1) {
-            return arg0 <= arg1;
+            return Strolch.lesserEqual(arg0, arg1);
         },
         and: function (arg0, arg1) {
-            return !!(arg0 && arg1);
+            return Strolch.and(arg0, arg1);
         },
         or: function (arg0, arg1) {
-            return !!(arg0 || arg1);
+            return Strolch.or(arg0, arg1);
         },
         arrayLength: function (array) {
-            return (array && array.length) ? array.length : 0;
+            return Strolch.arrayLength(array);
         },
         arrayFilled: function (array) {
-            return !!(array && array.length && array.length > 0);
+            return Strolch.arrayFilled(array);
         },
         arraySizeLessThan: function (array, size) {
-            return array != null && array.length < size;
+            return Strolch.arraySizeLessThan(array, size);
         },
         arraySizeGreaterThanOrEq: function (array, size) {
-            return array != null && array.length >= size;
+            return Strolch.arraySizeGreaterThanOrEq(array, size);
         },
         arrayEquals: function (array1, array2) {
-            if (array1 == null && array2 == null)
-                return true;
-            if (array1 == null && array2 != null)
-                return false;
-            if (array2 == null && array1 != null)
-                return false;
-            return (array1.length == array2.length) && array1.every(function (element, index) {
-                return element === array2[index];
-            });
+            return Strolch.arrayEquals(array1, array2);
         },
         add: function (arg0, arg1) {
-            return Number(arg0) + Number(arg1);
+            return Strolch.add(arg0, arg1);
         },
         sub: function (arg0, arg1) {
-            return Number(arg0) - Number(arg1);
+            return Strolch.sub(arg0, arg1);
         },
         round: function (value) {
-            return Math.round(value * 1000) / 1000;
+            return Strolch.round(value);
         },
         stringEmpty: function () {
-            for (var i in arguments) {
-                var arg = arguments[i];
-                if (!arg || arg.length == 0) return true;
-            }
-            return false;
+            return Strolch.stringEmpty(arguments);
         },
         isEmptyString: function (val) {
-            return typeof val == 'undefined' || val == null || val === '';
+            return Strolch.isEmptyString(val);
         },
         isNotEmptyString: function (val) {
-            return !this.isEmptyString(val);
+            return Strolch.isNotEmptyString(val);
         },
 
         isChrome: function () {
-            var isChromium = window.chrome, //
-                winNav = window.navigator, //
-                vendorName = winNav.vendor, //
-                isOpera = winNav.userAgent.indexOf("OPR") > -1, //
-                isIEedge = winNav.userAgent.indexOf("Edge") > -1, //
-                isIOSChrome = winNav.userAgent.match("CriOS");
-
-            if (isIOSChrome) {
-                return true;
-            } else if (isChromium !== null && //
-                typeof isChromium !== "undefined" && //
-                vendorName === "Google Inc." && //
-                isOpera === false && //
-                isIEedge === false) {
-                return true;
-            } else {
-                return false;
-            }
+            return Strolch.isChrome();
         },
         isFirefox: function () {
-            return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+            return Strolch.isFirefox();
         },
         isIE: function () {
-            var isIE = /*@cc_on!@*/false || !!document.documentMode;
-            return isIE;
+            return Strolch.isIE();
         },
         isEdge: function () {
-            return !Susi.Compute.isIE() && !!window.StyleMedia;
+            return Strolch.isEdge();
         },
 
         /*
@@ -193,134 +153,68 @@
 
         // gets the clock time as displayed in the UI
         getTimeString: function (datetime) {
-            var hour = datetime.getHours().toString();
-            var min = datetime.getMinutes().toString();
-
-            hour = hour.length < 2 ? "0" + hour : hour;
-            min = min.length < 2 ? "0" + min : min;
-            return hour + ":" + min;
+            return Strolch.getTimeString(datetime);
         },
 
         // gets the calendar date as displayed in the UI
         getDateString: function (datetime, addCentury) {
-            if (typeof (datetime) == 'string') {
-                datetime = new Date(datetime);
-            }
-
-            var day = (datetime.getDate()).toString();
-            var month = (datetime.getMonth() + 1).toString();
-            var year = (datetime.getFullYear()).toString();
-
-            day = day.length < 2 ? "0" + day : day;
-            month = month.length < 2 ? "0" + month : month;
-            year = addCentury ? year : year.slice(-2);
-            return day + "." + month + "." + year;
+            return Strolch.getDateString(datetime, addCentury);
         },
 
         // gets the date of a date string from getDateString()
         getDate: function (datetimeString) {
-            var splitString = datetimeString.split(".");
-            if (splitString.length != 3) return null;
-
-            var year = Number(splitString[2]);
-            var month = Number(splitString[1]) - 1;
-            var day = Number(splitString[0]);
-            return new Date(year, month, day);
+            return Strolch.getDate(datetimeString);
         },
 
         // gets the clock time of the current time
         getCurrentTimeString: function () {
-            return Susi.Datetime.getTimeString(new Date());
+            return Strolch.getCurrentTimeString();
         },
 
-        toDateTime: function (val) {
-
-            function pad10(i) {
-                if (i < 10) return '0' + i;
-                return i;
-            }
-
-            function pad100(i) {
-                if (i < 10) return '00' + i;
-                if (i < 100) return '0' + i;
-                return i;
-            }
-
-            if (Strolch.isEmptyString(val) || val == '-') return '-';
-            var date = new Date(val);
-
-            var y = date.getFullYear();
-            var m = pad10(date.getMonth() + 1);
-            var d = pad10(date.getDate());
-            var h = pad10(date.getHours());
-            var mi = pad10(date.getMinutes());
-            var s = pad10(date.getSeconds());
-            var mil = pad100(date.getMilliseconds());
-
-            return y + m + d + h + mi + s;
+        toDateTimeNoDelim: function (val) {
+            return Strolch.toDateTimeNoDelim(val);
         },
 
         // gets the calendar date of the current time
         getCurrentDateString: function () {
-            return Susi.Datetime.getDateString(new Date());
+            return Strolch.getDateString(new Date());
         },
 
         clearTime: function (date) {
-            date.setHours(0);
-            date.setMinutes(0);
-            date.setSeconds(0);
-            date.setMilliseconds(0);
-
-            return date;
+            return Strolch.clearTime(date);
         },
         dateToJson: function (date) {
-            date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
-            return date.toJSON();
+            return Strolch.dateToJson(date);
         },
 
         // returns true if a datetime has past
         isPast: function (datetime) {
-            return Date.now() > datetime.getTime();
+            return Strolch.isPast(datetime);
         },
 
         // returns true if a datetime is future
         isFuture: function (datetime) {
-            return Date.now() < datetime.getTime();
+            return Strolch.isFuture(datetime);
         },
 
         // turns hours into milliseconds
         hToMs: function (hour) {
-            return hour * 3600000;
+            return Strolch.hToMs(hour);
         },
 
         // turns milliseconds into hours
         msToH: function (milliseconds) {
-            return milliseconds / 3600000;
+            return Strolch.msToH(milliseconds);
         },
 
         getCookie: function (cname) {
-            var name = cname + "=";
-            var decodedCookie = decodeURIComponent(document.cookie);
-            var ca = decodedCookie.split(';');
-            for (var i = 0; i < ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
-            }
-            return null;
+            return Strolch.getCookie(cname);
         },
-        setCookie: function (cname, cvalue, validDays) {
-            var d = new Date();
-            d.setTime(d.getTime() + (validDays * 24 * 60 * 60 * 1000));
-            var expires = "expires=" + d.toUTCString();
-            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        setCookie: function (cname, cvalue, expiration) {
+            Strolch.setCookie(cname, cvalue, expiration);
         },
         deleteCookie: function (cname) {
-            document.cookie = cname + '=; Path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            Strolch.deleteCookie(cname);
         },
 
         // fires an event that will change the page of the app
@@ -337,15 +231,13 @@
         // convenience function to get the error message from responses
         onRequestError: function (event) {
             var readyState = event.detail.request.xhr.readyState;
-            var response = event.detail.request.xhr.response;
             var status = event.detail.request.xhr.status;
-            var isError = status && status >= 500;
 
             if (readyState === 4 && status === 0) {
                 this.fire("cx-server-not-available", event);
-            } else if (status == 401) {
+            } else if (status === 401) {
                 this.fire("cx-session-invalid", event);
-            } else if (status == 403) {
+            } else if (status === 403) {
                 this.fire("cx-privilege-denied", event);
             } else {
                 this.requestErrorToMsg(event);
@@ -364,7 +256,7 @@
             else
                 response = event.detail.detail.error.message;
 
-            var msg = "";
+            var msg;
             var isError = false;
 
             if (response && response.state) {
@@ -384,8 +276,8 @@
 
                 if (response && response.msg) {
                     msg = response.msg;
-                } else if (typeof (response) == 'string') {
-                    if (response.trim().charAt(0) == '{') {
+                } else if (typeof (response) === 'string') {
+                    if (response.trim().charAt(0) === '{') {
                         var json = JSON.parse(response);
 
                         if (json && json.i18n) {
@@ -473,13 +365,13 @@
         },
 
         localizeJsonMsg: function (jsonMsg) {
-            if (jsonMsg == null)
+            if (jsonMsg === null)
                 return jsonMsg;
 
             this.localize.useKeyIfMissing = true;
 
             try {
-                if (jsonMsg.values == null || Object.keys(jsonMsg.values).length === 0)
+                if (jsonMsg.values === null || Object.keys(jsonMsg.values).length === 0)
                     return this.localize(jsonMsg.key);
 
                 var values = [jsonMsg.key];
@@ -489,7 +381,7 @@
                     values.push(key);
                     values.push(jsonMsg.values[key]);
                 }
-                return this.localize.apply(null, values);
+                return this.localize.apply(this.localize, values);
             } catch (e) {
                 console.log(e);
                 return jsonMsg.key;
