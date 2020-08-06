@@ -5,6 +5,7 @@ import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
@@ -18,8 +19,8 @@ import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.policy.PolicyDef;
-import li.strolch.model.visitor.ElementDateVisitor;
 import li.strolch.model.visitor.ElementStateVisitor;
+import li.strolch.model.visitor.ElementZdtDateVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.report.ReportConstants;
@@ -29,7 +30,7 @@ import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.collections.TypedTuple;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 /**
  * A Generic Report defines a report as is described at <a href="https://strolch.li/documentation-reports.html">Strolch
@@ -405,8 +406,10 @@ public class GenericReport extends ReportPolicy {
 		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
 			StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
 			Object value = evaluateColumnValue(columnDefP, e, false);
+			if (value instanceof ZonedDateTime)
+				return ISO8601.toString((ZonedDateTime) value);
 			if (value instanceof Date)
-				return ISO8601FormatFactory.getInstance().formatDate((Date) value);
+				return ISO8601.toString((Date) value);
 			if (value instanceof Parameter)
 				return ((Parameter<?>) value).getValueAsString();
 			return value.toString();
@@ -594,9 +597,9 @@ public class GenericReport extends ReportPolicy {
 
 			String dateRangeSel = this.dateRangeSelP.getValue();
 
-			Date date;
+			ZonedDateTime date;
 			if (dateRangeSel.equals(COL_DATE)) {
-				date = element.accept(new ElementDateVisitor());
+				date = element.accept(new ElementZdtDateVisitor());
 			} else {
 				Optional<Parameter<?>> param = lookupParameter(this.dateRangeSelP, element);
 				if (!param.isPresent() || StrolchValueType.parse(param.get().getType()) != StrolchValueType.DATE)
@@ -604,7 +607,7 @@ public class GenericReport extends ReportPolicy {
 							"Date Range selector is invalid, as referenced parameter is not a Date but " + (param
 									.isPresent() ? param.get().getType() : "null"));
 
-				date = ((DateParameter) param.get()).getValue();
+				date = ((DateParameter) param.get()).getValueZdt();
 			}
 
 			if (!this.dateRange.contains(date))
@@ -664,7 +667,7 @@ public class GenericReport extends ReportPolicy {
 		} else if (columnDef.equals(COL_STATE)) {
 			columnValue = column.accept(new ElementStateVisitor());
 		} else if (columnDef.equals(COL_DATE)) {
-			columnValue = column.accept(new ElementDateVisitor());
+			columnValue = column.accept(new ElementZdtDateVisitor());
 		} else if (columnDef.startsWith(COL_SEARCH)) {
 			Parameter<?> parameter = findParameter(columnDefP, column);
 			if (parameter == null)

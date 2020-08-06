@@ -3,6 +3,7 @@ package li.strolch.report.policy;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
@@ -10,6 +11,7 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public abstract class ReportFilterPolicy extends StrolchPolicy {
@@ -47,7 +49,14 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 		DBC.PRE.assertNotNull("value required!", value);
 
 		Object left;
-		if (value instanceof Date) {
+		if (value instanceof ZonedDateTime) {
+
+			if (this.right == null)
+				this.right = parseFilterValueToZdt(this.filterValue);
+
+			left = value;
+
+		} else if (value instanceof Date) {
 
 			if (this.right == null)
 				this.right = parseFilterValueToDate(this.filterValue);
@@ -83,6 +92,7 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 
 	protected Date parseFilterValueToDate(String filterValue) {
 		DBC.INTERIM.assertNotEmpty("filterValue must not be empty for date comparisons!", filterValue);
+		logger.error("DEPRECATED, use ZonedDateTime");
 
 		if (!filterValue.startsWith("now"))
 			return ISO8601FormatFactory.getInstance().parseDate(filterValue);
@@ -97,6 +107,23 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 		Period period = Period.parse(periodS);
 		LocalDateTime dateTime = LocalDateTime.now().plus(period);
 		return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	protected ZonedDateTime parseFilterValueToZdt(String filterValue) {
+		DBC.INTERIM.assertNotEmpty("filterValue must not be empty for date comparisons!", filterValue);
+
+		if (!filterValue.startsWith("now"))
+			return ISO8601.parseToZdt(filterValue);
+
+		if (filterValue.charAt(3) != '(' || filterValue.charAt(filterValue.length() - 1) != ')')
+			throw new IllegalArgumentException("now() format invalid for " + filterValue);
+
+		String periodS = filterValue.substring(4, filterValue.length() - 1);
+		if (periodS.isEmpty())
+			return ZonedDateTime.now();
+
+		Period period = Period.parse(periodS);
+		return ZonedDateTime.now().plus(period);
 	}
 
 	protected abstract boolean filter(Object left, Object right, boolean negate);
