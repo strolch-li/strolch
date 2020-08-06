@@ -19,6 +19,14 @@
     <!--
         Internal
     -->
+
+    <Role name="I18nAdmin">
+        <Privilege name="I18n" policy="DefaultPrivilege">
+            <Allow>Get</Allow>
+            <Allow>Update</Allow>
+        </Privilege>
+    </Role>
+
     <Role name="ModelAccessor">
         <Privilege name="GetOrder" policy="ModelPrivilege">
             <AllAllowed>true</AllAllowed>
@@ -59,6 +67,10 @@
     </Role>
 
     <Role name="StrolchAdmin">
+        <Privilege name="I18n" policy="DefaultPrivilege">
+            <Allow>Get</Allow>
+            <Allow>Update</Allow>
+        </Privilege>
         <Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
