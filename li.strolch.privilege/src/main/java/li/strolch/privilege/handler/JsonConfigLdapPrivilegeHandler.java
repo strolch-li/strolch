@@ -4,6 +4,7 @@ import static java.lang.String.join;
 import static java.util.stream.Collectors.toSet;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -21,6 +22,7 @@ import li.strolch.utils.dbc.DBC;
 public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	private Locale defaultLocale;
+	private Map<String, String> ldapToLocalLocationMap;
 	private JsonObject ldapGroupConfigs;
 	private Set<String> ldapGroupNames;
 	private String realm;
@@ -60,6 +62,15 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		// validate the configuration
 		if (!configJ.has("ldapGroupConfigs") || !configJ.get("ldapGroupConfigs").isJsonObject())
 			throw new IllegalStateException("JSON config is missing ldapGroupConfigs element!");
+
+		this.ldapToLocalLocationMap = new HashMap<>();
+		if (configJ.has("locationMappings")) {
+			JsonObject locationMappingsJ = configJ.get("locationMappings").getAsJsonObject();
+			for (String ldapL : locationMappingsJ.keySet()) {
+				String localL = locationMappingsJ.get(ldapL).getAsString();
+				this.ldapToLocalLocationMap.put(ldapL, localL);
+			}
+		}
 
 		this.ldapGroupConfigs = configJ.get("ldapGroupConfigs").getAsJsonObject();
 		this.ldapGroupNames = ldapGroupConfigs.keySet();
@@ -151,11 +162,21 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	@Override
 	protected Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
-			Set<String> strolchRoles) {
+			Set<String> strolchRoles) throws NamingException {
 
 		String primaryLocation = "";
 		Set<String> secondaryLocations = new HashSet<>();
 		Set<String> locations = new HashSet<>();
+
+		// first see if we can find the primaryLocation from the department attribute:
+		String department = getLdapString(attrs, "department");
+		if (isNotEmpty(department)) {
+			if (this.ldapToLocalLocationMap.containsKey(department)) {
+				String localL = this.ldapToLocalLocationMap.get(department);
+				logger.info("Using primary location " + localL + " for LDAP department " + department);
+				primaryLocation = localL;
+			}
+		}
 
 		for (String ldapGroup : ldapGroups) {
 			JsonObject mappingJ = this.ldapGroupConfigs.get(ldapGroup).getAsJsonObject();
@@ -166,9 +187,13 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 				if (primaryLocation.isEmpty()) {
 					primaryLocation = primaryLocationJ.getAsString();
 				} else {
-					logger.warn("Primary location already set by previous LDAP Group config for LDAP Group " + ldapGroup
-							+ ", adding to secondary locations.");
-					secondaryLocations.add(primaryLocationJ.getAsString());
+					String location = primaryLocationJ.getAsString();
+					if (!secondaryLocations.contains(location)) {
+						logger.warn(
+								"Primary location already set by previous LDAP Group config for LDAP Group " + ldapGroup
+										+ ", adding to secondary locations.");
+						secondaryLocations.add(location);
+					}
 				}
 			}
 
