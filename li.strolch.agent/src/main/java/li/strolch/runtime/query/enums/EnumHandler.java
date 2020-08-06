@@ -17,6 +17,7 @@ package li.strolch.runtime.query.enums;
 
 import java.util.Locale;
 
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 
 /**
@@ -25,4 +26,6 @@ import li.strolch.privilege.model.Certificate;
 public interface EnumHandler {
 
 	StrolchEnum getEnum(Certificate certificate, String name, Locale locale);
+
+	StrolchEnum getEnum(StrolchTransaction tx, String name);
 }

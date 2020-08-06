@@ -44,24 +44,28 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 
 	@Override
 	public StrolchEnum getEnum(Certificate certificate, String name, Locale locale) {
-
 		DBC.PRE.assertNotEmpty("Enum name must be given!", name); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("Locale must be given!", locale); //$NON-NLS-1$
 
 		try (StrolchTransaction tx = openTx(certificate, true)) {
-			Resource enumeration = tx.getResourceBy(TYPE_ENUMERATION, name, true);
-			ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
-
-			List<Parameter<?>> parameters = enumValuesByLanguage.getParameters();
-			parameters.sort(Comparator.comparing(Parameter::getIndex));
-			Map<String, String> values = new LinkedHashMap<>(parameters.size());
-			for (Parameter<?> param : parameters) {
-				StringParameter enumParam = (StringParameter) param;
-				values.put(enumParam.getId(), enumParam.getValue());
-			}
-
-			return new StrolchEnum(name, locale, values);
+			return getEnum(tx, name);
 		}
+	}
+
+	@Override
+	public StrolchEnum getEnum(StrolchTransaction tx, String name) {
+		Resource enumeration = tx.getResourceBy(TYPE_ENUMERATION, name, true);
+		ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, tx.getLocale());
+
+		List<Parameter<?>> parameters = enumValuesByLanguage.getParameters();
+		parameters.sort(Comparator.comparing(Parameter::getIndex));
+		Map<String, String> values = new LinkedHashMap<>(parameters.size());
+		for (Parameter<?> param : parameters) {
+			StringParameter enumParam = (StringParameter) param;
+			values.put(enumParam.getId(), enumParam.getValue());
+		}
+
+		return new StrolchEnum(name, tx.getLocale(), values);
 	}
 
 	private ParameterBag findParameterBagByLanguage(Resource enumeration, Locale locale) {
