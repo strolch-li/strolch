@@ -1,6 +1,7 @@
 package li.strolch.utils;
 
 import static li.strolch.utils.helper.StringHelper.EMPTY;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -102,8 +103,9 @@ public class I18nMessage {
 	public String getMessage(Locale locale) {
 		ResourceBundle bundle = getBundle(locale);
 		if (bundle == null) {
+			if (isEmpty(this.bundleName))
+				return getMessage();
 			logger.warn("No bundle found for " + this.bundleName + " " + locale);
-			logger.info("Available: ");
 			getBundleMap().forEach((s, map) -> {
 				logger.info("  " + s);
 				map.forEach((l, resourceBundle) -> logger.info("  " + l + ": " + map.keySet()));
