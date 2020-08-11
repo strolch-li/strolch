@@ -21,6 +21,7 @@ import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -80,7 +81,9 @@ public class DefaultObserverHandler implements ObserverHandler {
 		if (event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty())
 			return;
 
-		this.future = this.agent.getExecutor("Observer").submit(() -> doUpdates(event));
+		ExecutorService service = this.agent.getExecutor("Observer");
+		if (!service.isShutdown())
+			this.future = service.submit(() -> doUpdates(event));
 	}
 
 	protected void doUpdates(ObserverEvent event) {
@@ -163,8 +166,8 @@ public class DefaultObserverHandler implements ObserverHandler {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), SYSTEM_USER_AGENT,
 					Locator.valueOf(AGENT, ObserverHandler.class.getName(), type, StrolchAgent.getUniqueId()),
-					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.observers.update.failed")
-					.withException(e).value("type", type).value("reason", e));
+					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+					"agent.observers.update.failed").withException(e).value("type", type).value("reason", e));
 		}
 	}
 
