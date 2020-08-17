@@ -1,5 +1,7 @@
 package li.strolch.utils;
 
+import static java.util.Collections.*;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -12,8 +14,7 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import li.strolch.utils.collections.MapOfMaps;
-import li.strolch.utils.collections.TypedTuple;
+import li.strolch.utils.collections.*;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class I18nMessage {
 
 	private static final Logger logger = LoggerFactory.getLogger(I18nMessage.class);
 	private static MapOfMaps<String, Locale, ResourceBundle> bundleMap;
+	private static final MapOfSets<String, String> missingKeysMap = synchronizedMapOfSets(new MapOfSets<>());
 
 	private final String bundleName;
 	private final String key;
@@ -89,8 +91,11 @@ public class I18nMessage {
 			return ResourceBundle.getBundle(baseName, locale, classLoader);
 
 		} catch (MissingResourceException e) {
-			logger.error("Failed to find resource bundle " + baseName + " " + locale.toLanguageTag()
-					+ ", returning current bundle " + this.bundle.getLocale().toLanguageTag());
+			if (!missingKeysMap.containsSet(baseName + "_" + locale.toLanguageTag())) {
+				logger.error("Failed to find resource bundle " + baseName + " " + locale.toLanguageTag()
+						+ ", returning current bundle " + this.bundle.getLocale().toLanguageTag());
+				missingKeysMap.addSet(baseName + "_" + locale.toLanguageTag(), emptySet());
+			}
 			return this.bundle;
 		}
 	}
@@ -105,11 +110,14 @@ public class I18nMessage {
 		if (bundle == null) {
 			if (isEmpty(this.bundleName))
 				return getMessage();
-			logger.warn("No bundle found for " + this.bundleName + " " + locale);
-			getBundleMap().forEach((s, map) -> {
-				logger.info("  " + s);
-				map.forEach((l, resourceBundle) -> logger.info("  " + l + ": " + map.keySet()));
-			});
+			if (!missingKeysMap.containsSet(this.bundleName + "_" + locale.toLanguageTag())) {
+				logger.warn("No bundle found for " + this.bundleName + " " + locale + ". Available are: ");
+				getBundleMap().forEach((s, map) -> {
+					logger.info("  " + s);
+					map.forEach((l, resourceBundle) -> logger.info("  " + l + ": " + map.keySet()));
+				});
+				missingKeysMap.addSet(this.bundleName + "_" + locale.toLanguageTag(), emptySet());
+			}
 			return getMessage();
 		}
 		return formatMessage(bundle);
@@ -145,7 +153,12 @@ public class I18nMessage {
 		} catch (MissingResourceException e) {
 			String baseName = bundle.getBaseBundleName();
 			String languageTag = bundle.getLocale().toLanguageTag();
-			logger.error("Key " + this.key + " is missing in bundle " + baseName + " for locale " + languageTag);
+			String bundleKey = baseName + "_" + languageTag;
+			if (!missingKeysMap.containsElement(bundleKey, this.key)) {
+				logger.error("Key " + this.key + " is missing in bundle " + baseName + " for locale " + languageTag);
+				missingKeysMap.addElement(bundleKey, this.key);
+			}
+
 			return this.key;
 		}
 	}
