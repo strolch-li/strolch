@@ -60,7 +60,7 @@ public class AuthenticationService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticate(@Context HttpServletRequest request, @Context HttpHeaders headers, String data) {
 
-		JsonObject login = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject login = JsonParser.parseString(data).getAsJsonObject();
 
 		try {
 
@@ -299,7 +299,7 @@ public class AuthenticationService {
 	public Response initiateChallenge(@Context HttpServletRequest request, String data) {
 
 		try {
-			JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+			JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 			String username = jsonObject.get("username").getAsString();
 			String usage = jsonObject.get("usage").getAsString();
 
@@ -325,7 +325,7 @@ public class AuthenticationService {
 
 		try {
 
-			JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+			JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 			String username = jsonObject.get("username").getAsString();
 			String challenge = jsonObject.get("challenge").getAsString();
 

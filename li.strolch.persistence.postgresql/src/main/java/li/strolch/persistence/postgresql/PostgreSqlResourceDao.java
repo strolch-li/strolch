@@ -87,7 +87,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 	@Override
 	protected Resource parseFromJson(String id, String type, String json) {
-		JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 		return new ResourceFromJsonVisitor().visit(jsonObject);
 	}
 

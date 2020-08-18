@@ -61,7 +61,7 @@ public class EnumTest extends AbstractRestfulTest {
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
 		assertNotNull(strolchEnumS);
-		JsonObject strolchEnumJ = new JsonParser().parse(strolchEnumS).getAsJsonObject();
+		JsonObject strolchEnumJ = JsonParser.parseString(strolchEnumS).getAsJsonObject();
 		assertEquals("sex", strolchEnumJ.get("name").getAsString());
 		assertEquals(4, strolchEnumJ.get("values").getAsJsonArray().size());
 	}
@@ -78,7 +78,7 @@ public class EnumTest extends AbstractRestfulTest {
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
 		assertNotNull(strolchEnumS);
-		JsonObject strolchEnumJ = new JsonParser().parse(strolchEnumS).getAsJsonObject();
+		JsonObject strolchEnumJ = JsonParser.parseString(strolchEnumS).getAsJsonObject();
 		assertEquals("salutation", strolchEnumJ.get("name").getAsString());
 		assertEquals(3, strolchEnumJ.get("values").getAsJsonArray().size());
 		assertEquals("Mr",
@@ -97,7 +97,7 @@ public class EnumTest extends AbstractRestfulTest {
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
 		assertNotNull(strolchEnumS);
-		JsonObject strolchEnumJ = new JsonParser().parse(strolchEnumS).getAsJsonObject();
+		JsonObject strolchEnumJ = JsonParser.parseString(strolchEnumS).getAsJsonObject();
 		assertEquals("salutation", strolchEnumJ.get("name").getAsString());
 		assertEquals(3, strolchEnumJ.get("values").getAsJsonArray().size());
 		assertEquals("Herr", strolchEnumJ.get("values").getAsJsonArray().get(0).getAsJsonObject().get("value").

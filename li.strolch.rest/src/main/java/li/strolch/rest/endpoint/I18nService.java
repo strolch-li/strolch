@@ -45,7 +45,7 @@ public class I18nService {
 
 		JsonObject i18nJ;
 		try (FileReader in = new FileReader(i18nFile)) {
-			i18nJ = new JsonParser().parse(in).getAsJsonObject();
+			i18nJ = JsonParser.parseReader(in).getAsJsonObject();
 		} catch (IOException e) {
 			throw new IllegalStateException("Failed to read i18n file at " + i18nFile);
 		}
@@ -69,7 +69,7 @@ public class I18nService {
 
 		JsonObject i18nJ;
 		try (FileReader in = new FileReader(i18nFile)) {
-			i18nJ = new JsonParser().parse(in).getAsJsonObject();
+			i18nJ = JsonParser.parseReader(in).getAsJsonObject();
 		} catch (IOException e) {
 			throw new IllegalStateException("Failed to read i18n file at " + i18nFile);
 		}
@@ -87,7 +87,7 @@ public class I18nService {
 		if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
 			ctx.validateAction(new SimpleRestrictable("I18n", Operation.UPDATE.getPrivilegePrefix()));
 
-		JsonObject i18nJ = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject i18nJ = JsonParser.parseString(data).getAsJsonObject();
 
 		File webPath = new File(RestfulStrolchComponent.getInstance().getWebPath());
 		File i18nFile = new File(webPath, "/locales.json");

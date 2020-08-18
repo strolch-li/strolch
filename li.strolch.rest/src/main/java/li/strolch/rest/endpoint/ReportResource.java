@@ -100,7 +100,7 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
@@ -155,7 +155,7 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
@@ -216,7 +216,7 @@ public class ReportResource {
 		DBC.PRE.assertNotEmpty("report ID is required", id);
 
 		// get information from body
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 
 		int offset = jsonObject.get(OFFSET) != null ? jsonObject.get(OFFSET).getAsInt() : 50;
 		int limit = jsonObject.get(LIMIT) != null ? jsonObject.get(LIMIT).getAsInt() : 50;
@@ -254,7 +254,7 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
@@ -345,7 +345,7 @@ public class ReportResource {
 		DBC.PRE.assertNotEmpty("report ID is required", id);
 
 		// get information from body
-		JsonObject jsonObject = StringHelper.isEmpty(data) ? null : new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = StringHelper.isEmpty(data) ? null : JsonParser.parseString(data).getAsJsonObject();
 
 		MapOfSets<String, String> filters = jsonObject != null && jsonObject.get(PARAM_FILTER) != null ?
 				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) :
@@ -381,7 +381,7 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = new JsonParser().parse(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();

@@ -57,7 +57,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	@Override
 	public void onMessage(String message) {
 
-		JsonObject jsonObject = new JsonParser().parse(message).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
 		String msgType = jsonObject.get(MSG_TYPE).getAsString();
 		logger.info("Handling message " + msgType);
 

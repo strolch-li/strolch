@@ -104,7 +104,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	@Override
 	protected Order parseFromJson(String id, String type, String json) {
-		JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 		return new OrderFromJsonVisitor().visit(jsonObject);
 	}
 

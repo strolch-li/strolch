@@ -87,7 +87,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 	@Override
 	protected Activity parseFromJson(String id, String type, String json) {
-		JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 		return new ActivityFromJsonVisitor().visit(jsonObject);
 	}
 

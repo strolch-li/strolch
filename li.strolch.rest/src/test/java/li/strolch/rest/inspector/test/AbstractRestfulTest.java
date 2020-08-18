@@ -112,7 +112,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 				.post(entity);
 		assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
 
-		JsonObject loginResult = new JsonParser().parse(result.readEntity(String.class)).getAsJsonObject();
+		JsonObject loginResult = JsonParser.parseString(result.readEntity(String.class)).getAsJsonObject();
 		assertEquals("jill", loginResult.get("username").getAsString());
 		assertEquals(64, loginResult.get("authToken").getAsString().length());
 		assertNull(loginResult.get("msg"));
@@ -128,7 +128,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 				.delete();
 		assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
 
-		JsonObject logoutResult = new JsonParser().parse(result.readEntity(String.class)).getAsJsonObject();
+		JsonObject logoutResult = JsonParser.parseString(result.readEntity(String.class)).getAsJsonObject();
 		assertEquals("jill has been logged out.", logoutResult.get("msg").getAsString());
 	}
 

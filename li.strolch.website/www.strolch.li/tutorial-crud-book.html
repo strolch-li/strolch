@@ -298,7 +298,7 @@ public Response create(@Context HttpServletRequest request, String data) {
   Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
   // parse data to JSON
-  JsonObject jsonData = new JsonParser().parse(data).getAsJsonObject();
+  JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
 
   // instantiate the service with the argument
   CreateBookService svc = new CreateBookService();
@@ -392,7 +392,7 @@ public Response update(@Context HttpServletRequest request, @PathParam("id") Str
   Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
   // parse data to JSON
-  JsonObject jsonData = new JsonParser().parse(data).getAsJsonObject();
+  JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
 
   // instantiate the service with the argument
   UpdateBookService svc = new UpdateBookService();

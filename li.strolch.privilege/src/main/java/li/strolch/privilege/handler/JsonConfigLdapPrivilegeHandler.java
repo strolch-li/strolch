@@ -54,7 +54,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		// parse the configuration file
 		JsonObject configJ;
 		try (FileReader reader = new FileReader(configFile)) {
-			configJ = new JsonParser().parse(reader).getAsJsonObject();
+			configJ = JsonParser.parseReader(reader).getAsJsonObject();
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to read config file " + configFile.getAbsolutePath(), e);
 		}

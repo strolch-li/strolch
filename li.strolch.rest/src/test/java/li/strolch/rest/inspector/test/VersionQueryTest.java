@@ -62,7 +62,7 @@ public class VersionQueryTest extends AbstractRestfulTest {
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String versionQueryResultS = result.readEntity(String.class);
 
-		JsonObject versionQueryResultJ = new JsonParser().parse(versionQueryResultS).getAsJsonObject();
+		JsonObject versionQueryResultJ = JsonParser.parseString(versionQueryResultS).getAsJsonObject();
 
 		if (versionQueryResultJ.has("errors")) {
 			JsonArray errorsJ = versionQueryResultJ.get("errors").getAsJsonArray();

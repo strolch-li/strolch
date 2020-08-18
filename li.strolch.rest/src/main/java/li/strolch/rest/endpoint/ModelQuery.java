@@ -38,7 +38,7 @@ public class ModelQuery {
 			@QueryParam("flat") String flat, String data) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 
 		QueryResponse queryResponse;
 		try (StrolchTransaction tx = openTx(cert, realmName)) {

@@ -175,7 +175,7 @@ public class PrivilegeUsersService {
 		PrivilegeUpdateUserRolesService svc = new PrivilegeUpdateUserRolesService();
 		JsonServiceArgument arg = svc.getArgumentInstance();
 		arg.objectId = username;
-		arg.jsonElement = new JsonParser().parse(data);
+		arg.jsonElement = JsonParser.parseString(data);
 
 		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
 		return handleServiceResult(svcResult);
@@ -276,7 +276,7 @@ public class PrivilegeUsersService {
 
 		try {
 
-			JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+			JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 
 			String passwordEncoded = jsonObject.get("password").getAsString();
 			byte[] decode = Base64.getDecoder().decode(passwordEncoded);

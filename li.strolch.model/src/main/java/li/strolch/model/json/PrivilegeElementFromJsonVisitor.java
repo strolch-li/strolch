@@ -14,15 +14,15 @@ import li.strolch.privilege.model.UserState;
 public class PrivilegeElementFromJsonVisitor {
 
 	public UserRep userRepFromJson(String string) {
-		return userRepFromJson(new JsonParser().parse(string).getAsJsonObject());
+		return userRepFromJson(JsonParser.parseString(string).getAsJsonObject());
 	}
 
 	public RoleRep roleRepFromJson(String string) {
-		return roleRepFromJson(new JsonParser().parse(string).getAsJsonObject());
+		return roleRepFromJson(JsonParser.parseString(string).getAsJsonObject());
 	}
 
 	public PrivilegeRep privilegeRepFromJson(String string) {
-		return privilegeRepFromJson(new JsonParser().parse(string).getAsJsonObject());
+		return privilegeRepFromJson(JsonParser.parseString(string).getAsJsonObject());
 	}
 
 	public RoleRep roleRepFromJson(JsonObject jsonObject) {

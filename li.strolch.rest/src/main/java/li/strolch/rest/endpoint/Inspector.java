@@ -795,7 +795,7 @@ public class Inspector {
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 
 		// parse JSON string
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		Resource resource;
 		if (flat) {
 
@@ -872,7 +872,7 @@ public class Inspector {
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 
 		// parse JSON string
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		Order order;
 		if (flat) {
 
@@ -949,7 +949,7 @@ public class Inspector {
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
 
 		// parse JSON string
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		Activity activity;
 		if (flat) {
 
@@ -1066,7 +1066,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse from complete JSON
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		ResourceFromJsonVisitor visitor = new ResourceFromJsonVisitor();
 		Resource resource = visitor.visit(jsonObject);
 
@@ -1145,7 +1145,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse from complete JSON
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		OrderFromJsonVisitor visitor = new OrderFromJsonVisitor();
 		Order order = visitor.visit(jsonObject);
 
@@ -1226,7 +1226,7 @@ public class Inspector {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		// parse from complete JSON
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		ActivityFromJsonVisitor visitor = new ActivityFromJsonVisitor();
 		Activity activity = visitor.visit(jsonObject);
 
@@ -1483,7 +1483,7 @@ public class Inspector {
 	private Resource parseNewResourceFromJson(Certificate cert, String realm, String type, String data, boolean flat) {
 
 		// parse JSON string
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		Resource resource;
 		if (flat) {
 
@@ -1510,7 +1510,7 @@ public class Inspector {
 	private Order parseNewOrderFromJson(Certificate cert, String realm, String type, String data, boolean flat) {
 
 		// parse JSON string
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		Order order;
 		if (flat) {
 
@@ -1537,7 +1537,7 @@ public class Inspector {
 	private Activity parseNewActivityFromJson(Certificate cert, String realm, String type, String data, boolean flat) {
 
 		// parse JSON string
-		JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 		Activity activity;
 		if (flat) {
 
