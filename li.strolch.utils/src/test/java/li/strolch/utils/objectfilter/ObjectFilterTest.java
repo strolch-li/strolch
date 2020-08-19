@@ -20,6 +20,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 /**
@@ -101,7 +102,7 @@ public class ObjectFilterTest {
 			filter.add(myObj, myObj);
 			fail("Should have failed adding twice!");
 		} catch (RuntimeException e) {
-			assertThat(e.getMessage(), containsString("Stale State exception: Invalid + after +"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("Stale State exception: Invalid + after +"));
 		}
 
 		testAssertions(filter, 1, 1, 1, 0, 0);
@@ -119,7 +120,7 @@ public class ObjectFilterTest {
 			filter.remove(myObj, myObj);
 			fail("Should have failed removing twice!");
 		} catch (RuntimeException e) {
-			assertThat(e.getMessage(), containsString("Stale State exception: Invalid - after -"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("Stale State exception: Invalid - after -"));
 		}
 
 		testAssertions(filter, 1, 1, 0, 0, 1);
@@ -159,7 +160,7 @@ public class ObjectFilterTest {
 			filter.add(myObj, myObj);
 			fail("Should have failed add after modify");
 		} catch (RuntimeException e) {
-			assertThat(e.getMessage(), containsString("Stale State exception: Invalid + after +="));
+			MatcherAssert.assertThat(e.getMessage(), containsString("Stale State exception: Invalid + after +="));
 		}
 
 		testAssertions(filter, 1, 1, 0, 1, 0);
@@ -187,7 +188,7 @@ public class ObjectFilterTest {
 			filter.update(myObj, myObj);
 			fail("Should have failed modify after remove");
 		} catch (RuntimeException e) {
-			assertThat(e.getMessage(), containsString("Stale State exception: Invalid += after -"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("Stale State exception: Invalid += after -"));
 		}
 
 		testAssertions(filter, 1, 1, 0, 0, 1);
@@ -209,7 +210,7 @@ public class ObjectFilterTest {
 		List<Object> updated = filter.getUpdated(Object.class.getName());
 		Object updatedObj = updated.get(0);
 		String msg = "registered object is not the last operation's object";
-		assertTrue(msg, obj2 == updatedObj);
+		assertEquals(msg, obj2, updatedObj);
 	}
 
 	@Test
@@ -228,7 +229,7 @@ public class ObjectFilterTest {
 		List<Object> added = filter.getAdded(Object.class.getName());
 		Object addedObj = added.get(0);
 		String msg = "registered object is not the last operation's object";
-		assertTrue(msg, obj2 == addedObj);
+		assertEquals(msg, obj2, addedObj);
 	}
 
 	@Test
@@ -247,7 +248,7 @@ public class ObjectFilterTest {
 		List<Object> updated = filter.getUpdated(Object.class.getName());
 		Object updatedObj = updated.get(0);
 		String msg = "registered object is not the last operation's object";
-		assertTrue(msg, obj2 == updatedObj);
+		assertEquals(msg, obj2, updatedObj);
 	}
 
 	@Test
@@ -266,7 +267,7 @@ public class ObjectFilterTest {
 		List<Object> removed = filter.getRemoved(Object.class.getName());
 		Object removedObj = removed.get(0);
 		String msg = "registered object is not the last operation's object";
-		assertTrue(msg, obj2 == removedObj);
+		assertEquals(msg, obj2, removedObj);
 	}
 
 	@Test
@@ -378,7 +379,7 @@ public class ObjectFilterTest {
 	}
 
 	private class TestObject {
-		private int id;
+		private final int id;
 
 		public TestObject(int id) {
 			this.id = id;
@@ -404,9 +405,7 @@ public class ObjectFilterTest {
 			TestObject other = (TestObject) obj;
 			if (!getOuterType().equals(other.getOuterType()))
 				return false;
-			if (this.id != other.id)
-				return false;
-			return true;
+			return this.id == other.id;
 		}
 
 		private ObjectFilterTest getOuterType() {
