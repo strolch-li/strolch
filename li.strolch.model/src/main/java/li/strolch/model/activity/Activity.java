@@ -624,6 +624,8 @@ public class Activity extends AbstractStrolchRootElement
 		if (withVersion)
 			clone.setVersion(this.version);
 
+		clone.locator = this.locator;
+
 		return clone;
 	}
 

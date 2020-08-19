@@ -227,6 +227,8 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 		if (withVersion)
 			clone.setVersion(this.version);
 
+		clone.locator = this.locator;
+
 		return clone;
 	}
 

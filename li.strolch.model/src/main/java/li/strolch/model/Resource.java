@@ -307,6 +307,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		if (withVersion)
 			clone.setVersion(this.version);
 
+		clone.locator = this.locator;
+
 		return clone;
 	}
 
