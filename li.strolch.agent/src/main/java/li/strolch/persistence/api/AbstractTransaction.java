@@ -1196,7 +1196,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		resource.assertNotReadonly();
 		if (hasResource(resource.getType(), resource.getId())) {
-			getObjectFilter().update(Tags.RESOURCE, resource.getLocator(), resource);
+			li.strolch.utils.objectfilter.Operation operation = getObjectFilter()
+					.getOperation(Tags.RESOURCE, resource.getLocator());
+			if (operation != li.strolch.utils.objectfilter.Operation.REMOVE)
+				getObjectFilter().update(Tags.RESOURCE, resource.getLocator(), resource);
+			else
+				getObjectFilter().add(Tags.RESOURCE, resource.getLocator(), resource);
 		} else {
 			lock(resource);
 			getObjectFilter().add(Tags.RESOURCE, resource.getLocator(), resource);
@@ -1209,7 +1214,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("order must not be null", order);
 		order.assertNotReadonly();
 		if (hasOrder(order.getType(), order.getId())) {
-			getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
+			li.strolch.utils.objectfilter.Operation operation = getObjectFilter()
+					.getOperation(Tags.ORDER, order.getLocator());
+			if (operation != li.strolch.utils.objectfilter.Operation.REMOVE)
+				getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
+			else
+				getObjectFilter().add(Tags.ORDER, order.getLocator(), order);
 		} else {
 			lock(order);
 			getObjectFilter().add(Tags.ORDER, order.getLocator(), order);
@@ -1222,7 +1232,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		activity.assertNotReadonly();
 		if (hasActivity(activity.getType(), activity.getId())) {
-			getObjectFilter().update(Tags.ACTIVITY, activity.getLocator(), activity);
+			li.strolch.utils.objectfilter.Operation operation = getObjectFilter()
+					.getOperation(Tags.ACTIVITY, activity.getLocator());
+			if (operation != li.strolch.utils.objectfilter.Operation.REMOVE)
+				getObjectFilter().update(Tags.ACTIVITY, activity.getLocator(), activity);
+			else
+				getObjectFilter().add(Tags.ACTIVITY, activity.getLocator(), activity);
 		} else {
 			lock(activity);
 			getObjectFilter().add(Tags.ACTIVITY, activity.getLocator(), activity);
