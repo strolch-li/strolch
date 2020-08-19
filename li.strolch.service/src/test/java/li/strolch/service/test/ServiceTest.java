@@ -15,8 +15,9 @@
  */
 package li.strolch.service.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -32,25 +33,21 @@ import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import li.strolch.service.test.model.TestService;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ServiceTest extends AbstractServiceTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	@Test
 	public void shouldFailInvalidCertificate1() {
-		this.thrown.expect(PrivilegeException.class);
-		TestService testService = new TestService();
-		getServiceHandler().doService(
-				new Certificate(null, null, null, null, null, null, null, null, LocalDateTime.now(), false, null,
-						new HashSet<>(), null), testService);
+		assertThrows(PrivilegeException.class, () -> {
+			TestService testService = new TestService();
+			getServiceHandler().doService(
+					new Certificate(null, null, null, null, null, null, null, null, LocalDateTime.now(), false, null,
+							new HashSet<>(), null), testService);
+		});
 	}
 
 	@Test

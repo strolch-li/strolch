@@ -17,10 +17,10 @@ package li.strolch.xmlpers.test;
 
 import static li.strolch.xmlpers.test.model.ModelBuilder.RES_ID;
 import static li.strolch.xmlpers.test.model.ModelBuilder.createResource;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +30,12 @@ import li.strolch.xmlpers.api.*;
 import li.strolch.xmlpers.test.model.Book;
 import li.strolch.xmlpers.test.model.MyModel;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class TransactionResultTest extends AbstractPersistenceTest {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private static final String BASEPATH = "target/db/TxResultTest/"; //$NON-NLS-1$
 

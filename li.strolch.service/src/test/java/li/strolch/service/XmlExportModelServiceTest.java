@@ -16,8 +16,8 @@
 package li.strolch.service;
 
 import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;

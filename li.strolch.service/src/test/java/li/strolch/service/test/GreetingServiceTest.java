@@ -15,8 +15,8 @@
  */
 package li.strolch.service.test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
 
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.test.model.GreetingResult;
