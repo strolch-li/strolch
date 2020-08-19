@@ -36,6 +36,7 @@ import li.strolch.privilege.xml.*;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
+import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -173,7 +174,7 @@ public class XmlTest {
 		assertEquals("Administrator", admin.getLastname());
 		assertEquals(UserState.ENABLED, admin.getUserState());
 		assertEquals("en-GB", admin.getLocale().toLanguageTag());
-		assertThat(admin.getRoles(), containsInAnyOrder("PrivilegeAdmin", "AppUser"));
+		MatcherAssert.assertThat(admin.getRoles(), containsInAnyOrder("PrivilegeAdmin", "AppUser"));
 		Map<String, String> properties = admin.getProperties();
 		assertEquals(new HashSet<>(Arrays.asList("organization", "organizationalUnit")), properties.keySet());
 		assertEquals("eitchnet.ch", properties.get("organization"));
@@ -183,13 +184,13 @@ public class XmlTest {
 		User systemAdmin = findUser("system_admin", users);
 		assertEquals("2", systemAdmin.getUserId());
 		assertEquals("system_admin", systemAdmin.getUsername());
-		assertEquals(null, systemAdmin.getPassword());
-		assertEquals(null, systemAdmin.getSalt());
+		assertNull(systemAdmin.getPassword());
+		assertNull(systemAdmin.getSalt());
 		assertEquals("System User", systemAdmin.getFirstname());
 		assertEquals("Administrator", systemAdmin.getLastname());
 		assertEquals(UserState.SYSTEM, systemAdmin.getUserState());
 		assertEquals("en-GB", systemAdmin.getLocale().toLanguageTag());
-		assertThat(systemAdmin.getRoles(), containsInAnyOrder("system_admin_privileges"));
+		MatcherAssert.assertThat(systemAdmin.getRoles(), containsInAnyOrder("system_admin_privileges"));
 		assertTrue(systemAdmin.getProperties().isEmpty());
 	}
 
@@ -249,7 +250,7 @@ public class XmlTest {
 		Role systemAdminPrivileges = findRole("system_admin_privileges", roles);
 		assertEquals("system_admin_privileges", systemAdminPrivileges.getName());
 		assertEquals(2, systemAdminPrivileges.getPrivilegeNames().size());
-		assertThat(systemAdminPrivileges.getPrivilegeNames(),
+		MatcherAssert.assertThat(systemAdminPrivileges.getPrivilegeNames(),
 				containsInAnyOrder("li.strolch.privilege.handler.SystemAction",
 						"li.strolch.privilege.test.model.TestSystemRestrictable"));
 
@@ -273,7 +274,8 @@ public class XmlTest {
 		Role restrictedRole = findRole("restrictedRole", roles);
 		assertEquals("restrictedRole", restrictedRole.getName());
 		assertEquals(1, restrictedRole.getPrivilegeNames().size());
-		assertThat(restrictedRole.getPrivilegeNames(), containsInAnyOrder("li.strolch.privilege.handler.SystemAction"));
+		MatcherAssert.assertThat(restrictedRole.getPrivilegeNames(),
+				containsInAnyOrder("li.strolch.privilege.handler.SystemAction"));
 
 		IPrivilege testSystemUserAction2 = restrictedRole.getPrivilege("li.strolch.privilege.handler.SystemAction");
 		assertEquals("li.strolch.privilege.handler.SystemAction", testSystemUserAction2.getName());
@@ -281,8 +283,8 @@ public class XmlTest {
 		assertFalse(testSystemUserAction2.isAllAllowed());
 		assertEquals(1, testSystemUserAction2.getAllowList().size());
 		assertEquals(1, testSystemUserAction2.getDenyList().size());
-		assertThat(testSystemUserAction2.getAllowList(), containsInAnyOrder("hello"));
-		assertThat(testSystemUserAction2.getDenyList(), containsInAnyOrder("goodbye"));
+		MatcherAssert.assertThat(testSystemUserAction2.getAllowList(), containsInAnyOrder("hello"));
+		MatcherAssert.assertThat(testSystemUserAction2.getDenyList(), containsInAnyOrder("goodbye"));
 	}
 
 	private User findUser(String username, List<User> users) {
@@ -337,14 +339,16 @@ public class XmlTest {
 		assertNotNull(parsedUsers);
 		assertEquals(2, parsedUsers.size());
 
-		User parsedUser1 = parsedUsers.stream().filter(u -> u.getUsername().equals("user1")).findAny().get();
-		User parsedUser2 = parsedUsers.stream().filter(u -> u.getUsername().equals("user2")).findAny().get();
+		User parsedUser1 = parsedUsers.stream().filter(u -> u.getUsername().equals("user1")).findAny()
+				.orElseThrow(() -> new RuntimeException("user1 missing!"));
+		User parsedUser2 = parsedUsers.stream().filter(u -> u.getUsername().equals("user2")).findAny()
+				.orElseThrow(() -> new RuntimeException("user2 missing!"));
 
 		assertEquals(user1.getFirstname(), parsedUser1.getFirstname());
 		assertEquals(user1.getLastname(), parsedUser1.getLastname());
 		assertEquals(user1.getLocale(), parsedUser1.getLocale());
-		assertTrue(Arrays.equals(user1.getPassword(), parsedUser1.getPassword()));
-		assertTrue(Arrays.equals(user1.getSalt(), parsedUser1.getSalt()));
+		assertArrayEquals(user1.getPassword(), parsedUser1.getPassword());
+		assertArrayEquals(user1.getSalt(), parsedUser1.getSalt());
 		assertEquals(user1.getProperties(), parsedUser1.getProperties());
 		assertEquals(user1.getUserId(), parsedUser1.getUserId());
 		assertEquals(user1.getUserState(), parsedUser1.getUserState());
@@ -353,8 +357,8 @@ public class XmlTest {
 		assertEquals(user2.getFirstname(), parsedUser2.getFirstname());
 		assertEquals(user2.getLastname(), parsedUser2.getLastname());
 		assertEquals(user2.getLocale(), parsedUser2.getLocale());
-		assertTrue(Arrays.equals(user2.getPassword(), parsedUser2.getPassword()));
-		assertTrue(Arrays.equals(user2.getSalt(), parsedUser2.getSalt()));
+		assertArrayEquals(user2.getPassword(), parsedUser2.getPassword());
+		assertArrayEquals(user2.getSalt(), parsedUser2.getSalt());
 		assertEquals(user2.getProperties(), parsedUser2.getProperties());
 		assertEquals(user2.getUserId(), parsedUser2.getUserId());
 		assertEquals(user2.getUserState(), parsedUser2.getUserState());
@@ -393,8 +397,10 @@ public class XmlTest {
 		assertEquals(2, parsedRoles.size());
 
 		assertEquals(2, parsedRoles.size());
-		Role parsedRole1 = parsedRoles.stream().filter(r -> r.getName().equals("role1")).findAny().get();
-		Role parsedRole2 = parsedRoles.stream().filter(r -> r.getName().equals("role2")).findAny().get();
+		Role parsedRole1 = parsedRoles.stream().filter(r -> r.getName().equals("role1")).findAny()
+				.orElseThrow(() -> new RuntimeException("role1 missing!"));
+		Role parsedRole2 = parsedRoles.stream().filter(r -> r.getName().equals("role2")).findAny()
+				.orElseThrow(() -> new RuntimeException("role2 missing!"));
 
 		Set<String> privilegeNames = role1.getPrivilegeNames();
 		assertEquals(privilegeNames, parsedRole1.getPrivilegeNames());

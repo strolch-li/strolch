@@ -33,8 +33,11 @@ import li.strolch.privilege.test.model.TestSystemUserAction;
 import li.strolch.privilege.test.model.TestSystemUserActionDeny;
 import li.strolch.privilege.test.model.TestUserChallengeHandler;
 import li.strolch.utils.helper.ArraysHelper;
-import org.junit.*;
-import org.junit.rules.ExpectedException;
+import org.hamcrest.MatcherAssert;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,28 +73,25 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(PrivilegeTest.class);
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-
 	@BeforeClass
-	public static void init() throws Exception {
+	public static void init() {
 		removeConfigs(PrivilegeTest.class.getSimpleName());
 		prepareConfigs(PrivilegeTest.class.getSimpleName(), "PrivilegeConfig.xml", "PrivilegeUsers.xml",
 				"PrivilegeRoles.xml");
 	}
 
 	@AfterClass
-	public static void destroy() throws Exception {
+	public static void destroy() {
 		removeConfigs(PrivilegeTest.class.getSimpleName());
 	}
 
 	@Before
-	public void setup() throws Exception {
+	public void setup() {
 		initialize(PrivilegeTest.class.getSimpleName(), "PrivilegeConfig.xml");
 	}
 
 	@Test
-	public void testAuthenticationOk() throws Exception {
+	public void testAuthenticationOk() {
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 		} finally {
@@ -100,7 +100,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
-	public void testAuthenticationAdmin2Ok() throws Exception {
+	public void testAuthenticationAdmin2Ok() {
 		try {
 			login(ADMIN2, ArraysHelper.copyOf(PASS_ADMIN));
 		} finally {
@@ -109,29 +109,31 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
-	public void testFailAuthenticationNOk() throws Exception {
-		this.exception.expect(InvalidCredentialsException.class);
-		this.exception.expectMessage("Password is incorrect for admin");
-		try {
-			login(ADMIN, ArraysHelper.copyOf(PASS_BAD));
-		} finally {
-			logout();
-		}
+	public void testFailAuthenticationNOk() {
+		InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> {
+			try {
+				login(ADMIN, ArraysHelper.copyOf(PASS_BAD));
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(), containsString("Password is incorrect for admin"));
 	}
 
 	@Test
-	public void testFailAuthenticationPWNull() throws Exception {
-		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage("A password may not be empty!");
-		try {
-			login(ADMIN, null);
-		} finally {
-			logout();
-		}
+	public void testFailAuthenticationPWNull() {
+		PrivilegeException exception = assertThrows(PrivilegeException.class, () -> {
+			try {
+				login(ADMIN, null);
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(), containsString("A password may not be empty!"));
 	}
 
 	@Test
-	public void testAddRoleTemp() throws Exception {
+	public void testAddRoleTemp() {
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
@@ -146,7 +148,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
-	public void testPerformRestrictableAsAdmin() throws Exception {
+	public void testPerformRestrictableAsAdmin() {
 		try {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
@@ -174,52 +176,56 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	 * Checks that the system user can not perform a valid action, but illegal privilege
 	 */
 	@Test
-	public void testPerformSystemRestrictableFailPrivilege() throws Exception {
-		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage(
-				"User system_admin does not have the privilege li.strolch.privilege.handler.SystemAction");
-		try {
-			// create the action to be performed as a system user
-			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
+	public void testPerformSystemRestrictableFailPrivilege() {
+		PrivilegeException exception = assertThrows(PrivilegeException.class, () -> {
+			try {
+				// create the action to be performed as a system user
+				TestSystemUserActionDeny action = new TestSystemUserActionDeny();
 
-			// and then perform the action
-			this.privilegeHandler.runAs(SYSTEM_USER_ADMIN, action);
-		} finally {
-			logout();
-		}
+				// and then perform the action
+				this.privilegeHandler.runAs(SYSTEM_USER_ADMIN, action);
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(), containsString(
+				"User system_admin does not have the privilege li.strolch.privilege.handler.SystemAction"));
 	}
 
 	/**
 	 * Checks that the system user can not perform a valid action, but illegal privilege
 	 */
 	@Test
-	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() throws Exception {
-		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage(
-				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction with value li.strolch.privilege.test.model.TestSystemUserActionDeny needed for Restrictable li.strolch.privilege.test.model.TestSystemUserActionDeny");
-		try {
-			// create the action to be performed as a system user
-			TestSystemUserActionDeny action = new TestSystemUserActionDeny();
+	public void testPerformSystemRestrictableFailNoAdditionalPrivilege() {
+		PrivilegeException exception = assertThrows(PrivilegeException.class, () -> {
+			try {
+				// create the action to be performed as a system user
+				TestSystemUserActionDeny action = new TestSystemUserActionDeny();
 
-			// and then perform the action
-			this.privilegeHandler.runAs(SYSTEM_USER_ADMIN2, action);
-		} finally {
-			logout();
-		}
+				// and then perform the action
+				this.privilegeHandler.runAs(SYSTEM_USER_ADMIN2, action);
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(), containsString(
+				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction with value li.strolch.privilege.test.model.TestSystemUserActionDeny needed for Restrictable li.strolch.privilege.test.model.TestSystemUserActionDeny"));
 	}
 
 	/**
 	 * System user may not login
 	 */
 	@Test
-	public void testLoginSystemUser() throws Exception {
-		this.exception.expect(AccessDeniedException.class);
-		this.exception.expectMessage("User system_admin is a system user and may not login!");
-		try {
-			login(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.toCharArray());
-		} finally {
-			logout();
-		}
+	public void testLoginSystemUser() {
+		AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
+			try {
+				login(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.toCharArray());
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(),
+				containsString("User system_admin is a system user and may not login!"));
 	}
 
 	@Test
@@ -260,36 +266,39 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldFailUpdateInexistantUser() {
-		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage("User bob does not exist");
-		try {
-			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+		PrivilegeException exception = assertThrows(PrivilegeException.class, () -> {
+			try {
+				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
-			Certificate certificate = this.ctx.getCertificate();
+				Certificate certificate = this.ctx.getCertificate();
 
-			// let's add a new user bob
-			UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null);
-			this.privilegeHandler.updateUser(certificate, userRep);
-		} finally {
-			logout();
-		}
+				// let's add a new user bob
+				UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null);
+				this.privilegeHandler.updateUser(certificate, userRep);
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(), containsString("User bob does not exist"));
 	}
 
 	@Test
 	public void shouldFailUpdateAdminNoChanges() {
-		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage("All updateable fields are empty for update of user admin");
-		try {
-			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+		PrivilegeException exception = assertThrows(PrivilegeException.class, () -> {
+			try {
+				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
-			Certificate certificate = this.ctx.getCertificate();
+				Certificate certificate = this.ctx.getCertificate();
 
-			// let's add a new user bob
-			UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
-			this.privilegeHandler.updateUser(certificate, userRep);
-		} finally {
-			logout();
-		}
+				// let's add a new user bob
+				UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
+				this.privilegeHandler.updateUser(certificate, userRep);
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(),
+				containsString("All updateable fields are empty for update of user admin"));
 	}
 
 	@Test
@@ -346,31 +355,33 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldDetectPrivilegeConflict1() {
-		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage("User admin has conflicts for privilege ");
-		try {
-			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			Certificate certificate = this.ctx.getCertificate();
-			PrivilegeRep privilegeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_ACTION, "DefaultPrivilege", true,
-					Collections.emptySet(), Collections.emptySet());
-			this.privilegeHandler.addOrReplacePrivilegeOnRole(certificate, ROLE_APP_USER, privilegeRep);
-		} finally {
-			logout();
-		}
+		PrivilegeException exception = assertThrows(PrivilegeException.class, () -> {
+			try {
+				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+				Certificate certificate = this.ctx.getCertificate();
+				PrivilegeRep privilegeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_ACTION, "DefaultPrivilege",
+						true, Collections.emptySet(), Collections.emptySet());
+				this.privilegeHandler.addOrReplacePrivilegeOnRole(certificate, ROLE_APP_USER, privilegeRep);
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(), containsString("User admin has conflicts for privilege "));
 	}
 
 	@Test
 	public void shouldDetectPrivilegeConflict2() {
-		this.exception.expect(PrivilegeException.class);
-		this.exception.expectMessage("User admin has conflicts for privilege ");
-		try {
-			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
-			Certificate certificate = this.ctx.getCertificate();
-			this.privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY);
-			this.privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY2);
-		} finally {
-			logout();
-		}
+		PrivilegeException exception = assertThrows(PrivilegeException.class, () -> {
+			try {
+				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+				Certificate certificate = this.ctx.getCertificate();
+				this.privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY);
+				this.privilegeHandler.addRoleToUser(certificate, ADMIN, ROLE_MY2);
+			} finally {
+				logout();
+			}
+		});
+		MatcherAssert.assertThat(exception.getMessage(), containsString("User admin has conflicts for privilege "));
 	}
 
 	@Test
@@ -417,7 +428,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	 * </ul>
 	 */
 	@Test
-	public void testUserStory() throws Exception {
+	public void testUserStory() {
 
 		addBobAsAdmin();
 		failAuthAsBobNotEnabled();
@@ -631,7 +642,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			fail("User Ted may not authenticate because the user has no password!");
 		} catch (PrivilegeException e) {
 			String msg = "User ted has no password and may not login!";
-			assertThat(e.getMessage(), containsString(msg));
+			MatcherAssert.assertThat(e.getMessage(), containsString(msg));
 		} finally {
 			logout();
 		}
@@ -669,7 +680,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	}
 
 	private void failAddTedAsBobNotAdmin() {
-		Certificate certificate = null;
+		Certificate certificate;
 		try {
 			UserRep userRep;
 			// testFailAddUserTedAsBob
@@ -677,8 +688,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// auth as Bob
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// let's add a new user Ted
-			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<String>(), null,
-					new HashMap<String, String>());
+			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<>(), null,
+					new HashMap<>());
 			certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
@@ -746,7 +757,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			fail("User Bob may not authenticate because the user is not yet enabled!");
 		} catch (PrivilegeException e) {
 			String msg = "User bob does not have state ENABLED and can not login!";
-			assertThat(e.getMessage(), containsString(msg));
+			MatcherAssert.assertThat(e.getMessage(), containsString(msg));
 		} finally {
 			logout();
 		}

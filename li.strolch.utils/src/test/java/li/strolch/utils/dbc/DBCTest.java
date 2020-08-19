@@ -15,13 +15,16 @@
  */
 package li.strolch.utils.dbc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.text.MessageFormat;
 
 import li.strolch.utils.dbc.DBC.DbcException;
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * The class <code>DBCTest</code> contains tests for the class <code>{@link DBC}</code>.
@@ -32,9 +35,6 @@ import org.junit.rules.ExpectedException;
  */
 @SuppressWarnings("nls")
 public class DBCTest {
-
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
@@ -63,18 +63,15 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertEquals_2() throws Exception {
-		this.exception.expect(DbcException.class);
 		Object value1 = new Object();
 		Object value2 = new Object();
 		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
-		this.exception.expectMessage(msg);
 
-		DBC.PRE.assertEquals(msg, value1, value2);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertEquals(msg, value1, value2);
+		});
 
-		// add additional test code here
-		// An unexpected exception was thrown in user code while executing this test:
-		//    li.strolch.utils.DBC.PRE.DBC$DbcException: Values are not equal: 
-		//       at li.strolch.utils.DBC.PRE.DBC.PRE.assertEquals(DBC.PRE.java:39)
+		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
@@ -86,17 +83,15 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertEquals_3() throws Exception {
-		this.exception.expect(DbcException.class);
-
 		Object value1 = null;
 		Object value2 = new Object();
-
 		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
-		this.exception.expectMessage(msg);
 
-		DBC.PRE.assertEquals(msg, value1, value2);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertEquals(msg, value1, value2);
+		});
 
-		// add additional test code here
+		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
@@ -108,17 +103,16 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertEquals_4() throws Exception {
-		this.exception.expect(DbcException.class);
-
 		Object value1 = new Object();
 		Object value2 = null;
 
 		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
-		this.exception.expectMessage(msg);
 
-		DBC.PRE.assertEquals(msg, value1, value2);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertEquals(msg, value1, value2);
+		});
 
-		// add additional test code here
+		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
@@ -151,17 +145,18 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertNotEquals_1() throws Exception {
-		this.exception.expect(DbcException.class);
-
 		String msg = "";
 		Object value1 = null;
 		Object value2 = null;
 
 		String ex = "{0}: {1} == {2}";
-		ex = MessageFormat.format(ex, msg, value1, value2);
-		this.exception.expectMessage(ex);
+		String expectedMsg = MessageFormat.format(ex, msg, value1, value2);
 
-		DBC.PRE.assertNotEquals(msg, value1, value2);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertNotEquals(expectedMsg, value1, value2);
+		});
+
+		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
@@ -221,17 +216,18 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertNotEquals_5() throws Exception {
-		this.exception.expect(DbcException.class);
-
 		String msg = "";
 		Object value1 = "bla";
 		Object value2 = "bla";
 
 		String ex = "{0}: {1} == {2}";
-		ex = MessageFormat.format(ex, msg, value1, value2);
-		this.exception.expectMessage(ex);
+		String expectedMsg = MessageFormat.format(ex, msg, value1, value2);
 
-		DBC.PRE.assertNotEquals(msg, value1, value2);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertNotEquals(expectedMsg, value1, value2);
+		});
+
+		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
@@ -258,18 +254,14 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertExists_2() throws Exception {
-		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Illegal situation as file (srcc) does not exist:");
-
 		String msg = "";
 		File file = new File("srcc");
 
-		DBC.PRE.assertExists(msg, file);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertExists(msg, file);
+		});
 
-		// add additional test code here
-		// An unexpected exception was thrown in user code while executing this test:
-		//    li.strolch.utils.DBC.PRE.DBC$DbcException: Illegal situation as file () does not exist: 
-		//       at li.strolch.utils.DBC.PRE.DBC.PRE.assertExists(DBC.PRE.java:95)
+		assertThat(dbcException.getMessage(), containsString("Illegal situation as file (srcc) does not exist:"));
 	}
 
 	/**
@@ -281,13 +273,14 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertFalse_1() throws Exception {
-		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Expected false, but was true: ");
-
 		String msg = "";
 		boolean value = true;
 
-		DBC.PRE.assertFalse(msg, value);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertFalse(msg, value);
+		});
+
+		assertThat(dbcException.getMessage(), containsString("Expected false, but was true: "));
 	}
 
 	/**
@@ -316,13 +309,14 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertNotEmpty_1() throws Exception {
-		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Illegal empty value: ");
-
 		String msg = "Illegal empty value: ";
 		String value = "";
 
-		DBC.PRE.assertNotEmpty(msg, value);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertNotEmpty(msg, value);
+		});
+
+		assertThat(dbcException.getMessage(), containsString("Illegal empty value: "));
 	}
 
 	/**
@@ -366,15 +360,14 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertNotExists_2() throws Exception {
-		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Illegal situation as file (src) exists: ");
-
 		String msg = "";
 		File file = new File("src");
 
-		DBC.PRE.assertNotExists(msg, file);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertNotExists(msg, file);
+		});
 
-		// add additional test code here
+		assertEquals("Illegal situation as file (src) exists: ", dbcException.getMessage());
 	}
 
 	/**
@@ -386,16 +379,17 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertNotNull_1() throws Exception {
-		this.exception.expect(DbcException.class);
-
 		String msg = "";
 		Object value = null;
 
 		String ex = "{0}: Illegal null value";
-		ex = MessageFormat.format(ex, msg, value);
-		this.exception.expectMessage(ex);
+		String expectedMsg = MessageFormat.format(ex, msg, value);
 
-		DBC.PRE.assertNotNull(msg, value);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertNotNull(expectedMsg, value);
+		});
+
+		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
@@ -424,14 +418,15 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertNull_1() throws Exception {
-		this.exception.expect(DbcException.class);
-
 		Object value = new Object();
 
 		String msg = MessageFormat.format("{0}: {1} != null", "", value);
-		this.exception.expectMessage(msg);
 
-		DBC.PRE.assertNull(msg, value);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertNull(msg, value);
+		});
+
+		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
@@ -460,18 +455,14 @@ public class DBCTest {
 	 */
 	@Test
 	public void testAssertTrue_1() throws Exception {
-		this.exception.expect(DbcException.class);
-		this.exception.expectMessage("Expected true, but was false: ");
-
 		String msg = "";
 		boolean value = false;
 
-		DBC.PRE.assertTrue(msg, value);
+		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> {
+			DBC.PRE.assertTrue(msg, value);
+		});
 
-		// add additional test code here
-		// An unexpected exception was thrown in user code while executing this test:
-		//    li.strolch.utils.DBC.PRE.DBC$DbcException: Expected true, but was false: 
-		//       at li.strolch.utils.DBC.PRE.DBC.PRE.assertTrue(DBC.PRE.java:47)
+		assertEquals("Expected true, but was false: ", dbcException.getMessage());
 	}
 
 	/**

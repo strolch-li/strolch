@@ -14,6 +14,7 @@ import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.*;
 import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.impl.*;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 
 public class ReadonlyModelTest {
@@ -33,13 +34,13 @@ public class ReadonlyModelTest {
 			element.setId("sdf");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			element.setName("sdf");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 	}
 
@@ -55,7 +56,7 @@ public class ReadonlyModelTest {
 			order.setState(State.CREATED);
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 	}
 
@@ -71,7 +72,7 @@ public class ReadonlyModelTest {
 			activity.addElement(createAction("action_" + activity.getId(), "Action " + activity.getName(), "Use"));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		Action act = activity.getElement("action_" + activity.getId());
@@ -80,19 +81,19 @@ public class ReadonlyModelTest {
 			act.setState(State.EXECUTION);
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			act.setResourceId("dfg");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			act.addChange(new ValueChange<>(1L, new FloatValue(1.0D), "sdf"));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 	}
 
@@ -104,7 +105,7 @@ public class ReadonlyModelTest {
 			boolP.setValue(false);
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		StringParameter stringP = bagContainer.getParameter(BAG_ID, PARAM_STRING_ID, true);
@@ -113,7 +114,7 @@ public class ReadonlyModelTest {
 			stringP.setValue("sdf");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		IntegerParameter integerP = bagContainer.getParameter(BAG_ID, PARAM_INTEGER_ID, true);
@@ -122,7 +123,7 @@ public class ReadonlyModelTest {
 			integerP.setValue(1);
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		DateParameter dateP = bagContainer.getParameter(BAG_ID, PARAM_DATE_ID, true);
@@ -131,7 +132,7 @@ public class ReadonlyModelTest {
 			dateP.setValue(new Date());
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		FloatParameter doublP = bagContainer.getParameter(BAG_ID, PARAM_FLOAT_ID, true);
@@ -140,7 +141,7 @@ public class ReadonlyModelTest {
 			doublP.setValue(1.0D);
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		LongParameter lonP = bagContainer.getParameter(BAG_ID, PARAM_LONG_ID, true);
@@ -149,7 +150,7 @@ public class ReadonlyModelTest {
 			lonP.setValue(1L);
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		FloatListParameter doublesP = bagContainer.getParameter(BAG_ID, PARAM_LIST_FLOAT_ID, true);
@@ -158,7 +159,7 @@ public class ReadonlyModelTest {
 			doublesP.setValue(Collections.singletonList(1.0D));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		IntegerListParameter integersP = bagContainer.getParameter(BAG_ID, PARAM_LIST_INTEGER_ID, true);
@@ -167,7 +168,7 @@ public class ReadonlyModelTest {
 			integersP.setValue(Collections.singletonList(1));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		LongListParameter longsP = bagContainer.getParameter(BAG_ID, PARAM_LIST_LONG_ID, true);
@@ -176,7 +177,7 @@ public class ReadonlyModelTest {
 			longsP.setValue(Collections.singletonList(1L));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		StringListParameter stringsP = bagContainer.getParameter(BAG_ID, PARAM_LIST_STRING_ID, true);
@@ -185,7 +186,7 @@ public class ReadonlyModelTest {
 			stringsP.setValue(Collections.singletonList("dfgdfg"));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 	}
 
@@ -196,13 +197,13 @@ public class ReadonlyModelTest {
 			booleanState.setStateFromStringAt(1L, "false");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			booleanState.getTimeEvolution().setValueAt(1L, new BooleanValue(false));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		FloatTimedState floatState = resource.getTimedState(STATE_FLOAT_ID);
@@ -211,13 +212,13 @@ public class ReadonlyModelTest {
 			floatState.setStateFromStringAt(1L, "1.0D");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			floatState.getTimeEvolution().setValueAt(1L, new FloatValue(2.0D));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		FloatListTimedState floatListState = resource.getTimedState(STATE_FLOAT_LIST_ID);
@@ -226,13 +227,13 @@ public class ReadonlyModelTest {
 			floatListState.setStateFromStringAt(1L, "1.0D");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			floatListState.getTimeEvolution().setValueAt(1L, new FloatListValue(2.0D));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		IntegerTimedState integerState = resource.getTimedState(STATE_INTEGER_ID);
@@ -241,13 +242,13 @@ public class ReadonlyModelTest {
 			integerState.setStateFromStringAt(1L, "1");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			integerState.getTimeEvolution().setValueAt(1L, new IntegerValue(1));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 
 		StringSetTimedState stringState = resource.getTimedState(STATE_STRING_ID);
@@ -256,13 +257,13 @@ public class ReadonlyModelTest {
 			stringState.setStateFromStringAt(1L, "sd");
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 		try {
 			stringState.getTimeEvolution().setValueAt(1L, new StringSetValue("sd"));
 			fail("Should have failed as readOnly!");
 		} catch (StrolchModelException e) {
-			assertThat(e.getMessage(), containsString("is currently readOnly"));
+			MatcherAssert.assertThat(e.getMessage(), containsString("is currently readOnly"));
 		}
 	}
 }

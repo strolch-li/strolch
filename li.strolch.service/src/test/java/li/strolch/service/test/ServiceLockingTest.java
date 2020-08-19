@@ -16,7 +16,8 @@
 package li.strolch.service.test;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.api.*;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.hamcrest.MatcherAssert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -111,7 +113,7 @@ public class ServiceLockingTest {
 		for (int i = 1; i < runners.size(); i++) {
 			ServiceResult result = runners.get(i).getResult();
 			assertEquals(ServiceResultState.EXCEPTION, result.getState());
-			assertThat(result.getMessage(), containsString("failed to acquire lock after"));
+			MatcherAssert.assertThat(result.getMessage(), containsString("failed to acquire lock after"));
 		}
 	}
 

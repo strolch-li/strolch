@@ -31,18 +31,14 @@ import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.test.impl.TestConstants;
 import li.strolch.xmlpers.test.model.ModelBuilder;
 import li.strolch.xmlpers.test.model.MyModel;
+import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ObjectDaoResourceTest extends AbstractPersistenceTest {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private static final String BASEPATH = "target/db/ObjectDaoTest/"; //$NON-NLS-1$
 
@@ -219,30 +215,32 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 	public void shouldFailModifyNotExisting() {
 		setup(IoMode.SAX);
 
-		this.thrown.expect(XmlPersistenceException.class);
-		this.thrown.expectMessage(containsString("Persistence unit does not exist for")); //$NON-NLS-1$
+		XmlPersistenceException exception = assertThrows(XmlPersistenceException.class, () -> {
+			// update
+			try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-		// update
-		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+				MyModel resource = createResource();
+				tx.getObjectDao().update(resource);
+			}
+		});
 
-			MyModel resource = createResource();
-			tx.getObjectDao().update(resource);
-		}
+		MatcherAssert.assertThat(exception.getMessage(), containsString("Persistence unit does not exist for"));
 	}
 
 	@Test
 	public void shouldFailDeleteNotExisting() {
 		setup(IoMode.SAX);
 
-		this.thrown.expect(XmlPersistenceException.class);
-		this.thrown.expectMessage(containsString("Persistence unit does not exist for")); //$NON-NLS-1$
+		XmlPersistenceException exception = assertThrows(XmlPersistenceException.class, () -> {
+			// update
+			try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-		// delete
-		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
+				MyModel resource = createResource();
+				tx.getObjectDao().remove(resource);
+			}
+		});
 
-			MyModel resource = createResource();
-			tx.getObjectDao().remove(resource);
-		}
+		MatcherAssert.assertThat(exception.getMessage(), containsString("Persistence unit does not exist for"));
 	}
 
 	@Test

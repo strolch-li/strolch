@@ -20,14 +20,9 @@ import static org.junit.Assert.*;
 import java.util.Date;
 
 import li.strolch.utils.dbc.DBC.DbcException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class DateRangeTest {
-
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
 
 	@Test
 	public void testFrom() {
@@ -83,11 +78,12 @@ public class DateRangeTest {
 
 	@Test
 	public void shouldNotOverlap() {
-		this.exception.expect(DbcException.class);
-		Date from = new Date(10);
-		Date to = new Date(20);
-		DateRange dateRange = new DateRange();
-		dateRange.from(to, true).to(from, true);
+		assertThrows(DbcException.class, () -> {
+			Date from = new Date(10);
+			Date to = new Date(20);
+			DateRange dateRange = new DateRange();
+			dateRange.from(to, true).to(from, true);
+		});
 	}
 
 	/**
