@@ -82,8 +82,11 @@ public class InMemoryQuery<T extends StrolchRootElement, U> {
 			U returnValue = element.accept(this.elementVisitor);
 			DBC.INTERIM.assertNotNull("Visitor may not return null in query!", returnValue); //$NON-NLS-1$
 
-			if (returnValue instanceof StrolchRootElement)
-				returnValue = (U) ((StrolchRootElement) returnValue).getClone(true);
+			if (returnValue instanceof StrolchRootElement) {
+				@SuppressWarnings("unchecked")
+				U ret = (U) ((StrolchRootElement) returnValue).getClone(true);
+				returnValue = ret;
+			}
 			return returnValue;
 		}).collect(Collectors.toList());
 	}
