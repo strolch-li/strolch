@@ -40,15 +40,15 @@ public class MethodExpression extends AbstractObjectExpression {
 		}
 
 		// now find the method to call
-		Method method = null;
+		Method method;
 		try {
-			method = object.getClass().getMethod(methodName, clazzes.toArray(new Class[clazzes.size()]));
+			method = object.getClass().getMethod(methodName, clazzes.toArray(new Class[0]));
 		} catch (NoSuchMethodException e) {
 			throw new SOQLEvaluationException(
 					"Method " + methodName + " with arguments " + clazzes + " not declared on object " + object
 							+ " of class " + object.getClass());
 		} catch (SecurityException e) {
-			e.printStackTrace();
+			throw new RuntimeException("Failed to getMethod() " + this.methodName, e);
 		}
 
 		Object result;

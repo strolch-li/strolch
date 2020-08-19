@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,20 +15,9 @@
  */
 package li.strolch.runtime.configuration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import java.util.*;
 
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.StrolchComponent;
@@ -37,14 +26,15 @@ import li.strolch.agent.impl.ComponentContainerStateHandler;
 import li.strolch.agent.impl.ComponentController;
 import li.strolch.agent.impl.ComponentDependencyAnalyzer;
 import li.strolch.utils.dbc.DBC.DbcException;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class ControllerDependencyTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
-	//  
+	//
 	//  
 	//         5
 	//         v
@@ -82,7 +72,6 @@ public class ControllerDependencyTest {
 	//         : Downstream dependency for b is a
 	//
 
-	private ComponentContainerImpl container;
 	private ComponentController con2;
 	private ComponentController con5;
 	private ComponentController con11;
@@ -110,16 +99,15 @@ public class ControllerDependencyTest {
 	@Before
 	public void setupModel() {
 
-		this.container = new ComponentContainerImpl(null);
-
-		this.con2 = new ComponentController(new StrolchComponent(this.container, "2"));
-		this.con5 = new ComponentController(new StrolchComponent(this.container, "5"));
-		this.con11 = new ComponentController(new StrolchComponent(this.container, "11"));
-		this.con10 = new ComponentController(new StrolchComponent(this.container, "10"));
-		this.con9 = new ComponentController(new StrolchComponent(this.container, "9"));
-		this.con7 = new ComponentController(new StrolchComponent(this.container, "7"));
-		this.con8 = new ComponentController(new StrolchComponent(this.container, "8"));
-		this.con3 = new ComponentController(new StrolchComponent(this.container, "3"));
+		ComponentContainerImpl container = new ComponentContainerImpl(null);
+		this.con2 = new ComponentController(new StrolchComponent(container, "2"));
+		this.con5 = new ComponentController(new StrolchComponent(container, "5"));
+		this.con11 = new ComponentController(new StrolchComponent(container, "11"));
+		this.con10 = new ComponentController(new StrolchComponent(container, "10"));
+		this.con9 = new ComponentController(new StrolchComponent(container, "9"));
+		this.con7 = new ComponentController(new StrolchComponent(container, "7"));
+		this.con8 = new ComponentController(new StrolchComponent(container, "8"));
+		this.con3 = new ComponentController(new StrolchComponent(container, "3"));
 
 		this.con5.addUpstreamDependency(this.con11);
 
@@ -137,10 +125,10 @@ public class ControllerDependencyTest {
 
 		//
 
-		this.conA = new ComponentController(new StrolchComponent(this.container, "A"));
-		this.conB = new ComponentController(new StrolchComponent(this.container, "B"));
-		this.conC = new ComponentController(new StrolchComponent(this.container, "C"));
-		this.conD = new ComponentController(new StrolchComponent(this.container, "D"));
+		this.conA = new ComponentController(new StrolchComponent(container, "A"));
+		this.conB = new ComponentController(new StrolchComponent(container, "B"));
+		this.conC = new ComponentController(new StrolchComponent(container, "C"));
+		this.conD = new ComponentController(new StrolchComponent(container, "D"));
 
 		this.conB.addUpstreamDependency(this.conA);
 		this.conC.addUpstreamDependency(this.conA);
@@ -148,10 +136,10 @@ public class ControllerDependencyTest {
 
 		//
 
-		this.conA1 = new ComponentController(new StrolchComponent(this.container, "A1"));
-		this.conB1 = new ComponentController(new StrolchComponent(this.container, "B1"));
-		this.conC1 = new ComponentController(new StrolchComponent(this.container, "C1"));
-		this.conD1 = new ComponentController(new StrolchComponent(this.container, "D1"));
+		this.conA1 = new ComponentController(new StrolchComponent(container, "A1"));
+		this.conB1 = new ComponentController(new StrolchComponent(container, "B1"));
+		this.conC1 = new ComponentController(new StrolchComponent(container, "C1"));
+		this.conD1 = new ComponentController(new StrolchComponent(container, "D1"));
 
 		this.conB1.addUpstreamDependency(this.conA1);
 		this.conB1.addUpstreamDependency(this.conC1);
@@ -160,10 +148,10 @@ public class ControllerDependencyTest {
 
 		//
 
-		this.conA2 = new ComponentController(new StrolchComponent(this.container, "A2"));
-		this.conB2 = new ComponentController(new StrolchComponent(this.container, "B2"));
-		this.conC2 = new ComponentController(new StrolchComponent(this.container, "C2"));
-		this.conD2 = new ComponentController(new StrolchComponent(this.container, "D2"));
+		this.conA2 = new ComponentController(new StrolchComponent(container, "A2"));
+		this.conB2 = new ComponentController(new StrolchComponent(container, "B2"));
+		this.conC2 = new ComponentController(new StrolchComponent(container, "C2"));
+		this.conD2 = new ComponentController(new StrolchComponent(container, "D2"));
 
 		this.conB2.addUpstreamDependency(this.conA2);
 		this.conB2.addUpstreamDependency(this.conC2);
@@ -327,23 +315,26 @@ public class ControllerDependencyTest {
 
 	@Test
 	public void shouldBreakModel1() {
-		this.thrown.expect(StrolchConfigurationException.class);
-		assertModel();
-		this.con2.addUpstreamDependency(this.con7);
+		assertThrows(StrolchConfigurationException.class, () -> {
+			assertModel();
+			this.con2.addUpstreamDependency(this.con7);
+		});
 	}
 
 	@Test
 	public void shouldBreakModel2() {
-		this.thrown.expect(StrolchConfigurationException.class);
-		assertModel();
-		this.con3.addUpstreamDependency(this.con3);
+		assertThrows(StrolchConfigurationException.class, () -> {
+			assertModel();
+			this.con3.addUpstreamDependency(this.con3);
+		});
 	}
 
 	@Test
 	public void shouldBreakModel3() {
-		this.thrown.expect(StrolchConfigurationException.class);
-		assertModel();
-		this.con9.addUpstreamDependency(this.con3);
+		assertThrows(StrolchConfigurationException.class, () -> {
+			assertModel();
+			this.con9.addUpstreamDependency(this.con3);
+		});
 	}
 
 	@Test
@@ -456,22 +447,22 @@ public class ControllerDependencyTest {
 
 	@Test
 	public void shouldNotCollectUpstreamDependencies4() {
-		thrown.expect(DbcException.class);
-		thrown.expectMessage("Upstream C1 is one of the input controllers!");
-		assertModel();
+		DbcException exception = assertThrows(DbcException.class, () -> {
+			assertModel();
 
-		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
-				this.controllerMap);
+			ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
+					this.controllerMap);
 
-		Set<ComponentController> controllers = new HashSet<>();
-		controllers.add(this.conD1);
-		controllers.add(this.conC1);
+			Set<ComponentController> controllers = new HashSet<>();
+			controllers.add(this.conD1);
+			controllers.add(this.conC1);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+			dependencyAnalyzer.collectDirectUpstreamDependencies(controllers);
+			fail("Shouldn't reach here!");
+		});
 
-		assertEquals(1, directUpstreamDependencies.size());
-		assertTrue(directUpstreamDependencies.contains(this.conA1));
+		MatcherAssert.assertThat(exception.getMessage(),
+				Matchers.containsString("Upstream C1 is one of the input controllers!"));
 	}
 
 	@Test
@@ -542,7 +533,7 @@ public class ControllerDependencyTest {
 	//
 
 	@Test
-	public void shouldAddDepedencies() {
+	public void shouldAddDependencies() {
 
 		ComponentContainerImpl container = new ComponentContainerImpl(null);
 		StrolchComponent component = new StrolchComponent(container, "1"); //$NON-NLS-1$

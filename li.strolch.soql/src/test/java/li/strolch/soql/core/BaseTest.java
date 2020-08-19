@@ -1,7 +1,7 @@
 package li.strolch.soql.core;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import li.strolch.model.*;
@@ -23,10 +23,8 @@ public abstract class BaseTest {
 
 	/**
 	 * parse the string and return the antlr tree
-	 *
-	 * @throws Exception
 	 */
-	ParseTree parseString(final String s) throws Exception {
+	ParseTree parseString(final String s) {
 
 		final CharStream input = CharStreams.fromString(s);
 		final SOQLLexer lexer = new SOQLLexer(input); // create a buffer of tokens pulled from the lexer
@@ -36,23 +34,19 @@ public abstract class BaseTest {
 		final SOQLParser parser = new SOQLParser(tokens);
 		parser.addErrorListener(new VerboseListener());
 
-		final ParseTree tree = parser.select_statement(); // begin parsing at block
-
 		// System.out.println(tree.toStringTree(parser)); // print LISP-style tree
-
-		return tree;
+		return parser.select_statement();
 	}
 
 	/**
 	 * compile the antlr tree to executable
 	 *
 	 * @param tree
+	 * 		the tree to compile
 	 *
 	 * @return CompiledSOQLStatement
-	 *
-	 * @throws Exception
 	 */
-	CompiledStatement compile(final ParseTree tree) throws Exception {
+	CompiledStatement compile(final ParseTree tree) {
 
 		final ParseTreeWalker walker = new ParseTreeWalker();
 		final SOQLListener listener = new SOQLListener();
@@ -93,7 +87,7 @@ public abstract class BaseTest {
 		order.setId(id);
 		order.setState(State.CREATED);
 
-		order.setDate(new Date(117, 10, 01));
+		order.setDate(LocalDateTime.of(117, 10, 1, 0, 0));
 
 		ParameterBag bag = new ParameterBag();
 		bag.setId("testBag");

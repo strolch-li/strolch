@@ -38,7 +38,7 @@ public class ValueRefReportFilter extends ReportFilterPolicy {
 		if (value1 instanceof Date) {
 			left = value1;
 		} else if (value1 instanceof Parameter) {
-			Parameter parameter = (Parameter) value1;
+			Parameter<?> parameter = (Parameter<?>) value1;
 			left = parameter.getValue();
 		} else {
 			left = value1.toString();
@@ -48,7 +48,7 @@ public class ValueRefReportFilter extends ReportFilterPolicy {
 		if (value2 instanceof Date) {
 			right = value2;
 		} else if (value2 instanceof Parameter) {
-			Parameter parameter = (Parameter) value2;
+			Parameter<?> parameter = (Parameter<?>) value2;
 			right = parameter.getValue();
 		} else {
 			right = value2.toString();
