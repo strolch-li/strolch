@@ -276,6 +276,17 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	@Override
+	public void setString(String paramKey, Enum<?> value) throws StrolchModelException {
+		defaultBag().setString(paramKey, value.name());
+	}
+
+	@Override
+	public void setString(String bagKey, String paramKey, Enum<?> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setString(paramKey, value.name());
+	}
+
+	@Override
 	public void setString(String bagKey, String paramKey, String value) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(bagKey, true);
 		bag.setString(paramKey, value);

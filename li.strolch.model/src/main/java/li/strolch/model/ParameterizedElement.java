@@ -345,6 +345,25 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	/**
+	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public void setString(String paramKey, Enum<?> value) throws StrolchModelException {
+		StringParameter param = getParameter(paramKey, false);
+		if (param == null)
+			addParameter(new StringParameter(paramKey, paramKey, value));
+		else
+			param.setValue(value.name());
+	}
+
+	/**
 	 * Sets the given value on the {@link BooleanParameter} with the given paramKey
 	 *
 	 * @param paramKey

@@ -424,6 +424,20 @@ public interface ParameterBagContainer extends StrolchElement {
 	void setString(String paramKey, String value) throws StrolchModelException;
 
 	/**
+	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the {@link
+	 * ParameterBag} with the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setString(String paramKey, Enum<?> value) throws StrolchModelException;
+
+	/**
 	 * Sets the given value on the {@link StringParameter} with the given paramKey on the {@link ParameterBag} with the
 	 * given bagKey
 	 *
@@ -438,6 +452,22 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * 		if the parameter does not exist
 	 */
 	void setString(String bagKey, String paramKey, String value) throws StrolchModelException;
+
+	/**
+	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the {@link
+	 * ParameterBag} with the given bagKey
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 * @param value
+	 * 		the value to set on the parameter
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	void setString(String bagKey, String paramKey, Enum<?> value) throws StrolchModelException;
 
 	/**
 	 * Sets the given value on the {@link BooleanParameter} with the given paramKey on the {@link ParameterBag} with the
