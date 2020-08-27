@@ -65,6 +65,8 @@ public class I18nMessage {
 	}
 
 	public String getBundle() {
+		if (this.bundle == null)
+			return "";
 		return this.bundle.getBaseBundleName();
 	}
 
