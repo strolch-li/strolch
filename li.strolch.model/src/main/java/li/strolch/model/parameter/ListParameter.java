@@ -17,6 +17,7 @@ package li.strolch.model.parameter;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * A {@link Parameter} which supports a list of elements.
@@ -27,6 +28,23 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 
 	String VALUE_SEPARATOR1 = ";"; //$NON-NLS-1$
 	String VALUE_SEPARATOR2 = ","; //$NON-NLS-1$
+
+	/**
+	 * Returns the value at the given index of this {@link ListParameter}'s value
+	 *
+	 * @param index
+	 * 		the index from which to return the value
+	 *
+	 * @return the value at the given index
+	 */
+	E getValue(int index);
+
+	/**
+	 * Returns a {@link Stream} for the values of this list
+	 *
+	 * @return a stream for the values
+	 */
+	Stream<E> streamValues();
 
 	/**
 	 * Set the internal value to have the content of the collection

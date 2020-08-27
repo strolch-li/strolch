@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.utils.helper.StringHelper;
@@ -88,6 +89,16 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	@Override
 	public List<E> getValue() {
 		return new ArrayList<>(this.value);
+	}
+
+	@Override
+	public E getValue(int index) {
+		return this.value.get(index);
+	}
+
+	@Override
+	public Stream<E> streamValues() {
+		return this.value.stream();
 	}
 
 	@Override
