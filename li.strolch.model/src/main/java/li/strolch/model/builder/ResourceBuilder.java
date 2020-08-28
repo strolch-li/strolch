@@ -5,11 +5,18 @@ import java.util.List;
 
 import li.strolch.model.Resource;
 import li.strolch.model.builder.states.*;
+import li.strolch.utils.dbc.DBC;
 
 public class ResourceBuilder extends RootElementBuilder<ResourceBuilder> {
 
 	private final StrolchElementBuilder builder;
 	private final List<TimedStateBuilder<?>> timedStates;
+
+	public ResourceBuilder(String id, String name, String type) {
+		super(id, name, type);
+		this.builder = null;
+		this.timedStates = new ArrayList<>();
+	}
 
 	public ResourceBuilder(StrolchElementBuilder builder, String id, String name, String type) {
 		super(id, name, type);
@@ -54,6 +61,7 @@ public class ResourceBuilder extends RootElementBuilder<ResourceBuilder> {
 	}
 
 	public StrolchElementBuilder endResource() {
+		DBC.PRE.assertNotNull("Can not end, as not part of a builder context!", this.builder);
 		return this.builder;
 	}
 

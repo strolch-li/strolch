@@ -15,7 +15,16 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 
 	private final List<ActivityElementBuilder> builders;
 
-	public ActivityBuilder(StrolchElementBuilder builder, String id, String name, String type, TimeOrdering timeOrdering) {
+	public ActivityBuilder(String id, String name, String type, TimeOrdering timeOrdering) {
+		super(id, name, type);
+		this.builder = null;
+		this.parentBuilder = null;
+		this.timeOrdering = timeOrdering;
+		this.builders = new ArrayList<>();
+	}
+
+	public ActivityBuilder(StrolchElementBuilder builder, String id, String name, String type,
+			TimeOrdering timeOrdering) {
 		super(id, name, type);
 		this.builder = builder;
 		this.parentBuilder = null;
@@ -23,8 +32,8 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 		this.builders = new ArrayList<>();
 	}
 
-	public ActivityBuilder(StrolchElementBuilder builder, ActivityBuilder parentBuilder, String id, String name, String type,
-			TimeOrdering timeOrdering) {
+	public ActivityBuilder(StrolchElementBuilder builder, ActivityBuilder parentBuilder, String id, String name,
+			String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
 		this.builder = builder;
 		this.parentBuilder = parentBuilder;
@@ -50,6 +59,7 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 	}
 
 	public StrolchElementBuilder endActivity() {
+		DBC.PRE.assertNotNull("Can not end, as not part of a builder context!", this.builder);
 		return this.builder;
 	}
 
