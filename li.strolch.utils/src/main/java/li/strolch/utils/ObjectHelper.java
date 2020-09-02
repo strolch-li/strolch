@@ -114,10 +114,10 @@ public class ObjectHelper {
 			return false;
 
 		if (left instanceof Collection) {
-			Collection<?> leftCollection = (Collection) left;
+			Collection<?> leftCollection = (Collection<?>) left;
 
 			if (right instanceof Collection) {
-				Collection<?> rightCollection = (Collection) right;
+				Collection<?> rightCollection = (Collection<?>) right;
 				for (Object l : leftCollection) {
 					for (Object r : rightCollection) {
 						if (contains(l, r, ignoreCase))
@@ -224,10 +224,10 @@ public class ObjectHelper {
 			return false;
 
 		if (right instanceof Collection) {
-			Collection<?> collectionRight = (Collection) right;
+			Collection<?> collectionRight = (Collection<?>) right;
 
 			if (left instanceof Collection) {
-				Collection<?> collectionLeft = (Collection) left;
+				Collection<?> collectionLeft = (Collection<?>) left;
 				for (Object l : collectionLeft) {
 					for (Object r : collectionRight) {
 						if (equals(r, l, ignoreCase))
