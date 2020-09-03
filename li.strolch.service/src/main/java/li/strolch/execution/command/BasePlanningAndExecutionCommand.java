@@ -51,9 +51,9 @@ public abstract class BasePlanningAndExecutionCommand extends Command {
 
 	protected ConfirmationPolicy getConfirmationPolicy(Action action) {
 		Resource resource = getResource(action);
-		PolicyDef executionPolicyDef = resource.getPolicyDefs()
+		PolicyDef policyDef = resource.getPolicyDefs()
 				.getPolicyDef(ConfirmationPolicy.class.getSimpleName(), DEFAULT_CONFIRMATION);
-		return getComponent(PolicyHandler.class).getPolicy(executionPolicyDef, tx());
+		return getComponent(PolicyHandler.class).getPolicy(policyDef, tx());
 	}
 
 	protected PlanningPolicy getPlanningPolicy(Action action) {
