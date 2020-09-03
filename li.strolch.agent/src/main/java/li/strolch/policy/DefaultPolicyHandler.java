@@ -103,11 +103,13 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 		DBC.PRE.assertNotNull("tx must not be null!", tx);
 		try {
 
-			Class<T> clazz;
 			if (defaultDef != null && !isPolicyDefAvailable(policyDef))
-				clazz = defaultDef.accept(this);
-			else
-				clazz = policyDef.accept(this);
+				policyDef = defaultDef;
+
+			Class<T> clazz = policyDef.accept(this);
+			if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()))
+				throw new IllegalArgumentException(
+						"Class " + clazz.getName() + " can not be instantiated as it is not a concrete class!");
 
 			@SuppressWarnings("unchecked")
 			Constructor<T> constructor = (Constructor<T>) getConstructorForPolicy(clazz);
