@@ -1,6 +1,6 @@
 package li.strolch.utils;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptySet;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
@@ -14,7 +14,9 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import li.strolch.utils.collections.*;
+import li.strolch.utils.collections.MapOfMaps;
+import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.collections.TypedTuple;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
@@ -379,34 +381,56 @@ public class I18nMessage {
 	}
 
 	private static boolean shouldIgnoreFile(File file) {
-		return file.getName().contains("jaxb-core") //
-				|| file.getName().contains("jaxrs-ri") //
-				|| file.getName().contains("jaxb-impl") //
-				|| file.getName().contains("jaxb-api") //
-				|| file.getName().contains("jakarta") //
-				|| file.getName().contains("cron") //
-				|| file.getName().contains("sax") //
-				|| file.getName().contains("aopalliance") //
-				|| file.getName().contains("antlr") //
-				|| file.getName().contains("ST4") //
-				|| file.getName().contains("osgi") //
-				|| file.getName().contains("gson") //
-				|| file.getName().contains("logback") //
-				|| file.getName().contains("slf4j") //
-				|| file.getName().contains("postgresql") //
-				|| file.getName().contains("commons-csv") //
-				|| file.getName().contains("camel") //
-				|| file.getName().contains("yasson") //
-				|| file.getName().contains("tyrus") //
-				|| file.getName().contains("jersey") //
-				|| file.getName().contains("icu4j") //
+		return file.getName().contains("aopalliance") //
 				|| file.getName().contains("activation") //
-				|| file.getName().contains("validation-api") //
+				|| file.getName().contains("antlr") //
+				|| file.getName().contains("assertj-core") //
+				|| file.getName().contains("c3p0") //
+				|| file.getName().contains("camel") //
+				|| file.getName().contains("checker-qual") //
+				|| file.getName().contains("commons-csv") //
+				|| file.getName().contains("cron") //
+				|| file.getName().contains("FastInfoset") //
+				|| file.getName().contains("gmbal") //
+				|| file.getName().contains("grizzly") //
+				|| file.getName().contains("gson") //
+				|| file.getName().contains("ha-api") //
+				|| file.getName().contains("hapi-base") //
+				|| file.getName().contains("hapi-structures") //
 				|| file.getName().contains("HikariCP") //
-				|| file.getName().contains("javassist") //
-				|| file.getName().contains("org.abego.treelayout") //
 				|| file.getName().contains("hk2") //
+				|| file.getName().contains("icu4j") //
+				|| file.getName().contains("jakarta") //
+				|| file.getName().contains("javassist") //
 				|| file.getName().contains("javax") //
-				|| file.getName().contains("grizzly");
+				|| file.getName().contains("jaxb-api") //
+				|| file.getName().contains("jaxb-core") //
+				|| file.getName().contains("jaxb-impl") //
+				|| file.getName().contains("jaxrs-ri") //
+				|| file.getName().contains("jaxws-rt") //
+				|| file.getName().contains("jaxws-rt") //
+				|| file.getName().contains("jersey") //
+				|| file.getName().contains("joda-time") //
+				|| file.getName().contains("logback") //
+				|| file.getName().contains("management-api") //
+				|| file.getName().contains("mchange-commons-java") //
+				|| file.getName().contains("mimepull") //
+				|| file.getName().contains("org.abego.treelayout") //
+				|| file.getName().contains("osgi") //
+				|| file.getName().contains("pfl-basic") //
+				|| file.getName().contains("pfl-tf") //
+				|| file.getName().contains("policy-2.7.10") //
+				|| file.getName().contains("postgresql") //
+				|| file.getName().contains("quartz") //
+				|| file.getName().contains("saaj-impl") //
+				|| file.getName().contains("sax") //
+				|| file.getName().contains("slf4j") //
+				|| file.getName().contains("ST4") //
+				|| file.getName().contains("stax-ex") //
+				|| file.getName().contains("stax2-api") //
+				|| file.getName().contains("streambuffer") //
+				|| file.getName().contains("tyrus") //
+				|| file.getName().contains("validation-api") //
+				|| file.getName().contains("yasson");
 	}
 }
