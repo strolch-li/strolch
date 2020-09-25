@@ -106,19 +106,20 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void addUser(User user) {
-		if (this.userMap
-				.containsKey(this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername()))
+		String username = this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
+		if (this.userMap.containsKey(username))
 			throw new IllegalStateException(MessageFormat.format("The user {0} already exists!", user.getUsername()));
-		this.userMap.put(user.getUsername(), user);
+		this.userMap.put(username, user);
 		this.userMapDirty = true;
 	}
 
 	@Override
 	public void replaceUser(User user) {
-		if (!this.userMap.containsKey(user.getUsername()))
-			throw new IllegalStateException(MessageFormat
-					.format("The user {0} can not be replaced as it does not exiset!", user.getUsername()));
-		this.userMap.put(user.getUsername(), user);
+		String username = this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
+		if (!this.userMap.containsKey(username))
+			throw new IllegalStateException(
+					MessageFormat.format("The user {0} can not be replaced as it does not exist!", user.getUsername()));
+		this.userMap.put(username, user);
 		this.userMapDirty = true;
 	}
 
