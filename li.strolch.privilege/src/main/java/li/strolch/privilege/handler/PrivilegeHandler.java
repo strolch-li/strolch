@@ -172,6 +172,11 @@ public interface PrivilegeHandler {
 	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh"; //$NON-NLS-1$
 
 	/**
+	 * configuration parameter to define if username is case insensitive
+	 */
+	String PARAM_CASE_INSENSITIVE_USERNAME = "caseInsensitiveUsername"; //$NON-NLS-1$
+
+	/**
 	 * configuration parameter to define a secret salt
 	 */
 	String PARAM_SECRET_SALT = "secretSalt"; //$NON-NLS-1$

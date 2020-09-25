@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.handler;
 
+import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
 import static li.strolch.privilege.helper.XmlConstants.*;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
@@ -58,6 +59,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private File usersPath;
 	private File rolesPath;
 
+	private boolean caseInsensitiveUsername;
+
 	@Override
 	public Map<String, String> getParameterMap() {
 		return this.parameterMap;
@@ -79,7 +82,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public User getUser(String username) {
-		return this.userMap.get(username);
+		return this.userMap.get(this.caseInsensitiveUsername ? username.toLowerCase() : username);
 	}
 
 	@Override
@@ -89,7 +92,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public User removeUser(String username) {
-		User user = this.userMap.remove(username);
+		User user = this.userMap.remove(this.caseInsensitiveUsername ? username.toLowerCase() : username);
 		this.userMapDirty = user != null;
 		return user;
 	}
@@ -103,7 +106,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void addUser(User user) {
-		if (this.userMap.containsKey(user.getUsername()))
+		if (this.userMap
+				.containsKey(this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername()))
 			throw new IllegalStateException(MessageFormat.format("The user {0} already exists!", user.getUsername()));
 		this.userMap.put(user.getUsername(), user);
 		this.userMapDirty = true;
@@ -145,7 +149,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public void initialize(Map<String, String> paramsMap) {
-		this.parameterMap = Collections.unmodifiableMap(new HashMap<>(paramsMap));
+		this.parameterMap = Map.copyOf(paramsMap);
 
 		// get and validate base bath
 		String basePath = this.parameterMap.get(XML_PARAM_BASE_PATH);
@@ -197,6 +201,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.usersPath = usersPath;
 		this.rolesPath = rolesPath;
 
+		this.caseInsensitiveUsername = Boolean.parseBoolean(this.parameterMap.get(PARAM_CASE_INSENSITIVE_USERNAME));
+
 		if (reload())
 			logger.info("Privilege Data loaded."); //$NON-NLS-1$
 	}
@@ -210,8 +216,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public boolean reload() {
 
-		this.roleMap = Collections.synchronizedMap(new HashMap<String, Role>());
-		this.userMap = Collections.synchronizedMap(new HashMap<String, User>());
+		this.roleMap = Collections.synchronizedMap(new HashMap<>());
+		this.userMap = Collections.synchronizedMap(new HashMap<>());
 
 		// parse models xml file to XML document
 		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader();
@@ -232,7 +238,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// USERS
 		List<User> users = usersXmlHandler.getUsers();
 		for (User user : users) {
-			this.userMap.put(user.getUsername(), user);
+			this.userMap
+					.put(this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername(), user);
 		}
 
 		this.userMapDirty = false;
