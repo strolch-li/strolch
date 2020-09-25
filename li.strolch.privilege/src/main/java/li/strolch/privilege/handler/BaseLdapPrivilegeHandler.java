@@ -124,7 +124,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	protected User buildUserFromSearchResult(String username, SearchResult sr) throws Exception {
 		Attributes attrs = sr.getAttributes();
 
-		validateLdapUsername(username, attrs);
+		username = validateLdapUsername(username, attrs);
 
 		String firstName = getFirstName(username, attrs);
 		String lastName = getLastName(username, attrs);
@@ -145,11 +145,13 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	protected abstract Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
 			Set<String> strolchRoles) throws Exception;
 
-	protected void validateLdapUsername(String username, Attributes attrs) throws NamingException {
+	protected String validateLdapUsername(String username, Attributes attrs) throws NamingException {
 		Attribute sAMAccountName = attrs.get("sAMAccountName");
 		if (sAMAccountName == null || !username.toLowerCase().equals(sAMAccountName.get().toString().toLowerCase()))
 			throw new AccessDeniedException(
 					"Could not login with user: " + username + this.domain + " on Ldap: Wrong LDAP Data");
+
+		return sAMAccountName.get().toString();
 	}
 
 	protected String getLdapString(Attributes attrs, String key) throws NamingException {
