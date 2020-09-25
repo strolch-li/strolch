@@ -12,9 +12,6 @@ import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.*;
 import li.strolch.execution.policy.ExecutionPolicy;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
@@ -22,8 +19,10 @@ import li.strolch.model.State;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import org.slf4j.Logger;
@@ -34,8 +33,8 @@ public class Controller {
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
 
 	private final String realm;
-	private ComponentContainer container;
-	private ExecutionHandler executionHandler;
+	private final ComponentContainer container;
+	private final ExecutionHandler executionHandler;
 
 	private final String activityType;
 	private final String activityId;
@@ -43,7 +42,7 @@ public class Controller {
 
 	private Activity activity;
 
-	private Map<Locator, ExecutionPolicy> inExecution;
+	private final Map<Locator, ExecutionPolicy> inExecution;
 
 	public Controller(String realm, ExecutionHandler executionHandler, Activity activity) {
 		this.realm = realm;
@@ -93,7 +92,7 @@ public class Controller {
 		return this.executionHandler.openTx(this.realm, cert, getClass(), false);
 	}
 
-	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	protected void runAsAgent(PrivilegedRunnable runnable) throws Exception {
 		this.executionHandler.runAsAgent(runnable);
 	}
 
@@ -126,6 +125,15 @@ public class Controller {
 
 		if (trigger[0])
 			this.executionHandler.triggerExecution(this.realm);
+	}
+
+	/**
+	 * Stops the execution of all actions
+	 */
+	public void stop() {
+		synchronized (this.inExecution) {
+			this.inExecution.values().forEach(ExecutionPolicy::stop);
+		}
 	}
 
 	private boolean execute(StrolchTransaction tx) {
@@ -301,8 +309,8 @@ public class Controller {
 				if (this.container.hasComponent(OperationsLog.class)) {
 					this.container.getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.error")
-									.withException(e).value("reason", e));
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+									"execution.handler.failed.error").withException(e).value("reason", e));
 				}
 			}
 		});
@@ -324,8 +332,8 @@ public class Controller {
 				if (this.container.hasComponent(OperationsLog.class)) {
 					this.container.getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.warning")
-									.withException(e).value("reason", e));
+									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+									"execution.handler.failed.warning").withException(e).value("reason", e));
 				}
 			}
 		});
