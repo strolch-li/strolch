@@ -147,7 +147,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	protected void validateLdapUsername(String username, Attributes attrs) throws NamingException {
 		Attribute sAMAccountName = attrs.get("sAMAccountName");
-		if (sAMAccountName == null || !username.equals(sAMAccountName.get().toString()))
+		if (sAMAccountName == null || !username.toLowerCase().equals(sAMAccountName.get().toString().toLowerCase()))
 			throw new AccessDeniedException(
 					"Could not login with user: " + username + this.domain + " on Ldap: Wrong LDAP Data");
 	}
