@@ -22,7 +22,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
 
-        <jdk.version>1.8</jdk.version>
+        <jdk.version>11</jdk.version>
 
         <!-- compile time dependencies -->
         <slf4j.version>1.7.28</slf4j.version>
