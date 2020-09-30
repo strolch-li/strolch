@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import org.junit.Test;
 
@@ -82,7 +83,7 @@ public class PeriodHelperTest {
 	public void shouldCalcShiftDays2() {
 		ZonedDateTime past = ZonedDateTime
 				.parse("2007-12-03T10:15:30+01:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(systemDefault()));
-		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS);
 		PeriodDuration periodDuration = PeriodDuration.parse("P1M");
 		ZonedDateTime shiftedDate = shiftByMultipleOfPeriod(past, now, periodDuration);
 
