@@ -42,7 +42,7 @@
         <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
         <jaxws.version>2.3.3</jaxws.version>
         <jaxp.version>1.4.2</jaxp.version>
-        <tyrus.version>1.13</tyrus.version>
+        <tyrus.version>1.17</tyrus.version>
         <websocket.version>1.1</websocket.version>
         <sax.version>2.0.1</sax.version>
         <csv.version>1.8</csv.version>
