@@ -155,7 +155,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	protected Certificate validateSession(ContainerRequestContext requestContext, String remoteIp) {
 
 		String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		authorization = authorization.trim();
+		authorization = authorization == null ? "" : authorization.trim();
 
 		if (isEmpty(authorization) || (authorization.startsWith("Basic ") && !getRestful().isBasicAuthEnabled())) {
 			return validateCookie(requestContext, remoteIp);
