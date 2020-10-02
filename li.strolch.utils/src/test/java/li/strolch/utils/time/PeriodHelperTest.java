@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 import org.junit.Test;
 
@@ -69,6 +68,26 @@ public class PeriodHelperTest {
 	}
 
 	@Test
+	public void shouldCalcMonths1() {
+		assertEquals(1, monthsIn(PeriodDuration.parse("P1M")), 0.0);
+	}
+
+	@Test
+	public void shouldCalcMonths2() {
+		assertEquals(1, monthsIn(PeriodDuration.parse("P30D")), 0.0);
+	}
+
+	@Test
+	public void shouldCalcMonths3() {
+		assertEquals(2, monthsIn(PeriodDuration.parse("P60D")), 0.0);
+	}
+
+	@Test
+	public void shouldCalcMonths4() {
+		assertEquals(12, monthsIn(PeriodDuration.parse("P1Y")), 0.0);
+	}
+
+	@Test
 	public void shouldCalcShiftDays1() {
 		ZonedDateTime past = ZonedDateTime.now().minusDays(35);
 		ZonedDateTime now = ZonedDateTime.now();
@@ -83,7 +102,7 @@ public class PeriodHelperTest {
 	public void shouldCalcShiftDays2() {
 		ZonedDateTime past = ZonedDateTime
 				.parse("2007-12-03T10:15:30+01:00", DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(systemDefault()));
-		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS);
+		ZonedDateTime now = ZonedDateTime.now();
 		PeriodDuration periodDuration = PeriodDuration.parse("P1M");
 		ZonedDateTime shiftedDate = shiftByMultipleOfPeriod(past, now, periodDuration);
 

@@ -9,12 +9,23 @@ import li.strolch.utils.dbc.DBC;
 
 public class PeriodHelper {
 
+	public static double monthsIn(PeriodDuration periodDuration) {
+		long hours = periodDuration.getDuration().toHours();
+		Period period = periodDuration.getPeriod();
+		long months = period.toTotalMonths();
+		return (months + (period.getDays() / 30.0) + (hours / 24.0 / 30.0));
+	}
+
 	public static double daysIn(PeriodDuration periodDuration) {
 		return (daysIn(periodDuration.getPeriod()) + (periodDuration.getDuration().toHours() / 24.0));
 	}
 
 	public static double daysIn(Period period) {
 		return (period.getYears() * 365.0) + (period.getMonths() * 30.0) + period.getDays();
+	}
+
+	private static double monthsIn(Period period) {
+		return (period.getYears() * 12.0) + (period.getMonths());
 	}
 
 	/**
@@ -35,7 +46,20 @@ public class PeriodHelper {
 			PeriodDuration periodDuration) {
 		DBC.PRE.assertTrue("date must be before to!", date.isBefore(to));
 		DBC.PRE.assertFalse("period duration may not be null!", periodDuration.isZero());
+
+		// see if we need to shift by months
+		long monthsInPeriod = (long) monthsIn(periodDuration);
+		if (monthsInPeriod > 0) {
+			Period between = between(date.toLocalDate(), to.toLocalDate());
+			double monthsInBetween = monthsIn(between);
+			long shifts = (long) (monthsInBetween / monthsInPeriod);
+			if (shifts > 0) {
+				date = date.plusMonths(shifts);
+			}
+		}
+
 		Period between = between(date.toLocalDate(), to.toLocalDate());
+
 		double daysInBetween = daysIn(between);
 		double daysInPeriod = daysIn(periodDuration);
 		long shifts = (long) (daysInBetween / daysInPeriod);
