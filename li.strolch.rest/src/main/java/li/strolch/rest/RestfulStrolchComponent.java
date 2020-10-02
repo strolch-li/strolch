@@ -43,6 +43,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private static final String PARAM_HTTP_CACHE_MODE = "httpCacheMode"; //$NON-NLS-1$
 	private static final String PARAM_SECURE_COOKIE = "secureCookie"; //$NON-NLS-1$
 	private static final String PARAM_COOKIE_MAX_AGE = "cookieMaxAge"; //$NON-NLS-1$
+	private static final String PARAM_BASIC_AUTH_ENABLED = "basicAuthEnabled"; //$NON-NLS-1$
 
 	/**
 	 * Allowed values:
@@ -79,6 +80,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private boolean restLoggingEntity;
 	private boolean secureCookie;
 	private int cookieMaxAge;
+	private boolean basicAuthEnabled;
 
 	private String webPath;
 
@@ -150,6 +152,13 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return this.cookieMaxAge;
 	}
 
+	/**
+	 * @return the basicAuthEnabled
+	 */
+	public boolean isBasicAuthEnabled() {
+		return this.basicAuthEnabled;
+	}
+
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 
@@ -177,6 +186,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 		this.secureCookie = configuration.getBoolean(PARAM_SECURE_COOKIE, true);
 		this.cookieMaxAge = configuration.getInt(PARAM_COOKIE_MAX_AGE, (int) TimeUnit.DAYS.toSeconds(1));
+		this.basicAuthEnabled = configuration.getBoolean(PARAM_BASIC_AUTH_ENABLED, true);
 
 		logger.info(
 				"Cookie max age is " + this.cookieMaxAge + "s and is " + (this.secureCookie ? "secure" : "not secure"));
