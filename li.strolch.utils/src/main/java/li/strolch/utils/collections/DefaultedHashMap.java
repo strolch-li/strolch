@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class DefaultedHashMap<K, V> extends HashMap<K, V> {
 
-	private V defaultValue;
+	private final V defaultValue;
 
 	/**
 	 * Constructs this {@link Map} instance to have a default value on inexistent keys

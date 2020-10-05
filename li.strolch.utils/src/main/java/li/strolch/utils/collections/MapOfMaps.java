@@ -47,7 +47,7 @@ import java.util.stream.Stream;
 public class MapOfMaps<T, U, V> {
 
 	private final boolean keepInsertionOrder;
-	private Map<T, Map<U, V>> mapOfMaps;
+	private final Map<T, Map<U, V>> mapOfMaps;
 
 	public MapOfMaps() {
 		this.keepInsertionOrder = false;

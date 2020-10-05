@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 public class FixedSizeQueue<E> extends LinkedList<E> {
 
-	private int maxSize;
+	private final int maxSize;
 
 	public FixedSizeQueue(int size) {
 		this.maxSize = size;

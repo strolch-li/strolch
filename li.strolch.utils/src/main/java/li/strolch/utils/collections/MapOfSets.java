@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class MapOfSets<T, U> {
 
 	private final boolean keepInsertionOrder;
-	private Map<T, Set<U>> mapOfSets;
+	private final Map<T, Set<U>> mapOfSets;
 
 	public MapOfSets() {
 		this.keepInsertionOrder = false;
@@ -127,9 +127,8 @@ public class MapOfSets<T, U> {
 	public int size() {
 		int size = 0;
 		Set<Entry<T, Set<U>>> entrySet = this.mapOfSets.entrySet();
-		Iterator<Entry<T, Set<U>>> iter = entrySet.iterator();
-		while (iter.hasNext()) {
-			size += iter.next().getValue().size();
+		for (Entry<T, Set<U>> tSetEntry : entrySet) {
+			size += tSetEntry.getValue().size();
 		}
 		return size;
 	}
@@ -206,5 +205,4 @@ public class MapOfSets<T, U> {
 	public int hashCode() {
 		return this.mapOfSets != null ? this.mapOfSets.hashCode() : 0;
 	}
-
 }

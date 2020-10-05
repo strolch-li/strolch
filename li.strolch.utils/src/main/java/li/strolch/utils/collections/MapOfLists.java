@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  */
 public class MapOfLists<T, U> {
 
-	private Map<T, List<U>> mapOfLists;
+	private final Map<T, List<U>> mapOfLists;
 
 	public MapOfLists() {
 		this.mapOfLists = new HashMap<>();
@@ -109,9 +109,8 @@ public class MapOfLists<T, U> {
 	public int size() {
 		int size = 0;
 		Set<Entry<T, List<U>>> entrySet = this.mapOfLists.entrySet();
-		Iterator<Entry<T, List<U>>> iter = entrySet.iterator();
-		while (iter.hasNext()) {
-			size += iter.next().getValue().size();
+		for (Entry<T, List<U>> tListEntry : entrySet) {
+			size += tListEntry.getValue().size();
 		}
 		return size;
 	}
