@@ -15,8 +15,7 @@
  */
 package li.strolch.model;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.model.StrolchModelConstants.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -205,6 +204,28 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 */
 	default boolean isActivity() {
 		return this.getClass() == Activity.class;
+	}
+
+	/**
+	 * Set or add a parameter to this element from a {@link JsonObject} to the {@link ParameterBag} with the id
+	 * {StrolchModelConstants#BAG_PARAMETERS}
+	 *
+	 * @param jsonObject
+	 * 		the object from which to get the value
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName
+	 * 		the name of the parameter, if the parameter is to be created
+	 * @param type
+	 * 		the type of Parameter to create
+	 * @param ignoreOnEmpty
+	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
+	 * 		is cleared if the json field is missing or null
+	 */
+	default void setOrAddParamFromFlatJson(JsonObject jsonObject, String paramId, String paramName,
+			StrolchValueType type, boolean ignoreOnEmpty) {
+		setOrAddParamFromFlatJson(jsonObject, BAG_PARAMETERS, TYPE_PARAMETERS, TYPE_PARAMETERS, paramId, paramName,
+				INTERPRETATION_NONE, UOM_NONE, type, ignoreOnEmpty);
 	}
 
 	/**
