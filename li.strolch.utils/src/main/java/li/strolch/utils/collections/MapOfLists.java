@@ -145,7 +145,7 @@ public class MapOfLists<T, U> {
 		if ((u = getList(key)) == null) {
 			List<U> newValue;
 			if ((newValue = mappingFunction.apply(key)) != null) {
-				addList(key, newValue);
+				this.mapOfLists.put(key, newValue);
 				return newValue;
 			}
 		}

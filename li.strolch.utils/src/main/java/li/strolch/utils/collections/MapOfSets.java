@@ -163,7 +163,7 @@ public class MapOfSets<T, U> {
 		if ((u = getSet(key)) == null) {
 			Set<U> newValue;
 			if ((newValue = mappingFunction.apply(key)) != null) {
-				addSet(key, newValue);
+				this.mapOfSets.put(key, newValue);
 				return newValue;
 			}
 		}

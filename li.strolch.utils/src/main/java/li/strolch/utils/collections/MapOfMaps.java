@@ -220,7 +220,7 @@ public class MapOfMaps<T, U, V> {
 		if ((u = getMap(key)) == null) {
 			Map<U, V> newValue;
 			if ((newValue = mappingFunction.apply(key)) != null) {
-				addMap(key, newValue);
+				this.mapOfMaps.put(key, newValue);
 				return newValue;
 			}
 		}
