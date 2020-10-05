@@ -21,12 +21,12 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
@@ -80,6 +80,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		this.name = name;
 		this.mode = jobMode;
 		this.first = true;
+		this.configureMethod = ConfigureMethod.Programmatic;
 	}
 
 	public StrolchJob setConfigureMethod(ConfigureMethod configureMethod) {
