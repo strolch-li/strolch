@@ -36,8 +36,8 @@ import li.strolch.utils.dbc.DBC;
 public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 	private Set<String> ignoredBagTypes;
-	private MapOfSets<String, String> ignoredKeys;
-	private MapOfSets<String, String> optionalKeys;
+	private final MapOfSets<String, String> ignoredKeys;
+	private final MapOfSets<String, String> optionalKeys;
 	private MapOfSets<String, String> nonEmptyParameters;
 
 	private JsonObject srcObject;
