@@ -65,9 +65,17 @@ public interface SearchExpressions {
 		return ExpressionsSupport.param(bagId, paramId);
 	}
 
+	default <T extends StrolchRootElement> SearchExpression<T> param(String paramId, SearchPredicate predicate) {
+		return ExpressionsSupport.param(BAG_PARAMETERS, paramId, predicate);
+	}
+
 	default <T extends StrolchRootElement> SearchExpression<T> param(String bagId, String paramId,
 			SearchPredicate predicate) {
 		return ExpressionsSupport.param(bagId, paramId, predicate);
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> paramNull(String paramId) {
+		return ExpressionsSupport.paramNull(BAG_PARAMETERS, paramId);
 	}
 
 	default <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
@@ -83,9 +91,18 @@ public interface SearchExpressions {
 		return ExpressionsSupport.relationName(tx, relationParamId, predicate);
 	}
 
+	default ExpressionBuilder relationParam(StrolchTransaction tx, String relationParamId, String paramId) {
+		return ExpressionsSupport.relationParam(tx, relationParamId, BAG_PARAMETERS, paramId);
+	}
+
 	default ExpressionBuilder relationParam(StrolchTransaction tx, String relationParamId, String bagId,
 			String paramId) {
 		return ExpressionsSupport.relationParam(tx, relationParamId, bagId, paramId);
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> relationParam(StrolchTransaction tx,
+			String relationParamId, String paramId, SearchPredicate predicate) {
+		return ExpressionsSupport.relationParam(tx, relationParamId, BAG_PARAMETERS, paramId, predicate);
 	}
 
 	default <T extends StrolchRootElement> SearchExpression<T> relationParam(StrolchTransaction tx,
