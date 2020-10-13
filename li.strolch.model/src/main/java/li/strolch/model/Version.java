@@ -1,6 +1,8 @@
 package li.strolch.model;
 
 import java.text.MessageFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import li.strolch.utils.dbc.DBC;
@@ -155,12 +157,30 @@ public class Version {
 	}
 
 	/**
+	 * Returns the date when this version was created
+	 *
+	 * @return the date when this version was created
+	 */
+	public ZonedDateTime getCreatedZdt() {
+		return ZonedDateTime.ofInstant(this.created.toInstant(), ZoneId.systemDefault());
+	}
+
+	/**
 	 * Returns the date when this version was update
 	 *
 	 * @return the date when this version was update
 	 */
 	public Date getUpdated() {
 		return this.updated;
+	}
+
+	/**
+	 * Returns the date when this version was update
+	 *
+	 * @return the date when this version was update
+	 */
+	public ZonedDateTime getUpdatedZdt() {
+		return ZonedDateTime.ofInstant(this.updated.toInstant(), ZoneId.systemDefault());
 	}
 
 	/**
