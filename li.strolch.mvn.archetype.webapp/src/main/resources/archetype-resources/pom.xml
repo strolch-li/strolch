@@ -49,7 +49,7 @@
         <cron.version>1.6.2</cron.version>
 
         <!-- test time dependencies -->
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
 
         <!-- maven plug-in dependencies -->
