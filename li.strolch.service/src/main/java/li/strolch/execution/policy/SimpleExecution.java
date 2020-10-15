@@ -127,6 +127,9 @@ public class SimpleExecution extends ExecutionPolicy {
 					tx.lock(this.actionLoc.trim(3));
 					Action action = tx.findElement(this.actionLoc);
 					consumer.accept(tx, action);
+
+					if (!readOnly && tx.needsCommit())
+						tx.commitOnClose();
 				}
 			});
 		} catch (Exception e) {
