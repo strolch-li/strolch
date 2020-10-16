@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
-import li.strolch.handler.operationslog.OperationsLog;
-import li.strolch.model.Locator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +24,9 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 	private static final Logger logger = LoggerFactory.getLogger(SimpleDurationExecutionTimer.class);
 
-	private Map<Locator, ScheduledFuture<?>> simulationTasks;
+	private final Map<Locator, ScheduledFuture<?>> simulationTasks;
 
-	private StrolchAgent agent;
+	private final StrolchAgent agent;
 
 	public SimpleDurationExecutionTimer(StrolchAgent agent) {
 		this.agent = agent;
@@ -89,17 +89,17 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 			if (this.agent.getContainer().hasComponent(OperationsLog.class)) {
 				this.agent.getContainer().getComponent(OperationsLog.class).addMessage(
 						new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-								LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
-								.withException(e).value("reason", e));
+								LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+								"execution.handler.failed.executed").withException(e).value("reason", e));
 			}
 		}
 	}
 
 	private class SimulationTask implements Runnable {
 
-		private String realm;
-		private ComponentContainer container;
-		private Locator locator;
+		private final String realm;
+		private final ComponentContainer container;
+		private final Locator locator;
 
 		public SimulationTask(String realm, ComponentContainer container, Locator locator) {
 			this.realm = realm;
