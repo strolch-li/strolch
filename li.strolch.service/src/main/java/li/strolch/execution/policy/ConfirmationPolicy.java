@@ -24,6 +24,10 @@ public class ConfirmationPolicy extends StrolchPolicy {
 		// do nothing
 	}
 
+	public void toPlanning(Action action) {
+		// do nothing
+	}
+
 	public void toPlanned(Action action) {
 		// do nothing
 	}
@@ -59,5 +63,47 @@ public class ConfirmationPolicy extends StrolchPolicy {
 	@Override
 	public void undo() {
 		// nothing to undo
+	}
+
+	/**
+	 * Calls the appropriate confirmation method depending on the state of the {@link Action}
+	 *
+	 * @param action
+	 * 		the action for which to perform the confirmation call
+	 */
+	public void doConfirmation(Action action) {
+		switch (action.getState()) {
+
+		case CREATED:
+			toCreated(action);
+			break;
+		case PLANNING:
+			toPlanning(action);
+			break;
+		case PLANNED:
+			toPlanned(action);
+			break;
+		case EXECUTABLE:
+			toExecutable(action);
+			break;
+		case EXECUTION:
+			toExecution(action);
+			break;
+		case WARNING:
+			toWarning(action);
+			break;
+		case ERROR:
+			toError(action);
+			break;
+		case STOPPED:
+			toStopped(action);
+			break;
+		case EXECUTED:
+			toExecuted(action);
+			break;
+		case CLOSED:
+			toClosed(action);
+			break;
+		}
 	}
 }

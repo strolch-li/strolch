@@ -91,7 +91,7 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 			logger.info("Action " + action.getLocator() + " is now being executed...");
 
 			executionPolicy.toExecution(action);
-			confirmationPolicy.toExecution(action);
+			confirmationPolicy.doConfirmation(action);
 
 			if (action.getState() == State.EXECUTED)
 				this.needsRetriggerOfExecution = true;
