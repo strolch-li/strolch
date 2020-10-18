@@ -38,7 +38,7 @@
         <javaxmail.version>1.6.2</javaxmail.version>
         <serverlet.version>4.0.1</serverlet.version>
         <jaxrs.api.version>2.1.1</jaxrs.api.version>
-        <jaxrs.ri.version>2.31</jaxrs.ri.version>
+        <jaxrs.ri.version>2.32</jaxrs.ri.version>
         <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
         <jaxws.version>2.3.3</jaxws.version>
         <jaxp.version>1.4.2</jaxp.version>
