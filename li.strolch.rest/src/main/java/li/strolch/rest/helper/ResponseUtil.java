@@ -20,6 +20,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.service.JsonServiceResult;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.I18nMessage;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.helper.StringHelper;
 
@@ -35,6 +36,15 @@ public class ResponseUtil {
 		String json = new Gson().toJson(response);
 
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
+	public static Response toResponse(I18nMessage msg) {
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, msg.getMessage());
+
+		String json = new Gson().toJson(response);
+
+		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(String errorMsg) {
