@@ -109,7 +109,7 @@ public class XmlTest {
 		assertNotNull(containerModel.getPersistenceHandlerParameterMap());
 
 		assertEquals(6, containerModel.getParameterMap().size());
-		assertEquals(3, containerModel.getPolicies().size());
+		assertEquals(4, containerModel.getPolicies().size());
 		assertEquals(3, containerModel.getEncryptionHandlerParameterMap().size());
 		assertEquals(3, containerModel.getPersistenceHandlerParameterMap().size());
 
@@ -215,10 +215,10 @@ public class XmlTest {
 		// PrivilegeAdmin
 		Role privilegeAdmin = findRole("PrivilegeAdmin", roles);
 		assertEquals("PrivilegeAdmin", privilegeAdmin.getName());
-		assertEquals(14, privilegeAdmin.getPrivilegeNames().size());
+		assertEquals(17, privilegeAdmin.getPrivilegeNames().size());
 		IPrivilege privilegeAction = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_ACTION);
 		assertFalse(privilegeAction.isAllAllowed());
-		assertEquals(3, privilegeAction.getAllowList().size());
+		assertEquals(5, privilegeAction.getAllowList().size());
 		assertEquals(0, privilegeAction.getDenyList().size());
 		assertEquals("DefaultPrivilege", privilegeAction.getPolicy());
 
