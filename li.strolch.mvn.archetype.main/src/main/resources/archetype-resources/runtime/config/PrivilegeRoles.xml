@@ -89,10 +89,29 @@
     </Role>
 
     <Role name="UserPrivileges">
+        <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
+            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserPasswordService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserLocaleService</Allow>
+        </Privilege>
         <Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege"/>
         <Privilege name="PrivilegeSetUserLocale" policy="UserAccessPrivilege"/>
     </Role>
     <Role name="PrivilegeAdmin">
+        <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
+            <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserRolesService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserPasswordService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserLocaleService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeRemoveUserService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeRemoveRoleFromUserService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeAddUserService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeAddRoleToUserService</Allow>
+            <Allow>li.strolch.service.privilege.roles.PrivilegeUpdateRoleService</Allow>
+            <Allow>li.strolch.service.privilege.roles.PrivilegeRemoveRoleService</Allow>
+            <Allow>li.strolch.service.privilege.roles.PrivilegeRemovePrivilegeFromRoleService</Allow>
+            <Allow>li.strolch.service.privilege.roles.PrivilegeAddRoleService</Allow>
+            <Allow>li.strolch.service.privilege.roles.PrivilegeAddOrReplacePrivilegeOnRoleService</Allow>
+        </Privilege>
         <Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>

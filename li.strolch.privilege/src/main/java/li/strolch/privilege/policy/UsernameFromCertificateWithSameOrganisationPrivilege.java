@@ -43,7 +43,7 @@ import li.strolch.privilege.model.Restrictable;
  */
 public class UsernameFromCertificateWithSameOrganisationPrivilege extends UsernameFromCertificatePrivilege {
 
-	private static final String PARAM_ORGANISATION = "organisation";
+	public static final String PARAM_ORGANISATION = "organisation";
 
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)

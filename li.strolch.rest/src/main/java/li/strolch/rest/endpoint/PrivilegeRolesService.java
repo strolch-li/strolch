@@ -15,12 +15,13 @@
  */
 package li.strolch.rest.endpoint;
 
+import static java.util.Comparator.comparing;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 import com.google.gson.JsonArray;
 import li.strolch.agent.api.ComponentContainer;
@@ -53,8 +54,13 @@ public class PrivilegeRolesService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		List<RoleRep> roles = privilegeHandler.getRoles(cert);
-		JsonArray rolesJ = toJson(roles);
+		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+		JsonArray rolesJ = privilegeHandler.getRoles(cert).stream() //
+				.sorted(comparing(roleRep -> roleRep.getName().toLowerCase())) //
+				.collect(JsonArray::new, //
+						(array, role) -> array.add(role.accept(visitor)), //
+						JsonArray::addAll);
+
 		return Response.ok(rolesJ.toString(), MediaType.APPLICATION_JSON).build();
 	}
 
@@ -172,13 +178,5 @@ public class PrivilegeRolesService {
 					.build();
 		}
 		return ResponseUtil.toResponse(svcResult);
-	}
-
-	private JsonArray toJson(List<RoleRep> roles) {
-		JsonArray rolesArr = new JsonArray();
-		for (RoleRep roleRep : roles) {
-			rolesArr.add(roleRep.accept(new PrivilegeElementToJsonVisitor()));
-		}
-		return rolesArr;
 	}
 }

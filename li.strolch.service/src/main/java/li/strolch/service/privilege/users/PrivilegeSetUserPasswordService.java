@@ -63,14 +63,4 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 
 		return ServiceResult.success();
 	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_SET_USER_PASSWORD;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
-	}
 }

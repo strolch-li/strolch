@@ -58,14 +58,4 @@ public class PrivilegeRemoveRoleFromUserService
 
 		return new PrivilegeUserResult(user);
 	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_REMOVE_ROLE_FROM_USER;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
-	}
 }

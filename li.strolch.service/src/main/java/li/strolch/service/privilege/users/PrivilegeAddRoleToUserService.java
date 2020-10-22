@@ -59,14 +59,4 @@ public class PrivilegeAddRoleToUserService
 
 		return new PrivilegeUserResult(user);
 	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_ADD_ROLE_TO_USER;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
-	}
 }

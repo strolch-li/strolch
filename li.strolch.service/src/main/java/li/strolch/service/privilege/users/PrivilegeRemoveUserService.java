@@ -58,14 +58,4 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 
 		return new PrivilegeUserResult(user);
 	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_REMOVE_USER;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
-	}
 }

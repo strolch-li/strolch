@@ -17,7 +17,6 @@ package li.strolch.service.privilege.users;
 
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
 
@@ -48,15 +47,5 @@ public class PrivilegeAddUserService extends AbstractService<PrivilegeUserArgume
 		}
 
 		return new PrivilegeUserResult(cmd.getUserOut());
-	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_ADD_USER;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
 	}
 }

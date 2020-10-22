@@ -58,14 +58,4 @@ public class PrivilegeUpdateUserService extends AbstractService<PrivilegeUserArg
 
 		return new PrivilegeUserResult(user);
 	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_MODIFY_USER;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
-	}
 }

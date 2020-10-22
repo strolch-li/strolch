@@ -58,14 +58,4 @@ public class PrivilegeRemoveRoleService extends AbstractService<PrivilegeRoleNam
 
 		return new PrivilegeRoleResult(role);
 	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_REMOVE_ROLE;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
-	}
 }

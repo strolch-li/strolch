@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.endpoint;
 
+import static java.util.Comparator.comparing;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
@@ -77,7 +78,9 @@ public class PrivilegeUsersService {
 				UserRep::getFirstname,  //
 				UserRep::getLastname,  //
 				userRep -> userRep.getUserState().name(),  //
-				UserRep::getRoles)).search(users);
+				UserRep::getRoles)) //
+				.search(users) //
+				.orderBy(comparing(r -> r.getUsername().toLowerCase()));
 
 		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 		JsonObject root = toJson(queryData, users.size(), result, t -> t.accept(visitor));
@@ -93,13 +96,15 @@ public class PrivilegeUsersService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		UserRep queryRep = new PrivilegeElementFromJsonVisitor().userRepFromJson(query);
-		List<UserRep> users = privilegeHandler.queryUsers(cert, queryRep);
+		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 
-		JsonArray usersArr = new JsonArray();
-		for (UserRep userRep : users) {
-			usersArr.add(userRep.accept(new PrivilegeElementToJsonVisitor()));
-		}
+		UserRep queryRep = new PrivilegeElementFromJsonVisitor().userRepFromJson(query);
+		JsonArray usersArr = privilegeHandler.queryUsers(cert, queryRep).stream() //
+				.sorted(comparing(r -> r.getUsername().toLowerCase())) //
+				.collect(JsonArray::new, //
+						(array, user) -> array.add(user.accept(visitor)), //
+						JsonArray::addAll);
+
 		return Response.ok(usersArr.toString(), MediaType.APPLICATION_JSON).build();
 	}
 
