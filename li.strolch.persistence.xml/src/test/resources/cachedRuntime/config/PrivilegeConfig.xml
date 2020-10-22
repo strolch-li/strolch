@@ -37,8 +37,10 @@
 
 	<Policies>
 		<Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
+		<Policy name="ModelPrivilege" class="li.strolch.runtime.privilege.ModelPrivilege" />
 		<Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege" />
 		<Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
+		<Policy name="UserSessionAccessPrivilege" class="li.strolch.privilege.policy.UsernameFromCertificatePrivilege"/>
 	</Policies>
 
 </Privilege>
