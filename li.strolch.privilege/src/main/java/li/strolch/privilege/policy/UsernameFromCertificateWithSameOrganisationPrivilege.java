@@ -15,10 +15,13 @@
  */
 package li.strolch.privilege.policy;
 
+import static java.util.stream.Collectors.toSet;
 import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.text.MessageFormat;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
@@ -42,8 +45,6 @@ import li.strolch.privilege.model.Restrictable;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class UsernameFromCertificateWithSameOrganisationPrivilege extends UsernameFromCertificatePrivilege {
-
-	public static final String PARAM_ORGANISATION = "organisation";
 
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
@@ -76,24 +77,37 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 		// get object
 		Certificate cert = (Certificate) object;
 
-		// get user organisation
-		String userOrg = ctx.getCertificate().getProperty(PARAM_ORGANISATION);
-		if (isEmpty(userOrg))
-			throw new PrivilegeException("No organisation configured for user " + ctx.getUsername());
-
-		// assert same organisation
-		String org = cert.getProperty(PARAM_ORGANISATION);
-		if (!userOrg.equals(org)) {
-
-			if (assertHasPrivilege)
-				throw new AccessDeniedException(
-						"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrg
-								+ " / " + org);
-
+		// first validate same organisation
+		if (!assertUserInSameOrganisation(ctx, cert, assertHasPrivilege))
 			return false;
-		}
 
 		// now delegate the rest of the validation to the super class
 		return super.validateAction(ctx, privilege, restrictable, assertHasPrivilege);
+	}
+
+	protected boolean assertUserInSameOrganisation(PrivilegeContext ctx, Certificate cert, boolean assertHasPrivilege) {
+		Set<String> userOrgs = getUserOrganisations(ctx.getCertificate());
+		Set<String> orgs = getUserOrganisations(cert);
+
+		if (isUserInOrganisation(userOrgs, orgs))
+			return true;
+
+		if (assertHasPrivilege)
+			throw new AccessDeniedException(
+					"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrgs
+							+ " / " + orgs);
+
+		return false;
+	}
+
+	protected boolean isUserInOrganisation(Set<String> organisations, Set<String> userOrg) {
+		return userOrg.stream().anyMatch(organisations::contains);
+	}
+
+	protected Set<String> getUserOrganisations(Certificate cert) {
+		String userOrg = cert.getOrganisation();
+		if (isEmpty(userOrg))
+			throw new PrivilegeException("No organisation configured for user " + cert.getUsername());
+		return Stream.of(userOrg.split(",")).map(String::trim).collect(toSet());
 	}
 }

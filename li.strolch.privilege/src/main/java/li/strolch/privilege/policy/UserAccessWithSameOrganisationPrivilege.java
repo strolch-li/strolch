@@ -41,8 +41,6 @@ import li.strolch.utils.dbc.DBC;
  */
 public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege {
 
-	public static final String PARAM_ORGANISATION = "organisation";
-
 	@Override
 	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
 			throws AccessDeniedException {
@@ -71,44 +69,28 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			throw new PrivilegeException(msg);
 		}
 
-		// get user organisation
-		Set<String> userOrgs = getUserOrganisations(ctx);
-
 		Tuple tuple = (Tuple) object;
 
 		switch (privilegeName) {
 		case PrivilegeHandler.PRIVILEGE_GET_USER:
 		case PrivilegeHandler.PRIVILEGE_ADD_USER:
 		case PrivilegeHandler.PRIVILEGE_MODIFY_USER:
+		case PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD:
 		case PrivilegeHandler.PRIVILEGE_REMOVE_USER: {
 
 			// make sure old user has same organisation
 			User oldUser = tuple.getFirst();
 			if (oldUser != null) {
-				Set<String> oldOrgs = getUserOrganisations(oldUser);
-				if (!isUserInOrganisation(userOrgs, oldOrgs)) {
-					if (assertHasPrivilege)
-						throw new AccessDeniedException(
-								"User " + ctx.getUsername() + " may not access users outside of their organisation: "
-										+ userOrgs + " / " + oldOrgs);
-
+				if (!assertUserInSameOrganisation(ctx, oldUser, assertHasPrivilege))
 					return false;
-				}
 			}
 
 			// make sure new user has same organisation
 			User newUser = tuple.getSecond();
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
-			Set<String> newOrgs = getUserOrganisations(newUser);
 
-			if (!isUserInOrganisation(userOrgs, newOrgs)) {
-				if (assertHasPrivilege)
-					throw new AccessDeniedException(
-							"User " + ctx.getUsername() + " may not access users outside of their organisations: "
-									+ userOrgs + " / " + newOrgs);
-
+			if (!assertUserInSameOrganisation(ctx, newUser, assertHasPrivilege))
 				return false;
-			}
 
 			break;
 		}
@@ -117,16 +99,8 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 
 			User user = tuple.getFirst();
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", user);
-			Set<String> orgs = getUserOrganisations(user);
-			if (!isUserInOrganisation(userOrgs, orgs)) {
-
-				if (assertHasPrivilege)
-					throw new AccessDeniedException(
-							"User " + ctx.getUsername() + " may not access users outside of their organisation: "
-									+ userOrgs + " / " + orgs);
-
+			if (!assertUserInSameOrganisation(ctx, user, assertHasPrivilege))
 				return false;
-			}
 
 			break;
 		}
@@ -142,19 +116,34 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		return super.validateAction(ctx, privilege, restrictable, assertHasPrivilege);
 	}
 
+	protected boolean assertUserInSameOrganisation(PrivilegeContext ctx, User user, boolean assertHasPrivilege) {
+		Set<String> userOrgs = getUserOrganisations(ctx);
+		Set<String> orgs = getUserOrganisations(user);
+
+		if (isUserInOrganisation(userOrgs, orgs))
+			return true;
+
+		if (assertHasPrivilege)
+			throw new AccessDeniedException(
+					"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrgs
+							+ " / " + orgs);
+
+		return false;
+	}
+
 	protected boolean isUserInOrganisation(Set<String> organisations, Set<String> userOrg) {
 		return userOrg.stream().anyMatch(organisations::contains);
 	}
 
 	protected Set<String> getUserOrganisations(User user) {
-		String userOrg = user.getProperty(PARAM_ORGANISATION);
+		String userOrg = user.getOrganisation();
 		if (isEmpty(userOrg))
 			throw new PrivilegeException("No organisation configured for user " + user.getUsername());
 		return Stream.of(userOrg.split(",")).map(String::trim).collect(toSet());
 	}
 
 	protected Set<String> getUserOrganisations(PrivilegeContext ctx) {
-		String userOrg = ctx.getCertificate().getProperty(PARAM_ORGANISATION);
+		String userOrg = ctx.getCertificate().getOrganisation();
 		if (isEmpty(userOrg))
 			throw new PrivilegeException("No organisation configured for user " + ctx.getUsername());
 		return Stream.of(userOrg.split(",")).map(String::trim).collect(toSet());
