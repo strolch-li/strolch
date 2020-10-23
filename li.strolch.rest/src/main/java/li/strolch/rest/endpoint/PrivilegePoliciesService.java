@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package li.strolch.rest.endpoint;
+
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION_GET_POLICIES;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -26,8 +29,10 @@ import java.util.Map;
 
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 
@@ -44,18 +49,27 @@ public class PrivilegePoliciesService {
 		return container.getPrivilegeHandler().getPrivilegeHandler();
 	}
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[2];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRoles(@Context HttpServletRequest request) {
+	public Response getPrivilegePolicies(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		Map<String, String> policyDefs = privilegeHandler.getPolicyDefs(cert);
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_GET_POLICIES));
 
-		JsonObject policiesJ = new JsonObject();
-		for (String key : policyDefs.keySet()) {
-			policiesJ.addProperty(key, policyDefs.get(key));
+			Map<String, String> policyDefs = privilegeHandler.getPolicyDefs(cert);
+
+			JsonObject policiesJ = new JsonObject();
+			for (String key : policyDefs.keySet()) {
+				policiesJ.addProperty(key, policyDefs.get(key));
+			}
+			return Response.ok(policiesJ.toString(), MediaType.APPLICATION_JSON).build();
 		}
-		return Response.ok(policiesJ.toString(), MediaType.APPLICATION_JSON).build();
 	}
 }

@@ -16,6 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import static java.util.Comparator.comparing;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
@@ -34,6 +35,7 @@ import com.google.gson.*;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.json.PrivilegeElementFromJsonVisitor;
 import li.strolch.model.json.PrivilegeElementToJsonVisitor;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.UserRep;
@@ -65,27 +67,36 @@ public class PrivilegeUsersService {
 		return container.getPrivilegeHandler().getPrivilegeHandler();
 	}
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[2];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queryUsers(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		String query = queryData.getQuery();
-		List<UserRep> users = privilegeHandler.getUsers(cert);
-		SearchResult<UserRep> result = buildSimpleValueSearch(new ValueSearch<UserRep>(), query, Arrays.asList( //
-				UserRep::getUsername, //
-				UserRep::getFirstname,  //
-				UserRep::getLastname,  //
-				userRep -> userRep.getUserState().name(),  //
-				UserRep::getRoles)) //
-				.search(users) //
-				.orderBy(comparing(r -> r.getUsername().toLowerCase()));
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER);
 
-		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
-		JsonObject root = toJson(queryData, users.size(), result, t -> t.accept(visitor));
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return Response.ok(gson.toJson(root), MediaType.APPLICATION_JSON).build();
+			String query = queryData.getQuery();
+			List<UserRep> users = privilegeHandler.getUsers(cert);
+			SearchResult<UserRep> result = buildSimpleValueSearch(new ValueSearch<UserRep>(), query, Arrays.asList( //
+					UserRep::getUsername, //
+					UserRep::getFirstname,  //
+					UserRep::getLastname,  //
+					userRep -> userRep.getUserState().name(),  //
+					UserRep::getRoles)) //
+					.search(users) //
+					.orderBy(comparing(r -> r.getUsername().toLowerCase()));
+
+			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+			JsonObject root = toJson(queryData, users.size(), result, t -> t.accept(visitor));
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			return Response.ok(gson.toJson(root), MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	@POST
@@ -96,16 +107,20 @@ public class PrivilegeUsersService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER);
 
-		UserRep queryRep = new PrivilegeElementFromJsonVisitor().userRepFromJson(query);
-		JsonArray usersArr = privilegeHandler.queryUsers(cert, queryRep).stream() //
-				.sorted(comparing(r -> r.getUsername().toLowerCase())) //
-				.collect(JsonArray::new, //
-						(array, user) -> array.add(user.accept(visitor)), //
-						JsonArray::addAll);
+			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 
-		return Response.ok(usersArr.toString(), MediaType.APPLICATION_JSON).build();
+			UserRep queryRep = new PrivilegeElementFromJsonVisitor().userRepFromJson(query);
+			JsonArray usersArr = privilegeHandler.queryUsers(cert, queryRep).stream() //
+					.sorted(comparing(r -> r.getUsername().toLowerCase())) //
+					.collect(JsonArray::new, //
+							(array, user) -> array.add(user.accept(visitor)), //
+							JsonArray::addAll);
+
+			return Response.ok(usersArr.toString(), MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	@GET
@@ -115,9 +130,12 @@ public class PrivilegeUsersService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		UserRep user = privilegeHandler.getUser(cert, username);
-		return Response.ok(user.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
-				.build();
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER);
+
+			UserRep user = privilegeHandler.getUser(cert, username);
+			return Response.ok(user.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	@POST

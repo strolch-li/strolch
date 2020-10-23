@@ -16,6 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import static java.util.Comparator.comparing;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_ROLE;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -27,6 +28,7 @@ import com.google.gson.JsonArray;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.json.PrivilegeElementFromJsonVisitor;
 import li.strolch.model.json.PrivilegeElementToJsonVisitor;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeRep;
@@ -48,20 +50,29 @@ public class PrivilegeRolesService {
 		return container.getPrivilegeHandler().getPrivilegeHandler();
 	}
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[2];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRoles(@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
-		JsonArray rolesJ = privilegeHandler.getRoles(cert).stream() //
-				.sorted(comparing(roleRep -> roleRep.getName().toLowerCase())) //
-				.collect(JsonArray::new, //
-						(array, role) -> array.add(role.accept(visitor)), //
-						JsonArray::addAll);
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_ROLE);
 
-		return Response.ok(rolesJ.toString(), MediaType.APPLICATION_JSON).build();
+			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+			JsonArray rolesJ = privilegeHandler.getRoles(cert).stream() //
+					.sorted(comparing(roleRep -> roleRep.getName().toLowerCase())) //
+					.collect(JsonArray::new, //
+							(array, role) -> array.add(role.accept(visitor)), //
+							JsonArray::addAll);
+
+			return Response.ok(rolesJ.toString(), MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	@GET
@@ -71,9 +82,12 @@ public class PrivilegeRolesService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
-		RoleRep role = privilegeHandler.getRole(cert, rolename);
-		return Response.ok(role.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
-				.build();
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_ROLE);
+
+			RoleRep role = privilegeHandler.getRole(cert, rolename);
+			return Response.ok(role.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	@POST

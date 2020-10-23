@@ -45,11 +45,13 @@ public class PrivilegeRemoveRoleService extends AbstractService<PrivilegeRoleNam
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
-		RoleRep role = privilegeHandler.removeRole(getCertificate(), arg.roleName);
-		privilegeHandler.persist(getCertificate());
-
+		RoleRep role;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE)) {
 			tx.setSuppressAudits(true);
+
+			role = privilegeHandler.removeRole(getCertificate(), arg.roleName);
+			privilegeHandler.persist(getCertificate());
+
 			Audit audit = tx
 					.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.ROLE,
 							role.getName());

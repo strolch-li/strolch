@@ -44,11 +44,13 @@ public class PrivilegeAddRoleService extends AbstractService<PrivilegeRoleArgume
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
-		RoleRep role = privilegeHandler.addRole(getCertificate(), arg.role);
-		privilegeHandler.persist(getCertificate());
-
+		RoleRep role;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_ROLE)) {
 			tx.setSuppressAudits(true);
+
+			role = privilegeHandler.addRole(getCertificate(), arg.role);
+			privilegeHandler.persist(getCertificate());
+
 			Audit audit = tx
 					.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.ROLE,
 							role.getName());

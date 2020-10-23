@@ -46,11 +46,13 @@ public class PrivilegeSetUserLocaleService
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
-		UserRep user = privilegeHandler.setUserLocale(getCertificate(), arg.username, arg.locale);
-		privilegeHandler.persist(getCertificate());
-
+		UserRep user;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE)) {
 			tx.setSuppressAudits(true);
+
+			user = privilegeHandler.setUserLocale(getCertificate(), arg.username, arg.locale);
+			privilegeHandler.persist(getCertificate());
+
 			Audit audit = tx
 					.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
 							user.getUsername());
@@ -58,15 +60,5 @@ public class PrivilegeSetUserLocaleService
 		}
 
 		return new PrivilegeUserResult(user);
-	}
-
-	@Override
-	public String getPrivilegeName() {
-		return StrolchPrivilegeConstants.PRIVILEGE_SET_USER_LOCALE;
-	}
-
-	@Override
-	public String getPrivilegeValue() {
-		return null;
 	}
 }

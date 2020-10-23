@@ -46,11 +46,13 @@ public class PrivilegeAddRoleToUserService
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
-		UserRep user = privilegeHandler.addRoleToUser(getCertificate(), arg.username, arg.rolename);
-		privilegeHandler.persist(getCertificate());
-
+		UserRep user;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER)) {
 			tx.setSuppressAudits(true);
+
+			user = privilegeHandler.addRoleToUser(getCertificate(), arg.username, arg.rolename);
+			privilegeHandler.persist(getCertificate());
+
 			Audit audit = tx
 					.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
 							user.getUsername());

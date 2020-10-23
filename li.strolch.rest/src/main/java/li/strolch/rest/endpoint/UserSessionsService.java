@@ -16,6 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import static li.strolch.rest.helper.RestfulHelper.toJson;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import java.util.Locale;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -48,6 +50,11 @@ public class UserSessionsService {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserSessionsService.class);
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[2];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response querySessions(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
@@ -56,19 +63,23 @@ public class UserSessionsService {
 		logger.info("[" + cert.getUsername() + "] Querying user sessions...");
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
-		String query = queryData.getQuery();
-		List<UserSession> sessions = sessionHandler.getSessions(cert, source);
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_SESSION);
 
-		SearchResult<UserSession> result = buildSimpleValueSearch(new ValueSearch<UserSession>(), query,
-				Arrays.asList( //
-						UserSession::getUsername, //
-						UserSession::getFirstname,  //
-						UserSession::getLastname,  //
-						UserSession::getUserRoles)).search(sessions);
+			String query = queryData.getQuery();
+			List<UserSession> sessions = sessionHandler.getSessions(cert, source);
 
-		JsonObject root = toJson(queryData, sessions.size(), result, UserSession::toJson);
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return Response.ok(gson.toJson(root), MediaType.APPLICATION_JSON).build();
+			SearchResult<UserSession> result = buildSimpleValueSearch(new ValueSearch<UserSession>(), query,
+					Arrays.asList( //
+							UserSession::getUsername, //
+							UserSession::getFirstname,  //
+							UserSession::getLastname,  //
+							UserSession::getUserRoles)).search(sessions);
+
+			JsonObject root = toJson(queryData, sessions.size(), result, UserSession::toJson);
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			return Response.ok(gson.toJson(root), MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	@GET
@@ -79,8 +90,13 @@ public class UserSessionsService {
 		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
 		logger.info("[" + cert.getUsername() + "] Returning session " + sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-		UserSession session = sessionHandler.getSession(cert, source, sessionId);
-		return Response.ok(session.toJson().toString(), MediaType.APPLICATION_JSON).build();
+
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_SESSION);
+
+			UserSession session = sessionHandler.getSession(cert, source, sessionId);
+			return Response.ok(session.toJson().toString(), MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	@DELETE
@@ -90,8 +106,13 @@ public class UserSessionsService {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		logger.info("[" + cert.getUsername() + "] Invalidating session " + sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
-		sessionHandler.invalidate(cert, sessionId);
-		return ResponseUtil.toResponse();
+
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_SESSION);
+
+			sessionHandler.invalidate(cert, sessionId);
+			return ResponseUtil.toResponse();
+		}
 	}
 
 	@PUT

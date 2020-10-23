@@ -55,28 +55,31 @@ public class PrivilegeUpdateUserRolesService extends AbstractService<JsonService
 		rolesE.forEach(e -> roles.add(e.getAsString()));
 
 		String username = arg.objectId;
-		UserRep user = privilegeHandler.getUser(getCertificate(), username);
 
-		// first add new roles
-		boolean changed = false;
-		for (String role : roles) {
-			if (!user.hasRole(role)) {
-				user = privilegeHandler.addRoleToUser(getCertificate(), username, role);
-				changed = true;
+		UserRep user;
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER)) {
+			tx.setSuppressAudits(true);
+
+			user = privilegeHandler.getUser(getCertificate(), username);
+
+			// first add new roles
+			boolean changed = false;
+			for (String role : roles) {
+				if (!user.hasRole(role)) {
+					user = privilegeHandler.addRoleToUser(getCertificate(), username, role);
+					changed = true;
+				}
 			}
-		}
 
-		// handle removed roles
-		for (String role : user.getRoles()) {
-			if (!roles.contains(role)) {
-				user = privilegeHandler.removeRoleFromUser(getCertificate(), username, role);
-				changed = true;
+			// handle removed roles
+			for (String role : user.getRoles()) {
+				if (!roles.contains(role)) {
+					user = privilegeHandler.removeRoleFromUser(getCertificate(), username, role);
+					changed = true;
+				}
 			}
-		}
 
-		if (changed) {
-			try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER)) {
-				tx.setSuppressAudits(true);
+			if (changed) {
 				Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 						StrolchPrivilegeConstants.USER, user.getUsername());
 				tx.getAuditTrail().add(tx, audit);
