@@ -15,6 +15,7 @@
  */
 package li.strolch.utils.helper;
 
+import static java.util.stream.Collectors.toSet;
 import static li.strolch.utils.helper.ByteHelper.setBit;
 
 import java.io.UnsupportedEncodingException;
@@ -22,6 +23,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -871,6 +874,18 @@ public class StringHelper {
 		if (value == null)
 			return EMPTY;
 		return value.trim();
+	}
+
+	/**
+	 * Parses the given string as a comma separated value, returning as a set
+	 *
+	 * @param csv
+	 * 		the comma separated value
+	 *
+	 * @return the set from parsing the value
+	 */
+	public static Set<String> getStringAsSet(String csv) {
+		return Stream.of(trimOrEmpty(csv).split(",")).map(String::trim).filter(s -> s.length() > 0).collect(toSet());
 	}
 
 	/**
