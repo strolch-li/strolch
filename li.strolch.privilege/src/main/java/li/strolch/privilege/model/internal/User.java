@@ -292,6 +292,15 @@ public final class User {
 	}
 
 	/**
+	 * Returns the value of the property {@link PrivilegeConstants#ORGANISATION}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#ORGANISATION}
+	 */
+	public String getOrganisation() {
+		return getProperty(ORGANISATION);
+	}
+
+	/**
 	 * Returns the value of the property {@link PrivilegeConstants#LOCATION}
 	 *
 	 * @return the value of the property {@link PrivilegeConstants#LOCATION}
