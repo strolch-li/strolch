@@ -132,6 +132,28 @@ public class PrivilegeContext {
 	//
 
 	/**
+	 * <p>Validates if the user for this context has the Privilege with the given name, and is allowed access to the
+	 * given value. If the user has the privilege, then this method returns with no exception and void, if the user does
+	 * not have the privilege, then a {@link AccessDeniedException} is thrown.</p>
+	 *
+	 * <p>This method uses the {@link SimpleRestrictable} to verify access</p>
+	 *
+	 * @param privilegeName
+	 * 		the name of the privilege to verify
+	 * @param privilegeValue
+	 * 		the value
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the user does not have access
+	 * @throws PrivilegeException
+	 * 		if there is an internal error due to wrongly configured privileges or programming errors
+	 */
+	public void validateAction(String privilegeName, String privilegeValue)
+			throws PrivilegeException, AccessDeniedException {
+		validateAction(new SimpleRestrictable(privilegeName, privilegeValue));
+	}
+
+	/**
 	 * Validates if the user for this context has the privilege to access to the given {@link Restrictable}. If the user
 	 * has the privilege, then this method returns with no exception and void, if the user does not have the privilege,
 	 * then a {@link AccessDeniedException} is thrown.
@@ -191,5 +213,25 @@ public class PrivilegeContext {
 
 		// delegate to the policy
 		return policy.hasPrivilege(this, privilege, restrictable);
+	}
+
+	/**
+	 * Validates if the user for this context has the privilege to access to the given {@link Restrictable}. Returning
+	 * true if the user has the privilege, and false if not
+	 *
+	 * <p>This method uses the {@link SimpleRestrictable} to verify access</p>
+	 *
+	 * @param privilegeName
+	 * 		the name of the privilege to verify
+	 * @param privilegeValue
+	 * 		the value
+	 *
+	 * @return returns true if the user has the privilege, and false if not
+	 *
+	 * @throws PrivilegeException
+	 * 		if there is an internal error due to wrongly configured privileges or programming errors
+	 */
+	public boolean hasPrivilege(String privilegeName, String privilegeValue) throws PrivilegeException {
+		return hasPrivilege(new SimpleRestrictable(privilegeName, privilegeValue));
 	}
 }

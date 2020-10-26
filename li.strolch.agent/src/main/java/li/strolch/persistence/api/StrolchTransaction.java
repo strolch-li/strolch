@@ -1723,6 +1723,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	void assertHasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException;
 
 	/**
+	 * @see PrivilegeContext#validateAction(String, String)
+	 */
+	void assertHasPrivilege(String privilegeName, String privilegeValue) throws AccessDeniedException;
+
+	/**
+	 * @see PrivilegeContext#hasPrivilege(Restrictable)
+	 */
+	boolean hasPrivilege(String privilegeName, String privilegeValue) throws AccessDeniedException;
+
+	/**
 	 * Asserts that the current {@link Certificate} has the given role
 	 *
 	 * @param roleName
