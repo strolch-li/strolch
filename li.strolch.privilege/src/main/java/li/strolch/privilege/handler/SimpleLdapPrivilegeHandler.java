@@ -1,7 +1,6 @@
 package li.strolch.privilege.handler;
 
-import static li.strolch.privilege.base.PrivilegeConstants.LOCATION;
-import static li.strolch.privilege.base.PrivilegeConstants.REALM;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import javax.naming.NamingException;
@@ -21,6 +20,7 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	private Locale defaultLocale;
 	private String adminUsers;
 	private Map<String, Set<String>> rolesForLdapGroups;
+	private String organisation;
 	private String location;
 	private String realm;
 
@@ -32,6 +32,7 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		super.initialize(parameterMap, encryptionHandler, persistenceHandler, userChallengeHandler, ssoHandler,
 				policyMap);
 
+		this.organisation = parameterMap.getOrDefault(ORGANISATION, "");
 		this.location = parameterMap.getOrDefault(LOCATION, "");
 		this.realm = parameterMap.getOrDefault(REALM, "");
 
@@ -60,6 +61,7 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 			Set<String> strolchRoles) throws NamingException {
 
 		Map<String, String> properties = new HashMap<>();
+		properties.put(ORGANISATION, this.organisation);
 		properties.put(LOCATION, this.location);
 		properties.put(REALM, this.realm);
 		return properties;

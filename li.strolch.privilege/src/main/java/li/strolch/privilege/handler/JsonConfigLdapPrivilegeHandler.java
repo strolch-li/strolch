@@ -166,6 +166,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 		String primaryLocation = "";
 		Set<String> secondaryLocations = new HashSet<>();
+		Set<String> organisations = new HashSet<>();
 		Set<String> locations = new HashSet<>();
 
 		// first see if we can find the primaryLocation from the department attribute:
@@ -180,6 +181,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 		for (String ldapGroup : ldapGroups) {
 			JsonObject mappingJ = this.ldapGroupConfigs.get(ldapGroup).getAsJsonObject();
+			if (mappingJ.has(ORGANISATION))
+				mappingJ.get(ORGANISATION).getAsJsonArray().forEach(e -> organisations.add(e.getAsString()));
 			mappingJ.get(LOCATION).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
 
 			JsonElement primaryLocationJ = mappingJ.get(PRIMARY_LOCATION);
@@ -218,6 +221,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put(REALM, this.realm);
+		properties.put(ORGANISATION, join(",", organisations));
 		properties.put(LOCATION, join(",", locations));
 		properties.put(PRIMARY_LOCATION, primaryLocation);
 		properties.put(SECONDARY_LOCATIONS, join(",", secondaryLocations));
