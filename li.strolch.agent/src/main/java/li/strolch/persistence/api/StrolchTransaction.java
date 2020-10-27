@@ -631,6 +631,27 @@ public interface StrolchTransaction extends AutoCloseable {
 			throws StrolchModelException, ClassCastException;
 
 	/**
+	 * <p>Finds a parameter with the {@link StrolchConstants#BAG_PARAMETERS} and @paramKey on the given @element, but if
+	 * it does not exists
+	 * on the element, then it retrieves the elements parent by using the bag {@link
+	 * StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>
+	 *
+	 * <p>In Strolch relationships are usually defined on the parameter bag with the id {@link
+	 * StrolchModelConstants#BAG_RELATIONS}</p>
+	 *
+	 * @param element
+	 * 		the element on which to search for the parameter
+	 * @param parentParamKey
+	 * 		the id of the parameter with which to find the parent
+	 * @param paramKey
+	 * 		the id of the parameter to find
+	 *
+	 * @return the {@link Optional} with the parameter which was found, following the hierarchy up the chain
+	 */
+	<U, T extends Parameter<U>> Optional<T> findParameterOnHierarchy(StrolchRootElement element, String parentParamKey,
+			String paramKey);
+
+	/**
 	 * <p>Finds a parameter with the given @bagKey and @paramKey on the given @element, but if it does not exists
 	 * on the element, then it retrieves the elements parent by using the bag {@link
 	 * StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>

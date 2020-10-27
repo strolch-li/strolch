@@ -559,6 +559,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public <U, T extends Parameter<U>> Optional<T> findParameterOnHierarchy(StrolchRootElement element,
+			String parentParamKey, String paramKey) {
+		return findParameterOnHierarchy(element, parentParamKey, BAG_PARAMETERS, paramKey);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> Optional<T> findParameterOnHierarchy(StrolchRootElement element,
 			String parentParamKey, String bagKey, String paramKey) {
 
 		DBC.PRE.assertNotNull("element must not be null!", element);
