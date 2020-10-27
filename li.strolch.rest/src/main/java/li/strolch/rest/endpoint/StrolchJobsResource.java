@@ -17,8 +17,8 @@ package li.strolch.rest.endpoint;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.rest.StrolchRestfulConstants.DATA;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -31,6 +31,7 @@ import java.util.List;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.job.StrolchJob;
 import li.strolch.job.StrolchJobsHandler;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.PrivilegeContext;
@@ -48,6 +49,11 @@ public class StrolchJobsResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchJobsResource.class);
 
+	private static String getContext() {
+		StackTraceElement element = new Throwable().getStackTrace()[1];
+		return element.getClassName() + "." + element.getMethodName();
+	}
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll(@Context HttpServletRequest request, @Context HttpHeaders headers) {
@@ -55,25 +61,28 @@ public class StrolchJobsResource {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-		PrivilegeContext ctx = container.getPrivilegeHandler().validate(cert, source);
 
-		// assert user can access StrolchJobs
-		if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
-			ctx.assertHasPrivilege(StrolchJob.class.getName());
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 
-		StrolchJobsHandler strolchJobsHandler = container.getComponent(StrolchJobsHandler.class);
+			// assert user can access StrolchJobs
+			PrivilegeContext ctx = tx.getPrivilegeContext();
+			if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
+				ctx.assertHasPrivilege(StrolchJob.class.getName());
 
-		List<StrolchJob> jobs = strolchJobsHandler.getJobs(cert, source).stream() //
-				.filter(job -> {
-					if (ctx.hasRole(ROLE_STROLCH_ADMIN))
-						return true;
+			StrolchJobsHandler strolchJobsHandler = container.getComponent(StrolchJobsHandler.class);
 
-					IPrivilege privilege = ctx.getPrivilege(StrolchJob.class.getName());
-					return privilege.isAllAllowed() || privilege.getAllowList().contains(job.getClass().getName());
-				}) //
-				.sorted(comparing(StrolchJob::getName)) //
-				.collect(toList());
-		return ResponseUtil.listToResponse(DATA, jobs, StrolchJob::toJson);
+			List<StrolchJob> jobs = strolchJobsHandler.getJobs(cert, source).stream() //
+					.filter(job -> {
+						if (ctx.hasRole(ROLE_STROLCH_ADMIN))
+							return true;
+
+						IPrivilege privilege = ctx.getPrivilege(StrolchJob.class.getName());
+						return privilege.isAllAllowed() || privilege.getAllowList().contains(job.getClass().getName());
+					}) //
+					.sorted(comparing(StrolchJob::getName)) //
+					.collect(toList());
+			return ResponseUtil.listToResponse(DATA, jobs, StrolchJob::toJson);
+		}
 	}
 
 	@PUT
@@ -82,10 +91,10 @@ public class StrolchJobsResource {
 	public Response doAction(@Context HttpServletRequest request, @Context HttpHeaders headers,
 			@PathParam("name") String name, @QueryParam("action") String action) {
 
-		try {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
 
-			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-			String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 
 			ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
 			StrolchJobsHandler strolchJobsHandler = container.getComponent(StrolchJobsHandler.class);
@@ -93,7 +102,7 @@ public class StrolchJobsResource {
 			StrolchJob job = strolchJobsHandler.getJob(cert, source, name);
 
 			// assert user can access StrolchJobs
-			PrivilegeContext ctx = container.getPrivilegeHandler().validate(cert, source);
+			PrivilegeContext ctx = tx.getPrivilegeContext();
 			if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
 				ctx.validateAction(job);
 
