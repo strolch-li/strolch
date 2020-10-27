@@ -51,7 +51,7 @@ public class UserSessionsService {
 	private static final Logger logger = LoggerFactory.getLogger(UserSessionsService.class);
 
 	private static String getContext() {
-		StackTraceElement element = new Throwable().getStackTrace()[2];
+		StackTraceElement element = new Throwable().getStackTrace()[1];
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
