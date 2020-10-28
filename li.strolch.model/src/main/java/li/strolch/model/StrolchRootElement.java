@@ -80,6 +80,26 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	void setVersion(Version version) throws IllegalArgumentException;
 
 	/**
+	 * Set a relation to the given element by using the type of the given element as the parameter ID, but lower-ccasing
+	 * the first letter. Should the parameter not exist, then it will be created
+	 *
+	 * @param element
+	 * 		the element for which to set the relation to
+	 */
+	void setRelation(StrolchRootElement element);
+
+	/**
+	 * Set a relation to the given element by using the given param. Should the parameter not exist, then it will be
+	 * created
+	 *
+	 * @param param
+	 * 		the parameter ID on which to set the relations
+	 * @param element
+	 * 		the element for which to set the relation to
+	 */
+	void setRelation(String param, StrolchRootElement element);
+
+	/**
 	 * Return a clone of this {@link StrolchElement}
 	 *
 	 * @return a clone of this {@link StrolchElement}

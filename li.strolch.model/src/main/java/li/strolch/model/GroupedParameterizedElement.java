@@ -496,10 +496,19 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		bag.setLongList(paramKey, value);
 	}
 
-	private ParameterBag defaultBag() {
+	protected ParameterBag defaultBag() {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
 		if (bag == null) {
 			bag = new ParameterBag(BAG_PARAMETERS, TYPE_PARAMETERS, TYPE_PARAMETERS);
+			addParameterBag(bag);
+		}
+		return bag;
+	}
+
+	protected ParameterBag relationsBag() {
+		ParameterBag bag = getParameterBag(BAG_RELATIONS, false);
+		if (bag == null) {
+			bag = new ParameterBag(BAG_RELATIONS, TYPE_RELATIONS, TYPE_RELATIONS);
 			addParameterBag(bag);
 		}
 		return bag;

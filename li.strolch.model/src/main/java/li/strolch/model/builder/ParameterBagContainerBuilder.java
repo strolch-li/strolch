@@ -3,6 +3,7 @@ package li.strolch.model.builder;
 import static java.util.Collections.emptyList;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.model.builder.BuilderHelper.buildParamId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,10 +64,6 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		if (this.parametersBags.put(id, bagBuilder) != null)
 			throw new IllegalArgumentException("Bag builder for " + id + " already exists!");
 		return bagBuilder;
-	}
-
-	private String buildParamId(String type) {
-		return Character.toLowerCase(type.charAt(0)) + type.substring(1);
 	}
 
 	public T resourceRelation(String type) {
