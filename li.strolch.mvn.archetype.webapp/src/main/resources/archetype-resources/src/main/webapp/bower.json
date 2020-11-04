@@ -5,7 +5,7 @@
   ],
   "private": true,
   "dependencies": {
-    "strolchjs": "4treesCH/strolchjs#^0.4.2",
+    "strolchjs": "4treesCH/strolchjs#^0.4.3",
     "strolch-wc-styles": "4treesCH/strolch-wc-styles#^0.3.0",
     "strolch-wc-auth": "4treesCH/strolch-wc-auth#^0.8.2",
     "strolch-wc-inspector": "4treesCH/strolch-wc-inspector#^0.20.2",
