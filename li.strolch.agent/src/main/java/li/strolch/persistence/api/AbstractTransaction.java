@@ -623,6 +623,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.objectFilter == null)
 			return Operation.GET;
 		li.strolch.utils.objectfilter.Operation op = this.objectFilter.getOperation(key, locator);
+		if (op == null)
+			return Operation.GET;
+
 		switch (op) {
 		case ADD:
 			return Operation.ADD;
