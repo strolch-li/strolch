@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.endpoint;
 
+import static java.util.Comparator.comparing;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
@@ -74,7 +75,9 @@ public class UserSessionsService {
 							UserSession::getUsername, //
 							UserSession::getFirstname,  //
 							UserSession::getLastname,  //
-							UserSession::getUserRoles)).search(sessions);
+							UserSession::getUserRoles)) //
+					.search(sessions) //
+					.orderBy(comparing(UserSession::getUsername));
 
 			JsonObject root = toJson(queryData, sessions.size(), result, UserSession::toJson);
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
