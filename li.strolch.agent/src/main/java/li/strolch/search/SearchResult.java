@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.collections.MapOfSets;
@@ -94,6 +96,15 @@ public class SearchResult<T> {
 	 */
 	public Set<T> toSet() {
 		return this.stream.collect(Collectors.toSet());
+	}
+
+	/**
+	 * Collects this stream to a {@link List}
+	 *
+	 * @return a list of this stream
+	 */
+	public JsonArray toJsonArray(Function<T, JsonElement> jsonMapper) {
+		return this.stream.map(jsonMapper).collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 	}
 
 	/**
