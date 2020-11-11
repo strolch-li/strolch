@@ -30,6 +30,7 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -273,7 +274,12 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public boolean hasPolicyDef(String type) {
-		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
+		return this.policyDefs != null && this.policyDefs.hasPolicyDef(type);
+	}
+
+	@Override
+	public boolean hasPolicyDef(Class<?> clazz) {
+		return this.policyDefs != null && this.policyDefs.hasPolicyDef(clazz.getSimpleName());
 	}
 
 	@Override
@@ -281,6 +287,17 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
+	}
+
+	@Override
+	public void addOrUpdate(PolicyDef policyDef) {
+		assertNotReadonly();
+		DBC.PRE.assertNotNull("policyDef", policyDef);
+		if (this.policyDefs == null) {
+			this.policyDefs = new PolicyDefs();
+			this.policyDefs.setParent(this);
+		}
+		this.policyDefs.addOrUpdate(policyDef);
 	}
 
 	@Override

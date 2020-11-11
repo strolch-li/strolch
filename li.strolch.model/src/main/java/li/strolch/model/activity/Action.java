@@ -32,6 +32,7 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.utils.dbc.DBC;
 
 /**
  * An {@link Action} represents a single step within an {@link Activity}, that is, one that is not further decomposed
@@ -281,10 +282,26 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public boolean hasPolicyDef(Class<?> clazz) {
+		return this.policyDefs != null && this.policyDefs.hasPolicyDef(clazz.getSimpleName());
+	}
+
+	@Override
 	public void setPolicyDefs(PolicyDefs policyDefs) {
 		assertNotReadonly();
 		this.policyDefs = policyDefs;
 		this.policyDefs.setParent(this);
+	}
+
+	@Override
+	public void addOrUpdate(PolicyDef policyDef) {
+		assertNotReadonly();
+		DBC.PRE.assertNotNull("policyDef", policyDef);
+		if (this.policyDefs == null) {
+			this.policyDefs = new PolicyDefs();
+			this.policyDefs.setParent(this);
+		}
+		this.policyDefs.addOrUpdate(policyDef);
 	}
 
 	@Override

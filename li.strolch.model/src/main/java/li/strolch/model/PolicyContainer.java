@@ -38,6 +38,16 @@ public interface PolicyContainer {
 	boolean hasPolicyDef(String type);
 
 	/**
+	 * Returns true if this container has the {@link PolicyDef} with the given type, false if not
+	 *
+	 * @param clazz
+	 * 		the type of policy def to return
+	 *
+	 * @return true if this container has the {@link PolicyDef} with the given type, false if not
+	 */
+	boolean hasPolicyDef(Class<?> clazz);
+
+	/**
 	 * Returns the {@link PolicyDef} for the given type
 	 *
 	 * @param type
@@ -88,4 +98,12 @@ public interface PolicyContainer {
 	 * 		the {@link PolicyDefs} to set
 	 */
 	void setPolicyDefs(PolicyDefs policyDefs);
+
+	/**
+	 * Add or update the given {@link PolicyDef} to this container
+	 *
+	 * @param policyDef
+	 * 		the {@link PolicyDef} to add or update
+	 */
+	void addOrUpdate(PolicyDef policyDef);
 }
