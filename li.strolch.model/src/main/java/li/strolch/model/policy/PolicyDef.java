@@ -17,6 +17,8 @@ package li.strolch.model.policy;
 
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -34,6 +36,9 @@ import li.strolch.utils.helper.StringHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class PolicyDef {
+
+	private static final Logger logger = LoggerFactory.getLogger(PolicyDef.class);
+
 	protected String type;
 	protected String value;
 
@@ -141,7 +146,7 @@ public abstract class PolicyDef {
 			try {
 				Class.forName(value);
 			} catch (ClassNotFoundException e) {
-				throw new StrolchPolicyException("Invalid policy configuration. Policy does not exist: " + value, e);
+				logger.error("Invalid policy configuration. Policy does not exist: " + value, e);
 			}
 
 			return new JavaPolicyDef(type, value);
