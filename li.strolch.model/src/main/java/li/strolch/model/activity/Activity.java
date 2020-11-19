@@ -484,6 +484,11 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public Activity asActivity() {
+		return this;
+	}
+
+	@Override
 	public Long getStart() {
 		long start = Long.MAX_VALUE;
 		if (this.elements == null)

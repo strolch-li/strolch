@@ -188,4 +188,22 @@ public interface IActivityElement extends StrolchElement {
 
 		return parent;
 	}
+
+	/**
+	 * Casts this {@link IActivityElement} to {@link Activity}
+	 *
+	 * @return this {@link IActivityElement} as {@link Activity}
+	 */
+	default Activity asActivity() {
+		return (Activity) this;
+	}
+
+	/**
+	 * Casts this {@link IActivityElement} to {@link Action}
+	 *
+	 * @return this {@link IActivityElement} as {@link Action}
+	 */
+	default Action asAction() {
+		return (Action) this;
+	}
 }
