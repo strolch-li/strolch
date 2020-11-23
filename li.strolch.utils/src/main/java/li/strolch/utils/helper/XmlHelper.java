@@ -15,7 +15,10 @@
  */
 package li.strolch.utils.helper;
 
+import static li.strolch.utils.helper.StringHelper.normalizeLength;
+
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.parsers.*;
@@ -28,6 +31,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import li.strolch.utils.RemoveCRFilterWriter;
 import li.strolch.utils.exceptions.XmlException;
@@ -326,5 +331,50 @@ public class XmlHelper {
 		} catch (DOMException | ParserConfigurationException e) {
 			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
 		}
+	}
+
+	public static void marshallTempFile(File tempPath, String prefix, Object object) throws Exception {
+
+		String currentHour = normalizeLength(String.valueOf(LocalTime.now().getHour()), 2, true, '0');
+		String pathS = LocalDate.now() + "/" + currentHour;
+		File path = new File(tempPath, pathS);
+		if (!path.exists() && !path.mkdirs())
+			throw new IllegalStateException("Failed to create path " + path.getAbsolutePath());
+
+		File dataFile = new File(path, prefix + "_" + System.currentTimeMillis() + ".xml");
+
+		marshall(dataFile, object);
+	}
+
+	/**
+	 * Marshalls the given element annotated with xml annotations to the given destination file
+	 *
+	 * @param dstFile
+	 * 		the destination to marshall the object
+	 * @param object
+	 * 		the object to marshall
+	 *
+	 * @throws Exception
+	 * 		if the marshalling fails for any reason
+	 */
+	public static void marshall(File dstFile, Object object) throws Exception {
+
+		try (FileOutputStream out = new FileOutputStream(dstFile)) {
+
+			JAXBContext jc = JAXBContext.newInstance(object.getClass());
+
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document document = db.newDocument();
+
+			Marshaller marshaller = jc.createMarshaller();
+			marshaller.marshal(object, document);
+
+			writeDocument(document, out);
+
+			out.flush();
+		}
+
+		logger.info("Marshalled " + object.getClass() + " to " + dstFile);
 	}
 }
