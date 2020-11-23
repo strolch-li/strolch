@@ -401,7 +401,8 @@ public class DbSchemaVersionCheck {
 					ZipEntry ze;
 					while ((ze = zip.getNextEntry()) != null) {
 						String entryName = ze.getName();
-						if (entryName.endsWith(".sql") && entryName.contains("migration"))
+						if (entryName.endsWith(".sql") && entryName.startsWith(this.app) && entryName
+								.contains("migration"))
 							versions.add(parseVersion(entryName));
 					}
 				} catch (IOException e) {
@@ -414,8 +415,9 @@ public class DbSchemaVersionCheck {
 				File[] files = file.listFiles();
 				if (files != null) {
 					for (File f : files) {
-						if (f.getName().endsWith(".sql") && f.getName().contains("migration"))
-							versions.add(parseVersion(f.getName()));
+						String name = f.getName();
+						if (name.endsWith(".sql") && name.startsWith(this.app) && name.contains("migration"))
+							versions.add(parseVersion(name));
 					}
 				}
 			}
