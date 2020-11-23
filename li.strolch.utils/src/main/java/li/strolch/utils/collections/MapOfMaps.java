@@ -248,6 +248,10 @@ public class MapOfMaps<T, U, V> {
 		return this.mapOfMaps.values().stream().flatMap(uvMap -> uvMap.values().stream());
 	}
 
+	public Stream<Entry<T, Map<U, V>>> stream() {
+		return this.mapOfMaps.entrySet().stream();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
