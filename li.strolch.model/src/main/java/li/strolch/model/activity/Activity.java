@@ -166,28 +166,89 @@ public class Activity extends AbstractStrolchRootElement
 	 *
 	 * @param activityElement
 	 * 		the element to add
-	 *
-	 * @return the element added
 	 */
-	@SuppressWarnings("unchecked")
-	public <T extends IActivityElement> T addElement(IActivityElement activityElement) {
+	public void addElement(IActivityElement activityElement) {
+		assertCanAdd(activityElement);
+		activityElement.setParent(this);
+		this.elements.put(activityElement.getId(), activityElement);
+	}
+
+	/**
+	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} before the given element
+	 *
+	 * @param element
+	 * 		the element before which to add the other element
+	 * @param elementToAdd
+	 * 		the element to add
+	 */
+	public void addElementBefore(IActivityElement element, IActivityElement elementToAdd) {
+		assertCanAdd(elementToAdd);
+
+		Iterator<Entry<String, IActivityElement>> iterator = this.elements.entrySet().iterator();
+		LinkedHashMap<String, IActivityElement> elements = new LinkedHashMap<>();
+		boolean added = false;
+		while (iterator.hasNext()) {
+			Entry<String, IActivityElement> next = iterator.next();
+
+			if (!added && next.getValue().equals(element)) {
+				elements.put(elementToAdd.getId(), elementToAdd);
+				elements.put(next.getKey(), next.getValue());
+				added = true;
+			}
+
+			elements.put(next.getKey(), next.getValue());
+		}
+		if (!added)
+			throw new IllegalStateException("Element " + element.getId() + " was not found, couldn't add before!");
+
+		elementToAdd.setParent(this);
+		this.elements = elements;
+	}
+
+	/**
+	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} after the given element
+	 *
+	 * @param element
+	 * 		the element before which to add the other element
+	 * @param elementToAdd
+	 * 		the element to add
+	 */
+	public void addElementAfter(IActivityElement element, IActivityElement elementToAdd) {
+		assertCanAdd(elementToAdd);
+
+		Iterator<Entry<String, IActivityElement>> iterator = this.elements.entrySet().iterator();
+		LinkedHashMap<String, IActivityElement> elements = new LinkedHashMap<>();
+		boolean added = false;
+		while (iterator.hasNext()) {
+			Entry<String, IActivityElement> next = iterator.next();
+			elements.put(next.getKey(), next.getValue());
+
+			if (!added && next.getValue().equals(element)) {
+				elements.put(elementToAdd.getId(), elementToAdd);
+				added = true;
+			}
+		}
+		if (!added)
+			throw new IllegalStateException("Element " + element.getId() + " was not found, couldn't add after!");
+
+		elementToAdd.setParent(this);
+		this.elements = elements;
+	}
+
+	private void assertCanAdd(IActivityElement elementToAdd) {
 		assertNotReadonly();
-		DBC.PRE.assertNotEquals("Can't add element to itself!", this, activityElement);
-		DBC.PRE.assertNull("Parent can't already be set!", activityElement.getParent());
+		DBC.PRE.assertNotEquals("Can't add element to itself!", this, elementToAdd);
+		DBC.PRE.assertNull("Parent can't already be set!", elementToAdd.getParent());
 
 		// TODO make sure we can't create a circular dependency
 
 		initElements();
-		String id = activityElement.getId();
+		String id = elementToAdd.getId();
 		if (id == null)
 			throw new StrolchException("Cannot add IActivityElement without id.");
-		else if (this.elements.containsKey(id))
+		if (this.elements.containsKey(id))
 			throw new StrolchException(
-					"Activiy " + getLocator() + " already contains an activity element with id = " + id);
-		else {
-			activityElement.setParent(this);
-			return (T) this.elements.put(activityElement.getId(), activityElement);
-		}
+					"Activity " + getLocator() + " already contains an activity element with id = " + id);
 	}
 
 	/**
@@ -701,7 +762,6 @@ public class Activity extends AbstractStrolchRootElement
 		return findParameter(BAG_RELATIONS, paramKey, assertExists);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey) {
 
@@ -710,7 +770,7 @@ public class Activity extends AbstractStrolchRootElement
 			return parameter;
 
 		if (this.parent != null)
-			return (T) this.parent.findParameter(bagKey, paramKey);
+			return this.parent.findParameter(bagKey, paramKey);
 
 		return null;
 	}

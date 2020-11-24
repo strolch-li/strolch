@@ -1,12 +1,12 @@
 /*
  * Copyright 2016 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import li.strolch.exception.StrolchException;
@@ -246,6 +248,48 @@ public class ActivityTest {
 		assertFalse(nextElement.isPresent());
 		nextElement = a.getNextElementByType(a5, "Use");
 		assertFalse(nextElement.isPresent());
+	}
+
+	@Test
+	public void testAddAfter() {
+		Activity a = new Activity("bla", "Bla", "Bla", TimeOrdering.SERIES);
+
+		Action a0 = new Action("a0", "A0", "Wait");
+		a.addElement(a0);
+		Action a1 = new Action("a1", "A1", "Consume");
+		a.addElement(a1);
+		Action a2 = new Action("a2", "A2", "Consume");
+		a.addElement(a2);
+
+		Action a3 = new Action("a3", "A3", "Produce");
+		a.addElementAfter(a0, a3);
+
+		Iterator<Map.Entry<String, IActivityElement>> iter = a.elementIterator();
+		assertEquals(a0, iter.next().getValue());
+		assertEquals(a3, iter.next().getValue());
+		assertEquals(a1, iter.next().getValue());
+		assertEquals(a2, iter.next().getValue());
+	}
+
+	@Test
+	public void testAddBefore() {
+		Activity a = new Activity("bla", "Bla", "Bla", TimeOrdering.SERIES);
+
+		Action a0 = new Action("a0", "A0", "Wait");
+		a.addElement(a0);
+		Action a1 = new Action("a1", "A1", "Consume");
+		a.addElement(a1);
+		Action a2 = new Action("a2", "A2", "Consume");
+		a.addElement(a2);
+
+		Action a3 = new Action("a3", "A3", "Produce");
+		a.addElementBefore(a1, a3);
+
+		Iterator<Map.Entry<String, IActivityElement>> iter = a.elementIterator();
+		assertEquals(a0, iter.next().getValue());
+		assertEquals(a3, iter.next().getValue());
+		assertEquals(a1, iter.next().getValue());
+		assertEquals(a2, iter.next().getValue());
 	}
 
 	@Test
