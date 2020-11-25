@@ -401,7 +401,7 @@ public class Activity extends AbstractStrolchRootElement
 		return this.elements.values().stream().filter(predicate).collect(toList());
 	}
 
-	public List<Action> findActions(Predicate<IActivityElement> predicate) {
+	public List<Action> findActions(Predicate<Action> predicate) {
 		return this.elements.values().stream() //
 				.filter(IActivityElement::isAction) //
 				.map(e -> (Action) e) //
