@@ -21,7 +21,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
 
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -38,8 +37,7 @@ public class AuthenticationResponseFilter implements ContainerResponseFilter {
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationResponseFilter.class);
 
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
 		Certificate cert = (Certificate) requestContext.getProperty(STROLCH_CERTIFICATE);
 		if (cert == null)
@@ -47,6 +45,9 @@ public class AuthenticationResponseFilter implements ContainerResponseFilter {
 
 		if (cert.getUsage().isSingle()) {
 			logger.info("Invalidating single usage certificate for " + cert.getUsername());
+			RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
+		} else if (cert.getUsage().isSetPassword()) {
+			logger.info("Invalidating SET_PASSWORD usage certificate for " + cert.getUsername());
 			RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
 		}
 	}
