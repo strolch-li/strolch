@@ -49,6 +49,11 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 	}
 
 	@Override
+	public void delay(long duration, Runnable runnable) {
+		getExecutor().schedule(runnable, duration, TimeUnit.MILLISECONDS);
+	}
+
+	@Override
 	public void execute(String realm, ComponentContainer container, Locator actionLocator, long duration) {
 		synchronized (this.simulationTasks) {
 			if (this.simulationTasks.containsKey(actionLocator)) {

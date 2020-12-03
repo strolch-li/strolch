@@ -198,6 +198,19 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Delays the given {@link Runnable} by the given {@link Duration}
+	 *
+	 * @param duration
+	 * 		the duration to delay
+	 * @param runnable
+	 * 		the action to delay
+	 */
+	public void delay(Duration duration, Runnable runnable) {
+		long delayMs = duration.toMillis();
+		getDelayedExecutionTimer().delay(delayMs, runnable);
+	}
+
+	/**
 	 * Method to delay toExecuted() call for this action by the given duration
 	 *
 	 * @param duration

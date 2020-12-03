@@ -15,6 +15,16 @@ import li.strolch.model.activity.Action;
 public interface DelayedExecutionTimer {
 
 	/**
+	 * Delays the execution of the given {@link Runnable} by the given milliseconds
+	 *
+	 * @param duration
+	 * 		the duration in milliseconds before calling the {@link Runnable}
+	 * @param runnable
+	 * 		the action to call after the given delay
+	 */
+	void delay(long duration, Runnable runnable);
+
+	/**
 	 * Completes the execution of the given {@link Action} {@link Locator} after the given duration in milliseconds
 	 *
 	 * @param realm
