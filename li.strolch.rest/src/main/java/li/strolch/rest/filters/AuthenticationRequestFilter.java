@@ -17,8 +17,7 @@ package li.strolch.rest.filters;
 
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_SOURCE;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import static li.strolch.utils.helper.StringHelper.*;
 
 import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
@@ -153,31 +152,22 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	 * authorization token
 	 */
 	protected Certificate validateSession(ContainerRequestContext requestContext, String remoteIp) {
-
 		String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		authorization = authorization == null ? "" : authorization.trim();
+		authorization = trimOrEmpty(authorization);
 
-		if (isEmpty(authorization) || (authorization.startsWith("Basic ") && !getRestful().isBasicAuthEnabled())) {
+		if (authorization.isEmpty())
 			return validateCookie(requestContext, remoteIp);
-		}
 
-		boolean basicAuth = authorization.startsWith("Basic ");
-		if (basicAuth) {
+		if (authorization.startsWith("Basic ")) {
+			if (!getRestful().isBasicAuthEnabled()) {
+				logger.error("Basic Auth is not available for URL " + requestContext.getUriInfo().getPath());
+				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Basic Auth not available")
+						.build());
+				return null;
+			}
 
-			// do basic auth, if enabled
-			if (getRestful().isBasicAuthEnabled())
-				return authenticateBasic(requestContext, authorization, remoteIp);
-
-			// otherwise see if we can do cookie auth
-			String sessionId = getSessionIdFromCookie(requestContext);
-			if (!sessionId.isEmpty())
-				return validateCertificate(requestContext, sessionId, remoteIp);
-
-			logger.error("Basic Auth not enabled. Can not process URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("Basic Auth not enabled").build());
-			return null;
+			return authenticateBasic(requestContext, authorization, remoteIp);
 		}
 
 		return validateCertificate(requestContext, authorization, remoteIp);
