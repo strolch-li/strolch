@@ -157,6 +157,7 @@ public class Tags {
 		public static final String WITH_LOCATOR = "withLocator";
 		public static final String WITH_VERSION = "withVersion";
 		public static final String PARAMS = "params";
+		public static final String OPERATION = "operation";
 
 		public static final String APP_VERSION = "appVersion";
 		public static final String SYSTEM_STATE = "systemState";
