@@ -215,6 +215,18 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	}
 
 	/**
+	 * Returns true if the given component is registered on this container
+	 *
+	 * @param clazz
+	 * 		the type of component to check for
+	 *
+	 * @return true if the component is available
+	 */
+	public boolean hasComponent(Class<?> clazz) {
+		return this.getContainer().hasComponent(clazz);
+	}
+
+	/**
 	 * Opens a {@link StrolchTransaction} for the default realm and certificate
 	 *
 	 * @param cert
