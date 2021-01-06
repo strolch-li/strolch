@@ -334,9 +334,20 @@ public class XmlHelper {
 	}
 
 	public static void marshallTempFile(File tempPath, String prefix, Object object) throws Exception {
+		marshallTempFile(tempPath, prefix, false, object);
+	}
+
+	public static void marshallTempFile(File tempPath, String prefix, boolean separateHours, Object object)
+			throws Exception {
 
 		String currentHour = normalizeLength(String.valueOf(LocalTime.now().getHour()), 2, true, '0');
-		String pathS = LocalDate.now() + "/" + currentHour;
+
+		String pathS;
+		if (separateHours)
+			pathS = LocalDate.now() + "/" + currentHour;
+		else
+			pathS = LocalDate.now() + "_" + currentHour;
+
 		File path = new File(tempPath, pathS);
 		if (!path.exists() && !path.mkdirs())
 			throw new IllegalStateException("Failed to create path " + path.getAbsolutePath());
