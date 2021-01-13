@@ -709,12 +709,18 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public String getRelationId(String paramKey) throws StrolchModelException {
-		return getRelationParam(paramKey, true).getValue();
+		ParameterBag relationsBag = getParameterBag(BAG_RELATIONS, false);
+		if (relationsBag == null)
+			return "";
+		return relationsBag.getString(paramKey);
 	}
 
 	@Override
 	public List<String> getRelationIds(String paramKey) throws StrolchModelException {
-		return getRelationsParam(paramKey, true).getValue();
+		ParameterBag relationsBag = getParameterBag(BAG_RELATIONS, false);
+		if (relationsBag == null)
+			return List.of();
+		return relationsBag.getStringList(paramKey);
 	}
 
 	@Override
