@@ -1239,6 +1239,21 @@ public interface ParameterBagContainer extends StrolchElement {
 	List<String> getRelationIds(String paramKey) throws StrolchModelException;
 
 	/**
+	 * Returns a stream over the values of the {@link StringListParameter} with the given key from the {@link
+	 * ParameterBag} with the ID {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link
+	 * ParameterBag} does not exist, then a {@link StrolchModelException} is thrown
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link StringParameter} for which the value is to be returned
+	 *
+	 * @return a stream over the the parameter's values
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	Stream<String> streamRelationIds(String paramKey) throws StrolchModelException;
+
+	/**
 	 * Sets the value of the {@link StringParameter} with the given key on the {@link ParameterBag} with the ID {@link
 	 * StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist, then a
 	 * {@link StrolchModelException} is thrown

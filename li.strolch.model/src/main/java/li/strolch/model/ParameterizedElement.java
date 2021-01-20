@@ -272,6 +272,24 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	/**
+	 * Returns a {@link Stream} over the elements of the {@link StringListParameter} with the given paramKey
+	 *
+	 * @param paramKey
+	 * 		the key of the parameter for which to return the value
+	 *
+	 * @return a stream over the values of the parameter with the given paramKey
+	 *
+	 * @throws StrolchModelException
+	 * 		if the parameter does not exist
+	 */
+	public Stream<String> streamStringList(String paramKey) throws StrolchModelException {
+		StringListParameter param = getParameter(paramKey, false);
+		if (param == null)
+			return Stream.empty();
+		return param.streamValues();
+	}
+
+	/**
 	 * Returns the value of the {@link IntegerListParameter} with the given paramKey
 	 *
 	 * @param paramKey
