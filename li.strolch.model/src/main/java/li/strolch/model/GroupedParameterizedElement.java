@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
@@ -89,183 +90,157 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	@Override
 	public String getString(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return "";
-		return bag.getString(paramKey);
+		return bag == null ? "" : bag.getString(paramKey);
 	}
 
 	@Override
 	public String getString(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getString(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? "" : bag.getString(paramKey);
 	}
 
 	@Override
 	public boolean getBoolean(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return false;
-		return bag.getBoolean(paramKey);
+		return bag != null && bag.getBoolean(paramKey);
 	}
 
 	@Override
 	public boolean getBoolean(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getBoolean(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag != null && bag.getBoolean(paramKey);
 	}
 
 	@Override
 	public int getInteger(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return 0;
-		return bag.getInteger(paramKey);
+		return bag == null ? 0 : bag.getInteger(paramKey);
 	}
 
 	@Override
 	public int getInteger(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getInteger(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? 0 : bag.getInteger(paramKey);
 	}
 
 	@Override
 	public double getDouble(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return 0.0D;
-		return bag.getDouble(paramKey);
+		return bag == null ? 0 : bag.getDouble(paramKey);
 	}
 
 	@Override
 	public double getDouble(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
+		ParameterBag bag = getParameterBag(bagKey, false);
 		return bag.getDouble(paramKey);
 	}
 
 	@Override
 	public long getLong(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return 0L;
-		return bag.getLong(paramKey);
+		return bag == null ? 0L : bag.getLong(paramKey);
 	}
 
 	@Override
 	public long getLong(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getLong(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? 0L : bag.getLong(paramKey);
 	}
 
 	@Override
 	public ZonedDateTime getDate(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return ISO8601.EMPTY_VALUE_ZONED_DATE;
-		return bag.getDate(paramKey);
+		return bag == null ? ISO8601.EMPTY_VALUE_ZONED_DATE : bag.getDate(paramKey);
 	}
 
 	@Override
 	public ZonedDateTime getDate(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getDate(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? ISO8601.EMPTY_VALUE_ZONED_DATE : bag.getDate(paramKey);
 	}
 
 	@Override
 	public LocalDateTime getLocalDate(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return ISO8601.EMPTY_VALUE_LOCAL_DATE;
-		return bag.getLocalDate(paramKey);
+		return bag == null ? ISO8601.EMPTY_VALUE_LOCAL_DATE : bag.getLocalDate(paramKey);
 	}
 
 	@Override
 	public LocalDateTime getLocalDate(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getLocalDate(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? ISO8601.EMPTY_VALUE_LOCAL_DATE : bag.getLocalDate(paramKey);
 	}
 
 	@Override
 	public String getText(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return "";
-		return bag.getText(paramKey);
+		return bag == null ? "" : bag.getText(paramKey);
 	}
 
 	@Override
 	public String getText(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getText(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? "" : bag.getText(paramKey);
 	}
 
 	@Override
 	public PeriodDuration getDuration(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return PeriodDuration.ZERO;
-		return bag.getDuration(paramKey);
+		return bag == null ? PeriodDuration.ZERO : bag.getDuration(paramKey);
 	}
 
 	@Override
 	public PeriodDuration getDuration(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getDuration(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? PeriodDuration.ZERO : bag.getDuration(paramKey);
 	}
 
 	@Override
 	public List<String> getStringList(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return Collections.emptyList();
-		return bag.getStringList(paramKey);
+		return bag == null ? emptyList() : bag.getStringList(paramKey);
 	}
 
 	@Override
 	public List<String> getStringList(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getStringList(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getStringList(paramKey);
 	}
 
 	@Override
 	public List<Integer> getIntegerList(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return Collections.emptyList();
-		return bag.getIntegerList(paramKey);
+		return bag == null ? emptyList() : bag.getIntegerList(paramKey);
 	}
 
 	@Override
 	public List<Integer> getIntegerList(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getIntegerList(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getIntegerList(paramKey);
 	}
 
 	@Override
 	public List<Double> getDoubleList(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return Collections.emptyList();
-		return bag.getDoubleList(paramKey);
+		return bag == null ? emptyList() : bag.getDoubleList(paramKey);
 	}
 
 	@Override
 	public List<Double> getDoubleList(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getDoubleList(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getDoubleList(paramKey);
 	}
 
 	@Override
 	public List<Long> getLongList(String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
-		if (bag == null)
-			return Collections.emptyList();
-		return bag.getLongList(paramKey);
+		return bag == null ? emptyList() : bag.getLongList(paramKey);
 	}
 
 	@Override
 	public List<Long> getLongList(String bagKey, String paramKey) throws StrolchModelException {
-		ParameterBag bag = getParameterBag(bagKey, true);
-		return bag.getLongList(paramKey);
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getLongList(paramKey);
 	}
 
 	//
@@ -724,6 +699,14 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	@Override
+	public Stream<String> streamRelationIds(String paramKey) throws StrolchModelException {
+		ParameterBag relationsBag = getParameterBag(BAG_RELATIONS, false);
+		if (relationsBag == null)
+			return Stream.empty();
+		return relationsBag.streamStringList(paramKey);
+	}
+
+	@Override
 	public void setRelationId(String paramKey, String id) throws StrolchModelException {
 		getRelationParam(paramKey, true).setValue(id);
 	}
@@ -980,7 +963,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	@Override
 	public Set<String> getParameterBagKeySet() {
 		if (this.parameterBagMap == null) {
-			return Collections.emptySet();
+			return emptySet();
 		}
 		return new HashSet<>(this.parameterBagMap.keySet());
 	}
