@@ -49,14 +49,14 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	private static final String querySizeOfTypeDrSqlS = "select count(*) from {0} where type = ANY(?) and latest = true {1}";
 
 	private static final String queryAllDrAsXmlSqlS = "select id, type, asxml from {0} where latest = true {1}";
-	private static final String queryAllDrAsXmlLimitSqlS = "select id, type, asxml from {0} where latest = true {1} order by id limit {2} offset {3}";
+	private static final String queryAllDrAsXmlLimitSqlS = "select id, type, asxml from {0} where latest = true {1} order by date {2} limit {3} offset {4}";
 	private static final String queryAllDrAsJsonSqlS = "select id, type, asjson from {0} where latest = true {1}";
-	private static final String queryAllDrAsJsonLimitSqlS = "select id, type, asjson from {0} where latest = true {1} order by id limit {2} offset {3}";
+	private static final String queryAllDrAsJsonLimitSqlS = "select id, type, asjson from {0} where latest = true {1} order by date {2} limit {3} offset {4}";
 
 	private static final String queryAllByTypeDrAsXmlSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true {1}";
-	private static final String queryAllByTypeDrAsXmlLimitSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true {1} order by id limit {2,number,#} offset {3,number,#}";
+	private static final String queryAllByTypeDrAsXmlLimitSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true {1} order by date {2} limit {3,number,#} offset {4,number,#}";
 	private static final String queryAllByTypeDrAsJsonSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true {1}";
-	private static final String queryAllByTypeDrAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true {1} order by id limit {2,number,#} offset {3,number,#}";
+	private static final String queryAllByTypeDrAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true {1} order by date {2} limit {3,number,#} offset {4,number,#}";
 
 	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
@@ -287,15 +287,16 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	@Override
 	public List<Order> queryAll(DateRange dateRange) throws StrolchPersistenceException {
-		return queryAll(dateRange, Integer.MAX_VALUE, 0);
+		return queryAll(dateRange, Integer.MAX_VALUE, 0, true);
 	}
 
 	@Override
-	public List<Order> queryAll(DateRange dateRange, long limit, long offset) throws StrolchPersistenceException {
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc)
+			throws StrolchPersistenceException {
 
 		List<Order> list = new ArrayList<>();
 
-		String sql = getLimitSql(dateRange, limit, offset, queryAllDrAsXmlSqlS, queryAllDrAsJsonSqlS,
+		String sql = getLimitSql(dateRange, limit, offset, asc, queryAllDrAsXmlSqlS, queryAllDrAsJsonSqlS,
 				queryAllDrAsXmlLimitSqlS, queryAllDrAsJsonLimitSqlS);
 
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
@@ -317,18 +318,18 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 	@Override
 	public List<Order> queryAll(DateRange dateRange, String... types) throws StrolchPersistenceException {
-		return queryAll(dateRange, Integer.MAX_VALUE, 0, types);
+		return queryAll(dateRange, Integer.MAX_VALUE, 0, true, types);
 	}
 
 	@Override
-	public List<Order> queryAll(DateRange dateRange, long limit, long offset, String... types)
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc, String... types)
 			throws StrolchPersistenceException {
 		if (types.length == 0)
 			return queryAll(limit, offset);
 
 		List<Order> list = new ArrayList<>();
 
-		String sql = getLimitSql(dateRange, limit, offset, queryAllByTypeDrAsXmlSqlS, queryAllByTypeDrAsJsonSqlS,
+		String sql = getLimitSql(dateRange, limit, offset, asc, queryAllByTypeDrAsXmlSqlS, queryAllByTypeDrAsJsonSqlS,
 				queryAllByTypeDrAsXmlLimitSqlS, queryAllByTypeDrAsJsonLimitSqlS);
 
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
@@ -351,13 +352,12 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		}
 	}
 
-	protected String getLimitSql(DateRange dateRange, long limit, long offset, String xmlSql, String jsonSql,
-			String xmlLimitSql, String jsonLimitSql) {
+	protected String getLimitSql(DateRange dateRange, long limit, long offset, boolean asc, String xmlSql,
+			String jsonSql, String xmlLimitSql, String jsonLimitSql) {
 
 		String sql;
-		if (limit == Integer.MAX_VALUE) {
+		if (limit == Integer.MAX_VALUE)
 			return getSql(dateRange, xmlSql, jsonSql);
-		}
 
 		if (this.dataType == DataType.xml)
 			sql = xmlLimitSql;
@@ -367,7 +367,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			throw new IllegalStateException("Unhandled DataType " + this.dataType);
 
 		String dateRangeClause = buildDateRangeClaus(dateRange);
-		return MessageFormat.format(sql, getTableName(), dateRangeClause, limit, offset);
+		return MessageFormat.format(sql, getTableName(), dateRangeClause, asc ? "ASC" : "DESC", limit, offset);
 	}
 
 	protected String getSql(DateRange dateRange, String xmlSql, String jsonSql) {

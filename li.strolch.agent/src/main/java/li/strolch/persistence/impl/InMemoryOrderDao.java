@@ -69,7 +69,8 @@ public class InMemoryOrderDao implements OrderDao {
 	}
 
 	@Override
-	public List<Order> queryAll(DateRange dateRange, long limit, long offset) throws StrolchPersistenceException {
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc)
+			throws StrolchPersistenceException {
 		return instance.getElements().values().stream().filter(o -> dateRange.contains(o.getDate())).skip(offset)
 				.limit(limit).collect(toList());
 	}
@@ -91,7 +92,7 @@ public class InMemoryOrderDao implements OrderDao {
 	}
 
 	@Override
-	public List<Order> queryAll(DateRange dateRange, long limit, long offset, String... types)
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc, String... types)
 			throws StrolchPersistenceException {
 		return instance.getElements().values().stream().filter(o -> isIn(o, types))
 				.filter(o -> dateRange.contains(o.getDate())).skip(offset).limit(limit).collect(toList());

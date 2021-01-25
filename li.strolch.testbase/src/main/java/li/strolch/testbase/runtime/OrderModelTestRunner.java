@@ -160,11 +160,11 @@ public class OrderModelTestRunner {
 			assertEquals("Expect 2 Orders from _2017 inc to _20190401 inc", 2, orders.size());
 
 			if (dao.supportsPaging()) {
-				orders = dao.queryAll(dateRange, 2, 1);
+				orders = dao.queryAll(dateRange, 2, 1, true);
 				assertEquals("Expect 1 Orders from _2017 inc to _20190401 inc offset 1 limit 2", 1, orders.size());
 				assertEquals("Expect order myTestOrder2", "myTestOrder2", orders.get(0).getId());
 
-				orders = dao.queryAll(new DateRange().from(_2017, true).to(_2020, true), 2, 1);
+				orders = dao.queryAll(new DateRange().from(_2017, true).to(_2020, true), 2, 1, true);
 				assertEquals("Expect 2 Orders from _2017 inc to _2020 inc offset 1 limit 2", 2, orders.size());
 				assertEquals("Expect order myTestOrder2", "myTestOrder2", orders.get(0).getId());
 				assertEquals("Expect order myTestOrder3", "myTestOrder3", orders.get(1).getId());

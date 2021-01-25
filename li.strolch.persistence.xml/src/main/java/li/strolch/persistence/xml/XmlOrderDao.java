@@ -114,7 +114,8 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 	}
 
 	@Override
-	public List<Order> queryAll(DateRange dateRange, long limit, long offset) throws StrolchPersistenceException {
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc)
+			throws StrolchPersistenceException {
 		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
 	}
 
@@ -124,7 +125,7 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 	}
 
 	@Override
-	public List<Order> queryAll(DateRange dateRange, long limit, long offset, String... types)
+	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc, String... types)
 			throws StrolchPersistenceException {
 		throw new UnsupportedOperationException("Paging not supported! Check first with supportsPaging()");
 	}

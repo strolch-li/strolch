@@ -66,13 +66,15 @@ public interface OrderDao extends StrolchDao<Order> {
 	 * 		the max amount, or @{@link Integer#MAX_VALUE} for all
 	 * @param offset
 	 * 		if max amount defined, then the offset to start from
+	 * @param asc
+	 * 		true for ascending, false for descending
 	 *
 	 * @return all elements regardless of type
 	 *
 	 * @throws StrolchPersistenceException
 	 * 		if something goes wrong
 	 */
-	List<Order> queryAll(DateRange dateRange, long limit, long offset) throws StrolchPersistenceException;
+	List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all elements of the given type
@@ -100,13 +102,14 @@ public interface OrderDao extends StrolchDao<Order> {
 	 * 		if max amount defined, then the offset to start from
 	 * @param types
 	 * 		the type(s) of element(s) to return
+	 * @param asc
+	 * 		true for ascending, false for descending
 	 *
 	 * @return all elements of the given type
 	 *
 	 * @throws StrolchPersistenceException
 	 * 		if something goes wrong
 	 */
-	List<Order> queryAll(DateRange dateRange, long limit, long offset, String... types)
+	List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc, String... types)
 			throws StrolchPersistenceException;
-
 }
