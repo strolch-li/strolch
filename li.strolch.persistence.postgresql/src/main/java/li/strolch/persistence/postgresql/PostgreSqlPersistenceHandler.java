@@ -42,7 +42,8 @@ import org.postgresql.Driver;
  */
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
-	public static final String SCRIPT_PREFIX = "strolch"; //$NON-NLS-1$
+	public static final String SCRIPT_PREFIX_STROLCH = "strolch"; //$NON-NLS-1$
+	public static final String SCRIPT_PREFIX_ARCHIVE = "archive"; //$NON-NLS-1$
 	public static final String PROP_DATA_TYPE = "dataType"; //$NON-NLS-1$
 	public static final String DATA_TYPE_XML = "xml"; //$NON-NLS-1$
 	public static final String DATA_TYPE_JSON = "json"; //$NON-NLS-1$
@@ -95,7 +96,7 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		boolean allowDataInitOnSchemaCreate = configuration
 				.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE, Boolean.FALSE);
 
-		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX, this.getClass(),
+		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX_STROLCH, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
 		schemaVersionCheck.checkSchemaVersion(this.dsMap);
 

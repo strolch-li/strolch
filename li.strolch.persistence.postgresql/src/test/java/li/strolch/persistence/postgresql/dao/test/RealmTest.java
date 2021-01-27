@@ -15,6 +15,9 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -40,8 +43,11 @@ import org.junit.Test;
 
 public class RealmTest extends AbstractModelTest {
 
-	private static final String TESTUSER2 = "testuser2"; //$NON-NLS-1$
-	private static final String TESTUSER1 = "testuser1"; //$NON-NLS-1$
+	public static final String DB_URL1 = "jdbc:postgresql://localhost/testdb1";
+	public static final String DB_URL2 = "jdbc:postgresql://localhost/testdb2";
+
+	private static final String TEST_USER2 = "testuser2"; //$NON-NLS-1$
+	private static final String TEST_USER1 = "testuser1"; //$NON-NLS-1$
 	private static final String TEST = "test"; //$NON-NLS-1$
 	private static final String FIRST = "first"; //$NON-NLS-1$
 	private static final String SECOND = "second"; //$NON-NLS-1$
@@ -60,8 +66,10 @@ public class RealmTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 
-		dropSchema("jdbc:postgresql://localhost/testdb1", TESTUSER1, TEST); //$NON-NLS-1$
-		dropSchema("jdbc:postgresql://localhost/testdb2", TESTUSER2, TEST); //$NON-NLS-1$
+		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL1, TEST_USER1, DB_PASSWORD);
+		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL1, TEST_USER1, DB_PASSWORD);
+		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL2, TEST_USER2, DB_PASSWORD);
+		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL2, TEST_USER2, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

@@ -87,9 +87,9 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 			Driver.register();
 
 		Version dbVersion = DbSchemaVersionCheck
-				.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class);
+				.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
 		String sql = DbSchemaVersionCheck
-				.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX, PostgreSqlPersistenceHandler.class, dbVersion,
+				.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class, dbVersion,
 						"drop"); //$NON-NLS-1$
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();

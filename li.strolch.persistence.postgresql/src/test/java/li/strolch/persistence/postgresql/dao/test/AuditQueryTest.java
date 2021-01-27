@@ -15,6 +15,8 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 import static org.junit.Assert.assertEquals;
 
@@ -65,7 +67,8 @@ public class AuditQueryTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 
-		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
