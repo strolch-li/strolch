@@ -15,24 +15,20 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.text.MessageFormat;
 
-import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.postgresql.DataType;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
-import li.strolch.utils.Version;
-import li.strolch.utils.helper.StringHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +54,8 @@ public class CachedJsonDaoTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 
-		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -70,23 +67,6 @@ public class CachedJsonDaoTest extends AbstractModelTest {
 		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
 				.getComponent(PersistenceHandler.class);
 		assertEquals(DataType.json, persistenceHandler.getDataType());
-	}
-
-	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
-
-		if (!Driver.isRegistered())
-			Driver.register();
-
-		Version dbVersion = DbSchemaVersionCheck
-				.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
-		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
-		String sql = DbSchemaVersionCheck
-				.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class, dbVersion,
-						"drop"); //$NON-NLS-1$
-		logger.info(StringHelper.NEW_LINE + sql);
-		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
-			connection.prepareStatement(sql).execute();
-		}
 	}
 
 	@AfterClass
