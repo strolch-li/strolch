@@ -1,17 +1,26 @@
 package li.strolch.search;
 
+import static li.strolch.model.StrolchModelConstants.INTERNAL;
+import static li.strolch.model.Tags.AGENT;
+
 import java.util.Collection;
+import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.base.PrivilegeModelException;
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Restrictable;
+import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.utils.I18nMessage;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.ExceptionHelper;
 
 /**
  * Class to perform searches on Strolch elements
@@ -71,7 +80,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 * @return this object for chaining
 	 */
 	public StrolchSearch<T> internal() {
-		this.privilegeValue = StrolchModelConstants.INTERNAL;
+		this.privilegeValue = INTERNAL;
 		return this;
 	}
 
@@ -86,11 +95,33 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	public RootElementSearchResult<T> search(StrolchTransaction tx) {
 		try {
 			tx.getPrivilegeContext().validateAction(this);
-		} catch (PrivilegeModelException e) {
-			throw e;
-		} catch (PrivilegeException e) {
-			throw new StrolchAccessDeniedException(tx.getCertificate(), this, ExceptionHelper.getExceptionMessage(e),
-					e);
+		} catch (AccessDeniedException e) {
+
+			String username = tx.getCertificate().getUsername();
+
+			if (tx.getContainer().hasComponent(OperationsLog.class)) {
+				String realmName = tx.getRealmName();
+				String searchName = this.privilegeValue.equals(INTERNAL) ?
+						(getClass().getName() + " (INTERNAL)") :
+						this.privilegeValue;
+				LogMessage logMessage = new LogMessage(realmName, username,
+						Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), getPrivilegeName(), searchName),
+						LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+						"agent.search.failed.access.denied").value("user", username).value("search", searchName)
+						.withException(e);
+
+				OperationsLog operationsLog = tx.getContainer().getComponent(OperationsLog.class);
+				operationsLog.addMessage(logMessage);
+			}
+
+			String searchName = this.privilegeValue.equals(INTERNAL) ?
+					(getClass().getSimpleName() + " (INTERNAL)") :
+					getClass().getSimpleName();
+			I18nMessage i18n = new I18nMessage(
+					ResourceBundle.getBundle("strolch-agent", tx.getCertificate().getLocale()),
+					"agent.search.failed.access.denied").value("user", username).value("search", searchName);
+
+			throw new StrolchAccessDeniedException(tx.getCertificate(), this, i18n, e);
 		}
 
 		// first prepare

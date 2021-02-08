@@ -10,7 +10,6 @@ import com.google.gson.JsonObject;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags.Json;
 import li.strolch.utils.I18nMessage;
-import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
 
@@ -23,7 +22,6 @@ public class LogMessage extends I18nMessage {
 	private final Locator locator;
 	private final LogSeverity severity;
 	private LogMessageState state;
-	private String stackTrace;
 
 	public LogMessage(String realm, String username, Locator locator, LogSeverity severity, LogMessageState state,
 			I18nMessage i18nMessage) {
@@ -100,12 +98,8 @@ public class LogMessage extends I18nMessage {
 	}
 
 	public LogMessage withException(Throwable t) {
-		this.stackTrace = ExceptionHelper.formatException(t);
+		super.withException(t);
 		return this;
-	}
-
-	public String getStackTrace() {
-		return this.stackTrace;
 	}
 
 	@Override
@@ -114,8 +108,9 @@ public class LogMessage extends I18nMessage {
 		return this;
 	}
 
+	@Override
 	public LogMessage value(String key, Throwable e) {
-		super.value(key, ExceptionHelper.getExceptionMessageWithCauses(e));
+		super.value(key, e);
 		return this;
 	}
 

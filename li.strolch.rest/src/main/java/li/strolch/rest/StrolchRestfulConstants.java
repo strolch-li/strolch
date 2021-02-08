@@ -30,6 +30,7 @@ public class StrolchRestfulConstants {
 	public static final String STROLCH_AUTHORIZATION_EXPIRATION_DATE = "strolch.authorization.expirationDate"; //$NON-NLS-1$
 
 	public static final String MSG = "msg";
+	public static final String I18N = "i18n";
 	public static final String EXCEPTION_MSG = "exceptionMsg";
 	public static final String DATA = Tags.Json.DATA;
 	public static final String LAST_OFFSET = "lastOffset";

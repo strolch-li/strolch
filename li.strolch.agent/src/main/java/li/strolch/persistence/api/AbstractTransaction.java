@@ -52,13 +52,13 @@ import li.strolch.policy.PolicyHandler;
 import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
+import li.strolch.utils.I18nMessage;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -401,10 +401,30 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private void assertQueryAllowed(StrolchQuery query) {
 		try {
 			getPrivilegeContext().validateAction(query);
-		} catch (PrivilegeModelException e) {
-			throw e;
-		} catch (PrivilegeException e) {
-			throw new StrolchAccessDeniedException(this.certificate, query, getExceptionMessage(e), e);
+		} catch (AccessDeniedException e) {
+
+			String username = getCertificate().getUsername();
+			if (getContainer().hasComponent(OperationsLog.class)) {
+				String realmName = getRealmName();
+				String queryName = query.getPrivilegeValue().equals(INTERNAL) ?
+						(getClass().getName() + " (INTERNAL)") :
+						query.getPrivilegeValue().toString();
+				LogMessage logMessage = new LogMessage(realmName, username,
+						Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), query.getPrivilegeName(),
+								queryName), LogSeverity.Exception, LogMessageState.Information,
+						ResourceBundle.getBundle("strolch-agent"), "agent.query.failed.access.denied")
+						.value("user", username).value("query", queryName).withException(e);
+
+				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
+				operationsLog.addMessage(logMessage);
+			}
+
+			String queryName = query.getPrivilegeValue().equals(INTERNAL) ?
+					(getClass().getSimpleName() + " (INTERNAL)") :
+					query.getClass().getSimpleName();
+			I18nMessage i18n = new I18nMessage(ResourceBundle.getBundle("strolch-agent", getCertificate().getLocale()),
+					"agent.search.failed.access.denied").value("user", username).value("query", queryName);
+			throw new StrolchAccessDeniedException(this.certificate, query, i18n, e);
 		}
 	}
 

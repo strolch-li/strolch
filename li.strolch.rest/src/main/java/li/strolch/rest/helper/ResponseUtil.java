@@ -15,6 +15,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchElementNotFoundException;
+import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
@@ -32,27 +33,22 @@ public class ResponseUtil {
 	public static Response toResponse() {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, StringHelper.DASH);
-
 		String json = new Gson().toJson(response);
-
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
-	public static Response toResponse(I18nMessage msg) {
+	public static Response toResponse(Status status, I18nMessage msg) {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, msg.getMessage());
-
+		response.add(I18N, msg.accept(new I18nMessageToJsonVisitor()));
 		String json = new Gson().toJson(response);
-
-		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
+		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(String errorMsg) {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, errorMsg);
-
 		String json = new Gson().toJson(response);
-
 		return Response.serverError().entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
@@ -60,9 +56,7 @@ public class ResponseUtil {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, StringHelper.DASH);
 		response.addProperty(prop, value);
-
 		String json = new Gson().toJson(response);
-
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -71,9 +65,7 @@ public class ResponseUtil {
 		response.addProperty(MSG, StringHelper.DASH);
 		response.addProperty(prop1, value1);
 		response.addProperty(prop2, value2);
-
 		String json = new Gson().toJson(response);
-
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -82,9 +74,7 @@ public class ResponseUtil {
 		response.addProperty(MSG, StringHelper.DASH);
 		response.addProperty(prop1, value1);
 		response.add(DATA, data);
-
 		String json = new Gson().toJson(response);
-
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -96,9 +86,7 @@ public class ResponseUtil {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, StringHelper.DASH);
 		response.add(member, jsonElement);
-
 		String json = new Gson().toJson(response);
-
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -125,7 +113,6 @@ public class ResponseUtil {
 		response.add(member, arrayJ);
 
 		String json = new Gson().toJson(response);
-
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
@@ -136,7 +123,6 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(ServiceResult svcResult) {
-
 		Throwable t = svcResult.getThrowable();
 		JsonObject response = svcResult.toJson();
 		String json = new Gson().toJson(response);
@@ -186,7 +172,6 @@ public class ResponseUtil {
 		JsonObject response = new JsonObject();
 		response.addProperty(MSG, getExceptionMessageWithCauses(t, false));
 		String json = new Gson().toJson(response);
-
 		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 

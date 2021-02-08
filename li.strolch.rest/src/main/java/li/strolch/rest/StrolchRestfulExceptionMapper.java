@@ -25,7 +25,6 @@ import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
-import li.strolch.privilege.model.Restrictable;
 import li.strolch.rest.helper.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,24 +44,10 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 
 		if (ex instanceof StrolchAccessDeniedException) {
 			StrolchAccessDeniedException e = (StrolchAccessDeniedException) ex;
-			StringBuilder sb = new StringBuilder();
-			sb.append("User ");
-			sb.append(e.getCertificate().getUsername());
-			sb.append(" does not have access to ");
-			Restrictable restrictable = e.getRestrictable();
-			if (restrictable == null) {
-				// sb.append(StringHelper.NULL);
-				// use the message
-				sb.append(e.getMessage());
-			} else {
-				sb.append(restrictable.getPrivilegeName());
-				sb.append(" - ");
-				sb.append(restrictable.getPrivilegeValue());
-			}
+			return ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
+		}
 
-			return Response.status(Status.FORBIDDEN).entity(sb.toString()).type(MediaType.TEXT_PLAIN).build();
-
-		} else if (ex instanceof StrolchNotAuthenticatedException) {
+		if (ex instanceof StrolchNotAuthenticatedException) {
 			StrolchNotAuthenticatedException e = (StrolchNotAuthenticatedException) ex;
 			logger.error("User tried to access resource, but was not authenticated: " + ex.getMessage());
 			return Response.status(Status.UNAUTHORIZED).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();

@@ -17,37 +17,23 @@ package li.strolch.exception;
 
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Restrictable;
+import li.strolch.utils.I18nMessage;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class StrolchAccessDeniedException extends StrolchException {
 
-	private Certificate certificate;
-	private Restrictable restrictable;
+	private final Certificate certificate;
+	private final Restrictable restrictable;
+	private final I18nMessage i18n;
 
-	/**
-	 * @param certificate
-	 * @param restrictable
-	 * @param message
-	 * @param cause
-	 */
-	public StrolchAccessDeniedException(Certificate certificate, Restrictable restrictable, String message,
+	public StrolchAccessDeniedException(Certificate certificate, Restrictable restrictable, I18nMessage i18n,
 			Throwable cause) {
-		super(message, cause);
+		super(i18n.getMessage(), cause);
 		this.certificate = certificate;
 		this.restrictable = restrictable;
-	}
-
-	/**
-	 * @param certificate
-	 * @param restrictable
-	 * @param message
-	 */
-	public StrolchAccessDeniedException(Certificate certificate, Restrictable restrictable, String message) {
-		super(message);
-		this.certificate = certificate;
-		this.restrictable = restrictable;
+		this.i18n = i18n;
 	}
 
 	public Certificate getCertificate() {
@@ -56,5 +42,9 @@ public class StrolchAccessDeniedException extends StrolchException {
 
 	public Restrictable getRestrictable() {
 		return restrictable;
+	}
+
+	public I18nMessage getI18n() {
+		return this.i18n;
 	}
 }

@@ -15,6 +15,7 @@ public class I18nMessageToJsonVisitor implements I18nMessageVisitor<JsonObject> 
 
 		json.addProperty(Tags.Json.KEY, message.getKey());
 		json.addProperty(Tags.Json.MESSAGE, message.getMessage());
+		json.addProperty(Tags.Json.EXCEPTION, message.getStackTrace());
 
 		Properties values = message.getValues();
 		if (!values.isEmpty()) {

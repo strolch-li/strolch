@@ -2,6 +2,8 @@ package li.strolch.utils;
 
 import static java.util.Collections.emptySet;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
+import static li.strolch.utils.helper.ExceptionHelper.formatException;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -33,6 +35,7 @@ public class I18nMessage {
 	private final Properties values;
 	private final ResourceBundle bundle;
 	private String message;
+	protected String stackTrace;
 
 	public I18nMessage(ResourceBundle bundle, String key) {
 		DBC.INTERIM.assertNotNull("bundle may not be null!", bundle);
@@ -135,6 +138,20 @@ public class I18nMessage {
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
 		this.values.setProperty(key, value == null ? "(null)" : value.toString());
 		return this;
+	}
+
+	public I18nMessage value(String key, Throwable e) {
+		value(key, getExceptionMessageWithCauses(e));
+		return this;
+	}
+
+	public I18nMessage withException(Throwable t) {
+		this.stackTrace = formatException(t);
+		return this;
+	}
+
+	public String getStackTrace() {
+		return this.stackTrace;
 	}
 
 	public String formatMessage() {
