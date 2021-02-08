@@ -97,8 +97,8 @@ public class GenericReport extends ReportPolicy {
 		this.filterCriteriaParams.put(objectType, objectTypeFilterCriteriaP);
 		if (this.reportRes.hasParameterBag(BAG_JOINS)) {
 			ParameterBag joinBag = this.reportRes.getParameterBag(BAG_JOINS);
-			joinBag.getParameters()
-					.forEach(parameter -> filterCriteriaParams.put(parameter.getId(), (StringParameter) parameter));
+			joinBag.getParameters().forEach(
+					parameter -> this.filterCriteriaParams.put(parameter.getId(), (StringParameter) parameter));
 		}
 		if (this.reportRes.hasParameterBag(BAG_ADDITIONAL_TYPE)) {
 			ParameterBag additionalTypeBag = this.reportRes.getParameterBag(BAG_ADDITIONAL_TYPE);
@@ -107,8 +107,8 @@ public class GenericReport extends ReportPolicy {
 		}
 		if (this.reportRes.hasParameterBag(BAG_ADDITIONAL_JOINS)) {
 			ParameterBag joinBag = this.reportRes.getParameterBag(BAG_ADDITIONAL_JOINS);
-			joinBag.getParameters()
-					.forEach(parameter -> filterCriteriaParams.put(parameter.getId(), (StringParameter) parameter));
+			joinBag.getParameters().forEach(
+					parameter -> this.filterCriteriaParams.put(parameter.getId(), (StringParameter) parameter));
 		}
 
 		// evaluate ordering params
@@ -374,7 +374,7 @@ public class GenericReport extends ReportPolicy {
 								.getLocator());
 
 			Optional<Parameter<?>> refP = lookupParameter(joinWithP, joinElement);
-			if (!refP.isPresent()) {
+			if (refP.isEmpty()) {
 				throw new IllegalStateException(
 						"Parameter reference (" + joinWithP.getValue() + ") for " + joinWithP.getLocator()
 								+ " not found on " + joinElement.getLocator());
@@ -520,12 +520,12 @@ public class GenericReport extends ReportPolicy {
 				Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1);
 				Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2);
 
-				if (!param1.isPresent() && !param2.isPresent())
+				if (param1.isEmpty() && param2.isEmpty())
 					continue;
 
-				if (param1.isPresent() && !param2.isPresent())
+				if (param1.isPresent() && param2.isEmpty())
 					return 1;
-				else if (!param1.isPresent())
+				else if (param1.isEmpty())
 					return -1;
 
 				if (this.descending)
@@ -602,10 +602,10 @@ public class GenericReport extends ReportPolicy {
 				date = element.accept(new ElementZdtDateVisitor());
 			} else {
 				Optional<Parameter<?>> param = lookupParameter(this.dateRangeSelP, element);
-				if (!param.isPresent() || StrolchValueType.parse(param.get().getType()) != StrolchValueType.DATE)
+				if (param.isEmpty() || param.get().getValueType() != StrolchValueType.DATE)
 					throw new IllegalStateException(
 							"Date Range selector is invalid, as referenced parameter is not a Date but " + (param
-									.isPresent() ? param.get().getType() : "null"));
+									.isPresent() ? param.get().getValueType() : "null"));
 
 				date = ((DateParameter) param.get()).getValueZdt();
 			}

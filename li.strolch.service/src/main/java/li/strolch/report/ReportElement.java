@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 
 public class ReportElement {
 
-	private List<String> columnKeys;
-	private Function<String, String> columnGetter;
+	private final List<String> columnKeys;
+	private final Function<String, String> columnGetter;
 
 	public ReportElement(List<String> columnKeys, Function<String, String> columnGetter) {
 		super();
@@ -29,6 +29,6 @@ public class ReportElement {
 	}
 
 	public Stream<String> valueStream() {
-		return this.columnKeys.stream().map(k -> this.columnGetter.apply(k));
+		return this.columnKeys.stream().map(this.columnGetter);
 	}
 }

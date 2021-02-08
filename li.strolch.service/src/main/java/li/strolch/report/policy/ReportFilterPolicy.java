@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
+import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
@@ -58,8 +59,10 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 
 		} else if (value instanceof Date) {
 
-			if (this.right == null)
+			if (this.right == null) {
+				logger.error("DEPRECATED, use ZonedDateTime");
 				this.right = parseFilterValueToDate(this.filterValue);
+			}
 
 			left = value;
 
@@ -69,12 +72,15 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 			if (this.right == null) {
 				StrolchValueType valueType = parameter.getValueType();
 				if (valueType == StrolchValueType.DATE)
-					this.right = parseFilterValueToDate(this.filterValue);
+					this.right = parseFilterValueToZdt(this.filterValue);
 				else
 					this.right = valueType.parseValue(this.filterValue);
 			}
 
-			left = parameter.getValue();
+			if (value instanceof DateParameter)
+				left = ((DateParameter) parameter).getValueZdt();
+			else
+				left = parameter.getValue();
 
 		} else {
 			if (this.right == null)

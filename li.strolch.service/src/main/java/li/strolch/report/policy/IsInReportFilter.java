@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import li.strolch.model.StrolchValueType;
+import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.ObjectHelper;
@@ -24,9 +25,11 @@ public class IsInReportFilter extends ReportFilterPolicy {
 		Object left;
 		if (value instanceof Date) {
 
-			if (this.right == null)
+			if (this.right == null) {
+				logger.error("DEPRECATED, use ZonedDateTime");
 				this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim)
 						.map(this::parseFilterValueToDate).collect(toList());
+			}
 
 			left = value;
 
@@ -37,13 +40,16 @@ public class IsInReportFilter extends ReportFilterPolicy {
 				StrolchValueType valueType = parameter.getValueType();
 				if (valueType == StrolchValueType.DATE)
 					this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim)
-							.map(this::parseFilterValueToDate).collect(toList());
+							.map(this::parseFilterValueToZdt).collect(toList());
 				else
 					this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim).map(valueType::parseValue)
 							.collect(toList());
 			}
 
-			left = parameter.getValue();
+			if (value instanceof DateParameter)
+				left = ((DateParameter) parameter).getValueZdt();
+			else
+				left = parameter.getValue();
 
 		} else {
 			if (this.right == null)
