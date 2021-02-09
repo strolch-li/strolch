@@ -132,6 +132,10 @@ public class ExpressionsSupport {
 		};
 	}
 
+	public static <T extends StrolchRootElement> SearchExpression<T> paramNull(String paramId) {
+		return paramNull(BAG_PARAMETERS, paramId);
+	}
+
 	public static <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
 		return element -> !element.hasParameter(bagId, paramId);
 	}
