@@ -15,11 +15,18 @@
  */
 package li.strolch.utils.helper;
 
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.normalizeLength;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +45,44 @@ public class FileHelper {
 	private static final int MAX_FILE_SIZE = 50 * 1024 * 1024;
 	private static final Logger logger = LoggerFactory.getLogger(FileHelper.class);
 
+	private static final DateTimeFormatter separatedDtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	private static final DateTimeFormatter nonSeparatedDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	/**
+	 * Generates a path to the given temporary path to write a file separated in sub folders by day using current date
+	 *
+	 * @param tempPath
+	 * 		the directory to which to write the file
+	 * @param prefix
+	 * 		the prefix of the file name
+	 * @param separateHours
+	 * 		true to have sub folders for each hour
+	 *
+	 * @return the temporary file
+	 */
+	public static File getTempFile(File tempPath, String prefix, String suffix, boolean separateDateSegments,
+			boolean separateHours) {
+
+		LocalDateTime dateTime = LocalDateTime.now();
+		LocalDate localDate = dateTime.toLocalDate();
+
+		String date = separateDateSegments ? localDate.format(separatedDtf) : localDate.format(nonSeparatedDtf);
+
+		String currentHour = normalizeLength(String.valueOf(LocalTime.now().getHour()), 2, true, '0');
+		String pathS = date + (separateHours ? "/" : "_") + currentHour;
+
+		File path = new File(tempPath, pathS);
+		if (!path.exists() && !path.mkdirs())
+			throw new IllegalStateException("Failed to create path " + path.getAbsolutePath());
+
+		prefix = (isEmpty(prefix) ? "" : prefix + "_");
+		suffix = (isEmpty(suffix) ? "" : suffix);
+		if (!suffix.startsWith("."))
+			suffix = "_" + suffix;
+		String fileName = prefix + System.currentTimeMillis() + suffix;
+		return new File(path, fileName);
+	}
+
 	/**
 	 * Reads the contents of a file into a byte array.
 	 *
@@ -46,7 +91,7 @@ public class FileHelper {
 	 *
 	 * @return the contents of a file as a string
 	 */
-	public static final byte[] readFile(File file) {
+	public static byte[] readFile(File file) {
 		if (file.length() > MAX_FILE_SIZE)
 			throw new RuntimeException(
 					String.format("Only allowed to read files up to %s. File too large: %s", //$NON-NLS-1$
@@ -79,7 +124,7 @@ public class FileHelper {
 	 *
 	 * @return the contents of a file as a string
 	 */
-	public static final String readFileToString(File file) {
+	public static String readFileToString(File file) {
 
 		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
 
@@ -109,7 +154,7 @@ public class FileHelper {
 	 *
 	 * @return the contents of a file as a string
 	 */
-	public static final String readStreamToString(InputStream stream) {
+	public static String readStreamToString(InputStream stream) {
 
 		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));) {
 
@@ -136,7 +181,7 @@ public class FileHelper {
 	 * @param dstFile
 	 * 		the path to which to write the data
 	 */
-	public static final void writeToFile(byte[] bytes, File dstFile) {
+	public static void writeToFile(byte[] bytes, File dstFile) {
 
 		try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(dstFile.toPath()))) {
 			out.write(bytes);
@@ -155,7 +200,7 @@ public class FileHelper {
 	 * @param dstFile
 	 * 		the file to write to
 	 */
-	public static final void writeStringToFile(String string, File dstFile) {
+	public static void writeStringToFile(String string, File dstFile) {
 
 		try (BufferedWriter bufferedwriter = new BufferedWriter(new FileWriter(dstFile));) {
 			bufferedwriter.write(string);
@@ -176,7 +221,7 @@ public class FileHelper {
 	 *
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
-	public final static boolean deleteFile(File file, boolean log) {
+	public static boolean deleteFile(File file, boolean log) {
 		return FileHelper.deleteFiles(new File[] { file }, log);
 	}
 
@@ -241,7 +286,7 @@ public class FileHelper {
 	 *
 	 * @return <b>true</b> if and only if the copying succeeded; <b>false</b> otherwise
 	 */
-	public final static boolean copy(File[] srcFiles, File dstDirectory, boolean checksum) {
+	public static boolean copy(File[] srcFiles, File dstDirectory, boolean checksum) {
 
 		if (!dstDirectory.isDirectory() || !dstDirectory.canWrite()) {
 			String msg = "Destination is not a directory or is not writeable: {0}"; //$NON-NLS-1$
@@ -282,7 +327,7 @@ public class FileHelper {
 	 *
 	 * @return <b>true</b> if and only if the renaming succeeded; <b>false</b> otherwise
 	 */
-	public final static boolean copy(File fromFile, File toFile, boolean checksum) {
+	public static boolean copy(File fromFile, File toFile, boolean checksum) {
 
 		try (BufferedInputStream inBuffer = new BufferedInputStream(Files.newInputStream(fromFile.toPath()));
 				BufferedOutputStream outBuffer = new BufferedOutputStream(Files.newOutputStream(toFile.toPath()))) {
@@ -339,7 +384,7 @@ public class FileHelper {
 	 *
 	 * @return <b>true</b> if and only if the renaming succeeded; <b>false</b> otherwise
 	 */
-	public final static boolean move(File fromFile, File toFile) {
+	public static boolean move(File fromFile, File toFile) {
 
 		if (fromFile.renameTo(toFile)) {
 			return true;

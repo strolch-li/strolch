@@ -15,8 +15,6 @@
  */
 package li.strolch.utils.helper;
 
-import static li.strolch.utils.helper.StringHelper.normalizeLength;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -31,8 +29,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 import li.strolch.utils.RemoveCRFilterWriter;
 import li.strolch.utils.exceptions.XmlException;
@@ -333,27 +329,10 @@ public class XmlHelper {
 		}
 	}
 
-	public static void marshallTempFile(File tempPath, String prefix, Object object) throws Exception {
-		marshallTempFile(tempPath, prefix, false, object);
-	}
+	public static void marshallTempFile(File tempPath, String prefix, boolean separateDateSegments,
+			boolean separateHours, Object object) throws Exception {
 
-	public static void marshallTempFile(File tempPath, String prefix, boolean separateHours, Object object)
-			throws Exception {
-
-		String currentHour = normalizeLength(String.valueOf(LocalTime.now().getHour()), 2, true, '0');
-
-		String pathS;
-		if (separateHours)
-			pathS = LocalDate.now() + "/" + currentHour;
-		else
-			pathS = LocalDate.now() + "_" + currentHour;
-
-		File path = new File(tempPath, pathS);
-		if (!path.exists() && !path.mkdirs())
-			throw new IllegalStateException("Failed to create path " + path.getAbsolutePath());
-
-		File dataFile = new File(path, prefix + "_" + System.currentTimeMillis() + ".xml");
-
+		File dataFile = FileHelper.getTempFile(tempPath, prefix, ".xml", separateDateSegments, separateHours);
 		marshall(dataFile, object);
 	}
 
