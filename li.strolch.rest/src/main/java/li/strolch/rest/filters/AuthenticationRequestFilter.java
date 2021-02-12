@@ -237,7 +237,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
 			if (!requestContext.getUriInfo().getMatchedURIs()
 					.contains("strolch/privilege/users/" + certificate.getUsername() + "/password")) {
-				requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
 						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Can only set password!")
 						.build());
 				return null;
