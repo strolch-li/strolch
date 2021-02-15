@@ -1,11 +1,12 @@
 package li.strolch.utils.collections;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A helper class to handle collections
@@ -160,5 +161,28 @@ public class CollectionsHelper {
 
 			return list.get(0);
 		});
+	}
+
+	/**
+	 * Returns a stream over an array of bytes
+	 *
+	 * @param bytes
+	 * 		the bytes to stream
+	 *
+	 * @return the stream of bytes
+	 */
+	public static Stream<Byte> byteStream(byte[] bytes) {
+		return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(bytes.length, Spliterator.ORDERED) {
+			int pos;
+
+			public boolean tryAdvance(Consumer<? super Byte> action) {
+				if (pos < bytes.length) {
+					action.accept(bytes[pos++]);
+					return true;
+				}
+
+				return false;
+			}
+		}, false);
 	}
 }
