@@ -116,40 +116,67 @@ public class ByteHelper {
 		return (data & ~(1 << position));
 	}
 
-	public static int countSetBits(byte activeChannels) {
+	public static int countSetBits(byte data) {
 		int setBits = 0;
 		for (int i = 0; i < 8; i++) {
-			if (isBitSet(activeChannels, i))
+			if (isBitSet(data, i))
 				setBits++;
 		}
 		return setBits;
 	}
 
-	public static int countSetBits(short activeChannels) {
+	public static int countSetBits(short data) {
 		int setBits = 0;
 		for (int i = 0; i < 16; i++) {
-			if (isBitSet(activeChannels, i))
+			if (isBitSet(data, i))
 				setBits++;
 		}
 		return setBits;
 	}
 
-	public static int countSetBits(int activeChannels) {
+	public static int countSetBits(int data) {
 		int setBits = 0;
 		for (int i = 0; i < 32; i++) {
-			if (isBitSet(activeChannels, i))
+			if (isBitSet(data, i))
 				setBits++;
 		}
 		return setBits;
 	}
 
-	public static int countSetBits(long activeChannels) {
+	public static int countSetBits(long data) {
 		int setBits = 0;
 		for (int i = 0; i < 64; i++) {
-			if (isBitSet(activeChannels, i))
+			if (isBitSet(data, i))
 				setBits++;
 		}
 		return setBits;
+	}
+
+	public static byte getHighestBit(byte data) {
+		byte pos = 0;
+		for (byte i = 0; i < Byte.SIZE; i++) {
+			if (isBitSet(data, i))
+				pos = i;
+		}
+		return pos;
+	}
+
+	public static byte getHighestBit(short data) {
+		byte pos = 0;
+		for (byte i = 0; i < Short.SIZE; i++) {
+			if (isBitSet(data, i))
+				pos = i;
+		}
+		return pos;
+	}
+
+	public static byte getHighestBit(int data) {
+		byte pos = 0;
+		for (byte i = 0; i < Integer.SIZE; i++) {
+			if (isBitSet(data, i))
+				pos = i;
+		}
+		return pos;
 	}
 
 	/**
@@ -258,6 +285,24 @@ public class ByteHelper {
 
 	public static byte getLowerNibble(byte b) {
 		return (byte) (0x0f & b);
+	}
+
+	public static byte parseBinaryToByte(String value) {
+		if (value.length() != Byte.SIZE)
+			throw new IllegalStateException("parsing binary to byte requires exactly " + Byte.SIZE + " digits!");
+		return (byte) Integer.parseInt(value, 2);
+	}
+
+	public static short parseBinaryToShort(String value) {
+		if (value.length() != Short.SIZE)
+			throw new IllegalStateException("parsing binary to short requires exactly " + Short.SIZE + " digits!");
+		return (short) Integer.parseInt(value, 2);
+	}
+
+	public static int parseBinaryToInt(String value) {
+		if (value.length() != Integer.SIZE)
+			throw new IllegalStateException("parsing binary to int requires exactly " + Integer.SIZE + " digits!");
+		return Integer.parseInt(value, 2);
 	}
 
 	/**
