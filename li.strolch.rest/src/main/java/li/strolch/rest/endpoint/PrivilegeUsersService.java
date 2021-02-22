@@ -134,7 +134,8 @@ public class PrivilegeUsersService {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER);
 
 			UserRep user = privilegeHandler.getUser(cert, username);
-			return Response.ok(user.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON).build();
+			return Response.ok(user.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
+					.build();
 		}
 	}
 
@@ -327,6 +328,39 @@ public class PrivilegeUsersService {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			return ResponseUtil.toResponse("Failed to set password: ",
+					MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
+		}
+	}
+
+	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{username}/password")
+	public Response clearUserPassword(@PathParam("username") String username, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+
+		try {
+
+			ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
+			ClearUserPasswordService svc = new ClearUserPasswordService();
+			PrivilegeUserNameArgument arg = svc.getArgumentInstance();
+			arg.username = username;
+
+			ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
+			if (svcResult.isNok())
+				return ResponseUtil.toResponse(svcResult);
+
+			// if user changes their own password, then invalidate the session
+			if (cert.getUsername().equals(username)) {
+				StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+				sessionHandler.invalidate(cert);
+			}
+
+			return ResponseUtil.toResponse();
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			String msg = e.getMessage();
+			return ResponseUtil.toResponse("Failed to clear password: ",
 					MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
 		}
 	}
