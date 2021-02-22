@@ -1,6 +1,5 @@
 package li.strolch.service.privilege.users;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -17,17 +16,17 @@ import li.strolch.utils.dbc.DBC;
 public class PrivilegeAddUserCommand extends Command {
 
 	// input
-	private UserRep userIn;
-	private Certificate cert;
+	protected UserRep userIn;
+	protected Certificate cert;
 
 	// intermediary
-	private Audit audit;
+	protected Audit audit;
 
 	// output
-	private UserRep userOut;
+	protected UserRep userOut;
 
-	public PrivilegeAddUserCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public PrivilegeAddUserCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	public void setUserIn(UserRep userIn) {
@@ -51,14 +50,14 @@ public class PrivilegeAddUserCommand extends Command {
 
 	@Override
 	public void doCommand() {
-
 		PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
-
 		this.userOut = privilegeHandler.addUser(this.cert, this.userIn, null);
 		privilegeHandler.persist(this.cert);
+		writeAudit();
+	}
 
+	protected void writeAudit() {
 		tx().setSuppressAuditsForAudits(true);
-
 		this.audit = tx()
 				.auditFrom(AccessType.CREATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
 						this.userOut.getUsername());
@@ -67,7 +66,6 @@ public class PrivilegeAddUserCommand extends Command {
 
 	@Override
 	public void undo() {
-
 		if (tx().isRollingBack()) {
 			PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
 
