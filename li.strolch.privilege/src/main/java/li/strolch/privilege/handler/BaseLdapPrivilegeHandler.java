@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import li.strolch.privilege.base.AccessDeniedException;
-import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
@@ -28,11 +27,12 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	@Override
 	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
-			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
+			PasswordStrengthHandler passwordStrengthHandler, PersistenceHandler persistenceHandler,
+			UserChallengeHandler userChallengeHandler, SingleSignOnHandler ssoHandler,
+			Map<String, Class<PrivilegePolicy>> policyMap) {
 
-		super.initialize(parameterMap, encryptionHandler, persistenceHandler, userChallengeHandler, ssoHandler,
-				policyMap);
+		super.initialize(parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
+				userChallengeHandler, ssoHandler, policyMap);
 
 		this.providerUrl = parameterMap.get("providerUrl");
 		this.searchBase = parameterMap.get("searchBase");
@@ -42,7 +42,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	@Override
 	protected synchronized User checkCredentialsAndUserState(String username, char[] password)
-			throws InvalidCredentialsException, AccessDeniedException {
+			throws AccessDeniedException {
 
 		// first see if this is a local user
 		User internalUser = this.persistenceHandler.getUser(username);
@@ -148,7 +148,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	protected String validateLdapUsername(String username, Attributes attrs) throws NamingException {
 		Attribute sAMAccountName = attrs.get("sAMAccountName");
-		if (sAMAccountName == null || !username.toLowerCase().equals(sAMAccountName.get().toString().toLowerCase()))
+		if (sAMAccountName == null || !username.equalsIgnoreCase(sAMAccountName.get().toString()))
 			throw new AccessDeniedException(
 					"Could not login with user: " + username + this.domain + " on Ldap: Wrong LDAP Data");
 

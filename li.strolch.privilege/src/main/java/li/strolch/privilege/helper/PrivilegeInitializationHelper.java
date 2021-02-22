@@ -15,6 +15,8 @@
  */
 package li.strolch.privilege.helper;
 
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -28,6 +30,8 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
 import li.strolch.utils.helper.ClassHelper;
 import li.strolch.utils.helper.XmlHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the initializing of the {@link PrivilegeHandler} by loading an XML file containing the
@@ -36,6 +40,8 @@ import li.strolch.utils.helper.XmlHelper;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PrivilegeInitializationHelper {
+
+	private static final Logger logger = LoggerFactory.getLogger(PrivilegeInitializationHelper.class);
 
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
@@ -108,6 +114,23 @@ public class PrivilegeInitializationHelper {
 			throw new PrivilegeException(msg, e);
 		}
 
+		// initialize password strength handler
+		String passwordStrengthHandlerClassName = containerModel.getPasswordStrengthHandlerClassName();
+		if (isEmpty(passwordStrengthHandlerClassName)) {
+			logger.info("No PasswordStrengthHandler defined, using " + SimplePasswordStrengthHandler.class.getName());
+			passwordStrengthHandlerClassName = SimplePasswordStrengthHandler.class.getName();
+		}
+		PasswordStrengthHandler passwordStrengthHandler = ClassHelper
+				.instantiateClass(passwordStrengthHandlerClassName);
+		parameterMap = containerModel.getPasswordStrengthHandlerParameterMap();
+		try {
+			passwordStrengthHandler.initialize(parameterMap);
+		} catch (Exception e) {
+			String msg = "PasswordStrengthHandler {0} could not be initialized"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, passwordStrengthHandlerClassName);
+			throw new PrivilegeException(msg, e);
+		}
+
 		// initialize persistence handler
 		String persistenceHandlerClassName = containerModel.getPersistenceHandlerClassName();
 		PersistenceHandler persistenceHandler = ClassHelper.instantiateClass(persistenceHandlerClassName);
@@ -164,9 +187,8 @@ public class PrivilegeInitializationHelper {
 
 		Map<String, Class<PrivilegePolicy>> policyMap = containerModel.getPolicies();
 		try {
-			privilegeHandler
-					.initialize(parameterMap, encryptionHandler, persistenceHandler, challengeHandler, ssoHandler,
-							policyMap);
+			privilegeHandler.initialize(parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
+					challengeHandler, ssoHandler, policyMap);
 		} catch (Exception e) {
 			String msg = "PrivilegeHandler {0} could not be initialized"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeHandler.getClass().getName());

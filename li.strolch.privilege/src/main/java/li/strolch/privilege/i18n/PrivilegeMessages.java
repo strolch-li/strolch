@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.i18n;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -27,6 +28,14 @@ public class PrivilegeMessages {
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
 	private PrivilegeMessages() {
+	}
+
+	public static String getString(Locale locale, String key) {
+		try {
+			return ResourceBundle.getBundle(BUNDLE_NAME, locale).getString(key);
+		} catch (MissingResourceException e) {
+			return '!' + key + '!';
+		}
 	}
 
 	public static String getString(String key) {

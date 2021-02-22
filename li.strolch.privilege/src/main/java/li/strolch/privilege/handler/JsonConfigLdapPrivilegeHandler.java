@@ -30,11 +30,12 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	@Override
 	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
-			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
+			PasswordStrengthHandler passwordStrengthHandler, PersistenceHandler persistenceHandler,
+			UserChallengeHandler userChallengeHandler, SingleSignOnHandler ssoHandler,
+			Map<String, Class<PrivilegePolicy>> policyMap) {
 
-		super.initialize(parameterMap, encryptionHandler, persistenceHandler, userChallengeHandler, ssoHandler,
-				policyMap);
+		super.initialize(parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
+				userChallengeHandler, ssoHandler, policyMap);
 
 		this.realm = parameterMap.get(REALM);
 		DBC.PRE.assertNotEmpty("realm must be set!", realm);

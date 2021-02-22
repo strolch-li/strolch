@@ -37,12 +37,14 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 public class PrivilegeContainerModel {
 
 	private String encryptionHandlerClassName;
+	private String passwordStrengthHandlerClassName;
 	private String persistenceHandlerClassName;
 	private String userChallengeHandlerClassName;
 	private String ssoHandlerClassName;
 	private String privilegeHandlerClassName;
 
 	private Map<String, String> encryptionHandlerParameterMap;
+	private Map<String, String> passwordStrengthHandlerParameterMap;
 	private Map<String, String> persistenceHandlerParameterMap;
 	private Map<String, String> challengeHandlerParameterMap;
 	private Map<String, String> ssoHandlerParameterMap;
@@ -50,11 +52,12 @@ public class PrivilegeContainerModel {
 
 	private Map<String, String> parameterMap;
 
-	private Map<String, Class<PrivilegePolicy>> policies;
+	private final Map<String, Class<PrivilegePolicy>> policies;
 
 	public PrivilegeContainerModel() {
 		this.policies = new HashMap<>();
 		this.encryptionHandlerParameterMap = new HashMap<>();
+		this.passwordStrengthHandlerParameterMap = new HashMap<>();
 		this.persistenceHandlerParameterMap = new HashMap<>();
 		this.challengeHandlerParameterMap = new HashMap<>();
 		this.ssoHandlerParameterMap = new HashMap<>();
@@ -75,6 +78,22 @@ public class PrivilegeContainerModel {
 
 	public void setEncryptionHandlerClassName(String encryptionHandlerClassName) {
 		this.encryptionHandlerClassName = encryptionHandlerClassName;
+	}
+
+	public String getPasswordStrengthHandlerClassName() {
+		return this.passwordStrengthHandlerClassName;
+	}
+
+	public void setPasswordStrengthHandlerClassName(String passwordStrengthHandlerClassName) {
+		this.passwordStrengthHandlerClassName = passwordStrengthHandlerClassName;
+	}
+
+	public Map<String, String> getPasswordStrengthHandlerParameterMap() {
+		return this.passwordStrengthHandlerParameterMap;
+	}
+
+	public void setPasswordStrengthHandlerParameterMap(Map<String, String> passwordStrengthHandlerParameterMap) {
+		this.passwordStrengthHandlerParameterMap = passwordStrengthHandlerParameterMap;
 	}
 
 	public Map<String, String> getEncryptionHandlerParameterMap() {
@@ -192,6 +211,10 @@ public class PrivilegeContainerModel {
 		builder.append(this.encryptionHandlerClassName);
 		builder.append(", encryptionHandlerParameterMap=");
 		builder.append(this.encryptionHandlerParameterMap.size());
+		builder.append(", passwordStrengthHandlerClassName=");
+		builder.append(this.passwordStrengthHandlerClassName);
+		builder.append(", passwordStrengthHandlerParameterMap=");
+		builder.append(this.passwordStrengthHandlerParameterMap);
 		builder.append(", persistenceHandlerClassName=");
 		builder.append(this.persistenceHandlerClassName);
 		builder.append(", persistenceHandlerParameterMap=");

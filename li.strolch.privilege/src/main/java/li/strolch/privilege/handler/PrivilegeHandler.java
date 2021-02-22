@@ -775,16 +775,9 @@ public interface PrivilegeHandler {
 	PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException;
 
 	/**
-	 * Validate that the given password meets certain requirements. What these requirements are is a decision made by
-	 * the concrete implementation
-	 *
-	 * @param password
-	 * 		the password to be validated to meet certain requirements
-	 *
-	 * @throws PrivilegeException
-	 * 		if the password does not implement the requirement of the concrete implementation
+	 * @see li.strolch.privilege.handler.PasswordStrengthHandler#validateStrength(char[])
 	 */
-	void validatePassword(char[] password) throws PrivilegeException;
+	void validatePassword(Locale locale, char[] password) throws PrivilegeException;
 
 	/**
 	 * <p>

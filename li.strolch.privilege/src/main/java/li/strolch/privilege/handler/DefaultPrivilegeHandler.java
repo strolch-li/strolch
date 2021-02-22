@@ -85,6 +85,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected EncryptionHandler encryptionHandler;
 
 	/**
+	 * The password strength handler is used for validating the strength of a password when being set
+	 */
+	protected PasswordStrengthHandler passwordStrengthHandler;
+
+	/**
 	 * The Single Sign On Handler
 	 */
 	protected SingleSignOnHandler ssoHandler;
@@ -399,7 +404,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			if (password != null) {
 
 				// validate password meets basic requirements
-				validatePassword(password);
+				validatePassword(certificate.getLocale(), password);
 
 				// get new salt for user
 				salt = this.encryptionHandler.nextSalt();
@@ -464,7 +469,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			if (password != null) {
 
 				// validate password meets basic requirements
-				validatePassword(password);
+				validatePassword(certificate.getLocale(), password);
 
 				// get new salt for user
 				salt = this.encryptionHandler.nextSalt();
@@ -779,7 +784,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			if (password != null) {
 
 				// validate password meets basic requirements
-				validatePassword(password);
+				validatePassword(certificate.getLocale(), password);
 
 				// get new salt for user
 				salt = this.encryptionHandler.nextSalt();
@@ -1484,7 +1489,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throws InvalidCredentialsException, AccessDeniedException {
 
 		// and validate the password
-		validatePassword(password);
+		if (password == null || password.length < 3)
+			throw new InvalidCredentialsException("Password is invalid!");
 
 		// get user object
 		User user = this.persistenceHandler.getUser(username);
@@ -1755,21 +1761,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return privilegeContext;
 	}
 
-	/**
-	 * This simple implementation validates that the password is not null, and that the password string is not empty
-	 *
-	 * @see li.strolch.privilege.handler.PrivilegeHandler#validatePassword(char[])
-	 */
 	@Override
-	public void validatePassword(char[] password) throws PrivilegeException {
-
-		if (password == null || password.length == 0) {
-			throw new PrivilegeModelException("A password may not be empty!"); //$NON-NLS-1$
-		}
-
-		if (password.length < 3) {
-			throw new PrivilegeModelException("The given password is shorter than 3 characters"); //$NON-NLS-1$
-		}
+	public void validatePassword(Locale locale, char[] password) throws PrivilegeException {
+		if (!this.passwordStrengthHandler.validateStrength(password))
+			throw new PrivilegeException(this.passwordStrengthHandler.getDescription(locale));
 	}
 
 	@Override
@@ -1811,6 +1806,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 		a map containing configuration properties
 	 * @param encryptionHandler
 	 * 		the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
+	 * @param passwordStrengthHandler
+	 * 		the {@link PasswordStrengthHandler} instance for this {@link PrivilegeHandler}
 	 * @param persistenceHandler
 	 * 		the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
 	 * @param userChallengeHandler
@@ -1824,14 +1821,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 		if the this method is called multiple times or an initialization exception occurs
 	 */
 	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
-			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
+			PasswordStrengthHandler passwordStrengthHandler, PersistenceHandler persistenceHandler,
+			UserChallengeHandler userChallengeHandler, SingleSignOnHandler ssoHandler,
+			Map<String, Class<PrivilegePolicy>> policyMap) {
 
 		if (this.initialized)
 			throw new PrivilegeModelException("Already initialized!"); //$NON-NLS-1$
 
 		this.policyMap = policyMap;
 		this.encryptionHandler = encryptionHandler;
+		this.passwordStrengthHandler = passwordStrengthHandler;
 		this.persistenceHandler = persistenceHandler;
 		this.userChallengeHandler = userChallengeHandler;
 		this.ssoHandler = ssoHandler;

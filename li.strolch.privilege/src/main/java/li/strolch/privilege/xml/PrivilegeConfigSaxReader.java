@@ -31,9 +31,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class PrivilegeConfigSaxReader extends DefaultHandler {
 
-	private Deque<ElementParser> buildersStack = new ArrayDeque<>();
-
-	private PrivilegeContainerModel containerModel;
+	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
+	private final PrivilegeContainerModel containerModel;
 
 	public PrivilegeConfigSaxReader(PrivilegeContainerModel containerModel) {
 		this.containerModel = containerModel;
@@ -46,12 +45,16 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (qName.equals(XmlConstants.XML_CONTAINER)) {
+		switch (qName) {
+		case XmlConstants.XML_CONTAINER:
 			this.buildersStack.push(new ContainerParser());
-		} else if (qName.equals(XmlConstants.XML_PARAMETERS)) {
+			break;
+		case XmlConstants.XML_PARAMETERS:
 			this.buildersStack.push(new ParametersParser());
-		} else if (qName.equals(XmlConstants.XML_POLICIES)) {
+			break;
+		case XmlConstants.XML_POLICIES:
 			this.buildersStack.push(new PoliciesParser());
+			break;
 		}
 
 		if (!this.buildersStack.isEmpty())
@@ -71,12 +74,12 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(XmlConstants.XML_CONTAINER)) {
+		switch (qName) {
+		case XmlConstants.XML_CONTAINER:
+		case XmlConstants.XML_PARAMETERS:
+		case XmlConstants.XML_POLICIES:
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(XmlConstants.XML_PARAMETERS)) {
-			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(XmlConstants.XML_POLICIES)) {
-			elementParser = this.buildersStack.pop();
+			break;
 		}
 
 		if (!this.buildersStack.isEmpty() && elementParser != null)
@@ -90,28 +93,47 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
-			if (qName.equals(XmlConstants.XML_CONTAINER)) {
+
+			switch (qName) {
+			case XmlConstants.XML_CONTAINER:
 				this.currentElement = qName;
-			} else if (qName.equals(XmlConstants.XML_HANDLER_ENCRYPTION)) {
+				break;
+			case XmlConstants.XML_HANDLER_ENCRYPTION: {
 				this.currentElement = qName;
 				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 				getContainerModel().setEncryptionHandlerClassName(className);
-			} else if (qName.equals(XmlConstants.XML_HANDLER_PERSISTENCE)) {
+				break;
+			}
+			case XmlConstants.XML_HANDLER_PASSWORD_STRENGTH: {
+				this.currentElement = qName;
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				getContainerModel().setPasswordStrengthHandlerClassName(className);
+				break;
+			}
+			case XmlConstants.XML_HANDLER_PERSISTENCE: {
 				this.currentElement = qName;
 				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 				getContainerModel().setPersistenceHandlerClassName(className);
-			} else if (qName.equals(XmlConstants.XML_HANDLER_USER_CHALLENGE)) {
+				break;
+			}
+			case XmlConstants.XML_HANDLER_USER_CHALLENGE: {
 				this.currentElement = qName;
 				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 				getContainerModel().setUserChallengeHandlerClassName(className);
-			} else if (qName.equals(XmlConstants.XML_HANDLER_SSO)) {
+				break;
+			}
+			case XmlConstants.XML_HANDLER_SSO: {
 				this.currentElement = qName;
 				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 				getContainerModel().setSsoHandlerClassName(className);
-			} else if (qName.equals(XmlConstants.XML_HANDLER_PRIVILEGE)) {
+				break;
+			}
+			case XmlConstants.XML_HANDLER_PRIVILEGE: {
 				this.currentElement = qName;
 				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
 				getContainerModel().setPrivilegeHandlerClassName(className);
+				break;
+			}
 			}
 		}
 
@@ -122,27 +144,37 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 			ParametersParser parametersChild = (ParametersParser) child;
 
-			if (this.currentElement.equals(XmlConstants.XML_CONTAINER)) {
+			switch (this.currentElement) {
+			case XmlConstants.XML_CONTAINER:
 				getContainerModel().setParameterMap(parametersChild.getParameterMap());
-			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_ENCRYPTION)) {
+				break;
+			case XmlConstants.XML_HANDLER_ENCRYPTION:
 				getContainerModel().setEncryptionHandlerParameterMap(parametersChild.getParameterMap());
-			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_PERSISTENCE)) {
+				break;
+			case XmlConstants.XML_HANDLER_PASSWORD_STRENGTH:
+				getContainerModel().setPasswordStrengthHandlerParameterMap(parametersChild.getParameterMap());
+				break;
+			case XmlConstants.XML_HANDLER_PERSISTENCE:
 				getContainerModel().setPersistenceHandlerParameterMap(parametersChild.getParameterMap());
-			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_USER_CHALLENGE)) {
+				break;
+			case XmlConstants.XML_HANDLER_USER_CHALLENGE:
 				getContainerModel().setUserChallengeHandlerParameterMap(parametersChild.getParameterMap());
-			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_SSO)) {
+				break;
+			case XmlConstants.XML_HANDLER_SSO:
 				getContainerModel().setSsoHandlerParameterMap(parametersChild.getParameterMap());
-			} else if (this.currentElement.equals(XmlConstants.XML_HANDLER_PRIVILEGE)) {
+				break;
+			case XmlConstants.XML_HANDLER_PRIVILEGE:
 				getContainerModel().setPrivilegeHandlerParameterMap(parametersChild.getParameterMap());
+				break;
 			}
 		}
 	}
 
-	class ParametersParser extends ElementParserAdapter {
+	static class ParametersParser extends ElementParserAdapter {
 
 //	      <Parameter name="autoPersistOnPasswordChange" value="true" />
 
-		private Map<String, String> parameterMap = new HashMap<>();
+		private final Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
