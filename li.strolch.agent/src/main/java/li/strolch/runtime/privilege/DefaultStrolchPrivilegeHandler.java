@@ -224,43 +224,42 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
-	public void runAs(String username, SystemAction action) throws PrivilegeException, Exception {
+	public void runAs(String username, SystemAction action) throws Exception {
 		this.privilegeHandler.runAs(username, action);
 	}
 
 	@Override
-	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException, Exception {
+	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws Exception {
 		return this.privilegeHandler.runWithResult(username, action);
 	}
 
 	@Override
-	public void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	public void runAs(String username, PrivilegedRunnable runnable) throws Exception {
 		this.privilegeHandler.runAs(username, new StrolchSystemAction(runnable));
 	}
 
 	@Override
-	public <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable)
-			throws PrivilegeException, Exception {
+	public <T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws Exception {
 		return this.privilegeHandler.runWithResult(username, new StrolchSystemActionWithResult<>(runnable));
 	}
 
 	@Override
-	public void runAsAgent(SystemAction action) throws PrivilegeException, Exception {
+	public void runAsAgent(SystemAction action) throws Exception {
 		this.privilegeHandler.runAs(StrolchConstants.SYSTEM_USER_AGENT, action);
 	}
 
 	@Override
-	public <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException, Exception {
+	public <T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws Exception {
 		return this.privilegeHandler.runWithResult(StrolchConstants.SYSTEM_USER_AGENT, action);
 	}
 
 	@Override
-	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	public void runAsAgent(PrivilegedRunnable runnable) throws Exception {
 		this.privilegeHandler.runAs(StrolchConstants.SYSTEM_USER_AGENT, new StrolchSystemAction(runnable));
 	}
 
 	@Override
-	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
 		return this.privilegeHandler
 				.runWithResult(StrolchConstants.SYSTEM_USER_AGENT, new StrolchSystemActionWithResult<>(runnable));
 	}
