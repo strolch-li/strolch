@@ -50,13 +50,13 @@ public final class User {
 	private final String firstname;
 	private final String lastname;
 
-	private final UserState userState;
-
 	private final Set<String> roles;
 
+	private final UserState userState;
 	private final Map<String, String> propertyMap;
-
 	private final Locale locale;
+
+	private final UserHistory history;
 
 	/**
 	 * Default constructor
@@ -90,25 +90,23 @@ public final class User {
 	 */
 	public User(String userId, String username, byte[] password, byte[] salt, String hashAlgorithm, int hashIterations,
 			int hashKeyLength, String firstname, String lastname, UserState userState, Set<String> roles, Locale locale,
-			Map<String, String> propertyMap) {
+			Map<String, String> propertyMap, UserHistory history) {
 
-		if (StringHelper.isEmpty(userId)) {
+		if (StringHelper.isEmpty(userId))
 			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
-		}
-		if (userState == null) {
+		if (userState == null)
 			throw new PrivilegeException("No userState defined!"); //$NON-NLS-1$
-		}
-		if (StringHelper.isEmpty(username)) {
+		if (StringHelper.isEmpty(username))
 			throw new PrivilegeException("No username defined!"); //$NON-NLS-1$
-		}
 		if (userState != UserState.SYSTEM) {
-			if (StringHelper.isEmpty(lastname)) {
+			if (StringHelper.isEmpty(lastname))
 				throw new PrivilegeException("No lastname defined!"); //$NON-NLS-1$
-			}
-			if (StringHelper.isEmpty(firstname)) {
+			if (StringHelper.isEmpty(firstname))
 				throw new PrivilegeException("No firstname defined!"); //$NON-NLS-1$
-			}
 		}
+
+		if (history == null)
+			throw new PrivilegeException("History must not be null!");
 
 		// password, salt and hash* may be null, meaning not able to login
 		// roles may be null, meaning not able to login and must be added later
@@ -133,7 +131,7 @@ public final class User {
 		if (roles == null)
 			this.roles = Collections.emptySet();
 		else
-			this.roles = Collections.unmodifiableSet(new HashSet<>(roles));
+			this.roles = Set.copyOf(roles);
 
 		if (locale == null)
 			this.locale = Locale.getDefault();
@@ -143,7 +141,9 @@ public final class User {
 		if (propertyMap == null)
 			this.propertyMap = Collections.emptyMap();
 		else
-			this.propertyMap = Collections.unmodifiableMap(new HashMap<>(propertyMap));
+			this.propertyMap = Map.copyOf(propertyMap);
+
+		this.history = history;
 	}
 
 	/**
@@ -250,6 +250,24 @@ public final class User {
 	 */
 	public Locale getLocale() {
 		return this.locale;
+	}
+
+	/**
+	 * Returns the History object
+	 *
+	 * @return the History object
+	 */
+	public UserHistory getHistory() {
+		return this.history;
+	}
+
+	/**
+	 * Returns true if the history for this user is empty
+	 *
+	 * @return true if the history for this user is empty
+	 */
+	public boolean isHistoryEmpty() {
+		return this.history.isEmpty();
 	}
 
 	/**

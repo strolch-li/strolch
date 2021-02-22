@@ -19,7 +19,7 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIV
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INVALIDATE_SESSION;
 
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -313,8 +313,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			certificateMap = new HashMap<>(this.certificateMap);
 		}
 
-		LocalDateTime maxKeepAliveTime = LocalDateTime.now().minus(this.maxKeepAliveMinutes, ChronoUnit.MINUTES);
-		LocalDateTime timeOutTime = LocalDateTime.now().minus(this.sessionTtlMinutes, ChronoUnit.MINUTES);
+		ZonedDateTime maxKeepAliveTime = ZonedDateTime.now().minus(this.maxKeepAliveMinutes, ChronoUnit.MINUTES);
+		ZonedDateTime timeOutTime = ZonedDateTime.now().minus(this.sessionTtlMinutes, ChronoUnit.MINUTES);
 
 		for (Certificate certificate : certificateMap.values()) {
 			if (certificate.isKeepAlive()) {

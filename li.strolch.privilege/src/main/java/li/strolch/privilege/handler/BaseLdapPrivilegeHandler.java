@@ -13,6 +13,7 @@ import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
+import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +140,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		Map<String, String> properties = buildProperties(username, attrs, ldapGroups, strolchRoles);
 
 		return new User(username, username, null, null, null, -1, -1, firstName, lastName, UserState.REMOTE,
-				strolchRoles, locale, properties);
+				strolchRoles, locale, properties, new UserHistory());
 	}
 
 	protected abstract Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,

@@ -109,6 +109,26 @@ public class XmlConstants {
 	public static final String XML_USER = "User";
 
 	/**
+	 * XML_USER = "User"
+	 */
+	public static final String XML_HISTORY = "History";
+
+	/**
+	 * XML_USER = "User"
+	 */
+	public static final String XML_FIRST_LOGIN = "FirstLogin";
+
+	/**
+	 * XML_USER = "User"
+	 */
+	public static final String XML_LAST_LOGIN = "LastLogin";
+
+	/**
+	 * XML_USER = "User"
+	 */
+	public static final String XML_LAST_PASSWORD_CHANGE = "LastPasswordChange";
+
+	/**
 	 * XML_PRIVILEGE = "Privilege" :
 	 */
 	public static final String XML_PRIVILEGE = "Privilege";

@@ -19,6 +19,9 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import li.strolch.privilege.handler.DefaultEncryptionHandler;
@@ -27,10 +30,7 @@ import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.handler.XmlPersistenceHandler;
 import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.UserState;
-import li.strolch.privilege.model.internal.PrivilegeContainerModel;
-import li.strolch.privilege.model.internal.PrivilegeImpl;
-import li.strolch.privilege.model.internal.Role;
-import li.strolch.privilege.model.internal.User;
+import li.strolch.privilege.model.internal.*;
 import li.strolch.privilege.test.model.DummySsoHandler;
 import li.strolch.privilege.xml.*;
 import li.strolch.utils.helper.FileHelper;
@@ -316,16 +316,21 @@ public class XmlTest {
 		propertyMap.put("prop1", "value1");
 		userRoles = new HashSet<>();
 		userRoles.add("role1");
+		UserHistory history = new UserHistory();
+		history.setFirstLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()));
 		User user1 = new User("1", "user1", "blabla".getBytes(), "blabla".getBytes(), "PBKDF2WithHmacSHA512", 10000,
-				256, "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap);
+				256, "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap, history);
 		users.add(user1);
 
 		propertyMap = new HashMap<>();
 		propertyMap.put("prop2", "value2");
 		userRoles = new HashSet<>();
 		userRoles.add("role2");
+		history = new UserHistory();
+		history.setFirstLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()));
+		history.setLastLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 5, 2, 3, 4, 5), ZoneId.systemDefault()));
 		User user2 = new User("2", "user2", "haha".getBytes(), "haha".getBytes(), null, -1, -1, "Leonard", "Sheldon",
-				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap);
+				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap, history);
 		users.add(user2);
 
 		File modelFile = new File(TARGET_TEST + "PrivilegeUsersTest.xml");

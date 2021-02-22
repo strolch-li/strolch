@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThrows;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 
 import li.strolch.privilege.base.AccessDeniedException;
@@ -45,7 +45,7 @@ public class ServiceTest extends AbstractServiceTest {
 		assertThrows(PrivilegeException.class, () -> {
 			TestService testService = new TestService();
 			getServiceHandler().doService(
-					new Certificate(null, null, null, null, null, null, null, null, LocalDateTime.now(), false, null,
+					new Certificate(null, null, null, null, null, null, null, null, ZonedDateTime.now(), false, null,
 							new HashSet<>(), null), testService);
 		});
 	}
@@ -54,7 +54,7 @@ public class ServiceTest extends AbstractServiceTest {
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", "asd",
-				LocalDateTime.now(), false, null, new HashSet<>(), null);
+				ZonedDateTime.now(), false, null, new HashSet<>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
 		assertThat(svcResult.getThrowable(), instanceOf(NotAuthenticatedException.class));
 	}

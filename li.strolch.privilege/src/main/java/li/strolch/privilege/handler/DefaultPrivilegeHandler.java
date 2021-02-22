@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -29,10 +29,7 @@ import java.util.stream.Stream;
 
 import li.strolch.privilege.base.*;
 import li.strolch.privilege.model.*;
-import li.strolch.privilege.model.internal.PrivilegeImpl;
-import li.strolch.privilege.model.internal.Role;
-import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.model.internal.UserChallenge;
+import li.strolch.privilege.model.internal.*;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.privilege.xml.CertificateStubsDomWriter;
 import li.strolch.privilege.xml.CertificateStubsSaxReader;
@@ -396,6 +393,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeModelException(MessageFormat.format(msg, userRep.getUsername()));
 			}
 
+			UserHistory history = new UserHistory();
 			byte[] passwordHash = null;
 			byte[] salt = null;
 			if (password != null) {
@@ -408,10 +406,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 				// hash password
 				passwordHash = this.encryptionHandler.hashPassword(password, salt);
+
+				history.setLastPasswordChange(ZonedDateTime.now());
 			}
 
 			// create new user
-			User newUser = createUser(userRep, passwordHash, salt);
+			User newUser = createUser(userRep, history, passwordHash, salt);
 
 			// detect privilege conflicts
 			assertNoPrivilegeConflict(newUser);
@@ -458,6 +458,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeModelException(MessageFormat.format(msg, userRep.getUsername()));
 			}
 
+			UserHistory history = existingUser.getHistory().getClone();
 			byte[] passwordHash = null;
 			byte[] salt = null;
 			if (password != null) {
@@ -470,9 +471,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 				// hash password
 				passwordHash = this.encryptionHandler.hashPassword(password, salt);
+
+				history.setLastPasswordChange(ZonedDateTime.now());
 			}
 
-			User newUser = createUser(userRep, passwordHash, salt);
+			User newUser = createUser(userRep, history, passwordHash, salt);
 
 			// detect privilege conflicts
 			assertNoPrivilegeConflict(newUser);
@@ -503,7 +506,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	private User createUser(UserRep userRep, byte[] passwordHash, byte[] salt) {
+	private User createUser(UserRep userRep, UserHistory history, byte[] passwordHash, byte[] salt) {
 		String userId = userRep.getUserId();
 		String userName = userRep.getUsername();
 		String firstName = userRep.getFirstname();
@@ -514,7 +517,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Map<String, String> properties = userRep.getProperties();
 		return new User(userId, userName, passwordHash, salt, this.encryptionHandler.getAlgorithm(),
 				this.encryptionHandler.getIterations(), this.encryptionHandler.getKeyLength(), firstName, lastName,
-				state, roles, locale, properties);
+				state, roles, locale, properties, history);
 	}
 
 	@Override
@@ -573,7 +576,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(userId, username, password, salt, hashAlgorithm, hashIterations, hashKeyLength,
-				firstName, lastName, userState, roles, locale, propertyMap);
+				firstName, lastName, userState, roles, locale, propertyMap, existingUser.getHistory().getClone());
 
 		// detect privilege conflicts
 		assertNoPrivilegeConflict(newUser);
@@ -654,7 +657,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
-				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties());
+				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties(),
+				existingUser.getHistory().getClone());
 
 		// detect privilege conflicts
 		assertNoPrivilegeConflict(newUser);
@@ -701,7 +705,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
-				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties());
+				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties(),
+				existingUser.getHistory().getClone());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
@@ -731,7 +736,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
-				existingUser.getUserState(), existingUser.getRoles(), locale, existingUser.getProperties());
+				existingUser.getUserState(), existingUser.getRoles(), locale, existingUser.getProperties(),
+				existingUser.getHistory().getClone());
 
 		// if the user is not setting their own locale, then make sure this user may set this user's locale
 		if (!certificate.getUsername().equals(username)) {
@@ -766,6 +772,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 						MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
 			}
 
+			UserHistory history = existingUser.getHistory().getClone();
+
 			byte[] passwordHash = null;
 			byte[] salt = null;
 			if (password != null) {
@@ -778,6 +786,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 				// hash password
 				passwordHash = this.encryptionHandler.hashPassword(password, salt);
+
+				history.setLastPasswordChange(ZonedDateTime.now());
 			}
 
 			// create new user
@@ -785,7 +795,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					this.encryptionHandler.getAlgorithm(), this.encryptionHandler.getIterations(),
 					this.encryptionHandler.getKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 					existingUser.getUserState(), existingUser.getRoles(), existingUser.getLocale(),
-					existingUser.getProperties());
+					existingUser.getProperties(), history);
 
 			if (!certificate.getUsername().equals(username)) {
 				// check that the user may change their own password
@@ -821,15 +831,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
-		if (existingUser == null) {
+		if (existingUser == null)
 			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
-		}
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(), state,
-				existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties());
+				existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties(),
+				existingUser.getHistory().getClone());
 
 		// validate that this user may modify this user's state
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_STATE, new Tuple(existingUser, newUser)));
@@ -1159,7 +1169,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// create a new certificate, with details of the user
 		Usage usage = userChallenge.getUsage();
 		Certificate certificate = buildCertificate(usage, user, authToken, sessionId, userChallenge.getSource(),
-				LocalDateTime.now(), false);
+				ZonedDateTime.now(), false);
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1197,10 +1207,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// validate user has at least one role
 			Set<String> userRoles = user.getRoles();
-			if (userRoles.isEmpty()) {
+			if (userRoles.isEmpty())
 				throw new InvalidCredentialsException(
 						MessageFormat.format("User {0} does not have any roles defined!", username)); //$NON-NLS-1$
-			}
 
 			// get 2 auth tokens
 			String authToken = this.encryptionHandler.nextToken();
@@ -1209,13 +1218,21 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String sessionId = UUID.randomUUID().toString();
 
 			// create a new certificate, with details of the user
-			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, LocalDateTime.now(),
+			Certificate certificate = buildCertificate(usage, user, authToken, sessionId, source, ZonedDateTime.now(),
 					keepAlive);
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
 
 			persistSessions();
+
+			// save last login
+			if (user.getHistory().isFirstLoginEmpty())
+				user.getHistory().setFirstLogin(ZonedDateTime.now());
+			user.getHistory().setLastLogin(ZonedDateTime.now());
+			this.persistenceHandler.replaceUser(user);
+			if (this.autoPersistOnUserChangesData)
+				this.persistenceHandler.persist();
 
 			// log
 			logger.info(MessageFormat.format("User {0} authenticated: {1}", username, certificate)); //$NON-NLS-1$
@@ -1249,13 +1266,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		User user = this.ssoHandler.authenticateSingleSignOn(data);
 		DBC.PRE.assertEquals("SSO Users must have UserState.REMOTE!", UserState.REMOTE, user.getUserState());
+		user.getHistory().setLastLogin(ZonedDateTime.now());
 
 		// persist this user
 		User internalUser = this.persistenceHandler.getUser(user.getUsername());
-		if (internalUser == null)
+		if (internalUser == null) {
+			user.getHistory().setFirstLogin(ZonedDateTime.now());
 			this.persistenceHandler.addUser(user);
-		else
+		} else {
+			user.getHistory().setFirstLogin(internalUser.getHistory().getFirstLogin());
 			this.persistenceHandler.replaceUser(user);
+		}
 
 		if (this.autoPersistOnUserChangesData)
 			this.persistenceHandler.persist();
@@ -1267,7 +1288,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		String sessionId = UUID.randomUUID().toString();
 
 		// create a new certificate, with details of the user
-		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source, LocalDateTime.now(),
+		Certificate certificate = buildCertificate(Usage.ANY, user, authToken, sessionId, source, ZonedDateTime.now(),
 				keepAlive);
 
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
@@ -1311,7 +1332,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// create a new certificate, with details of the user
 			Certificate refreshedCert = buildCertificate(certificate.getUsage(), user, authToken, sessionId, source,
-					LocalDateTime.now(), true);
+					ZonedDateTime.now(), true);
 
 			PrivilegeContext privilegeContext = buildPrivilegeContext(refreshedCert, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
@@ -1339,7 +1360,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	private Certificate buildCertificate(Usage usage, User user, String authToken, String sessionId, String source,
-			LocalDateTime loginTime, boolean keepAlive) {
+			ZonedDateTime loginTime, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		Set<String> userRoles = user.getRoles();
 		return new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(), user.getLastname(),
@@ -1527,7 +1548,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, salt,
 					this.encryptionHandler.getAlgorithm(), this.encryptionHandler.getIterations(),
 					this.encryptionHandler.getKeyLength(), user.getFirstname(), user.getLastname(), user.getUserState(),
-					user.getRoles(), user.getLocale(), user.getProperties());
+					user.getRoles(), user.getLocale(), user.getProperties(), user.getHistory().getClone());
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
@@ -1685,7 +1706,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException(msg);
 		}
 
-		certificate.setLastAccess(LocalDateTime.now());
+		certificate.setLastAccess(ZonedDateTime.now());
 
 		if (!certificate.getSource().equals(this.identifier))
 			throw new IllegalStateException(
@@ -1717,14 +1738,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate that challenge certificate is not expired (1 hour only) 
 		if (sessionCertificate.getUsage() != Usage.ANY) {
-			LocalDateTime dateTime = sessionCertificate.getLoginTime();
-			if (dateTime.plusHours(1).isBefore(LocalDateTime.now())) {
+			ZonedDateTime dateTime = sessionCertificate.getLoginTime();
+			if (dateTime.plusHours(1).isBefore(ZonedDateTime.now())) {
 				invalidate(sessionCertificate);
 				throw new NotAuthenticatedException("Certificate has already expired!"); //$NON-NLS-1$
 			}
 		}
 
-		certificate.setLastAccess(LocalDateTime.now());
+		certificate.setLastAccess(ZonedDateTime.now());
 
 		// TODO decide if we want to assert source did not change!
 		// if (!source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
@@ -2150,7 +2171,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create a new certificate, with details of the user
 		Certificate systemUserCertificate = buildCertificate(Usage.ANY, user, authToken, sessionId, this.identifier,
-				LocalDateTime.now(), false);
+				ZonedDateTime.now(), false);
 
 		// create and save a new privilege context
 		PrivilegeContext privilegeContext = buildPrivilegeContext(systemUserCertificate, user);

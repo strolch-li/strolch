@@ -15,7 +15,7 @@
  */
 package li.strolch.rest.model;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Set;
 
@@ -28,14 +28,14 @@ public class UserSession {
 
 	private final boolean keepAlive;
 	private final String sessionId;
-	private final LocalDateTime loginTime;
+	private final ZonedDateTime loginTime;
 	private final String username;
 	private final String firstName;
 	private final String lastName;
 	private final String source;
 	private final Set<String> userRoles;
 	private final Locale locale;
-	private final LocalDateTime lastAccess;
+	private final ZonedDateTime lastAccess;
 
 	public UserSession(Certificate certificate) {
 		this.sessionId = certificate.getSessionId();
@@ -54,7 +54,7 @@ public class UserSession {
 		return locale;
 	}
 
-	public LocalDateTime getLastAccess() {
+	public ZonedDateTime getLastAccess() {
 		return lastAccess;
 	}
 
@@ -62,7 +62,7 @@ public class UserSession {
 		return sessionId;
 	}
 
-	public LocalDateTime getLoginTime() {
+	public ZonedDateTime getLoginTime() {
 		return loginTime;
 	}
 

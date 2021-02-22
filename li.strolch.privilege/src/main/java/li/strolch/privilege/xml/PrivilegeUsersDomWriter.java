@@ -16,16 +16,18 @@
 package li.strolch.privilege.xml;
 
 import static java.util.Comparator.comparing;
+import static li.strolch.privilege.helper.CryptHelper.buildPasswordString;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import li.strolch.privilege.helper.CryptHelper;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.User;
+import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
+import li.strolch.utils.iso8601.ISO8601;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -34,8 +36,8 @@ import org.w3c.dom.Element;
  */
 public class PrivilegeUsersDomWriter {
 
-	private List<User> users;
-	private File modelFile;
+	private final List<User> users;
+	private final File modelFile;
 
 	public PrivilegeUsersDomWriter(List<User> users, File modelFile) {
 		this.users = users;
@@ -98,12 +100,36 @@ public class PrivilegeUsersDomWriter {
 			if (!user.getProperties().isEmpty()) {
 				Element parametersElement = doc.createElement(XmlConstants.XML_PROPERTIES);
 				userElement.appendChild(parametersElement);
-				user.getProperties().entrySet().stream().sorted(comparing(Map.Entry::getKey)).forEach(entry -> {
+				user.getProperties().entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> {
 					Element paramElement = doc.createElement(XmlConstants.XML_PROPERTY);
 					paramElement.setAttribute(XmlConstants.XML_ATTR_NAME, entry.getKey());
 					paramElement.setAttribute(XmlConstants.XML_ATTR_VALUE, entry.getValue());
 					parametersElement.appendChild(paramElement);
 				});
+			}
+
+			if (!user.isHistoryEmpty()) {
+				UserHistory history = user.getHistory();
+				Element historyElement = doc.createElement(XmlConstants.XML_HISTORY);
+				userElement.appendChild(historyElement);
+
+				if (!history.isFirstLoginEmpty()) {
+					Element element = doc.createElement(XmlConstants.XML_FIRST_LOGIN);
+					element.setTextContent(ISO8601.toString(history.getFirstLogin()));
+					historyElement.appendChild(element);
+				}
+
+				if (!history.isLastLoginEmpty()) {
+					Element element = doc.createElement(XmlConstants.XML_LAST_LOGIN);
+					element.setTextContent(ISO8601.toString(history.getLastLogin()));
+					historyElement.appendChild(element);
+				}
+
+				if (!history.isLastPasswordChangeEmpty()) {
+					Element element = doc.createElement(XmlConstants.XML_LAST_PASSWORD_CHANGE);
+					element.setTextContent(ISO8601.toString(history.getLastPasswordChange()));
+					historyElement.appendChild(element);
+				}
 			}
 		});
 
@@ -112,15 +138,10 @@ public class PrivilegeUsersDomWriter {
 	}
 
 	private void writePassword(User user, Element userElement) {
-
 		if (user.getPassword() != null && user.getSalt() != null && user.getHashAlgorithm() != null
 				&& user.getHashIterations() != -1 && user.getHashKeyLength() != -1) {
-
-			String passwordS = CryptHelper.buildPasswordString(user);
-			userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, passwordS);
-
+			userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, buildPasswordString(user));
 		} else {
-
 			if (user.getPassword() != null)
 				userElement.setAttribute(XmlConstants.XML_ATTR_PASSWORD, StringHelper.toHexString(user.getPassword()));
 			if (user.getSalt() != null)

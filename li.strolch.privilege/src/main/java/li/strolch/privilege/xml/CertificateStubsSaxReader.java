@@ -20,7 +20,7 @@ import static li.strolch.privilege.helper.XmlConstants.*;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.io.InputStream;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -67,8 +67,8 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			stub.authToken = attributes.getValue(XML_ATTR_AUTH_TOKEN);
 			stub.source = attributes.getValue(XML_ATTR_SOURCE);
 			stub.locale = Locale.forLanguageTag(attributes.getValue(XML_ATTR_LOCALE));
-			stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME)).toLocalDateTime();
-			stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS)).toLocalDateTime();
+			stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME));
+			stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS));
 			stub.keepAlive = Boolean.parseBoolean(attributes.getValue(XML_ATTR_KEEP_ALIVE));
 
 			DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
@@ -93,8 +93,8 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		private String authToken;
 		private String source;
 		private Locale locale;
-		private LocalDateTime loginTime;
-		private LocalDateTime lastAccess;
+		private ZonedDateTime loginTime;
+		private ZonedDateTime lastAccess;
 		private boolean keepAlive;
 
 		public Usage getUsage() {
@@ -121,11 +121,11 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 			return locale;
 		}
 
-		public LocalDateTime getLoginTime() {
+		public ZonedDateTime getLoginTime() {
 			return loginTime;
 		}
 
-		public LocalDateTime getLastAccess() {
+		public ZonedDateTime getLastAccess() {
 			return lastAccess;
 		}
 

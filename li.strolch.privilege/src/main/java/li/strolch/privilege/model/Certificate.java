@@ -18,7 +18,7 @@ package li.strolch.privilege.model;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -47,14 +47,14 @@ public final class Certificate implements Serializable {
 	private final UserState userState;
 	private final String authToken;
 	private final String source;
-	private final LocalDateTime loginTime;
+	private final ZonedDateTime loginTime;
 	private final boolean keepAlive;
 
 	private final Set<String> userRoles;
 	private final Map<String, String> propertyMap;
 
 	private Locale locale;
-	private LocalDateTime lastAccess;
+	private ZonedDateTime lastAccess;
 
 	/**
 	 * Default constructor initializing with all information needed for this certificate
@@ -85,7 +85,7 @@ public final class Certificate implements Serializable {
 	 * 		edited and can be used for the user to change settings of this session
 	 */
 	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
-			UserState userState, String authToken, String source, LocalDateTime loginTime, boolean keepAlive,
+			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
 			Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
 
 		// validate arguments are not null
@@ -131,7 +131,7 @@ public final class Certificate implements Serializable {
 			this.propertyMap = Collections.unmodifiableMap(propertyMap);
 
 		this.userRoles = Collections.unmodifiableSet(userRoles);
-		this.lastAccess = LocalDateTime.now();
+		this.lastAccess = ZonedDateTime.now();
 	}
 
 	public Usage getUsage() {
@@ -239,7 +239,7 @@ public final class Certificate implements Serializable {
 		return userState;
 	}
 
-	public LocalDateTime getLoginTime() {
+	public ZonedDateTime getLoginTime() {
 		return this.loginTime;
 	}
 
@@ -255,11 +255,11 @@ public final class Certificate implements Serializable {
 		return this.source;
 	}
 
-	public LocalDateTime getLastAccess() {
+	public ZonedDateTime getLastAccess() {
 		return this.lastAccess;
 	}
 
-	public void setLastAccess(LocalDateTime lastAccess) {
+	public void setLastAccess(ZonedDateTime lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 

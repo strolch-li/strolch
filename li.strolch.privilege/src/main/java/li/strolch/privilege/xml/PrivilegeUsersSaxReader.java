@@ -15,13 +15,16 @@
  */
 package li.strolch.privilege.xml;
 
+import static li.strolch.privilege.helper.XmlConstants.*;
+
 import java.text.MessageFormat;
 import java.util.*;
 
-import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
+import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -35,9 +38,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersSaxReader.class);
 
-	private Deque<ElementParser> buildersStack = new ArrayDeque<>();
+	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private List<User> users;
+	private final List<User> users;
 
 	public PrivilegeUsersSaxReader() {
 		this.users = new ArrayList<>();
@@ -52,9 +55,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equals(XmlConstants.XML_USER)) {
+		if (qName.equals(XML_USER)) {
 			this.buildersStack.push(new UserParser());
-		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
+		} else if (qName.equals(XML_PROPERTIES)) {
 			this.buildersStack.push(new PropertyParser());
 		}
 
@@ -75,9 +78,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(XmlConstants.XML_USER)) {
+		if (qName.equals(XML_USER)) {
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
+		} else if (qName.equals(XML_PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -98,6 +101,11 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 //	    <Property name="organization" value="eitchnet.ch" />
 //	    <Property name="organizationalUnit" value="Development" />
 //	  </Properties>
+//    <History>
+//      <FirstLogin>2021-02-19T15:32:09.592+01:00</FirstLogin>
+//      <LastLogin>2021-02-19T15:32:09.592+01:00</LastLogin>
+//      <LastPasswordChange>2021-02-19T15:32:09.592+01:00</LastPasswordChange>
+//    </History>
 //	</User>
 
 	public class UserParser extends ElementParserAdapter {
@@ -117,6 +125,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		Locale locale;
 		Set<String> userRoles;
 		Map<String, String> parameters;
+		UserHistory history;
 
 		public UserParser() {
 			this.userRoles = new HashSet<>();
@@ -128,13 +137,15 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			if (qName.equals(XmlConstants.XML_USER)) {
-				this.userId = attributes.getValue(XmlConstants.XML_ATTR_USER_ID);
-				this.username = attributes.getValue(XmlConstants.XML_ATTR_USERNAME);
+			if (qName.equals(XML_USER)) {
+				this.userId = attributes.getValue(XML_ATTR_USER_ID);
+				this.username = attributes.getValue(XML_ATTR_USERNAME);
 
-				String password = attributes.getValue(XmlConstants.XML_ATTR_PASSWORD);
-				String salt = attributes.getValue(XmlConstants.XML_ATTR_SALT);
+				String password = attributes.getValue(XML_ATTR_PASSWORD);
+				String salt = attributes.getValue(XML_ATTR_SALT);
 				parsePassword(password, salt);
+			} else if (qName.equals(XML_HISTORY)) {
+				this.history = new UserHistory();
 			}
 		}
 
@@ -183,36 +194,54 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 
 			switch (qName) {
-			case XmlConstants.XML_FIRSTNAME:
+			case XML_FIRSTNAME:
 
 				this.firstName = this.text.toString().trim();
 				break;
 
-			case XmlConstants.XML_LASTNAME:
+			case XML_LASTNAME:
 
 				this.lastname = this.text.toString().trim();
 				break;
 
-			case XmlConstants.XML_STATE:
+			case XML_STATE:
 
 				this.userState = UserState.valueOf(this.text.toString().trim());
 				break;
 
-			case XmlConstants.XML_LOCALE:
+			case XML_LOCALE:
 
 				this.locale = Locale.forLanguageTag(this.text.toString().trim());
 				break;
 
-			case XmlConstants.XML_ROLE:
+			case XML_FIRST_LOGIN:
+
+				this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+				break;
+
+			case XML_LAST_LOGIN:
+
+				this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+				break;
+
+			case XML_LAST_PASSWORD_CHANGE:
+
+				this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
+				break;
+
+			case XML_ROLE:
 
 				this.userRoles.add(this.text.toString().trim());
 				break;
 
-			case XmlConstants.XML_USER:
+			case XML_USER:
+
+				if (this.history == null)
+					this.history = new UserHistory();
 
 				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
 						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
-						this.locale, this.parameters);
+						this.locale, this.parameters, this.history);
 				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
 
 				getUsers().add(user);
@@ -220,9 +249,10 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 			default:
 
-				if (!(qName.equals(XmlConstants.XML_ROLES) //
-						|| qName.equals(XmlConstants.XML_PARAMETER) //
-						|| qName.equals(XmlConstants.XML_PARAMETERS))) {
+				if (!(qName.equals(XML_ROLES) //
+						|| qName.equals(XML_PARAMETER) //
+						|| qName.equals(XML_HISTORY) //
+						|| qName.equals(XML_PARAMETERS))) {
 					throw new IllegalArgumentException("Unhandled tag " + qName);
 				}
 
@@ -238,7 +268,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		}
 	}
 
-	class PropertyParser extends ElementParserAdapter {
+	static class PropertyParser extends ElementParserAdapter {
 
 		// <Property name="organizationalUnit" value="Development" />
 
@@ -249,16 +279,16 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 				throws SAXException {
 
 			switch (qName) {
-			case XmlConstants.XML_PROPERTY:
+			case XML_PROPERTY:
 
-				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
-				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
+				String key = attributes.getValue(XML_ATTR_NAME);
+				String value = attributes.getValue(XML_ATTR_VALUE);
 				this.parameterMap.put(key, value);
 				break;
 
 			default:
 
-				if (!qName.equals(XmlConstants.XML_PROPERTIES)) {
+				if (!qName.equals(XML_PROPERTIES)) {
 					throw new IllegalArgumentException("Unhandled tag " + qName);
 				}
 			}
