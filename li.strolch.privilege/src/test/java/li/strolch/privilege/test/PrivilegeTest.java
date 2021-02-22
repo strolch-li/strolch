@@ -252,7 +252,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			assertNotEquals("Admin", user.getLastname());
 
 			// let's add a new user bob
-			UserRep userRep = new UserRep(null, ADMIN, "The", "Admin", null, null, null, null);
+			UserRep userRep = new UserRep(null, ADMIN, "The", "Admin", null, null, null, null, null);
 			this.privilegeHandler.updateUser(certificate, userRep);
 
 			user = this.privilegeHandler.getUser(certificate, ADMIN);
@@ -273,7 +273,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 				Certificate certificate = this.ctx.getCertificate();
 
 				// let's add a new user bob
-				UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null);
+				UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null, null);
 				this.privilegeHandler.updateUser(certificate, userRep);
 			} finally {
 				logout();
@@ -291,7 +291,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 				Certificate certificate = this.ctx.getCertificate();
 
 				// let's add a new user bob
-				UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
+				UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null, null);
 				this.privilegeHandler.updateUser(certificate, userRep);
 			} finally {
 				logout();
@@ -308,7 +308,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			Certificate certificate = this.ctx.getCertificate();
 
-			UserRep selectorRep = new UserRep(null, ADMIN, null, null, null, null, null, null);
+			UserRep selectorRep = new UserRep(null, ADMIN, null, null, null, null, null, null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
@@ -326,7 +326,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			UserRep selectorRep = new UserRep(null, null, null, null, null,
-					new HashSet<>(Collections.singletonList("PrivilegeAdmin")), null, null);
+					new HashSet<>(Collections.singletonList("PrivilegeAdmin")), null, null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(2, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
@@ -344,7 +344,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			UserRep selectorRep = new UserRep(null, null, null, null, null,
-					new HashSet<>(Collections.singletonList(ROLE_TEMP)), null, null);
+					new HashSet<>(Collections.singletonList(ROLE_TEMP)), null, null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(0, users.size());
 
@@ -656,7 +656,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// let's add a new user ted
 			HashSet<String> roles = new HashSet<>();
 			roles.add(ROLE_USER);
-			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null, new HashMap<>());
+			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null, new HashMap<>(), null);
 			Certificate certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + TED);
@@ -689,7 +689,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// let's add a new user Ted
 			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<>(), null,
-					new HashMap<>());
+					new HashMap<>(), null);
 			certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
@@ -769,7 +769,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			// let's add a new user bob
 			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW,
-					new HashSet<>(Collections.singletonList(ROLE_MY)), null, new HashMap<>());
+					new HashSet<>(Collections.singletonList(ROLE_MY)), null, new HashMap<>(), null);
 			Certificate certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);

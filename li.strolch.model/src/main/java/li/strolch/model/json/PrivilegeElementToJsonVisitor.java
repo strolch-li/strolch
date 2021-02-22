@@ -7,6 +7,8 @@ import li.strolch.privilege.model.PrivilegeElementVisitor;
 import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.privilege.model.UserRep;
+import li.strolch.privilege.model.internal.UserHistory;
+import li.strolch.utils.iso8601.ISO8601;
 
 public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<JsonObject> {
 
@@ -35,6 +37,13 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 			propObj.addProperty("value", userRep.getProperty(propKey));
 			propsArr.add(propObj);
 		}
+
+		JsonObject historyJ = new JsonObject();
+		jsonObject.add("history", historyJ);
+		UserHistory history = userRep.getHistory();
+		historyJ.addProperty("firstLogin", ISO8601.toString(history.getFirstLogin()));
+		historyJ.addProperty("lastLogin", ISO8601.toString(history.getLastLogin()));
+		historyJ.addProperty("lastPasswordChange", ISO8601.toString(history.getLastPasswordChange()));
 
 		return jsonObject;
 	}

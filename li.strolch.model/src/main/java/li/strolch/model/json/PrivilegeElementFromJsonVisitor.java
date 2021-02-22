@@ -111,6 +111,6 @@ public class PrivilegeElementFromJsonVisitor {
 			}
 		}
 
-		return new UserRep(userId, username, firstname, lastname, userState, roles, locale, properties);
+		return new UserRep(userId, username, firstname, lastname, userState, roles, locale, properties, null);
 	}
 }

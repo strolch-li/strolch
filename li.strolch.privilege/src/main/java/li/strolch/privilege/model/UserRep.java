@@ -25,6 +25,7 @@ import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
+import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.utils.helper.StringHelper;
 
 /**
@@ -44,6 +45,8 @@ public class UserRep implements Serializable {
 	private Locale locale;
 	private Set<String> roles;
 	private Map<String, String> properties;
+
+	private UserHistory history;
 
 	/**
 	 * Default constructor
@@ -66,7 +69,7 @@ public class UserRep implements Serializable {
 	 * 		a {@link Map} containing string value pairs of properties for this user
 	 */
 	public UserRep(String userId, String username, String firstname, String lastname, UserState userState,
-			Set<String> roles, Locale locale, Map<String, String> propertyMap) {
+			Set<String> roles, Locale locale, Map<String, String> propertyMap, UserHistory history) {
 		this.userId = userId;
 		this.username = username;
 		this.firstname = firstname;
@@ -79,6 +82,8 @@ public class UserRep implements Serializable {
 			this.properties = new HashMap<>(propertyMap);
 			this.properties.remove("");
 		}
+
+		this.history = history;
 	}
 
 	/**
@@ -240,6 +245,17 @@ public class UserRep implements Serializable {
 	}
 
 	/**
+	 * Returns the {@link UserHistory}
+	 *
+	 * @return the user history
+	 */
+	public UserHistory getHistory() {
+		if (this.history == null)
+			return new UserHistory();
+		return this.history;
+	}
+
+	/**
 	 * Returns the property with the given key
 	 *
 	 * @param key
@@ -375,7 +391,7 @@ public class UserRep implements Serializable {
 		Map<String, String> propertyMap = this.properties == null ? null : new HashMap<>(this.properties);
 
 		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, roles,
-				this.locale, propertyMap);
+				this.locale, propertyMap, this.history.getClone());
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

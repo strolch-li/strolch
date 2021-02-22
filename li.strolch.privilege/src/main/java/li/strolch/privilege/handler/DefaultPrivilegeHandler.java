@@ -934,7 +934,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate no user is using this role
 		Set<String> roles = new HashSet<>(Collections.singletonList(roleName));
-		UserRep selector = new UserRep(null, null, null, null, null, roles, null, null);
+		UserRep selector = new UserRep(null, null, null, null, null, roles, null, null, null);
 		List<UserRep> usersWithRole = queryUsers(certificate, selector);
 		if (!usersWithRole.isEmpty()) {
 			String usersS = usersWithRole.stream().map(UserRep::getUsername).collect(Collectors.joining(", "));

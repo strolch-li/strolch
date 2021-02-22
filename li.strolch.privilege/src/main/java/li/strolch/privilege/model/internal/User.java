@@ -341,7 +341,7 @@ public final class User {
 	 */
 	public UserRep asUserRep() {
 		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState,
-				new HashSet<>(this.roles), this.locale, new HashMap<>(this.propertyMap));
+				new HashSet<>(this.roles), this.locale, new HashMap<>(this.propertyMap), this.history.getClone());
 	}
 
 	/**
