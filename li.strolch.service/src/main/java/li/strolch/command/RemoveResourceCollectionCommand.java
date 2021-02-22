@@ -37,8 +37,8 @@ public class RemoveResourceCollectionCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public RemoveResourceCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public RemoveResourceCollectionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

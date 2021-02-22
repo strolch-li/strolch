@@ -40,22 +40,22 @@ public class RemoveOrderCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
 		Order order = tx.findElement(this.locator);
 
-		RemoveOrderCommand command = new RemoveOrderCommand(container, tx);
+		RemoveOrderCommand command = new RemoveOrderCommand(tx);
 		command.setOrder(order);
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		assertFalse(tx.getOrderMap().hasElement(tx, "TestType", "@3"));
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		assertTrue(tx.getOrderMap().hasElement(tx, "TestType", "@3"));
 	}
 }

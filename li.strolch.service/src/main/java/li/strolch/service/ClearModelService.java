@@ -45,7 +45,7 @@ public class ClearModelService extends AbstractService<ClearModelArgument, Servi
 
 		ClearModelCommand command;
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			command = new ClearModelCommand(getContainer(), tx);
+			command = new ClearModelCommand(tx);
 			command.setClearOrders(arg.clearOrders);
 			command.setClearResources(arg.clearResources);
 			tx.addCommand(command);

@@ -38,21 +38,21 @@ public class UpdateResourceCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		UpdateResourceCommand command = new UpdateResourceCommand(container, tx);
+		UpdateResourceCommand command = new UpdateResourceCommand(tx);
 		command.setResource(this.resource.getClone(true));
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		Resource r = tx.getResourceBy(resource.getType(), resource.getId());
 		assertEquals("Modified Yellow Ball", r.getName());
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		Resource r = tx.getResourceBy(resource.getType(), resource.getId());
 		assertEquals("Yellow Ball", r.getName());
 	}

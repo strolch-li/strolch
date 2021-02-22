@@ -115,7 +115,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 			Constructor<T> constructor = (Constructor<T>) getConstructorForPolicy(clazz);
 			if (constructor.getParameterCount() == 1)
 				return constructor.newInstance(tx);
-			return constructor.newInstance(getContainer(), tx);
+			return constructor.newInstance(tx);
 
 		} catch (Exception e) {
 			if (e instanceof StrolchPolicyException)

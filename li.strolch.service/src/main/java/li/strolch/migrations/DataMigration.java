@@ -43,7 +43,7 @@ public class DataMigration extends Migration {
 		XmlImportModelCommand command;
 		try (StrolchTransaction tx = openTx(container, certificate)) {
 
-			command = new XmlImportModelCommand(container, tx);
+			command = new XmlImportModelCommand(tx);
 			command.setModelFile(getDataFile());
 			command.setAddOrders(true);
 			command.setAddResources(true);
@@ -53,7 +53,7 @@ public class DataMigration extends Migration {
 			command.setResourceTypes(Collections.emptySet());
 
 			tx.addCommand(command);
-			buildMigrationVersionChangeCommand(container, tx);
+			buildMigrationVersionChangeCommand(tx);
 			tx.commitOnClose();
 		} catch (Exception e) {
 			String msg = MessageFormat.format("Migration of {0} failed due to {1}", getVersion(), e.getMessage());

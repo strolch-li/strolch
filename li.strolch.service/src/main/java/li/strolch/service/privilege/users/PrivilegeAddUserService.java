@@ -40,7 +40,7 @@ public class PrivilegeAddUserService extends AbstractService<PrivilegeUserArgume
 
 		PrivilegeAddUserCommand cmd;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_USER)) {
-			cmd = new PrivilegeAddUserCommand(getContainer(), tx);
+			cmd = new PrivilegeAddUserCommand(tx);
 			cmd.setUserIn(arg.user);
 			tx.addCommand(cmd);
 			tx.commitOnClose();

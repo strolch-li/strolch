@@ -20,7 +20,6 @@ import static org.junit.Assert.assertNull;
 
 import java.util.*;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.AbstractRealmCommandTest;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.UserRep;
@@ -39,27 +38,27 @@ public class PrivilegeAddUserCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
 		Set<String> roles = new HashSet<>();
 		roles.add("AppUser");
 		Map<String, String> propertyMap = new HashMap<>();
 
 		UserRep user = new UserRep(null, "dude", "Jeff", "Lebowski", UserState.ENABLED, roles, Locale.getDefault(),
-				propertyMap);
+				propertyMap, null);
 
-		PrivilegeAddUserCommand command = new PrivilegeAddUserCommand(container, tx);
+		PrivilegeAddUserCommand command = new PrivilegeAddUserCommand(tx);
 		command.setUserIn(user);
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
-		assertNotNull(container.getPrivilegeHandler().getPrivilegeHandler().getUser(certificate, "dude"));
+	protected void validateAfterCommand(StrolchTransaction tx) {
+		assertNotNull(tx.getContainer().getPrivilegeHandler().getPrivilegeHandler().getUser(certificate, "dude"));
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
-		assertNull(container.getPrivilegeHandler().getPrivilegeHandler().getUser(certificate, "dude"));
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
+		assertNull(tx.getContainer().getPrivilegeHandler().getPrivilegeHandler().getUser(certificate, "dude"));
 	}
 }

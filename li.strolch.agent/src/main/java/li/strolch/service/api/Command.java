@@ -64,19 +64,6 @@ public abstract class Command implements Restrictable {
 	}
 
 	/**
-	 * Instantiate a new command
-	 *
-	 * @param container
-	 * 		the {@link ComponentContainer} to access components at runtime
-	 * @param tx
-	 * 		the transaction
-	 */
-	public Command(ComponentContainer container, StrolchTransaction tx) {
-		this.container = container;
-		this.tx = tx;
-	}
-
-	/**
 	 * Allows the concrete command implementation access to {@link StrolchComponent StrolchComponents} at runtime
 	 *
 	 * @param clazz

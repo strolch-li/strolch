@@ -64,7 +64,7 @@ public abstract class Migration {
 		return container.getRealm(getRealm()).openTx(cert, getClass(), false);
 	}
 
-	protected void buildMigrationVersionChangeCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void buildMigrationVersionChangeCommand(StrolchTransaction tx) {
 
 		Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);
 		if (migrationsRes == null) {

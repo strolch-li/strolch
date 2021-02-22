@@ -1377,7 +1377,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		removed = this.objectFilter.getRemoved(Tags.RESOURCE);
 		if (!removed.isEmpty()) {
 			for (Object obj : removed) {
-				RemoveResourceCommand cmd = new RemoveResourceCommand(getContainer(), this);
+				RemoveResourceCommand cmd = new RemoveResourceCommand(this);
 				cmd.setResource((Resource) obj);
 				addCommand(cmd);
 			}
@@ -1386,7 +1386,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		updated = this.objectFilter.getUpdated(Tags.RESOURCE);
 		if (!updated.isEmpty()) {
 			for (Object obj : updated) {
-				UpdateResourceCommand cmd = new UpdateResourceCommand(getContainer(), this);
+				UpdateResourceCommand cmd = new UpdateResourceCommand(this);
 				cmd.setResource((Resource) obj);
 				addCommand(cmd);
 			}
@@ -1395,7 +1395,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		added = this.objectFilter.getAdded(Tags.RESOURCE);
 		if (!added.isEmpty()) {
 			for (Object obj : added) {
-				AddResourceCommand cmd = new AddResourceCommand(getContainer(), this);
+				AddResourceCommand cmd = new AddResourceCommand(this);
 				cmd.setResource((Resource) obj);
 				addCommand(cmd);
 			}
@@ -1407,7 +1407,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		removed = this.objectFilter.getRemoved(Tags.ORDER);
 		if (!removed.isEmpty()) {
 			for (Object obj : removed) {
-				RemoveOrderCommand cmd = new RemoveOrderCommand(getContainer(), this);
+				RemoveOrderCommand cmd = new RemoveOrderCommand(this);
 				cmd.setOrder((Order) obj);
 				addCommand(cmd);
 			}
@@ -1416,7 +1416,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		updated = this.objectFilter.getUpdated(Tags.ORDER);
 		if (!updated.isEmpty()) {
 			for (Object obj : updated) {
-				UpdateOrderCommand cmd = new UpdateOrderCommand(getContainer(), this);
+				UpdateOrderCommand cmd = new UpdateOrderCommand(this);
 				cmd.setOrder((Order) obj);
 				addCommand(cmd);
 			}
@@ -1425,7 +1425,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		added = this.objectFilter.getAdded(Tags.ORDER);
 		if (!added.isEmpty()) {
 			for (Object obj : added) {
-				AddOrderCommand cmd = new AddOrderCommand(getContainer(), this);
+				AddOrderCommand cmd = new AddOrderCommand(this);
 				cmd.setOrder((Order) obj);
 				addCommand(cmd);
 			}
@@ -1437,7 +1437,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		removed = this.objectFilter.getRemoved(Tags.ACTIVITY);
 		if (!removed.isEmpty()) {
 			for (Object obj : removed) {
-				RemoveActivityCommand cmd = new RemoveActivityCommand(getContainer(), this);
+				RemoveActivityCommand cmd = new RemoveActivityCommand(this);
 				cmd.setActivity((Activity) obj);
 				addCommand(cmd);
 			}
@@ -1446,7 +1446,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		updated = this.objectFilter.getUpdated(Tags.ACTIVITY);
 		if (!updated.isEmpty()) {
 			for (Object obj : updated) {
-				UpdateActivityCommand cmd = new UpdateActivityCommand(getContainer(), this);
+				UpdateActivityCommand cmd = new UpdateActivityCommand(this);
 				cmd.setActivity((Activity) obj);
 				addCommand(cmd);
 			}
@@ -1455,7 +1455,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		added = this.objectFilter.getAdded(Tags.ACTIVITY);
 		if (!added.isEmpty()) {
 			for (Object obj : added) {
-				AddActivityCommand cmd = new AddActivityCommand(getContainer(), this);
+				AddActivityCommand cmd = new AddActivityCommand(this);
 				cmd.setActivity((Activity) obj);
 				addCommand(cmd);
 			}

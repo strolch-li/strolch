@@ -74,8 +74,8 @@ public class XmlExportModelCommand extends Command {
 
 	private long nextLogTime;
 
-	public XmlExportModelCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public XmlExportModelCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

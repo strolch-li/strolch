@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
@@ -39,8 +38,8 @@ public class UpdateOrderCollectionCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public UpdateOrderCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public UpdateOrderCollectionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

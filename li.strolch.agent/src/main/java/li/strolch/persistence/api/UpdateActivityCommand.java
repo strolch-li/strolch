@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,6 @@ package li.strolch.persistence.api;
 import java.text.MessageFormat;
 
 import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
 import li.strolch.service.api.Command;
@@ -36,13 +35,13 @@ public class UpdateActivityCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public UpdateActivityCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public UpdateActivityCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**
 	 * @param activity
-	 *            the activity to set
+	 * 		the activity to set
 	 */
 	public void setActivity(Activity activity) {
 		this.activity = activity;

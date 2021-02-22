@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -44,22 +43,22 @@ public class AddResourceCollectionCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		AddResourceCollectionCommand command = new AddResourceCollectionCommand(container, tx);
+		AddResourceCollectionCommand command = new AddResourceCollectionCommand(tx);
 		command.setResources(this.resources);
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		for (Resource resource : resources) {
 			assertTrue(tx.getResourceMap().hasElement(tx, resource.getType(), resource.getId()));
 		}
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		for (Resource resource : resources) {
 			assertFalse(tx.getResourceMap().hasElement(tx, resource.getType(), resource.getId()));
 		}

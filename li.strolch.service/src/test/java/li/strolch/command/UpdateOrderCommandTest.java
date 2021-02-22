@@ -38,21 +38,21 @@ public class UpdateOrderCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		UpdateOrderCommand command = new UpdateOrderCommand(container, tx);
+		UpdateOrderCommand command = new UpdateOrderCommand(tx);
 		command.setOrder(this.order.getClone(true));
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		Order o = tx.getOrderBy(order.getType(), order.getId());
 		assertEquals("Modified Car Order", o.getName());
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		Order o = tx.getOrderBy(order.getType(), order.getId());
 		assertEquals("Car Production Order", o.getName());
 	}

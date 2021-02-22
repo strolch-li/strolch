@@ -71,17 +71,17 @@ public abstract class AbstractRealmCommandTest {
 		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
 	}
 
-	protected abstract Command getCommandInstance(ComponentContainer container, StrolchTransaction tx);
+	protected abstract Command getCommandInstance(StrolchTransaction tx);
 
-	protected abstract void validateAfterCommand(ComponentContainer container, StrolchTransaction tx);
+	protected abstract void validateAfterCommand(StrolchTransaction tx);
 
-	protected abstract void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx);
+	protected abstract void validateAfterCommandFailed(StrolchTransaction tx);
 
 	protected void doCommandAsFail(String realmName) {
 		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
 		boolean caught = false;
 		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
-			Command command = getCommandInstance(runtimeMock.getContainer(), tx);
+			Command command = getCommandInstance(tx);
 			FailCommandFacade commandFacade = new FailCommandFacade(runtimeMock.getContainer(), tx, command);
 
 			tx.addCommand(commandFacade);
@@ -93,20 +93,20 @@ public abstract class AbstractRealmCommandTest {
 		assertTrue(caught);
 
 		try (StrolchTransaction tx = realm.openTx(certificate, "test", true)) {
-			validateAfterCommandFailed(runtimeMock.getContainer(), tx);
+			validateAfterCommandFailed(tx);
 		}
 	}
 
 	protected void doCommand(String realmName) {
 		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
 		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
-			Command command = getCommandInstance(runtimeMock.getContainer(), tx);
+			Command command = getCommandInstance(tx);
 			tx.addCommand(command);
 			tx.commitOnClose();
 		}
 
 		try (StrolchTransaction tx = realm.openTx(certificate, "test", true)) {
-			validateAfterCommand(runtimeMock.getContainer(), tx);
+			validateAfterCommand(tx);
 		}
 	}
 
@@ -131,7 +131,7 @@ public abstract class AbstractRealmCommandTest {
 		 * @param tx
 		 */
 		public FailCommandFacade(ComponentContainer container, StrolchTransaction tx, Command command) {
-			super(container, tx);
+			super(tx);
 			this.command = command;
 		}
 

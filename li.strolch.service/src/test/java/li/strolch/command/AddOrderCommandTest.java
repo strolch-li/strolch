@@ -18,7 +18,6 @@ package li.strolch.command;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.AddOrderCommand;
@@ -39,20 +38,20 @@ public class AddOrderCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		AddOrderCommand command = new AddOrderCommand(container, tx);
+		AddOrderCommand command = new AddOrderCommand(tx);
 		command.setOrder(this.order);
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		assertTrue(tx.getOrderMap().hasElement(tx, this.order.getType(), this.order.getId()));
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		assertFalse(tx.getOrderMap().hasElement(tx, this.order.getType(), this.order.getId()));
 	}
 }

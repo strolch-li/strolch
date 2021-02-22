@@ -18,7 +18,6 @@ package li.strolch.command;
 import java.io.File;
 import java.util.Set;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.impl.InMemoryElementListener;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
@@ -51,8 +50,8 @@ public class XmlImportModelCommand extends Command {
 	 * @param container
 	 * @param tx
 	 */
-	public XmlImportModelCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public XmlImportModelCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

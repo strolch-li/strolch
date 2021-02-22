@@ -16,7 +16,6 @@
 package li.strolch.command;
 
 import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.ModelStatistics;
@@ -40,8 +39,8 @@ public class ClearModelCommand extends Command {
 	 * @param container
 	 * @param tx
 	 */
-	public ClearModelCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public ClearModelCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	@Override

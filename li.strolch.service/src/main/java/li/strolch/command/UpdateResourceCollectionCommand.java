@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
@@ -39,8 +38,8 @@ public class UpdateResourceCollectionCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public UpdateResourceCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public UpdateResourceCollectionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

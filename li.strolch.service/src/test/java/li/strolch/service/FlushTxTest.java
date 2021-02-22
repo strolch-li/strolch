@@ -83,13 +83,13 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 
 				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
 
-				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				AddResourceCommand addResCmd = new AddResourceCommand(tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);
 				tx.flush();
 				DBC.PRE.assertNotNull("Expected resource with id " + id, tx.getResourceBy(id, id));
 
-				RemoveResourceCommand rmResCmd = new RemoveResourceCommand(getContainer(), tx);
+				RemoveResourceCommand rmResCmd = new RemoveResourceCommand(tx);
 				rmResCmd.setResource(resource);
 				tx.addCommand(rmResCmd);
 				tx.flush();
@@ -133,7 +133,7 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 
 				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
 
-				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				AddResourceCommand addResCmd = new AddResourceCommand(tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);
 				tx.flush();
@@ -141,7 +141,7 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 
 				Resource res = tx.getResourceBy(id, id);
 
-				UpdateResourceCommand updateResCmd = new UpdateResourceCommand(getContainer(), tx);
+				UpdateResourceCommand updateResCmd = new UpdateResourceCommand(tx);
 				updateResCmd.setResource(res);
 				tx.addCommand(updateResCmd);
 
@@ -183,7 +183,7 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 
 				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
 
-				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				AddResourceCommand addResCmd = new AddResourceCommand(tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);
 				tx.flush();
@@ -207,7 +207,7 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 
 				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
 
-				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				AddResourceCommand addResCmd = new AddResourceCommand(tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);
 				tx.flush();

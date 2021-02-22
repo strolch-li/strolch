@@ -17,7 +17,6 @@ package li.strolch.persistence.api;
 
 import java.text.MessageFormat;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
@@ -35,8 +34,8 @@ public class RemoveOrderCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public RemoveOrderCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public RemoveOrderCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

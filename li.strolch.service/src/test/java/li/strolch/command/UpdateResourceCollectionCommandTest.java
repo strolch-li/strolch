@@ -44,15 +44,15 @@ public class UpdateResourceCollectionCommandTest extends AbstractRealmCommandTes
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(container, tx);
+		UpdateResourceCollectionCommand command = new UpdateResourceCollectionCommand(tx);
 		command.setResources(this.resources.stream().map(e -> e.getClone(true)).collect(toList()));
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		for (Resource resource : this.resources) {
 			Resource r = tx.getResourceBy(resource.getType(), resource.getId());
 			assertEquals("Modified Enumeration", r.getName());
@@ -60,7 +60,7 @@ public class UpdateResourceCollectionCommandTest extends AbstractRealmCommandTes
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		for (Resource resource : this.resources) {
 			Resource r = tx.getResourceBy(resource.getType(), resource.getId());
 			assertEquals(r.getId(), r.getName().toLowerCase());

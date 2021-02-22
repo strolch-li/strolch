@@ -109,7 +109,7 @@ public class AddOrderService extends AbstractService&lt;AddOrderService.AddOrder
   protected ServiceResult internalDoService(AddOrderArg arg) {
 
     try (StrolchTransaction tx = openTx(arg.realm)) {
-      AddOrderCommand command = new AddOrderCommand(getContainer(), tx);
+      AddOrderCommand command = new AddOrderCommand(tx);
       command.setOrder(arg.order);
       tx.addCommand(command);
       tx.commitOnClose();
@@ -130,8 +130,8 @@ public class AddOrderCommand extends Command {
 
   private Order order;
 
-  public AddOrderCommand(ComponentContainer container, StrolchTransaction tx) {
-    super(container, tx);
+  public AddOrderCommand(StrolchTransaction tx) {
+    super(tx);
   }
 
   public void setOrder(Order order) {

@@ -48,7 +48,7 @@ public class PrivilegeAddUserServiceTest extends AbstractRealmServiceTest<Privil
 
 		PrivilegeUserArgument arg = new PrivilegeUserArgument();
 		arg.user = new UserRep(null, "dude", "Jeff", "Lebowski", UserState.ENABLED, roles, Locale.getDefault(),
-				propertyMap);
+				propertyMap, null);
 
 		return arg;
 	}

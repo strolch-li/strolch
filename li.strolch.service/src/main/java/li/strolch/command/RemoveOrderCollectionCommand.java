@@ -18,7 +18,6 @@ package li.strolch.command;
 import java.text.MessageFormat;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
@@ -37,8 +36,8 @@ public class RemoveOrderCollectionCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public RemoveOrderCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public RemoveOrderCollectionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

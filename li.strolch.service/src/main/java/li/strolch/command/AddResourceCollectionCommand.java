@@ -18,7 +18,6 @@ package li.strolch.command;
 import java.text.MessageFormat;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
@@ -37,8 +36,8 @@ public class AddResourceCollectionCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public AddResourceCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public AddResourceCollectionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

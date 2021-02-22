@@ -122,11 +122,11 @@ public class MigrationsTest {
 
 				Order fooOrder = ModelGenerator.createOrder("foo", "Foo", "Foo");
 
-				AddOrderCommand addOrderCommand = new AddOrderCommand(container, tx);
+				AddOrderCommand addOrderCommand = new AddOrderCommand(tx);
 				addOrderCommand.setOrder(fooOrder);
 				tx.addCommand(addOrderCommand);
 
-				buildMigrationVersionChangeCommand(container, tx);
+				buildMigrationVersionChangeCommand(tx);
 
 				tx.commitOnClose();
 			}
@@ -149,11 +149,11 @@ public class MigrationsTest {
 
 				Order fooOrder = ModelGenerator.createOrder("foo1", "Foo", "Foo");
 
-				AddOrderCommand addOrderCommand = new AddOrderCommand(container, tx);
+				AddOrderCommand addOrderCommand = new AddOrderCommand(tx);
 				addOrderCommand.setOrder(fooOrder);
 				tx.addCommand(addOrderCommand);
 
-				buildMigrationVersionChangeCommand(container, tx);
+				buildMigrationVersionChangeCommand(tx);
 
 				tx.commitOnClose();
 			}
@@ -176,11 +176,11 @@ public class MigrationsTest {
 
 				Order fooOrder = tx.getOrderBy("Foo", "foo");
 
-				RemoveOrderCommand removeOrderCommand = new RemoveOrderCommand(container, tx);
+				RemoveOrderCommand removeOrderCommand = new RemoveOrderCommand(tx);
 				removeOrderCommand.setOrder(fooOrder);
 				tx.addCommand(removeOrderCommand);
 
-				buildMigrationVersionChangeCommand(container, tx);
+				buildMigrationVersionChangeCommand(tx);
 
 				tx.commitOnClose();
 			}

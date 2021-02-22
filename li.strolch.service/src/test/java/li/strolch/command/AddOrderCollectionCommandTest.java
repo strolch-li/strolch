@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -44,22 +43,22 @@ public class AddOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		AddOrderCollectionCommand command = new AddOrderCollectionCommand(container, tx);
+		AddOrderCollectionCommand command = new AddOrderCollectionCommand(tx);
 		command.setOrders(this.orders);
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		for (Order order : orders) {
 			assertTrue(tx.getOrderMap().hasElement(tx, order.getType(), order.getId()));
 		}
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		for (Order order : orders) {
 			assertFalse(tx.getOrderMap().hasElement(tx, order.getType(), order.getId()));
 		}

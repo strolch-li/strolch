@@ -92,7 +92,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 
 				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
 
-				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				AddResourceCommand addResCmd = new AddResourceCommand(tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);
 				tx.flush();
@@ -136,7 +136,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 
 				DBC.PRE.assertNull("Did not expect resource with id " + id, tx.getResourceBy(id, id));
 
-				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				AddResourceCommand addResCmd = new AddResourceCommand(tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);
 				tx.flush();
@@ -205,7 +205,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 
 			boolean txFailed = false;
 			try (StrolchTransaction tx = openTx(arg.realm, true)) {
-				AddResourceCommand addResCmd = new AddResourceCommand(getContainer(), tx);
+				AddResourceCommand addResCmd = new AddResourceCommand(tx);
 				addResCmd.setResource(resource);
 				tx.addCommand(addResCmd);
 			} catch (Exception e) {

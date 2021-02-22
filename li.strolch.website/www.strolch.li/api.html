@@ -257,7 +257,7 @@ public class SetParameterService extends AbstractService&lt;SetParameterArg, Ser
       Parameter&lt;?&gt; parameter = tx.findElement(arg.locator);
 
       // instantiate the command
-      SetParameterCommand command = new SetParameterCommand(getContainer(), tx);
+      SetParameterCommand command = new SetParameterCommand(tx);
       
       // set the arguments
       command.setParameter(parameter);
@@ -318,8 +318,8 @@ public class SetParameterCommand extends Command {
    * @param container
    * @param tx
    */
-  public SetParameterCommand(ComponentContainer container, StrolchTransaction tx) {
-    super(container, tx);
+  public SetParameterCommand(StrolchTransaction tx) {
+    super(tx);
   }
 
   // setters for input ...

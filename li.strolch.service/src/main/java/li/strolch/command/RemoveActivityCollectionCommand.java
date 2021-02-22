@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -37,8 +36,8 @@ public class RemoveActivityCollectionCommand extends Command {
 	/**
 	 * @param tx
 	 */
-	public RemoveActivityCollectionCommand(ComponentContainer container, StrolchTransaction tx) {
-		super(container, tx);
+	public RemoveActivityCollectionCommand(StrolchTransaction tx) {
+		super(tx);
 	}
 
 	/**

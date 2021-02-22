@@ -18,7 +18,6 @@ package li.strolch.command;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.AddResourceCommand;
@@ -39,20 +38,20 @@ public class AddResourceCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		AddResourceCommand command = new AddResourceCommand(container, tx);
+		AddResourceCommand command = new AddResourceCommand(tx);
 		command.setResource(this.resource);
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		assertTrue(tx.getResourceMap().hasElement(tx, this.resource.getType(), this.resource.getId()));
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		assertFalse(tx.getResourceMap().hasElement(tx, this.resource.getType(), this.resource.getId()));
 	}
 }

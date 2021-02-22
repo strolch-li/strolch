@@ -40,22 +40,22 @@ public class RemoveResourceCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
 		Resource resource = tx.findElement(this.locator);
 
-		RemoveResourceCommand command = new RemoveResourceCommand(container, tx);
+		RemoveResourceCommand command = new RemoveResourceCommand(tx);
 		command.setResource(resource);
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		assertFalse(tx.getResourceMap().hasElement(tx, "Enumeration", "sex"));
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		assertTrue(tx.getResourceMap().hasElement(tx, "Enumeration", "sex"));
 	}
 }

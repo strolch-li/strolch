@@ -83,7 +83,7 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			realm = tx.getRealmName();
 
-			command = new XmlExportModelCommand(getContainer(), tx);
+			command = new XmlExportModelCommand(tx);
 			command.setModelFile(modelFile);
 			command.setOverwrite(arg.overwrite);
 			command.setMultiFile(arg.multiFile);

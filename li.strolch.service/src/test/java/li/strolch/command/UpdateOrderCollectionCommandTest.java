@@ -45,15 +45,15 @@ public class UpdateOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected Command getCommandInstance(ComponentContainer container, StrolchTransaction tx) {
+	protected Command getCommandInstance(StrolchTransaction tx) {
 
-		UpdateOrderCollectionCommand command = new UpdateOrderCollectionCommand(container, tx);
+		UpdateOrderCollectionCommand command = new UpdateOrderCollectionCommand(tx);
 		command.setOrders(this.orders.stream().map(e -> e.getClone(true)).collect(toList()));
 		return command;
 	}
 
 	@Override
-	protected void validateAfterCommand(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommand(StrolchTransaction tx) {
 		for (Order order : orders) {
 			Order o = tx.getOrderBy(order.getType(), order.getId());
 			assertEquals("Modified Test Order", o.getName());
@@ -61,7 +61,7 @@ public class UpdateOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	}
 
 	@Override
-	protected void validateAfterCommandFailed(ComponentContainer container, StrolchTransaction tx) {
+	protected void validateAfterCommandFailed(StrolchTransaction tx) {
 		for (Order order : orders) {
 			Order o = tx.getOrderBy(order.getType(), order.getId());
 			assertEquals("Test Name", o.getName());
