@@ -129,7 +129,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 				logout();
 			}
 		});
-		MatcherAssert.assertThat(exception.getMessage(), containsString("A password may not be empty!"));
+		MatcherAssert.assertThat(exception.getMessage(), containsString("Password is invalid!"));
 	}
 
 	@Test
