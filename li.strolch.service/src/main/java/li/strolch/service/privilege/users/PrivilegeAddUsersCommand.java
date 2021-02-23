@@ -3,6 +3,8 @@ package li.strolch.service.privilege.users;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.USER;
 
+import java.util.List;
+
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -15,37 +17,27 @@ import li.strolch.utils.dbc.DBC;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeAddUserCommand extends Command {
+public class PrivilegeAddUsersCommand extends Command {
 
 	// input
-	protected UserRep userIn;
+	protected List<UserRep> usersIn;
 	protected Certificate cert;
 
-	// intermediary
-	protected Audit audit;
-
-	// output
-	protected UserRep userOut;
-
-	public PrivilegeAddUserCommand(StrolchTransaction tx) {
+	public PrivilegeAddUsersCommand(StrolchTransaction tx) {
 		super(tx);
 	}
 
-	public void setUserIn(UserRep userIn) {
-		this.userIn = userIn;
+	public void setUsersIn(List<UserRep> usersIn) {
+		this.usersIn = usersIn;
 	}
 
 	public void setCert(Certificate cert) {
 		this.cert = cert;
 	}
 
-	public UserRep getUserOut() {
-		return this.userOut;
-	}
-
 	@Override
 	public void validate() {
-		DBC.PRE.assertNotNull("userIn may not be null!", this.userIn);
+		DBC.PRE.assertNotEmpty("usersIn may not be empty!", this.usersIn);
 		if (this.cert == null)
 			this.cert = tx().getCertificate();
 	}
@@ -53,27 +45,16 @@ public class PrivilegeAddUserCommand extends Command {
 	@Override
 	public void doCommand() {
 		PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
-		this.userOut = privilegeHandler.addUser(this.cert, this.userIn, null);
+		privilegeHandler.addOrUpdateUsers(this.cert, this.usersIn);
 		privilegeHandler.persist(this.cert);
-		writeAudit();
+		writeAudits();
 	}
 
-	protected void writeAudit() {
+	protected void writeAudits() {
 		tx().setSuppressAuditsForAudits(true);
-		this.audit = tx().auditFrom(AccessType.CREATE, PRIVILEGE, USER, this.userOut.getUsername());
-		tx().getAuditTrail().add(tx(), this.audit);
-	}
-
-	@Override
-	public void undo() {
-		if (tx().isRollingBack()) {
-			PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
-
-			if (this.userOut != null)
-				privilegeHandler.removeUser(tx().getCertificate(), this.userIn.getUsername());
-
-			if (this.audit != null)
-				tx().getAuditTrail().remove(tx(), this.audit);
+		for (UserRep userRep : usersIn) {
+			Audit audit = tx().auditFrom(AccessType.CREATE, PRIVILEGE, USER, userRep.getUsername());
+			tx().getAuditTrail().add(tx(), audit);
 		}
 	}
 }

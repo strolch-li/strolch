@@ -438,6 +438,83 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public void addOrUpdateUsers(Certificate certificate, List<UserRep> userReps) throws PrivilegeException {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_ADD_USER);
+
+		List<User> toCreate = new ArrayList<>();
+		List<User> toUpdate = new ArrayList<>();
+
+		for (UserRep e : userReps) {
+			UserRep userRep = e.clone();
+
+			User user;
+			User existingUser = this.persistenceHandler.getUser(userRep.getUsername());
+
+			if (existingUser == null) {
+
+				// add user
+
+				// make sure userId is not set
+				if (isNotEmpty(userRep.getUserId())) {
+					String msg = "UserId can not be set when adding a new user!";
+					throw new PrivilegeModelException(MessageFormat.format(msg, userRep.getUsername()));
+				}
+
+				// set userId
+				userRep.setUserId(getUniqueId());
+
+				// first validate user
+				userRep.validate();
+
+				validateRolesExist(userRep);
+
+				// create new user
+				user = createUser(userRep, new UserHistory(), null, null, false);
+
+				// detect privilege conflicts
+				assertNoPrivilegeConflict(user);
+
+				// validate this user may create such a user
+				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_USER, new Tuple(null, user)));
+
+				toCreate.add(user);
+				logger.info("Creating new user " + user.getUsername());
+
+			} else {
+
+				// update user
+
+				if (userRep.getUserId() == null)
+					userRep.setUserId(existingUser.getUserId());
+
+				UserHistory history = existingUser.getHistory().getClone();
+				byte[] passwordHash = existingUser.getPassword();
+				byte[] salt = existingUser.getSalt();
+				user = createUser(userRep, history, passwordHash, salt, existingUser.isPasswordChangeRequested());
+
+				// detect privilege conflicts
+				assertNoPrivilegeConflict(user);
+
+				// validate this user may modify this user
+				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, user)));
+
+				toUpdate.add(user);
+				logger.info("Updating existing user " + user.getUsername());
+			}
+		}
+
+		// delegate to persistence handler
+		toCreate.forEach(user -> this.persistenceHandler.addUser(user));
+		toUpdate.forEach(user -> this.persistenceHandler.replaceUser(user));
+
+		logger.info("Created " + toCreate.size() + " users");
+		logger.info("Updated " + toUpdate.size() + " users");
+	}
+
+	@Override
 	public UserRep replaceUser(Certificate certificate, UserRep userRep, char[] password) {
 		try {
 

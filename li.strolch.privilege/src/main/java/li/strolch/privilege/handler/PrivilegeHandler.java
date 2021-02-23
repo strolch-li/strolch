@@ -379,6 +379,19 @@ public interface PrivilegeHandler {
 	UserRep addUser(Certificate certificate, UserRep userRep, char[] password) throws PrivilegeException;
 
 	/**
+	 * Allows the bulk adding or updating of users. If the user exists, the user's history and password is kept,
+	 * otherwise the user is created without a password
+	 *
+	 * @param certificate
+	 * 		the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userReps
+	 * 		the list of users to add or update
+	 *
+	 * @throws PrivilegeException
+	 */
+	void addOrUpdateUsers(Certificate certificate, List<UserRep> userReps) throws PrivilegeException;
+
+	/**
 	 * <p>
 	 * Updates the fields for the user with the given user. All fields on the given {@link UserRep} which are non-null
 	 * will be updated on the existing user. The username on the given {@link UserRep} must be set and correspond to an
