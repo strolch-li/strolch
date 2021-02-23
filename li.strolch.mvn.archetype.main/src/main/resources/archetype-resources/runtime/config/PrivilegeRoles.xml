@@ -65,6 +65,9 @@
         <Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
+        <Privilege name="RequirePasswordChange" policy="UserAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
         <Privilege name="li.strolch.handler.operationslog.OperationsLog" policy="DefaultPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
@@ -122,6 +125,9 @@
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="RequirePasswordChange" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="PrivilegeSetUserLocale" policy="UserAccessPrivilege">
