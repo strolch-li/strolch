@@ -820,7 +820,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				invalidate(certificate);
 			}
 
-			logger.info("Updated password for " + newUser.getUsername());
+			if (password == null)
+				logger.info("Cleared password for " + newUser.getUsername());
+			else
+				logger.info("Updated password for " + newUser.getUsername());
 
 		} finally {
 			clearPassword(password);
