@@ -60,4 +60,8 @@ public enum UserState {
 	public boolean isSystem() {
 		return this == UserState.SYSTEM;
 	}
+
+	public boolean isRemote() {
+		return this == UserState.REMOTE;
+	}
 }

@@ -56,6 +56,7 @@ public final class User {
 	private final Map<String, String> propertyMap;
 	private final Locale locale;
 
+	private final boolean passwordChangeRequested;
 	private final UserHistory history;
 
 	/**
@@ -90,7 +91,7 @@ public final class User {
 	 */
 	public User(String userId, String username, byte[] password, byte[] salt, String hashAlgorithm, int hashIterations,
 			int hashKeyLength, String firstname, String lastname, UserState userState, Set<String> roles, Locale locale,
-			Map<String, String> propertyMap, UserHistory history) {
+			Map<String, String> propertyMap, boolean passwordChangeRequested, UserHistory history) {
 
 		if (StringHelper.isEmpty(userId))
 			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
@@ -143,6 +144,7 @@ public final class User {
 		else
 			this.propertyMap = Map.copyOf(propertyMap);
 
+		this.passwordChangeRequested = passwordChangeRequested;
 		this.history = history;
 	}
 
@@ -250,6 +252,10 @@ public final class User {
 	 */
 	public Locale getLocale() {
 		return this.locale;
+	}
+
+	public boolean isPasswordChangeRequested() {
+		return this.passwordChangeRequested;
 	}
 
 	/**

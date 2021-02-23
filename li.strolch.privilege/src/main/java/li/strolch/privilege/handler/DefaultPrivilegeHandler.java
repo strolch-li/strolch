@@ -15,6 +15,8 @@
  */
 package li.strolch.privilege.handler;
 
+import static li.strolch.utils.helper.StringHelper.*;
+
 import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.InputStream;
@@ -37,7 +39,6 @@ import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.AesCryptoHelper;
-import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -377,7 +378,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			prvCtx.assertHasPrivilege(PRIVILEGE_ADD_USER);
 
 			// make sure userId is not set
-			if (StringHelper.isNotEmpty(userRepParam.getUserId())) {
+			if (isNotEmpty(userRepParam.getUserId())) {
 				String msg = "UserId can not be set when adding a new user!";
 				throw new PrivilegeModelException(MessageFormat.format(msg, userRepParam.getUsername()));
 			}
@@ -385,7 +386,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			UserRep userRep = userRepParam.clone();
 
 			// set userId
-			userRep.setUserId(StringHelper.getUniqueId());
+			userRep.setUserId(getUniqueId());
 
 			// first validate user
 			userRep.validate();
@@ -416,7 +417,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			// create new user
-			User newUser = createUser(userRep, history, passwordHash, salt);
+			User newUser = createUser(userRep, history, passwordHash, salt, false);
 
 			// detect privilege conflicts
 			assertNoPrivilegeConflict(newUser);
@@ -480,7 +481,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				history.setLastPasswordChange(ZonedDateTime.now());
 			}
 
-			User newUser = createUser(userRep, history, passwordHash, salt);
+			User newUser = createUser(userRep, history, passwordHash, salt, existingUser.isPasswordChangeRequested());
 
 			// detect privilege conflicts
 			assertNoPrivilegeConflict(newUser);
@@ -511,7 +512,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	private User createUser(UserRep userRep, UserHistory history, byte[] passwordHash, byte[] salt) {
+	private User createUser(UserRep userRep, UserHistory history, byte[] passwordHash, byte[] salt,
+			boolean passwordChangeRequested) {
 		String userId = userRep.getUserId();
 		String userName = userRep.getUsername();
 		String firstName = userRep.getFirstname();
@@ -522,12 +524,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Map<String, String> properties = userRep.getProperties();
 		return new User(userId, userName, passwordHash, salt, this.encryptionHandler.getAlgorithm(),
 				this.encryptionHandler.getIterations(), this.encryptionHandler.getKeyLength(), firstName, lastName,
-				state, roles, locale, properties, history);
+				state, roles, locale, properties, passwordChangeRequested, history);
 	}
 
 	@Override
-	public UserRep updateUser(Certificate certificate, UserRep userRep)
-			throws AccessDeniedException, PrivilegeException {
+	public UserRep updateUser(Certificate certificate, UserRep userRep) throws PrivilegeException {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -535,15 +536,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get existing user
 		User existingUser = this.persistenceHandler.getUser(userRep.getUsername());
-		if (existingUser == null) {
+		if (existingUser == null)
 			throw new PrivilegeModelException(
 					MessageFormat.format("User {0} does not exist!", userRep.getUsername())); //$NON-NLS-1$
-		}
 
 		// if nothing to do, then stop
-		if (StringHelper.isEmpty(userRep.getFirstname()) && StringHelper.isEmpty(userRep.getLastname())
-				&& userRep.getLocale() == null && (userRep.getProperties() == null || userRep.getProperties()
-				.isEmpty())) {
+		if (isEmpty(userRep.getFirstname()) && isEmpty(userRep.getLastname()) && userRep.getLocale() == null && (
+				userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
 			throw new PrivilegeModelException(
 					MessageFormat.format("All updateable fields are empty for update of user {0}", //$NON-NLS-1$
 							userRep.getUsername()));
@@ -565,9 +564,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		int hashKeyLength = existingUser.getHashKeyLength();
 
 		// get updated fields
-		if (StringHelper.isNotEmpty(userRep.getFirstname()))
+		if (isNotEmpty(userRep.getFirstname()))
 			firstName = userRep.getFirstname();
-		if (StringHelper.isNotEmpty(userRep.getLastname()))
+		if (isNotEmpty(userRep.getLastname()))
 			lastName = userRep.getLastname();
 		if (userRep.getProperties() != null && !userRep.getProperties().isEmpty())
 			propertyMap = userRep.getProperties();
@@ -581,7 +580,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// create new user
 		User newUser = new User(userId, username, password, salt, hashAlgorithm, hashIterations, hashKeyLength,
-				firstName, lastName, userState, roles, locale, propertyMap, existingUser.getHistory().getClone());
+				firstName, lastName, userState, roles, locale, propertyMap, existingUser.isPasswordChangeRequested(),
+				existingUser.getHistory().getClone());
 
 		// detect privilege conflicts
 		assertNoPrivilegeConflict(newUser);
@@ -635,9 +635,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get user
 		User existingUser = this.persistenceHandler.getUser(username);
-		if (existingUser == null) {
+		if (existingUser == null)
 			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
-		}
 
 		// validate that this user may add this role to this user
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_ROLE_TO_USER, new Tuple(existingUser, roleName)));
@@ -663,7 +662,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties(),
-				existingUser.getHistory().getClone());
+				existingUser.isPasswordChangeRequested(), existingUser.getHistory().getClone());
 
 		// detect privilege conflicts
 		assertNoPrivilegeConflict(newUser);
@@ -688,9 +687,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
-		if (existingUser == null) {
+		if (existingUser == null)
 			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
-		}
 
 		// validate that this user may remove this role from this user
 		prvCtx.validateAction(
@@ -711,7 +709,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 				existingUser.getUserState(), newRoles, existingUser.getLocale(), existingUser.getProperties(),
-				existingUser.getHistory().getClone());
+				existingUser.isPasswordChangeRequested(), existingUser.getHistory().getClone());
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
@@ -733,16 +731,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
-		if (existingUser == null) {
+		if (existingUser == null)
 			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
-		}
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 				existingUser.getUserState(), existingUser.getRoles(), locale, existingUser.getProperties(),
-				existingUser.getHistory().getClone());
+				existingUser.isPasswordChangeRequested(), existingUser.getHistory().getClone());
 
 		// if the user is not setting their own locale, then make sure this user may set this user's locale
 		if (!certificate.getUsername().equals(username)) {
@@ -763,6 +760,40 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public void requirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_REQUIRE_PASSWORD_CHANGE);
+
+		// get User
+		User existingUser = this.persistenceHandler.getUser(username);
+		if (existingUser == null)
+			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
+
+		if (existingUser.getUserState().isRemote())
+			throw new PrivilegeModelException(
+					MessageFormat.format("User {0} is remote and can not set password!", username)); //$NON-NLS-1$
+
+		// create new user
+		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
+				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
+				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
+				existingUser.getUserState(), existingUser.getRoles(), existingUser.getLocale(),
+				existingUser.getProperties(), true, existingUser.getHistory().getClone());
+
+		// delegate user replacement to persistence handler
+		this.persistenceHandler.replaceUser(newUser);
+
+		// perform automatic persisting, if enabled
+		if (this.autoPersistOnUserChangesData) {
+			this.persistenceHandler.persist();
+		}
+
+		logger.info("Requiring user " + newUser.getUsername() + " to change their password on next login.");
+	}
+
+	@Override
 	public void setUserPassword(Certificate certificate, String username, char[] password) {
 		try {
 
@@ -772,10 +803,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// get User
 			User existingUser = this.persistenceHandler.getUser(username);
-			if (existingUser == null) {
+			if (existingUser == null)
 				throw new PrivilegeModelException(
 						MessageFormat.format("User {0} does not exist!", username)); //$NON-NLS-1$
-			}
 
 			UserHistory history = existingUser.getHistory().getClone();
 
@@ -800,7 +830,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					this.encryptionHandler.getAlgorithm(), this.encryptionHandler.getIterations(),
 					this.encryptionHandler.getKeyLength(), existingUser.getFirstname(), existingUser.getLastname(),
 					existingUser.getUserState(), existingUser.getRoles(), existingUser.getLocale(),
-					existingUser.getProperties(), history);
+					existingUser.getProperties(), false, history);
 
 			if (!certificate.getUsername().equals(username)) {
 				// check that the user may change their own password
@@ -847,7 +877,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				existingUser.getSalt(), existingUser.getHashAlgorithm(), existingUser.getHashIterations(),
 				existingUser.getHashKeyLength(), existingUser.getFirstname(), existingUser.getLastname(), state,
 				existingUser.getRoles(), existingUser.getLocale(), existingUser.getProperties(),
-				existingUser.getHistory().getClone());
+				existingUser.isPasswordChangeRequested(), existingUser.getHistory().getClone());
 
 		// validate that this user may modify this user's state
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_STATE, new Tuple(existingUser, newUser)));
@@ -1219,6 +1249,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new InvalidCredentialsException(
 						MessageFormat.format("User {0} does not have any roles defined!", username)); //$NON-NLS-1$
 
+			if (user.isPasswordChangeRequested()) {
+				if (usage == Usage.SINGLE)
+					throw new IllegalStateException("Password change requested!");
+				usage = Usage.SET_PASSWORD;
+			}
+
 			// get 2 auth tokens
 			String authToken = this.encryptionHandler.nextToken();
 
@@ -1520,7 +1556,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		byte[] pwHash = user.getPassword();
 		if (pwHash == null)
-			throw new AccessDeniedException(
+			throw new InvalidCredentialsException(
 					MessageFormat.format("User {0} has no password and may not login!", username)); //$NON-NLS-1$
 		byte[] salt = user.getSalt();
 
@@ -1557,7 +1593,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			User newUser = new User(user.getUserId(), user.getUsername(), passwordHash, salt,
 					this.encryptionHandler.getAlgorithm(), this.encryptionHandler.getIterations(),
 					this.encryptionHandler.getKeyLength(), user.getFirstname(), user.getLastname(), user.getUserState(),
-					user.getRoles(), user.getLocale(), user.getProperties(), user.getHistory().getClone());
+					user.getRoles(), user.getLocale(), user.getProperties(), user.isPasswordChangeRequested(),
+					user.getHistory().getClone());
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
@@ -1863,7 +1900,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	private void handleAutoPersistOnUserDataChange(Map<String, String> parameterMap) {
 		String autoPersistS = parameterMap.get(PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA);
-		if (StringHelper.isEmpty(autoPersistS) || autoPersistS.equals(Boolean.FALSE.toString())) {
+		if (isEmpty(autoPersistS) || autoPersistS.equals(Boolean.FALSE.toString())) {
 			this.autoPersistOnUserChangesData = false;
 		} else if (autoPersistS.equals(Boolean.TRUE.toString())) {
 			this.autoPersistOnUserChangesData = true;
@@ -1878,13 +1915,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	private void handlePersistSessionsParam(Map<String, String> parameterMap) {
 		String persistSessionsS = parameterMap.get(PARAM_PERSIST_SESSIONS);
-		if (StringHelper.isEmpty(persistSessionsS) || persistSessionsS.equals(Boolean.FALSE.toString())) {
+		if (isEmpty(persistSessionsS) || persistSessionsS.equals(Boolean.FALSE.toString())) {
 			this.persistSessions = false;
 		} else if (persistSessionsS.equals(Boolean.TRUE.toString())) {
 			this.persistSessions = true;
 
 			String persistSessionsPathS = parameterMap.get(PARAM_PERSIST_SESSIONS_PATH);
-			if (StringHelper.isEmpty(persistSessionsPathS)) {
+			if (isEmpty(persistSessionsPathS)) {
 				String msg = "Parameter {0} has illegal value {1}."; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, PARAM_PERSIST_SESSIONS_PATH, persistSessionsPathS);
 				throw new PrivilegeModelException(msg);
@@ -1936,14 +1973,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private void handleSecretParams(Map<String, String> parameterMap) {
 
 		String secretKeyS = parameterMap.get(PARAM_SECRET_KEY);
-		if (StringHelper.isEmpty(secretKeyS)) {
+		if (isEmpty(secretKeyS)) {
 			String msg = "Parameter {0} may not be empty"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, PARAM_SECRET_KEY, PARAM_PRIVILEGE_CONFLICT_RESOLUTION);
 			throw new PrivilegeModelException(msg);
 		}
 
 		String secretSaltS = parameterMap.get(PARAM_SECRET_SALT);
-		if (StringHelper.isEmpty(secretSaltS)) {
+		if (isEmpty(secretSaltS)) {
 			String msg = "Parameter {0} may not be empty"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, PARAM_SECRET_SALT, PARAM_PRIVILEGE_CONFLICT_RESOLUTION);
 			throw new PrivilegeModelException(msg);
@@ -2065,7 +2102,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void runAs(String username, SystemAction action) throws PrivilegeException, Exception {
+	public void runAs(String username, SystemAction action) throws Exception {
 
 		PrivilegeContext systemUserPrivilegeContext = initiateSystemPrivilege(username, action);
 
@@ -2079,7 +2116,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException, Exception {
+	public <T> T runWithResult(String username, SystemActionWithResult<T> action) throws Exception {
 
 		PrivilegeContext systemUserPrivilegeContext = initiateSystemPrivilege(username, action);
 

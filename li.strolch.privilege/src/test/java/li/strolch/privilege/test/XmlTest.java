@@ -319,7 +319,7 @@ public class XmlTest {
 		UserHistory history = new UserHistory();
 		history.setFirstLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()));
 		User user1 = new User("1", "user1", "blabla".getBytes(), "blabla".getBytes(), "PBKDF2WithHmacSHA512", 10000,
-				256, "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap, history);
+				256, "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap, false, history);
 		users.add(user1);
 
 		propertyMap = new HashMap<>();
@@ -330,7 +330,7 @@ public class XmlTest {
 		history.setFirstLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()));
 		history.setLastLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 5, 2, 3, 4, 5), ZoneId.systemDefault()));
 		User user2 = new User("2", "user2", "haha".getBytes(), "haha".getBytes(), null, -1, -1, "Leonard", "Sheldon",
-				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap, history);
+				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap, false, history);
 		users.add(user2);
 
 		File modelFile = new File(TARGET_TEST + "PrivilegeUsersTest.xml");

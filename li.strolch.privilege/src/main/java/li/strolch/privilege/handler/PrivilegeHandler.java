@@ -159,6 +159,12 @@ public interface PrivilegeHandler {
 	 */
 	String PRIVILEGE_SET_USER_PASSWORD = "PrivilegeSetUserPassword";
 
+	/**
+	 * Privilege "PRIVILEGE_SET_USER_PASSWORD" which is used to validate that a user can set the password of a user, or
+	 * their own
+	 */
+	String PRIVILEGE_REQUIRE_PASSWORD_CHANGE = "RequirePasswordChange";
+
 	///
 
 	/**
@@ -518,6 +524,23 @@ public interface PrivilegeHandler {
 	 * 		if there is anything wrong with this certificate
 	 */
 	void setUserPassword(Certificate certificate, String username, char[] password) throws PrivilegeException;
+
+	/**
+	 * <p>
+	 * Requires the given user to change their password after next login
+	 * </p>
+	 *
+	 * @param certificate
+	 * 		the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param username
+	 * 		the username of the {@link User} for which the password change is requested
+	 *
+	 * @throws AccessDeniedException
+	 * 		if the user for this certificate may not perform the action
+	 * @throws PrivilegeException
+	 * 		if there is anything wrong with this certificate
+	 */
+	void requirePasswordChange(Certificate certificate, String username) throws PrivilegeException;
 
 	/**
 	 * Changes the {@link UserState} of the user

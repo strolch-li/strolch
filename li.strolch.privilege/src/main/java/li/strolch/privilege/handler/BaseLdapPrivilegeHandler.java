@@ -140,7 +140,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		Map<String, String> properties = buildProperties(username, attrs, ldapGroups, strolchRoles);
 
 		return new User(username, username, null, null, null, -1, -1, firstName, lastName, UserState.REMOTE,
-				strolchRoles, locale, properties, new UserHistory());
+				strolchRoles, locale, properties, false, new UserHistory());
 	}
 
 	protected abstract Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,

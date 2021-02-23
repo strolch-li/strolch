@@ -388,6 +388,7 @@ public class AuthenticationService {
 		loginResult.addProperty("cookieMaxAge", cookieMaxAge);
 		loginResult.addProperty("authorizationExpiration", expirationDateS);
 		loginResult.addProperty("refreshAllowed", sessionHandler.isRefreshAllowed());
+		loginResult.addProperty("usage", certificate.getUsage().getValue());
 
 		if (!certificate.getPropertyMap().isEmpty()) {
 			JsonObject propObj = new JsonObject();

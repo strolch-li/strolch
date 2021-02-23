@@ -134,6 +134,11 @@ public class XmlConstants {
 	public static final String XML_LAST_PASSWORD_CHANGE = "LastPasswordChange";
 
 	/**
+	 * XML_USER = "User"
+	 */
+	public static final String XML_PASSWORD_CHANGE_REQUESTED = "PasswordChangeRequested";
+
+	/**
 	 * XML_PRIVILEGE = "Privilege" :
 	 */
 	public static final String XML_PRIVILEGE = "Privilege";

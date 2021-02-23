@@ -126,6 +126,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		Set<String> userRoles;
 		Map<String, String> parameters;
 		UserHistory history;
+		boolean passwordChangeRequested;
 
 		public UserParser() {
 			this.userRoles = new HashSet<>();
@@ -214,6 +215,11 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 				this.locale = Locale.forLanguageTag(this.text.toString().trim());
 				break;
 
+			case XML_PASSWORD_CHANGE_REQUESTED:
+
+				this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
+				break;
+
 			case XML_FIRST_LOGIN:
 
 				this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
@@ -241,7 +247,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
 						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
-						this.locale, this.parameters, this.history);
+						this.locale, this.parameters, this.passwordChangeRequested, this.history);
 				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
 
 				getUsers().add(user);

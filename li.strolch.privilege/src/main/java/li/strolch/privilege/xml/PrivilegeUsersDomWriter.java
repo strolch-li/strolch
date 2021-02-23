@@ -87,6 +87,13 @@ public class PrivilegeUsersDomWriter {
 			localeElement.setTextContent(user.getLocale().toLanguageTag());
 			userElement.appendChild(localeElement);
 
+			// add password change requested element
+			if (user.isPasswordChangeRequested()) {
+				Element passwordChangeRequestedElement = doc.createElement(XmlConstants.XML_PASSWORD_CHANGE_REQUESTED);
+				localeElement.setTextContent(Boolean.toString(true));
+				userElement.appendChild(passwordChangeRequestedElement);
+			}
+
 			// add all the role elements
 			Element rolesElement = doc.createElement(XmlConstants.XML_ROLES);
 			userElement.appendChild(rolesElement);
