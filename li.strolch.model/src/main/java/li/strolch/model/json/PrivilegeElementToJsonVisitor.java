@@ -25,18 +25,16 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 
 		JsonArray rolesArr = new JsonArray();
 		jsonObject.add("roles", rolesArr);
-		for (String role : userRep.getRoles()) {
-			rolesArr.add(new JsonPrimitive(role));
-		}
+		userRep.getRoles().stream().sorted(String::compareToIgnoreCase).map(JsonPrimitive::new).forEach(rolesArr::add);
 
 		JsonArray propsArr = new JsonArray();
 		jsonObject.add("properties", propsArr);
-		for (String propKey : userRep.getPropertyKeySet()) {
+		userRep.getPropertyKeySet().stream().sorted(String::compareToIgnoreCase).forEach(propKey -> {
 			JsonObject propObj = new JsonObject();
 			propObj.addProperty("key", propKey);
 			propObj.addProperty("value", userRep.getProperty(propKey));
 			propsArr.add(propObj);
-		}
+		});
 
 		JsonObject historyJ = new JsonObject();
 		jsonObject.add("history", historyJ);

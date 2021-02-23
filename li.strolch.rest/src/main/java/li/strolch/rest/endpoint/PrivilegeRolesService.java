@@ -77,16 +77,17 @@ public class PrivilegeRolesService {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}")
-	public Response getRole(@PathParam("rolename") String rolename, @Context HttpServletRequest request) {
+	@Path("{roleName}")
+	public Response getRole(@PathParam("roleName") String roleName, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_ROLE);
 
-			RoleRep role = privilegeHandler.getRole(cert, rolename);
-			return Response.ok(role.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON).build();
+			RoleRep role = privilegeHandler.getRole(cert, roleName);
+			return Response.ok(role.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
+					.build();
 		}
 	}
 
@@ -110,14 +111,14 @@ public class PrivilegeRolesService {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}")
-	public Response replaceRole(@Context HttpServletRequest request, @PathParam("rolename") String rolename,
+	@Path("{roleName}")
+	public Response replaceRole(@Context HttpServletRequest request, @PathParam("roleName") String roleName,
 			String data) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		RoleRep updatedRole = new PrivilegeElementFromJsonVisitor().roleRepFromJson(data);
-		if (!rolename.equals(updatedRole.getName())) {
-			String msg = "Path rolename and data do not have same role name!";
+		if (!roleName.equals(updatedRole.getName())) {
+			String msg = "Path roleName and data do not have same role name!";
 			return ResponseUtil.toResponse(msg);
 		}
 
@@ -133,14 +134,14 @@ public class PrivilegeRolesService {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}")
-	public Response removeRole(@Context HttpServletRequest request, @PathParam("rolename") String rolename) {
+	@Path("{roleName}")
+	public Response removeRole(@Context HttpServletRequest request, @PathParam("roleName") String roleName) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeRemoveRoleService svc = new PrivilegeRemoveRoleService();
 		PrivilegeRoleNameArgument arg = new PrivilegeRoleNameArgument();
-		arg.roleName = rolename;
+		arg.roleName = roleName;
 
 		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
 		return handleServiceResult(svcResult);
@@ -149,9 +150,9 @@ public class PrivilegeRolesService {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}/privileges")
+	@Path("{roleName}/privileges")
 	public Response addOrReplacePrivilegeOnRole(@Context HttpServletRequest request,
-			@PathParam("rolename") String rolename, String data) {
+			@PathParam("roleName") String roleName, String data) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		PrivilegeRep privilegeRep = new PrivilegeElementFromJsonVisitor().privilegeRepFromJson(data);
@@ -159,7 +160,7 @@ public class PrivilegeRolesService {
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeAddOrReplacePrivilegeOnRoleService svc = new PrivilegeAddOrReplacePrivilegeOnRoleService();
 		PrivilegeAddOrReplacePrivilegeOnRoleArgument arg = new PrivilegeAddOrReplacePrivilegeOnRoleArgument();
-		arg.roleName = rolename;
+		arg.roleName = roleName;
 		arg.privilegeRep = privilegeRep;
 
 		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
@@ -169,15 +170,15 @@ public class PrivilegeRolesService {
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{rolename}/privileges/{privilege}")
-	public Response removePrivilegeFromRole(@Context HttpServletRequest request, @PathParam("rolename") String rolename,
+	@Path("{roleName}/privileges/{privilege}")
+	public Response removePrivilegeFromRole(@Context HttpServletRequest request, @PathParam("roleName") String roleName,
 			@PathParam("privilege") String privilege) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeRemovePrivilegeFromRoleService svc = new PrivilegeRemovePrivilegeFromRoleService();
 		PrivilegeRemovePrivilegeFromRoleArgument arg = new PrivilegeRemovePrivilegeFromRoleArgument();
-		arg.roleName = rolename;
+		arg.roleName = roleName;
 		arg.privilegeName = privilege;
 
 		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
