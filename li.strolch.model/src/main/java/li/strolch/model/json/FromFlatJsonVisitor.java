@@ -1,6 +1,7 @@
 package li.strolch.model.json;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -83,6 +84,10 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 		return ignoreParameter(BAG_PARAMETERS, paramId);
 	}
 
+	public FromFlatJsonVisitor ignoreRelation(String paramId) {
+		return ignoreParameter(BAG_RELATIONS, paramId);
+	}
+
 	public FromFlatJsonVisitor ignoreParameter(String bagId, String paramId) {
 		this.ignoredKeys.addElement(bagId, paramId);
 		return this;
@@ -90,6 +95,10 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 	public FromFlatJsonVisitor optionalParameter(String paramId) {
 		return optionalParameter(BAG_PARAMETERS, paramId);
+	}
+
+	public FromFlatJsonVisitor optionalRelation(String paramId) {
+		return optionalParameter(BAG_RELATIONS, paramId);
 	}
 
 	public FromFlatJsonVisitor optionalParameter(String bagId, String paramId) {
