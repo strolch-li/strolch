@@ -58,7 +58,7 @@
   },
   "en": {
     "info": "Information",
-    "appTitle": "MFS",
+    "appTitle": "${appName}",
     "language": "Language",
     "reports": "Reports",
     "operations-log": "Operation Logs",

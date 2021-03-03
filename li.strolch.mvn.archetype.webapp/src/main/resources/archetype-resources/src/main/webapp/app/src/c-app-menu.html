@@ -94,9 +94,8 @@
         </template>
 
         <paper-menu on-tap="onMenuTap">
-            <paper-item id="logout" class="menu-item">Logout</paper-item>
+            <paper-item id="logout" class="menu-item">[[localize('logout')]]</paper-item>
         </paper-menu>
-
 
         <paper-material id="container" class="container info-div" elevation="0">
             <p>[[userConfig.firstname]] [[userConfig.lastname]] / [[userConfig.username]]</p>
@@ -117,12 +116,15 @@
             <p class="strolch">Strolch</p>
         </paper-material>
 
-
     </template>
 
     <script>
         Polymer({
             is: "c-app-menu",
+
+            behaviors: [
+                CustomComputeBehavior, StrolchLocalizeBehavior
+            ],
 
             properties: {
                 localesPath: {
@@ -153,10 +155,6 @@
                     this.$.menu.select(page);
                 }
             },
-
-            behaviors: [
-                CustomComputeBehavior, StrolchLocalizeBehavior
-            ],
 
             onInspectorMenuTap: function (event) {
                 this.selectedPage = event.detail.target.id;

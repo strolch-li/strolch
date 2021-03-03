@@ -23,7 +23,7 @@
     "gulp-load-plugins": "^1.4.0",
     "gulp-minify": "0.0.15",
     "gulp-rename": "^1.2.2",
-    "gulp-shell": "^0.5.2",
+    "gulp-shell": "^0.8.0",
     "gulp-size": "^2.1.0",
     "gulp-vulcanize": "^6.1.0",
     "merge-stream": "^1.0.0",
