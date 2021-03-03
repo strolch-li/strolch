@@ -58,6 +58,7 @@
   },
   "en": {
     "info": "Information",
+    "keepAlive": "Stay logged in",
     "appTitle": "${appName}",
     "language": "Language",
     "reports": "Reports",
