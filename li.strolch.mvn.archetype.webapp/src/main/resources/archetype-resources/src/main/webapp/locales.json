@@ -1,6 +1,7 @@
 {
   "de": {
     "appTitle": "${appName}",
+    "logout": "Ausloggen",
     "language": "Sprache",
     "reports": "Berichte",
     "operations-log": "Betriebsnachrichten",
@@ -57,6 +58,7 @@
     "info": "Information"
   },
   "en": {
+    "logout": "Logout",
     "info": "Information",
     "keepAlive": "Stay logged in",
     "appTitle": "${appName}",
@@ -110,5 +112,31 @@
     "user": "User",
     "i18n-editor": "Internationalization editor",
     "login": "Login"
+  },
+  "fr": {
+    "appTitle": "${appName}",
+    "language": "Langue",
+    "reports": "Rapports",
+    "operations-log": "Logs",
+    "jobs": "Jobs",
+    "sessions": "Sessions",
+    "users": "Utilisateurs",
+    "roles": "Rôles",
+    "control": "Controle",
+    "inspector": "Inspecteur",
+    "newVersionAvailableRefreshRequired": "Une nouvelle version est disponible!",
+    "refresh": "Actualiser",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "ok": "Ok",
+    "reconnect": "Reconnecter",
+    "serverNotAvailable": "Server indisponible",
+    "serverNotAvailableMsg": "La connexion au serveur est indisponible",
+    "privilegeDenied": "Action refusée",
+    "privilegeDeniedText": "L'action a été refusée.",
+    "sessionInvalid": "Session invalide",
+    "sessionInvalidConfirmNavToLogin": "La session a expirée, veuillez vous reconnecter.",
+    "sessionInvalidLoggingBackIn": "La session a expirée, reconnexion automatiqque...",
+    "errorOccurred": "Une erreur s'est produite"
   }
 }

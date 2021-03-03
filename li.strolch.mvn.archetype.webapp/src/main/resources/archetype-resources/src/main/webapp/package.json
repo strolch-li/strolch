@@ -19,7 +19,7 @@
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-crisper": "^1.1.0",
-    "gulp-imagemin": "^3.1.1",
+    "gulp-imagemin": "^7.1.0",
     "gulp-load-plugins": "^1.4.0",
     "gulp-minify": "0.0.15",
     "gulp-rename": "^1.2.2",
