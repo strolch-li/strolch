@@ -22,6 +22,7 @@
 
 <link rel="import" href="../bower_components/strolch-wc-localize-behavior/strolch-wc-localize-behavior.html">
 <link rel="import" href="../bower_components/strolch-wc-debounced-input/strolch-wc-debounced-input.html">
+<link rel="import" href="../bower_components/strolch-wc-information-dialog/strolch-wc-information-dialog.html">
 <link rel="import" href="../bower_components/strolch-wc-styles/strolch-wc-styles.html">
 <link rel="import" href="../bower_components/strolch-wc-auth/strolch-wc-auth.html">
 <link rel="import" href="../bower_components/strolch-wc-inspector/strolch-wc-inspector.html">
@@ -248,28 +249,8 @@
             </app-header-layout>
         </app-drawer-layout>
 
-        <paper-dialog id="dlg" modal>
-            <h2>[[dlgTitle]]</h2>
-            <p id="dlgText"></p>
-            <div class="buttons">
-                <paper-button dialog-confirm autofocus>{{localize('close')}}</paper-button>
-            </div>
-        </paper-dialog>
-        <paper-dialog id="confirmationDlg" modal>
-            <h2>[[dlgTitle]]</h2>
-            <p id="confirmationDlgText"></p>
-            <div class="buttons">
-                <paper-button dialog-dismiss>{{localize('cancel')}}</paper-button>
-                <paper-button dialog-confirm autofocus>{{localize('ok')}}</paper-button>
-            </div>
-        </paper-dialog>
-        <paper-dialog id="serverNotConnectedDlg" modal>
-            <h2>[[localize('serverNotAvailable')]]</h2>
-            <p>[[localize('serverNotAvailableMsg')]]</p>
-            <div class="buttons">
-                <paper-button autofocus on-tap="reconnect">{{localize('reconnect')}}</paper-button>
-            </div>
-        </paper-dialog>
+        <strolch-wc-information-dialog id="infoDlg"
+                                       locales-path="../../../locales.json"></strolch-wc-information-dialog>
 
         <iron-ajax id="ajaxGetVersion"
                    url="[[baseRestPath]]/strolch/version"
@@ -332,12 +313,6 @@
                 route: {
                     type: Object
                 },
-                dlgTitle: {
-                    type: String
-                },
-                dlgText: {
-                    type: String
-                },
                 queuedToasts: {
                     type: Array,
                     value: []
@@ -364,9 +339,9 @@
                 "cx-privilege-denied": "onPrivilegeDenied",
                 "cx-page-change": "onPageChange",
                 "cx-show-dialog": "onShowDialog",
-                "strolch-show-dialog": "onShowStrolchDialog",
+                "cx-show-info": "onShowInfo",
+                "strolch-show-dialog": "onShowDialog",
                 "strolch-ajax-request-error": "onRequestError",
-                "cx-show-confirmation": "onShowConfirmation",
                 "cx-show-notification": "onShowNotification",
                 "cx-clear-notification": "onClearNotification",
                 "cx-log-out": "onLogOut",
@@ -417,7 +392,9 @@
                 document.location.reload();
             },
 
-            /* Lifecycle */
+            onShowInfo: function (e) {
+                this.$.infoDlg.open(e.detail);
+            }
         });
 
     </script>

@@ -3,13 +3,12 @@
 
         /* Lifecycle */
         attached: function () {
-            var that = this;
             setTimeout(function () {
-                that.checkForNewVersion();
-            }, 3000);
+                this.checkForNewVersion();
+            }.bind(this), 3000);
             this.checkForNewVersionInterval = setInterval(function () {
-                that.checkForNewVersion();
-            }, 120000);
+                this.checkForNewVersion();
+            }.bind(this), 120000);
         },
 
         reloadPage: function (pageName) {
@@ -54,30 +53,20 @@
             }
         },
 
-        onShowStrolchDialog: function (event) {
-            var dlgTitle;
-            if (event.detail.title != null)
-                dlgTitle = event.detail.title;
-            else
-                dlgTitle = event.detail.isError ? 'errorOccurred' : 'info';
-            var dlgText = event.detail.text;
-            this._showDialog(dlgTitle, dlgText);
-        },
         onShowDialog: function (event) {
             var dlgTitle;
             if (event.detail.title != null)
                 dlgTitle = event.detail.title;
             else
                 dlgTitle = event.detail.isError ? 'errorOccurred' : 'info';
-            var dlgText = event.detail.message;
+            var dlgText;
+            if (event.detail.text)
+                dlgText = event.detail.text;
+            else if (event.detail.message)
+                dlgText = event.detail.message;
+            else
+                dlgText = JSON.stringify(event.detail);
             this._showDialog(dlgTitle, dlgText);
-        },
-        onShowConfirmation: function (event) {
-            var dlgTitle = event.detail.title;
-            var dlgText = event.detail.text;
-            var dlgCallback = event.detail.callback;
-            var bind = event.detail.bind;
-            this._showConfirmation(dlgTitle, dlgText, dlgCallback, bind);
         },
         onShowNotification: function (event) {
             this.$.toolBar.showNotification(event.detail);
@@ -91,23 +80,59 @@
         },
         onServerNotAvailable: function (event) {
             clearInterval(this.checkForNewVersionInterval);
-            this.$.dlg.close();
-            this.$.confirmationDlg.close();
-            this.$.serverNotConnectedDlg.open();
+            this.showInfo({
+                translate: true,
+                okLbl: 'reconnect',
+                title: 'serverNotAvailable',
+                line1: 'serverNotAvailableMsg',
+                cancelable: false,
+                callback: function () {
+                    this.reconnect();
+                }.bind(this)
+            });
         },
         onSessionInvalid: function (event) {
-            var that = this;
             console.log(this.routeTail);
-            if (this.routeTail.prefix != '/login') {
-                this._showConfirmation('sessionInvalid', 'sessionInvalidConfirmNavToLogin', function () {
-                    that.deleteCookie('strolch.authorization');
-                    that.set("authTokenValid", false);
+            if (this.routeTail.prefix !== '/login') {
+                this.showInfo({
+                    translate: true,
+                    title: 'sessionInvalid',
+                    line1: 'sessionInvalidConfirmNavToLogin',
+                    cancelable: false,
+                    callback: function () {
+                        this.deleteCookie('strolch.authorization');
+                        this.set("authTokenValid", false);
+                    }.bind(this)
                 });
             }
         },
         onPrivilegeDenied: function (event) {
             if (this.authTokenValid) {
-                this._showDialog('privilegeDenied', 'privilegeDeniedText', this.requestEventToUrl(event));
+                if (event.detail && event.detail.detail && event.detail.detail.request //
+                    && event.detail.detail.request.response //
+                    && event.detail.detail.request.response.i18n) {
+                    this.showInfo({
+                        title: 'privilegeDenied',
+                        i18n: event.detail.detail.request.response.i18n,
+                        translate: true
+                    });
+                } else if (event.detail && event.detail.detail && event.detail.detail.request //
+                    && event.detail.detail.request.response //
+                    && event.detail.detail.request.response.exceptionMsg) {
+                    this.showInfo({
+                        title: 'privilegeDenied',
+                        line1: event.detail.detail.request.response.exceptionMsg,
+                        line2: this.requestEventToUrl(event),
+                        translate: true
+                    });
+                } else {
+                    this.showInfo({
+                        title: 'privilegeDenied',
+                        line1: 'privilegeDeniedText',
+                        line2: this.requestEventToUrl(event),
+                        translate: true
+                    });
+                }
             } else {
                 console.warn("Privilege denied to URL " + this.requestEventToUrl(event), this.requestErrorToMsg(event));
             }
@@ -118,7 +143,7 @@
                 this.$.ajaxPutLocale.generateRequest();
                 Strolch.setUserLocale(newValue);
                 window.location.reload();
-            } else if (this.userConfig == null && Strolch.getUserConfig() != null && Strolch.getUserConfig().locale != newValue) {
+            } else if (this.userConfig == null && Strolch.getUserConfig() != null && Strolch.getUserConfig().locale !== newValue) {
                 this.userConfig = Strolch.getUserConfig();
                 this.userConfig.locale = newValue;
                 Strolch.setUserConfig(this.userConfig);
@@ -150,51 +175,23 @@
 
         _showDialog: function (dlgTitle, dlgText, dlgReason) {
             if (this.localize) {
-                this.dlgTitle = this.localize(dlgTitle);
-                dlgText = this.localize(dlgText);
+                var data = {
+                    title: this.localize(dlgTitle),
+                    line1: this.localize(dlgText)
+                };
                 if (dlgReason)
-                    dlgText += ": " + dlgReason;
-                console.log("Message: " + this.dlgTitle + ': ' + dlgText);
-                this.$.dlgText.innerHTML = this.localize(dlgText);
-                this.$.dlg.open();
+                    data.line1 += ": " + dlgReason;
+                this.$.infoDlg.open(data);
             } else {
                 this.debounce('show-dlg', function () {
-                    this.dlgTitle = this.localize(dlgTitle);
-                    dlgText = this.localize(dlgText);
+                    var data = {
+                        title: this.localize(dlgTitle),
+                        line1: this.localize(dlgText)
+                    };
                     if (dlgReason)
-                        dlgText += ": " + dlgReason;
-                    console.log("Message: " + this.dlgTitle + ': ' + dlgText);
-                    this.$.dlgText.innerHTML = this.localize(dlgText);
-                    this.$.dlg.open();
-                }, 250);
-            }
-        },
-        _showConfirmation: function (dlgTitle, dlgText, dlgCallback, bind) {
-
-            function onClose(event) {
-                dlg.removeEventListener("iron-overlay-closed", onClose);
-                var bound = dlgCallback.bind(bind);
-                bound(event.detail.confirmed);
-            }
-
-            if (this.localize) {
-                this.dlgTitle = this.localize(dlgTitle);
-                dlgText = this.localize(dlgText);
-                console.log("Message: " + this.dlgTitle + ': ' + dlgText);
-                this.$.confirmationDlgText.innerHTML = this.localize(dlgText);
-                var dlg = this.$.confirmationDlg;
-                dlg.addEventListener("iron-overlay-closed", onClose);
-                dlg.open();
-            } else {
-                this.debounce('show-dlg', function () {
-                    this.dlgTitle = this.localize(dlgTitle);
-                    dlgText = this.localize(dlgText);
-                    console.log("Message: " + this.dlgTitle + ': ' + dlgText);
-                    this.$.confirmationDlgText.innerHTML = this.localize(dlgText);
-                    var dlg = this.$.confirmationDlg;
-                    dlg.addEventListener("iron-overlay-closed", onClose);
-                    dlg.open();
-                }, 250);
+                        data.line1 += ": " + dlgReason;
+                    this.$.infoDlg.open(data);
+                }.bind(this), 250);
             }
         },
 
@@ -202,7 +199,6 @@
             this.$.ajaxGetVersion.generateRequest();
         },
         reconnect: function () {
-            this.$.serverNotConnectedDlg.close();
             this.onGetVersionResponse = function (event) {
                 var version = event.detail.response;
                 this.scmRevision = version.appVersion.scmRevision;

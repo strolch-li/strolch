@@ -325,14 +325,11 @@
             });
         },
 
-        // fires an event that will show a confirmation dialog
-        showConfirmation: function (title, text, callback) {
-            this.fire("cx-show-confirmation", {
-                title: title,
-                text: text,
-                callback: callback,
-                bind: this
-            });
+        // fires an event that will show an information dialog, with optional callback
+        showInfo: function (data) {
+            if (data.callback != null)
+                data.callback.bind(this);
+            this.fire("cx-show-info", data);
         },
 
         // fires an event that will show a notification below the toolbar
