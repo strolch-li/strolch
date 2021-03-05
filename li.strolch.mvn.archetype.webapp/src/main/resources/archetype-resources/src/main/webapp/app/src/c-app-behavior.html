@@ -202,7 +202,7 @@
             this.onGetVersionResponse = function (event) {
                 var version = event.detail.response;
                 this.scmRevision = version.appVersion.scmRevision;
-                localStorage['appScmRevision'] = this.scmRevision;
+                sessionStorage['appScmRevision'] = this.scmRevision;
                 document.location.reload();
             };
             this.$.ajaxGetVersion.generateRequest();
@@ -213,10 +213,10 @@
             Strolch.setAppVersion(version);
             this.scmRevision = version.appVersion.scmRevision;
 
-            if (localStorage['appScmRevision'] == null) {
-                localStorage['appScmRevision'] = this.scmRevision;
-            } else if (this.scmRevision !== localStorage['appScmRevision']) {
-                console.log("App SCM Revision has changed from " + localStorage['appScmRevision'] + " to " + this.scmRevision + ". Need to refresh browser...");
+            if (sessionStorage['appScmRevision'] == null) {
+                sessionStorage['appScmRevision'] = this.scmRevision;
+            } else if (this.scmRevision !== sessionStorage['appScmRevision']) {
+                console.log("App SCM Revision has changed from " + sessionStorage['appScmRevision'] + " to " + this.scmRevision + ". Need to refresh browser...");
                 this.$.newVersionAvailableToast.open();
             }
             this.appVersion = version;

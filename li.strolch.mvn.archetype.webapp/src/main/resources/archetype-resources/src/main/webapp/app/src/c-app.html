@@ -388,7 +388,7 @@
             },
 
             refreshBrowser: function () {
-                localStorage['appScmRevision'] = this.scmRevision;
+                sessionStorage['appScmRevision'] = this.scmRevision;
                 document.location.reload();
             },
 
