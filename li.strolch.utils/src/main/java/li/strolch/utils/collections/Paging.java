@@ -31,7 +31,7 @@ public class Paging<T> {
 	private int limit;
 	private int offset;
 	private int size;
-	private int dataSetSize;
+	private long dataSetSize;
 
 	private List<T> input;
 	private List<T> page;
@@ -89,7 +89,7 @@ public class Paging<T> {
 	/**
 	 * @return the size of all the data unfiltered
 	 */
-	public int getDataSetSize() {
+	public long getDataSetSize() {
 		return this.dataSetSize;
 	}
 
@@ -99,7 +99,7 @@ public class Paging<T> {
 	 * @param dataSetSize
 	 * 		the size of all the data unfiltered
 	 */
-	public void setDataSetSize(int dataSetSize) {
+	public void setDataSetSize(long dataSetSize) {
 		this.dataSetSize = dataSetSize;
 	}
 
@@ -132,8 +132,29 @@ public class Paging<T> {
 	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
 	 */
 	public static <T> Paging<T> asPage(List<T> list, int offset, int limit) {
+		return asPage(list, offset, limit, 0);
+	}
+
+	/**
+	 * Creates a sub list of the input list with the given limit and offset
+	 *
+	 * @param list
+	 * 		the list to paginate / create a window for
+	 * @param offset
+	 * 		where to start the sub list
+	 * @param limit
+	 * 		The number of items to return in each page/window
+	 * @param dataSetSize
+	 * 		The number of items before filtering
+	 * @param <T>
+	 * 		the type of element in the list
+	 *
+	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
+	 */
+	public static <T> Paging<T> asPage(List<T> list, int offset, int limit, long dataSetSize) {
 
 		Paging<T> paging = new Paging<>();
+		paging.dataSetSize = dataSetSize;
 		paging.limit = limit;
 		paging.offset = offset;
 

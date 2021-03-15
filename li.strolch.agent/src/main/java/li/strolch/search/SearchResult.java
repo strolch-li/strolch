@@ -244,6 +244,22 @@ public class SearchResult<T> {
 	}
 
 	/**
+	 * Returns a {@link Paging} element to use this object in paged results
+	 *
+	 * @param offset
+	 * 		the element offset
+	 * @param limit
+	 * 		the limit per page
+	 * @param dataSetSize
+	 * 		The number of items before filtering
+	 *
+	 * @return the paging
+	 */
+	public Paging<T> toPaging(int offset, int limit, long dataSetSize) {
+		return Paging.asPage(this.stream.collect(Collectors.toList()), offset, limit, dataSetSize);
+	}
+
+	/**
 	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream contains more
 	 * than 1 element, or the empty {@link Optional}
 	 *
