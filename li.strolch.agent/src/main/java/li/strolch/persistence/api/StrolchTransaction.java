@@ -172,6 +172,48 @@ public interface StrolchTransaction extends AutoCloseable {
 	ActivityMap getActivityMap();
 
 	/**
+	 * Returns the count of all resources
+	 *
+	 * @return the count of all resources
+	 */
+	long getResourceCount();
+
+	/**
+	 * Returns the count of resources by the given type
+	 *
+	 * @return the count of resources by the given type
+	 */
+	long getResourceCount(String type);
+
+	/**
+	 * Returns the count of all orders
+	 *
+	 * @return the count of all orders
+	 */
+	long getOrderCount();
+
+	/**
+	 * Returns the count of orders by the given type
+	 *
+	 * @return the count of orders by the given type
+	 */
+	long getOrderCount(String type);
+
+	/**
+	 * Returns the count of all activities
+	 *
+	 * @return the count of all activities
+	 */
+	long getActivityCount();
+
+	/**
+	 * Returns the count of activities by the given type
+	 *
+	 * @return the count of activities by the given type
+	 */
+	long getActivityCount(String type);
+
+	/**
 	 * Returns the {@link PersistenceHandler}. If the {@link StrolchRealm} is not running in {@link
 	 * DataStoreMode#TRANSIENT} mode, then the {@link PersistenceHandler} will be a {@link StrolchComponent}, otherwise
 	 * it will be the internal in memory persistence handler
@@ -631,9 +673,8 @@ public interface StrolchTransaction extends AutoCloseable {
 			throws StrolchModelException, ClassCastException;
 
 	/**
-	 * <p>Finds a parameter with the {@link StrolchConstants#BAG_PARAMETERS} and @paramKey on the given @element, but if
-	 * it does not exists
-	 * on the element, then it retrieves the elements parent by using the bag {@link
+	 * <p>Finds a parameter with the {@link StrolchConstants#BAG_PARAMETERS} and @paramKey on the given @element, but
+	 * if it does not exists on the element, then it retrieves the elements parent by using the bag {@link
 	 * StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>
 	 *
 	 * <p>In Strolch relationships are usually defined on the parameter bag with the id {@link

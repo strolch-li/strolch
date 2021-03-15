@@ -375,6 +375,36 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public long getResourceCount() {
+		return getResourceMap().querySize(this);
+	}
+
+	@Override
+	public long getResourceCount(String type) {
+		return getResourceMap().querySize(this, type);
+	}
+
+	@Override
+	public long getOrderCount() {
+		return getOrderMap().querySize(this);
+	}
+
+	@Override
+	public long getOrderCount(String type) {
+		return getOrderMap().querySize(this, type);
+	}
+
+	@Override
+	public long getActivityCount() {
+		return getActivityMap().querySize(this);
+	}
+
+	@Override
+	public long getActivityCount(String type) {
+		return getActivityMap().querySize(this, type);
+	}
+
+	@Override
 	public AuditTrail getAuditTrail() {
 		if (this.auditTrail == null) {
 			this.auditTrail = new AuditingAuditMapFacade(this.realm.getAuditTrail(),
