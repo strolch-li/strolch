@@ -15,9 +15,12 @@
  */
 package li.strolch.privilege.model;
 
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
@@ -49,15 +52,15 @@ public class PrivilegeRep implements Serializable {
 	 * 		the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
 	 * @param allAllowed
 	 * 		a boolean defining if a {@link Role} with this {@link IPrivilege} has unrestricted access to a {@link
-	 * 		Restrictable}
+	 *        Restrictable}
 	 * @param denyList
 	 * 		a list of deny rules for this {@link IPrivilege}
 	 * @param allowList
 	 * 		a list of allow rules for this {@link IPrivilege}
 	 */
 	public PrivilegeRep(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
-		this.name = name;
-		this.policy = policy;
+		this.name = trimOrEmpty(name);
+		this.policy = trimOrEmpty(policy);
 		this.allAllowed = allAllowed;
 		this.denyList = denyList;
 		this.allowList = allowList;
@@ -96,7 +99,7 @@ public class PrivilegeRep implements Serializable {
 	 * 		the name to set
 	 */
 	public void setName(String name) {
-		this.name = name;
+		this.name = trimOrEmpty(name);
 	}
 
 	/**
@@ -111,7 +114,7 @@ public class PrivilegeRep implements Serializable {
 	 * 		the policy to set
 	 */
 	public void setPolicy(String policy) {
-		this.policy = policy;
+		this.policy = trimOrEmpty(policy);
 	}
 
 	/**
@@ -141,7 +144,7 @@ public class PrivilegeRep implements Serializable {
 	 * 		the denyList to set
 	 */
 	public void setDenyList(Set<String> denyList) {
-		this.denyList = denyList;
+		this.denyList = denyList.stream().map(String::trim).collect(Collectors.toSet());
 	}
 
 	/**
@@ -156,7 +159,7 @@ public class PrivilegeRep implements Serializable {
 	 * 		the allowList to set
 	 */
 	public void setAllowList(Set<String> allowList) {
-		this.allowList = allowList;
+		this.allowList = allowList.stream().map(String::trim).collect(Collectors.toSet());
 	}
 
 	/**

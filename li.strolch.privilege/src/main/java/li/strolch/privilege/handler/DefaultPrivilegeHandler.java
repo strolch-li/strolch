@@ -288,16 +288,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			boolean propertySelected;
 
 			// userId
-			userIdSelected = selUserId == null || selUserId.equals(user.getUserId());
+			userIdSelected = isEmpty(selUserId) || selUserId.equals(user.getUserId());
 
 			// username
-			usernameSelected = selUsername == null || selUsername.equals(user.getUsername());
+			usernameSelected = isEmpty(selUsername) || selUsername.equals(user.getUsername());
 
 			// firstname
-			firstNameSelected = selFirstName == null || selFirstName.equals(user.getFirstname());
+			firstNameSelected = isEmpty(selFirstName) || selFirstName.equals(user.getFirstname());
 
 			// lastname
-			lastNameSelected = selLastName == null || selLastName.equals(user.getLastname());
+			lastNameSelected = isEmpty(selLastName) || selLastName.equals(user.getLastname());
 
 			// user state
 			userStateSelected = selUserState == null || selUserState.equals(user.getUserState());

@@ -15,6 +15,8 @@
  */
 package li.strolch.privilege.model;
 
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ public class RoleRep implements Serializable {
 	 * 		the list of privileges granted to this role
 	 */
 	public RoleRep(String name, List<PrivilegeRep> privileges) {
-		this.name = name;
+		this.name = trimOrEmpty(name);
 		this.privileges = privileges;
 	}
 
@@ -81,7 +83,7 @@ public class RoleRep implements Serializable {
 	 * 		the name to set
 	 */
 	public void setName(String name) {
-		this.name = name;
+		this.name = trimOrEmpty(name);
 	}
 
 	/**

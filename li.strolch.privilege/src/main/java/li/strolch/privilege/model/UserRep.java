@@ -16,10 +16,12 @@
 package li.strolch.privilege.model;
 
 import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.base.PrivilegeException;
@@ -70,17 +72,19 @@ public class UserRep implements Serializable {
 	 */
 	public UserRep(String userId, String username, String firstname, String lastname, UserState userState,
 			Set<String> roles, Locale locale, Map<String, String> propertyMap, UserHistory history) {
-		this.userId = userId;
-		this.username = username;
-		this.firstname = firstname;
-		this.lastname = lastname;
+		this.userId = trimOrEmpty(userId);
+		this.username = trimOrEmpty(username);
+		this.firstname = trimOrEmpty(firstname);
+		this.lastname = trimOrEmpty(lastname);
 		this.userState = userState;
-		this.roles = roles;
+		this.roles = roles == null ? null : roles.stream().map(String::trim).collect(Collectors.toSet());
 		this.locale = locale;
 
 		if (propertyMap != null) {
-			this.properties = new HashMap<>(propertyMap);
-			this.properties.remove("");
+			this.properties = new HashMap<>();
+			propertyMap.forEach((key, value) -> {
+				this.properties.put(key.trim(), value.trim());
+			});
 		}
 
 		this.history = history;
@@ -139,7 +143,7 @@ public class UserRep implements Serializable {
 	 * 		to set
 	 */
 	public void setUserId(String userId) {
-		this.userId = userId;
+		this.userId = trimOrEmpty(userId);
 	}
 
 	/**
@@ -154,7 +158,7 @@ public class UserRep implements Serializable {
 	 * 		the username to set
 	 */
 	public void setUsername(String username) {
-		this.username = username;
+		this.username = trimOrEmpty(username);
 	}
 
 	/**
@@ -169,7 +173,7 @@ public class UserRep implements Serializable {
 	 * 		the firstname to set
 	 */
 	public void setFirstname(String firstname) {
-		this.firstname = firstname;
+		this.firstname = trimOrEmpty(firstname);
 	}
 
 	/**
@@ -184,7 +188,7 @@ public class UserRep implements Serializable {
 	 * 		the lastname to set
 	 */
 	public void setLastname(String lastname) {
-		this.lastname = lastname;
+		this.lastname = trimOrEmpty(lastname);
 	}
 
 	/**
@@ -214,7 +218,7 @@ public class UserRep implements Serializable {
 	 * 		the roles to set
 	 */
 	public void setRoles(Set<String> roles) {
-		this.roles = roles;
+		this.roles = roles.stream().map(String::trim).collect(Collectors.toSet());
 	}
 
 	/**
@@ -280,7 +284,7 @@ public class UserRep implements Serializable {
 	public void setProperty(String key, String value) {
 		if (this.properties == null)
 			this.properties = new HashMap<>(1);
-		this.properties.put(key, value);
+		this.properties.put(key.trim(), value.trim());
 	}
 
 	/**
