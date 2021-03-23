@@ -3,9 +3,13 @@ package li.strolch.search;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 
 /**
@@ -19,6 +23,22 @@ public interface SearchExpressions {
 
 	default <T extends StrolchRootElement> SearchExpression<T> predicate(Supplier<Boolean> predicate) {
 		return ExpressionsSupport.predicate(predicate);
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> predicate(Function<T, Boolean> predicate) {
+		return ExpressionsSupport.predicate(predicate);
+	}
+
+	default ExpressionBuilder mapResource(Function<Resource, Object> extractor) {
+		return t -> extractor.apply((Resource) t);
+	}
+
+	default ExpressionBuilder mapOrder(Function<Order, Object> extractor) {
+		return t -> extractor.apply((Order) t);
+	}
+
+	default ExpressionBuilder mapActivity(Function<Activity, Object> extractor) {
+		return t -> extractor.apply((Activity) t);
 	}
 
 	default ExpressionBuilder id() {

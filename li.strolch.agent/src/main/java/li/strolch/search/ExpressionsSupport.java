@@ -3,6 +3,7 @@ package li.strolch.search;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import li.strolch.model.*;
@@ -25,6 +26,22 @@ public class ExpressionsSupport {
 		return element -> predicate.get();
 	}
 
+	public static <T extends StrolchRootElement> SearchExpression<T> predicate(Function<T, Boolean> predicate) {
+		return predicate::apply;
+	}
+
+	public static ExpressionBuilder mapResource(Function<Resource, Object> extractor) {
+		return t -> extractor.apply((Resource) t);
+	}
+
+	public static ExpressionBuilder mapOrder(Function<Order, Object> extractor) {
+		return t -> extractor.apply((Order) t);
+	}
+
+	public static ExpressionBuilder mapActivity(Function<Activity, Object> extractor) {
+		return t -> extractor.apply((Activity) t);
+	}
+
 	public static <T extends StrolchRootElement> SearchExpression<T> id(SearchPredicate predicate) {
 		return element -> predicate.matches(element.getId());
 	}
@@ -38,7 +55,7 @@ public class ExpressionsSupport {
 	}
 
 	public static <T extends StrolchRootElement> ExpressionBuilder name() {
-		return StrolchElement::getName;
+		return element -> element.getName();
 	}
 
 	public static <T extends StrolchRootElement> SearchExpression<T> date(SearchPredicate predicate) {
