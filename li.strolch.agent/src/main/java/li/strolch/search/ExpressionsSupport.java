@@ -153,6 +153,10 @@ public class ExpressionsSupport {
 		return paramNull(BAG_PARAMETERS, paramId);
 	}
 
+	public static <T extends StrolchRootElement> SearchExpression<T> relationNull(String paramId) {
+		return paramNull(BAG_RELATIONS, paramId);
+	}
+
 	public static <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
 		return element -> !element.hasParameter(bagId, paramId);
 	}
