@@ -40,22 +40,22 @@ import li.strolch.utils.iso8601.ISO8601;
  */
 public class GenericReport extends ReportPolicy {
 
-	private Resource reportRes;
+	protected Resource reportRes;
 
-	private ParameterBag columnsBag;
-	private List<StringParameter> orderingParams;
-	private Map<String, StringParameter> filterCriteriaParams;
-	private boolean descending;
-	private boolean allowMissingColumns;
-	private boolean filterMissingValuesAsTrue;
-	private List<String> columnIds;
-	private StringParameter dateRangeSelP;
+	protected ParameterBag columnsBag;
+	protected List<StringParameter> orderingParams;
+	protected Map<String, StringParameter> filterCriteriaParams;
+	protected boolean descending;
+	protected boolean allowMissingColumns;
+	protected boolean filterMissingValuesAsTrue;
+	protected List<String> columnIds;
+	protected StringParameter dateRangeSelP;
 
-	private DateRange dateRange;
-	private Map<ReportFilterPolicy, TypedTuple<StringParameter, StringParameter>> filtersByPolicy;
-	private MapOfSets<String, String> filtersById;
+	protected DateRange dateRange;
+	protected Map<ReportFilterPolicy, TypedTuple<StringParameter, StringParameter>> filtersByPolicy;
+	protected MapOfSets<String, String> filtersById;
 
-	private long counter;
+	protected long counter;
 
 	protected JsonObject i18nData;
 
@@ -287,10 +287,13 @@ public class GenericReport extends ReportPolicy {
 
 		// query the main objects and return a stream
 		stream = queryRows() //
+
 				// transform each element into a map of Type,Value pairs
 				.map(this::evaluateRow);
 
 		stream = handleAdditionalTypes(stream);
+
+		stream = flatMap(stream);
 
 		if (hasFilter())
 			stream = stream.filter(this::filter);
@@ -300,6 +303,18 @@ public class GenericReport extends ReportPolicy {
 		if (hasOrdering())
 			stream = stream.sorted(this::sort);
 
+		return stream;
+	}
+
+	/**
+	 * Allows sub classes to extend this stream, i.e. flat map an object to extend the stream where necessary
+	 *
+	 * @param stream
+	 * 		the stream to extend
+	 *
+	 * @return the stream
+	 */
+	public Stream<Map<String, StrolchRootElement>> flatMap(Stream<Map<String, StrolchRootElement>> stream) {
 		return stream;
 	}
 
@@ -347,9 +362,9 @@ public class GenericReport extends ReportPolicy {
 		if (additionalTypeBag == null)
 			return stream;
 
-		StringParameter objectTypeP = additionalTypeBag.getParameter(PARAM_OBJECT_TYPE, true);
+		StringParameter objectTypeP = additionalTypeBag.getStringP(PARAM_OBJECT_TYPE);
 
-		StringParameter joinParamP = additionalTypeBag.getParameter(PARAM_JOIN_PARAM, true);
+		StringParameter joinParamP = additionalTypeBag.getStringP(PARAM_JOIN_PARAM);
 		String[] locatorParts = joinParamP.getValue().split(Locator.PATH_SEPARATOR);
 		if (locatorParts.length != 3)
 			throw new IllegalStateException(
@@ -364,7 +379,7 @@ public class GenericReport extends ReportPolicy {
 					mapOfLists.addElement(joinP.getValue(), e);
 				}, MapOfLists::addAll);
 
-		StringParameter joinWithP = additionalTypeBag.getParameter(PARAM_JOIN_WITH, true);
+		StringParameter joinWithP = additionalTypeBag.getStringP(PARAM_JOIN_WITH);
 		return stream.flatMap(row -> {
 
 			StrolchRootElement joinElement = row.get(joinWithP.getUom());
@@ -430,7 +445,8 @@ public class GenericReport extends ReportPolicy {
 	 * @return true if the element is to be kept, false if not
 	 */
 	protected boolean filterCriteria(StrolchRootElement element) {
-		return !this.filterCriteriaParams.get(element.getType()).isHidden();
+		StringParameter filterCriteriaP = this.filterCriteriaParams.get(element.getType());
+		return !filterCriteriaP.isHidden();
 	}
 
 	/**
@@ -755,8 +771,24 @@ public class GenericReport extends ReportPolicy {
 	 * @return the stream of {@link StrolchRootElement StrolchRootElement}
 	 */
 	protected Stream<? extends StrolchRootElement> queryRows() {
-		StringParameter objectTypeP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
-		return getStreamFor(objectTypeP);
+		return getStreamFor(getObjectTypeParam());
+	}
+
+	protected StringParameter getObjectTypeParam() {
+		return this.reportRes.getStringP(BAG_PARAMETERS, PARAM_OBJECT_TYPE);
+	}
+
+	protected String getObjectType() {
+		return getObjectTypeParam().getValue();
+	}
+
+	protected boolean hasJoinOnType(String type) {
+		return (this.reportRes.hasParameterBag(BAG_JOINS) //
+				&& this.reportRes.getParameterBag(BAG_JOINS).hasParameter(type)) //
+				|| (this.reportRes.hasParameterBag(BAG_ADDITIONAL_TYPE) //
+				&& this.reportRes.getParameterBag(BAG_ADDITIONAL_TYPE).getString(PARAM_OBJECT_TYPE).equals(type)) //
+				|| (this.reportRes.hasParameterBag(BAG_ADDITIONAL_JOINS) //
+				&& this.reportRes.getParameterBag(BAG_ADDITIONAL_JOINS).hasParameter(type));
 	}
 
 	private Stream<? extends StrolchRootElement> getStreamFor(StringParameter objectTypeP) {
@@ -851,22 +883,19 @@ public class GenericReport extends ReportPolicy {
 		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType)
 				.stream().filter(p -> p.getValueType() == StrolchValueType.STRING).collect(Collectors.toList());
 
-		if (relationParams.isEmpty()) {
+		if (relationParams.isEmpty())
 			throw new IllegalStateException(
 					"Found no relation parameters with UOM " + joinType + " of type " + StrolchValueType.STRING
 							.getType() + " on dependency " + dependency.getLocator());
-		}
-		if (relationParams.size() > 1) {
+		if (relationParams.size() > 1)
 			throw new IllegalStateException(
 					"Found multiple possible relation parameters for UOM " + joinType + " on dependency " + dependency
 							.getLocator());
-		}
 
 		Parameter<?> relationParam = relationParams.get(0);
 		StringParameter relationP = (StringParameter) relationParam;
-		if (relationP.getValue().isEmpty() && optional) {
+		if (relationP.getValue().isEmpty() && optional)
 			return null;
-		}
 
 		Locator locator = Locator.valueOf(elementType, joinType, relationP.getValue());
 		StrolchRootElement joinElem = tx().findElement(locator, true);
