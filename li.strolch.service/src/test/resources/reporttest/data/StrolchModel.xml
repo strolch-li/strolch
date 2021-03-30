@@ -101,8 +101,8 @@
 
         <ParameterBag Id="joins" Name="Joins" Type="Joins">
             <Parameter Id="Product" Index="0" Name="Product" Type="String" Interpretation="Resource-Ref" Uom="Product" Value="Slot"/>
-            <Parameter Id="Section" Index="10" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="Slot"/>
             <Parameter Id="Storage" Index="5" Name="Storage" Type="String" Interpretation="Resource-Ref" Uom="Storage" Value="Section"/>
+            <Parameter Id="Section" Index="10" Name="Section" Type="String" Interpretation="Resource-Ref" Uom="Section" Value="Slot"/>
             <Parameter Id="Location" Hidden="true" Name="Location" Type="String" Interpretation="Resource-Ref" Uom="Location" Value="Storage"/>
         </ParameterBag>
 

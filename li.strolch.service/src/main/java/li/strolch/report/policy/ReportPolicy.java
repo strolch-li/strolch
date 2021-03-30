@@ -39,16 +39,13 @@ public abstract class ReportPolicy extends StrolchPolicy {
 
 	public abstract Stream<ReportElement> doReport();
 
-	public abstract MapOfSets<String, StrolchRootElement> generateFilterCriteria();
+	public abstract MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit);
+
+	public abstract Stream<StrolchRootElement> generateFilterCriteria(String type);
 
 	public abstract long getCounter();
 
 	public void close() throws Exception {
 		// do nothing
-	}
-
-	@Override
-	public void undo() {
-		// can't be undone
 	}
 }

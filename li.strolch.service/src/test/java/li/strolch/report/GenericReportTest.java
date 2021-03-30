@@ -238,7 +238,7 @@ public class GenericReportTest {
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
 				Report report = new Report(tx, "stockReport")) {
 
-			MapOfSets<String, StrolchRootElement> filterCriteria = report.generateFilterCriteria();
+			MapOfSets<String, StrolchRootElement> filterCriteria = report.generateFilterCriteria(1000);
 
 			assertFalse(filterCriteria.containsSet("Location"));
 			assertFalse(filterCriteria.containsSet("Slot"));
@@ -261,7 +261,7 @@ public class GenericReportTest {
 				Report report = new Report(tx, "stockReport")) {
 
 			MapOfSets<String, StrolchRootElement> filterCriteria = report.filter("Product", "product01")
-					.generateFilterCriteria();
+					.generateFilterCriteria(1000);
 
 			// assert sequence of filter criteria is correct
 			List<String> types = new ArrayList<>(filterCriteria.keySet());
@@ -297,7 +297,7 @@ public class GenericReportTest {
 			MapOfSets<String, StrolchRootElement> filterCriteria = report //
 					.dateRange(dateRange) //
 					.filter("Product", "product01") //
-					.generateFilterCriteria();
+					.generateFilterCriteria(1000);
 
 			assertTrue(filterCriteria.isEmpty());
 		}

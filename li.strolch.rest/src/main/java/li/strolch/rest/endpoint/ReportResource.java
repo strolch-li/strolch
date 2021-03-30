@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -116,20 +115,16 @@ public class ReportResource {
 			if (localeJ != null)
 				report.getReportPolicy().setI18nData(localeJ);
 
-			MapOfSets<String, StrolchRootElement> criteria = report.generateFilterCriteria();
-			criteria.keySet().forEach(type -> {
-				JsonArray values = new JsonArray();
-				criteria.getSet(type).stream().limit(limit) //
-						.forEach(f -> {
-							JsonObject o = new JsonObject();
-							o.addProperty(Tags.Json.ID, f.getId());
-							o.addProperty(Tags.Json.NAME, f.getName());
-							values.add(o);
-						});
-
+			MapOfSets<String, StrolchRootElement> criteria = report.generateFilterCriteria(limit);
+			criteria.forEach((type, elements) -> {
 				JsonObject filter = new JsonObject();
 				filter.addProperty(Tags.Json.TYPE, type);
-				filter.add(Tags.Json.VALUES, values);
+				filter.add(Tags.Json.VALUES, elements.stream().map(f -> {
+					JsonObject o = new JsonObject();
+					o.addProperty(Tags.Json.ID, f.getId());
+					o.addProperty(Tags.Json.NAME, f.getName());
+					return o;
+				}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
 				result.add(filter);
 			});
 
@@ -171,32 +166,19 @@ public class ReportResource {
 				report.getReportPolicy().setI18nData(localeJ);
 
 			// get filter criteria
-			MapOfSets<String, StrolchRootElement> criteria = report.generateFilterCriteria();
-
-			// create final array
-			JsonArray array = new JsonArray();
-			Set<StrolchRootElement> valueSet = criteria.getSet(type);
-
-			// filter if required
-			if (valueSet != null) {
-
-				Stream<StrolchRootElement> stream = valueSet.stream();
-				if (query != null && !query.isEmpty()) {
-					String[] parts = query.split(" ");
-					stream = stream.filter(f -> ObjectHelper.contains(f.getName(), parts, true));
-				}
-
-				// limit
-				stream.limit(limit) //
-
-						// add the data finally
-						.forEach(f -> {
-							JsonObject o = new JsonObject();
-							o.addProperty(Tags.Json.ID, f.getId());
-							o.addProperty(Tags.Json.NAME, f.getName());
-							array.add(o);
-						});
+			Stream<StrolchRootElement> criteria = report.generateFilterCriteria(type);
+			if (query != null && !query.isEmpty()) {
+				String[] parts = query.split(" ");
+				criteria = criteria.filter(f -> ObjectHelper.contains(f.getName(), parts, true));
 			}
+
+			// add the data finally
+			JsonArray array = criteria.limit(limit).map(f -> {
+				JsonObject o = new JsonObject();
+				o.addProperty(Tags.Json.ID, f.getId());
+				o.addProperty(Tags.Json.NAME, f.getName());
+				return o;
+			}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			return ResponseUtil.toResponse(DATA, array);
 		}

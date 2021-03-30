@@ -71,8 +71,12 @@ public class Report implements AutoCloseable {
 		return this.reportPolicy.doReport();
 	}
 
-	public MapOfSets<String, StrolchRootElement> generateFilterCriteria() {
-		return this.reportPolicy.generateFilterCriteria();
+	public MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit) {
+		return this.reportPolicy.generateFilterCriteria(limit);
+	}
+
+	public Stream<StrolchRootElement> generateFilterCriteria(String type) {
+		return this.reportPolicy.generateFilterCriteria(type);
 	}
 
 	public long getCounter() {

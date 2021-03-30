@@ -1,15 +1,14 @@
 package li.strolch.report.policy;
 
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.toList;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
@@ -83,7 +82,7 @@ public class GenericReport extends ReportPolicy {
 		this.columnIds = this.columnsBag.getParameters().stream() //
 				.sorted(comparingInt(Parameter::getIndex)) //
 				.map(StrolchElement::getId) //
-				.collect(Collectors.toList());
+				.collect(toList());
 
 		this.descending = this.reportRes.getBoolean(PARAM_DESCENDING);
 		this.allowMissingColumns = this.reportRes.getBoolean(PARAM_ALLOW_MISSING_COLUMNS);
@@ -116,7 +115,7 @@ public class GenericReport extends ReportPolicy {
 			ParameterBag orderingBag = this.reportRes.getParameterBag(BAG_ORDERING, true);
 			if (orderingBag.hasParameters()) {
 				this.orderingParams = orderingBag.getParameters().stream().map(e -> (StringParameter) e)
-						.collect(Collectors.toList());
+						.collect(toList());
 				this.orderingParams.sort(comparingInt(AbstractParameter::getIndex));
 			}
 		}
@@ -439,14 +438,13 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * <p>This method can be overridden for further filtering</p>
 	 *
-	 * @param element
-	 * 		the element to filter
+	 * @param type
+	 * 		the type of element to filter
 	 *
 	 * @return true if the element is to be kept, false if not
 	 */
-	protected boolean filterCriteria(StrolchRootElement element) {
-		StringParameter filterCriteriaP = this.filterCriteriaParams.get(element.getType());
-		return !filterCriteriaP.isHidden();
+	protected boolean filterCriteriaAllowed(String type) {
+		return !this.filterCriteriaParams.get(type).isHidden();
 	}
 
 	/**
@@ -455,35 +453,49 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return the filter criteria as a map of sets
 	 */
-	public MapOfSets<String, StrolchRootElement> generateFilterCriteria() {
-		return buildStream() //
+	@Override
+	public MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit) {
 
-				.flatMap(e -> e.values().stream().filter(this::filterCriteria)) //
+		MapOfSets<String, StrolchRootElement> result = new MapOfSets<>(true);
 
-				.sorted((o1, o2) -> {
-					String type1 = o1.getType();
-					String type2 = o2.getType();
-					if (type1.equals(type2))
-						return 0;
-					StringParameter p1 = this.filterCriteriaParams.get(type1);
-					StringParameter p2 = this.filterCriteriaParams.get(type2);
-					if (p1 == null && p2 == null)
-						return type1.compareTo(type2);
-					if (p1 == null)
-						return 1;
-					if (p2 == null)
-						return -1;
+		Iterator<Map<String, StrolchRootElement>> iter = buildStream().iterator();
+		if (!iter.hasNext())
+			return result;
 
-					return Integer.compare(p1.getIndex(), p2.getIndex());
+		List<String> criteria = this.filterCriteriaParams.values().stream() //
+				.filter(p -> {
+					if (p.getId().equals(UOM_NONE))
+						throw new IllegalStateException("UOM invalid: " + p.getId() + " for " + p.getLocator());
+					if (p.getId().equals(PARAM_OBJECT_TYPE))
+						return filterCriteriaAllowed(p.getUom());
+					return filterCriteriaAllowed(p.getId());
 				}) //
+				.sorted(comparing(StringParameter::getIndex)) //
+				.map(StringParameter::getUom).collect(toList());
+		while (iter.hasNext()) {
+			Map<String, StrolchRootElement> row = iter.next();
 
-				.collect( //
-						Collector.of( //
-								(Supplier<MapOfSets<String, StrolchRootElement>>) () -> new MapOfSets<>(
-										new LinkedHashMap<>()), //
-								(m, e) -> m.addElement(e.getType(), e), //
-								MapOfSets::addAll, //
-								m -> m));
+			boolean changed = false;
+			for (String criterion : criteria) {
+				if (row.containsKey(criterion)) {
+					if (result.size(criterion) >= limit)
+						continue;
+
+					result.addElement(criterion, row.get(criterion));
+					changed = true;
+				}
+			}
+
+			if (!changed)
+				break;
+		}
+
+		return result;
+	}
+
+	@Override
+	public Stream<StrolchRootElement> generateFilterCriteria(String type) {
+		return buildStream().filter(row -> row.containsKey(type)).map(row -> row.get(type));
 	}
 
 	/**
@@ -881,7 +893,7 @@ public class GenericReport extends ReportPolicy {
 							+ dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
 
 		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType)
-				.stream().filter(p -> p.getValueType() == StrolchValueType.STRING).collect(Collectors.toList());
+				.stream().filter(p -> p.getValueType() == StrolchValueType.STRING).collect(toList());
 
 		if (relationParams.isEmpty())
 			throw new IllegalStateException(
