@@ -117,7 +117,7 @@ public class MapOfLists<T, U> {
 
 	public int size(T t) {
 		List<U> list = this.mapOfLists.get(t);
-		if (list.size() == 0)
+		if (list == null || list.size() == 0)
 			return 0;
 		return list.size();
 	}

@@ -135,7 +135,7 @@ public class MapOfSets<T, U> {
 
 	public int size(T t) {
 		Set<U> set = this.mapOfSets.get(t);
-		if (set.size() == 0)
+		if (set == null || set.size() == 0)
 			return 0;
 		return set.size();
 	}
