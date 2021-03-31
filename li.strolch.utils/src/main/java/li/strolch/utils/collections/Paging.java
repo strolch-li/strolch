@@ -188,6 +188,12 @@ public class Paging<T> {
 			paging.previousOffset = Math.max(0, offset - 1);
 			paging.lastOffset = paging.size - 1;
 
+		} else if (paging.size == 0) {
+
+			paging.lastOffset = 0;
+			paging.nextOffset = 0;
+			paging.previousOffset = 0;
+
 		} else {
 
 			paging.lastOffset = paging.size % limit == 0 ? paging.size - limit : (paging.size / limit) * limit;
