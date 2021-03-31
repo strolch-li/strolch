@@ -1492,6 +1492,17 @@ public interface ParameterBagContainer extends StrolchElement {
 	<U, T extends Parameter<U>> T removeParameter(String paramKey);
 
 	/**
+	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the key {@link
+	 * StrolchModelConstants#BAG_RELATIONS}
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} which is to be removed
+	 *
+	 * @return the removed {@link Parameter} or null if it did not exist
+	 */
+	<U, T extends Parameter<U>> T removeRelation(String paramKey);
+
+	/**
 	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
 	 *
 	 * @param bagKey

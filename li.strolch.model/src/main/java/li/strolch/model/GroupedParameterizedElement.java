@@ -830,6 +830,19 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	@Override
+	public <U, T extends Parameter<U>> T removeRelation(String paramKey) {
+		assertNotReadonly();
+		if (this.parameterBagMap == null)
+			return null;
+		ParameterBag bag = this.parameterBagMap.get(BAG_RELATIONS);
+		if (bag == null) {
+			return null;
+		}
+
+		return bag.removeParameter(paramKey);
+	}
+
+	@Override
 	public <U, T extends Parameter<U>> T removeParameter(String bagKey, String paramKey) {
 		assertNotReadonly();
 		if (this.parameterBagMap == null)
