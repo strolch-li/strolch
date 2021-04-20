@@ -104,7 +104,7 @@
         <hapi.version>2.3</hapi.version>
 
         <pi4j.version>1.4</pi4j.version>
-        <jserialcomm.version>[2.0.0,3.0.0)</jserialcomm.version>
+        <jserialcomm.version>2.6.2</jserialcomm.version>
 
         <javafx.version>11.0.2</javafx.version>
 
