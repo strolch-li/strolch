@@ -15,23 +15,37 @@
  */
 package li.strolch.exception;
 
+import li.strolch.utils.I18nMessage;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class StrolchException extends RuntimeException {
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
+	private I18nMessage i18n;
+
 	public StrolchException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	/**
-	 * @param message
-	 */
 	public StrolchException(String message) {
 		super(message);
+	}
+
+	public boolean hasI18n() {
+		return this.i18n != null;
+	}
+
+	public I18nMessage getI18n() {
+		return this.i18n;
+	}
+
+	public void setI18n(I18nMessage i18n) {
+		this.i18n = i18n;
+	}
+
+	public StrolchException i18n(I18nMessage i18n) {
+		this.i18n = i18n;
+		return this;
 	}
 }
