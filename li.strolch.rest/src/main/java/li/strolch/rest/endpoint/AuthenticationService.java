@@ -23,8 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -344,14 +342,7 @@ public class AuthenticationService {
 				logger.warn(msg);
 			}
 
-			String domain;
-			try {
-				domain = new URL(request.getRequestURL().toString()).getHost();
-			} catch (MalformedURLException e) {
-				logger.error("Failed to parse URL: " + request.getRequestURL().toString(), e);
-				domain = null;
-			}
-
+			String domain = RestfulStrolchComponent.getInstance().getDomain();
 			String path = "/;SameSite=Strict";
 
 			NewCookie cookie = new NewCookie(STROLCH_AUTHORIZATION, certificate.getAuthToken(), path, domain,
@@ -450,14 +441,7 @@ public class AuthenticationService {
 
 		if (setCookies) {
 
-			String domain;
-			try {
-				domain = new URL(request.getRequestURL().toString()).getHost();
-			} catch (MalformedURLException e) {
-				logger.error("Failed to parse URL: " + request.getRequestURL().toString(), e);
-				domain = null;
-			}
-
+			String domain = RestfulStrolchComponent.getInstance().getDomain();
 			String path = "/;SameSite=Strict";
 
 			NewCookie authCookie = new NewCookie(STROLCH_AUTHORIZATION, authToken, path, domain,

@@ -43,6 +43,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private static final String PARAM_HTTP_CACHE_MODE = "httpCacheMode"; //$NON-NLS-1$
 	private static final String PARAM_SECURE_COOKIE = "secureCookie"; //$NON-NLS-1$
 	private static final String PARAM_COOKIE_MAX_AGE = "cookieMaxAge"; //$NON-NLS-1$
+	private static final String PARAM_DOMAIN = "domain"; //$NON-NLS-1$
 	private static final String PARAM_BASIC_AUTH_ENABLED = "basicAuthEnabled"; //$NON-NLS-1$
 
 	/**
@@ -79,6 +80,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private boolean restLogging;
 	private boolean restLoggingEntity;
 	private boolean secureCookie;
+	private String domain;
 	private int cookieMaxAge;
 	private boolean basicAuthEnabled;
 
@@ -153,6 +155,15 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	}
 
 	/**
+	 * Returns the Cookie Domain for this server
+	 *
+	 * @return the domain
+	 */
+	public String getDomain() {
+		return domain;
+	}
+
+	/**
 	 * @return the basicAuthEnabled
 	 */
 	public boolean isBasicAuthEnabled() {
@@ -186,6 +197,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 		this.secureCookie = configuration.getBoolean(PARAM_SECURE_COOKIE, true);
 		this.cookieMaxAge = configuration.getInt(PARAM_COOKIE_MAX_AGE, (int) TimeUnit.DAYS.toSeconds(1));
+		this.domain = configuration.getString(PARAM_DOMAIN, "");
+		if (this.domain.isEmpty())
+			this.domain = null;
 		this.basicAuthEnabled = configuration.getBoolean(PARAM_BASIC_AUTH_ENABLED, true);
 
 		logger.info(
