@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -342,7 +344,17 @@ public class AuthenticationService {
 				logger.warn(msg);
 			}
 
-			NewCookie cookie = new NewCookie(STROLCH_AUTHORIZATION, certificate.getAuthToken(), "/", null,
+			String domain;
+			try {
+				domain = new URL(request.getRequestURL().toString()).getHost();
+			} catch (MalformedURLException e) {
+				logger.error("Failed to parse URL: " + request.getRequestURL().toString(), e);
+				domain = null;
+			}
+
+			String path = "/;SameSite=Strict";
+
+			NewCookie cookie = new NewCookie(STROLCH_AUTHORIZATION, certificate.getAuthToken(), path, domain,
 					"Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
 
 			return Response.ok().entity(jsonObject.toString())//
@@ -437,10 +449,21 @@ public class AuthenticationService {
 		}
 
 		if (setCookies) {
-			NewCookie authCookie = new NewCookie(STROLCH_AUTHORIZATION, authToken, "/", null, "Authorization header",
-					cookieMaxAge, secureCookie);
-			NewCookie authExpirationCookie = new NewCookie(STROLCH_AUTHORIZATION_EXPIRATION_DATE, expirationDateS, "/",
-					null, "Authorization Expiration Date", cookieMaxAge, secureCookie);
+
+			String domain;
+			try {
+				domain = new URL(request.getRequestURL().toString()).getHost();
+			} catch (MalformedURLException e) {
+				logger.error("Failed to parse URL: " + request.getRequestURL().toString(), e);
+				domain = null;
+			}
+
+			String path = "/;SameSite=Strict";
+
+			NewCookie authCookie = new NewCookie(STROLCH_AUTHORIZATION, authToken, path, domain,
+					"Strolch Authorization header", cookieMaxAge, secureCookie);
+			NewCookie authExpirationCookie = new NewCookie(STROLCH_AUTHORIZATION_EXPIRATION_DATE, expirationDateS, path,
+					domain, "Strolch Authorization Expiration Date", cookieMaxAge, secureCookie);
 
 			return Response.ok().entity(loginResult.toString()) //
 					.header(HttpHeaders.AUTHORIZATION, authToken) //
