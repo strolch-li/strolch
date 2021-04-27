@@ -17,6 +17,7 @@ package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static li.strolch.model.builder.BuilderHelper.buildParamName;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.text.MessageFormat;
@@ -357,7 +358,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setString(String paramKey, String value) throws StrolchModelException {
 		StringParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new StringParameter(paramKey, paramKey, value));
+			addParameter(new StringParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -376,7 +377,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setString(String paramKey, Enum<?> value) throws StrolchModelException {
 		StringParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new StringParameter(paramKey, paramKey, value));
+			addParameter(new StringParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value.name());
 	}
@@ -395,7 +396,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setBoolean(String paramKey, boolean value) throws StrolchModelException {
 		BooleanParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new BooleanParameter(paramKey, paramKey, value));
+			addParameter(new BooleanParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -414,7 +415,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setInteger(String paramKey, int value) throws StrolchModelException {
 		IntegerParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new IntegerParameter(paramKey, paramKey, value));
+			addParameter(new IntegerParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -433,7 +434,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setDouble(String paramKey, double value) throws StrolchModelException {
 		FloatParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new FloatParameter(paramKey, paramKey, value));
+			addParameter(new FloatParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -452,7 +453,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setLong(String paramKey, long value) throws StrolchModelException {
 		LongParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new LongParameter(paramKey, paramKey, value));
+			addParameter(new LongParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -471,7 +472,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException {
 		DateParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new DateParameter(paramKey, paramKey, value));
+			addParameter(new DateParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValueFromZonedDateTime(value);
 	}
@@ -490,7 +491,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setDate(String paramKey, LocalDateTime value) throws StrolchModelException {
 		DateParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new DateParameter(paramKey, paramKey, value));
+			addParameter(new DateParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValueFromLocalDateTime(value);
 	}
@@ -509,7 +510,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setText(String paramKey, String value) throws StrolchModelException {
 		TextParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new TextParameter(paramKey, paramKey, value));
+			addParameter(new TextParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -528,7 +529,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException {
 		DurationParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new DurationParameter(paramKey, paramKey, value));
+			addParameter(new DurationParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -547,7 +548,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setStringList(String paramKey, List<String> value) throws StrolchModelException {
 		StringListParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new StringListParameter(paramKey, paramKey, value));
+			addParameter(new StringListParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -566,7 +567,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException {
 		IntegerListParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new IntegerListParameter(paramKey, paramKey, value));
+			addParameter(new IntegerListParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -585,7 +586,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException {
 		FloatListParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new FloatListParameter(paramKey, paramKey, value));
+			addParameter(new FloatListParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
@@ -604,7 +605,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setLongList(String paramKey, List<Long> value) throws StrolchModelException {
 		LongListParameter param = getParameter(paramKey, false);
 		if (param == null)
-			addParameter(new LongListParameter(paramKey, paramKey, value));
+			addParameter(new LongListParameter(paramKey, buildParamName(paramKey), value));
 		else
 			param.setValue(value);
 	}
