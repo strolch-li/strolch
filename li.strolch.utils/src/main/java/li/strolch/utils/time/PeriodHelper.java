@@ -29,6 +29,24 @@ public class PeriodHelper {
 	}
 
 	/**
+	 * Special method to add the given number of months to the given date and making sure that the day always stays the
+	 * same if possible. I.e. If the given date has the 3. day, then this will also be so on the returned date. But for
+	 * the day 29, 30 or 31 the date might change to 28 or 30, depending on the month on which the result lies.
+	 *
+	 * @param date
+	 * 		the date to shift
+	 * @param nrOfMonths
+	 * 		the number of months to shift the given date by
+	 *
+	 * @return the shifted date
+	 */
+	public static ZonedDateTime shiftMonths(ZonedDateTime date, int nrOfMonths) {
+		int selectedDayOfMonth = date.getDayOfMonth();
+		ZonedDateTime next = date.plusMonths(nrOfMonths);
+		return next.withDayOfMonth(Math.min(selectedDayOfMonth, next.toLocalDate().lengthOfMonth()));
+	}
+
+	/**
 	 * This special function allows us to shift a date by a multiple of the given {@link PeriodDuration} so that is
 	 * before the given to date. It does multiple tries to get as close as possible, due to the inexactness of 30 days
 	 * being one month, and 365 days being one year.

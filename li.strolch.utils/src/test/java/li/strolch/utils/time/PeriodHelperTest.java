@@ -5,6 +5,8 @@ import static li.strolch.utils.time.PeriodHelper.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -85,6 +87,141 @@ public class PeriodHelperTest {
 	@Test
 	public void shouldCalcMonths4() {
 		assertEquals(12, monthsIn(PeriodDuration.parse("P1Y")), 0.0);
+	}
+
+	@Test
+	public void shouldPlusMonthsNormal() {
+		int expectedDay = 4;
+
+		ZonedDateTime date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+		assertEquals(expectedDay, date.getDayOfMonth());
+
+		// increase by single months
+		for (int i = 0; i < 5; i++) {
+			date = shiftMonths(date, 1);
+			assertEquals(expectedDay, date.getDayOfMonth());
+		}
+
+		// also when increase by multiple months
+		for (int i = 0; i < 5; i++) {
+			date = shiftMonths(date, 4);
+			assertEquals(expectedDay, date.getDayOfMonth());
+		}
+	}
+
+	@Test
+	public void shouldPlusMonths28() {
+		int expectedDay = 28;
+
+		ZonedDateTime date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+		assertEquals(expectedDay, date.getDayOfMonth());
+
+		// increase by single months
+		for (int i = 0; i < 5; i++) {
+			date = shiftMonths(date, 1);
+			assertEquals(expectedDay, date.getDayOfMonth());
+		}
+
+		// also when increase by multiple months
+		for (int i = 0; i < 5; i++) {
+			date = shiftMonths(date, 4);
+			assertEquals(expectedDay, date.getDayOfMonth());
+		}
+	}
+
+	@Test
+	public void shouldPlusMonths29() {
+		int expectedDay = 29;
+
+		ZonedDateTime date;
+
+		// increase by single months
+		for (int i = 0; i < 5; i++) {
+			date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+			date = shiftMonths(date, i);
+			if (date.getMonth() == Month.FEBRUARY)
+				assertEquals(28, date.getDayOfMonth());
+			else
+				assertEquals(expectedDay, date.getDayOfMonth());
+		}
+
+		// also when increase by multiple months
+		for (int i = 0; i < 5; i++) {
+			date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+			date = shiftMonths(date, i);
+			if (date.getMonth() == Month.FEBRUARY)
+				assertEquals(28, date.getDayOfMonth());
+			else
+				assertEquals(expectedDay, date.getDayOfMonth());
+		}
+	}
+
+	@Test
+	public void shouldPlusMonths30() {
+		int expectedDay = 30;
+
+		ZonedDateTime date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+		assertEquals(expectedDay, date.getDayOfMonth());
+
+		// increase by single months
+		for (int i = 0; i < 5; i++) {
+			date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+			date = shiftMonths(date, i);
+			if (date.getMonth() == Month.FEBRUARY)
+				assertEquals(28, date.getDayOfMonth());
+			else
+				assertEquals(expectedDay, date.getDayOfMonth());
+		}
+
+		// also when increase by multiple months
+		for (int i = 0; i < 5; i++) {
+			date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+			date = shiftMonths(date, i);
+			if (date.getMonth() == Month.FEBRUARY)
+				assertEquals(28, date.getDayOfMonth());
+			else
+				assertEquals(expectedDay, date.getDayOfMonth());
+		}
+	}
+
+	@Test
+	public void shouldPlusMonths31() {
+		int expectedDay = 31;
+
+		ZonedDateTime date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+		assertEquals(date.getMonth().name(), expectedDay, date.getDayOfMonth());
+
+		// increase by single months
+		for (int i = 0; i < 5; i++) {
+			date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+			date = shiftMonths(date, i);
+			if (date.getMonth() == Month.FEBRUARY) {
+				assertEquals(date.getMonth().name(), 28, date.getDayOfMonth());
+			} else if (date.getMonth() == Month.APRIL //
+					|| date.getMonth() == Month.JUNE //
+					|| date.getMonth() == Month.SEPTEMBER //
+					|| date.getMonth() == Month.NOVEMBER) {
+				assertEquals(date.getMonth().name(), 30, date.getDayOfMonth());
+			} else {
+				assertEquals(date.getMonth().name(), expectedDay, date.getDayOfMonth());
+			}
+		}
+
+		// also when increase by multiple months
+		for (int i = 0; i < 5; i++) {
+			date = LocalDate.of(2001, Month.JANUARY, expectedDay).atStartOfDay(systemDefault());
+			date = shiftMonths(date, i);
+			if (date.getMonth() == Month.FEBRUARY) {
+				assertEquals(date.getMonth().name(), 28, date.getDayOfMonth());
+			} else if (date.getMonth() == Month.APRIL //
+					|| date.getMonth() == Month.JUNE //
+					|| date.getMonth() == Month.SEPTEMBER //
+					|| date.getMonth() == Month.NOVEMBER) {
+				assertEquals(date.getMonth().name(), 30, date.getDayOfMonth());
+			} else {
+				assertEquals(date.getMonth().name(), expectedDay, date.getDayOfMonth());
+			}
+		}
 	}
 
 	@Test
