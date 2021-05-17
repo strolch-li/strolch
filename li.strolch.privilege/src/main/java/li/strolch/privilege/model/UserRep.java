@@ -260,6 +260,18 @@ public class UserRep implements Serializable {
 	}
 
 	/**
+	 * Returns true if the the given property exists
+	 *
+	 * @param key
+	 * 		the property key to check
+	 *
+	 * @return true if the the given property exists
+	 */
+	public boolean hasProperty(String key) {
+		return this.properties.containsKey(key);
+	}
+
+	/**
 	 * Returns the property with the given key
 	 *
 	 * @param key
