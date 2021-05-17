@@ -90,6 +90,12 @@ public class ResponseUtil {
 		return Response.ok(json, MediaType.APPLICATION_JSON).build();
 	}
 
+	public static Response toResponse(JsonObject response) {
+		response.addProperty(MSG, StringHelper.DASH);
+		String json = new Gson().toJson(response);
+		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+	}
+
 	public static <T> Response toResponse(String member, List<T> list, Function<T, JsonObject> toJson) {
 		return toResponse(member, list.stream().map(toJson).collect(Collectors.toList()));
 	}
