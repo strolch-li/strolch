@@ -743,6 +743,13 @@ public interface PrivilegeHandler {
 	boolean isRefreshAllowed();
 
 	/**
+	 * Returns true if persisting on user data changed enabled
+	 *
+	 * @return true persisting on user data changed enabled
+	 */
+	boolean isPersistOnUserDataChanged();
+
+	/**
 	 * Invalidates the session for the given {@link Certificate}, effectively logging out the user who was authenticated
 	 * with the credentials associated to the given {@link Certificate}
 	 *

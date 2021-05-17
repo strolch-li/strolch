@@ -162,6 +162,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public boolean isPersistOnUserDataChanged() {
+		return this.autoPersistOnUserChangesData;
+	}
+
+	@Override
 	public EncryptionHandler getEncryptionHandler() throws PrivilegeException {
 		return this.encryptionHandler;
 	}
