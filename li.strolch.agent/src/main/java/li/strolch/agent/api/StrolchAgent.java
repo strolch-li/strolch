@@ -129,14 +129,29 @@ public class StrolchAgent {
 	}
 
 	/**
-	 * @see ComponentContainer#runAsAgent(PrivilegedRunnable)
+	 * @see PrivilegeHandler#runAs(String, PrivilegedRunnable)
+	 */
+	public void runAs(String systemUser, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+		getPrivilegeHandler().runAs(systemUser, runnable);
+	}
+
+	/**
+	 * @see PrivilegeHandler#runAsAgent(PrivilegedRunnable)
 	 */
 	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getPrivilegeHandler().runAsAgent(runnable);
 	}
 
 	/**
-	 * @see ComponentContainer#runAsAgentWithResult(PrivilegedRunnableWithResult)
+	 * @see PrivilegeHandler#runAsAgentWithResult(PrivilegedRunnableWithResult)
+	 */
+	public <T> T runAsWithResult(String systemUser, PrivilegedRunnableWithResult<T> runnable)
+			throws PrivilegeException, Exception {
+		return getPrivilegeHandler().runAsWithResult(systemUser, runnable);
+	}
+
+	/**
+	 * @see PrivilegeHandler#runAsAgentWithResult(PrivilegedRunnableWithResult)
 	 */
 	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
 		return getPrivilegeHandler().runAsAgentWithResult(runnable);

@@ -265,6 +265,11 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	}
 
 	@Override
+	public <T> T runAsWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws Exception {
+		return this.privilegeHandler.runWithResult(username, new StrolchSystemActionWithResult<>(runnable));
+	}
+
+	@Override
 	public PrivilegeContext openAgentSystemUserContext() throws PrivilegeException {
 		return this.privilegeHandler.openSystemUserContext(StrolchConstants.SYSTEM_USER_AGENT);
 	}

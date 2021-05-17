@@ -299,6 +299,24 @@ public interface PrivilegeHandler {
 	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception;
 
 	/**
+	 * Run the given {@link PrivilegedRunnableWithResult} as the given system user
+	 *
+	 * @param username
+	 * 		the system username
+	 * @param runnable
+	 * 		the runnable to perform
+	 *
+	 * @return the result
+	 *
+	 * @throws PrivilegeException
+	 * 		if there is something wrong
+	 * @throws Exception
+	 * 		if anything else goes wrong during execution
+	 */
+	<T> T runAsWithResult(String username, PrivilegedRunnableWithResult<T> runnable)
+			throws PrivilegeException, Exception;
+
+	/**
 	 * Opens a {@link PrivilegeContext} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @throws PrivilegeException
