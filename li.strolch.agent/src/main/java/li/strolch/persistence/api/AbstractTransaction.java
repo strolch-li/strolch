@@ -740,6 +740,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public Resource lockAndGetConfiguration() {
+		lock(Resource.locatorFor(TYPE_CONFIGURATION, RES_CONFIGURATION));
+		return getConfiguration();
+	}
+
+	@Override
 	public Order getOrderTemplate(String type) {
 		return getOrderTemplate(type, false);
 	}

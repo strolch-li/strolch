@@ -801,6 +801,20 @@ public interface StrolchTransaction extends AutoCloseable {
 	Resource getConfiguration();
 
 	/**
+	 * <p>Returns the {@link Resource} with the type {@link StrolchConstants#TYPE_CONFIGURATION} and id {@link
+	 * StrolchConstants#RES_CONFIGURATION}.</p>
+	 *
+	 * <p>Should the configuration resource not exist, then it will be created without any parameters, as {@link
+	 * Resource#getBoolean(String)} methods et. al. will then just return empty values for their corresponding
+	 * types.</p>
+	 *
+	 * <p>This method first locks the resource's locator, so that we can perform a read lock</p>
+	 *
+	 * @return the configuration resource
+	 */
+	Resource lockAndGetConfiguration();
+
+	/**
 	 * <p>
 	 * Returns a copy of the {@link Order} of Type {@link StrolchModelConstants#TEMPLATE} with the given type as id, or
 	 * null if it does not exist
