@@ -1,6 +1,7 @@
 package li.strolch.execution;
 
 import static java.util.Collections.synchronizedMap;
+import static li.strolch.execution.EventBasedExecutionHandler.PROP_LOCK_RETRIES;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.ResourceBundle;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverEvent;
+import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.*;
 import li.strolch.execution.policy.ExecutionPolicy;
@@ -32,6 +34,7 @@ public class Controller {
 
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
 
+	private final int lockRetries;
 	private final String realm;
 	private final ComponentContainer container;
 	private final ExecutionHandler executionHandler;
@@ -53,6 +56,7 @@ public class Controller {
 		this.activityId = activity.getId();
 		this.activity = activity;
 		this.inExecution = synchronizedMap(new HashMap<>());
+		this.lockRetries = executionHandler.getConfiguration().getInt(PROP_LOCK_RETRIES, 2);
 	}
 
 	public String getRealm() {
@@ -115,7 +119,7 @@ public class Controller {
 		boolean[] trigger = new boolean[1];
 		this.executionHandler.runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				tx.lock(this.locator);
+				lockWithRetries(tx);
 				trigger[0] = execute(tx);
 				if (tx.needsCommit()) {
 					tx.commitOnClose();
@@ -173,7 +177,7 @@ public class Controller {
 	public void toExecuted(Locator actionLoc) throws Exception {
 		this.executionHandler.runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				tx.lock(this.locator);
+				lockWithRetries(tx);
 
 				if (!refreshActivity(tx))
 					return;
@@ -212,7 +216,7 @@ public class Controller {
 	public void toStopped(Locator actionLoc) throws Exception {
 		this.executionHandler.runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				tx.lock(this.locator);
+				lockWithRetries(tx);
 
 				if (!refreshActivity(tx))
 					return;
@@ -242,7 +246,7 @@ public class Controller {
 	public void toError(Locator actionLoc) throws Exception {
 		this.executionHandler.runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				tx.lock(this.locator);
+				lockWithRetries(tx);
 
 				if (!refreshActivity(tx))
 					return;
@@ -272,7 +276,7 @@ public class Controller {
 	public void toWarning(Locator actionLoc) throws Exception {
 		this.executionHandler.runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				tx.lock(this.locator);
+				lockWithRetries(tx);
 
 				if (!refreshActivity(tx))
 					return;
@@ -337,6 +341,29 @@ public class Controller {
 				}
 			}
 		});
+	}
+
+	private void lockWithRetries(StrolchTransaction tx) throws StrolchLockException {
+		int tries = 0;
+		while (true) {
+			try {
+
+				tx.lock(this.locator);
+				return;
+
+			} catch (StrolchLockException e) {
+				tries++;
+				if (tries >= this.lockRetries) {
+					logger.error("Failed to lock " + this.locator + ". Max retries " + tries
+							+ " reached, throwing exception!");
+					throw e;
+				}
+
+				logger.error("LOCK FAILURE!");
+				logger.error("Failed to lock " + this.locator + ". Trying again...");
+				logger.error("LOCK FAILURE!");
+			}
+		}
 	}
 
 	private void updateObservers() {

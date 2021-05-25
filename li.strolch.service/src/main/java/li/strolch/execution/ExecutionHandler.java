@@ -44,6 +44,9 @@ public abstract class ExecutionHandler extends StrolchComponent {
 		super(container, componentName);
 	}
 
+	public static final String PROP_RESTART_EXECUTION = "restartExecution";
+	public static final String PROP_LOCK_RETRIES = "lockRetries";
+
 	public static final String PARAM_STATE = "state";
 
 	public StrolchTransaction openTx(String realm, Certificate cert, Class<?> action, boolean readOnly) {

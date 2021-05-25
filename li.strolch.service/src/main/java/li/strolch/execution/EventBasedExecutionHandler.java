@@ -34,8 +34,6 @@ import li.strolch.utils.collections.MapOfMaps;
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
-	private static final String PROP_RESTART_EXECUTION = "restartExecution";
-
 	private Map<String, ExecutionHandlerState> statesByRealm;
 	private MapOfMaps<String, Locator, Controller> controllers;
 
