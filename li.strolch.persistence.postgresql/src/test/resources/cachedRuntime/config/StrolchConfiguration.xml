@@ -40,6 +40,7 @@
 				<db.username>testuser</db.username>
 				<db.password>test</db.password>
 				<db.pool.maximumPoolSize>1</db.pool.maximumPoolSize>
+				<db.pool.keepaliveTime>600000</db.pool.keepaliveTime>
 			</Properties>
 		</Component>
 		<Component>

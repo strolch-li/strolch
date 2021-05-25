@@ -57,11 +57,13 @@
 				<db.username.svcCached>cacheduser</db.username.svcCached>
 				<db.password.svcCached>test</db.password.svcCached>
 				<db.pool.maximumPoolSize.svcCached>1</db.pool.maximumPoolSize.svcCached>
+				<db.pool.keepaliveTime.svcCached>600000</db.pool.keepaliveTime.svcCached>
 
 				<db.url.svcCachedAuditsVersioning>jdbc:postgresql://localhost/cacheduserauditsversioningdb</db.url.svcCachedAuditsVersioning>
 				<db.username.svcCachedAuditsVersioning>cacheduserauditsversioning</db.username.svcCachedAuditsVersioning>
 				<db.password.svcCachedAuditsVersioning>test</db.password.svcCachedAuditsVersioning>
 				<db.pool.maximumPoolSize.svcCachedAuditsVersioning>1</db.pool.maximumPoolSize.svcCachedAuditsVersioning>
+				<db.pool.keepaliveTime.svcCachedAuditsVersioning>600000</db.pool.keepaliveTime.svcCachedAuditsVersioning>
 
 			</Properties>
 		</Component>

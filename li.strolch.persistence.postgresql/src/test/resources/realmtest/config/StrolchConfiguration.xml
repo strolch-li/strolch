@@ -44,11 +44,13 @@
                 <db.username.first>testuser1</db.username.first>
                 <db.password.first>test</db.password.first>
                 <db.pool.maximumPoolSize.first>1</db.pool.maximumPoolSize.first>
+                <db.pool.keepaliveTime.first>600000</db.pool.keepaliveTime.first>
 
                 <db.url.second>jdbc:postgresql://localhost/testdb2</db.url.second>
                 <db.username.second>testuser2</db.username.second>
                 <db.password.second>test</db.password.second>
                 <db.pool.maximumPoolSize.second>1</db.pool.maximumPoolSize.second>
+                <db.pool.keepaliveTime.second>600000</db.pool.keepaliveTime.second>
             </Properties>
         </Component>
         <Component>

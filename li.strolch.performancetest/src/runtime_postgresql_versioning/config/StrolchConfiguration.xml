@@ -46,6 +46,7 @@
 				<db.username.cached>testuser</db.username.cached>
 				<db.password.cached>test</db.password.cached>
 				<db.pool.maximumPoolSize.cached>1</db.pool.maximumPoolSize.cached>
+				<db.pool.keepaliveTime>600000</db.pool.keepaliveTime>
 			</Properties>
 		</Component>
 		<Component>
