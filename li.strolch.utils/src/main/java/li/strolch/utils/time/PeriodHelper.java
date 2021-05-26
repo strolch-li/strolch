@@ -250,6 +250,6 @@ public class PeriodHelper {
 		if (shiftHours < 24)
 			return date;
 
-		return date.plusDays(shiftHours / 24);
+		return date.plusDays((shiftHours / 24) - 1);
 	}
 }
