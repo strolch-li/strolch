@@ -611,7 +611,7 @@ public class PeriodHelperTest {
 
 		ZonedDateTime shifted = shiftByMultipleOfPeriod(d1, d2, PeriodDuration.parse("PT8H"));
 
-		ZonedDateTime expected = LocalDate.of(2021, 4, 26).atStartOfDay(ZoneId.systemDefault());
+		ZonedDateTime expected = LocalDate.of(2021, 4, 25).atStartOfDay(ZoneId.systemDefault());
 		assertEquals(shifted.toString(), expected, shifted);
 	}
 
@@ -622,7 +622,7 @@ public class PeriodHelperTest {
 
 		ZonedDateTime shifted = shiftByMultipleOfPeriod(d1, d2, PeriodDuration.parse("PT8H"));
 
-		ZonedDateTime expected = LocalDate.of(2021, 4, 26).atStartOfDay(ZoneId.systemDefault());
+		ZonedDateTime expected = LocalDate.of(2021, 4, 25).atStartOfDay(ZoneId.systemDefault());
 		assertEquals(shifted.toString(), expected, shifted);
 	}
 }
