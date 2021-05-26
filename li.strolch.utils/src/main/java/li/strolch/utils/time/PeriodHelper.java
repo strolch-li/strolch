@@ -201,7 +201,7 @@ public class PeriodHelper {
 		double daysInPeriod = daysIn(periodDuration);
 
 		// see if we need end shift by weeks
-		if (period.getDays() % 7 == 0 && daysInPeriod % 7 == 0) {
+		if (period.getDays() != 0 && period.getDays() % 7 == 0 && daysInPeriod % 7 == 0) {
 			int numberOfWeeks = period.getDays() / 7;
 
 			// calculate the number of weeks to shift
@@ -213,7 +213,9 @@ public class PeriodHelper {
 			if (shiftWeeks < numberOfWeeks)
 				return date;
 
-			return date.plusWeeks(shiftWeeks);
+			ZonedDateTime result = date.plusWeeks(shiftWeeks);
+			if (!result.isBefore(end))
+				return date.plusWeeks(shiftWeeks - 1);
 		}
 
 		// see if we are shifting simply by single days
@@ -243,10 +245,10 @@ public class PeriodHelper {
 					"Expected period to be zero at this point and only duration to be set: " + periodDuration);
 
 		// shifting by e.g. PT8H
-		long hoursInPeriod = duration.toHours();
-		long hoursInBetween = TimeUnit.DAYS.toHours((long) daysInBetween);
-		long shifts = hoursInBetween / hoursInPeriod;
-		long shiftHours = shifts * hoursInPeriod;
+		double hoursInPeriod = duration.getSeconds() / 60.0 / 60.0;
+		double hoursInBetween = TimeUnit.DAYS.toHours((long) daysInBetween);
+		long shifts = (long) (hoursInBetween / hoursInPeriod);
+		long shiftHours = (long) (shifts * hoursInPeriod);
 		if (shiftHours < 24)
 			return date;
 
