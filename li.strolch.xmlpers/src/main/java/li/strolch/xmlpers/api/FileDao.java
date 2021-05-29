@@ -85,7 +85,7 @@ public class FileDao {
 		assertIsIdRef(IoOperation.UPDATE, objectRef);
 		File path = objectRef.getPath(this.pathBuilder);
 		logPath(IoOperation.UPDATE, path, objectRef);
-		assertPathIsFileAndWritable(path, objectRef);
+		assertPathIsDirectoryAndWritable(path.getParentFile(), objectRef);
 		FileIo fileIo = new FileIo(path);
 		this.tx.getManager().getIoMode().write(ctx, fileIo);
 	}
@@ -185,6 +185,21 @@ public class FileDao {
 		if (!path.isFile() || !path.canWrite()) {
 			String msg;
 			msg = "Persistence unit is not a file or is not readable for {0} at {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
+			throw new XmlPersistenceException(msg);
+		}
+	}
+
+	private void assertPathIsDirectoryAndWritable(File path, ObjectRef objectRef) {
+		if (!path.exists()) {
+			String msg = "Persistence path does not exist for {0} at {1}"; //$NON-NLS-1$
+			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
+			throw new XmlPersistenceException(msg);
+		}
+
+		if (!path.isDirectory() || !path.canWrite()) {
+			String msg;
+			msg = "Persistence path is not a directory or is not readable for {0} at {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}

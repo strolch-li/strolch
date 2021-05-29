@@ -212,22 +212,6 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 	}
 
 	@Test
-	public void shouldFailModifyNotExisting() {
-		setup(IoMode.SAX);
-
-		XmlPersistenceException exception = assertThrows(XmlPersistenceException.class, () -> {
-			// update
-			try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-
-				MyModel resource = createResource();
-				tx.getObjectDao().update(resource);
-			}
-		});
-
-		MatcherAssert.assertThat(exception.getMessage(), containsString("Persistence unit does not exist for"));
-	}
-
-	@Test
 	public void shouldFailDeleteNotExisting() {
 		setup(IoMode.SAX);
 
