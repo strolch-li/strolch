@@ -34,6 +34,12 @@ public class StrolchModelConstants {
 	public static final String SUFFIX_REF = "-Ref";
 
 	/**
+	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as an
+	 * enumeration
+	 */
+	public static final String INTERPRETATION_ENUMERATION = "Enumeration"; //$NON-NLS-1$
+
+	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to a {@link Resource}
 	 */

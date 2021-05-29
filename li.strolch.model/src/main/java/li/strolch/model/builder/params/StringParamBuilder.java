@@ -31,6 +31,13 @@ public class StringParamBuilder<T extends ParameterBagContainerBuilder<T>>
 		return this;
 	}
 
+	public StringParamBuilder<T> enumeration(Enum<?> defaultValue) {
+		this.interpretation = INTERPRETATION_ENUMERATION;
+		this.uom = defaultValue.getDeclaringClass().getSimpleName();
+		value(defaultValue.name());
+		return this;
+	}
+
 	@Override
 	public StringParameter build() {
 		return build(new StringParameter());
