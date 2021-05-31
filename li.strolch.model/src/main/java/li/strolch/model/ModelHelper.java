@@ -22,7 +22,7 @@ public class ModelHelper {
 		if (src.hasParameter(bagId, paramId) && !src.getStringP(bagId, paramId).isEmpty()) {
 			StringParameter existingBillingIdP = src.getStringP(bagId, paramId);
 			if (!dst.hasParameter(bagId, paramId)) {
-				dst.addParameter(existingBillingIdP.getClone());
+				dst.addParameter(bagId, existingBillingIdP.getClone());
 			} else if (dst.getStringP(bagId, paramId).isEmpty()) {
 				dst.setString(bagId, paramId, existingBillingIdP.getValue());
 			}
