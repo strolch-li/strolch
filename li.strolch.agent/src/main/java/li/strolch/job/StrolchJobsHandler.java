@@ -1,7 +1,7 @@
 package li.strolch.job;
 
 import static java.lang.String.join;
-import static li.strolch.runtime.StrolchConstants.*;
+import static li.strolch.runtime.StrolchConstants.TYPE_STROLCH_JOB;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -195,8 +195,10 @@ public class StrolchJobsHandler extends StrolchComponent {
 	@Override
 	public void stop() throws Exception {
 
-		for (StrolchJob job : this.jobs.values()) {
-			job.cancel(true);
+		if (this.jobs != null) {
+			for (StrolchJob job : this.jobs.values()) {
+				job.cancel(true);
+			}
 		}
 
 		super.stop();
@@ -204,7 +206,8 @@ public class StrolchJobsHandler extends StrolchComponent {
 
 	@Override
 	public void destroy() throws Exception {
-		this.jobs.clear();
+		if (this.jobs != null)
+			this.jobs.clear();
 		super.destroy();
 	}
 }
