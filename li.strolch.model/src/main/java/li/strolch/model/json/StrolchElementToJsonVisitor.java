@@ -52,6 +52,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private boolean withoutVersion;
 	private boolean withoutPolicies;
 	private boolean withoutStateVariables;
+	private boolean withoutValueChanges;
 	private int activityDepth = Integer.MAX_VALUE;
 
 	public StrolchElementToJsonVisitor() {
@@ -94,6 +95,10 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this.withoutStateVariables;
 	}
 
+	public boolean isWithoutValueChanges() {
+		return this.withoutValueChanges;
+	}
+
 	public StrolchElementToJsonVisitor withLocator() {
 		this.withLocator = true;
 		return this;
@@ -126,6 +131,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public StrolchElementToJsonVisitor withPolicies() {
 		this.withoutPolicies = false;
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor withoutValueChanges() {
+		this.withoutValueChanges = true;
 		return this;
 	}
 
@@ -496,8 +506,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			this.actionHook.accept(element, rootJ);
 
 		// value changes
-		Iterator<IValueChange<? extends IValue<?>>> iter = element.getChanges().iterator();
-		if (iter.hasNext()) {
+		if (!this.withoutValueChanges && element.hasChanges()) {
+			Iterator<IValueChange<? extends IValue<?>>> iter = element.getChanges().iterator();
 
 			JsonArray changesJ = new JsonArray();
 			rootJ.add(Json.VALUE_CHANGES, changesJ);
