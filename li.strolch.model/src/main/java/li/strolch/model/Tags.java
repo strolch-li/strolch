@@ -114,6 +114,7 @@ public class Tags {
 
 		public static final String ACTION = "Action";
 		public static final String RESOURCE_ID = "resourceId";
+		public static final String RESOURCE_NAME = "resourceName";
 		public static final String RESOURCE_TYPE = "resourceType";
 		public static final String VALUE_CHANGES = "valueChanges";
 		public static final String STATE_ID = "stateId";
