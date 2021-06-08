@@ -93,21 +93,40 @@ public class GenericReport extends ReportPolicy {
 		this.filterCriteriaParams = new HashMap<>();
 		StringParameter objectTypeFilterCriteriaP = objectTypeP.getClone();
 		objectTypeFilterCriteriaP.setId(objectType);
+		if (objectTypeFilterCriteriaP.getUom().equals(UOM_NONE))
+			throw new IllegalStateException(
+					"Join UOM " + objectTypeFilterCriteriaP.getUom() + " invalid: " + objectTypeFilterCriteriaP.getId()
+							+ " for " + objectTypeFilterCriteriaP.getLocator());
 		this.filterCriteriaParams.put(objectType, objectTypeFilterCriteriaP);
 		if (this.reportRes.hasParameterBag(BAG_JOINS)) {
 			ParameterBag joinBag = this.reportRes.getParameterBag(BAG_JOINS);
-			joinBag.getParameters().forEach(
-					parameter -> this.filterCriteriaParams.put(parameter.getId(), (StringParameter) parameter));
+			joinBag.getParameters().forEach(parameter -> {
+				StringParameter joinP = (StringParameter) parameter;
+				if (joinP.getUom().equals(UOM_NONE))
+					throw new IllegalStateException(
+							"Join UOM " + joinP.getUom() + " invalid: " + joinP.getId() + " for " + joinP.getLocator());
+				this.filterCriteriaParams.put(parameter.getId(), joinP);
+			});
 		}
 		if (this.reportRes.hasParameterBag(BAG_ADDITIONAL_TYPE)) {
 			ParameterBag additionalTypeBag = this.reportRes.getParameterBag(BAG_ADDITIONAL_TYPE);
 			StringParameter additionalTypeP = additionalTypeBag.getParameter(PARAM_OBJECT_TYPE, true);
+			if (additionalTypeP.getUom().equals(UOM_NONE))
+				throw new IllegalStateException(
+						"Additional Type UOM " + additionalTypeP.getUom() + " invalid: " + additionalTypeP.getId()
+								+ " for " + additionalTypeP.getLocator());
 			this.filterCriteriaParams.put(additionalTypeP.getValue(), additionalTypeP);
 		}
 		if (this.reportRes.hasParameterBag(BAG_ADDITIONAL_JOINS)) {
 			ParameterBag joinBag = this.reportRes.getParameterBag(BAG_ADDITIONAL_JOINS);
-			joinBag.getParameters().forEach(
-					parameter -> this.filterCriteriaParams.put(parameter.getId(), (StringParameter) parameter));
+			joinBag.getParameters().forEach(parameter -> {
+				StringParameter joinP = (StringParameter) parameter;
+				if (joinP.getUom().equals(UOM_NONE))
+					throw new IllegalStateException(
+							"Additional Join UOM " + joinP.getUom() + " invalid: " + joinP.getId() + " for " + joinP
+									.getLocator());
+				this.filterCriteriaParams.put(parameter.getId(), joinP);
+			});
 		}
 
 		// evaluate ordering params
@@ -464,8 +483,9 @@ public class GenericReport extends ReportPolicy {
 
 		List<String> criteria = this.filterCriteriaParams.values().stream() //
 				.filter(p -> {
-					if (p.getId().equals(UOM_NONE))
-						throw new IllegalStateException("UOM invalid: " + p.getId() + " for " + p.getLocator());
+					if (p.getUom().equals(UOM_NONE))
+						throw new IllegalStateException(
+								"Join UOM " + p.getUom() + " invalid: " + p.getId() + " for " + p.getLocator());
 					if (p.getId().equals(PARAM_OBJECT_TYPE))
 						return filterCriteriaAllowed(p.getUom());
 					return filterCriteriaAllowed(p.getId());
@@ -881,6 +901,9 @@ public class GenericReport extends ReportPolicy {
 		} else {
 			// recursively find the dependency
 			StringParameter dependencyP = joinBag.getParameter(dependencyType);
+			if (dependencyP == null)
+				throw new IllegalStateException(
+						"The defined join dependency " + dependencyType + " does not exist for " + joinP.getLocator());
 			dependency = addColumnJoin(refs, joinBag, dependencyP, false);
 			if (dependency == null)
 				return null;
