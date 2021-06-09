@@ -54,8 +54,6 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	private Map<String, String> parameterMap;
 
-	private long usersFileDate;
-	private long rolesFileDate;
 	private File usersPath;
 	private File rolesPath;
 
@@ -227,9 +225,6 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		PrivilegeRolesSaxReader rolesXmlHandler = new PrivilegeRolesSaxReader();
 		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler);
 
-		this.usersFileDate = this.usersPath.lastModified();
-		this.rolesFileDate = this.rolesPath.lastModified();
-
 		// ROLES
 		List<Role> roles = rolesXmlHandler.getRoles();
 		for (Role role : roles) {
@@ -292,12 +287,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		boolean saved = false;
 
 		// get users file
-		boolean usersFileUnchanged = this.usersPath.exists() && this.usersPath.lastModified() == this.usersFileDate;
-		if (usersFileUnchanged && !this.userMapDirty) {
-			logger.warn(
-					"Not persisting of users as current file is unchanged and users data is not dirty"); //$NON-NLS-1$
-		} else {
-
+		if (this.userMapDirty) {
 			// delegate writing
 			PrivilegeUsersDomWriter modelWriter = new PrivilegeUsersDomWriter(getAllUsers(), this.usersPath);
 			modelWriter.write();
@@ -307,12 +297,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get roles file
-		boolean rolesFileUnchanged = this.rolesPath.exists() && this.rolesPath.lastModified() == this.rolesFileDate;
-		if (rolesFileUnchanged && !this.roleMapDirty) {
-			logger.warn(
-					"Not persisting of roles as current file is unchanged and roles data is not dirty"); //$NON-NLS-1$
-		} else {
-
+		if (this.roleMapDirty) {
 			// delegate writing
 			PrivilegeRolesDomWriter modelWriter = new PrivilegeRolesDomWriter(getAllRoles(), this.rolesPath);
 			modelWriter.write();
