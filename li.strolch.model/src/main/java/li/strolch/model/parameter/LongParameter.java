@@ -93,7 +93,8 @@ public class LongParameter extends AbstractParameter<Long> {
 
 	@Override
 	public boolean isEqualTo(Parameter<Long> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		LongParameter other = (LongParameter) otherValue;
+		return this.value.equals(other.value);
 	}
 
 	@Override

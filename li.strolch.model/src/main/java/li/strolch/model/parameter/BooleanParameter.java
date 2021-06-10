@@ -99,7 +99,8 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 
 	@Override
 	public boolean isEqualTo(Parameter<Boolean> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		BooleanParameter other = (BooleanParameter) otherValue;
+		return this.value.equals(other.value);
 	}
 
 	@Override

@@ -124,7 +124,8 @@ public class DurationParameter extends AbstractParameter<PeriodDuration> {
 
 	@Override
 	public boolean isEqualTo(Parameter<PeriodDuration> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		DurationParameter other = (DurationParameter) otherValue;
+		return this.value.equals(other.value);
 	}
 
 	@Override

@@ -103,7 +103,8 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 
 	@Override
 	public boolean isEqualTo(Parameter<Integer> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		IntegerParameter other = (IntegerParameter) otherValue;
+		return this.value.equals(other.value);
 	}
 
 	@Override

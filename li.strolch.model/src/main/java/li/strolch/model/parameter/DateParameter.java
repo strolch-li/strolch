@@ -143,7 +143,7 @@ public class DateParameter extends AbstractParameter<Date> {
 	@Override
 	public boolean isEqualTo(Parameter<Date> otherValue) {
 		DateParameter other = (DateParameter) otherValue;
-		return this.value.equals(other.getValueZdt());
+		return this.value.equals(other.value);
 	}
 
 	@Override

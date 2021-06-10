@@ -186,7 +186,8 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 
 	@Override
 	public boolean isEqualTo(Parameter<List<E>> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		AbstractListParameter<E> other = (AbstractListParameter<E>) otherValue;
+		return this.value.equals(other.value);
 	}
 
 	@Override

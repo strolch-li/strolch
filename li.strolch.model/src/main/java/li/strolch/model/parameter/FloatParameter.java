@@ -100,7 +100,8 @@ public class FloatParameter extends AbstractParameter<Double> {
 
 	@Override
 	public boolean isEqualTo(Parameter<Double> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		FloatParameter other = (FloatParameter) otherValue;
+		return this.value.equals(other.value);
 	}
 
 	@Override

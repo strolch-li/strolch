@@ -132,7 +132,8 @@ public class StringParameter extends AbstractParameter<String> {
 
 	@Override
 	public boolean isEqualTo(Parameter<String> otherValue) {
-		return this.value.equals(otherValue.getValue());
+		StringParameter other = (StringParameter) otherValue;
+		return this.value.equals(other.value);
 	}
 
 	@Override
