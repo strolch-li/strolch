@@ -214,8 +214,9 @@ public class PeriodHelper {
 				return date;
 
 			ZonedDateTime result = date.plusWeeks(shiftWeeks);
-			if (!result.isBefore(end))
-				return date.plusWeeks(shiftWeeks - 1);
+			if (result.isBefore(end))
+				return result;
+			return date.plusWeeks(shiftWeeks - 1);
 		}
 
 		// see if we are shifting simply by single days
@@ -237,7 +238,10 @@ public class PeriodHelper {
 			if (shiftDays < 1)
 				return date;
 
-			return date.plusDays(shiftDays);
+			ZonedDateTime result = date.plusDays(shiftDays);
+			if (result.isBefore(end))
+				return result;
+			return date.plusDays(shiftDays - 1);
 		}
 
 		if (!period.isZero())
