@@ -239,9 +239,11 @@ public class PeriodHelper {
 				return date;
 
 			ZonedDateTime result = date.plusDays(shiftDays);
-			if (result.isBefore(end))
-				return result;
-			return date.plusDays(shiftDays - 1);
+			while (!result.isBefore(end)) {
+				shiftDays--;
+				result = date.plusDays(shiftDays);
+			}
+			return result;
 		}
 
 		if (!period.isZero())
