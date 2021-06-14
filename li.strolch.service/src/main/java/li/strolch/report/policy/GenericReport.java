@@ -492,21 +492,26 @@ public class GenericReport extends ReportPolicy {
 				}) //
 				.sorted(comparing(StringParameter::getIndex)) //
 				.map(StringParameter::getUom).collect(toList());
+
+		// make sure all types are in the result, even if just empty
+		criteria.forEach(s -> result.addSet(s, Collections.emptySet()));
+
+		int count = 0;
 		while (iter.hasNext()) {
 			Map<String, StrolchRootElement> row = iter.next();
 
-			boolean changed = false;
 			for (String criterion : criteria) {
 				if (row.containsKey(criterion)) {
-					if (result.size(criterion) >= limit)
+					if (result.size(criterion) >= 10)
 						continue;
 
 					result.addElement(criterion, row.get(criterion));
-					changed = true;
 				}
 			}
 
-			if (!changed)
+			// stop if we have enough data, or iterated over "enough"
+			count++;
+			if (count > 10 * result.keySet().size() || result.size() > 1000)
 				break;
 		}
 
