@@ -493,9 +493,6 @@ public class GenericReport extends ReportPolicy {
 				.sorted(comparing(StringParameter::getIndex)) //
 				.map(StringParameter::getUom).collect(toList());
 
-		// make sure all types are in the result, even if just empty
-		criteria.forEach(s -> result.addSet(s, Collections.emptySet()));
-
 		int count = 0;
 		while (iter.hasNext()) {
 			Map<String, StrolchRootElement> row = iter.next();
