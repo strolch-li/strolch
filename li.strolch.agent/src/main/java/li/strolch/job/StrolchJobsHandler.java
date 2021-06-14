@@ -168,7 +168,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 	 */
 	public StrolchJob registerAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
 		StrolchJob job = instantiateJob(strolchJobClass, strolchJobClass.getSimpleName(),
-				strolchJobClass.getSimpleName(), JobMode.Manual);
+				strolchJobClass.getSimpleName(), JobMode.Recurring);
 		job.setConfigureMethod(ConfigureMethod.Programmatic);
 		return register(job).schedule();
 	}
