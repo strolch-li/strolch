@@ -515,7 +515,7 @@ public class GenericReport extends ReportPolicy {
 
 	@Override
 	public Stream<StrolchRootElement> generateFilterCriteria(String type) {
-		return buildStream().filter(row -> row.containsKey(type)).map(row -> row.get(type));
+		return buildStream().filter(row -> row.containsKey(type)).map(row -> row.get(type)).distinct();
 	}
 
 	/**
