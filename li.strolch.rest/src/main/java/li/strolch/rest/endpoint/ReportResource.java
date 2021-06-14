@@ -1,5 +1,6 @@
 package li.strolch.rest.endpoint;
 
+import static java.util.Comparator.comparing;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
@@ -18,7 +19,9 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +30,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.model.Resource;
+import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.StringParameter;
@@ -116,10 +120,16 @@ public class ReportResource {
 				report.getReportPolicy().setI18nData(localeJ);
 
 			MapOfSets<String, StrolchRootElement> criteria = report.generateFilterCriteria(limit);
-			criteria.forEach((type, elements) -> {
+			List<String> types = new ArrayList<>(criteria.keySet());
+			JsonObject finalLocaleJ = localeJ;
+			types.stream().sorted(comparing(type -> {
+				JsonElement translatedJ = finalLocaleJ.get(type);
+				return translatedJ == null ? type : translatedJ.getAsString();
+			})).forEach(type -> {
+				Set<StrolchRootElement> elements = criteria.getSet(type);
 				JsonObject filter = new JsonObject();
 				filter.addProperty(Tags.Json.TYPE, type);
-				filter.add(Tags.Json.VALUES, elements.stream().map(f -> {
+				filter.add(Tags.Json.VALUES, elements.stream().sorted(comparing(StrolchElement::getName)).map(f -> {
 					JsonObject o = new JsonObject();
 					o.addProperty(Tags.Json.ID, f.getId());
 					o.addProperty(Tags.Json.NAME, f.getName());
