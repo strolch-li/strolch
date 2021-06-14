@@ -19,6 +19,7 @@ import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.runtime.StrolchConstants;
 
 /**
  * The {@link StrolchJobsHandler} registers all {@link StrolchJob StrolchJobs}
@@ -37,6 +38,12 @@ public class StrolchJobsHandler extends StrolchComponent {
 		super.start();
 	}
 
+	/**
+	 * Reload the jobs from the {@link Resource Resources} of type {@link StrolchConstants#TYPE_STROLCH_JOB}
+	 *
+	 * @throws Exception
+	 * 		if something goes wrong while instantiating the jobs
+	 */
 	public void reloadJobs() throws Exception {
 		reloadJobs(false);
 	}
@@ -151,6 +158,14 @@ public class StrolchJobsHandler extends StrolchComponent {
 		return strolchJob;
 	}
 
+	/**
+	 * Registers the given job as a recurring job, and schedules it for execution
+	 *
+	 * @param strolchJobClass
+	 * 		the job to instantiate and schedule for execution
+	 *
+	 * @return the instantiated job
+	 */
 	public StrolchJob registerAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
 		StrolchJob job = instantiateJob(strolchJobClass, strolchJobClass.getSimpleName(),
 				strolchJobClass.getSimpleName(), JobMode.Manual);
@@ -158,6 +173,14 @@ public class StrolchJobsHandler extends StrolchComponent {
 		return register(job).schedule();
 	}
 
+	/**
+	 * Registers the given job as a manual job, which can be executed later by a job admin
+	 *
+	 * @param strolchJobClass
+	 * 		the job to register
+	 *
+	 * @return the instantiated job
+	 */
 	public StrolchJob register(Class<? extends StrolchJob> strolchJobClass) {
 		StrolchJob job = instantiateJob(strolchJobClass, strolchJobClass.getSimpleName(),
 				strolchJobClass.getSimpleName(), JobMode.Manual);
@@ -165,6 +188,14 @@ public class StrolchJobsHandler extends StrolchComponent {
 		return register(job);
 	}
 
+	/**
+	 * Registers the given job, not changing its current schedule or type
+	 *
+	 * @param job
+	 * 		the job to register
+	 *
+	 * @return the job
+	 */
 	public StrolchJob register(StrolchJob job) {
 		return internalRegister(job.setConfigureMethod(ConfigureMethod.Programmatic));
 	}
@@ -177,12 +208,34 @@ public class StrolchJobsHandler extends StrolchComponent {
 		return job;
 	}
 
+	/**
+	 * Returns the current list of registered jobs
+	 *
+	 * @param cert
+	 * 		the certificate to assert privilege
+	 * @param source
+	 * 		the source of the request
+	 *
+	 * @return a list of registered jobs
+	 */
 	public List<StrolchJob> getJobs(Certificate cert, String source) {
 		getContainer().getPrivilegeHandler().validate(cert, source)
 				.assertHasPrivilege(StrolchJobsHandler.class.getName());
 		return new ArrayList<>(this.jobs.values());
 	}
 
+	/**
+	 * Returns the job with the given name
+	 *
+	 * @param cert
+	 * 		the certificate to assert privilege
+	 * @param source
+	 * 		the source of the request
+	 * @param jobName
+	 * 		the name of the job to return
+	 *
+	 * @return the job with the requested name
+	 */
 	public StrolchJob getJob(Certificate cert, String source, String jobName) {
 		getContainer().getPrivilegeHandler().validate(cert, source)
 				.assertHasPrivilege(StrolchJobsHandler.class.getName());
