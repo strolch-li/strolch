@@ -2,6 +2,7 @@ package li.strolch.rest.helper;
 
 import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -15,6 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchElementNotFoundException;
+import li.strolch.exception.StrolchException;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
@@ -176,6 +178,18 @@ public class ResponseUtil {
 
 	public static Response toResponse(Status status, Throwable t) {
 		JsonObject response = new JsonObject();
+
+		if (t instanceof StrolchException && ((StrolchException) t).hasI18n()) {
+			StrolchException ex = (StrolchException) t;
+			response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
+		} else {
+			Throwable rootCause = getRootCause(t);
+			if (rootCause instanceof StrolchException && ((StrolchException) rootCause).hasI18n()) {
+				StrolchException ex = (StrolchException) rootCause;
+				response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
+			}
+		}
+
 		response.addProperty(MSG, getExceptionMessageWithCauses(t, false));
 		String json = new Gson().toJson(response);
 		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
