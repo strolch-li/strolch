@@ -100,37 +100,37 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 				break;
 			case XmlConstants.XML_HANDLER_ENCRYPTION: {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
 				getContainerModel().setEncryptionHandlerClassName(className);
 				break;
 			}
 			case XmlConstants.XML_HANDLER_PASSWORD_STRENGTH: {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
 				getContainerModel().setPasswordStrengthHandlerClassName(className);
 				break;
 			}
 			case XmlConstants.XML_HANDLER_PERSISTENCE: {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
 				getContainerModel().setPersistenceHandlerClassName(className);
 				break;
 			}
 			case XmlConstants.XML_HANDLER_USER_CHALLENGE: {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
 				getContainerModel().setUserChallengeHandlerClassName(className);
 				break;
 			}
 			case XmlConstants.XML_HANDLER_SSO: {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
 				getContainerModel().setSsoHandlerClassName(className);
 				break;
 			}
 			case XmlConstants.XML_HANDLER_PRIVILEGE: {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
 				getContainerModel().setPrivilegeHandlerClassName(className);
 				break;
 			}
@@ -180,8 +180,8 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
 			if (qName.equals(XmlConstants.XML_PARAMETER)) {
-				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
-				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
+				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
+				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
 			}
 		}
@@ -202,8 +202,8 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
 			if (qName.equals(XmlConstants.XML_POLICY)) {
-				String policyName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
-				String policyClassName = attributes.getValue(XmlConstants.XML_ATTR_CLASS);
+				String policyName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
+				String policyClassName = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
 
 				getContainerModel().addPolicy(policyName, policyClassName);
 			}

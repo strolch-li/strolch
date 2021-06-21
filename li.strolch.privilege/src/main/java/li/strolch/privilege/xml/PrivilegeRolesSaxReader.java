@@ -36,9 +36,9 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeRolesSaxReader.class);
 
-	private Deque<ElementParser> buildersStack = new ArrayDeque<>();
+	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private List<Role> roles;
+	private final List<Role> roles;
 
 	public PrivilegeRolesSaxReader() {
 		this.roles = new ArrayList<>();
@@ -135,10 +135,10 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.text = new StringBuilder();
 
 			if (qName.equals(XmlConstants.XML_ROLE)) {
-				this.roleName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
+				this.roleName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
 			} else if (qName.equals(XmlConstants.XML_PRIVILEGE)) {
-				this.privilegeName = attributes.getValue(XmlConstants.XML_ATTR_NAME);
-				this.privilegePolicy = attributes.getValue(XmlConstants.XML_ATTR_POLICY);
+				this.privilegeName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
+				this.privilegePolicy = attributes.getValue(XmlConstants.XML_ATTR_POLICY).trim();
 			} else if (qName.equals(XmlConstants.XML_ALLOW) || qName.equals(XmlConstants.XML_DENY) || qName
 					.equals(XmlConstants.XML_ALL_ALLOWED)) {
 				// no-op
@@ -185,7 +185,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 		}
 	}
 
-	class PropertyParser extends ElementParserAdapter {
+	static class PropertyParser extends ElementParserAdapter {
 
 //	      <Property name="organizationalUnit" value="Development" />
 
@@ -195,8 +195,8 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
 			if (qName.equals(XmlConstants.XML_PROPERTY)) {
-				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME);
-				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE);
+				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
+				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
 			} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
 				// NO-OP

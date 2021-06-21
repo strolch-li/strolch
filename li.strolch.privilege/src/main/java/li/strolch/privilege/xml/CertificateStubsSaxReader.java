@@ -61,15 +61,15 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 		case XML_CERTIFICATE:
 
 			CertificateStub stub = new CertificateStub();
-			stub.usage = Usage.valueOf(attributes.getValue(XML_ATTR_USAGE));
-			stub.sessionId = attributes.getValue(XML_ATTR_SESSION_ID);
-			stub.username = attributes.getValue(XML_ATTR_USERNAME);
-			stub.authToken = attributes.getValue(XML_ATTR_AUTH_TOKEN);
-			stub.source = attributes.getValue(XML_ATTR_SOURCE);
-			stub.locale = Locale.forLanguageTag(attributes.getValue(XML_ATTR_LOCALE));
-			stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME));
-			stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS));
-			stub.keepAlive = Boolean.parseBoolean(attributes.getValue(XML_ATTR_KEEP_ALIVE));
+			stub.usage = Usage.valueOf(attributes.getValue(XML_ATTR_USAGE).trim());
+			stub.sessionId = attributes.getValue(XML_ATTR_SESSION_ID).trim();
+			stub.username = attributes.getValue(XML_ATTR_USERNAME).trim();
+			stub.authToken = attributes.getValue(XML_ATTR_AUTH_TOKEN).trim();
+			stub.source = attributes.getValue(XML_ATTR_SOURCE).trim();
+			stub.locale = Locale.forLanguageTag(attributes.getValue(XML_ATTR_LOCALE).trim());
+			stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME).trim());
+			stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS).trim());
+			stub.keepAlive = Boolean.parseBoolean(attributes.getValue(XML_ATTR_KEEP_ALIVE).trim());
 
 			DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
 			DBC.INTERIM.assertNotEmpty("username missing on sessions data!", stub.username);

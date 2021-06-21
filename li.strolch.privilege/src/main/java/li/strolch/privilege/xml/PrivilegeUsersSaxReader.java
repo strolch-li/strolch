@@ -139,8 +139,8 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			this.text = new StringBuilder();
 
 			if (qName.equals(XML_USER)) {
-				this.userId = attributes.getValue(XML_ATTR_USER_ID);
-				this.username = attributes.getValue(XML_ATTR_USERNAME);
+				this.userId = attributes.getValue(XML_ATTR_USER_ID).trim();
+				this.username = attributes.getValue(XML_ATTR_USERNAME).trim();
 
 				String password = attributes.getValue(XML_ATTR_PASSWORD);
 				String salt = attributes.getValue(XML_ATTR_SALT);
@@ -153,10 +153,12 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		private void parsePassword(String passwordS, String salt) {
 
 			if (StringHelper.isNotEmpty(salt))
-				this.salt = StringHelper.fromHexString(salt);
+				this.salt = StringHelper.fromHexString(salt.trim());
 
 			if (StringHelper.isEmpty(passwordS))
 				return;
+
+			passwordS = passwordS.trim();
 
 			if (!passwordS.startsWith("$")) {
 				this.password = StringHelper.fromHexString(passwordS);
@@ -287,8 +289,8 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			switch (qName) {
 			case XML_PROPERTY:
 
-				String key = attributes.getValue(XML_ATTR_NAME);
-				String value = attributes.getValue(XML_ATTR_VALUE);
+				String key = attributes.getValue(XML_ATTR_NAME).trim();
+				String value = attributes.getValue(XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
 				break;
 

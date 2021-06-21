@@ -30,7 +30,7 @@ public class PrivilegeElementFromJsonVisitor {
 		JsonElement nameE = jsonObject.get("name");
 		JsonElement privilegesE = jsonObject.get("privileges");
 
-		String name = nameE == null ? null : nameE.getAsString();
+		String name = nameE == null ? null : nameE.getAsString().trim();
 
 		List<PrivilegeRep> privileges = new ArrayList<>();
 		if (privilegesE != null) {
@@ -51,15 +51,15 @@ public class PrivilegeElementFromJsonVisitor {
 		JsonElement denyListE = privilegeJ.get("denyList");
 		JsonElement allowListE = privilegeJ.get("allowList");
 
-		String privilegeName = privilegeNameE == null ? null : privilegeNameE.getAsString();
-		String policy = policyE == null ? null : policyE.getAsString();
+		String privilegeName = privilegeNameE == null ? null : privilegeNameE.getAsString().trim();
+		String policy = policyE == null ? null : policyE.getAsString().trim();
 		boolean allAllowed = allAllowedE != null && allAllowedE.getAsBoolean();
 
 		Set<String> denyList = new HashSet<>();
 		if (denyListE != null) {
 			JsonArray denyListArr = denyListE.getAsJsonArray();
 			for (JsonElement denyValueE : denyListArr) {
-				denyList.add(denyValueE.getAsString());
+				denyList.add(denyValueE.getAsString().trim());
 			}
 		}
 
@@ -67,7 +67,7 @@ public class PrivilegeElementFromJsonVisitor {
 		if (allowListE != null) {
 			JsonArray allowListArr = allowListE.getAsJsonArray();
 			for (JsonElement allowValueE : allowListArr) {
-				allowList.add(allowValueE.getAsString());
+				allowList.add(allowValueE.getAsString().trim());
 			}
 		}
 
@@ -85,19 +85,19 @@ public class PrivilegeElementFromJsonVisitor {
 		JsonElement rolesE = jsonObject.get("roles");
 		JsonElement propertiesE = jsonObject.get("properties");
 
-		String userId = userIdE == null ? null : userIdE.getAsString();
-		String username = userNameE == null ? null : userNameE.getAsString();
-		String firstname = firstNameE == null ? null : firstNameE.getAsString();
-		String lastname = lastNameE == null ? null : lastNameE.getAsString();
-		UserState userState = userStateE == null ? null : UserState.valueOf(userStateE.getAsString());
-		Locale locale = localeE == null ? null : new Locale(localeE.getAsString());
+		String userId = userIdE == null ? null : userIdE.getAsString().trim();
+		String username = userNameE == null ? null : userNameE.getAsString().trim();
+		String firstname = firstNameE == null ? null : firstNameE.getAsString().trim();
+		String lastname = lastNameE == null ? null : lastNameE.getAsString().trim();
+		UserState userState = userStateE == null ? null : UserState.valueOf(userStateE.getAsString().trim());
+		Locale locale = localeE == null ? null : new Locale(localeE.getAsString().trim());
 
 		Set<String> roles = null;
 		if (rolesE != null) {
 			roles = new HashSet<>();
 			JsonArray rolesArr = rolesE.getAsJsonArray();
 			for (JsonElement role : rolesArr) {
-				roles.add(role.getAsString());
+				roles.add(role.getAsString().trim());
 			}
 		}
 
@@ -107,7 +107,7 @@ public class PrivilegeElementFromJsonVisitor {
 			JsonArray propertiesArr = propertiesE.getAsJsonArray();
 			for (JsonElement propertyE : propertiesArr) {
 				JsonObject property = propertyE.getAsJsonObject();
-				properties.put(property.get("key").getAsString(), property.get("value").getAsString());
+				properties.put(property.get("key").getAsString().trim(), property.get("value").getAsString().trim());
 			}
 		}
 
