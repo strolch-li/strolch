@@ -15,9 +15,11 @@
  */
 package li.strolch.privilege.xml;
 
+import static java.util.Comparator.comparing;
+
 import java.io.File;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.Role;
@@ -30,14 +32,12 @@ import org.w3c.dom.Element;
  */
 public class PrivilegeRolesDomWriter {
 
-	private List<Role> roles;
-	private File modelFile;
+	private final List<Role> roles;
+	private final File modelFile;
 
 	public PrivilegeRolesDomWriter(List<Role> roles, File modelFile) {
 		this.roles = roles;
 		this.modelFile = modelFile;
-
-		this.roles.sort(Comparator.comparing(Role::getName));
 	}
 
 	public void write() {
@@ -47,7 +47,7 @@ public class PrivilegeRolesDomWriter {
 		Element rootElement = doc.createElement(XmlConstants.XML_ROLES);
 		doc.appendChild(rootElement);
 
-		this.roles.forEach(role -> {
+		this.roles.stream().sorted(comparing(role1 -> role1.getName().toLowerCase(Locale.ROOT))).forEach(role -> {
 
 			// create the role element
 			Element roleElement = doc.createElement(XmlConstants.XML_ROLE);
