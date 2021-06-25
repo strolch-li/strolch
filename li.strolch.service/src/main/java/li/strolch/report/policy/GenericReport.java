@@ -508,7 +508,7 @@ public class GenericReport extends ReportPolicy {
 
 			// stop if we have enough data, or iterated over "enough"
 			count++;
-			if (count > 10 * result.keySet().size() || result.size() > 1000)
+			if (count > 1000 || result.size() > 10 * result.keySet().size())
 				break;
 		}
 
