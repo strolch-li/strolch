@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # Your mvn settings.xml:
 # 
@@ -38,6 +38,7 @@ fi
 echo
 echo
 
+current_branch=$(pwb)
 
 # Checkout tag
 echo -e "\nINFO: Checking out tag ${releaseVersion}"
@@ -46,10 +47,18 @@ if ! git checkout ${releaseVersion} ; then
   exit 1
 fi
 
+# cleanup trap
+function cleanup {
+  if ! git checkout ${current_branch} ; then
+    echo "ERROR: Failed to checkout previous branch ${current_branch}"
+    exit 1
+  fi
+}
+trap cleanup EXIT
 
 # Build and deploy
 echo -e "\nINFO: Building and deploying to Maven Central..."
-if ! mvn clean deploy -DskipTests -Pdeploy > /dev/null ; then
+if ! mvn clean deploy -DskipTests -Pdeploy ; then
   echo -e "ERROR: Failed to build and deploy to Maven Central!"
   exit 1
 fi
