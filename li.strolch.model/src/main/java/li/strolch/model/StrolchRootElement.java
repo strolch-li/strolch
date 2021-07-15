@@ -25,6 +25,8 @@ import com.google.gson.JsonObject;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.model.parameter.StringListParameter;
+import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.visitor.SetParameterValueVisitor;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
@@ -82,7 +84,16 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	void setVersion(Version version) throws IllegalArgumentException;
 
 	/**
-	 * Set a relation to the given element by using the given param. Should the parameter not exist, then it will be
+	 * Set a relation to the given element by using the type of the given element as the parameter ID, but lower-casing
+	 * the first letter. Should the {@link StringParameter} not exist, then it will be created
+	 *
+	 * @param element
+	 * 		the element for which to set the relation to
+	 */
+	void setRelation(StrolchRootElement element);
+
+	/**
+	 * Set a relation to the given element by using the given param. Should the {@link StringParameter} not exist, then it will be
 	 * created
 	 *
 	 * @param param
@@ -102,6 +113,26 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * 		the elements for which to set the relations to
 	 */
 	void setRelations(String param, List<? extends StrolchRootElement> elements);
+
+	/**
+	 * Set a relation to the given element by using the type of the given element as the parameter ID, but lower-casing
+	 * the first letter. Should the {@link StringListParameter} not exist, then it will be created
+	 *
+	 * @param element
+	 * 		the element for which to set the relation to
+	 */
+	void addRelation(StrolchRootElement element);
+
+	/**
+	 * Adds a relation to the given element by using the given parameter ID. Should the {@link StringListParameter} not exist,
+	 * then it will be created
+	 *
+	 * @param param
+	 * 		the parameter ID on which to set the relations
+	 * @param element
+	 * 		the element for which to set the relation to
+	 */
+	void addRelation(String param, StrolchRootElement element);
 
 	/**
 	 * Return a clone of this {@link StrolchElement}

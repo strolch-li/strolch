@@ -2,11 +2,14 @@ package li.strolch.model;
 
 import static java.util.Collections.emptyList;
 import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.model.builder.BuilderHelper.buildParamId;
 import static li.strolch.model.builder.BuilderHelper.buildParamName;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 
@@ -26,25 +29,45 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 		if (relationP == null) {
 			String name = buildParamName(param);
 			relationP = new StringParameter(param, name, "");
-
-			switch (element.getObjectType()) {
-			case Tags.RESOURCE:
-				relationP.setInterpretation(INTERPRETATION_RESOURCE_REF);
-				break;
-			case Tags.ORDER:
-				relationP.setInterpretation(INTERPRETATION_ORDER_REF);
-				break;
-			case Tags.ACTIVITY:
-				relationP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
-				break;
-			}
-
-			relationP.setUom(element.getType());
-
+			setInterpretationAndUom(element, relationP);
 			relationsBag().addParameter(relationP);
 		}
 
 		relationP.setValue(element.getId());
+	}
+
+	@Override
+	public void addRelation(StrolchRootElement element) {
+		addRelation(buildParamId(element.getType()), element);
+	}
+
+	@Override
+	public void addRelation(String param, StrolchRootElement element) {
+		StringListParameter relationsP = relationsBag().getParameter(param);
+		if (relationsP == null) {
+			String name = buildParamName(param);
+			relationsP = new StringListParameter(param, name, Collections.emptyList());
+			setInterpretationAndUom(element, relationsP);
+			relationsBag().addParameter(relationsP);
+		}
+
+		relationsP.addValueIfNotContains(element.getId());
+	}
+
+	private void setInterpretationAndUom(StrolchRootElement element, Parameter<?> relationP) {
+		switch (element.getObjectType()) {
+		case Tags.RESOURCE:
+			relationP.setInterpretation(INTERPRETATION_RESOURCE_REF);
+			break;
+		case Tags.ORDER:
+			relationP.setInterpretation(INTERPRETATION_ORDER_REF);
+			break;
+		case Tags.ACTIVITY:
+			relationP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
+			break;
+		}
+
+		relationP.setUom(element.getType());
 	}
 
 	@Override
