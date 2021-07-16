@@ -15,13 +15,13 @@
 
     <issueManagement>
         <system>Github Issues</system>
-        <url>https://github.com/4treesCH/strolch/issues</url>
+        <url>https://github.com/strolch-li/strolch/issues</url>
     </issueManagement>
 
     <scm>
-        <connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
-        <developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
-        <url>https://github.com/4treesCH/strolch</url>
+        <connection>scm:git:https://github.com/strolch-li/strolch.git</connection>
+        <developerConnection>scm:git:https://github.com/strolch-li/strolch.git</developerConnection>
+        <url>https://github.com/strolch-li/strolch</url>
     </scm>
 
     <licenses>
