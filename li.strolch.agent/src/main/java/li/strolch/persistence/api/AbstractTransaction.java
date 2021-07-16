@@ -1403,98 +1403,123 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.objectFilter == null)
 			return;
 
-		List<Object> removed;
-		List<Object> updated;
-		List<Object> added;
+		List<Object> changed;
 
 		/*
 		 * Resources
 		 */
-		removed = this.objectFilter.getRemoved(Tags.RESOURCE);
-		if (!removed.isEmpty()) {
-			for (Object obj : removed) {
-				RemoveResourceCommand cmd = new RemoveResourceCommand(this);
-				cmd.setResource((Resource) obj);
-				addCommand(cmd);
-			}
+		// removed
+		changed = this.objectFilter.getRemoved(Tags.RESOURCE);
+		if (changed.size() == 1) {
+			RemoveResourceCommand cmd = new RemoveResourceCommand(this);
+			cmd.setResource((Resource) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			RemoveResourcesCommand cmd = new RemoveResourcesCommand(this);
+			changed.stream().map(e -> (Resource) e).forEach(cmd::addResource);
+			addCommand(cmd);
 		}
 
-		updated = this.objectFilter.getUpdated(Tags.RESOURCE);
-		if (!updated.isEmpty()) {
-			for (Object obj : updated) {
-				UpdateResourceCommand cmd = new UpdateResourceCommand(this);
-				cmd.setResource((Resource) obj);
-				addCommand(cmd);
-			}
+		// updated
+		changed = this.objectFilter.getUpdated(Tags.RESOURCE);
+		if (changed.size() == 1) {
+			UpdateResourceCommand cmd = new UpdateResourceCommand(this);
+			cmd.setResource((Resource) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			UpdateResourcesCommand cmd = new UpdateResourcesCommand(this);
+			changed.stream().map(e -> (Resource) e).forEach(cmd::addResource);
+			addCommand(cmd);
 		}
 
-		added = this.objectFilter.getAdded(Tags.RESOURCE);
-		if (!added.isEmpty()) {
-			for (Object obj : added) {
-				AddResourceCommand cmd = new AddResourceCommand(this);
-				cmd.setResource((Resource) obj);
-				addCommand(cmd);
-			}
+		// added
+		changed = this.objectFilter.getAdded(Tags.RESOURCE);
+		if (changed.size() == 1) {
+			AddResourceCommand cmd = new AddResourceCommand(this);
+			cmd.setResource((Resource) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			AddResourcesCommand cmd = new AddResourcesCommand(this);
+			changed.stream().map(e -> (Resource) e).forEach(cmd::addResource);
+			addCommand(cmd);
 		}
 
 		/*
 		 * Orders
 		 */
-		removed = this.objectFilter.getRemoved(Tags.ORDER);
-		if (!removed.isEmpty()) {
-			for (Object obj : removed) {
-				RemoveOrderCommand cmd = new RemoveOrderCommand(this);
-				cmd.setOrder((Order) obj);
-				addCommand(cmd);
-			}
+		// removed
+		changed = this.objectFilter.getRemoved(Tags.ORDER);
+		if (changed.size() == 1) {
+			RemoveOrderCommand cmd = new RemoveOrderCommand(this);
+			cmd.setOrder((Order) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			RemoveOrdersCommand cmd = new RemoveOrdersCommand(this);
+			changed.stream().map(e -> (Order) e).forEach(cmd::addOrder);
+			addCommand(cmd);
 		}
 
-		updated = this.objectFilter.getUpdated(Tags.ORDER);
-		if (!updated.isEmpty()) {
-			for (Object obj : updated) {
-				UpdateOrderCommand cmd = new UpdateOrderCommand(this);
-				cmd.setOrder((Order) obj);
-				addCommand(cmd);
-			}
+		// updated
+		changed = this.objectFilter.getUpdated(Tags.ORDER);
+		if (changed.size() == 1) {
+			UpdateOrderCommand cmd = new UpdateOrderCommand(this);
+			cmd.setOrder((Order) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			UpdateOrdersCommand cmd = new UpdateOrdersCommand(this);
+			changed.stream().map(e -> (Order) e).forEach(cmd::addOrder);
+			addCommand(cmd);
 		}
 
-		added = this.objectFilter.getAdded(Tags.ORDER);
-		if (!added.isEmpty()) {
-			for (Object obj : added) {
-				AddOrderCommand cmd = new AddOrderCommand(this);
-				cmd.setOrder((Order) obj);
-				addCommand(cmd);
-			}
+		// added
+		changed = this.objectFilter.getAdded(Tags.ORDER);
+		if (changed.size() == 1) {
+			AddOrderCommand cmd = new AddOrderCommand(this);
+			cmd.setOrder((Order) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			AddOrdersCommand cmd = new AddOrdersCommand(this);
+			changed.stream().map(e -> (Order) e).forEach(cmd::addOrder);
+			addCommand(cmd);
 		}
 
 		/*
 		 * Activities
 		 */
-		removed = this.objectFilter.getRemoved(Tags.ACTIVITY);
-		if (!removed.isEmpty()) {
-			for (Object obj : removed) {
-				RemoveActivityCommand cmd = new RemoveActivityCommand(this);
-				cmd.setActivity((Activity) obj);
-				addCommand(cmd);
-			}
+		// removed
+		changed = this.objectFilter.getRemoved(Tags.ACTIVITY);
+		if (changed.size() == 1) {
+			RemoveActivityCommand cmd = new RemoveActivityCommand(this);
+			cmd.setActivity((Activity) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			RemoveActivitiesCommand cmd = new RemoveActivitiesCommand(this);
+			changed.stream().map(e -> (Activity) e).forEach(cmd::addActivity);
+			addCommand(cmd);
 		}
 
-		updated = this.objectFilter.getUpdated(Tags.ACTIVITY);
-		if (!updated.isEmpty()) {
-			for (Object obj : updated) {
-				UpdateActivityCommand cmd = new UpdateActivityCommand(this);
-				cmd.setActivity((Activity) obj);
-				addCommand(cmd);
-			}
+		// updated
+		changed = this.objectFilter.getUpdated(Tags.ACTIVITY);
+		if (changed.size() == 1) {
+			UpdateActivityCommand cmd = new UpdateActivityCommand(this);
+			cmd.setActivity((Activity) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			UpdateActivitiesCommand cmd = new UpdateActivitiesCommand(this);
+			changed.stream().map(e -> (Activity) e).forEach(cmd::addActivity);
+			addCommand(cmd);
 		}
 
-		added = this.objectFilter.getAdded(Tags.ACTIVITY);
-		if (!added.isEmpty()) {
-			for (Object obj : added) {
-				AddActivityCommand cmd = new AddActivityCommand(this);
-				cmd.setActivity((Activity) obj);
-				addCommand(cmd);
-			}
+		// added
+		changed = this.objectFilter.getAdded(Tags.ACTIVITY);
+		if (changed.size() == 1) {
+			AddActivityCommand cmd = new AddActivityCommand(this);
+			cmd.setActivity((Activity) changed.get(0));
+			addCommand(cmd);
+		} else if (changed.size() > 1) {
+			AddActivitiesCommand cmd = new AddActivitiesCommand(this);
+			changed.stream().map(e -> (Activity) e).forEach(cmd::addActivitiy);
+			addCommand(cmd);
 		}
 
 		// clear, so that we don't do it twice in case of a flush()
