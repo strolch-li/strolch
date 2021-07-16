@@ -1403,44 +1403,42 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.objectFilter == null)
 			return;
 
-		List<Object> changed;
-
 		/*
 		 * Resources
 		 */
 		// removed
-		changed = this.objectFilter.getRemoved(Tags.RESOURCE);
-		if (changed.size() == 1) {
+		List<Resource> changedR = this.objectFilter.getRemoved(Resource.class, Tags.RESOURCE);
+		if (changedR.size() == 1) {
 			RemoveResourceCommand cmd = new RemoveResourceCommand(this);
-			cmd.setResource((Resource) changed.get(0));
+			cmd.setResource(changedR.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedR.size() > 1) {
 			RemoveResourcesCommand cmd = new RemoveResourcesCommand(this);
-			changed.stream().map(e -> (Resource) e).forEach(cmd::addResource);
+			cmd.setResources(changedR);
 			addCommand(cmd);
 		}
 
 		// updated
-		changed = this.objectFilter.getUpdated(Tags.RESOURCE);
-		if (changed.size() == 1) {
+		changedR = this.objectFilter.getUpdated(Resource.class, Tags.RESOURCE);
+		if (changedR.size() == 1) {
 			UpdateResourceCommand cmd = new UpdateResourceCommand(this);
-			cmd.setResource((Resource) changed.get(0));
+			cmd.setResource(changedR.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedR.size() > 1) {
 			UpdateResourcesCommand cmd = new UpdateResourcesCommand(this);
-			changed.stream().map(e -> (Resource) e).forEach(cmd::addResource);
+			cmd.setResources(changedR);
 			addCommand(cmd);
 		}
 
 		// added
-		changed = this.objectFilter.getAdded(Tags.RESOURCE);
-		if (changed.size() == 1) {
+		changedR = this.objectFilter.getAdded(Resource.class, Tags.RESOURCE);
+		if (changedR.size() == 1) {
 			AddResourceCommand cmd = new AddResourceCommand(this);
-			cmd.setResource((Resource) changed.get(0));
+			cmd.setResource((Resource) changedR.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedR.size() > 1) {
 			AddResourcesCommand cmd = new AddResourcesCommand(this);
-			changed.stream().map(e -> (Resource) e).forEach(cmd::addResource);
+			changedR.stream().map(e -> (Resource) e).forEach(cmd::addResource);
 			addCommand(cmd);
 		}
 
@@ -1448,38 +1446,38 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		 * Orders
 		 */
 		// removed
-		changed = this.objectFilter.getRemoved(Tags.ORDER);
-		if (changed.size() == 1) {
+		List<Order> changedO = this.objectFilter.getRemoved(Order.class, Tags.ORDER);
+		if (changedO.size() == 1) {
 			RemoveOrderCommand cmd = new RemoveOrderCommand(this);
-			cmd.setOrder((Order) changed.get(0));
+			cmd.setOrder(changedO.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedO.size() > 1) {
 			RemoveOrdersCommand cmd = new RemoveOrdersCommand(this);
-			changed.stream().map(e -> (Order) e).forEach(cmd::addOrder);
+			cmd.setOrders(changedO);
 			addCommand(cmd);
 		}
 
 		// updated
-		changed = this.objectFilter.getUpdated(Tags.ORDER);
-		if (changed.size() == 1) {
+		changedO = this.objectFilter.getUpdated(Order.class, Tags.ORDER);
+		if (changedO.size() == 1) {
 			UpdateOrderCommand cmd = new UpdateOrderCommand(this);
-			cmd.setOrder((Order) changed.get(0));
+			cmd.setOrder(changedO.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedO.size() > 1) {
 			UpdateOrdersCommand cmd = new UpdateOrdersCommand(this);
-			changed.stream().map(e -> (Order) e).forEach(cmd::addOrder);
+			cmd.setOrders(changedO);
 			addCommand(cmd);
 		}
 
 		// added
-		changed = this.objectFilter.getAdded(Tags.ORDER);
-		if (changed.size() == 1) {
+		changedO = this.objectFilter.getAdded(Order.class, Tags.ORDER);
+		if (changedO.size() == 1) {
 			AddOrderCommand cmd = new AddOrderCommand(this);
-			cmd.setOrder((Order) changed.get(0));
+			cmd.setOrder(changedO.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedO.size() > 1) {
 			AddOrdersCommand cmd = new AddOrdersCommand(this);
-			changed.stream().map(e -> (Order) e).forEach(cmd::addOrder);
+			cmd.setOrders(changedO);
 			addCommand(cmd);
 		}
 
@@ -1487,38 +1485,38 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		 * Activities
 		 */
 		// removed
-		changed = this.objectFilter.getRemoved(Tags.ACTIVITY);
-		if (changed.size() == 1) {
+		List<Activity> changedA = this.objectFilter.getRemoved(Activity.class, Tags.ACTIVITY);
+		if (changedA.size() == 1) {
 			RemoveActivityCommand cmd = new RemoveActivityCommand(this);
-			cmd.setActivity((Activity) changed.get(0));
+			cmd.setActivity(changedA.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedA.size() > 1) {
 			RemoveActivitiesCommand cmd = new RemoveActivitiesCommand(this);
-			changed.stream().map(e -> (Activity) e).forEach(cmd::addActivity);
+			cmd.setActivities(changedA);
 			addCommand(cmd);
 		}
 
 		// updated
-		changed = this.objectFilter.getUpdated(Tags.ACTIVITY);
-		if (changed.size() == 1) {
+		changedA = this.objectFilter.getUpdated(Activity.class, Tags.ACTIVITY);
+		if (changedA.size() == 1) {
 			UpdateActivityCommand cmd = new UpdateActivityCommand(this);
-			cmd.setActivity((Activity) changed.get(0));
+			cmd.setActivity(changedA.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedA.size() > 1) {
 			UpdateActivitiesCommand cmd = new UpdateActivitiesCommand(this);
-			changed.stream().map(e -> (Activity) e).forEach(cmd::addActivity);
+			cmd.setActivities(changedA);
 			addCommand(cmd);
 		}
 
 		// added
-		changed = this.objectFilter.getAdded(Tags.ACTIVITY);
-		if (changed.size() == 1) {
+		changedA = this.objectFilter.getAdded(Activity.class, Tags.ACTIVITY);
+		if (changedA.size() == 1) {
 			AddActivityCommand cmd = new AddActivityCommand(this);
-			cmd.setActivity((Activity) changed.get(0));
+			cmd.setActivity(changedA.get(0));
 			addCommand(cmd);
-		} else if (changed.size() > 1) {
+		} else if (changedA.size() > 1) {
 			AddActivitiesCommand cmd = new AddActivitiesCommand(this);
-			changed.stream().map(e -> (Activity) e).forEach(cmd::addActivitiy);
+			cmd.setActivities(changedA);
 			addCommand(cmd);
 		}
 
