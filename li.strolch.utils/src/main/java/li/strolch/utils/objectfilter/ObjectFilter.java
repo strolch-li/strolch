@@ -17,6 +17,8 @@ package li.strolch.utils.objectfilter;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import li.strolch.utils.collections.MapOfMaps;
 import org.slf4j.Logger;
@@ -477,6 +479,105 @@ public class ObjectFilter {
 	}
 
 	/**
+	 * Streams all objects with the given operation and key
+	 *
+	 * @param operation
+	 * 		the operation to match
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be added.
+	 */
+	public Stream<Object> streamFor(String key, Operation operation) {
+		if (!this.cache.containsMap(key))
+			return Stream.empty();
+		return this.cache.getAllElements(key).stream() //
+				.filter(objectCache -> objectCache.getOperation() == operation) //
+				.map(ObjectCache::getObject);
+	}
+
+	/**
+	 * Streams all objects with the given key
+	 *
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be added.
+	 */
+	public Stream<Object> streamFor(String key) {
+		if (!this.cache.containsMap(key))
+			return Stream.empty();
+		return this.cache.getAllElements(key).stream() //
+				.map(ObjectCache::getObject);
+	}
+
+	/**
+	 * Streams all objects with the given key
+	 *
+	 * @return The list of all objects registered under the given key and that need to be added.
+	 */
+	public <V> Stream<V> streamFor(Class<V> clazz) {
+		return this.cache.stream().flatMap(m -> m.getValue().values().stream()) //
+				.filter(objectCache -> objectCache.getObject().getClass() == clazz) //
+				.map(objectCache -> {
+					@SuppressWarnings("unchecked")
+					V v = (V) objectCache.getObject();
+					return v;
+				});
+	}
+
+	/**
+	 * Streams all objects with the given key
+	 *
+	 * @param clazz
+	 * 		the class to match
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be added.
+	 */
+	public <V> Stream<V> streamFor(Class<V> clazz, String key) {
+		if (!this.cache.containsMap(key))
+			return Stream.empty();
+		return this.cache.getAllElements(key).stream() //
+				.filter(objectCache -> objectCache.getObject().getClass() == clazz) //
+				.map(objectCache -> {
+					@SuppressWarnings("unchecked")
+					V v = (V) objectCache.getObject();
+					return v;
+				});
+	}
+
+	/**
+	 * Streams all objects with the given operation, key and clazz type
+	 *
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be added.
+	 */
+	public <V> Stream<V> streamFor(Class<V> clazz, String key, Operation operation) {
+		return streamFor(key, operation).filter(o -> o.getClass() == clazz) //
+				.map(o -> {
+					@SuppressWarnings("unchecked")
+					V v = (V) o;
+					return v;
+				});
+	}
+
+	/**
+	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
+	 *
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be added.
+	 */
+	public Stream<Object> streamAdded(String key) {
+		return streamFor(key, Operation.ADD);
+	}
+
+	/**
 	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
 	 *
 	 * @param key
@@ -485,16 +586,21 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public List<Object> getAdded(String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<Object> addedObjects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.ADD) {
-				addedObjects.add(objectCache.getObject());
-			}
-		}
-		return addedObjects;
+		return streamAdded(key).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all objects that were registered under the given key and that have as a resulting final action an addition.
+	 *
+	 * @param clazz
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be added.
+	 */
+	public <V> Stream<V> streamAdded(Class<V> clazz, String key) {
+		return streamFor(clazz, key, Operation.ADD);
 	}
 
 	/**
@@ -508,20 +614,19 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be added.
 	 */
 	public <V> List<V> getAdded(Class<V> clazz, String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<V> addedObjects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.ADD) {
-				if (objectCache.getObject().getClass() == clazz) {
-					@SuppressWarnings("unchecked")
-					V object = (V) objectCache.getObject();
-					addedObjects.add(object);
-				}
-			}
-		}
-		return addedObjects;
+		return streamAdded(clazz, key).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all objects that were registered under the given key and that have as a resulting final action an update.
+	 *
+	 * @param key
+	 * 		registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be updated.
+	 */
+	public Stream<Object> streamUpdated(String key) {
+		return streamFor(key, Operation.MODIFY);
 	}
 
 	/**
@@ -533,16 +638,21 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public List<Object> getUpdated(String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<Object> updatedObjects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.MODIFY) {
-				updatedObjects.add(objectCache.getObject());
-			}
-		}
-		return updatedObjects;
+		return streamUpdated(key).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all objects that were registered under the given key and that have as a resulting final action an update.
+	 *
+	 * @param clazz
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * @param key
+	 * 		registration key of the objects to match
+	 *
+	 * @return The list of all objects registered under the given key and that need to be updated.
+	 */
+	public <V> Stream<V> streamUpdated(Class<V> clazz, String key) {
+		return streamFor(clazz, key, Operation.MODIFY);
 	}
 
 	/**
@@ -556,20 +666,19 @@ public class ObjectFilter {
 	 * @return The list of all objects registered under the given key and that need to be updated.
 	 */
 	public <V> List<V> getUpdated(Class<V> clazz, String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<V> updatedObjects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.MODIFY) {
-				if (objectCache.getObject().getClass() == clazz) {
-					@SuppressWarnings("unchecked")
-					V object = (V) objectCache.getObject();
-					updatedObjects.add(object);
-				}
-			}
-		}
-		return updatedObjects;
+		return streamUpdated(clazz, key).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all objects that were registered under the given key that have as a resulting final action their removal.
+	 *
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of object registered under the given key that have, as a final action, removal.
+	 */
+	public Stream<Object> streamRemoved(String key) {
+		return streamFor(key, Operation.REMOVE);
 	}
 
 	/**
@@ -581,16 +690,21 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public List<Object> getRemoved(String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<Object> removedObjects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.REMOVE) {
-				removedObjects.add(objectCache.getObject());
-			}
-		}
-		return removedObjects;
+		return streamRemoved(key).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all objects that were registered under the given key that have as a resulting final action their removal.
+	 *
+	 * @param clazz
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of object registered under the given key that have, as a final action, removal.
+	 */
+	public <V> Stream<V> streamRemoved(Class<V> clazz, String key) {
+		return streamFor(clazz, key, Operation.REMOVE);
 	}
 
 	/**
@@ -604,20 +718,21 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public <V> List<V> getRemoved(Class<V> clazz, String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<V> removedObjects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getOperation() == Operation.REMOVE) {
-				if (objectCache.getObject().getClass() == clazz) {
-					@SuppressWarnings("unchecked")
-					V object = (V) objectCache.getObject();
-					removedObjects.add(object);
-				}
-			}
-		}
-		return removedObjects;
+		return streamRemoved(clazz, key).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all objects that were registered under the given key
+	 *
+	 * @param clazz
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 * @param key
+	 * 		The registration key of the objects to match
+	 *
+	 * @return The list of object registered under the given key that have, as a final action, removal.
+	 */
+	public <V> Stream<V> streamAll(Class<V> clazz, String key) {
+		return streamFor(clazz, key);
 	}
 
 	/**
@@ -631,18 +746,19 @@ public class ObjectFilter {
 	 * @return The list of object registered under the given key that have, as a final action, removal.
 	 */
 	public <V> List<V> getAll(Class<V> clazz, String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<V> objects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getObject().getClass() == clazz) {
-				@SuppressWarnings("unchecked")
-				V object = (V) objectCache.getObject();
-				objects.add(object);
-			}
-		}
-		return objects;
+		return streamAll(clazz, key).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all objects that of the given class
+	 *
+	 * @param clazz
+	 * 		The class type of the object to be retrieved, that acts as an additional filter criterion.
+	 *
+	 * @return The list of all objects that of the given class
+	 */
+	public <V> Stream<V> streamAll(Class<V> clazz) {
+		return streamFor(clazz);
 	}
 
 	/**
@@ -654,16 +770,20 @@ public class ObjectFilter {
 	 * @return The list of all objects that of the given class
 	 */
 	public <V> List<V> getAll(Class<V> clazz) {
-		List<V> objects = new LinkedList<>();
-		Collection<ObjectCache> allObjs = this.cache.getAllElements();
-		for (ObjectCache objectCache : allObjs) {
-			if (objectCache.getObject().getClass() == clazz) {
-				@SuppressWarnings("unchecked")
-				V object = (V) objectCache.getObject();
-				objects.add(object);
-			}
-		}
-		return objects;
+		return streamAll(clazz).collect(Collectors.toList());
+	}
+
+	/**
+	 * Get all the objects that were processed in this transaction, that were registered under the given key. No action
+	 * is associated to the object.
+	 *
+	 * @param key
+	 * 		The registration key for which the objects shall be retrieved
+	 *
+	 * @return The list of objects matching the given key.
+	 */
+	public Stream<Object> streamAll(String key) {
+		return streamFor(key);
 	}
 
 	/**
@@ -676,14 +796,7 @@ public class ObjectFilter {
 	 * @return The list of objects matching the given key.
 	 */
 	public List<Object> getAll(String key) {
-		if (!this.cache.containsMap(key))
-			return Collections.emptyList();
-		List<Object> allObjects = new LinkedList<>();
-		List<ObjectCache> allObjs = this.cache.getAllElements(key);
-		for (ObjectCache objectCache : allObjs) {
-			allObjects.add(objectCache.getObject());
-		}
-		return allObjects;
+		return streamAll(key).collect(Collectors.toList());
 	}
 
 	/**
