@@ -1,11 +1,8 @@
 package li.strolch.execution.command;
 
-import static li.strolch.execution.policy.ActivityArchivalPolicy.DEFAULT_ACTIVITY_ARCHIVAL;
-
 import li.strolch.execution.policy.ActivityArchivalPolicy;
 import li.strolch.model.Locator;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
@@ -39,8 +36,6 @@ public class ArchiveActivityCommand extends Command {
 
 		logger.info("Activity " + activity.getLocator() + " is in state " + activity.getState());
 
-		PolicyDef policyDef = activity.getPolicyDef(ActivityArchivalPolicy.class, DEFAULT_ACTIVITY_ARCHIVAL);
-		ActivityArchivalPolicy archivalPolicy = tx().getPolicy(policyDef);
-		archivalPolicy.archive(activity);
+		tx().getPolicy(activity, ActivityArchivalPolicy.class).archive(activity);
 	}
 }

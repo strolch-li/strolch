@@ -22,6 +22,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
 
@@ -77,9 +78,11 @@ public class AssignActionCommand extends PlanningCommand {
 	@Override
 	public Void visitAction(Action action) {
 
+		PolicyDef planningPolicyDef = action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING);
+
 		// unplan the action
 		if (action.getState() == State.PLANNED) {
-			PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
+			PlanningPolicy planningPolicy = tx().getPolicy(PlanningPolicy.class, planningPolicyDef);
 			planningPolicy.unplan(action);
 		}
 
@@ -88,7 +91,7 @@ public class AssignActionCommand extends PlanningCommand {
 		action.setResourceType(this.targetResourceType);
 
 		// finally plan the action to the assigned resource
-		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
+		PlanningPolicy planningPolicy = tx().getPolicy(PlanningPolicy.class, planningPolicyDef);
 		planningPolicy.plan(action);
 
 		return null;

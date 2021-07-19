@@ -25,7 +25,7 @@ public abstract class ActionExecutionCommand extends BasePlanningAndExecutionCom
 	protected ExecutionPolicy getExecutionPolicy(Action action) {
 		if (this.executionPolicy != null)
 			return this.executionPolicy;
-		return tx().getPolicy(action.getPolicyDef(ExecutionPolicy.class));
+		return tx().getPolicy(action, ExecutionPolicy.class);
 	}
 
 	@Override

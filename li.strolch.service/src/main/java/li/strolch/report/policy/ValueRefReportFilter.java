@@ -20,8 +20,9 @@ public class ValueRefReportFilter extends ReportFilterPolicy {
 	public void init(String value) {
 		super.init(value);
 
-		this.filterPolicy = tx().getPolicy(PolicyDef
-				.valueOf(ReportFilterPolicy.class.getSimpleName(), KeyPolicyDef.XML_PREFIX + this.filterValue));
+		PolicyDef filterPolicyDef = PolicyDef
+				.valueOf(ReportFilterPolicy.class.getSimpleName(), KeyPolicyDef.XML_PREFIX + this.filterValue);
+		this.filterPolicy = tx().getPolicy(ReportFilterPolicy.class, filterPolicyDef);
 	}
 
 	@Override

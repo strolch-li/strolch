@@ -23,6 +23,7 @@ import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -67,9 +68,11 @@ public class ShiftActionCommand extends PlanningCommand {
 	@Override
 	public Void visitAction(Action action) {
 
+		PolicyDef planningPolicyDef = action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING);
+
 		// unplan the action
 		if (action.getState() == State.PLANNED) {
-			PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
+			PlanningPolicy planningPolicy = tx().getPolicy(PlanningPolicy.class, planningPolicyDef);
 			planningPolicy.unplan(action);
 			if (action.getState() == State.CREATED)
 				getConfirmationPolicy(action).toCreated(action);
@@ -82,7 +85,7 @@ public class ShiftActionCommand extends PlanningCommand {
 		}
 
 		// finally plan the action
-		PlanningPolicy planningPolicy = tx().getPolicy(action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING));
+		PlanningPolicy planningPolicy = tx().getPolicy(PlanningPolicy.class, planningPolicyDef);
 		planningPolicy.plan(action);
 		if (action.getState() == State.PLANNED)
 			getConfirmationPolicy(action).toPlanned(action);

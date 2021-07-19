@@ -79,7 +79,7 @@ public class Controller {
 	public ExecutionPolicy refreshExecutionPolicy(StrolchTransaction tx, Action action) {
 		ExecutionPolicy executionPolicy = this.inExecution.computeIfAbsent(action.getLocator(), e -> {
 			Resource resource = tx.getResourceFor(action, true);
-			return tx.getPolicy(resource.getPolicyDef(ExecutionPolicy.class));
+			return tx.getPolicy(resource, ExecutionPolicy.class);
 		});
 
 		// always update the TX and controller
