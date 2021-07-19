@@ -188,7 +188,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	public Iterator<IValueChange<? extends IValue<?>>> changesIterator() {
 		if (this.changes == null)
-			return Collections.<IValueChange<? extends IValue<?>>>emptyList().iterator();
+			return Collections.emptyIterator();
 		return this.changes.iterator();
 	}
 
