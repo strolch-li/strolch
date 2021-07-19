@@ -238,8 +238,25 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the type of policy to return
 	 *
 	 * @return the policy
+	 *
+	 * @deprecated use {@link #getPolicy(Class, PolicyDef)} instead
 	 */
+	@Deprecated
 	<T extends StrolchPolicy> T getPolicy(PolicyDef policyDef);
+
+	/**
+	 * Instantiates the policy using the given {@link PolicyDef}
+	 *
+	 * @param clazz
+	 * 		the type of policy to return
+	 * @param policyDef
+	 * 		the policy definition
+	 * @param <T>
+	 * 		the type of policy to return
+	 *
+	 * @return the policy
+	 */
+	<T extends StrolchPolicy> T getPolicy(Class<T> clazz, PolicyDef policyDef);
 
 	/**
 	 * Instantiates the policy using the given {@link PolicyDef}, or if not available, the default policy
@@ -252,8 +269,27 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the type of policy to return
 	 *
 	 * @return the policy
+	 *
+	 * @deprecated user {@link #getPolicy(Class, PolicyDef, PolicyDef)} instead
 	 */
+	@Deprecated
 	<T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, PolicyDef defaultDef);
+
+	/**
+	 * Instantiates the policy using the given {@link PolicyDef}, or if not available, the default policy
+	 *
+	 * @param clazz
+	 * 		the type of policy to return
+	 * @param policyDef
+	 * 		the policy definition
+	 * @param defaultDef
+	 * 		the default policy definition if the given policy definition is unavailable
+	 * @param <T>
+	 * 		the type of policy to return
+	 *
+	 * @return the policy
+	 */
+	<T extends StrolchPolicy> T getPolicy(Class<T> clazz, PolicyDef policyDef, PolicyDef defaultDef);
 
 	/**
 	 * Returns the currently set {@link TransactionCloseStrategy}
@@ -324,6 +360,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * StrolchTransactionException} which can be thrown by the caller to stop the exception
 	 *
 	 * @param exceptionMessage
+	 * 		the message with which this TX has failed
 	 *
 	 * @return a {@link StrolchTransactionException} to be thrown by the caller
 	 */
@@ -505,7 +542,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchLockException
 	 * 		if something goes wrong while unlocking
 	 */
-	<T extends StrolchRootElement> void releaseLock(Locator locator) throws StrolchLockException;
+	void releaseLock(Locator locator) throws StrolchLockException;
 
 	/**
 	 * Adds the given {@link Command} to the transaction. Using this method guarantees that a {@link Command} is

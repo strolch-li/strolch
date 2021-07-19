@@ -317,7 +317,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public <T extends StrolchRootElement> void releaseLock(Locator locator) throws StrolchLockException {
+	public void releaseLock(Locator locator) throws StrolchLockException {
 		this.realm.releaseLock(locator);
 		this.lockedElements.remove(locator);
 	}
@@ -419,12 +419,24 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	@Deprecated
 	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef) {
 		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, this);
 	}
 
 	@Override
+	public <T extends StrolchPolicy> T getPolicy(Class<T> clazz, PolicyDef policyDef) {
+		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, this);
+	}
+
+	@Override
+	@Deprecated
 	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef, PolicyDef defaultDef) {
+		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, defaultDef, this);
+	}
+
+	@Override
+	public <T extends StrolchPolicy> T getPolicy(Class<T> clazz, PolicyDef policyDef, PolicyDef defaultDef) {
 		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, defaultDef, this);
 	}
 
