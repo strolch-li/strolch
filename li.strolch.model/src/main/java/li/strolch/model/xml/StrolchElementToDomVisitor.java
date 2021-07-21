@@ -15,6 +15,8 @@
  */
 package li.strolch.model.xml;
 
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -170,9 +172,9 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 		Element element = document.createElement(Tags.TIMED_STATE);
 		fillElement(element, (AbstractStrolchElement) timedState);
 
-		if (!timedState.getInterpretation().equals(StrolchModelConstants.INTERPRETATION_NONE))
+		if (!timedState.getInterpretation().equals(INTERPRETATION_NONE))
 			element.setAttribute(Tags.INTERPRETATION, timedState.getInterpretation());
-		if (!timedState.getUom().equals(StrolchModelConstants.UOM_NONE))
+		if (!timedState.getUom().equals(UOM_NONE))
 			element.setAttribute(Tags.UOM, timedState.getUom());
 		if (timedState.isHidden()) {
 			element.setAttribute(Tags.HIDDEN, Boolean.toString(timedState.isHidden()));
@@ -207,9 +209,9 @@ public class StrolchElementToDomVisitor implements StrolchRootElementVisitor<Doc
 		Element element = document.createElement(Tags.PARAMETER);
 		fillElement(element, (AbstractStrolchElement) param);
 
-		if (!param.getInterpretation().equals(StrolchModelConstants.INTERPRETATION_NONE))
+		if (!param.getInterpretation().equals(INTERPRETATION_NONE))
 			element.setAttribute(Tags.INTERPRETATION, param.getInterpretation());
-		if (!param.getUom().equals(StrolchModelConstants.UOM_NONE))
+		if (!param.getUom().equals(UOM_NONE))
 			element.setAttribute(Tags.UOM, param.getUom());
 		if (param.isHidden())
 			element.setAttribute(Tags.HIDDEN, Boolean.toString(param.isHidden()));

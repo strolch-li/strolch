@@ -16,6 +16,7 @@
 package li.strolch.service;
 
 import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.StrolchModelConstants.*;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
@@ -26,7 +27,6 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
-import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.StringListParameter;
@@ -89,12 +89,12 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 			Resource resource3 = ModelGenerator.createResource(resId + "3", resId + "3", type);
 			StringListParameter resRefsP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(resource1.getId(), resource2.getId(), resource3.getId()));
-			resRefsP.setInterpretation(StrolchModelConstants.INTERPRETATION_RESOURCE_REF);
+			resRefsP.setInterpretation(INTERPRETATION_RESOURCE_REF);
 			resRefsP.setUom(type);
 			resource.addParameter(BAG_ID, resRefsP);
 
 			StringParameter resRefP = new StringParameter("refP", "Ref P", resource.getId());
-			resRefP.setInterpretation(StrolchModelConstants.INTERPRETATION_RESOURCE_REF);
+			resRefP.setInterpretation(INTERPRETATION_RESOURCE_REF);
 			resRefP.setUom(type);
 			resource1.addParameter(BAG_ID, resRefP.getClone());
 			resource2.addParameter(BAG_ID, resRefP.getClone());
@@ -107,12 +107,12 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 			Order order3 = ModelGenerator.createOrder(orderId + "3", orderId + "3", type);
 			StringListParameter orderRefsP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(order1.getId(), order2.getId(), order3.getId()));
-			orderRefsP.setInterpretation(StrolchModelConstants.INTERPRETATION_ORDER_REF);
+			orderRefsP.setInterpretation(INTERPRETATION_ORDER_REF);
 			orderRefsP.setUom(type);
 			order.addParameter(BAG_ID, orderRefsP);
 
 			StringParameter orderRefP = new StringParameter("refP", "Ref P", order.getId());
-			orderRefP.setInterpretation(StrolchModelConstants.INTERPRETATION_ORDER_REF);
+			orderRefP.setInterpretation(INTERPRETATION_ORDER_REF);
 			orderRefP.setUom(type);
 			order1.addParameter(BAG_ID, orderRefP.getClone());
 			order2.addParameter(BAG_ID, orderRefP.getClone());
@@ -128,12 +128,12 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 					.createActivity(activityId + "3", activityId + "3", type, TimeOrdering.SERIES);
 			StringListParameter actRefsP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(activity1.getId(), activity2.getId(), activity3.getId()));
-			actRefsP.setInterpretation(StrolchModelConstants.INTERPRETATION_ACTIVITY_REF);
+			actRefsP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
 			actRefsP.setUom(type);
 			activity.addParameter(BAG_ID, actRefsP);
 
 			StringParameter actRefP = new StringParameter("refP", "Ref P", activity.getId());
-			actRefP.setInterpretation(StrolchModelConstants.INTERPRETATION_ACTIVITY_REF);
+			actRefP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
 			actRefP.setUom(type);
 			activity1.addParameter(BAG_ID, actRefP.getClone());
 			activity2.addParameter(BAG_ID, actRefP.getClone());
@@ -306,7 +306,7 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 			Resource resource3 = ModelGenerator.createResource(resId + "3", resId + "3", type);
 			StringListParameter resRefP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(resource1.getId(), resource2.getId(), resource3.getId()));
-			resRefP.setInterpretation(StrolchModelConstants.INTERPRETATION_RESOURCE_REF);
+			resRefP.setInterpretation(INTERPRETATION_RESOURCE_REF);
 			resRefP.setUom(type);
 			resource.addParameter(BAG_ID, resRefP);
 
@@ -317,7 +317,7 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 			Order order3 = ModelGenerator.createOrder(orderId + "3", orderId + "3", type);
 			StringListParameter orderRefP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(order1.getId(), order2.getId(), order3.getId()));
-			orderRefP.setInterpretation(StrolchModelConstants.INTERPRETATION_ORDER_REF);
+			orderRefP.setInterpretation(INTERPRETATION_ORDER_REF);
 			orderRefP.setUom(type);
 			order.addParameter(BAG_ID, orderRefP);
 
@@ -331,7 +331,7 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 					.createActivity(activityId + "3", activityId + "3", type, TimeOrdering.SERIES);
 			StringListParameter actRefP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(activity1.getId(), activity2.getId(), activity3.getId()));
-			actRefP.setInterpretation(StrolchModelConstants.INTERPRETATION_ACTIVITY_REF);
+			actRefP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
 			actRefP.setUom(type);
 			activity.addParameter(BAG_ID, actRefP);
 

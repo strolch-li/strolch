@@ -1,5 +1,8 @@
 package li.strolch.model.xml;
 
+import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+import static li.strolch.model.StrolchModelConstants.DEFAULT_XML_VERSION;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
@@ -7,7 +10,6 @@ import java.io.StringWriter;
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
-import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
@@ -36,8 +38,7 @@ public class StrolchElementToXmlStringVisitor implements StrolchRootElementVisit
 
 			// start document
 			if (this.withDocument)
-				writer.writeStartDocument(StrolchModelConstants.DEFAULT_ENCODING,
-						StrolchModelConstants.DEFAULT_XML_VERSION);
+				writer.writeStartDocument(DEFAULT_ENCODING, DEFAULT_XML_VERSION);
 
 			element.accept(new StrolchElementToSaxWriterVisitor(writer));
 

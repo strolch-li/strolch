@@ -1,5 +1,8 @@
 package li.strolch.model.xml;
 
+import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+import static li.strolch.model.StrolchModelConstants.DEFAULT_XML_VERSION;
+
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -15,7 +18,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
-import li.strolch.model.*;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +118,7 @@ public class StrolchXmlHelper {
 			throws FactoryConfigurationError, XMLStreamException {
 
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
-		XMLStreamWriter writer = factory.createXMLStreamWriter(out, StrolchModelConstants.DEFAULT_ENCODING);
+		XMLStreamWriter writer = factory.createXMLStreamWriter(out, DEFAULT_ENCODING);
 
 		return prepareXmlStreamWriter(writer);
 	}
@@ -122,7 +128,7 @@ public class StrolchXmlHelper {
 
 		writer = new IndentingXMLStreamWriter(writer);
 
-		writer.writeStartDocument(StrolchModelConstants.DEFAULT_ENCODING, StrolchModelConstants.DEFAULT_XML_VERSION);
+		writer.writeStartDocument(DEFAULT_ENCODING, DEFAULT_XML_VERSION);
 		writer.writeStartElement(Tags.STROLCH_MODEL);
 		return writer;
 	}

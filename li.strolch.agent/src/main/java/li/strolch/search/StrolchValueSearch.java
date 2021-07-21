@@ -1,5 +1,7 @@
 package li.strolch.search;
 
+import static li.strolch.model.StrolchModelConstants.INTERNAL;
+
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -37,7 +39,7 @@ public class StrolchValueSearch<T> extends ValueSearch<T> implements Restrictabl
 	 * @return this object for chaining
 	 */
 	public StrolchValueSearch<T> internal() {
-		this.privilegeValue = StrolchModelConstants.INTERNAL;
+		this.privilegeValue = INTERNAL;
 		return this;
 	}
 

@@ -16,6 +16,7 @@
 package li.strolch.agent.impl;
 
 import static java.util.function.Function.identity;
+import static li.strolch.model.StrolchModelConstants.TEMPLATE;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -26,7 +27,6 @@ import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Version;
 import li.strolch.model.parameter.Parameter;
@@ -86,7 +86,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) {
 
-		T t = getBy(tx, StrolchModelConstants.TEMPLATE, type);
+		T t = getBy(tx, TEMPLATE, type);
 		if (assertExists && t == null) {
 			String msg = "The template with type \"{0}\" does not exist!"; //$NON-NLS-1$
 			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type));
@@ -155,7 +155,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 					T t = getBy(tx, type, id, false);
 					if (assertExists && t == null) {
 						String msg = "The element with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
-						throw new StrolchElementNotFoundException(MessageFormat.format(msg, type, id, refP.getLocator()));
+						throw new StrolchElementNotFoundException(
+								MessageFormat.format(msg, type, id, refP.getLocator()));
 					}
 					return t;
 				}) //

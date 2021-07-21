@@ -12,9 +12,4 @@ public abstract class ActivityCreationPolicy extends StrolchPolicy {
 	}
 
 	public abstract Activity create(Order order);
-
-	@Override
-	public void undo() {
-		// nothing to do
-	}
 }
