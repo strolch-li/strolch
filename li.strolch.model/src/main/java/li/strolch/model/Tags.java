@@ -90,6 +90,7 @@ public class Tags {
 		public static final String RESOURCE = Tags.RESOURCE;
 		public static final String ORDER = Tags.ORDER;
 		public static final String ACTIVITY = Tags.ACTIVITY;
+		public static final String ACTION = Tags.ACTION;
 
 		public static final String OBJECT_TYPE = "objectType";
 
@@ -112,7 +113,6 @@ public class Tags {
 		public static final String TIMED_STATES = "timedStates";
 		public static final String VALUES = "values";
 
-		public static final String ACTION = "Action";
 		public static final String RESOURCE_ID = "resourceId";
 		public static final String RESOURCE_NAME = "resourceName";
 		public static final String RESOURCE_TYPE = "resourceType";
