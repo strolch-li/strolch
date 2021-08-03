@@ -136,6 +136,13 @@ public enum State {
 	}
 
 	/**
+	 * @return true if the state is {@link #STOPPED}
+	 */
+	public boolean isStopped() {
+		return this == STOPPED;
+	}
+
+	/**
 	 * @return true if the state is {@link #EXECUTED}
 	 */
 	public boolean isExecuted() {
@@ -268,8 +275,8 @@ public enum State {
 		// execution
 		if (states.contains(EXECUTABLE) || states.contains(EXECUTION))
 			return EXECUTION;
-		if (states.contains(EXECUTED) && (states.contains(CREATED) || states.contains(PLANNING) || states
-				.contains(PLANNED)))
+		if (states.contains(EXECUTED) && (states.contains(CREATED) || states.contains(PLANNING) || states.contains(
+				PLANNED)))
 			return EXECUTION;
 
 		// executed
