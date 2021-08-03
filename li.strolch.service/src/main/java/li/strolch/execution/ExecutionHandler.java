@@ -102,9 +102,20 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * @param realm
 	 * 		the realm where the {@link Activity} resides
 	 * @param activity
-	 * 		the the {@link Activity}
+	 * 		the {@link Activity}
 	 */
 	public abstract void toExecution(String realm, Activity activity);
+
+	/**
+	 * Triggers the execution of the given {@link Activity}'s {@link Locator}. If the {@link Controller} is available,
+	 * then it is triggered
+	 *
+	 * @param realm
+	 * 		the realm where the {@link Activity} resides
+	 * @param activityLoc
+	 * 		the {@link Locator} for the activity to execute
+	 */
+	public abstract void toExecution(String realm, Locator activityLoc);
 
 	/**
 	 * Removes the given {@link Controller} from execution, so it is not executed further

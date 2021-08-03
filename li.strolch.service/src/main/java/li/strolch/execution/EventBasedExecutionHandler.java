@@ -12,13 +12,13 @@ import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.ArchiveActivityCommand;
 import li.strolch.execution.policy.ExecutionPolicy;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -124,6 +124,20 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void toExecution(String realm, Locator activityLoc) {
+		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+		if (state == ExecutionHandlerState.HaltNew)
+			throw new IllegalStateException(
+					"ExecutionHandler state is " + state + ", can not add activities for execution!");
+
+		Controller controller = this.controllers.getElement(realm, activityLoc);
+		if (controller == null)
+			throw new IllegalStateException("No controller registered for activity " + activityLoc);
+
+		toExecution(controller);
+	}
+
+	@Override
 	public void removeFromExecution(Controller controller) {
 		if (this.controllers.removeElement(controller.getRealm(), controller.getLocator()) != null) {
 			logger.info("Removed controller " + controller.getLocator() + " from execution.");
@@ -222,8 +236,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		runAsAgent(ctx -> getContainer().getRealmNames().forEach(realm -> {
 			try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), false)) {
-				Resource executionHandlerConfig = tx
-						.getResourceBy(TYPE_CONFIGURATION, ExecutionHandler.class.getSimpleName());
+				Resource executionHandlerConfig = tx.getResourceBy(TYPE_CONFIGURATION,
+						ExecutionHandler.class.getSimpleName());
 				if (executionHandlerConfig == null) {
 					this.statesByRealm.put(realm, ExecutionHandlerState.Running);
 				} else {
@@ -256,8 +270,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public void setState(Certificate cert, String realm, ExecutionHandlerState state) {
 		try (StrolchTransaction tx = openTx(realm, cert, false)) {
-			Resource executionHandlerConfig = tx
-					.getResourceBy(TYPE_CONFIGURATION, ExecutionHandler.class.getSimpleName());
+			Resource executionHandlerConfig = tx.getResourceBy(TYPE_CONFIGURATION,
+					ExecutionHandler.class.getSimpleName());
 			if (executionHandlerConfig == null) {
 				executionHandlerConfig = new Resource(ExecutionHandler.class.getSimpleName(),
 						"ExecutionHandler Configuration", TYPE_CONFIGURATION);
