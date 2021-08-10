@@ -410,7 +410,7 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	public List<Action> findActionsDeep(Predicate<IActivityElement> predicate) {
-		return getActionsAsFlatList().stream().filter(predicate).collect(toList());
+		return streamActionsDeep().filter(predicate).collect(toList());
 	}
 
 	public List<IActivityElement> getElementsByType(String type) {
@@ -435,6 +435,14 @@ public class Activity extends AbstractStrolchRootElement
 
 	public Stream<IActivityElement> streamElements() {
 		return this.elements.values().stream();
+	}
+
+	public Stream<Action> streamActionsDeep() {
+		return streamElements().flatMap(e -> {
+			if (e.isAction())
+				return Stream.of(e);
+			return e.asActivity().streamActionsDeep();
+		}).map(IActivityElement::asAction);
 	}
 
 	/**
