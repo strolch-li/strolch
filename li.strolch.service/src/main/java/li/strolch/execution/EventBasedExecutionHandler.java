@@ -176,24 +176,23 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			// iterate all activities
 			tx.streamActivities().forEach(activity -> {
 
-				if (activity.isReadOnly())
-					activity = activity.getClone(true);
-
 				// we only want to restart activities which were in execution
 				State state = activity.getState();
 				if (!state.inExecutionPhase())
 					return;
 
-				logger.info("Starting Execution of " + activity.getLocator() + " on realm " + realmName);
+				if (activity.isReadOnly())
+					activity = activity.getClone(true);
 
-				// Activities need to be in state STOPPED to restart
-				if (state == State.ERROR) {
-					activity.getActionsWithState(State.ERROR).forEach(a -> a.setState(State.STOPPED));
-				} else if (state == State.WARNING) {
-					activity.getActionsWithState(State.WARNING).forEach(a -> a.setState(State.STOPPED));
-				} else if (state == State.EXECUTION) {
-					activity.getActionsWithState(State.EXECUTION).forEach(a -> a.setState(State.STOPPED));
-				}
+				logger.info("Restarting Execution of " + activity.getLocator() + " on realm " + realmName);
+
+				// in execution actions need to be in state STOPPED to restart
+				activity.findActionsDeep(a -> a.getState().inExecutionPhase()).forEach(a -> {
+					// but not if is in error:
+					if (state != State.ERROR)
+						a.setState(State.STOPPED);
+				});
+
 				tx.update(activity);
 
 				// register for execution
