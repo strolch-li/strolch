@@ -115,10 +115,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if the state is {@link #EXECUTION}
+	 * @return true if the state is {@link #EXECUTION} or {@link #WARNING}
 	 */
 	public boolean isInExecution() {
-		return this == EXECUTION;
+		return this == EXECUTION || this == WARNING;
 	}
 
 	/**
