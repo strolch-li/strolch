@@ -55,6 +55,10 @@ public class FileHelper {
 	 * 		the directory to which to write the file
 	 * @param prefix
 	 * 		the prefix of the file name
+	 * @param suffix
+	 * 		the prefix of the file name
+	 * @param separateDateSegments
+	 * 		true to separate date segments in sub folders
 	 * @param separateHours
 	 * 		true to have sub folders for each hour
 	 *
@@ -62,6 +66,29 @@ public class FileHelper {
 	 */
 	public static File getTempFile(File tempPath, String prefix, String suffix, boolean separateDateSegments,
 			boolean separateHours) {
+		return getTempFile(tempPath, prefix, suffix, separateDateSegments, separateHours, true);
+	}
+
+	/**
+	 * Generates a path to the given temporary path to write a file separated in sub folders by day using current date
+	 *
+	 * @param tempPath
+	 * 		the directory to which to write the file
+	 * @param prefix
+	 * 		the prefix of the file name
+	 * @param suffix
+	 * 		the prefix of the file name
+	 * @param separateDateSegments
+	 * 		true to separate date segments in sub folders
+	 * @param separateHours
+	 * 		true to have sub folders for each hour
+	 * @param appendMillis
+	 * 		true of append the current milliseconds to the file name
+	 *
+	 * @return the temporary file
+	 */
+	public static File getTempFile(File tempPath, String prefix, String suffix, boolean separateDateSegments,
+			boolean separateHours, boolean appendMillis) {
 
 		LocalDateTime dateTime = LocalDateTime.now();
 		LocalDate localDate = dateTime.toLocalDate();
@@ -75,11 +102,21 @@ public class FileHelper {
 		if (!path.exists() && !path.mkdirs())
 			throw new IllegalStateException("Failed to create path " + path.getAbsolutePath());
 
-		prefix = (isEmpty(prefix) ? "" : prefix + "_");
+		if (appendMillis)
+			prefix = (isEmpty(prefix) ? "" : prefix + "_");
+		else
+			prefix = (isEmpty(prefix) ? "" : prefix);
+
 		suffix = (isEmpty(suffix) ? "" : suffix);
-		if (!suffix.startsWith("."))
+		if (!suffix.startsWith(".") && appendMillis)
 			suffix = "_" + suffix;
-		String fileName = prefix + System.currentTimeMillis() + suffix;
+
+		String fileName;
+		if (appendMillis)
+			fileName = prefix + System.currentTimeMillis() + suffix;
+		else
+			fileName = prefix + suffix;
+
 		return new File(path, fileName);
 	}
 
@@ -344,8 +381,8 @@ public class FileHelper {
 				String fromFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(fromFile));
 				String toFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
-					FileHelper.logger.error(MessageFormat
-							.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
+					FileHelper.logger.error(
+							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
 									fromFileMD5, toFileMD5));
 					toFile.delete();
 
@@ -364,8 +401,8 @@ public class FileHelper {
 			}
 
 		} catch (Exception e) {
-			String msg = MessageFormat
-					.format("Failed to copy path from {0} to + {1} due to:", fromFile, toFile); //$NON-NLS-1$
+			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile,
+					toFile); //$NON-NLS-1$
 			FileHelper.logger.error(msg, e);
 			return false;
 		}
