@@ -160,4 +160,16 @@ public abstract class PolicyDef {
 			throw new StrolchPolicyException("Unhandled PolicyDef from xml value " + xmlValue);
 		}
 	}
+
+	public static PolicyDef getJavaPolicy(Class<?> type, Class<?> impl) {
+		return valueOf(type, JavaPolicyDef.XML_PREFIX + impl.getName());
+	}
+
+	public static PolicyDef getJavaPolicy(Class<?> type, String xmlValue) {
+		return valueOf(type, JavaPolicyDef.XML_PREFIX + xmlValue);
+	}
+
+	public static PolicyDef getKeyPolicy(Class<?> type, String xmlValue) {
+		return valueOf(type, KeyPolicyDef.XML_PREFIX + xmlValue);
+	}
 }
