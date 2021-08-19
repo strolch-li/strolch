@@ -15,23 +15,20 @@
  */
 package li.strolch.service.privilege.users;
 
-import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.model.UserRep;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
+import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNameArgument, PrivilegeUserResult> {
+public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNameArgument, ServiceResult> {
 
 	@Override
-	protected PrivilegeUserResult getResultInstance() {
-		return new PrivilegeUserResult(ServiceResultState.FAILED);
+	protected ServiceResult getResultInstance() {
+		return new ServiceResult(ServiceResultState.FAILED);
 	}
 
 	@Override
@@ -40,24 +37,18 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 	}
 
 	@Override
-	protected PrivilegeUserResult internalDoService(PrivilegeUserNameArgument arg) throws Exception {
+	protected ServiceResult internalDoService(PrivilegeUserNameArgument arg) throws Exception {
 
-		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
-		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
-
-		UserRep user;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_USER)) {
 			tx.setSuppressAudits(true);
 
-			user = privilegeHandler.removeUser(getCertificate(), arg.username);
-			privilegeHandler.persist(getCertificate());
+			PrivilegeRemoveUserCommand cmd = new PrivilegeRemoveUserCommand(tx);
+			cmd.setUsername(arg.username);
+			tx.addCommand(cmd);
 
-			Audit audit = tx
-					.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
-							user.getUsername());
-			tx.getAuditTrail().add(tx, audit);
+			tx.commitOnClose();
 		}
 
-		return new PrivilegeUserResult(user);
+		return ServiceResult.success();
 	}
 }

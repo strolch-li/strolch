@@ -17,6 +17,7 @@ package li.strolch.rest.endpoint;
 
 import static java.util.Comparator.comparing;
 import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
+import static li.strolch.rest.helper.ResponseUtil.toResponse;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
@@ -44,7 +45,6 @@ import li.strolch.privilege.model.UserState;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.StrolchSessionHandler;
-import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.SearchResult;
 import li.strolch.search.ValueSearch;
@@ -168,8 +168,8 @@ public class PrivilegeUsersService {
 		PrivilegeUserNameArgument arg = new PrivilegeUserNameArgument();
 		arg.username = username;
 
-		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
+		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
+		return toResponse(svcResult);
 	}
 
 	@PUT
@@ -255,7 +255,7 @@ public class PrivilegeUsersService {
 			userState = UserState.valueOf(state);
 		} catch (Exception e) {
 			String msg = MessageFormat.format("UserState {0} is not valid!", state);
-			return ResponseUtil.toResponse(msg);
+			return toResponse(msg);
 		}
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
@@ -280,7 +280,7 @@ public class PrivilegeUsersService {
 			locale = new Locale(localeS);
 		} catch (Exception e) {
 			String msg = MessageFormat.format("Locale {0} is not valid!", localeS);
-			return ResponseUtil.toResponse(msg);
+			return toResponse(msg);
 		}
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
@@ -313,7 +313,7 @@ public class PrivilegeUsersService {
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
 		if (svcResult.isNok())
-			return ResponseUtil.toResponse(svcResult);
+			return toResponse(svcResult);
 
 		// if user changes their own password, then invalidate the session
 		if (cert.getUsername().equals(username)) {
@@ -321,7 +321,7 @@ public class PrivilegeUsersService {
 			sessionHandler.invalidate(cert);
 		}
 
-		return ResponseUtil.toResponse();
+		return toResponse();
 	}
 
 	@PUT
@@ -339,7 +339,7 @@ public class PrivilegeUsersService {
 		arg.map.put(Tags.Json.STATE, jsonObject.get(Tags.Json.STATE).getAsString());
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
-		return ResponseUtil.toResponse(svcResult);
+		return toResponse(svcResult);
 	}
 
 	@DELETE
@@ -353,16 +353,15 @@ public class PrivilegeUsersService {
 		arg.username = username;
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
-		return ResponseUtil.toResponse(svcResult);
+		return toResponse(svcResult);
 	}
 
 	private Response handleServiceResult(PrivilegeUserResult svcResult) {
 		if (svcResult.isOk()) {
 			UserRep userRep = svcResult.getUser();
-			return Response
-					.ok(userRep.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
-					.build();
+			return Response.ok(userRep.accept(new PrivilegeElementToJsonVisitor()).toString(),
+					MediaType.APPLICATION_JSON).build();
 		}
-		return ResponseUtil.toResponse(svcResult);
+		return toResponse(svcResult);
 	}
 }
