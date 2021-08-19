@@ -50,11 +50,11 @@ public class PrivilegeRemoveRoleFromUserService
 			tx.setSuppressAudits(true);
 
 			user = privilegeHandler.removeRoleFromUser(getCertificate(), arg.username, arg.rolename);
-			privilegeHandler.persist(getCertificate());
+			if (privilegeHandler.isPersistOnUserDataChanged())
+				privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx
-					.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
-							user.getUsername());
+			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.USER, user.getUsername());
 			tx.getAuditTrail().add(tx, audit);
 		}
 

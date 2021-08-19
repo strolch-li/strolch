@@ -80,6 +80,10 @@ public class PrivilegeUpdateUserRolesService extends AbstractService<JsonService
 			}
 
 			if (changed) {
+
+				if (privilegeHandler.isPersistOnUserDataChanged())
+					privilegeHandler.persist(getCertificate());
+
 				Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
 						StrolchPrivilegeConstants.USER, user.getUsername());
 				tx.getAuditTrail().add(tx, audit);

@@ -51,11 +51,11 @@ public class PrivilegeSetUserLocaleService
 			tx.setSuppressAudits(true);
 
 			user = privilegeHandler.setUserLocale(getCertificate(), arg.username, arg.locale);
-			privilegeHandler.persist(getCertificate());
+			if (privilegeHandler.isPersistOnUserDataChanged())
+				privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx
-					.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
-							user.getUsername());
+			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.USER, user.getUsername());
 			tx.getAuditTrail().add(tx, audit);
 		}
 

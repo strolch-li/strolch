@@ -56,10 +56,11 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_PASSWORD)) {
 			tx.setSuppressAudits(true);
 
-			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer()
-					.getPrivilegeHandler();
+			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 			privilegeHandler.requirePasswordChange(getCertificate(), username);
+			if (privilegeHandler.isPersistOnUserDataChanged())
+				privilegeHandler.persist(getCertificate());
 
 			Audit audit = tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, username);
 			tx.getAuditTrail().add(tx, audit);

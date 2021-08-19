@@ -45,20 +45,19 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD)) {
 			tx.setSuppressAudits(true);
 
-			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer()
-					.getPrivilegeHandler();
+			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 			privilegeHandler.setUserPassword(getCertificate(), arg.username, arg.password);
 
 			// only persist if not setting own password
 			if (!getCertificate().getUsername().equals(arg.username) && getPrivilegeContext().getPrivilegeNames()
 					.contains(PrivilegeHandler.PRIVILEGE_ACTION_PERSIST)) {
-				privilegeHandler.persist(getCertificate());
+				if (privilegeHandler.isPersistOnUserDataChanged())
+					privilegeHandler.persist(getCertificate());
 			}
 
-			Audit audit = tx
-					.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
-							arg.username);
+			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.USER, arg.username);
 			tx.getAuditTrail().add(tx, audit);
 		}
 

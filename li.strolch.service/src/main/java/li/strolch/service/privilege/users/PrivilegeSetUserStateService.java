@@ -50,11 +50,11 @@ public class PrivilegeSetUserStateService extends AbstractService<PrivilegeSetUs
 			tx.setSuppressAudits(true);
 
 			user = privilegeHandler.setUserState(getCertificate(), arg.username, arg.userState);
-			privilegeHandler.persist(getCertificate());
+			if (privilegeHandler.isPersistOnUserDataChanged())
+				privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx
-					.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.USER,
-							user.getUsername());
+			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.USER, user.getUsername());
 			tx.getAuditTrail().add(tx, audit);
 		}
 
