@@ -19,6 +19,7 @@ import static li.strolch.utils.helper.ExceptionHelper.formatException;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.google.gson.JsonObject;
@@ -54,6 +55,18 @@ public class ServiceResult {
 		this.state = state;
 		this.message = message;
 		this.throwable = throwable;
+	}
+
+	public ServiceResult(ServiceResultState state, I18nMessage i18nMessage) {
+		this.state = state;
+		this.message = i18nMessage.getMessage(Locale.getDefault());
+		this.i18nMessage = i18nMessage;
+	}
+
+	public ServiceResult(ServiceResultState state, String message, I18nMessage i18nMessage) {
+		this.state = state;
+		this.message = message;
+		this.i18nMessage = i18nMessage;
 	}
 
 	/**
@@ -116,15 +129,15 @@ public class ServiceResult {
 	}
 
 	public static ServiceResult success() {
-		return new ServiceResult(ServiceResultState.SUCCESS, null, null);
+		return new ServiceResult(ServiceResultState.SUCCESS);
 	}
 
 	public static ServiceResult success(String msg) {
-		return new ServiceResult(ServiceResultState.SUCCESS, msg, null);
+		return new ServiceResult(ServiceResultState.SUCCESS, msg);
 	}
 
 	public static ServiceResult warning(String warning) {
-		return new ServiceResult(ServiceResultState.WARNING, warning, null);
+		return new ServiceResult(ServiceResultState.WARNING, warning);
 	}
 
 	public static ServiceResult warning(String warning, Throwable t) {
@@ -132,7 +145,15 @@ public class ServiceResult {
 	}
 
 	public static ServiceResult error(String error) {
-		return new ServiceResult(ServiceResultState.FAILED, error, null);
+		return new ServiceResult(ServiceResultState.FAILED, error);
+	}
+
+	public static ServiceResult error(I18nMessage i18nMessage) {
+		return new ServiceResult(ServiceResultState.FAILED, i18nMessage);
+	}
+
+	public static ServiceResult error(String message, I18nMessage i18nMessage) {
+		return new ServiceResult(ServiceResultState.FAILED, message, i18nMessage);
 	}
 
 	public static ServiceResult failed(String error, Throwable t) {
@@ -190,6 +211,10 @@ public class ServiceResult {
 
 	public I18nMessage getI18nMessage() {
 		return this.i18nMessage;
+	}
+
+	public void setI18nMessage(I18nMessage i18nMessage) {
+		this.i18nMessage = i18nMessage;
 	}
 
 	public JsonObject toJson() {

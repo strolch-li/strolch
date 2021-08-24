@@ -25,6 +25,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.UserMessageException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.SystemAction;
@@ -572,6 +573,10 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 			result.setState(ServiceResultState.EXCEPTION);
 			result.setMessage(e.getMessage());
 			result.setThrowable(e);
+
+			if (e instanceof UserMessageException)
+				result.setI18nMessage(((UserMessageException) e).getI18nMsg());
+
 			return result;
 		}
 	}
