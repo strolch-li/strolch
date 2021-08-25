@@ -185,11 +185,7 @@ public class Controller {
 				Action action = this.activity.getElementByLocator(actionLoc);
 
 				// set this action to executed
-				SetActionToExecutedCommand command = new SetActionToExecutedCommand(tx);
-				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
-				command.setAction(action);
-				command.validate();
-				command.doCommand();
+				toExecuted(tx, action);
 
 				updateObservers();
 
@@ -205,6 +201,22 @@ public class Controller {
 		});
 
 		this.executionHandler.triggerExecution(this.realm);
+	}
+
+	/**
+	 * Completes the execution of the given {@link Action}
+	 *
+	 * @param tx
+	 * 		the TX
+	 * @param action
+	 * 		the {@link Action} to set to executed
+	 */
+	public void toExecuted(StrolchTransaction tx, Action action) throws Exception {
+		SetActionToExecutedCommand command = new SetActionToExecutedCommand(tx);
+		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
+		command.setAction(action);
+		command.validate();
+		command.doCommand();
 	}
 
 	/**
@@ -224,17 +236,29 @@ public class Controller {
 				Action action = this.activity.getElementByLocator(actionLoc);
 
 				// set this action to executed
-				SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
-				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
-				command.setAction(action);
-				command.validate();
-				command.doCommand();
+				toStopped(tx, action);
 
 				tx.commitOnClose();
 			}
 		});
 
 		updateObservers();
+	}
+
+	/**
+	 * Sets the state of the {@link Action} to {@link State#STOPPED}
+	 *
+	 * @param tx
+	 * 		the TX
+	 * @param action
+	 * 		the {@link Action} to set to stopped
+	 */
+	public void toStopped(StrolchTransaction tx, Action action) throws Exception {
+		SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
+		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
+		command.setAction(action);
+		command.validate();
+		command.doCommand();
 	}
 
 	/**
@@ -253,18 +277,30 @@ public class Controller {
 
 				Action action = this.activity.getElementByLocator(actionLoc);
 
-				// set this action to executed
-				SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
-				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
-				command.setAction(action);
-				command.validate();
-				command.doCommand();
+				// set this action to error
+				toError(tx, action);
 
 				tx.commitOnClose();
 			}
 		});
 
 		updateObservers();
+	}
+
+	/**
+	 * Sets the state of the {@link Action} to {@link State#ERROR}
+	 *
+	 * @param tx
+	 * 		the TX
+	 * @param action
+	 * 		the {@link Action} to set to error
+	 */
+	public void toError(StrolchTransaction tx, Action action) throws Exception {
+		SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
+		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
+		command.setAction(action);
+		command.validate();
+		command.doCommand();
 	}
 
 	/**
@@ -283,18 +319,30 @@ public class Controller {
 
 				Action action = this.activity.getElementByLocator(actionLoc);
 
-				// set this action to executed
-				SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
-				command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
-				command.setAction(action);
-				command.validate();
-				command.doCommand();
+				// set this action to warning
+				toWarning(tx, action);
 
 				tx.commitOnClose();
 			}
 		});
 
 		updateObservers();
+	}
+
+	/**
+	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#WARNING}
+	 *
+	 * @param tx
+	 * 		the TX
+	 * @param action
+	 * 		the {@link Action} to set to error
+	 */
+	public void toWarning(StrolchTransaction tx, Action action) throws Exception {
+		SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
+		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
+		command.setAction(action);
+		command.validate();
+		command.doCommand();
 	}
 
 	/**
@@ -366,7 +414,7 @@ public class Controller {
 		}
 	}
 
-	private void updateObservers() {
+	public void updateObservers() {
 		StrolchRealm realm = this.executionHandler.getContainer().getRealm(this.realm);
 		if (!realm.isUpdateObservers())
 			return;
