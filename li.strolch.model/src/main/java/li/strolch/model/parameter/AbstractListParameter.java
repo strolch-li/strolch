@@ -93,6 +93,8 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 
 	@Override
 	public E getValue(int index) {
+		if (this.value.isEmpty() || this.value.size() < index)
+			throw new IllegalStateException("No value at index " + index + " for " + getLocator());
 		return this.value.get(index);
 	}
 
