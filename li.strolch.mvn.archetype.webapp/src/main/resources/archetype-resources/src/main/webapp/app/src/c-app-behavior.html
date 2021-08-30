@@ -86,8 +86,9 @@
                 title: 'serverNotAvailable',
                 line1: 'serverNotAvailableMsg',
                 cancelable: false,
-                callback: function () {
-                    this.reconnect();
+                callback: function (confirmed) {
+                    if (confirmed)
+                        this.reconnect();
                 }.bind(this)
             });
         },
@@ -99,7 +100,8 @@
                     title: 'sessionInvalid',
                     line1: 'sessionInvalidConfirmNavToLogin',
                     cancelable: false,
-                    callback: function () {
+                    callback: function (confirmed) {
+                        if (!confirmed) return;
                         this.deleteCookie('strolch.authorization');
                         this.set("authTokenValid", false);
                     }.bind(this)
