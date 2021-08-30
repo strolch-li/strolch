@@ -1824,7 +1824,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			sb.append(", close="); //$NON-NLS-1$
 			sb.append(formatNanoDuration(closeDuration));
 		}
-		logger.error(sb.toString());
+		logger.warn(sb.toString());
 	}
 
 	private void handleFailure(boolean throwEx, long closeStartNanos, Exception e) {

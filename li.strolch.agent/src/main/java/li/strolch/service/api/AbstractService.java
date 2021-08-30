@@ -570,12 +570,15 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 
 		} catch (Exception e) {
 			U result = getResultInstance();
-			result.setState(ServiceResultState.EXCEPTION);
 			result.setMessage(e.getMessage());
-			result.setThrowable(e);
 
-			if (e instanceof UserMessageException)
+			if (e instanceof UserMessageException) {
+				result.setState(ServiceResultState.WARNING);
 				result.setI18nMessage(((UserMessageException) e).getI18nMsg());
+			} else {
+				result.setState(ServiceResultState.FAILED);
+				result.setThrowable(e);
+			}
 
 			return result;
 		}
