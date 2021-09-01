@@ -124,7 +124,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		if (this.reloadSessions) {
 
-			persistSessions();
+			if (this.privilegeHandler != null)
+				persistSessions();
 
 		} else if (this.certificateMap != null) {
 			synchronized (this.certificateMap) {
