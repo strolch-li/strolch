@@ -42,11 +42,11 @@ public class ISO8601 implements DateFormat {
 
 	public static final Date EMPTY_VALUE = parseToDate("-");
 
-	public static final ZonedDateTime EMPTY_VALUE_ZONED_DATE = ZonedDateTime
-			.ofInstant(EMPTY_VALUE.toInstant(), systemDefault());
+	public static final ZonedDateTime EMPTY_VALUE_ZONED_DATE = ZonedDateTime.ofInstant(EMPTY_VALUE.toInstant(),
+			systemDefault());
 
-	public static final LocalDateTime EMPTY_VALUE_LOCAL_DATE = LocalDateTime
-			.ofInstant(EMPTY_VALUE.toInstant(), systemDefault());
+	public static final LocalDateTime EMPTY_VALUE_LOCAL_DATE = LocalDateTime.ofInstant(EMPTY_VALUE.toInstant(),
+			systemDefault());
 
 	private static final DateTimeFormatter _LOCAL_DATE_TIME_SECONDS;
 
@@ -124,7 +124,7 @@ public class ISO8601 implements DateFormat {
 
 	@Override
 	public String format(long timePoint) {
-		if (timePoint == Long.MAX_VALUE || timePoint == Long.MIN_VALUE)
+		if (timePoint == Long.MAX_VALUE || timePoint == Long.MIN_VALUE || timePoint == 0L)
 			return "-";
 
 		try {
