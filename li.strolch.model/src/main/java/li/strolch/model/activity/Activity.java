@@ -539,7 +539,7 @@ public class Activity extends AbstractStrolchRootElement
 	 */
 	public Iterator<Entry<String, IActivityElement>> elementIterator() {
 		if (this.elements == null)
-			return Collections.<String, IActivityElement>emptyMap().entrySet().iterator();
+			return Collections.emptyIterator();
 		return this.elements.entrySet().iterator();
 	}
 
@@ -548,7 +548,7 @@ public class Activity extends AbstractStrolchRootElement
 	 */
 	public Stream<Entry<String, IActivityElement>> elementStream() {
 		if (this.elements == null)
-			return Collections.<String, IActivityElement>emptyMap().entrySet().stream();
+			return Stream.empty();
 		return this.elements.entrySet().stream();
 	}
 
@@ -564,8 +564,8 @@ public class Activity extends AbstractStrolchRootElement
 			return start;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
 		while (elementIterator.hasNext()) {
-			IActivityElement action = elementIterator.next().getValue();
-			start = Math.min(start, action.getStart());
+			IActivityElement element = elementIterator.next().getValue();
+			start = Math.min(start, element.getStart());
 		}
 		return start;
 	}
@@ -577,8 +577,8 @@ public class Activity extends AbstractStrolchRootElement
 			return end;
 		Iterator<Entry<String, IActivityElement>> elementIterator = elementIterator();
 		while (elementIterator.hasNext()) {
-			IActivityElement action = elementIterator.next().getValue();
-			end = Math.max(end, action.getEnd());
+			IActivityElement element = elementIterator.next().getValue();
+			end = Math.max(end, element.getEnd());
 		}
 		return end;
 	}
