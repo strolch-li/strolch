@@ -15,8 +15,10 @@
  */
 package li.strolch.utils.helper;
 
+import static java.util.Collections.emptySet;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.normalizeLength;
+import static li.strolch.utils.helper.TempFileOptions.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -27,9 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import li.strolch.utils.DataUnit;
 import org.slf4j.Logger;
@@ -49,7 +49,8 @@ public class FileHelper {
 	private static final DateTimeFormatter nonSeparatedDtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	/**
-	 * Generates a path to the given temporary path to write a file separated in sub folders by day using current date
+	 * <p>Generates a path to the given temporary path to write a file separated in sub folders by day using current
+	 * date without any options enabled</p>
 	 *
 	 * @param tempPath
 	 * 		the directory to which to write the file
@@ -57,20 +58,24 @@ public class FileHelper {
 	 * 		the prefix of the file name
 	 * @param suffix
 	 * 		the prefix of the file name
-	 * @param separateDateSegments
-	 * 		true to separate date segments in sub folders
-	 * @param separateHours
-	 * 		true to have sub folders for each hour
 	 *
 	 * @return the temporary file
 	 */
-	public static File getTempFile(File tempPath, String prefix, String suffix, boolean separateDateSegments,
-			boolean separateHours) {
-		return getTempFile(tempPath, prefix, suffix, separateDateSegments, separateHours, true);
+	public static File getTempFile(File tempPath, String prefix, String suffix) {
+		return getTempFile(tempPath, prefix, suffix, emptySet());
 	}
 
 	/**
-	 * Generates a path to the given temporary path to write a file separated in sub folders by day using current date
+	 * <p>Generates a path to the given temporary path to write a file separated in sub folders by day using current
+	 * date</p>
+	 *
+	 * <p>The options can be one of:</p>
+	 * <ul>
+	 *     <li>{@link TempFileOptions#APPEND_MILLIS}</li>
+	 *     <li>{@link TempFileOptions#SEPARATE_DATE_SEGMENTS}</li>
+	 *     <li>{@link TempFileOptions#SEPARATE_HOURS}</li>
+	 *     <li>{@link TempFileOptions#WITH_HOURS}</li>
+	 * </ul>
 	 *
 	 * @param tempPath
 	 * 		the directory to which to write the file
@@ -78,30 +83,33 @@ public class FileHelper {
 	 * 		the prefix of the file name
 	 * @param suffix
 	 * 		the prefix of the file name
-	 * @param separateDateSegments
-	 * 		true to separate date segments in sub folders
-	 * @param separateHours
-	 * 		true to have sub folders for each hour
-	 * @param appendMillis
-	 * 		true of append the current milliseconds to the file name
+	 * @param options
+	 * 		the option bits
 	 *
 	 * @return the temporary file
 	 */
-	public static File getTempFile(File tempPath, String prefix, String suffix, boolean separateDateSegments,
-			boolean separateHours, boolean appendMillis) {
+	public static File getTempFile(File tempPath, String prefix, String suffix, Set<TempFileOptions> options) {
 
 		LocalDateTime dateTime = LocalDateTime.now();
 		LocalDate localDate = dateTime.toLocalDate();
 
+		boolean separateDateSegments = options.contains(SEPARATE_DATE_SEGMENTS);
 		String date = separateDateSegments ? localDate.format(separatedDtf) : localDate.format(nonSeparatedDtf);
 
-		String currentHour = normalizeLength(String.valueOf(LocalTime.now().getHour()), 2, true, '0');
-		String pathS = date + (separateHours ? "/" : "_") + currentHour;
+		String pathS;
+		if (options.contains(WITH_HOURS)) {
+			boolean separateHours = options.contains(SEPARATE_HOURS);
+			String currentHour = normalizeLength(String.valueOf(LocalTime.now().getHour()), 2, true, '0');
+			pathS = date + (separateHours ? "/" : "_") + currentHour;
+		} else {
+			pathS = date;
+		}
 
 		File path = new File(tempPath, pathS);
 		if (!path.exists() && !path.mkdirs())
 			throw new IllegalStateException("Failed to create path " + path.getAbsolutePath());
 
+		boolean appendMillis = options.contains(APPEND_MILLIS);
 		if (appendMillis)
 			prefix = (isEmpty(prefix) ? "" : prefix + "_");
 		else

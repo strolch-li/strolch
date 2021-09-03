@@ -15,6 +15,8 @@
  */
 package li.strolch.utils.helper;
 
+import static li.strolch.utils.helper.FileHelper.getTempFile;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -29,6 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.util.Set;
 
 import li.strolch.utils.RemoveCRFilterWriter;
 import li.strolch.utils.exceptions.XmlException;
@@ -290,8 +293,8 @@ public class XmlHelper {
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
 			transformer.setOutputProperty(OutputKeys.ENCODING, docEncoding);
-			transformer
-					.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-1$ //$NON-NLS-2$
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount",
+					"2"); //$NON-NLS-1$ //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
@@ -329,11 +332,9 @@ public class XmlHelper {
 		}
 	}
 
-	public static void marshallTempFile(File tempPath, String prefix, boolean separateDateSegments,
-			boolean separateHours, Object object) throws Exception {
-
-		File dataFile = FileHelper.getTempFile(tempPath, prefix, ".xml", separateDateSegments, separateHours);
-		marshall(dataFile, object);
+	public static void marshallTempFile(File tempPath, String prefix, Set<TempFileOptions> options, Object object)
+			throws Exception {
+		marshall(getTempFile(tempPath, prefix, ".xml", options), object);
 	}
 
 	/**
