@@ -20,7 +20,6 @@ import java.util.Set;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 
@@ -29,7 +28,7 @@ import li.strolch.utils.collections.DateRange;
  */
 public class NoStrategyAuditTrail implements AuditTrail {
 
-	private String realm;
+	private final String realm;
 
 	public NoStrategyAuditTrail(String realm) {
 		this.realm = realm;
@@ -103,10 +102,5 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	@Override
 	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
 		return 0;
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
-		throw new IllegalStateException("Audit trail is not enabled for realm " + this.realm);
 	}
 }

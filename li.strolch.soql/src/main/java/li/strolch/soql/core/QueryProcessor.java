@@ -4,7 +4,6 @@ import java.util.*;
 
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
-import li.strolch.model.query.StrolchElementQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.search.ActivitySearch;
 import li.strolch.search.OrderSearch;
@@ -25,9 +24,6 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  * @author msmock
  */
 public class QueryProcessor {
-
-	// Map of queries to retrieve the input objects
-	protected Map<String, StrolchElementQuery<?>> queries;
 
 	// Map of entities the input objects are taken from
 	private Map<String, List<? extends StrolchRootElement>> inputCollections;

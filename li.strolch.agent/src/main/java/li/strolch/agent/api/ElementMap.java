@@ -364,8 +364,6 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * @param element
 	 * 		the element to update
 	 *
-	 * @return the replaced element
-	 *
 	 * @throws StrolchPersistenceException
 	 * 		if the element does not exist
 	 */
@@ -378,8 +376,6 @@ public interface ElementMap<T extends StrolchRootElement> {
 	 * 		the {@link StrolchTransaction} instance
 	 * @param elements
 	 * 		the elements to update
-	 *
-	 * @return the replaced elements
 	 *
 	 * @throws StrolchPersistenceException
 	 * 		if any of the elements don't yet exist

@@ -30,18 +30,10 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditVisitor;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.policy.PolicyDef;
-import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.query.AuditQuery;
-import li.strolch.model.query.OrderQuery;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.visitor.ActivityVisitor;
-import li.strolch.model.visitor.OrderVisitor;
-import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
@@ -236,10 +228,10 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		the element from which to retrieve the {@link PolicyDef
 	 * @param <T>
 	 * 		the type of policy to return
+	 * @param clazz
+	 * 		the type of policy to return
 	 *
 	 * @return the policy
-	 * @param clazz
- * 		the type of policy to return
 	 */
 	<T extends StrolchPolicy> T getPolicy(PolicyContainer element, Class<T> clazz);
 
@@ -623,60 +615,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the new audit
 	 */
 	Audit auditFrom(AccessType accessType, StrolchRootElement element);
-
-	/**
-	 * <p>
-	 * Performs the given {@link OrderQuery} and each returned {@link Order} is passed through the {@link OrderVisitor}
-	 * attached to the {@link OrderQuery} and the return value of the visitor is added to the return list
-	 * </p>
-	 *
-	 * @param query
-	 * 		the query to perform
-	 *
-	 * @return the result list of elements as returned by the {@link OrderVisitor}, never null
-	 */
-	<U> List<U> doQuery(OrderQuery<U> query);
-
-	/**
-	 * <p>
-	 * Performs the given {@link ResourceQuery} and each returned {@link Resource} is passed through the {@link
-	 * ResourceVisitor} attached to the {@link ResourceQuery} and the return value of the visitor is added to the return
-	 * list
-	 * </p>
-	 *
-	 * @param query
-	 * 		the query to perform
-	 *
-	 * @return the result list of elements as returned by the {@link ResourceVisitor}, never null
-	 */
-	<U> List<U> doQuery(ResourceQuery<U> query);
-
-	/**
-	 * <p>
-	 * Performs the given {@link ActivityQuery} and each returned {@link Activity} is passed through the {@link
-	 * ActivityVisitor} attached to the {@link ActivityQuery} and the return value of the visitor is added to the return
-	 * list
-	 * </p>
-	 *
-	 * @param query
-	 * 		the query to perform
-	 *
-	 * @return the result list of elements as returned by the {@link ActivityVisitor}, never null
-	 */
-	<U> List<U> doQuery(ActivityQuery<U> query);
-
-	/**
-	 * <p>
-	 * Performs the given {@link AuditQuery} and each returned {@link Audit} is passed through the {@link AuditVisitor}
-	 * attached to the {@link AuditQuery} and the return value of the visitor is added to the return list
-	 * </p>
-	 *
-	 * @param query
-	 * 		the query to perform
-	 *
-	 * @return the result list of elements as returned by the {@link AuditVisitor}, never null
-	 */
-	<U> List<U> doQuery(AuditQuery<U> query);
 
 	/**
 	 * <p>

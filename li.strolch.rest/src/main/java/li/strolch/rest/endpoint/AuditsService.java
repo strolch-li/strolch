@@ -16,21 +16,19 @@
 package li.strolch.rest.endpoint;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.JsonArray;
-import li.strolch.model.audit.Audit;
-import li.strolch.model.json.AuditToJsonVisitor;
-import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.model.AuditQueryData;
-import li.strolch.rest.model.visitor.ToAuditQueryVisitor;
 
 @Path("strolch/audits")
 public class AuditsService {
@@ -50,21 +48,6 @@ public class AuditsService {
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 			JsonArray dataJ = new JsonArray();
 			tx.getAuditTrail().getTypes(tx).forEach(dataJ::add);
-			return Response.ok(dataJ.toString(), MediaType.APPLICATION_JSON).build();
-		}
-	}
-
-	@GET
-	@Path("query")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response queryAudits(@BeanParam AuditQueryData query, @Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
-			AuditQuery<Audit> auditQuery = new ToAuditQueryVisitor().create(query);
-			JsonArray dataJ = new JsonArray();
-			tx.getAuditTrail().doQuery(tx, auditQuery).forEach(a -> a.accept(new AuditToJsonVisitor()));
 			return Response.ok(dataJ.toString(), MediaType.APPLICATION_JSON).build();
 		}
 	}

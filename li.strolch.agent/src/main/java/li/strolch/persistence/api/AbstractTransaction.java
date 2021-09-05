@@ -1,18 +1,3 @@
-/*
- * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package li.strolch.persistence.api;
 
 import static li.strolch.agent.api.StrolchAgent.getUniqueId;
@@ -28,7 +13,6 @@ import java.util.stream.Stream;
 
 import li.strolch.agent.api.*;
 import li.strolch.agent.impl.*;
-import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.handler.operationslog.OperationsLog;
@@ -45,7 +29,6 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.model.policy.PolicyDef;
-import li.strolch.model.query.*;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.policy.PolicyHandler;
@@ -58,7 +41,6 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
-import li.strolch.utils.I18nMessage;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -73,10 +55,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractTransaction.class);
 
-	private ComponentContainer container;
-	private PrivilegeHandler privilegeHandler;
-
-	private InternalStrolchRealm realm;
+	private final ComponentContainer container;
+	private final PrivilegeHandler privilegeHandler;
+	private final InternalStrolchRealm realm;
+	private final TransactionResult txResult;
 
 	private ObjectFilter objectFilter;
 	private MapOfMaps<String, String, Resource> resourceCache;
@@ -88,19 +70,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
 	private boolean suppressAuditsForAudits;
-	private TransactionResult txResult;
 
 	private List<Command> commands;
-	private List<Command> flushedCommands;
-	private Set<Locator> lockedElements;
+	private final List<Command> flushedCommands;
+	private final Set<Locator> lockedElements;
 
 	private AuditingOrderMap orderMap;
 	private AuditingResourceMap resourceMap;
 	private AuditingActivityMap activityMap;
 	private AuditingAuditMapFacade auditTrail;
 
-	private String action;
-	private Certificate certificate;
+	private final String action;
+	private final Certificate certificate;
 	private PrivilegeContext privilegeContext;
 
 	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate, String action,
@@ -444,64 +425,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public <T extends StrolchPolicy> T getPolicy(Class<T> clazz, PolicyDef policyDef, PolicyDef defaultDef) {
 		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, defaultDef, this);
-	}
-
-	private void assertQueryAllowed(StrolchQuery query) {
-		try {
-			getPrivilegeContext().validateAction(query);
-		} catch (AccessDeniedException e) {
-
-			String username = getCertificate().getUsername();
-			if (getContainer().hasComponent(OperationsLog.class)) {
-				String realmName = getRealmName();
-				String queryName = query.getPrivilegeValue().equals(INTERNAL) ?
-						(getClass().getName() + " (INTERNAL)") :
-						query.getPrivilegeValue().toString();
-				LogMessage logMessage = new LogMessage(realmName, username,
-						Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), query.getPrivilegeName(),
-								queryName), LogSeverity.Exception, LogMessageState.Information,
-						ResourceBundle.getBundle("strolch-agent"), "agent.query.failed.access.denied")
-						.value("user", username).value("query", queryName).withException(e);
-
-				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
-				operationsLog.addMessage(logMessage);
-			}
-
-			String queryName = query.getPrivilegeValue().equals(INTERNAL) ?
-					(getClass().getSimpleName() + " (INTERNAL)") :
-					query.getClass().getSimpleName();
-			I18nMessage i18n = new I18nMessage(ResourceBundle.getBundle("strolch-agent", getCertificate().getLocale()),
-					"agent.search.failed.access.denied").value("user", username).value("query", queryName);
-			throw new StrolchAccessDeniedException(this.certificate, query, i18n, e);
-		}
-	}
-
-	@Override
-	public <U> List<U> doQuery(OrderQuery<U> query) {
-		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("orderVisitor", query.getVisitor());
-		return getOrderMap().doQuery(this, query);
-	}
-
-	@Override
-	public <U> List<U> doQuery(ResourceQuery<U> query) {
-		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("resourceVisitor", query.getVisitor());
-		return getResourceMap().doQuery(this, query);
-	}
-
-	@Override
-	public <U> List<U> doQuery(ActivityQuery<U> query) {
-		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("activityVisitor", query.getVisitor());
-		return getActivityMap().doQuery(this, query);
-	}
-
-	@Override
-	public <U> List<U> doQuery(AuditQuery<U> query) {
-		assertQueryAllowed(query);
-		DBC.PRE.assertNotNull("auditVisitor", query.getVisitor());
-		return getAuditTrail().doQuery(this, query);
 	}
 
 	@Override

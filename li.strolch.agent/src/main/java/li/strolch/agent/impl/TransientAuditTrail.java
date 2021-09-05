@@ -4,16 +4,13 @@ import java.util.*;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.query.inmemory.InMemoryAuditQuery;
-import li.strolch.runtime.query.inmemory.InMemoryAuditQueryVisitor;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfMaps;
 
 public class TransientAuditTrail implements AuditTrail {
 
-	private MapOfMaps<String, Long, Audit> auditMap;
+	private final MapOfMaps<String, Long, Audit> auditMap;
 
 	public TransientAuditTrail() {
 		this.auditMap = new MapOfMaps<>();
@@ -139,12 +136,5 @@ public class TransientAuditTrail implements AuditTrail {
 		}
 
 		return toRemoveList.size();
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> auditQuery) {
-		InMemoryAuditQueryVisitor<U> visitor = new InMemoryAuditQueryVisitor<>();
-		InMemoryAuditQuery<U> query = visitor.toInMemory(auditQuery);
-		return query.doQuery(tx, this);
 	}
 }

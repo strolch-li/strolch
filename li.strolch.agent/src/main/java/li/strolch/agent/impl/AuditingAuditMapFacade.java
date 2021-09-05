@@ -19,8 +19,6 @@ import java.util.*;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.audit.AuditVisitor;
-import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.dbc.DBC;
@@ -40,16 +38,16 @@ import li.strolch.utils.dbc.DBC;
  */
 public class AuditingAuditMapFacade implements AuditTrail {
 
-	private AuditTrail auditTrail;
+	private final AuditTrail auditTrail;
 
-	private Set<Audit> read;
-	private Set<Audit> created;
-	private Set<Audit> updated;
-	private Set<Audit> deleted;
+	private final Set<Audit> read;
+	private final Set<Audit> created;
+	private final Set<Audit> updated;
+	private final Set<Audit> deleted;
 	private long deletedAll;
-	private Map<String, Long> deletedAllByType;
+	private final Map<String, Long> deletedAllByType;
 
-	private boolean observeAccessReads;
+	private final boolean observeAccessReads;
 
 	public AuditingAuditMapFacade(AuditTrail auditTrail, boolean observeAccessReads) {
 		DBC.PRE.assertNotNull("auditTrail must be set!", auditTrail); //$NON-NLS-1$
@@ -194,16 +192,5 @@ public class AuditingAuditMapFacade implements AuditTrail {
 
 		this.deletedAll += removed;
 		return removed;
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
-		AuditVisitor<U> auditVisitor = query.getVisitor();
-		query.setVisitor(audit -> {
-			this.read.add(audit);
-			return auditVisitor.visitAudit(audit);
-		});
-
-		return this.auditTrail.doQuery(tx, query);
 	}
 }

@@ -15,18 +15,11 @@
  */
 package li.strolch.agent.impl;
 
-import java.util.HashSet;
-import java.util.List;
-
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
-import li.strolch.model.query.ResourceQuery;
-import li.strolch.model.visitor.ResourceVisitor;
-import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.utils.dbc.DBC;
 
 /**
  * This is the {@link AuditTrail} for {@link Resource Resources}
@@ -48,19 +41,5 @@ public class AuditingResourceMap extends AuditingElementMapFacade<Resource> impl
 	@Override
 	protected ResourceMap getElementMap() {
 		return (ResourceMap) super.getElementMap();
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> query) {
-		ResourceVisitor<U> resourceVisitor = query.getVisitor();
-		DBC.PRE.assertNotNull("resourceVisitor on query", resourceVisitor);
-		query.setVisitor(resource -> {
-			if (this.read == null)
-				this.read = new HashSet<>();
-			this.read.add(resource);
-			return resource.accept(resourceVisitor);
-		});
-
-		return getElementMap().doQuery(tx, query);
 	}
 }

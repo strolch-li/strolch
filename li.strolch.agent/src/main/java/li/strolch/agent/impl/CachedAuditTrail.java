@@ -19,7 +19,6 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import li.strolch.model.audit.Audit;
-import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
@@ -98,10 +97,5 @@ public class CachedAuditTrail extends TransientAuditTrail {
 			logger.error(MessageFormat.format(msg, removed, daoRemoved));
 		}
 		return removed;
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, AuditQuery<U> query) {
-		return getDbDao(tx).doQuery(query);
 	}
 }

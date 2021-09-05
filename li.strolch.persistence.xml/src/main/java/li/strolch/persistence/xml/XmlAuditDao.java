@@ -23,7 +23,6 @@ import java.util.function.Predicate;
 
 import li.strolch.model.Tags;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
@@ -145,10 +144,5 @@ public class XmlAuditDao implements AuditDao {
 	public long removeAll(String type, DateRange dateRange) {
 		Predicate<File> predicate = file -> dateRange.contains(new Date(file.lastModified()));
 		return this.tx.getObjectDao().removeAllBy(getTypeRef(type), predicate);
-	}
-
-	@Override
-	public <U> List<U> doQuery(AuditQuery<U> query) {
-		throw new UnsupportedOperationException("not yet supported!");
 	}
 }

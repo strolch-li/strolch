@@ -26,11 +26,9 @@ import java.util.*;
 
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
-import li.strolch.model.query.AuditQuery;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.utils.collections.DateRange;
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -292,14 +290,6 @@ public class PostgreSqlAuditDao implements AuditDao {
 					MessageFormat.format("Failed to remove all elements due to {0}", //$NON-NLS-1$
 							e.getLocalizedMessage()), e);
 		}
-	}
-
-	@Override
-	public <U> List<U> doQuery(AuditQuery<U> query) {
-
-		PostgreSqlAuditQueryVisitor queryVisitor = new PostgreSqlAuditQueryVisitor(FIELDS);
-		query.accept(queryVisitor);
-		return null;
 	}
 
 	private void setAuditFields(Audit audit, PreparedStatement ps) throws SQLException {

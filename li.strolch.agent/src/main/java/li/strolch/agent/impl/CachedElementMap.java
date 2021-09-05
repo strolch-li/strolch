@@ -32,7 +32,7 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public abstract class CachedElementMap<T extends StrolchRootElement> extends TransientElementMap<T> {
 
-	private StrolchRealm realm;
+	private final StrolchRealm realm;
 
 	public CachedElementMap(StrolchRealm realm) {
 		super();

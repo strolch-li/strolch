@@ -17,17 +17,12 @@ package li.strolch.agent.impl;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
 
-import java.util.List;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.query.ActivityQuery;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.query.inmemory.InMemoryActivityQueryVisitor;
-import li.strolch.runtime.query.inmemory.InMemoryQuery;
 
 public class CachedActivityMap extends CachedElementMap<Activity> implements ActivityMap {
 
@@ -43,12 +38,5 @@ public class CachedActivityMap extends CachedElementMap<Activity> implements Act
 	@Override
 	protected ActivityDao getDbDao(StrolchTransaction tx) {
 		return tx.getPersistenceHandler().getActivityDao(tx);
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery<U> activityQuery) {
-		InMemoryActivityQueryVisitor visitor = new InMemoryActivityQueryVisitor();
-		InMemoryQuery<Activity, U> query = visitor.visit(activityQuery);
-		return query.doQuery(tx, this);
 	}
 }

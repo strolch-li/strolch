@@ -15,18 +15,11 @@
  */
 package li.strolch.agent.impl;
 
-import java.util.HashSet;
-import java.util.List;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.query.ActivityQuery;
-import li.strolch.model.visitor.ActivityVisitor;
-import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.utils.dbc.DBC;
 
 /**
  * This is the {@link AuditTrail} for {@link Activity Activities}
@@ -48,19 +41,5 @@ public class AuditingActivityMap extends AuditingElementMapFacade<Activity> impl
 	@Override
 	protected ActivityMap getElementMap() {
 		return (ActivityMap) super.getElementMap();
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ActivityQuery<U> query) {
-		ActivityVisitor<U> activityVisitor = query.getVisitor();
-		DBC.PRE.assertNotNull("activityVisitor on query", activityVisitor);
-		query.setVisitor(activity -> {
-			if (this.read == null)
-				this.read = new HashSet<>();
-			this.read.add(activity);
-			return activity.accept(activityVisitor);
-		});
-
-		return getElementMap().doQuery(tx, query);
 	}
 }

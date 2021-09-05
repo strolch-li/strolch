@@ -15,18 +15,11 @@
  */
 package li.strolch.agent.impl;
 
-import java.util.HashSet;
-import java.util.List;
-
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
-import li.strolch.model.query.OrderQuery;
-import li.strolch.model.visitor.OrderVisitor;
-import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.utils.dbc.DBC;
 
 /**
  * This is the {@link AuditTrail} for {@link Order Orders}
@@ -48,19 +41,5 @@ public class AuditingOrderMap extends AuditingElementMapFacade<Order> implements
 	@Override
 	protected OrderMap getElementMap() {
 		return (OrderMap) super.getElementMap();
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery<U> query) {
-		OrderVisitor<U> orderVisitor = query.getVisitor();
-		DBC.PRE.assertNotNull("orderVisitor on query", orderVisitor);
-		query.setVisitor(order -> {
-			if (this.read == null)
-				this.read = new HashSet<>();
-			this.read.add(order);
-			return order.accept(orderVisitor);
-		});
-
-		return getElementMap().doQuery(tx, query);
 	}
 }

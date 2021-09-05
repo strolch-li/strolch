@@ -17,17 +17,12 @@ package li.strolch.agent.impl;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
 
-import java.util.List;
-
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.query.ResourceQuery;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.query.inmemory.InMemoryQuery;
-import li.strolch.runtime.query.inmemory.InMemoryResourceQueryVisitor;
 
 public class CachedResourceMap extends CachedElementMap<Resource> implements ResourceMap {
 
@@ -43,12 +38,5 @@ public class CachedResourceMap extends CachedElementMap<Resource> implements Res
 	@Override
 	protected ResourceDao getDbDao(StrolchTransaction tx) {
 		return tx.getPersistenceHandler().getResourceDao(tx);
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, ResourceQuery<U> resourceQuery) {
-		InMemoryResourceQueryVisitor visitor = new InMemoryResourceQueryVisitor();
-		InMemoryQuery<Resource, U> query = visitor.visit(resourceQuery);
-		return query.doQuery(tx, this);
 	}
 }

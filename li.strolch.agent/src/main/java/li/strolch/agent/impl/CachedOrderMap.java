@@ -18,17 +18,13 @@ package li.strolch.agent.impl;
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ORDER_REF;
 
 import java.util.Date;
-import java.util.List;
 
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.query.OrderQuery;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.runtime.query.inmemory.InMemoryOrderQueryVisitor;
-import li.strolch.runtime.query.inmemory.InMemoryQuery;
 
 public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap {
 
@@ -51,12 +47,5 @@ public class CachedOrderMap extends CachedElementMap<Order> implements OrderMap 
 	@Override
 	protected OrderDao getDbDao(StrolchTransaction tx) {
 		return tx.getPersistenceHandler().getOrderDao(tx);
-	}
-
-	@Override
-	public <U> List<U> doQuery(StrolchTransaction tx, OrderQuery<U> orderQuery) {
-		InMemoryOrderQueryVisitor visitor = new InMemoryOrderQueryVisitor();
-		InMemoryQuery<Order, U> query = visitor.visit(orderQuery);
-		return query.doQuery(tx, this);
 	}
 }
