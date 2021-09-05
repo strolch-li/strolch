@@ -1375,11 +1375,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		changedR = this.objectFilter.getAdded(Resource.class, Tags.RESOURCE);
 		if (changedR.size() == 1) {
 			AddResourceCommand cmd = new AddResourceCommand(this);
-			cmd.setResource((Resource) changedR.get(0));
+			cmd.setResource(changedR.get(0));
 			addCommand(cmd);
 		} else if (changedR.size() > 1) {
 			AddResourcesCommand cmd = new AddResourcesCommand(this);
-			changedR.stream().map(e -> (Resource) e).forEach(cmd::addResource);
+			cmd.setResources(changedR);
 			addCommand(cmd);
 		}
 

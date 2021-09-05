@@ -15,7 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static java.util.function.Function.identity;
 import static li.strolch.model.StrolchModelConstants.TEMPLATE;
 
 import java.text.MessageFormat;
@@ -44,7 +43,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	protected static final Logger logger = LoggerFactory.getLogger(TransientElementMap.class);
 
-	private Map<String, Map<String, T>> elementMap;
+	private final Map<String, Map<String, T>> elementMap;
 
 	public TransientElementMap() {
 		this.elementMap = new HashMap<>();
@@ -63,8 +62,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized long querySize(StrolchTransaction tx) {
-		return this.elementMap.entrySet().stream() //
-				.map(e -> e.getValue().entrySet().size()) //
+		return this.elementMap.values().stream() //
+				.map(map -> map.entrySet().size()) //
 				.mapToInt(Integer::valueOf) //
 				.sum();
 	}
@@ -227,10 +226,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized Set<String> getAllKeys(StrolchTransaction tx) {
-		return this.elementMap.entrySet().stream() //
-				.map(e -> e.getValue().entrySet().stream() //
-						.map(Map.Entry::getKey)) //
-				.flatMap(identity()) //
+		return this.elementMap.values().stream() //
+				.flatMap(map -> map.keySet().stream()) //
 				.collect(Collectors.toSet());
 	}
 
@@ -240,9 +237,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (byType == null)
 			return new HashSet<>(0);
 
-		return byType.entrySet().stream() //
-				.map(Map.Entry::getKey) //
-				.collect(Collectors.toSet());
+		return new HashSet<>(byType.keySet());
 	}
 
 	/**
