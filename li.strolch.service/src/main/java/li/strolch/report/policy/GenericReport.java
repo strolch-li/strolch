@@ -44,6 +44,7 @@ public class GenericReport extends ReportPolicy {
 	protected ParameterBag columnsBag;
 	protected List<StringParameter> orderingParams;
 	protected Map<String, StringParameter> filterCriteriaParams;
+	protected boolean parallel;
 	protected boolean descending;
 	protected boolean allowMissingColumns;
 	protected boolean filterMissingValuesAsTrue;
@@ -84,6 +85,7 @@ public class GenericReport extends ReportPolicy {
 				.map(StrolchElement::getId) //
 				.collect(toList());
 
+		this.parallel = this.reportRes.getBoolean(PARAM_PARALLEL);
 		this.descending = this.reportRes.getBoolean(PARAM_DESCENDING);
 		this.allowMissingColumns = this.reportRes.getBoolean(PARAM_ALLOW_MISSING_COLUMNS);
 		this.filterMissingValuesAsTrue = this.reportRes.getBoolean(PARAM_FILTER_MISSING_VALUES_AS_TRUE);
@@ -123,8 +125,8 @@ public class GenericReport extends ReportPolicy {
 				StringParameter joinP = (StringParameter) parameter;
 				if (joinP.getUom().equals(UOM_NONE))
 					throw new IllegalStateException(
-							"Additional Join UOM " + joinP.getUom() + " invalid: " + joinP.getId() + " for " + joinP
-									.getLocator());
+							"Additional Join UOM " + joinP.getUom() + " invalid: " + joinP.getId() + " for "
+									+ joinP.getLocator());
 				this.filterCriteriaParams.put(parameter.getId(), joinP);
 			});
 		}
@@ -144,8 +146,8 @@ public class GenericReport extends ReportPolicy {
 		List<ParameterBag> filterBags = this.reportRes.getParameterBagsByType(TYPE_FILTER);
 		for (ParameterBag filterBag : filterBags) {
 
-			if (filterBag.hasParameter(PARAM_FIELD_REF) && (filterBag.hasParameter(PARAM_FIELD_REF1) || filterBag
-					.hasParameter(PARAM_FIELD_REF2))) {
+			if (filterBag.hasParameter(PARAM_FIELD_REF) && (filterBag.hasParameter(PARAM_FIELD_REF1)
+					|| filterBag.hasParameter(PARAM_FIELD_REF2))) {
 				throw new IllegalArgumentException(
 						"Filter " + filterBag.getLocator() + " can not have combination of " + PARAM_FIELD_REF
 								+ " and any of " + PARAM_FIELD_REF1 + ", " + PARAM_FIELD_REF2);
@@ -391,8 +393,8 @@ public class GenericReport extends ReportPolicy {
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
 
-		MapOfLists<String, StrolchRootElement> joinElements = getStreamFor(objectTypeP)
-				.collect(MapOfLists::new, (mapOfLists, e) -> {
+		MapOfLists<String, StrolchRootElement> joinElements = getStreamFor(objectTypeP).collect(MapOfLists::new,
+				(mapOfLists, e) -> {
 					StringParameter joinP = e.getParameter(bagKey, paramKey, true);
 					mapOfLists.addElement(joinP.getValue(), e);
 				}, MapOfLists::addAll);
@@ -403,8 +405,8 @@ public class GenericReport extends ReportPolicy {
 			StrolchRootElement joinElement = row.get(joinWithP.getUom());
 			if (joinElement == null)
 				throw new IllegalStateException(
-						"Additional join type " + joinWithP.getUom() + " is not available on row for " + joinWithP
-								.getLocator());
+						"Additional join type " + joinWithP.getUom() + " is not available on row for "
+								+ joinWithP.getLocator());
 
 			Optional<Parameter<?>> refP = lookupParameter(joinWithP, joinElement);
 			if (refP.isEmpty()) {
@@ -654,8 +656,8 @@ public class GenericReport extends ReportPolicy {
 				Optional<Parameter<?>> param = lookupParameter(this.dateRangeSelP, element);
 				if (param.isEmpty() || param.get().getValueType() != StrolchValueType.DATE)
 					throw new IllegalStateException(
-							"Date Range selector is invalid, as referenced parameter is not a Date but " + (param
-									.isPresent() ? param.get().getValueType() : "null"));
+							"Date Range selector is invalid, as referenced parameter is not a Date but "
+									+ (param.isPresent() ? param.get().getValueType() : "null"));
 
 				date = ((DateParameter) param.get()).getValueZdt();
 			}
@@ -783,8 +785,8 @@ public class GenericReport extends ReportPolicy {
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
 		if (locatorParts.length != 3)
 			throw new IllegalStateException(
-					"Parameter reference (" + paramRef + ") is invalid as it does not have 3 parts for " + paramRefP
-							.getLocator());
+					"Parameter reference (" + paramRef + ") is invalid as it does not have 3 parts for "
+							+ paramRefP.getLocator());
 
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
@@ -792,8 +794,8 @@ public class GenericReport extends ReportPolicy {
 		Parameter<?> param = element.getParameter(bagKey, paramKey);
 		if (!allowMissingColumns && param == null)
 			throw new IllegalStateException(
-					"Parameter reference (" + paramRef + ") for " + paramRefP.getLocator() + " not found on " + element
-							.getLocator());
+					"Parameter reference (" + paramRef + ") for " + paramRefP.getLocator() + " not found on "
+							+ element.getLocator());
 
 		return Optional.ofNullable(param);
 	}
@@ -805,6 +807,8 @@ public class GenericReport extends ReportPolicy {
 	 * @return the stream of {@link StrolchRootElement StrolchRootElement}
 	 */
 	protected Stream<? extends StrolchRootElement> queryRows() {
+		if (this.parallel)
+			return getStreamFor(getObjectTypeParam()).parallel();
 		return getStreamFor(getObjectTypeParam());
 	}
 
@@ -921,13 +925,12 @@ public class GenericReport extends ReportPolicy {
 				.stream().filter(p -> p.getValueType() == StrolchValueType.STRING).collect(toList());
 
 		if (relationParams.isEmpty())
-			throw new IllegalStateException(
-					"Found no relation parameters with UOM " + joinType + " of type " + StrolchValueType.STRING
-							.getType() + " on dependency " + dependency.getLocator());
+			throw new IllegalStateException("Found no relation parameters with UOM " + joinType + " of type "
+					+ StrolchValueType.STRING.getType() + " on dependency " + dependency.getLocator());
 		if (relationParams.size() > 1)
 			throw new IllegalStateException(
-					"Found multiple possible relation parameters for UOM " + joinType + " on dependency " + dependency
-							.getLocator());
+					"Found multiple possible relation parameters for UOM " + joinType + " on dependency "
+							+ dependency.getLocator());
 
 		Parameter<?> relationParam = relationParams.get(0);
 		StringParameter relationP = (StringParameter) relationParam;

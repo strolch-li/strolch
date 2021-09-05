@@ -12,6 +12,7 @@ public class ReportConstants {
 	public static final String BAG_ADDITIONAL_JOINS = "additionalJoins";
 
 	public static final String PARAM_OBJECT_TYPE = "objectType";
+	public static final String PARAM_PARALLEL = "parallel";
 	public static final String PARAM_DESCENDING = "descending";
 	public static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
 	public static final String PARAM_FIELD_REF = "fieldRef";
