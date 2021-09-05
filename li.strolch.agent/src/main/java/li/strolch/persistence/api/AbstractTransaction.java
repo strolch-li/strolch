@@ -718,7 +718,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public Order getOrderBy(String type, String id, boolean assertExists) throws StrolchException {
+	public synchronized Order getOrderBy(String type, String id, boolean assertExists) throws StrolchException {
 		Order element = getElementFromFilter(Tags.ORDER, Order.locatorFor(type, id));
 		if (element != null)
 			return element;
@@ -728,11 +728,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return element;
 
 		element = getOrderMap().getBy(this, type, id, assertExists);
-		if (element != null) {
-			if (this.orderCache == null)
-				this.orderCache = new MapOfMaps<>(1);
-			this.orderCache.addElement(type, id, element);
-		}
+		if (element != null)
+			orderCache().addElement(type, id, element);
 
 		return element;
 	}
@@ -743,7 +740,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public Order getOrderBy(StringParameter refP, boolean assertExists) throws StrolchException {
+	public synchronized Order getOrderBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
 
@@ -764,11 +761,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return element;
 
 		element = getOrderMap().getBy(this, refP, assertExists);
-		if (element != null) {
-			if (this.orderCache == null)
-				this.orderCache = new MapOfMaps<>(1);
-			this.orderCache.addElement(refP.getUom(), refP.getValue(), element);
-		}
+		if (element != null)
+			orderCache().addElement(refP.getUom(), refP.getValue(), element);
 
 		return element;
 	}
@@ -838,7 +832,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public Resource getResourceBy(String type, String id, boolean assertExists) throws StrolchException {
+	public synchronized Resource getResourceBy(String type, String id, boolean assertExists) throws StrolchException {
 		Resource element = getElementFromFilter(Tags.RESOURCE, Resource.locatorFor(type, id));
 		if (element != null)
 			return element;
@@ -848,11 +842,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return element;
 
 		element = getResourceMap().getBy(this, type, id, assertExists);
-		if (element != null) {
-			if (this.resourceCache == null)
-				this.resourceCache = new MapOfMaps<>(1);
-			this.resourceCache.addElement(type, id, element);
-		}
+		if (element != null)
+			resourceCache().addElement(type, id, element);
 
 		return element;
 	}
@@ -863,7 +854,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException {
+	public synchronized Resource getResourceBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
 
@@ -884,11 +875,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return element;
 
 		element = getResourceMap().getBy(this, refP, assertExists);
-		if (element != null) {
-			if (this.resourceCache == null)
-				this.resourceCache = new MapOfMaps<>(1);
-			this.resourceCache.addElement(refP.getUom(), refP.getValue(), element);
-		}
+		if (element != null)
+			resourceCache().addElement(refP.getUom(), refP.getValue(), element);
 
 		return element;
 	}
@@ -974,7 +962,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException {
+	public synchronized Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException {
 		Activity element = getElementFromFilter(Tags.ACTIVITY, Activity.locatorFor(type, id));
 		if (element != null)
 			return element;
@@ -984,11 +972,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return element;
 
 		element = getActivityMap().getBy(this, type, id, assertExists);
-		if (element != null) {
-			if (this.activityCache == null)
-				this.activityCache = new MapOfMaps<>(1);
-			this.activityCache.addElement(type, id, element);
-		}
+		if (element != null)
+			activityCache().addElement(type, id, element);
 
 		return element;
 	}
@@ -999,7 +984,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException {
+	public synchronized Activity getActivityBy(StringParameter refP, boolean assertExists) throws StrolchException {
 		DBC.PRE.assertNotNull("refP", refP);
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
 
@@ -1020,11 +1005,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			return element;
 
 		element = getActivityMap().getBy(this, refP, assertExists);
-		if (element != null) {
-			if (this.activityCache == null)
-				this.activityCache = new MapOfMaps<>(1);
-			this.activityCache.addElement(refP.getUom(), refP.getValue(), element);
-		}
+		if (element != null)
+			activityCache().addElement(refP.getUom(), refP.getValue(), element);
 
 		return element;
 	}
@@ -1089,29 +1071,47 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void removeFromCache(Locator locator) {
+	public synchronized void removeFromCache(Locator locator) {
 		if (this.resourceCache != null)
 			this.resourceCache.removeElement(locator.get(1), locator.get(2));
 		if (this.objectFilter != null)
 			this.objectFilter.removeObjectCache(locator.get(0), locator);
 	}
 
+	private MapOfMaps<String, String, Resource> resourceCache() {
+		if (this.resourceCache == null)
+			this.resourceCache = new MapOfMaps<>(1);
+		return this.resourceCache;
+	}
+
+	private MapOfMaps<String, String, Order> orderCache() {
+		if (this.orderCache == null)
+			this.orderCache = new MapOfMaps<>(1);
+		return this.orderCache;
+	}
+
+	private MapOfMaps<String, String, Activity> activityCache() {
+		if (this.activityCache == null)
+			this.activityCache = new MapOfMaps<>(1);
+		return this.activityCache;
+	}
+
 	@Override
-	public Resource getCachedResource(String type, String id) {
+	public synchronized Resource getCachedResource(String type, String id) {
 		if (this.resourceCache == null)
 			return null;
 		return this.resourceCache.getElement(type, id);
 	}
 
 	@Override
-	public Order getCachedOrder(String type, String id) {
+	public synchronized Order getCachedOrder(String type, String id) {
 		if (this.orderCache == null)
 			return null;
 		return this.orderCache.getElement(type, id);
 	}
 
 	@Override
-	public Activity getCachedActivity(String type, String id) {
+	public synchronized Activity getCachedActivity(String type, String id) {
 		if (this.activityCache == null)
 			return null;
 		return this.activityCache.getElement(type, id);
@@ -1175,8 +1175,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public void assertHasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException {
 		DBC.PRE.assertNotNull("operation must not be null", operation);
 		DBC.PRE.assertNotNull("element must not be null", element);
-		getPrivilegeContext()
-				.validateAction(new TransactedRestrictable(this, operation.getPrivilegeName(element), element));
+		getPrivilegeContext().validateAction(
+				new TransactedRestrictable(this, operation.getPrivilegeName(element), element));
 	}
 
 	@Override
@@ -1211,8 +1211,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		resource.assertNotReadonly();
 		if (hasResource(resource.getType(), resource.getId())) {
-			li.strolch.utils.objectfilter.Operation operation = getObjectFilter()
-					.getOperation(Tags.RESOURCE, resource.getLocator());
+			li.strolch.utils.objectfilter.Operation operation = getObjectFilter().getOperation(Tags.RESOURCE,
+					resource.getLocator());
 			if (operation != li.strolch.utils.objectfilter.Operation.REMOVE)
 				getObjectFilter().update(Tags.RESOURCE, resource.getLocator(), resource);
 			else
@@ -1229,8 +1229,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("order must not be null", order);
 		order.assertNotReadonly();
 		if (hasOrder(order.getType(), order.getId())) {
-			li.strolch.utils.objectfilter.Operation operation = getObjectFilter()
-					.getOperation(Tags.ORDER, order.getLocator());
+			li.strolch.utils.objectfilter.Operation operation = getObjectFilter().getOperation(Tags.ORDER,
+					order.getLocator());
 			if (operation != li.strolch.utils.objectfilter.Operation.REMOVE)
 				getObjectFilter().update(Tags.ORDER, order.getLocator(), order);
 			else
@@ -1247,8 +1247,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		activity.assertNotReadonly();
 		if (hasActivity(activity.getType(), activity.getId())) {
-			li.strolch.utils.objectfilter.Operation operation = getObjectFilter()
-					.getOperation(Tags.ACTIVITY, activity.getLocator());
+			li.strolch.utils.objectfilter.Operation operation = getObjectFilter().getOperation(Tags.ACTIVITY,
+					activity.getLocator());
 			if (operation != li.strolch.utils.objectfilter.Operation.REMOVE)
 				getObjectFilter().update(Tags.ACTIVITY, activity.getLocator(), activity);
 			else
@@ -1311,7 +1311,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void remove(Resource resource) throws StrolchException {
+	public synchronized void remove(Resource resource) throws StrolchException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		getObjectFilter().remove(Tags.RESOURCE, resource.getLocator(), resource);
@@ -1321,7 +1321,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void remove(Order order) throws StrolchException {
+	public synchronized void remove(Order order) throws StrolchException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("order must not be null", order);
 		getObjectFilter().remove(Tags.ORDER, order.getLocator(), order);
@@ -1331,7 +1331,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void remove(Activity activity) throws StrolchException {
+	public synchronized void remove(Activity activity) throws StrolchException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		getObjectFilter().remove(Tags.ACTIVITY, activity.getLocator(), activity);
@@ -1466,7 +1466,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void clearCache() {
+	public synchronized void clearCache() {
 		if (this.orderCache != null) {
 			this.orderCache.clear();
 			this.orderCache = null;
@@ -1782,8 +1782,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
 					Locator.valueOf(AGENT, "tx", this.action, getUniqueId()), LogSeverity.Exception,
-					LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
-					.withException(e).value("reason", e));
+					LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+					"agent.tx.failed").withException(e).value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
