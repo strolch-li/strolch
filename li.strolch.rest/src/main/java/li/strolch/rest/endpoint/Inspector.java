@@ -114,8 +114,8 @@ public class Inspector {
 
 			try (StrolchTransaction tx = openTx(cert, realmName)) {
 				long size = 0;
-				size += tx.getResourceMap().querySize(tx);
-				size += tx.getOrderMap().querySize(tx);
+				size += tx.getResourceCount();
+				size += tx.getOrderCount();
 
 				realmJ.addProperty(Tags.Json.NAME, realmName);
 				realmJ.addProperty(Tags.Json.SIZE, size);
@@ -144,7 +144,7 @@ public class Inspector {
 				ResourceMap resourceMap = tx.getResourceMap();
 				JsonObject elementMapJ = new JsonObject();
 				elementMapJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.RESOURCE);
-				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, resourceMap.querySize(tx));
+				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, tx.getResourceCount());
 				JsonArray typesJ = new JsonArray();
 				resourceMap.getTypes(tx).forEach(typesJ::add);
 				elementMapJ.add(Tags.Json.TYPES, typesJ);
@@ -156,7 +156,7 @@ public class Inspector {
 				OrderMap orderMap = tx.getOrderMap();
 				JsonObject elementMapJ = new JsonObject();
 				elementMapJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ORDER);
-				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, orderMap.querySize(tx));
+				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, tx.getOrderCount());
 				JsonArray typesJ = new JsonArray();
 				orderMap.getTypes(tx).forEach(typesJ::add);
 				elementMapJ.add(Tags.Json.TYPES, typesJ);
@@ -168,7 +168,7 @@ public class Inspector {
 				ActivityMap activityMap = tx.getActivityMap();
 				JsonObject elementMapJ = new JsonObject();
 				elementMapJ.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
-				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, activityMap.querySize(tx));
+				elementMapJ.addProperty(Tags.Json.NR_OF_ELEMENTS, tx.getActivityCount());
 				JsonArray typesJ = new JsonArray();
 				activityMap.getTypes(tx).forEach(typesJ::add);
 				elementMapJ.add(Tags.Json.TYPES, typesJ);
@@ -222,7 +222,7 @@ public class Inspector {
 			ResourceMap resourceMap = tx.getResourceMap();
 
 			mapOverview.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.RESOURCE);
-			mapOverview.addProperty(Tags.Json.SIZE, resourceMap.querySize(tx));
+			mapOverview.addProperty(Tags.Json.SIZE, tx.getResourceCount());
 
 			JsonArray typeArrJ = new JsonArray();
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
@@ -233,7 +233,7 @@ public class Inspector {
 
 				JsonObject typeJ = new JsonObject();
 				typeJ.addProperty(Tags.Json.TYPE, type);
-				typeJ.addProperty(Tags.Json.SIZE, resourceMap.querySize(tx, type));
+				typeJ.addProperty(Tags.Json.SIZE, tx.getResourceCount(type));
 
 				typeArrJ.add(typeJ);
 			});
@@ -255,7 +255,7 @@ public class Inspector {
 			OrderMap orderMap = tx.getOrderMap();
 
 			mapOverview.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ORDER);
-			mapOverview.addProperty(Tags.Json.SIZE, orderMap.querySize(tx));
+			mapOverview.addProperty(Tags.Json.SIZE, tx.getOrderCount());
 
 			JsonArray typeArrJ = new JsonArray();
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
@@ -266,7 +266,7 @@ public class Inspector {
 
 				JsonObject typeJ = new JsonObject();
 				typeJ.addProperty(Tags.Json.TYPE, type);
-				typeJ.addProperty(Tags.Json.SIZE, orderMap.querySize(tx, type));
+				typeJ.addProperty(Tags.Json.SIZE, tx.getOrderCount(type));
 
 				typeArrJ.add(typeJ);
 			});
@@ -288,7 +288,7 @@ public class Inspector {
 			ActivityMap activityMap = tx.getActivityMap();
 
 			mapOverview.addProperty(Tags.Json.OBJECT_TYPE, Tags.Json.ACTIVITY);
-			mapOverview.addProperty(Tags.Json.SIZE, activityMap.querySize(tx));
+			mapOverview.addProperty(Tags.Json.SIZE, tx.getActivityCount());
 
 			JsonArray typeArrJ = new JsonArray();
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
@@ -299,7 +299,7 @@ public class Inspector {
 
 				JsonObject typeJ = new JsonObject();
 				typeJ.addProperty(Tags.Json.TYPE, type);
-				typeJ.addProperty(Tags.Json.SIZE, activityMap.querySize(tx, type));
+				typeJ.addProperty(Tags.Json.SIZE, tx.getActivityCount(type));
 
 				typeArrJ.add(typeJ);
 			});
@@ -406,7 +406,7 @@ public class Inspector {
 		RootElementSearchResult<Resource> result;
 		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			dataSetSize = tx.getResourceMap().querySize(tx, type);
+			dataSetSize = tx.getResourceCount(type);
 			result = search.search(tx);
 		}
 
@@ -451,7 +451,7 @@ public class Inspector {
 		RootElementSearchResult<Order> result;
 		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			dataSetSize = tx.getOrderMap().querySize(tx, type);
+			dataSetSize = tx.getOrderCount(type);
 			result = search.search(tx);
 		}
 
@@ -498,7 +498,7 @@ public class Inspector {
 		RootElementSearchResult<Activity> result;
 		long dataSetSize;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
-			dataSetSize = tx.getActivityMap().querySize(tx, type);
+			dataSetSize = tx.getActivityCount(type);
 			result = search.search(tx);
 		}
 
