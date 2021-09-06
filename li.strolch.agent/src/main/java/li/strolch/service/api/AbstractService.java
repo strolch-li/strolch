@@ -576,7 +576,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 				result.setState(ServiceResultState.WARNING);
 				result.setI18nMessage(((UserMessageException) e).getI18nMsg());
 			} else {
-				result.setState(ServiceResultState.FAILED);
+				result.setState(ServiceResultState.EXCEPTION);
 				result.setThrowable(e);
 			}
 
