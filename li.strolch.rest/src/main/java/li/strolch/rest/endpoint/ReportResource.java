@@ -38,6 +38,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.report.Report;
+import li.strolch.report.ReportElement;
 import li.strolch.report.ReportSearch;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -123,7 +124,7 @@ public class ReportResource {
 			List<String> types = new ArrayList<>(criteria.keySet());
 			JsonObject finalLocaleJ = localeJ;
 			types.stream().sorted(comparing(type -> {
-				JsonElement translatedJ = finalLocaleJ.get(type);
+				JsonElement translatedJ = finalLocaleJ == null ? null : finalLocaleJ.get(type);
 				return translatedJ == null ? type : translatedJ.getAsString();
 			})).forEach(type -> {
 				Set<StrolchRootElement> elements = criteria.getSet(type);
@@ -283,7 +284,10 @@ public class ReportResource {
 			// add rows to response
 			JsonObject finalResult = new JsonObject();
 			JsonArray rows = new JsonArray();
-			json.forEach(rows::add);
+			if (report.isParallel())
+				json.forEachOrdered(rows::add);
+			else
+				json.forEach(rows::add);
 
 			finalResult.add(PARAM_ROWS, rows);
 
@@ -432,16 +436,21 @@ public class ReportResource {
 				try (CSVPrinter csvP = new CSVPrinter(new OutputStreamWriter(out),
 						CSVFormat.DEFAULT.withHeader(headers).withDelimiter(';'))) {
 
-					report.doReport().forEach(row -> {
-						try {
-							csvP.printRecord(row.valueStream().collect(Collectors.toList())); // add to CSV
-						} catch (Exception e) {
-							logger.error("Could not write CSV row", e);
-						}
-					});
+					if (report.isParallel())
+						report.doReport().forEachOrdered(row -> writeCsv(csvP, row));
+					else
+						report.doReport().forEach(row -> writeCsv(csvP, row));
 				}
 			}
 		};
+	}
+
+	private void writeCsv(CSVPrinter csvP, ReportElement row) {
+		try {
+			csvP.printRecord(row.valueStream().collect(Collectors.toList())); // add to CSV
+		} catch (Exception e) {
+			logger.error("Could not write CSV row", e);
+		}
 	}
 
 	private MapOfSets<String, String> getFiltersFromJson(JsonArray filters) {

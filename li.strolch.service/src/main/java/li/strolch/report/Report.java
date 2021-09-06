@@ -35,6 +35,10 @@ public class Report implements AutoCloseable {
 		return this.reportPolicy;
 	}
 
+	public boolean isParallel() {
+		return this.reportPolicy.isParallel();
+	}
+
 	public boolean hasDateRangeSelector() {
 		return this.reportPolicy.hasDateRangeSelector();
 	}

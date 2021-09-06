@@ -186,6 +186,11 @@ public class GenericReport extends ReportPolicy {
 		return this.descending;
 	}
 
+	@Override
+	public boolean isParallel() {
+		return this.parallel;
+	}
+
 	public void setI18nData(JsonObject i18nData) {
 		this.i18nData = i18nData;
 	}
@@ -807,7 +812,7 @@ public class GenericReport extends ReportPolicy {
 	 * @return the stream of {@link StrolchRootElement StrolchRootElement}
 	 */
 	protected Stream<? extends StrolchRootElement> queryRows() {
-		if (this.parallel)
+		if (isParallel())
 			return getStreamFor(getObjectTypeParam()).parallel();
 		return getStreamFor(getObjectTypeParam());
 	}

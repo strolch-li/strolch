@@ -19,6 +19,8 @@ public abstract class ReportPolicy extends StrolchPolicy {
 		super(tx);
 	}
 
+	public abstract boolean isParallel();
+
 	public abstract void setI18nData(JsonObject i18nData);
 
 	public abstract void initialize(String reportId);
