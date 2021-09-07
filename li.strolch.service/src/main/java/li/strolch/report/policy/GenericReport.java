@@ -29,6 +29,7 @@ import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.collections.TypedTuple;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
 
 /**
@@ -56,6 +57,9 @@ public class GenericReport extends ReportPolicy {
 	protected MapOfSets<String, String> filtersById;
 
 	protected long counter;
+	protected boolean withPage;
+	protected int offset = -1;
+	protected int limit = -1;
 
 	protected JsonObject i18nData;
 
@@ -70,6 +74,7 @@ public class GenericReport extends ReportPolicy {
 	 * @param reportId
 	 * 		the report to use
 	 */
+	@Override
 	public void initialize(String reportId) {
 
 		// get the reportRes
@@ -191,10 +196,27 @@ public class GenericReport extends ReportPolicy {
 		return this.parallel;
 	}
 
+	@Override
 	public void setI18nData(JsonObject i18nData) {
 		this.i18nData = i18nData;
 	}
 
+	@Override
+	public boolean withPage() {
+		return withPage;
+	}
+
+	@Override
+	public int getOffset() {
+		return this.offset;
+	}
+
+	@Override
+	public int getLimit() {
+		return this.limit;
+	}
+
+	@Override
 	public long getCounter() {
 		return this.counter;
 	}
@@ -204,6 +226,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return true if the report has a date range selector specified
 	 */
+	@Override
 	public boolean hasDateRangeSelector() {
 		return this.dateRangeSelP != null;
 	}
@@ -216,6 +239,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return this for chaining
 	 */
+	@Override
 	public GenericReport dateRange(DateRange dateRange) {
 		this.dateRange = dateRange;
 		return this;
@@ -235,6 +259,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return the keys for the header
 	 */
+	@Override
 	public List<String> getColumnKeys() {
 		return this.columnIds;
 	}
@@ -249,6 +274,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return this for chaining
 	 */
+	@Override
 	public GenericReport filter(String type, String... ids) {
 		if (this.filtersById == null)
 			this.filtersById = new MapOfSets<>();
@@ -268,6 +294,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return this for chaining
 	 */
+	@Override
 	public GenericReport filter(String type, List<String> ids) {
 		if (this.filtersById == null)
 			this.filtersById = new MapOfSets<>();
@@ -287,6 +314,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return this for chaining
 	 */
+	@Override
 	public GenericReport filter(String type, Set<String> ids) {
 		if (this.filtersById == null)
 			this.filtersById = new MapOfSets<>();
@@ -296,7 +324,7 @@ public class GenericReport extends ReportPolicy {
 		return this;
 	}
 
-	protected void incrementCounter() {
+	protected synchronized void incrementCounter() {
 		this.counter++;
 	}
 
@@ -306,6 +334,7 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return this for chaining
 	 */
+	@Override
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
 
 		Stream<Map<String, StrolchRootElement>> stream;
@@ -323,7 +352,7 @@ public class GenericReport extends ReportPolicy {
 		if (hasFilter())
 			stream = stream.filter(this::filter);
 
-		stream = stream.peek(e -> this.incrementCounter());
+		stream = stream.peek(e -> incrementCounter());
 
 		if (hasOrdering())
 			stream = stream.sorted(this::sort);
@@ -441,8 +470,8 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return this for chaining
 	 */
+	@Override
 	public Stream<ReportElement> doReport() {
-
 		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
 			StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
 			Object value = evaluateColumnValue(columnDefP, e, false);
@@ -454,6 +483,17 @@ public class GenericReport extends ReportPolicy {
 				return ((Parameter<?>) value).getValueAsString();
 			return value.toString();
 		}));
+	}
+
+	@Override
+	public Stream<ReportElement> doReportWithPage(int offset, int limit) {
+		DBC.PRE.assertTrue("offset must >= 0", offset >= 0);
+		DBC.PRE.assertTrue("limit must > 0", limit > 0);
+		this.limit = limit;
+		this.offset = offset;
+		this.withPage = true;
+
+		return doReport().skip(this.offset).limit(this.limit);
 	}
 
 	/**
@@ -506,7 +546,7 @@ public class GenericReport extends ReportPolicy {
 
 			for (String criterion : criteria) {
 				if (row.containsKey(criterion)) {
-					if (result.size(criterion) >= 10)
+					if (result.size(criterion) >= limit)
 						continue;
 
 					result.addElement(criterion, row.get(criterion));
@@ -515,7 +555,7 @@ public class GenericReport extends ReportPolicy {
 
 			// stop if we have enough data, or iterated over "enough"
 			count++;
-			if (count > 1000 || result.size() > 10 * result.keySet().size())
+			if (count > 1000 || result.size() > limit * result.keySet().size())
 				break;
 		}
 

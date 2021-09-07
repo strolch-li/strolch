@@ -41,11 +41,19 @@ public abstract class ReportPolicy extends StrolchPolicy {
 
 	public abstract Stream<ReportElement> doReport();
 
+	public abstract Stream<ReportElement> doReportWithPage(int offset, int limit);
+
 	public abstract MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit);
 
 	public abstract Stream<StrolchRootElement> generateFilterCriteria(String type);
 
 	public abstract long getCounter();
+
+	public abstract boolean withPage();
+
+	public abstract int getOffset();
+
+	public abstract int getLimit();
 
 	public void close() throws Exception {
 		// do nothing

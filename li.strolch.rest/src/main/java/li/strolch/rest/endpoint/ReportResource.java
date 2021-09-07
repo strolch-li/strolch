@@ -184,7 +184,7 @@ public class ReportResource {
 			}
 
 			// add the data finally
-			JsonArray array = criteria.limit(limit).map(f -> {
+			JsonArray array = criteria.limit(limit).sorted(comparing(StrolchElement::getName)).map(f -> {
 				JsonObject o = new JsonObject();
 				o.addProperty(Tags.Json.ID, f.getId());
 				o.addProperty(Tags.Json.NAME, f.getName());
@@ -279,7 +279,7 @@ public class ReportResource {
 				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
 
 			// get rows
-			Stream<JsonObject> json = report.doReportAsJson().skip(offset).limit(limit);
+			Stream<JsonObject> json = report.doReportWithPageAsJson(offset, limit);
 
 			// add rows to response
 			JsonObject finalResult = new JsonObject();
@@ -321,6 +321,7 @@ public class ReportResource {
 
 			String duration = formatNanoDuration(System.nanoTime() - start);
 			finalResult.addProperty(PARAM_DURATION, duration);
+			finalResult.addProperty(PARAM_PARALLEL, report.isParallel());
 
 			logger.info(id + " Report took: " + duration);
 			return ResponseUtil.toResponse(DATA, finalResult);

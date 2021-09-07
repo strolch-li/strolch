@@ -75,6 +75,10 @@ public class Report implements AutoCloseable {
 		return this.reportPolicy.doReport();
 	}
 
+	public Stream<ReportElement> doReportWithPage(int offset, int limit) {
+		return this.reportPolicy.doReportWithPage(offset, limit);
+	}
+
 	public MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit) {
 		return this.reportPolicy.generateFilterCriteria(limit);
 	}
@@ -88,8 +92,15 @@ public class Report implements AutoCloseable {
 	}
 
 	public Stream<JsonObject> doReportAsJson() {
-
 		return doReport().map(e -> {
+			JsonObject o = new JsonObject();
+			e.keyValueStream().forEach(elem -> o.addProperty(elem.getKey(), elem.getValue()));
+			return o;
+		});
+	}
+
+	public Stream<JsonObject> doReportWithPageAsJson(int offset, int limit) {
+		return doReportWithPage(offset, limit).map(e -> {
 			JsonObject o = new JsonObject();
 			e.keyValueStream().forEach(elem -> o.addProperty(elem.getKey(), elem.getValue()));
 			return o;
