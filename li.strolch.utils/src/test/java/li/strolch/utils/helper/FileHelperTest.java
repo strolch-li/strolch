@@ -1,7 +1,7 @@
 package li.strolch.utils.helper;
 
-import static li.strolch.utils.helper.FileHelper.*;
-import static li.strolch.utils.helper.StringHelper.*;
+import static li.strolch.utils.helper.FileHelper.getTempFile;
+import static li.strolch.utils.helper.StringHelper.normalizeLength;
 import static li.strolch.utils.helper.TempFileOptions.*;
 import static org.junit.Assert.assertEquals;
 
