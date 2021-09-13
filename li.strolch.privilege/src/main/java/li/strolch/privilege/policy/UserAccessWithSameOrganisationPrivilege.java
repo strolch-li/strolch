@@ -16,6 +16,7 @@
 package li.strolch.privilege.policy;
 
 import static java.util.stream.Collectors.toSet;
+import static li.strolch.privilege.base.PrivilegeConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -53,6 +54,11 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		return validateAction(ctx, privilege, restrictable, false);
 	}
 
+	protected boolean isStrolchAdminAndIgnoreOrganisation(PrivilegeContext ctx) {
+		return ctx.hasRole(ROLE_STROLCH_ADMIN);
+	}
+
+	@Override
 	protected boolean validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
 			boolean assertHasPrivilege) throws AccessDeniedException {
 
@@ -63,8 +69,8 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple)) {
-			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
+			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
+					"Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -77,6 +83,9 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		case PrivilegeHandler.PRIVILEGE_MODIFY_USER:
 		case PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD:
 		case PrivilegeHandler.PRIVILEGE_REMOVE_USER: {
+
+			if (isStrolchAdminAndIgnoreOrganisation(ctx))
+				break;
 
 			// make sure old user has same organisation
 			User oldUser = tuple.getFirst();
@@ -97,6 +106,9 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		case PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER:
 		case PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER: {
 
+			if (isStrolchAdminAndIgnoreOrganisation(ctx))
+				break;
+
 			User user = tuple.getFirst();
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", user);
 			if (!assertUserInSameOrganisation(ctx, user, assertHasPrivilege))
@@ -106,8 +118,8 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		}
 
 		default:
-			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
+					"Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeName);
 			throw new PrivilegeException(msg);
 		}
