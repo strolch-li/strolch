@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
+import li.strolch.privilege.base.PrivilegeConstants;
 
 public class StrolchModelConstants {
 
@@ -86,7 +87,7 @@ public class StrolchModelConstants {
 	/**
 	 * ID of the admin role which has access to all resources
 	 */
-	public static final String ROLE_STROLCH_ADMIN = "StrolchAdmin";
+	public static final String ROLE_STROLCH_ADMIN = PrivilegeConstants.ROLE_STROLCH_ADMIN;
 
 	public static final String PARAM_CLASS_NAME = "className";
 	public static final String PARAM_CRON = "cron";
