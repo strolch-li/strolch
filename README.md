@@ -35,7 +35,7 @@ Or install locally first:
 
 Then you can create your own project. Please read the README files in the generated projects.
 
-To create a Strolch project see https://strolch.li/development.html
+To create a Strolch project see https://strolch.li/development/
 
 ## More Information
 
