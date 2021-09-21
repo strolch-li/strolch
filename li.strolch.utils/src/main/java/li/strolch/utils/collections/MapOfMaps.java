@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -226,6 +227,12 @@ public class MapOfMaps<T, U, V> {
 		}
 
 		return u;
+	}
+
+	public V computeIfAbsent(T t, U u, Supplier<V> mappingFunction) {
+		Objects.requireNonNull(mappingFunction);
+		Map<U, V> uvMap = this.mapOfMaps.computeIfAbsent(t, k -> getMap());
+		return uvMap.computeIfAbsent(u, k -> mappingFunction.get());
 	}
 
 	public void forEach(BiConsumer<? super T, ? super Map<U, V>> action) {
