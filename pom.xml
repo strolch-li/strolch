@@ -103,7 +103,7 @@
         <csv.version>1.8</csv.version>
         <cron.version>1.6.2</cron.version>
 
-        <camel.version>2.25.2</camel.version>
+        <camel.version>3.11.1</camel.version>
         <hapi.version>2.3</hapi.version>
 
         <pi4j.version>1.4</pi4j.version>
