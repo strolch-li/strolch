@@ -91,8 +91,10 @@
         <serverlet.version>4.0.1</serverlet.version>
         <jaxrs.api.version>2.1.1</jaxrs.api.version>
         <jaxrs.ri.version>2.34</jaxrs.ri.version>
-        <jaxb.api.version>2.4.0-b180830.0359</jaxb.api.version>
-        <jaxws.version>2.3.4</jaxws.version>
+        <jaxb.api.version>2.3.1</jaxb.api.version>
+        <jaxb.core.version>2.3.0.1</jaxb.core.version>
+        <jaxb.impl.version>2.3.2</jaxb.impl.version>
+        <jaxws.version>3.0.2</jaxws.version>
         <jaxp.version>1.4.2</jaxp.version>
         <tyrus.version>1.17</tyrus.version>
         <grizzly.version>2.3.35</grizzly.version>
@@ -235,9 +237,24 @@
                 <version>${cron.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>${jaxb.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${jaxb.impl.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>${jaxb.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml</groupId>
+                <artifactId>jaxp-api</artifactId>
+                <version>${jaxp.version}</version>
             </dependency>
             <dependency>
                 <groupId>sax</groupId>
