@@ -35,11 +35,9 @@ public class ReservationExecution extends DurationExecution {
 	public boolean isExecutable(Action action) {
 		switch (action.getType()) {
 		case TYPE_RESERVE:
+			return !isReserved(tx(), action);
 		case TYPE_RELEASE:
-			if (action.getType().equals(TYPE_RESERVE))
-				return !isReserved(tx(), action);
-			return isReserved(tx(), action);
-
+			return true;
 		default:
 			return super.isExecutable(action);
 		}
@@ -80,9 +78,8 @@ public class ReservationExecution extends DurationExecution {
 		Resource resource = tx.getResourceFor(action, true);
 
 		if (!resource.hasParameter(BAG_PARAMETERS, PARAM_RESERVED))
-			throw new StrolchModelException(
-					"Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on " + resource
-							.getLocator());
+			throw new StrolchModelException("Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on "
+					+ resource.getLocator());
 
 		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
 		return reservedP.getValue();
