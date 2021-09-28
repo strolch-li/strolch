@@ -100,6 +100,7 @@ public class Controller {
 		this.executionHandler.runAsAgent(runnable);
 	}
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	private boolean refreshActivity(StrolchTransaction tx) {
 		Activity activity = tx.getActivityBy(this.activityType, this.activityId, false);
 		if (activity == null) {
