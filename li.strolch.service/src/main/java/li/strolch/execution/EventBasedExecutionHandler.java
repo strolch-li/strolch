@@ -217,6 +217,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
+		//noinspection SynchronizeOnNonFinalField
 		synchronized (this.controllers) {
 			Map<Locator, Controller> controllers = this.controllers.getMap(realm);
 			if (controllers != null)
@@ -409,24 +410,24 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
-	public void archiveActivity(String realm, Activity activity) {
+	public void archiveActivity(String realm, Locator activityLoc) {
 		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ArchiveActivityCommand.class,
 							false)) {
 						ArchiveActivityCommand command = new ArchiveActivityCommand(tx);
-						command.setActivityLoc(activity.getLocator());
+						command.setActivityLoc(activityLoc);
 						tx.addCommand(command);
 						tx.commitOnClose();
 					}
 				});
 			} catch (Exception e) {
-				logger.error("Failed to archive " + activity.getLocator() + " due to " + e.getMessage(), e);
+				logger.error("Failed to archive " + activityLoc + " due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, SYSTEM_USER_AGENT, activity.getLocator(), LogSeverity.Exception,
+							new LogMessage(realm, SYSTEM_USER_AGENT, activityLoc, LogSeverity.Exception,
 									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 									"execution.handler.failed.archive").withException(e).value("reason", e));
 				}
