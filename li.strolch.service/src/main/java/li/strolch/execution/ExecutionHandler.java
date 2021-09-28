@@ -188,10 +188,10 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 *
 	 * @param realm
 	 * 		the realm where the activity resides
-	 * @param activity
-	 * 		the {@link Activity}
+	 * @param activityLoc
+	 * 		the {@link Locator} of the {@link Activity} to archive
 	 */
-	public abstract void archiveActivity(String realm, Activity activity);
+	public abstract void archiveActivity(String realm, Locator activityLoc);
 
 	/**
 	 * Returns the {@link Set} of {@link Locator Locators} of {@link Activity Activities} which are registered for

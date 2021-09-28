@@ -147,7 +147,7 @@ public class Controller {
 		if (this.activity.getState().isExecuted()) {
 			this.executionHandler.removeFromExecution(this);
 			logger.info("Archiving executed activity " + this.locator + " with state " + this.activity.getState());
-			this.executionHandler.archiveActivity(this.realm, this.activity);
+			this.executionHandler.archiveActivity(this.realm, this.activity.getLocator());
 
 			return false;
 		}
