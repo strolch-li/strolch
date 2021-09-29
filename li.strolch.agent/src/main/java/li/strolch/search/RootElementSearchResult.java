@@ -142,6 +142,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	 *
 	 * @return this for chaining
 	 */
+	@Override
 	public RootElementSearchResult<T> orderBy(Comparator<? super T> comparator) {
 		super.orderBy(comparator);
 		return this;
@@ -178,6 +179,6 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	 * @return the new search result for chaining
 	 */
 	public <U> SearchResult<U> visitor(StrolchRootElementVisitor<U> visitor) {
-		return new SearchResult<U>(this.stream.map(e -> e.accept(visitor)));
+		return new SearchResult<>(this.stream.map(e -> e.accept(visitor)));
 	}
 }
