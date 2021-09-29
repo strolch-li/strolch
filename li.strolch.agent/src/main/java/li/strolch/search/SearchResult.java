@@ -322,7 +322,7 @@ public class SearchResult<T> {
 	 * @return true if this search result is empty
 	 */
 	public boolean isEmpty() {
-		return this.stream.count() == 0;
+		return this.stream.findAny().isEmpty();
 	}
 
 	/**
@@ -333,6 +333,6 @@ public class SearchResult<T> {
 	 * @return true if this search result is <b>NOT</b> empty
 	 */
 	public boolean isNotEmpty() {
-		return this.stream.count() != 0;
+		return this.stream.findAny().isPresent();
 	}
 }
