@@ -137,6 +137,7 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
         <archetype-packaging.version>3.2.0</archetype-packaging.version>
+        <spotbugs-maven-plugin.version>4.4.1</spotbugs-maven-plugin.version>
 
         <warFinalName>NOT_SET</warFinalName>
         <tomcat7Url>NOT_SET</tomcat7Url>
@@ -489,6 +490,19 @@
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>${maven-project-info-reports-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs-maven-plugin.version}</version>
+                    <configuration>
+                        <effort>Max</effort>
+                        <threshold>Default</threshold>
+                        <skipEmptyReport>false</skipEmptyReport>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <includeTests>true</includeTests>
+                        <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+                    </configuration>
+                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -673,6 +687,10 @@
             <id>oss.sonatype.org</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <site>
+            <id>localhost</id>
+            <url>file://${project.basedir}/target</url>
+        </site>
     </distributionManagement>
 
     <profiles>
@@ -715,5 +733,44 @@
             </build>
         </profile>
     </profiles>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs-maven-plugin.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <id>spotbugs</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>spotbugs</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${pmd-maven-plugin.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <!-- aggregate reportSet, to define in poms having modules -->
+                        <id>aggregate</id>
+                        <inherited>false</inherited> <!-- don't run aggregate in child modules -->
+                        <reports>
+                            <report>aggregate-pmd</report>
+                            <report>aggregate-cpd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 
 </project>

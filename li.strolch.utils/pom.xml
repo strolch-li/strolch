@@ -16,6 +16,13 @@
     <description>These utils contain project independent helper classes and utilities for reuse</description>
     <inceptionYear>2011</inceptionYear>
 
+    <distributionManagement>
+        <site>
+            <id>localhost</id>
+            <url>file://${project.basedir}/../target/${project.artifactId}</url>
+        </site>
+    </distributionManagement>
+
     <dependencies>
 
         <!-- Base -->

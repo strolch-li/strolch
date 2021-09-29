@@ -15,6 +15,13 @@
     <name>li.strolch.bom</name>
     <description>All of Strolch's dependencies for easy dependency management in Strolch projects</description>
 
+    <distributionManagement>
+        <site>
+            <id>localhost</id>
+            <url>file://${project.basedir}/../target/${project.artifactId}</url>
+        </site>
+    </distributionManagement>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

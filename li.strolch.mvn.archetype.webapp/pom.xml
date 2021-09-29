@@ -12,6 +12,13 @@
     <artifactId>li.strolch.mvn.archetype.webapp</artifactId>
     <packaging>maven-archetype</packaging>
 
+    <distributionManagement>
+        <site>
+            <id>localhost</id>
+            <url>file://${project.basedir}/../target/${project.artifactId}</url>
+        </site>
+    </distributionManagement>
+
     <build>
 
         <resources>
