@@ -195,34 +195,29 @@ public class ResponseUtil {
 		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
+	public static <T> Response toResponse(List<T> list, Function<T, JsonObject> visitor) {
+		JsonObject response = new JsonObject();
+		response.addProperty(MSG, StringHelper.DASH);
+		return handleIterable(visitor, response, list);
+	}
+
 	public static <T> Response toResponse(Paging<T> paging, Function<T, JsonObject> visitor) {
 		JsonObject response = new JsonObject();
 		addPagingInfo(paging, response);
-
-		List<T> page = paging.getPage();
-		JsonArray data = new JsonArray();
-		page.forEach(t -> data.add(visitor.apply(t)));
-		response.add(DATA, data);
-
-		String json = new Gson().toJson(response);
-
-		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+		return handleIterable(visitor, response, paging.getPage());
 	}
 
 	public static Response toResponse(Paging<JsonObject> paging) {
 		JsonObject response = new JsonObject();
 		addPagingInfo(paging, response);
+		return handleIterable(e -> e, response, paging.getPage());
+	}
 
-		List<JsonObject> page = paging.getPage();
+	private static <T> Response handleIterable(Function<T, JsonObject> visitor, JsonObject response, Iterable<T> page) {
 		JsonArray data = new JsonArray();
-		for (JsonObject jsonObject : page) {
-			data.add(jsonObject);
-		}
+		page.forEach(t -> data.add(visitor.apply(t)));
 		response.add(DATA, data);
-
-		String json = new Gson().toJson(response);
-
-		return Response.ok(json, MediaType.APPLICATION_JSON).build();
+		return Response.ok(new Gson().toJson(response), MediaType.APPLICATION_JSON).build();
 	}
 
 	private static <T> void addPagingInfo(Paging<T> paging, JsonObject response) {
