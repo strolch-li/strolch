@@ -1,6 +1,8 @@
 # Strolch
 [![Build Status](https://ci.4trees.ch/buildStatus/icon?job=strolch)](https://ci.4trees.ch/job/strolch/)
 
+[![WorksWithOpenJDK](https://github.com/foojayio/badges/raw/main/works_with_openjdk/WorksWithOpenJDK-100.png)](https://foojay.io/works-with-openjdk)
+
 The main repository which contains all of Strolch.
 
 Strolch consists of the following modules:
