@@ -34,7 +34,7 @@ import li.strolch.utils.dbc.DBC;
 public class PolicyDefs {
 
 	private StrolchElement parent;
-	private Map<String, PolicyDef> policyDefMap;
+	private final Map<String, PolicyDef> policyDefMap;
 	private boolean readOnly;
 
 	public PolicyDefs() {
@@ -58,6 +58,10 @@ public class PolicyDefs {
 		return getPolicyDef(type, null);
 	}
 
+	public PolicyDef getPolicyDef(Class<?> clazz) {
+		return getPolicyDef(clazz.getSimpleName(), null);
+	}
+
 	public PolicyDef getPolicyDef(String type, PolicyDef defaultDef) {
 		if (!this.policyDefMap.containsKey(type)) {
 			if (defaultDef != null)
@@ -69,8 +73,16 @@ public class PolicyDefs {
 		return this.policyDefMap.get(type);
 	}
 
+	public PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef) {
+		return getPolicyDef(clazz.getSimpleName(), defaultDef);
+	}
+
 	public boolean hasPolicyDef(String type) {
 		return this.policyDefMap.containsKey(type);
+	}
+
+	public boolean hasPolicyDef(Class<?> clazz) {
+		return this.policyDefMap.containsKey(clazz.getSimpleName());
 	}
 
 	public boolean hasPolicyDefs() {
@@ -86,6 +98,11 @@ public class PolicyDefs {
 	public void remove(String type) {
 		assertNotReadonly();
 		this.policyDefMap.remove(type);
+	}
+
+	public void remove(Class<?> clazz) {
+		assertNotReadonly();
+		this.policyDefMap.remove(clazz.getSimpleName());
 	}
 
 	@Override
