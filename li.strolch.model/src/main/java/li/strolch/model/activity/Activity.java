@@ -599,7 +599,7 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public PolicyDef getPolicyDef(Class<?> clazz) {
-		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
+		return getPolicyDefs().getPolicyDef(clazz);
 	}
 
 	@Override
@@ -611,7 +611,7 @@ public class Activity extends AbstractStrolchRootElement
 	public PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef) {
 		if (!hasPolicyDefs())
 			return defaultDef;
-		return getPolicyDefs().getPolicyDef(clazz.getSimpleName(), defaultDef);
+		return getPolicyDefs().getPolicyDef(clazz, defaultDef);
 	}
 
 	@Override
@@ -628,12 +628,12 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public boolean hasPolicyDef(String type) {
-		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
+		return this.policyDefs != null && this.policyDefs.hasPolicyDef(type);
 	}
 
 	@Override
 	public boolean hasPolicyDef(Class<?> clazz) {
-		return this.policyDefs != null && this.policyDefs.hasPolicyDef(clazz.getSimpleName());
+		return this.policyDefs != null && this.policyDefs.hasPolicyDef(clazz);
 	}
 
 	@Override

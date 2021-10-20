@@ -248,25 +248,20 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public PolicyDef getPolicyDef(Class<?> clazz) {
+		return getPolicyDefs().getPolicyDef(clazz);
+	}
+
+	@Override
 	public PolicyDef getPolicyDef(String type) {
 		return getPolicyDefs().getPolicyDef(type);
-	}
-
-	@Override
-	public boolean hasPolicyDefs() {
-		return this.policyDefs != null;
-	}
-
-	@Override
-	public PolicyDef getPolicyDef(Class<?> clazz) {
-		return getPolicyDefs().getPolicyDef(clazz.getSimpleName());
 	}
 
 	@Override
 	public PolicyDef getPolicyDef(Class<?> clazz, PolicyDef defaultDef) {
 		if (!hasPolicyDefs())
 			return defaultDef;
-		return getPolicyDefs().getPolicyDef(clazz.getSimpleName(), defaultDef);
+		return getPolicyDefs().getPolicyDef(clazz, defaultDef);
 	}
 
 	@Override
@@ -277,13 +272,18 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public boolean hasPolicyDefs() {
+		return this.policyDefs != null;
+	}
+
+	@Override
 	public boolean hasPolicyDef(String type) {
-		return this.policyDefs != null && policyDefs.hasPolicyDef(type);
+		return this.policyDefs != null && this.policyDefs.hasPolicyDef(type);
 	}
 
 	@Override
 	public boolean hasPolicyDef(Class<?> clazz) {
-		return this.policyDefs != null && this.policyDefs.hasPolicyDef(clazz.getSimpleName());
+		return this.policyDefs != null && this.policyDefs.hasPolicyDef(clazz);
 	}
 
 	@Override
