@@ -97,6 +97,7 @@ public class LogMessage extends I18nMessage {
 		this.state = state;
 	}
 
+	@Override
 	public LogMessage withException(Throwable t) {
 		super.withException(t);
 		return this;

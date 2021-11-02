@@ -35,6 +35,7 @@ public class I18nMessage {
 	private final Properties values;
 	private final ResourceBundle bundle;
 	private String message;
+	protected Throwable exception;
 	protected String stackTrace;
 
 	public I18nMessage(ResourceBundle bundle, String key) {
@@ -140,14 +141,25 @@ public class I18nMessage {
 		return this;
 	}
 
-	public I18nMessage value(String key, Throwable e) {
-		value(key, getExceptionMessageWithCauses(e));
+	public I18nMessage value(String key, Throwable t) {
+		this.exception = t;
+		this.stackTrace = formatException(t);
+		value(key, getExceptionMessageWithCauses(t));
 		return this;
 	}
 
 	public I18nMessage withException(Throwable t) {
+		this.exception = t;
 		this.stackTrace = formatException(t);
 		return this;
+	}
+
+	public boolean hasException() {
+		return this.exception != null;
+	}
+
+	public Throwable getException() {
+		return exception;
 	}
 
 	public String getStackTrace() {
@@ -298,8 +310,8 @@ public class I18nMessage {
 						String baseName = tuple.getFirst();
 						Locale locale = tuple.getSecond();
 
-						ResourceBundle bundle = ResourceBundle
-								.getBundle(baseName, locale, new CustomControl(jarFile.getInputStream(je)));
+						ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale,
+								new CustomControl(jarFile.getInputStream(je)));
 
 						bundleMap.addElement(bundle.getBaseBundleName(), bundle.getLocale(), bundle);
 						logger.info("    Loaded bundle " + bundle.getBaseBundleName() + " " + bundle.getLocale());
@@ -310,13 +322,13 @@ public class I18nMessage {
 			File classesD = new File(jarD.getParentFile(), "classes");
 			if (classesD.isDirectory()) {
 				File[] propertyFiles = classesD.listFiles(
-						(dir, name) -> name.endsWith(".properties") && !(name.equals("appVersion.properties") || name
-								.equals("ENV.properties")));
+						(dir, name) -> name.endsWith(".properties") && !(name.equals("appVersion.properties")
+								|| name.equals("ENV.properties")));
 				if (propertyFiles != null && propertyFiles.length > 0) {
 					for (File propertyFile : propertyFiles) {
 
-						logger.info("  Found property file " + propertyFile.getName() + " in classes " + classesD
-								.getAbsolutePath());
+						logger.info("  Found property file " + propertyFile.getName() + " in classes "
+								+ classesD.getAbsolutePath());
 
 						TypedTuple<String, Locale> tuple = parsePropertyName(propertyFile.getName());
 						if (tuple == null)
