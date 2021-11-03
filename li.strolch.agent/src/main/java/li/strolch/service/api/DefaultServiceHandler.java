@@ -74,9 +74,15 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	}
 
 	@Override
-	public <T extends ServiceArgument, U extends ServiceResult> U doService(Certificate certificate,
-			Service<T, U> service, T argument) {
+	public <T extends ServiceArgument, U extends ServiceResult> U doService(Certificate certificate, Service<T, U> svc,
+			T argument) {
 		DBC.PRE.assertNotNull("Certificate my not be null!", certificate);
+
+		if (!(svc instanceof AbstractService))
+			throw new IllegalArgumentException(
+					"This service handle expects all services to be instance of " + AbstractService.class.getName());
+
+		AbstractService<T, U> service = (AbstractService<T, U>) svc;
 
 		long start = System.nanoTime();
 
@@ -99,8 +105,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				LogMessage logMessage = new LogMessage(realmName, username,
 						Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), service.getPrivilegeName(),
 								svcName), LogSeverity.Exception, LogMessageState.Information,
-						ResourceBundle.getBundle("strolch-agent"), "agent.service.failed.access.denied")
-						.value("user", username).value("service", svcName).withException(e);
+						ResourceBundle.getBundle("strolch-agent"), "agent.service.failed.access.denied").value("user",
+						username).value("service", svcName).withException(e);
 
 				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
 				operationsLog.addMessage(logMessage);
@@ -110,12 +116,10 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 					"agent.service.failed.access.denied").value("user", username)
 					.value("service", service.getClass().getSimpleName());
 
-			if (!this.throwOnPrivilegeFail && service instanceof AbstractService) {
+			if (!this.throwOnPrivilegeFail) {
 				logger.error(e.getMessage(), e);
 
-				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
-				@SuppressWarnings("unchecked")
-				U result = (U) abstractService.getResultInstance();
+				U result = service.getResultInstance();
 				result.setState(e instanceof PrivilegeModelException ?
 						ServiceResultState.EXCEPTION :
 						ServiceResultState.ACCESS_DENIED);
@@ -132,23 +136,13 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		try {
 			// then perform the service
-			if (service instanceof AbstractService) {
-				AbstractService<?, ?> abstractService = (AbstractService<?, ?>) service;
-				abstractService.setContainer(getContainer());
-				abstractService.setPrivilegeContext(privilegeContext);
-			}
-
-			U serviceResult = service.doService(argument);
-			if (serviceResult == null) {
-				String msg = "Service {0} is not properly implemented as it returned a null result!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, service.getClass().getSimpleName());
-				throw new StrolchException(msg);
-			}
+			service.setContainer(getContainer());
+			service.setPrivilegeContext(privilegeContext);
+			U result = service.doService(argument);
 
 			// log the result
-			logResult(service, argument, start, certificate, serviceResult);
-
-			return serviceResult;
+			logResult(service, argument, start, certificate, result);
+			return result;
 
 		} catch (Exception e) {
 			long end = System.nanoTime();
@@ -177,7 +171,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	}
 
 	private void logResult(Service<?, ?> service, ServiceArgument arg, long start, Certificate certificate,
-			ServiceResult serviceResult) {
+			ServiceResult result) {
 
 		long end = System.nanoTime();
 
@@ -189,38 +183,37 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(end - start));
 
-		if (serviceResult.getState() == ServiceResultState.SUCCESS) {
+		if (result.getState() == ServiceResultState.SUCCESS) {
 			logger.info(msg);
-		} else if (serviceResult.getState() == ServiceResultState.WARNING) {
+		} else if (result.getState() == ServiceResultState.WARNING) {
 
 			msg = ServiceResultState.WARNING + ": " + msg;
 			logger.warn(msg);
 
-			if (isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
-				logger.warn("Reason: " + serviceResult.getMessage(), serviceResult.getThrowable());
-			} else if (isNotEmpty(serviceResult.getMessage())) {
-				logger.warn("Reason: " + serviceResult.getMessage());
-			} else if (serviceResult.getThrowable() != null) {
-				logger.warn("Reason: " + serviceResult.getThrowable().getMessage(), serviceResult.getThrowable());
+			if (isNotEmpty(result.getMessage()) && result.getThrowable() != null) {
+				logger.warn("Reason: " + result.getMessage(), result.getThrowable());
+			} else if (isNotEmpty(result.getMessage())) {
+				logger.warn("Reason: " + result.getMessage());
+			} else if (result.getThrowable() != null) {
+				logger.warn("Reason: " + result.getThrowable().getMessage(), result.getThrowable());
 			}
 
-		} else if (serviceResult.getState() == ServiceResultState.FAILED
-				|| serviceResult.getState() == ServiceResultState.EXCEPTION
-				|| serviceResult.getState() == ServiceResultState.ACCESS_DENIED) {
+		} else if (result.getState() == ServiceResultState.FAILED || result.getState() == ServiceResultState.EXCEPTION
+				|| result.getState() == ServiceResultState.ACCESS_DENIED) {
 
-			msg = serviceResult.getState() + ": " + msg;
+			msg = result.getState() + ": " + msg;
 			logger.error(msg);
 
 			String reason = null;
 			Throwable throwable = null;
-			if (isNotEmpty(serviceResult.getMessage()) && serviceResult.getThrowable() != null) {
-				reason = serviceResult.getMessage();
-				throwable = serviceResult.getThrowable();
-			} else if (isNotEmpty(serviceResult.getMessage())) {
-				reason = serviceResult.getMessage();
-			} else if (serviceResult.getThrowable() != null) {
-				reason = serviceResult.getThrowable().getMessage();
-				throwable = serviceResult.getThrowable();
+			if (isNotEmpty(result.getMessage()) && result.getThrowable() != null) {
+				reason = result.getMessage();
+				throwable = result.getThrowable();
+			} else if (isNotEmpty(result.getMessage())) {
+				reason = result.getMessage();
+			} else if (result.getThrowable() != null) {
+				reason = result.getThrowable().getMessage();
+				throwable = result.getThrowable();
 			}
 
 			if (throwable == null)
@@ -228,8 +221,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			else
 				logger.error("Reason: " + reason, throwable);
 
-			if ((serviceResult.getState() == ServiceResultState.EXCEPTION
-					|| serviceResult.getState() == ServiceResultState.ACCESS_DENIED) //
+			if ((result.getState() == ServiceResultState.EXCEPTION
+					|| result.getState() == ServiceResultState.ACCESS_DENIED) //
 					&& getContainer().hasComponent(OperationsLog.class)) {
 
 				LogMessage logMessage;
@@ -237,24 +230,24 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				ResourceBundle bundle = ResourceBundle.getBundle("strolch-agent");
 				if (throwable == null) {
 					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
-							LogSeverity.Exception, LogMessageState.Information, bundle, "agent.service.failed")
-							.value("service", svcName).value("reason", reason);
+							LogSeverity.Exception, LogMessageState.Information, bundle, "agent.service.failed").value(
+							"service", svcName).value("reason", reason);
 				} else {
 					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
-							LogSeverity.Exception, LogMessageState.Information, bundle, "agent.service.failed.ex")
-							.withException(throwable).value("service", svcName).value("reason", reason)
-							.value("exception", throwable);
+							LogSeverity.Exception, LogMessageState.Information, bundle,
+							"agent.service.failed.ex").withException(throwable).value("service", svcName)
+							.value("reason", reason).value("exception", throwable);
 				}
 
 				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
 				operationsLog.addMessage(logMessage);
 			}
 
-		} else if (serviceResult.getState() == null) {
+		} else if (result.getState() == null) {
 			logger.error("Service " + svcName + " returned a null ServiceResultState!");
 			logger.error(msg);
 		} else {
-			logger.error("UNHANDLED SERVICE RESULT STATE: " + serviceResult.getState());
+			logger.error("UNHANDLED SERVICE RESULT STATE: " + result.getState());
 			logger.error(msg);
 		}
 	}

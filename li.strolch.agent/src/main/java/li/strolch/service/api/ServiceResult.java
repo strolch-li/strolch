@@ -23,7 +23,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import com.google.gson.JsonObject;
-import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.utils.I18nMessage;
 
@@ -227,8 +227,10 @@ public class ServiceResult {
 			json.addProperty("exceptionMsg", getExceptionMessageWithCauses(this.throwable, false));
 			json.addProperty("throwable", formatException(this.throwable));
 
-			if (this.throwable instanceof StrolchException && ((StrolchException) this.throwable).hasI18n())
-				json.add("i18n", ((StrolchException) this.throwable).getI18n().accept(new I18nMessageToJsonVisitor()));
+			if (this.throwable instanceof StrolchUserMessageException
+					&& ((StrolchUserMessageException) this.throwable).hasI18n())
+				json.add("i18n", ((StrolchUserMessageException) this.throwable).getI18n()
+						.accept(new I18nMessageToJsonVisitor()));
 		}
 
 		if (!json.has("i18n") && this.i18nMessage != null)

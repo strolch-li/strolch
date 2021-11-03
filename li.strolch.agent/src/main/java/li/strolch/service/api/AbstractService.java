@@ -16,6 +16,7 @@
 package li.strolch.service.api;
 
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 import java.text.MessageFormat;
@@ -25,7 +26,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.UserMessageException;
+import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.SystemAction;
@@ -572,14 +573,21 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 			U result = getResultInstance();
 			result.setMessage(e.getMessage());
 
-			if (e instanceof UserMessageException) {
+			if (e instanceof StrolchUserMessageException) {
 				result.setState(ServiceResultState.WARNING);
-				result.setI18nMessage(((UserMessageException) e).getI18nMsg());
-			} else {
-				result.setState(ServiceResultState.EXCEPTION);
-				result.setThrowable(e);
+				result.setI18nMessage(((StrolchUserMessageException) e).getI18n());
+				return result;
 			}
 
+			Throwable rootCause = getRootCause(e);
+			if (rootCause instanceof StrolchUserMessageException) {
+				result.setState(ServiceResultState.WARNING);
+				result.setI18nMessage(((StrolchUserMessageException) rootCause).getI18n());
+				return result;
+			}
+
+			result.setState(ServiceResultState.EXCEPTION);
+			result.setThrowable(e);
 			return result;
 		}
 	}

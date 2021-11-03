@@ -16,7 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchElementNotFoundException;
-import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
@@ -179,13 +179,14 @@ public class ResponseUtil {
 	public static Response toResponse(Status status, Throwable t) {
 		JsonObject response = new JsonObject();
 
-		if (t instanceof StrolchException && ((StrolchException) t).hasI18n()) {
-			StrolchException ex = (StrolchException) t;
+		if (t instanceof StrolchUserMessageException && ((StrolchUserMessageException) t).hasI18n()) {
+			StrolchUserMessageException ex = (StrolchUserMessageException) t;
 			response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 		} else {
 			Throwable rootCause = getRootCause(t);
-			if (rootCause instanceof StrolchException && ((StrolchException) rootCause).hasI18n()) {
-				StrolchException ex = (StrolchException) rootCause;
+			if (rootCause instanceof StrolchUserMessageException
+					&& ((StrolchUserMessageException) rootCause).hasI18n()) {
+				StrolchUserMessageException ex = (StrolchUserMessageException) rootCause;
 				response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 			}
 		}
