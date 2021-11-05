@@ -409,7 +409,7 @@ public class Activity extends AbstractStrolchRootElement
 				.collect(toList());
 	}
 
-	public List<Action> findActionsDeep(Predicate<IActivityElement> predicate) {
+	public List<Action> findActionsDeep(Predicate<Action> predicate) {
 		return streamActionsDeep().filter(predicate).collect(toList());
 	}
 
