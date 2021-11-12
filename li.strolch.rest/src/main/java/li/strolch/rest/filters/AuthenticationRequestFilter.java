@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * header {@link HttpHeaders#AUTHORIZATION} with the authorization token as its value.
  *
  * <br>
- *
+ * <p>
  * Sub classes should override {@link #validateSession(ContainerRequestContext, String)} to add further validation.
  *
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
@@ -64,6 +64,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	private HttpServletRequest request;
 
 	private Set<String> unsecuredPaths;
+
+	protected RestfulStrolchComponent getRestful() {
+		return RestfulStrolchComponent.getInstance();
+	}
+
+	protected StrolchSessionHandler getSessionHandler() {
+		return getRestful().getSessionHandler();
+	}
 
 	/**
 	 * Defines the set of paths which are considered to be unsecured, i.e. can be requested without having logged in
@@ -82,9 +90,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	/**
 	 * Validates if the path for the given request is for an unsecured path, i.e. no authorization is required
 	 *
-	 * @param requestContext
-	 * 		the request context
-	 *
+	 * @param requestContext the request context
 	 * @return true if the request context is for an unsecured path, false if not, meaning authorization must be
 	 * validated
 	 */
@@ -109,12 +115,13 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " + requestContext.getUriInfo()
 				.getRequestUri());
 
-		if (isUnsecuredPath(requestContext))
-			return;
-
 		try {
 
-			validateSession(requestContext, remoteIp);
+			if (isUnsecuredPath(requestContext)) {
+				validateSessionIfAvailable(requestContext, remoteIp);
+			} else {
+				validateSession(requestContext, remoteIp);
+			}
 
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
@@ -134,46 +141,45 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		}
 	}
 
+	protected void validateSessionIfAvailable(ContainerRequestContext requestContext, String remoteIp) {
+		String sessionId = trimOrEmpty(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
+		if (sessionId.isEmpty()) {
+			sessionId = getSessionIdFromCookie(requestContext);
+			if (isEmpty(sessionId)) {
+				return;
+			}
+		}
+
+		if (sessionId.startsWith("Basic "))
+			authenticateBasic(requestContext, sessionId, remoteIp);
+		else
+			validateCertificate(requestContext, sessionId, remoteIp);
+	}
+
 	/**
 	 * Validate the given request context by checking for the authorization cookie or header and then verifying a
 	 * session exists and is valid with the given authoriation token
 	 *
 	 * <br>
-	 *
+	 * <p>
 	 * Sub classes should override this method and first call super. If the return value is non-null, then further
 	 * validation can be performed
 	 *
-	 * @param requestContext
-	 * 		the request context for the secured path
-	 * @param remoteIp
-	 * 		the remote IP
-	 *
+	 * @param requestContext the request context for the secured path
+	 * @param remoteIp       the remote IP
 	 * @return the certificate for the validated session, or null, of the request is aborted to no missing or invalid
 	 * authorization token
 	 */
 	protected Certificate validateSession(ContainerRequestContext requestContext, String remoteIp) {
-		String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
-		authorization = trimOrEmpty(authorization);
-
+		String authorization = trimOrEmpty(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 		if (authorization.isEmpty())
 			return validateCookie(requestContext, remoteIp);
-
-		if (authorization.startsWith("Basic ")) {
-			if (!getRestful().isBasicAuthEnabled()) {
-				logger.error("Basic Auth is not available for URL " + requestContext.getUriInfo().getPath());
-				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Basic Auth not available")
-						.build());
-				return null;
-			}
-
+		if (authorization.startsWith("Basic "))
 			return authenticateBasic(requestContext, authorization, remoteIp);
-		}
-
 		return validateCertificate(requestContext, authorization, remoteIp);
 	}
 
-	private String getSessionIdFromCookie(ContainerRequestContext requestContext) {
+	protected String getSessionIdFromCookie(ContainerRequestContext requestContext) {
 		Cookie cookie = requestContext.getCookies().get(StrolchRestfulConstants.STROLCH_AUTHORIZATION);
 		if (cookie == null)
 			return "";
@@ -185,7 +191,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		return sessionId.trim();
 	}
 
-	private Certificate validateCookie(ContainerRequestContext requestContext, String remoteIp) {
+	protected Certificate validateCookie(ContainerRequestContext requestContext, String remoteIp) {
 		String sessionId = getSessionIdFromCookie(requestContext);
 		if (isEmpty(sessionId)) {
 			logger.error(
@@ -199,12 +205,17 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		return validateCertificate(requestContext, sessionId, remoteIp);
 	}
 
-	private RestfulStrolchComponent getRestful() {
-		return RestfulStrolchComponent.getInstance();
-	}
-
-	private Certificate authenticateBasic(ContainerRequestContext requestContext, String authorization,
+	protected Certificate authenticateBasic(ContainerRequestContext requestContext, String authorization,
 			String remoteIp) {
+
+		if (!getRestful().isBasicAuthEnabled()) {
+			logger.error("Basic Auth is not available for URL " + requestContext.getUriInfo().getPath());
+			requestContext.abortWith(
+					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("Basic Auth not available").build());
+			return null;
+		}
+
 		String basicAuth = authorization.substring("Basic ".length());
 		basicAuth = new String(Base64.getDecoder().decode(basicAuth.getBytes()), StandardCharsets.UTF_8);
 		String[] parts = basicAuth.split(":");
@@ -217,8 +228,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		logger.info("Performing basic auth for user " + parts[0] + "...");
 		StrolchSessionHandler sessionHandler = getSessionHandler();
-		Certificate certificate = sessionHandler
-				.authenticate(parts[0], parts[1].toCharArray(), remoteIp, Usage.SINGLE, false);
+		Certificate certificate = sessionHandler.authenticate(parts[0], parts[1].toCharArray(), remoteIp, Usage.SINGLE,
+				false);
 
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
@@ -226,11 +237,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		return certificate;
 	}
 
-	private StrolchSessionHandler getSessionHandler() {
-		return getRestful().getSessionHandler();
-	}
-
-	private Certificate validateCertificate(ContainerRequestContext requestContext, String sessionId, String remoteIp) {
+	protected Certificate validateCertificate(ContainerRequestContext requestContext, String sessionId,
+			String remoteIp) {
 		StrolchSessionHandler sessionHandler = getSessionHandler();
 		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 

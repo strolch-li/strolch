@@ -15,6 +15,9 @@
  */
 package li.strolch.rest.endpoint;
 
+import static li.strolch.model.Tags.Json.COMPONENT_NAME;
+import static li.strolch.model.Tags.Json.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,9 +26,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.VersionQueryResult;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.StrolchRestfulConstants;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -36,9 +42,32 @@ public class VersionQuery {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getVersions(@Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
 
-		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-		VersionQueryResult versionQueryResult = container.getAgent().getVersion();
-		return Response.ok(versionQueryResult.toJson().toString(), MediaType.APPLICATION_JSON).build();
+		if (cert == null && RestfulStrolchComponent.getInstance().isHideVersionFromUnauthorizedClients()) {
+
+			JsonObject agentVersion = new JsonObject();
+			agentVersion.addProperty(AGENT_NAME, agent.getApplicationName());
+			agentVersion.addProperty(ENVIRONMENT, agent.getEnvironment());
+			agentVersion.addProperty(LOCALE, agent.getLocale().toLanguageTag());
+			agentVersion.addProperty(TIMEZONE, agent.getTimezone());
+
+			JsonArray componentVersionsJ = new JsonArray();
+			agent.getVersion().getComponentVersions().forEach(c -> {
+				JsonObject componentVersionJ = new JsonObject();
+				componentVersionJ.addProperty(COMPONENT_NAME, c.getComponentName());
+				componentVersionsJ.add(componentVersionJ);
+			});
+
+			JsonObject jsonObject = new JsonObject();
+			jsonObject.add(AGENT_VERSION, agentVersion);
+			jsonObject.add(APP_VERSION, new JsonObject());
+			jsonObject.add(COMPONENT_VERSIONS, componentVersionsJ);
+
+			return Response.ok(jsonObject.toString(), MediaType.APPLICATION_JSON).build();
+		}
+
+		return Response.ok(agent.getVersion().toJson().toString(), MediaType.APPLICATION_JSON).build();
 	}
 }

@@ -45,6 +45,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private static final String PARAM_COOKIE_MAX_AGE = "cookieMaxAge"; //$NON-NLS-1$
 	private static final String PARAM_DOMAIN = "domain"; //$NON-NLS-1$
 	private static final String PARAM_BASIC_AUTH_ENABLED = "basicAuthEnabled"; //$NON-NLS-1$
+	private static final String PARAM_HIDE_VERSION_FROM_UNAUTHORIZED_CLIENTS = "hideVersionFromUnauthorizedClients"; //$NON-NLS-1$
 
 	/**
 	 * Allowed values:
@@ -83,6 +84,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private String domain;
 	private int cookieMaxAge;
 	private boolean basicAuthEnabled;
+	private boolean hideVersionFromUnauthorizedClients;
 
 	private String webPath;
 
@@ -98,76 +100,48 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.webPath = webPath;
 	}
 
-	/**
-	 * @return the corsEnabled
-	 */
 	public boolean isCorsEnabled() {
 		return this.corsEnabled;
 	}
 
-	/**
-	 * @return the origin
-	 */
 	public String getCorsOrigin() {
 		return this.corsOrigin;
 	}
 
-	/**
-	 * @return the restTracing
-	 */
 	public String getRestTracing() {
 		return this.restTracing;
 	}
 
-	/**
-	 * @return the restTracingThreshold
-	 */
 	public String getRestTracingThreshold() {
 		return this.restTracingThreshold;
 	}
 
-	/**
-	 * @return the restLogging
-	 */
 	public boolean isRestLogging() {
 		return this.restLogging;
 	}
 
-	/**
-	 * @return the restLoggingEntity
-	 */
 	public boolean isRestLoggingEntity() {
 		return this.restLoggingEntity;
 	}
 
-	/**
-	 * @return the secureCookie
-	 */
 	public boolean isSecureCookie() {
 		return this.secureCookie;
 	}
 
-	/**
-	 * @return the secureCookie
-	 */
 	public int getCookieMaxAge() {
 		return this.cookieMaxAge;
 	}
 
-	/**
-	 * Returns the Cookie Domain for this server
-	 *
-	 * @return the domain
-	 */
 	public String getDomain() {
 		return domain;
 	}
 
-	/**
-	 * @return the basicAuthEnabled
-	 */
 	public boolean isBasicAuthEnabled() {
 		return this.basicAuthEnabled;
+	}
+
+	public boolean isHideVersionFromUnauthorizedClients() {
+		return hideVersionFromUnauthorizedClients;
 	}
 
 	@Override
@@ -188,8 +162,8 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE"); //$NON-NLS-1$
 
 		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}"; //$NON-NLS-1$
-		logger.info(MessageFormat
-				.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing, this.restTracingThreshold));
+		logger.info(MessageFormat.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing,
+				this.restTracingThreshold));
 
 		// set http cache mode
 		String cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
@@ -201,6 +175,8 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		if (this.domain.isEmpty())
 			this.domain = null;
 		this.basicAuthEnabled = configuration.getBoolean(PARAM_BASIC_AUTH_ENABLED, true);
+		this.hideVersionFromUnauthorizedClients = configuration.getBoolean(PARAM_HIDE_VERSION_FROM_UNAUTHORIZED_CLIENTS,
+				false);
 
 		logger.info(
 				"Cookie max age is " + this.cookieMaxAge + "s and is " + (this.secureCookie ? "secure" : "not secure"));

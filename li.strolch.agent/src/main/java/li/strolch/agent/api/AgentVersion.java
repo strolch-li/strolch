@@ -15,20 +15,19 @@
  */
 package li.strolch.agent.api;
 
+import static li.strolch.model.Tags.Json.*;
+
 import java.util.Locale;
 import java.util.Properties;
 
 import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AgentVersion extends StrolchVersion {
 
-	public static final String AGENT_NAME = "agentName";
-	public static final String ENVIRONMENT = "environment";
-	public static final String LOCALE = "locale";
-	public static final String TIMEZONE = "timezone";
 	private final String environment;
 	private final String locale;
 	private final String timezone;
