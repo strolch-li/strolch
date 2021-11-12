@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.lang.management.*;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -66,6 +67,8 @@ public class StrolchAgent {
 
 	private JsonObject systemState;
 	private long systemStateUpdateTime;
+
+	private VersionQueryResult versionQueryResult;
 
 	public StrolchAgent(StrolchVersion appVersion) {
 		this.appVersion = appVersion;
@@ -165,6 +168,27 @@ public class StrolchAgent {
 	}
 
 	/**
+	 * @return the currently loaded environment of this application as is defined in the configuration
+	 */
+	public String getEnvironment() {
+		return this.strolchConfiguration.getRuntimeConfiguration().getEnvironment();
+	}
+
+	/**
+	 * @return the agent's {@link Locale}
+	 */
+	public Locale getLocale() {
+		return this.strolchConfiguration.getRuntimeConfiguration().getLocale();
+	}
+
+	/**
+	 * @return the agent's time zone
+	 */
+	public String getTimezone() {
+		return this.strolchConfiguration.getRuntimeConfiguration().getTimezone();
+	}
+
+	/**
 	 * Return the {@link ExecutorService} instantiated for this agent
 	 *
 	 * @return the {@link ExecutorService} instantiated for this agent
@@ -254,14 +278,10 @@ public class StrolchAgent {
 	 * Sets up the agent by parsing the configuration file and initializes the given environment
 	 * </p>
 	 *
-	 * @param environment
-	 * 		the current environment
-	 * @param configPathF
-	 * 		the path to the config directory
-	 * @param dataPathF
-	 * 		the path to the data directory
-	 * @param tempPathF
-	 * 		the path to the temp directory
+	 * @param environment the current environment
+	 * @param configPathF the path to the config directory
+	 * @param dataPathF   the path to the data directory
+	 * @param tempPathF   the path to the temp directory
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
@@ -272,8 +292,8 @@ public class StrolchAgent {
 		logger.info(" - Temp: " + tempPathF.getAbsolutePath());
 		logger.info(" - user.dir: " + SystemHelper.getUserDir());
 
-		this.strolchConfiguration = ConfigurationParser
-				.parseConfiguration(environment, configPathF, dataPathF, tempPathF);
+		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, configPathF, dataPathF,
+				tempPathF);
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
 		container.setup(this.strolchConfiguration);
@@ -281,8 +301,8 @@ public class StrolchAgent {
 		this.container = container;
 
 		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
-		logger.info(MessageFormat
-				.format("Setup Agent {0}:{1}", config.getApplicationName(), config.getEnvironment())); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(),
+				config.getEnvironment())); //$NON-NLS-1$
 	}
 
 	protected void assertContainerStarted() {
@@ -306,8 +326,6 @@ public class StrolchAgent {
 		return StringHelper.getUniqueIdLong();
 	}
 
-	private VersionQueryResult versionQueryResult;
-
 	/**
 	 * Returns the version of this agent
 	 *
@@ -329,8 +347,8 @@ public class StrolchAgent {
 						runtimeConfiguration.getTimezone(), properties);
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
-				String msg = MessageFormat
-						.format("Failed to read version properties for agent: {0}", e.getMessage()); //$NON-NLS-1$
+				String msg = MessageFormat.format("Failed to read version properties for agent: {0}",
+						e.getMessage()); //$NON-NLS-1$
 				queryResult.getErrors().add(msg);
 				logger.error(msg, e);
 			}
@@ -357,8 +375,9 @@ public class StrolchAgent {
 
 	public JsonObject getSystemState(long updateInterval, TimeUnit updateIntervalUnit) {
 
-		if (this.systemState == null || System.currentTimeMillis() - this.systemStateUpdateTime > updateIntervalUnit
-				.toMillis(updateInterval)) {
+		if (this.systemState == null
+				|| System.currentTimeMillis() - this.systemStateUpdateTime > updateIntervalUnit.toMillis(
+				updateInterval)) {
 			this.systemState = new JsonObject();
 
 			JsonObject osJ = new JsonObject();

@@ -165,6 +165,17 @@ public class Tags {
 		public static final String AGENT_VERSION = "agentVersion";
 		public static final String COMPONENT_VERSIONS = "componentVersions";
 		public static final String ERRORS = "errors";
+		public static final String COMPONENT_NAME = "componentName";
+		public static final String AGENT_NAME = "agentName";
+		public static final String ENVIRONMENT = "environment";
+		public static final String LOCALE = "locale";
+		public static final String TIMEZONE = "timezone";
+		public static final String BUILD_TIMESTAMP = "buildTimestamp";
+		public static final String SCM_BRANCH = "scmBranch";
+		public static final String SCM_REVISION = "scmRevision";
+		public static final String ARTIFACT_VERSION = "artifactVersion";
+		public static final String ARTIFACT_ID = "artifactId";
+		public static final String GROUP_ID = "groupId";
 
 		public static final String OPERATING_SYSTEM = "operatingSystem";
 		public static final String OS_NAME = "osName";
