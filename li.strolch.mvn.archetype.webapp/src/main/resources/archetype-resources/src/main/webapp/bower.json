@@ -7,7 +7,7 @@
   "dependencies": {
     "strolchjs": "strolch-li/strolchjs#^0.4.4",
     "strolch-wc-styles": "strolch-li/strolch-wc-styles#^0.3.1",
-    "strolch-wc-auth": "strolch-li/strolch-wc-auth#^0.9.2",
+    "strolch-wc-auth": "strolch-li/strolch-wc-auth#^0.9.3",
     "strolch-wc-inspector": "strolch-li/strolch-wc-inspector#^0.22.2",
     "strolch-wc-localize-behavior": "strolch-li/strolch-wc-localize-behavior#^1.1.12",
     "strolch-wc-information-dialog": "strolch-li/strolch-wc-information-dialog#^0.1.3",
