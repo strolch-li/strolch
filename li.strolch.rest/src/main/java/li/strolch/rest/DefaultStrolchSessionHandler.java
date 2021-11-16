@@ -84,8 +84,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.sessionTtlMinutes = configuration.getInt(PARAM_SESSION_TTL_MINUTES, 30);
-		this.maxKeepAliveMinutes = configuration
-				.getInt(PARAM_SESSION_MAX_KEEP_ALIVE_MINUTES, Math.max(this.sessionTtlMinutes, 30));
+		this.maxKeepAliveMinutes = configuration.getInt(PARAM_SESSION_MAX_KEEP_ALIVE_MINUTES,
+				Math.max(this.sessionTtlMinutes, 30));
 		this.reloadSessions = configuration.getBoolean(PARAM_SESSION_RELOAD_SESSIONS, false);
 		super.initialize(configuration);
 	}
@@ -110,8 +110,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 					- this.certificateMap.size()) + " had timed out and were removed.");
 		}
 
-		this.validateSessionsTask = getScheduledExecutor("SessionHandler")
-				.scheduleWithFixedDelay(this::checkSessionsForTimeout, 5, 1, TimeUnit.MINUTES);
+		this.validateSessionsTask = getScheduledExecutor("SessionHandler").scheduleWithFixedDelay(
+				this::checkSessionsForTimeout, 5, 1, TimeUnit.MINUTES);
 
 		super.start();
 	}
@@ -195,6 +195,12 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
+	public boolean isSessionKnown(String authToken) {
+		DBC.PRE.assertNotEmpty("authToken must be set!", authToken); //$NON-NLS-1$
+		return this.certificateMap.containsKey(authToken);
+	}
+
+	@Override
 	public Certificate validate(String authToken) throws StrolchNotAuthenticatedException {
 		DBC.PRE.assertNotEmpty("authToken must be set!", authToken); //$NON-NLS-1$
 
@@ -224,8 +230,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			PrivilegeContext privilegeContext = this.privilegeHandler.validate(certificate);
 
 			if (this.persistSessionsTask != null)
-				this.persistSessionsTask = getScheduledExecutor("SessionHandler")
-						.schedule(this::persistSessions, 5, TimeUnit.SECONDS);
+				this.persistSessionsTask = getScheduledExecutor("SessionHandler").schedule(this::persistSessions, 5,
+						TimeUnit.SECONDS);
 
 			return privilegeContext;
 		} catch (PrivilegeException e) {
@@ -239,8 +245,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			PrivilegeContext privilegeContext = this.privilegeHandler.validate(certificate, source);
 
 			if (this.persistSessionsTask != null)
-				this.persistSessionsTask = getScheduledExecutor("SessionHandler")
-						.schedule(this::persistSessions, 5, TimeUnit.SECONDS);
+				this.persistSessionsTask = getScheduledExecutor("SessionHandler").schedule(this::persistSessions, 5,
+						TimeUnit.SECONDS);
 
 			return privilegeContext;
 		} catch (PrivilegeException e) {
@@ -265,8 +271,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error(MessageFormat
-					.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
+			logger.error(MessageFormat.format("No session was registered with token {0}",
+					certificate.getAuthToken())); //$NON-NLS-1$
 
 		this.privilegeHandler.invalidate(certificate);
 	}
@@ -341,8 +347,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error(MessageFormat
-					.format("No session was registered with token {0}", certificate.getAuthToken())); //$NON-NLS-1$
+			logger.error(MessageFormat.format("No session was registered with token {0}",
+					certificate.getAuthToken())); //$NON-NLS-1$
 
 		this.privilegeHandler.sessionTimeout(certificate);
 	}
