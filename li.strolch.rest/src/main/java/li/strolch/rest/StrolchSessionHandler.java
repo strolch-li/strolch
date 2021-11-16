@@ -108,6 +108,16 @@ public interface StrolchSessionHandler {
 	Certificate refreshSession(Certificate certificate, String source);
 
 	/**
+	 * Returns true if a {@link Certificate} exists with the given auth token
+	 *
+	 * @param authToken
+	 * 		the auth token for the certificate
+	 *
+	 * @return true if a {@link Certificate} exists with the given auth token
+	 */
+	boolean isSessionKnown(String authToken);
+
+	/**
 	 * Validates that a {@link Certificate} exists with the given auth token and is still valid
 	 *
 	 * @param authToken
