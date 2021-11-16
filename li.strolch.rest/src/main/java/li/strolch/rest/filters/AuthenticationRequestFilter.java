@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.filters;
 
+import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_SOURCE;
 import static li.strolch.utils.helper.StringHelper.*;
@@ -90,7 +91,9 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	/**
 	 * Validates if the path for the given request is for an unsecured path, i.e. no authorization is required
 	 *
-	 * @param requestContext the request context
+	 * @param requestContext
+	 * 		the request context
+	 *
 	 * @return true if the request context is for an unsecured path, false if not, meaning authorization must be
 	 * validated
 	 */
@@ -118,7 +121,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		try {
 
 			if (isUnsecuredPath(requestContext)) {
-				validateSessionIfAvailable(requestContext, remoteIp);
+				setCertificateIfAvailable(requestContext, remoteIp);
 			} else {
 				validateSession(requestContext, remoteIp);
 			}
@@ -141,19 +144,30 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		}
 	}
 
-	protected void validateSessionIfAvailable(ContainerRequestContext requestContext, String remoteIp) {
+	protected void setCertificateIfAvailable(ContainerRequestContext requestContext, String remoteIp) {
+		StrolchSessionHandler sessionHandler = getSessionHandler();
+
 		String sessionId = trimOrEmpty(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
-		if (sessionId.isEmpty()) {
-			sessionId = getSessionIdFromCookie(requestContext);
-			if (isEmpty(sessionId)) {
-				return;
+		if (isNotEmpty(sessionId)) {
+			if (sessionHandler.isSessionKnown(sessionId)) {
+				validateCertificate(requestContext, sessionId, remoteIp);
+			} else {
+				logger.error("Session " + sessionId + " by authorization header does not exist anymore, ignoring!");
 			}
+
+			return;
 		}
 
-		if (sessionId.startsWith("Basic "))
-			authenticateBasic(requestContext, sessionId, remoteIp);
-		else
+		sessionId = getSessionIdFromCookie(requestContext);
+		if (isEmpty(sessionId)) {
+			return;
+		}
+
+		if (sessionHandler.isSessionKnown(sessionId)) {
 			validateCertificate(requestContext, sessionId, remoteIp);
+		} else {
+			logger.error("Session " + sessionId + " by cookie does not exist anymore, ignoring!");
+		}
 	}
 
 	/**
@@ -165,8 +179,11 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	 * Sub classes should override this method and first call super. If the return value is non-null, then further
 	 * validation can be performed
 	 *
-	 * @param requestContext the request context for the secured path
-	 * @param remoteIp       the remote IP
+	 * @param requestContext
+	 * 		the request context for the secured path
+	 * @param remoteIp
+	 * 		the remote IP
+	 *
 	 * @return the certificate for the validated session, or null, of the request is aborted to no missing or invalid
 	 * authorization token
 	 */
@@ -180,7 +197,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	}
 
 	protected String getSessionIdFromCookie(ContainerRequestContext requestContext) {
-		Cookie cookie = requestContext.getCookies().get(StrolchRestfulConstants.STROLCH_AUTHORIZATION);
+		Cookie cookie = requestContext.getCookies().get(STROLCH_AUTHORIZATION);
 		if (cookie == null)
 			return "";
 
