@@ -64,6 +64,12 @@ public class ParameterBag extends ParameterizedElement {
 		return false;
 	}
 
+	public void removeAllParameters() {
+		assertNotReadonly();
+		if (this.parameterMap != null)
+			this.parameterMap.clear();
+	}
+
 	@Override
 	public <T> T accept(StrolchElementVisitor<T> visitor) {
 		return visitor.visitParameterBag(this);
