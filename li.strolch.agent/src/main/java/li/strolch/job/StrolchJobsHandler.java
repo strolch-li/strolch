@@ -110,8 +110,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 				return;
 			}
 
-			if (jobRes.hasParameter(PARAM_INITIAL_DELAY) && jobRes
-					.hasParameter(PARAM_DELAY)) {
+			if (jobRes.hasParameter(PARAM_INITIAL_DELAY) && jobRes.hasParameter(PARAM_DELAY)) {
 				IntegerParameter initialDelayP = jobRes.getParameter(PARAM_INITIAL_DELAY, true);
 				IntegerParameter delayP = jobRes.getParameter(PARAM_DELAY, true);
 				TimeUnit initialDelayUnit = TimeUnit.valueOf(initialDelayP.getUom());
@@ -149,8 +148,8 @@ public class StrolchJobsHandler extends StrolchComponent {
 	private StrolchJob instantiateJob(Class<? extends StrolchJob> clazz, String id, String name, JobMode mode) {
 		StrolchJob strolchJob;
 		try {
-			Constructor<? extends StrolchJob> constructor = clazz
-					.getConstructor(StrolchAgent.class, String.class, String.class, JobMode.class);
+			Constructor<? extends StrolchJob> constructor = clazz.getConstructor(StrolchAgent.class, String.class,
+					String.class, JobMode.class);
 			strolchJob = constructor.newInstance(getContainer().getAgent(), id, name, mode);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Failed to instantiate job " + clazz.getName(), e);
@@ -201,8 +200,16 @@ public class StrolchJobsHandler extends StrolchComponent {
 	}
 
 	private StrolchJob internalRegister(StrolchJob job) {
-		if (this.jobs.containsKey(job.getName()))
-			throw new IllegalArgumentException("Job " + job.getName() + " is already registered!");
+		if (this.jobs.containsKey(job.getName())) {
+			StrolchJob existingJob = this.jobs.get(job.getName());
+			if (existingJob.getClass().equals(job.getClass()) && existingJob.getConfigureMethod().isModel()
+					&& job.getConfigureMethod().isProgrammatic()) {
+				logger.error("Not registering job " + job.getName()
+						+ " as it is already registered by a model specific job!");
+			} else {
+				throw new IllegalArgumentException("Job " + job.getName() + " is already registered!");
+			}
+		}
 		this.jobs.put(job.getName(), job);
 
 		return job;
