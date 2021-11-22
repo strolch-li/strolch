@@ -271,8 +271,6 @@ public class I18nMessage {
 				if (shouldIgnoreFile(file))
 					continue;
 
-				logger.info("Scanning JAR " + file.getName() + " for property files...");
-
 				try (JarFile jarFile = new JarFile(file)) {
 					Enumeration<JarEntry> entries = jarFile.entries();
 					while (entries.hasMoreElements()) {
@@ -281,16 +279,15 @@ public class I18nMessage {
 						String entryName = je.getName();
 
 						if (entryName.startsWith("META-INF") //
+								|| entryName.equals("ENV.properties") //
+								|| entryName.equals("agentVersion.properties") //
+								|| entryName.equals("appVersion.properties") //
 								|| entryName.equals("componentVersion.properties") //
 								|| entryName.equals("strolch_db_version.properties"))
 							continue;
 
 						if (!entryName.endsWith(".properties"))
 							continue;
-
-						String propertyName = entryName.replace('/', '.');
-
-						logger.info("  Found property file " + propertyName + " in JAR " + file.getName());
 
 						TypedTuple<String, Locale> tuple = parsePropertyName(entryName);
 						if (tuple == null)
@@ -302,7 +299,11 @@ public class I18nMessage {
 								.getBundle(baseName, locale, new CustomControl(jarFile.getInputStream(je)));
 
 						bundleMap.addElement(bundle.getBaseBundleName(), bundle.getLocale(), bundle);
-						logger.info("    Loaded bundle " + bundle.getBaseBundleName() + " " + bundle.getLocale());
+
+						String propertyName = entryName.replace('/', '.');
+						logger.info(
+								"    Loaded bundle " + bundle.getBaseBundleName() + " " + bundle.getLocale() + " from "
+										+ propertyName + " from JAR " + file.getName());
 					}
 				}
 			}
@@ -402,18 +403,25 @@ public class I18nMessage {
 				|| file.getName().contains("activation") //
 				|| file.getName().contains("antlr") //
 				|| file.getName().contains("assertj-core") //
+				|| file.getName().startsWith("commons-") //
+				|| file.getName().startsWith("jackson-") //
+				|| file.getName().startsWith("hapi-") //
+				|| file.getName().startsWith("org.hl7.") //
+				|| file.getName().startsWith("listenablefuture-") //
+				|| file.getName().startsWith("j2objc-annotations") //
+				|| file.getName().startsWith("failureaccess-") //
+				|| file.getName().startsWith("error_prone_") //
+				|| file.getName().startsWith("guava-") //
+				|| file.getName().contains("jsr305") //
 				|| file.getName().contains("c3p0") //
 				|| file.getName().contains("camel") //
 				|| file.getName().contains("checker-qual") //
-				|| file.getName().contains("commons-csv") //
 				|| file.getName().contains("cron") //
 				|| file.getName().contains("FastInfoset") //
 				|| file.getName().contains("gmbal") //
 				|| file.getName().contains("grizzly") //
 				|| file.getName().contains("gson") //
 				|| file.getName().contains("ha-api") //
-				|| file.getName().contains("hapi-base") //
-				|| file.getName().contains("hapi-structures") //
 				|| file.getName().contains("HikariCP") //
 				|| file.getName().contains("hk2") //
 				|| file.getName().contains("icu4j") //
