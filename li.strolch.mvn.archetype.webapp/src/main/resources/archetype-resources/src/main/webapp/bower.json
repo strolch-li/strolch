@@ -10,7 +10,7 @@
     "strolch-wc-auth": "strolch-li/strolch-wc-auth#^0.9.3",
     "strolch-wc-inspector": "strolch-li/strolch-wc-inspector#^0.22.2",
     "strolch-wc-localize-behavior": "strolch-li/strolch-wc-localize-behavior#^1.1.12",
-    "strolch-wc-information-dialog": "strolch-li/strolch-wc-information-dialog#^0.1.4",
+    "strolch-wc-information-dialog": "strolch-li/strolch-wc-information-dialog#^0.1.5",
     "strolch-wc-reports": "strolch-li/strolch-wc-reports#^0.3.2",
     "strolch-wc-paging": "strolch-li/strolch-wc-paging#^0.1.4",
     "strolch-wc-ws-observer": "strolch-li/strolch-wc-ws-observer#^0.2.7",
