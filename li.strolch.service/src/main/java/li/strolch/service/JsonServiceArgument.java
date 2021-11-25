@@ -26,4 +26,22 @@ public class JsonServiceArgument extends ServiceArgument {
 	 * The input object
 	 */
 	public JsonElement jsonElement;
+
+	public JsonServiceArgument() {
+	}
+
+	public JsonServiceArgument(JsonElement jsonElement) {
+		this.jsonElement = jsonElement;
+	}
+
+	public JsonServiceArgument(String objectId, JsonElement jsonElement) {
+		this.objectId = objectId;
+		this.jsonElement = jsonElement;
+	}
+
+	public JsonServiceArgument(String objectType, String objectId, JsonElement jsonElement) {
+		this.objectType = objectType;
+		this.objectId = objectId;
+		this.jsonElement = jsonElement;
+	}
 }
