@@ -343,7 +343,8 @@ public class I18nMessage {
 						}
 
 						bundleMap.addElement(bundle.getBaseBundleName(), bundle.getLocale(), bundle);
-						logger.info("    Loaded bundle " + bundle.getBaseBundleName() + " " + bundle.getLocale());
+						logger.info("    Loaded bundle " + bundle.getBaseBundleName() + " " + bundle.getLocale()
+								+ " from file " + propertyFile.getName());
 					}
 				}
 			}
