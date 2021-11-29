@@ -40,7 +40,8 @@
         <jaxrs.api.version>2.1.1</jaxrs.api.version>
         <jaxrs.ri.version>2.34</jaxrs.ri.version>
         <jaxb.api.version>2.3.1</jaxb.api.version>
-        <jaxws.version>3.0.2</jaxws.version>
+        <jaxws.version>2.3.3</jaxws.version>
+        <jakarta.jws-api.version>2.1.0</jakarta.jws-api.version>
         <jaxp.version>1.4.2</jaxp.version>
         <tyrus.version>1.17</tyrus.version>
         <grizzly.version>2.3.35</grizzly.version>
