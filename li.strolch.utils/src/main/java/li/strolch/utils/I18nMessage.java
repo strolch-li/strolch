@@ -416,6 +416,8 @@ public class I18nMessage {
 				|| file.getName().contains("activation") //
 				|| file.getName().contains("antlr") //
 				|| file.getName().contains("assertj-core") //
+				|| file.getName().startsWith("com.sun") //
+				|| file.getName().startsWith("commonj.") //
 				|| file.getName().startsWith("commons-") //
 				|| file.getName().startsWith("jackson-") //
 				|| file.getName().startsWith("hapi-") //
@@ -425,6 +427,7 @@ public class I18nMessage {
 				|| file.getName().startsWith("failureaccess-") //
 				|| file.getName().startsWith("error_prone_") //
 				|| file.getName().startsWith("guava-") //
+				|| file.getName().startsWith("org.eclipse") //
 				|| file.getName().contains("jsr305") //
 				|| file.getName().contains("c3p0") //
 				|| file.getName().contains("camel") //
