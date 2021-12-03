@@ -751,7 +751,6 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		ParameterBag bag = getParameterBag(bagKey);
 		if (bag == null)
 			return Stream.empty();
-
 		return bag.streamOfParameters();
 	}
 
@@ -760,7 +759,6 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		ParameterBag bag = getParameterBag(bagKey);
 		if (bag == null)
 			return Stream.empty();
-
 		return bag.streamOfParametersByInterpretation(interpretation);
 	}
 
@@ -770,7 +768,6 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		ParameterBag bag = getParameterBag(bagKey);
 		if (bag == null)
 			return Stream.empty();
-
 		return bag.streamOfParametersByInterpretationAndUom(interpretation, uom);
 	}
 
@@ -822,11 +819,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		if (this.parameterBagMap == null)
 			return null;
 		ParameterBag bag = this.parameterBagMap.get(BAG_PARAMETERS);
-		if (bag == null) {
-			return null;
-		}
-
-		return bag.removeParameter(paramKey);
+		return bag == null ? null : bag.removeParameter(paramKey);
 	}
 
 	@Override
@@ -835,11 +828,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		if (this.parameterBagMap == null)
 			return null;
 		ParameterBag bag = this.parameterBagMap.get(BAG_RELATIONS);
-		if (bag == null) {
-			return null;
-		}
-
-		return bag.removeParameter(paramKey);
+		return bag == null ? null : bag.removeParameter(paramKey);
 	}
 
 	@Override
@@ -848,11 +837,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		if (this.parameterBagMap == null)
 			return null;
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
-		if (bag == null) {
-			return null;
-		}
-
-		return bag.removeParameter(paramKey);
+		return bag == null ? null : bag.removeParameter(paramKey);
 	}
 
 	@Override
@@ -903,9 +888,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	@Override
 	public void addParameterBag(ParameterBag bag) {
 		assertNotReadonly();
-		if (this.parameterBagMap == null) {
+		if (this.parameterBagMap == null)
 			this.parameterBagMap = new HashMap<>(1, 1.0F);
-		}
 
 		if (this.parameterBagMap.containsKey(bag.getId())) {
 			String msg = "A ParameterBag already exists with id {0} on {1}";
@@ -918,9 +902,8 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	@Override
 	public ParameterBag removeParameterBag(String key) {
 		assertNotReadonly();
-		if (this.parameterBagMap == null) {
+		if (this.parameterBagMap == null)
 			return null;
-		}
 		return this.parameterBagMap.remove(key);
 	}
 
@@ -936,27 +919,19 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public boolean hasParameter(String paramKey) {
-		if (this.parameterBagMap == null) {
+		if (this.parameterBagMap == null)
 			return false;
-		}
 		ParameterBag bag = this.parameterBagMap.get(BAG_PARAMETERS);
-		if (bag == null) {
-			return false;
-		}
-
-		return bag.hasParameter(paramKey);
+		return bag != null && bag.hasParameter(paramKey);
 	}
 
 	@Override
 	public boolean hasRelation(String paramKey) {
-		if (this.parameterBagMap == null) {
+		if (this.parameterBagMap == null)
 			return false;
-		}
 		ParameterBag bag = this.parameterBagMap.get(BAG_RELATIONS);
-		if (bag == null) {
+		if (bag == null)
 			return false;
-		}
-
 		return bag.hasParameter(paramKey);
 	}
 
@@ -973,23 +948,15 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 
 	@Override
 	public boolean hasParameter(String bagKey, String paramKey) {
-		if (this.parameterBagMap == null) {
+		if (this.parameterBagMap == null)
 			return false;
-		}
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
-		if (bag == null) {
-			return false;
-		}
-
-		return bag.hasParameter(paramKey);
+		return bag != null && bag.hasParameter(paramKey);
 	}
 
 	@Override
 	public Set<String> getParameterBagKeySet() {
-		if (this.parameterBagMap == null) {
-			return emptySet();
-		}
-		return new HashSet<>(this.parameterBagMap.keySet());
+		return this.parameterBagMap == null ? emptySet() : new HashSet<>(this.parameterBagMap.keySet());
 	}
 
 	/**
@@ -1003,18 +970,16 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		clone.setType(getType());
 
 		if (this.parameterBagMap != null) {
-			for (ParameterBag bag : this.parameterBagMap.values()) {
+			for (ParameterBag bag : this.parameterBagMap.values())
 				clone.addParameterBag(bag.getClone());
-			}
 		}
 	}
 
 	@Override
 	public void setReadOnly() {
 		if (this.parameterBagMap != null) {
-			for (ParameterBag bag : this.parameterBagMap.values()) {
+			for (ParameterBag bag : this.parameterBagMap.values())
 				bag.setReadOnly();
-			}
 		}
 		super.setReadOnly();
 	}
