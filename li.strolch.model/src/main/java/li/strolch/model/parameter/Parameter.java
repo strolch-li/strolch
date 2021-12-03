@@ -75,6 +75,15 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	boolean isEmpty();
 
 	/**
+	 * Returns true if the value is set, i.e. not empty. This is the inverse of {@link #isEmpty()}
+	 *
+	 * @return true if the value is set, i.e. not empty
+	 */
+	default boolean isSet() {
+		return !isEmpty();
+	}
+
+	/**
 	 * Returns true if the given parameter's value is equal to the current value
 	 *
 	 * @param otherValue
