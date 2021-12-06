@@ -873,7 +873,7 @@ public class GenericReport extends ReportPolicy {
 				&& this.reportRes.getParameterBag(BAG_ADDITIONAL_JOINS).hasParameter(type));
 	}
 
-	private Stream<? extends StrolchRootElement> getStreamFor(StringParameter objectTypeP) {
+	protected Stream<? extends StrolchRootElement> getStreamFor(StringParameter objectTypeP) {
 		switch (objectTypeP.getInterpretation()) {
 		case INTERPRETATION_RESOURCE_REF:
 			return tx().streamResources(objectTypeP.getUom());
@@ -912,7 +912,7 @@ public class GenericReport extends ReportPolicy {
 		return refs;
 	}
 
-	private void handleJoins(Map<String, StrolchRootElement> refs, String joinBagId) {
+	protected void handleJoins(Map<String, StrolchRootElement> refs, String joinBagId) {
 		ParameterBag joinBag = this.reportRes.getParameterBag(joinBagId);
 		if (joinBag != null && joinBag.hasParameters()) {
 			for (String paramId : joinBag.getParameterKeySet()) {
