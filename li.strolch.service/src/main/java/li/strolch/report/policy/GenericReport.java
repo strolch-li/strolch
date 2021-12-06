@@ -852,9 +852,8 @@ public class GenericReport extends ReportPolicy {
 	 * @return the stream of {@link StrolchRootElement StrolchRootElement}
 	 */
 	protected Stream<? extends StrolchRootElement> queryRows() {
-		if (isParallel())
-			return getStreamFor(getObjectTypeParam()).parallel();
-		return getStreamFor(getObjectTypeParam());
+		Stream<? extends StrolchRootElement> stream = getStreamFor(getObjectTypeParam());
+		return isParallel() ? stream.parallel() : stream;
 	}
 
 	protected StringParameter getObjectTypeParam() {
