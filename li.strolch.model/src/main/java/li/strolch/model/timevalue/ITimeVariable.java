@@ -17,6 +17,7 @@ package li.strolch.model.timevalue;
 
 import java.util.Collection;
 import java.util.SortedSet;
+import java.util.stream.Stream;
 
 /**
  * A timed variable storing a ordered sequence of {@link ITimeValue} objects modeling a time evolution of a quantity.
@@ -100,6 +101,13 @@ public interface ITimeVariable<T extends IValue> {
 	 * @return a defensive copy of the {@link ITimeValue}s
 	 */
 	SortedSet<ITimeValue<T>> getValues();
+
+	/**
+	 * Returns a {@link Stream} over all {@link ITimeValue} objects
+	 *
+	 * @return a stream of all the values
+	 */
+	Stream<ITimeValue<T>> streamValues();
 
 	/**
 	 * removes {@link ITimeValue} objects from the sequence, where the successor matches value. I.e considering a pair
