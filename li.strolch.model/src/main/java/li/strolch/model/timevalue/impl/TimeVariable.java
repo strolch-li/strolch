@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.timevalue.ITimeValue;
@@ -91,6 +92,11 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	@Override
 	public SortedSet<ITimeValue<T>> getValues() {
 		return new TreeSet<>(this.container);
+	}
+
+	@Override
+	public Stream<ITimeValue<T>> streamValues() {
+		return this.container.stream();
 	}
 
 	@Override
