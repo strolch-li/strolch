@@ -421,6 +421,7 @@ public class I18nMessage {
 				|| file.getName().startsWith("commons-") //
 				|| file.getName().startsWith("jackson-") //
 				|| file.getName().startsWith("hapi-") //
+				|| file.getName().startsWith("jaxb-") //
 				|| file.getName().startsWith("org.hl7.") //
 				|| file.getName().startsWith("listenablefuture-") //
 				|| file.getName().startsWith("j2objc-annotations") //
