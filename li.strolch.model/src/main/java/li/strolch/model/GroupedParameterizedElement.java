@@ -942,7 +942,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 		ParameterBag bag = this.parameterBagMap.get(BAG_RELATIONS);
 		if (bag == null)
 			return false;
-		StringParameter relationP = bag.getStringP(paramKey);
+		StringParameter relationP = bag.getParameter(paramKey);
 		return relationP != null && relationP.isSet();
 	}
 
