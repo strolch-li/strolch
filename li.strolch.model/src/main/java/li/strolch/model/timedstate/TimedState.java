@@ -15,11 +15,11 @@
  */
 package li.strolch.model.timedstate;
 
+import static java.util.Spliterators.spliteratorUnknownSize;
+import static java.util.stream.StreamSupport.stream;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.NavigableSet;
 
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
@@ -38,27 +38,18 @@ public class TimedState<T extends IValue> implements ITimedState<T>, Serializabl
 	@Override
 	@SuppressWarnings("unchecked")
 	public ITimeValue<T> getNextMatch(final Long time, final T value) {
-		Collection<ITimeValue<T>> futureValues = this.timeVariable.getFutureValues(time);
-		for (ITimeValue<T> iTimeValue : futureValues) {
-			if (iTimeValue.getValue().matches(value)) {
-				return iTimeValue;
-			}
-		}
-		return null;
+		return this.timeVariable.getFutureValues(time).stream() //
+				.filter(v -> v.getValue().matches(value)) //
+				.findFirst().orElse(null);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public ITimeValue<T> getPreviousMatch(final Long time, final T value) {
-		Collection<ITimeValue<T>> pastValues = this.timeVariable.getPastValues(time);
-		List<ITimeValue<T>> asList = new ArrayList<>(pastValues);
-		Collections.reverse(asList);
-		for (ITimeValue<T> iTimeValue : asList) {
-			if (iTimeValue.getValue().matches(value)) {
-				return iTimeValue;
-			}
-		}
-		return null;
+		NavigableSet<ITimeValue<T>> pastValues = this.timeVariable.getPastValues(time);
+		return pastValues.descendingSet().stream() //
+				.filter(v -> v.getValue().matches(value)) //
+				.findFirst().orElse(null);
 	}
 
 	@Override

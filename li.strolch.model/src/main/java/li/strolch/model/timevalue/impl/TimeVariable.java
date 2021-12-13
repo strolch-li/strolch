@@ -15,11 +15,10 @@
  */
 package li.strolch.model.timevalue.impl;
 
+import static java.util.Collections.*;
+
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchModelException;
@@ -34,7 +33,7 @@ import li.strolch.model.timevalue.IValueChange;
 @SuppressWarnings("rawtypes")
 public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Serializable {
 
-	public SortedSet<ITimeValue<T>> container = new TreeSet<>();
+	public NavigableSet<ITimeValue<T>> container = new TreeSet<>();
 	private boolean readonly;
 
 	@Override
@@ -62,12 +61,12 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
-	public SortedSet<ITimeValue<T>> getFutureValues(long time) {
+	public NavigableSet<ITimeValue<T>> getFutureValues(long time) {
 		return new TreeSet<>(this.container.tailSet(new TimeValue<>(time, null)));
 	}
 
 	@Override
-	public Collection<ITimeValue<T>> removeFutureValues(long time) {
+	public NavigableSet<ITimeValue<T>> removeFutureValues(long time) {
 		assertNotReadonly();
 		SortedSet<ITimeValue<T>> values = this.container.tailSet(new TimeValue<>(time, null));
 		TreeSet<ITimeValue<T>> result = new TreeSet<>(values);
@@ -76,12 +75,12 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
-	public Collection<ITimeValue<T>> getPastValues(long time) {
+	public NavigableSet<ITimeValue<T>> getPastValues(long time) {
 		return new TreeSet<>(this.container.headSet(new TimeValue<>(time, null)));
 	}
 
 	@Override
-	public Collection<ITimeValue<T>> removePastValues(long time) {
+	public NavigableSet<ITimeValue<T>> removePastValues(long time) {
 		assertNotReadonly();
 		SortedSet<ITimeValue<T>> values = this.container.headSet(new TimeValue<>(time, null));
 		TreeSet<ITimeValue<T>> result = new TreeSet<>(values);
@@ -90,8 +89,8 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
-	public SortedSet<ITimeValue<T>> getValues() {
-		return new TreeSet<>(this.container);
+	public NavigableSet<ITimeValue<T>> getValues() {
+		return unmodifiableNavigableSet(this.container);
 	}
 
 	@Override
@@ -103,7 +102,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	public void applyChange(final IValueChange<T> change, boolean compact) {
 		assertNotReadonly();
 
-		SortedSet<ITimeValue<T>> futureValues = getFutureValues(change.getTime());
+		NavigableSet<ITimeValue<T>> futureValues = getFutureValues(change.getTime());
 		for (ITimeValue<T> value : futureValues) {
 			value.add(change.getValue());
 		}

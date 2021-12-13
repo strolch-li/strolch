@@ -15,8 +15,7 @@
  */
 package li.strolch.model.timevalue;
 
-import java.util.Collection;
-import java.util.SortedSet;
+import java.util.NavigableSet;
 import java.util.stream.Stream;
 
 /**
@@ -61,9 +60,11 @@ public interface ITimeVariable<T extends IValue> {
 	 * @param time
 	 * 		the time the sequence starts with
 	 *
+	 * <b>Note:</b> The returned result is unmodifiable
+	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
-	Collection<ITimeValue<T>> getFutureValues(long time);
+	NavigableSet<ITimeValue<T>> getFutureValues(long time);
 
 	/**
 	 * Removes all {@link ITimeValue} objects whose time field is greater or equal to the given time
@@ -73,7 +74,7 @@ public interface ITimeVariable<T extends IValue> {
 	 *
 	 * @return the sequence of {@link ITimeValue} objects removed
 	 */
-	Collection<ITimeValue<T>> removeFutureValues(long time);
+	NavigableSet<ITimeValue<T>> removeFutureValues(long time);
 
 	/**
 	 * Get all {@link ITimeValue} objects whose time field is strictly smaller than the given time
@@ -81,9 +82,11 @@ public interface ITimeVariable<T extends IValue> {
 	 * @param time
 	 * 		the time the sequence starts with
 	 *
+	 * <b>Note:</b> The returned result is unmodifiable
+	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
-	Collection<ITimeValue<T>> getPastValues(long time);
+	NavigableSet<ITimeValue<T>> getPastValues(long time);
 
 	/**
 	 * Remove all {@link ITimeValue} objects whose time field is strictly smaller than the given time
@@ -93,14 +96,16 @@ public interface ITimeVariable<T extends IValue> {
 	 *
 	 * @return the sequence of {@link ITimeValue} objects removed
 	 */
-	Collection<ITimeValue<T>> removePastValues(long time);
+	NavigableSet<ITimeValue<T>> removePastValues(long time);
 
 	/**
-	 * Get all {@link ITimeValue} objects
+	 * Returns all {@link ITimeValue} objects in an unmodifiable {@link NavigableSet}
+	 *
+	 * <b>Note:</b> The returned result is unmodifiable
 	 *
 	 * @return a defensive copy of the {@link ITimeValue}s
 	 */
-	SortedSet<ITimeValue<T>> getValues();
+	NavigableSet<ITimeValue<T>> getValues();
 
 	/**
 	 * Returns a {@link Stream} over all {@link ITimeValue} objects
@@ -132,11 +137,11 @@ public interface ITimeVariable<T extends IValue> {
 	 *
 	 * @return true if this element is read only
 	 */
-	public boolean isReadonly();
+	boolean isReadonly();
 
 	/**
 	 * Sets this element to readOnly, so that it may not be modified. To modify it, call <code>getClone()</code> on the
 	 * parent
 	 */
-	public void setReadonly();
+	void setReadonly();
 }
