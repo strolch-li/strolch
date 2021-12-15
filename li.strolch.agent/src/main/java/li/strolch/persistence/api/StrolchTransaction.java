@@ -215,6 +215,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	PersistenceHandler getPersistenceHandler();
 
 	/**
+	 * Return the {@link StrolchAgent}
+	 *
+	 * @return the reference to the agent
+	 */
+	StrolchAgent getAgent();
+
+	/**
 	 * Return the {@link ComponentContainer}
 	 *
 	 * @return the reference to the container

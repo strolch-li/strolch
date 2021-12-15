@@ -395,6 +395,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public StrolchAgent getAgent() {
+		return this.container.getAgent();
+	}
+
+	@Override
 	public ComponentContainer getContainer() {
 		return this.container;
 	}
