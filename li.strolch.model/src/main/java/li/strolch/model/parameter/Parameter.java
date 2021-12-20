@@ -134,11 +134,18 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	void setUom(String uom);
 
 	/**
-	 * Returns true if the interpretation is not {@link StrolchModelConstants#UOM_NONE}
+	 * Returns true if the UOM is not {@link StrolchModelConstants#UOM_NONE}
 	 *
-	 * @return true if the interpretation is not {@link StrolchModelConstants#UOM_NONE}
+	 * @return true if the UOM is not {@link StrolchModelConstants#UOM_NONE}
 	 */
 	boolean isUomDefined();
+
+	/**
+	 * Returns true if the UOM is set to {@link StrolchModelConstants#UOM_NONE}
+	 *
+	 * @return true if the UOM is set to {@link StrolchModelConstants#UOM_NONE}
+	 */
+	boolean isUomEmpty();
 
 	/**
 	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
@@ -188,6 +195,13 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * @return true if the interpretation is not {@link StrolchModelConstants#INTERPRETATION_NONE}
 	 */
 	boolean isInterpretationDefined();
+
+	/**
+	 * Returns true if the interpretation is set to {@link StrolchModelConstants#INTERPRETATION_NONE}
+	 *
+	 * @return true if the interpretation is set to {@link StrolchModelConstants#INTERPRETATION_NONE}
+	 */
+	boolean isInterpretationEmpty();
 
 	/**
 	 * The {@link ParameterizedElement} parent to which this {@link Parameter} belongs

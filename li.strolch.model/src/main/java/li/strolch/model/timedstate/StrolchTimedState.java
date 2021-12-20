@@ -67,6 +67,20 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	void setUom(String uom);
 
 	/**
+	 * Returns true if the UOM is not {@link StrolchModelConstants#UOM_NONE}
+	 *
+	 * @return true if the UOM is not {@link StrolchModelConstants#UOM_NONE}
+	 */
+	boolean isUomDefined();
+
+	/**
+	 * Returns true if the UOM is set to {@link StrolchModelConstants#UOM_NONE}
+	 *
+	 * @return true if the UOM is set to {@link StrolchModelConstants#UOM_NONE}
+	 */
+	boolean isUomEmpty();
+
+	/**
 	 * Returns the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 *
 	 * @return the index of this {@link Parameter}. This can be used to sort the parameters in a UI
@@ -107,6 +121,20 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * 		the interpretation
 	 */
 	void setInterpretation(String interpretation);
+
+	/**
+	 * Returns true if the interpretation is not {@link StrolchModelConstants#INTERPRETATION_NONE}
+	 *
+	 * @return true if the interpretation is not {@link StrolchModelConstants#INTERPRETATION_NONE}
+	 */
+	boolean isInterpretationDefined();
+
+	/**
+	 * Returns true if the interpretation is set to {@link StrolchModelConstants#INTERPRETATION_NONE}
+	 *
+	 * @return true if the interpretation is set to {@link StrolchModelConstants#INTERPRETATION_NONE}
+	 */
+	boolean isInterpretationEmpty();
 
 	ITimeValue<T> getNextMatch(Long time, T value);
 

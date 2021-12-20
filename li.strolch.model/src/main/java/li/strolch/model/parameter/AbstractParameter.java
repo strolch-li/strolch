@@ -29,8 +29,6 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * @param <T>
- *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class AbstractParameter<T> extends AbstractStrolchElement implements Parameter<T> {
@@ -93,6 +91,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
+	public boolean isInterpretationEmpty() {
+		return INTERPRETATION_NONE.equals(this.interpretation);
+	}
+
+	@Override
 	public String getUom() {
 		return this.uom;
 	}
@@ -110,6 +113,11 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	@Override
 	public boolean isUomDefined() {
 		return !UOM_NONE.equals(this.uom);
+	}
+
+	@Override
+	public boolean isUomEmpty() {
+		return UOM_NONE.equals(this.uom);
 	}
 
 	@Override
