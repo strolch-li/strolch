@@ -146,6 +146,9 @@
         <tomcat7ServerId>NOT_SET</tomcat7ServerId>
         <gpg.keyname>NOT_SET</gpg.keyname>
 
+        <!--suppress UnresolvedMavenProperty -->
+        <dependency-check-suppressions-file>${maven.multiModuleProjectDirectory}/src/dependency-check/suppressions.xml</dependency-check-suppressions-file>
+
     </properties>
 
     <modules>
@@ -476,6 +479,7 @@
                     <configuration>
                         <failBuildOnCVSS>8</failBuildOnCVSS>
                         <yarnAuditAnalyzerEnabled>false</yarnAuditAnalyzerEnabled>
+                        <suppressionFiles>${dependency-check-suppressions-file}</suppressionFiles>
                     </configuration>
                     <executions>
                         <execution>
@@ -679,20 +683,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
             </plugin>
-            <!--
-                <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>1.4.5</version>
-                <executions>
-                <execution>
-                <goals>
-                <goal>check</goal>
-                </goals>
-                </execution>
-                </executions>
-                </plugin>
-            -->
         </plugins>
 
     </build>
@@ -796,6 +786,22 @@
                         <reports>
                             <report>aggregate-pmd</report>
                             <report>aggregate-cpd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <failBuildOnCVSS>8</failBuildOnCVSS>
+                    <yarnAuditAnalyzerEnabled>false</yarnAuditAnalyzerEnabled>
+                    <suppressionFiles>${dependency-check-suppressions-file}</suppressionFiles>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>aggregate</report>
                         </reports>
                     </reportSet>
                 </reportSets>
