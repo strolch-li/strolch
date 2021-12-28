@@ -1,11 +1,13 @@
 package li.strolch.persistence.postgresql;
 
 import static li.strolch.db.DbConstants.*;
+import static li.strolch.persistence.postgresql.DataType.xml;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -19,8 +21,15 @@ public class PostgreSqlDataArchiveHandler extends StrolchComponent implements Da
 
 	private static final String SCRIPT_PREFIX = "archive";
 
+	private final Map<Connection, ResourceDao> resourceDaoMap;
+	private final Map<Connection, OrderDao> orderDaoMap;
+	private final Map<Connection, ActivityDao> activityDaoMap;
+
 	public PostgreSqlDataArchiveHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
+		this.resourceDaoMap = new ConcurrentHashMap<>();
+		this.orderDaoMap = new ConcurrentHashMap<>();
+		this.activityDaoMap = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -52,39 +61,72 @@ public class PostgreSqlDataArchiveHandler extends StrolchComponent implements Da
 
 	@Override
 	public void run(StrolchTransaction tx, BiConsumer<Connection, TransactionResult> runnable) {
+		Connection con = null;
 		try (Connection connection = getConnection(tx)) {
+			con = connection;
 			TransactionResult txResult = new TransactionResult(tx.getRealmName(), System.nanoTime(), new Date());
 			runnable.accept(connection, txResult);
+			flush(connection);
 			connection.commit();
 		} catch (Exception e) {
 			throw new StrolchPersistenceException("Archive DB Connection failed", e);
+		} finally {
+			if (con != null)
+				clearCachedDAOs(con);
 		}
 	}
 
 	@Override
 	public <T> T runWithResult(StrolchTransaction tx, BiFunction<Connection, TransactionResult, T> runnable) {
+		Connection con = null;
 		try (Connection connection = getConnection(tx)) {
+			con = connection;
 			TransactionResult txResult = new TransactionResult(tx.getRealmName(), System.nanoTime(), new Date());
 			T t = runnable.apply(connection, txResult);
+			flush(connection);
 			connection.commit();
 			return t;
 		} catch (Exception e) {
 			throw new StrolchPersistenceException("Archive DB Connection failed", e);
+		} finally {
+			if (con != null)
+				clearCachedDAOs(con);
 		}
 	}
 
-	@Override
-	public OrderDao getOrderDao(Connection connection, TransactionResult txResult) {
-		return new ArchivePostgreSqlOrderDao(DataType.xml, connection, txResult, false);
+	private void flush(Connection connection) {
+		ResourceDao resourceDao = this.resourceDaoMap.remove(connection);
+		if (resourceDao != null)
+			resourceDao.flush();
+		OrderDao orderDao = this.orderDaoMap.remove(connection);
+		if (orderDao != null)
+			orderDao.flush();
+		ActivityDao activityDao = this.activityDaoMap.remove(connection);
+		if (activityDao != null)
+			activityDao.flush();
+	}
+
+	private void clearCachedDAOs(Connection con) {
+		this.resourceDaoMap.remove(con);
+		this.orderDaoMap.remove(con);
+		this.activityDaoMap.remove(con);
 	}
 
 	@Override
 	public ResourceDao getResourceDao(Connection connection, TransactionResult txResult) {
-		return new ArchivePostgreSqlResourceDao(DataType.xml, connection, txResult, false);
+		return this.resourceDaoMap.computeIfAbsent(connection,
+				c -> new ArchivePostgreSqlResourceDao(xml, connection, txResult, false));
+	}
+
+	@Override
+	public OrderDao getOrderDao(Connection connection, TransactionResult txResult) {
+		return this.orderDaoMap.computeIfAbsent(connection,
+				c -> new ArchivePostgreSqlOrderDao(xml, connection, txResult, false));
 	}
 
 	@Override
 	public ActivityDao getActivityDao(Connection connection, TransactionResult txResult) {
-		return new ArchivePostgreSqlActivityDao(DataType.xml, connection, txResult, false);
+		return this.activityDaoMap.computeIfAbsent(connection,
+				c -> new ArchivePostgreSqlActivityDao(xml, connection, txResult, false));
 	}
 }
