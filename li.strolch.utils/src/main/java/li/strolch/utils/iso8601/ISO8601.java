@@ -18,10 +18,7 @@ package li.strolch.utils.iso8601;
 import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoField.*;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.SignStyle;
@@ -173,6 +170,10 @@ public class ISO8601 implements DateFormat {
 		if (s.equals("-"))
 			return ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 		return ZonedDateTime.parse(s, getIso8601Formatter(precision));
+	}
+
+	public static String toString(long timeMs) {
+		return toString(Instant.ofEpochMilli(timeMs).atZone(systemDefault()));
 	}
 
 	public static String toString(LocalDateTime localDateTime) {
