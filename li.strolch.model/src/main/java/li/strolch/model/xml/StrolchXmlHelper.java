@@ -15,7 +15,9 @@ import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Order;
@@ -62,6 +64,12 @@ public class StrolchXmlHelper {
 		return elementListener.getElements();
 	}
 
+	public static Stream<StrolchRootElement> parseFileAsStream(File file) {
+		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
+		return elementListener.streamElements();
+	}
+
 	public static List<StrolchRootElement> parseStream(InputStream stream, String encoding) {
 		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
 		new XmlModelSaxStreamReader(elementListener, stream, encoding).parseStream();
@@ -76,6 +84,17 @@ public class StrolchXmlHelper {
 		}
 
 		logger.info("Wrote " + elements.size() + " elements to file " + file);
+	}
+
+	public static void writeToFile(File file, Stream<? extends StrolchRootElement> elements) {
+		int size;
+		try (OutputStream out = Files.newOutputStream(file.toPath())) {
+			size = writeToStream(out, elements);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to write elements to " + file, e);
+		}
+
+		logger.info("Wrote " + size + " elements to file " + file);
 	}
 
 	public static void writeToWriter(Writer writer, Collection<? extends StrolchRootElement> elements) {
@@ -95,14 +114,17 @@ public class StrolchXmlHelper {
 
 	public static void writeToStream(OutputStream out, Collection<? extends StrolchRootElement> elements)
 			throws Exception {
-
 		XMLStreamWriter writer = prepareXmlStreamWriter(out);
-
-		for (StrolchRootElement element : elements) {
-			element.accept(new StrolchElementToSaxWriterVisitor(writer));
-		}
-
+		elements.forEach(element -> element.accept(new StrolchElementToSaxWriterVisitor(writer)));
 		writer.writeEndDocument();
+	}
+
+	public static int writeToStream(OutputStream out, Stream<? extends StrolchRootElement> elements) throws Exception {
+		XMLStreamWriter writer = prepareXmlStreamWriter(out);
+		AtomicInteger size = new AtomicInteger();
+		elements.peek(e -> size.incrementAndGet()).forEach(e -> e.accept(new StrolchElementToSaxWriterVisitor(writer)));
+		writer.writeEndDocument();
+		return size.get();
 	}
 
 	public static XMLStreamWriter prepareXmlStreamWriter(Writer writer)

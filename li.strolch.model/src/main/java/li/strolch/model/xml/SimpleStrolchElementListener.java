@@ -15,7 +15,11 @@
  */
 package li.strolch.model.xml;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -30,31 +34,22 @@ import li.strolch.model.activity.Activity;
  */
 public class SimpleStrolchElementListener implements StrolchElementListener {
 
-	private Map<String, Resource> resources;
-	private Map<String, Order> orders;
-	private Map<String, Activity> activities;
+	private final Map<String, Resource> resources = new HashMap<>();
+	private final Map<String, Order> orders = new HashMap<>();
+	private final Map<String, Activity> activities = new HashMap<>();
 
 	@Override
 	public void notifyResource(Resource resource) {
-		if (this.resources == null) {
-			this.resources = new HashMap<>();
-		}
 		this.resources.put(resource.getId(), resource);
 	}
 
 	@Override
 	public void notifyOrder(Order order) {
-		if (this.orders == null) {
-			this.orders = new HashMap<>();
-		}
 		this.orders.put(order.getId(), order);
 	}
 
 	@Override
 	public void notifyActivity(Activity activity) {
-		if (this.activities == null) {
-			this.activities = new HashMap<>();
-		}
 		this.activities.put(activity.getId(), activity);
 	}
 
@@ -71,20 +66,14 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 	}
 
 	public List<Resource> getResources() {
-		if (this.resources == null)
-			return Collections.emptyList();
 		return new ArrayList<>(this.resources.values());
 	}
 
 	public List<Order> getOrders() {
-		if (this.orders == null)
-			return Collections.emptyList();
 		return new ArrayList<>(this.orders.values());
 	}
 
 	public List<Activity> getActivities() {
-		if (this.activities == null)
-			return Collections.emptyList();
 		return new ArrayList<>(this.activities.values());
 	}
 
@@ -94,5 +83,10 @@ public class SimpleStrolchElementListener implements StrolchElementListener {
 		elements.addAll(getOrders());
 		elements.addAll(getActivities());
 		return elements;
+	}
+
+	public Stream<StrolchRootElement> streamElements() {
+		return Stream.concat(this.resources.values().stream(),
+				Stream.concat(this.orders.values().stream(), this.activities.values().stream()));
 	}
 }
