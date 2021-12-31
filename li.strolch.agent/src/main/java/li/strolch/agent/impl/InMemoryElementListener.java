@@ -27,11 +27,15 @@ import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.xml.StrolchElementListener;
 import li.strolch.persistence.api.StrolchTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class InMemoryElementListener implements StrolchElementListener {
+
+	private static final Logger logger = LoggerFactory.getLogger(InMemoryElementListener.class);
 
 	private final StrolchTransaction tx;
 	private final ModelStatistics statistics;
@@ -164,6 +168,8 @@ public class InMemoryElementListener implements StrolchElementListener {
 				throw new StrolchException(
 						MessageFormat.format("Resource {0} already exists and updating is disallowed!",
 								resource.getLocator()));
+			} else {
+				logger.warn("Ignoring " + resource.getLocator() + " as updating is not enabled!");
 			}
 		} else if (this.addResources) {
 			this.tx.add(resource);
@@ -187,6 +193,8 @@ public class InMemoryElementListener implements StrolchElementListener {
 			} else if (failOnUpdate) {
 				throw new StrolchException(MessageFormat.format("Order {0} already exists and updating is disallowed!",
 						order.getLocator()));
+			} else {
+				logger.warn("Ignoring " + order.getLocator() + " as updating is not enabled!");
 			}
 		} else if (this.addOrders) {
 			this.tx.add(order);
@@ -211,6 +219,8 @@ public class InMemoryElementListener implements StrolchElementListener {
 				throw new StrolchException(
 						MessageFormat.format("Activity {0} already exists and updating is disallowed!",
 								activity.getLocator()));
+			} else {
+				logger.warn("Ignoring " + activity.getLocator() + " as updating is not enabled!");
 			}
 		} else if (this.addActivities) {
 			this.tx.add(activity);
