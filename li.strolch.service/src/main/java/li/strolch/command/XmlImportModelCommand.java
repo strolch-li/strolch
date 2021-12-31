@@ -16,6 +16,8 @@
 package li.strolch.command;
 
 import java.io.File;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Set;
 
 import li.strolch.agent.impl.InMemoryElementListener;
@@ -31,6 +33,7 @@ import li.strolch.utils.dbc.DBC;
 public class XmlImportModelCommand extends Command {
 
 	// input
+	private boolean failOnUpdate;
 	private File modelFile;
 	private boolean addOrders;
 	private boolean addResources;
@@ -46,10 +49,6 @@ public class XmlImportModelCommand extends Command {
 	private ModelStatistics statistics;
 	private boolean allowInclude;
 
-	/**
-	 * @param container
-	 * @param tx
-	 */
 	public XmlImportModelCommand(StrolchTransaction tx) {
 		super(tx);
 	}
@@ -64,6 +63,7 @@ public class XmlImportModelCommand extends Command {
 
 		InMemoryElementListener elementListener = new InMemoryElementListener(tx());
 
+		elementListener.setFailOnUpdate(this.failOnUpdate);
 		elementListener.setAddOrders(this.addOrders);
 		elementListener.setAddResources(this.addResources);
 		elementListener.setAddActivities(this.addActivities);
@@ -74,10 +74,12 @@ public class XmlImportModelCommand extends Command {
 		elementListener.setResourceTypes(this.resourceTypes);
 		elementListener.setActivityTypes(this.activityTypes);
 
+		long start = System.nanoTime();
 		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, this.allowInclude);
 		handler.parseFile();
 
-		this.statistics = handler.getStatistics();
+		this.statistics = elementListener.getStatistics();
+		this.statistics.durationNanos = System.nanoTime() - start;
 	}
 
 	@Override
@@ -85,16 +87,14 @@ public class XmlImportModelCommand extends Command {
 		logger.warn("Not undoing import of file " + this.modelFile);
 	}
 
-	/**
-	 * @param modelFileName
-	 */
+	public void setFailOnUpdate(boolean failOnUpdate) {
+		this.failOnUpdate = failOnUpdate;
+	}
+
 	public void setModelFile(File modelFileName) {
 		this.modelFile = modelFileName;
 	}
 
-	/**
-	 * @param allowInclude
-	 */
 	public void setAllowInclude(boolean allowInclude) {
 		this.allowInclude = allowInclude;
 	}

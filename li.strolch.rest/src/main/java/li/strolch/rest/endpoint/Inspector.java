@@ -993,7 +993,16 @@ public class Inspector {
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
 	@Path("{realm}/import")
-	public Response importAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
+	public Response importAsXml(@Context HttpServletRequest request, //
+			@PathParam("realm") String realm, //
+			@QueryParam("failOnUpdate") boolean failOnUpdate, //
+			@QueryParam("addResources") boolean addResources, //
+			@QueryParam("addOrders") boolean addOrders, //
+			@QueryParam("addActivities") boolean addActivities, //
+			@QueryParam("updateResources") boolean updateResources, //
+			@QueryParam("updateOrders") boolean updateOrders, //
+			@QueryParam("updateActivities") boolean updateActivities, //
+			String data) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
@@ -1010,12 +1019,16 @@ public class Inspector {
 			arg.modelFileName = tempFile.getAbsolutePath();
 			arg.allowInclude = false;
 			arg.external = true;
-			arg.addOrders = true;
-			arg.addResources = true;
-			arg.updateOrders = true;
-			arg.updateResources = true;
-			arg.orderTypes = Collections.emptySet();
-			arg.resourceTypes = Collections.emptySet();
+			arg.failOnUpdate = failOnUpdate;
+			arg.addResources = addResources;
+			arg.addOrders = addOrders;
+			arg.addActivities = addActivities;
+			arg.updateResources = updateResources;
+			arg.updateOrders = updateOrders;
+			arg.updateActivities = updateActivities;
+			arg.orderTypes = emptySet();
+			arg.resourceTypes = emptySet();
+			arg.activityTypes = emptySet();
 			arg.realm = realm;
 
 			XmlImportModelResult svcResult = getServiceHandler().doService(cert, svc, arg);

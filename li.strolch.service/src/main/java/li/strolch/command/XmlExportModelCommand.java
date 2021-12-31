@@ -23,6 +23,7 @@ import java.io.FilenameFilter;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -106,7 +107,7 @@ public class XmlExportModelCommand extends Command {
 
 		long start = System.nanoTime();
 		this.statistics = new ModelStatistics();
-		this.statistics.startTime = new Date();
+		this.statistics.startTime = LocalDateTime.now();
 
 		String exportName = fileName.substring(0, fileName.indexOf(XML_FILE_SUFFIX));
 
@@ -320,7 +321,7 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	/**
-	 * @param multiFile
+	 *
 	 */
 	public void setMultiFile(boolean multiFile) {
 		this.multiFile = multiFile;
@@ -382,7 +383,7 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	/**
-	 * @param overwrite
+	 *
 	 */
 	public void setOverwrite(boolean overwrite) {
 		this.overwrite = overwrite;

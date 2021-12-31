@@ -53,7 +53,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 	private GroupedParameterizedElement parameterizedElement;
 	private TextParameter textParam;
-	private Deque<Activity> activityStack;
+	private final Deque<Activity> activityStack;
 	private ParameterBag pBag;
 	private StrolchTimedState<? extends IValue<?>> state;
 	private PolicyDefs policies;

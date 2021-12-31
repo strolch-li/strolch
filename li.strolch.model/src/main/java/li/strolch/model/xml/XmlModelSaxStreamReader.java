@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import li.strolch.exception.StrolchException;
@@ -85,7 +86,7 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
 		try {
 			long startNanos = System.nanoTime();
-			this.statistics.startTime = new Date();
+			this.statistics.startTime = LocalDateTime.now();
 
 			SAXParserFactory spf = SAXParserFactory.newInstance();
 			SAXParser sp = spf.newSAXParser();
