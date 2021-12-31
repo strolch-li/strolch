@@ -15,7 +15,10 @@
  */
 package li.strolch.rest.endpoint;
 
+import static java.util.Collections.*;
+import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.rest.helper.ResponseUtil.*;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.search.SearchBuilder.orderBy;
 
@@ -64,6 +67,7 @@ import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.*;
 import li.strolch.service.*;
+import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -100,7 +104,7 @@ public class Inspector {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAgentOverview(@Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		JsonObject agentOverview = new JsonObject();
 		JsonArray realmsArr = new JsonArray();
@@ -132,7 +136,7 @@ public class Inspector {
 	@Path("{realm}")
 	public Response getRealmOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		JsonObject realmDetailJ = new JsonObject();
 		JsonArray elementMapsArr = new JsonArray();
@@ -185,7 +189,7 @@ public class Inspector {
 	@Path("{realm}/xml")
 	public Response exportRealmToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -214,7 +218,7 @@ public class Inspector {
 	@Path("{realm}/resources")
 	public Response getResourcesOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		JsonObject mapOverview = new JsonObject();
 
@@ -228,7 +232,7 @@ public class Inspector {
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
 
 			List<String> types = new ArrayList<>(resourceMap.getTypes(tx));
-			Collections.sort(types);
+			sort(types);
 			types.forEach(type -> {
 
 				JsonObject typeJ = new JsonObject();
@@ -247,7 +251,7 @@ public class Inspector {
 	@Path("{realm}/orders")
 	public Response getOrdersOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		JsonObject mapOverview = new JsonObject();
 
@@ -261,7 +265,7 @@ public class Inspector {
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
 
 			List<String> types = new ArrayList<>(orderMap.getTypes(tx));
-			Collections.sort(types);
+			sort(types);
 			types.forEach(type -> {
 
 				JsonObject typeJ = new JsonObject();
@@ -280,7 +284,7 @@ public class Inspector {
 	@Path("{realm}/activities")
 	public Response getActivitiesOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		JsonObject mapOverview = new JsonObject();
 
@@ -294,7 +298,7 @@ public class Inspector {
 			mapOverview.add(Tags.Json.TYPES, typeArrJ);
 
 			List<String> types = new ArrayList<>(activityMap.getTypes(tx));
-			Collections.sort(types);
+			sort(types);
 			types.forEach(type -> {
 
 				JsonObject typeJ = new JsonObject();
@@ -313,7 +317,7 @@ public class Inspector {
 	@Path("{realm}/resources/xml")
 	public Response exportResourcesToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -340,7 +344,7 @@ public class Inspector {
 	@Path("{realm}/orders/xml")
 	public Response exportOrdersToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -367,7 +371,7 @@ public class Inspector {
 	@Path("{realm}/activities/xml")
 	public Response exportActivitiesToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -397,7 +401,7 @@ public class Inspector {
 			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		// parse the query string
 		ResourceSearch search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
@@ -442,7 +446,7 @@ public class Inspector {
 			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		// parse the query string
 		OrderSearch search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
@@ -489,7 +493,7 @@ public class Inspector {
 			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		// parse the query string
 		ActivitySearch search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
@@ -534,7 +538,7 @@ public class Inspector {
 	public Response exportResourcesOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
 			@PathParam("type") String type, @Context HttpServletRequest request) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		queryData.initializeUnsetFields();
 
@@ -567,7 +571,7 @@ public class Inspector {
 	public Response exportOrdersOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
 			@PathParam("type") String type, @Context HttpServletRequest request) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		queryData.initializeUnsetFields();
 
@@ -600,7 +604,7 @@ public class Inspector {
 	public Response exportActivitiesOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
 			@PathParam("type") String type, @Context HttpServletRequest request) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		queryData.initializeUnsetFields();
 
@@ -633,7 +637,7 @@ public class Inspector {
 	public Response getResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -656,7 +660,7 @@ public class Inspector {
 	public Response getResourceAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -676,7 +680,7 @@ public class Inspector {
 	public Response getOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -698,7 +702,7 @@ public class Inspector {
 	public Response getOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -718,7 +722,7 @@ public class Inspector {
 	public Response getActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -740,7 +744,7 @@ public class Inspector {
 	public Response getActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -761,7 +765,7 @@ public class Inspector {
 	public Response updateResourceAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Resource resource = parseResourceFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
@@ -772,13 +776,13 @@ public class Inspector {
 		arg.rootElement = resource;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			String asXml = resource.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@PUT
@@ -788,7 +792,7 @@ public class Inspector {
 	public Response updateResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateResourceService svc = new UpdateResourceService();
@@ -820,7 +824,7 @@ public class Inspector {
 		arg.realm = realm;
 
 		// do service
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
@@ -828,7 +832,7 @@ public class Inspector {
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@PUT
@@ -838,7 +842,7 @@ public class Inspector {
 	public Response updateOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Order order = parseOrderFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
@@ -849,13 +853,13 @@ public class Inspector {
 		arg.rootElement = order;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			String asXml = order.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@PUT
@@ -865,7 +869,7 @@ public class Inspector {
 	public Response updateOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateOrderService svc = new UpdateOrderService();
@@ -897,7 +901,7 @@ public class Inspector {
 		arg.realm = realm;
 
 		// do service
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
@@ -905,7 +909,7 @@ public class Inspector {
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@PUT
@@ -915,7 +919,7 @@ public class Inspector {
 	public Response updateActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Activity activity = parseActivityFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
@@ -926,13 +930,13 @@ public class Inspector {
 		arg.rootElement = activity;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			String asXml = activity.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@PUT
@@ -942,7 +946,7 @@ public class Inspector {
 	public Response updateActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateActivityService svc = new UpdateActivityService();
@@ -974,7 +978,7 @@ public class Inspector {
 		arg.realm = realm;
 
 		// do service
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
@@ -982,7 +986,7 @@ public class Inspector {
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -991,7 +995,7 @@ public class Inspector {
 	@Path("{realm}/import")
 	public Response importAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		File tempFile = null;
 		try {
@@ -1014,21 +1018,24 @@ public class Inspector {
 			arg.resourceTypes = Collections.emptySet();
 			arg.realm = realm;
 
-			XmlImportModelResult svcResult = RestfulStrolchComponent.getInstance().getServiceHandler()
-					.doService(cert, svc, arg);
+			XmlImportModelResult svcResult = getServiceHandler().doService(cert, svc, arg);
 			if (svcResult.isOk())
-				return ResponseUtil.toResponse(MSG, svcResult.getStatistics().toString());
-			return ResponseUtil.toResponse(svcResult);
+				return toResponse(MSG, svcResult.getStatistics().toString());
+			return toResponse(svcResult);
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-			return ResponseUtil.toResponse(e);
+			return toResponse(e);
 		} finally {
 			if (tempFile != null) {
 				if (!tempFile.delete())
-					logger.error("Failed to delete " + tempFile.getAbsolutePath());
+					logger.error("Failed to delete temp file " + tempFile.getAbsolutePath());
 			}
 		}
+	}
+
+	private ServiceHandler getServiceHandler() {
+		return RestfulStrolchComponent.getInstance().getServiceHandler();
 	}
 
 	@POST
@@ -1038,7 +1045,7 @@ public class Inspector {
 	public Response addResourceAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Resource resource = parseResourceFromXml(null, data);
 
@@ -1047,13 +1054,13 @@ public class Inspector {
 		arg.rootElement = resource;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			String asXml = resource.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1063,7 +1070,7 @@ public class Inspector {
 	public Response addResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		// parse from complete JSON
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -1075,13 +1082,13 @@ public class Inspector {
 		arg.rootElement = resource;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1091,7 +1098,7 @@ public class Inspector {
 	public Response addResourceAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		Resource resource = parseNewResourceFromJson(cert, realm, type, data, flat);
@@ -1101,7 +1108,7 @@ public class Inspector {
 		arg.rootElement = resource;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
@@ -1109,7 +1116,7 @@ public class Inspector {
 			return Response.ok().entity(toString(resource.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1118,7 +1125,7 @@ public class Inspector {
 	@Path("{realm}/orders")
 	public Response addOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Order order = parseOrderFromXml(null, data);
 
@@ -1127,13 +1134,13 @@ public class Inspector {
 		arg.rootElement = order;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			String asXml = order.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1142,7 +1149,7 @@ public class Inspector {
 	@Path("{realm}/orders")
 	public Response addOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		// parse from complete JSON
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -1154,13 +1161,13 @@ public class Inspector {
 		arg.rootElement = order;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1170,7 +1177,7 @@ public class Inspector {
 	public Response addOrderAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		Order order = parseNewOrderFromJson(cert, realm, type, data, flat);
@@ -1180,7 +1187,7 @@ public class Inspector {
 		arg.rootElement = order;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
@@ -1188,7 +1195,7 @@ public class Inspector {
 			return Response.ok().entity(toString(order.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1198,7 +1205,7 @@ public class Inspector {
 	public Response addActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		Activity activity = parseActivityFromXml(null, data);
 
@@ -1207,13 +1214,13 @@ public class Inspector {
 		arg.rootElement = activity;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			String asXml = activity.accept(new StrolchElementToXmlStringVisitor());
 			return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1223,7 +1230,7 @@ public class Inspector {
 	public Response addActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		// parse from complete JSON
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -1235,13 +1242,13 @@ public class Inspector {
 		arg.rootElement = activity;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@POST
@@ -1251,7 +1258,7 @@ public class Inspector {
 	public Response addActivityAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		Activity activity = parseNewActivityFromJson(cert, realm, type, data, flat);
@@ -1261,7 +1268,7 @@ public class Inspector {
 		arg.rootElement = activity;
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
 		if (result.isOk()) {
 			StrolchElementToJsonVisitor toJsonVisitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
 			if (flat)
@@ -1269,7 +1276,7 @@ public class Inspector {
 			return Response.ok().entity(toString(activity.accept(toJsonVisitor))).build();
 		}
 
-		return ResponseUtil.toResponse(result);
+		return toResponse(result);
 	}
 
 	@DELETE
@@ -1277,7 +1284,7 @@ public class Inspector {
 	public Response removeResourcesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
 			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		RemoveResourcesService svc = new RemoveResourcesService();
 		LocatorListArgument arg = svc.getArgumentInstance();
@@ -1289,8 +1296,8 @@ public class Inspector {
 			arg.locators.add(locator);
 		}
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return ResponseUtil.toResponse(result);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
+		return toResponse(result);
 	}
 
 	@DELETE
@@ -1298,7 +1305,7 @@ public class Inspector {
 	public Response removeOrdersByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
 			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		RemoveOrdersService svc = new RemoveOrdersService();
 		LocatorListArgument arg = svc.getArgumentInstance();
@@ -1310,8 +1317,8 @@ public class Inspector {
 			arg.locators.add(locator);
 		}
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return ResponseUtil.toResponse(result);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
+		return toResponse(result);
 	}
 
 	@DELETE
@@ -1319,7 +1326,7 @@ public class Inspector {
 	public Response removeActivitiesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
 			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		RemoveActivitiesService svc = new RemoveActivitiesService();
 		LocatorListArgument arg = svc.getArgumentInstance();
@@ -1331,8 +1338,8 @@ public class Inspector {
 			arg.locators.add(locator);
 		}
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return ResponseUtil.toResponse(result);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
+		return toResponse(result);
 	}
 
 	@DELETE
@@ -1341,15 +1348,15 @@ public class Inspector {
 	public Response removeResource(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		RemoveResourceService svc = new RemoveResourceService();
 		LocatorArgument arg = svc.getArgumentInstance();
 		arg.locator = Resource.locatorFor(type, id);
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return ResponseUtil.toResponse(result);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
+		return toResponse(result);
 	}
 
 	@DELETE
@@ -1358,15 +1365,15 @@ public class Inspector {
 	public Response removeOrder(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		RemoveOrderService svc = new RemoveOrderService();
 		LocatorArgument arg = svc.getArgumentInstance();
 		arg.locator = Order.locatorFor(type, id);
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return ResponseUtil.toResponse(result);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
+		return toResponse(result);
 	}
 
 	@DELETE
@@ -1375,15 +1382,15 @@ public class Inspector {
 	public Response removeActivity(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		RemoveActivityService svc = new RemoveActivityService();
 		LocatorArgument arg = svc.getArgumentInstance();
 		arg.locator = Activity.locatorFor(type, id);
 		arg.realm = realm;
 
-		ServiceResult result = RestfulStrolchComponent.getInstance().getServiceHandler().doService(cert, svc, arg);
-		return ResponseUtil.toResponse(result);
+		ServiceResult result = getServiceHandler().doService(cert, svc, arg);
+		return toResponse(result);
 	}
 
 	private Resource parseResourceFromXml(String type, String data) {
