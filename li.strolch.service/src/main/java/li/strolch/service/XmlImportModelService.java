@@ -75,6 +75,7 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			command = new XmlImportModelCommand(tx);
+			command.setFailOnUpdate(arg.failOnUpdate);
 			command.setModelFile(modelFile);
 			command.setAllowInclude(arg.allowInclude);
 			command.setAddOrders(arg.addOrders);
@@ -87,18 +88,18 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 			command.setResourceTypes(arg.resourceTypes);
 			command.setActivityTypes(arg.activityTypes);
 
-			tx.addCommand(command);
+			command.validate();
+			command.doCommand();
 			tx.commitOnClose();
 		}
 
 		ModelStatistics statistics = command.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat
-				.format("Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(), //$NON-NLS-1$
-						arg.realm, durationS));
-		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(),
+				arg.realm, durationS));
+		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders));
+		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources));
+		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities));
 
 		return new XmlImportModelResult(statistics);
 	}

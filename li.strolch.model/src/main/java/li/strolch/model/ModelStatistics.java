@@ -17,10 +17,14 @@ package li.strolch.model;
 
 import static li.strolch.utils.helper.StringHelper.NULL;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import com.google.gson.JsonObject;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
@@ -28,38 +32,41 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  */
 public class ModelStatistics {
 
-	public Date startTime;
+	public LocalDateTime startTime;
 	public long durationNanos;
 	public long nrOfResources;
+	public long nrOfResourcesUpdated;
 	public long nrOfOrders;
+	public long nrOfOrdersUpdated;
 	public long nrOfActivities;
+	public long nrOfActivitiesUpdated;
 
-	/**
-	 * @return the nrOfOrders
-	 */
-	public long getNrOfOrders() {
-		return this.nrOfOrders;
-	}
-
-	/**
-	 * @return the nrOfResources
-	 */
 	public long getNrOfResources() {
 		return this.nrOfResources;
 	}
 
-	/**
-	 * @return the nrOfResources + nrOfOrders
-	 */
-	public long getNrOfElements() {
-		return this.nrOfOrders + this.nrOfResources;
+	public long getNrOfResourcesUpdated() {
+		return nrOfResourcesUpdated;
 	}
 
-	/**
-	 * @return the nrOfActivities
-	 */
+	public long getNrOfOrders() {
+		return this.nrOfOrders;
+	}
+
+	public long getNrOfOrdersUpdated() {
+		return nrOfOrdersUpdated;
+	}
+
 	public long getNrOfActivities() {
 		return this.nrOfActivities;
+	}
+
+	public long getNrOfActivitiesUpdated() {
+		return nrOfActivitiesUpdated;
+	}
+
+	public long getNrOfElements() {
+		return this.nrOfResources + this.nrOfOrders + this.nrOfActivities;
 	}
 
 	/**
@@ -69,38 +76,56 @@ public class ModelStatistics {
 	 * 		further statistics to add to this {@link ModelStatistics}
 	 */
 	public void add(ModelStatistics statistics) {
-		this.nrOfOrders += statistics.nrOfOrders;
 		this.nrOfResources += statistics.nrOfResources;
+		this.nrOfResourcesUpdated += statistics.nrOfResourcesUpdated;
+		this.nrOfOrders += statistics.nrOfOrders;
+		this.nrOfOrdersUpdated += statistics.nrOfOrdersUpdated;
 		this.nrOfActivities += statistics.nrOfActivities;
+		this.nrOfActivitiesUpdated += statistics.nrOfActivitiesUpdated;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
-		builder.append(" [startTime=");
-		builder.append(this.startTime == null ? NULL : ISO8601FormatFactory.getInstance().formatDate(this.startTime));
-		builder.append(", durationNanos=");
+		builder.append(",\n- startTime=");
+		builder.append(this.startTime == null ?
+				NULL :
+				this.startTime.toLocalTime().truncatedTo(ChronoUnit.SECONDS).toString());
+		builder.append(",\n- duration=");
 		builder.append(StringHelper.formatNanoDuration(this.durationNanos));
-		builder.append(", nrOfResources=");
-		builder.append(this.nrOfResources);
-		builder.append(", nrOfOrders=");
-		builder.append(this.nrOfOrders);
-		builder.append(", nrOfActivities=");
-		builder.append(this.nrOfActivities);
-		builder.append("]");
+
+		if (this.nrOfResourcesUpdated == 0)
+			builder.append(",\n- Resources=").append(this.nrOfResources);
+		else
+			builder.append(",\n- Resources: added=").append(this.nrOfResources).append(" updated=")
+					.append(this.nrOfResourcesUpdated);
+
+		if (this.nrOfOrdersUpdated == 0)
+			builder.append(",\n- Orders=").append(this.nrOfOrders);
+		else
+			builder.append(",\n- Orders: added=").append(this.nrOfOrders).append(" updated=")
+					.append(this.nrOfOrdersUpdated);
+
+		if (this.nrOfActivitiesUpdated == 0)
+			builder.append(",\n- Activities=").append(this.nrOfActivities);
+		else
+			builder.append(",\n- Activities: added=").append(this.nrOfActivities).append(" updated=")
+					.append(this.nrOfActivitiesUpdated);
 		return builder.toString();
 	}
 
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 
-		json.addProperty("startTime",
-				this.startTime == null ? NULL : ISO8601FormatFactory.getInstance().formatDate(this.startTime));
+		json.addProperty("startTime", this.startTime == null ? NULL : ISO8601.toString(this.startTime));
 		json.addProperty("durationNanos", durationNanos);
-		json.addProperty("nrOfResources", nrOfResources);
-		json.addProperty("nrOfOrders", nrOfOrders);
-		json.addProperty("nrOfActivities", nrOfActivities);
+		json.addProperty("resourcesAdded", nrOfResources);
+		json.addProperty("resourcesUpdated", nrOfResourcesUpdated);
+		json.addProperty("ordersAdded", nrOfOrders);
+		json.addProperty("ordersUpdated", nrOfOrdersUpdated);
+		json.addProperty("activitiesAdded", nrOfActivities);
+		json.addProperty("activitiesUpdated", nrOfActivitiesUpdated);
 
 		return json;
 	}

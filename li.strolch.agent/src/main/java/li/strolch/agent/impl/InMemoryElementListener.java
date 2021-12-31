@@ -16,10 +16,12 @@
 package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Set;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
@@ -30,6 +32,9 @@ import li.strolch.persistence.api.StrolchTransaction;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class InMemoryElementListener implements StrolchElementListener {
+
+	private final StrolchTransaction tx;
+	private final ModelStatistics statistics;
 
 	private boolean addOrders;
 	private boolean addResources;
@@ -43,10 +48,10 @@ public class InMemoryElementListener implements StrolchElementListener {
 
 	private boolean failOnUpdate;
 
-	private StrolchTransaction tx;
-
 	public InMemoryElementListener(StrolchTransaction tx) {
 		this.tx = tx;
+		this.statistics = new ModelStatistics();
+		this.statistics.startTime = LocalDateTime.now();
 
 		this.addResources = true;
 		this.addOrders = true;
@@ -139,6 +144,10 @@ public class InMemoryElementListener implements StrolchElementListener {
 		this.failOnUpdate = failOnUpdate;
 	}
 
+	public ModelStatistics getStatistics() {
+		return this.statistics;
+	}
+
 	@Override
 	public void notifyResource(Resource resource) {
 		if (!this.resourceTypes.isEmpty() && !this.resourceTypes.contains(resource.getType()))
@@ -150,12 +159,15 @@ public class InMemoryElementListener implements StrolchElementListener {
 				Resource current = this.tx.getResourceBy(resource.getType(), resource.getId());
 				resource.setVersion(current.getVersion());
 				this.tx.update(resource);
+				this.statistics.nrOfResourcesUpdated++;
 			} else if (this.failOnUpdate) {
-				throw new StrolchException(MessageFormat
-						.format("Resource {0} already exists and updating is disallowed!", resource.getLocator()));
+				throw new StrolchException(
+						MessageFormat.format("Resource {0} already exists and updating is disallowed!",
+								resource.getLocator()));
 			}
 		} else if (this.addResources) {
 			this.tx.add(resource);
+			this.statistics.nrOfResources++;
 		}
 		// else ignore
 	}
@@ -171,12 +183,14 @@ public class InMemoryElementListener implements StrolchElementListener {
 				Order current = this.tx.getOrderBy(order.getType(), order.getId());
 				order.setVersion(current.getVersion());
 				this.tx.update(order);
+				this.statistics.nrOfOrdersUpdated++;
 			} else if (failOnUpdate) {
-				throw new StrolchException(MessageFormat
-						.format("Order {0} already exists and updating is disallowed!", order.getLocator()));
+				throw new StrolchException(MessageFormat.format("Order {0} already exists and updating is disallowed!",
+						order.getLocator()));
 			}
 		} else if (this.addOrders) {
 			this.tx.add(order);
+			this.statistics.nrOfOrders++;
 		}
 		// else ignore
 	}
@@ -192,12 +206,15 @@ public class InMemoryElementListener implements StrolchElementListener {
 				Activity current = this.tx.getActivityBy(activity.getType(), activity.getId());
 				activity.setVersion(current.getVersion());
 				this.tx.update(activity);
+				this.statistics.nrOfActivitiesUpdated++;
 			} else if (failOnUpdate) {
-				throw new StrolchException(MessageFormat
-						.format("Activity {0} already exists and updating is disallowed!", activity.getLocator()));
+				throw new StrolchException(
+						MessageFormat.format("Activity {0} already exists and updating is disallowed!",
+								activity.getLocator()));
 			}
 		} else if (this.addActivities) {
 			this.tx.add(activity);
+			this.statistics.nrOfActivities++;
 		}
 		// else ignore
 	}

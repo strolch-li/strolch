@@ -22,6 +22,7 @@ import li.strolch.service.api.ServiceArgument;
 
 public class XmlImportModelArgument extends ServiceArgument {
 	public String modelFileName;
+	public boolean failOnUpdate = false;
 	public boolean external = false;
 	public boolean allowInclude = true;
 	public boolean addOrders = true;
@@ -39,7 +40,10 @@ public class XmlImportModelArgument extends ServiceArgument {
 		StringBuilder builder = new StringBuilder();
 		builder.append("XmlImportModelArgument [ ");
 
-		builder.append("external=");
+		builder.append("failOnUpdate=");
+		builder.append(this.failOnUpdate);
+
+		builder.append(", external=");
 		builder.append(this.external);
 
 		builder.append(", allowInclude=");
