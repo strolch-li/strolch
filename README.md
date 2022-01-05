@@ -1,4 +1,7 @@
 # Strolch
+
+[![Contributors](https://img.shields.io/github/contributors/strolch-li/strolch)](https://github.com/strolch-li/strolch/graphs/contributors)
+[![License](https://img.shields.io/github/license/strolch-li/strolch)](https://github.com/strolch-li/strolch/blob/master/LICENSE)
 [![Build Status](https://ci.4trees.ch/buildStatus/icon?job=strolch)](https://ci.4trees.ch/job/strolch/)
 
 [![WorksWithOpenJDK](https://github.com/foojayio/badges/raw/main/works_with_openjdk/WorksWithOpenJDK-100.png)](https://foojay.io/works-with-openjdk)
