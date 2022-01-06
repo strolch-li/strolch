@@ -416,14 +416,12 @@ public enum StrolchValueType {
 
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
-			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+			return new IntegerListTimedState();
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
-			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+			return new IntegerListValue(valueAsString);
 		}
 	},
 

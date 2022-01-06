@@ -54,6 +54,12 @@ public class ResourceBuilder extends RootElementBuilder<ResourceBuilder> {
 		return builder;
 	}
 
+	public IntegerListStateBuilder integerListState(String id, String name) {
+		IntegerListStateBuilder builder = new IntegerListStateBuilder(this, id, name);
+		this.timedStates.add(builder);
+		return builder;
+	}
+
 	public StringSetStateBuilder stringSetState(String id, String name) {
 		StringSetStateBuilder builder = new StringSetStateBuilder(this, id, name);
 		this.timedStates.add(builder);

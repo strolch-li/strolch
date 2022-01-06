@@ -68,6 +68,8 @@ public interface StrolchElementVisitor<U> extends StrolchVisitor {
 
 	U visitFloatListState(FloatListTimedState state);
 
+	U visitIntegerListState(IntegerListTimedState state);
+
 	U visitIntegerState(IntegerTimedState state);
 
 	U visitStringState(StringSetTimedState state);

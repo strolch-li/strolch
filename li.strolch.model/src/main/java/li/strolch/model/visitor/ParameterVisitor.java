@@ -63,6 +63,11 @@ public interface ParameterVisitor<U> extends StrolchElementVisitor<U> {
 	}
 
 	@Override
+	default U visitIntegerListState(IntegerListTimedState state) {
+		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
+	}
+
+	@Override
 	default U visitIntegerState(IntegerTimedState state) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + state.getClass());
 	}

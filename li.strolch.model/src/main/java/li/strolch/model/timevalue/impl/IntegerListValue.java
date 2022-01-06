@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Martin Smock <smock.martin@gmail.com>
+ * Copyright 2022 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@ package li.strolch.model.timevalue.impl;
 import static li.strolch.model.parameter.ListParameter.VALUE_SEPARATOR2;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
@@ -26,54 +29,54 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.utils.helper.StringHelper;
 
 /**
- * {@link IValue} implementation to work with Double valued {@link ITimeValue} objects
+ * {@link IValue} implementation to work with Integer valued {@link ITimeValue} objects
  *
- * @author Martin Smock <smock.martin@gmail.com>
+ * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class FloatListValue implements IValue<List<Double>>, Serializable {
+public class IntegerListValue implements IValue<List<Integer>>, Serializable {
 
-	public static final FloatListValue NEUTRAL = new FloatListValue(0.0d);
+	public static final IntegerListValue NEUTRAL = new IntegerListValue(0);
 
-	private final List<Double> value;
+	private final List<Integer> value;
 
-	public FloatListValue(Double value) {
+	public IntegerListValue(Integer value) {
 		this.value = Collections.singletonList(value);
 	}
 
-	public FloatListValue(double... values) {
-		List<Double> value = new ArrayList<>();
-		for (Double aDouble : values) {
-			value.add(aDouble);
+	public IntegerListValue(int... values) {
+		List<Integer> value = new ArrayList<>();
+		for (Integer aInteger : values) {
+			value.add(aInteger);
 		}
 		this.value = value;
 	}
 
-	public FloatListValue(List<Double> values) {
+	public IntegerListValue(List<Integer> values) {
 		this.value = new ArrayList<>(values);
 	}
 
-	public FloatListValue(String valueAsString) throws NumberFormatException {
-		List<Double> value = new ArrayList<>();
+	public IntegerListValue(String valueAsString) throws NumberFormatException {
+		List<Integer> value = new ArrayList<>();
 		String[] values = valueAsString.split(",");
 		for (String s : values) {
-			value.add(Double.parseDouble(s.trim()));
+			value.add(Integer.parseInt(s.trim()));
 		}
 		this.value = value;
 	}
 
 	@Override
 	public String getType() {
-		return StrolchValueType.FLOAT_LIST.getType();
+		return StrolchValueType.INTEGER_LIST.getType();
 	}
 
 	@Override
-	public FloatListValue add(List<Double> o) {
+	public IntegerListValue add(List<Integer> o) {
 		this.value.addAll(o);
 		return this;
 	}
 
 	@Override
-	public List<Double> getValue() {
+	public List<Integer> getValue() {
 		return this.value;
 	}
 
@@ -84,7 +87,7 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 		}
 
 		StringBuilder sb = new StringBuilder();
-		Iterator<Double> iter = this.value.iterator();
+		Iterator<Integer> iter = this.value.iterator();
 		while (iter.hasNext()) {
 
 			sb.append(iter.next());
@@ -102,25 +105,25 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("FloatListValue [value=");
+		sb.append("IntegerListValue [value=");
 		sb.append(this.value);
 		sb.append("]");
 		return sb.toString();
 	}
 
 	@Override
-	public boolean matches(IValue<List<Double>> other) {
+	public boolean matches(IValue<List<Integer>> other) {
 		return this.value.equals(other.getValue());
 	}
 
 	@Override
-	public FloatListValue getInverse() {
-		return new FloatListValue(this.value);
+	public IntegerListValue getInverse() {
+		return new IntegerListValue(this.value);
 	}
 
 	@Override
-	public FloatListValue getCopy() {
-		return new FloatListValue(this.value);
+	public IntegerListValue getCopy() {
+		return new IntegerListValue(this.value);
 	}
 
 	@Override
@@ -142,7 +145,7 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		FloatListValue other = (FloatListValue) obj;
+		IntegerListValue other = (IntegerListValue) obj;
 		if (this.value == null) {
 			if (other.value != null) {
 				return false;
@@ -154,8 +157,8 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 	}
 
 	@Override
-	public int compareTo(IValue<List<Double>> o) {
-		List<Double> otherValues = o.getValue();
+	public int compareTo(IValue<List<Integer>> o) {
+		List<Integer> otherValues = o.getValue();
 		if (this.value.equals(otherValues))
 			return 0;
 		return Integer.compare(this.value.size(), otherValues.size());

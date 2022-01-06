@@ -82,6 +82,9 @@ public class ModelGenerator {
 	public static final String STATE_FLOAT_LIST_ID = "@state5";
 	public static final String STATE_FLOAT_LIST_NAME = "Float List State";
 
+	public static final String STATE_INTEGER_LIST_ID = "@state6";
+	public static final String STATE_INTEGER_LIST_NAME = "Integer List State";
+
 	public static final String STATE_INTEGER_ID = "@state2";
 	public static final String STATE_INTEGER_NAME = "Integer State";
 
@@ -171,6 +174,15 @@ public class ModelGenerator {
 		FloatListValue floatListValueChange = new FloatListValue(STATE_FLOAT_TIME_10, STATE_FLOAT_TIME_20);
 		floatListTimedState.applyChange(new ValueChange<>(STATE_TIME_30, floatListValueChange), true);
 		resource.addTimedState(floatListTimedState);
+
+		// integer list state
+		IntegerListTimedState intListTimedState = new IntegerListTimedState(STATE_INTEGER_LIST_ID,
+				STATE_INTEGER_LIST_NAME);
+		intListTimedState.applyChange(new ValueChange<>(STATE_TIME_0, new IntegerListValue(STATE_INTEGER_TIME_0)),
+				true);
+		IntegerListValue intListValueChange = new IntegerListValue(STATE_INTEGER_TIME_10, STATE_INTEGER_TIME_20);
+		intListTimedState.applyChange(new ValueChange<>(STATE_TIME_30, intListValueChange), true);
+		resource.addTimedState(intListTimedState);
 
 		// integer state
 		IntegerTimedState integerTimedState = new IntegerTimedState(STATE_INTEGER_ID, STATE_INTEGER_NAME);
@@ -444,8 +456,6 @@ public class ModelGenerator {
 	 * <li>DateParameter - 1354295525628L</li>
 	 * <li>StringListParameter - Hello, World</li>
 	 * </ul>
-	 *
-	 * @param bag
 	 */
 	public static void addAllParameters(ParameterBag bag) {
 

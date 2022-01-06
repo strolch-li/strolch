@@ -506,6 +506,14 @@ public class ModelTest {
 		assertEquals(asList(STATE_FLOAT_TIME_0, STATE_FLOAT_TIME_10, STATE_FLOAT_TIME_20),
 				floatListState.getStateAt(STATE_TIME_30).getValue().getValue());
 
+		IntegerListTimedState intListState = resource.getTimedState(STATE_INTEGER_LIST_ID);
+		assertNotNull("Integer List State missing with id " + STATE_INTEGER_ID, intListState);
+		assertEquals(singletonList(STATE_INTEGER_TIME_0), intListState.getStateAt(STATE_TIME_0).getValue().getValue());
+		assertEquals(singletonList(STATE_INTEGER_TIME_0), intListState.getStateAt(STATE_TIME_10).getValue().getValue());
+		assertEquals(singletonList(STATE_INTEGER_TIME_0), intListState.getStateAt(STATE_TIME_20).getValue().getValue());
+		assertEquals(asList(STATE_INTEGER_TIME_0, STATE_INTEGER_TIME_10, STATE_INTEGER_TIME_20),
+				intListState.getStateAt(STATE_TIME_30).getValue().getValue());
+
 		IntegerTimedState integerState = resource.getTimedState(STATE_INTEGER_ID);
 		assertNotNull("Integer State missing with id " + STATE_INTEGER_ID, integerState);
 		assertEquals(STATE_INTEGER_TIME_0, integerState.getStateAt(STATE_TIME_0).getValue().getValue(), 0.0);

@@ -344,161 +344,168 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 
 	@Override
 	public List<Locator> visitOrder(Order order) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), order.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), order.getClass());
 		deepEquals((Order) this.srcElement, order);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitResource(Resource resource) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), resource.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), resource.getClass());
 		deepEquals((Resource) this.srcElement, resource);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitActivity(Activity activity) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), activity.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), activity.getClass());
 		deepEquals((Activity) this.srcElement, activity);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitAction(Action action) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), action.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), action.getClass());
 		deepEquals((Action) this.srcElement, action);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitBooleanParam(BooleanParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitDateParam(DateParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitDurationParam(DurationParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitFloatParam(FloatParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitIntegerParam(IntegerParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitLongParam(LongParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitStringParam(StringParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitTextParam(TextParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitStringListParam(StringListParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitIntegerListParam(IntegerListParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitFloatListParam(FloatListParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitLongListParam(LongListParameter param) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), param.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), param.getClass());
 		deepEquals((Parameter<?>) this.srcElement, param);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitBooleanState(BooleanTimedState state) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), state.getClass());
 		deepEquals((StrolchTimedState<?>) this.srcElement, state);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitFloatState(FloatTimedState state) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), state.getClass());
 		deepEquals((StrolchTimedState<?>) this.srcElement, state);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitFloatListState(FloatListTimedState state) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), state.getClass());
+		deepEquals((StrolchTimedState<?>) this.srcElement, state);
+		return getMismatchedLocators();
+	}
+
+	@Override
+	public List<Locator> visitIntegerListState(IntegerListTimedState state) {
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), state.getClass());
 		deepEquals((StrolchTimedState<?>) this.srcElement, state);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitIntegerState(IntegerTimedState state) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), state.getClass());
 		deepEquals((StrolchTimedState<?>) this.srcElement, state);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitLongState(LongTimedState state) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), state.getClass());
 		deepEquals((StrolchTimedState<?>) this.srcElement, state);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitStringState(StringSetTimedState state) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), state.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), state.getClass());
 		deepEquals((StrolchTimedState<?>) this.srcElement, state);
 		return getMismatchedLocators();
 	}
 
 	@Override
 	public List<Locator> visitParameterBag(ParameterBag bag) {
-		DBC.PRE.assertEquals("Can't compare apples with pairs =)", this.srcElement.getClass(), bag.getClass());
+		DBC.PRE.assertEquals("Can't compare apples with pears =)", this.srcElement.getClass(), bag.getClass());
 		deepEquals((ParameterBag) this.srcElement, bag);
 		return getMismatchedLocators();
 	}

@@ -356,6 +356,13 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	@Override
+	public JsonElement visitIntegerListState(IntegerListTimedState state) {
+		if (isFlat())
+			return stateToJsonFlat(state);
+		return stateToJsonFull(state);
+	}
+
+	@Override
 	public JsonElement visitIntegerState(IntegerTimedState state) {
 		if (isFlat())
 			return stateToJsonFlat(state);

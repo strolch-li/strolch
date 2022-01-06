@@ -15,9 +15,6 @@
  */
 package li.strolch.model.timedstate;
 
-import static java.util.Spliterators.spliteratorUnknownSize;
-import static java.util.stream.StreamSupport.stream;
-
 import java.io.Serializable;
 import java.util.NavigableSet;
 

@@ -58,6 +58,13 @@ public class SetStateValueVisitor implements TimedStateVisitor<Void> {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Void visitIntegerListState(IntegerListTimedState state) {
+		state.getTimeEvolution().setValueAt(this.time, new IntegerListValue((List<Integer>) value));
+		return null;
+	}
+
 	@Override
 	public Void visitIntegerState(IntegerTimedState state) {
 		state.getTimeEvolution().setValueAt(this.time, new IntegerValue((Integer) value));

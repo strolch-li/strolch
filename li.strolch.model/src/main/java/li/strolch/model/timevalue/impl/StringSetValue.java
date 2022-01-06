@@ -36,7 +36,7 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class StringSetValue implements IValue<Set<AString>>, Serializable {
 
-	private static Set<AString> neu = Collections.emptySet();
+	private final static Set<AString> neu = Collections.emptySet();
 	public static final IValue<Set<AString>> NEUTRAL = new StringSetValue(neu);
 
 	private Set<AString> aStrings = new HashSet<>();

@@ -68,11 +68,11 @@ public interface ITimedState<T extends IValue> {
 	 *
 	 * @return true if this element is read only
 	 */
-	public boolean isReadonly();
+	boolean isReadonly();
 
 	/**
 	 * Sets this element to readOnly, so that it may not be modified. To modify it, call <code>getClone()</code> on the
 	 * parent
 	 */
-	public void setReadonly();
+	void setReadonly();
 }
