@@ -111,6 +111,13 @@ public class StrolchAgent {
 	}
 
 	/**
+	 * @see ComponentContainer#getRealm(String)
+	 */
+	public StrolchRealm getRealm(String realm) throws StrolchException {
+		return getComponent(RealmHandler.class).getRealm(realm);
+	}
+
+	/**
 	 * @see ComponentContainer#getRealm(Certificate)
 	 */
 	public StrolchRealm getRealm(Certificate certificate) throws StrolchException {
@@ -278,10 +285,14 @@ public class StrolchAgent {
 	 * Sets up the agent by parsing the configuration file and initializes the given environment
 	 * </p>
 	 *
-	 * @param environment the current environment
-	 * @param configPathF the path to the config directory
-	 * @param dataPathF   the path to the data directory
-	 * @param tempPathF   the path to the temp directory
+	 * @param environment
+	 * 		the current environment
+	 * @param configPathF
+	 * 		the path to the config directory
+	 * @param dataPathF
+	 * 		the path to the data directory
+	 * @param tempPathF
+	 * 		the path to the temp directory
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
