@@ -81,8 +81,11 @@ public class StrolchModelConstants {
 	public static final String TYPE_ENUMERATION = "Enumeration";
 	public static final String TYPE_CONFIGURATION = "Configuration";
 	public static final String TYPE_OBJECTIVES = "Objectives";
+	public static final String TYPE_METRIC = "Metric";
 
 	public static final String RES_CONFIGURATION = "configuration";
+
+	public static final String STATE_VALUES = "values";
 
 	/**
 	 * ID of the admin role which has access to all resources
@@ -95,8 +98,11 @@ public class StrolchModelConstants {
 	public static final String PARAM_DELAY = "delay";
 	public static final String PARAM_START_DATE = "startDate";
 	public static final String PARAM_MODE = "mode";
+	public static final String PARAM_GROUP = "group";
 
 	public static class PolicyConstants {
+		public static final String POLICY_DEFAULT = "Default";
+
 		public static final String TYPE_PRODUCE = "Produce";
 		public static final String TYPE_CONSUME = "Consume";
 		public static final String TYPE_RESERVE = "Reserve";
