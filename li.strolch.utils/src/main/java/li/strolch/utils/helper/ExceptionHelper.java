@@ -40,9 +40,9 @@ public class ExceptionHelper {
 
 	public static String getCallerMethod(int depth) {
 		// TODO change to StackWalker:
-//		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-//		walker.walk(frames -> frames.skip(1)
-//				.map((StackWalker.StackFrame s) -> s.getDeclaringClass() + "." + s.getMethodName()).findFirst());
+		//		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+		//		walker.walk(frames -> frames.skip(1)
+		//				.map((StackWalker.StackFrame s) -> s.getDeclaringClass() + "." + s.getMethodName()).findFirst());
 
 		StackTraceElement element = new Throwable().getStackTrace()[depth];
 		return element.getClassName() + "." + element.getMethodName();
@@ -205,6 +205,18 @@ public class ExceptionHelper {
 		}
 
 		return t;
+	}
+
+	/**
+	 * Returns {@link #getExceptionMessage(Throwable, boolean)} for the root cause of the given {@link Throwable}
+	 *
+	 * @param throwable
+	 * 		the throwable for which to get the message of the root cause
+	 *
+	 * @return {@link #getExceptionMessage(Throwable, boolean)} for the root cause of the given {@link Throwable}
+	 */
+	public static String getRootCauseMessage(Throwable throwable) {
+		return getExceptionMessage(getRootCause(throwable), true);
 	}
 
 	/**
