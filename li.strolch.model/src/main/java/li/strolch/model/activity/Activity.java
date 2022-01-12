@@ -390,29 +390,6 @@ public class Activity extends AbstractStrolchRootElement
 		return Optional.empty();
 	}
 
-	public <T extends IActivityElement> T findElement(Predicate<IActivityElement> predicate,
-			Supplier<String> msgSupplier) {
-		@SuppressWarnings("unchecked")
-		T t = (T) this.elements.values().stream().filter(predicate).collect(singletonCollector(msgSupplier));
-		return t;
-	}
-
-	public List<IActivityElement> findElements(Predicate<IActivityElement> predicate) {
-		return this.elements.values().stream().filter(predicate).collect(toList());
-	}
-
-	public List<Action> findActions(Predicate<Action> predicate) {
-		return this.elements.values().stream() //
-				.filter(IActivityElement::isAction) //
-				.map(e -> (Action) e) //
-				.filter(predicate) //
-				.collect(toList());
-	}
-
-	public List<Action> findActionsDeep(Predicate<Action> predicate) {
-		return streamActionsDeep().filter(predicate).collect(toList());
-	}
-
 	public List<IActivityElement> getElementsByType(String type) {
 		List<IActivityElement> elements = new ArrayList<>();
 		Iterator<Entry<String, IActivityElement>> iter = elementIterator();
@@ -433,8 +410,35 @@ public class Activity extends AbstractStrolchRootElement
 		return this.elements;
 	}
 
+	/**
+	 * @return the iterator for entries, which include the id as key and the {@link IActivityElement} as value
+	 */
+	public Iterator<Entry<String, IActivityElement>> elementIterator() {
+		if (this.elements == null)
+			return Collections.emptyIterator();
+		return this.elements.entrySet().iterator();
+	}
+
+	/**
+	 * @return the stream for entries, which include the id as key and the {@link IActivityElement} as value
+	 */
+	public Stream<Entry<String, IActivityElement>> elementStream() {
+		if (this.elements == null)
+			return Stream.empty();
+		return this.elements.entrySet().stream();
+	}
+
 	public Stream<IActivityElement> streamElements() {
+		if (this.elements == null)
+			return Stream.empty();
 		return this.elements.values().stream();
+	}
+
+	public Stream<Action> streamActions(Predicate<Action> predicate) {
+		return streamElements() //
+				.filter(IActivityElement::isAction) //
+				.map(e -> (Action) e) //
+				.filter(predicate);
 	}
 
 	public Stream<Action> streamActionsDeep() {
@@ -445,24 +449,36 @@ public class Activity extends AbstractStrolchRootElement
 		}).map(IActivityElement::asAction);
 	}
 
+	public Stream<Action> streamActionsDeep(Predicate<Action> predicate) {
+		return streamActionsDeep().filter(predicate);
+	}
+
+	public <T extends IActivityElement> T findElement(Predicate<IActivityElement> predicate,
+			Supplier<String> msgSupplier) {
+		@SuppressWarnings("unchecked")
+		T t = (T) streamElements().filter(predicate).collect(singletonCollector(msgSupplier));
+		return t;
+	}
+
+	public List<IActivityElement> findElements(Predicate<IActivityElement> predicate) {
+		return streamElements().filter(predicate).collect(toList());
+	}
+
+	public List<Action> findActions(Predicate<Action> predicate) {
+		return streamActions(predicate).collect(toList());
+	}
+
+	public List<Action> findActionsDeep(Predicate<Action> predicate) {
+		return streamActionsDeep().filter(predicate).collect(toList());
+	}
+
 	/**
 	 * Returns all the actions as a flat list
 	 *
 	 * @return the list of actions
 	 */
 	public List<Action> getActionsAsFlatList() {
-		List<Action> actions = new ArrayList<>();
-		getActionsAsFlatList(actions);
-		return actions;
-	}
-
-	private void getActionsAsFlatList(List<Action> actions) {
-		for (IActivityElement element : this.elements.values()) {
-			if (element instanceof Activity)
-				((Activity) element).getActionsAsFlatList(actions);
-			else
-				actions.add((Action) element);
-		}
+		return streamActionsDeep().toList();
 	}
 
 	/**
@@ -474,18 +490,7 @@ public class Activity extends AbstractStrolchRootElement
 	 * @return the list of actions with the given state
 	 */
 	public List<Action> getActionsWithState(State state) {
-		List<Action> actions = new ArrayList<>();
-		getActionsWithState(actions, state);
-		return actions;
-	}
-
-	private void getActionsWithState(List<Action> actions, State state) {
-		for (IActivityElement element : this.elements.values()) {
-			if (element instanceof Activity)
-				((Activity) element).getActionsWithState(actions, state);
-			else if (element.getState() == state)
-				actions.add((Action) element);
-		}
+		return streamActionsDeep(action -> action.getState() == state).toList();
 	}
 
 	/**
@@ -497,18 +502,7 @@ public class Activity extends AbstractStrolchRootElement
 	 * @return the list of actions with the given type
 	 */
 	public List<Action> getActionsByType(String type) {
-		List<Action> actions = new ArrayList<>();
-		getActionsByType(actions, type);
-		return actions;
-	}
-
-	private void getActionsByType(List<Action> actions, String type) {
-		for (IActivityElement element : this.elements.values()) {
-			if (element instanceof Activity)
-				((Activity) element).getActionsByType(actions, type);
-			else if (element.getType().equals(type))
-				actions.add((Action) element);
-		}
+		return streamActionsDeep(action -> action.getType().equals(type)).toList();
 	}
 
 	public <T extends IActivityElement> T getElementByLocator(Locator locator) {
@@ -532,24 +526,6 @@ public class Activity extends AbstractStrolchRootElement
 		@SuppressWarnings("unchecked")
 		T t = (T) element;
 		return t;
-	}
-
-	/**
-	 * @return the iterator for entries, which include the id as key and the {@link IActivityElement} as value
-	 */
-	public Iterator<Entry<String, IActivityElement>> elementIterator() {
-		if (this.elements == null)
-			return Collections.emptyIterator();
-		return this.elements.entrySet().iterator();
-	}
-
-	/**
-	 * @return the stream for entries, which include the id as key and the {@link IActivityElement} as value
-	 */
-	public Stream<Entry<String, IActivityElement>> elementStream() {
-		if (this.elements == null)
-			return Stream.empty();
-		return this.elements.entrySet().stream();
 	}
 
 	@Override
