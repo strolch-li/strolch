@@ -13,8 +13,8 @@ import li.strolch.policy.StrolchPolicy;
  */
 public class ConfirmationPolicy extends StrolchPolicy {
 
-	public static PolicyDef DEFAULT_CONFIRMATION = PolicyDef
-			.valueOf(ConfirmationPolicy.class.getSimpleName(), "key:DefaultConfirmation");
+	public static PolicyDef DEFAULT_CONFIRMATION = PolicyDef.valueOf(ConfirmationPolicy.class.getSimpleName(),
+			"key:DefaultConfirmation");
 
 	public ConfirmationPolicy(StrolchTransaction tx) {
 		super(tx);
@@ -73,37 +73,16 @@ public class ConfirmationPolicy extends StrolchPolicy {
 	 */
 	public void doConfirmation(Action action) {
 		switch (action.getState()) {
-
-		case CREATED:
-			toCreated(action);
-			break;
-		case PLANNING:
-			toPlanning(action);
-			break;
-		case PLANNED:
-			toPlanned(action);
-			break;
-		case EXECUTABLE:
-			toExecutable(action);
-			break;
-		case EXECUTION:
-			toExecution(action);
-			break;
-		case WARNING:
-			toWarning(action);
-			break;
-		case ERROR:
-			toError(action);
-			break;
-		case STOPPED:
-			toStopped(action);
-			break;
-		case EXECUTED:
-			toExecuted(action);
-			break;
-		case CLOSED:
-			toClosed(action);
-			break;
+		case CREATED -> toCreated(action);
+		case PLANNING -> toPlanning(action);
+		case PLANNED -> toPlanned(action);
+		case EXECUTABLE -> toExecutable(action);
+		case EXECUTION -> toExecution(action);
+		case WARNING -> toWarning(action);
+		case ERROR -> toError(action);
+		case STOPPED -> toStopped(action);
+		case EXECUTED -> toExecuted(action);
+		case CLOSED -> toClosed(action);
 		}
 	}
 }
