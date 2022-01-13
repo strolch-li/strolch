@@ -35,9 +35,9 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
 
-	private MapOfSets<String, String> ignoredKeys;
-	private Set<String> ignoredTimedStates;
-	private Set<String> ignoredBagTypes;
+	private final MapOfSets<String, String> ignoredKeys;
+	private final Set<String> ignoredTimedStates;
+	private final Set<String> ignoredBagTypes;
 
 	private BiConsumer<ParameterBag, JsonObject> bagHook;
 	private BiConsumer<Resource, JsonObject> resourceHook;
@@ -46,8 +46,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private BiConsumer<Action, JsonObject> actionHook;
 
 	private boolean flat;
-	private Set<String> flatBags;
-	private Set<String> flatBagsByType;
+	private final Set<String> flatBags;
+	private final Set<String> flatBagsByType;
 	private boolean withoutElementName;
 	private boolean withLocator;
 	private boolean withoutVersion;
