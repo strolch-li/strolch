@@ -175,7 +175,32 @@ public interface IActivityElement extends StrolchElement {
 	 *
 	 * @return the result of the visitor being accepted
 	 */
+	@Override
 	<T> T accept(StrolchElementVisitor<T> visitor);
+
+	default boolean inCreatedPhase() {
+		return getState().inCreatedPhase();
+	}
+
+	default boolean inPlanningPhase() {
+		return getState().inPlanningPhase();
+	}
+
+	default boolean inExecutionPhase() {
+		return getState().inExecutionPhase();
+	}
+
+	default boolean inErrorPhase() {
+		return getState().inErrorPhase();
+	}
+
+	default boolean inExecutionWarningPhase() {
+		return getState().inExecutionWarningPhase();
+	}
+
+	default boolean inClosedPhase() {
+		return getState().inClosedPhase();
+	}
 
 	default Activity findParent(Predicate<Activity> predicate) {
 
