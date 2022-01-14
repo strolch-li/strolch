@@ -55,6 +55,7 @@ public class SimplePlanning extends PlanningPolicy {
 		for (IValueChange<?> change : changes) {
 			@SuppressWarnings("rawtypes")
 			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
+			//noinspection unchecked
 			timedState.applyChange(change, true);
 		}
 
@@ -83,6 +84,7 @@ public class SimplePlanning extends PlanningPolicy {
 		for (IValueChange<?> change : changes) {
 			@SuppressWarnings("rawtypes")
 			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
+			//noinspection unchecked
 			timedState.applyChange(change.getInverse(), true);
 		}
 

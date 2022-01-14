@@ -17,6 +17,7 @@ package li.strolch.execution.command;
 
 import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
 
+import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -34,7 +35,7 @@ import li.strolch.utils.dbc.DBC;
  * objects of the action are already constructed and {@link Action#getResourceId()} is set.
  *
  * <br>
- *
+ * <p>
  * It iterates the {@link IValueChange} operators and registers the resulting changes on the {@link StrolchTimedState}
  * objects assigned to the {@link Resource}.
  *
@@ -67,11 +68,20 @@ public class PlanActionCommand extends PlanningCommand {
 
 	@Override
 	public Void visitAction(Action action) {
+		if (action.getState() != State.CREATED && action.getState() != State.PLANNING)
+			throw new IllegalStateException("Can not plan action in state " + action.getState());
+		ConfirmationPolicy confirmationPolicy = getConfirmationPolicy(action);
+
+		action.setState(State.PLANNING);
+		confirmationPolicy.toPlanning(action);
+
 		PolicyDef planningPolicyDef = action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING);
 		PlanningPolicy planningPolicy = tx().getPolicy(PlanningPolicy.class, planningPolicyDef);
 		planningPolicy.plan(action);
+
 		if (action.getState() == State.PLANNED)
-			getConfirmationPolicy(action).toPlanned(action);
+			confirmationPolicy.toPlanned(action);
+
 		return null;
 	}
 }
