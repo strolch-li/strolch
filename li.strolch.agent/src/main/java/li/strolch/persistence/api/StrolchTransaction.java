@@ -510,6 +510,26 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean isVersioningEnabled();
 
 	/**
+	 * Returns true if this TX has a lock on the given {@link Locator}
+	 *
+	 * @param locator
+	 * 		the {@link Locator} to check
+	 *
+	 * @return true if this TX has a lock on the given {@link Locator}
+	 */
+	boolean hasLock(Locator locator) throws StrolchLockException;
+
+	/**
+	 * Returns true if this TX has a lock on the given {@link StrolchRootElement}
+	 *
+	 * @param element
+	 * 		the element which to check
+	 *
+	 * @return true if this TX has a lock on the given {@link Locator}
+	 */
+	<T extends StrolchRootElement> boolean hasLock(T element) throws StrolchLockException;
+
+	/**
 	 * Locks the element with the given locator and registers it on the transaction so the lock is released when the
 	 * transaction is closed
 	 *
@@ -564,7 +584,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * <li>{@link Command#validate()}</li>
 	 * <li>{@link Command#doCommand()}</li>
 	 * </ul>
-	 *
+	 * <p>
 	 * and if an exception occurs:
 	 * <ul>
 	 * <li>{@link Command#undo()}</li>
@@ -582,7 +602,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * <li>{@link Command#validate()}</li>
 	 * <li>{@link Command#doCommand()}</li>
 	 * </ul>
-	 *
+	 * <p>
 	 * and if an exception occurs:
 	 * <ul>
 	 * <li>{@link Command#undo()}</li>

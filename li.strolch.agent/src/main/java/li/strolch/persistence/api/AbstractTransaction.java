@@ -2,7 +2,7 @@ package li.strolch.persistence.api;
 
 import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.model.Tags.AGENT;
+import static li.strolch.model.Tags.*;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
@@ -276,6 +276,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public boolean needsCommit() {
 		return (this.objectFilter != null && !this.objectFilter.isEmpty()) || !this.commands.isEmpty()
 				|| !this.flushedCommands.isEmpty();
+	}
+
+	@Override
+	public boolean hasLock(Locator locator) throws StrolchLockException {
+		return this.lockedElements.contains(locator);
+	}
+
+	@Override
+	public <T extends StrolchRootElement> boolean hasLock(T element) throws StrolchLockException {
+		return this.lockedElements.contains(element.getLocator());
 	}
 
 	@Override
