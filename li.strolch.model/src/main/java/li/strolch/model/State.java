@@ -40,7 +40,7 @@ public enum State {
 	EXECUTED("Executed"), //$NON-NLS-1$
 	CLOSED("Closed"); //$NON-NLS-1$
 
-	private String state;
+	private final String state;
 
 	State(String state) {
 		this.state = state;
@@ -73,6 +73,13 @@ public enum State {
 	}
 
 	/**
+	 * @return true if {@link #inPlanningPhase()} or {@link #inExecutionPhase()} returns true
+	 */
+	public boolean inExecutionPlanningPhase() {
+		return inPlanningPhase() || inExecutionPhase();
+	}
+
+	/**
 	 * @return true if the state is {@link #ERROR} or {@link #STOPPED}
 	 */
 	public boolean inErrorPhase() {
@@ -80,10 +87,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if the state is one of {@link #STOPPED}, {@link #WARNING} or {@link #ERROR}
+	 * @return true if the state is one of {@link #EXECUTION}, {@link #STOPPED}, {@link #WARNING} or {@link #ERROR}
 	 */
 	public boolean inExecutionWarningPhase() {
-		return this == STOPPED || this == WARNING || this == ERROR;
+		return this == EXECUTION || this == STOPPED || this == WARNING || this == ERROR;
 	}
 
 	/**

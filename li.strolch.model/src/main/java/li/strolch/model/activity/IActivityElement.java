@@ -190,6 +190,10 @@ public interface IActivityElement extends StrolchElement {
 		return getState().inExecutionPhase();
 	}
 
+	default boolean inExecutionPlanningPhase() {
+		return getState().inExecutionPlanningPhase();
+	}
+
 	default boolean inErrorPhase() {
 		return getState().inErrorPhase();
 	}
