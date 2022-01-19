@@ -22,7 +22,7 @@ public class SimplePlanning extends PlanningPolicy {
 	 * the action are already constructed. The resource is evaluated using {@link #evaluateAndSetResource(Action)}
 	 *
 	 * <br>
-	 *
+	 * <p>
 	 * It iterates the {@link IValueChange} operators and registers the resulting changes on the {@link
 	 * StrolchTimedState} objects assigned to the {@link Resource}.
 	 *
@@ -31,7 +31,8 @@ public class SimplePlanning extends PlanningPolicy {
 	 */
 	@Override
 	public void plan(Action action) {
-		DBC.PRE.assertEquals("Can not plan illegal state", State.CREATED, action.getState());
+		if (action.getState().compareTo(State.PLANNED) >= 0)
+			throw new IllegalStateException("Can not plan illegal state " + action.getState());
 
 		logger.info("Planning action " + action.getLocator());
 
@@ -57,7 +58,7 @@ public class SimplePlanning extends PlanningPolicy {
 	 * {@link State#PLANNED} and that the {@link IValueChange} objects of the action are stored on the action.
 	 *
 	 * <br>
-	 *
+	 * <p>
 	 * It iterates the {@link IValueChange} operators and unregisters the changes from the {@link StrolchTimedState}
 	 * objects on the {@link Resource}.
 	 *
