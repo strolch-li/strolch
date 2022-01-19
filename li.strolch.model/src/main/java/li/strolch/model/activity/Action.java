@@ -146,12 +146,33 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		this.resourceId = resource.getId();
 	}
 
+	/**
+	 * @deprecated use {@link #isResourceDefined()}
+	 */
+	@Deprecated
 	public boolean hasResourceDefined() {
 		return isNotEmpty(this.resourceType) && isNotEmpty(this.resourceId);
 	}
 
+	/**
+	 * Returns true if the {@link #getResourceType()} and {@link #getResourceId()} have defined values
+	 *
+	 * @return true if the {@link #getResourceType()} and {@link #getResourceId()} have defined values
+	 */
+	public boolean isResourceDefined() {
+		return isNotEmpty(this.resourceType) && isNotEmpty(this.resourceId);
+	}
+
+	/**
+	 * Returns the {@link Locator} for the {@link Resource} for this action
+	 *
+	 * @return the {@link Locator} for the {@link Resource} for this action
+	 *
+	 * @throws IllegalStateException
+	 * 		if the resource is not defined
+	 */
 	public Locator getResourceLocator() {
-		if (!hasResourceDefined())
+		if (!isResourceDefined())
 			throw new IllegalStateException("Resource not set on " + getLocator());
 		return Resource.locatorFor(this.resourceType, this.resourceId);
 	}
@@ -186,6 +207,9 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		return this.changes;
 	}
 
+	/**
+	 * @return the iterator of {@code IValueChange} attached to the {@code Action} start
+	 */
 	public Iterator<IValueChange<? extends IValue<?>>> changesIterator() {
 		if (this.changes == null)
 			return Collections.emptyIterator();
