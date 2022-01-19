@@ -290,7 +290,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void lock(Locator locator) throws StrolchLockException {
-		this.realm.lock(locator);
+		this.realm.lock(locator.trim(3));
 		this.lockedElements.add(locator);
 	}
 
