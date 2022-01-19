@@ -4,6 +4,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import li.strolch.exception.StrolchException;
+import li.strolch.execution.ExecutionHandler;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -79,6 +80,7 @@ public class SimpleExecution extends ExecutionPolicy {
 	protected void toExecuted() throws Exception {
 		stop();
 		getController().toExecuted(this.actionLoc);
+		getComponent(ExecutionHandler.class).triggerExecution(this.realm);
 	}
 
 	protected void toError(LogMessage message) {

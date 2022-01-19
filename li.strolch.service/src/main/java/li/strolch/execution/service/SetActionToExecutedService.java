@@ -26,9 +26,11 @@ public class SetActionToExecutedService extends AbstractService<LocatorArgument,
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
 		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
-		Controller controller = executionHandler.getController(getArgOrUserRealm(arg), arg.locator.trim(3));
+		String realm = getArgOrUserRealm(arg);
+		Controller controller = executionHandler.getController(realm, arg.locator.trim(3));
 		if (controller != null) {
 			controller.toExecuted(arg.locator);
+			executionHandler.triggerExecution(realm);
 			return ServiceResult.success();
 		}
 
