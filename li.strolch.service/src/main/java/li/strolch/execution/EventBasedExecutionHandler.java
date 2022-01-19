@@ -1,11 +1,13 @@
 package li.strolch.execution;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverEvent;
@@ -228,6 +230,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		triggerExecution(realmName);
 	}
 
+	protected Stream<Controller> controllerStream(String realm) {
+		return this.controllers.getMapOrDefault(realm, emptyMap()).values().stream();
+	}
+
 	@Override
 	public void triggerExecution(String realm) {
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
@@ -237,9 +243,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 
 		synchronized (this.controllers) {
-			Map<Locator, Controller> controllers = this.controllers.getMap(realm);
-			if (controllers != null)
-				controllers.values().forEach(this::toExecution);
+			controllerStream(realm).forEach(this::toExecution);
 		}
 	}
 
