@@ -32,10 +32,6 @@ public class ConfirmationPolicy extends StrolchPolicy {
 		// do nothing
 	}
 
-	public void toExecutable(Action action) {
-		// do nothing
-	}
-
 	public void toExecution(Action action) {
 		// do nothing
 	}
@@ -60,11 +56,6 @@ public class ConfirmationPolicy extends StrolchPolicy {
 		// do nothing
 	}
 
-	@Override
-	public void undo() {
-		// nothing to undo
-	}
-
 	/**
 	 * Calls the appropriate confirmation method depending on the state of the {@link Action}
 	 *
@@ -76,7 +67,6 @@ public class ConfirmationPolicy extends StrolchPolicy {
 		case CREATED -> toCreated(action);
 		case PLANNING -> toPlanning(action);
 		case PLANNED -> toPlanned(action);
-		case EXECUTABLE -> toExecutable(action);
 		case EXECUTION -> toExecution(action);
 		case WARNING -> toWarning(action);
 		case ERROR -> toError(action);

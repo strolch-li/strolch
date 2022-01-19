@@ -192,13 +192,6 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #PLANNED} or {@link #EXECUTABLE} or {@link #EXECUTION}
-	 */
-	public boolean isExecutable() {
-		return this == PLANNED || this == EXECUTABLE || this == EXECUTION;
-	}
-
-	/**
 	 * @return true if state >= {@link #EXECUTED}
 	 */
 	public boolean canNotSetToExecution() {
