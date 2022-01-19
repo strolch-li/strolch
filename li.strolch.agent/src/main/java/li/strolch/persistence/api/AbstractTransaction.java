@@ -299,6 +299,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		Locator locator = element.getLocator();
 		this.realm.lock(locator);
 		this.lockedElements.add(locator);
+
+		switch (element.getObjectType()) {
+		case RESOURCE -> resourceCache().addElement(element.getType(), element.getId(), (Resource) element);
+		case ORDER -> orderCache().addElement(element.getType(), element.getId(), (Order) element);
+		case ACTIVITY -> activityCache().addElement(element.getType(), element.getId(), (Activity) element);
+		}
 	}
 
 	@Override
