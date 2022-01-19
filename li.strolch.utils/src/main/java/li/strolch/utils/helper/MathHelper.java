@@ -135,4 +135,21 @@ public class MathHelper {
 	public static int getNumberOfDecimalPlaces(BigDecimal bigDecimal) {
 		return Math.max(0, bigDecimal.stripTrailingZeros().scale());
 	}
+
+	/**
+	 * Formatting a double to a string, without scientific notation
+	 *
+	 * @param d
+	 * 		the double to format
+	 *
+	 * @return the formatted string
+	 */
+	public static String doubleToString(Double d) {
+		if (d == null)
+			return null;
+		if (d.isNaN() || d.isInfinite())
+			return d.toString();
+
+		return new BigDecimal(d.toString()).stripTrailingZeros().toPlainString();
+	}
 }
