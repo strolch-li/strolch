@@ -24,8 +24,8 @@ public class SetActionToClosedService extends AbstractService<LocatorArgument, S
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-
 			tx.lock(arg.locator.trim(3));
+
 			Action action = tx.findElement(arg.locator);
 			tx.lock(action.getResourceLocator());
 

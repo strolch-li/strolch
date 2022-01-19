@@ -42,9 +42,10 @@ public class SetActionToPlannedCommand extends BasePlanningAndExecutionCommand {
 		Activity rootElement = this.action.getRootElement();
 		State currentState = rootElement.getState();
 
-		this.action.setState(State.PLANNED);
-
-		getConfirmationPolicy(this.action).toPlanned(this.action);
+		State currentActionState = this.action.getState();
+		getPlanningPolicy(this.action).plan(this.action);
+		if (currentActionState != this.action.getState() && this.action.isResourceDefined())
+			getConfirmationPolicy(this.action).doConfirmation(this.action);
 
 		updateOrderState(tx(), rootElement, currentState, rootElement.getState());
 	}

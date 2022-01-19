@@ -17,16 +17,6 @@ public class SimplePlanning extends PlanningPolicy {
 		super(tx);
 	}
 
-	@Override
-	public Resource evaluateAndSetResource(Action action) {
-		if (action.hasResourceDefined()) {
-			tx().lock(action.getResourceLocator());
-			return tx().getResourceBy(action.getResourceType(), action.getResourceId());
-		}
-
-		return null;
-	}
-
 	/**
 	 * Command to plan an {@link Action} to a {@link Resource}. It is assumed that the {@link IValueChange} objects of
 	 * the action are already constructed. The resource is evaluated using {@link #evaluateAndSetResource(Action)}

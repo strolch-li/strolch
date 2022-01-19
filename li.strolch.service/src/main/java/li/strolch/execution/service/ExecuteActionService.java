@@ -1,5 +1,6 @@
 package li.strolch.execution.service;
 
+import li.strolch.execution.Controller;
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -24,33 +25,20 @@ public class ExecuteActionService extends AbstractService<LocatorArgument, Servi
 
 	@Override
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
+		String realm = getArgOrUserRealm(arg);
+		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
 
-		String realm;
-		Activity activity;
-		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			realm = tx.getRealmName();
-
-			tx.lock(arg.locator.trim(3));
-
-			if (arg.locator.getSize() == 3) {
-				activity = tx.findElement(arg.locator);
-			} else {
-
-				Action action = tx.findElement(arg.locator);
-
-				// this is so we can re-execute stopped actions
-				if (action.getState() == State.STOPPED) {
-					action.setState(State.EXECUTABLE);
-
-					tx.update(action.getRootElement());
-					tx.commitOnClose();
-				}
-
-				activity = action.getRootElement();
-			}
+		Controller controller = executionHandler.getController(realm, arg.locator.trim(3));
+		if (controller != null) {
+			controller.execute();
+			return ServiceResult.success();
 		}
 
-		getComponent(ExecutionHandler.class).toExecution(realm, activity);
+		try (StrolchTransaction tx = openTx(realm, true)) {
+			tx.lock(arg.locator);
+			Activity activity = tx.getActivityBy(arg.locator.get(1), arg.locator.get(2), true);
+			executionHandler.toExecution(realm, activity);
+		}
 
 		return ServiceResult.success();
 	}

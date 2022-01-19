@@ -7,9 +7,10 @@ import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverEvent;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.*;
@@ -27,29 +28,30 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Controller {
 
-	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+	protected static final Logger logger = LoggerFactory.getLogger(Controller.class);
 
-	private final int lockRetries;
-	private final String realm;
-	private final ComponentContainer container;
-	private final ExecutionHandler executionHandler;
+	protected final int lockRetries;
+	protected final String realm;
+	protected final StrolchAgent agent;
+	protected final ExecutionHandler executionHandler;
 
-	private final String activityType;
-	private final String activityId;
-	private final Locator locator;
-
-	private Activity activity;
+	protected final String activityType;
+	protected final String activityId;
+	protected final Locator locator;
 
 	private final Map<Locator, ExecutionPolicy> inExecution;
 
+	protected Activity activity;
+
 	public Controller(String realm, ExecutionHandler executionHandler, Activity activity) {
 		this.realm = realm;
-		this.container = executionHandler.getContainer();
+		this.agent = executionHandler.getAgent();
 		this.executionHandler = executionHandler;
 		this.locator = activity.getLocator();
 		this.activityType = activity.getType();
@@ -76,6 +78,14 @@ public class Controller {
 		return this.activity;
 	}
 
+	public Set<Locator> getInExecutionActionLocators() {
+		return this.inExecution.keySet();
+	}
+
+	public ExecutionPolicy getExecutionPolicy(Locator actionLoc) {
+		return this.inExecution.get(actionLoc);
+	}
+
 	public ExecutionPolicy refreshExecutionPolicy(StrolchTransaction tx, Action action) {
 		ExecutionPolicy executionPolicy = this.inExecution.computeIfAbsent(action.getLocator(), e -> {
 			Resource resource = tx.getResourceFor(action, true);
@@ -97,7 +107,11 @@ public class Controller {
 	}
 
 	protected void runAsAgent(PrivilegedRunnable runnable) throws Exception {
-		this.executionHandler.runAsAgent(runnable);
+		this.agent.runAsAgent(runnable);
+	}
+
+	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
+		return this.agent.runAsAgentWithResult(runnable);
 	}
 
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -114,37 +128,69 @@ public class Controller {
 	}
 
 	/**
-	 * Starts the execution of this {@link Activity}
+	 * Stops the execution of all actions of this controller
 	 */
-	public void execute() throws Exception {
-		boolean[] trigger = new boolean[1];
-		this.executionHandler.runAsAgent(ctx -> {
-			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				lockWithRetries(tx);
-				trigger[0] = execute(tx);
-				if (tx.needsCommit()) {
-					tx.commitOnClose();
-				}
-			}
-		});
-
-		if (trigger[0])
-			this.executionHandler.triggerExecution(this.realm);
-	}
-
-	/**
-	 * Stops the execution of all actions
-	 */
-	public void stop() {
+	public void stopExecutions() {
 		synchronized (this.inExecution) {
 			this.inExecution.values().forEach(ExecutionPolicy::stop);
 		}
 	}
 
-	private boolean execute(StrolchTransaction tx) {
-		if (!refreshActivity(tx))
-			return false;
+	/**
+	 * Executes {@link Action Actions} for {@link Activity} of {@link Controller#getLocator()}. Keeps executing till no {@link Action} was set to {@link State#EXECUTED}
+	 */
+	public boolean execute() throws Exception {
+		return runAsAgentWithResult(ctx -> {
+			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
+				lockWithRetries(tx);
+				if (!refreshActivity(tx))
+					return false;
 
+				boolean trigger = internalExecute(tx);
+
+				// we trigger execution for the same activity if the controller says it is needed
+				if (trigger) {
+					logger.info("Triggering additional execution of controller " + this + " after execution.");
+					triggerExecute(tx);
+				}
+
+				if (tx.needsCommit())
+					tx.commitOnClose();
+
+				return trigger;
+			}
+		});
+	}
+
+	/**
+	 * Executes the activity in the given TX. Keeps executing till no {@link Action} was set to {@link State#EXECUTED}
+	 *
+	 * @param tx
+	 * 		the TX
+	 */
+	public void execute(StrolchTransaction tx) {
+		lockWithRetries(tx);
+		if (!refreshActivity(tx))
+			return;
+
+		boolean trigger = internalExecute(tx);
+
+		// we trigger execution for the same activity if the controller says it is needed
+		if (trigger) {
+			logger.info("Triggering additional execution of controller " + this + " after execution.");
+			triggerExecute(tx);
+		}
+	}
+
+	/**
+	 * Executes the activity in the given TX by calling the {@link ExecuteActivityCommand}
+	 *
+	 * @param tx
+	 * 		the TX
+	 *
+	 * @return true if execute should be called again, i.e. the {@link ExecuteActivityCommand#needsRetriggerOfExecution()} returns true and the activity isn't complete yet
+	 */
+	protected boolean internalExecute(StrolchTransaction tx) {
 		if (this.activity.getState().isExecuted()) {
 			this.executionHandler.removeFromExecution(this);
 			logger.info("Archiving executed activity " + this.locator + " with state " + this.activity.getState());
@@ -166,78 +212,111 @@ public class Controller {
 
 		updateObservers();
 
-		return command.needsRetriggerOfExecution();
+		return command.needsRetriggerOfExecution() && !this.activity.inClosedPhase();
 	}
 
 	/**
-	 * Completes the execution of the given {@link Action} with the given {@link Locator}
+	 * Completes the execution of the given {@link Action} with the given {@link Locator}, executing next {@link Action Actions} if possible
 	 *
 	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * 		the {@link Locator} of the {@link Action} to set to executed
 	 */
 	public void toExecuted(Locator actionLoc) throws Exception {
-		this.executionHandler.runAsAgent(ctx -> {
+		runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				lockWithRetries(tx);
-
-				if (!refreshActivity(tx))
+				if (invalidActionContext(tx, actionLoc))
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
-
-				// set this action to executed
-				toExecuted(tx, action);
-
-				updateObservers();
-
-				// flush so we can see the changes performed
-				tx.flush();
+				setToExecuted(tx, action);
 
 				// now try and execute the next action(s)
-				execute(tx);
+				triggerExecute(tx);
 
 				if (tx.needsCommit())
 					tx.commitOnClose();
 			}
 		});
-
-		this.executionHandler.triggerExecution(this.realm);
 	}
 
 	/**
-	 * Completes the execution of the given {@link Action}
+	 * Completes the execution of the given {@link Action}. No further processing is done.
+	 *
+	 * @param tx
+	 * 		the TX
+	 * @param actionLoc
+	 * 		the {@link Locator} of the {@link Action} to set to executed
+	 */
+	public void toExecuted(StrolchTransaction tx, Locator actionLoc) throws Exception {
+		if (invalidActionContext(tx, actionLoc))
+			return;
+
+		Action action = this.activity.getElementByLocator(actionLoc);
+		setToExecuted(tx, action);
+	}
+
+	private boolean invalidActionContext(StrolchTransaction tx, Locator actionLoc) {
+		lockWithRetries(tx);
+		if (!this.inExecution.containsKey(actionLoc))
+			throw new IllegalStateException(actionLoc + " is not in execution!");
+		return !refreshActivity(tx);
+	}
+
+	/**
+	 * <p>Simply calls the {@link SetActionToExecutedCommand} and then updates the observers</p>
+	 *
+	 * <p><b>Note:</b> Usually you will want to call {@link #toExecuted(Locator)} or
+	 * {@link #toExecuted(StrolchTransaction, Locator)}. This method expects the associated {@link Activity} to
+	 * already be locked, and validated that this action is in execution</p>
 	 *
 	 * @param tx
 	 * 		the TX
 	 * @param action
-	 * 		the {@link Action} to set to executed
+	 * 		the Action to set to executed
 	 */
-	public void toExecuted(StrolchTransaction tx, Action action) throws Exception {
+	public void setToExecuted(StrolchTransaction tx, Action action) {
+
+		// set this action to executed
 		SetActionToExecutedCommand command = new SetActionToExecutedCommand(tx);
 		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 		command.setAction(action);
 		command.validate();
 		command.doCommand();
+
+		updateObservers();
+	}
+
+	/**
+	 * <p>Keeps triggering till {@link #internalExecute(StrolchTransaction)} returns false.</p>
+	 *
+	 * <p>This occurs when the {@link Action} which is executed, has state set to {@link State#EXECUTED} instead of
+	 * {@link State#EXECUTION}. Thus the execution thread stays with this activity, keeping resources bound to it,
+	 * till we can wait and allow other activities to execute</p>
+	 *
+	 * @param tx
+	 * 		the TX
+	 */
+	protected void triggerExecute(StrolchTransaction tx) {
+		boolean trigger;
+		do {
+			trigger = internalExecute(tx);
+		} while (trigger);
 	}
 
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#STOPPED}
 	 *
 	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * 		the {@link Locator} of the {@link Action} to set to stopped
 	 */
 	public void toStopped(Locator actionLoc) throws Exception {
-		this.executionHandler.runAsAgent(ctx -> {
+		runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				lockWithRetries(tx);
-
-				if (!refreshActivity(tx))
+				if (invalidActionContext(tx, actionLoc))
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
-
-				// set this action to executed
-				toStopped(tx, action);
+				internalToStopped(tx, action);
 
 				tx.commitOnClose();
 			}
@@ -251,10 +330,18 @@ public class Controller {
 	 *
 	 * @param tx
 	 * 		the TX
-	 * @param action
-	 * 		the {@link Action} to set to stopped
+	 * @param actionLoc
+	 * 		the {@link Locator} of the {@link Action} to set to stopped
 	 */
-	public void toStopped(StrolchTransaction tx, Action action) throws Exception {
+	public void toStopped(StrolchTransaction tx, Locator actionLoc) throws Exception {
+		if (invalidActionContext(tx, actionLoc))
+			return;
+
+		Action action = this.activity.getElementByLocator(actionLoc);
+		internalToStopped(tx, action);
+	}
+
+	protected void internalToStopped(StrolchTransaction tx, Action action) {
 		SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
 		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 		command.setAction(action);
@@ -266,20 +353,16 @@ public class Controller {
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#ERROR}
 	 *
 	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * 		the {@link Locator} of the {@link Action} to set to executed
 	 */
 	public void toError(Locator actionLoc) throws Exception {
-		this.executionHandler.runAsAgent(ctx -> {
+		runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				lockWithRetries(tx);
-
-				if (!refreshActivity(tx))
+				if (invalidActionContext(tx, actionLoc))
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
-
-				// set this action to error
-				toError(tx, action);
+				internalToError(tx, action);
 
 				tx.commitOnClose();
 			}
@@ -293,10 +376,18 @@ public class Controller {
 	 *
 	 * @param tx
 	 * 		the TX
-	 * @param action
-	 * 		the {@link Action} to set to error
+	 * @param actionLoc
+	 * 		the {@link Locator} of the {@link Action} to set to error
 	 */
-	public void toError(StrolchTransaction tx, Action action) throws Exception {
+	public void toError(StrolchTransaction tx, Locator actionLoc) throws Exception {
+		if (invalidActionContext(tx, actionLoc))
+			return;
+
+		Action action = this.activity.getElementByLocator(actionLoc);
+		internalToError(tx, action);
+	}
+
+	protected void internalToError(StrolchTransaction tx, Action action) {
 		SetActionToErrorCommand command = new SetActionToErrorCommand(tx);
 		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 		command.setAction(action);
@@ -308,20 +399,18 @@ public class Controller {
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#WARNING}
 	 *
 	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * 		the {@link Locator} of the {@link Action} to set to warning
 	 */
 	public void toWarning(Locator actionLoc) throws Exception {
-		this.executionHandler.runAsAgent(ctx -> {
+		runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				lockWithRetries(tx);
-
-				if (!refreshActivity(tx))
+				if (invalidActionContext(tx, actionLoc))
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
 
 				// set this action to warning
-				toWarning(tx, action);
+				internalToWarning(tx, action);
 
 				tx.commitOnClose();
 			}
@@ -335,10 +424,18 @@ public class Controller {
 	 *
 	 * @param tx
 	 * 		the TX
-	 * @param action
-	 * 		the {@link Action} to set to error
+	 * @param actionLoc
+	 * 		the {@link Locator} of the {@link Action} to set to error
 	 */
-	public void toWarning(StrolchTransaction tx, Action action) throws Exception {
+	public void toWarning(StrolchTransaction tx, Locator actionLoc) throws Exception {
+		if (invalidActionContext(tx, actionLoc))
+			return;
+
+		Action action = this.activity.getElementByLocator(actionLoc);
+		internalToWarning(tx, action);
+	}
+
+	protected void internalToWarning(StrolchTransaction tx, Action action) {
 		SetActionToWarningCommand command = new SetActionToWarningCommand(tx);
 		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 		command.setAction(action);
@@ -359,8 +456,8 @@ public class Controller {
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to error due to " + e.getMessage(), e);
 
-				if (this.container.hasComponent(OperationsLog.class)) {
-					this.container.getComponent(OperationsLog.class).addMessage(
+				if (this.agent.hasComponent(OperationsLog.class)) {
+					this.agent.getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
 									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 									"execution.handler.failed.error").withException(e).value("reason", e));
@@ -382,8 +479,8 @@ public class Controller {
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to warning due to " + e.getMessage(), e);
 
-				if (this.container.hasComponent(OperationsLog.class)) {
-					this.container.getComponent(OperationsLog.class).addMessage(
+				if (this.agent.hasComponent(OperationsLog.class)) {
+					this.agent.getComponent(OperationsLog.class).addMessage(
 							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
 									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 									"execution.handler.failed.warning").withException(e).value("reason", e));
@@ -392,7 +489,10 @@ public class Controller {
 		});
 	}
 
-	private void lockWithRetries(StrolchTransaction tx) throws StrolchLockException {
+	protected void lockWithRetries(StrolchTransaction tx) throws StrolchLockException {
+		if (tx.hasLock(this.locator))
+			return;
+
 		int tries = 0;
 		while (true) {
 			try {
@@ -423,5 +523,10 @@ public class Controller {
 		ObserverEvent observerEvent = new ObserverEvent();
 		observerEvent.updated.addElement(Tags.CONTROLLER, this.activity);
 		realm.getObserverHandler().notify(observerEvent);
+	}
+
+	@Override
+	public String toString() {
+		return "Controller{" + "realm='" + realm + '\'' + ", locator=" + locator + '}';
 	}
 }

@@ -13,12 +13,6 @@ public class NoPlanning extends PlanningPolicy {
 	}
 
 	@Override
-	public Resource evaluateAndSetResource(Action action) {
-		tx().lock(Resource.locatorFor(action.getResourceType(), action.getResourceId()));
-		return tx().getResourceBy(action.getResourceType(), action.getResourceId());
-	}
-
-	@Override
 	public void plan(Action action) {
 		DBC.PRE.assertEquals("Can not plan illegal state", State.CREATED, action.getState());
 		logger.info("Planning action " + action.getLocator());

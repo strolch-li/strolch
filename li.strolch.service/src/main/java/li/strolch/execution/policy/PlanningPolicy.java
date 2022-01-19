@@ -8,21 +8,21 @@ import li.strolch.policy.StrolchPolicy;
 
 public abstract class PlanningPolicy extends StrolchPolicy {
 
-	public static PolicyDef DEFAULT_PLANNING = PolicyDef
-			.valueOf(PlanningPolicy.class.getSimpleName(), "key:DefaultPlanning");
+	public static PolicyDef DEFAULT_PLANNING = PolicyDef.getKeyPolicy(PlanningPolicy.class, "DefaultPlanning");
 
 	public PlanningPolicy(StrolchTransaction tx) {
 		super(tx);
 	}
 
-	public abstract Resource evaluateAndSetResource(Action action);
+	public Resource evaluateAndSetResource(Action action) {
+		if (!action.isResourceDefined())
+			return null;
+
+		tx().lock(action.getResourceLocator());
+		return tx().getResourceBy(action.getResourceType(), action.getResourceId());
+	}
 
 	public abstract void plan(Action action);
 
 	public abstract void unplan(Action action);
-
-	@Override
-	public void undo() {
-		// do nothing
-	}
 }

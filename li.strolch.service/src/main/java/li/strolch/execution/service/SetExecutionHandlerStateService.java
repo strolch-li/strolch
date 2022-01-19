@@ -32,45 +32,28 @@ public class SetExecutionHandlerStateService extends AbstractService<StringMapAr
 		getPrivilegeContext().validateAction(new SimpleRestrictable(getPrivilegeValue(), state));
 
 		switch (state) {
-		case "Running": {
-
+		case "Running" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
 			executionHandler.setState(getCertificate(), realm, ExecutionHandlerState.Running);
 			executionHandler.triggerExecution(realm);
-
-			break;
 		}
-		case "HaltNew": {
-
+		case "HaltNew" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
 			executionHandler.setState(getCertificate(), realm, ExecutionHandlerState.HaltNew);
-
-			break;
 		}
-		case "Paused": {
-
+		case "Paused" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
 			executionHandler.setState(getCertificate(), realm, ExecutionHandlerState.Paused);
-
-			break;
 		}
-		case "Trigger": {
-
+		case "Trigger" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
 			executionHandler.triggerExecution(realm);
-
-			break;
 		}
-		case "ReloadActivities": {
-
+		case "ReloadActivities" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
 			executionHandler.reloadActivitiesInExecution(getPrivilegeContext(), realm);
-
-			break;
 		}
-
-		default:
-			throw new UnsupportedOperationException("Unhandled state " + state);
+		default -> throw new UnsupportedOperationException("Unhandled state " + state);
 		}
 
 		return ServiceResult.success();

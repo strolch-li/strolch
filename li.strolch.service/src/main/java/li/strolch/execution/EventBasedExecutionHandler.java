@@ -23,7 +23,6 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.collections.MapOfMaps;
 
 /**
@@ -34,13 +33,14 @@ import li.strolch.utils.collections.MapOfMaps;
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
+	private final MapOfMaps<String, Locator, Controller> controllers;
 	private Map<String, ExecutionHandlerState> statesByRealm;
-	private MapOfMaps<String, Locator, Controller> controllers;
 
 	private DelayedExecutionTimer delayedExecutionTimer;
 
 	public EventBasedExecutionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
+		this.controllers = synchronizedMapOfMaps(new MapOfMaps<>(true));
 	}
 
 	@Override
@@ -71,17 +71,13 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		return activities.keySet();
 	}
 
-	@Override
-	public void initialize(ComponentConfiguration configuration) throws Exception {
-		this.controllers = synchronizedMapOfMaps(new MapOfMaps<>(true));
-		super.initialize(configuration);
+	protected Controller newController(String realm, Activity activity) {
+		return new Controller(realm, this, activity);
 	}
 
 	@Override
 	public void start() throws Exception {
-
 		evaluateStateByRealm();
-
 		this.delayedExecutionTimer = new SimpleDurationExecutionTimer(getContainer().getAgent());
 
 		// restart execution of activities already in execution
@@ -98,12 +94,35 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public void stop() throws Exception {
 
+		// first stop and clear all existing controllers
+		synchronized (this.controllers) {
+			this.controllers.keySet().forEach(this::stopControllers);
+		}
+
 		if (this.delayedExecutionTimer != null) {
 			this.delayedExecutionTimer.destroy();
 			this.delayedExecutionTimer = null;
 		}
 
 		super.stop();
+	}
+
+	protected void stopControllers(String realm) {
+		logger.info("Stopping controllers for realm " + realm + "...");
+		synchronized (this.controllers) {
+			Map<Locator, Controller> map = this.controllers.getMap(realm);
+			if (map == null) {
+				logger.error("No controllers for realm " + realm);
+				return;
+			}
+
+			map.values().forEach(controller -> {
+				logger.info("Stopping controller " + controller);
+				controller.stopExecutions();
+			});
+
+			this.controllers.removeMap(realm);
+		}
 	}
 
 	@Override
@@ -115,7 +134,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		Controller controller = this.controllers.getElement(realm, activity.getLocator());
 		if (controller == null) {
-			controller = new Controller(realm, this, activity);
+			controller = newController(realm, activity);
 			this.controllers.addElement(realm, activity.getLocator(), controller);
 			notifyObserverAdd(controller);
 		}
@@ -162,16 +181,16 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		getExecutor().submit(() -> notifyObserverRemove(realm, removed));
 	}
 
-	private void restartActivityExecution(PrivilegeContext ctx) {
-		// iterate the realms
-		for (String realmName : getContainer().getRealmNames()) {
-			reloadActivitiesInExecution(ctx, realmName);
-		}
+	protected void restartActivityExecution(PrivilegeContext ctx) {
+		getContainer().getRealmNames().forEach(realmName -> reloadActivitiesInExecution(ctx, realmName));
 	}
 
 	@Override
 	public void reloadActivitiesInExecution(PrivilegeContext ctx, String realmName) {
 		try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), false)) {
+
+			// first stop and clear all existing controllers
+			stopControllers(realmName);
 
 			// iterate all activities
 			tx.streamActivities().forEach(activity -> {
@@ -196,7 +215,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				tx.update(activity);
 
 				// register for execution
-				Controller controller = new Controller(realmName, this, activity);
+				Controller controller = newController(realmName, activity);
 				this.controllers.addElement(realmName, activity.getLocator(), controller);
 			});
 
@@ -205,19 +224,18 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 
 		// trigger execution of the registered activities
+		logger.info("Triggering execution for realm " + realmName + " after reloading activities...");
 		triggerExecution(realmName);
 	}
 
 	@Override
 	public void triggerExecution(String realm) {
-
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.Paused) {
 			logger.warn("Ignoring trigger for paused realm " + realm);
 			return;
 		}
 
-		//noinspection SynchronizeOnNonFinalField
 		synchronized (this.controllers) {
 			Map<Locator, Controller> controllers = this.controllers.getMap(realm);
 			if (controllers != null)
@@ -225,78 +243,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 	}
 
-	@Override
-	public ExecutionHandlerState getState(String realm) {
-		return this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
-	}
-
-	private void evaluateStateByRealm() throws Exception {
-
-		this.statesByRealm = Collections.synchronizedMap(new HashMap<>());
-
-		runAsAgent(ctx -> getContainer().getRealmNames().forEach(realm -> {
-			try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), false)) {
-				Resource executionHandlerConfig = tx.getResourceBy(TYPE_CONFIGURATION,
-						ExecutionHandler.class.getSimpleName());
-				if (executionHandlerConfig == null) {
-					this.statesByRealm.put(realm, ExecutionHandlerState.Running);
-				} else {
-					ParameterBag parameters = executionHandlerConfig.getParameterBag(BAG_PARAMETERS);
-					if (parameters == null) {
-						this.statesByRealm.put(realm, ExecutionHandlerState.Running);
-					} else {
-						StringParameter stateP = parameters.getParameter(PARAM_STATE);
-						if (stateP == null) {
-							this.statesByRealm.put(realm, ExecutionHandlerState.Running);
-						} else {
-							ExecutionHandlerState state;
-							try {
-								state = ExecutionHandlerState.valueOf(stateP.getValue());
-							} catch (Exception e) {
-								state = ExecutionHandlerState.Running;
-								stateP.setValue(ExecutionHandlerState.Running.name());
-								tx.update(executionHandlerConfig);
-								tx.commitOnClose();
-								logger.error("Failed to read unhandled state " + stateP.getValue(), e);
-							}
-							this.statesByRealm.put(realm, state);
-						}
-					}
-				}
-			}
-		}));
-	}
-
-	@Override
-	public void setState(Certificate cert, String realm, ExecutionHandlerState state) {
-		try (StrolchTransaction tx = openTx(realm, cert, false)) {
-			Resource executionHandlerConfig = tx.getResourceBy(TYPE_CONFIGURATION,
-					ExecutionHandler.class.getSimpleName());
-			if (executionHandlerConfig == null) {
-				executionHandlerConfig = new Resource(ExecutionHandler.class.getSimpleName(),
-						"ExecutionHandler Configuration", TYPE_CONFIGURATION);
-			}
-			ParameterBag parameters = executionHandlerConfig.getParameterBag(BAG_PARAMETERS);
-			if (parameters == null) {
-				parameters = new ParameterBag(BAG_PARAMETERS, "Parameters", TYPE_PARAMETERS);
-				executionHandlerConfig.addParameterBag(parameters);
-			}
-			StringParameter stateP = parameters.getParameter(PARAM_STATE);
-			if (stateP == null) {
-				stateP = new StringParameter(PARAM_STATE, "State", state);
-				parameters.addParameter(stateP);
-			}
-
-			stateP.setValueE(state);
-
-			tx.addOrUpdate(executionHandlerConfig);
-			tx.commitOnClose();
-
-			this.statesByRealm.put(realm, state);
-		}
-	}
-
-	private void toExecution(Controller controller) {
+	protected void toExecution(Controller controller) {
 
 		String realm = controller.getRealm();
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
@@ -307,7 +254,15 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		getExecutor().execute(() -> {
 			try {
-				controller.execute();
+
+				// execute the controller
+				boolean trigger = controller.execute();
+
+				if (trigger) {
+					logger.info("Triggering of controllers for realm " + realm + " after executing " + controller);
+					triggerExecution(realm);
+				}
+
 			} catch (Exception e) {
 				logger.error("Failed to set " + controller.getLocator() + " to execution", e);
 
@@ -329,6 +284,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				Controller controller = this.controllers.getElement(realm, locator.trim(3));
 				if (controller != null)
 					controller.toExecuted(locator);
+
+				triggerExecution(realm);
 
 			} catch (Exception e) {
 				logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
@@ -470,5 +427,67 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public DelayedExecutionTimer getDelayedExecutionTimer() {
 		return this.delayedExecutionTimer;
+	}
+
+	@Override
+	public ExecutionHandlerState getState(String realm) {
+		return this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+	}
+
+	@Override
+	public void setState(Certificate cert, String realm, ExecutionHandlerState state) {
+		try (StrolchTransaction tx = openTx(realm, cert, false)) {
+			Resource executionHandlerConfig = tx.getResourceBy(TYPE_CONFIGURATION,
+					ExecutionHandler.class.getSimpleName());
+			if (executionHandlerConfig == null) {
+				executionHandlerConfig = new Resource(ExecutionHandler.class.getSimpleName(),
+						"ExecutionHandler Configuration", TYPE_CONFIGURATION);
+			}
+			ParameterBag parameters = executionHandlerConfig.getParameterBag(BAG_PARAMETERS);
+			if (parameters == null) {
+				parameters = new ParameterBag(BAG_PARAMETERS, "Parameters", TYPE_PARAMETERS);
+				executionHandlerConfig.addParameterBag(parameters);
+			}
+			StringParameter stateP = parameters.getParameter(PARAM_STATE);
+			if (stateP == null) {
+				stateP = new StringParameter(PARAM_STATE, "State", state);
+				parameters.addParameter(stateP);
+			}
+
+			stateP.setValueE(state);
+
+			tx.addOrUpdate(executionHandlerConfig);
+			tx.commitOnClose();
+
+			this.statesByRealm.put(realm, state);
+		}
+	}
+
+	private void evaluateStateByRealm() throws Exception {
+		this.statesByRealm = Collections.synchronizedMap(new HashMap<>());
+
+		runAsAgent(ctx -> getContainer().getRealmNames().forEach(realm -> {
+			try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), false)) {
+
+				Resource config = tx.getResourceBy(TYPE_CONFIGURATION, ExecutionHandler.class.getSimpleName());
+				if (config == null) {
+					this.statesByRealm.put(realm, ExecutionHandlerState.Running);
+				} else {
+					String currentState = config.getString(PARAM_STATE);
+					ExecutionHandlerState state = ExecutionHandlerState.Running;
+					try {
+						if (!currentState.isEmpty())
+							state = ExecutionHandlerState.valueOf(currentState);
+					} catch (Exception e) {
+						config.setString(PARAM_STATE, ExecutionHandlerState.Running);
+						tx.update(config);
+						tx.commitOnClose();
+						logger.error("Failed to read unhandled state " + currentState, e);
+					}
+
+					this.statesByRealm.put(realm, state);
+				}
+			}
+		}));
 	}
 }

@@ -33,40 +33,26 @@ public class ReservationExecution extends DurationExecution {
 
 	@Override
 	public boolean isExecutable(Action action) {
-		switch (action.getType()) {
-		case TYPE_RESERVE:
-			return !isReserved(tx(), action);
-		case TYPE_RELEASE:
-			return true;
-		default:
-			return super.isExecutable(action);
-		}
+		return switch (action.getType()) {
+			case TYPE_RESERVE -> !isReserved(tx(), action);
+			case TYPE_RELEASE -> true;
+			default -> super.isExecutable(action);
+		};
 	}
 
 	@Override
 	public void toExecution(Action action) {
 		switch (action.getType()) {
-		case TYPE_RESERVE:
-		case TYPE_RELEASE:
-
-			toExecuted(action);
-			break;
-
-		default:
-			super.toExecution(action);
+		case TYPE_RESERVE, TYPE_RELEASE -> toExecuted(action);
+		default -> super.toExecution(action);
 		}
 	}
 
 	@Override
 	public void toExecuted(Action action) {
 		switch (action.getType()) {
-
-		case TYPE_RESERVE:
-			setReservation(tx(), action, true);
-			break;
-		case TYPE_RELEASE:
-			setReservation(tx(), action, false);
-			break;
+		case TYPE_RESERVE -> setReservation(tx(), action, true);
+		case TYPE_RELEASE -> setReservation(tx(), action, false);
 		}
 
 		super.toExecuted(action);

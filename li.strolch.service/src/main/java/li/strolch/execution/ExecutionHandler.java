@@ -14,10 +14,10 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 
 /**
  * <p>
@@ -49,12 +49,19 @@ public abstract class ExecutionHandler extends StrolchComponent {
 
 	public static final String PARAM_STATE = "state";
 
+	@Override
 	public StrolchTransaction openTx(String realm, Certificate cert, Class<?> action, boolean readOnly) {
 		return super.openTx(realm, cert, action.getName(), readOnly);
 	}
 
-	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	@Override
+	public void runAsAgent(PrivilegedRunnable runnable) throws Exception {
 		super.runAsAgent(runnable);
+	}
+
+	@Override
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
+		return super.runAsAgentWithResult(runnable);
 	}
 
 	public ExecutorService getExecutor() {

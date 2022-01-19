@@ -88,6 +88,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 		try {
 			controller.toExecuted(locator);
+			executionHandler.triggerExecution(realm);
 		} catch (Exception e) {
 			logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
 

@@ -51,6 +51,12 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 	}
 
 	@Override
+	public Void visitActivity(Activity activity) {
+		activity.getTimeOrdering().accept(this, activity);
+		return null;
+	}
+
+	@Override
 	public Void visitAction(Action action) {
 		execute(action);
 		return null;
@@ -60,15 +66,22 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 
 		// first plan
 		if (action.getState().compareTo(State.PLANNED) < 0) {
+			State currentState = action.getState();
 			getPlanningPolicy(action).plan(action);
+
 			if (action.getState() != State.PLANNED) {
+				if (currentState != action.getState() && action.isResourceDefined())
+					getConfirmationPolicy(action).doConfirmation(action);
+
 				logger.info("Action " + action.getLocator() + " was not planned, can thus not executed.");
 				return;
 			}
+
+			// planning is complete, so we can now confirm it
+			getConfirmationPolicy(action).toPlanned(action);
 		}
 
 		tx().lock(action.getResourceLocator());
-		tx().removeFromCache(action.getResourceLocator());
 
 		ConfirmationPolicy confirmationPolicy = getConfirmationPolicy(action);
 		ExecutionPolicy executionPolicy = getExecutionPolicy(action);
@@ -165,7 +178,6 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 
 	@Override
 	public void visitParallel(Activity activity) {
-
 		if (activity.getState().compareTo(State.EXECUTED) >= 0)
 			return;
 
@@ -177,16 +189,8 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 
 			// in parallel we execute all the actions in the activity
 
-			boolean canExecute = isExecutable(element);
-			if (canExecute) {
+			if (isExecutable(element))
 				element.accept(this);
-			}
 		}
-	}
-
-	@Override
-	public Void visitActivity(Activity activity) {
-		activity.getTimeOrdering().accept(this, activity);
-		return null;
 	}
 }

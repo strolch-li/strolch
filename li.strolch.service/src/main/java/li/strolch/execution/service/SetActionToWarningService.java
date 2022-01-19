@@ -33,8 +33,8 @@ public class SetActionToWarningService extends AbstractService<LocatorArgument, 
 		}
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-
 			tx.lock(arg.locator.trim(3));
+
 			Action action = tx.findElement(arg.locator);
 			tx.lock(action.getResourceLocator());
 
