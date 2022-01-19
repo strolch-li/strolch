@@ -1,9 +1,9 @@
 package li.strolch.websocket;
 
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
-import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.*;
 
@@ -17,8 +17,8 @@ import java.util.Map;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverHandler;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
@@ -31,18 +31,18 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 	public static final Logger logger = LoggerFactory.getLogger(WebSocketClient.class);
 
-	private final StrolchSessionHandler sessionHandler;
-	private final ComponentContainer container;
-	private final Session session;
-	private final EndpointConfig config;
-	private final String remoteIp;
-	private final Map<String, WebSocketObserverHandler> observerHandlersByRealm;
+	protected final StrolchSessionHandler sessionHandler;
+	protected final StrolchAgent agent;
+	protected final Session session;
+	protected final EndpointConfig config;
+	protected final String remoteIp;
+	protected final Map<String, WebSocketObserverHandler> observerHandlersByRealm;
 
-	private Certificate certificate;
+	protected Certificate certificate;
 
-	public WebSocketClient(ComponentContainer container, Session session, EndpointConfig config) {
-		this.container = container;
-		this.sessionHandler = container.getComponent(StrolchSessionHandler.class);
+	public WebSocketClient(StrolchAgent agent, Session session, EndpointConfig config) {
+		this.agent = agent;
+		this.sessionHandler = agent.getComponent(StrolchSessionHandler.class);
 		this.session = session;
 		this.config = config;
 		this.remoteIp = WebSocketRemoteIp.get();
@@ -62,27 +62,20 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		logger.info("Handling message " + msgType);
 
 		switch (msgType) {
-
-		case "Authenticate":
-			handleAuthenticate(jsonObject);
-			break;
-
-		case "ObserverRegister":
+		case "Authenticate" -> handleAuthenticate(jsonObject);
+		case "ObserverRegister" -> {
 			assertAuthenticated(msgType);
 			handleRegister(jsonObject);
-			break;
-		case "ObserverUnregister":
+		}
+		case "ObserverUnregister" -> {
 			assertAuthenticated(msgType);
 			handleUnregister(jsonObject);
-			break;
-
-		default:
-			logger.error("Unhandled Event msgType: " + msgType);
+		}
+		default -> logger.error("Unhandled Event msgType: " + msgType);
 		}
 	}
 
 	public void assertAuthenticated(String type) {
-
 		if (this.certificate == null) {
 			logger.error("Received " + type + " request, but not yet authed!");
 			close(CloseReason.CloseCodes.PROTOCOL_ERROR, "Not yet authed!");
@@ -92,8 +85,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		try {
 			this.sessionHandler.validate(this.certificate, this.remoteIp);
 		} catch (RuntimeException e) {
-			logger.error("Received " + type + " request, but authentication is not valid anymore: " + ExceptionHelper
-					.getExceptionMessage(e));
+			logger.error("Received " + type + " request, but authentication is not valid anymore: "
+					+ ExceptionHelper.getExceptionMessage(e));
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Not yet authed!");
 		}
 	}
@@ -122,15 +115,16 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		JsonObject params = jsonObject.get(PARAMS).getAsJsonObject();
 
 		this.observerHandlersByRealm.computeIfAbsent(objectType, s -> {
-			ObserverHandler observerHandler = this.container.getRealm(realm).getObserverHandler();
-			return getWebSocketObserverHandler(observerHandler);
+			ObserverHandler observerHandler = this.agent.getRealm(realm).getObserverHandler();
+			return getWebSocketObserverHandler(realm, observerHandler);
 		}).register(objectType, type, params);
-		logger.info(
-				this.certificate.getUsername() + " registered for " + objectType + " " + type + " params: " + params);
+
+		String username = this.certificate.getUsername();
+		logger.info(username + " registered for " + objectType + " " + type + " params: " + params);
 	}
 
-	protected WebSocketObserverHandler getWebSocketObserverHandler(ObserverHandler observerHandler) {
-		return new WebSocketObserverHandler(observerHandler, this);
+	protected WebSocketObserverHandler getWebSocketObserverHandler(String realm, ObserverHandler observerHandler) {
+		return new WebSocketObserverHandler(this.agent, realm, observerHandler, this);
 	}
 
 	private void handleUnregister(JsonObject jsonObject) {
@@ -148,9 +142,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	}
 
 	private void handleAuthenticate(JsonObject jsonObject) {
-
 		if (!jsonObject.has("authToken") || !jsonObject.has("username")) {
-			logger.error("Received invalid authentication request: " + jsonObject.toString());
+			logger.error("Received invalid authentication request: " + jsonObject);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}
@@ -159,7 +152,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		String username = jsonObject.get("username").getAsString();
 
 		if (authToken.isEmpty() || username.isEmpty()) {
-			logger.error("Received invalid authentication request: " + jsonObject.toString());
+			logger.error("Received invalid authentication request: " + jsonObject);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}
@@ -204,9 +197,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		} catch (IOException e) {
 			logger.error("Failed to close client after invalid authentication!", e);
 		}
-		this.observerHandlersByRealm.keySet().forEach(realm -> {
-			this.observerHandlersByRealm.get(realm).unregisterAll();
-		});
+		this.observerHandlersByRealm.keySet().forEach(realm -> this.observerHandlersByRealm.get(realm).unregisterAll());
 	}
 
 	public void onError(Throwable t) {

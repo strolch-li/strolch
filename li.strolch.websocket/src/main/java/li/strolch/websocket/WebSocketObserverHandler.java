@@ -3,6 +3,7 @@ package li.strolch.websocket;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.DASH;
 
@@ -16,6 +17,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.ObserverHandler;
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.execution.ExecutionHandler;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.model.json.StrolchElementToJsonVisitor;
@@ -28,13 +31,18 @@ public class WebSocketObserverHandler implements Observer {
 
 	protected static final Logger logger = LoggerFactory.getLogger(WebSocketObserverHandler.class);
 
+	protected final StrolchAgent agent;
+	protected final String realmName;
 	protected ObserverHandler observerHandler;
 	protected WebSocketClient client;
 
 	protected MapOfSets<String, String> observedTypes;
 	protected Map<String, JsonObject> params;
 
-	public WebSocketObserverHandler(ObserverHandler observerHandler, WebSocketClient client) {
+	public WebSocketObserverHandler(StrolchAgent agent, String realmName, ObserverHandler observerHandler,
+			WebSocketClient client) {
+		this.agent = agent;
+		this.realmName = realmName;
 		this.observerHandler = observerHandler;
 		this.client = client;
 		this.observedTypes = new MapOfSets<>();
@@ -113,7 +121,11 @@ public class WebSocketObserverHandler implements Observer {
 
 	protected JsonObject toJson(StrolchRootElement e) {
 
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor();
+		StrolchElementToJsonVisitor visitor;
+		if (e.isActivity())
+			visitor = inExecutionActivityToJson(this.realmName, this.agent.getComponent(ExecutionHandler.class));
+		else
+			visitor = new StrolchElementToJsonVisitor();
 
 		JsonObject params = this.params.get(e.getType());
 		if (params == null)

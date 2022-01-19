@@ -4,18 +4,18 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.util.concurrent.ConcurrentHashMap;
 
-import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.rest.RestfulStrolchComponent;
 
 @ServerEndpoint("/websocket/strolch/observer")
 public class WebSocketEndpoint {
 
-	private ConcurrentHashMap<Session, WebSocketClient> clientMap = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Session, WebSocketClient> clientMap = new ConcurrentHashMap<>();
 
 	@OnOpen
 	public void onOpen(Session session, EndpointConfig config) {
-		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-		WebSocketClient webSocketClient = new WebSocketClient(container, session, config);
+		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
+		WebSocketClient webSocketClient = new WebSocketClient(agent, session, config);
 		this.clientMap.put(session, webSocketClient);
 		session.addMessageHandler(webSocketClient);
 	}

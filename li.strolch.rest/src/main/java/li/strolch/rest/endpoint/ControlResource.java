@@ -2,6 +2,7 @@ package li.strolch.rest.endpoint;
 
 import static li.strolch.execution.ExecutionHandler.PARAM_STATE;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
+import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -18,13 +19,13 @@ import li.strolch.execution.service.*;
 import li.strolch.model.Locator;
 import li.strolch.model.State;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.service.LocatorArgument;
 import li.strolch.service.StringMapArgument;
+import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
@@ -47,8 +48,6 @@ public class ControlResource {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
-		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withVersion().withLocator();
-
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ExecutionHandler executionHandler = tx.getContainer().getComponent(ExecutionHandler.class);
 			JsonArray activitiesJ = executionHandler.getActiveActivitiesLocator(realm) //
@@ -56,7 +55,7 @@ public class ControlResource {
 					.map(locator -> tx.getActivityBy(locator.get(1), locator.get(2))) //
 					.filter(Objects::nonNull) //
 					.sorted(Comparator.comparing(Activity::getId)) //
-					.map(activity -> activity.accept(visitor)) //
+					.map(activity -> activity.accept(inExecutionActivityToJson(tx.getRealmName(), executionHandler))) //
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			ExecutionHandlerState state = executionHandler.getState(tx.getRealmName());
@@ -69,7 +68,6 @@ public class ControlResource {
 	public Response clearAllActivities(@Context HttpServletRequest request, @QueryParam("realm") String realm) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
-
 		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
 
 		ClearAllCurrentExecutionsService svc = new ClearAllCurrentExecutionsService();
@@ -77,7 +75,6 @@ public class ControlResource {
 		arg.realm = realm;
 
 		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
-
 		return ResponseUtil.toResponse(svcResult);
 	}
 
@@ -114,9 +111,7 @@ public class ControlResource {
 			@QueryParam("type") String type, @QueryParam("id") String id, @QueryParam("state") String stateS) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
-
 		Locator locator = Activity.locatorFor(type, id);
-
 		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
 
 		StartActivityExecutionService svc = new StartActivityExecutionService();
@@ -124,7 +119,6 @@ public class ControlResource {
 		arg.locator = locator;
 
 		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
-
 		return ResponseUtil.toResponse(svcResult);
 	}
 
@@ -142,76 +136,21 @@ public class ControlResource {
 
 		ServiceHandler serviceHandler = RestfulStrolchComponent.getInstance().getServiceHandler();
 		ServiceResult svcResult;
+		Service<LocatorArgument, ServiceResult> svc;
 
 		switch (state) {
-		case CREATED: {
-
-			SetActionToCreatedService svc = new SetActionToCreatedService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
+		case CREATED -> svc = new SetActionToCreatedService();
+		case PLANNED -> svc = new SetActionToPlannedService();
+		case EXECUTION -> svc = new ExecuteActionService();
+		case WARNING -> svc = new SetActionToWarningService();
+		case ERROR -> svc = new SetActionToErrorService();
+		case STOPPED -> svc = new SetActionToStoppedService();
+		case EXECUTED -> svc = new SetActionToExecutedService();
+		case CLOSED -> svc = new SetActionToClosedService();
+		default -> throw new UnsupportedOperationException("Unhandled state " + state);
 		}
 
-		case PLANNED: {
-
-			SetActionToPlannedService svc = new SetActionToPlannedService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
-		}
-
-		case EXECUTION: {
-
-			ExecuteActionService svc = new ExecuteActionService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
-		}
-
-		case WARNING: {
-
-			SetActionToWarningService svc = new SetActionToWarningService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
-		}
-
-		case ERROR: {
-
-			SetActionToErrorService svc = new SetActionToErrorService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
-		}
-
-		case STOPPED: {
-
-			SetActionToStoppedService svc = new SetActionToStoppedService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
-		}
-
-		case EXECUTED: {
-
-			SetActionToExecutedService svc = new SetActionToExecutedService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
-		}
-
-		case CLOSED: {
-
-			SetActionToClosedService svc = new SetActionToClosedService();
-			svcResult = serviceHandler.doService(cert, svc, arg);
-
-			break;
-		}
-
-		default:
-			throw new UnsupportedOperationException("Unhandled state " + state);
-		}
-
+		svcResult = serviceHandler.doService(cert, svc, arg);
 		return ResponseUtil.toResponse(svcResult);
 	}
 
@@ -221,9 +160,7 @@ public class ControlResource {
 			@QueryParam("type") String type, @QueryParam("id") String id) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
-
 		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
-
 		Locator locator = Activity.locatorFor(type, id);
 
 		RemoveActivityFromExecutionService svc = new RemoveActivityFromExecutionService();
@@ -232,7 +169,6 @@ public class ControlResource {
 		arg.locator = locator;
 
 		ServiceResult svcResult = instance.getServiceHandler().doService(cert, svc, arg);
-
 		return ResponseUtil.toResponse(svcResult);
 	}
 }
