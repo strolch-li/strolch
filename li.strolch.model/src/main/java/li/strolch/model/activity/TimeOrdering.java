@@ -19,7 +19,7 @@ public enum TimeOrdering {
 
 	private final String name;
 
-	private TimeOrdering(String name) {
+	TimeOrdering(String name) {
 		this.name = name;
 	}
 
