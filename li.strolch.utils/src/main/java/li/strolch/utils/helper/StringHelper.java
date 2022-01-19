@@ -19,6 +19,8 @@ import static java.util.stream.Collectors.toSet;
 import static li.strolch.utils.helper.ByteHelper.setBit;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
@@ -52,7 +54,7 @@ public class StringHelper {
 	/**
 	 * the semi-unique id which is incremented on every {@link #getUniqueId()}-method call
 	 */
-	private static long uniqueId = System.currentTimeMillis() - 1119953500000l;
+	private static long uniqueId = System.currentTimeMillis() - 1119953500000L;
 
 	/**
 	 * Hex char table for fast calculating of hex values
@@ -83,29 +85,23 @@ public class StringHelper {
 	}
 
 	public static String toPrettyHexString(byte[] raw, int srcPos, int length) {
-		try {
-			byte[] hex = new byte[3 * length + (length / 8)];
-			int index = srcPos;
+		byte[] hex = new byte[3 * length + (length / 8)];
+		int index = srcPos;
 
-			for (int i = srcPos; i < length; i++) {
-				byte b = raw[i];
-				int v = b & 0xFF;
-				hex[index++] = HEX_CHAR_TABLE[v >>> 4];
-				hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+		for (int i = srcPos; i < length; i++) {
+			byte b = raw[i];
+			int v = b & 0xFF;
+			hex[index++] = HEX_CHAR_TABLE[v >>> 4];
+			hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+			hex[index++] = ' ';
+
+			if ((i + 1) % 8 == 0) {
 				hex[index++] = ' ';
-
-				if ((i + 1) % 8 == 0) {
-					hex[index++] = ' ';
-				}
 			}
-
-			return new String(hex, "ASCII"); //$NON-NLS-1$
-
-		} catch (UnsupportedEncodingException e) {
-			String msg = MessageFormat
-					.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
-			throw new RuntimeException(msg, e);
 		}
+
+		return new String(hex, StandardCharsets.US_ASCII); //$NON-NLS-1$
+
 	}
 
 	public static byte[] fromPrettyHexString(String prettyHex) {
@@ -145,26 +141,20 @@ public class StringHelper {
 	 * 		if {@link UnsupportedEncodingException} is thrown
 	 */
 	public static String toHexString(byte[] raw, int offset, int length) throws RuntimeException {
-		try {
-			byte[] hex = new byte[2 * length];
-			int index = 0;
+		byte[] hex = new byte[2 * length];
+		int index = 0;
 
-			int pos = offset;
-			for (int i = 0; i < length; i++) {
-				byte b = raw[pos];
-				int v = b & 0xFF;
-				hex[index++] = HEX_CHAR_TABLE[v >>> 4];
-				hex[index++] = HEX_CHAR_TABLE[v & 0xF];
-				pos++;
-			}
-
-			return new String(hex, "ASCII"); //$NON-NLS-1$
-
-		} catch (UnsupportedEncodingException e) {
-			String msg = MessageFormat
-					.format("Something went wrong while converting to HEX: {0}", e.getMessage()); //$NON-NLS-1$
-			throw new RuntimeException(msg, e);
+		int pos = offset;
+		for (int i = 0; i < length; i++) {
+			byte b = raw[pos];
+			int v = b & 0xFF;
+			hex[index++] = HEX_CHAR_TABLE[v >>> 4];
+			hex[index++] = HEX_CHAR_TABLE[v & 0xF];
+			pos++;
 		}
+
+		return new String(hex, StandardCharsets.US_ASCII); //$NON-NLS-1$
+
 	}
 
 	public static byte fromHexStringByte(String encoded) {
@@ -186,12 +176,10 @@ public class StringHelper {
 		if ((encoded.length() % 2) != 0)
 			throw new IllegalArgumentException("Input string must contain an even number of characters."); //$NON-NLS-1$
 
-		final byte result[] = new byte[encoded.length() / 2];
-		final char enc[] = encoded.toCharArray();
+		final byte[] result = new byte[encoded.length() / 2];
+		final char[] enc = encoded.toCharArray();
 		for (int i = 0; i < enc.length; i += 2) {
-			StringBuilder curr = new StringBuilder(2);
-			curr.append(enc[i]).append(enc[i + 1]);
-			result[i / 2] = (byte) Integer.parseInt(curr.toString(), 16);
+			result[i / 2] = (byte) Integer.parseInt(String.valueOf(enc[i]) + enc[i + 1], 16);
 		}
 
 		return result;
@@ -391,9 +379,7 @@ public class StringHelper {
 		try {
 
 			MessageDigest digest = MessageDigest.getInstance(algorithm);
-			byte[] hashArray = digest.digest(string.getBytes());
-
-			return hashArray;
+			return digest.digest(string.getBytes());
 
 		} catch (NoSuchAlgorithmException e) {
 			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm); //$NON-NLS-1$
@@ -429,9 +415,7 @@ public class StringHelper {
 		try {
 
 			MessageDigest digest = MessageDigest.getInstance(algorithm);
-			byte[] hashArray = digest.digest(bytes);
-
-			return hashArray;
+			return digest.digest(bytes);
 
 		} catch (NoSuchAlgorithmException e) {
 			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm); //$NON-NLS-1$
@@ -674,14 +658,14 @@ public class StringHelper {
 		int end = Math.min(i + maxContext, (Math.min(bytes1.length, bytes2.length)));
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("Strings are not equal! Start of inequality is at " + i); //$NON-NLS-1$
-		sb.append(". Showing " + maxContext); //$NON-NLS-1$
+		sb.append("Strings are not equal! Start of inequality is at ").append(i); //$NON-NLS-1$
+		sb.append(". Showing ").append(maxContext); //$NON-NLS-1$
 		sb.append(" extra characters and start and end:\n"); //$NON-NLS-1$
 		sb.append("context s1: "); //$NON-NLS-1$
-		sb.append(s1.substring(start, end));
+		sb.append(s1, start, end);
 		sb.append("\n"); //$NON-NLS-1$
 		sb.append("context s2: "); //$NON-NLS-1$
-		sb.append(s2.substring(start, end));
+		sb.append(s2, start, end);
 		sb.append("\n"); //$NON-NLS-1$
 
 		return sb.toString();
@@ -911,5 +895,4 @@ public class StringHelper {
 		uniqueId += 1;
 		return uniqueId;
 	}
-
 }
