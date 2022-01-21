@@ -434,11 +434,40 @@ public class Activity extends AbstractStrolchRootElement
 		return this.elements.values().stream();
 	}
 
-	public Stream<Action> streamActions(Predicate<Action> predicate) {
+	public Stream<IActivityElement> streamElementsByType(String type) {
+		return streamElements().filter(e -> e.getType().equals(type));
+	}
+
+	public Stream<IActivityElement> streamElements(Predicate<IActivityElement> predicate) {
+		return streamElements().filter(predicate);
+	}
+
+	public Stream<Activity> streamActivities() {
+		return streamElements() //
+				.filter(IActivityElement::isActivity) //
+				.map(IActivityElement::asActivity);
+	}
+
+	public Stream<Activity> streamActivities(Predicate<Activity> predicate) {
+		return streamActivities().filter(predicate);
+	}
+
+	public Stream<Activity> streamActivitiesByType(String type) {
+		return streamActivities(a -> a.getType().equals(type));
+	}
+
+	public Stream<Action> streamActions() {
 		return streamElements() //
 				.filter(IActivityElement::isAction) //
-				.map(e -> (Action) e) //
-				.filter(predicate);
+				.map(IActivityElement::asAction);
+	}
+
+	public Stream<Action> streamActions(Predicate<Action> predicate) {
+		return streamActions().filter(predicate);
+	}
+
+	public Stream<Action> streamActionsByType(String type) {
+		return streamActions(a -> a.getType().equals(type));
 	}
 
 	public Stream<Action> streamActionsDeep() {
@@ -458,6 +487,10 @@ public class Activity extends AbstractStrolchRootElement
 		@SuppressWarnings("unchecked")
 		T t = (T) streamElements().filter(predicate).collect(singletonCollector(msgSupplier));
 		return t;
+	}
+
+	public List<IActivityElement> findElementsByType(String type) {
+		return findElements(e -> e.getType().equals(type));
 	}
 
 	public List<IActivityElement> findElements(Predicate<IActivityElement> predicate) {
