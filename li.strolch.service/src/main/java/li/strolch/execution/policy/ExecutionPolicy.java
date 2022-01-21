@@ -1,5 +1,7 @@
 package li.strolch.execution.policy;
 
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
@@ -17,6 +19,7 @@ import li.strolch.model.Locator;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.parameter.DurationParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
 import li.strolch.privilege.base.PrivilegeException;
@@ -61,25 +64,46 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 		this.realm = tx.getRealmName();
 	}
 
-	public void setController(StrolchTransaction tx, Controller controller) {
+	/**
+	 * <p>Set the {@link Controller} for this execution policy. Usually called by the controller itself, when instantiating this instance</p>
+	 *
+	 * <p><b>Note:</b> This is used as execution policies can have a longer lifecycle than its transaction.</p>
+	 *
+	 * @param tx
+	 * 		the update TX
+	 * @param controller
+	 * 		the controller
+	 */
+	public void refreshController(StrolchTransaction tx, Controller controller) {
 		this.tx = tx;
 		this.controller = controller;
+		this.stopped = false;
 	}
 
+	/**
+	 * Returns the controller, controlling this execution policy
+	 *
+	 * @return the controller, controlling this execution policy
+	 */
 	public Controller getController() {
 		return this.controller;
 	}
 
+	/**
+	 * Returns true if this execution policy was stopped
+	 *
+	 * @return true if this execution policy was stopped
+	 */
 	public boolean isStopped() {
 		return this.stopped;
 	}
 
-	public void setStopped(boolean stopped) {
-		this.stopped = stopped;
-	}
-
 	/**
 	 * Returns the TX which is defined on this class, not the one defined on {@link StrolchPolicy}
+	 *
+	 * <p><b>Note:</b> This is used as execution policies can have a longer lifecycle than its transaction.</p>
+	 *
+	 * @return the TX which is defined on this class, not the one defined on {@link StrolchPolicy}
 	 */
 	@Override
 	protected StrolchTransaction tx() {
@@ -178,10 +202,21 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 		}
 	}
 
+	/**
+	 * Performs tasked required when this execution policy is stopped
+	 */
 	protected void handleStopped() {
 		getDelayedExecutionTimer().cancel(this.actionLoc);
 	}
 
+	/**
+	 * Updates the state of the given {@link Action} to the given {@link State} and updates the {@link Activity} for persisting on the TX
+	 *
+	 * @param action
+	 * 		the action to change
+	 * @param state
+	 * 		the new state to set
+	 */
 	protected void setActionState(Action action, State state) {
 
 		action.setState(state);
@@ -211,32 +246,76 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Method to delay toExecuted() call for this action by the given duration
-	 *
-	 * @param duration
-	 * 		the delay duration
+	 * Async method to delay setting the given {@link Action} to executed by the duration defined by the {@link DurationParameter} found by calling {@link Action#findParameter(String, String, boolean)}
 	 */
-	protected void delayToExecutedBy(Duration duration) {
-		long delayMs = duration.toMillis();
-		if (delayMs < 20) {
-			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
-			delayMs = 20;
-		}
-		logger.info("Delaying toExecuted of " + this.actionLoc + " by " + formatMillisecondsDuration(delayMs));
-		getDelayedExecutionTimer().execute(this.realm, getContainer(), this.actionLoc, delayMs);
+	protected void delayToExecuted(Action action) {
+		DurationParameter durationP = action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
+		delayToExecutedBy(durationP);
 	}
 
+	/**
+	 * Async method to delay setting the {@link Action} to executed by the duration defined by the given {@link DurationParameter}
+	 */
+	protected void delayToExecutedBy(DurationParameter durationP) {
+		long duration = durationP.getValue().toMillis();
+		delayToExecutedBy(duration, TimeUnit.MILLISECONDS);
+	}
+
+	/**
+	 * Async method to delay setting the {@link Action} to executed by the given duration
+	 */
+	protected void delayToExecutedBy(Duration duration) {
+		delayToExecutedBy(duration.toMillis(), TimeUnit.MILLISECONDS);
+	}
+
+	/**
+	 * Async method to delay setting the {@link Action} to executed by the given duration,
+	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 */
+	protected void delayToExecutedByRandom(Duration duration, double minFactor, double maxFactor) {
+		long durationMs = duration.toMillis();
+		delayToExecutedByRandom(durationMs, minFactor, maxFactor, TimeUnit.MILLISECONDS);
+	}
+
+	/**
+	 * Async method to delay setting the given {@link Action} to executed by the duration defined
+	 * by the {@link DurationParameter} found by calling {@link Action#findParameter(String, String, boolean)},
+	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 */
+	protected void delayToExecutedByRandom(Action action, double minFactor, double maxFactor) {
+		DurationParameter durationP = action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
+		delayToExecutedByRandom(durationP, minFactor, maxFactor);
+	}
+
+	/**
+	 * Async method to delay setting the {@link Action} to executed
+	 * by the duration defined by the given {@link DurationParameter},
+	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 */
+	protected void delayToExecutedByRandom(DurationParameter durationP, double minFactor, double maxFactor) {
+		long duration = durationP.getValue().toMillis();
+		delayToExecutedByRandom((long) (duration * minFactor), (long) (duration * maxFactor), TimeUnit.MILLISECONDS);
+	}
+
+	/**
+	 * Async method to delay setting the {@link Action} to executed by the given duration,
+	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 */
 	protected void delayToExecutedByRandom(long duration, double minFactor, double maxFactor, TimeUnit delayUnit) {
 		delayToExecutedByRandom((long) (duration * minFactor), (long) (duration * maxFactor), delayUnit);
 	}
 
+	/**
+	 * Async method to delay setting the {@link Action} to executed by randomly choosing a value
+	 * by calling {@link ThreadLocalRandom#nextLong(long, long)} passing min and max as origin and bound respectively
+	 */
 	protected void delayToExecutedByRandom(long min, long max, TimeUnit delayUnit) {
 		long delay = ThreadLocalRandom.current().nextLong(min, max + 1);
 		delayToExecutedBy(delay, delayUnit);
 	}
 
 	/**
-	 * Method to delay toExecuted() call for this action by the given amount
+	 * Async method to delay setting the {@link Action} to executed by the given delay value
 	 *
 	 * @param delay
 	 * 		the delay time

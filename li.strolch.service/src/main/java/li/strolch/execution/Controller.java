@@ -93,8 +93,7 @@ public class Controller {
 		});
 
 		// always update the TX and controller
-		executionPolicy.setController(tx, this);
-		executionPolicy.setStopped(false);
+		executionPolicy.refreshController(tx, this);
 		return executionPolicy;
 	}
 
@@ -195,7 +194,6 @@ public class Controller {
 			this.executionHandler.removeFromExecution(this);
 			logger.info("Archiving executed activity " + this.locator + " with state " + this.activity.getState());
 			this.executionHandler.archiveActivity(this.realm, this.activity.getLocator());
-
 			return false;
 		}
 
