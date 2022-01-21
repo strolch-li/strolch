@@ -109,6 +109,7 @@ public class StrolchModelConstants {
 		public static final String TYPE_RELEASE = "Release";
 		public static final String TYPE_USE = "Use";
 		public static final String TYPE_WAIT = "Wait";
+		public static final String TYPE_JOB_COUNT_SEMAPHORE = "JobCountSemaphore";
 
 		public static final String BAG_OBJECTIVES = "Objectives";
 
@@ -117,5 +118,7 @@ public class StrolchModelConstants {
 		public static final String PARAM_DURATION = "duration";
 		public static final String PARAM_ORDER = "order";
 		public static final String PARAM_ACTIVITY = "activity";
+		public static final String PARAM_JOB_COUNT_SEMAPHORE = "jobCountSemaphore";
+		public static final String PARAM_JOB_COUNT_SEMAPHORE_TYPES = "jobCountSemaphoreTypes";
 	}
 }
