@@ -258,6 +258,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
+		logger.info("Triggering execution...");
 		synchronized (this.controllers) {
 			controllerStream(realm).forEach(this::toExecution);
 		}
@@ -410,6 +411,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				}
 			}
 		});
+
+		triggerExecution(realm);
 	}
 
 	private void notifyObserverAdd(Controller controller) {
