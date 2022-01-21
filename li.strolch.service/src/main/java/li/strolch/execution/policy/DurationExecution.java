@@ -1,10 +1,6 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
-
 import li.strolch.model.activity.Action;
-import li.strolch.model.parameter.DurationParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 
 /**
@@ -23,10 +19,7 @@ public class DurationExecution extends SimpleExecution {
 
 	@Override
 	public void toExecution(Action action) {
-
-		DurationParameter durationP = action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
-		delayToExecutedBy(durationP.getDuration());
-
+		delayToExecuted(action);
 		super.toExecution(action);
 	}
 }
