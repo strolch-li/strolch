@@ -35,10 +35,9 @@ import li.strolch.utils.collections.MapOfMaps;
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
-	private final MapOfMaps<String, Locator, Controller> controllers;
-	private Map<String, ExecutionHandlerState> statesByRealm;
-
-	private DelayedExecutionTimer delayedExecutionTimer;
+	protected final MapOfMaps<String, Locator, Controller> controllers;
+	protected Map<String, ExecutionHandlerState> statesByRealm;
+	protected DelayedExecutionTimer delayedExecutionTimer;
 
 	public EventBasedExecutionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -125,6 +124,23 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			this.controllers.removeMap(realm);
 		}
+	}
+
+	@Override
+	public void addForExecution(String realm, Activity activity) {
+		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
+		if (state == ExecutionHandlerState.HaltNew)
+			throw new IllegalStateException(
+					"ExecutionHandler state is " + state + ", can not add activities for execution!");
+
+		if (this.controllers.containsElement(realm, activity.getLocator()))
+			throw new IllegalStateException(activity.getLocator() + " is already registered for execution!");
+
+		Controller controller = newController(realm, activity);
+		this.controllers.addElement(realm, activity.getLocator(), controller);
+		notifyObserverAdd(controller);
+
+		triggerExecution(realm);
 	}
 
 	@Override

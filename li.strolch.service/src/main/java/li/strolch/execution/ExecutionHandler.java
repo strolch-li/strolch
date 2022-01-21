@@ -103,6 +103,16 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public abstract Controller getController(String realm, Locator locator);
 
 	/**
+	 * Registers the given {@link Activity} for execution. Execution is started when the concrete implementation deems necessary
+	 *
+	 * @param realm
+	 * 		the realm where the {@link Activity} resides
+	 * @param activity
+	 * 		the {@link Activity}
+	 */
+	public abstract void addForExecution(String realm, Activity activity);
+
+	/**
 	 * Registers the given {@link Activity} for execution, and submits it for execution immediately in an asynchronous
 	 * manner
 	 *
