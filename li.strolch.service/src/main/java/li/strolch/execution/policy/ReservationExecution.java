@@ -5,23 +5,37 @@ import static li.strolch.model.StrolchModelConstants.PolicyConstants.*;
 
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Resource;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.activity.Action;
+import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.BooleanParameter;
+import li.strolch.model.parameter.IntegerParameter;
+import li.strolch.model.parameter.StringListParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
 
 /**
+ * <p>This reservation execution policy has two modes of functioning:</p>
+ * <ul>
+ *     <li>Reserving the executing {@link Action}'s {@link Resource} using the {@link BooleanParameter} with ID
+ *     {@link StrolchModelConstants.PolicyConstants#PARAM_RESERVED} </li>
+ *     <li>Validating that no more than a certain number of jobs are running using the
+ *     {@link StrolchModelConstants.PolicyConstants#PARAM_JOB_COUNT_SEMAPHORE} as the max number of jobs. Which jobs
+ *     are considered is either the {@link Action#getRootElement()}'s type, or the list of types defined on the
+ *     {@link StringListParameter} with ID {@link StrolchModelConstants.PolicyConstants#PARAM_JOB_COUNT_SEMAPHORE_TYPES}
+ *     which is found using {@link Action#findParameter(String, String)}</li>
+ * </ul>
+ *
  * <p>
- * This extension of the {@link DurationExecution} overrides the {@link #isExecutable(Action)} method and validates that
- * the {@link Resource} to which the {@link Action} is attached, has a {@link BooleanParameter} <code>reserved</code>
- * and only allows execution if the value is false, in which case the {@link #toExecution(Action)} method sets the value
- * to true, and the {@link #toExecuted(Action)} method returns the value to false.
+ * The rules are enforced in the {@link #isExecutable(Action)} method, and simply executed in the {@link #toExecuted(Action)} method
  * </p>
  *
  * <p>
- * <b>Note:</b> the reservation is done for {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RESERVE}
+ * <b>Note 1:</b> the reservation is done for {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RESERVE}
  * and releasing is done for {@link Action} of type {@link StrolchConstants.PolicyConstants#TYPE_RELEASE}
  * </p>
+ *
+ * <p><b>Note 2:</b> the semaphore is done of {@link Action Actions} of type {@link StrolchModelConstants.PolicyConstants#TYPE_JOB_COUNT_SEMAPHORE}</p>
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -36,6 +50,8 @@ public class ReservationExecution extends DurationExecution {
 		return switch (action.getType()) {
 			case TYPE_RESERVE -> !isReserved(tx(), action);
 			case TYPE_RELEASE -> true;
+			case TYPE_JOB_COUNT_SEMAPHORE -> jobCountSemaphoreSatisfied(action);
+
 			default -> super.isExecutable(action);
 		};
 	}
@@ -43,7 +59,7 @@ public class ReservationExecution extends DurationExecution {
 	@Override
 	public void toExecution(Action action) {
 		switch (action.getType()) {
-		case TYPE_RESERVE, TYPE_RELEASE -> toExecuted(action);
+		case TYPE_RESERVE, TYPE_RELEASE, TYPE_JOB_COUNT_SEMAPHORE -> toExecuted(action);
 		default -> super.toExecution(action);
 		}
 	}
@@ -80,5 +96,24 @@ public class ReservationExecution extends DurationExecution {
 
 		// save changes
 		tx.update(resource);
+	}
+
+	protected boolean jobCountSemaphoreSatisfied(Action action) {
+		StringListParameter jobCountSemaphoreTypesP = action.findParameter(BAG_OBJECTIVES,
+				PARAM_JOB_COUNT_SEMAPHORE_TYPES, false);
+		String[] types = jobCountSemaphoreTypesP == null ?
+				new String[] { action.getRootElement().getType() } :
+				jobCountSemaphoreTypesP.getValue().toArray(String[]::new);
+
+		long nrOfActivitiesInExecution = tx().streamActivities(types).filter(Activity::inExecutionPlanningPhase)
+				.count();
+
+		IntegerParameter jobCountSemaphoreP = action.findParameter(BAG_OBJECTIVES, PARAM_JOB_COUNT_SEMAPHORE, true);
+		if (nrOfActivitiesInExecution < jobCountSemaphoreP.getValue())
+			return true;
+
+		logger.error("Action " + action.getLocator() + " is not executable as there are " + nrOfActivitiesInExecution
+				+ " activities in execution with type(s): " + jobCountSemaphoreP.getValueAsString());
+		return false;
 	}
 }
