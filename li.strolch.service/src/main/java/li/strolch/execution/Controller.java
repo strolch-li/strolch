@@ -65,6 +65,14 @@ public class Controller {
 		return this.realm;
 	}
 
+	public ExecutionHandler getExecutionHandler() {
+		return this.executionHandler;
+	}
+
+	public StrolchAgent getAgent() {
+		return this.agent;
+	}
+
 	public boolean isStopped(Locator locator) {
 		ExecutionPolicy executionPolicy = this.inExecution.get(locator);
 		return executionPolicy == null || executionPolicy.isStopped();
@@ -76,6 +84,10 @@ public class Controller {
 
 	public Activity getActivity() {
 		return this.activity;
+	}
+
+	public State getState() {
+		return this.activity.getState();
 	}
 
 	public Set<Locator> getInExecutionActionLocators() {
