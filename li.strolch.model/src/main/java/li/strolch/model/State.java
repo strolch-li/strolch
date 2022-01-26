@@ -65,6 +65,13 @@ public enum State {
 	}
 
 	/**
+	 * @return true if {@link #inCreatedPhase()} or {@link #inPlanningPhase()} returns true
+	 */
+	public boolean inCreatedPlanningPhase() {
+		return inCreatedPhase() || inPlanningPhase();
+	}
+
+	/**
 	 * @return true if the state is one of {@link #EXECUTION}, {@link #STOPPED}, {@link #WARNING},
 	 * {@link #ERROR} or {@link #EXECUTED}
 	 */
@@ -84,6 +91,13 @@ public enum State {
 	 */
 	public boolean inErrorPhase() {
 		return this == ERROR || this == STOPPED;
+	}
+
+	/**
+	 * @return true if the state is {@link #EXECUTED}
+	 */
+	public boolean inExecutedPhase() {
+		return this == EXECUTED;
 	}
 
 	/**
