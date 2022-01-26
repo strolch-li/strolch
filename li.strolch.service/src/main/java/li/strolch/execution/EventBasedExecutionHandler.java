@@ -45,11 +45,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
-	public Collection<Controller> getControllers(String realm) {
+	public List<Controller> getControllers(String realm) {
 		Map<Locator, Controller> controllersByRealm = this.controllers.getMap(realm);
 		if (controllersByRealm == null)
-			return Collections.emptyList();
-		return controllersByRealm.values();
+			return new ArrayList<>();
+		return new ArrayList<>(controllersByRealm.values());
 	}
 
 	@Override
