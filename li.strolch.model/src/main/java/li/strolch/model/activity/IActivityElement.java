@@ -198,10 +198,6 @@ public interface IActivityElement extends StrolchElement {
 		return getState().inErrorPhase();
 	}
 
-	default boolean inExecutionWarningPhase() {
-		return getState().inExecutionWarningPhase();
-	}
-
 	default boolean inClosedPhase() {
 		return getState().inClosedPhase();
 	}
