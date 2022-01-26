@@ -35,10 +35,12 @@ public class SimplePlanning extends PlanningPolicy {
 			throw new IllegalStateException("Can not plan illegal state " + action.getState());
 
 		logger.info("Planning action " + action.getLocator());
+		action.setState(State.PLANNING);
 
 		Resource resource = evaluateAndSetResource(action);
 		if (resource == null) {
 			logger.error("No resource evaluated, so can not plan " + action.getLocator());
+			tx().update(action.getRootElement());
 			return;
 		}
 
@@ -51,6 +53,7 @@ public class SimplePlanning extends PlanningPolicy {
 		}
 
 		action.setState(State.PLANNED);
+		tx().update(action.getRootElement());
 	}
 
 	/**
