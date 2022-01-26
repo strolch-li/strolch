@@ -70,8 +70,9 @@ public class ExecuteActivityCommand extends BasePlanningAndExecutionCommand
 			getPlanningPolicy(action).plan(action);
 
 			if (action.getState() != State.PLANNED) {
-				if (currentState != action.getState() && action.isResourceDefined())
+				if (currentState != action.getState() && action.isResourceDefined()) {
 					getConfirmationPolicy(action).doConfirmation(action);
+				}
 
 				logger.info("Action " + action.getLocator() + " was not planned, can thus not executed.");
 				return;
