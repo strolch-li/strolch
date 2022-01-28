@@ -27,6 +27,8 @@ import li.strolch.agent.api.*;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.runtime.privilege.PrivilegedRunnable;
+import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.service.api.*;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
@@ -40,8 +42,6 @@ public class RuntimeMock {
 
 	private ComponentContainer container;
 	private StrolchAgent agent;
-	private File targetPathF;
-	private File srcPathF;
 
 	public ComponentContainer getContainer() {
 		return this.container;
@@ -95,16 +95,13 @@ public class RuntimeMock {
 
 	public RuntimeMock mockRuntime(File targetPathF, File srcPathF) {
 
-		this.targetPathF = targetPathF;
-		this.srcPathF = srcPathF;
-
-		if (!this.targetPathF.getParentFile().getName().equals(TARGET)) {
+		if (!targetPathF.getParentFile().getName().equals(TARGET)) {
 			String msg = "Mocking path must be in a maven target: {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.targetPathF.getAbsolutePath());
+			msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 
-		File configSrc = new File(this.srcPathF, StrolchBootstrapper.PATH_CONFIG);
+		File configSrc = new File(srcPathF, StrolchBootstrapper.PATH_CONFIG);
 
 		if (!configSrc.isDirectory() || !configSrc.canRead()) {
 			String msg = "Could not find config source in: {0}"; //$NON-NLS-1$
@@ -112,28 +109,27 @@ public class RuntimeMock {
 			throw new RuntimeException(msg);
 		}
 
-		if (this.targetPathF.exists()) {
-			logger.info("Deleting all files in " + this.targetPathF.getAbsolutePath()); //$NON-NLS-1$
-			if (!FileHelper.deleteFile(this.targetPathF, true)) {
+		if (targetPathF.exists()) {
+			logger.info("Deleting all files in " + targetPathF.getAbsolutePath()); //$NON-NLS-1$
+			if (!FileHelper.deleteFile(targetPathF, true)) {
 				String msg = "Failed to delete {0}"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, this.targetPathF.getAbsolutePath());
+				msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 				throw new RuntimeException(msg);
 			}
 		}
 
-		if (!this.targetPathF.mkdirs()) {
+		if (!targetPathF.mkdirs()) {
 			String msg = "Failed to create {0}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.targetPathF.getAbsolutePath());
+			msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 
 		logger.info(
-				MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(), //$NON-NLS-1$
-						this.targetPathF.getAbsolutePath()));
+				MessageFormat.format("Mocking runtime from {0} to {1}", srcPathF.getAbsolutePath(), //$NON-NLS-1$
+						targetPathF.getAbsolutePath()));
 
 		// setup the container
-		this.agent = new StrolchBootstrapper(getAppVersion())
-				.setupByCopyingRoot("dev", this.srcPathF, this.targetPathF);
+		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", srcPathF, targetPathF);
 
 		return this;
 	}
@@ -172,6 +168,14 @@ public class RuntimeMock {
 		} catch (Exception e) {
 			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
 		}
+	}
+
+	public void runAsAgent(PrivilegedRunnable runnable) throws Exception {
+		this.agent.runAsAgent(runnable);
+	}
+
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
+		return this.agent.runAsAgentWithResult(runnable);
 	}
 
 	public <T extends ServiceArgument, U extends ServiceResult> U doService(Certificate certificate,
