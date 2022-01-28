@@ -42,6 +42,7 @@ Then you can create your own project. Please read the README files in the genera
 
 To create a Strolch project see https://strolch.li/development/
 
+
 ## More Information
 
 Find more to Strolch at our website: https://strolch.li
