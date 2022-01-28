@@ -429,6 +429,7 @@ public class I18nMessage {
 				|| file.getName().startsWith("error_prone_") //
 				|| file.getName().startsWith("guava-") //
 				|| file.getName().startsWith("org.eclipse") //
+				|| file.getName().startsWith("javax") //
 				|| file.getName().contains("jsr305") //
 				|| file.getName().contains("c3p0") //
 				|| file.getName().contains("camel") //
@@ -444,7 +445,6 @@ public class I18nMessage {
 				|| file.getName().contains("icu4j") //
 				|| file.getName().contains("jakarta") //
 				|| file.getName().contains("javassist") //
-				|| file.getName().contains("javax") //
 				|| file.getName().contains("jaxb-api") //
 				|| file.getName().contains("jaxb-core") //
 				|| file.getName().contains("jaxb-impl") //
