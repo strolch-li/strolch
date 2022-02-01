@@ -15,6 +15,7 @@
  */
 package li.strolch.service.api;
 
+import static li.strolch.model.Tags.Json.*;
 import static li.strolch.utils.helper.ExceptionHelper.formatException;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
@@ -24,6 +25,7 @@ import java.util.ResourceBundle;
 
 import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchUserMessageException;
+import li.strolch.model.Tags;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.utils.I18nMessage;
 
@@ -220,20 +222,20 @@ public class ServiceResult {
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 
-		json.addProperty("state", this.state.name());
-		json.addProperty("msg", isEmpty(this.message) ? "-" : this.message);
+		json.addProperty(Tags.Json.STATE, this.state.name());
+		json.addProperty(MSG, isEmpty(this.message) ? "-" : this.message);
 
 		if (this.throwable != null) {
-			json.addProperty("exceptionMsg", getExceptionMessageWithCauses(this.throwable, false));
-			json.addProperty("throwable", formatException(this.throwable));
+			json.addProperty(EXCEPTION_MSG, getExceptionMessageWithCauses(this.throwable, false));
+			json.addProperty(THROWABLE, formatException(this.throwable));
 
 			if (this.throwable instanceof StrolchUserMessageException
 					&& ((StrolchUserMessageException) this.throwable).hasI18n())
-				json.add("i18n", ((StrolchUserMessageException) this.throwable).getI18n()
+				json.add(I_18_N, ((StrolchUserMessageException) this.throwable).getI18n()
 						.accept(new I18nMessageToJsonVisitor()));
 		}
 
-		if (!json.has("i18n") && this.i18nMessage != null)
+		if (!json.has(I_18_N) && this.i18nMessage != null)
 			json.add("i18n", this.i18nMessage.accept(new I18nMessageToJsonVisitor()));
 
 		return json;

@@ -143,6 +143,10 @@ public class Tags {
 
 		// miscellaneous
 
+		public static final String MSG = "msg";
+		public static final String EXCEPTION_MSG = "exceptionMsg";
+		public static final String THROWABLE = "throwable";
+		public static final String I_18_N = "i18n";
 		public static final String MSG_TYPE = "msgType";
 		public static final String USERNAME = "username";
 		public static final String PASSWORD = "password";
