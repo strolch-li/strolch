@@ -28,12 +28,11 @@ import java.util.*;
 
 import li.strolch.agent.api.*;
 import li.strolch.exception.StrolchException;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
-import li.strolch.handler.operationslog.OperationsLog;
-import li.strolch.model.Locator;
-import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
@@ -41,6 +40,7 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.SystemHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +49,10 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerImpl.class);
 
-	private StrolchAgent agent;
+	private final StrolchAgent agent;
 	private Map<Class<?>, StrolchComponent> componentMap;
 	private Map<String, ComponentController> controllerMap;
 	private ComponentDependencyAnalyzer dependencyAnalyzer;
-	private StrolchConfiguration strolchConfiguration;
 	private ComponentState state;
 
 	private ComponentContainerStateHandler containerStateHandler;
@@ -133,12 +132,12 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	@Override
-	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	public void runAsAgent(PrivilegedRunnable runnable) throws Exception {
 		getPrivilegeHandler().runAsAgent(runnable);
 	}
 
 	@Override
-	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
 		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
@@ -146,9 +145,20 @@ public class ComponentContainerImpl implements ComponentContainer {
 			Map<String, ComponentController> controllerMap, ComponentConfiguration componentConfiguration) {
 
 		String componentName = componentConfiguration.getName();
+		if (isEmpty(componentName))
+			throw new IllegalStateException(
+					"name missing for a component in env " + componentConfiguration.getRuntimeConfiguration()
+							.getEnvironment());
+
 		try {
 			String api = componentConfiguration.getApi();
 			String impl = componentConfiguration.getImpl();
+
+			if (isEmpty(api))
+				throw new IllegalStateException("api must be set for " + componentName);
+			if (isEmpty(impl))
+				throw new IllegalStateException("impl must be set for " + componentName);
+
 			Class<?> apiClass = Class.forName(api);
 			Class<?> implClass = Class.forName(impl);
 
@@ -166,8 +176,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			@SuppressWarnings("unchecked")
 			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
-			Constructor<StrolchComponent> constructor = strolchComponentClass
-					.getConstructor(ComponentContainer.class, String.class);
+			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainer.class,
+					String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 			strolchComponent.setup(componentConfiguration);
 
@@ -199,17 +209,16 @@ public class ComponentContainerImpl implements ComponentContainer {
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		System.setProperty("user.timezone", getTimezone());
-		logger.info(MessageFormat
-				.format(msg, applicationName, environment, Locale.getDefault(), System.getProperty("user.timezone")));
+		logger.info(MessageFormat.format(msg, applicationName, environment, Locale.getDefault(),
+				System.getProperty("user.timezone")));
 
 		// set up the container itself
-		this.strolchConfiguration = strolchConfiguration;
 		Map<Class<?>, StrolchComponent> componentMap = new HashMap<>();
 		Map<String, ComponentController> controllerMap = new HashMap<>();
-		Set<String> componentNames = this.strolchConfiguration.getComponentNames();
+		Set<String> componentNames = strolchConfiguration.getComponentNames();
 		for (String componentName : componentNames) {
-			ComponentConfiguration componentConfiguration = strolchConfiguration
-					.getComponentConfiguration(componentName);
+			ComponentConfiguration componentConfiguration = strolchConfiguration.getComponentConfiguration(
+					componentName);
 
 			// setup each component
 			setupComponent(componentMap, controllerMap, componentConfiguration);
@@ -222,18 +231,16 @@ public class ComponentContainerImpl implements ComponentContainer {
 		// now save references
 		this.componentMap = componentMap;
 		this.controllerMap = controllerMap;
-		this.strolchConfiguration = strolchConfiguration;
 
 		// and configure the state handler
-		this.containerStateHandler = new ComponentContainerStateHandler(this.dependencyAnalyzer,
-				this.strolchConfiguration);
+		this.containerStateHandler = new ComponentContainerStateHandler(this.dependencyAnalyzer, strolchConfiguration);
 
 		this.state = ComponentState.SETUP;
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}"; //$NON-NLS-1$
-		logger.info(MessageFormat
-				.format(msg, applicationName, environment, this.componentMap.size(), formatNanoDuration(took)));
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size(),
+				formatNanoDuration(took)));
 	}
 
 	public void initialize() {
@@ -254,8 +261,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} All {2} Strolch Components have been initialized. Took {3}"; //$NON-NLS-1$
-		logger.info(MessageFormat
-				.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+				formatNanoDuration(took)));
 	}
 
 	public void start() {
@@ -278,8 +285,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",
 				getAgent().getStrolchConfiguration().getRuntimeConfiguration().getLocale().toLanguageTag(),
 				getTimezone()));
-		logger.info(MessageFormat
-				.format("file.encoding: {0} / sun.jnu.encoding {1}", System.getProperty("file.encoding"),
+		logger.info(
+				MessageFormat.format("file.encoding: {0} / sun.jnu.encoding {1}", System.getProperty("file.encoding"),
 						System.getProperty("sun.jnu.encoding")));
 
 		String tookS = formatNanoDuration(System.nanoTime() - start);
@@ -330,8 +337,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			long took = System.nanoTime() - start;
 			msg = "{0}:{1} All {2} Strolch Components have been stopped. Took {3}"; //$NON-NLS-1$
-			logger.info(MessageFormat
-					.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
+			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+					formatNanoDuration(took)));
 		}
 
 		this.state = ComponentState.STOPPED;
@@ -355,8 +362,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 			long took = System.nanoTime() - start;
 			msg = "{0}:{1} All {2} Strolch Components have been destroyed! Took {3}"; //$NON-NLS-1$
-			logger.info(MessageFormat
-					.format(msg, applicationName, environment, this.controllerMap.size(), formatNanoDuration(took)));
+			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+					formatNanoDuration(took)));
 			this.controllerMap.clear();
 			this.componentMap.clear();
 		}
