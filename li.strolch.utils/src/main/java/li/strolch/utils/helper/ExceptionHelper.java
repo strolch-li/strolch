@@ -39,13 +39,9 @@ public class ExceptionHelper {
 	}
 
 	public static String getCallerMethod(int depth) {
-		// TODO change to StackWalker:
-		//		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-		//		walker.walk(frames -> frames.skip(1)
-		//				.map((StackWalker.StackFrame s) -> s.getDeclaringClass() + "." + s.getMethodName()).findFirst());
-
-		StackTraceElement element = new Throwable().getStackTrace()[depth];
-		return element.getClassName() + "." + element.getMethodName();
+		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE) //
+				.walk(frames -> frames.map((StackWalker.StackFrame sf) -> sf.getClassName() + "." + sf.getMethodName())
+						.skip(depth).findFirst()).orElse("UnknownClass.unknownMethod!");
 	}
 
 	/**
