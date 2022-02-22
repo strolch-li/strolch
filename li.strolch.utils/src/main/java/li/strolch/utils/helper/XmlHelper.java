@@ -120,10 +120,24 @@ public class XmlHelper {
 	 * 		the XML {@link InputSource} which is to be parsed
 	 */
 	public static void parseDocument(InputSource xmlInputSource, DefaultHandler xmlHandler) {
+		parseDocument(xmlInputSource, xmlHandler, false);
+	}
+
+	/**
+	 * Parses an XML file on the file system and returns the resulting {@link Document} object
+	 *
+	 * @param xmlInputSource
+	 * 		the XML {@link InputSource} which is to be parsed
+	 * @param nsAware
+	 * 		if true, then calls {@link SAXParserFactory#setNamespaceAware(boolean)}
+	 */
+	public static void parseDocument(InputSource xmlInputSource, DefaultHandler xmlHandler, boolean nsAware) {
 
 		try {
 
 			SAXParserFactory spf = SAXParserFactory.newInstance();
+			if (nsAware)
+				spf.setNamespaceAware(true);
 
 			SAXParser sp = spf.newSAXParser();
 			sp.parse(xmlInputSource, xmlHandler);
