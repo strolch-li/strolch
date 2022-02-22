@@ -48,9 +48,9 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("nls")
 public class XmlTest {
 
-	private static final String TARGET_TEST = "target/test/";
-	private static final String SRC_TEST = "src/test/resources/config/";
-	private static final Logger logger = LoggerFactory.getLogger(XmlTest.class);
+	public static final String TARGET_TEST = "target/test/";
+	public static final String SRC_TEST = "src/test/resources/config/";
+	public static final Logger logger = LoggerFactory.getLogger(XmlTest.class);
 
 	@BeforeClass
 	public static void init() {
