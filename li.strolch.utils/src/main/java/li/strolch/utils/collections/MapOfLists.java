@@ -172,6 +172,10 @@ public class MapOfLists<T, U> {
 		return this.mapOfLists.values().stream().flatMap(Collection::stream);
 	}
 
+	public Stream<Entry<T, List<U>>> stream() {
+		return this.mapOfLists.entrySet().stream();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
