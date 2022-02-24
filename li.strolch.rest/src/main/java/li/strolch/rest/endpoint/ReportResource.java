@@ -2,6 +2,7 @@ package li.strolch.rest.endpoint;
 
 import static java.util.Comparator.comparing;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.TYPE_PARAMETERS;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
 import static li.strolch.rest.StrolchRestfulConstants.*;
@@ -33,6 +34,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
+import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -73,19 +75,17 @@ public class ReportResource {
 			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
-			List<Resource> reports = new ReportSearch(tx).search(tx).orderByName(false).toList();
 
-			// create final array
-			JsonArray array = new JsonArray();
-			reports.forEach(res -> {
-				JsonObject o = new JsonObject();
-				o.addProperty(Tags.Json.ID, res.getId());
-				o.addProperty(Tags.Json.NAME, res.getName());
-				o.addProperty(PARAM_DATE_RANGE, res.hasParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL));
-				array.add(o);
-			});
+			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat().withoutVersion()
+					.withoutObjectType().withoutPolicies().withoutStateVariables()
+					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING).ignoreBagByType(TYPE_FILTER).resourceHook(
+							(reportRes, reportJ) -> reportJ.addProperty(PARAM_DATE_RANGE,
+									reportRes.hasParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL)));
+			JsonArray result = new ReportSearch(tx).search(tx).orderByName(false)
+					.map(resource -> resource.accept(visitor)).asStream()
+					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
-			return ResponseUtil.toResponse(DATA, array);
+			return ResponseUtil.toResponse(DATA, result);
 		}
 	}
 
