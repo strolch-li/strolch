@@ -540,7 +540,7 @@ public class GenericReport extends ReportPolicy {
 				.sorted(comparing(StringParameter::getIndex)) //
 				.map(StringParameter::getUom).collect(toList());
 
-		int count = 0;
+		boolean trimFacetValues = this.reportRes.getBoolean(PARAM_TRIM_FACETS_VALUES);
 		while (iter.hasNext()) {
 			Map<String, StrolchRootElement> row = iter.next();
 
@@ -553,9 +553,8 @@ public class GenericReport extends ReportPolicy {
 				}
 			}
 
-			// stop if we have enough data, or iterated over "enough"
-			count++;
-			if (count > 1000 || result.size() > limit * result.keySet().size())
+			// stop if we have enough data
+			if (trimFacetValues && result.stream().mapToInt(e -> e.getValue().size()).allMatch(v -> v >= limit))
 				break;
 		}
 
