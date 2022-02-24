@@ -190,6 +190,10 @@ public class MapOfSets<T, U> {
 		return this.mapOfSets.values().stream().flatMap(Collection::stream);
 	}
 
+	public Stream<Entry<T, Set<U>>> stream() {
+		return this.mapOfSets.entrySet().stream();
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
