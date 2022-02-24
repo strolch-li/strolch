@@ -49,6 +49,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private Set<String> flatBags;
 	private Set<String> flatBagsByType;
 	private boolean withoutElementName;
+	private boolean withoutObjectType;
 	private boolean withLocator;
 	private boolean withoutVersion;
 	private boolean withoutPolicies;
@@ -117,6 +118,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public StrolchElementToJsonVisitor withoutElementName() {
 		this.withoutElementName = true;
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor withoutObjectType() {
+		this.withoutObjectType = true;
 		return this;
 	}
 
@@ -398,7 +404,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	protected JsonObject toJson(Resource element) {
 
 		JsonObject rootJ = new JsonObject();
-		rootJ.addProperty(OBJECT_TYPE, RESOURCE);
+		if (!this.withoutObjectType)
+			rootJ.addProperty(OBJECT_TYPE, RESOURCE);
 
 		toJson(element, rootJ);
 
@@ -416,7 +423,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	protected JsonObject toJson(Order element) {
 
 		JsonObject rootJ = new JsonObject();
-		rootJ.addProperty(OBJECT_TYPE, ORDER);
+		if (!this.withoutObjectType)
+			rootJ.addProperty(OBJECT_TYPE, ORDER);
 
 		toJson(element, rootJ);
 		rootJ.addProperty(DATE, formatDate(element.getDate()));
@@ -444,7 +452,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	protected JsonObject toJson(Activity element, JsonObject rootJ, int currentDepth) {
 
-		rootJ.addProperty(OBJECT_TYPE, ACTIVITY);
+		if (!this.withoutObjectType)
+			rootJ.addProperty(OBJECT_TYPE, ACTIVITY);
 
 		toJson((AbstractStrolchElement) element, rootJ);
 		rootJ.addProperty(TIME_ORDERING, element.getTimeOrdering().getName());
@@ -490,7 +499,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	protected JsonObject toJson(Action element, JsonObject rootJ) {
 
-		rootJ.addProperty(OBJECT_TYPE, ACTION);
+		if (!this.withoutObjectType)
+			rootJ.addProperty(OBJECT_TYPE, ACTION);
 
 		// attributes
 		toJson((AbstractStrolchElement) element, rootJ);
