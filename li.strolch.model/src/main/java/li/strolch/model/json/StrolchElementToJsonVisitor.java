@@ -626,7 +626,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 			if (rootJ.has(paramId)) {
 				throw new StrolchModelException(
-						"JsonObject already has a member with ID " + paramId + ": " + parameterBag.getLocator());
+						"JsonObject already has a member with ID " + paramId + ": " + param.getLocator());
 			}
 
 			StrolchValueType type = StrolchValueType.parse(param.getType());
