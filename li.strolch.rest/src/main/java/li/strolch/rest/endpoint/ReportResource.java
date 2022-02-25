@@ -78,9 +78,9 @@ public class ReportResource {
 
 			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat().withoutVersion()
 					.withoutObjectType().withoutPolicies().withoutStateVariables()
-					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING).ignoreBagByType(TYPE_FILTER).resourceHook(
-							(reportRes, reportJ) -> reportJ.addProperty(PARAM_DATE_RANGE,
-									reportRes.hasParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL)));
+					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING, BAG_ADDITIONAL_TYPE).ignoreBagByType(TYPE_FILTER)
+					.resourceHook((reportRes, reportJ) -> reportJ.addProperty(PARAM_DATE_RANGE,
+							reportRes.hasParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL)));
 			JsonArray result = new ReportSearch(tx).search(tx).orderByName(false)
 					.map(resource -> resource.accept(visitor)).asStream()
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
