@@ -35,6 +35,10 @@ public class Report implements AutoCloseable {
 		return this.reportPolicy;
 	}
 
+	public Resource getReportResource() {
+		return this.reportPolicy.getReportResource();
+	}
+
 	public boolean isParallel() {
 		return this.reportPolicy.isParallel();
 	}

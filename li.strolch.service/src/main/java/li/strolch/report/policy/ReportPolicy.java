@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
+import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
@@ -27,6 +28,8 @@ public abstract class ReportPolicy extends StrolchPolicy {
 
 	public abstract boolean hasDateRangeSelector();
 
+	public abstract Resource getReportResource();
+
 	public abstract ReportPolicy dateRange(DateRange dateRange);
 
 	public abstract List<String> getColumnKeys();
@@ -38,6 +41,8 @@ public abstract class ReportPolicy extends StrolchPolicy {
 	public abstract ReportPolicy filter(String type, Set<String> ids);
 
 	public abstract Stream<Map<String, StrolchRootElement>> buildStream();
+
+	public abstract Stream<Map<String, StrolchRootElement>> buildStream(boolean withOrdering);
 
 	public abstract Stream<ReportElement> doReport();
 

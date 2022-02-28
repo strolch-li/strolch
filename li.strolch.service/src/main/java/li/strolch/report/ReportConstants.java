@@ -15,12 +15,14 @@ public class ReportConstants {
 	public static final String PARAM_PARALLEL = "parallel";
 	public static final String PARAM_DESCENDING = "descending";
 	public static final String PARAM_DATE_RANGE_SEL = "dateRangeSel";
+	public static final String PARAM_DIRECT_CRITERIA = "directCriteria";
 	public static final String PARAM_FIELD_REF = "fieldRef";
 	public static final String PARAM_FIELD_REF1 = "fieldRef1";
 	public static final String PARAM_FIELD_REF2 = "fieldRef2";
 	public static final String PARAM_ALLOW_MISSING_COLUMNS = "allowMissingColumns";
 	public static final String PARAM_FILTER_MISSING_VALUES_AS_TRUE = "filterMissingValuesAsTrue";
 	public static final String PARAM_MAX_ROWS_FOR_FACET_GENERATION = "maxRowsForFacetGeneration";
+	public static final String PARAM_MAX_FACET_VALUES = "maxFacetValues";
 	public static final String PARAM_POLICY = "policy";
 
 	public static final String PARAM_JOIN_PARAM = "joinParam";
