@@ -15,6 +15,10 @@
  */
 package li.strolch.exception;
 
+import java.util.Locale;
+
+import li.strolch.utils.I18nMessage;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -26,5 +30,9 @@ public class StrolchNotAuthenticatedException extends StrolchException {
 
 	public StrolchNotAuthenticatedException(String message, Throwable cause) {
 		super(message, cause);
+	}
+
+	public StrolchNotAuthenticatedException(I18nMessage i18n) {
+		super(i18n.getMessage(Locale.getDefault()));
 	}
 }

@@ -15,6 +15,8 @@
  */
 package li.strolch.exception;
 
+import java.util.Locale;
+
 import li.strolch.utils.I18nMessage;
 
 /**
@@ -30,6 +32,10 @@ public class StrolchException extends RuntimeException {
 
 	public StrolchException(String message) {
 		super(message);
+	}
+
+	public StrolchException(I18nMessage i18n) {
+		super(i18n.getMessage(Locale.getDefault()));
 	}
 
 	public boolean hasI18n() {
