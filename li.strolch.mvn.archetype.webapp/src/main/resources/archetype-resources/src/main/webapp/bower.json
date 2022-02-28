@@ -14,7 +14,7 @@
     "strolch-wc-debounced-input": "strolch-li/strolch-wc-debounced-input#^0.1.1",
     "strolch-wc-dialog-button": "strolch-li/strolch-wc-dialog-button#^0.1.1",
     "strolch-wc-information-dialog": "strolch-li/strolch-wc-information-dialog#^0.1.10",
-    "strolch-wc-reports": "strolch-li/strolch-wc-reports#^0.4.0",
+    "strolch-wc-reports": "strolch-li/strolch-wc-reports#^0.5.0",
     "strolch-wc-paging": "strolch-li/strolch-wc-paging#^0.1.4",
     "strolch-wc-ws-observer": "strolch-li/strolch-wc-ws-observer#^0.2.9",
     "strolch-wc-tree": "strolch-li/strolch-wc-tree#^0.2.2",
