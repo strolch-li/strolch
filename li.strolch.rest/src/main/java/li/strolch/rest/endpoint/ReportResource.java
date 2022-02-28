@@ -2,8 +2,8 @@ package li.strolch.rest.endpoint;
 
 import static java.util.Comparator.comparing;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.TYPE_PARAMETERS;
 import static li.strolch.report.ReportConstants.*;
+import static li.strolch.rest.RestfulStrolchComponent.getInstance;
 import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
 import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.utils.helper.StringHelper.*;
@@ -42,7 +42,6 @@ import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.report.Report;
 import li.strolch.report.ReportElement;
 import li.strolch.report.ReportSearch;
-import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.utils.ObjectHelper;
@@ -72,9 +71,9 @@ public class ReportResource {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		if (isEmpty(realm))
-			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
+			realm = getInstance().getContainer().getRealm(cert).getRealm();
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext())) {
+		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext())) {
 
 			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat().withoutVersion()
 					.withoutObjectType().withoutPolicies().withoutStateVariables()
@@ -97,7 +96,7 @@ public class ReportResource {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		if (isEmpty(realm))
-			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
+			realm = getInstance().getContainer().getRealm(cert).getRealm();
 
 		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
 
@@ -110,8 +109,10 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
 		}
 
-		JsonArray result = new JsonArray();
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+		long start = System.nanoTime();
+
+		JsonObject result = new JsonObject();
+		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 				Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
@@ -120,10 +121,12 @@ public class ReportResource {
 			if (localeJ != null)
 				report.getReportPolicy().setI18nData(localeJ);
 
-			MapOfSets<String, StrolchRootElement> criteria = report.generateFilterCriteria(limit);
-			List<String> types = new ArrayList<>(criteria.keySet());
+			JsonArray facetsJ = new JsonArray();
 			JsonObject finalLocaleJ = localeJ;
-			types.stream().sorted(comparing(type -> {
+
+			MapOfSets<String, StrolchRootElement> criteria = report.generateFilterCriteria(limit);
+
+			criteria.keySet().stream().sorted(comparing(type -> {
 				JsonElement translatedJ = finalLocaleJ == null ? null : finalLocaleJ.get(type);
 				return translatedJ == null ? type : translatedJ.getAsString();
 			})).forEach(type -> {
@@ -136,9 +139,16 @@ public class ReportResource {
 					o.addProperty(Tags.Json.NAME, f.getName());
 					return o;
 				}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
-				result.add(filter);
+				facetsJ.add(filter);
 			});
 
+			String duration = formatNanoDuration(System.nanoTime() - start);
+
+			result.add(PARAM_FACETS, facetsJ);
+			result.addProperty(PARAM_DURATION, duration);
+			result.addProperty(PARAM_PARALLEL, report.isParallel());
+
+			logger.info("Facet Generation for " + id + " took: " + duration);
 			return ResponseUtil.toResponse(DATA, result);
 		}
 	}
@@ -153,7 +163,7 @@ public class ReportResource {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		if (isEmpty(realm))
-			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
+			realm = getInstance().getContainer().getRealm(cert).getRealm();
 
 		String query = isNotEmpty(queryS) ? queryS.toLowerCase() : queryS;
 		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
@@ -167,7 +177,9 @@ public class ReportResource {
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
 		}
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+		long start = System.nanoTime();
+
+		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 				Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
@@ -183,14 +195,31 @@ public class ReportResource {
 				criteria = criteria.filter(f -> ObjectHelper.contains(f.getName(), parts, true));
 			}
 
+			int maxFacetValues;
+			int reportMaxFacetValues = report.getReportResource().getInteger(PARAM_MAX_FACET_VALUES);
+			if (reportMaxFacetValues != 0 && reportMaxFacetValues != limit) {
+				logger.warn("Report " + report.getReportResource().getId() + " has " + PARAM_MAX_FACET_VALUES
+						+ " defined as " + reportMaxFacetValues + ". Ignoring requested limit " + limit);
+				maxFacetValues = reportMaxFacetValues;
+			} else {
+				maxFacetValues = limit;
+			}
+
+			criteria = criteria.sorted(comparing(StrolchElement::getName));
+
+			if (maxFacetValues != 0)
+				criteria = criteria.limit(maxFacetValues);
+
 			// add the data finally
-			JsonArray array = criteria.limit(limit).sorted(comparing(StrolchElement::getName)).map(f -> {
+			JsonArray array = criteria.map(f -> {
 				JsonObject o = new JsonObject();
 				o.addProperty(Tags.Json.ID, f.getId());
 				o.addProperty(Tags.Json.NAME, f.getName());
 				return o;
 			}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
+			String duration = formatNanoDuration(System.nanoTime() - start);
+			logger.info("Facet Generation for " + id + "." + type + " took: " + duration);
 			return ResponseUtil.toResponse(DATA, array);
 		}
 	}
@@ -204,7 +233,7 @@ public class ReportResource {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		if (isEmpty(realm))
-			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
+			realm = getInstance().getContainer().getRealm(cert).getRealm();
 
 		DBC.PRE.assertNotEmpty("report ID is required", id);
 
@@ -255,7 +284,7 @@ public class ReportResource {
 
 		long start = System.nanoTime();
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 				Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
@@ -337,7 +366,7 @@ public class ReportResource {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		if (isEmpty(realm))
-			realm = RestfulStrolchComponent.getInstance().getContainer().getRealm(cert).getRealm();
+			realm = getInstance().getContainer().getRealm(cert).getRealm();
 
 		DBC.PRE.assertNotEmpty("report ID is required", id);
 
@@ -398,7 +427,7 @@ public class ReportResource {
 
 		return out -> {
 
-			try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, realm, getContext());
+			try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 					Report report = new Report(tx, reportId)) {
 
 				tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), reportId));

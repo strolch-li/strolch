@@ -40,11 +40,13 @@ import li.strolch.utils.iso8601.ISO8601;
  */
 public class GenericReport extends ReportPolicy {
 
+	public static final int MAX_FACET_VALUE_LIMIT = 100;
 	protected Resource reportRes;
 
 	protected ParameterBag columnsBag;
 	protected List<StringParameter> orderingParams;
 	protected Map<String, StringParameter> filterCriteriaParams;
+	protected Set<String> directCriteria;
 	protected boolean parallel;
 	protected boolean descending;
 	protected boolean allowMissingColumns;
@@ -185,6 +187,14 @@ public class GenericReport extends ReportPolicy {
 
 			this.filtersByPolicy.put(filterFunction, refTuple);
 		}
+
+		// get the list of types of criteria to query directly, not over the element stream
+		this.directCriteria = new HashSet<>(this.reportRes.getStringList(PARAM_DIRECT_CRITERIA));
+	}
+
+	@Override
+	public Resource getReportResource() {
+		return this.reportRes;
 	}
 
 	public boolean isDescending() {
@@ -336,6 +346,17 @@ public class GenericReport extends ReportPolicy {
 	 */
 	@Override
 	public Stream<Map<String, StrolchRootElement>> buildStream() {
+		return buildStream(true);
+	}
+
+	/**
+	 * Builds the stream of rows on which further transformations can be performed. Each row is a {@link Map} for where
+	 * the key is an element type, and the value is the associated element
+	 *
+	 * @return this for chaining
+	 */
+	@Override
+	public Stream<Map<String, StrolchRootElement>> buildStream(boolean withOrdering) {
 
 		Stream<Map<String, StrolchRootElement>> stream;
 
@@ -354,7 +375,7 @@ public class GenericReport extends ReportPolicy {
 
 		stream = stream.peek(e -> incrementCounter());
 
-		if (hasOrdering())
+		if (withOrdering && hasOrdering())
 			stream = stream.sorted(this::sort);
 
 		return stream;
@@ -442,7 +463,7 @@ public class GenericReport extends ReportPolicy {
 						"Additional join type " + joinWithP.getUom() + " is not available on row for "
 								+ joinWithP.getLocator());
 
-			Optional<Parameter<?>> refP = lookupParameter(joinWithP, joinElement);
+			Optional<Parameter<?>> refP = lookupParameter(joinWithP, joinElement, false);
 			if (refP.isEmpty()) {
 				throw new IllegalStateException(
 						"Parameter reference (" + joinWithP.getValue() + ") for " + joinWithP.getLocator()
@@ -517,17 +538,32 @@ public class GenericReport extends ReportPolicy {
 	 * Generates the filter criteria for this report, i.e. it returns a {@link MapOfSets} which defines the type of
 	 * elements on which a filter can be set and the {@link Set} of IDs which can be used for filtering.
 	 *
+	 * @param limit
+	 * 		the max number of values per filter criteria to return
+	 *
 	 * @return the filter criteria as a map of sets
 	 */
 	@Override
 	public MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit) {
 
+		if (limit <= 0 || limit >= MAX_FACET_VALUE_LIMIT) {
+			logger.warn("Overriding invalid limit " + limit + " with " + MAX_FACET_VALUE_LIMIT);
+			limit = 100;
+		}
+
+		int maxFacetValues;
+		int reportMaxFacetValues = this.reportRes.getInteger(PARAM_MAX_FACET_VALUES);
+		if (reportMaxFacetValues != 0 && reportMaxFacetValues != limit) {
+			logger.warn("Report " + this.reportRes.getId() + " has " + PARAM_MAX_FACET_VALUES + " defined as "
+					+ reportMaxFacetValues + ". Ignoring requested limit " + limit);
+			maxFacetValues = reportMaxFacetValues;
+		} else {
+			maxFacetValues = limit;
+		}
+
 		MapOfSets<String, StrolchRootElement> result = new MapOfSets<>(true);
 
-		Iterator<Map<String, StrolchRootElement>> iter = buildStream().iterator();
-		if (!iter.hasNext())
-			return result;
-
+		// we need the list of possible element types, which designate the criteria
 		List<String> criteria = this.filterCriteriaParams.values().stream() //
 				.filter(p -> {
 					if (p.getUom().equals(UOM_NONE))
@@ -538,32 +574,70 @@ public class GenericReport extends ReportPolicy {
 					return filterCriteriaAllowed(p.getId());
 				}) //
 				.sorted(comparing(StringParameter::getIndex)) //
-				.map(StringParameter::getUom).collect(toList());
+				.map(StringParameter::getUom) //
+				.collect(toList());
 
-		boolean maxRowsForFacetGeneration = this.reportRes.getBoolean(PARAM_MAX_ROWS_FOR_FACET_GENERATION);
-		long count = 0;
+		int maxRowsForFacetGeneration = this.reportRes.getInteger(PARAM_MAX_ROWS_FOR_FACET_GENERATION);
+
+		if (!this.directCriteria.isEmpty()) {
+			criteria.forEach(type -> {
+				if (!this.directCriteria.contains(type))
+					return;
+				StringParameter filterCriteriaP = this.filterCriteriaParams.get(type);
+				Stream<? extends StrolchRootElement> stream;
+				switch (filterCriteriaP.getInterpretation()) {
+				case INTERPRETATION_RESOURCE_REF:
+					stream = tx().streamResources(filterCriteriaP.getUom());
+					break;
+				case INTERPRETATION_ORDER_REF:
+					stream = tx().streamOrders(filterCriteriaP.getUom());
+					break;
+				case INTERPRETATION_ACTIVITY_REF:
+					stream = tx().streamActivities(filterCriteriaP.getUom());
+					break;
+				default:
+					throw new IllegalArgumentException("Unhandled element type " + filterCriteriaP.getInterpretation());
+				}
+
+				stream = stream.map(this::mapFilterCriteria).filter(this::filterDirectCriteria);
+
+				if (hasOrdering())
+					stream = stream.sorted(this::sortDirectCriteria);
+
+				if (maxFacetValues > 0)
+					stream = stream.limit(maxFacetValues);
+
+				stream.forEachOrdered(e -> result.addElement(e.getType(), e));
+			});
+
+			criteria.removeAll(this.directCriteria);
+		}
+
+		Stream<Map<String, StrolchRootElement>> stream = buildStream(false);
+		if (maxRowsForFacetGeneration > 0)
+			stream = stream.limit(maxRowsForFacetGeneration);
+
+		Iterator<Map<String, StrolchRootElement>> iter = stream.iterator();
+
 		while (iter.hasNext()) {
 			Map<String, StrolchRootElement> row = iter.next();
 
 			for (String criterion : criteria) {
-				if (row.containsKey(criterion)) {
-					if (result.size(criterion) >= limit)
-						continue;
-
+				if (row.containsKey(criterion) && result.size(criterion) < maxFacetValues)
 					result.addElement(criterion, row.get(criterion));
-				}
 			}
 
 			// stop if we have enough data
-			count++;
-//			if (trimFacetValues) {
-//
-//			}
-			if (result.stream().mapToInt(e -> e.getValue().size()).allMatch(v -> v >= limit))
+			if (result.stream().filter(e -> !this.directCriteria.contains(e.getKey()))
+					.mapToInt(e -> e.getValue().size()).allMatch(v -> v >= maxFacetValues))
 				break;
 		}
 
 		return result;
+	}
+
+	protected StrolchRootElement mapFilterCriteria(StrolchRootElement element) {
+		return element;
 	}
 
 	@Override
@@ -578,6 +652,56 @@ public class GenericReport extends ReportPolicy {
 	 */
 	protected boolean hasOrdering() {
 		return this.orderingParams != null && !this.orderingParams.isEmpty();
+	}
+
+	protected int sortDirectCriteria(StrolchRootElement column1, StrolchRootElement column2) {
+		if (column1 == null && column2 == null)
+			return 0;
+		if (column1 == null)
+			return -1;
+		if (column2 == null)
+			return 1;
+
+		for (StringParameter fieldRefP : this.orderingParams) {
+			String type = fieldRefP.getUom();
+
+			if (!column1.getType().equals(type))
+				continue;
+
+			int sortVal;
+			if (fieldRefP.getValue().startsWith("$")) {
+				Object columnValue1 = evaluateColumnValue(fieldRefP, Map.of(column1.getType(), column1), false);
+				Object columnValue2 = evaluateColumnValue(fieldRefP, Map.of(column2.getType(), column2), false);
+
+				if (this.descending) {
+					sortVal = ObjectHelper.compare(columnValue2, columnValue1, true);
+				} else {
+					sortVal = ObjectHelper.compare(columnValue1, columnValue2, true);
+				}
+
+			} else {
+				Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1, false);
+				Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2, false);
+
+				if (param1.isEmpty() && param2.isEmpty())
+					continue;
+
+				if (param1.isPresent() && param2.isEmpty())
+					return 1;
+				else if (param1.isEmpty())
+					return -1;
+
+				if (this.descending)
+					sortVal = param2.get().compareTo(param1.get());
+				else
+					sortVal = param1.get().compareTo(param2.get());
+			}
+
+			if (sortVal != 0)
+				return sortVal;
+		}
+
+		return 0;
 	}
 
 	/**
@@ -618,8 +742,8 @@ public class GenericReport extends ReportPolicy {
 				}
 
 			} else {
-				Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1);
-				Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2);
+				Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1, false);
+				Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2, false);
 
 				if (param1.isEmpty() && param2.isEmpty())
 					continue;
@@ -653,6 +777,39 @@ public class GenericReport extends ReportPolicy {
 				&& !this.filtersById.isEmpty());
 	}
 
+	protected boolean filterDirectCriteria(StrolchRootElement element) {
+
+		// do filtering by policies
+		for (ReportFilterPolicy filterPolicy : this.filtersByPolicy.keySet()) {
+			TypedTuple<StringParameter, StringParameter> refTuple = this.filtersByPolicy.get(filterPolicy);
+			if (refTuple.hasBoth()) {
+				// not applicable for direct criteria
+				continue;
+			}
+
+			// not for this element
+			if (!refTuple.getFirst().getUom().equals(element.getType()))
+				continue;
+
+			Object value = evaluateColumnValue(refTuple.getFirst(), Map.of(element.getType(), element), true);
+			if (this.filterMissingValuesAsTrue && value == null)
+				continue;
+			if (value == null || !filterPolicy.filter(value))
+				return false;
+		}
+
+		// then we do a filter by criteria
+		if (this.filtersById != null && !this.filtersById.isEmpty() && this.filtersById.containsSet(
+				element.getType())) {
+
+			if (!this.filtersById.getSet(element.getType()).contains(element.getId()))
+				return false;
+		}
+
+		// otherwise we want to keep this row
+		return true;
+	}
+
 	/**
 	 * Returns true if the element is filtered, i.e. is to be kep, false if it should not be kept in the stream
 	 *
@@ -667,7 +824,7 @@ public class GenericReport extends ReportPolicy {
 		for (ReportFilterPolicy filterPolicy : this.filtersByPolicy.keySet()) {
 			TypedTuple<StringParameter, StringParameter> refTuple = this.filtersByPolicy.get(filterPolicy);
 
-			if (refTuple.hasFirst() && refTuple.hasSecond()) {
+			if (refTuple.hasBoth()) {
 				Object value1 = evaluateColumnValue(refTuple.getFirst(), row, true);
 				Object value2 = evaluateColumnValue(refTuple.getSecond(), row, true);
 
@@ -702,7 +859,7 @@ public class GenericReport extends ReportPolicy {
 			if (dateRangeSel.equals(COL_DATE)) {
 				date = element.accept(new ElementZdtDateVisitor());
 			} else {
-				Optional<Parameter<?>> param = lookupParameter(this.dateRangeSelP, element);
+				Optional<Parameter<?>> param = lookupParameter(this.dateRangeSelP, element, false);
 				if (param.isEmpty() || param.get().getValueType() != StrolchValueType.DATE)
 					throw new IllegalStateException(
 							"Date Range selector is invalid, as referenced parameter is not a Date but "
@@ -776,7 +933,8 @@ public class GenericReport extends ReportPolicy {
 			else
 				columnValue = parameter;
 		} else {
-			columnValue = lookupParameter(columnDefP, column).orElseGet(() -> allowNull ? null : new StringParameter());
+			columnValue = lookupParameter(columnDefP, column, allowNull) //
+					.orElseGet(() -> allowNull ? null : new StringParameter());
 		}
 
 		return columnValue;
@@ -828,7 +986,8 @@ public class GenericReport extends ReportPolicy {
 	 *
 	 * @return the {@link Optional} with the parameter
 	 */
-	protected Optional<Parameter<?>> lookupParameter(StringParameter paramRefP, StrolchRootElement element) {
+	protected Optional<Parameter<?>> lookupParameter(StringParameter paramRefP, StrolchRootElement element,
+			boolean overrideAllowMissingColumns) {
 		String paramRef = paramRefP.getValue();
 
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
@@ -841,7 +1000,7 @@ public class GenericReport extends ReportPolicy {
 		String paramKey = locatorParts[2];
 
 		Parameter<?> param = element.getParameter(bagKey, paramKey);
-		if (!allowMissingColumns && param == null)
+		if (!overrideAllowMissingColumns && !this.allowMissingColumns && param == null)
 			throw new IllegalStateException(
 					"Parameter reference (" + paramRef + ") for " + paramRefP.getLocator() + " not found on "
 							+ element.getLocator());
