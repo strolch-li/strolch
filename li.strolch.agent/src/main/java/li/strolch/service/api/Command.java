@@ -299,4 +299,12 @@ public abstract class Command implements Restrictable {
 	public void undo() {
 		// do nothing
 	}
+
+	/**
+	 * Simple method to call {@link #validate()} and {@link #doCommand()} in a single call
+	 */
+	public void validateAndDoCommand() {
+		validate();
+		doCommand();
+	}
 }
