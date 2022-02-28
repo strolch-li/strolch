@@ -62,4 +62,8 @@ public class TypedTuple<T, U> {
 	public boolean hasSecond() {
 		return this.second != null;
 	}
+
+	public boolean hasBoth() {
+		return this.hasFirst() & this.hasSecond();
+	}
 }
