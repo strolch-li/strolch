@@ -15,23 +15,24 @@
  */
 package li.strolch.exception;
 
+import java.util.Locale;
+
+import li.strolch.utils.I18nMessage;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class StrolchPolicyException extends StrolchException {
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
 	public StrolchPolicyException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	/**
-	 * @param message
-	 */
 	public StrolchPolicyException(String message) {
 		super(message);
+	}
+
+	public StrolchPolicyException(I18nMessage i18n) {
+		super(i18n.getMessage(Locale.getDefault()));
 	}
 }

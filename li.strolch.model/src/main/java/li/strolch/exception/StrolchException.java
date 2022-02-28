@@ -15,10 +15,16 @@
  */
 package li.strolch.exception;
 
+import java.util.Locale;
+
+import li.strolch.utils.I18nMessage;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class StrolchException extends RuntimeException {
+
+	private I18nMessage i18n;
 
 	public StrolchException(String message, Throwable cause) {
 		super(message, cause);
@@ -26,5 +32,26 @@ public class StrolchException extends RuntimeException {
 
 	public StrolchException(String message) {
 		super(message);
+	}
+
+	public StrolchException(I18nMessage i18n) {
+		super(i18n.getMessage(Locale.getDefault()));
+	}
+
+	public boolean hasI18n() {
+		return this.i18n != null;
+	}
+
+	public I18nMessage getI18n() {
+		return this.i18n;
+	}
+
+	public void setI18n(I18nMessage i18n) {
+		this.i18n = i18n;
+	}
+
+	public StrolchException i18n(I18nMessage i18n) {
+		this.i18n = i18n;
+		return this;
 	}
 }
