@@ -9,6 +9,10 @@ public class TransactionThreadLocal extends ThreadLocal<StrolchTransaction> {
 
 	private static final TransactionThreadLocal instance = new TransactionThreadLocal();
 
+	public static boolean hasTx() {
+		return instance.get() != null;
+	}
+
 	public static StrolchTransaction getTx() {
 		StrolchTransaction tx = instance.get();
 		if (tx == null)
