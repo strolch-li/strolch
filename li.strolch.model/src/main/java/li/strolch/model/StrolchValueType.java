@@ -388,6 +388,11 @@ public enum StrolchValueType {
 		public IValue<?> valueInstance(String valueAsString) {
 			return new FloatListValue(valueAsString);
 		}
+
+		@Override
+		public boolean isList() {
+			return true;
+		}
 	},
 
 	/**
@@ -422,6 +427,11 @@ public enum StrolchValueType {
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
 			return new IntegerListValue(valueAsString);
+		}
+
+		@Override
+		public boolean isList() {
+			return true;
 		}
 	},
 
@@ -460,6 +470,11 @@ public enum StrolchValueType {
 			throw new UnsupportedOperationException(
 					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
 		}
+
+		@Override
+		public boolean isList() {
+			return true;
+		}
 	},
 
 	/**
@@ -496,6 +511,11 @@ public enum StrolchValueType {
 		public IValue<?> valueInstance(String valueAsString) {
 			throw new UnsupportedOperationException(
 					MessageFormat.format("Values of type {0} are not supported!", getType())); //$NON-NLS-1$
+		}
+
+		@Override
+		public boolean isList() {
+			return true;
 		}
 	},
 
@@ -578,6 +598,10 @@ public enum StrolchValueType {
 	}
 
 	public boolean isString() {
+		return false;
+	}
+
+	public boolean isList() {
 		return false;
 	}
 }
