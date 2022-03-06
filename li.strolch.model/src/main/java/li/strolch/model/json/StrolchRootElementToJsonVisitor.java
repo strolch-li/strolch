@@ -104,6 +104,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this;
 	}
 
+	public StrolchRootElementToJsonVisitor withListParametersAsArray() {
+		this.visitor.withListParametersAsArray();
+		return this;
+	}
+
 	public StrolchRootElementToJsonVisitor withPolicies() {
 		this.visitor.withPolicies();
 		return this;
