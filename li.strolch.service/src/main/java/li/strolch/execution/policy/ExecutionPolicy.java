@@ -90,6 +90,15 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Returns the {@link ExecutionHandler}
+	 *
+	 * @return the {@link ExecutionHandler}
+	 */
+	public ExecutionHandler getExecutionHandler() {
+		return getComponent(ExecutionHandler.class);
+	}
+
+	/**
 	 * Returns true if this execution policy was stopped
 	 *
 	 * @return true if this execution policy was stopped
