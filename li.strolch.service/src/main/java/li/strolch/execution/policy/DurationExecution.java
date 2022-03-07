@@ -13,13 +13,16 @@ import li.strolch.persistence.api.StrolchTransaction;
  */
 public class DurationExecution extends SimpleExecution {
 
+	protected boolean delayToExecuted = true;
+
 	public DurationExecution(StrolchTransaction tx) {
 		super(tx);
 	}
 
 	@Override
 	public void toExecution(Action action) {
-		delayToExecuted(action);
+		if (this.delayToExecuted)
+			delayToExecuted(action);
 		super.toExecution(action);
 	}
 }
