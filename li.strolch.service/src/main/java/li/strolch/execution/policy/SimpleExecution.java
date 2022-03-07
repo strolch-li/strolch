@@ -119,10 +119,10 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void runWithFreshAction(BiConsumer<StrolchTransaction, Action> consumer) {
-		runWithFreshAction(consumer, true);
+		runWithFreshAction(true, consumer);
 	}
 
-	protected void runWithFreshAction(BiConsumer<StrolchTransaction, Action> consumer, boolean readOnly) {
+	protected void runWithFreshAction(boolean readOnly, BiConsumer<StrolchTransaction, Action> consumer) {
 		try {
 			runAsAgent(ctx -> {
 				try (StrolchTransaction tx = openLocalTx(ctx, readOnly)) {
