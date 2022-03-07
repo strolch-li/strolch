@@ -94,34 +94,22 @@ public class StrolchJobsResource {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
+		StrolchJobsHandler strolchJobsHandler = container.getComponent(StrolchJobsHandler.class);
 
-			ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
-			StrolchJobsHandler strolchJobsHandler = container.getComponent(StrolchJobsHandler.class);
-
+		try {
+			PrivilegeContext ctx = container.getPrivilegeHandler().validate(cert);
 			StrolchJob job = strolchJobsHandler.getJob(cert, source, name);
 
 			// assert user can access StrolchJobs
-			PrivilegeContext ctx = tx.getPrivilegeContext();
 			if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
 				ctx.validateAction(job);
 
 			switch (action) {
-
-			case "runNow":
-				job.runNow();
-				break;
-
-			case "schedule":
-				job.schedule();
-				break;
-
-			case "cancel":
-				job.cancel(true);
-				break;
-
-			default:
-				throw new IllegalArgumentException("Unhandled action " + action);
+			case "runNow" -> job.runNow();
+			case "schedule" -> job.schedule();
+			case "cancel" -> job.cancel(true);
+			default -> throw new IllegalArgumentException("Unhandled action " + action);
 			}
 
 			return ResponseUtil.toResponse();
