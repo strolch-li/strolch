@@ -40,7 +40,7 @@ public class ParallelTests {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, false)) {
 
-			for (int i = 0; i < 5000; i++) {
+			for (int i = 0; i < 500; i++) {
 				String id = StrolchAgent.getUniqueId();
 				tx.add(ModelGenerator.createResource(id, id, "SomeType"));
 			}
@@ -91,7 +91,7 @@ public class ParallelTests {
 
 			long start = System.currentTimeMillis();
 
-			while (System.currentTimeMillis() - start < 1000L) {
+			while (System.currentTimeMillis() - start < 100L) {
 
 				StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 				try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, false)) {
