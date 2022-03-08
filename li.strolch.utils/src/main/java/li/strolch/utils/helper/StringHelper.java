@@ -515,7 +515,7 @@ public class StringHelper {
 	}
 
 	/**
-	 * Traverses the given string searching for occurrences of <code>prefix</code>{...} sequences. Theses sequences are
+	 * Traverses the given string searching for occurrences of <code>prefix</code>{...} sequences. These sequences are
 	 * replaced with a {@link Properties#getProperty(String)} value if such a value exists in the properties map. If the
 	 * value of the sequence is not in the properties, then the sequence is not replaced
 	 *
