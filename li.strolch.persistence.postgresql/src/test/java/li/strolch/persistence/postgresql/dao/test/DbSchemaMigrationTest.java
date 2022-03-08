@@ -15,10 +15,12 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -43,8 +45,10 @@ public class DbSchemaMigrationTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
-		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME,
+				DB_PASSWORD);
+		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME,
+				DB_PASSWORD);
 	}
 
 	@Test
@@ -60,27 +64,31 @@ public class DbSchemaMigrationTest {
 		logger.info("Trying to migrate DB schema from 0.1.0 upwards...");
 		logger.info("");
 
+		String dbUrl = DB_URL;
+		if (System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+			dbUrl = overridePostgresqlHost(DbSchemaCreationTest.class.getSimpleName(), dbUrl);
+
 		// first clear DB
-		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), scriptPrefix, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), scriptPrefix, dbUrl, DB_USERNAME, DB_PASSWORD);
 
 		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(scriptPrefix, PostgreSqlPersistenceHandler.class, true,
 				true, true);
 
-		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+		try (Connection con = DriverManager.getConnection(dbUrl, DB_USERNAME, DB_PASSWORD)) {
 
 			// CREATE 0.1.0
 			Version currentVersion = Version.valueOf("0.1.0");
 			dbCheck.createSchema(con, DEFAULT_REALM, currentVersion);
 
-			Version expectedDbVersion = DbSchemaVersionCheck
-					.getExpectedDbVersion(scriptPrefix, PostgreSqlPersistenceHandler.class);
+			Version expectedDbVersion = DbSchemaVersionCheck.getExpectedDbVersion(scriptPrefix,
+					PostgreSqlPersistenceHandler.class);
 
 			// MIGRATE
 			dbCheck.migrateSchema(con, DEFAULT_REALM, currentVersion, expectedDbVersion);
 
 		} catch (SQLException e) {
 			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, DB_URL, e.getMessage());
+			msg = MessageFormat.format(msg, dbUrl, e.getMessage());
 			throw new DbException(msg, e);
 		}
 	}

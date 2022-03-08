@@ -129,6 +129,10 @@ public abstract class DbConnectionBuilder {
 		String host = tmp.substring(0, tmp.indexOf('/'));
 		String dbName = tmp.substring(tmp.indexOf('/'));
 		String hostOverride = System.getProperty(PROP_DB_HOST_OVERRIDE);
+
+		if (host.equals(hostOverride))
+			return dbUrl;
+
 		logger.warn("[" + realm + "] Replacing db host " + host + " with override " + hostOverride);
 		dbUrl = "jdbc:postgresql://" + hostOverride + dbName;
 		logger.warn("[" + realm + "] DB URL is now " + dbUrl);

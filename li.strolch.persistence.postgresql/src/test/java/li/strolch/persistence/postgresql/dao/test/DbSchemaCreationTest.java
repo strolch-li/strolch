@@ -16,10 +16,12 @@
 package li.strolch.persistence.postgresql.dao.test;
 
 import static java.util.Comparator.comparing;
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
 import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -64,28 +66,32 @@ public class DbSchemaCreationTest {
 		logger.info("Trying to create DB schema for " + scriptPrefix);
 		logger.info("");
 
+		String dbUrl = DB_URL;
+		if (System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+			dbUrl = overridePostgresqlHost(DbSchemaCreationTest.class.getSimpleName(), dbUrl);
+
 		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(scriptPrefix, PostgreSqlPersistenceHandler.class, true,
 				true, true);
 
-		try (Connection con = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+		try (Connection con = DriverManager.getConnection(dbUrl, DB_USERNAME, DB_PASSWORD)) {
 
 			// CREATE 0.1.0
 			dbCheck.createSchema(con, DEFAULT_REALM, Version.valueOf("0.1.0"));
 
 			File scriptsD = new File("src/main/resources");
-			File[] scriptFiles = scriptsD
-					.listFiles(f -> f.getName().startsWith(scriptPrefix) && f.getName().endsWith("_initial.sql"));
+			File[] scriptFiles = scriptsD.listFiles(
+					f -> f.getName().startsWith(scriptPrefix) && f.getName().endsWith("_initial.sql"));
 			assertNotNull(scriptFiles);
 			Arrays.sort(scriptFiles, comparing(File::getName));
 			for (File scriptFile : scriptFiles) {
 
 				String name = scriptFile.getName();
-				String versionS = name
-						.substring((scriptPrefix + "_db_schema_").length(), name.length() - "_initial.sql".length());
+				String versionS = name.substring((scriptPrefix + "_db_schema_").length(),
+						name.length() - "_initial.sql".length());
 				Version version = Version.valueOf(versionS);
 				logger.info("Creating Version " + version);
 
-				dropSchema(DbSchemaCreationTest.class.getSimpleName(), scriptPrefix, DB_URL, DB_USERNAME, DB_PASSWORD);
+				dropSchema(DbSchemaCreationTest.class.getSimpleName(), scriptPrefix, dbUrl, DB_USERNAME, DB_PASSWORD);
 
 				// CREATE
 				dbCheck.createSchema(con, DEFAULT_REALM, version);
@@ -93,7 +99,7 @@ public class DbSchemaCreationTest {
 
 		} catch (SQLException e) {
 			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, DB_URL, e.getMessage());
+			msg = MessageFormat.format(msg, dbUrl, e.getMessage());
 			throw new DbException(msg, e);
 		}
 	}

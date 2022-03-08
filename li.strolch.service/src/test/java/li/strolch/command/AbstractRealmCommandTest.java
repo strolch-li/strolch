@@ -15,6 +15,8 @@
  */
 package li.strolch.command;
 
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static li.strolch.service.test.AbstractRealmServiceTest.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -49,7 +51,11 @@ public abstract class AbstractRealmCommandTest {
 	@Before
 	public void beforeClass() throws Exception {
 
-		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
+		String dbUrl = "jdbc:postgresql://localhost/cacheduserdb";
+		if (System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+			dbUrl = overridePostgresqlHost(AbstractRealmCommandTest.class.getSimpleName(), dbUrl);
+
+		dropSchema(dbUrl, "cacheduser", "test");
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -127,8 +133,7 @@ public abstract class AbstractRealmCommandTest {
 		private Command command;
 
 		/**
-		 * @param container
-		 * @param tx
+		 *
 		 */
 		public FailCommandFacade(ComponentContainer container, StrolchTransaction tx, Command command) {
 			super(tx);
