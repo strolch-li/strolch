@@ -99,7 +99,7 @@ public class SynchronizedMapOfMapsTest {
 		Future<Boolean> task5 = this.executorService.submit(iterateTask);
 
 		run.set(true);
-		Thread.sleep(1000L);
+		Thread.sleep(20L);
 		run.set(false);
 
 		Boolean result0 = task0.get();
@@ -141,7 +141,7 @@ public class SynchronizedMapOfMapsTest {
 	}
 
 	private void addElement(MapOfMaps<String, String, String> mapOfMaps, String type, String subType, String id) {
-		logger.info("Adding " + type + " " + subType + " " + id);
+		//logger.info("Adding " + type + " " + subType + " " + id);
 		mapOfMaps.addElement(type, subType, id);
 	}
 

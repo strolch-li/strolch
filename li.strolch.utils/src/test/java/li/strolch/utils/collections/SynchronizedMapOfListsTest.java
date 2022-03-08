@@ -97,7 +97,7 @@ public class SynchronizedMapOfListsTest {
 		Future<Boolean> task5 = this.executorService.submit(iterateTask);
 
 		run.set(true);
-		Thread.sleep(1000L);
+		Thread.sleep(20L);
 		run.set(false);
 
 		Boolean result0 = task0.get();
@@ -139,7 +139,7 @@ public class SynchronizedMapOfListsTest {
 	}
 
 	private void addElement(MapOfLists<String, String> mapOfLists, String type, String id) {
-		logger.info("Adding " + type + " " + id);
+		//logger.info("Adding " + type + " " + id);
 		mapOfLists.addElement(type, id);
 	}
 
