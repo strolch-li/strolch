@@ -34,7 +34,7 @@ public class PerformancePostgreSqlJsonTest extends PerformanceTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		dropSchema(DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(PerformancePostgreSqlJsonTest.class.getSimpleName(), DB_URL, DB_USERNAME, DB_PASSWORD);
 		buildRuntime(CONFIG_SRC, RUNTIME_PATH, DataType.json);
 	}
 

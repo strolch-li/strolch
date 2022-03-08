@@ -47,8 +47,8 @@ public class DbSchemaCreationTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
-		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(DbSchemaCreationTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(DbSchemaCreationTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class DbSchemaCreationTest {
 				Version version = Version.valueOf(versionS);
 				logger.info("Creating Version " + version);
 
-				dropSchema(scriptPrefix, DB_URL, DB_USERNAME, DB_PASSWORD);
+				dropSchema(DbSchemaCreationTest.class.getSimpleName(), scriptPrefix, DB_URL, DB_USERNAME, DB_PASSWORD);
 
 				// CREATE
 				dbCheck.createSchema(con, DEFAULT_REALM, version);

@@ -43,8 +43,8 @@ public class DbSchemaMigrationTest {
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {
-		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
-		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class DbSchemaMigrationTest {
 		logger.info("");
 
 		// first clear DB
-		dropSchema(scriptPrefix, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(DbSchemaMigrationTest.class.getSimpleName(), scriptPrefix, DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		DbSchemaVersionCheck dbCheck = new DbSchemaVersionCheck(scriptPrefix, PostgreSqlPersistenceHandler.class, true,
 				true, true);

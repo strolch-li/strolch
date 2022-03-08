@@ -54,8 +54,8 @@ public class CachedVersioningDaoTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 
-		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
-		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(CachedVersioningDaoTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(CachedVersioningDaoTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

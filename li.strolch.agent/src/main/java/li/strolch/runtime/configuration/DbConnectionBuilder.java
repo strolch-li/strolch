@@ -78,15 +78,7 @@ public abstract class DbConnectionBuilder {
 
 			if (this.configuration.getBoolean(PROP_DB_ALLOW_HOST_OVERRIDE_ENV, false) //
 					&& System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE)) {
-				if (!dbUrl.startsWith("jdbc:postgresql://"))
-					throw new IllegalStateException("DB URL is invalid: " + dbUrlKey + " = " + dbUrl);
-				String tmp = dbUrl.substring("jdbc:postgresql://".length());
-				String host = tmp.substring(0, tmp.indexOf('/'));
-				String dbName = tmp.substring(tmp.indexOf('/'));
-				String hostOverride = System.getProperty(PROP_DB_HOST_OVERRIDE);
-				logger.warn("[" + realm + "] Replacing db host " + host + " with override " + hostOverride);
-				dbUrl = "jdbc:postgresql://" + hostOverride + dbName;
-				logger.warn("[" + realm + "] DB URL is now " + dbUrl);
+				dbUrl = overridePostgresqlHost(realm.getRealm(), dbUrl);
 			}
 
 			// find any pool configuration values
@@ -125,6 +117,22 @@ public abstract class DbConnectionBuilder {
 		}
 
 		return dsMap;
+	}
+
+	public static String overridePostgresqlHost(String realm, String dbUrl) {
+		if (!System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+			return dbUrl;
+		if (!dbUrl.startsWith("jdbc:postgresql://"))
+			throw new IllegalStateException("DB URL is invalid: " + dbUrl);
+
+		String tmp = dbUrl.substring("jdbc:postgresql://".length());
+		String host = tmp.substring(0, tmp.indexOf('/'));
+		String dbName = tmp.substring(tmp.indexOf('/'));
+		String hostOverride = System.getProperty(PROP_DB_HOST_OVERRIDE);
+		logger.warn("[" + realm + "] Replacing db host " + host + " with override " + hostOverride);
+		dbUrl = "jdbc:postgresql://" + hostOverride + dbName;
+		logger.warn("[" + realm + "] DB URL is now " + dbUrl);
+		return dbUrl;
 	}
 
 	protected abstract DataSource build(String realm, String url, String username, String password, Properties proops);

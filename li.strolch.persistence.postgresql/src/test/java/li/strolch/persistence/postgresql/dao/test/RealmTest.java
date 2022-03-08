@@ -66,10 +66,10 @@ public class RealmTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 
-		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL1, TEST_USER1, DB_PASSWORD);
-		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL1, TEST_USER1, DB_PASSWORD);
-		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL2, TEST_USER2, DB_PASSWORD);
-		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL2, TEST_USER2, DB_PASSWORD);
+		dropSchema(RealmTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL1, TEST_USER1, DB_PASSWORD);
+		dropSchema(RealmTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL1, TEST_USER1, DB_PASSWORD);
+		dropSchema(RealmTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL2, TEST_USER2, DB_PASSWORD);
+		dropSchema(RealmTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL2, TEST_USER2, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

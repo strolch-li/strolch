@@ -15,8 +15,11 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
+import static li.strolch.db.DbConstants.PROP_DB_ALLOW_HOST_OVERRIDE_ENV;
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -60,8 +63,8 @@ public class CachedDaoTest extends AbstractModelTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 
-		dropSchema(SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
-		dropSchema(SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(CachedDaoTest.class.getSimpleName(), SCRIPT_PREFIX_ARCHIVE, DB_URL, DB_USERNAME, DB_PASSWORD);
+		dropSchema(CachedDaoTest.class.getSimpleName(), SCRIPT_PREFIX_STROLCH, DB_URL, DB_USERNAME, DB_PASSWORD);
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -75,16 +78,19 @@ public class CachedDaoTest extends AbstractModelTest {
 		assertEquals(DataType.xml, persistenceHandler.getDataType());
 	}
 
-	public static void dropSchema(String scriptPrefix, String dbUrl, String dbUsername, String dbPassword)
+	public static void dropSchema(String ctx, String scriptPrefix, String dbUrl, String dbUsername, String dbPassword)
 			throws Exception {
+
+		if (System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+			dbUrl = overridePostgresqlHost(ctx, dbUrl);
 
 		if (!Driver.isRegistered())
 			Driver.register();
 
 		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(scriptPrefix, PostgreSqlPersistenceHandler.class);
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
-		String sql = DbSchemaVersionCheck
-				.getSql(scriptPrefix, PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
+		String sql = DbSchemaVersionCheck.getSql(scriptPrefix, PostgreSqlPersistenceHandler.class, dbVersion,
+				"drop"); //$NON-NLS-1$
 		logger.info(StringHelper.NEW_LINE + sql);
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();

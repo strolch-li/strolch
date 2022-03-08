@@ -1,5 +1,7 @@
 package li.strolch.performance;
 
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -49,23 +51,24 @@ public abstract class PerformanceTest {
 		runtimeMock.startContainer();
 
 		if (runtimeMock.getContainer().hasComponent(PersistenceHandler.class)) {
-			assertEquals(dataType,
-					((PostgreSqlPersistenceHandler) runtimeMock.getContainer().getComponent(PersistenceHandler.class))
-							.getDataType());
+			assertEquals(dataType, ((PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+					.getComponent(PersistenceHandler.class)).getDataType());
 		}
 	}
 
-	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
+	public static void dropSchema(String ctx, String dbUrl, String dbUsername, String dbPassword) throws Exception {
+
+		if (System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+			dbUrl = overridePostgresqlHost(ctx, dbUrl);
 
 		if (!Driver.isRegistered())
 			Driver.register();
 
-		Version dbVersion = DbSchemaVersionCheck
-				.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
+		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(
+				PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
-		String sql = DbSchemaVersionCheck
-				.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class, dbVersion,
-						"drop"); //$NON-NLS-1$
+		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH,
+				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
 		logger.info(StringHelper.NEW_LINE + sql);
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();
@@ -88,8 +91,8 @@ public abstract class PerformanceTest {
 	protected void runPerformanceTest(String username, int nrOfElements) {
 		Certificate certificate = runtime().getPrivilegeHandler().authenticate(username, username.toCharArray());
 		ServiceHandler svcHandler = runtime().getServiceHandler();
-		PerformanceTestResult svcResult = svcHandler
-				.doService(certificate, new PerformanceTestService(), argInstance(nrOfElements));
+		PerformanceTestResult svcResult = svcHandler.doService(certificate, new PerformanceTestService(),
+				argInstance(nrOfElements));
 		if (svcResult.isNok())
 			throw new IllegalStateException("Performance test failed", svcResult.getThrowable());
 	}
