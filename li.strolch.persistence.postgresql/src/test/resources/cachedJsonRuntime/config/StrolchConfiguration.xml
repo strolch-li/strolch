@@ -37,6 +37,7 @@
 				<allowDataInitOnSchemaCreate>true</allowDataInitOnSchemaCreate>
 				<allowSchemaCreation>true</allowSchemaCreation>
 				<allowSchemaDrop>true</allowSchemaDrop>
+				<db.allowHostOverrideEnv>true</db.allowHostOverrideEnv>
 				<db.url>jdbc:postgresql://localhost/testdb</db.url>
 				<db.username>testuser</db.username>
 				<db.password>test</db.password>

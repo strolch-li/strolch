@@ -42,6 +42,7 @@
                 <allowSchemaDrop>true</allowSchemaDrop>
 
                 <!-- cached -->
+                <db.allowHostOverrideEnv>true</db.allowHostOverrideEnv>
                 <db.url.cached>jdbc:postgresql://localhost/testdb</db.url.cached>
                 <db.username.cached>testuser</db.username.cached>
                 <db.password.cached>test</db.password.cached>

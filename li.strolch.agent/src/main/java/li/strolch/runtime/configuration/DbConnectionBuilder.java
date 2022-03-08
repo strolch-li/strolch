@@ -42,8 +42,8 @@ public abstract class DbConnectionBuilder {
 
 	protected static final Logger logger = LoggerFactory.getLogger(DbConnectionBuilder.class);
 
-	private ComponentContainer container;
-	private ComponentConfiguration configuration;
+	private final ComponentContainer container;
+	private final ComponentConfiguration configuration;
 
 	public DbConnectionBuilder(ComponentContainer container, ComponentConfiguration persistenceHandlerConfiguration) {
 		this.container = container;
@@ -54,10 +54,10 @@ public abstract class DbConnectionBuilder {
 
 		Map<String, DataSource> dsMap = new HashMap<>();
 
-		Set<String> realmNames = container.getRealmNames();
+		Set<String> realmNames = this.container.getRealmNames();
 		for (String realmName : realmNames) {
 
-			StrolchRealm realm = container.getRealm(realmName);
+			StrolchRealm realm = this.container.getRealm(realmName);
 			if (realm.getMode().isTransient())
 				continue;
 
@@ -66,18 +66,31 @@ public abstract class DbConnectionBuilder {
 			String dbUsernameKey = makeRealmKey(realmName, PROP_DB_USERNAME);
 			String dbPasswordKey = makeRealmKey(realmName, PROP_DB_PASSWORD);
 
-			boolean dbIgnoreRealm = configuration.getBoolean(dbIgnoreRealmKey, Boolean.FALSE);
+			boolean dbIgnoreRealm = this.configuration.getBoolean(dbIgnoreRealmKey, Boolean.FALSE);
 			if (dbIgnoreRealm) {
-				logger.info("Ignoring any DB configuration for Realm " + realmName);
+				logger.info("[" + realm + "] Ignoring any DB configuration for Realm " + realmName);
 				continue;
 			}
 
-			String dbUrl = configuration.getString(dbUrlKey, null);
-			String username = configuration.getString(dbUsernameKey, null);
-			String password = configuration.getString(dbPasswordKey, null);
+			String dbUrl = this.configuration.getString(dbUrlKey, null);
+			String username = this.configuration.getString(dbUsernameKey, null);
+			String password = this.configuration.getString(dbPasswordKey, null);
+
+			if (this.configuration.getBoolean(PROP_DB_ALLOW_HOST_OVERRIDE_ENV, false) //
+					&& System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE)) {
+				if (!dbUrl.startsWith("jdbc:postgresql://"))
+					throw new IllegalStateException("DB URL is invalid: " + dbUrlKey + " = " + dbUrl);
+				String tmp = dbUrl.substring("jdbc:postgresql://".length());
+				String host = tmp.substring(0, tmp.indexOf('/'));
+				String dbName = tmp.substring(tmp.indexOf('/'));
+				String hostOverride = System.getProperty(PROP_DB_HOST_OVERRIDE);
+				logger.warn("[" + realm + "] Replacing db host " + host + " with override " + hostOverride);
+				dbUrl = "jdbc:postgresql://" + hostOverride + dbName;
+				logger.warn("[" + realm + "] DB URL is now " + dbUrl);
+			}
 
 			// find any pool configuration values
-			Set<String> propertyKeys = configuration.getPropertyKeys();
+			Set<String> propertyKeys = this.configuration.getPropertyKeys();
 			Properties props = new Properties();
 			for (String key : propertyKeys) {
 				if (!key.startsWith(PROP_DB_POOL_PREFIX))
@@ -102,7 +115,7 @@ public abstract class DbConnectionBuilder {
 					continue;
 
 				poolKey = segments[2];
-				String value = configuration.getString(key, null);
+				String value = this.configuration.getString(key, null);
 				props.setProperty(poolKey, value);
 			}
 

@@ -25,6 +25,8 @@ public class DbConstants {
 	public static final String PROP_DB_USERNAME = "db.username"; //$NON-NLS-1$
 	public static final String PROP_DB_PASSWORD = "db.password"; //$NON-NLS-1$
 	public static final String PROP_DB_VERBOSE = "db.verbose"; //$NON-NLS-1$
+	public static final String PROP_DB_ALLOW_HOST_OVERRIDE_ENV = "db.allowHostOverrideEnv"; //$NON-NLS-1$
+	public static final String PROP_DB_HOST_OVERRIDE = "db.hostOverride"; //$NON-NLS-1$
 	public static final String PROP_ALLOW_SCHEMA_CREATION = "allowSchemaCreation";
 	public static final String PROP_ALLOW_SCHEMA_MIGRATION = "allowSchemaMigration";
 	public static final String PROP_ALLOW_SCHEMA_DROP = "allowSchemaDrop";

@@ -53,6 +53,8 @@
 				<allowSchemaMigration>true</allowSchemaMigration>
 				<allowSchemaDrop>true</allowSchemaDrop>
 
+				<db.allowHostOverrideEnv>true</db.allowHostOverrideEnv>
+
 				<db.url.svcCached>jdbc:postgresql://localhost/cacheduserdb</db.url.svcCached>
 				<db.username.svcCached>cacheduser</db.username.svcCached>
 				<db.password.svcCached>test</db.password.svcCached>

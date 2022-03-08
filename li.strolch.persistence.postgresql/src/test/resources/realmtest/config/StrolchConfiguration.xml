@@ -40,6 +40,8 @@
                 <allowSchemaCreation>true</allowSchemaCreation>
                 <allowSchemaDrop>true</allowSchemaDrop>
 
+                <db.allowHostOverrideEnv>true</db.allowHostOverrideEnv>
+
                 <db.url.first>jdbc:postgresql://localhost/testdb1</db.url.first>
                 <db.username.first>testuser1</db.username.first>
                 <db.password.first>test</db.password.first>
