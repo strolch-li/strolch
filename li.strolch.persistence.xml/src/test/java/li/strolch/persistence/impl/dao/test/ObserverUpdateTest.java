@@ -98,7 +98,7 @@ public class ObserverUpdateTest {
 	}
 
 	@Test
-	public void shouldReceiveUpdates() {
+	public void shouldReceiveUpdates() throws InterruptedException {
 
 		// register an observer for orders and resources
 		ElementAddedObserver observer = new ElementAddedObserver();
@@ -122,6 +122,9 @@ public class ObserverUpdateTest {
 			tx.add(newResource);
 			tx.commitOnClose();
 		}
+
+		// updates are async, so wait
+		Thread.sleep(20L);
 
 		assertEquals(2, observer.results.size());
 		assertEquals(1, observer.results.get(Tags.ORDER).getCreated().size());
