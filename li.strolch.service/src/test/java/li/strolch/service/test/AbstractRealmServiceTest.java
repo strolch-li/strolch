@@ -15,6 +15,8 @@
  */
 package li.strolch.service.test;
 
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
 
 import java.io.File;
@@ -23,6 +25,7 @@ import java.sql.DriverManager;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.command.AbstractRealmCommandTest;
 import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
 import li.strolch.privilege.model.Certificate;
@@ -61,8 +64,10 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 	@Before
 	public void before() throws Exception {
 
-		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
-		dropSchema("jdbc:postgresql://localhost/cacheduserauditsversioningdb", "cacheduserauditsversioning", "test");
+		dropSchema(AbstractRealmServiceTest.class.getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb",
+				"cacheduser", "test");
+		dropSchema(AbstractRealmServiceTest.class.getSimpleName(),
+				"jdbc:postgresql://localhost/cacheduserauditsversioningdb", "cacheduserauditsversioning", "test");
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
@@ -81,16 +86,18 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 			runtimeMock.destroyRuntime();
 	}
 
-	public static void dropSchema(String dbUrl, String dbUsername, String dbPassword) throws Exception {
+	public static void dropSchema(String ctx, String dbUrl, String dbUsername, String dbPassword) throws Exception {
+
+		if (System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+			dbUrl = overridePostgresqlHost(ctx, dbUrl);
 
 		if (!Driver.isRegistered())
 			Driver.register();
 
-		Version dbVersion = DbSchemaVersionCheck
-				.getExpectedDbVersion(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
-		String sql = DbSchemaVersionCheck
-				.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class, dbVersion,
-						"drop"); //$NON-NLS-1$
+		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(
+				PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
+		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH,
+				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();
 		}

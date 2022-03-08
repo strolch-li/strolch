@@ -51,11 +51,8 @@ public abstract class AbstractRealmCommandTest {
 	@Before
 	public void beforeClass() throws Exception {
 
-		String dbUrl = "jdbc:postgresql://localhost/cacheduserdb";
-		if (System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
-			dbUrl = overridePostgresqlHost(AbstractRealmCommandTest.class.getSimpleName(), dbUrl);
-
-		dropSchema(dbUrl, "cacheduser", "test");
+		dropSchema(AbstractRealmCommandTest.class.getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb",
+				"cacheduser", "test");
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

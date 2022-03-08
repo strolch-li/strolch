@@ -1,5 +1,7 @@
 package li.strolch.command;
 
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static li.strolch.service.test.AbstractRealmServiceTest.*;
 import static org.junit.Assert.*;
 
@@ -26,7 +28,8 @@ public class InMemoryTransactionTest {
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 
-		dropSchema("jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
+		dropSchema(InMemoryTransactionTest.class.getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb",
+				"cacheduser", "test");
 
 		runtimeMock = new RuntimeMock().mockRuntime(TARGET_RUNTIME, CONFIG_SRC);
 		runtimeMock.startContainer();
