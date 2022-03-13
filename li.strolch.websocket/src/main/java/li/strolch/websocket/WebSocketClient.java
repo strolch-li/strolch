@@ -142,7 +142,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	}
 
 	private void handleAuthenticate(JsonObject jsonObject) {
-		if (!jsonObject.has("authToken") || !jsonObject.has("username")) {
+		if (!jsonObject.has("authToken") || jsonObject.get("authToken").isJsonNull() || !jsonObject.has("username")
+				|| jsonObject.get("username").isJsonNull()) {
 			logger.error("Received invalid authentication request: " + jsonObject);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
