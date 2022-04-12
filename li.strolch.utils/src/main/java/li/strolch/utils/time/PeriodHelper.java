@@ -2,10 +2,8 @@ package li.strolch.utils.time;
 
 import static java.time.Period.between;
 
-import java.time.Duration;
-import java.time.Month;
-import java.time.Period;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.utils.dbc.DBC;
@@ -131,22 +129,22 @@ public class PeriodHelper {
 	}
 
 	/**
-	 * This special function allows us end shift a start by a multiple of the given {@link PeriodDuration} so that is
-	 * before the given end start. It does multiple tries end get as close as possible, due end the inexactness of 30
+	 * This special function allows us to shift a date by a multiple of the given {@link PeriodDuration} so that is
+	 * before the given end date. It does multiple tries end get as close as possible, due to the inexactness of 30
 	 * days being one month, and 365 days being one year.
 	 *
-	 * @param date
-	 * 		the start date to shift before the end
+	 * @param dateWithTime
+	 * 		the start date to shift before the end date
 	 * @param end
-	 * 		the start before which end stop shifting
+	 * 		the date to which the given date may be shifted
 	 * @param periodDuration
-	 * 		the period shift in multiples by
+	 * 		the period with which to shift the date with. Shifting is done in multiples of this given period
 	 *
-	 * @return the shifted start
+	 * @return the shifted date
 	 */
-	public static ZonedDateTime shiftByMultipleOfPeriod(ZonedDateTime date, ZonedDateTime end,
+	public static ZonedDateTime shiftByMultipleOfPeriod(ZonedDateTime dateWithTime, ZonedDateTime end,
 			PeriodDuration periodDuration) {
-		DBC.PRE.assertTrue("date must be before end!", date.isBefore(end));
+		DBC.PRE.assertTrue("date must be before end!", dateWithTime.isBefore(end));
 		DBC.PRE.assertFalse("period duration may not be null!", periodDuration.isZero());
 
 		Duration duration = periodDuration.getDuration();
@@ -156,9 +154,9 @@ public class PeriodHelper {
 			throw new UnsupportedOperationException(
 					"Shifting by Periods and Durations at the same time is not supported!");
 
-		Period between = between(date.toLocalDate(), end.toLocalDate());
+		Period between = between(dateWithTime.toLocalDate(), end.toLocalDate());
 		if (between.isZero() || daysIn(between) < 1)
-			return date;
+			return dateWithTime;
 
 		// see if we need end shift by years
 		if (period.getYears() > 0 && period.getMonths() == 0 && period.getDays() == 0 && duration.isZero()) {
@@ -172,9 +170,9 @@ public class PeriodHelper {
 				shiftYears -= numberOfYears;
 
 			if (shiftYears < numberOfYears)
-				return date;
+				return dateWithTime;
 
-			return date.plusYears(shiftYears);
+			return dateWithTime.plusYears(shiftYears);
 		}
 
 		// see if we need end shift by months
@@ -192,10 +190,10 @@ public class PeriodHelper {
 				shiftMonths -= numberOfMonths;
 
 			if (shiftMonths < numberOfMonths)
-				return date;
+				return dateWithTime;
 
 			// use special shift, so we keep end of month if applicable
-			return shiftMonths(date, shiftMonths);
+			return shiftMonths(dateWithTime, shiftMonths);
 		}
 
 		double daysInPeriod = daysIn(periodDuration);
@@ -211,24 +209,27 @@ public class PeriodHelper {
 			long shiftWeeks = shifts * numberOfWeeks;
 
 			if (shiftWeeks < numberOfWeeks)
-				return date;
+				return dateWithTime;
 
-			ZonedDateTime result = date.plusWeeks(shiftWeeks);
+			ZonedDateTime result = dateWithTime.plusWeeks(shiftWeeks);
 			if (result.isBefore(end))
 				return result;
-			return date.plusWeeks(shiftWeeks - 1);
+			return dateWithTime.plusWeeks(shiftWeeks - 1);
 		}
 
 		// see if we are shifting simply by single days
 		// this includes 24h durations
 		if (daysInPeriod == 1.0)
-			return date.plus(between.minusDays(1));
+			return dateWithTime.plus(between.minusDays(1));
 
 		double daysInBetween = daysIn(between);
 
 		// e.g. period is P70D
 		if (daysInPeriod > daysInBetween)
-			return date;
+			return dateWithTime;
+
+		LocalTime localTime = dateWithTime.toLocalTime();
+		ZonedDateTime dateNoTime = dateWithTime.truncatedTo(ChronoUnit.DAYS);
 
 		// if shifting by more than one day e.g. P2D or P75D
 		if (daysInPeriod > 1.0) {
@@ -236,14 +237,14 @@ public class PeriodHelper {
 			long shifts = (long) (daysInBetween / daysInPeriod);
 			long shiftDays = (long) (shifts * daysInPeriod);
 			if (shiftDays < 1)
-				return date;
+				return dateWithTime;
 
-			ZonedDateTime result = date.plusDays(shiftDays);
-			while (!result.isBefore(end)) {
-				shiftDays--;
-				result = date.plusDays(shiftDays);
+			ZonedDateTime result = dateNoTime.plusDays(shiftDays);
+			while (result.isAfter(end)) {
+				shiftDays =- (long) daysInPeriod;
+				result = dateNoTime.plusDays(shiftDays);
 			}
-			return result;
+			return result.toLocalDate().atTime(localTime).atZone(ZoneId.systemDefault());
 		}
 
 		if (!period.isZero())
@@ -256,8 +257,8 @@ public class PeriodHelper {
 		long shifts = (long) (hoursInBetween / hoursInPeriod);
 		long shiftHours = (long) (shifts * hoursInPeriod);
 		if (shiftHours < 24)
-			return date;
+			return dateWithTime;
 
-		return date.plusDays((shiftHours / 24) - 1);
+		return dateWithTime.plusDays((shiftHours / 24) - 1);
 	}
 }
