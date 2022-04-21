@@ -2,9 +2,78 @@
 <StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
               xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel.xsd">
 
-    <Resource Id="yellowBall" Name="Yellow Ball" Type="Ball">
+    <Resource Id="location1" Name="Bücher Lüthy Solothurn" Type="Location">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
-            <Parameter Id="color" Name="Color" Type="String" Value="yellow"/>
+            <Parameter Id="city" Name="City" Type="String" Value="Solothurn"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook1" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book1"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="8"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook2" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book2"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="7"/>
+        </ParameterBag>
+    </Resource>
+
+    <Resource Id="location2" Name="Buchhaus Stocker Luzern" Type="Location">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="city" Name="City" Type="String" Value="Luzern"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook3" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book3"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="5"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook4" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book4"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="8"/>
+        </ParameterBag>
+    </Resource>
+
+    <Resource Id="location3" Name="Bücher Lüthy Sihlcity Zürich" Type="Location">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="city" Name="City" Type="String" Value="Zürich"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook1" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book1"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="4"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook2" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book2"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="1"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook3" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book3"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="54"/>
+        </ParameterBag>
+        <ParameterBag Id="stockBook4" Name="Stock" Type="Stock">
+            <Parameter Id="book" Name="Book" Type="String" Interpretation="Resource-Ref" Uom="Book" Value="book4"/>
+            <Parameter Id="stock" Name="Stock" Type="Integer" Value="0"/>
+        </ParameterBag>
+    </Resource>
+
+    <Resource Id="book1" Name="The Road to Reality - Roger Penrose" Type="Book">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="author" Name="Author" Type="String" Value="Roger Penrose"/>
+            <Parameter Id="title" Name="Title" Type="String" Value="The Road to Reality"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="book2" Name="The God Delusion - Richard Hawkins" Type="Book">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="author" Name="Author" Type="String" Value="Richard Hawkins"/>
+            <Parameter Id="title" Name="Title" Type="String" Value="The God Delusion"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="book3" Name="It's Not Rocket Science - Ben Miller" Type="Book">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="author" Name="Author" Type="String" Value="Ben Miller"/>
+            <Parameter Id="title" Name="Title" Type="String" Value="It's Not Rocket Science"/>
+        </ParameterBag>
+    </Resource>
+    <Resource Id="book4" Name="Catching Fire - Richard Wrangham" Type="Book">
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="author" Name="Author" Type="String" Value="Richard Wrangham"/>
+            <Parameter Id="title" Name="Title" Type="String" Value="Catching Fire"/>
         </ParameterBag>
     </Resource>
 

@@ -1,4 +1,4 @@
-package ${package};
+package ${package}.components;
 
 import java.util.concurrent.TimeUnit;
 

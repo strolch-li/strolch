@@ -18,9 +18,9 @@ Please change the SCM connection in the pom.xml:
 
     <scm>
         <!-- TODO: Change this to your SCM URL -->
-        <connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
-        <developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
-        <url>https://github.com/4treesCH/strolch</url>
+        <connection>scm:git:https://github.com/strolch-li/strolch.git</connection>
+        <developerConnection>scm:git:https://github.com/strolch-li/strolch.git</developerConnection>
+        <url>https://github.com/strolch-li/strolch</url>
     </scm>
 
 Before you are able to start the app, you need to update the path in the

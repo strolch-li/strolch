@@ -1,0 +1,205 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
+
+<link rel="import" href="../../bower_components/strolch-wc-dialog-button/strolch-wc-dialog-button.html">
+
+<link rel="import" href="../styles/c-app-style.html">
+
+<link rel="import" href="../widgets/c-demo-table.html">
+
+<dom-module id="c-demo-data-detail">
+    <template>
+
+        <!-- Style -->
+        <style is="custom-style" include="c-app-style">
+            :host {
+                display: block;
+            }
+
+            .info {
+                display: flex;
+                flex-direction: row;
+                margin-bottom: 10px;
+            }
+
+            .symbol {
+                flex-basis: 50px;
+                flex-shrink: 0;
+                flex-grow: 0;
+                display: flex;
+                align-content: center;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .name {
+                flex-basis: 150px;
+                flex-shrink: 0;
+                flex-grow: 1;
+                flex-direction: column;
+
+                display: flex;
+                padding-top: 10px;
+            }
+
+            .text-name {
+                font-size: larger;
+            }
+
+            .info-text {
+                color: var(--google-grey-500);
+            }
+
+            .details {
+                flex-basis: 100px;
+                flex-shrink: 0;
+                flex-grow: 1;
+
+                display: flex;
+                min-width: inherit;
+                padding-top: 10px;
+            }
+
+            .table-cell {
+                min-height: inherit;
+                padding: 0 10px 0 0;
+            }
+
+            .label {
+                justify-content: flex-end;
+            }
+
+            .select {
+                flex-basis: 100px;
+                flex-shrink: 0;
+                flex-grow: 0;
+
+                display: flex;
+                padding-top: 10px;
+            }
+        </style>
+
+        <!-- Content -->
+        <paper-card>
+            <div class="info" on-tap="toggleCollapse">
+                <div class="symbol">
+                    <iron-icon icon="icons:android"></iron-icon>
+                </div>
+                <div class="name">
+                    <div class="text-name">
+                        [[data.name]]
+                    </div>
+                    <div class="info-text">
+                        [[data.city]]
+                    </div>
+                </div>
+                <div class="details table">
+                    <div class="table-row">
+                        <div class="table-cell label">[[localize('nrOfBooks')]]:</div>
+                        <div class="table-cell">
+                            <b>[[data.stocks.length]]</b>
+                        </div>
+                    </div>
+                </div>
+                <div class="select">
+                    <paper-checkbox class="person-checkbox"
+                                    checked="{{data.checked}}"
+                                    disabled="[[!data.selectable]]"
+                                    on-tap="dataSelected"></paper-checkbox>
+                </div>
+                <paper-ripple></paper-ripple>
+            </div>
+
+            <template is="dom-if" if="[[expanded]]" restamp>
+                <hr>
+                <template is="dom-if" if="[[arrayFilled(rows)]]">
+                    <c-demo-table rows="[[rows]]" on-refresh="refresh" on-row-selected="onRowSelected"></c-demo-table>
+                </template>
+                <template is="dom-if" if="[[!arrayFilled(rows)]]">
+                    <p class="g-center"><i>[[localize('noElementsAvailable')]]</i></p>
+                </template>
+
+                <div class="actions padding actions-right">
+                    <paper-button raised on-tap="_removeLocation">Remove</paper-button>
+                </div>
+            </template>
+        </paper-card>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'c-demo-data-detail',
+
+            behaviors: [
+                CustomComponentBehavior
+            ],
+
+            properties: {
+                data: {
+                    type: Object,
+                    observer: 'dataChanged'
+                },
+                rows: {
+                    type: Array,
+                    value: []
+                },
+                selectedRows: {
+                    type: Array,
+                    value: []
+                },
+                expanded: {
+                    type: Boolean
+                },
+            },
+
+            /* Observers */
+            observers: [],
+            dataChanged: function (newValue, oldValue) {
+                this.selectedRows = [];
+                this.rows = [];
+
+                if (newValue && newValue.stocks) {
+                    newValue.stocks.forEach(function (stock) {
+                        stock.selectable = true;
+                    });
+                }
+
+                if (this.expanded && (newValue == null || (oldValue != null && newValue.id !== oldValue.id))) {
+                    this.expanded = false;
+                } else if (this.expanded) {
+                    this.rows = this.data.stocks;
+                }
+            },
+            /* Listeners*/
+            listeners: {},
+            toggleCollapse: function (e) {
+                this.expanded = !this.expanded;
+                if (this.expanded) {
+                    this.selectedRows = [];
+                    this.rows = this.data.stocks;
+                }
+            },
+
+            dataSelected: function (e) {
+                e.cancelBubble = true;
+                this.fire('data-selected', {data: this.data});
+            },
+
+            /* Private */
+            _removeLocation: function (e) {
+                this.fire("remove-location", {location: this.data});
+            },
+
+            /* Public */
+
+            /* Lifecycle */
+        });
+    </script>
+</dom-module>

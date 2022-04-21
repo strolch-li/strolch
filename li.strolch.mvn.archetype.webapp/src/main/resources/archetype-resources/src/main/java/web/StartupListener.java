@@ -1,4 +1,4 @@
-package ${package};
+package ${package}.web;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -9,7 +9,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.util.ContextInitializer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
-import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ import org.slf4j.impl.StaticLoggerBinder;
 public class StartupListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(StartupListener.class);
-	private static final String APP_NAME = "${appName}";
+	private static final String APP_NAME = "eSyTest";
 
 	private StrolchAgent agent;
 

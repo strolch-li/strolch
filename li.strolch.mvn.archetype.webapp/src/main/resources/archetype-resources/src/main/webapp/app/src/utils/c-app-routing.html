@@ -1,7 +1,7 @@
 <!-- Components -->
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
 
 <dom-module id="c-app-routing">
     <template>
@@ -65,9 +65,9 @@
                 Strolch.setUserConfig(userConfig);
 
                 if (Strolch.hasRole("StrolchAdmin")) {
-                    return "inspector";
+                    return "demo";
                 } else {
-                    return "reports";
+                    return "demo";
                 }
             },
 
@@ -102,6 +102,7 @@
                 // prevent navigation to any page but exposed pages if the auth is invalid
                 var accessesExposedPage = (pathBase === this.loginPage || this.exposedPages.indexOf(pathBase) !== -1);
                 if (!accessesExposedPage && authValid === false) {
+                    console.log("Not authenticated, navigating from page " + pathBase + " to " + this.loginPage);
                     // instead save this path to return after login and go to login
                     this.set("returnPath", path);
                     this.replaceCurrentPage(this.loginPage);

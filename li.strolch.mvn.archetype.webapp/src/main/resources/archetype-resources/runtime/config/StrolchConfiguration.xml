@@ -103,7 +103,7 @@
 		<Component>
 			<name>PostInitializer</name>
 			<api>li.strolch.agent.api.PostInitializer</api>
-			<impl>${package}.PostInitializer</impl>
+			<impl>${package}.components.PostInitializer</impl>
 			<depends>RestfulHandler</depends>
 			<Properties>
 			</Properties>

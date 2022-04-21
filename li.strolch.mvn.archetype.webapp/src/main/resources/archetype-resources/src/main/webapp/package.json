@@ -1,19 +1,19 @@
 {
-  "name": "ipsc-gateway-web",
-  "description": "IPSC Gateway Web",
+  "name": "${artifactId}",
+  "description": "${appName}",
   "version": "0.1.0",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:4trees/ipsc.git"
+    "url": "https://github.com/strolch-li/strolch.git"
   },
-  "author": "Robert von Burg <robert.vonburg@4trees.ch>",
+  "author": "Robert von Burg <eitch@eitchnet.ch>",
   "license": "Proprietary",
   "keywords": [],
   "bugs": {
-    "url": "https://bitbucket.org/4trees/ipsc/issues"
+    "url": "https://github.com/strolch-li/strolch/issues"
   },
-  "homepage": "www.ipsc.ch",
+  "homepage": "https://strolch.li",
   "devDependencies": {
     "bower": "^1.8.8",
     "del": "^2.2.2",

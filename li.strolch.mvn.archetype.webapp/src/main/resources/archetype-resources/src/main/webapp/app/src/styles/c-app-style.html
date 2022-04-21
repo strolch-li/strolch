@@ -1,105 +1,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/color.html">
 
-<link rel="import" href="../../bower_components/strolch-wc-styles/strolch-wc-styles.html">
+<link rel="import" href="../../bower_components/strolch-wc-styles/strolch-wc-app-style.html">
 
 <dom-module id="c-app-style">
     <template>
-        <style is="c-app-style" include="strolch-wc-styles">
+        <style is="c-app-style" include="strolch-wc-app-style">
             :root {
 
-                /* dimensions of this app */
-                --app-width: 100%;
-                --app-max-width: 2000px;
-                --app-min-width: 640px;
-
-                /* dimensions of the header */
-                --app-header-height: 64px;
-                --app-drawer-height: calc(100vh - var(--app-header-height));
-                --app-notification-height: 48px;
-
-                /* dimensions of the pages */
-                --app-pages-content-padding: 24px;
-
-                /* primary colors */
-                --app-primary-color: #9965F4;
-                --app-secondary-color: #616161;
-
-                /* highlight colors */
-                --app-light-highlight-fg-color: black;
-                --app-light-highlight-bg-color: var(--paper-indigo-100);
-                --app-regular-highlight-fg-color: white;
-                --app-regular-highlight-bg-color: var(--paper-indigo-200);
-                --app-dark-highlight-fg-color: white;
-                --app-dark-highlight-bg-color: var(--paper-indigo-400);
-
-                /* warning colors */
-                --app-light-warning-fg-color: white;
-                --app-light-warning-bg-color: var(--paper-red-200);
-                --app-regular-warning-fg-color: white;
-                --app-regular-warning-bg-color: var(--paper-red-700);
-                --app-dark-warning-fg-color: white;
-                --app-dark-warning-bg-color: var(--paper-red-700);
-
-                /* decent colors */
-                --app-light-decent-fg-color: black;
-                --app-light-decent-bg-color: var(--paper-grey-100);
-                --app-regular-decent-fg-color: black;
-                --app-regular-decent-bg-color: var(--paper-grey-200);
-                --app-dark-decent-fg-color: black;
-                --app-dark-decent-bg-color: var(--paper-grey-300);
-            }
-
-            h1, h2, h3, h4, h5, h6 {
-                color: var(--app-primary-color);
-            }
-
-            paper-material {
-                background: white;
-                padding: 10px;
-                margin: 10px;
-            }
-
-            paper-card {
-                background: white;
-                margin: 10px;
-            }
-
-            paper-card .header {
-                margin: 10px;
-            }
-
-            paper-toggle-button {
-                --paper-toggle-button-checked-button-color: var(--app-primary-color);
-            }
-
-            paper-button {
-                background: var(--paper-grey-100);
-                color: var(--app-secondary-color);
-                height: 35px;
-            }
-
-            paper-checkbox {
-                padding: 8px;
-            }
-
-            paper-input.readonly {
-                --paper-input-container: {
-                    padding: 4px 0;
-                };
-                --paper-input-container-underline: {
-                    display: none;
-                };
-                --paper-input-container-underline-focus: {
-                    display: none;
-                };
-                --paper-input-container-underline-disabled: {
-                    display: none;
-                };
-            }
-
-            h3 {
-                margin-bottom: 0;
             }
 
         </style>

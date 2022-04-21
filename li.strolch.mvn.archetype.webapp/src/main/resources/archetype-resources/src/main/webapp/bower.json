@@ -1,24 +1,26 @@
 {
-  "name": "ipsc-gateway",
+  "name": "${artifactId}",
   "authors": [
     "Robert von Burg <eitch@eitchnet.ch>"
   ],
   "private": true,
   "dependencies": {
     "strolchjs": "strolch-li/strolchjs#^0.5.1",
-    "strolch-wc-styles": "strolch-li/strolch-wc-styles#^0.3.1",
+    "strolch-wc-styles": "strolch-li/strolch-wc-styles#^0.4.0",
     "strolch-wc-auth": "strolch-li/strolch-wc-auth#^0.9.6",
-    "strolch-wc-inspector": "strolch-li/strolch-wc-inspector#^0.23.3",
-    "strolch-wc-util-behavior": "strolch-li/strolch-wc-util-behavior#^0.2.1",
+    "strolch-wc-badge": "strolch-li/strolch-wc-badge#^0.1.3",
+    "strolch-wc-notification": "strolch-li/strolch-wc-notification#^0.1.0",
+    "strolch-wc-inspector": "strolch-li/strolch-wc-inspector#^0.23.4",
+    "strolch-wc-util-behavior": "strolch-li/strolch-wc-util-behavior#^0.3.0",
     "strolch-wc-localize-behavior": "strolch-li/strolch-wc-localize-behavior#^1.1.14",
-    "strolch-wc-debounced-input": "strolch-li/strolch-wc-debounced-input#^0.1.1",
-    "strolch-wc-dialog-button": "strolch-li/strolch-wc-dialog-button#^0.1.3",
+    "strolch-wc-debounced-input": "strolch-li/strolch-wc-debounced-input#^0.1.2",
+    "strolch-wc-dialog-button": "strolch-li/strolch-wc-dialog-button#^0.1.4",
     "strolch-wc-information-dialog": "strolch-li/strolch-wc-information-dialog#^0.1.10",
-    "strolch-wc-parameter-input": "strolch-li/strolch-wc-parameter-input#^0.1.2",
-    "strolch-wc-reports": "strolch-li/strolch-wc-reports#^0.4.0",
-    "strolch-wc-paging": "strolch-li/strolch-wc-paging#^0.1.4",
+    "strolch-wc-parameter-input": "strolch-li/strolch-wc-parameter-input#^0.1.3",
+    "strolch-wc-reports": "strolch-li/strolch-wc-reports#^0.5.1",
+    "strolch-wc-paging": "strolch-li/strolch-wc-paging#^0.1.5",
     "strolch-wc-ws-observer": "strolch-li/strolch-wc-ws-observer#^0.2.9",
-    "strolch-wc-tree": "strolch-li/strolch-wc-tree#^0.2.2",
+    "strolch-wc-tree": "strolch-li/strolch-wc-tree#^0.2.3",
 
     "polymer": "Polymer/polymer#^1.12.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.9",
@@ -31,6 +33,7 @@
     "paper-header-panel": "PolymerElements/paper-header-panel#^1.1.7",
     "paper-input": "PolymerElements/paper-input#^1.1.24",
     "paper-radio-group": "PolymerElements/paper-radio-group#^1.2.2",
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.3.0",
     "paper-toast": "PolymerElements/paper-toast#^1.3.1"
   },
   "devDependencies": {

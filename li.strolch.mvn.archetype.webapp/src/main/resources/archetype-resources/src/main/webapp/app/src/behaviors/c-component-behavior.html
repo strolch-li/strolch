@@ -1,0 +1,30 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/strolch-wc-util-behavior/strolch-wc-component-behavior.html">
+<link rel="import" href="../../bower_components/strolch-wc-localize-behavior/strolch-wc-localize-behavior.html">
+
+<script>
+    CustomComponentBehaviorImpl = {
+
+        properties: {
+            baseRestPath: {
+                type: String,
+                value: function () {
+                    return CustomWeb.baseRestPath;
+                }
+            },
+            baseWsPath: {
+                type: String,
+                value: function () {
+                    return CustomWeb.baseWsPath;
+                }
+            },
+            localesPath: {
+                type: String,
+                value: '../../../locales.json'
+            }
+        }
+    };
+
+    CustomComponentBehavior = [StrolchComponentBehavior, StrolchLocalizeBehavior, CustomComponentBehaviorImpl];
+</script>

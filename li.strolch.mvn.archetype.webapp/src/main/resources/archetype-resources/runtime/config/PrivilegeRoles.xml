@@ -3,13 +3,14 @@
 
     <Role name="AppUser">
         <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
-            <AllAllowed>true</AllAllowed>
+            <Allow>${package}.service.CreateBookService</Allow>
+            <Allow>${package}.service.UpdateBookService</Allow>
+            <Allow>${package}.service.RemoveBookService</Allow>
         </Privilege>
-        <Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
-            <AllAllowed>true</AllAllowed>
-        </Privilege>
+
         <Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege">
-            <AllAllowed>true</AllAllowed>
+            <Allow>internal</Allow>
+            <Allow>${package}.search.BookSearch</Allow>
         </Privilege>
         <Privilege name="li.strolch.report.ReportSearch" policy="DefaultPrivilege">
             <AllAllowed>true</AllAllowed>
@@ -87,9 +88,6 @@
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="li.strolch.report.ReportSearch" policy="DefaultPrivilege">
-            <AllAllowed>true</AllAllowed>
-        </Privilege>
-        <Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="li.strolch.job.StrolchJob" policy="DefaultPrivilege">
@@ -207,9 +205,6 @@
             <Allow>PersistSessions</Allow>
         </Privilege>
         <Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
-            <AllAllowed>true</AllAllowed>
-        </Privilege>
-        <Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">

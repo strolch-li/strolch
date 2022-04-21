@@ -1,8 +1,10 @@
-package ${package};
+package ${package}.web;
 
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.Priorities;
 import java.util.logging.Level;
 
+import ${package}.rest.BooksResource;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulExceptionMapper;
 import li.strolch.rest.endpoint.*;
@@ -16,8 +18,8 @@ public class RestfulApplication extends ResourceConfig {
 
 	public RestfulApplication() {
 
-		// ${appName} services
-		//packages(GatewayResource.class.getPackage().getName());
+		// add project resources by package name
+		packages(BooksResource.class.getPackage().getName());
 
 		// strolch services
 		register(AuthenticationService.class);
@@ -34,7 +36,7 @@ public class RestfulApplication extends ResourceConfig {
 		register(VersionQuery.class);
 
 		// filters
-		register(AuthenticationRequestFilter.class);
+		register(AuthenticationRequestFilter.class, Priorities.AUTHENTICATION);
 		register(AccessControlResponseFilter.class);
 		register(AuthenticationResponseFilter.class);
 		register(HttpCacheResponseFilter.class);
@@ -48,7 +50,7 @@ public class RestfulApplication extends ResourceConfig {
 		RestfulStrolchComponent restfulComponent = RestfulStrolchComponent.getInstance();
 		if (restfulComponent.isRestLogging()) {
 			register(new LoggingFeature(java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME),
-					Level.SEVERE, LoggingFeature.Verbosity.PAYLOAD_ANY, null));
+					Level.SEVERE, LoggingFeature.Verbosity.PAYLOAD_ANY, Integer.MAX_VALUE));
 
 			property(ServerProperties.TRACING, "ALL");
 			property(ServerProperties.TRACING_THRESHOLD, "TRACE");

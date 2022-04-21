@@ -10,9 +10,9 @@
 
     <scm>
         <!-- TODO: Change this to your SCM URL -->
-        <connection>scm:git:https://github.com/4treesCH/strolch.git</connection>
-        <developerConnection>scm:git:https://github.com/4treesCH/strolch.git</developerConnection>
-        <url>https://github.com/4treesCH/strolch</url>
+        <connection>scm:git:https://github.com/strolch-li/strolch.git</connection>
+        <developerConnection>scm:git:https://github.com/strolch-li/strolch.git</developerConnection>
+        <url>https://github.com/strolch-li/strolch</url>
     </scm>
 
     <properties>
@@ -53,6 +53,8 @@
         <!-- test time dependencies -->
         <junit.version>4.13.2</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
+
+        <strolch.version>1.8.0-SNAPSHOT</strolch.version>
 
         <!-- maven plug-in dependencies -->
         <maven-scm-plugin.version>1.12.2</maven-scm-plugin.version>

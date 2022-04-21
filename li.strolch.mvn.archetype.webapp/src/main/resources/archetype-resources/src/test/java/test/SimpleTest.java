@@ -1,5 +1,6 @@
-package ${package};
+package ${package}.test;
 
+import static ${package}.model.Constants.TYPE_BOOK;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -41,9 +42,9 @@ public class SimpleTest {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true)) {
 
-			Resource ball = tx.getResourceBy("Ball", "yellowBall", true);
-			assertTrue(ball.hasParameter("parameters", "color"));
-			assertEquals("yellow", ball.getParameter("parameters", "color", true).getValue());
+			Resource book = tx.getResourceBy(TYPE_BOOK, "book1", true);
+			assertTrue(book.hasParameter("author"));
+			assertEquals("Roger Penrose", book.getParameter("author", true).getValue());
 		}
 	}
 }
