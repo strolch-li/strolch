@@ -190,23 +190,6 @@
                 this.set("userConfig", Strolch.getUserConfig());
                 this.$.ajaxGetAppVersion.generateRequest();
             },
-            reconnect: function () {
-                this.onGetVersionResponse = function (event) {
-                    var version = event.detail.response;
-                    this.scmRevision = version.appVersion.scmRevision;
-                    sessionStorage.appScmRevision = this.scmRevision;
-                    document.location.reload();
-                };
-                this.$.ajaxGetAppVersion.generateRequest();
-            },
-            checkForNewVersion: function () {
-                this.$.ajaxGetAppVersion.generateRequest();
-            },
-            refreshBrowser: function () {
-                sessionStorage.appScmRevision = this.scmRevision;
-                document.location.reload();
-            },
-
             onGetAppVersionResponse: function (event) {
                 this.version = event.detail.response;
                 Strolch.setAppVersion(this.version);

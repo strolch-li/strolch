@@ -157,11 +157,10 @@
             },
 
             onInspectorMenuTap: function (e) {
-                this.fire('strolch-page-change', {page: e.detail.target.id});
+                this.changePage(e.detail.target.id, false);
             },
-
             onMenuTap: function (e) {
-                this.fire('strolch-page-change', {page: e.detail.sourceEvent.target.id});
+                this.changePage(e.detail.sourceEvent.target.id, false);
             },
             onLogoutTapped: function (e) {
                 this.fire('cx-logout');
