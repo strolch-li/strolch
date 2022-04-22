@@ -75,7 +75,8 @@
 
             <paper-menu id="menu" selected="{{page}}" attr-for-selected="id" on-tap="onMenuTap">
 
-                <paper-item id="demo" class="menu-item">[[localize('demo')]]</paper-item>
+                <paper-item id="demo-locations" class="menu-item">[[localize('demo-locations')]]</paper-item>
+                <paper-item id="demo-books" class="menu-item">[[localize('demo-books')]]</paper-item>
 
                 <template is="dom-if" if="[[hasPrivilege('li.strolch.report.ReportSearch')]]">
                     <paper-item id="reports" class="menu-item">[[localize('reports')]]</paper-item>

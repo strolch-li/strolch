@@ -6,7 +6,7 @@
 
 <link rel="import" href="../styles/c-app-style.html">
 
-<dom-module id="c-demo-table">
+<dom-module id="c-demo-books-table">
     <template>
 
         <!-- Style -->
@@ -18,7 +18,7 @@
             }
 
             .select {
-                flex-basis: 80px;
+                flex-basis: 150px;
                 flex-grow: 0;
             }
 
@@ -28,8 +28,8 @@
         <div class="table">
             <div class="table-row">
                 <div class="table-heading">[[localize('id')]]</div>
-                <div class="table-heading">[[localize('name')]]</div>
-                <div class="table-heading">[[localize('stock')]]</div>
+                <div class="table-heading">[[localize('title')]]</div>
+                <div class="table-heading">[[localize('author')]]</div>
                 <div class="table-heading select">
                     <paper-checkbox checked="{{allRowsSelected}}"
                                     on-tap="onToggleAllRowsSelected"
@@ -40,22 +40,24 @@
                 <div class="table-row data">
                     <div class="table-cell">
                         <strolch-wc-dialog-button button-icon="info-outline"
-                                                  dialog-headline="[[row.bookName]]"
-                                                  dialog-content="[[row.bookName]]"
+                                                  dialog-headline="[[row.name]]"
+                                                  dialog-content="[[row.name]]"
                                                   link-url="https://strolch.li"
                                                   link-name="Strolch"></strolch-wc-dialog-button>
-                        [[row.book]]
+                        [[row.id]]
                     </div>
                     <div class="table-cell">
-                        [[row.bookName]]
+                        [[row.title]]
                     </div>
                     <div class="table-cell">
-                        [[row.stock]]
+                        [[row.author]]
                     </div>
                     <div class="table-cell select">
                         <paper-checkbox checked="{{row.selected}}"
                                         disabled$="[[!row.selectable]]"
                                         on-tap="onRowSelected"></paper-checkbox>
+
+                        <paper-button on-tap="onRemoveBook" raised>[[localize('remove')]]</paper-button>
                     </div>
                 </div>
             </template>
@@ -65,7 +67,7 @@
 
     <script>
         Polymer({
-            is: 'c-demo-table',
+            is: 'c-demo-books-table',
 
             behaviors: [
                 CustomComponentBehavior
@@ -121,6 +123,9 @@
             },
             onRowSelected: function (e) {
                 this._rowsChanged(this.rows);
+            },
+            onRemoveBook: function (e) {
+                this.fire("remove-book", {book: e.model.row});
             },
 
             /* Private */

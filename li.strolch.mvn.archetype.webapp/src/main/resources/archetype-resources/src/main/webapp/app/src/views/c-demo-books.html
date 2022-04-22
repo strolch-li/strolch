@@ -1,0 +1,157 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<link rel="import" href="../../bower_components/strolch-wc-badge/strolch-wc-badge.html">
+<link rel="import" href="../../bower_components/strolch-wc-styles/strolch-wc-styles.html">
+
+<link rel="import" href="../styles/c-app-style.html">
+
+<link rel="import" href="../widgets/c-demo-books-table.html">
+
+<dom-module id="c-demo-books">
+    <template>
+
+        <style is="custom-style" include="c-app-style">
+            :host {
+                display: block;
+                padding: 10px 10px;
+            }
+
+            paper-card {
+                margin: 0;
+            }
+
+        </style>
+
+        <h1>Demo Books Table</h1>
+
+        <div class="actions">
+            <paper-button on-tap="onShowLocations" raised>Show Locations</paper-button>
+            <paper-icon-button icon="refresh" on-tap="reload"></paper-icon-button>
+        </div>
+
+        <template is="dom-if" if="[[arrayFilled(rows)]]">
+            <c-demo-books-table rows="[[rows]]" on-data-selected="onRowSelected" on-remove-book="onRemoveBook"></c-demo-books-table>
+        </template>
+        <template is="dom-if" if="[[!arrayFilled(rows)]]">
+            <p class="g-center"><i>[[localize('noElementsAvailable')]]</i></p>
+        </template>
+
+        <strolch-wc-paging id="paging" data-obj="[[dataObj]]" hidden$="[[!arrayFilled(rows)]]"></strolch-wc-paging>
+
+        <iron-ajax id="ajaxGetBooks"
+                   url="[[baseRestPath]]/books?query=[[searchTerm]]"
+                   content-type="application/json"
+                   params=""
+                   handle-as="json"
+                   method="GET"
+                   on-response="onGetBooksResponse"
+                   on-error="onRequestError"></iron-ajax>
+        <iron-ajax id="ajaxRemoveBook"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="DELETE"
+                   on-response="onRemoveBookResponse"
+                   on-error="onRequestError"></iron-ajax>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'c-demo-books',
+
+            behaviors: [
+                CustomComponentBehavior
+            ],
+
+            properties: {
+                toolbarConfig: {
+                    type: Object,
+                    readOnly: true,
+                    value: {
+                        hasSearchTerm: true
+                    }
+                },
+                searchTerm: {
+                    type: String,
+                    observer: "searchTermChanged"
+                },
+                selectedRows: {
+                    type: Array,
+                    value: []
+                },
+                dataObj: {
+                    type: Object,
+                    value: null
+                },
+                rows: {
+                    type: Array,
+                    value: []
+                }
+            },
+
+            searchTermChanged: function (newValue, oldValue) {
+                if (newValue != null && oldValue !== undefined)
+                    this.reload();
+            },
+
+            /* Private */
+            onShowLocations : function () {
+              this.changePage("demo-locations");
+            },
+            onRowSelected: function (e) {
+                if (e.detail.data.checked) {
+                    this.push('selectedRows', e.detail.data);
+                } else {
+                    this.arrayDelete('selectedRows', e.detail.data);
+                }
+            },
+            onRemoveBook: function (e) {
+                var book = e.detail.book;
+                this.showInfo({
+                    title: "Remove Book",
+                    line1: "Do you really want to remove book " + book.name,
+                    callback: function (confirmed) {
+                        this.async(function () {
+                            if (!confirmed) return;
+                            this.$.ajaxRemoveBook.url = this.baseRestPath + "/books/" + book.id;
+                            this.$.ajaxRemoveBook.generateRequest();
+                        });
+                    }.bind(this)
+                });
+            },
+
+            /* Public */
+            reload: function () {
+                this.$.ajaxGetBooks.generateRequest();
+            },
+
+            onGetBooksResponse: function (e) {
+                this.selectedRows = [];
+                var response = e.detail.response;
+                response.data.forEach(function (book) {
+                    book.selectable = true;
+                });
+                this.rows = response.data;
+                this.dataObj = response;
+            },
+            onRemoveBookResponse: function (e) {
+                this.reload();
+            },
+
+            /* Lifecycle */
+            attached: function () {
+                this.$.ajaxGetBooks.params.limit = 20;
+                this.$.paging.ajax = this.$.ajaxGetBooks;
+            },
+            ready: function () {
+
+            },
+        });
+    </script>
+</dom-module>

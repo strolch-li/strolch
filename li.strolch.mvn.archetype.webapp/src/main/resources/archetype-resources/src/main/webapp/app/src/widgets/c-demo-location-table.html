@@ -1,0 +1,133 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="../../bower_components/strolch-wc-dialog-button/strolch-wc-dialog-button.html">
+
+<link rel="import" href="../styles/c-app-style.html">
+
+<dom-module id="c-demo-location-table">
+    <template>
+
+        <!-- Style -->
+        <style is="custom-style" include="c-app-style">
+            :host {
+                display: block;
+                min-width: 100%;
+                padding-bottom: 10px;
+            }
+
+            .select {
+                flex-basis: 80px;
+                flex-grow: 0;
+            }
+
+        </style>
+
+        <!-- Content -->
+        <div class="table">
+            <div class="table-row">
+                <div class="table-heading">[[localize('id')]]</div>
+                <div class="table-heading">[[localize('name')]]</div>
+                <div class="table-heading">[[localize('stock')]]</div>
+                <div class="table-heading select">
+                    <paper-checkbox checked="{{allRowsSelected}}"
+                                    on-tap="onToggleAllRowsSelected"
+                                    disabled$="[[allNotSelectable]]"></paper-checkbox>
+                </div>
+            </div>
+            <template is="dom-repeat" items="[[rows]]" as="row">
+                <div class="table-row data">
+                    <div class="table-cell">
+                        <strolch-wc-dialog-button button-icon="info-outline"
+                                                  dialog-headline="[[row.bookName]]"
+                                                  dialog-content="[[row.bookName]]"
+                                                  link-url="https://strolch.li"
+                                                  link-name="Strolch"></strolch-wc-dialog-button>
+                        [[row.book]]
+                    </div>
+                    <div class="table-cell">
+                        [[row.bookName]]
+                    </div>
+                    <div class="table-cell">
+                        [[row.stock]]
+                    </div>
+                    <div class="table-cell select">
+                        <paper-checkbox checked="{{row.selected}}"
+                                        disabled$="[[!row.selectable]]"
+                                        on-tap="onRowSelected"></paper-checkbox>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'c-demo-location-table',
+
+            behaviors: [
+                CustomComponentBehavior
+            ],
+
+            properties: {
+                rows: {
+                    type: Array,
+                    value: [],
+                    observer: "_rowsChanged"
+                },
+                allRowsSelected: {
+                    type: Boolean,
+                    value: false
+                },
+                allNotSelectable: {
+                    type: Boolean,
+                    value: true
+                }
+            },
+
+            /* Observers */
+            observers: [],
+            _rowsChanged: function (newValue) {
+                var allNotSelectable = true;
+                var allSelected = true;
+                for (var i = 0; i < newValue.length; i++) {
+                    if (newValue[i].selectable) {
+                        allNotSelectable = false;
+                        if (!newValue[i].selected) {
+                            allSelected = false;
+                            break;
+                        }
+                    }
+                }
+                this.allNotSelectable = allNotSelectable;
+                this.allRowsSelected = newValue.length > 0 && allSelected && !allNotSelectable;
+                this.fire("selected-rows-changed", {value: newValue.slice()});
+            },
+
+            /* Listeners*/
+            listeners: {},
+
+            onToggleAllRowsSelected: function (e) {
+                var selected = this.allRowsSelected;
+                for (var i = 0; i < this.rows.length; i++) {
+                    if (this.rows[i].selectable && this.rows[i].selected !== selected) {
+                        this.set("rows." + i + ".selected", !selected);
+                        this.set("rows." + i + ".selected", selected);
+                    }
+                }
+                this.fire("selected-rows-changed", {value: this.rows.slice()});
+            },
+            onRowSelected: function (e) {
+                this._rowsChanged(this.rows);
+            },
+
+            /* Private */
+
+            /* Public */
+
+            /* Lifecycle */
+        });
+    </script>
+</dom-module>

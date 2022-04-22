@@ -19,7 +19,8 @@
 <link rel="import" href="../styles/c-app-style.html">
 
 <link rel="import" href="../views/c-view404.html">
-<link rel="import" href="../views/c-demo.html">
+<link rel="import" href="../views/c-demo-locations.html">
+<link rel="import" href="../views/c-demo-books.html">
 
 <dom-module id="c-pages">
     <template>
@@ -38,10 +39,14 @@
                              show-version
                              show-keep-alive></strolch-wc-auth>
 
-            <c-demo id="demo"
+            <c-demo-locations id="demo-locations"
                     toolbar-config="{{toolbarConfig}}"
                     search-term="[[searchTerm]]"
-                    base-path="../"></c-demo>
+                    base-path="../"></c-demo-locations>
+            <c-demo-books id="demo-books"
+                    toolbar-config="{{toolbarConfig}}"
+                    search-term="[[searchTerm]]"
+                    base-path="../"></c-demo-books>
 
             <template is="dom-if" if="[[equal(page, 'inspector')]]" restamp>
                 <strolch-wc-inspector id="inspector"

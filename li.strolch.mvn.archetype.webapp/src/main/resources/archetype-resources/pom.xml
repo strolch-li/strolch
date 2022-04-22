@@ -56,6 +56,9 @@
 
         <strolch.version>1.8.0-SNAPSHOT</strolch.version>
 
+        <!-- strolch -->
+        <strolch.version>1.8.0-SNAPSHOT</strolch.version>
+
         <!-- maven plug-in dependencies -->
         <maven-scm-plugin.version>1.12.2</maven-scm-plugin.version>
         <buildnumber-maven-plugin.version>3.0.0</buildnumber-maven-plugin.version>

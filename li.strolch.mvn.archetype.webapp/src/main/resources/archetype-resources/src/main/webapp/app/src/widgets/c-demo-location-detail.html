@@ -11,9 +11,9 @@
 
 <link rel="import" href="../styles/c-app-style.html">
 
-<link rel="import" href="../widgets/c-demo-table.html">
+<link rel="import" href="../widgets/c-demo-location-table.html">
 
-<dom-module id="c-demo-data-detail">
+<dom-module id="c-demo-location-detail">
     <template>
 
         <!-- Style -->
@@ -119,7 +119,7 @@
             <template is="dom-if" if="[[expanded]]" restamp>
                 <hr>
                 <template is="dom-if" if="[[arrayFilled(rows)]]">
-                    <c-demo-table rows="[[rows]]" on-refresh="refresh" on-row-selected="onRowSelected"></c-demo-table>
+                    <c-demo-location-table rows="[[rows]]" on-refresh="refresh" on-row-selected="onRowSelected"></c-demo-location-table>
                 </template>
                 <template is="dom-if" if="[[!arrayFilled(rows)]]">
                     <p class="g-center"><i>[[localize('noElementsAvailable')]]</i></p>
@@ -135,7 +135,7 @@
 
     <script>
         Polymer({
-            is: 'c-demo-data-detail',
+            is: 'c-demo-location-detail',
 
             behaviors: [
                 CustomComponentBehavior
