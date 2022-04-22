@@ -1,6 +1,10 @@
 {
   "de": {
-    "appTitle": "${appName}",
+    "appTitle": "eSyOrder",
+    "demo-locations": "Demo Locations",
+    "demo-books": "Demo Books",
+    "title": "Title",
+    "author": "Author",
     "logout": "Ausloggen",
     "language": "Sprache",
     "reports": "Berichte",
@@ -64,10 +68,14 @@
     "agent.service.failed.access.denied": "User {user} may not perform service {service}",
     "agent.query.failed.access.denied": "User {user} may not perform query {query}",
     "agent.search.failed.access.denied": "User {user} may not perform search {search}",
+    "demo-locations": "Demo Locations",
+    "demo-books": "Demo Books",
+    "title": "Titel",
+    "author": "Author",
     "logout": "Logout",
     "info": "Information",
     "keepAlive": "Stay logged in",
-    "appTitle": "${appName}",
+    "appTitle": "eSyOrder",
     "language": "Language",
     "reports": "Reports",
     "operations-log": "Operation Logs",
@@ -120,7 +128,9 @@
     "login": "Login"
   },
   "fr": {
-    "appTitle": "${appName}",
+    "appTitle": "eSyOrder",
+    "demo-locations": "Demo Locations",
+    "demo-books": "Demo Books",
     "language": "Langue",
     "reports": "Rapports",
     "operations-log": "Logs",
