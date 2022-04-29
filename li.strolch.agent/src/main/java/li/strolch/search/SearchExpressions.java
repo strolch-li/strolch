@@ -98,6 +98,10 @@ public interface SearchExpressions {
 		return ExpressionsSupport.paramNull(BAG_PARAMETERS, paramId);
 	}
 
+	default <T extends StrolchRootElement> SearchExpression<T> relationNull(String paramId) {
+		return ExpressionsSupport.paramNull(BAG_RELATIONS, paramId);
+	}
+
 	default <T extends StrolchRootElement> SearchExpression<T> paramNull(String bagId, String paramId) {
 		return ExpressionsSupport.paramNull(bagId, paramId);
 	}
