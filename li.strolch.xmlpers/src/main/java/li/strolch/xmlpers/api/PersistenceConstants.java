@@ -23,6 +23,7 @@ public class PersistenceConstants {
 
 	private static final String PROP_PREFIX = "li.strolch.xmlpers.";
 	public static final String PROP_VERBOSE = PROP_PREFIX + "verbose";
+	public static final String PROP_ALLOW_OVERWRITE_ON_CREATE = PROP_PREFIX + "allowOverwriteOnCreate";
 	public static final String PROP_BASEPATH = PROP_PREFIX + "basePath";
 	public static final String PROP_DAO_FACTORY_CLASS = PROP_PREFIX + "daoFactoryClass";
 	public static final String PROP_XML_IO_MOD = PROP_PREFIX + "ioMode";

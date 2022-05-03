@@ -34,6 +34,7 @@ public class FileDaoTest extends AbstractPersistenceTest {
 
 	private static final String TEST_PATH = "target/db/FileDaoTest/";
 	private static final boolean VERBOSE = true;
+	private static final boolean ALLOW_OVERWRITE_ON_CREATE = false;
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -51,7 +52,8 @@ public class FileDaoTest extends AbstractPersistenceTest {
 	public void testCrudSax() {
 		setup(IoMode.SAX);
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			FileDao fileDao = new FileDao(tx, this.persistenceManager.getPathBuilder(), VERBOSE);
+			FileDao fileDao = new FileDao(tx, this.persistenceManager.getPathBuilder(), VERBOSE,
+					ALLOW_OVERWRITE_ON_CREATE);
 			testCrud(tx, fileDao);
 		}
 	}
@@ -60,7 +62,8 @@ public class FileDaoTest extends AbstractPersistenceTest {
 	public void testCrudDom() {
 		setup(IoMode.DOM);
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			FileDao fileDao = new FileDao(tx, this.persistenceManager.getPathBuilder(), VERBOSE);
+			FileDao fileDao = new FileDao(tx, this.persistenceManager.getPathBuilder(), VERBOSE,
+					ALLOW_OVERWRITE_ON_CREATE);
 			testCrud(tx, fileDao);
 		}
 	}

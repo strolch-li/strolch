@@ -51,13 +51,14 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 	private Set<LockableObject> lockedObjects;
 
-	public DefaultPersistenceTransaction(PersistenceManager manager, IoMode ioMode, boolean verbose) {
+	public DefaultPersistenceTransaction(PersistenceManager manager, IoMode ioMode, boolean verbose,
+			boolean allowOverwriteOnCreate) {
 		this.startTime = System.nanoTime();
 		this.startTimeDate = new Date();
 		this.manager = manager;
 		this.verbose = verbose;
 		this.objectFilter = new ObjectFilter();
-		this.fileDao = new FileDao(this, manager.getPathBuilder(), verbose);
+		this.fileDao = new FileDao(this, manager.getPathBuilder(), verbose, allowOverwriteOnCreate);
 		this.objectDao = new ObjectDao(this, this.fileDao, this.objectFilter);
 		this.metadataDao = new MetadataDao(manager.getPathBuilder(), this, verbose);
 
