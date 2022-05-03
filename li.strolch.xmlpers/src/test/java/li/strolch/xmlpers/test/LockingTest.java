@@ -55,6 +55,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		properties.setProperty(PersistenceConstants.PROP_XML_IO_MOD, IoMode.DOM.name());
 		properties.setProperty(PersistenceConstants.PROP_BASEPATH, BASE_PATH + IoMode.DOM.name());
 		properties.setProperty(PersistenceConstants.PROP_LOCK_TIME_MILLIS, Long.toString(500L));
+		properties.setProperty(PersistenceConstants.PROP_ALLOW_OVERWRITE_ON_CREATE, Boolean.FALSE.toString());
 		setup(properties);
 
 		this.waitForWorkersTime = LockableObject.getLockTime() + 300L;
