@@ -30,14 +30,17 @@ public class FileDao {
 
 	private final PersistenceTransaction tx;
 	private final boolean verbose;
+	private final boolean allowOverwriteOnCreate;
 	private final PathBuilder pathBuilder;
 
-	public FileDao(PersistenceTransaction tx, PathBuilder pathBuilder, boolean verbose) {
+	public FileDao(PersistenceTransaction tx, PathBuilder pathBuilder, boolean verbose,
+			boolean allowOverwriteOnCreate) {
 		DBC.PRE.assertNotNull("TX must not be null!", tx);
 		DBC.PRE.assertNotNull("pathBuilder must not be null!", pathBuilder);
 		this.tx = tx;
 		this.pathBuilder = pathBuilder;
 		this.verbose = verbose;
+		this.allowOverwriteOnCreate = allowOverwriteOnCreate;
 	}
 
 	private void assertIsIdRef(IoOperation ioOperation, ObjectRef objectRef) {
@@ -118,8 +121,8 @@ public class FileDao {
 		File directoryPath = objectRef.getPath(this.pathBuilder);
 		if (!directoryPath.getAbsolutePath().startsWith(this.pathBuilder.getRootPath().getAbsolutePath())) {
 			String msg = "The path for {0} is invalid as not child of {1}"; //$NON-NLS-1$
-			msg = MessageFormat
-					.format(msg, directoryPath.getAbsolutePath(), this.pathBuilder.getRootPath().getAbsolutePath());
+			msg = MessageFormat.format(msg, directoryPath.getAbsolutePath(),
+					this.pathBuilder.getRootPath().getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
 
@@ -209,7 +212,11 @@ public class FileDao {
 		if (path.exists()) {
 			String msg = "Persistence unit already exists for {0} at {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
-			throw new XmlPersistenceException(msg);
+			if (this.allowOverwriteOnCreate) {
+				logger.error(msg);
+			} else {
+				throw new XmlPersistenceException(msg);
+			}
 		}
 	}
 }

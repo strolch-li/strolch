@@ -19,12 +19,9 @@ import static li.strolch.utils.helper.PropertiesHelper.*;
 import static li.strolch.xmlpers.api.PersistenceConstants.*;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import li.strolch.utils.helper.PropertiesHelper;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.xmlpers.api.*;
 import li.strolch.xmlpers.objref.LockableObject;
 import li.strolch.xmlpers.objref.ObjectReferenceCache;
@@ -40,6 +37,7 @@ public class DefaultPersistenceManager implements PersistenceManager {
 
 	protected boolean initialized;
 	protected boolean verbose;
+	protected boolean allowOverwriteOnCreate;
 	protected IoMode ioMode;
 	private PersistenceContextFactoryDelegator ctxFactory;
 	private ObjectReferenceCache objectRefCache;
@@ -53,6 +51,8 @@ public class DefaultPersistenceManager implements PersistenceManager {
 
 		// get properties
 		boolean verbose = getPropertyBool(properties, context, PROP_VERBOSE, Boolean.FALSE);
+		boolean allowOverwriteOnCreate = getPropertyBool(properties, context, PROP_ALLOW_OVERWRITE_ON_CREATE,
+				Boolean.TRUE);
 		IoMode ioMode = IoMode.valueOf(getProperty(properties, context, PROP_XML_IO_MOD, IoMode.DOM.name()));
 		long lockTime = getPropertyLong(properties, context, PROP_LOCK_TIME_MILLIS, LockableObject.getLockTime());
 		String basePath = getProperty(properties, context, PROP_BASEPATH, null);
@@ -74,6 +74,7 @@ public class DefaultPersistenceManager implements PersistenceManager {
 		logger.info(MessageFormat.format("Using base path {0}", basePathF)); //$NON-NLS-1$
 
 		this.verbose = verbose;
+		this.allowOverwriteOnCreate = allowOverwriteOnCreate;
 		this.ioMode = ioMode;
 		this.ctxFactory = new PersistenceContextFactoryDelegator();
 
@@ -103,6 +104,6 @@ public class DefaultPersistenceManager implements PersistenceManager {
 
 	@Override
 	public synchronized PersistenceTransaction openTx() {
-		return new DefaultPersistenceTransaction(this, this.ioMode, this.verbose);
+		return new DefaultPersistenceTransaction(this, this.ioMode, this.verbose, this.allowOverwriteOnCreate);
 	}
 }
