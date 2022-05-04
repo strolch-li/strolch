@@ -23,7 +23,7 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 
 public class OperationsLog extends StrolchComponent {
 
-	private Map<String, List<LogMessage>> logMessagesByRealmAndId;
+	private Map<String, LinkedHashSet<LogMessage>> logMessagesByRealmAndId;
 	private Map<String, LinkedHashMap<Locator, LinkedHashSet<LogMessage>>> logMessagesByLocator;
 	private int maxMessages;
 	private ExecutorService executorService;
@@ -61,7 +61,7 @@ public class OperationsLog extends StrolchComponent {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<LogMessage> messages = logMessageDao.queryLatest(realmName, this.maxMessages);
 					logger.info("Loaded " + messages.size() + " messages for OperationsLog for realm " + realmName);
-					this.logMessagesByRealmAndId.put(realmName, messages);
+					this.logMessagesByRealmAndId.put(realmName, new LinkedHashSet<>(messages));
 				} catch (RuntimeException e) {
 					logger.error("Failed to load operations log for realm " + realmName, e);
 				}
@@ -81,14 +81,15 @@ public class OperationsLog extends StrolchComponent {
 
 		// store in global list
 		String realmName = logMessage.getRealm();
-		List<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName, r -> new ArrayList<>());
+		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
+				r -> new LinkedHashSet<>());
 		logMessages.add(logMessage);
 
 		// store under locator
-		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator
-				.computeIfAbsent(realmName, this::newBoundedLocatorMap);
-		LinkedHashSet<LogMessage> messages = logMessagesLocator
-				.computeIfAbsent(logMessage.getLocator(), (l) -> new LinkedHashSet<>());
+		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator.computeIfAbsent(
+				realmName, this::newBoundedLocatorMap);
+		LinkedHashSet<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
+				(l) -> new LinkedHashSet<>());
 		messages.add(logMessage);
 
 		// prune if necessary
@@ -107,7 +108,7 @@ public class OperationsLog extends StrolchComponent {
 		if (byLocator != null)
 			byLocator.remove(message.getLocator());
 
-		List<LogMessage> messages = this.logMessagesByRealmAndId.get(realmName);
+		LinkedHashSet<LogMessage> messages = this.logMessagesByRealmAndId.get(realmName);
 		if (messages != null) {
 			messages.remove(message);
 
@@ -129,7 +130,7 @@ public class OperationsLog extends StrolchComponent {
 			if (byLocator != null)
 				messages.forEach(logMessage -> byLocator.remove(logMessage.getLocator()));
 
-			List<LogMessage> byRealm = this.logMessagesByRealmAndId.get(realmName);
+			LinkedHashSet<LogMessage> byRealm = this.logMessagesByRealmAndId.get(realmName);
 			if (byRealm != null) {
 				messages.removeIf(logMessage -> !byRealm.remove(logMessage));
 
@@ -153,7 +154,7 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public synchronized void updateState(String realmName, String id, LogMessageState state) {
-		List<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realmName);
+		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realmName);
 		for (LogMessage logMessage : logMessages) {
 			if (logMessage.getId().equals(id)) {
 				logMessage.setState(state);
@@ -166,7 +167,7 @@ public class OperationsLog extends StrolchComponent {
 		}
 	}
 
-	private List<LogMessage> pruneMessages(List<LogMessage> logMessages) {
+	private List<LogMessage> pruneMessages(LinkedHashSet<LogMessage> logMessages) {
 		if (logMessages.size() < this.maxMessages)
 			return emptyList();
 
@@ -204,7 +205,7 @@ public class OperationsLog extends StrolchComponent {
 		} catch (Exception e) {
 			logger.error("Failed to persist operations logs!", e);
 			synchronized (this) {
-				this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), r -> new ArrayList<>())
+				this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), r -> new LinkedHashSet<>())
 						.add(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
 								Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
 								LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
@@ -227,7 +228,7 @@ public class OperationsLog extends StrolchComponent {
 		} catch (Exception e) {
 			logger.error("Failed to persist operations logs!", e);
 			synchronized (this) {
-				this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), r -> new ArrayList<>())
+				this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), r -> new LinkedHashSet<>())
 						.add(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
 								Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
 								LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
@@ -252,7 +253,7 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public synchronized List<LogMessage> getMessages(String realm) {
-		List<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
+		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
 		if (logMessages == null)
 			return emptyList();
 
@@ -260,7 +261,7 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	private LinkedHashMap<Locator, LinkedHashSet<LogMessage>> newBoundedLocatorMap(String realm) {
-		return new LinkedHashMap<Locator, LinkedHashSet<LogMessage>>() {
+		return new LinkedHashMap<>() {
 			@Override
 			protected boolean removeEldestEntry(java.util.Map.Entry<Locator, LinkedHashSet<LogMessage>> eldest) {
 				return size() > maxMessages;
