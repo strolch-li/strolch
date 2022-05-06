@@ -15,7 +15,7 @@
     "strolch-wc-localize-behavior": "strolch-li/strolch-wc-localize-behavior#^1.1.14",
     "strolch-wc-debounced-input": "strolch-li/strolch-wc-debounced-input#^0.1.3",
     "strolch-wc-dialog-button": "strolch-li/strolch-wc-dialog-button#^0.1.4",
-    "strolch-wc-information-dialog": "strolch-li/strolch-wc-information-dialog#^0.1.10",
+    "strolch-wc-information-dialog": "strolch-li/strolch-wc-information-dialog#^0.1.12",
     "strolch-wc-parameter-input": "strolch-li/strolch-wc-parameter-input#^0.1.3",
     "strolch-wc-reports": "strolch-li/strolch-wc-reports#^0.5.1",
     "strolch-wc-paging": "strolch-li/strolch-wc-paging#^0.1.5",
