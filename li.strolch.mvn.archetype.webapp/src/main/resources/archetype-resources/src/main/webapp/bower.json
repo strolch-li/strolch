@@ -7,7 +7,7 @@
   "dependencies": {
     "strolchjs": "strolch-li/strolchjs#^0.5.1",
     "strolch-wc-styles": "strolch-li/strolch-wc-styles#^0.4.4",
-    "strolch-wc-auth": "strolch-li/strolch-wc-auth#^0.9.6",
+    "strolch-wc-auth": "strolch-li/strolch-wc-auth#^0.9.7",
     "strolch-wc-badge": "strolch-li/strolch-wc-badge#^0.1.3",
     "strolch-wc-notification": "strolch-li/strolch-wc-notification#^0.1.0",
     "strolch-wc-inspector": "strolch-li/strolch-wc-inspector#^0.23.4",
