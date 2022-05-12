@@ -20,6 +20,11 @@ gulp.task('copy', function () {
     ])
         .pipe(gulp.dest('www/'));
 
+    var font = gulp.src([
+        'app/font/*'
+    ])
+        .pipe(gulp.dest('www/font/'));
+
     var imgs = gulp.src([
         'app/img/*.svg', 'app/img/*.ico', 'app/img/*.png', 'app/img/*.gif'
     ])
@@ -40,7 +45,7 @@ gulp.task('copy', function () {
     ])
         .pipe(gulp.dest('js'));
 
-    return merge(svg, imgs, locales, app_files, js)
+    return merge(svg, font, imgs, locales, app_files, js)
         .pipe($.size({title: 'Copy app files to dist dir:'}));
 });
 
