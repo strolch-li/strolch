@@ -30,5 +30,8 @@
     "merge-stream": "^1.0.0",
     "run-sequence": "^1.2.2",
     "vulcanize": "^1.15.3"
+  },
+  "scripts": {
+    "postinstall": "bower install"
   }
 }
