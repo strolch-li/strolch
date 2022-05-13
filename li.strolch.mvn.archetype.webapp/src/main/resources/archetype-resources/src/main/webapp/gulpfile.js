@@ -58,7 +58,7 @@ gulp.task('vulcanize', function () {
             inlineCss: true
         }))
         .pipe(replace('<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:400,300,300italic,400italic,500,500italic,700,700italic" crossorigin="anonymous">', ''))
-        .pipe(replace("font-family: 'Roboto', 'Noto', sans-serif;", "font-family: sans-serif;"))
+        .pipe(replace("font-family: 'Roboto', 'Noto', sans-serif;", "font-family: 'Ubuntu-local', sans-serif;"))
         .pipe(crisper())
         .pipe(gulp.dest('www/'));
 });
