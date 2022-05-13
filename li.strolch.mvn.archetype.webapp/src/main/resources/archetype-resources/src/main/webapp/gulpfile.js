@@ -1,16 +1,17 @@
-var gulp = require('gulp');
-var $ = require('gulp-load-plugins')();
-var merge = require('merge-stream');
-var del = require('del');
+const gulp = require('gulp');
+const $ = require('gulp-load-plugins')();
+const merge = require('merge-stream');
+const del = require('del');
 
 // temporary until gulp 4.0 is released
-var runSequence = require('run-sequence');
+const runSequence = require('run-sequence');
 
-var vulcanize = require('gulp-vulcanize');
-var minify = require('gulp-minify');
-var crisper = require('gulp-crisper');
-var shell = require('gulp-shell');
-var rename = require("gulp-rename");
+const vulcanize = require('gulp-vulcanize');
+const minify = require('gulp-minify');
+const crisper = require('gulp-crisper');
+const shell = require('gulp-shell');
+const rename = require("gulp-rename");
+const replace = require('gulp-replace');
 
 // Copy All Files At The Root Level
 gulp.task('copy', function () {
@@ -56,6 +57,8 @@ gulp.task('vulcanize', function () {
             inlineScripts: true,
             inlineCss: true
         }))
+        .pipe(replace('<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:400,300,300italic,400italic,500,500italic,700,700italic" crossorigin="anonymous">', ''))
+        .pipe(replace("font-family: 'Roboto', 'Noto', sans-serif;", "font-family: sans-serif;"))
         .pipe(crisper())
         .pipe(gulp.dest('www/'));
 });
