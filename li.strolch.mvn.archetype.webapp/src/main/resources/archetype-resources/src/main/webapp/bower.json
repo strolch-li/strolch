@@ -20,7 +20,7 @@
     "strolch-wc-reports": "strolch-li/strolch-wc-reports#^0.5.2",
     "strolch-wc-paging": "strolch-li/strolch-wc-paging#^0.1.6",
     "strolch-wc-ws-observer": "strolch-li/strolch-wc-ws-observer#^0.2.10",
-    "strolch-wc-tree": "strolch-li/strolch-wc-tree#^0.2.4",
+    "strolch-wc-tree": "strolch-li/strolch-wc-tree#^0.2.5",
 
     "polymer": "Polymer/polymer#^1.12.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.9",
