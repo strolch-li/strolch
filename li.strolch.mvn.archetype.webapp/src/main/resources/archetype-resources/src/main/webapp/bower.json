@@ -6,7 +6,7 @@
   "private": true,
   "dependencies": {
     "strolchjs": "strolch-li/strolchjs#^0.5.1",
-    "strolch-wc-styles": "strolch-li/strolch-wc-styles#^0.4.5",
+    "strolch-wc-styles": "strolch-li/strolch-wc-styles#^0.4.6",
     "strolch-wc-auth": "strolch-li/strolch-wc-auth#^0.9.8",
     "strolch-wc-badge": "strolch-li/strolch-wc-badge#^0.1.4",
     "strolch-wc-notification": "strolch-li/strolch-wc-notification#^0.1.1",
