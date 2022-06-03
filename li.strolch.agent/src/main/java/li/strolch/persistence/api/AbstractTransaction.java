@@ -125,6 +125,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		return this.txResult.getState().isOpen();
 	}
 
+
+
 	@Override
 	public boolean isRollingBack() {
 		return this.txResult.getState().isRollingBack();
@@ -320,8 +322,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.commands.add(command);
 	}
 
-	private boolean isReadOnly() {
-		return this.closeStrategy == TransactionCloseStrategy.READ_ONLY;
+	public boolean isReadOnly() {
+		return this.closeStrategy.isReadonly();
+	}
+
+	@Override
+	public boolean isWriteable() {
+		return this.closeStrategy.isReadonly();
 	}
 
 	private void assertNotReadOnly() {

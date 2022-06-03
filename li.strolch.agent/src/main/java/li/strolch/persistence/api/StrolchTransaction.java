@@ -407,6 +407,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean isOpen();
 
 	/**
+	 * @return if the current state of the StrolchTransaction is {@link TransactionCloseStrategy#READ_ONLY} or {@link TransactionCloseStrategy#ROLLBACK}
+	 */
+	boolean isReadOnly();
+
+	/**
+	 * @return if the current state of the StrolchTransaction is {@link TransactionCloseStrategy#COMMIT}
+	 */
+	boolean isWriteable();
+
+	/**
 	 * @return if the current state of the StrolchTransaction is {@link TransactionState#ROLLING_BACK}
 	 */
 	boolean isRollingBack();

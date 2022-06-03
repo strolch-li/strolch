@@ -28,12 +28,16 @@ import li.strolch.exception.StrolchException;
 public enum TransactionCloseStrategy {
 
 	/**
-	 * <p>The default close strategy. It defines a read-only transaction, i.e. no modifications will be persisted,
-	 * modifications will be logged as an error</p>
+	 * <p>The default close strategy. It defines a writeable transaction</p>
 	 */
 	DEFAULT() {
 		@Override
 		public boolean isReadonly() {
+			return false;
+		}
+
+		@Override
+		public boolean isWriteable() {
 			return true;
 		}
 
@@ -61,6 +65,11 @@ public enum TransactionCloseStrategy {
 		}
 
 		@Override
+		public boolean isWriteable() {
+			return false;
+		}
+
+		@Override
 		public void close(StrolchTransaction tx) throws StrolchException {
 			tx.autoCloseableReadOnly();
 		}
@@ -74,6 +83,11 @@ public enum TransactionCloseStrategy {
 		@Override
 		public boolean isReadonly() {
 			return false;
+		}
+
+		@Override
+		public boolean isWriteable() {
+			return true;
 		}
 
 		@Override
@@ -93,6 +107,11 @@ public enum TransactionCloseStrategy {
 		}
 
 		@Override
+		public boolean isWriteable() {
+			return false;
+		}
+
+		@Override
 		public void close(StrolchTransaction tx) throws StrolchException {
 			tx.autoCloseableRollback();
 		}
@@ -101,4 +120,6 @@ public enum TransactionCloseStrategy {
 	public abstract void close(StrolchTransaction tx) throws StrolchException;
 
 	public abstract boolean isReadonly();
+
+	public abstract boolean isWriteable();
 }
