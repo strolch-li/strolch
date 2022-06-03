@@ -328,7 +328,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public boolean isWriteable() {
-		return this.closeStrategy.isReadonly();
+		return this.closeStrategy.isWriteable();
 	}
 
 	private void assertNotReadOnly() {
