@@ -16,10 +16,7 @@
 package li.strolch.rest.endpoint;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -44,15 +41,17 @@ public class EnumQuery {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}")
-	public Response getEnum(@PathParam("name") String name, @Context HttpServletRequest request) {
+	public Response getEnum(@Context HttpServletRequest request, @PathParam("name") String name,
+			@QueryParam("withoutHidden") boolean withoutHidden) {
 
 		try {
 
-			EnumHandler enumHandler = RestfulStrolchComponent.getInstance().getContainer()
+			EnumHandler enumHandler = RestfulStrolchComponent.getInstance()
+					.getContainer()
 					.getComponent(EnumHandler.class);
 
 			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, cert.getLocale());
+			StrolchEnum strolchEnum = enumHandler.getEnum(cert, name, cert.getLocale(), withoutHidden);
 			return Response.ok().entity(strolchEnum.toJson().toString()).build();
 
 		} catch (Exception e) {
@@ -69,7 +68,8 @@ public class EnumQuery {
 
 		try {
 
-			EnumHandler enumHandler = RestfulStrolchComponent.getInstance().getContainer()
+			EnumHandler enumHandler = RestfulStrolchComponent.getInstance()
+					.getContainer()
 					.getComponent(EnumHandler.class);
 
 			Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);

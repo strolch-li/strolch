@@ -27,5 +27,9 @@ public interface EnumHandler {
 
 	StrolchEnum getEnum(Certificate certificate, String name, Locale locale);
 
+	StrolchEnum getEnum(Certificate certificate, String name, Locale locale, boolean withoutHidden);
+
 	StrolchEnum getEnum(StrolchTransaction tx, String name);
+
+	StrolchEnum getEnum(StrolchTransaction tx, String name, boolean withoutHidden);
 }
