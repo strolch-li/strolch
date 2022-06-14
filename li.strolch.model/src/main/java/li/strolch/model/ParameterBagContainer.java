@@ -20,6 +20,66 @@ import li.strolch.utils.time.PeriodDuration;
 public interface ParameterBagContainer extends StrolchElement {
 
 	/**
+	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 *
+	 * @param paramKey
+	 * 		the parameter to check if it is empty
+	 *
+	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 */
+	default boolean isParamEmpty(String paramKey) {
+		return !this.hasParameter(paramKey) || getParameter(paramKey).isEmpty();
+	}
+
+	/**
+	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the parameter to check if it is empty
+	 *
+	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 */
+	default boolean isParamEmpty(String bagKey, String paramKey) {
+		return !this.hasParameter(bagKey, paramKey) || getParameter(bagKey, paramKey).isEmpty();
+	}
+
+	/**
+	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 *
+	 * @param paramKey
+	 * 		the parameter to check if it has a value
+	 *
+	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 */
+	default boolean isParamSet(String paramKey) {
+		return this.hasParameter(paramKey) && getParameter(paramKey).isSet();
+	}
+
+	/**
+	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 *
+	 * @param bagKey
+	 * 		the key from which {@link ParameterBag} to get the parameter
+	 * @param paramKey
+	 * 		the parameter to check if it has a value
+	 *
+	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 */
+	default boolean isParamSet(String bagKey, String paramKey) {
+		return this.hasParameter(bagKey, paramKey) && getParameter(bagKey, paramKey).isSet();
+	}
+
+	/**
 	 * Returns the value of the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the
 	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *

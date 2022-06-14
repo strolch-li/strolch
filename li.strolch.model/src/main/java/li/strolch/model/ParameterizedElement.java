@@ -93,6 +93,30 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	///
 
 	/**
+	 * Returns true if the parameter with the given key does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 *
+	 * @param paramKey
+	 * 		the parameter to check if it is empty
+	 *
+	 * @return true if the parameter with the given key does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 */
+	public boolean isParamEmpty(String paramKey) {
+		return !this.hasParameter(paramKey) || getParameter(paramKey).isEmpty();
+	}
+
+	/**
+	 * Returns true if the parameter with the given key exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 *
+	 * @param paramKey
+	 * 		the parameter to check if it has a value
+	 *
+	 * @return true if the parameter with the given key exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 */
+	public boolean isParamSet(String paramKey) {
+		return this.hasParameter(paramKey) && getParameter(paramKey).isSet();
+	}
+
+	/**
 	 * Returns the value of the {@link StringParameter} with the given paramKey
 	 *
 	 * @param paramKey
@@ -925,7 +949,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		if (this.parameterMap == null)
 			return Stream.empty();
 
-		return this.parameterMap.values().stream()
+		return this.parameterMap.values()
+				.stream()
 				.filter(p -> p.getInterpretation().equals(interpretation) && p.getUom().equals(uom));
 	}
 
@@ -997,7 +1022,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Parameters
 	 */
 	public Map<String, Object> toObjectMap() {
-		return this.parameterMap.values().stream()
+		return this.parameterMap.values()
+				.stream()
 				.collect(toMap(StrolchElement::getId, (Function<Parameter<?>, Object>) Parameter::getValue));
 	}
 
