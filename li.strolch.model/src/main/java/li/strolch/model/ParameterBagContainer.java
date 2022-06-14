@@ -1,5 +1,9 @@
 package li.strolch.model;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static li.strolch.model.StrolchModelConstants.*;
+
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -9,6 +13,7 @@ import java.util.stream.Stream;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.*;
+import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.time.PeriodDuration;
 
 /**
@@ -91,7 +96,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	String getString(String paramKey) throws StrolchModelException;
+	default String getString(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? "" : bag.getString(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -107,7 +115,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	String getString(String bagKey, String paramKey) throws StrolchModelException;
+	default String getString(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? "" : bag.getString(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -121,7 +132,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	boolean getBoolean(String paramKey) throws StrolchModelException;
+	default boolean getBoolean(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag != null && bag.getBoolean(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -137,7 +151,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	boolean getBoolean(String bagKey, String paramKey) throws StrolchModelException;
+	default boolean getBoolean(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag != null && bag.getBoolean(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -151,7 +168,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	int getInteger(String paramKey) throws StrolchModelException;
+	default int getInteger(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? 0 : bag.getInteger(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -167,7 +187,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	int getInteger(String bagKey, String paramKey) throws StrolchModelException;
+	default int getInteger(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? 0 : bag.getInteger(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the ID
@@ -181,7 +204,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	double getDouble(String paramKey) throws StrolchModelException;
+	default double getDouble(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? 0 : bag.getDouble(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -197,7 +223,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	double getDouble(String bagKey, String paramKey) throws StrolchModelException;
+	default double getDouble(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag.getDouble(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the ID
@@ -211,7 +240,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	long getLong(String paramKey) throws StrolchModelException;
+	default long getLong(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? 0L : bag.getLong(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -227,7 +259,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	long getLong(String bagKey, String paramKey) throws StrolchModelException;
+	default long getLong(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? 0L : bag.getLong(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID
@@ -241,7 +276,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	ZonedDateTime getDate(String paramKey) throws StrolchModelException;
+	default ZonedDateTime getDate(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? ISO8601.EMPTY_VALUE_ZONED_DATE : bag.getDate(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -257,7 +295,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	ZonedDateTime getDate(String bagKey, String paramKey) throws StrolchModelException;
+	default ZonedDateTime getDate(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? ISO8601.EMPTY_VALUE_ZONED_DATE : bag.getDate(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID
@@ -271,7 +312,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	LocalDateTime getLocalDate(String paramKey) throws StrolchModelException;
+	default LocalDateTime getLocalDate(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? ISO8601.EMPTY_VALUE_LOCAL_DATE : bag.getLocalDate(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -287,7 +331,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	LocalDateTime getLocalDate(String bagKey, String paramKey) throws StrolchModelException;
+	default LocalDateTime getLocalDate(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? ISO8601.EMPTY_VALUE_LOCAL_DATE : bag.getLocalDate(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the ID
@@ -301,7 +348,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	String getText(String paramKey) throws StrolchModelException;
+	default String getText(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? "" : bag.getText(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -317,7 +367,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	String getText(String bagKey, String paramKey) throws StrolchModelException;
+	default String getText(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? "" : bag.getText(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -331,7 +384,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	PeriodDuration getDuration(String paramKey) throws StrolchModelException;
+	default PeriodDuration getDuration(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? PeriodDuration.ZERO : bag.getDuration(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -347,7 +403,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	PeriodDuration getDuration(String bagKey, String paramKey) throws StrolchModelException;
+	default PeriodDuration getDuration(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? PeriodDuration.ZERO : bag.getDuration(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with
@@ -361,7 +420,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<String> getStringList(String paramKey) throws StrolchModelException;
+	default List<String> getStringList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? emptyList() : bag.getStringList(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with
@@ -377,7 +439,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<String> getStringList(String bagKey, String paramKey) throws StrolchModelException;
+	default List<String> getStringList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getStringList(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with
@@ -391,7 +456,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<Integer> getIntegerList(String paramKey) throws StrolchModelException;
+	default List<Integer> getIntegerList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? emptyList() : bag.getIntegerList(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with
@@ -407,7 +475,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<Integer> getIntegerList(String bagKey, String paramKey) throws StrolchModelException;
+	default List<Integer> getIntegerList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getIntegerList(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with
@@ -421,7 +492,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<Double> getDoubleList(String paramKey) throws StrolchModelException;
+	default List<Double> getDoubleList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? emptyList() : bag.getDoubleList(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with
@@ -437,7 +511,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<Double> getDoubleList(String bagKey, String paramKey) throws StrolchModelException;
+	default List<Double> getDoubleList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getDoubleList(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -451,7 +528,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<Long> getLongList(String paramKey) throws StrolchModelException;
+	default List<Long> getLongList(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		return bag == null ? emptyList() : bag.getLongList(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the
@@ -467,7 +547,42 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<Long> getLongList(String bagKey, String paramKey) throws StrolchModelException;
+	default List<Long> getLongList(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, false);
+		return bag == null ? emptyList() : bag.getLongList(paramKey);
+	}
+
+	/**
+	 * <p>Returns the default {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_PARAMETERS}</p>
+	 *
+	 * <p><b>Note:</b> If the bag does not exist, it is created, and added to this container. Thus this element must not be read-only!</p>
+	 *
+	 * @return the default {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 */
+	default ParameterBag defaultBag() {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, false);
+		if (bag == null) {
+			bag = new ParameterBag(BAG_PARAMETERS, TYPE_PARAMETERS, TYPE_PARAMETERS);
+			addParameterBag(bag);
+		}
+		return bag;
+	}
+
+	/**
+	 * <p>Returns the relations {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_RELATIONS}</p>
+	 *
+	 * <p><b>Note:</b> If the bag does not exist, it is created, and added to this container. Thus this element must not be read-only!</p>
+	 *
+	 * @return the relations {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_RELATIONS}
+	 */
+	default ParameterBag relationsBag() {
+		ParameterBag bag = getParameterBag(BAG_RELATIONS, false);
+		if (bag == null) {
+			bag = new ParameterBag(BAG_RELATIONS, TYPE_RELATIONS, TYPE_RELATIONS);
+			addParameterBag(bag);
+		}
+		return bag;
+	}
 
 	/**
 	 * Sets the given value on the {@link StringParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -481,7 +596,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setString(String paramKey, String value) throws StrolchModelException;
+	default void setString(String paramKey, String value) throws StrolchModelException {
+		defaultBag().setString(paramKey, value);
+	}
 
 	/**
 	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the {@link
@@ -495,7 +612,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setString(String paramKey, Enum<?> value) throws StrolchModelException;
+	default void setString(String paramKey, Enum<?> value) throws StrolchModelException {
+		defaultBag().setString(paramKey, value.name());
+	}
 
 	/**
 	 * Sets the given value on the {@link StringParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -511,7 +630,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setString(String bagKey, String paramKey, String value) throws StrolchModelException;
+	default void setString(String bagKey, String paramKey, String value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setString(paramKey, value);
+	}
 
 	/**
 	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the {@link
@@ -527,7 +649,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setString(String bagKey, String paramKey, Enum<?> value) throws StrolchModelException;
+	default void setString(String bagKey, String paramKey, Enum<?> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setString(paramKey, value.name());
+	}
 
 	/**
 	 * Sets the given value on the {@link BooleanParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -541,7 +666,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setBoolean(String paramKey, boolean value) throws StrolchModelException;
+	default void setBoolean(String paramKey, boolean value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		BooleanParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new BooleanParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link BooleanParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -557,7 +690,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setBoolean(String bagKey, String paramKey, boolean value) throws StrolchModelException;
+	default void setBoolean(String bagKey, String paramKey, boolean value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setBoolean(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link IntegerParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -571,7 +707,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setInteger(String paramKey, int value) throws StrolchModelException;
+	default void setInteger(String paramKey, int value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		IntegerParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new IntegerParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link IntegerParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -587,7 +731,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setInteger(String bagKey, String paramKey, int value) throws StrolchModelException;
+	default void setInteger(String bagKey, String paramKey, int value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setInteger(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link FloatParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -601,7 +748,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDouble(String paramKey, double value) throws StrolchModelException;
+	default void setDouble(String paramKey, double value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		FloatParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new FloatParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link FloatParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -617,7 +772,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDouble(String bagKey, String paramKey, double value) throws StrolchModelException;
+	default void setDouble(String bagKey, String paramKey, double value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDouble(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link LongParameter} with the given paramKey on the {@link ParameterBag} with the ID
@@ -631,7 +789,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setLong(String paramKey, long value) throws StrolchModelException;
+	default void setLong(String paramKey, long value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		LongParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new LongParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link LongParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -647,7 +813,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setLong(String bagKey, String paramKey, long value) throws StrolchModelException;
+	default void setLong(String bagKey, String paramKey, long value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setLong(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the ID
@@ -661,7 +830,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException;
+	default void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		DateParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValueFromZonedDateTime(value);
+		} else {
+			bag.addParameter(new DateParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -677,7 +854,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDate(String bagKey, String paramKey, ZonedDateTime value) throws StrolchModelException;
+	default void setDate(String bagKey, String paramKey, ZonedDateTime value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDate(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the ID
@@ -691,7 +871,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDate(String paramKey, LocalDateTime value) throws StrolchModelException;
+	default void setDate(String paramKey, LocalDateTime value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		DateParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValueFromLocalDateTime(value);
+		} else {
+			bag.addParameter(new DateParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link DateParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -707,7 +895,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDate(String bagKey, String paramKey, LocalDateTime value) throws StrolchModelException;
+	default void setDate(String bagKey, String paramKey, LocalDateTime value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDate(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link TextParameter} with the given paramKey on the {@link ParameterBag} with the ID
@@ -721,7 +912,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setText(String paramKey, String value) throws StrolchModelException;
+	default void setText(String paramKey, String value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		TextParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new TextParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link TextParameter} with the given paramKey on the {@link ParameterBag} with the
@@ -737,7 +936,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setText(String bagKey, String paramKey, String value) throws StrolchModelException;
+	default void setText(String bagKey, String paramKey, String value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setText(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link DurationParameter} with the given paramKey on the {@link ParameterBag} with
@@ -751,7 +953,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException;
+	default void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		DurationParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new DurationParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link DurationParameter} with the given paramKey on the {@link ParameterBag} with
@@ -767,7 +977,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDuration(String bagKey, String paramKey, PeriodDuration value) throws StrolchModelException;
+	default void setDuration(String bagKey, String paramKey, PeriodDuration value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDuration(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link StringListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -781,7 +994,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setStringList(String paramKey, List<String> value) throws StrolchModelException;
+	default void setStringList(String paramKey, List<String> value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		StringListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new StringListParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link StringListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -797,7 +1018,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setStringList(String bagKey, String paramKey, List<String> value) throws StrolchModelException;
+	default void setStringList(String bagKey, String paramKey, List<String> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setStringList(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link IntegerListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -811,7 +1035,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException;
+	default void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		IntegerListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new IntegerListParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link IntegerListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -827,7 +1059,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setIntegerList(String bagKey, String paramKey, List<Integer> value) throws StrolchModelException;
+	default void setIntegerList(String bagKey, String paramKey, List<Integer> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setIntegerList(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link FloatListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -841,7 +1076,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException;
+	default void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		FloatListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new FloatListParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link FloatListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -857,7 +1100,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setDoubleList(String bagKey, String paramKey, List<Double> value) throws StrolchModelException;
+	default void setDoubleList(String bagKey, String paramKey, List<Double> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setDoubleList(paramKey, value);
+	}
 
 	/**
 	 * Sets the given value on the {@link LongListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -871,7 +1117,15 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setLongList(String paramKey, List<Long> value) throws StrolchModelException;
+	default void setLongList(String paramKey, List<Long> value) throws StrolchModelException {
+		ParameterBag bag = defaultBag();
+		LongListParameter param = bag.getParameter(paramKey);
+		if (param != null) {
+			param.setValue(value);
+		} else {
+			bag.addParameter(new LongListParameter(paramKey, paramKey, value));
+		}
+	}
 
 	/**
 	 * Sets the given value on the {@link LongListParameter} with the given paramKey on the {@link ParameterBag} with
@@ -887,7 +1141,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setLongList(String bagKey, String paramKey, List<Long> value) throws StrolchModelException;
+	default void setLongList(String bagKey, String paramKey, List<Long> value) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		bag.setLongList(paramKey, value);
+	}
 
 	/**
 	 * Returns the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -901,7 +1158,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	StringParameter getStringP(String paramKey) throws StrolchModelException;
+	default StringParameter getStringP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getStringP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -916,7 +1176,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	StringParameter getStringP(String bagKey, String paramKey) throws StrolchModelException;
+	default StringParameter getStringP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getStringP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -930,7 +1193,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	BooleanParameter getBooleanP(String paramKey) throws StrolchModelException;
+	default BooleanParameter getBooleanP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getBooleanP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -945,7 +1211,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	BooleanParameter getBooleanP(String bagKey, String paramKey) throws StrolchModelException;
+	default BooleanParameter getBooleanP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getBooleanP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -959,7 +1228,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	IntegerParameter getIntegerP(String paramKey) throws StrolchModelException;
+	default IntegerParameter getIntegerP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getIntegerP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -974,7 +1246,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	IntegerParameter getIntegerP(String bagKey, String paramKey) throws StrolchModelException;
+	default IntegerParameter getIntegerP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getIntegerP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -988,7 +1263,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	FloatParameter getDoubleP(String paramKey) throws StrolchModelException;
+	default FloatParameter getDoubleP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDoubleP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -1003,7 +1281,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	FloatParameter getDoubleP(String bagKey, String paramKey) throws StrolchModelException;
+	default FloatParameter getDoubleP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDoubleP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1017,7 +1298,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	LongParameter getLongP(String paramKey) throws StrolchModelException;
+	default LongParameter getLongP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getLongP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -1032,7 +1316,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	LongParameter getLongP(String bagKey, String paramKey) throws StrolchModelException;
+	default LongParameter getLongP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getLongP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1046,7 +1333,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	DateParameter getDateP(String paramKey) throws StrolchModelException;
+	default DateParameter getDateP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDateP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -1061,7 +1351,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	DateParameter getDateP(String bagKey, String paramKey) throws StrolchModelException;
+	default DateParameter getDateP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDateP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1075,7 +1368,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	TextParameter getTextP(String paramKey) throws StrolchModelException;
+	default TextParameter getTextP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getTextP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the given bagKey
@@ -1090,7 +1386,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	TextParameter getTextP(String bagKey, String paramKey) throws StrolchModelException;
+	default TextParameter getTextP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getTextP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1104,7 +1403,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	DurationParameter getDurationP(String paramKey) throws StrolchModelException;
+	default DurationParameter getDurationP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDurationP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the given
@@ -1120,7 +1422,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	DurationParameter getDurationP(String bagKey, String paramKey) throws StrolchModelException;
+	default DurationParameter getDurationP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDurationP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1134,7 +1439,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	StringListParameter getStringListP(String paramKey) throws StrolchModelException;
+	default StringListParameter getStringListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getStringListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with the given
@@ -1150,7 +1458,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	StringListParameter getStringListP(String bagKey, String paramKey) throws StrolchModelException;
+	default StringListParameter getStringListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getStringListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1164,7 +1475,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	IntegerListParameter getIntegerListP(String paramKey) throws StrolchModelException;
+	default IntegerListParameter getIntegerListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getIntegerListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with the given
@@ -1180,7 +1494,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	IntegerListParameter getIntegerListP(String bagKey, String paramKey) throws StrolchModelException;
+	default IntegerListParameter getIntegerListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getIntegerListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1194,7 +1511,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	FloatListParameter getDoubleListP(String paramKey) throws StrolchModelException;
+	default FloatListParameter getDoubleListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getDoubleListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with the given
@@ -1210,7 +1530,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	FloatListParameter getDoubleListP(String bagKey, String paramKey) throws StrolchModelException;
+	default FloatListParameter getDoubleListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getDoubleListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
@@ -1224,7 +1547,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	LongListParameter getLongListP(String paramKey) throws StrolchModelException;
+	default LongListParameter getLongListP(String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(BAG_PARAMETERS, true);
+		return bag.getLongListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the given
@@ -1240,7 +1566,10 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	LongListParameter getLongListP(String bagKey, String paramKey) throws StrolchModelException;
+	default LongListParameter getLongListP(String bagKey, String paramKey) throws StrolchModelException {
+		ParameterBag bag = getParameterBag(bagKey, true);
+		return bag.getLongListP(paramKey);
+	}
 
 	/**
 	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link *
@@ -1281,7 +1610,12 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	String getRelationId(String paramKey) throws StrolchModelException;
+	default String getRelationId(String paramKey) throws StrolchModelException {
+		ParameterBag relationsBag = getParameterBag(BAG_RELATIONS, false);
+		if (relationsBag == null)
+			return "";
+		return relationsBag.getString(paramKey);
+	}
 
 	/**
 	 * Returns the value of the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID
@@ -1296,7 +1630,12 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	List<String> getRelationIds(String paramKey) throws StrolchModelException;
+	default List<String> getRelationIds(String paramKey) throws StrolchModelException {
+		ParameterBag relationsBag = getParameterBag(BAG_RELATIONS, false);
+		if (relationsBag == null)
+			return List.of();
+		return relationsBag.getStringList(paramKey);
+	}
 
 	/**
 	 * Returns a stream over the values of the {@link StringListParameter} with the given key from the {@link
@@ -1311,7 +1650,12 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	Stream<String> streamRelationIds(String paramKey) throws StrolchModelException;
+	default Stream<String> streamRelationIds(String paramKey) throws StrolchModelException {
+		ParameterBag relationsBag = getParameterBag(BAG_RELATIONS, false);
+		if (relationsBag == null)
+			return Stream.empty();
+		return relationsBag.streamStringList(paramKey);
+	}
 
 	/**
 	 * Sets the value of the {@link StringParameter} with the given key on the {@link ParameterBag} with the ID {@link
@@ -1326,7 +1670,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setRelationId(String paramKey, String id) throws StrolchModelException;
+	default void setRelationId(String paramKey, String id) throws StrolchModelException {
+		getRelationParam(paramKey, true).setValue(id);
+	}
 
 	/**
 	 * Sets the value of the {@link StringListParameter} with the given key on the {@link ParameterBag} with the ID
@@ -1341,7 +1687,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	void setRelationIds(String paramKey, List<String> ids) throws StrolchModelException;
+	default void setRelationIds(String paramKey, List<String> ids) throws StrolchModelException {
+		getRelationsParam(paramKey, true).setValue(ids);
+	}
 
 	/**
 	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
@@ -1356,7 +1704,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	StringParameter getRelationP(String paramKey) throws StrolchModelException;
+	default StringParameter getRelationP(String paramKey) {
+		return getParameter(BAG_RELATIONS, paramKey, true);
+	}
 
 	/**
 	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
@@ -1368,7 +1718,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	StringParameter getRelationParam(String paramKey);
+	default StringParameter getRelationParam(String paramKey) {
+		return getParameter(BAG_RELATIONS, paramKey, false);
+	}
 
 	/**
 	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
@@ -1382,7 +1734,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	StringParameter getRelationParam(String paramKey, boolean assertExists);
+	default StringParameter getRelationParam(String paramKey, boolean assertExists) {
+		return getParameter(BAG_RELATIONS, paramKey, assertExists);
+	}
 
 	/**
 	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
@@ -1394,7 +1748,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	StringListParameter getRelationsParam(String paramKey);
+	default StringListParameter getRelationsParam(String paramKey) {
+		return getParameter(BAG_RELATIONS, paramKey, false);
+	}
 
 	/**
 	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
@@ -1409,7 +1765,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @throws StrolchModelException
 	 * 		if the parameter does not exist
 	 */
-	StringListParameter getRelationsP(String paramKey) throws StrolchModelException;
+	default StringListParameter getRelationsP(String paramKey) {
+		return getParameter(BAG_RELATIONS, paramKey, true);
+	}
 
 	/**
 	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
@@ -1423,7 +1781,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the found {@link Parameter} or null if it was not found
 	 */
-	StringListParameter getRelationsParam(String paramKey, boolean assertExists);
+	default StringListParameter getRelationsParam(String paramKey, boolean assertExists) {
+		return getParameter(BAG_RELATIONS, paramKey, assertExists);
+	}
 
 	/**
 	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the given bagKey, or null if
@@ -1461,7 +1821,12 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the parameters with the given interpretation
 	 */
-	Stream<Parameter<?>> streamOfParameters(String bagKey);
+	default Stream<Parameter<?>> streamOfParameters(String bagKey) {
+		ParameterBag bag = getParameterBag(bagKey);
+		if (bag == null)
+			return Stream.empty();
+		return bag.streamOfParameters();
+	}
 
 	/**
 	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
@@ -1473,7 +1838,12 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the parameters with the given interpretation
 	 */
-	Stream<Parameter<?>> streamOfParametersByInterpretation(String bagKey, String interpretation);
+	default Stream<Parameter<?>> streamOfParametersByInterpretation(String bagKey, String interpretation) {
+		ParameterBag bag = getParameterBag(bagKey);
+		if (bag == null)
+			return Stream.empty();
+		return bag.streamOfParametersByInterpretation(interpretation);
+	}
 
 	/**
 	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
@@ -1487,7 +1857,13 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the parameters with the given interpretation
 	 */
-	Stream<Parameter<?>> streamOfParametersByInterpretationAndUom(String bagKey, String interpretation, String uom);
+	default Stream<Parameter<?>> streamOfParametersByInterpretationAndUom(String bagKey, String interpretation,
+			String uom) {
+		ParameterBag bag = getParameterBag(bagKey);
+		if (bag == null)
+			return Stream.empty();
+		return bag.streamOfParametersByInterpretationAndUom(interpretation, uom);
+	}
 
 	/**
 	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
@@ -1499,7 +1875,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the parameters with the given interpretation
 	 */
-	List<Parameter<?>> getParametersByInterpretation(String bagKey, String interpretation);
+	default List<Parameter<?>> getParametersByInterpretation(String bagKey, String interpretation) {
+		return streamOfParametersByInterpretation(bagKey, interpretation).collect(toList());
+	}
 
 	/**
 	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
@@ -1513,7 +1891,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the parameters with the given interpretation
 	 */
-	List<Parameter<?>> getParametersByInterpretationAndUom(String bagKey, String interpretation, String uom);
+	default List<Parameter<?>> getParametersByInterpretationAndUom(String bagKey, String interpretation, String uom) {
+		return streamOfParametersByInterpretationAndUom(bagKey, interpretation, uom).collect(toList());
+	}
 
 	/**
 	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key {@link
@@ -1621,7 +2001,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 *
 	 * @return the {@link ParameterBag ParameterBags} of the given type
 	 */
-	List<ParameterBag> getParameterBagsByType(String type);
+	default List<ParameterBag> getParameterBagsByType(String type) {
+		return streamOfParameterBagsByType(type).collect(toList());
+	}
 
 	/**
 	 * Adds the given {@link ParameterBag} to this {@link GroupedParameterizedElement}
