@@ -51,6 +51,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private boolean withoutElementName;
 	private boolean withoutObjectType;
 	private boolean withLocator;
+	private boolean withBagId;
 	private boolean withoutVersion;
 	private boolean withoutPolicies;
 	private boolean withoutStateVariables;
@@ -104,6 +105,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public boolean isWithListParametersAsArray() {
 		return this.withListParametersAsArray;
+	}
+
+	public StrolchElementToJsonVisitor withBagId() {
+		this.withBagId = true;
+		return this;
 	}
 
 	public StrolchElementToJsonVisitor withLocator() {
@@ -405,6 +411,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		if (isFlat() || isBagFlat(bag)) {
 
 			JsonObject bagJ = new JsonObject();
+			if (this.withBagId)
+				bagJ.addProperty(ID, bag.getId());
 
 			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bag.getId());
 			addParameterBagFlat(bagJ, ignoredParamIds, bag);
@@ -678,7 +686,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		JsonObject paramsJ = new JsonObject();
 		bagJ.add(PARAMETERS, paramsJ);
 
-		bag.streamOfParameters().sorted(comparing(Parameter::getIndex))
+		bag.streamOfParameters()
+				.sorted(comparing(Parameter::getIndex))
 				.forEach(param -> paramsJ.add(param.getId(), paramToJsonFull(param)));
 
 		if (this.bagHook != null)
