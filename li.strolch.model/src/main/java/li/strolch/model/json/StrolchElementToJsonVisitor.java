@@ -35,9 +35,9 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
 
-	private MapOfSets<String, String> ignoredKeys;
-	private Set<String> ignoredTimedStates;
-	private Set<String> ignoredBagTypes;
+	private final MapOfSets<String, String> ignoredKeys;
+	private final Set<String> ignoredTimedStates;
+	private final Set<String> ignoredBagTypes;
 
 	private BiConsumer<ParameterBag, JsonObject> bagHook;
 	private BiConsumer<Resource, JsonObject> resourceHook;
@@ -46,15 +46,17 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private BiConsumer<Action, JsonObject> actionHook;
 
 	private boolean flat;
-	private Set<String> flatBags;
-	private Set<String> flatBagsByType;
+	private final Set<String> flatBags;
+	private final Set<String> flatBagsByType;
 	private boolean withoutElementName;
 	private boolean withoutObjectType;
 	private boolean withLocator;
+	private boolean withBagId;
 	private boolean withoutVersion;
 	private boolean withoutPolicies;
 	private boolean withoutStateVariables;
 	private boolean withoutValueChanges;
+	private boolean withListParametersAsArray;
 	private int activityDepth = Integer.MAX_VALUE;
 
 	public StrolchElementToJsonVisitor() {
@@ -99,6 +101,15 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public boolean isWithoutValueChanges() {
 		return this.withoutValueChanges;
+	}
+
+	public boolean isWithListParametersAsArray() {
+		return this.withListParametersAsArray;
+	}
+
+	public StrolchElementToJsonVisitor withBagId() {
+		this.withBagId = true;
+		return this;
 	}
 
 	public StrolchElementToJsonVisitor withLocator() {
@@ -388,6 +399,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		if (isFlat() || isBagFlat(bag)) {
 
 			JsonObject bagJ = new JsonObject();
+			if (this.withBagId)
+				bagJ.addProperty(ID, bag.getId());
 
 			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bag.getId());
 			addParameterBagFlat(bagJ, ignoredParamIds, bag);
@@ -634,6 +647,19 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 				rootJ.addProperty(paramId, (Boolean) param.getValue());
 			} else if (type.isNumber()) {
 				rootJ.addProperty(paramId, (Number) param.getValue());
+			} else if (this.withListParametersAsArray && type.isList()) {
+				JsonArray valuesJ = switch (type) {
+					case FLOAT_LIST -> ((FloatListParameter) param).streamValues()
+							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+					case INTEGER_LIST -> ((IntegerListParameter) param).streamValues()
+							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+					case STRING_LIST -> ((StringListParameter) param).streamValues()
+							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+					case LONG_LIST -> ((LongListParameter) param).streamValues()
+							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+					default -> throw new IllegalStateException("Unhandle list type " + type);
+				};
+				rootJ.add(paramId, valuesJ);
 			} else {
 				rootJ.addProperty(paramId, param.getValueAsString());
 			}
@@ -648,7 +674,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		JsonObject paramsJ = new JsonObject();
 		bagJ.add(PARAMETERS, paramsJ);
 
-		bag.streamOfParameters().sorted(comparing(Parameter::getIndex))
+		bag.streamOfParameters()
+				.sorted(comparing(Parameter::getIndex))
 				.forEach(param -> paramsJ.add(param.getId(), paramToJsonFull(param)));
 
 		if (this.bagHook != null)

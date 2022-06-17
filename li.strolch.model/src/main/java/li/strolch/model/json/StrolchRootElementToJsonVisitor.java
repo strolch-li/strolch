@@ -54,6 +54,11 @@ public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisito
 		return this::visitActivity;
 	}
 
+	public StrolchRootElementToJsonVisitor withBagId() {
+		this.visitor.withBagId();
+		return this;
+	}
+
 	public StrolchRootElementToJsonVisitor withLocator() {
 		this.visitor.withLocator();
 		return this;
