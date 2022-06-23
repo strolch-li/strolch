@@ -107,8 +107,11 @@ public class OperationsLog extends StrolchComponent {
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> byLocator = this.logMessagesByLocator.get(realmName);
 		if (byLocator != null) {
 			LinkedHashSet<LogMessage> messages = byLocator.get(message.getLocator());
-			if (messages != null)
+			if (messages != null) {
 				messages.remove(message);
+				if (messages.isEmpty())
+					byLocator.remove(message.getLocator());
+			}
 		}
 
 		LinkedHashSet<LogMessage> messages = this.logMessagesByRealmAndId.get(realmName);
@@ -133,8 +136,11 @@ public class OperationsLog extends StrolchComponent {
 			if (byLocator != null) {
 				messages.forEach(logMessage -> {
 					LinkedHashSet<LogMessage> tmp = byLocator.get(logMessage.getLocator());
-					if (tmp != null)
+					if (tmp != null) {
 						tmp.remove(logMessage);
+						if (tmp.isEmpty())
+							byLocator.remove(logMessage.getLocator());
+					}
 				});
 			}
 
