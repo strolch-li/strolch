@@ -219,6 +219,11 @@ public class I18nMessage {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return getMessage(Locale.getDefault());
+	}
+
 	private ResourceBundle findBundle(String baseName) {
 		if (baseName.isEmpty())
 			return null;
