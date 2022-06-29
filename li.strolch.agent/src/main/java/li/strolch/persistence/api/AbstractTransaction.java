@@ -107,6 +107,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setState(TransactionState.OPEN);
 	}
 
+	@Override
 	public String getAction() {
 		return this.action;
 	}
@@ -124,8 +125,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public boolean isOpen() {
 		return this.txResult.getState().isOpen();
 	}
-
-
 
 	@Override
 	public boolean isRollingBack() {
@@ -191,11 +190,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
 		this.closeStrategy = closeStrategy;
-	}
-
-	@Override
-	public void close() throws StrolchTransactionException {
-		this.closeStrategy.close(this);
 	}
 
 	@Override
@@ -333,11 +327,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		add(command);
 	}
 
+	@Override
 	public void add(Command command) {
 		assertNotReadOnly();
 		this.commands.add(command);
 	}
 
+	@Override
 	public boolean isReadOnly() {
 		return this.closeStrategy.isReadonly();
 	}
@@ -484,20 +480,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		String objectClassType = elements.get(0);
 		String type = elements.get(1);
 		String id = elements.get(2);
-		switch (objectClassType) {
-		case Tags.RESOURCE:
-			rootElement = getResourceBy(type, id);
-			break;
-		case Tags.ORDER:
-			rootElement = getOrderBy(type, id);
-			break;
-		case Tags.ACTIVITY:
-			rootElement = getActivityBy(type, id);
-			break;
-		default:
-			throw new StrolchModelException(
+		rootElement = switch (objectClassType) {
+			case Tags.RESOURCE -> getResourceBy(type, id);
+			case Tags.ORDER -> getOrderBy(type, id);
+			case Tags.ACTIVITY -> getActivityBy(type, id);
+			default -> throw new StrolchModelException(
 					MessageFormat.format("Unknown object class {0}", objectClassType)); //$NON-NLS-1$
-		}
+		};
 
 		if (rootElement == null) {
 			if (allowNull)
@@ -549,9 +538,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			StrolchTimedState<IValue<?>> timedState = resource.getTimedState(stateId);
 			return (T) timedState;
 
-		} else if (rootElement instanceof Activity) {
-
-			Activity activity = (Activity) rootElement;
+		} else if (rootElement instanceof Activity activity) {
 
 			Iterator<String> iter = elements.subList(3, elements.size()).iterator();
 			IActivityElement element = activity;
@@ -601,19 +588,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			if (parentP == null || parentP.isEmpty())
 				break;
 
-			switch (parentP.getInterpretation()) {
-			case INTERPRETATION_RESOURCE_REF:
-				parent = getResourceBy(parentP);
-				break;
-			case INTERPRETATION_ORDER_REF:
-				parent = getOrderBy(parentP);
-				break;
-			case INTERPRETATION_ACTIVITY_REF:
-				parent = getActivityBy(parentP);
-				break;
-			default:
-				throw new IllegalStateException("Unhandled element ref " + parentP.getInterpretation());
-			}
+			parent = switch (parentP.getInterpretation()) {
+				case INTERPRETATION_RESOURCE_REF -> getResourceBy(parentP);
+				case INTERPRETATION_ORDER_REF -> getOrderBy(parentP);
+				case INTERPRETATION_ACTIVITY_REF -> getActivityBy(parentP);
+				default -> throw new IllegalStateException("Unhandled element ref " + parentP.getInterpretation());
+			};
 
 			if (parent == null)
 				break;
@@ -645,16 +625,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (op == null)
 			return Operation.GET;
 
-		switch (op) {
-		case ADD:
-			return Operation.ADD;
-		case MODIFY:
-			return Operation.UPDATE;
-		case REMOVE:
-			return Operation.REMOVE;
-		default:
-			return Operation.GET;
-		}
+		return switch (op) {
+			case ADD -> Operation.ADD;
+			case MODIFY -> Operation.UPDATE;
+			case REMOVE -> Operation.REMOVE;
+		};
 	}
 
 	@Override
@@ -1593,10 +1568,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.txResult.setState(TransactionState.FAILED);
 
 			handleFailure(true, start, e);
-
-		} finally {
-			releaseElementLocks();
-			TransactionThreadLocal.removeTx();
 		}
 	}
 
@@ -1613,9 +1584,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		} catch (Exception e) {
 			handleFailure(true, start, e);
 			this.txResult.setState(TransactionState.FAILED);
-		} finally {
-			releaseElementLocks();
-			TransactionThreadLocal.removeTx();
 		}
 	}
 
@@ -1657,6 +1625,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			}
 			handleFailure(true, start, e);
 			this.txResult.setState(TransactionState.FAILED);
+		}
+	}
+
+	@Override
+	public void close() throws StrolchTransactionException {
+		try {
+			this.closeStrategy.close(this);
 		} finally {
 			releaseElementLocks();
 			TransactionThreadLocal.removeTx();
