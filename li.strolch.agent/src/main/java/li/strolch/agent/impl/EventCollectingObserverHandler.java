@@ -46,12 +46,12 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultObserverHandler.class);
 
-	private MapOfLists<String, Observer> observerMap;
+	private final MapOfLists<String, Observer> observerMap;
 
 	private ObserverEvent observerEvent;
 
 	private ScheduledFuture<?> future;
-	private StrolchAgent agent;
+	private final StrolchAgent agent;
 	private final StrolchRealm realm;
 
 	public EventCollectingObserverHandler(StrolchAgent agent, StrolchRealm realm) {
@@ -67,7 +67,6 @@ public class EventCollectingObserverHandler implements ObserverHandler {
 
 	@Override
 	public void stop() {
-
 		if (this.future != null) {
 			this.future.cancel(false);
 			this.future = null;
