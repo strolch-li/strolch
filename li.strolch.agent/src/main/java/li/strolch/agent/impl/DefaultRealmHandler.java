@@ -47,10 +47,6 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 
 	protected Map<String, InternalStrolchRealm> realms;
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
 	public DefaultRealmHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}

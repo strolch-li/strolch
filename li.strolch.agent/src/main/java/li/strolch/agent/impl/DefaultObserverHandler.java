@@ -23,15 +23,14 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 
 import li.strolch.agent.api.*;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.utils.collections.MapOfLists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +47,7 @@ public class DefaultObserverHandler implements ObserverHandler {
 	private final StrolchAgent agent;
 	private final StrolchRealm realm;
 
-	private MapOfLists<String, Observer> observerMap;
-	private Future<?> future;
+	private final MapOfLists<String, Observer> observerMap;
 
 	public DefaultObserverHandler(StrolchAgent agent, StrolchRealm realm) {
 		this.agent = agent;
@@ -64,26 +62,17 @@ public class DefaultObserverHandler implements ObserverHandler {
 
 	@Override
 	public void stop() {
-
-		if (this.future != null) {
-			this.future.cancel(false);
-			this.future = null;
-		}
-	}
-
-	private ScheduledExecutorService getExecutor() {
-		return this.agent.getScheduledExecutor("Observer");
+		// nothing to do
 	}
 
 	@Override
 	public void notify(ObserverEvent event) {
-
 		if (event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty())
 			return;
 
 		ExecutorService service = this.agent.getExecutor("Observer");
 		if (!service.isShutdown())
-			this.future = service.submit(() -> doUpdates(event));
+			service.submit(() -> doUpdates(event));
 	}
 
 	protected void doUpdates(ObserverEvent event) {
