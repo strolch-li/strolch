@@ -21,9 +21,15 @@ import li.strolch.model.StrolchRootElement;
 
 public interface Observer {
 
-	void add(String key, List<StrolchRootElement> elements) throws Exception;
+	default void add(String key, List<StrolchRootElement> elements) throws Exception {
+		// empty implementation
+	}
 
-	void update(String key, List<StrolchRootElement> elements) throws Exception;
+	default void update(String key, List<StrolchRootElement> elements) throws Exception {
+		// empty implementation
+	}
 
-	void remove(String key, List<StrolchRootElement> elements) throws Exception;
+	default void remove(String key, List<StrolchRootElement> elements) throws Exception {
+		// empty implementation
+	}
 }
