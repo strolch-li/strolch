@@ -37,7 +37,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	public static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit"; //$NON-NLS-1$
 	public static final String PROP_TRY_LOCK_TIME = "tryLockTime"; //$NON-NLS-1$
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
-	private String realm;
+	private final String realm;
 	private LockHandler lockHandler;
 	private boolean auditTrailEnabled;
 	private boolean auditTrailEnabledForRead;
@@ -89,13 +89,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		String updateObserversKey = makeRealmKey(getRealm(), PROP_ENABLE_OBSERVER_UPDATES);
 		this.updateObservers = configuration.getBoolean(updateObserversKey, Boolean.FALSE);
 		if (this.updateObservers) {
-			String delayedObserversKey = makeRealmKey(getRealm(), PROP_ENABLED_DELAYED_OBSERVER_UPDATES);
-			if (configuration.getBoolean(delayedObserversKey, Boolean.FALSE)) {
-				this.observerHandler = new EventCollectingObserverHandler(container.getAgent(), this);
-				logger.info("Enabled Delayed Observer Updates.");
-			} else {
-				this.observerHandler = new DefaultObserverHandler(container.getAgent(), this);
-			}
+			this.observerHandler = new DefaultObserverHandler(container.getAgent(), this);
 		}
 
 		// lock timeout

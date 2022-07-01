@@ -17,12 +17,15 @@ package li.strolch.agent.impl;
 
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfLists;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import li.strolch.agent.api.*;
 import li.strolch.handler.operationslog.OperationsLog;
@@ -47,104 +50,129 @@ public class DefaultObserverHandler implements ObserverHandler {
 	private final StrolchAgent agent;
 	private final StrolchRealm realm;
 
+	private volatile boolean run;
+
+	private final BlockingDeque<ObserverEvent> eventQueue;
+
 	private final MapOfLists<String, Observer> observerMap;
+	private Future<?> updateTask;
 
 	public DefaultObserverHandler(StrolchAgent agent, StrolchRealm realm) {
 		this.agent = agent;
 		this.realm = realm;
-		this.observerMap = new MapOfLists<>();
+		this.observerMap = synchronizedMapOfLists(new MapOfLists<>());
+		this.eventQueue = new LinkedBlockingDeque<>();
 	}
 
 	@Override
 	public void start() {
-		// nothing to do
+		this.run = true;
+		this.updateTask = this.agent.getSingleThreadExecutor("Observer").submit(this::doUpdates);
 	}
 
 	@Override
 	public void stop() {
-		// nothing to do
+		this.run = false;
+		this.updateTask.cancel(true);
 	}
 
 	@Override
 	public void notify(ObserverEvent event) {
-		if (event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty())
-			return;
-
-		ExecutorService service = this.agent.getExecutor("Observer");
-		if (!service.isShutdown())
-			service.submit(() -> doUpdates(event));
+		if (!(event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty()))
+			this.eventQueue.addLast(event);
 	}
 
-	protected void doUpdates(ObserverEvent event) {
-		synchronized (this.observerMap) {
-			for (String key : event.added.keySet()) {
-				add(key, event.added.getList(key));
-			}
-			for (String key : event.updated.keySet()) {
-				update(key, event.updated.getList(key));
-			}
-			for (String key : event.removed.keySet()) {
-				remove(key, event.removed.getList(key));
+	protected void doUpdates() {
+		while (this.run) {
+			try {
+				ObserverEvent event = this.eventQueue.takeFirst();
+
+				for (String key : event.added.keySet()) {
+					List<StrolchRootElement> list = event.added.getList(key);
+					if (list != null)
+						notifyAdd(key, list);
+				}
+				for (String key : event.updated.keySet()) {
+					List<StrolchRootElement> list = event.updated.getList(key);
+					if (list != null)
+						notifyUpdate(key, list);
+				}
+				for (String key : event.removed.keySet()) {
+					List<StrolchRootElement> list = event.removed.getList(key);
+					if (list != null)
+						notifyRemove(key, list);
+				}
+
+			} catch (InterruptedException e) {
+				if (this.run)
+					logger.error("Failed to do updates!", e);
+				else
+					logger.warn("Interrupted!");
 			}
 		}
 	}
 
-	private void add(String key, List<StrolchRootElement> elements) {
-		if (elements == null || elements.isEmpty())
+	private List<Observer> getObservers(String key) {
+		List<Observer> observerList = this.observerMap.getList(key);
+		if (observerList == null)
+			return null;
+
+		observerList = new ArrayList<>(observerList);
+		if (observerList.isEmpty())
+			return null;
+		return observerList;
+	}
+
+	private void notifyAdd(String key, List<StrolchRootElement> elements) {
+		List<Observer> observerList = getObservers(key);
+		if (observerList == null)
 			return;
 
-		List<Observer> observerList = this.observerMap.getList(key);
-		if (observerList != null && !observerList.isEmpty()) {
-			for (Observer observer : observerList) {
-				try {
-					observer.add(key, elements);
-				} catch (Exception e) {
-					String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
-					msg = MessageFormat.format(msg, key, observer, e.getMessage());
-					logger.error(msg, e);
+		for (Observer observer : observerList) {
+			try {
+				observer.add(key, elements);
+			} catch (Exception e) {
+				String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, key, observer, e.getMessage());
+				logger.error(msg, e);
 
-					addLogMessage("add", e);
-				}
+				addLogMessage("add", e);
 			}
 		}
 	}
 
-	private void update(String key, List<StrolchRootElement> elements) {
-		if (elements == null || elements.isEmpty())
+	private void notifyUpdate(String key, List<StrolchRootElement> elements) {
+		List<Observer> observerList = getObservers(key);
+		if (observerList == null)
 			return;
 
-		List<Observer> observerList = this.observerMap.getList(key);
-		if (observerList != null && !observerList.isEmpty()) {
-			for (Observer observer : observerList) {
-				try {
-					observer.update(key, elements);
-				} catch (Exception e) {
-					String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
-					msg = MessageFormat.format(msg, key, observer, e.getMessage());
-					logger.error(msg, e);
+		for (Observer observer : observerList) {
+			try {
+				observer.update(key, elements);
+			} catch (Exception e) {
+				String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, key, observer, e.getMessage());
+				logger.error(msg, e);
 
-					addLogMessage("update", e);
-				}
+				addLogMessage("update", e);
 			}
 		}
 	}
 
-	private void remove(String key, List<StrolchRootElement> elements) {
-		if (elements == null || elements.isEmpty())
+	private void notifyRemove(String key, List<StrolchRootElement> elements) {
+		List<Observer> observerList = getObservers(key);
+		if (observerList == null)
 			return;
 
-		List<Observer> observerList = this.observerMap.getList(key);
-		if (observerList != null && !observerList.isEmpty()) {
-			for (Observer observer : observerList) {
-				try {
-					observer.remove(key, elements);
-				} catch (Exception e) {
-					String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
-					msg = MessageFormat.format(msg, key, observer, e.getMessage());
-					logger.error(msg, e);
+		for (Observer observer : observerList) {
+			try {
+				observer.remove(key, elements);
+			} catch (Exception e) {
+				String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, key, observer, e.getMessage());
+				logger.error(msg, e);
 
-					addLogMessage("remove", e);
-				}
+				addLogMessage("remove", e);
 			}
 		}
 	}
@@ -162,20 +190,16 @@ public class DefaultObserverHandler implements ObserverHandler {
 
 	@Override
 	public void registerObserver(String key, Observer observer) {
-		synchronized (this.observerMap) {
-			this.observerMap.addElement(key, observer);
-			String msg = MessageFormat.format("Registered observer {0} with {1}", key, observer); //$NON-NLS-1$
-			logger.info(msg);
-		}
+		this.observerMap.addElement(key, observer);
+		String msg = MessageFormat.format("Registered observer {0} with {1}", key, observer); //$NON-NLS-1$
+		logger.info(msg);
 	}
 
 	@Override
 	public void unregisterObserver(String key, Observer observer) {
-		synchronized (this.observerMap) {
-			if (this.observerMap.removeElement(key, observer)) {
-				String msg = MessageFormat.format("Unregistered observer {0} with {1}", key, observer); //$NON-NLS-1$
-				logger.info(msg);
-			}
+		if (this.observerMap.removeElement(key, observer)) {
+			String msg = MessageFormat.format("Unregistered observer {0} with {1}", key, observer); //$NON-NLS-1$
+			logger.info(msg);
 		}
 	}
 }
