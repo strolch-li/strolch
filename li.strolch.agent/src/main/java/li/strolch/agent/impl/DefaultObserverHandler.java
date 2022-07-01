@@ -18,6 +18,7 @@ package li.strolch.agent.impl;
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfLists;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -87,6 +88,8 @@ public class DefaultObserverHandler implements ObserverHandler {
 			try {
 				ObserverEvent event = this.eventQueue.takeFirst();
 
+				long start = System.nanoTime();
+
 				for (String key : event.added.keySet()) {
 					List<StrolchRootElement> list = event.added.getList(key);
 					if (list != null)
@@ -102,6 +105,10 @@ public class DefaultObserverHandler implements ObserverHandler {
 					if (list != null)
 						notifyRemove(key, list);
 				}
+
+				long durationNanos = System.nanoTime() - start;
+				if (durationNanos >= 250000000L)
+					logger.warn("Observer update for event " + event + " took " + formatNanoDuration(durationNanos));
 
 			} catch (InterruptedException e) {
 				if (this.run)
