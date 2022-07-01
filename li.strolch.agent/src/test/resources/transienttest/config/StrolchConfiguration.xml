@@ -23,6 +23,7 @@
 			<Properties>
 				<dataStoreMode>TRANSIENT</dataStoreMode>
 				<dataStoreFile>StrolchModel.xml</dataStoreFile>
+				<enableObserverUpdates>true</enableObserverUpdates>
 			</Properties>
 		</Component>
 		<Component>
