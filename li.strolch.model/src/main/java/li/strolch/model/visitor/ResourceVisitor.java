@@ -26,12 +26,12 @@ import li.strolch.model.activity.Activity;
 public interface ResourceVisitor<U> extends StrolchRootElementVisitor<U> {
 
 	@Override
-	public default U visitActivity(Activity activity) {
+	default U visitActivity(Activity activity) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + activity.getClass());
 	}
 
 	@Override
-	public default U visitOrder(Order order) {
+	default U visitOrder(Order order) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + order.getClass());
 	}
 }
