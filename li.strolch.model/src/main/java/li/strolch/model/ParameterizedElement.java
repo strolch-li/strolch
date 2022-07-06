@@ -17,6 +17,8 @@ package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 import static li.strolch.model.builder.BuilderHelper.buildParamName;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -27,9 +29,11 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator.LocatorBuilder;
+import li.strolch.model.json.SetParameterValueFromJsonVisitor;
 import li.strolch.model.parameter.*;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
@@ -1012,6 +1016,99 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		if (this.parameterMap == null)
 			return Collections.emptySet();
 		return new HashSet<>(this.parameterMap.keySet());
+	}
+
+	/**
+	 * Set or add a parameter to this element from a {@link JsonObject}
+	 *
+	 * @param jsonObject
+	 * 		the object from which to get the value
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName
+	 * 		the name of the parameter, if the parameter is to be created
+	 * @param type
+	 * 		the type of Parameter to create
+	 * @param ignoreOnEmpty
+	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
+	 * 		is cleared if the json field is missing or null
+	 */
+	public void setOrAddParamFromFlatJson(JsonObject jsonObject, String paramId, String paramName,
+			StrolchValueType type, boolean ignoreOnEmpty) {
+		setOrAddParamFromFlatJson(jsonObject, paramId, paramName, INTERPRETATION_NONE, UOM_NONE, type, ignoreOnEmpty);
+	}
+
+	/**
+	 * Set or add a parameter to this element from a {@link JsonObject}
+	 *
+	 * @param jsonObject
+	 * 		the object from which to get the value
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName
+	 * 		the name of the parameter, if the parameter is to be created
+	 * @param interpretation
+	 * 		the interpretation
+	 * @param uom
+	 * 		the uom
+	 * @param type
+	 * 		the type of Parameter to create
+	 * @param ignoreOnEmpty
+	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
+	 * 		is cleared if the json field is missing or null
+	 */
+	public void setOrAddParamFromFlatJson(JsonObject jsonObject, String paramId, String paramName,
+			String interpretation, String uom, StrolchValueType type, boolean ignoreOnEmpty) {
+
+		if (!jsonObject.has(paramId) && ignoreOnEmpty)
+			return;
+
+		Parameter<?> param = getParameter(paramId);
+		boolean valueNotSet = !jsonObject.has(paramId) || jsonObject.get(paramId).isJsonNull();
+		if (param == null && valueNotSet)
+			return;
+
+		if (param == null) {
+			param = type.parameterInstance();
+			param.setId(paramId);
+			param.setName(paramName);
+			param.setInterpretation(interpretation);
+			param.setUom(uom);
+			addParameter(param);
+		}
+
+		accept(new SetParameterValueFromJsonVisitor(jsonObject, ignoreOnEmpty));
+	}
+
+	/**
+	 * Set a parameter on this element from a {@link JsonObject}
+	 *
+	 * @param jsonObject
+	 * 		the object from which to get the value
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 */
+	public void setParamFromFlatJson(JsonObject jsonObject, String paramId) {
+		Parameter<?> param = getParameter(paramId);
+		param.accept(new SetParameterValueFromJsonVisitor(jsonObject, false));
+	}
+
+	/**
+	 * Set a parameter on this element from a {@link JsonObject}
+	 *
+	 * @param jsonObject
+	 * 		the object from which to get the value
+	 * @param paramId
+	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param ignoreOnEmpty
+	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
+	 * 		is cleared if the json field is missing or null
+	 */
+	public void setParamFromFlatJson(JsonObject jsonObject, String paramId, boolean ignoreOnEmpty) {
+		if (!jsonObject.has(paramId) && ignoreOnEmpty)
+			return;
+		Parameter<?> param = getParameter(paramId);
+		param.accept(new SetParameterValueFromJsonVisitor(jsonObject, ignoreOnEmpty));
 	}
 
 	/**

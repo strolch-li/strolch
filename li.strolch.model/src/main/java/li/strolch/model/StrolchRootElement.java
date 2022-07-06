@@ -339,25 +339,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 			addParameterBag(bag);
 		}
 
-		Parameter<?> param = bag.getParameter(paramId);
-		boolean valueNotSet = !jsonObject.has(paramId) || jsonObject.get(paramId).isJsonNull();
-		if (param == null && valueNotSet)
-			return;
-
-		if (param == null) {
-			param = type.parameterInstance();
-			param.setId(paramId);
-			param.setName(paramName);
-			param.setInterpretation(interpretation);
-			param.setUom(uom);
-			bag.addParameter(param);
-		}
-
-		if (valueNotSet) {
-			param.clear();
-		} else {
-			param.setValueFromString(jsonObject.get(paramId).getAsString());
-		}
+		bag.setOrAddParamFromFlatJson(jsonObject, paramId, paramName, interpretation, uom, type, ignoreOnEmpty);
 	}
 
 	/**
