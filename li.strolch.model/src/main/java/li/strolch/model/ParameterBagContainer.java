@@ -2051,7 +2051,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
 	 * the {@link ParameterBag}
 	 */
-	boolean hasParameter(String paramKey);
+	default boolean hasParameter(String paramKey) {
+		return hasParameter(BAG_PARAMETERS, paramKey);
+	}
 
 	/**
 	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the id
@@ -2064,7 +2066,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * bagKey. False is returned if the {@link ParameterBag} does not exist, or the {@link Parameter} does not exist on
 	 * the {@link ParameterBag}
 	 */
-	boolean hasRelation(String paramKey);
+	default boolean hasRelation(String paramKey) {
+		return hasParameter(BAG_RELATIONS, paramKey);
+	}
 
 	/**
 	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the id
@@ -2077,7 +2081,25 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * bagKey and the value of the parameter is also set, i.e. not empty. False is returned if the {@link ParameterBag} does not exist, the {@link Parameter} does not exist on
 	 * the {@link ParameterBag}, or the value of the parameter is empty
 	 */
-	boolean isRelationSet(String paramKey);
+	default boolean isRelationSet(String paramKey) {
+		StringParameter relationP = getParameter(BAG_RELATIONS, paramKey);
+		return relationP != null && relationP.isSet();
+	}
+
+	/**
+	 * Returns true if the {@link Parameter} with the given paramKey does not exist on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_RELATIONS} or if the value of the parameter is empty
+	 *
+	 * @param paramKey
+	 * 		the key of the {@link Parameter} to be found
+	 *
+	 * @return true if the {@link Parameter} with the given paramKey does not exist on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_RELATIONS} or if the value of the parameter is empty
+	 */
+	default boolean isRelationEmpty(String paramKey) {
+		StringParameter relationP = getParameter(BAG_RELATIONS, paramKey);
+		return relationP == null || relationP.isEmpty();
+	}
 
 	/**
 	 * Returns true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
