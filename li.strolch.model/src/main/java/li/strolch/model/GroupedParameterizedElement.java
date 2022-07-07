@@ -262,35 +262,6 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	@Override
-	public boolean hasParameter(String paramKey) {
-		if (this.parameterBagMap == null)
-			return false;
-		ParameterBag bag = this.parameterBagMap.get(BAG_PARAMETERS);
-		return bag != null && bag.hasParameter(paramKey);
-	}
-
-	@Override
-	public boolean hasRelation(String paramKey) {
-		if (this.parameterBagMap == null)
-			return false;
-		ParameterBag bag = this.parameterBagMap.get(BAG_RELATIONS);
-		if (bag == null)
-			return false;
-		return bag.hasParameter(paramKey);
-	}
-
-	@Override
-	public boolean isRelationSet(String paramKey) {
-		if (this.parameterBagMap == null)
-			return false;
-		ParameterBag bag = this.parameterBagMap.get(BAG_RELATIONS);
-		if (bag == null)
-			return false;
-		StringParameter relationP = bag.getParameter(paramKey);
-		return relationP != null && relationP.isSet();
-	}
-
-	@Override
 	public boolean hasParameter(String bagKey, String paramKey) {
 		if (this.parameterBagMap == null)
 			return false;
