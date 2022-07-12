@@ -1077,7 +1077,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 			addParameter(param);
 		}
 
-		accept(new SetParameterValueFromJsonVisitor(jsonObject, ignoreOnEmpty));
+		param.accept(new SetParameterValueFromJsonVisitor(jsonObject, ignoreOnEmpty));
 	}
 
 	/**
