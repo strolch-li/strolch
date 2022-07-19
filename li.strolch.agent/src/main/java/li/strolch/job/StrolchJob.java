@@ -183,8 +183,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
-	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @param runnable
 	 * 		the runnable to perform
@@ -276,14 +276,15 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			this.lastException = e;
 			logger.error("Execution of Job " + getName() + " failed.", e);
 
-			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
-			if (operationsLog != null) {
+			if (getContainer().hasComponent(OperationsLog.class)) {
+				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
 				operationsLog.addMessage(
 						new LogMessage(this.realmName == null ? StrolchConstants.DEFAULT_REALM : this.realmName,
 								SYSTEM_USER_AGENT, Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()),
 								LogSeverity.Exception, LogMessageState.Information,
 								ResourceBundle.getBundle("strolch-agent"), "strolchjob.failed").withException(e)
-								.value("jobName", getClass().getName()).value("reason", e));
+								.value("jobName", getClass().getName())
+								.value("reason", e));
 			}
 		}
 
@@ -359,8 +360,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 					return this;
 				}
 
-				logger.info("First execution of " + getName() + " will be at " + executionTime
-						.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+				logger.info("First execution of " + getName() + " will be at " + executionTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
 				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
 				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
@@ -369,7 +370,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 
 				long millis = this.initialDelayTimeUnit.toMillis(this.initialDelay);
 				logger.info("First execution of " + getName() + " will be at " + ZonedDateTime.now()
-						.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+						.plus(millis, ChronoUnit.MILLIS)
+						.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
 				this.future = getScheduledExecutor().schedule(this, this.initialDelay, this.initialDelayTimeUnit);
 			}
@@ -386,8 +388,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 					return this;
 				}
 
-				logger.info("Next execution of " + getName() + " will be at " + executionTime
-						.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+				logger.info("Next execution of " + getName() + " will be at " + executionTime.format(
+						DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
 				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
 				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
@@ -396,7 +398,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 
 				long millis = this.delayTimeUnit.toMillis(this.delay);
 				logger.info("Next execution of " + getName() + " will be at " + ZonedDateTime.now()
-						.plus(millis, ChronoUnit.MILLIS).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+						.plus(millis, ChronoUnit.MILLIS)
+						.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
 				this.future = getScheduledExecutor().schedule(this, this.delay, this.delayTimeUnit);
 			}
@@ -439,8 +442,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		if (this.lastExecution == null) {
 			jsonObject.addProperty("lastExecution", "-");
 		} else {
-			String lastExecution = this.lastExecution
-					.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
+			String lastExecution = this.lastExecution.format(
+					DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
 			jsonObject.addProperty("lastExecution", lastExecution);
 		}
 
@@ -449,7 +452,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		} else {
 
 			long delay = this.future.getDelay(TimeUnit.MILLISECONDS);
-			String nextExecution = ZonedDateTime.now().plus(delay, ChronoUnit.MILLIS)
+			String nextExecution = ZonedDateTime.now()
+					.plus(delay, ChronoUnit.MILLIS)
 					.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME.withZone(ZoneId.systemDefault()));
 			jsonObject.addProperty("nextExecution", nextExecution);
 		}
