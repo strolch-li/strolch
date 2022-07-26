@@ -1,7 +1,6 @@
 package li.strolch.metrics;
 
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.model.builder.BuilderHelper.buildParamName;
+import static li.strolch.model.StrolchModelConstants.STATE_VALUES;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -11,10 +10,11 @@ import li.strolch.model.Resource;
 import li.strolch.model.timedstate.BooleanTimedState;
 import li.strolch.model.timedstate.IntegerListTimedState;
 import li.strolch.model.timedstate.IntegerTimedState;
+import li.strolch.model.timevalue.ITimeValue;
+import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.impl.BooleanValue;
 import li.strolch.model.timevalue.impl.IntegerListValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
-import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
 
@@ -26,19 +26,40 @@ public abstract class MetricPolicy extends StrolchPolicy {
 
 	public void incr(Resource metric, int value, ZonedDateTime time) {
 		long timeStamp = getTimeStamp(time);
-		getIntegerMetric(metric).applyChange(getValueChange(timeStamp, value), true);
+		ITimeVariable<IntegerValue> timeEvolution = getIntegerMetric(metric).getTimeEvolution();
+		ITimeValue<IntegerValue> currentValue = timeEvolution.getValueAt(timeStamp);
+		if (currentValue != null && currentValue.getTime() == timeStamp) {
+			timeEvolution.setValueAt(timeStamp, currentValue.getCopy().add(getValue(value)).getValue());
+		} else {
+			timeEvolution.setValueAt(timeStamp, getValue(value));
+		}
+		timeEvolution.compact();
 		tx().update(metric);
 	}
 
 	public void add(Resource metric, int value, ZonedDateTime time) {
 		long timeStamp = getTimeStamp(time);
-		getIntegerListMetric(metric).applyChange(getValueChangeList(timeStamp, value), true);
+		ITimeVariable<IntegerListValue> timeEvolution = getIntegerListMetric(metric).getTimeEvolution();
+		ITimeValue<IntegerListValue> currentValue = timeEvolution.getValueAt(timeStamp);
+		if (currentValue != null && currentValue.getTime() == timeStamp) {
+			timeEvolution.setValueAt(timeStamp, currentValue.getCopy().add(getValueList(value)).getValue());
+		} else {
+			timeEvolution.setValueAt(timeStamp, getValueList(value));
+		}
+		timeEvolution.compact();
 		tx().update(metric);
 	}
 
 	public void set(Resource metric, boolean value, ZonedDateTime time) {
 		long timeStamp = getTimeStamp(time);
-		getBooleanMetric(metric).applyChange(getValueChange(timeStamp, value), true);
+		ITimeVariable<BooleanValue> timeEvolution = getBooleanMetric(metric).getTimeEvolution();
+		ITimeValue<BooleanValue> currentValue = timeEvolution.getValueAt(timeStamp);
+		if (currentValue != null && currentValue.getTime() == timeStamp) {
+			timeEvolution.setValueAt(timeStamp, currentValue.getCopy().add(getValue(value)).getValue());
+		} else {
+			timeEvolution.setValueAt(timeStamp, getValue(value));
+		}
+		timeEvolution.compact();
 		tx().update(metric);
 	}
 
@@ -72,16 +93,16 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		return metricT;
 	}
 
-	protected ValueChange<BooleanValue> getValueChange(long timeStamp, boolean value) {
-		return new ValueChange<>(timeStamp, new BooleanValue(value));
+	protected BooleanValue getValue(boolean value) {
+		return new BooleanValue(value);
 	}
 
-	protected ValueChange<IntegerValue> getValueChange(long timeStamp, int value) {
-		return new ValueChange<>(timeStamp, new IntegerValue(value));
+	protected IntegerValue getValue(int value) {
+		return new IntegerValue(value);
 	}
 
-	protected ValueChange<IntegerListValue> getValueChangeList(long timeStamp, int value) {
-		return new ValueChange<>(timeStamp, new IntegerListValue(value));
+	protected IntegerListValue getValueList(int value) {
+		return new IntegerListValue(value);
 	}
 
 	protected long getTimeStamp(ZonedDateTime time) {
