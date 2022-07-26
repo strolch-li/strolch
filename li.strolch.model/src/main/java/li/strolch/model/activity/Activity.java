@@ -36,6 +36,7 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -836,7 +837,31 @@ public class Activity extends AbstractStrolchRootElement
 		this.parent = activity;
 	}
 
+	/**
+	 * Creates a {@link Locator} for activities of the given type and id
+	 *
+	 * @param type
+	 * 		the type of activity
+	 * @param id
+	 * 		the id of the activity
+	 *
+	 * @return the locator
+	 */
 	public static Locator locatorFor(String type, String id) {
 		return Locator.valueOf(Tags.ACTIVITY, type, id);
+	}
+
+	/**
+	 * Parses the given XML and returns the activity with the given ID
+	 *
+	 * @param xml
+	 * 		the xml to parse
+	 * @param id
+	 * 		the id of the activity to return from the parsed elements
+	 *
+	 * @return the activity, or null if it does not exist
+	 */
+	public static Resource parse(String xml, String id) {
+		return StrolchXmlHelper.parseAndReturnResource(xml, id);
 	}
 }

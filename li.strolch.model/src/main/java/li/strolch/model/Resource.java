@@ -30,6 +30,7 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.utils.dbc.DBC;
 
 /**
@@ -197,7 +198,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		if (this.timedStateMap == null || this.timedStateMap.isEmpty())
 			return Stream.empty();
 
-		return this.timedStateMap.values().stream()
+		return this.timedStateMap.values()
+				.stream()
 				.filter(s -> s.getInterpretation().equals(interpretation) && s.getUom().equals(uom));
 	}
 
@@ -399,7 +401,31 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		return getId().compareTo(o.getId());
 	}
 
+	/**
+	 * Creates a {@link Locator} for resources of the given type and id
+	 *
+	 * @param type
+	 * 		the type of resource
+	 * @param id
+	 * 		the id of the resource
+	 *
+	 * @return the locator
+	 */
 	public static Locator locatorFor(String type, String id) {
 		return Locator.valueOf(Tags.RESOURCE, type, id);
+	}
+
+	/**
+	 * Parses the given XML and returns the resource with the given ID
+	 *
+	 * @param xml
+	 * 		the xml to parse
+	 * @param id
+	 * 		the id of the resource to return from the parsed elements
+	 *
+	 * @return the resource, or null if it does not exist
+	 */
+	public static Resource parse(String xml, String id) {
+		return StrolchXmlHelper.parseAndReturnResource(xml, id);
 	}
 }

@@ -1,16 +1,16 @@
 package li.strolch.model.xml;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
 import static li.strolch.model.StrolchModelConstants.DEFAULT_XML_VERSION;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
@@ -32,22 +32,20 @@ public class StrolchXmlHelper {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchXmlHelper.class);
 
+	public static Resource parseAndReturnResource(String xml, String id) {
+		return parse(xml).getResource(id);
+	}
+
 	public static Resource parseAndReturnResource(File file, String id) {
-		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
-		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
-		return elementListener.getResource(id);
+		return parse(file).getResource(id);
 	}
 
 	public static Order parseAndReturnOrder(File file, String id) {
-		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
-		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
-		return elementListener.getOrder(id);
+		return parse(file).getOrder(id);
 	}
 
 	public static Activity parseAndReturnActivity(File file, String id) {
-		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
-		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
-		return elementListener.getActivity(id);
+		return parse(file).getActivity(id);
 	}
 
 	public static Map<String, StrolchRootElement> parseToMap(File file) {
@@ -56,6 +54,23 @@ public class StrolchXmlHelper {
 
 	public static Map<String, StrolchRootElement> parseToMap(InputStream stream, String encoding) {
 		return parseStream(stream, encoding).stream().collect(Collectors.toMap(StrolchRootElement::getId, e -> e));
+	}
+
+	public static SimpleStrolchElementListener parse(File file) {
+		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
+		return elementListener;
+	}
+
+	private static SimpleStrolchElementListener parse(String xml) {
+		try {
+			SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+			SAXParser sp = SAXParserFactory.newInstance().newSAXParser();
+			sp.parse(new ByteArrayInputStream(xml.getBytes(UTF_8)), new XmlModelSaxReader(elementListener));
+			return elementListener;
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to parse XML", e);
+		}
 	}
 
 	public static List<StrolchRootElement> parseFile(File file) {
