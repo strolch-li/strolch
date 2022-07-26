@@ -24,6 +24,7 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
 
@@ -31,7 +32,7 @@ import li.strolch.utils.iso8601.ISO8601;
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
  * Resources. Resources are supposed to be thought of as things i.e. a table, a machine and so forth, where a order is
  * to be thought of as an object for doing something.
- *
+ * <p>
  * In this sense, orders do not need to be verified, so all verifier chracteristics are disabled and the
  * getVerifier()-method will return the null reference
  *
@@ -318,7 +319,31 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 		return getId().compareTo(o.getId());
 	}
 
+	/**
+	 * Creates a {@link Locator} for orders of the given type and id
+	 *
+	 * @param type
+	 * 		the type of order
+	 * @param id
+	 * 		the id of the order
+	 *
+	 * @return the locator
+	 */
 	public static Locator locatorFor(String type, String id) {
 		return Locator.valueOf(Tags.ORDER, type, id);
+	}
+
+	/**
+	 * Parses the given XML and returns the order with the given ID
+	 *
+	 * @param xml
+	 * 		the xml to parse
+	 * @param id
+	 * 		the id of the order to return from the parsed elements
+	 *
+	 * @return the order, or null if it does not exist
+	 */
+	public static Resource parse(String xml, String id) {
+		return StrolchXmlHelper.parseAndReturnResource(xml, id);
 	}
 }
