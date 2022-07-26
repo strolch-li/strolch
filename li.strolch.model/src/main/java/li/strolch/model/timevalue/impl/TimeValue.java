@@ -67,16 +67,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 	@SuppressWarnings("unchecked")
 	@Override
 	public int compareTo(final ITimeValue<T> arg0) {
-		int i = getTime().compareTo(arg0.getTime());
-		if (i != 0)
-			return i;
-		if (this.value == null && arg0.getValue() == null)
-			return 0;
-		if (this.value == null)
-			return -1;
-		if (arg0.getValue() == null)
-			return 1;
-		return getValue().compareTo(arg0.getValue());
+		return getTime().compareTo(arg0.getTime());
 	}
 
 	@SuppressWarnings("unchecked")
