@@ -5,6 +5,7 @@ import static li.strolch.model.StrolchModelConstants.STATE_VALUES;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import li.strolch.model.Resource;
 import li.strolch.model.timedstate.BooleanTimedState;
@@ -29,7 +30,7 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		ITimeVariable<IntegerValue> timeEvolution = getIntegerMetric(metric).getTimeEvolution();
 		ITimeValue<IntegerValue> currentValue = timeEvolution.getValueAt(timeStamp);
 		if (currentValue != null && currentValue.getTime() == timeStamp) {
-			timeEvolution.setValueAt(timeStamp, currentValue.getCopy().add(getValue(value)).getValue());
+			timeEvolution.setValueAt(timeStamp, currentValue.getValue().add(value));
 		} else {
 			timeEvolution.setValueAt(timeStamp, getValue(value));
 		}
@@ -42,7 +43,7 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		ITimeVariable<IntegerListValue> timeEvolution = getIntegerListMetric(metric).getTimeEvolution();
 		ITimeValue<IntegerListValue> currentValue = timeEvolution.getValueAt(timeStamp);
 		if (currentValue != null && currentValue.getTime() == timeStamp) {
-			timeEvolution.setValueAt(timeStamp, currentValue.getCopy().add(getValueList(value)).getValue());
+			timeEvolution.setValueAt(timeStamp, currentValue.getValue().add(List.of(value)));
 		} else {
 			timeEvolution.setValueAt(timeStamp, getValueList(value));
 		}
@@ -55,11 +56,10 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		ITimeVariable<BooleanValue> timeEvolution = getBooleanMetric(metric).getTimeEvolution();
 		ITimeValue<BooleanValue> currentValue = timeEvolution.getValueAt(timeStamp);
 		if (currentValue != null && currentValue.getTime() == timeStamp) {
-			timeEvolution.setValueAt(timeStamp, currentValue.getCopy().add(getValue(value)).getValue());
+			timeEvolution.setValueAt(timeStamp, currentValue.getValue().add((value)));
 		} else {
 			timeEvolution.setValueAt(timeStamp, getValue(value));
-		}
-		timeEvolution.compact();
+		} timeEvolution.compact();
 		tx().update(metric);
 	}
 
@@ -106,11 +106,10 @@ public abstract class MetricPolicy extends StrolchPolicy {
 	}
 
 	protected long getTimeStamp(ZonedDateTime time) {
-		time = time.truncatedTo(ChronoUnit.HOURS);
-		return time.toInstant().toEpochMilli();
+		return time.truncatedTo(ChronoUnit.HOURS).toInstant().toEpochMilli();
 	}
 
 	protected int getDurationSeconds(Duration duration) {
-		return (int) duration.toSeconds();
+		return (int) duration.abs().toSeconds();
 	}
 }
