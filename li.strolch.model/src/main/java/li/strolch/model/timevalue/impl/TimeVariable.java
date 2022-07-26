@@ -15,10 +15,13 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import static java.util.Collections.*;
+import static java.util.Collections.unmodifiableNavigableSet;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Iterator;
+import java.util.NavigableSet;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchModelException;
@@ -38,15 +41,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 	@Override
 	public ITimeValue<T> getValueAt(long time) {
-		ITimeValue<T> tmp = null;
-		for (ITimeValue<T> value : this.container) {
-			if (value.getTime() <= time) {
-				tmp = value;
-			} else {
-				break;
-			}
-		}
-		return tmp;
+		return this.container.floor(new TimeValue<>(time, null));
 	}
 
 	@Override
