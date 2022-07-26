@@ -231,7 +231,7 @@
                 this.$.ajaxGetAppVersion.generateRequest();
             },
             reconnect: function () {
-                this.onGetVersionResponse = function (event) {
+                this.onGetAppVersionResponse = function (event) {
                     var version = event.detail.response;
                     this.scmRevision = version.appVersion.scmRevision;
                     sessionStorage.appScmRevision = this.scmRevision;
