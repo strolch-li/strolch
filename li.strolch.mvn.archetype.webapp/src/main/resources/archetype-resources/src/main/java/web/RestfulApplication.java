@@ -1,5 +1,7 @@
 package ${package}.web;
 
+import static ${package}.web.StartupListener.APP_NAME;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Priorities;
 import java.util.logging.Level;
@@ -12,11 +14,16 @@ import li.strolch.rest.filters.*;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationPath("rest")
 public class RestfulApplication extends ResourceConfig {
 
+	private static final Logger logger = LoggerFactory.getLogger(RestfulApplication.class);
+
 	public RestfulApplication() {
+		setApplicationName(APP_NAME);
 
 		// add project resources by package name
 		packages(BooksResource.class.getPackage().getName());
@@ -55,5 +62,10 @@ public class RestfulApplication extends ResourceConfig {
 			property(ServerProperties.TRACING, "ALL");
 			property(ServerProperties.TRACING_THRESHOLD, "TRACE");
 		}
+
+		logger.info(
+				"Initialized REST application " + getApplicationName() + " with " + getClasses().size() + " classes, "
+						+ getInstances().size() + " instances, " + getResources().size() + " resources and "
+						+ getProperties().size() + " properties");
 	}
 }

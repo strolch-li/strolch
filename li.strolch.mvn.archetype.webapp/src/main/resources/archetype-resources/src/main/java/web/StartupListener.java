@@ -18,7 +18,7 @@ import org.slf4j.impl.StaticLoggerBinder;
 public class StartupListener implements ServletContextListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(StartupListener.class);
-	private static final String APP_NAME = "eSyTest";
+	public static final String APP_NAME = "eSyTest";
 
 	private StrolchAgent agent;
 
