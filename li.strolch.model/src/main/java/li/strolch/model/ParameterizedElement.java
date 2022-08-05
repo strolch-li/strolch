@@ -17,8 +17,7 @@ package li.strolch.model;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.model.builder.BuilderHelper.buildParamName;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -97,24 +96,28 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	///
 
 	/**
-	 * Returns true if the parameter with the given key does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 * Returns true if the parameter with the given key does not exist or the value is empty, i.e.
+	 * {@link Parameter#isEmpty()} returns true
 	 *
 	 * @param paramKey
 	 * 		the parameter to check if it is empty
 	 *
-	 * @return true if the parameter with the given key does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 * @return true if the parameter with the given key does not exist or the value is empty, i.e.
+	 * {@link Parameter#isEmpty()} returns true
 	 */
 	public boolean isParamEmpty(String paramKey) {
 		return !this.hasParameter(paramKey) || getParameter(paramKey).isEmpty();
 	}
 
 	/**
-	 * Returns true if the parameter with the given key exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 * Returns true if the parameter with the given key exists and the value is not empty, i.e.
+	 * {@link Parameter#isSet()} returns true
 	 *
 	 * @param paramKey
 	 * 		the parameter to check if it has a value
 	 *
-	 * @return true if the parameter with the given key exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 * @return true if the parameter with the given key exists and the value is not empty, i.e.
+	 * {@link Parameter#isSet()} returns true
 	 */
 	public boolean isParamSet(String paramKey) {
 		return this.hasParameter(paramKey) && getParameter(paramKey).isSet();
@@ -1109,6 +1112,62 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 			return;
 		Parameter<?> param = getParameter(paramId);
 		param.accept(new SetParameterValueFromJsonVisitor(jsonObject, ignoreOnEmpty));
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element
+	 *
+	 * @param paramId
+	 * 		the parameter ID of which to copy the value
+	 * @param otherElement
+	 * 		the element from which to get the value to copy
+	 */
+	public void copyParameterValue(String paramId, ParameterizedElement otherElement) {
+		Parameter<?> otherParam = otherElement.getParameter(paramId);
+		getParameter(paramId, true).setValue(otherParam.getValue());
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element. Copying is done from the #BAG_PARAMETERS parameter bag
+	 *
+	 * @param paramId
+	 * 		the parameter ID of which to copy the value
+	 * @param otherElement
+	 * 		the element from which to get the value to copy
+	 */
+	public void copyParameterValue(String paramId, GroupedParameterizedElement otherElement) {
+		copyParameterValue(BAG_PARAMETERS, paramId, otherElement);
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element. Copying is done from the #BAG_RELATIONS parameter bag
+	 *
+	 * @param paramId
+	 * 		the parameter ID of which to copy the value
+	 * @param otherElement
+	 * 		the element from which to get the value to copy
+	 */
+	public void copyRelationId(String paramId, GroupedParameterizedElement otherElement) {
+		copyParameterValue(BAG_RELATIONS, paramId, otherElement);
+	}
+
+	/**
+	 * Copies the value of the parameter from the {@link ParameterBag} with the given bag and param ID from the given
+	 * element and sets it on the parameter on this element
+	 *
+	 * @param bagId
+	 * 		the ID of the bag from which to get the parameter from the other element
+	 * @param paramId
+	 * 		the parameter ID of which to copy the value
+	 * @param otherElement
+	 * 		the element from which to get the value to copy
+	 */
+	public void copyParameterValue(String bagId, String paramId, GroupedParameterizedElement otherElement) {
+		Parameter<?> otherParam = otherElement.getParameter(bagId, paramId);
+		getParameter(paramId, true).setValue(otherParam.getValue());
 	}
 
 	/**
