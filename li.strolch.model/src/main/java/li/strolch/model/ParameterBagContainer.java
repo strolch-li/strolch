@@ -26,13 +26,15 @@ public interface ParameterBagContainer extends StrolchElement {
 
 	/**
 	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e.
+	 * {@link Parameter#isEmpty()} returns true
 	 *
 	 * @param paramKey
 	 * 		the parameter to check if it is empty
 	 *
 	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e.
+	 * {@link Parameter#isEmpty()} returns true
 	 */
 	default boolean isParamEmpty(String paramKey) {
 		return !this.hasParameter(paramKey) || getParameter(paramKey).isEmpty();
@@ -40,7 +42,8 @@ public interface ParameterBagContainer extends StrolchElement {
 
 	/**
 	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e.
+	 * {@link Parameter#isEmpty()} returns true
 	 *
 	 * @param bagKey
 	 * 		the key from which {@link ParameterBag} to get the parameter
@@ -48,7 +51,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * 		the parameter to check if it is empty
 	 *
 	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e. {@link Parameter#isEmpty()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} does not exist or the value is empty, i.e.
+	 * {@link Parameter#isEmpty()} returns true
 	 */
 	default boolean isParamEmpty(String bagKey, String paramKey) {
 		return !this.hasParameter(bagKey, paramKey) || getParameter(bagKey, paramKey).isEmpty();
@@ -56,13 +60,15 @@ public interface ParameterBagContainer extends StrolchElement {
 
 	/**
 	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()}
+	 * returns true
 	 *
 	 * @param paramKey
 	 * 		the parameter to check if it has a value
 	 *
 	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()}
+	 * returns true
 	 */
 	default boolean isParamSet(String paramKey) {
 		return this.hasParameter(paramKey) && getParameter(paramKey).isSet();
@@ -70,7 +76,8 @@ public interface ParameterBagContainer extends StrolchElement {
 
 	/**
 	 * Returns true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()}
+	 * returns true
 	 *
 	 * @param bagKey
 	 * 		the key from which {@link ParameterBag} to get the parameter
@@ -78,7 +85,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * 		the parameter to check if it has a value
 	 *
 	 * @return true if the parameter with the given key on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()} returns true
+	 * {@link StrolchModelConstants#BAG_PARAMETERS} exists and the value is not empty, i.e. {@link Parameter#isSet()}
+	 * returns true
 	 */
 	default boolean isParamSet(String bagKey, String paramKey) {
 		return this.hasParameter(bagKey, paramKey) && getParameter(bagKey, paramKey).isSet();
@@ -553,9 +561,11 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * <p>Returns the default {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_PARAMETERS}</p>
+	 * <p>Returns the default {@link ParameterBag}, i.e. the bag with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}</p>
 	 *
-	 * <p><b>Note:</b> If the bag does not exist, it is created, and added to this container. Thus this element must not be read-only!</p>
+	 * <p><b>Note:</b> If the bag does not exist, it is created, and added to this container. Thus this element must
+	 * not be read-only!</p>
 	 *
 	 * @return the default {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_PARAMETERS}
 	 */
@@ -569,9 +579,11 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * <p>Returns the relations {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_RELATIONS}</p>
+	 * <p>Returns the relations {@link ParameterBag}, i.e. the bag with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}</p>
 	 *
-	 * <p><b>Note:</b> If the bag does not exist, it is created, and added to this container. Thus this element must not be read-only!</p>
+	 * <p><b>Note:</b> If the bag does not exist, it is created, and added to this container. Thus this element must
+	 * not be read-only!</p>
 	 *
 	 * @return the relations {@link ParameterBag}, i.e. the bag with the ID {@link StrolchModelConstants#BAG_RELATIONS}
 	 */
@@ -601,8 +613,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the {@link
-	 * ParameterBag} with the ID {@link StrolchModelConstants#BAG_PARAMETERS}
+	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the
+	 * {@link ParameterBag} with the ID {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter for which to return the value
@@ -636,8 +648,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the {@link
-	 * ParameterBag} with the given bagKey
+	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey on the
+	 * {@link ParameterBag} with the given bagKey
 	 *
 	 * @param bagKey
 	 * 		the key from which {@link ParameterBag} to get the parameter
@@ -1147,8 +1159,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link StringParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1182,8 +1194,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1217,8 +1229,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link IntegerParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1252,8 +1264,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link FloatParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1287,8 +1299,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link LongParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1322,8 +1334,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link DateParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1357,8 +1369,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link TextParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1392,8 +1404,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link DurationParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1428,8 +1440,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link StringListParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1464,8 +1476,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link IntegerListParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1500,8 +1512,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link FloatListParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1536,8 +1548,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Returns the {@link LongListParameter} with the given paramKey from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the parameter
@@ -1572,9 +1584,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link *
-	 * StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
-	 * exist
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link * StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does
+	 * not exist
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1584,9 +1596,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	<U, T extends Parameter<U>> T getParameter(String paramKey);
 
 	/**
-	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
-	 * exist
+	 * Returns the {@link Parameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}, or null if the {@link Parameter} or the {@link ParameterBag} does
+	 * not exist
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1638,9 +1650,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns a stream over the values of the {@link StringListParameter} with the given key from the {@link
-	 * ParameterBag} with the ID {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link
-	 * ParameterBag} does not exist, then a {@link StrolchModelException} is thrown
+	 * Returns a stream over the values of the {@link StringListParameter} with the given key from the
+	 * {@link ParameterBag} with the ID {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the
+	 * {@link ParameterBag} does not exist, then a {@link StrolchModelException} is thrown
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link StringParameter} for which the value is to be returned
@@ -1658,9 +1670,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Sets the value of the {@link StringParameter} with the given key on the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist, then a
-	 * {@link StrolchModelException} is thrown
+	 * Sets the value of the {@link StringParameter} with the given key on the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist,
+	 * then a {@link StrolchModelException} is thrown
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link StringParameter} for which the value is to be returned
@@ -1692,9 +1704,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist, then a
-	 * {@link StrolchModelException} is thrown
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist,
+	 * then a {@link StrolchModelException} is thrown
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1709,9 +1721,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
-	 * exist
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does
+	 * not exist
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1723,9 +1735,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
-	 * exist
+	 * Returns the {@link StringParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does
+	 * not exist
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1739,9 +1751,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
-	 * exist
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does
+	 * not exist
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1753,9 +1765,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist, then a
-	 * {@link StrolchModelException} is thrown
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, if the {@link Parameter} or the {@link ParameterBag} does not exist,
+	 * then a {@link StrolchModelException} is thrown
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1770,9 +1782,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does not
-	 * exist
+	 * Returns the {@link StringListParameter} with the given key from the {@link ParameterBag} with the ID
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, or null if the {@link Parameter} or the {@link ParameterBag} does
+	 * not exist
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be returned
@@ -1896,8 +1908,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Adds a new {@link Parameter} to the {@link ParameterBag} with the given key
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param parameter
 	 * 		the {@link Parameter} to be added to the {@link ParameterBag}
@@ -1921,8 +1933,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	void addParameter(String bagKey, Parameter<?> parameter) throws StrolchException;
 
 	/**
-	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the key {@link
-	 * StrolchModelConstants#BAG_PARAMETERS}
+	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the key
+	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be removed
@@ -1932,8 +1944,8 @@ public interface ParameterBagContainer extends StrolchElement {
 	<U, T extends Parameter<U>> T removeParameter(String paramKey);
 
 	/**
-	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the key {@link
-	 * StrolchModelConstants#BAG_RELATIONS}
+	 * Removes the {@link Parameter} with the given paramKey from the {@link ParameterBag} with the key
+	 * {@link StrolchModelConstants#BAG_RELATIONS}
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} which is to be removed
@@ -2078,8 +2090,9 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * 		the key of the {@link Parameter} to be found
 	 *
 	 * @return true if the {@link Parameter} with the given paramKey exists on the {@link ParameterBag} with the given
-	 * bagKey and the value of the parameter is also set, i.e. not empty. False is returned if the {@link ParameterBag} does not exist, the {@link Parameter} does not exist on
-	 * the {@link ParameterBag}, or the value of the parameter is empty
+	 * bagKey and the value of the parameter is also set, i.e. not empty. False is returned if the {@link ParameterBag}
+	 * does not exist, the {@link Parameter} does not exist on the {@link ParameterBag}, or the value of the parameter
+	 * is empty
 	 */
 	default boolean isRelationSet(String paramKey) {
 		StringParameter relationP = getParameter(BAG_RELATIONS, paramKey);
@@ -2087,14 +2100,14 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
-	 * Returns true if the {@link Parameter} with the given paramKey does not exist on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_RELATIONS} or if the value of the parameter is empty
+	 * Returns true if the {@link Parameter} with the given paramKey does not exist on the {@link ParameterBag} with the
+	 * id {@link StrolchModelConstants#BAG_RELATIONS} or if the value of the parameter is empty
 	 *
 	 * @param paramKey
 	 * 		the key of the {@link Parameter} to be found
 	 *
-	 * @return true if the {@link Parameter} with the given paramKey does not exist on the {@link ParameterBag} with the id
-	 * {@link StrolchModelConstants#BAG_RELATIONS} or if the value of the parameter is empty
+	 * @return true if the {@link Parameter} with the given paramKey does not exist on the {@link ParameterBag} with the
+	 * id {@link StrolchModelConstants#BAG_RELATIONS} or if the value of the parameter is empty
 	 */
 	default boolean isRelationEmpty(String paramKey) {
 		StringParameter relationP = getParameter(BAG_RELATIONS, paramKey);
@@ -2122,4 +2135,88 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @return the {@link Set} of keys for the {@link ParameterBag}s on this {@link GroupedParameterizedElement}
 	 */
 	Set<String> getParameterBagKeySet();
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element. Copying is done from the #BAG_PARAMETERS parameter bag
+	 *
+	 * @param paramId
+	 * 		the id of the parameter to fetch from the {@link ParameterBag} with the id #BAG_PARAMETERS
+	 * @param otherElement
+	 * 		the element from which to get the parameter
+	 */
+	default void copyParameterValue(String paramId, ParameterizedElement otherElement) {
+		copyParameterValue(BAG_PARAMETERS, paramId, otherElement);
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element. Copying is done from the #BAG_RELATIONS parameter bag
+	 *
+	 * @param paramId
+	 * 		the id of the parameter to fetch from the {@link ParameterBag} with the id #BAG_PARAMETERS
+	 * @param otherElement
+	 * 		the element from which to get the parameter
+	 */
+	default void copyRelationId(String paramId, ParameterizedElement otherElement) {
+		copyParameterValue(BAG_RELATIONS, paramId, otherElement);
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element
+	 *
+	 * @param bagId
+	 * 		the id of the bag from which to fetch the parameter
+	 * @param paramId
+	 * 		the id of the parameter to use
+	 * @param otherElement
+	 * 		the element from which to fetch the parameter
+	 */
+	default void copyParameterValue(String bagId, String paramId, ParameterizedElement otherElement) {
+		Parameter<?> otherParam = otherElement.getParameter(paramId);
+		getParameter(bagId, paramId, true).setValue(otherParam.getValue());
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element. Copying is done from the #BAG_PARAMETERS parameter bag
+	 *
+	 * @param paramId
+	 * 		the id of the parameter to use
+	 * @param otherElement
+	 * 		the element from which to fetch the parameter
+	 */
+	default void copyParameterValue(String paramId, ParameterBagContainer otherElement) {
+		copyParameterValue(BAG_PARAMETERS, paramId, otherElement);
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element. Copying is done from the #BAG_RELATIONS parameter bag
+	 *
+	 * @param paramId
+	 * 		the id of the parameter to use
+	 * @param otherElement
+	 * 		the element from which to fetch the parameter
+	 */
+	default void copyRelationId(String paramId, ParameterBagContainer otherElement) {
+		copyParameterValue(BAG_RELATIONS, paramId, otherElement);
+	}
+
+	/**
+	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
+	 * element
+	 *
+	 * @param bagId
+	 * 		the id of the bag from which to fetch the parameter
+	 * @param paramId
+	 * 		the id of the parameter to use
+	 * @param otherElement
+	 * 		the element from which to fetch the parameter
+	 */
+	default void copyParameterValue(String bagId, String paramId, ParameterBagContainer otherElement) {
+		Parameter<?> otherParam = otherElement.getParameter(bagId, paramId);
+		getParameter(bagId, paramId, true).setValue(otherParam.getValue());
+	}
 }
