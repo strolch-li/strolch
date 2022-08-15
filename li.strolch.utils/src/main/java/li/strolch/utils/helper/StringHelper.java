@@ -19,10 +19,10 @@ import static java.util.stream.Collectors.toSet;
 import static li.strolch.utils.helper.ByteHelper.setBit;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.Set;
@@ -596,8 +596,8 @@ public class StringHelper {
 	}
 
 	/**
-	 * Checks every value in the {@link Properties} and then then replaces any ${...} variables with keys in this {@link
-	 * Properties} value using {@link StringHelper#replacePropertiesIn(Properties, String)}
+	 * Checks every value in the {@link Properties} and then then replaces any ${...} variables with keys in this
+	 * {@link Properties} value using {@link StringHelper#replacePropertiesIn(Properties, String)}
 	 *
 	 * @param properties
 	 * 		the properties in which the values must have any ${...} replaced by values of the respective key
@@ -894,5 +894,42 @@ public class StringHelper {
 
 		uniqueId += 1;
 		return uniqueId;
+	}
+
+	/**
+	 * <p>Generates a string ID, using {@link SecureRandom} to concatenate ASCII characters of A-Z and 0-9 together
+	 * till the given length is reached.</p>
+	 *
+	 * <p>The following characters are filtered out:</p>
+	 * <ul>
+	 *     <li>O</li>
+	 *     <li>0</li>
+	 *     <li>I</li>
+	 *     <li>1</li>
+	 * </ul>
+	 *
+	 * <p>Examples:</p>
+	 * <ul>
+	 *     <li>QGAQ4QX3VX</li>
+	 *     <li>WMQLJAQY2N</li>
+	 * </ul>
+	 *
+	 * @param length
+	 * 		the length of the ID to generate
+	 *
+	 * @return the generated ID, e.g. RR1BEAQBS3
+	 */
+	public static String generateId(int length) {
+		StringBuilder sb = new StringBuilder();
+		SecureRandom secureRandom = new SecureRandom();
+		for (int i = 0; i < length; i++) {
+			char v;
+			do {
+				v = (char) (secureRandom.nextInt(42) + 48);
+			} while ((v > 57 && v < 65) || v == 'O' || v == '0' || v == '1' || v == 'I');
+			sb.append(v);
+		}
+
+		return sb.toString();
 	}
 }
