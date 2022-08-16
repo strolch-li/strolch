@@ -54,8 +54,6 @@
         <junit.version>4.13.2</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
 
-        <strolch.version>1.8.0-SNAPSHOT</strolch.version>
-
         <!-- strolch -->
         <strolch.version>1.8.0-SNAPSHOT</strolch.version>
 

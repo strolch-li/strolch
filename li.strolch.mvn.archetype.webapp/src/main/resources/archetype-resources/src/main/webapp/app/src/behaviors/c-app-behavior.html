@@ -17,10 +17,10 @@
         },
 
         _updatePageTitle: function (pageName) {
-            if (pageName === "eSyOrder" || pageName === "eSyOrder")
+            if (pageName === "${appName}" || pageName === "${appName}")
                 document.title = pageName;
             else
-                document.title = "eSyOrder: " + (this.localize == null ? pageName : this.localize(pageName));
+                document.title = "${appName}: " + (this.localize == null ? pageName : this.localize(pageName));
         },
 
         onLogOut: function () {

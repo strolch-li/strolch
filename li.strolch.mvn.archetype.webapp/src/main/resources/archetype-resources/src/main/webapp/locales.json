@@ -1,6 +1,6 @@
 {
   "de": {
-    "appTitle": "eSyOrder",
+    "appTitle": "${appName}",
     "demo-locations": "Demo Locations",
     "demo-books": "Demo Books",
     "title": "Title",
@@ -75,7 +75,7 @@
     "logout": "Logout",
     "info": "Information",
     "keepAlive": "Stay logged in",
-    "appTitle": "eSyOrder",
+    "appTitle": "${appName}",
     "language": "Language",
     "reports": "Reports",
     "operations-log": "Operation Logs",
@@ -128,7 +128,7 @@
     "login": "Login"
   },
   "fr": {
-    "appTitle": "eSyOrder",
+    "appTitle": "${appName}",
     "demo-locations": "Demo Locations",
     "demo-books": "Demo Books",
     "language": "Langue",
