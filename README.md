@@ -26,22 +26,18 @@ Strolch consists of the following modules:
 * li.strolch.testbase
 * li.strolch.performancetest
 
-And of course the website itself:
-* li.strolch.website
-
 ## Getting Started
 Either use a version on Maven Central: https://mvnrepository.com/artifact/li.strolch/li.strolch.agent
 
 Or install locally first:
 
-    git clone https://github.com/4treesCH/strolch.git
+    git clone https://github.com/strolch-li/strolch.git
     cd strolch
     mvn clean install -DskipTests
 
 Then you can create your own project. Please read the README files in the generated projects.
 
 To create a Strolch project see https://strolch.li/development/
-
 
 ## More Information
 
