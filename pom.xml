@@ -170,9 +170,6 @@
         <module>li.strolch.performancetest</module>
 
         <module>li.strolch.bom</module>
-        <module>li.strolch.mvn.archetype.main</module>
-        <module>li.strolch.mvn.archetype.webapp</module>
-
     </modules>
 
     <dependencyManagement>
