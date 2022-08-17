@@ -74,7 +74,8 @@ public class DefaultObserverHandler implements ObserverHandler {
 	@Override
 	public void stop() {
 		this.run = false;
-		this.updateTask.cancel(true);
+		if (this.updateTask != null)
+			this.updateTask.cancel(true);
 	}
 
 	@Override
