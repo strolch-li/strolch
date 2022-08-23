@@ -223,7 +223,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = validate(certificate);
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_GET_CERTIFICATES));
 
-		return this.privilegeContextMap.values().stream().map(PrivilegeContext::getCertificate)
+		return this.privilegeContextMap.values()
+				.stream()
+				.map(PrivilegeContext::getCertificate)
 				.collect(Collectors.toList());
 	}
 
@@ -237,8 +239,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Stream<Role> rolesStream = this.persistenceHandler.getAllRoles().stream();
 
 		// validate access to each role
-		rolesStream = rolesStream
-				.filter(role -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role))));
+		rolesStream = rolesStream.filter(
+				role -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role))));
 
 		return rolesStream.map(Role::asRoleRep).collect(Collectors.toList());
 	}
@@ -253,8 +255,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Stream<User> usersStream = this.persistenceHandler.getAllUsers().stream();
 
 		// validate access to each user
-		usersStream = usersStream
-				.filter(user -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user))));
+		usersStream = usersStream.filter(
+				user -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user))));
 
 		return usersStream.map(User::asUserRep).collect(Collectors.toList());
 	}
@@ -1493,7 +1495,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			return false;
 
 		List<Certificate> sessions = new ArrayList<>(this.privilegeContextMap.values()).stream()
-				.map(PrivilegeContext::getCertificate).filter(c -> !c.getUserState().isSystem())
+				.map(PrivilegeContext::getCertificate)
+				.filter(c -> !c.getUserState().isSystem())
 				.collect(Collectors.toList());
 
 		try (OutputStream fout = Files.newOutputStream(this.persistSessionsPath.toPath());
@@ -1506,9 +1509,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} catch (Exception e) {
 			logger.error("Failed to persist sessions!", e);
 			if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
-				logger.error(
-						"Failed to delete sessions file after failing to write to it, at " + this.persistSessionsPath
-								.getAbsolutePath());
+				logger.error("Failed to delete sessions file after failing to write to it, at "
+						+ this.persistSessionsPath.getAbsolutePath());
 			}
 		}
 
@@ -1643,9 +1645,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} else if (user.getHashAlgorithm() == null || user.getHashIterations() == -1 || user.getHashKeyLength() == -1) {
 			passwordHash = this.encryptionHandler.hashPassword(password, salt);
 		} else {
-			passwordHash = this.encryptionHandler
-					.hashPassword(password, salt, user.getHashAlgorithm(), user.getHashIterations(),
-							user.getHashKeyLength());
+			passwordHash = this.encryptionHandler.hashPassword(password, salt, user.getHashAlgorithm(),
+					user.getHashIterations(), user.getHashKeyLength());
 		}
 
 		// validate password
@@ -2130,6 +2131,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Set<String> userRoles = user.getRoles();
 		for (String roleName : userRoles) {
 			Role role = this.persistenceHandler.getRole(roleName);
+			if (role == null)
+				throw new IllegalStateException("Role " + roleName + " does not exist for user " + user.getUsername());
 			for (String privilegeName : role.getPrivilegeNames()) {
 				String roleOrigin = privilegeNames.get(privilegeName);
 				if (roleOrigin == null) {
@@ -2300,8 +2303,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * <p>
 	 * This method instantiates a {@link PrivilegePolicy} object from the given policyName. The {@link PrivilegePolicy}
-	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new {@link
-	 * PrivilegePolicy} object
+	 * is not stored in a database. The privilege name is a class name and is then used to instantiate a new
+	 * {@link PrivilegePolicy} object
 	 * </p>
 	 *
 	 * @param policyName
