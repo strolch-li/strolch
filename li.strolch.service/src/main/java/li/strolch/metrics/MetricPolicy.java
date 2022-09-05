@@ -26,7 +26,11 @@ public abstract class MetricPolicy extends StrolchPolicy {
 	}
 
 	public void incr(Resource metric, int value, ZonedDateTime time) {
-		long timeStamp = getTimeStamp(time);
+		incr(metric, value, time, ChronoUnit.HOURS);
+	}
+
+	public void incr(Resource metric, int value, ZonedDateTime time, ChronoUnit granularity) {
+		long timeStamp = getTimeStamp(time, granularity);
 		ITimeVariable<IntegerValue> timeEvolution = getIntegerMetric(metric).getTimeEvolution();
 		ITimeValue<IntegerValue> currentValue = timeEvolution.getValueAt(timeStamp);
 		if (currentValue != null && currentValue.getTime() == timeStamp) {
@@ -34,12 +38,15 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		} else {
 			timeEvolution.setValueAt(timeStamp, getValue(value));
 		}
-		timeEvolution.compact();
 		tx().update(metric);
 	}
 
 	public void add(Resource metric, int value, ZonedDateTime time) {
-		long timeStamp = getTimeStamp(time);
+		add(metric, value, time, ChronoUnit.HOURS);
+	}
+
+	public void add(Resource metric, int value, ZonedDateTime time, ChronoUnit granularity) {
+		long timeStamp = getTimeStamp(time, granularity);
 		ITimeVariable<IntegerListValue> timeEvolution = getIntegerListMetric(metric).getTimeEvolution();
 		ITimeValue<IntegerListValue> currentValue = timeEvolution.getValueAt(timeStamp);
 		if (currentValue != null && currentValue.getTime() == timeStamp) {
@@ -47,19 +54,17 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		} else {
 			timeEvolution.setValueAt(timeStamp, getValueList(value));
 		}
-		timeEvolution.compact();
 		tx().update(metric);
 	}
 
 	public void set(Resource metric, boolean value, ZonedDateTime time) {
-		long timeStamp = getTimeStamp(time);
+		set(metric, value, time, ChronoUnit.HOURS);
+	}
+
+	public void set(Resource metric, boolean value, ZonedDateTime time, ChronoUnit granularity) {
+		long timeStamp = getTimeStamp(time, granularity);
 		ITimeVariable<BooleanValue> timeEvolution = getBooleanMetric(metric).getTimeEvolution();
-		ITimeValue<BooleanValue> currentValue = timeEvolution.getValueAt(timeStamp);
-		if (currentValue != null && currentValue.getTime() == timeStamp) {
-			timeEvolution.setValueAt(timeStamp, currentValue.getValue().add((value)));
-		} else {
-			timeEvolution.setValueAt(timeStamp, getValue(value));
-		} timeEvolution.compact();
+		timeEvolution.setValueAt(timeStamp, getValue(value));
 		tx().update(metric);
 	}
 
@@ -105,8 +110,8 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		return new IntegerListValue(value);
 	}
 
-	protected long getTimeStamp(ZonedDateTime time) {
-		return time.truncatedTo(ChronoUnit.HOURS).toInstant().toEpochMilli();
+	protected long getTimeStamp(ZonedDateTime time, ChronoUnit granularity) {
+		return time.truncatedTo(granularity).toInstant().toEpochMilli();
 	}
 
 	protected int getDurationSeconds(Duration duration) {
