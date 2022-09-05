@@ -18,6 +18,7 @@ package li.strolch.model.activity;
 
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -67,7 +68,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	public Action(String id, String name, String type, String resourceId, String resourceType) {
 		super(id, name, type);
 		this.resourceId = resourceId;
-		this.resourceType = resourceType;
+		this.resourceType = trimOrEmpty(resourceType).intern();
 		this.state = State.CREATED;
 	}
 
