@@ -17,6 +17,7 @@ package li.strolch.model.timedstate;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 import li.strolch.model.*;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -48,7 +49,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	public AbstractStrolchTimedState(String id, String name) {
-		super(id, name);
+		super(trimOrEmpty(id).intern(), trimOrEmpty(name).intern());
 		this.state = new TimedState<>();
 	}
 
@@ -74,7 +75,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		if (StringHelper.isEmpty(interpretation)) {
 			this.interpretation = INTERPRETATION_NONE;
 		} else {
-			this.interpretation = interpretation;
+			this.interpretation = interpretation.intern();
 		}
 	}
 
@@ -89,7 +90,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		if (StringHelper.isEmpty(uom)) {
 			this.uom = UOM_NONE;
 		} else {
-			this.uom = uom;
+			this.uom = uom.intern();
 		}
 	}
 

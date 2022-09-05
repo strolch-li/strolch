@@ -52,8 +52,8 @@ public abstract class PolicyDef {
 	 */
 	public PolicyDef(String type, String value) {
 		super();
-		this.type = type;
-		this.value = value;
+		this.type = type.intern();
+		this.value = value.intern();
 	}
 
 	/**
