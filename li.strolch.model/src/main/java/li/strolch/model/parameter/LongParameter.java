@@ -150,11 +150,8 @@ public class LongParameter extends AbstractParameter<Long> {
 	@Override
 	public LongParameter getClone() {
 		LongParameter clone = new LongParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

@@ -126,11 +126,8 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	@Override
 	public BooleanParameter getClone() {
 		BooleanParameter clone = new BooleanParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

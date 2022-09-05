@@ -57,11 +57,8 @@ public class TextParameter extends StringParameter {
 	@Override
 	public TextParameter getClone() {
 		TextParameter clone = new TextParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

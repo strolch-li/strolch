@@ -157,11 +157,8 @@ public class FloatParameter extends AbstractParameter<Double> {
 	@Override
 	public FloatParameter getClone() {
 		FloatParameter clone = new FloatParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

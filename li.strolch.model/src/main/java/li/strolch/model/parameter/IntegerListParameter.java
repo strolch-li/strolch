@@ -74,11 +74,8 @@ public class IntegerListParameter extends AbstractListParameter<Integer> {
 	@Override
 	public IntegerListParameter getClone() {
 		IntegerListParameter clone = new IntegerListParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = new ArrayList<>(this.value);
 		return clone;
 	}
 
