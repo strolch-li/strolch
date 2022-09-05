@@ -150,11 +150,8 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 	@Override
 	public IntegerParameter getClone() {
 		IntegerParameter clone = new IntegerParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

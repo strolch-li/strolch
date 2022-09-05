@@ -89,7 +89,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 			throw new StrolchException(msg);
 		}
 
-		this.type = type;
+		this.type = type.intern();
 	}
 
 	///
@@ -1193,14 +1193,12 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		return lb.build();
 	}
 
-	@Override
-	protected void fillClone(StrolchElement clone) {
+	protected void fillClone(ParameterizedElement clone) {
 		super.fillClone(clone);
-		ParameterizedElement peClone = (ParameterizedElement) clone;
-		peClone.setType(this.type);
+		clone.type = this.type;
 		if (this.parameterMap != null) {
 			for (Parameter<?> param : this.parameterMap.values()) {
-				peClone.addParameter(param.getClone());
+				clone.addParameter(param.getClone());
 			}
 		}
 	}

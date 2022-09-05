@@ -181,13 +181,13 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * @param clone
 	 * 		the clone to fill
 	 */
-	protected void fillClone(Parameter<?> clone) {
+	protected void fillClone(AbstractParameter<?> clone) {
 		super.fillClone(clone);
 
-		clone.setHidden(this.hidden);
-		clone.setInterpretation(this.interpretation);
-		clone.setUom(this.uom);
-		clone.setIndex(this.index);
+		clone.hidden = this.hidden;
+		clone.interpretation = this.interpretation;
+		clone.uom = this.uom;
+		clone.index = this.index;
 	}
 
 	@SuppressWarnings("nls")

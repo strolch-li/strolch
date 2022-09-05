@@ -74,11 +74,8 @@ public class StringListParameter extends AbstractListParameter<String> {
 	@Override
 	public StringListParameter getClone() {
 		StringListParameter clone = new StringListParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = new ArrayList<>(this.value);
 		return clone;
 	}
 

@@ -43,6 +43,7 @@ import li.strolch.utils.dbc.DBC;
  */
 public class Action extends GroupedParameterizedElement implements IActivityElement, PolicyContainer {
 
+	protected Locator locator;
 	protected Activity parent;
 	protected String resourceId;
 	protected String resourceType;
@@ -211,10 +212,10 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	public Action getClone() {
 		Action clone = new Action();
 		super.fillClone(clone);
-
-		clone.setResourceId(this.resourceId);
-		clone.setResourceType(this.resourceType);
-		clone.setState(this.state);
+		clone.resourceId = this.resourceId;
+		clone.resourceType = this.resourceType;
+		clone.state = this.state;
+		clone.locator = this.locator;
 
 		if (this.changes != null) {
 			for (IValueChange<? extends IValue<?>> change : getChanges()) {
@@ -223,8 +224,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 		}
 
 		if (this.policyDefs != null)
-			clone.setPolicyDefs(this.policyDefs.getClone());
-
+			clone.policyDefs = this.policyDefs.getClone();
 		return clone;
 	}
 
@@ -306,11 +306,14 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public Locator getLocator() {
-		LocatorBuilder lb = new LocatorBuilder();
-		if (this.parent != null)
-			this.parent.fillLocator(lb);
-		fillLocator(lb);
-		return lb.build();
+		if (this.locator == null) {
+			LocatorBuilder lb = new LocatorBuilder();
+			if (this.parent != null)
+				this.parent.fillLocator(lb);
+			fillLocator(lb);
+			this.locator = lb.build();
+		}
+		return this.locator;
 	}
 
 	@Override

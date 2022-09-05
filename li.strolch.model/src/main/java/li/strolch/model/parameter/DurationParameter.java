@@ -163,11 +163,8 @@ public class DurationParameter extends AbstractParameter<PeriodDuration> {
 	@Override
 	public DurationParameter getClone() {
 		DurationParameter clone = new DurationParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

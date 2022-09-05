@@ -74,11 +74,8 @@ public class LongListParameter extends AbstractListParameter<Long> {
 	@Override
 	public LongListParameter getClone() {
 		LongListParameter clone = new LongListParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = new ArrayList<>(this.value);
 		return clone;
 	}
 
