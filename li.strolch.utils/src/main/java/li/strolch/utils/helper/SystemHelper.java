@@ -96,8 +96,12 @@ public class SystemHelper {
 		return FileHelper.humanizeFileSize(Runtime.getRuntime().maxMemory());
 	}
 
-	public static String getUsedMemory() {
+	public static String getTotalMemory() {
 		return FileHelper.humanizeFileSize(Runtime.getRuntime().totalMemory());
+	}
+
+	public static String getUsedMemory() {
+		return FileHelper.humanizeFileSize(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
 	}
 
 	public static String getFreeMemory() {
@@ -106,11 +110,13 @@ public class SystemHelper {
 
 	public static String getMemorySummary() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Memory available "); //$NON-NLS-1$
+		sb.append("System Memory available "); //$NON-NLS-1$
 		sb.append(SystemHelper.getMaxMemory());
-		sb.append(" / Used: "); //$NON-NLS-1$
+		sb.append(",  Total: "); //$NON-NLS-1$
+		sb.append(SystemHelper.getTotalMemory());
+		sb.append(",  Used: "); //$NON-NLS-1$
 		sb.append(SystemHelper.getUsedMemory());
-		sb.append(" / Free: "); //$NON-NLS-1$
+		sb.append(",  Free: "); //$NON-NLS-1$
 		sb.append(SystemHelper.getFreeMemory());
 		return sb.toString();
 	}
