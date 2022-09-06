@@ -273,6 +273,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.STARTED;
 
+		logger.info("Garbage collecting after startup...");
+		System.gc();
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString()));
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary()));
 		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",
