@@ -16,9 +16,11 @@ public class ObjectHelper {
 		if (left == null || right == null)
 			return false;
 
-		if (left instanceof Collection<?> leftCollection) {
+		if (left instanceof Collection) {
+			Collection<?> leftCollection = (Collection) left;
 
-			if (right instanceof Collection<?> rightCollection) {
+			if (right instanceof Collection) {
+				Collection<?> rightCollection = (Collection) right;
 				if (leftCollection.size() != rightCollection.size())
 					return false;
 
@@ -42,7 +44,8 @@ public class ObjectHelper {
 				return true;
 			}
 
-			if (right instanceof String[] rightArr) {
+			if (right instanceof String[]) {
+				String[] rightArr = (String[]) right;
 
 				int i = 0;
 				for (Object l : leftCollection) {
@@ -112,9 +115,11 @@ public class ObjectHelper {
 		if (right == null)
 			return false;
 
-		if (left instanceof Collection<?> leftCollection) {
+		if (left instanceof Collection) {
+			Collection<?> leftCollection = (Collection<?>) left;
 
-			if (right instanceof Collection<?> rightCollection) {
+			if (right instanceof Collection) {
+				Collection<?> rightCollection = (Collection<?>) right;
 				for (Object l : leftCollection) {
 					for (Object r : rightCollection) {
 						if (contains(l, r, ignoreCase))
@@ -125,7 +130,8 @@ public class ObjectHelper {
 				return false;
 			}
 
-			if (right instanceof String[] rightArr) {
+			if (right instanceof String[]) {
+				String[] rightArr = (String[]) right;
 				for (Object l : leftCollection) {
 					for (Object r : rightArr) {
 						if (contains(l, r, ignoreCase))
@@ -144,9 +150,11 @@ public class ObjectHelper {
 			return false;
 		}
 
-		if (left instanceof String leftString) {
+		if (left instanceof String) {
+			String leftString = (String) left;
 
-			if (right instanceof String[] rightArr) {
+			if (right instanceof String[]) {
+				String[] rightArr = (String[]) right;
 
 				if (ignoreCase) {
 					leftString = leftString.toLowerCase();
@@ -170,7 +178,8 @@ public class ObjectHelper {
 			if (right.getClass().isEnum())
 				right = ((Enum<?>) right).name();
 
-			if (right instanceof String rightString) {
+			if (right instanceof String) {
+				String rightString = (String) right;
 
 				if (ignoreCase)
 					return leftString.toLowerCase().contains(rightString.toLowerCase());
@@ -184,7 +193,8 @@ public class ObjectHelper {
 			return left.equals(right);
 
 		// try to coerce the right side to the left side
-		if (right instanceof String rightString) {
+		if (right instanceof String) {
+			String rightString = (String) right;
 			Object rightO;
 			if (left instanceof Integer) {
 				rightO = Integer.valueOf(rightString);
@@ -215,9 +225,11 @@ public class ObjectHelper {
 		if (right == null)
 			return false;
 
-		if (right instanceof Collection<?> collectionRight) {
+		if (right instanceof Collection) {
+			Collection<?> collectionRight = (Collection<?>) right;
 
-			if (left instanceof Collection<?> collectionLeft) {
+			if (left instanceof Collection) {
+				Collection<?> collectionLeft = (Collection<?>) left;
 				for (Object l : collectionLeft) {
 					for (Object r : collectionRight) {
 						if (equals(r, l, ignoreCase))
@@ -227,7 +239,8 @@ public class ObjectHelper {
 
 				return false;
 
-			} else if (left instanceof String[] leftArr) {
+			} else if (left instanceof String[]) {
+				String[] leftArr = (String[]) left;
 				for (Object r : collectionRight) {
 					for (Object l : leftArr) {
 						if (equals(r, l, ignoreCase))
@@ -247,7 +260,8 @@ public class ObjectHelper {
 			}
 		}
 
-		if (right instanceof Object[] arr) {
+		if (right instanceof Object[]) {
+			Object[] arr = (Object[]) right;
 			for (Object o : arr) {
 				if (equals(left, o, ignoreCase))
 					return true;
@@ -271,7 +285,9 @@ public class ObjectHelper {
 		if (right == null)
 			return false;
 
-		if (left instanceof String str && right instanceof String subStr) {
+		if (left instanceof String && right instanceof String) {
+			String str = (String) left;
+			String subStr = (String) right;
 
 			if (ignoreCase)
 				return str.toLowerCase().startsWith(subStr.toLowerCase());
@@ -289,7 +305,9 @@ public class ObjectHelper {
 		if (right == null)
 			return false;
 
-		if (left instanceof String str && right instanceof String subStr) {
+		if (left instanceof String && right instanceof String) {
+			String str = (String) left;
+			String subStr = (String) right;
 
 			if (ignoreCase)
 				return str.toLowerCase().endsWith(subStr.toLowerCase());
