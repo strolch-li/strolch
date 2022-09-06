@@ -61,6 +61,16 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	}
 
 	@Override
+	public void setId(String id) {
+		super.setId(trimOrEmpty(id).intern());
+	}
+
+	@Override
+	public void setName(String name) {
+		super.setName(trimOrEmpty(name).intern());
+	}
+
+	@Override
 	public boolean isHidden() {
 		return this.hidden;
 	}

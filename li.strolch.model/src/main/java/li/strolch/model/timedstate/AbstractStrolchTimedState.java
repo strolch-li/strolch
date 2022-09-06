@@ -49,8 +49,18 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	public AbstractStrolchTimedState(String id, String name) {
-		super(trimOrEmpty(id).intern(), trimOrEmpty(name).intern());
+		super(id, name);
 		this.state = new TimedState<>();
+	}
+
+	@Override
+	public void setId(String id) {
+		super.setId(trimOrEmpty(id).intern());
+	}
+
+	@Override
+	public void setName(String name) {
+		super.setName(trimOrEmpty(name).intern());
 	}
 
 	@Override
@@ -75,7 +85,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		if (StringHelper.isEmpty(interpretation)) {
 			this.interpretation = INTERPRETATION_NONE;
 		} else {
-			this.interpretation = interpretation.intern();
+			this.interpretation = interpretation;
 		}
 	}
 
@@ -100,7 +110,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		if (StringHelper.isEmpty(uom)) {
 			this.uom = UOM_NONE;
 		} else {
-			this.uom = uom.intern();
+			this.uom = uom;
 		}
 	}
 
