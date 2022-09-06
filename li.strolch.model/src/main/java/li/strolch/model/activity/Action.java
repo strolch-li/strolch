@@ -61,8 +61,18 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	public Action(String id, String name, String type) {
-		super(id, name, type);
+		super(trimOrEmpty(id).intern(), trimOrEmpty(name).intern(), trimOrEmpty(type));
 		this.state = State.CREATED;
+	}
+
+	@Override
+	public void setId(String id) {
+		super.setId(trimOrEmpty(id).intern());
+	}
+
+	@Override
+	public void setName(String name) {
+		super.setName(trimOrEmpty(name).intern());
 	}
 
 	public Action(String id, String name, String type, String resourceId, String resourceType) {
@@ -133,7 +143,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 */
 	public void setResourceType(String resourceType) {
 		assertNotReadonly();
-		this.resourceType = resourceType;
+		this.resourceType = trimOrEmpty(resourceType).intern();
 	}
 
 	/**
