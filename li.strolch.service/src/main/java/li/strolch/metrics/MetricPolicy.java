@@ -25,13 +25,14 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		super(tx);
 	}
 
-	public void incr(Resource metric, int value, ZonedDateTime time) {
-		incr(metric, value, time, ChronoUnit.HOURS);
+	public void incr(Resource metric, int value, ZonedDateTime time, String interpretation, String uom) {
+		incr(metric, value, time, interpretation, uom, ChronoUnit.HOURS);
 	}
 
-	public void incr(Resource metric, int value, ZonedDateTime time, ChronoUnit granularity) {
+	public void incr(Resource metric, int value, ZonedDateTime time, String interpretation, String uom,
+			ChronoUnit granularity) {
 		long timeStamp = getTimeStamp(time, granularity);
-		ITimeVariable<IntegerValue> timeEvolution = getIntegerMetric(metric).getTimeEvolution();
+		ITimeVariable<IntegerValue> timeEvolution = getIntegerMetric(metric, interpretation, uom).getTimeEvolution();
 		ITimeValue<IntegerValue> currentValue = timeEvolution.getValueAt(timeStamp);
 		if (currentValue != null && currentValue.getTime() == timeStamp) {
 			timeEvolution.setValueAt(timeStamp, currentValue.getValue().add(value));
@@ -41,13 +42,15 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		tx().update(metric);
 	}
 
-	public void add(Resource metric, int value, ZonedDateTime time) {
-		add(metric, value, time, ChronoUnit.HOURS);
+	public void add(Resource metric, int value, ZonedDateTime time, String interpretation, String uom) {
+		add(metric, value, time, interpretation, uom, ChronoUnit.HOURS);
 	}
 
-	public void add(Resource metric, int value, ZonedDateTime time, ChronoUnit granularity) {
+	public void add(Resource metric, int value, ZonedDateTime time, String interpretation, String uom,
+			ChronoUnit granularity) {
 		long timeStamp = getTimeStamp(time, granularity);
-		ITimeVariable<IntegerListValue> timeEvolution = getIntegerListMetric(metric).getTimeEvolution();
+		ITimeVariable<IntegerListValue> timeEvolution = getIntegerListMetric(metric, interpretation,
+				uom).getTimeEvolution();
 		ITimeValue<IntegerListValue> currentValue = timeEvolution.getValueAt(timeStamp);
 		if (currentValue != null && currentValue.getTime() == timeStamp) {
 			timeEvolution.setValueAt(timeStamp, currentValue.getValue().add(List.of(value)));
@@ -57,41 +60,48 @@ public abstract class MetricPolicy extends StrolchPolicy {
 		tx().update(metric);
 	}
 
-	public void set(Resource metric, boolean value, ZonedDateTime time) {
-		set(metric, value, time, ChronoUnit.HOURS);
+	public void set(Resource metric, boolean value, String interpretation, String uom, ZonedDateTime time) {
+		set(metric, value, time, interpretation, uom, ChronoUnit.HOURS);
 	}
 
-	public void set(Resource metric, boolean value, ZonedDateTime time, ChronoUnit granularity) {
+	public void set(Resource metric, boolean value, ZonedDateTime time, String interpretation, String uom,
+			ChronoUnit granularity) {
 		long timeStamp = getTimeStamp(time, granularity);
-		ITimeVariable<BooleanValue> timeEvolution = getBooleanMetric(metric).getTimeEvolution();
+		ITimeVariable<BooleanValue> timeEvolution = getBooleanMetric(metric, interpretation, uom).getTimeEvolution();
 		timeEvolution.setValueAt(timeStamp, getValue(value));
 		tx().update(metric);
 	}
 
-	protected IntegerTimedState getIntegerMetric(Resource metric) {
+	protected IntegerTimedState getIntegerMetric(Resource metric, String interpretation, String uom) {
 		IntegerTimedState metricT = metric.getTimedState(STATE_VALUES, false);
 		if (metricT == null) {
 			metricT = new IntegerTimedState(STATE_VALUES, "Values");
+			metricT.setInterpretation(interpretation);
+			metricT.setUom(uom);
 			metric.addTimedState(metricT);
 		}
 
 		return metricT;
 	}
 
-	protected BooleanTimedState getBooleanMetric(Resource metric) {
+	protected BooleanTimedState getBooleanMetric(Resource metric, String interpretation, String uom) {
 		BooleanTimedState metricT = metric.getTimedState(STATE_VALUES, false);
 		if (metricT == null) {
 			metricT = new BooleanTimedState(STATE_VALUES, "Values");
+			metricT.setInterpretation(interpretation);
+			metricT.setUom(uom);
 			metric.addTimedState(metricT);
 		}
 
 		return metricT;
 	}
 
-	protected IntegerListTimedState getIntegerListMetric(Resource metric) {
+	protected IntegerListTimedState getIntegerListMetric(Resource metric, String interpretation, String uom) {
 		IntegerListTimedState metricT = metric.getTimedState(STATE_VALUES, false);
 		if (metricT == null) {
 			metricT = new IntegerListTimedState(STATE_VALUES, "Values");
+			metricT.setInterpretation(interpretation);
+			metricT.setUom(uom);
 			metric.addTimedState(metricT);
 		}
 
