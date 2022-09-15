@@ -107,6 +107,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setState(TransactionState.OPEN);
 	}
 
+	@Override
 	public String getAction() {
 		return this.action;
 	}
@@ -124,8 +125,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public boolean isOpen() {
 		return this.txResult.getState().isOpen();
 	}
-
-
 
 	@Override
 	public boolean isRollingBack() {
@@ -191,11 +190,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	private void setCloseStrategy(TransactionCloseStrategy closeStrategy) {
 		this.closeStrategy = closeStrategy;
-	}
-
-	@Override
-	public void close() throws StrolchTransactionException {
-		this.closeStrategy.close(this);
 	}
 
 	@Override
@@ -317,11 +311,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		add(command);
 	}
 
+	@Override
 	public void add(Command command) {
 		assertNotReadOnly();
 		this.commands.add(command);
 	}
 
+	@Override
 	public boolean isReadOnly() {
 		return this.closeStrategy.isReadonly();
 	}
@@ -1572,10 +1568,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			this.txResult.setState(TransactionState.FAILED);
 
 			handleFailure(true, start, e);
-
-		} finally {
-			releaseElementLocks();
-			TransactionThreadLocal.removeTx();
 		}
 	}
 
@@ -1592,9 +1584,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		} catch (Exception e) {
 			handleFailure(true, start, e);
 			this.txResult.setState(TransactionState.FAILED);
-		} finally {
-			releaseElementLocks();
-			TransactionThreadLocal.removeTx();
 		}
 	}
 
@@ -1636,6 +1625,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			}
 			handleFailure(true, start, e);
 			this.txResult.setState(TransactionState.FAILED);
+		}
+	}
+
+	@Override
+	public void close() throws StrolchTransactionException {
+		try {
+			this.closeStrategy.close(this);
 		} finally {
 			releaseElementLocks();
 			TransactionThreadLocal.removeTx();
