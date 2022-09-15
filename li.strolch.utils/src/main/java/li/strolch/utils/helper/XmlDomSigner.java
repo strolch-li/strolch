@@ -62,7 +62,7 @@ public class XmlDomSigner {
 
 		try {
 
-			String id = "Signed_" + UUID.randomUUID().toString();
+			String id = "Signed_" + UUID.randomUUID();
 			Element rootElement = document.getDocumentElement();
 			rootElement.setAttribute("ID", id);
 			rootElement.setIdAttribute("ID", true);
@@ -78,18 +78,18 @@ public class XmlDomSigner {
 			List<Transform> transforms = new ArrayList<>();
 			transforms.add(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
 			transforms.add(fac.newTransform(CanonicalizationMethod.EXCLUSIVE, (TransformParameterSpec) null));
-			DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA1, null);
+			DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA256, null);
 			Reference ref = fac.newReference("#" + id, digestMethod, transforms, null, null);
 
 			// Create the SignedInfo.
 			SignedInfo signedInfo = fac.newSignedInfo(
 					fac.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE, (C14NMethodParameterSpec) null), //
-					fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null), //
+					fac.newSignatureMethod(SignatureMethod.RSA_SHA256, null), //
 					Collections.singletonList(ref));
 
 			// Load the KeyStore and get the signing key and certificate.
-			PrivateKeyEntry keyEntry = (PrivateKeyEntry) this.keyStore
-					.getEntry(this.privateKeyAlias, new KeyStore.PasswordProtection(this.password));
+			PrivateKeyEntry keyEntry = (PrivateKeyEntry) this.keyStore.getEntry(this.privateKeyAlias,
+					new KeyStore.PasswordProtection(this.password));
 			PrivateKey privateKey = keyEntry.getPrivateKey();
 			X509Certificate cert = (X509Certificate) keyEntry.getCertificate();
 
@@ -146,6 +146,7 @@ public class XmlDomSigner {
 
 			// Unmarshal the XMLSignature.
 			valContext.setProperty("javax.xml.crypto.dsig.cacheReference", Boolean.TRUE);
+			valContext.setProperty("org.jcp.xml.dsig.secureValidation", Boolean.FALSE);
 			XMLSignature signature = fac.unmarshalXMLSignature(valContext);
 
 			// Validate the XMLSignature.
