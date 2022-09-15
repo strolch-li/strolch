@@ -56,7 +56,6 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private boolean withoutPolicies;
 	private boolean withoutStateVariables;
 	private boolean withoutValueChanges;
-	private boolean withListParametersAsArray;
 	private int activityDepth = Integer.MAX_VALUE;
 
 	public StrolchElementToJsonVisitor() {
@@ -101,10 +100,6 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 
 	public boolean isWithoutValueChanges() {
 		return this.withoutValueChanges;
-	}
-
-	public boolean isWithListParametersAsArray() {
-		return this.withListParametersAsArray;
 	}
 
 	public StrolchElementToJsonVisitor withBagId() {
@@ -647,19 +642,6 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 				rootJ.addProperty(paramId, (Boolean) param.getValue());
 			} else if (type.isNumber()) {
 				rootJ.addProperty(paramId, (Number) param.getValue());
-			} else if (this.withListParametersAsArray && type.isList()) {
-				JsonArray valuesJ = switch (type) {
-					case FLOAT_LIST -> ((FloatListParameter) param).streamValues()
-							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-					case INTEGER_LIST -> ((IntegerListParameter) param).streamValues()
-							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-					case STRING_LIST -> ((StringListParameter) param).streamValues()
-							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-					case LONG_LIST -> ((LongListParameter) param).streamValues()
-							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-					default -> throw new IllegalStateException("Unhandle list type " + type);
-				};
-				rootJ.add(paramId, valuesJ);
 			} else {
 				rootJ.addProperty(paramId, param.getValueAsString());
 			}
