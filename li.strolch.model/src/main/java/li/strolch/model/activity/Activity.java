@@ -705,27 +705,21 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public Activity getClone(boolean withVersion) {
-
 		Activity clone = new Activity();
-		clone.timeOrdering = this.timeOrdering;
-
 		super.fillClone(clone);
+		clone.timeOrdering = this.timeOrdering;
+		clone.locator = this.locator;
 
-		if (this.elements == null)
-			return clone;
-
-		for (IActivityElement element : this.elements.values()) {
-			clone.addElement(element.getClone());
+		if (this.elements != null) {
+			for (IActivityElement element : this.elements.values()) {
+				clone.addElement(element.getClone());
+			}
 		}
 
 		if (this.policyDefs != null)
-			clone.setPolicyDefs(this.policyDefs.getClone());
-
+			clone.policyDefs = this.policyDefs.getClone();
 		if (withVersion)
-			clone.setVersion(this.version);
-
-		clone.locator = this.locator;
-
+			clone.version = this.version;
 		return clone;
 	}
 

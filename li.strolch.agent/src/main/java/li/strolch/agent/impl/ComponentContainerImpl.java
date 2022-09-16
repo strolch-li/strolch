@@ -40,7 +40,6 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
-import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.SystemHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,6 +279,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.STARTED;
 
+		logger.info("Garbage collecting after startup...");
+		System.gc();
 		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString()));
 		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary()));
 		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",

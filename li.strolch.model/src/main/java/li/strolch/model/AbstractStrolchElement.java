@@ -109,9 +109,9 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	 * @param clone
 	 * 		the clone to fill
 	 */
-	protected void fillClone(StrolchElement clone) {
-		clone.setId(getId());
-		clone.setName(getName());
+	protected void fillClone(AbstractStrolchElement clone) {
+		clone.id = this.id;
+		clone.name = this.name;
 	}
 
 	@Override

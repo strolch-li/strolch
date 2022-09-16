@@ -180,11 +180,8 @@ public class DateParameter extends AbstractParameter<Date> {
 	@Override
 	public DateParameter getClone() {
 		DateParameter clone = new DateParameter();
-
 		super.fillClone(clone);
-
-		clone.setValueFromZonedDateTime(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

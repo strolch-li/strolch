@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringParameter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -81,7 +80,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 			throw new StrolchException(msg);
 		}
 
-		this.type = type;
+		this.type = type.intern();
 	}
 
 	@Override
@@ -282,7 +281,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 */
 	protected void fillClone(GroupedParameterizedElement clone) {
 		super.fillClone(clone);
-		clone.setType(getType());
+		clone.type = this.type;
 
 		if (this.parameterBagMap != null) {
 			for (ParameterBag bag : this.parameterBagMap.values())

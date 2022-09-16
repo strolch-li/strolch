@@ -17,6 +17,7 @@ package li.strolch.model.parameter;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 import java.text.MessageFormat;
 
@@ -56,7 +57,17 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * 		the name
 	 */
 	public AbstractParameter(String id, String name) {
-		super(id, name);
+		super(trimOrEmpty(id).intern(), trimOrEmpty(name).intern());
+	}
+
+	@Override
+	public void setId(String id) {
+		super.setId(trimOrEmpty(id).intern());
+	}
+
+	@Override
+	public void setName(String name) {
+		super.setName(trimOrEmpty(name).intern());
 	}
 
 	@Override
@@ -81,7 +92,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		if (StringHelper.isEmpty(interpretation)) {
 			this.interpretation = INTERPRETATION_NONE;
 		} else {
-			this.interpretation = interpretation;
+			this.interpretation = interpretation.intern();
 		}
 	}
 
@@ -106,7 +117,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		if (StringHelper.isEmpty(uom)) {
 			this.uom = UOM_NONE;
 		} else {
-			this.uom = uom;
+			this.uom = uom.intern();
 		}
 	}
 
@@ -189,13 +200,13 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * @param clone
 	 * 		the clone to fill
 	 */
-	protected void fillClone(Parameter<?> clone) {
+	protected void fillClone(AbstractParameter<?> clone) {
 		super.fillClone(clone);
 
-		clone.setHidden(this.hidden);
-		clone.setInterpretation(this.interpretation);
-		clone.setUom(this.uom);
-		clone.setIndex(this.index);
+		clone.hidden = this.hidden;
+		clone.interpretation = this.interpretation;
+		clone.uom = this.uom;
+		clone.index = this.index;
 	}
 
 	@SuppressWarnings("nls")

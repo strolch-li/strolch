@@ -39,8 +39,8 @@ public abstract class PolicyDef {
 
 	private static final Logger logger = LoggerFactory.getLogger(PolicyDef.class);
 
-	protected String type;
-	protected String value;
+	protected final String type;
+	protected final String value;
 
 	/**
 	 * Create a new policy definition

@@ -74,11 +74,8 @@ public class FloatListParameter extends AbstractListParameter<Double> {
 	@Override
 	public FloatListParameter getClone() {
 		FloatListParameter clone = new FloatListParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = new ArrayList<>(this.value);
 		return clone;
 	}
 

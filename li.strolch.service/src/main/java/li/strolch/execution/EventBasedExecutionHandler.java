@@ -97,7 +97,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		// first stop and clear all existing controllers
 		synchronized (this.controllers) {
-			this.controllers.keySet().forEach(this::stopControllers);
+			new HashSet<>(this.controllers.keySet()).forEach(this::stopControllers);
 		}
 
 		if (this.delayedExecutionTimer != null) {

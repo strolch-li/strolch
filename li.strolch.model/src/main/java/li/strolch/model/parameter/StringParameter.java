@@ -149,11 +149,8 @@ public class StringParameter extends AbstractParameter<String> {
 	@Override
 	public StringParameter getClone() {
 		StringParameter clone = new StringParameter();
-
 		super.fillClone(clone);
-
-		clone.setValue(this.value);
-
+		clone.value = this.value;
 		return clone;
 	}
 

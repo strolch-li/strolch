@@ -309,10 +309,9 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public Resource getClone(boolean withVersion) {
-
 		Resource clone = new Resource();
-
 		super.fillClone(clone);
+		clone.locator = this.locator;
 
 		if (this.timedStateMap != null) {
 			for (StrolchTimedState<IValue<?>> timedState : this.timedStateMap.values()) {
@@ -321,13 +320,9 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		}
 
 		if (this.policyDefs != null)
-			clone.setPolicyDefs(this.policyDefs.getClone());
-
+			clone.policyDefs = this.policyDefs.getClone();
 		if (withVersion)
-			clone.setVersion(this.version);
-
-		clone.locator = this.locator;
-
+			clone.version = this.version;
 		return clone;
 	}
 

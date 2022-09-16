@@ -41,17 +41,17 @@ public class I18nMessage {
 	public I18nMessage(ResourceBundle bundle, String key) {
 		DBC.INTERIM.assertNotNull("bundle may not be null!", bundle);
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
-		this.key = key;
+		this.key = key.intern();
 		this.values = new Properties();
 		this.bundle = bundle;
-		this.bundleName = bundle.getBaseBundleName();
+		this.bundleName = bundle.getBaseBundleName().intern();
 	}
 
 	public I18nMessage(String bundle, String key, Properties values, String message) {
 		DBC.INTERIM.assertNotNull("bundle must not be empty!", bundle);
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
 		DBC.INTERIM.assertNotEmpty("message must be set!", message);
-		this.key = key;
+		this.key = key.intern();
 		this.values = values == null ? new Properties() : values;
 		this.message = message;
 		this.bundle = findBundle(bundle);

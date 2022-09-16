@@ -31,8 +31,8 @@ public class LogMessage extends I18nMessage {
 		// persisting in the DB only handles millisecond precision, not nano precision
 		ZonedDateTime now = ZonedDateTime.now();
 		this.zonedDateTime = now.withNano((now.getNano() / 1000000) * 1000000);
-		this.realm = realm;
-		this.username = username;
+		this.realm = realm.intern();
+		this.username = username.intern();
 		this.locator = locator;
 		this.severity = severity;
 		this.state = state;
@@ -45,8 +45,8 @@ public class LogMessage extends I18nMessage {
 		// persisting in the DB only handles millisecond precision, not nano precision
 		ZonedDateTime now = ZonedDateTime.now();
 		this.zonedDateTime = now.withNano((now.getNano() / 1000000) * 1000000);
-		this.realm = realm;
-		this.username = username;
+		this.realm = realm.intern();
+		this.username = username.intern();
 		this.locator = locator;
 		this.severity = severity;
 		this.state = state;
@@ -58,8 +58,8 @@ public class LogMessage extends I18nMessage {
 		super(bundle, key, values, message);
 		this.id = id;
 		this.zonedDateTime = zonedDateTime;
-		this.realm = realm;
-		this.username = username;
+		this.realm = realm.intern();
+		this.username = username.intern();
 		this.locator = locator;
 		this.severity = severity;
 		this.state = state;

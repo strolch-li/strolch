@@ -98,7 +98,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeElement(Resource resource) throws XMLStreamException {
-		boolean empty = !resource.hasParameterBags() && !resource.hasTimedStates() && !resource.hasPolicyDefs();
+		boolean empty = !resource.hasVersion() && !resource.hasParameterBags() && !resource.hasTimedStates()
+				&& !resource.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.RESOURCE, empty, resource);
 
@@ -119,7 +120,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeElement(Order order) throws XMLStreamException {
-		boolean empty = !order.hasParameterBags() && !order.hasPolicyDefs();
+		boolean empty = !order.hasVersion() && !order.hasParameterBags() && !order.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ORDER, empty, order);
 		this.writer.writeAttribute(Tags.DATE, ISO8601.toString(order.getDateZdt()));
@@ -139,7 +140,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeElement(Activity activity) throws XMLStreamException {
-		boolean empty = activity.hasVersion() && !activity.hasParameterBags() && !activity.hasElements()
+		boolean empty = !activity.hasVersion() && !activity.hasParameterBags() && !activity.hasElements()
 				&& !activity.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
