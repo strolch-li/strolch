@@ -21,8 +21,12 @@ import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LogMessagesTestRunner {
+
+	private static final Logger logger = LoggerFactory.getLogger(LogMessagesTestRunner.class);
 
 	private static final int MAX_MESSAGES = 100;
 
@@ -79,13 +83,16 @@ public class LogMessagesTestRunner {
 			}
 
 			// initialize with the existing message IDs
-			List<String> ids = this.operationsLog.getMessages(this.realmName).stream().map(LogMessage::getId)
+			List<String> ids = this.operationsLog.getMessages(this.realmName)
+					.stream()
+					.map(LogMessage::getId)
 					.collect(toList());
 
 			for (int i = 0; i < MAX_MESSAGES * 2; i++) {
 				LogMessage m = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "li.strolch.testbase", StrolchAgent.getUniqueId()),
-						LogSeverity.Exception, LogMessageState.Information, bundle, "test-message");
+						LogSeverity.Exception, LogMessageState.Information, bundle, "test-message").value("reason",
+						"" + i);
 				this.operationsLog.addMessage(m);
 				ids.add(m.getId());
 			}
@@ -103,10 +110,14 @@ public class LogMessagesTestRunner {
 
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-					List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE).stream()
-							.map(LogMessage::getId).sorted().collect(toList());
-					assertEquals(expectedSize, logMessageIds.size());
-					assertEquals(ids.subList(ids.size() - expectedSize, ids.size()), logMessageIds);
+					List<String> actualIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE)
+							.stream()
+							.map(LogMessage::getId)
+							.sorted()
+							.collect(toList());
+					assertEquals(expectedSize, actualIds.size());
+					List<String> expectedIds = ids.subList(ids.size() - expectedSize, ids.size());
+					assertEquals(expectedIds, actualIds);
 				}
 			}
 
@@ -158,8 +169,11 @@ public class LogMessagesTestRunner {
 			} else {
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-					List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE).stream()
-							.map(LogMessage::getId).sorted().collect(toList());
+					List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE)
+							.stream()
+							.map(LogMessage::getId)
+							.sorted()
+							.toList();
 					assertFalse(logMessageIds.contains(logMessage1.getId()));
 					assertFalse(logMessageIds.contains(logMessage2.getId()));
 					assertFalse(logMessageIds.contains(logMessage3.getId()));
