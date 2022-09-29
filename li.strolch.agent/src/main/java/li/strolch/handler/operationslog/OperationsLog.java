@@ -2,7 +2,10 @@ package li.strolch.handler.operationslog;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.ResourceBundle.getBundle;
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.model.log.LogMessageState.Information;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 import java.util.*;
@@ -10,7 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Locator;
@@ -47,13 +49,20 @@ public class OperationsLog extends StrolchComponent {
 
 	@Override
 	public void start() throws Exception {
-		runAsAgent(ctx -> {
-			Set<String> realmNames = getContainer().getRealmNames();
-			for (String realmName : realmNames) {
 
-				// ignore for transient realms
-				if (getContainer().getRealm(realmName).getMode().isTransient())
-					continue;
+		Set<String> realmNames = getContainer().getRealmNames();
+		for (String realmName : realmNames) {
+			StrolchRealm realm = getContainer().getRealm(realmName);
+			if (!realm.getMode().isTransient())
+				this.executorService.submit(() -> loadMessages(realmName));
+		}
+
+		super.start();
+	}
+
+	private synchronized void loadMessages(String realmName) {
+		try {
+			runAsAgent(ctx -> {
 
 				logger.info("Loading OperationsLog for realm " + realmName + "...");
 
@@ -61,14 +70,22 @@ public class OperationsLog extends StrolchComponent {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<LogMessage> messages = logMessageDao.queryLatest(realmName, this.maxMessages);
 					logger.info("Loaded " + messages.size() + " messages for OperationsLog for realm " + realmName);
-					this.logMessagesByRealmAndId.put(realmName, new LinkedHashSet<>(messages));
+					this.logMessagesByRealmAndId.computeIfAbsent(realmName, OperationsLog::newHashSet).addAll(messages);
 				} catch (RuntimeException e) {
 					logger.error("Failed to load operations log for realm " + realmName, e);
 				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to load operations logs!", e);
+			synchronized (this) {
+				this.logMessagesByRealmAndId.computeIfAbsent(realmName, OperationsLog::newHashSet)
+						.add(new LogMessage(realmName, SYSTEM_USER_AGENT,
+								Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception,
+								Information, getBundle("strolch-agent"), "operationsLog.load.failed") //
+								.value("reason", e.getMessage()) //
+								.withException(e));
 			}
-		});
-
-		super.start();
+		}
 	}
 
 	public void setMaxMessages(int maxMessages) {
@@ -82,14 +99,14 @@ public class OperationsLog extends StrolchComponent {
 		// store in global list
 		String realmName = logMessage.getRealm();
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
-				r -> new LinkedHashSet<>());
+				OperationsLog::newHashSet);
 		logMessages.add(logMessage);
 
 		// store under locator
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator.computeIfAbsent(
 				realmName, this::newBoundedLocatorMap);
 		LinkedHashSet<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
-				(l) -> new LinkedHashSet<>());
+				OperationsLog::newHashSet);
 		messages.add(logMessage);
 
 		// prune if necessary
@@ -101,7 +118,7 @@ public class OperationsLog extends StrolchComponent {
 			this.executorService.submit(() -> persist(realm, logMessage, messagesToRemove));
 	}
 
-	public void removeMessage(LogMessage message) {
+	public synchronized void removeMessage(LogMessage message) {
 
 		String realmName = message.getRealm();
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> byLocator = this.logMessagesByLocator.get(realmName);
@@ -169,6 +186,9 @@ public class OperationsLog extends StrolchComponent {
 
 	public synchronized void updateState(String realmName, String id, LogMessageState state) {
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realmName);
+		if (logMessages == null)
+			return;
+
 		for (LogMessage logMessage : logMessages) {
 			if (logMessage.getId().equals(id)) {
 				logMessage.setState(state);
@@ -188,9 +208,9 @@ public class OperationsLog extends StrolchComponent {
 		List<LogMessage> messagesToRemove = new ArrayList<>();
 
 		int maxDelete = Math.max(1, (int) (this.maxMessages * 0.1));
-		int nrOfExcessMsgs = logMessages.size() - this.maxMessages;
-		if (nrOfExcessMsgs > 0)
-			maxDelete += nrOfExcessMsgs;
+		int nrOfExcessMessages = logMessages.size() - this.maxMessages;
+		if (nrOfExcessMessages > 0)
+			maxDelete += nrOfExcessMessages;
 
 		logger.info("Pruning " + maxDelete + " messages from OperationsLog...");
 		Iterator<LogMessage> iterator = logMessages.iterator();
@@ -217,16 +237,7 @@ public class OperationsLog extends StrolchComponent {
 				}
 			});
 		} catch (Exception e) {
-			logger.error("Failed to persist operations logs!", e);
-			synchronized (this) {
-				this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), r -> new LinkedHashSet<>())
-						.add(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
-								Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
-								LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
-								"operationsLog.persist.failed") //
-								.value("reason", e.getMessage()) //
-								.withException(e));
-			}
+			handleFailedPersist(realm, e);
 		}
 	}
 
@@ -240,16 +251,7 @@ public class OperationsLog extends StrolchComponent {
 				}
 			});
 		} catch (Exception e) {
-			logger.error("Failed to persist operations logs!", e);
-			synchronized (this) {
-				this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), r -> new LinkedHashSet<>())
-						.add(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
-								Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
-								LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
-								"operationsLog.persist.failed") //
-								.value("reason", e.getMessage()) //
-								.withException(e));
-			}
+			handleFailedPersist(realm, e);
 		}
 	}
 
@@ -277,6 +279,18 @@ public class OperationsLog extends StrolchComponent {
 		return new ArrayList<>(logMessages);
 	}
 
+	private void handleFailedPersist(StrolchRealm realm, Exception e) {
+		logger.error("Failed to persist operations logs!", e);
+		synchronized (this) {
+			this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), OperationsLog::newHashSet)
+					.add(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
+							Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception, Information,
+							getBundle("strolch-agent"), "operationsLog.persist.failed") //
+							.value("reason", e.getMessage()) //
+							.withException(e));
+		}
+	}
+
 	private LinkedHashMap<Locator, LinkedHashSet<LogMessage>> newBoundedLocatorMap(String realm) {
 		return new LinkedHashMap<>() {
 			@Override
@@ -284,5 +298,9 @@ public class OperationsLog extends StrolchComponent {
 				return size() > maxMessages;
 			}
 		};
+	}
+
+	private static LinkedHashSet<LogMessage> newHashSet(Object o) {
+		return new LinkedHashSet<>();
 	}
 }
