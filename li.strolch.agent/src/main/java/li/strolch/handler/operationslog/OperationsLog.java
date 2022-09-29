@@ -10,6 +10,9 @@ import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -25,10 +28,14 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 
 public class OperationsLog extends StrolchComponent {
 
+	private LinkedBlockingQueue<LogTask> queue;
+
 	private Map<String, LinkedHashSet<LogMessage>> logMessagesByRealmAndId;
 	private Map<String, LinkedHashMap<Locator, LinkedHashSet<LogMessage>>> logMessagesByLocator;
 	private int maxMessages;
 	private ExecutorService executorService;
+	private Future<?> handleQueueTask;
+	private boolean run;
 
 	public OperationsLog(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -39,6 +46,7 @@ public class OperationsLog extends StrolchComponent {
 
 		this.maxMessages = configuration.getInt("maxMessages", 10000);
 
+		this.queue = new LinkedBlockingQueue<>();
 		this.logMessagesByRealmAndId = new HashMap<>();
 		this.logMessagesByLocator = new HashMap<>();
 
@@ -54,13 +62,41 @@ public class OperationsLog extends StrolchComponent {
 		for (String realmName : realmNames) {
 			StrolchRealm realm = getContainer().getRealm(realmName);
 			if (!realm.getMode().isTransient())
-				this.executorService.submit(() -> loadMessages(realmName));
+				this.queue.offer(() -> loadMessages(realmName));
 		}
+
+		this.run = true;
+		this.handleQueueTask = this.executorService.submit(this::handleQueue);
 
 		super.start();
 	}
 
-	private synchronized void loadMessages(String realmName) {
+	@Override
+	public void stop() throws Exception {
+		this.run = false;
+		if (this.handleQueueTask != null)
+			this.handleQueueTask.cancel(true);
+		if (this.executorService != null)
+			this.executorService.shutdownNow();
+		super.stop();
+	}
+
+	private void handleQueue() {
+		while (this.run) {
+			try {
+				LogTask poll = this.queue.poll(1, TimeUnit.SECONDS);
+				if (poll == null)
+					continue;
+
+				poll.run();
+
+			} catch (Exception e) {
+				logger.error("Failed to perform a log task", e);
+			}
+		}
+	}
+
+	private void loadMessages(String realmName) {
 		try {
 			runAsAgent(ctx -> {
 
@@ -77,14 +113,12 @@ public class OperationsLog extends StrolchComponent {
 			});
 		} catch (Exception e) {
 			logger.error("Failed to load operations logs!", e);
-			synchronized (this) {
-				this.logMessagesByRealmAndId.computeIfAbsent(realmName, OperationsLog::newHashSet)
-						.add(new LogMessage(realmName, SYSTEM_USER_AGENT,
-								Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception,
-								Information, getBundle("strolch-agent"), "operationsLog.load.failed") //
-								.value("reason", e.getMessage()) //
-								.withException(e));
-			}
+			addMessage(
+					new LogMessage(realmName, SYSTEM_USER_AGENT, Locator.valueOf(AGENT, "strolch-agent", getUniqueId()),
+							LogSeverity.Exception, Information, getBundle("strolch-agent"),
+							"operationsLog.load.failed") //
+							.value("reason", e.getMessage()) //
+							.withException(e));
 		}
 	}
 
@@ -92,10 +126,28 @@ public class OperationsLog extends StrolchComponent {
 		this.maxMessages = maxMessages;
 	}
 
-	public synchronized void addMessage(LogMessage logMessage) {
-		if (this.logMessagesByRealmAndId == null)
-			return;
+	public void addMessage(LogMessage logMessage) {
+		if (this.logMessagesByRealmAndId != null)
+			this.queue.offer(() -> _addMessage(logMessage));
+	}
 
+	public void removeMessage(LogMessage message) {
+		this.queue.offer(() -> _removeMessage(message));
+	}
+
+	public void removeMessages(Collection<LogMessage> logMessages) {
+		this.queue.offer(() -> _removeMessages(logMessages));
+	}
+
+	public void updateState(String realmName, Locator locator, LogMessageState state) {
+		this.queue.offer(() -> _updateState(realmName, locator, state));
+	}
+
+	public void updateState(String realmName, String id, LogMessageState state) {
+		this.queue.offer(() -> _updateState(realmName, id, state));
+	}
+
+	private void _addMessage(LogMessage logMessage) {
 		// store in global list
 		String realmName = logMessage.getRealm();
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
@@ -110,16 +162,15 @@ public class OperationsLog extends StrolchComponent {
 		messages.add(logMessage);
 
 		// prune if necessary
-		List<LogMessage> messagesToRemove = pruneMessages(logMessages);
+		List<LogMessage> messagesToRemove = _pruneMessages(realmName, logMessages);
 
 		// persist changes for non-transient realms
 		StrolchRealm realm = getContainer().getRealm(realmName);
 		if (!realm.getMode().isTransient())
-			this.executorService.submit(() -> persist(realm, logMessage, messagesToRemove));
+			persist(realm, logMessage, messagesToRemove);
 	}
 
-	public synchronized void removeMessage(LogMessage message) {
-
+	private void _removeMessage(LogMessage message) {
 		String realmName = message.getRealm();
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> byLocator = this.logMessagesByLocator.get(realmName);
 		if (byLocator != null) {
@@ -132,18 +183,16 @@ public class OperationsLog extends StrolchComponent {
 		}
 
 		LinkedHashSet<LogMessage> messages = this.logMessagesByRealmAndId.get(realmName);
-		if (messages != null) {
+		if (messages != null)
 			messages.remove(message);
 
-			// persist changes for non-transient realms
-			StrolchRealm realm = getContainer().getRealm(realmName);
-			if (!realm.getMode().isTransient())
-				this.executorService.submit(() -> persist(realm, null, singletonList(message)));
-		}
+		// persist changes for non-transient realms
+		StrolchRealm realm = getContainer().getRealm(realmName);
+		if (!realm.getMode().isTransient())
+			persist(realm, null, singletonList(message));
 	}
 
-	public synchronized void removeMessages(Collection<LogMessage> logMessages) {
-
+	private void _removeMessages(Collection<LogMessage> logMessages) {
 		Map<String, List<LogMessage>> messagesByRealm = logMessages.stream()
 				.collect(Collectors.groupingBy(LogMessage::getRealm));
 
@@ -162,29 +211,28 @@ public class OperationsLog extends StrolchComponent {
 			}
 
 			LinkedHashSet<LogMessage> byRealm = this.logMessagesByRealmAndId.get(realmName);
-			if (byRealm != null) {
+			if (byRealm != null)
 				messages.removeIf(logMessage -> !byRealm.remove(logMessage));
 
-				// persist changes for non-transient realms
-				StrolchRealm realm = getContainer().getRealm(realmName);
-				if (!realm.getMode().isTransient())
-					this.executorService.submit(() -> persist(realm, null, messages));
-			}
+			// persist changes for non-transient realms
+			StrolchRealm realm = getContainer().getRealm(realmName);
+			if (!realm.getMode().isTransient())
+				persist(realm, null, messages);
 		});
 	}
 
-	public synchronized void updateState(String realmName, Locator locator, LogMessageState state) {
+	private void _updateState(String realmName, Locator locator, LogMessageState state) {
 		getMessagesFor(realmName, locator).ifPresent(logMessages -> {
 			logMessages.forEach(logMessage -> logMessage.setState(state));
 
 			StrolchRealm realm = getContainer().getRealm(realmName);
-			if (!realm.getMode().isTransient()) {
-				this.executorService.submit(() -> updateStates(realm, logMessages));
-			}
+			if (!realm.getMode().isTransient())
+				updateStates(realm, logMessages);
+
 		});
 	}
 
-	public synchronized void updateState(String realmName, String id, LogMessageState state) {
+	private void _updateState(String realmName, String id, LogMessageState state) {
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realmName);
 		if (logMessages == null)
 			return;
@@ -194,14 +242,14 @@ public class OperationsLog extends StrolchComponent {
 				logMessage.setState(state);
 
 				StrolchRealm realm = getContainer().getRealm(realmName);
-				if (!realm.getMode().isTransient()) {
-					this.executorService.submit(() -> updateStates(realm, singletonList(logMessage)));
-				}
+				if (!realm.getMode().isTransient())
+					updateStates(realm, singletonList(logMessage));
+
 			}
 		}
 	}
 
-	private List<LogMessage> pruneMessages(LinkedHashSet<LogMessage> logMessages) {
+	private List<LogMessage> _pruneMessages(String realm, LinkedHashSet<LogMessage> logMessages) {
 		if (logMessages.size() < this.maxMessages)
 			return emptyList();
 
@@ -212,7 +260,7 @@ public class OperationsLog extends StrolchComponent {
 		if (nrOfExcessMessages > 0)
 			maxDelete += nrOfExcessMessages;
 
-		logger.info("Pruning " + maxDelete + " messages from OperationsLog...");
+		logger.info("Pruning " + maxDelete + " messages from realm " + realm + "...");
 		Iterator<LogMessage> iterator = logMessages.iterator();
 		while (maxDelete > 0 && iterator.hasNext()) {
 			LogMessage messageToRemove = iterator.next();
@@ -255,10 +303,12 @@ public class OperationsLog extends StrolchComponent {
 		}
 	}
 
-	public synchronized void clearMessages(String realm, Locator locator) {
-		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
-		if (logMessages != null)
-			logMessages.remove(locator);
+	public void clearMessages(String realm, Locator locator) {
+		this.queue.offer(() -> {
+			LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
+			if (logMessages != null)
+				logMessages.remove(locator);
+		});
 	}
 
 	public synchronized Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
@@ -281,14 +331,11 @@ public class OperationsLog extends StrolchComponent {
 
 	private void handleFailedPersist(StrolchRealm realm, Exception e) {
 		logger.error("Failed to persist operations logs!", e);
-		synchronized (this) {
-			this.logMessagesByRealmAndId.computeIfAbsent(realm.getRealm(), OperationsLog::newHashSet)
-					.add(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
-							Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception, Information,
-							getBundle("strolch-agent"), "operationsLog.persist.failed") //
-							.value("reason", e.getMessage()) //
-							.withException(e));
-		}
+		addMessage(new LogMessage(realm.getRealm(), SYSTEM_USER_AGENT,
+				Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception, Information,
+				getBundle("strolch-agent"), "operationsLog.persist.failed") //
+				.value("reason", e.getMessage()) //
+				.withException(e));
 	}
 
 	private LinkedHashMap<Locator, LinkedHashSet<LogMessage>> newBoundedLocatorMap(String realm) {
@@ -302,5 +349,9 @@ public class OperationsLog extends StrolchComponent {
 
 	private static LinkedHashSet<LogMessage> newHashSet(Object o) {
 		return new LinkedHashSet<>();
+	}
+
+	private interface LogTask {
+		void run() throws Exception;
 	}
 }
