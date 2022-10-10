@@ -76,6 +76,8 @@
         <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
 
         <jdk.version>17</jdk.version>
+        <maven.compiler.source>${jdk.version}</maven.compiler.source>
+        <maven.compiler.target>${jdk.version}</maven.compiler.target>
 
         <!-- compile time dependencies -->
         <slf4j.version>1.7.30</slf4j.version>
