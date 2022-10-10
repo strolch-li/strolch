@@ -148,7 +148,8 @@ public class Controller {
 	}
 
 	/**
-	 * Executes {@link Action Actions} for {@link Activity} of {@link Controller#getLocator()}. Keeps executing till no {@link Action} was set to {@link State#EXECUTED}
+	 * Executes {@link Action Actions} for {@link Activity} of {@link Controller#getLocator()}. Keeps executing till no
+	 * {@link Action} was set to {@link State#EXECUTED}
 	 */
 	public boolean execute() throws Exception {
 		return runAsAgentWithResult(ctx -> {
@@ -199,7 +200,8 @@ public class Controller {
 	 * @param tx
 	 * 		the TX
 	 *
-	 * @return true if execute should be called again, i.e. the {@link ExecuteActivityCommand#needsRetriggerOfExecution()} returns true and the activity isn't complete yet
+	 * @return true if execute should be called again, i.e. the
+	 * {@link ExecuteActivityCommand#needsRetriggerOfExecution()} returns true and the activity isn't complete yet
 	 */
 	protected boolean internalExecute(StrolchTransaction tx) {
 		if (this.activity.getState().isExecuted()) {
@@ -226,7 +228,8 @@ public class Controller {
 	}
 
 	/**
-	 * Completes the execution of the given {@link Action} with the given {@link Locator}, executing next {@link Action Actions} if possible
+	 * Completes the execution of the given {@link Action} with the given {@link Locator}, executing next
+	 * {@link Action Actions} if possible
 	 *
 	 * @param actionLoc
 	 * 		the {@link Locator} of the {@link Action} to set to executed
@@ -276,8 +279,8 @@ public class Controller {
 	 * <p>Simply calls the {@link SetActionToExecutedCommand} and then updates the observers</p>
 	 *
 	 * <p><b>Note:</b> Usually you will want to call {@link #toExecuted(Locator)} or
-	 * {@link #toExecuted(StrolchTransaction, Locator)}. This method expects the associated {@link Activity} to
-	 * already be locked, and validated that this action is in execution</p>
+	 * {@link #toExecuted(StrolchTransaction, Locator)}. This method expects the associated {@link Activity} to already
+	 * be locked, and validated that this action is in execution</p>
 	 *
 	 * @param tx
 	 * 		the TX
@@ -300,8 +303,8 @@ public class Controller {
 	 * <p>Keeps triggering till {@link #internalExecute(StrolchTransaction)} returns false.</p>
 	 *
 	 * <p>This occurs when the {@link Action} which is executed, has state set to {@link State#EXECUTED} instead of
-	 * {@link State#EXECUTION}. Thus the execution thread stays with this activity, keeping resources bound to it,
-	 * till we can wait and allow other activities to execute</p>
+	 * {@link State#EXECUTION}. Thus the execution thread stays with this activity, keeping resources bound to it, till
+	 * we can wait and allow other activities to execute</p>
 	 *
 	 * @param tx
 	 * 		the TX
@@ -344,9 +347,9 @@ public class Controller {
 	 * 		the {@link Locator} of the {@link Action} to set to stopped
 	 */
 	public void toStopped(StrolchTransaction tx, Locator actionLoc) throws Exception {
-		if (invalidActionContext(tx, actionLoc))
-			return;
-
+		lockWithRetries(tx);
+		if (!refreshActivity(tx))
+			throw new IllegalStateException("Activity " + actionLoc.trim(3) + " does not exist anymore!");
 		Action action = this.activity.getElementByLocator(actionLoc);
 		internalToStopped(tx, action);
 	}
@@ -467,8 +470,8 @@ public class Controller {
 				logger.error("Failed to set " + locator + " to error due to " + e.getMessage(), e);
 
 				if (this.agent.hasComponent(OperationsLog.class)) {
-					this.agent.getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
+					this.agent.getComponent(OperationsLog.class)
+							.addMessage(new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
 									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 									"execution.handler.failed.error").withException(e).value("reason", e));
 				}
@@ -490,8 +493,8 @@ public class Controller {
 				logger.error("Failed to set " + locator + " to warning due to " + e.getMessage(), e);
 
 				if (this.agent.hasComponent(OperationsLog.class)) {
-					this.agent.getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
+					this.agent.getComponent(OperationsLog.class)
+							.addMessage(new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
 									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 									"execution.handler.failed.warning").withException(e).value("reason", e));
 				}
