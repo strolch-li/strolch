@@ -2,6 +2,7 @@ package li.strolch.execution;
 
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,7 @@ import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
+import li.strolch.utils.time.PeriodDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +51,18 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 	}
 
 	@Override
-	public void delay(long duration, Runnable runnable) {
-		getExecutor().schedule(runnable, duration, TimeUnit.MILLISECONDS);
+	public ScheduledFuture<?> delay(PeriodDuration duration, Runnable runnable) {
+		return delay(duration.toMillis(), runnable);
+	}
+
+	@Override
+	public ScheduledFuture<?> delay(Duration duration, Runnable runnable) {
+		return delay(duration.toMillis(), runnable);
+	}
+
+	@Override
+	public ScheduledFuture<?> delay(long duration, Runnable runnable) {
+		return getExecutor().schedule(runnable, duration, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -93,8 +105,9 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 			logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
 
 			if (this.agent.getContainer().hasComponent(OperationsLog.class)) {
-				this.agent.getContainer().getComponent(OperationsLog.class).addMessage(
-						new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
+				this.agent.getContainer()
+						.getComponent(OperationsLog.class)
+						.addMessage(new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
 								LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 								"execution.handler.failed.executed").withException(e).value("reason", e));
 			}
