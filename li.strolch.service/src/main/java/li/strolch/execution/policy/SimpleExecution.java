@@ -46,8 +46,18 @@ public class SimpleExecution extends ExecutionPolicy {
 			this.warningTask = null;
 		}
 
-		DurationParameter durationP = findActionDuration(action);
-		this.warningTask = getDelayedExecutionTimer().delay(durationP.getValue(), () -> toWarning(handler.get()));
+		this.warningTask = getDelayedExecutionTimer().delay(duration, () -> handleToWarning(handler));
+		logger.info("Registered warning task for action " + this.actionLoc);
+	}
+
+	private void handleToWarning(Supplier<LogMessage> handler) {
+		try {
+			LogMessage logMessage = handler.get();
+			logger.warn("Action " + this.actionLoc + " is in warning with message: " + logMessage.getMessage());
+			toWarning(logMessage);
+		} catch (Exception e) {
+			logger.error("Failed to perform warning task for action " + this.actionLoc, e);
+		}
 	}
 
 	protected void cancelWarningTask() {
@@ -127,7 +137,6 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	protected void toWarning(LogMessage message) {
 		cancelWarningTask();
-		stop();
 		addMessage(message);
 		getController().asyncToWarning(message.getLocator());
 	}
