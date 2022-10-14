@@ -6,9 +6,6 @@
 			<Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
 			<Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
 		</Privilege>
-		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
-			<AllAllowed>true</AllAllowed>
-		</Privilege>
 		<Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
@@ -53,9 +50,6 @@
 
 	<Role name="AppUser">
 		<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
-			<AllAllowed>true</AllAllowed>
-		</Privilege>
-		<Privilege name="li.strolch.model.query.StrolchQuery" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 		<Privilege name="li.strolch.search.StrolchSearch" policy="DefaultPrivilege">

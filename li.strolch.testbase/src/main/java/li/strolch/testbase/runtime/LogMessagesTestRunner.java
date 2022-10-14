@@ -138,12 +138,14 @@ public class LogMessagesTestRunner {
 
 			// update state of element
 			this.operationsLog.updateState(this.realmName, logMessage1.getLocator(), LogMessageState.Inactive);
-			assertEquals(LogMessageState.Inactive, logMessage1.getState());
 
 			// default is async persisting...
 			Thread.sleep(50L);
 
+			assertEquals(LogMessageState.Inactive, logMessage1.getState());
+
 			this.operationsLog.updateState(this.realmName, logMessage1.getId(), LogMessageState.Active);
+			Thread.sleep(50L);
 			assertEquals(LogMessageState.Active, logMessage1.getState());
 
 			// default is async persisting...
@@ -151,6 +153,7 @@ public class LogMessagesTestRunner {
 
 			// now try and remove a single element
 			this.operationsLog.removeMessage(logMessage1);
+			Thread.sleep(50L);
 			assertFalse(this.operationsLog.getMessagesFor(this.realmName, logMessage1.getLocator()).isPresent());
 
 			// now remove bulk

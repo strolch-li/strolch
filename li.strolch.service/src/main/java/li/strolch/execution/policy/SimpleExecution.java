@@ -1,7 +1,9 @@
 package li.strolch.execution.policy;
 
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.execution.ExecutionHandler;
@@ -9,10 +11,12 @@ import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.log.LogMessage;
+import li.strolch.model.parameter.DurationParameter;
 import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.utils.time.PeriodDuration;
 
 /**
  * <p>
@@ -23,8 +27,44 @@ import li.strolch.privilege.model.PrivilegeContext;
  */
 public class SimpleExecution extends ExecutionPolicy {
 
+	private ScheduledFuture<?> warningTask;
+
 	public SimpleExecution(StrolchTransaction tx) {
 		super(tx);
+	}
+
+	protected void startWarningTask(Action action, Supplier<LogMessage> handler) {
+		DurationParameter durationP = findActionDuration(action);
+		startWarningTask(durationP.getValue(), action, handler);
+	}
+
+	protected void startWarningTask(PeriodDuration duration, Action action, Supplier<LogMessage> handler) {
+		if (this.warningTask != null) {
+			logger.warn("There is already a warning task registered, for action " + action.getLocator()
+					+ ". Cancelling and creating a new task...");
+			this.warningTask.cancel(true);
+			this.warningTask = null;
+		}
+
+		this.warningTask = getDelayedExecutionTimer().delay(duration, () -> handleToWarning(handler));
+		logger.info("Registered warning task for action " + this.actionLoc);
+	}
+
+	private void handleToWarning(Supplier<LogMessage> handler) {
+		try {
+			LogMessage logMessage = handler.get();
+			logger.warn("Action " + this.actionLoc + " is in warning with message: " + logMessage.getMessage());
+			toWarning(logMessage);
+		} catch (Exception e) {
+			logger.error("Failed to perform warning task for action " + this.actionLoc, e);
+		}
+	}
+
+	protected void cancelWarningTask() {
+		if (this.warningTask != null) {
+			this.warningTask.cancel(true);
+			this.warningTask = null;
+		}
 	}
 
 	@Override
@@ -42,6 +82,7 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toExecuted(Action action) {
+		cancelWarningTask();
 		stop();
 
 		setActionState(action, State.EXECUTED);
@@ -52,6 +93,7 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toStopped(Action action) {
+		cancelWarningTask();
 		stop();
 
 		setActionState(action, State.STOPPED);
@@ -62,6 +104,7 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toError(Action action) {
+		cancelWarningTask();
 		stop();
 
 		setActionState(action, State.ERROR);
@@ -78,12 +121,14 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void toExecuted() throws Exception {
+		cancelWarningTask();
 		stop();
 		getController().toExecuted(this.actionLoc);
 		getComponent(ExecutionHandler.class).triggerExecution(this.realm);
 	}
 
 	protected void toError(LogMessage message) {
+		cancelWarningTask();
 		stop();
 		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
 		addMessage(message);
@@ -91,7 +136,7 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void toWarning(LogMessage message) {
-		stop();
+		cancelWarningTask();
 		addMessage(message);
 		getController().asyncToWarning(message.getLocator());
 	}

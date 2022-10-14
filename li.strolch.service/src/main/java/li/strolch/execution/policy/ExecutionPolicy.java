@@ -16,6 +16,7 @@ import li.strolch.execution.Controller;
 import li.strolch.execution.DelayedExecutionTimer;
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.model.Locator;
+import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -50,6 +51,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 
 	protected String realm;
 	protected String actionType;
+	protected Locator resourceLoc;
 	protected Locator actionLoc;
 
 	/**
@@ -65,7 +67,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * <p>Set the {@link Controller} for this execution policy. Usually called by the controller itself, when instantiating this instance</p>
+	 * <p>Set the {@link Controller} for this execution policy. Usually called by the controller itself, when
+	 * instantiating this instance</p>
 	 *
 	 * <p><b>Note:</b> This is used as execution policies can have a longer lifecycle than its transaction.</p>
 	 *
@@ -87,6 +90,22 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	public Controller getController() {
 		return this.controller;
+	}
+
+	/**
+	 * Returns the type of the {@link Resource} for this action. Can only be called after {@link #initialize(Action)}
+	 * was called.
+	 */
+	protected String getResourceType() {
+		return this.resourceLoc.get(1);
+	}
+
+	/**
+	 * Returns the id of the {@link Resource} for this action. Can only be called after {@link #initialize(Action)} was
+	 * called.
+	 */
+	protected String getResourceId() {
+		return this.resourceLoc.get(2);
 	}
 
 	/**
@@ -144,8 +163,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Performs any initialization of this {@link ExecutionPolicy} for the given action, this method stores the {@link
-	 * Locator} of the action and its type
+	 * Performs any initialization of this {@link ExecutionPolicy} for the given action, this method stores the
+	 * {@link Locator} of the action and its type
 	 *
 	 * @param action
 	 * 		the action for which to initialize
@@ -153,6 +172,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	public void initialize(Action action) {
 		this.actionType = action.getType();
 		this.actionLoc = action.getLocator();
+		this.resourceLoc = action.getResourceLocator();
 	}
 
 	/**
@@ -172,8 +192,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	public abstract void toExecuted(Action action);
 
 	/**
-	 * Stops the execution of this {@link Action} without completing its execution, i.e. sets the state to {@link
-	 * State#STOPPED}
+	 * Stops the execution of this {@link Action} without completing its execution, i.e. sets the state to
+	 * {@link State#STOPPED}
 	 *
 	 * @param action
 	 * 		the action to stop execution for
@@ -181,8 +201,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	public abstract void toStopped(Action action);
 
 	/**
-	 * Sets this {@link Action} which should be in execution to an error state, i.e. sets the state to {@link
-	 * State#ERROR}
+	 * Sets this {@link Action} which should be in execution to an error state, i.e. sets the state to
+	 * {@link State#ERROR}
 	 *
 	 * @param action
 	 * 		the action to set to error state
@@ -190,8 +210,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	public abstract void toError(Action action);
 
 	/**
-	 * Sets this {@link Action} which should be in execution to a warning state, i.e. sets the state to {@link
-	 * State#WARNING}
+	 * Sets this {@link Action} which should be in execution to a warning state, i.e. sets the state to
+	 * {@link State#WARNING}
 	 *
 	 * @param action
 	 * 		the action to set to warning state
@@ -219,7 +239,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Updates the state of the given {@link Action} to the given {@link State} and updates the {@link Activity} for persisting on the TX
+	 * Updates the state of the given {@link Action} to the given {@link State} and updates the {@link Activity} for
+	 * persisting on the TX
 	 *
 	 * @param action
 	 * 		the action to change
@@ -242,6 +263,16 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Finds the duration of the given {@link Action} by searching the activity hierarchy using
+	 * {@link Action#findParameter(String, String, boolean)} using #BAG_OBJECTIVES and #PARAM_DURATION.
+	 *
+	 * @return the {@link DurationParameter}
+	 */
+	protected DurationParameter findActionDuration(Action action) {
+		return action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
+	}
+
+	/**
 	 * Delays the given {@link Runnable} by the given {@link Duration}
 	 *
 	 * @param duration
@@ -255,15 +286,16 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Async method to delay setting the given {@link Action} to executed by the duration defined by the {@link DurationParameter} found by calling {@link Action#findParameter(String, String, boolean)}
+	 * Async method to delay setting the given {@link Action} to executed by the duration defined by the
+	 * {@link DurationParameter} found by calling {@link Action#findParameter(String, String, boolean)}
 	 */
 	protected void delayToExecuted(Action action) {
-		DurationParameter durationP = action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
-		delayToExecutedBy(durationP);
+		delayToExecutedBy(findActionDuration(action));
 	}
 
 	/**
-	 * Async method to delay setting the {@link Action} to executed by the duration defined by the given {@link DurationParameter}
+	 * Async method to delay setting the {@link Action} to executed by the duration defined by the given
+	 * {@link DurationParameter}
 	 */
 	protected void delayToExecutedBy(DurationParameter durationP) {
 		long duration = durationP.getValue().toMillis();
@@ -278,8 +310,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Async method to delay setting the {@link Action} to executed by the given duration,
-	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 * Async method to delay setting the {@link Action} to executed by the given duration, but randomly changing the
+	 * duration in milliseconds by the given min and max factors
 	 */
 	protected void delayToExecutedByRandom(Duration duration, double minFactor, double maxFactor) {
 		long durationMs = duration.toMillis();
@@ -287,19 +319,17 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Async method to delay setting the given {@link Action} to executed by the duration defined
-	 * by the {@link DurationParameter} found by calling {@link Action#findParameter(String, String, boolean)},
-	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 * Async method to delay setting the given {@link Action} to executed by the duration defined by the
+	 * {@link DurationParameter} found by calling {@link Action#findParameter(String, String, boolean)}, but randomly
+	 * changing the duration in milliseconds by the given min and max factors
 	 */
 	protected void delayToExecutedByRandom(Action action, double minFactor, double maxFactor) {
-		DurationParameter durationP = action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
-		delayToExecutedByRandom(durationP, minFactor, maxFactor);
+		delayToExecutedByRandom(findActionDuration(action), minFactor, maxFactor);
 	}
 
 	/**
-	 * Async method to delay setting the {@link Action} to executed
-	 * by the duration defined by the given {@link DurationParameter},
-	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 * Async method to delay setting the {@link Action} to executed by the duration defined by the given
+	 * {@link DurationParameter}, but randomly changing the duration in milliseconds by the given min and max factors
 	 */
 	protected void delayToExecutedByRandom(DurationParameter durationP, double minFactor, double maxFactor) {
 		long duration = durationP.getValue().toMillis();
@@ -307,16 +337,16 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Async method to delay setting the {@link Action} to executed by the given duration,
-	 * but randomly changing the duration in milliseconds by the given min and max factors
+	 * Async method to delay setting the {@link Action} to executed by the given duration, but randomly changing the
+	 * duration in milliseconds by the given min and max factors
 	 */
 	protected void delayToExecutedByRandom(long duration, double minFactor, double maxFactor, TimeUnit delayUnit) {
 		delayToExecutedByRandom((long) (duration * minFactor), (long) (duration * maxFactor), delayUnit);
 	}
 
 	/**
-	 * Async method to delay setting the {@link Action} to executed by randomly choosing a value
-	 * by calling {@link ThreadLocalRandom#nextLong(long, long)} passing min and max as origin and bound respectively
+	 * Async method to delay setting the {@link Action} to executed by randomly choosing a value by calling
+	 * {@link ThreadLocalRandom#nextLong(long, long)} passing min and max as origin and bound respectively
 	 */
 	protected void delayToExecutedByRandom(long min, long max, TimeUnit delayUnit) {
 		long delay = ThreadLocalRandom.current().nextLong(min, max + 1);
@@ -345,13 +375,14 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * @return the {@link DelayedExecutionTimer} to simplify the delayed execution of an {@link Action}, e.g. for
 	 * simulated execution or simple wait tasks
 	 */
-	private DelayedExecutionTimer getDelayedExecutionTimer() {
+	protected DelayedExecutionTimer getDelayedExecutionTimer() {
 		return getComponent(ExecutionHandler.class).getDelayedExecutionTimer();
 	}
 
 	/**
-	 * Opens a {@link StrolchTransaction} where the realm retrieved using {@link ComponentContainer#getRealm(Certificate)}.
-	 * This transaction should be used in a try-with-resource clause so it is properly closed.
+	 * Opens a {@link StrolchTransaction} where the realm retrieved using
+	 * {@link ComponentContainer#getRealm(Certificate)}. This transaction should be used in a try-with-resource clause
+	 * so it is properly closed.
 	 *
 	 * @param ctx
 	 * 		the privilege context
@@ -387,8 +418,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnableWithResult} as the system user {@link
-	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnableWithResult} as the system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @param runnable
 	 * 		the runnable to perform
