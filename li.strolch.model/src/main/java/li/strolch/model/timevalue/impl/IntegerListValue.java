@@ -18,10 +18,7 @@ package li.strolch.model.timevalue.impl;
 import static li.strolch.model.parameter.ListParameter.VALUE_SEPARATOR2;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
@@ -127,40 +124,25 @@ public class IntegerListValue implements IValue<List<Integer>>, Serializable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		IntegerListValue other = (IntegerListValue) obj;
-		if (this.value == null) {
-			if (other.value != null) {
-				return false;
-			}
-		} else if (!this.value.equals(other.value)) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
 	public int compareTo(IValue<List<Integer>> o) {
 		List<Integer> otherValues = o.getValue();
 		if (this.value.equals(otherValues))
 			return 0;
 		return Integer.compare(this.value.size(), otherValues.size());
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		IntegerListValue that = (IntegerListValue) o;
+		return Objects.equals(value, that.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
 	}
 }
