@@ -60,7 +60,7 @@ public interface ITimeVariable<T extends IValue> {
 	 * @param time
 	 * 		the time the sequence starts with
 	 *
-	 * <b>Note:</b> The returned result is unmodifiable
+	 * 		<b>Note:</b> The returned result is unmodifiable
 	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
@@ -82,7 +82,7 @@ public interface ITimeVariable<T extends IValue> {
 	 * @param time
 	 * 		the time the sequence starts with
 	 *
-	 * <b>Note:</b> The returned result is unmodifiable
+	 * 		<b>Note:</b> The returned result is unmodifiable
 	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
@@ -144,4 +144,10 @@ public interface ITimeVariable<T extends IValue> {
 	 * parent
 	 */
 	void setReadonly();
+
+	/**
+	 * Returns true if the given {@link ITimeVariable} is equal to this {@link ITimeVariable} by validating that the
+	 * values {@link IValue IValues} have the same time and actual value
+	 */
+	boolean equals(ITimeVariable<T> other);
 }

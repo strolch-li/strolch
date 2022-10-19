@@ -274,10 +274,20 @@ public class ModelTest {
 		FloatParameter fParam = bag.getParameter(PARAM_FLOAT_ID);
 		fParam.setValue(23434234.234);
 		fParam.setName("Ohla");
+		FloatTimedState floatState = dstRes.getTimedState(STATE_FLOAT_ID, true);
+		floatState.setStateFromStringAt(STATE_TIME_30, "3453451.0");
 		StrolchElementDeepEqualsVisitor visitor = new StrolchElementDeepEqualsVisitor(srcRes);
 		List<Locator> mismatches = dstRes.accept(visitor);
 		assertFalse("Resource should not be same if param is changed!", mismatches.isEmpty());
-		assertEquals("Multiple changes should be registered", 3, mismatches.size());
+		assertEquals("Multiple changes should be registered", 4, mismatches.size());
+		assertTrue("Should contain locator",
+				mismatches.contains(Locator.valueOf("Resource/MyType/@res01/Bag/@bag01/Name")));
+		assertTrue("Should contain locator",
+				mismatches.contains(Locator.valueOf("Resource/MyType/@res01/Bag/@bag01/@param2/Name")));
+		assertTrue("Should contain locator",
+				mismatches.contains(Locator.valueOf("Resource/MyType/@res01/Bag/@bag01/@param2/Value")));
+		assertTrue("Should contain locator",
+				mismatches.contains(Locator.valueOf("Resource/MyType/@res01/State/@state1/Values")));
 	}
 
 	@Test

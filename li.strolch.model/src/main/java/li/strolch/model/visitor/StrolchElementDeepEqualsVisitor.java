@@ -33,8 +33,8 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.utils.dbc.DBC;
 
 /**
- * Visitor of {@link StrolchRootElement} to check if they are equal. This implementations stores a list of {@link
- * Locator} for every element of an object which is not equal, thus making it easy to find the inconsistencies in
+ * Visitor of {@link StrolchRootElement} to check if they are equal. This implementations stores a list of
+ * {@link Locator} for every element of an object which is not equal, thus making it easy to find the inconsistencies in
  * objects.
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -175,7 +175,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 		if (srcElement.hasPolicyDefs() && dstElement.hasPolicyDefs())
 			deepEquals(srcElement.getPolicyDefs(), dstElement.getPolicyDefs());
 		else if (srcElement.hasPolicyDefs() != dstElement.hasPolicyDefs())
-			addLocator(srcElement.getPolicyDefs().getLocator());
+			addLocator(srcElement.getPolicyDefs().getLocator().append(Tags.POLICIES));
 	}
 
 	private void deepEquals(StrolchElement srcElement, StrolchElement dstElement) {
@@ -252,7 +252,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 		if (srcAction.hasPolicyDefs() && dstAction.hasPolicyDefs())
 			deepEquals(srcAction.getPolicyDefs(), dstAction.getPolicyDefs());
 		else if (srcAction.hasPolicyDefs() != dstAction.hasPolicyDefs())
-			addLocator(dstAction.getPolicyDefs().getLocator());
+			addLocator(dstAction.getPolicyDefs().getLocator().append(Tags.POLICIES));
 	}
 
 	private void deepEquals(GroupedParameterizedElement srcElement, GroupedParameterizedElement dstElement) {
@@ -305,16 +305,16 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	private void deepEquals(Parameter<?> srcParam, Parameter<?> dstParam) {
 		deepEquals((StrolchElement) srcParam, (StrolchElement) dstParam);
 		if (!srcParam.getUom().equals(dstParam.getUom()))
-			addLocator(dstParam.getLocator());
+			addLocator(dstParam.getLocator().append(Tags.UOM));
 		if (!srcParam.getInterpretation().equals(dstParam.getInterpretation()))
-			addLocator(dstParam.getLocator());
+			addLocator(dstParam.getLocator().append(Tags.INTERPRETATION));
 		if (srcParam.isHidden() != dstParam.isHidden())
-			addLocator(dstParam.getLocator());
+			addLocator(dstParam.getLocator().append(Tags.HIDDEN));
 		if (srcParam.getIndex() != dstParam.getIndex())
-			addLocator(dstParam.getLocator());
+			addLocator(dstParam.getLocator().append(Tags.INDEX));
 
 		if (!srcParam.getValue().equals(dstParam.getValue()))
-			addLocator(dstParam.getLocator());
+			addLocator(dstParam.getLocator().append(Tags.VALUE));
 	}
 
 	private void deepEquals(StrolchTimedState<?> srcState, StrolchTimedState<?> dstState) {
@@ -322,7 +322,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 		final ITimeVariable<?> srcTimeEvolution = srcState.getTimeEvolution();
 		final ITimeVariable<?> dstTimeEvolution = dstState.getTimeEvolution();
 
-		if (!srcTimeEvolution.getValues().equals(dstTimeEvolution.getValues()))
+		if (!srcTimeEvolution.equals(dstTimeEvolution))
 			addLocator(dstState.getLocator().append(Tags.VALUES));
 	}
 
