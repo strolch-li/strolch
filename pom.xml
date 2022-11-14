@@ -126,10 +126,8 @@
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <dependency-check-maven-plugin.version>6.5.2</dependency-check-maven-plugin.version>
         <maven-site-plugin.version>3.10.0</maven-site-plugin.version>
-        <maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
-        <tomcat7-maven-plugin.version>2.2</tomcat7-maven-plugin.version>
         <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
         <maven-deploy-plugin.version>3.0.0-M2</maven-deploy-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
@@ -450,16 +448,6 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-eclipse-plugin</artifactId>
-                    <version>${maven-eclipse-plugin.version}</version>
-                    <configuration>
-                        <downloadJavadocs>true</downloadJavadocs>
-                        <downloadSources>true</downloadSources>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>${maven-source-plugin.version}</version>
                     <executions>
@@ -563,18 +551,6 @@
                                 </includes>
                             </resource>
                         </webResources>
-                    </configuration>
-                </plugin>
-
-                <plugin>
-                    <!-- Publish to Tomcat7: mvn tomcat7:redeploy -->
-                    <groupId>org.apache.tomcat.maven</groupId>
-                    <artifactId>tomcat7-maven-plugin</artifactId>
-                    <version>${tomcat7-maven-plugin.version}</version>
-                    <configuration>
-                        <url>${tomcat7Url}</url>
-                        <server>${tomcat7ServerId}</server>
-                        <path>/${warFinalName}</path>
                     </configuration>
                 </plugin>
 
