@@ -30,6 +30,7 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.TextParameter;
+import li.strolch.model.policy.JavaPolicyDef;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.StrolchTimedState;
@@ -265,7 +266,14 @@ public class XmlModelSaxReader extends DefaultHandler {
 			String policyValue = attributes.getValue(VALUE);
 
 			try {
+
 				PolicyDef policyDef = PolicyDef.valueOf(policyType, policyValue);
+				if (policyDef instanceof JavaPolicyDef j && !j.isClassExists()) {
+					logger.error(
+							"Policy invalid for " + policyType + " = " + policyValue + ": class does not exist for "
+									+ this.parameterizedElement.getLocator());
+				}
+
 				this.policies.addOrUpdate(policyDef);
 			} catch (Exception e) {
 				throw new StrolchException("Failed to parse policy " + policyType + " = " + policyValue + " for bag "
