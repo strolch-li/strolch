@@ -90,7 +90,20 @@ public class StrolchJobsHandler extends StrolchComponent {
 			String className = jobRes.getParameter(PARAM_CLASS_NAME, true).getValue();
 			JobMode mode = JobMode.valueOf(jobRes.getParameter(PARAM_MODE, true).getValue());
 
-			StrolchJob job = instantiateJob(className, jobRes.getId(), jobRes.getName(), mode);
+			StrolchJob job;
+			try {
+				job = instantiateJob(className, jobRes.getId(), jobRes.getName(), mode);
+			} catch (ClassNotFoundException e) {
+				if (!catchExceptions) {
+					throw new IllegalStateException(
+							"Failed to load StrolchJob " + jobRes.getId() + " from model as class " + className
+									+ " does not exist!");
+				}
+
+				logger.error("Failed to load StrolchJob " + jobRes.getId() + " from model as class " + className
+						+ " does not exist!");
+				return;
+			}
 			job.setConfigureMethod(ConfigureMethod.Model).setMode(mode);
 
 			if (mode == JobMode.Manual) {
@@ -134,14 +147,9 @@ public class StrolchJobsHandler extends StrolchComponent {
 	}
 
 	@SuppressWarnings("unchecked")
-	private StrolchJob instantiateJob(String className, String id, String name, JobMode mode) {
-		Class<StrolchJob> clazz;
-		try {
-			clazz = (Class<StrolchJob>) Class.forName(className);
-		} catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException("StrolchJob class " + className + " does not exist!");
-		}
-
+	private StrolchJob instantiateJob(String className, String id, String name, JobMode mode)
+			throws ClassNotFoundException {
+		Class<StrolchJob> clazz = (Class<StrolchJob>) Class.forName(className);
 		return instantiateJob(clazz, id, name, mode);
 	}
 
@@ -226,7 +234,8 @@ public class StrolchJobsHandler extends StrolchComponent {
 	 * @return a list of registered jobs
 	 */
 	public List<StrolchJob> getJobs(Certificate cert, String source) {
-		getContainer().getPrivilegeHandler().validate(cert, source)
+		getContainer().getPrivilegeHandler()
+				.validate(cert, source)
 				.assertHasPrivilege(StrolchJobsHandler.class.getName());
 		return new ArrayList<>(this.jobs.values());
 	}
@@ -244,7 +253,8 @@ public class StrolchJobsHandler extends StrolchComponent {
 	 * @return the job with the requested name
 	 */
 	public StrolchJob getJob(Certificate cert, String source, String jobName) {
-		getContainer().getPrivilegeHandler().validate(cert, source)
+		getContainer().getPrivilegeHandler()
+				.validate(cert, source)
 				.assertHasPrivilege(StrolchJobsHandler.class.getName());
 		StrolchJob strolchJob = this.jobs.get(jobName);
 		if (strolchJob == null)
