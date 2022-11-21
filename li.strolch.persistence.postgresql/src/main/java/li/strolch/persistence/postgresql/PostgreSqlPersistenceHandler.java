@@ -55,6 +55,11 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		super(container, componentName);
 	}
 
+	@Override
+	public boolean supportsPaging() {
+		return true;
+	}
+
 	public DataType getDataType() {
 		return this.dataType;
 	}
@@ -93,8 +98,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		boolean allowSchemaCreation = configuration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
 		boolean allowSchemaMigration = configuration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION, Boolean.FALSE);
 		boolean allowSchemaDrop = configuration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
-		boolean allowDataInitOnSchemaCreate = configuration
-				.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE, Boolean.FALSE);
+		boolean allowDataInitOnSchemaCreate = configuration.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE,
+				Boolean.FALSE);
 
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX_STROLCH, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);
@@ -140,8 +145,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	public Connection getConnection(String realm) {
 		DataSource ds = this.dsMap.get(realm);
 		if (ds == null) {
-			String msg = MessageFormat
-					.format("There is no DataSource registered for the realm {0}", realm); //$NON-NLS-1$
+			String msg = MessageFormat.format("There is no DataSource registered for the realm {0}",
+					realm); //$NON-NLS-1$
 			throw new StrolchPersistenceException(msg);
 		}
 

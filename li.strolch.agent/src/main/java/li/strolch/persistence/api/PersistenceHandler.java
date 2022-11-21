@@ -28,6 +28,11 @@ import li.strolch.privilege.model.Certificate;
 public interface PersistenceHandler {
 
 	/**
+	 * Returns true if this persistence layer supports paging, i.e. the DAO methods with a limit and offset may be used
+	 */
+	boolean supportsPaging();
+
+	/**
 	 * Opens a {@link StrolchTransaction} on the given {@link StrolchRealm}. The transaction is the main object to be
 	 * used when accessing and modifying the elements of a realm.
 	 *
