@@ -44,6 +44,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	private boolean versioningEnabled;
 	private boolean updateObservers;
 	private ObserverHandler observerHandler;
+
 	protected ComponentContainer container;
 
 	public InternalStrolchRealm(String realm) {

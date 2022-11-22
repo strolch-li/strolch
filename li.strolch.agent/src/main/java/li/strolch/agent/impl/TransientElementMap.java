@@ -244,11 +244,14 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	 * Special method used when starting the container to cache the values. Not to be used anywhere else but from the
 	 * {@link CachedRealm}
 	 *
-	 * @param element
-	 * 		the element to insert
+	 * @param elements
+	 * 		the elements to insert
 	 */
-	synchronized void insert(T element) {
+	synchronized void insertAll(List<T> elements) {
+		elements.forEach(this::internalInsert);
+	}
 
+	private void internalInsert(T element) {
 		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
 
 		// assert no object already exists with this id
@@ -274,19 +277,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (!element.hasVersion())
 			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 
-		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
-
-		// assert no object already exists with this id
-		if (byType.containsKey(element.getId())) {
-			String msg = "An element already exists with the id \"{0}\". Elements of the same class must always have a unique id, regardless of their type!"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, element.getId());
-			throw new StrolchPersistenceException(msg);
-		}
-
-		byType.put(element.getId(), element);
-
-		// now make read only
-		element.setReadOnly();
+		internalInsert(element);
 	}
 
 	@Override

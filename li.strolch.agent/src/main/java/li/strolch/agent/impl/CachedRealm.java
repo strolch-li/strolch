@@ -15,7 +15,9 @@
  */
 package li.strolch.agent.impl;
 
-import li.strolch.agent.api.*;
+import li.strolch.agent.api.AuditTrail;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -73,6 +75,10 @@ public class CachedRealm extends InternalStrolchRealm {
 	@Override
 	public AuditTrail getAuditTrail() {
 		return this.auditTrail;
+	}
+
+	StrolchAgent getAgent() {
+		return this.container.getAgent();
 	}
 
 	@Override
