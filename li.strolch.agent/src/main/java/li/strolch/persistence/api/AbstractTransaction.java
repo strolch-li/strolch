@@ -234,6 +234,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public StrolchTransaction suppressUpdates() {
+		this.suppressUpdates = true;
+		return this;
+	}
+
+	@Override
 	public void setSuppressUpdates(boolean suppressUpdates) {
 		this.suppressUpdates = suppressUpdates;
 	}

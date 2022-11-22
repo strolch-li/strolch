@@ -206,9 +206,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	long getActivityCount(String type);
 
 	/**
-	 * Returns the {@link PersistenceHandler}. If the {@link StrolchRealm} is not running in {@link
-	 * DataStoreMode#TRANSIENT} mode, then the {@link PersistenceHandler} will be a {@link StrolchComponent}, otherwise
-	 * it will be the internal in memory persistence handler
+	 * Returns the {@link PersistenceHandler}. If the {@link StrolchRealm} is not running in
+	 * {@link DataStoreMode#TRANSIENT} mode, then the {@link PersistenceHandler} will be a {@link StrolchComponent},
+	 * otherwise it will be the internal in memory persistence handler
 	 *
 	 * @return the {@link PersistenceHandler}
 	 */
@@ -332,8 +332,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 * <p>
 	 * <code>
-	 * StrolchAgent strolchAgent = getStrolchAgent(); StrolchRealm realm = strolchAgent.getContainer().getRealm("defaultRealm");
-	 * try(StrolchTransaction tx = realm.openTx(certificate, getClass())){ // do work tx.commitOnClose(); }
+	 * StrolchAgent strolchAgent = getStrolchAgent(); StrolchRealm realm =
+	 * strolchAgent.getContainer().getRealm("defaultRealm"); try(StrolchTransaction tx = realm.openTx(certificate,
+	 * getClass())){ // do work tx.commitOnClose(); }
 	 * </code>
 	 * <p>
 	 * After the block is closed, the transaction is automatically closed and all allocated resources are released
@@ -362,8 +363,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	StrolchTransaction rollbackOnClose();
 
 	/**
-	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK} and returns a {@link
-	 * StrolchTransactionException} which can be thrown by the caller to stop the exception
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK} and returns a
+	 * {@link StrolchTransactionException} which can be thrown by the caller to stop the exception
 	 *
 	 * @param exceptionMessage
 	 * 		the message with which this TX has failed
@@ -407,7 +408,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean isOpen();
 
 	/**
-	 * @return if the current state of the StrolchTransaction is {@link TransactionCloseStrategy#READ_ONLY} or {@link TransactionCloseStrategy#ROLLBACK}
+	 * @return if the current state of the StrolchTransaction is {@link TransactionCloseStrategy#READ_ONLY} or
+	 * {@link TransactionCloseStrategy#ROLLBACK}
 	 */
 	boolean isReadOnly();
 
@@ -457,6 +459,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the threshold duration in milliseconds for the TX to be silent if TX duration is less than this value
 	 */
 	long getSilentThreshold();
+
+	/**
+	 * Suppresses the updates of observer
+	 */
+	StrolchTransaction suppressUpdates();
 
 	/**
 	 * If the given argument is true, then no observer updates are performed
@@ -597,8 +604,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	void add(Command command);
 
 	/**
-	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling {@link
-	 * AuditTrail#add(StrolchTransaction, Audit)}
+	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling
+	 * {@link AuditTrail#add(StrolchTransaction, Audit)}
 	 *
 	 * @param accessType
 	 * 		the type of access
@@ -614,8 +621,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	Audit auditFrom(AccessType accessType, String elementType, String elementSubType, String id);
 
 	/**
-	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling {@link
-	 * AuditTrail#add(StrolchTransaction, Audit)}
+	 * Helper method to create an {@link Audit} with the given arguments. The audit can then be saved by calling
+	 * {@link AuditTrail#add(StrolchTransaction, Audit)}
 	 *
 	 * @param accessType
 	 * 		the type of access
@@ -649,8 +656,8 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 *
 	 * <p>
-	 * This method can also be used to find a deeper element, e.g. a specific {@link Parameter} on an {@link
-	 * ParameterBag} on an {@link Order}. This would be done as follows: <i>Order/MyType/Bag/@1/myParam</i>
+	 * This method can also be used to find a deeper element, e.g. a specific {@link Parameter} on an
+	 * {@link ParameterBag} on an {@link Order}. This would be done as follows: <i>Order/MyType/Bag/@1/myParam</i>
 	 * </p>
 	 *
 	 * @param locator
@@ -673,8 +680,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>Finds a parameter with the {@link StrolchConstants#BAG_PARAMETERS} and @paramKey on the given @element, but
-	 * if it does not exists on the element, then it retrieves the elements parent by using the bag {@link
-	 * StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>
+	 * if it does not exists on the element, then it retrieves the elements parent by using the bag
+	 * {@link StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>
 	 *
 	 * <p>In Strolch relationships are usually defined on the parameter bag with the id {@link
 	 * StrolchModelConstants#BAG_RELATIONS}</p>
@@ -693,8 +700,8 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * <p>Finds a parameter with the given @bagKey and @paramKey on the given @element, but if it does not exists
-	 * on the element, then it retrieves the elements parent by using the bag {@link
-	 * StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>
+	 * on the element, then it retrieves the elements parent by using the bag
+	 * {@link StrolchModelConstants#BAG_RELATIONS} and the param @parentParamKey.</p>
 	 *
 	 * <p>In Strolch relationships are usually defined on the parameter bag with the id {@link
 	 * StrolchModelConstants#BAG_RELATIONS}</p>
@@ -750,10 +757,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 *
 	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
-	 * StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
-	 * creating a {@link Resource} of type {@code Person} then having a template with the id {@code Person} helps
-	 * creating new Person resources; get the resource and then create a clone: {@link Resource#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For
+	 * instance when creating a {@link Resource} of type {@code Person} then having a template with the id
+	 * {@code Person} helps creating new Person resources; get the resource and then create a clone:
+	 * {@link Resource#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -770,10 +778,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 *
 	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
-	 * StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
-	 * creating a {@link Resource} of type {@code Person} then having a template with the id {@code Person} helps
-	 * creating new Person resources; get the resource and then create a clone: {@link Resource#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For
+	 * instance when creating a {@link Resource} of type {@code Person} then having a template with the id
+	 * {@code Person} helps creating new Person resources; get the resource and then create a clone:
+	 * {@link Resource#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -820,10 +829,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 *
 	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
-	 * StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
-	 * creating an {@link Order} of type {@code PurchaseOrder} then having a template with the id {@code PurchaseOrder}
-	 * helps creating new PurchaseOrder orders; get the order and then create a clone: {@link Order#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For
+	 * instance when creating an {@link Order} of type {@code PurchaseOrder} then having a template with the id
+	 * {@code PurchaseOrder} helps creating new PurchaseOrder orders; get the order and then create a clone:
+	 * {@link Order#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -840,10 +850,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 *
 	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
-	 * StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
-	 * creating an {@link Order} of type {@code PurchaseOrder} then having a template with the id {@code PurchaseOrder}
-	 * helps creating new PurchaseOrder orders; get the order and then create a clone: {@link Order#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For
+	 * instance when creating an {@link Order} of type {@code PurchaseOrder} then having a template with the id
+	 * {@code PurchaseOrder} helps creating new PurchaseOrder orders; get the order and then create a clone:
+	 * {@link Order#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -864,10 +875,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 *
 	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
-	 * StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
-	 * creating a {@link Activity} of type {@code ToStock} then having a template with the id {@code ToStock} helps
-	 * creating new ToStock activities; get the activity and then create a clone: {@link Activity#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For
+	 * instance when creating a {@link Activity} of type {@code ToStock} then having a template with the id
+	 * {@code ToStock} helps creating new ToStock activities; get the activity and then create a clone:
+	 * {@link Activity#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -884,10 +896,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * </p>
 	 *
 	 * <p>
-	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type {@link
-	 * StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For instance when
-	 * creating a {@link Activity} of type {@code ToStock} then having a template with the id {@code ToStock} helps
-	 * creating new ToStock activities; get the activity and then create a clone: {@link Activity#getClone()}
+	 * Templates are {@link StrolchRootElement StrolchRootElements} which have the type
+	 * {@link StrolchModelConstants#TEMPLATE} and their id is the type of element for which it is a template. For
+	 * instance when creating a {@link Activity} of type {@code ToStock} then having a template with the id
+	 * {@code ToStock} helps creating new ToStock activities; get the activity and then create a clone:
+	 * {@link Activity#getClone()}
 	 * </p>
 	 *
 	 * @param type
@@ -931,9 +944,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	Resource getResourceBy(String type, String id, boolean assertExists) throws StrolchException;
 
 	/**
-	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference {@link
-	 * Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the
-	 * UOM must be set to the resource's type and the value is the id of the resource
+	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}
+	 * and the UOM must be set to the resource's type and the value is the id of the resource
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references a {@link Resource}
@@ -946,9 +959,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	Resource getResourceBy(StringParameter refP) throws StrolchException;
 
 	/**
-	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference {@link
-	 * Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the
-	 * UOM must be set to the resource's type and the value is the id of the resource
+	 * Returns the {@link Resource} which is referenced by the given {@link StringParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}
+	 * and the UOM must be set to the resource's type and the value is the id of the resource
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references a {@link Resource}
@@ -1000,16 +1013,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * Returns the {@link Resource} which is referenced by the given {@link StrolchRootElement}. The element must have a
 	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
-	 * with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value
-	 * is the id of the resource to return
+	 * with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the
+	 * value is the id of the resource to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 *
 	 * @return the resource referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
 	 * referenced element do not exist
@@ -1022,16 +1035,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * Returns the {@link Resource} which is referenced by the given {@link StrolchRootElement}. The element must have a
 	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
-	 * with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value
-	 * is the id of the resource to return
+	 * with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the
+	 * value is the id of the resource to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 * @param assertExists
 	 * 		if true, and referenced resource does not exist, then a {@link StrolchException} is thrown
 	 *
@@ -1046,17 +1059,17 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Resource Resources} which are referenced by the given {@link StrolchRootElement}. The element
-	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
-	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value
-	 * is the id of the resource to return
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a
+	 * {@link StringListParameter} on it with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the
+	 * value is the id of the resource to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringListParameter} with
 	 * 		the given refId
 	 * @param refId
-	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 *
 	 * @return the resources referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter}
 	 * or referenced element do not exist
@@ -1068,17 +1081,17 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Resource Resources} which are referenced by the given {@link StrolchRootElement}. The element
-	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
-	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the value
-	 * is the id of the resource to return
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a
+	 * {@link StringListParameter} on it with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF} and the UOM must be set to the resource's type and the
+	 * value is the id of the resource to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Resource} through a {@link StringListParameter} with
 	 * 		the given refId
 	 * @param refId
-	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 * @param assertExists
 	 * 		if true, and referenced resource does not exist, then a {@link StrolchException} is thrown
 	 *
@@ -1155,9 +1168,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	Activity getActivityBy(String type, String id, boolean assertExists) throws StrolchException;
 
 	/**
-	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference {@link
-	 * Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the
-	 * UOM must be set to the activity's type and the value is the id of the activity
+	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF}
+	 * and the UOM must be set to the activity's type and the value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references an {@link Activity}
@@ -1170,9 +1183,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	Activity getActivityBy(StringParameter refP) throws StrolchException;
 
 	/**
-	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference {@link
-	 * Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the
-	 * UOM must be set to the activity's type and the value is the id of the activity
+	 * Returns the {@link Activity} which is referenced by the given {@link StringParameter}. A reference
+	 * {@link Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF}
+	 * and the UOM must be set to the activity's type and the value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringParameter} which references an {@link Activity}
@@ -1189,8 +1202,9 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Activity Activities} which are referenced by the given {@link StringListParameter}. A
-	 * reference {@link Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF}
-	 * and the UOM must be set to the activity's type and the value is the id of the activity
+	 * reference {@link Parameter} must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the
+	 * value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringListParameter} which references a list of {@link Activity Activities}
@@ -1205,8 +1219,9 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Activity Activities} which are referenced by the given {@link StringListParameter}. A
-	 * reference {@link Parameter} must have its interpretation set to {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF}
-	 * and the UOM must be set to the activity's type and the value is the id of the activity
+	 * reference {@link Parameter} must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the
+	 * value is the id of the activity
 	 *
 	 * @param refP
 	 * 		the {@link StringListParameter} which references a list of {@link Activity Activities}
@@ -1224,16 +1239,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * Returns the {@link Activity} which is referenced by the given {@link StrolchRootElement}. The element must have a
 	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
-	 * with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value
-	 * is the id of the activity to return
+	 * with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the
+	 * value is the id of the activity to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 *
 	 * @return the activity referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
 	 * referenced element do not exist
@@ -1246,16 +1261,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * Returns the {@link Activity} which is referenced by the given {@link StrolchRootElement}. The element must have a
 	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
-	 * with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the value
-	 * is the id of the activity to return
+	 * with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the
+	 * value is the id of the activity to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 * @param assertExists
 	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
 	 *
@@ -1270,17 +1285,17 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Activity Activities} which are referenced by the given {@link StrolchRootElement}. The element
-	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
-	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the values
-	 * are the ids of the activities to return
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a
+	 * {@link StringListParameter} on it with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the
+	 * values are the ids of the activities to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringListParameter} with
 	 * 		the given refId
 	 * @param refId
-	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 *
 	 * @return the activity referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter}
 	 * or referenced element do not exist
@@ -1292,22 +1307,22 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Activity Activities} which are referenced by the given {@link StrolchRootElement}. The element
-	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
-	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the values
-	 * are the ids of the activities to return
+	 * must have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a
+	 * {@link StringListParameter} on it with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ACTIVITY_REF} and the UOM must be set to the activity's type and the
+	 * values are the ids of the activities to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Activity} through a {@link StringListParameter} with
 	 * 		the given refId
 	 * @param refId
-	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 * @param assertExists
 	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
 	 *
-	 * @return the activities referenced by the element, or null if the {@link ParameterBag}, {@link
-	 * StringListParameter} or referenced element do not exist
+	 * @return the activities referenced by the element, or null if the {@link ParameterBag},
+	 * {@link StringListParameter} or referenced element do not exist
 	 *
 	 * @throws StrolchException
 	 * 		if the {@link StringListParameter} is not a properly configured as a reference parameter
@@ -1414,16 +1429,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * Returns the {@link Order} which is referenced by the given {@link StrolchRootElement}. The element must have a
 	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
-	 * with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the value is the
-	 * id of the order to return
+	 * with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the value
+	 * is the id of the order to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 *
 	 * @return the order referenced by the element, or null if the {@link ParameterBag}, {@link StringParameter} or
 	 * referenced element do not exist
@@ -1436,16 +1451,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	/**
 	 * Returns the {@link Order} which is referenced by the given {@link StrolchRootElement}. The element must have a
 	 * {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link StringParameter} on it
-	 * with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the value is the
-	 * id of the order to return
+	 * with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the value
+	 * is the id of the order to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 * @param assertExists
 	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
 	 *
@@ -1459,17 +1474,17 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Order Orders} which are referenced by the given {@link StrolchRootElement}. The element must
-	 * have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
-	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the values are
-	 * the ids of the orders to return
+	 * have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a
+	 * {@link StringListParameter} on it with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the values
+	 * are the ids of the orders to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringListParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 *
 	 * @return the orders referenced by the element, or null if the {@link ParameterBag}, {@link StringListParameter} or
 	 * referenced element do not exist
@@ -1481,17 +1496,17 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Returns all {@link Order Orders} which are referenced by the given {@link StrolchRootElement}. The element must
-	 * have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a {@link
-	 * StringListParameter} on it with the given refId. The parameter must have its interpretation set to {@link
-	 * StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the values are
-	 * the ids of the orders to return
+	 * have a {@link ParameterBag} with the id {@link StrolchModelConstants#BAG_RELATIONS} and a
+	 * {@link StringListParameter} on it with the given refId. The parameter must have its interpretation set to
+	 * {@link StrolchModelConstants#INTERPRETATION_ORDER_REF} and the UOM must be set to the order's type and the values
+	 * are the ids of the orders to return
 	 *
 	 * @param element
 	 * 		the {@link StrolchRootElement} which references a {@link Order} through a {@link StringListParameter} with the
 	 * 		given refId
 	 * @param refId
-	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id {@link
-	 *        StrolchModelConstants#BAG_RELATIONS}
+	 * 		the id of the {@link StringListParameter} which needs to be on the {@link ParameterBag} with the id
+	 *        {@link StrolchModelConstants#BAG_RELATIONS}
 	 * @param assertExists
 	 * 		if true, and referenced order does not exist, then a {@link StrolchException} is thrown
 	 *
