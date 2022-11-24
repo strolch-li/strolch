@@ -732,6 +732,13 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public Activity ensureModifiable() {
+		if (isReadOnly())
+			return getClone(true);
+		return this;
+	}
+
+	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Activity [id=");

@@ -33,8 +33,9 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
 
 /**
- * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g. {@link Resource
- * Resources} and {@link Order Orders}. Every root element has a version, so that versions can be kept of an object
+ * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g.
+ * {@link Resource Resources} and {@link Order Orders}. Every root element has a version, so that versions can be kept
+ * of an object
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -84,8 +85,8 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	void setVersion(Version version) throws IllegalArgumentException;
 
 	/**
-	 * Set a relation to the given element by using the given param. Should the {@link StringParameter} not exist, then it will be
-	 * created
+	 * Set a relation to the given element by using the given param. Should the {@link StringParameter} not exist, then
+	 * it will be created
 	 *
 	 * @param param
 	 * 		the parameter ID on which to set the relations
@@ -115,8 +116,8 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	void addRelation(StrolchRootElement element);
 
 	/**
-	 * Adds a relation to the given element by using the given parameter ID. Should the {@link StringListParameter} not exist,
-	 * then it will be created
+	 * Adds a relation to the given element by using the given parameter ID. Should the {@link StringListParameter} not
+	 * exist, then it will be created
 	 *
 	 * @param param
 	 * 		the parameter ID on which to set the relations
@@ -124,6 +125,8 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * 		the element for which to set the relation to
 	 */
 	void addRelation(String param, StrolchRootElement element);
+
+	StrolchRootElement ensureModifiable();
 
 	/**
 	 * Return a clone of this {@link StrolchElement}
