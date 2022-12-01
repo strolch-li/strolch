@@ -11,11 +11,10 @@ import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * A search result for {@link StrolchSearch} for {@link StrolchRootElement} adding methods specific to root element
- *
- * @param <T>
  */
 public class RootElementSearchResult<T extends StrolchRootElement> extends SearchResult<T> {
 
@@ -163,8 +162,22 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 			@SuppressWarnings("unchecked")
 			T clone = (T) e.getClone(true);
 			return clone;
-
 		});
+		return this;
+	}
+
+	/**
+	 * <p>Appends a map to the stream which performs a {@link StrolchTransaction#readLock(StrolchRootElement)}</p>
+	 *
+	 * <p>Use this method to make sure you have exclusive access to the element and need to modify it</p>
+	 *
+	 * @param tx
+	 * 		the transaction on which to perform the read-lock
+	 *
+	 * @return this instance for chaining.
+	 */
+	public RootElementSearchResult<T> readLock(StrolchTransaction tx) {
+		this.stream = this.stream.map(tx::readLock);
 		return this;
 	}
 
