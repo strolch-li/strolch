@@ -1081,8 +1081,23 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized void removeFromCache(Locator locator) {
-		if (this.resourceCache != null)
-			this.resourceCache.removeElement(locator.get(1), locator.get(2));
+		if (locator.getSize() != 3)
+			throw new IllegalStateException("Locator is invalid for cache removal: " + locator);
+		switch (locator.get(0)) {
+		case RESOURCE -> {
+			if (this.resourceCache != null)
+				this.resourceCache.removeElement(locator.get(1), locator.get(2));
+		}
+		case ORDER -> {
+			if (this.orderCache != null)
+				this.orderCache.removeElement(locator.get(1), locator.get(2));
+		}
+		case ACTIVITY -> {
+			if (this.activityCache != null)
+				this.activityCache.removeElement(locator.get(1), locator.get(2));
+		}
+
+		}
 		if (this.objectFilter != null)
 			this.objectFilter.removeObjectCache(locator.get(0), locator);
 	}
