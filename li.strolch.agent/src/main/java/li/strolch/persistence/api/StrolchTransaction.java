@@ -571,6 +571,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	<T extends StrolchRootElement> void lock(T element) throws StrolchLockException;
 
 	/**
+	 * Performs a read-lock on the given element. This means that the given element is locked by calling
+	 * {@link #lock(StrolchRootElement)}, then the object is removed from cache, and then the object is ready again from
+	 * the {@link ElementMap} so that we have the most current version of the element.
+	 */
+	<T extends StrolchRootElement> T readLock(T element) throws StrolchLockException;
+
+	/**
 	 * Releases the lock of the element so that even though the transaction is still open, another thread/transaction
 	 * can lock the element
 	 *
