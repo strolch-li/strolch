@@ -18,10 +18,7 @@ package li.strolch.model.timevalue.impl;
 import static java.util.Collections.unmodifiableNavigableSet;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.NavigableSet;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchModelException;
@@ -169,5 +166,37 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 			throw new StrolchModelException("The element " + this.getClass().getSimpleName()
 					+ " is currently readOnly, to modify clone first!");
 		}
+	}
+
+	@Override
+	public boolean equals(ITimeVariable<T> o) {
+		return equals((Object) o);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		@SuppressWarnings("unchecked")
+		TimeVariable<T> other = (TimeVariable<T>) o;
+		if (this.container.size() != other.container.size())
+			return false;
+		Iterator<ITimeValue<T>> thisIter = this.container.iterator();
+		Iterator<ITimeValue<T>> thatIter = other.container.iterator();
+		while (thisIter.hasNext()) {
+			ITimeValue<T> thisNext = thisIter.next();
+			ITimeValue<T> thatNext = thatIter.next();
+			if (!thisNext.equals(thatNext))
+				return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.container);
 	}
 }

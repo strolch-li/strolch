@@ -24,8 +24,15 @@ public class JavaPolicyDef extends PolicyDef {
 
 	public static final String XML_PREFIX = "java:";
 
-	public JavaPolicyDef(String type, String value) {
+	private final boolean classExists;
+
+	public JavaPolicyDef(String type, String value, boolean classFound) {
 		super(type, value);
+		this.classExists = classFound;
+	}
+
+	public boolean isClassExists() {
+		return this.classExists;
 	}
 
 	@Override
@@ -40,6 +47,6 @@ public class JavaPolicyDef extends PolicyDef {
 
 	@Override
 	public JavaPolicyDef getClone() {
-		return new JavaPolicyDef(this.type, this.value);
+		return new JavaPolicyDef(this.type, this.value, this.classExists);
 	}
 }

@@ -339,6 +339,13 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public Resource ensureModifiable() {
+		if (isReadOnly())
+			return getClone(true);
+		return this;
+	}
+
+	@Override
 	public void fillLocator(LocatorBuilder lb) {
 		lb.append(Tags.RESOURCE).append(getType()).append(getId());
 	}

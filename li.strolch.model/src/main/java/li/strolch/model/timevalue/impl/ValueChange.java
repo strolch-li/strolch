@@ -18,6 +18,7 @@ package li.strolch.model.timevalue.impl;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
@@ -86,41 +87,18 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
+	public boolean equals(Object o) {
+		if (this == o)
 			return true;
-		}
-		if (obj == null) {
+		if (o == null || getClass() != o.getClass())
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		ValueChange<?> other = (ValueChange<?>) obj;
-		if (this.time == null) {
-			if (other.time != null) {
-				return false;
-			}
-		} else if (!this.time.equals(other.time)) {
-			return false;
-		}
-		if (this.value == null) {
-			if (other.value != null) {
-				return false;
-			}
-		} else if (!this.value.equals(other.value)) {
-			return false;
-		}
-		return true;
+		ValueChange<?> that = (ValueChange<?>) o;
+		return Objects.equals(time, that.time) && Objects.equals(value, that.value);
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.time == null) ? 0 : this.time.hashCode());
-		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
-		return result;
+		return Objects.hash(time, value);
 	}
 
 	@SuppressWarnings("nls")

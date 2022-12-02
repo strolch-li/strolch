@@ -16,6 +16,7 @@
 package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
@@ -87,37 +88,22 @@ public class LongValue implements IValue<Long>, Serializable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		LongValue other = (LongValue) obj;
-		if (this.value == null) {
-			if (other.value != null) {
-				return false;
-			}
-		} else if (!this.value.equals(other.value)) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
 	public int compareTo(IValue<Long> o) {
 		return Long.compare(this.value, o.getValue());
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		LongValue longValue = (LongValue) o;
+		return Objects.equals(value, longValue.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
 	}
 }

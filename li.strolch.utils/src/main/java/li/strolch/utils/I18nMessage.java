@@ -330,7 +330,7 @@ public class I18nMessage {
 				File[] propertyFiles = classesD.listFiles(
 						(dir, name) -> name.endsWith(".properties") && !(name.equals("appVersion.properties")
 								|| name.equals("ENV.properties")));
-				if (propertyFiles != null && propertyFiles.length > 0) {
+				if (propertyFiles != null) {
 					for (File propertyFile : propertyFiles) {
 
 						logger.info("  Found property file " + propertyFile.getName() + " in classes "
@@ -435,6 +435,9 @@ public class I18nMessage {
 				|| file.getName().startsWith("guava-") //
 				|| file.getName().startsWith("org.eclipse") //
 				|| file.getName().startsWith("javax") //
+				|| file.getName().startsWith("jaxws") //
+				|| file.getName().startsWith("jaxrs") //
+				|| file.getName().startsWith("jaxb") //
 				|| file.getName().contains("jsr305") //
 				|| file.getName().contains("c3p0") //
 				|| file.getName().contains("camel") //
@@ -450,12 +453,6 @@ public class I18nMessage {
 				|| file.getName().contains("icu4j") //
 				|| file.getName().contains("jakarta") //
 				|| file.getName().contains("javassist") //
-				|| file.getName().contains("jaxb-api") //
-				|| file.getName().contains("jaxb-core") //
-				|| file.getName().contains("jaxb-impl") //
-				|| file.getName().contains("jaxrs-ri") //
-				|| file.getName().contains("jaxws-rt") //
-				|| file.getName().contains("jaxws-rt") //
 				|| file.getName().contains("jersey") //
 				|| file.getName().contains("joda-time") //
 				|| file.getName().contains("logback") //

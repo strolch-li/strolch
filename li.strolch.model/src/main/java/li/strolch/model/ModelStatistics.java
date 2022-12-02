@@ -18,14 +18,11 @@ package li.strolch.model;
 import static li.strolch.utils.helper.StringHelper.NULL;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 import com.google.gson.JsonObject;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

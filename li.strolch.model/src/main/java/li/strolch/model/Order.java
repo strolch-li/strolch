@@ -251,6 +251,13 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
+	public Order ensureModifiable() {
+		if (isReadOnly())
+			return getClone(true);
+		return this;
+	}
+
+	@Override
 	protected void fillLocator(LocatorBuilder lb) {
 		lb.append(Tags.ORDER).append(getType()).append(getId());
 	}

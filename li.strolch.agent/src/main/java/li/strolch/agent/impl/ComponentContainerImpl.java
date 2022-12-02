@@ -189,7 +189,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
 			throw new StrolchConfigurationException(msg, e);
 
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException |
+				 IllegalArgumentException | InvocationTargetException e) {
 
 			String msg = "Could not load class for component {0} due to: {1}"; //$NON-NLS-1$
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
@@ -304,8 +305,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 			}
 		}
 
-		msg = "{0}:{1} All {2} Strolch Components started. Took {3}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(), tookS));
+		msg = "{0}:{1} All {2} Strolch Components started for version {3}. Took {4}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
+				getAgent().getVersion().getAppVersion().getArtifactVersion(), tookS));
 	}
 
 	public void stop() {
@@ -384,7 +386,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	private String getTimezone() {
-		return getAgent().getStrolchConfiguration().getRuntimeConfiguration()
+		return getAgent().getStrolchConfiguration()
+				.getRuntimeConfiguration()
 				.getString(PROP_TIMEZONE, System.getProperty("user.timezone"));
 	}
 }

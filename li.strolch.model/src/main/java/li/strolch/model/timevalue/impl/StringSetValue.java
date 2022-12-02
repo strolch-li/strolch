@@ -16,10 +16,7 @@
 package li.strolch.model.timevalue.impl;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
@@ -148,5 +145,20 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 		if (this.aStrings.equals(otherValues))
 			return 0;
 		return Integer.compare(this.aStrings.size(), otherValues.size());
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		StringSetValue that = (StringSetValue) o;
+		return Objects.equals(aStrings, that.aStrings);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(aStrings);
 	}
 }

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.*;
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
@@ -59,9 +58,10 @@ public class StrolchAgent {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
+	private final StrolchVersion appVersion;
+
 	private ComponentContainerImpl container;
 	private StrolchConfiguration strolchConfiguration;
-	private StrolchVersion appVersion;
 
 	private ExecutorPool executorPool;
 
@@ -235,8 +235,8 @@ public class StrolchAgent {
 	}
 
 	/**
-	 * Initializes the underlying container and prepares the executor services. Before calling this method, {@link
-	 * #setup(String, File, File, File)} must have ben called
+	 * Initializes the underlying container and prepares the executor services. Before calling this method,
+	 * {@link #setup(String, File, File, File)} must have ben called
 	 */
 	public void initialize() {
 		if (this.container == null)
@@ -404,17 +404,16 @@ public class StrolchAgent {
 			osJ.addProperty(SYSTEM_LOAD_AVERAGE, osMXBean.getSystemLoadAverage());
 
 			RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-			osJ.addProperty(START_TIME, ISO8601.toString(new Date(runtimeMXBean.getStartTime())));
+			osJ.addProperty(START_TIME, ISO8601.toString(runtimeMXBean.getStartTime()));
 			osJ.addProperty(UPTIME, runtimeMXBean.getUptime());
 
 			// memory
 			JsonObject memoryJ = new JsonObject();
 			this.systemState.add(MEMORY, memoryJ);
 
-			if (osMXBean instanceof com.sun.management.OperatingSystemMXBean) {
-				com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) osMXBean;
-				memoryJ.addProperty(TOTAL_PHYSICAL_MEMORY_SIZE, os.getTotalPhysicalMemorySize());
-				memoryJ.addProperty(FREE_PHYSICAL_MEMORY_SIZE, os.getFreePhysicalMemorySize());
+			if (osMXBean instanceof com.sun.management.OperatingSystemMXBean os) {
+				memoryJ.addProperty(TOTAL_PHYSICAL_MEMORY_SIZE, os.getTotalMemorySize());
+				memoryJ.addProperty(FREE_PHYSICAL_MEMORY_SIZE, os.getFreeMemorySize());
 				memoryJ.addProperty(FREE_SWAP_SPACE_SIZE, os.getFreeSwapSpaceSize());
 				memoryJ.addProperty(COMMITTED_VIRTUAL_MEMORY_SIZE, os.getCommittedVirtualMemorySize());
 			}

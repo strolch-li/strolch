@@ -4,6 +4,7 @@ import static li.strolch.utils.helper.StringHelper.toHexString;
 
 import com.google.gson.JsonObject;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601;
 
 public class Packet {
 
@@ -78,7 +79,7 @@ public class Packet {
 
 	@Override
 	public String toString() {
-		return "Packet{" + "timestamp=" + this.timestamp //
+		return "Packet{" + "timestamp=" + ISO8601.toString(this.timestamp) //
 				+ ", command='" + this.command + '\'' //
 				+ ", position=" + this.position //
 				+ ", packetState=" + this.packetState //

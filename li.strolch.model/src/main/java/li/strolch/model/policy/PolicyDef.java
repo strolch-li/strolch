@@ -144,12 +144,14 @@ public abstract class PolicyDef {
 				throw new StrolchPolicyException("Invalid policy configuration. Policy value is empty for " + type);
 
 			try {
-				Class.forName(value);
-			} catch (ClassNotFoundException e) {
-				logger.error("Invalid policy configuration. Policy does not exist: " + value, e);
-			}
 
-			return new JavaPolicyDef(type, value);
+				Class.forName(value);
+				return new JavaPolicyDef(type, value, true);
+
+			} catch (ClassNotFoundException e) {
+				logger.error("INVALID POLICY CONFIGURATION: Policy does not exist: " + value);
+				return new JavaPolicyDef(type, value, false);
+			}
 
 		} else if (xmlValue.startsWith(KeyPolicyDef.XML_PREFIX)) {
 

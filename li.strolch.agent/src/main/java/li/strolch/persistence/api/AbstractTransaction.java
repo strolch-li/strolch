@@ -234,6 +234,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public StrolchTransaction suppressUpdates() {
+		this.suppressUpdates = true;
+		return this;
+	}
+
+	@Override
 	public void setSuppressUpdates(boolean suppressUpdates) {
 		this.suppressUpdates = suppressUpdates;
 	}
@@ -301,6 +307,25 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		case ORDER -> orderCache().addElement(element.getType(), element.getId(), (Order) element);
 		case ACTIVITY -> activityCache().addElement(element.getType(), element.getId(), (Activity) element);
 		}
+	}
+
+	@Override
+	public <T extends StrolchRootElement> T readLock(T element) throws StrolchLockException {
+		lock(element);
+
+		Locator locator = element.getLocator();
+		removeFromCache(locator);
+
+		StrolchRootElement freshCopy = switch (locator.get(0)) {
+			case RESOURCE -> getResourceBy(locator.get(1), locator.get(2), true);
+			case ORDER -> getOrderBy(locator.get(1), locator.get(2), true);
+			case ACTIVITY -> getActivityBy(locator.get(1), locator.get(2), true);
+			default -> throw new IllegalStateException("Unexpected object type " + locator.get(0));
+		};
+
+		@SuppressWarnings("unchecked")
+		T t = (T) freshCopy;
+		return t;
 	}
 
 	@Override
@@ -1075,8 +1100,23 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized void removeFromCache(Locator locator) {
-		if (this.resourceCache != null)
-			this.resourceCache.removeElement(locator.get(1), locator.get(2));
+		if (locator.getSize() != 3)
+			throw new IllegalStateException("Locator is invalid for cache removal: " + locator);
+		switch (locator.get(0)) {
+		case RESOURCE -> {
+			if (this.resourceCache != null)
+				this.resourceCache.removeElement(locator.get(1), locator.get(2));
+		}
+		case ORDER -> {
+			if (this.orderCache != null)
+				this.orderCache.removeElement(locator.get(1), locator.get(2));
+		}
+		case ACTIVITY -> {
+			if (this.activityCache != null)
+				this.activityCache.removeElement(locator.get(1), locator.get(2));
+		}
+
+		}
 		if (this.objectFilter != null)
 			this.objectFilter.removeObjectCache(locator.get(0), locator);
 	}

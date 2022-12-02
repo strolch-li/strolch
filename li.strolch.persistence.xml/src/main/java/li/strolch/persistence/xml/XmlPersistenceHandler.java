@@ -27,13 +27,13 @@ import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.StoreToDaoElementListener;
-import li.strolch.model.log.LogMessage;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.Audit;
+import li.strolch.model.log.LogMessage;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.*;
 import li.strolch.persistence.xml.model.*;
@@ -58,6 +58,11 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 
 	public XmlPersistenceHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
+	}
+
+	@Override
+	public boolean supportsPaging() {
+		return false;
 	}
 
 	@Override
@@ -140,8 +145,8 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 				logger.info("Initializing realm " + realmName + " as DB is empty.");
 
 				StrolchConfiguration strolchConfiguration = getContainer().getAgent().getStrolchConfiguration();
-				ComponentConfiguration realmConfiguration = strolchConfiguration
-						.getComponentConfiguration(RealmHandler.class.getSimpleName());
+				ComponentConfiguration realmConfiguration = strolchConfiguration.getComponentConfiguration(
+						RealmHandler.class.getSimpleName());
 				String dataStoreKey = makeRealmKey(realmName, PREFIX_DATA_STORE_FILE);
 				RuntimeConfiguration runtimeConfiguration = strolchConfiguration.getRuntimeConfiguration();
 				File dataStoreF = realmConfiguration.getDataFile(dataStoreKey, null, runtimeConfiguration, true);
