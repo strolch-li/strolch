@@ -325,7 +325,8 @@ public class Controller {
 	public void toStopped(Locator actionLoc) throws Exception {
 		runAsAgent(ctx -> {
 			try (StrolchTransaction tx = openTx(ctx.getCertificate())) {
-				if (invalidActionContext(tx, actionLoc))
+				lockWithRetries(tx);
+				if (!refreshActivity(tx))
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
