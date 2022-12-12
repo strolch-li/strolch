@@ -19,6 +19,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -38,24 +39,37 @@ public class DefaultLockHandler implements LockHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultLockHandler.class);
 
-	private String realm;
-	private TimeUnit tryLockTimeUnit;
-	private long tryLockTime;
-	private Map<Locator, TypedTuple<ReentrantLock, Long>> lockMap;
+	private final StrolchAgent agent;
+	private final String realm;
+	private final TimeUnit tryLockTimeUnit;
+	private final long tryLockTime;
+	private final Map<Locator, TypedTuple<ReentrantLock, Long>> lockMap;
+
+	private ScheduledFuture<?> cleanupTask;
 
 	public DefaultLockHandler(StrolchAgent agent, String realm, TimeUnit tryLockTimeUnit, long tryLockTime) {
-
 		DBC.PRE.assertNotNull("agent must be set!", agent); //$NON-NLS-1$
 		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
 		DBC.PRE.assertNotNull("TimeUnit must be set!", tryLockTimeUnit); //$NON-NLS-1$
 		DBC.PRE.assertNotEquals("try lock time must not be 0", 0, tryLockTime); //$NON-NLS-1$
 
+		this.agent = agent;
 		this.realm = realm;
 		this.tryLockTimeUnit = tryLockTimeUnit;
 		this.tryLockTime = tryLockTime;
 		this.lockMap = new ConcurrentHashMap<>();
+	}
 
-		agent.getScheduledExecutor().scheduleAtFixedRate(this::cleanupOldLocks, 1, 1, TimeUnit.HOURS);
+	@Override
+	public void start() {
+		this.cleanupTask = agent.getScheduledExecutor()
+				.scheduleAtFixedRate(this::cleanupOldLocks, 1, 1, TimeUnit.HOURS);
+	}
+
+	@Override
+	public void stop() {
+		if (this.cleanupTask != null)
+			this.cleanupTask.cancel(true);
 	}
 
 	private void cleanupOldLocks() {
@@ -83,8 +97,8 @@ public class DefaultLockHandler implements LockHandler {
 
 	@Override
 	public void lock(Locator locator) throws StrolchLockException {
-		TypedTuple<ReentrantLock, Long> tuple = this.lockMap
-				.computeIfAbsent(locator, l -> new TypedTuple<>(new ReentrantLock(true), System.currentTimeMillis()));
+		TypedTuple<ReentrantLock, Long> tuple = this.lockMap.computeIfAbsent(locator,
+				l -> new TypedTuple<>(new ReentrantLock(true), System.currentTimeMillis()));
 		lock(this.tryLockTimeUnit, this.tryLockTime, tuple, locator);
 	}
 
@@ -126,8 +140,8 @@ public class DefaultLockHandler implements LockHandler {
 
 			if (!tuple.getFirst().tryLock() && !tuple.getFirst().tryLock(tryLockTime, timeUnit)) {
 				String msg = "Thread {0} failed to acquire lock after {1}s for {2}"; //$NON-NLS-1$
-				msg = MessageFormat
-						.format(msg, Thread.currentThread().getName(), timeUnit.toSeconds(tryLockTime), locator);
+				msg = MessageFormat.format(msg, Thread.currentThread().getName(), timeUnit.toSeconds(tryLockTime),
+						locator);
 
 				try {
 					logger.error(msg);

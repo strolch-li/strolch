@@ -154,16 +154,18 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 	public void start(PrivilegeContext privilegeContext) {
 
-		if (this.observerHandler != null) {
+		if (this.lockHandler != null)
+			this.lockHandler.start();
+		if (this.observerHandler != null)
 			this.observerHandler.start();
-		}
 	}
 
 	public void stop() {
 
-		if (this.observerHandler != null) {
+		if (this.lockHandler != null)
+			this.lockHandler.stop();
+		if (this.observerHandler != null)
 			this.observerHandler.stop();
-		}
 	}
 
 	public abstract void destroy();
