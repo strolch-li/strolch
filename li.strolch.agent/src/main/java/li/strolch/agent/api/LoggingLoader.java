@@ -3,12 +3,11 @@ package li.strolch.agent.api;
 import java.io.File;
 import java.net.MalformedURLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.joran.spi.JoranException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoggingLoader {
 
@@ -20,15 +19,15 @@ public class LoggingLoader {
 
 		File logConfigFile = new File(configPathF, LOGBACK_XML);
 		if (!logConfigFile.exists()) {
-			logger.info("Not changing loback configuration as " + logConfigFile.getAbsolutePath() + " does not exist.");
+			logger.info(
+					"Not changing logback configuration as " + logConfigFile.getAbsolutePath() + " does not exist.");
 		} else {
-			if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext)) {
+			if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
 				logger.error(logConfigFile.getAbsolutePath()
 						+ "  exists, but LoggerFactory is not instance of ch.qos.logback.classic.LoggerContext. Ignoring.");
 			} else {
 				logger.info(logConfigFile.getAbsolutePath() + " file exists. Reloading logging configuration from "
 						+ logConfigFile);
-				LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 				try {
 					loggerContext.reset();
 					new ContextInitializer(loggerContext).configureByResource(logConfigFile.toURI().toURL());
