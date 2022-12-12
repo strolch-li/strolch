@@ -25,7 +25,9 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -195,8 +197,8 @@ public class AuthenticationService {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
-			logoutResult
-					.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
+			logoutResult.addProperty("msg",
+					MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
 			return Response.serverError().entity(logoutResult.toString()).build();
 		}
 	}
@@ -329,27 +331,19 @@ public class AuthenticationService {
 			String username = jsonObject.get("username").getAsString();
 			String challenge = jsonObject.get("challenge").getAsString();
 
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+			RestfulStrolchComponent restComponent = RestfulStrolchComponent.getInstance();
+			StrolchSessionHandler sessionHandler = restComponent.getSessionHandler();
 			String source = getRemoteIp(request);
 			Certificate certificate = sessionHandler.validateChallenge(username, challenge, source);
+			int sessionMaxKeepAliveMinutes = sessionHandler.getSessionMaxKeepAliveMinutes();
+			int cookieMaxAge = getCookieMaxAge(certificate, restComponent, sessionMaxKeepAliveMinutes);
+			LocalDateTime expirationDate = LocalDateTime.now().plusSeconds(cookieMaxAge);
 
-			jsonObject = new JsonObject();
-			jsonObject.addProperty("authToken", certificate.getAuthToken());
+			JsonObject result = new JsonObject();
+			String authToken = certificate.getAuthToken();
+			result.addProperty("authToken", authToken);
 
-			boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
-			if (secureCookie && !request.getScheme().equals("https")) {
-				String msg = "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
-				logger.warn(msg);
-			}
-
-			String domain = RestfulStrolchComponent.getInstance().getDomain();
-			String path = "/;SameSite=Strict";
-
-			NewCookie cookie = new NewCookie(STROLCH_AUTHORIZATION, certificate.getAuthToken(), path, domain,
-					"Authorization header", (int) TimeUnit.DAYS.toSeconds(1), secureCookie);
-
-			return Response.ok().entity(jsonObject.toString())//
-					.header(HttpHeaders.AUTHORIZATION, certificate.getAuthToken()).cookie(cookie).build();
+			return setCookiesAndReturnResponse(request, restComponent, cookieMaxAge, expirationDate, result, authToken);
 
 		} catch (PrivilegeException e) {
 			logger.error("Challenge validation failed: " + e.getMessage());
@@ -363,21 +357,15 @@ public class AuthenticationService {
 	private Response getAuthenticationResponse(HttpServletRequest request, Certificate certificate, String source,
 			boolean setCookies) {
 
-		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+		RestfulStrolchComponent restComponent = RestfulStrolchComponent.getInstance();
+		StrolchSessionHandler sessionHandler = restComponent.getSessionHandler();
 		int sessionMaxKeepAliveMinutes = sessionHandler.getSessionMaxKeepAliveMinutes();
-		int cookieMaxAge;
-		if (certificate.isKeepAlive()) {
-			cookieMaxAge = (int) TimeUnit.MINUTES.toSeconds(sessionMaxKeepAliveMinutes);
-		} else {
-			cookieMaxAge = RestfulStrolchComponent.getInstance().getCookieMaxAge();
-		}
-
+		int cookieMaxAge = getCookieMaxAge(certificate, restComponent, sessionMaxKeepAliveMinutes);
 		LocalDateTime expirationDate = LocalDateTime.now().plusSeconds(cookieMaxAge);
-		String expirationDateS = ISO8601.toString(expirationDate);
 
 		JsonObject loginResult = new JsonObject();
 
-		PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer().getPrivilegeHandler();
+		PrivilegeHandler privilegeHandler = restComponent.getContainer().getPrivilegeHandler();
 		PrivilegeContext privilegeContext = privilegeHandler.validate(certificate, source);
 		loginResult.addProperty("sessionId", certificate.getSessionId());
 		String authToken = certificate.getAuthToken();
@@ -389,7 +377,7 @@ public class AuthenticationService {
 		loginResult.addProperty("keepAlive", certificate.isKeepAlive());
 		loginResult.addProperty("keepAliveMinutes", sessionMaxKeepAliveMinutes);
 		loginResult.addProperty("cookieMaxAge", cookieMaxAge);
-		loginResult.addProperty("authorizationExpiration", expirationDateS);
+		loginResult.addProperty("authorizationExpiration", ISO8601.toString(expirationDate));
 		loginResult.addProperty("refreshAllowed", sessionHandler.isRefreshAllowed());
 		loginResult.addProperty("usage", certificate.getUsage().getValue());
 
@@ -433,29 +421,55 @@ public class AuthenticationService {
 			}
 		}
 
-		boolean secureCookie = RestfulStrolchComponent.getInstance().isSecureCookie();
-		if (secureCookie && !request.getScheme().equals("https")) {
-			logger.error(
-					"Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!");
-		}
-
-		if (setCookies) {
-
-			String domain = RestfulStrolchComponent.getInstance().getDomain();
-			String path = "/;SameSite=Strict";
-
-			NewCookie authCookie = new NewCookie(STROLCH_AUTHORIZATION, authToken, path, domain,
-					"Strolch Authorization header", cookieMaxAge, secureCookie);
-			NewCookie authExpirationCookie = new NewCookie(STROLCH_AUTHORIZATION_EXPIRATION_DATE, expirationDateS, path,
-					domain, "Strolch Authorization Expiration Date", cookieMaxAge, secureCookie);
-
-			return Response.ok().entity(loginResult.toString()) //
-					.header(HttpHeaders.AUTHORIZATION, authToken) //
-					.cookie(authCookie) //
-					.cookie(authExpirationCookie) //
-					.build();
-		}
-
+		if (setCookies)
+			return setCookiesAndReturnResponse(request, restComponent, cookieMaxAge, expirationDate, loginResult,
+					authToken);
 		return Response.ok().entity(loginResult.toString()).header(HttpHeaders.AUTHORIZATION, authToken).build();
+	}
+
+	private static Response setCookiesAndReturnResponse(HttpServletRequest request,
+			RestfulStrolchComponent restComponent, int cookieMaxAge, LocalDateTime expirationDate,
+			JsonObject loginResult, String authToken) {
+		boolean secureCookie = restComponent.isSecureCookie();
+		if (secureCookie && !request.getScheme().equals("https")) {
+			String msg = "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
+			logger.error(msg);
+		}
+
+		String expirationDateS = ISO8601.toString(expirationDate);
+		String domain = restComponent.isDomainSet() ? restComponent.getDomain() : request.getServerName();
+		String path = request.getContextPath() + ";SameSite=Strict";
+
+		Date expiry = Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant());
+		boolean httpOnly = false;
+		int version = 1;
+
+		NewCookie authCookie = getNewCookie(STROLCH_AUTHORIZATION, authToken, path, domain, version,
+				"Strolch Authorization header", cookieMaxAge, expiry, secureCookie, httpOnly);
+		NewCookie authExpirationCookie = getNewCookie(STROLCH_AUTHORIZATION_EXPIRATION_DATE, expirationDateS, path,
+				domain, version, "Strolch Authorization Expiration Date", cookieMaxAge, expiry, secureCookie, httpOnly);
+
+		return Response.ok().entity(loginResult.toString()) //
+				.header(HttpHeaders.AUTHORIZATION, authToken) //
+				.cookie(authCookie) //
+				.cookie(authExpirationCookie) //
+				.build();
+	}
+
+	private static int getCookieMaxAge(Certificate certificate, RestfulStrolchComponent restComponent,
+			int sessionMaxKeepAliveMinutes) {
+		int cookieMaxAge;
+		if (certificate.isKeepAlive()) {
+			cookieMaxAge = (int) TimeUnit.MINUTES.toSeconds(sessionMaxKeepAliveMinutes);
+		} else {
+			cookieMaxAge = restComponent.getCookieMaxAge();
+		}
+		return cookieMaxAge;
+	}
+
+	private static NewCookie getNewCookie(String strolchAuthorization, String authToken, String path, String domain,
+			int version, String comment, int cookieMaxAge, Date expiry, boolean secureCookie, boolean httpOnly) {
+		return new NewCookie(strolchAuthorization, authToken, path, domain, version, comment, cookieMaxAge, expiry,
+				secureCookie, httpOnly);
 	}
 }

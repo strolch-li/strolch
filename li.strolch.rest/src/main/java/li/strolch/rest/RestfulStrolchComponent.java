@@ -136,6 +136,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return domain;
 	}
 
+	public boolean isDomainSet() {
+		return this.domain != null;
+	}
+
 	public boolean isBasicAuthEnabled() {
 		return this.basicAuthEnabled;
 	}
