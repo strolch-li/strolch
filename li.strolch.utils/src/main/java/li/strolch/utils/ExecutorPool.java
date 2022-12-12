@@ -4,6 +4,7 @@ import static java.util.concurrent.Executors.*;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,8 +38,8 @@ public class ExecutorPool {
 
 	public ScheduledExecutorService getScheduledExecutor(String poolName) {
 		DBC.PRE.assertNotEmpty("poolName must be set!", poolName);
-		return this.scheduledExecutors
-				.computeIfAbsent(poolName, p -> newScheduledThreadPool(4, new NamedThreadPoolFactory(p)));
+		return this.scheduledExecutors.computeIfAbsent(poolName,
+				p -> newScheduledThreadPool(4, new NamedThreadPoolFactory(p)));
 	}
 
 	public void destroy() {
@@ -46,27 +47,30 @@ public class ExecutorPool {
 		for (String poolName : this.executors.keySet()) {
 			logger.info("Shutting down executor pool " + poolName);
 			ExecutorService executor = this.executors.get(poolName);
-			shutdownExecutor(executor);
+			shutdownExecutor(poolName, executor);
 		}
 
 		for (String poolName : this.scheduledExecutors.keySet()) {
 			logger.info("Shutting down scheduled executor pool " + poolName);
 			ExecutorService executor = this.scheduledExecutors.get(poolName);
-			shutdownExecutor(executor);
+			shutdownExecutor(poolName, executor);
 		}
 	}
 
-	private void shutdownExecutor(ExecutorService executor) {
+	private void shutdownExecutor(String name, ExecutorService executor) {
 		try {
-			executor.shutdown();
-			executor.awaitTermination(5, TimeUnit.SECONDS);
+			List<Runnable> tasks = executor.shutdownNow();
+			if (!tasks.isEmpty()) {
+				logger.warn("The following " + tasks.size() + " tasks were never started for executor " + name + " :");
+				for (Runnable runnable : tasks) {
+					logger.warn("  " + runnable);
+				}
+			}
+
+			if (!executor.awaitTermination(5, TimeUnit.SECONDS))
+				logger.error("Executor " + name + " did not stop after " + 5 + "s!");
 		} catch (InterruptedException e) {
 			logger.error("Was interrupted while shutting down tasks");
-		} finally {
-			if (!executor.isTerminated()) {
-				logger.error("Tasks not stopped after " + 5 + "s. Shutting down now.");
-				executor.shutdownNow();
-			}
 		}
 	}
 }
