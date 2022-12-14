@@ -15,6 +15,8 @@ public class LoggingLoader {
 
 	private static final String LOGBACK_XML = "logback.xml";
 
+	private static File lastConfigFile;
+
 	public static void reloadLogging(File configPathF) {
 
 		File logConfigFile = new File(configPathF, LOGBACK_XML);
@@ -29,9 +31,10 @@ public class LoggingLoader {
 				logger.info(logConfigFile.getAbsolutePath() + " file exists. Reloading logging configuration from "
 						+ logConfigFile);
 				try {
-					loggerContext.reset();
+					//loggerContext.reset();
 					new ContextInitializer(loggerContext).configureByResource(logConfigFile.toURI().toURL());
 					logger.info("Reloaded logger configuration from " + logConfigFile.getAbsolutePath());
+					lastConfigFile = logConfigFile;
 				} catch (MalformedURLException | JoranException e) {
 					try {
 						new ContextInitializer(loggerContext).autoConfig();
@@ -40,6 +43,33 @@ public class LoggingLoader {
 								+ logConfigFile.getAbsolutePath(), e);
 					}
 					logger.error("Failed to reload logback configuration from file " + logConfigFile, e);
+				}
+			}
+		}
+	}
+
+	public static void reloadLoggingConfiguration() {
+		if (lastConfigFile != null) {
+			logger.info("Reloading configuration from last config file " + lastConfigFile.getAbsolutePath());
+			System.out.println("Reloading configuration from last config file " + lastConfigFile.getAbsolutePath());
+			reloadLogging(lastConfigFile);
+		} else {
+			if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
+				logger.error("LoggerFactory is not instance of " + LoggerContext.class.getName()
+						+ ". Ignoring request to reload configuration!");
+				System.out.println("LoggerFactory is not instance of " + LoggerContext.class.getName()
+						+ ". Ignoring request to reload configuration!");
+			} else {
+				logger.info(
+						"Resetting logging configuration using auto config as no previous config fila available...");
+				System.out.println(
+						"Resetting logging configuration using auto config as no previous config fila available...");
+				try {
+					new ContextInitializer(loggerContext).autoConfig();
+				} catch (JoranException e) {
+					logger.error("Failed to do logging auto configuration", e);
+					System.out.println("Failed to do logging auto configuration");
+					e.printStackTrace();
 				}
 			}
 		}
