@@ -52,7 +52,7 @@ public class LoggingLoader {
 		if (lastConfigFile != null) {
 			logger.info("Reloading configuration from last config file " + lastConfigFile.getAbsolutePath());
 			System.out.println("Reloading configuration from last config file " + lastConfigFile.getAbsolutePath());
-			reloadLogging(lastConfigFile);
+			reloadLogging(lastConfigFile.getParentFile());
 		} else {
 			if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
 				logger.error("LoggerFactory is not instance of " + LoggerContext.class.getName()
