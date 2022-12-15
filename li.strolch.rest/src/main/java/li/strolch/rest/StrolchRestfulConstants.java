@@ -15,7 +15,7 @@
  */
 package li.strolch.rest;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import li.strolch.model.Tags;
 

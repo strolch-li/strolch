@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,11 +18,6 @@ package li.strolch.rest.inspector.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -32,6 +27,10 @@ import java.util.logging.Level;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import li.strolch.rest.StrolchRestfulClasses;
 import li.strolch.rest.endpoint.Inspector;
 import li.strolch.rest.filters.AuthenticationRequestFilter;
@@ -64,8 +63,8 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 	public static final String AUTHENTICATION_PATH = "strolch/authentication";
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractRestfulTest.class);
-	private static final String RUNTIME_PATH = "target/withPrivilegeRuntime/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/withPrivilegeRuntime"; //$NON-NLS-1$
+	private static final String RUNTIME_PATH = "target/withPrivilegeRuntime/";
+	private static final String CONFIG_SRC = "src/test/resources/withPrivilegeRuntime";
 	private static RuntimeMock runtimeMock;
 
 	@BeforeClass
@@ -76,18 +75,12 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
+
 	}
 
 	@AfterClass
 	public static void afterClass() {
 		runtimeMock.destroyRuntime();
-	}
-
-	@Override
-	protected Application configure() {
-		forceEnable(TestProperties.LOG_TRAFFIC);
-		enable(TestProperties.DUMP_ENTITY);
-		return createApp();
 	}
 
 	protected String authenticate() {
@@ -132,16 +125,18 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		assertEquals("jill has been logged out.", logoutResult.get("msg").getAsString());
 	}
 
+	@Override
+	protected ResourceConfig configure() {
+		forceEnable(TestProperties.LOG_TRAFFIC);
+		enable(TestProperties.DUMP_ENTITY);
+		return createApp();
+	}
+
 	public static ResourceConfig createApp() {
 		ResourceConfig resourceConfig = new ResourceConfig();
 		resourceConfig.setApplicationName("RestTest");
-
-		for (Class<?> clazz : StrolchRestfulClasses.restfulClasses) {
-			resourceConfig.register(clazz);
-		}
-		for (Class<?> clazz : StrolchRestfulClasses.providerClasses) {
-			resourceConfig.register(clazz);
-		}
+		resourceConfig.registerClasses(StrolchRestfulClasses.restfulClasses);
+		resourceConfig.registerClasses(StrolchRestfulClasses.providerClasses);
 
 		LoggingFeature loggingFeature = new LoggingFeature(
 				java.util.logging.Logger.getLogger(LoggingFeature.DEFAULT_LOGGER_NAME), Level.SEVERE,
@@ -174,13 +169,11 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 					@Override
 					public void start() {
 						try {
-							this.server = GrizzlyWebContainerFactory.create(baseUri, Collections
-									.singletonMap("jersey.config.server.provider.packages",
+							this.server = GrizzlyWebContainerFactory.create(baseUri,
+									Collections.singletonMap("jersey.config.server.provider.packages",
 											Inspector.class.getPackage().getName() + ";"
 													+ AuthenticationRequestFilter.class.getPackage().getName()));
-						} catch (ProcessingException e) {
-							throw new TestContainerException(e);
-						} catch (IOException e) {
+						} catch (ProcessingException | IOException e) {
 							throw new TestContainerException(e);
 						}
 					}

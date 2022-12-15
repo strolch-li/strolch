@@ -17,8 +17,8 @@ package li.strolch.rest.helper;
 
 import static java.util.stream.Collectors.toList;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.HttpHeaders;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;

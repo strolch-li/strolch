@@ -20,12 +20,12 @@ import static java.util.stream.Collectors.toList;
 import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 import li.strolch.agent.api.ComponentContainer;

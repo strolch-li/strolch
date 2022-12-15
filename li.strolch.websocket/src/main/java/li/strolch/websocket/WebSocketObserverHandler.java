@@ -7,7 +7,7 @@ import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.DASH;
 
-import javax.websocket.CloseReason;
+import jakarta.websocket.CloseReason;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

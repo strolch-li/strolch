@@ -19,10 +19,6 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION_EXPIRATION_DATE;
 import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import javax.ws.rs.core.Response.Status;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,6 +28,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.core.Response.Status;
 import li.strolch.exception.StrolchException;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;

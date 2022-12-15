@@ -1,6 +1,6 @@
 package li.strolch.rest.model;
 
-import javax.ws.rs.QueryParam;
+import jakarta.ws.rs.QueryParam;
 
 import li.strolch.runtime.StrolchConstants;
 

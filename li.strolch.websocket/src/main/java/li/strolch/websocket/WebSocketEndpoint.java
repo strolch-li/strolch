@@ -1,7 +1,7 @@
 package li.strolch.websocket;
 
-import javax.websocket.*;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.*;
+import jakarta.websocket.server.ServerEndpoint;
 import java.util.concurrent.ConcurrentHashMap;
 
 import li.strolch.agent.api.StrolchAgent;

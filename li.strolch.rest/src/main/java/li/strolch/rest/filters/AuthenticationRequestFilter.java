@@ -20,13 +20,15 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_SOURCE;
 import static li.strolch.utils.helper.StringHelper.*;
 
-import javax.annotation.Priority;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.*;
-import javax.ws.rs.ext.Provider;
+import jakarta.annotation.Priority;
+import jakarta.servlet.http.HttpServletRequest;
+
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.ext.Provider;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashSet;
@@ -128,19 +130,22 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(
-					Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("User is not authenticated!").build());
+			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("User is not authenticated!")
+					.build());
 		} catch (StrolchAccessDeniedException e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("User is not authorized!").build());
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("User is not authorized!")
+					.build());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("User cannot access the resource.").build());
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("User cannot access the resource.")
+					.build());
 		}
 	}
 
@@ -213,9 +218,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		if (isEmpty(sessionId)) {
 			logger.error(
 					"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("Missing Authorization!").build());
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("Missing Authorization!")
+					.build());
 			return null;
 		}
 
@@ -227,9 +233,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		if (!getRestful().isBasicAuthEnabled()) {
 			logger.error("Basic Auth is not available for URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("Basic Auth not available").build());
+			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("Basic Auth not available")
+					.build());
 			return null;
 		}
 
@@ -237,9 +244,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		basicAuth = new String(Base64.getDecoder().decode(basicAuth.getBytes()), StandardCharsets.UTF_8);
 		String[] parts = basicAuth.split(":");
 		if (parts.length != 2) {
-			requestContext.abortWith(
-					Response.status(Response.Status.BAD_REQUEST).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("Invalid Basic Authorization!").build());
+			requestContext.abortWith(Response.status(Response.Status.BAD_REQUEST)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("Invalid Basic Authorization!")
+					.build());
 			return null;
 		}
 
@@ -260,10 +268,12 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
-			if (!requestContext.getUriInfo().getMatchedURIs()
+			if (!requestContext.getUriInfo()
+					.getMatchedURIs()
 					.contains("strolch/privilege/users/" + certificate.getUsername() + "/password")) {
 				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Can only set password!")
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.entity("Can only set password!")
 						.build());
 				return null;
 			}
@@ -275,6 +285,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	}
 
 	public static String getRemoteIp(HttpServletRequest request) {
+		if (request == null) {
+			logger.error("HttpServletRequest NOT AVAILABLE! Probably running in TEST!");
+			return "(null)";
+		}
 
 		String remoteHost = request.getRemoteHost();
 		String remoteAddr = request.getRemoteAddr();

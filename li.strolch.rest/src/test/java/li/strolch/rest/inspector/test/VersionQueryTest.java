@@ -17,10 +17,10 @@ package li.strolch.rest.inspector.test;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
