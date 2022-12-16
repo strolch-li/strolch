@@ -1,19 +1,20 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>li.strolch</groupId>
-        <artifactId>li.strolch</artifactId>
-        <version>1.8.0-SNAPSHOT</version>
+        <artifactId>strolch</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>li.strolch.soql</artifactId>
+    <artifactId>utils</artifactId>
     <packaging>jar</packaging>
-    <name>li.strolch.soql</name>
-    <inceptionYear>2012</inceptionYear>
+    <name>utils</name>
+    <description>These utils contain project independent helper classes and utilities for reuse</description>
+    <inceptionYear>2011</inceptionYear>
 
     <distributionManagement>
         <site>
@@ -23,12 +24,6 @@
     </distributionManagement>
 
     <dependencies>
-
-        <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr4</artifactId>
-            <version>${antlr.version}</version>
-        </dependency>
 
         <!-- Base -->
         <dependency>
@@ -41,23 +36,24 @@
         </dependency>
 
         <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.privilege</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.agent</artifactId>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
 
-        <!-- Test -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+        </dependency>
+
+        <!-- test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -74,25 +70,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/componentVersion.properties</exclude>
-                </excludes>
-                <includes>
-                    <include>**/*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/componentVersion.properties</include>
-                </includes>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

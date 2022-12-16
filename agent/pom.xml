@@ -5,13 +5,13 @@
 
     <parent>
         <groupId>li.strolch</groupId>
-        <artifactId>li.strolch</artifactId>
-        <version>1.8.0-SNAPSHOT</version>
+        <artifactId>strolch</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>li.strolch.agent</artifactId>
-    <name>li.strolch.agent</name>
+    <artifactId>agent</artifactId>
+    <name>agent</name>
     <description>Strolch Agent which is the runtime for Strolch</description>
     <inceptionYear>2011</inceptionYear>
 
@@ -37,11 +37,11 @@
         <!-- main -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.model</artifactId>
+            <artifactId>model</artifactId>
         </dependency>
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>li.strolch.privilege</artifactId>
+            <artifactId>privilege</artifactId>
         </dependency>
 
         <dependency>

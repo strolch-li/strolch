@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>li.strolch</groupId>
-    <artifactId>li.strolch</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <artifactId>strolch</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
 
-    <name>li.strolch</name>
+    <name>strolch</name>
     <description>Module build for strolch</description>
     <packaging>pom</packaging>
-    <url>http://www.strolch.li</url>
+    <url>https://www.strolch.li</url>
     <inceptionYear>2014</inceptionYear>
 
     <issueManagement>
@@ -148,23 +148,23 @@
     </properties>
 
     <modules>
-        <module>li.strolch.privilege</module>
-        <module>li.strolch.utils</module>
-        <module>li.strolch.xmlpers</module>
-        <module>li.strolch.model</module>
-        <module>li.strolch.soql</module>
-        <module>li.strolch.testbase</module>
+        <module>privilege</module>
+        <module>utils</module>
+        <module>xmlpers</module>
+        <module>model</module>
+        <module>soql</module>
+        <module>test-base</module>
 
-        <module>li.strolch.persistence.postgresql</module>
-        <module>li.strolch.persistence.xml</module>
-        <module>li.strolch.agent</module>
-        <module>li.strolch.service</module>
-        <module>li.strolch.rest</module>
-        <module>li.strolch.websocket</module>
+        <module>persistence-postgresql</module>
+        <module>persistence-xml</module>
+        <module>agent</module>
+        <module>service</module>
+        <module>web-rest</module>
+        <module>websocket</module>
 
-        <module>li.strolch.performancetest</module>
+        <module>test-performance</module>
 
-        <module>li.strolch.bom</module>
+        <module>bom</module>
     </modules>
 
     <dependencyManagement>
@@ -185,58 +185,58 @@
             <!-- Strolch -->
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.model</artifactId>
+                <artifactId>model</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.agent</artifactId>
+                <artifactId>agent</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.service</artifactId>
+                <artifactId>service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.persistence.xml</artifactId>
+                <artifactId>persistence-xml</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.persistence.postgresql</artifactId>
+                <artifactId>persistence-postgresql</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.rest</artifactId>
+                <artifactId>web-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.utils</artifactId>
+                <artifactId>utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.xmlpers</artifactId>
+                <artifactId>xmlpers</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.privilege</artifactId>
+                <artifactId>privilege</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.soql</artifactId>
+                <artifactId>soql</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>li.strolch.testbase</artifactId>
+                <artifactId>test-base</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -557,7 +557,7 @@
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 
                                 <!-- When creating an executable jar, use copy-dependencies plugin with libs in lib/ dir: -->
-                                <!-- mainClass>li.strolch.main.Main</mainClass -->
+                                <!-- mainClass>main.Main</mainClass -->
                                 <!-- addClasspath>true</addClasspath -->
                                 <!-- classpathPrefix>lib/</classpathPrefix -->
                             </manifest>
@@ -615,7 +615,7 @@
                         <archive>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-                                <!-- mainClass>li.strolch.main.Main</mainClass -->
+                                <!-- mainClass>main.Main</mainClass -->
                             </manifest>
                         </archive>
                         <!-- <descriptorRefs> -->
