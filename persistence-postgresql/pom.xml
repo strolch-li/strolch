@@ -11,7 +11,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>persistence-postgresql</artifactId>
-    <name>persistence-postgresql</name>
+    <name>strolch-persistence-postgresql</name>
     <description>PostgreSQL Persistence Implementation for Strolch</description>
     <inceptionYear>2011</inceptionYear>
 

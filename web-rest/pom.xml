@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>web-rest</artifactId>
-    <name>web-rest</name>
+    <name>strolch-web-rest</name>
     <description>Restful Web Service API for Strolch</description>
     <inceptionYear>2011</inceptionYear>
 

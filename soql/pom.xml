@@ -12,7 +12,7 @@
 
     <artifactId>soql</artifactId>
     <packaging>jar</packaging>
-    <name>soql</name>
+    <name>strolch-soql</name>
     <inceptionYear>2012</inceptionYear>
 
     <distributionManagement>

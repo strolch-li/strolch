@@ -12,7 +12,7 @@
 
     <artifactId>strolch-bom</artifactId>
     <packaging>pom</packaging>
-    <name>bom</name>
+    <name>strolch-bom</name>
     <description>All of Strolch's dependencies for easy dependency management in Strolch projects</description>
 
     <distributionManagement>

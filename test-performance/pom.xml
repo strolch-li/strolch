@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>test-performance</artifactId>
-    <name>performancetest</name>
+    <name>strolch-test-performance</name>
     <description>Strolch project for running performance tests</description>
     <inceptionYear>2015</inceptionYear>
 

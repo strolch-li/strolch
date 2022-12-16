@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>agent</artifactId>
-    <name>agent</name>
+    <name>strolch-agent</name>
     <description>Strolch Agent which is the runtime for Strolch</description>
     <inceptionYear>2011</inceptionYear>
 

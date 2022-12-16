@@ -12,7 +12,7 @@
 
     <artifactId>model</artifactId>
     <packaging>jar</packaging>
-    <name>model</name>
+    <name>strolch-model</name>
     <inceptionYear>2012</inceptionYear>
 
     <distributionManagement>

@@ -12,7 +12,7 @@
 
     <artifactId>utils</artifactId>
     <packaging>jar</packaging>
-    <name>utils</name>
+    <name>strolch-utils</name>
     <description>These utils contain project independent helper classes and utilities for reuse</description>
     <inceptionYear>2011</inceptionYear>
 

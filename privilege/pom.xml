@@ -12,7 +12,7 @@
 
     <artifactId>privilege</artifactId>
     <packaging>jar</packaging>
-    <name>privilege</name>
+    <name>strolch-privilege</name>
     <inceptionYear>2011</inceptionYear>
 
     <distributionManagement>

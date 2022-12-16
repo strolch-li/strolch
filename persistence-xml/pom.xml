@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>persistence-xml</artifactId>
-    <name>persistence.xml</name>
+    <name>strolch-persistence.xml</name>
     <description>Reference Persistence Implementation for Strolch</description>
     <inceptionYear>2011</inceptionYear>
 
