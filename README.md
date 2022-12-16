@@ -2,29 +2,11 @@
 
 [![Contributors](https://img.shields.io/github/contributors/strolch-li/strolch)](https://github.com/strolch-li/strolch/graphs/contributors)
 [![License](https://img.shields.io/github/license/strolch-li/strolch)](https://github.com/strolch-li/strolch/blob/master/LICENSE)
-[![Build Status](https://ci.4trees.ch/buildStatus/icon?job=strolch)](https://ci.4trees.ch/job/strolch/)
+[![Build Status](https://ci.atexxi.ch/buildStatus/icon?job=strolch)](https://ci.atexxi.ch/job/strolch/)
 
 [![WorksWithOpenJDK](https://github.com/foojayio/badges/raw/main/works_with_openjdk/WorksWithOpenJDK-100.png)](https://foojay.io/works-with-openjdk)
 
 The main repository which contains all of Strolch.
-
-Strolch consists of the following modules:
-* li.strolch.utils
-* li.strolch.privilege
-* li.strolch.xmlpers
-* li.strolch.model
-* li.strolch.agent
-* li.strolch.service
-* li.strolch.persistence.postgresql
-* li.strolch.persistence.xml
-* li.strolch.rest
-* li.strolch.websocket
-* li.strolch.soql
-* li.strolch.mvn.archetype.main
-* li.strolch.mvn.archetype.webapp
-* li.strolch.bom
-* li.strolch.testbase
-* li.strolch.performancetest
 
 ## Getting Started
 Either use a version on Maven Central: https://mvnrepository.com/artifact/li.strolch/li.strolch.agent
