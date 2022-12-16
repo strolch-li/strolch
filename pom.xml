@@ -164,7 +164,7 @@
 
         <module>test-performance</module>
 
-        <module>bom</module>
+        <module>strolch-bom</module>
     </modules>
 
     <dependencyManagement>
