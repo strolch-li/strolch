@@ -7,7 +7,7 @@
 The main repository which contains all of Strolch.
 
 ## Getting Started
-Either use a version on Maven Central: https://mvnrepository.com/artifact/li.strolch/li.strolch.agent
+Either use a version on Maven Central: https://mvnrepository.com/artifact/li.strolch/
 
 Or install locally first:
 
