@@ -204,15 +204,40 @@ public class Version {
 	 * 		if the given argument is not the next version
 	 */
 	public void validateIsNewer(Version other) throws IllegalArgumentException, IllegalStateException {
+		if (!isNewer(other)) {
+			String msg = "Other version: {0} is a newer version of this version: {1}";
+			throw new IllegalArgumentException(MessageFormat.format(msg, other, this.version));
+		}
+	}
+
+	/**
+	 * Returns true if the given argument is a newer version than this version
+	 *
+	 * @param other
+	 * 		the other version to check
+	 */
+	public boolean isNewer(Version other) {
 		if (!this.locator.equals(other.locator)) {
 			String msg = "Other version {0} is not for same object: {1}";
 			throw new IllegalArgumentException(MessageFormat.format(msg, other, this.version));
 		}
 
-		if (this.version >= other.version) {
-			String msg = "Other version: {0} is a newer version of this version: {1}";
+		return other.version > this.version;
+	}
+
+	/**
+	 * Returns true if the given argument is a newer version than this version
+	 *
+	 * @param other
+	 * 		the other version to check
+	 */
+	public boolean isNewerThan(Version other) {
+		if (!this.locator.equals(other.locator)) {
+			String msg = "Other version {0} is not for same object: {1}";
 			throw new IllegalArgumentException(MessageFormat.format(msg, other, this.version));
 		}
+
+		return this.version > other.version;
 	}
 
 	@Override
