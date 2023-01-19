@@ -28,6 +28,7 @@ import li.strolch.model.*;
 import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
@@ -44,6 +45,13 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
  */
 public class StrolchElementFromJsonVisitor {
 
+	private boolean overwriteExisting;
+
+	public StrolchElementFromJsonVisitor overwriteExisting() {
+		this.overwriteExisting = true;
+		return this;
+	}
+
 	public void fillElement(JsonObject jsonObject, Order order) {
 
 		DBC.PRE.assertTrue("objectType must be set!", jsonObject.has(Json.OBJECT_TYPE));
@@ -55,9 +63,7 @@ public class StrolchElementFromJsonVisitor {
 		parseVersion(order, jsonObject);
 
 		// policies
-		PolicyDefs defs = parsePolicies(jsonObject);
-		if (defs.hasPolicyDefs())
-			order.setPolicyDefs(defs);
+		handlePolicies(jsonObject, order);
 
 		// attributes
 		if (jsonObject.has(Json.DATE)) {
@@ -85,9 +91,7 @@ public class StrolchElementFromJsonVisitor {
 		parseVersion(resource, jsonObject);
 
 		// policies
-		PolicyDefs defs = parsePolicies(jsonObject);
-		if (defs.hasPolicyDefs())
-			resource.setPolicyDefs(defs);
+		handlePolicies(jsonObject, resource);
 
 		// time states
 		if (!jsonObject.has(Json.TIMED_STATES))
@@ -104,7 +108,18 @@ public class StrolchElementFromJsonVisitor {
 			String typeS = timeStateJ.get(Json.TYPE).getAsString();
 			DBC.PRE.assertNotEmpty("Type must be set on TimedState for resource with id " + resource.getId(), typeS);
 			StrolchValueType valueType = StrolchValueType.parse(typeS);
-			StrolchTimedState<? extends IValue<?>> timedState = valueType.timedStateInstance();
+
+			StrolchTimedState<? extends IValue<?>> timedState;
+			if (resource.hasTimedState(stateId)) {
+				timedState = resource.getTimedState(stateId);
+				if (valueType != timedState.getValueType()) {
+					String msg = "Existing TimedState {0} has change of type to {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, stateId, timedState.getValueType());
+					throw new StrolchException(msg);
+				}
+			} else {
+				timedState = valueType.timedStateInstance();
+			}
 
 			// attributes
 			fillElement(timeStateJ, (AbstractStrolchElement) timedState);
@@ -126,7 +141,14 @@ public class StrolchElementFromJsonVisitor {
 			if (timeStateJ.has(Json.HIDDEN))
 				timedState.setHidden(timeStateJ.get(Json.HIDDEN).getAsBoolean());
 
-			resource.addTimedState(timedState);
+			if (!this.overwriteExisting && resource.hasTimedState(stateId)) {
+				String msg = "Not overwriting elements, and TimedState {0} already exists!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, stateId);
+				throw new StrolchException(msg);
+			}
+
+			if (!resource.hasTimedState(stateId))
+				resource.addTimedState(timedState);
 
 			if (!timeStateJ.has(Json.VALUES))
 				continue;
@@ -162,9 +184,7 @@ public class StrolchElementFromJsonVisitor {
 		parseVersion(activity, jsonObject);
 
 		// policies
-		PolicyDefs defs = parsePolicies(jsonObject);
-		if (defs.hasPolicyDefs())
-			activity.setPolicyDefs(defs);
+		handlePolicies(jsonObject, activity);
 
 		if (!jsonObject.has(Json.ELEMENTS))
 			return;
@@ -173,25 +193,49 @@ public class StrolchElementFromJsonVisitor {
 		elementsJsonArray.forEach(e -> {
 
 			JsonObject elementJsonObject = e.getAsJsonObject();
+			String objectId = elementJsonObject.get(Json.ID).getAsString();
 			String objectType = elementJsonObject.get(Json.OBJECT_TYPE).getAsString();
 
 			switch (objectType) {
-			case Json.ACTIVITY:
-				Activity childActivity = new Activity();
-				fillElement(elementJsonObject, childActivity);
-				activity.addElement(childActivity);
-				break;
-
-			case Json.ACTION:
-				Action childAction = new Action();
-				fillElement(elementJsonObject, childAction);
-				activity.addElement(childAction);
-				break;
-
-			default:
+			case Json.ACTIVITY -> {
+				Activity childActivity;
+				if (activity.hasElement(objectId)) {
+					IActivityElement tmp = activity.getElement(objectId);
+					if (!tmp.isActivity()) {
+						String msg = "Existing activity {0} has element {1} which is not an activity!";
+						msg = MessageFormat.format(msg, activity.getId(), objectId);
+						throw new IllegalStateException(msg);
+					}
+					childActivity = tmp.asActivity();
+					fillElement(elementJsonObject, childActivity);
+				} else {
+					childActivity = new Activity();
+					fillElement(elementJsonObject, childActivity);
+					activity.addElement(childActivity);
+				}
+			}
+			case Json.ACTION -> {
+				Action childAction;
+				if (activity.hasElement(objectId)) {
+					IActivityElement tmp = activity.getElement(objectId);
+					if (!tmp.isAction()) {
+						String msg = "Existing activity {0} has element {1} which is not an action!";
+						msg = MessageFormat.format(msg, activity.getId(), objectId);
+						throw new IllegalStateException(msg);
+					}
+					childAction = tmp.asAction();
+					fillElement(elementJsonObject, childAction);
+				} else {
+					childAction = new Action();
+					fillElement(elementJsonObject, childAction);
+					activity.addElement(childAction);
+				}
+			}
+			default -> {
 				String msg = "Check the values of the jsonObject: {0} unknown object Type {1} !"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, elementJsonObject, objectType);
 				throw new StrolchException(msg);
+			}
 			}
 		});
 	}
@@ -230,20 +274,33 @@ public class StrolchElementFromJsonVisitor {
 			JsonElement jsonElement = entry.getValue();
 			if (!jsonElement.isJsonObject()) {
 				String msg = "Check the values of the jsonElement: {0} it is not a JsonObject!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, jsonElement);
+				msg = MessageFormat.format(msg, bagId);
 				throw new StrolchException(msg);
 			}
 
 			JsonObject bagJsonObject = jsonElement.getAsJsonObject();
-			ParameterBag bag = new ParameterBag();
+
+			ParameterBag bag;
+			if (groupedParameterizedElement.hasParameterBag(bagId))
+				bag = groupedParameterizedElement.getParameterBag(bagId);
+			else
+				bag = new ParameterBag();
+
 			fillElement(bagJsonObject, bag);
 			if (!bagId.equals(bag.getId())) {
 				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!"; //$NON-NLS-1$
-				msg = MessageFormat.format(msg, jsonElement);
+				msg = MessageFormat.format(msg, bagId);
 				throw new StrolchException(msg);
 			}
 
-			groupedParameterizedElement.addParameterBag(bag);
+			if (!this.overwriteExisting && groupedParameterizedElement.hasParameterBag(bagId)) {
+				String msg = "Not overwriting elements, and ParameterBag {0} already exists!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, bagId);
+				throw new StrolchException(msg);
+			}
+
+			if (!groupedParameterizedElement.hasParameterBag(bagId))
+				groupedParameterizedElement.addParameterBag(bag);
 		}
 	}
 
@@ -277,7 +334,19 @@ public class StrolchElementFromJsonVisitor {
 			String paramtype = paramJsonObject.get(Json.TYPE).getAsString();
 
 			StrolchValueType paramValueType = StrolchValueType.parse(paramtype);
-			Parameter<?> parameter = paramValueType.parameterInstance();
+
+			Parameter<?> parameter;
+			if (parameterizedElement.hasParameter(paramId)) {
+				parameter = parameterizedElement.getParameter(paramId);
+				if (paramValueType != parameter.getValueType()) {
+					String msg = "Existing Parameter {0} has change of type to {1}"; //$NON-NLS-1$
+					msg = MessageFormat.format(msg, paramId, parameter.getValueType());
+					throw new StrolchException(msg);
+				}
+			} else {
+				parameter = paramValueType.parameterInstance();
+			}
+
 			fillElement(paramJsonObject, parameter);
 			if (!paramId.equals(parameter.getId())) {
 				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!"; //$NON-NLS-1$
@@ -285,7 +354,14 @@ public class StrolchElementFromJsonVisitor {
 				throw new StrolchException(msg);
 			}
 
-			parameterizedElement.addParameter(parameter);
+			if (!this.overwriteExisting && parameterizedElement.hasParameter(paramId)) {
+				String msg = "Not overwriting elements, and Parameter {0} already exists!"; //$NON-NLS-1$
+				msg = MessageFormat.format(msg, paramId);
+				throw new StrolchException(msg);
+			}
+
+			if (!parameterizedElement.hasParameter(paramId))
+				parameterizedElement.addParameter(parameter);
 		}
 	}
 
@@ -317,13 +393,14 @@ public class StrolchElementFromJsonVisitor {
 			action.setState(State.parse(jsonObject.get(Json.STATE).getAsString()));
 
 		// policies
-		PolicyDefs defs = parsePolicies(jsonObject);
-		if (defs.hasPolicyDefs())
-			action.setPolicyDefs(defs);
+		handlePolicies(jsonObject, action);
 
 		// value changes
 		if (!jsonObject.has(Json.VALUE_CHANGES))
 			return;
+
+		if (this.overwriteExisting)
+			action.clearChanges();
 
 		JsonArray valueChangesJ = jsonObject.getAsJsonArray(Json.VALUE_CHANGES);
 		valueChangesJ.forEach(e -> {
@@ -370,6 +447,18 @@ public class StrolchElementFromJsonVisitor {
 		}
 
 		return policyDefs;
+	}
+
+	private void handlePolicies(JsonObject jsonObject, PolicyContainer pc) {
+		PolicyDefs defs = parsePolicies(jsonObject);
+		if (!defs.hasPolicyDefs())
+			return;
+
+		if (pc.hasPolicyDefs()) {
+			defs.getPolicyTypes().forEach(type -> pc.getPolicyDefs().addOrUpdate(defs.getPolicyDef(type)));
+		} else {
+			pc.setPolicyDefs(defs);
+		}
 	}
 
 	protected void parseVersion(StrolchRootElement rootElement, JsonObject jsonObject) {
