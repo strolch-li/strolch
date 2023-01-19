@@ -211,6 +211,14 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
+	 * Clears the current list of {@link IValueChange IValueChanges}
+	 */
+	public void clearChanges() {
+		if (this.changes != null)
+			this.changes.clear();
+	}
+
+	/**
 	 * @return the list of {@code IValueChange} attached to the {@code Action} start
 	 */
 	public List<IValueChange<? extends IValue<?>>> getChanges() {
