@@ -269,7 +269,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
-		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
+		Version.updateVersionFor(element, 0, tx.getUsername(), false);
 		internalAdd(tx, element);
 	}
 
@@ -283,7 +283,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
-			Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
+			Version.updateVersionFor(element, 0, tx.getUsername(), false);
 			internalAdd(tx, element);
 		}
 	}
@@ -291,7 +291,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized void update(StrolchTransaction tx, T element) {
 		element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
-		Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
+		Version.updateVersionFor(element, 0, tx.getUsername(), false);
 		internalUpdate(tx, element);
 	}
 
@@ -320,7 +320,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
 		for (T element : elements) {
 			element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
-			Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), false);
+			Version.updateVersionFor(element, 0, tx.getUsername(), false);
 			internalUpdate(tx, element);
 		}
 	}

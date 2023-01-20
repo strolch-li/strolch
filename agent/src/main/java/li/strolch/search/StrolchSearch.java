@@ -97,7 +97,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 			tx.getPrivilegeContext().validateAction(this);
 		} catch (AccessDeniedException e) {
 
-			String username = tx.getCertificate().getUsername();
+			String username = tx.getUsername();
 
 			if (tx.getContainer().hasComponent(OperationsLog.class)) {
 				String realmName = tx.getRealmName();

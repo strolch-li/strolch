@@ -45,7 +45,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 	public synchronized void add(StrolchTransaction tx, T element) {
 		if (this.realm.isVersioningEnabled()) {
 			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId()) + 1;
-			Version.updateVersionFor(element, latestVersion, tx.getCertificate().getUsername(), false);
+			Version.updateVersionFor(element, latestVersion, tx.getUsername(), false);
 		} else {
 			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 		}
@@ -64,7 +64,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		for (T element : elements) {
 			if (this.realm.isVersioningEnabled()) {
 				int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId()) + 1;
-				Version.updateVersionFor(element, latestVersion, tx.getCertificate().getUsername(), false);
+				Version.updateVersionFor(element, latestVersion, tx.getUsername(), false);
 			} else {
 				Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 			}
@@ -84,13 +84,13 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 					element.setVersion(current.getVersion());
 				} else {
 					int currentVersion = getLatestVersionFor(tx, element.getType(), element.getId());
-					Version.updateVersionFor(element, currentVersion, tx.getCertificate().getUsername(), deleted);
+					Version.updateVersionFor(element, currentVersion, tx.getUsername(), deleted);
 				}
 			}
-			Version.updateVersionFor(element, tx.getCertificate().getUsername(), deleted);
+			Version.updateVersionFor(element, tx.getUsername(), deleted);
 		} else {
 			element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
-			Version.updateVersionFor(element, 0, tx.getCertificate().getUsername(), deleted);
+			Version.updateVersionFor(element, 0, tx.getUsername(), deleted);
 		}
 	}
 
