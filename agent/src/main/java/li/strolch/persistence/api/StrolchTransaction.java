@@ -107,6 +107,15 @@ public interface StrolchTransaction extends AutoCloseable {
 	Certificate getCertificate();
 
 	/**
+	 * Returns the username of the {@link Certificate} currently executing this TX
+	 *
+	 * @return the username of the {@link Certificate} currently executing this TX
+	 */
+	default String getUsername() {
+		return getCertificate().getUsername();
+	}
+
+	/**
 	 * Returns the {@link Locale} for the {@link Certificate}
 	 *
 	 * @return the {@link Locale} for the {@link Certificate}
