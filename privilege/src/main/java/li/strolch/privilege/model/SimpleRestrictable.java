@@ -17,6 +17,9 @@ package li.strolch.privilege.model;
 
 import li.strolch.utils.dbc.DBC;
 
+/**
+ * Implements a simple restrictable, which returns the privilege name and value passed on construction
+ */
 public class SimpleRestrictable implements Restrictable {
 
 	private final String name;
@@ -24,10 +27,12 @@ public class SimpleRestrictable implements Restrictable {
 
 	/**
 	 * @param name
+	 * 		the name of the privilege
 	 * @param value
+	 * 		the value allowed on the privilege
 	 */
 	public SimpleRestrictable(String name, Object value) {
-		DBC.PRE.assertNotEmpty("name must not be emepty", name);
+		DBC.PRE.assertNotEmpty("name must not be empty", name);
 		DBC.PRE.assertNotNull("value must not be null", value);
 		this.name = name;
 		this.value = value;
