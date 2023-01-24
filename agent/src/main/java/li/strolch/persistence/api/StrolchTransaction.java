@@ -1861,6 +1861,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	void assertHasPrivilege(String privilegeName, String privilegeValue) throws AccessDeniedException;
 
 	/**
+	 * @see PrivilegeContext#validateAction(Restrictable)
+	 */
+	void assertHasPrivilege(Restrictable restrictable) throws AccessDeniedException;
+
+	/**
 	 * @see PrivilegeContext#hasPrivilege(Restrictable)
 	 */
 	boolean hasPrivilege(String privilegeName, String privilegeValue) throws AccessDeniedException;

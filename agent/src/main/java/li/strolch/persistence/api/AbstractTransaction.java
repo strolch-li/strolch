@@ -1231,6 +1231,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void assertHasPrivilege(Restrictable restrictable) throws AccessDeniedException {
+		DBC.PRE.assertNotNull("restrictable must not be null", restrictable);
+		getPrivilegeContext().validateAction(restrictable);
+	}
+
+	@Override
 	public boolean hasPrivilege(String privilegeName, String privilegeValue) throws AccessDeniedException {
 		DBC.PRE.assertNotEmpty("privilegeName must not be empty", privilegeValue);
 		DBC.PRE.assertNotEmpty("privilegeValue must not be empty", privilegeValue);
