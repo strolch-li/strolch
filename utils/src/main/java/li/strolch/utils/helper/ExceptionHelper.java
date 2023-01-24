@@ -41,7 +41,14 @@ public class ExceptionHelper {
 	public static String getCallerMethod(int depth) {
 		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE) //
 				.walk(frames -> frames.map((StackWalker.StackFrame sf) -> sf.getClassName() + "." + sf.getMethodName())
-						.skip(depth).findFirst()).orElse("UnknownClass.unknownMethod!");
+						.skip(depth)
+						.findFirst()).orElse("UnknownClass.unknownMethod!");
+	}
+
+	public static String getCallerMethodNoClass(int depth) {
+		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE) //
+				.walk(frames -> frames.map(StackWalker.StackFrame::getMethodName).skip(depth).findFirst())
+				.orElse("UnknownClass.unknownMethod!");
 	}
 
 	/**
