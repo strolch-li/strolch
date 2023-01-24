@@ -15,19 +15,17 @@
  */
 package li.strolch.rest.endpoint;
 
-import static java.util.Collections.*;
-import static li.strolch.rest.StrolchRestfulConstants.*;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.sort;
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
-import static li.strolch.rest.helper.ResponseUtil.*;
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
+import static li.strolch.rest.helper.ResponseUtil.toResponse;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.search.SearchBuilder.orderBy;
+import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
+import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
@@ -37,20 +35,22 @@ import java.io.FileWriter;
 import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import com.google.gson.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
-import li.strolch.model.Locator;
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.model.Tags;
+import li.strolch.model.*;
 import li.strolch.model.Tags.Json;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.*;
@@ -62,8 +62,6 @@ import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.*;
 import li.strolch.service.*;
@@ -87,13 +85,11 @@ public class Inspector {
 
 	private static final Logger logger = LoggerFactory.getLogger(Inspector.class);
 
-	private static String getContext() {
-		StackTraceElement element = new Throwable().getStackTrace()[2];
-		return element.getClassName() + "." + element.getMethodName();
-	}
-
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getContext());
+		RestfulStrolchComponent rest = RestfulStrolchComponent.getInstance();
+		if (!certificate.hasRole(ROLE_STROLCH_ADMIN))
+			rest.validate(certificate).validateAction(Inspector.class.getSimpleName(), getCallerMethodNoClass(2));
+		return rest.openTx(certificate, realm, getCallerMethod(2));
 	}
 
 	private String toString(JsonElement jsonElement) {
@@ -210,7 +206,8 @@ public class Inspector {
 
 		String fileName = "strolch_export_" + realm + "_" + System.currentTimeMillis() + ".xml";
 		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -336,7 +333,8 @@ public class Inspector {
 
 		String fileName = "strolch_export_resources_" + realm + "_" + System.currentTimeMillis() + ".xml";
 		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -363,7 +361,8 @@ public class Inspector {
 
 		String fileName = "strolch_export_orders_" + realm + "_" + System.currentTimeMillis() + ".xml";
 		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -390,7 +389,8 @@ public class Inspector {
 
 		String fileName = "strolch_export_activities_" + realm + "_" + System.currentTimeMillis() + ".xml";
 		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -562,7 +562,8 @@ public class Inspector {
 
 		String fileName = "strolch_export_resources_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
 		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -595,7 +596,8 @@ public class Inspector {
 
 		String fileName = "strolch_export_orders_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
 		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -628,7 +630,8 @@ public class Inspector {
 
 		String fileName = "strolch_export_activities_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
 		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -1294,8 +1297,8 @@ public class Inspector {
 
 	@DELETE
 	@Path("{realm}/resources/{type}")
-	public Response removeResourcesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
-			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
+	public Response removeResourcesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @QueryParam("ids") String ids) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
@@ -1315,8 +1318,8 @@ public class Inspector {
 
 	@DELETE
 	@Path("{realm}/orders/{type}")
-	public Response removeOrdersByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
-			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
+	public Response removeOrdersByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @QueryParam("ids") String ids) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
@@ -1336,8 +1339,8 @@ public class Inspector {
 
 	@DELETE
 	@Path("{realm}/activities/{type}")
-	public Response removeActivitiesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
-			@PathParam("realm") String realm, @PathParam("type") String type, @QueryParam("ids") String ids) {
+	public Response removeActivitiesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@PathParam("type") String type, @QueryParam("ids") String ids) {
 
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
