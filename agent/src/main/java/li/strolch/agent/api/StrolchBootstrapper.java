@@ -41,6 +41,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 	private static final String TEMP = "temp";
 
 	public static final String FILE_BOOTSTRAP = "StrolchBootstrap.xml";
+	public static final String ENV_STROLCH_ENV = "STROLCH_ENV";
+	public static final String ENV_STROLCH_PATH = "STROLCH_PATH";
 
 	public static final String PATH_CONFIG = "config"; //$NON-NLS-1$
 	public static final String PATH_DATA = "data"; //$NON-NLS-1$
@@ -334,8 +336,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 		if (!this.envFound) {
 			throw new StrolchConfigurationException(
-					"Environment " + this.environment + " not configured in bootstrap configuration " + bootstrapFile
-							.getAbsolutePath());
+					"Environment " + this.environment + " not configured in bootstrap configuration "
+							+ bootstrapFile.getAbsolutePath());
 		}
 
 		evaluatePaths();
@@ -358,8 +360,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 		// validate the parsed data
 		if (!this.defaultAllowed) {
-			if (StringHelper.isEmpty(this.configS) || StringHelper.isEmpty(this.dataS) || StringHelper
-					.isEmpty(this.tempS)) {
+			if (StringHelper.isEmpty(this.configS) || StringHelper.isEmpty(this.dataS) || StringHelper.isEmpty(
+					this.tempS)) {
 				String msg = "One element of " + Arrays.toString(new String[] { CONFIG, DATA, TEMP })
 						+ " is not set and environment " + this.environment + " does not have attribute " + DEFAULT
 						+ "=\"true\". Either set the value or allow using default values!";
