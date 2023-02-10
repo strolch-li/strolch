@@ -16,7 +16,10 @@
 package li.strolch.persistence.xml;
 
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
+import static li.strolch.db.DbConstants.PROP_DB_IGNORE_REALM;
+import static li.strolch.db.DbConstants.PROP_USE_ENV;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -42,6 +45,7 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.xmlpers.api.*;
 
 /**
@@ -79,18 +83,21 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 			if (realm.getMode().isTransient())
 				continue;
 
-			String dbIgnoreRealmKey = makeRealmKey(realmName, PROP_DB_IGNORE_REALM);
-			String dbStorePathKey = makeRealmKey(realmName, PROP_DB_STORE_PATH);
-			String dbVerboseKey = makeRealmKey(realmName, PROP_VERBOSE);
+			String dbUseEnvKey = makeRealmKey(realmName, PROP_USE_ENV, false);
+			boolean dbUseEnv = configuration.getBoolean(dbUseEnvKey, false);
 
-			boolean dbIgnoreRealm = configuration.getBoolean(dbIgnoreRealmKey, Boolean.FALSE);
+			String dbStorePathKey = makeRealmKey(realmName, PROP_DB_STORE_PATH, dbUseEnv);
+			String dbVerboseKey = makeRealmKey(realmName, PROP_VERBOSE, dbUseEnv);
+
+			String dbIgnoreRealmKey = makeRealmKey(realmName, PROP_DB_IGNORE_REALM, false);
+			boolean dbIgnoreRealm = configuration.getBoolean(dbIgnoreRealmKey, false);
 			if (dbIgnoreRealm) {
 				logger.info("Ignoring any DB configuration for Realm " + realmName);
 				continue;
 			}
 
-			String dbStorePath = configuration.getString(dbStorePathKey, null);
-			boolean verbose = configuration.getBoolean(dbVerboseKey, Boolean.FALSE);
+			String dbStorePath = getConfigString(configuration, dbStorePathKey, dbUseEnv);
+			boolean verbose = getConfigBoolean(configuration, dbVerboseKey, dbUseEnv);
 
 			// validate URL
 			if (dbStorePaths.contains(dbStorePath))
@@ -126,6 +133,26 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		}
 
 		super.initialize(configuration);
+	}
+
+	private String getConfigString(ComponentConfiguration configuration, String dbKey, boolean useEnv) {
+		if (!useEnv)
+			return configuration.getString(dbKey, null);
+
+		String value = System.getenv(dbKey);
+		if (isEmpty(value))
+			throw new IllegalStateException("Missing environment variable " + dbKey);
+		return value;
+	}
+
+	private Boolean getConfigBoolean(ComponentConfiguration configuration, String dbKey, boolean useEnv) {
+		if (!useEnv)
+			return configuration.getBoolean(dbKey, false);
+
+		String value = System.getenv(dbKey);
+		if (isEmpty(value))
+			throw new IllegalStateException("Missing environment variable " + dbKey);
+		return StringHelper.parseBoolean(value);
 	}
 
 	@Override

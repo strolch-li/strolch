@@ -16,6 +16,7 @@
 package li.strolch.runtime;
 
 import static li.strolch.utils.helper.StringHelper.DOT;
+import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
@@ -46,10 +47,14 @@ public class StrolchConstants extends StrolchModelConstants {
 	public static final String TYPE_STROLCH_JOB = "StrolchJob";
 
 	public static String makeRealmKey(String realmName, String key) {
+		return makeRealmKey(realmName, key, false);
+	}
+
+	public static String makeRealmKey(String realmName, String key, boolean useEnv) {
 		String realmKey = key;
 		if (!realmName.equals(DEFAULT_REALM))
-			realmKey += DOT + realmName;
-		return realmKey;
+			realmKey += (useEnv ? UNDERLINE : DOT) + realmName;
+		return useEnv ? realmKey.replace(DOT, UNDERLINE).toUpperCase() : realmKey;
 	}
 
 	/**

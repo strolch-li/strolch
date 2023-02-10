@@ -35,4 +35,6 @@ public class DbConstants {
 	public static final String PROP_ALLOW_DATA_INIT_ON_EMPTY_DB = "allowDataInitOnEmptyDb";
 	public static final String PROP_DB_VERSION = "db_version";
 	public static final String RESOURCE_DB_VERSION = "/{0}_db_version.properties";
+
+	public static final String ENV_DB_HOST_OVERRIDE = "DB_HOST_OVERRIDE";
 }

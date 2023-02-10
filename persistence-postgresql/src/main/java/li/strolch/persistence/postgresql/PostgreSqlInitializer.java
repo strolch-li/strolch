@@ -91,7 +91,7 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 
 	protected File getDataStoreFile(RuntimeConfiguration runtimeConfiguration,
 			ComponentConfiguration realmConfiguration, String realmName) {
-		String dataStoreKey = makeRealmKey(realmName, PREFIX_DATA_STORE_FILE);
+		String dataStoreKey = makeRealmKey(realmName, PREFIX_DATA_STORE_FILE, false);
 		return realmConfiguration.getDataFile(dataStoreKey, null, runtimeConfiguration, true);
 	}
 }

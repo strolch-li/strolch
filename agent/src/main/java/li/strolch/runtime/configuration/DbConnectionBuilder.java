@@ -16,7 +16,9 @@
 package li.strolch.runtime.configuration;
 
 import static li.strolch.db.DbConstants.*;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
+import static li.strolch.utils.helper.StringHelper.*;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -29,7 +31,6 @@ import java.util.Set;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.runtime.StrolchConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,36 +62,44 @@ public abstract class DbConnectionBuilder {
 			if (realm.getMode().isTransient())
 				continue;
 
-			String dbIgnoreRealmKey = makeRealmKey(realmName, PROP_DB_IGNORE_REALM);
-			String dbUrlKey = makeRealmKey(realmName, PROP_DB_URL);
-			String dbUsernameKey = makeRealmKey(realmName, PROP_DB_USERNAME);
-			String dbPasswordKey = makeRealmKey(realmName, PROP_DB_PASSWORD);
+			String dbUseEnvKey = makeRealmKey(realmName, PROP_USE_ENV, false);
+			boolean dbUseEnv = this.configuration.getBoolean(dbUseEnvKey, false);
+			if (dbUseEnv)
+				logger.info("Configuration specifies to use environment variables to configure DB access...");
 
-			boolean dbIgnoreRealm = this.configuration.getBoolean(dbIgnoreRealmKey, Boolean.FALSE);
+			String dbUrlKey = makeRealmKey(realmName, PROP_DB_URL, dbUseEnv);
+			String dbUsernameKey = makeRealmKey(realmName, PROP_DB_USERNAME, dbUseEnv);
+			String dbPasswordKey = makeRealmKey(realmName, PROP_DB_PASSWORD, dbUseEnv);
+
+			String dbIgnoreRealmKey = makeRealmKey(realmName, PROP_DB_IGNORE_REALM, false);
+			boolean dbIgnoreRealm = this.configuration.getBoolean(dbIgnoreRealmKey, false);
 			if (dbIgnoreRealm) {
 				logger.info("[" + realm + "] Ignoring any DB configuration for Realm " + realmName);
 				continue;
 			}
 
-			String dbUrl = this.configuration.getString(dbUrlKey, null);
-			String username = this.configuration.getString(dbUsernameKey, null);
-			String password = this.configuration.getString(dbPasswordKey, null);
+			String dbUrl = getConfigString(dbUrlKey, dbUseEnv);
+			String username = getConfigString(dbUsernameKey, dbUseEnv);
+			String password = getConfigString(dbPasswordKey, dbUseEnv);
 
 			if (this.configuration.getBoolean(PROP_DB_ALLOW_HOST_OVERRIDE_ENV, false) //
 					&& System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE)) {
-				dbUrl = overridePostgresqlHost(realm.getRealm(), dbUrl);
+				dbUrl = overridePostgresqlHost(realm.getRealm(), dbUrl, dbUseEnv);
 			}
 
 			// find any pool configuration values
-			Set<String> propertyKeys = this.configuration.getPropertyKeys();
+			Map<String, String> properties = dbUseEnv ? System.getenv() : this.configuration.getAsMap();
+			String dbPoolPrefix = dbUseEnv ?
+					PROP_DB_POOL_PREFIX.replace(DOT, UNDERLINE).toUpperCase() :
+					PROP_DB_POOL_PREFIX;
 			Properties props = new Properties();
-			for (String key : propertyKeys) {
-				if (!key.startsWith(PROP_DB_POOL_PREFIX))
+			for (String key : properties.keySet()) {
+				if (!key.startsWith(dbPoolPrefix))
 					continue;
 
 				// TODO we should change how properties for realms are configured
 				// since defaultRealm does not have to be on the key, we need this hack:
-				String[] segments = key.split("\\.");
+				String[] segments = key.split(dbUseEnv ? UNDERLINE : "\\.");
 				String poolKey;
 				String foundRealm;
 				if (segments.length == 4) {
@@ -98,7 +107,7 @@ public abstract class DbConnectionBuilder {
 					foundRealm = segments[3];
 				} else if (segments.length == 3) {
 					// default realm
-					foundRealm = StrolchConstants.DEFAULT_REALM;
+					foundRealm = DEFAULT_REALM;
 				} else {
 					throw new IllegalArgumentException("Can't detect realm of this property: " + key);
 				}
@@ -107,39 +116,62 @@ public abstract class DbConnectionBuilder {
 					continue;
 
 				poolKey = segments[2];
-				String value = this.configuration.getString(key, null);
+				String value = properties.get(key);
 				props.setProperty(poolKey, value);
 			}
 
-			DataSource ds = build(realmName, dbUrl, username, password, props);
-
-			dsMap.put(realmName, ds);
+			DataSource dataSource = build(realmName, dbUrl, username, password, props);
+			dsMap.put(realmName, dataSource);
 		}
 
 		return dsMap;
 	}
 
-	public static String overridePostgresqlHost(String realm, String dbUrl) {
-		if (!System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
-			return dbUrl;
+	private String getConfigString(String dbKey, boolean useEnv) {
+		if (!useEnv)
+			return this.configuration.getString(dbKey, null);
+
+		String value = System.getenv(dbKey);
+		if (isEmpty(value))
+			throw new IllegalStateException("Missing environment variable " + dbKey);
+		return value;
+	}
+
+	public static String overridePostgresqlHost(String realmName, String dbUrl) {
+		return overridePostgresqlHost(realmName, dbUrl, false);
+	}
+
+	public static String overridePostgresqlHost(String realmName, String dbUrl, boolean useEnv) {
+		String hostOverride;
+		if (useEnv) {
+			if (!System.getenv().containsKey(ENV_DB_HOST_OVERRIDE))
+				return dbUrl;
+			String hostOverrideKey = makeRealmKey(realmName, PROP_DB_HOST_OVERRIDE, true);
+			hostOverride = System.getenv(hostOverrideKey);
+		} else {
+			if (!System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
+				return dbUrl;
+			String hostOverrideKey = makeRealmKey(realmName, PROP_DB_HOST_OVERRIDE, false);
+			hostOverride = System.getProperty(hostOverrideKey);
+		}
+
 		if (!dbUrl.startsWith("jdbc:postgresql://"))
 			throw new IllegalStateException("DB URL is invalid: " + dbUrl);
 
 		String tmp = dbUrl.substring("jdbc:postgresql://".length());
 		String host = tmp.substring(0, tmp.indexOf('/'));
 		String dbName = tmp.substring(tmp.indexOf('/'));
-		String hostOverride = System.getProperty(PROP_DB_HOST_OVERRIDE);
 
 		if (host.equals(hostOverride))
 			return dbUrl;
 
-		logger.warn("[" + realm + "] Replacing db host " + host + " with override " + hostOverride);
+		logger.warn("[" + realmName + "] Replacing db host " + host + " with override " + hostOverride);
 		dbUrl = "jdbc:postgresql://" + hostOverride + dbName;
-		logger.warn("[" + realm + "] DB URL is now " + dbUrl);
+		logger.warn("[" + realmName + "] DB URL is now " + dbUrl);
 		return dbUrl;
 	}
 
-	protected abstract DataSource build(String realm, String url, String username, String password, Properties proops);
+	protected abstract DataSource build(String realm, String url, String username, String password, Properties props);
 
 	protected void validateConnection(DataSource ds) {
 		try (Connection con = ds.getConnection()) {
