@@ -17,6 +17,7 @@ package li.strolch.service.privilege.users;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import li.strolch.privilege.model.UserRep;
@@ -54,7 +55,8 @@ public class PrivilegeAddUserServiceTest extends AbstractRealmServiceTest<Privil
 	}
 
 	@Test
-	public void runTest() throws IllegalAccessException, InstantiationException {
+	public void runTest()
+			throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 
 		runTransient(PrivilegeUserResult.class);
 
