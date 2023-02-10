@@ -16,6 +16,7 @@
 package li.strolch.privilege.handler;
 
 import static java.text.MessageFormat.format;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.*;
 
 import javax.crypto.SecretKey;
@@ -41,6 +42,7 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.AesCryptoHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXParseException;
 
 /**
  * <p>
@@ -1540,7 +1542,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			certificateStubs = reader.read();
 
 		} catch (Exception e) {
-			logger.error("Failed to load sessions!", e);
+			if (getRootCause(e) instanceof SAXParseException)
+				logger.error("Failed to load sessions: " + getRootCause(e).getMessage());
+			else
+				logger.error("Failed to load sessions!", e);
 			if (!this.persistSessionsPath.delete())
 				logger.error("Failed to delete session file at " + this.persistSessionsPath.getAbsolutePath());
 			return;
