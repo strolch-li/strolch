@@ -146,13 +146,11 @@ public abstract class DbConnectionBuilder {
 		if (useEnv) {
 			if (!System.getenv().containsKey(ENV_DB_HOST_OVERRIDE))
 				return dbUrl;
-			String hostOverrideKey = makeRealmKey(realmName, PROP_DB_HOST_OVERRIDE, true);
-			hostOverride = System.getenv(hostOverrideKey);
+			hostOverride = System.getenv(ENV_DB_HOST_OVERRIDE);
 		} else {
 			if (!System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE))
 				return dbUrl;
-			String hostOverrideKey = makeRealmKey(realmName, PROP_DB_HOST_OVERRIDE, false);
-			hostOverride = System.getProperty(hostOverrideKey);
+			hostOverride = System.getProperty(PROP_DB_HOST_OVERRIDE);
 		}
 
 		if (!dbUrl.startsWith("jdbc:postgresql://"))
