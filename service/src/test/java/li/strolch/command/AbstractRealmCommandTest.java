@@ -15,8 +15,6 @@
  */
 package li.strolch.command;
 
-import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
-import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static li.strolch.service.test.AbstractRealmServiceTest.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;

@@ -20,6 +20,7 @@ import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostg
 import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -49,8 +50,8 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 	public static final String REALM_CACHED = "svcCached";
 	public static final String REALM_CACHED_AUDITS_VERSIONING = "svcCachedAuditsVersioning";
 	public static final String REALM_TRANSIENT = "svcTransient";
-	public static final String RUNTIME_PATH = "target/svcTestRuntime/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/svctest"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/svcTestRuntime/";
+	public static final String CONFIG_SRC = "src/test/resources/svctest";
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractRealmServiceTest.class);
 
@@ -97,7 +98,7 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(
 				PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
 		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH,
-				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
+				PostgreSqlPersistenceHandler.class, dbVersion, "drop");
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();
 		}
@@ -114,9 +115,10 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 	}
 
 	private void doService(String realm, ServiceResultState expectedState, Class<?> expectedServiceResultType,
-			Runner before, Runner validator, Runner after) throws IllegalAccessException, InstantiationException {
+			Runner before, Runner validator, Runner after)
+			throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
 
-		Service<T, U> svc = getSvcClass().newInstance();
+		Service<T, U> svc = getSvcClass().getConstructor().newInstance();
 		T arg = getArgInstance();
 
 		if (before != null)
@@ -165,34 +167,37 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 			runTransient(expectedServiceResultType, before, validator, after);
 			runCached(expectedServiceResultType, before, validator, after);
 			runCachedWithAuditsAndVersioning(expectedServiceResultType, before, validator, after);
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+				 NoSuchMethodException e) {
 			throw new RuntimeException("Failed to instantiate class " + getSvcClass().getName() + ": " + e.getMessage(),
 					e);
 		}
 	}
 
 	private void runCached(Class<?> expectedServiceResultType, Runner before, Runner validator, Runner after)
-			throws InstantiationException, IllegalAccessException {
+			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		doService(REALM_CACHED, ServiceResultState.SUCCESS, expectedServiceResultType, before, validator, after);
 	}
 
 	private void runCachedWithAuditsAndVersioning(Class<?> expectedServiceResultType, Runner before, Runner validator,
-			Runner after) throws InstantiationException, IllegalAccessException {
+			Runner after)
+			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		doService(REALM_CACHED_AUDITS_VERSIONING, ServiceResultState.SUCCESS, expectedServiceResultType, before,
 				validator, after);
 	}
 
-	protected void runTransient() throws IllegalAccessException, InstantiationException {
+	protected void runTransient()
+			throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		runTransient(null);
 	}
 
 	protected void runTransient(Class<?> expectedServiceResultType)
-			throws IllegalAccessException, InstantiationException {
+			throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		runTransient(expectedServiceResultType, null, null, null);
 	}
 
 	private void runTransient(Class<?> expectedServiceResultType, Runner before, Runner validator, Runner after)
-			throws InstantiationException, IllegalAccessException {
+			throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		doService(REALM_TRANSIENT, ServiceResultState.SUCCESS, expectedServiceResultType, before, validator, after);
 	}
 }

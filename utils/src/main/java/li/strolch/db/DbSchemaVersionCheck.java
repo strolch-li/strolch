@@ -42,16 +42,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
-@SuppressWarnings(value = "nls")
 public class DbSchemaVersionCheck {
 
 	private static final Logger logger = LoggerFactory.getLogger(DbSchemaVersionCheck.class);
-	private String app;
-	private Class<?> ctxClass;
-	private boolean allowSchemaCreation;
-	private boolean allowSchemaMigration;
-	private boolean allowSchemaDrop;
-	private Map<String, DbMigrationState> dbMigrationStates;
+	private final String app;
+	private final Class<?> ctxClass;
+	private final boolean allowSchemaCreation;
+	private final boolean allowSchemaMigration;
+	private final boolean allowSchemaDrop;
+	private final Map<String, DbMigrationState> dbMigrationStates;
 
 	/**
 	 * @param app
@@ -127,18 +126,13 @@ public class DbSchemaVersionCheck {
 			DbMigrationState migrationType = detectMigrationState(realm, expectedDbVersion, currentVersion);
 
 			switch (migrationType) {
-			case CREATED:
-				createSchema(con, realm, expectedDbVersion);
-				break;
-			case MIGRATED:
-				migrateSchema(con, realm, currentVersion, expectedDbVersion);
-				break;
-			case DROPPED_CREATED:
-				throw new DbException("Migration type " + migrationType + " not handled!");
-			case NOTHING:
-				// do nothing
-			default:
-				break;
+			case CREATED -> createSchema(con, realm, expectedDbVersion);
+			case MIGRATED -> migrateSchema(con, realm, currentVersion, expectedDbVersion);
+			case DROPPED_CREATED -> throw new DbException("Migration type " + migrationType + " not handled!");
+
+			// do nothing
+			case NOTHING -> {
+			}
 			}
 
 			con.commit();
@@ -215,8 +209,8 @@ public class DbSchemaVersionCheck {
 			return DbMigrationState.MIGRATED;
 		}
 
-		throw new DbException(MessageFormat
-				.format("[{0}:{1}]Current version {2} is later than expected version {3}", this.app, realm,
+		throw new DbException(
+				MessageFormat.format("[{0}:{1}]Current version {2} is later than expected version {3}", this.app, realm,
 						currentVersion, expectedDbVersion));
 	}
 
@@ -312,8 +306,8 @@ public class DbSchemaVersionCheck {
 			throw new DbException("Failed to execute schema generation SQL: " + e.getMessage(), e);
 		}
 
-		logger.info(MessageFormat
-				.format("[{0}:{1}] Successfully created schema with version {2}", this.app, realm, version));
+		logger.info(MessageFormat.format("[{0}:{1}] Successfully created schema with version {2}", this.app, realm,
+				version));
 	}
 
 	/**
@@ -345,8 +339,8 @@ public class DbSchemaVersionCheck {
 					"Expected version " + expectedVersion + " is weirdly before current version" + currentVersion
 							+ " for " + this.app);
 
-		logger.info(MessageFormat
-				.format("[{0}:{1}] Migrating schema from {2} to {3}...", this.app, realm, currentVersion,
+		logger.info(
+				MessageFormat.format("[{0}:{1}] Migrating schema from {2} to {3}...", this.app, realm, currentVersion,
 						expectedVersion));
 
 		// first get all possible migration scripts
@@ -383,8 +377,8 @@ public class DbSchemaVersionCheck {
 			throw new IllegalStateException("Failed to read current version", e);
 		}
 
-		logger.info(MessageFormat
-				.format("[{0}:{1}] Successfully migrated schema to version {2}", this.app, realm, expectedVersion));
+		logger.info(MessageFormat.format("[{0}:{1}] Successfully migrated schema to version {2}", this.app, realm,
+				expectedVersion));
 	}
 
 	public List<Version> parseMigrationVersions() {
@@ -401,8 +395,8 @@ public class DbSchemaVersionCheck {
 					ZipEntry ze;
 					while ((ze = zip.getNextEntry()) != null) {
 						String entryName = ze.getName();
-						if (entryName.endsWith(".sql") && entryName.startsWith(this.app) && entryName
-								.contains("migration"))
+						if (entryName.endsWith(".sql") && entryName.startsWith(this.app) && entryName.contains(
+								"migration"))
 							versions.add(parseVersion(entryName));
 					}
 				} catch (IOException e) {
@@ -463,7 +457,7 @@ public class DbSchemaVersionCheck {
 			throw new DbException("Failed to execute schema drop SQL: " + e.getMessage(), e);
 		}
 
-		logger.info(MessageFormat
-				.format("[{0}:{1}] Successfully dropped schema with version {2}", this.app, realm, version));
+		logger.info(MessageFormat.format("[{0}:{1}] Successfully dropped schema with version {2}", this.app, realm,
+				version));
 	}
 }

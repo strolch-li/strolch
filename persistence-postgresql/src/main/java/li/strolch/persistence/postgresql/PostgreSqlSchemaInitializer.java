@@ -28,7 +28,7 @@ import li.strolch.privilege.model.PrivilegeContext;
  */
 public class PostgreSqlSchemaInitializer extends PostgreSqlInitializer {
 
-	private Map<String, DbMigrationState> dbMigrationStates;
+	private final Map<String, DbMigrationState> dbMigrationStates;
 
 	public PostgreSqlSchemaInitializer(StrolchAgent agent, PostgreSqlPersistenceHandler persistenceHandler,
 			Map<String, DbMigrationState> dbMigrationStates) {

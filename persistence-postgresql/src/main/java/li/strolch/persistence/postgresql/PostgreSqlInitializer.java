@@ -69,9 +69,8 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 		logger.info(MessageFormat.format(msg, realmName, migrationType));
 
 		ModelStatistics statistics;
-		try (StrolchTransaction tx = this.persistenceHandler
-				.openTx(this.agent.getContainer().getRealm(realmName), getCertificate(), getClass().getSimpleName(),
-						false)) {
+		try (StrolchTransaction tx = this.persistenceHandler.openTx(this.agent.getContainer().getRealm(realmName),
+				getCertificate(), getClass().getSimpleName(), false)) {
 			File dataStoreF = getDataStoreFile(this.runtimeConfig, this.realmConfig, realmName);
 
 			StoreToDaoElementListener listener = new StoreToDaoElementListener(tx);
@@ -84,19 +83,10 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 	}
 
 	protected boolean checkNeedsDbInit(DbMigrationState migrationType) {
-		boolean needsDbInit;
-		switch (migrationType) {
-		case CREATED:
-		case DROPPED_CREATED:
-			needsDbInit = true;
-			break;
-		case MIGRATED:
-		case NOTHING:
-		default:
-			needsDbInit = false;
-			break;
-		}
-		return needsDbInit;
+		return switch (migrationType) {
+			case CREATED, DROPPED_CREATED -> true;
+			case MIGRATED, NOTHING -> false;
+		};
 	}
 
 	protected File getDataStoreFile(RuntimeConfiguration runtimeConfiguration,

@@ -94,12 +94,11 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public void start() throws Exception {
 
-		ComponentConfiguration configuration = getConfiguration();
-		boolean allowSchemaCreation = configuration.getBoolean(PROP_ALLOW_SCHEMA_CREATION, Boolean.FALSE);
-		boolean allowSchemaMigration = configuration.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION, Boolean.FALSE);
-		boolean allowSchemaDrop = configuration.getBoolean(PROP_ALLOW_SCHEMA_DROP, Boolean.FALSE);
-		boolean allowDataInitOnSchemaCreate = configuration.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE,
-				Boolean.FALSE);
+		ComponentConfiguration config = getConfiguration();
+		boolean allowSchemaCreation = config.getBoolean(PROP_ALLOW_SCHEMA_CREATION, false);
+		boolean allowSchemaMigration = config.getBoolean(PROP_ALLOW_SCHEMA_MIGRATION, false);
+		boolean allowSchemaDrop = config.getBoolean(PROP_ALLOW_SCHEMA_DROP, false);
+		boolean allowDataInitOnSchemaCreate = config.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE, false);
 
 		DbSchemaVersionCheck schemaVersionCheck = new DbSchemaVersionCheck(SCRIPT_PREFIX_STROLCH, this.getClass(),
 				allowSchemaCreation, allowSchemaMigration, allowSchemaDrop);

@@ -15,7 +15,6 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.db.DbConstants.PROP_DB_ALLOW_HOST_OVERRIDE_ENV;
 import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
 import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
@@ -43,13 +42,13 @@ import org.slf4j.LoggerFactory;
 
 public class CachedDaoTest extends AbstractModelTest {
 
-	public static final String RUNTIME_PATH = "target/cachedRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/cachedRuntime/";
+	public static final String DB_STORE_PATH_DIR = "dbStore";
+	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime";
 
-	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
-	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
-	public static final String DB_PASSWORD = "test"; //$NON-NLS-1$
+	public static final String DB_URL = "jdbc:postgresql://localhost/testdb";
+	public static final String DB_USERNAME = "testuser";
+	public static final String DB_PASSWORD = "test";
 
 	private static final Logger logger = LoggerFactory.getLogger(CachedDaoTest.class);
 
@@ -70,7 +69,9 @@ public class CachedDaoTest extends AbstractModelTest {
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
-		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
+		File dbStorePath = new File(rootPath, DB_STORE_PATH_DIR);
+		if (!dbStorePath.mkdir())
+			throw new IllegalStateException("Failed to created db store path " + dbStorePath);
 		runtimeMock.startContainer();
 
 		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
@@ -89,8 +90,7 @@ public class CachedDaoTest extends AbstractModelTest {
 
 		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(scriptPrefix, PostgreSqlPersistenceHandler.class);
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
-		String sql = DbSchemaVersionCheck.getSql(scriptPrefix, PostgreSqlPersistenceHandler.class, dbVersion,
-				"drop"); //$NON-NLS-1$
+		String sql = DbSchemaVersionCheck.getSql(scriptPrefix, PostgreSqlPersistenceHandler.class, dbVersion, "drop");
 		logger.info(StringHelper.NEW_LINE + sql);
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();

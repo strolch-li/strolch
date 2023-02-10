@@ -122,7 +122,7 @@ public abstract class PerformanceTest {
 			logger.info("Task " + i + " executed " + results.get(i) + " TXs");
 		}
 
-		long avg = (long) results.stream().mapToLong(l -> l).average().getAsDouble();
+		long avg = (long) results.stream().mapToLong(l -> l).average().orElse(0.0D);
 		long took = System.currentTimeMillis() - start;
 		long txPerSec = avg / (took / 1000);
 		logger.info("Average TXs was " + avg + " with " + txPerSec + " TXs/s");
@@ -130,8 +130,8 @@ public abstract class PerformanceTest {
 
 	public class PerformanceTask extends ForkJoinTask<Long> {
 
-		private String username;
-		private int nrOfElements;
+		private final String username;
+		private final int nrOfElements;
 		private PerformanceTestResult svcResult;
 
 		public PerformanceTask(String username, int nrOfElements) {
