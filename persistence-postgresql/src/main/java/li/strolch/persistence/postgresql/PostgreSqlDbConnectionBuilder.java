@@ -35,10 +35,6 @@ import li.strolch.utils.dbc.DBC;
  */
 public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
-	/**
-	 * @param container
-	 * @param persistenceHandlerConfiguration
-	 */
 	public PostgreSqlDbConnectionBuilder(ComponentContainer container,
 			ComponentConfiguration persistenceHandlerConfiguration) {
 		super(container, persistenceHandlerConfiguration);
@@ -62,29 +58,26 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		config.setUsername(username);
 		config.setPassword(password);
 
+		logger.info("Preparing HikariDataSource with a fail timeout of " + config.getInitializationFailTimeout()
+				+ "ms for realm " + realm + " to " + url);
 		ds = new HikariDataSource(config);
-		logger.info("[" + realm + "] PostgreSQL Connection pool to " + url + " has a maximum pool size of " + ds
-				.getMaximumPoolSize() + " connections");
+
+		logger.info("[" + realm + "] PostgreSQL Connection pool to " + url + " has a maximum pool size of "
+				+ ds.getMaximumPoolSize() + " connections");
 
 		return new StrolchPostgreDataSource(ds);
 	}
 
-	public class StrolchPostgreDataSource implements DataSource {
+	public static class StrolchPostgreDataSource implements DataSource {
 
-		private HikariDataSource ds;
+		private final HikariDataSource ds;
 
-		/**
-		 * @param ds
-		 */
 		public StrolchPostgreDataSource(HikariDataSource ds) {
 			DBC.PRE.assertNotNull("DataSource must be set!", ds);
 			this.ds = ds;
 		}
 
 		/**
-		 * @return
-		 *
-		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#getLogWriter()
 		 */
 		@Override
@@ -93,11 +86,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @param iface
-		 *
-		 * @return
-		 *
-		 * @throws SQLException
 		 * @see java.sql.Wrapper#unwrap(java.lang.Class)
 		 */
 		@Override
@@ -106,9 +94,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @param out
-		 *
-		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#setLogWriter(java.io.PrintWriter)
 		 */
 		@Override
@@ -117,11 +102,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @param iface
-		 *
-		 * @return
-		 *
-		 * @throws SQLException
 		 * @see java.sql.Wrapper#isWrapperFor(java.lang.Class)
 		 */
 		@Override
@@ -130,9 +110,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @return
-		 *
-		 * @throws SQLException
 		 * @see javax.sql.DataSource#getConnection()
 		 */
 		@Override
@@ -141,9 +118,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @param seconds
-		 *
-		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#setLoginTimeout(int)
 		 */
 		@Override
@@ -152,12 +126,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @param username
-		 * @param password
-		 *
-		 * @return
-		 *
-		 * @throws SQLException
 		 * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
 		 */
 		@Override
@@ -166,9 +134,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @return
-		 *
-		 * @throws SQLException
 		 * @see javax.sql.CommonDataSource#getLoginTimeout()
 		 */
 		@Override
@@ -177,9 +142,6 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		}
 
 		/**
-		 * @return
-		 *
-		 * @throws SQLFeatureNotSupportedException
 		 * @see javax.sql.CommonDataSource#getParentLogger()
 		 */
 		@Override
@@ -189,12 +151,12 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		@Override
 		public String toString() {
-			return "HikariDataSource for realm " + ds.getPoolName() + " for " + ds.getUsername() + " at " + ds
-					.getJdbcUrl();
+			return "HikariDataSource for realm " + ds.getPoolName() + " for " + ds.getUsername() + " at "
+					+ ds.getJdbcUrl();
 		}
 
 		/**
-		 * @see com.zaxxer.hikari.HikariDataSource#shutdown()
+		 * @see com.zaxxer.hikari.HikariDataSource#close()
 		 */
 		public void shutdown() {
 			this.ds.close();
