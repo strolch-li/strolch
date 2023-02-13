@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,50 +15,29 @@
  */
 package li.strolch.runtime.configuration;
 
-import static li.strolch.runtime.configuration.ConfigurationTags.API;
-import static li.strolch.runtime.configuration.ConfigurationTags.APPLICATION_NAME;
-import static li.strolch.runtime.configuration.ConfigurationTags.DEPENDS;
-import static li.strolch.runtime.configuration.ConfigurationTags.ENV_GLOBAL;
-import static li.strolch.runtime.configuration.ConfigurationTags.ID;
-import static li.strolch.runtime.configuration.ConfigurationTags.IMPL;
-import static li.strolch.runtime.configuration.ConfigurationTags.NAME;
-import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV;
-import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_COMPONENT;
-import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES;
-import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_RUNTIME;
-import static li.strolch.runtime.configuration.ConfigurationTags.STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES;
+import static li.strolch.runtime.configuration.ConfigurationTags.*;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import java.util.*;
 
 import li.strolch.model.Locator;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class ConfigurationSaxParser extends DefaultHandler {
-
-	//private static final Logger logger = LoggerFactory.getLogger(ConfigurationSaxParser.class);
 
 	private final String environment;
 	private String currentEnvironment;
 
-	private ConfigurationBuilder globalEnvBuilder;
-	private Map<String, ConfigurationBuilder> envBuilders;
-	private LocatorBuilder locatorBuilder;
-	private Deque<ElementHandler> delegateHandlers;
+	private final ConfigurationBuilder globalEnvBuilder;
+	private final Map<String, ConfigurationBuilder> envBuilders;
+	private final LocatorBuilder locatorBuilder;
+	private final Deque<ElementHandler> delegateHandlers;
 
 	public ConfigurationSaxParser(String environment) {
 		this.environment = environment;
@@ -80,10 +59,6 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		return this.environment;
 	}
 
-	public String getCurrentEnvironment() {
-		return this.currentEnvironment;
-	}
-
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		if (!this.delegateHandlers.isEmpty())
@@ -99,11 +74,9 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		this.locatorBuilder.append(qName);
 
 		Locator locator = this.locatorBuilder.build();
-		//logger.info("path: " + locator.toString()); //$NON-NLS-1$
 
 		switch (locator.toString()) {
-
-		case STROLCH_CONFIGURATION_ENV:
+		case STROLCH_CONFIGURATION_ENV -> {
 			String env = attributes.getValue(ID);
 			DBC.PRE.assertNotEmpty("attribute 'id' must be set on element 'env'", env); //$NON-NLS-1$
 			if (this.envBuilders.containsKey(env)) {
@@ -114,46 +87,42 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			ConfigurationBuilder newEnvBuilder = new ConfigurationBuilder();
 			newEnvBuilder.runtimeBuilder().setEnvironment(this.currentEnvironment);
 			this.envBuilders.put(env, newEnvBuilder);
-			break;
-
-		case STROLCH_CONFIGURATION_ENV_RUNTIME:
+		}
+		case STROLCH_CONFIGURATION_ENV_RUNTIME -> {
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				RuntimeHandler runtimeHandler = new RuntimeHandler(configurationBuilder, locator);
 				this.delegateHandlers.push(runtimeHandler);
 			}
-			break;
-
-		case STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES:
+		}
+		case STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES -> {
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				PropertiesHandler runtimePropertiesHandler = new PropertiesHandler(configurationBuilder, locator);
 				this.delegateHandlers.push(runtimePropertiesHandler);
 				configurationBuilder.setPropertyBuilder(configurationBuilder.runtimeBuilder());
 			}
-			break;
-
-		case STROLCH_CONFIGURATION_ENV_COMPONENT:
+		}
+		case STROLCH_CONFIGURATION_ENV_COMPONENT -> {
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				configurationBuilder.nextComponentBuilder();
 				ComponentHandler componentHandler = new ComponentHandler(configurationBuilder, locator);
 				this.delegateHandlers.push(componentHandler);
 			}
-			break;
-
-		case STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES:
+		}
+		case STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES -> {
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				PropertiesHandler componentPropertiesHandler = new PropertiesHandler(configurationBuilder, locator);
 				this.delegateHandlers.push(componentPropertiesHandler);
 				configurationBuilder.setPropertyBuilder(configurationBuilder.componentBuilder());
 			}
-			break;
-
-		default:
+		}
+		default -> {
 			if (!this.delegateHandlers.isEmpty())
 				this.delegateHandlers.peek().startElement(uri, localName, qName, attributes);
+		}
 		}
 	}
 
@@ -173,36 +142,20 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-
 		Locator locator = this.locatorBuilder.build();
-		//LoggerFactory.getLogger(getClass()).info("path: " + locator.toString()); //$NON-NLS-1$
 
 		switch (locator.toString()) {
 
 		case STROLCH_CONFIGURATION_ENV:
 			break;
 
-		case STROLCH_CONFIGURATION_ENV_RUNTIME:
+		case STROLCH_CONFIGURATION_ENV_RUNTIME, STROLCH_CONFIGURATION_ENV_COMPONENT:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
 			}
 			break;
 
-		case STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES:
-			if (isRequiredEnv(this.currentEnvironment)) {
-				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
-				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
-				configurationBuilder.setPropertyBuilder(null);
-			}
-			break;
-
-		case STROLCH_CONFIGURATION_ENV_COMPONENT:
-			if (isRequiredEnv(this.currentEnvironment)) {
-				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
-			}
-			break;
-
-		case STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES:
+		case STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES, STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES:
 			if (isRequiredEnv(this.currentEnvironment)) {
 				ConfigurationBuilder configurationBuilder = getEnvBuilder(this.currentEnvironment);
 				assertExpectedLocator(locator, this.delegateHandlers.pop().getLocator());
@@ -226,7 +179,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 	}
 
-	public class ElementHandler extends DefaultHandler {
+	public static class ElementHandler extends DefaultHandler {
 		protected final ConfigurationBuilder configurationBuilder;
 		protected final Locator locator;
 		protected StringBuilder valueBuffer;
@@ -249,7 +202,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 	}
 
-	public class RuntimeHandler extends ElementHandler {
+	public static class RuntimeHandler extends ElementHandler {
 
 		public RuntimeHandler(ConfigurationBuilder configurationBuilder, Locator locator) {
 			super(configurationBuilder, locator);
@@ -258,30 +211,22 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
-			switch (qName) {
-			case APPLICATION_NAME:
+			if (qName.equals(APPLICATION_NAME)) {
 				this.valueBuffer = new StringBuilder();
-				break;
-			default:
-				break;
 			}
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
-			switch (qName) {
-			case APPLICATION_NAME:
+			if (qName.equals(APPLICATION_NAME)) {
 				String applicationName = this.valueBuffer.toString();
 				this.configurationBuilder.runtimeBuilder().setApplicationName(applicationName);
 				this.valueBuffer = null;
-				break;
-			default:
-				break;
 			}
 		}
 	}
 
-	public class ComponentHandler extends ElementHandler {
+	public static class ComponentHandler extends ElementHandler {
 
 		public ComponentHandler(ConfigurationBuilder configurationBuilder, Locator locator) {
 			super(configurationBuilder, locator);
@@ -291,46 +236,37 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		public void startElement(String uri, String localName, String qName, Attributes attributes)
 				throws SAXException {
 			switch (qName) {
-			case NAME:
-			case API:
-			case IMPL:
-			case DEPENDS:
-				this.valueBuffer = new StringBuilder();
-				break;
-			default:
-				break;
+			case NAME, API, IMPL, DEPENDS -> this.valueBuffer = new StringBuilder();
 			}
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			switch (qName) {
-			case NAME:
+			case NAME -> {
 				String name = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().setName(name);
 				this.valueBuffer = null;
-				break;
-			case API:
+			}
+			case API -> {
 				String api = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().setApi(api);
 				this.valueBuffer = null;
-				break;
-			case IMPL:
+			}
+			case IMPL -> {
 				String impl = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().setImpl(impl);
-				break;
-			case DEPENDS:
+			}
+			case DEPENDS -> {
 				String depends = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().addDependency(depends);
-				break;
-			default:
-				break;
+			}
 			}
 		}
 
 	}
 
-	public class PropertiesHandler extends ElementHandler {
+	public static class PropertiesHandler extends ElementHandler {
 
 		public PropertiesHandler(ConfigurationBuilder configurationBuilder, Locator locator) {
 			super(configurationBuilder, locator);
@@ -366,12 +302,12 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 	}
 
-	public class ConfigurationBuilder {
+	public static class ConfigurationBuilder {
 
-		private RuntimeBuilder runtimeBuilder;
+		private final RuntimeBuilder runtimeBuilder;
+		private final List<ComponentBuilder> componentBuilders;
 		private ComponentBuilder componentBuilder;
 		private PropertyBuilder propertyBuilder;
-		private List<ComponentBuilder> componentBuilders;
 
 		public ConfigurationBuilder() {
 			this.componentBuilders = new ArrayList<>();
@@ -390,10 +326,9 @@ public class ConfigurationSaxParser extends DefaultHandler {
 			return this.runtimeBuilder;
 		}
 
-		public ComponentBuilder nextComponentBuilder() {
+		public void nextComponentBuilder() {
 			this.componentBuilder = new ComponentBuilder();
 			this.componentBuilders.add(this.componentBuilder);
-			return this.componentBuilder;
 		}
 
 		public ComponentBuilder componentBuilder() {
@@ -410,30 +345,25 @@ public class ConfigurationSaxParser extends DefaultHandler {
 				configurationByComponent.put(componentConfiguration.getName(), componentConfiguration);
 			}
 
-			StrolchConfiguration strolchConfiguration = new StrolchConfiguration(runtimeConfiguration,
-					configurationByComponent);
-
-			return strolchConfiguration;
+			return new StrolchConfiguration(runtimeConfiguration, configurationByComponent);
 		}
 
 		/**
 		 * Merge the given {@link ConfigurationBuilder ConfigurationBuilder's} values into this configuration builder
-		 * 
+		 *
 		 * @param otherConfBuilder
-		 *            the {@link ConfigurationBuilder} to be merged into this
+		 * 		the {@link ConfigurationBuilder} to be merged into this
 		 */
 		public void merge(ConfigurationBuilder otherConfBuilder) {
 
 			runtimeBuilder().setEnvironment(otherConfBuilder.runtimeBuilder().getEnvironment());
 
-			if (otherConfBuilder.runtimeBuilder != null) {
-				RuntimeBuilder thisRuntime = this.runtimeBuilder;
-				RuntimeBuilder other = otherConfBuilder.runtimeBuilder;
-				if (StringHelper.isNotEmpty(other.getApplicationName()))
-					thisRuntime.setApplicationName(other.getApplicationName());
-				if (!other.getProperties().isEmpty()) {
-					thisRuntime.getProperties().putAll(other.getProperties());
-				}
+			RuntimeBuilder thisRuntime = this.runtimeBuilder;
+			RuntimeBuilder other = otherConfBuilder.runtimeBuilder;
+			if (StringHelper.isNotEmpty(other.getApplicationName()))
+				thisRuntime.setApplicationName(other.getApplicationName());
+			if (!other.getProperties().isEmpty()) {
+				thisRuntime.getProperties().putAll(other.getProperties());
 			}
 
 			if (!otherConfBuilder.componentBuilders.isEmpty()) {
@@ -442,8 +372,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 					thisComponentBuilders.put(thisComponentBuilder.getName(), thisComponentBuilder);
 				}
 
-				List<ComponentBuilder> otherComponents = otherConfBuilder.componentBuilders;
-				for (ComponentBuilder otherComponentBuilder : otherComponents) {
+				for (ComponentBuilder otherComponentBuilder : otherConfBuilder.componentBuilders) {
 					ComponentBuilder thisComponentBuilder = thisComponentBuilders.get(otherComponentBuilder.getName());
 					if (thisComponentBuilder == null) {
 						this.componentBuilders.add(otherComponentBuilder);
@@ -459,8 +388,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 	}
 
-	public abstract class PropertyBuilder {
-		private Map<String, String> properties;
+	public abstract static class PropertyBuilder {
+		private final Map<String, String> properties;
 
 		public PropertyBuilder() {
 			this.properties = new HashMap<>();
@@ -477,7 +406,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 	}
 
-	public class RuntimeBuilder extends PropertyBuilder {
+	public static class RuntimeBuilder extends PropertyBuilder {
 
 		private String applicationName;
 		private String environment;
@@ -491,9 +420,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		public RuntimeConfiguration build(File configPathF, File dataPathF, File tempPathF) {
-			RuntimeConfiguration configuration = new RuntimeConfiguration(this.applicationName, this.environment,
-					getProperties(), configPathF, dataPathF, tempPathF);
-			return configuration;
+			return new RuntimeConfiguration(this.applicationName, this.environment, getProperties(), configPathF,
+					dataPathF, tempPathF);
 		}
 
 		public RuntimeBuilder setApplicationName(String applicationName) {
@@ -507,7 +435,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 	}
 
-	public class ComponentBuilder extends PropertyBuilder {
+	public static class ComponentBuilder extends PropertyBuilder {
 
 		private String name;
 		private String api;
@@ -519,9 +447,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		public ComponentConfiguration build(RuntimeConfiguration runtimeConfiguration) {
-			ComponentConfiguration componentConfiguration = new ComponentConfiguration(runtimeConfiguration, this.name,
-					getProperties(), this.api, this.impl, this.dependencies);
-			return componentConfiguration;
+			return new ComponentConfiguration(runtimeConfiguration, this.name, getProperties(), this.api, this.impl,
+					this.dependencies);
 		}
 
 		public String getName() {
