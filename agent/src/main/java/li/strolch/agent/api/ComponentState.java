@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,7 +19,12 @@ import java.text.MessageFormat;
 
 public enum ComponentState {
 
-	UNDEFINED, SETUP, INITIALIZED, STARTED, STOPPED, DESTROYED;
+	UNDEFINED,
+	SETUP,
+	INITIALIZED,
+	STARTED,
+	STOPPED,
+	DESTROYED;
 
 	public ComponentState validateStateChange(ComponentState newState, String componentName) {
 
@@ -27,30 +32,27 @@ public enum ComponentState {
 			return this;
 
 		switch (this) {
-		case UNDEFINED:
+		case UNDEFINED -> {
 			if (newState != ComponentState.SETUP && newState != STOPPED)
 				throw getIllegalStateEx(newState, componentName);
-			break;
-		case SETUP:
+		}
+		case SETUP -> {
 			if (newState != ComponentState.INITIALIZED && newState != STOPPED && newState != DESTROYED)
 				throw getIllegalStateEx(newState, componentName);
-			break;
-		case INITIALIZED:
+		}
+		case INITIALIZED -> {
 			if (newState != ComponentState.STARTED && newState != STOPPED && newState != DESTROYED)
 				throw getIllegalStateEx(newState, componentName);
-			break;
-		case STARTED:
+		}
+		case STARTED -> {
 			if (newState != ComponentState.STOPPED)
 				throw getIllegalStateEx(newState, componentName);
-			break;
-		case STOPPED:
+		}
+		case STOPPED -> {
 			if (newState != ComponentState.STARTED && newState != ComponentState.DESTROYED)
 				throw getIllegalStateEx(newState, componentName);
-			break;
-		case DESTROYED:
-			throw getIllegalStateEx(newState, componentName);
-		default:
-			throw getIllegalStateEx(newState, componentName);
+		}
+		default -> throw getIllegalStateEx(newState, componentName);
 		}
 
 		return newState;
