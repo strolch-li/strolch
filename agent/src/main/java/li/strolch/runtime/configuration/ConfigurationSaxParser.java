@@ -292,14 +292,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 				throws SAXException {
 			switch (qName) {
 			case NAME:
-				this.valueBuffer = new StringBuilder();
-				break;
 			case API:
-				this.valueBuffer = new StringBuilder();
-				break;
 			case IMPL:
-				this.valueBuffer = new StringBuilder();
-				break;
 			case DEPENDS:
 				this.valueBuffer = new StringBuilder();
 				break;
