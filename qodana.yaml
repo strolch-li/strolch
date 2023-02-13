@@ -7,3 +7,4 @@ include:
   - name: EnhancedSwitchMigration
   - name: PatternVariableCanBeUsed
   - name: Java9CollectionFactory
+  - name: UnnecessarySemicolon
