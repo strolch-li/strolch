@@ -12,8 +12,7 @@ public class NamedThreadPoolFactory implements ThreadFactory {
 	private final String poolName;
 
 	public NamedThreadPoolFactory(String poolName) {
-		SecurityManager s = System.getSecurityManager();
-		this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+		this.group = Thread.currentThread().getThreadGroup();
 		this.poolName = poolName + "-";
 	}
 
