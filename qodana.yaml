@@ -8,3 +8,4 @@ include:
   - name: PatternVariableCanBeUsed
   - name: Java9CollectionFactory
   - name: UnnecessarySemicolon
+  - name: CommentedOutCode
