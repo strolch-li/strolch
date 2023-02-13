@@ -1,2 +1,9 @@
 version: "1.0"
 linter: jetbrains/qodana-jvm-community:2022.3
+include:
+  - name: SystemOutErr
+  - name: InstanceofCatchParameter
+  - name: ReplaceWithOperatorAssignment
+  - name: EnhancedSwitchMigration
+  - name: PatternVariableCanBeUsed
+  - name: Java9CollectionFactory
