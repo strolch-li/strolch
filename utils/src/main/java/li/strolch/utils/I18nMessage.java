@@ -60,10 +60,12 @@ public class I18nMessage {
 
 	public I18nMessage(I18nMessage other) {
 		this.key = other.key;
-		this.values = other.values;
+		this.values = new Properties(other.values);
 		this.bundle = other.bundle;
 		this.bundleName = other.bundleName;
 		this.message = other.message;
+		this.exception = other.exception;
+		this.stackTrace = other.stackTrace;
 	}
 
 	public String getKey() {
@@ -81,7 +83,7 @@ public class I18nMessage {
 	}
 
 	public Object getValue(String key) {
-		return this.values.get(key);
+		return this.values.getOrDefault(key, null);
 	}
 
 	private ResourceBundle getBundle(Locale locale) {
@@ -253,7 +255,7 @@ public class I18nMessage {
 
 	private static MapOfMaps<String, Locale, ResourceBundle> getBundleMap() {
 		if (bundleMap == null) {
-			synchronized (I18nMessage.class) {
+			synchronized (logger) {
 				bundleMap = findAllBundles();
 			}
 		}
