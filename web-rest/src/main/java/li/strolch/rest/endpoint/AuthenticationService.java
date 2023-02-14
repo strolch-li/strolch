@@ -438,7 +438,7 @@ public class AuthenticationService {
 
 		String expirationDateS = ISO8601.toString(expirationDate);
 		String domain = restComponent.isDomainSet() ? restComponent.getDomain() : request.getServerName();
-		String path = request.getContextPath() + ";SameSite=Strict";
+		String path = (restComponent.isPathSet() ? restComponent.getPath() : "/") + ";SameSite=Strict";
 
 		Date expiry = Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant());
 		boolean httpOnly = false;
