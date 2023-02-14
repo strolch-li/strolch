@@ -16,6 +16,7 @@
 package li.strolch.agent.impl;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,15 +44,15 @@ public class DefaultLockHandler implements LockHandler {
 	private final String realm;
 	private final TimeUnit tryLockTimeUnit;
 	private final long tryLockTime;
-	private final Map<Locator, TypedTuple<ReentrantLock, Long>> lockMap;
+	private final Map<Locator, TypedTuple<Lock, Long>> lockMap;
 
 	private ScheduledFuture<?> cleanupTask;
 
 	public DefaultLockHandler(StrolchAgent agent, String realm, TimeUnit tryLockTimeUnit, long tryLockTime) {
-		DBC.PRE.assertNotNull("agent must be set!", agent); //$NON-NLS-1$
-		DBC.PRE.assertNotEmpty("Realm must be set!", realm); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("TimeUnit must be set!", tryLockTimeUnit); //$NON-NLS-1$
-		DBC.PRE.assertNotEquals("try lock time must not be 0", 0, tryLockTime); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("agent must be set!", agent);
+		DBC.PRE.assertNotEmpty("Realm must be set!", realm);
+		DBC.PRE.assertNotNull("TimeUnit must be set!", tryLockTimeUnit);
+		DBC.PRE.assertNotEquals("try lock time must not be 0", 0, tryLockTime);
 
 		this.agent = agent;
 		this.realm = realm;
@@ -74,14 +75,14 @@ public class DefaultLockHandler implements LockHandler {
 
 	private void cleanupOldLocks() {
 
-		Map<Locator, TypedTuple<ReentrantLock, Long>> lockMap;
+		Map<Locator, TypedTuple<Lock, Long>> lockMap;
 		synchronized (this.lockMap) {
 			lockMap = new HashMap<>(this.lockMap);
 		}
 
 		long maxAge = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1);
 		long count = 0;
-		for (Map.Entry<Locator, TypedTuple<ReentrantLock, Long>> entry : lockMap.entrySet()) {
+		for (Map.Entry<Locator, TypedTuple<Lock, Long>> entry : lockMap.entrySet()) {
 			if (!entry.getValue().getFirst().isLocked() && entry.getValue().getSecond() <= maxAge) {
 				this.lockMap.remove(entry.getKey());
 				count++;
@@ -97,27 +98,26 @@ public class DefaultLockHandler implements LockHandler {
 
 	@Override
 	public void lock(Locator locator) throws StrolchLockException {
-		TypedTuple<ReentrantLock, Long> tuple = this.lockMap.computeIfAbsent(locator,
-				l -> new TypedTuple<>(new ReentrantLock(true), System.currentTimeMillis()));
+		TypedTuple<Lock, Long> tuple = this.lockMap.computeIfAbsent(locator,
+				l -> new TypedTuple<>(new Lock(true), System.currentTimeMillis()));
 		lock(this.tryLockTimeUnit, this.tryLockTime, tuple, locator);
 	}
 
 	@Override
 	public void unlock(Locator locator) throws StrolchLockException {
-		TypedTuple<ReentrantLock, Long> tuple = this.lockMap.get(locator);
-		ReentrantLock lock = tuple.getFirst();
+		TypedTuple<Lock, Long> tuple = this.lockMap.get(locator);
+		Lock lock = tuple.getFirst();
 		if (lock == null || !lock.isHeldByCurrentThread()) {
-			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator)); //$NON-NLS-1$
+			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator));
 		} else {
-			// logger.debug("unlocking " + locator); //$NON-NLS-1$
 			unlock(lock);
 		}
 	}
 
 	@Override
 	public void releaseLock(Locator locator) throws StrolchLockException {
-		TypedTuple<ReentrantLock, Long> tuple = this.lockMap.get(locator);
-		ReentrantLock lock = tuple.getFirst();
+		TypedTuple<Lock, Long> tuple = this.lockMap.get(locator);
+		Lock lock = tuple.getFirst();
 		if (lock == null) {
 			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", locator));
 		} else if (!lock.isHeldByCurrentThread()) {
@@ -126,7 +126,6 @@ public class DefaultLockHandler implements LockHandler {
 			else
 				logger.error(MessageFormat.format("Element {0} is not locked!", locator));
 		} else {
-			//logger.info("releasing lock " + locator); //$NON-NLS-1$
 			releaseLock(lock);
 		}
 	}
@@ -134,36 +133,37 @@ public class DefaultLockHandler implements LockHandler {
 	/**
 	 * @see java.util.concurrent.locks.ReentrantLock#tryLock(long, TimeUnit)
 	 */
-	private void lock(TimeUnit timeUnit, long tryLockTime, TypedTuple<ReentrantLock, Long> tuple, Locator locator)
+	private void lock(TimeUnit timeUnit, long tryLockTime, TypedTuple<Lock, Long> tuple, Locator locator)
 			throws StrolchLockException {
 		try {
 
-			if (!tuple.getFirst().tryLock() && !tuple.getFirst().tryLock(tryLockTime, timeUnit)) {
-				String msg = "Thread {0} failed to acquire lock after {1}s for {2}"; //$NON-NLS-1$
+			Lock lock = tuple.getFirst();
+			if (!lock.tryLock() && !lock.tryLock(tryLockTime, timeUnit)) {
+				String msg = "Thread {0} failed to acquire lock after {1}s for {2}";
 				msg = MessageFormat.format(msg, Thread.currentThread().getName(), timeUnit.toSeconds(tryLockTime),
 						locator);
 
-				try {
-					logger.error(msg);
-					logger.error("Listing all active threads: ");
-					Map<Thread, StackTraceElement[]> allStackTraces = Thread.getAllStackTraces();
-					for (Thread thread : allStackTraces.keySet()) {
-						StackTraceElement[] trace = allStackTraces.get(thread);
-						StringBuilder sb = new StringBuilder();
-						for (StackTraceElement traceElement : trace)
-							sb.append("\n\tat ").append(traceElement);
-						logger.error("\nThread " + thread.getName() + ":\n" + sb.toString() + "\n");
-					}
-				} catch (Exception e) {
-					logger.error("Failed to log active threads: " + e.getMessage(), e);
+				Thread owner = lock.getOwner();
+				if (owner == null) {
+					logger.error("Lock is currently held unknown thread!");
+					logger.error(lock.toString());
+				} else {
+					Exception e = new Exception();
+					e.setStackTrace(owner.getStackTrace());
+					logger.error(MessageFormat.format("Lock is currently held by {0}", owner), e);
+				}
+
+				logger.error("Threads waiting on this lock are:");
+				for (Thread queuedThread : lock.getQueuedThreads()) {
+					Exception e = new Exception();
+					e.setStackTrace(queuedThread.getStackTrace());
+					logger.error("\n" + queuedThread.getName(), e);
 				}
 
 				throw new StrolchLockException(msg);
 			}
 
 			tuple.setSecond(System.currentTimeMillis());
-
-			// logger.debug("locked " + locator); //$NON-NLS-1$
 
 		} catch (InterruptedException e) {
 			throw new StrolchLockException("Interrupted while trying to acquire lock for " + locator, e);
@@ -177,8 +177,7 @@ public class DefaultLockHandler implements LockHandler {
 		try {
 			lock.unlock();
 		} catch (IllegalMonitorStateException e) {
-			throw new StrolchLockException("IllegalMonitorStateException when trying to unlock: " + e.getMessage(),
-					e); //$NON-NLS-1$
+			throw new StrolchLockException("IllegalMonitorStateException when trying to unlock: " + e.getMessage(), e);
 		}
 	}
 
@@ -188,6 +187,23 @@ public class DefaultLockHandler implements LockHandler {
 	private void releaseLock(ReentrantLock lock) {
 		while (lock.isHeldByCurrentThread() && lock.isLocked()) {
 			unlock(lock);
+		}
+	}
+
+	public static class Lock extends ReentrantLock {
+
+		public Lock(boolean fair) {
+			super(fair);
+		}
+
+		@Override
+		public Thread getOwner() {
+			return super.getOwner();
+		}
+
+		@Override
+		public Collection<Thread> getQueuedThreads() {
+			return super.getQueuedThreads();
 		}
 	}
 }
