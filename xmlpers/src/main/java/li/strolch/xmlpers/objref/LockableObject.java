@@ -20,11 +20,10 @@ import static java.text.MessageFormat.format;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 import java.text.MessageFormat;
-import java.util.Map;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.xmlpers.api.XmlPersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +37,12 @@ public class LockableObject {
 		LockableObject.tryLockTime = tryLockTime;
 	}
 
-	private final ReentrantLock lock;
+	private final Lock lock;
 	protected final String name;
 
 	public LockableObject(String name) {
 		this.name = name;
-		this.lock = new ReentrantLock(true);
+		this.lock = new Lock(true);
 	}
 
 	public String getName() {
@@ -69,19 +68,21 @@ public class LockableObject {
 				String msg = "Thread {0} failed to acquire lock after {1} for {2}"; //$NON-NLS-1$
 				msg = format(msg, currentThread().getName(), formatMillisecondsDuration(tryLockTime), this);
 
-				try {
-					logger.error(msg);
-					logger.error("Listing all active threads: ");
-					Map<Thread, StackTraceElement[]> allStackTraces = Thread.getAllStackTraces();
-					for (Thread thread : allStackTraces.keySet()) {
-						StackTraceElement[] trace = allStackTraces.get(thread);
-						StringBuilder sb = new StringBuilder();
-						for (StackTraceElement traceElement : trace)
-							sb.append("\n\tat ").append(traceElement);
-						logger.error("\nThread " + thread.getName() + ":\n" + sb.toString() + "\n");
-					}
-				} catch (Exception e) {
-					logger.error("Failed to log active threads: " + e.getMessage(), e);
+				Thread owner = lock.getOwner();
+				if (owner == null) {
+					logger.error(MessageFormat.format("Lock {0} is currently held unknown thread!", this.name));
+					logger.error(lock.toString());
+				} else {
+					Exception e = new Exception();
+					e.setStackTrace(owner.getStackTrace());
+					logger.error(MessageFormat.format("Lock {0} is currently held by {1}", this.name, owner), e);
+				}
+
+				logger.error("Threads waiting on this lock are:");
+				for (Thread queuedThread : lock.getQueuedThreads()) {
+					Exception e = new Exception();
+					e.setStackTrace(queuedThread.getStackTrace());
+					logger.error("\n" + queuedThread.getName(), e);
 				}
 
 				throw new XmlPersistenceException(msg);
@@ -101,6 +102,23 @@ public class LockableObject {
 			if (logger.isDebugEnabled())
 				logger.debug("unlocking " + toString()); //$NON-NLS-1$
 			this.lock.unlock();
+		}
+	}
+
+	public static class Lock extends ReentrantLock {
+
+		public Lock(boolean fair) {
+			super(fair);
+		}
+
+		@Override
+		public Thread getOwner() {
+			return super.getOwner();
+		}
+
+		@Override
+		public Collection<Thread> getQueuedThreads() {
+			return super.getQueuedThreads();
 		}
 	}
 }
