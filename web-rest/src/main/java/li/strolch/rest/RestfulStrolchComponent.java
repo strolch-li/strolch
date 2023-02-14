@@ -188,7 +188,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.domain = configuration.getString(PARAM_DOMAIN, "");
 		if (this.domain.isEmpty())
 			this.domain = null;
-		this.path = configuration.getString(PARAM_DOMAIN, "");
+		this.path = configuration.getString(PARAM_PATH, "");
 		if (this.path.isEmpty())
 			this.path = null;
 		this.basicAuthEnabled = configuration.getBoolean(PARAM_BASIC_AUTH_ENABLED, true);
