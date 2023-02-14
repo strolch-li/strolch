@@ -145,12 +145,12 @@ public class DefaultLockHandler implements LockHandler {
 
 				Thread owner = lock.getOwner();
 				if (owner == null) {
-					logger.error("Lock is currently held unknown thread!");
+					logger.error(MessageFormat.format("Lock {0} is currently held by unknown thread!", locator));
 					logger.error(lock.toString());
 				} else {
 					Exception e = new Exception();
 					e.setStackTrace(owner.getStackTrace());
-					logger.error(MessageFormat.format("Lock is currently held by {0}", owner), e);
+					logger.error(MessageFormat.format("Lock {0} is currently held by {1}", locator, owner), e);
 				}
 
 				logger.error("Threads waiting on this lock are:");
