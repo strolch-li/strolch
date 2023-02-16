@@ -15,6 +15,10 @@
  */
 package li.strolch.model.timedstate;
 
+import java.time.ZonedDateTime;
+import java.util.Iterator;
+import java.util.NavigableSet;
+
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchModelConstants;
@@ -162,4 +166,50 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	StrolchTimedState<T> getClone();
 
 	void clear();
+
+	/**
+	 * Trims this timed state, so it has at most the given number of values
+	 *
+	 * @param maxValues
+	 * 		the number of values to keep
+	 *
+	 * @return true if the state was trimmed, false if not
+	 */
+	default boolean trim(int maxValues) {
+		assertNotReadonly();
+
+		ITimeVariable<T> timeEvolution = getTimeEvolution();
+		NavigableSet<? extends ITimeValue<?>> values = timeEvolution.getValues();
+		if (values.size() < maxValues)
+			return false;
+
+		Iterator<? extends ITimeValue<?>> iterator = values.descendingIterator();
+		ITimeValue<?> next = iterator.next();
+		for (int i = 0; i < maxValues - 1; i++) {
+			next = iterator.next();
+		}
+
+		return !timeEvolution.removePastValues(next.getTime()).isEmpty();
+	}
+
+	/**
+	 * Trims this timed state, so all values before the given time stamp
+	 *
+	 * @param timeStamp
+	 * 		the max date the values may have
+	 * @param keepLastValue
+	 * 		if true, and the last value is before the max
+	 *
+	 * @return true if the state was trimmed, false if not
+	 */
+	default boolean trim(ZonedDateTime timeStamp, boolean keepLastValue) {
+		assertNotReadonly();
+		ITimeVariable<T> timeEvolution = getTimeEvolution();
+
+		long time = timeStamp.toInstant().toEpochMilli();
+		if (keepLastValue && timeEvolution.getFutureValues(time).isEmpty())
+			time = timeEvolution.getValueAt(time).getTime();
+
+		return !timeEvolution.removePastValues(time).isEmpty();
+	}
 }
