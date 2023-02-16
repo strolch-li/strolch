@@ -1,5 +1,8 @@
 package li.strolch.search;
 
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
+
+import li.strolch.model.Order;
 import li.strolch.model.activity.Activity;
 
 /**
@@ -17,6 +20,12 @@ public class ActivitySearch extends StrolchSearch<Activity> {
 	@Override
 	public ActivitySearch types(String... types) {
 		this.navigator = tx -> tx.streamActivities(types);
+		return this;
+	}
+
+	public ActivitySearch forOrder(Order order) {
+		types(order.getType());
+		where(relation(PARAM_ORDER).isEqualTo(order.getId()));
 		return this;
 	}
 
