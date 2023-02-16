@@ -37,6 +37,11 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	private boolean readonly;
 
 	@Override
+	public int size() {
+		return this.container.size();
+	}
+
+	@Override
 	public ITimeValue<T> getValueAt(long time) {
 		return this.container.floor(new TimeValue<>(time, null));
 	}

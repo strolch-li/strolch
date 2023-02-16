@@ -146,6 +146,13 @@ public interface ITimeVariable<T extends IValue> {
 	void setReadonly();
 
 	/**
+	 * Returns the number of values stored on this time variable
+	 *
+	 * @return the number of values stored on this time variable
+	 */
+	int size();
+
+	/**
 	 * Returns true if the given {@link ITimeVariable} is equal to this {@link ITimeVariable} by validating that the
 	 * values {@link IValue IValues} have the same time and actual value
 	 */
