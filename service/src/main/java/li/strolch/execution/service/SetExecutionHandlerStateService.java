@@ -34,16 +34,16 @@ public class SetExecutionHandlerStateService extends AbstractService<StringMapAr
 		switch (state) {
 		case "Running" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.setState(getCertificate(), realm, ExecutionHandlerState.Running);
+			executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.Running);
 			executionHandler.triggerExecution(realm);
 		}
 		case "HaltNew" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.setState(getCertificate(), realm, ExecutionHandlerState.HaltNew);
+			executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.HaltNew);
 		}
 		case "Paused" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.setState(getCertificate(), realm, ExecutionHandlerState.Paused);
+			executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.Paused);
 		}
 		case "Trigger" -> {
 			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);

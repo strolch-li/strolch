@@ -552,12 +552,22 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
-	public ExecutionHandlerState getState(String realm) {
+	public ExecutionHandlerState getExecutionState() {
+		return getExecutionState(getDefaultRealm());
+	}
+
+	@Override
+	public ExecutionHandlerState getExecutionState(String realm) {
 		return this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 	}
 
 	@Override
-	public void setState(Certificate cert, String realm, ExecutionHandlerState state) {
+	public void getExecutionState(Certificate cert, ExecutionHandlerState state) {
+		getExecutionState(cert, getDefaultRealm(), state);
+	}
+
+	@Override
+	public void getExecutionState(Certificate cert, String realm, ExecutionHandlerState state) {
 		try (StrolchTransaction tx = openTx(realm, cert, false)) {
 			Resource executionHandlerConfig = tx.getResourceBy(TYPE_CONFIGURATION,
 					ExecutionHandler.class.getSimpleName());

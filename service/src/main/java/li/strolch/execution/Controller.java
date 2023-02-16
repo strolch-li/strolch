@@ -211,7 +211,7 @@ public class Controller {
 			return false;
 		}
 
-		ExecutionHandlerState state = this.executionHandler.getState(this.realm);
+		ExecutionHandlerState state = this.executionHandler.getExecutionState(this.realm);
 		if (state == ExecutionHandlerState.Paused) {
 			logger.warn("Ignoring trigger for paused realm " + this.realm);
 			return false;

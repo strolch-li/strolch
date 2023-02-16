@@ -363,14 +363,37 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public abstract void triggerExecution(String realm);
 
 	/**
-	 * Get the sate of the execution handler
+	 * Get the state of the execution handler for the default realm
+	 *
+	 * @return the state of the execution handler
+	 *
+	 * @throws IllegalStateException
+	 * 		if the default realm is not set!
+	 */
+	public abstract ExecutionHandlerState getExecutionState();
+
+	/**
+	 * Get the state of the execution handler for the given realm
 	 *
 	 * @param realm
 	 * 		the realm for which to get the state
 	 *
 	 * @return the state of the execution handler
 	 */
-	public abstract ExecutionHandlerState getState(String realm);
+	public abstract ExecutionHandlerState getExecutionState(String realm);
+
+	/**
+	 * Set the state for the default realm
+	 *
+	 * @param cert
+	 * 		certificate to use
+	 * @param state
+	 * 		the state to set
+	 *
+	 * @throws IllegalStateException
+	 * 		if the default realm is not set!
+	 */
+	public abstract void getExecutionState(Certificate cert, ExecutionHandlerState state);
 
 	/**
 	 * Set the state for the given realm
@@ -382,7 +405,18 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * @param state
 	 * 		the state to set
 	 */
-	public abstract void setState(Certificate cert, String realm, ExecutionHandlerState state);
+	public abstract void getExecutionState(Certificate cert, String realm, ExecutionHandlerState state);
+
+	/**
+	 * Archives the given {@link Activity} on the default realm
+	 *
+	 * @param activityLoc
+	 * 		the {@link Locator} of the {@link Activity} to archive
+	 *
+	 * @throws IllegalStateException
+	 * 		if the default realm is not set!
+	 */
+	public abstract void archiveActivity(Locator activityLoc);
 
 	/**
 	 * Archives the given {@link Activity}

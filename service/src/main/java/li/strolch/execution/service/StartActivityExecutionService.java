@@ -32,7 +32,7 @@ public class StartActivityExecutionService extends AbstractService<LocatorArgume
 		String realm = StringHelper.isEmpty(arg.realm) ? StrolchConstants.DEFAULT_REALM : arg.realm;
 
 		ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-		ExecutionHandlerState executionHandlerState = executionHandler.getState(getRealmName());
+		ExecutionHandlerState executionHandlerState = executionHandler.getExecutionState(getRealmName());
 		if (executionHandlerState != ExecutionHandlerState.Running)
 			return new StrolchRootElementResult(ServiceResultState.WARNING,
 					"ExecutionHandler is not running, can not start new jobs!")

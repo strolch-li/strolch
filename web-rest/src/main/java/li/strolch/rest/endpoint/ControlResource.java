@@ -58,7 +58,7 @@ public class ControlResource {
 					.map(activity -> activity.accept(inExecutionActivityToJson(tx.getRealmName(), executionHandler))) //
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
-			ExecutionHandlerState state = executionHandler.getState(tx.getRealmName());
+			ExecutionHandlerState state = executionHandler.getExecutionState(tx.getRealmName());
 			return ResponseUtil.toResponse(PARAM_STATE, state.name(), activitiesJ);
 		}
 	}
@@ -83,7 +83,7 @@ public class ControlResource {
 	public Response getExecutionHandlerState(@Context HttpServletRequest request, @QueryParam("realm") String realm) {
 
 		ExecutionHandler executionHandler = RestfulStrolchComponent.getInstance().getComponent(ExecutionHandler.class);
-		String state = executionHandler.getState(realm).name();
+		String state = executionHandler.getExecutionState(realm).name();
 
 		return ResponseUtil.toResponse(PARAM_STATE, state);
 	}
