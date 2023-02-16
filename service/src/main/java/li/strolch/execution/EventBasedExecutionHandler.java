@@ -45,6 +45,30 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public boolean isControlling(Activity activity) {
+		return this.controllers.containsElement(getDefaultRealm(), activity.getLocator());
+	}
+
+	@Override
+	public boolean isControlling(String realm, Activity activity) {
+		return this.controllers.containsElement(realm, activity.getLocator());
+	}
+
+	@Override
+	public boolean isControlling(Locator locator) {
+		return this.controllers.containsElement(getDefaultRealm(), locator);
+	}
+
+	public boolean isControlling(String realm, Locator locator) {
+		return this.controllers.containsElement(realm, locator);
+	}
+
+	@Override
+	public List<Controller> getControllers() {
+		return getControllers(getDefaultRealm());
+	}
+
+	@Override
 	public List<Controller> getControllers(String realm) {
 		Map<Locator, Controller> controllersByRealm = this.controllers.getMap(realm);
 		if (controllersByRealm == null)
@@ -53,13 +77,28 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public Controller getController(Activity activity) {
+		return getController(getDefaultRealm(), activity);
+	}
+
+	@Override
 	public Controller getController(String realm, Activity activity) {
 		return this.controllers.getElement(realm, activity.getLocator());
 	}
 
 	@Override
+	public Controller getController(Locator locator) {
+		return getController(getDefaultRealm(), locator);
+	}
+
+	@Override
 	public Controller getController(String realm, Locator locator) {
 		return this.controllers.getElement(realm, locator.trim(3));
+	}
+
+	@Override
+	public Set<Locator> getActiveActivitiesLocator() {
+		return getActiveActivitiesLocator(getDefaultRealm());
 	}
 
 	@Override
@@ -127,6 +166,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void addForExecution(Activity activity) {
+		addForExecution(getDefaultRealm(), activity);
+	}
+
+	@Override
 	public void addForExecution(String realm, Activity activity) {
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.HaltNew)
@@ -144,6 +188,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void toExecution(Activity activity) {
+		toExecution(getDefaultRealm(), activity);
+	}
+
+	@Override
 	public void toExecution(String realm, Activity activity) {
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.HaltNew)
@@ -158,6 +207,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 
 		toExecution(controller);
+	}
+
+	@Override
+	public void toExecution(Locator activityLoc) {
+		toExecution(getDefaultRealm(), activityLoc);
 	}
 
 	@Override
@@ -186,11 +240,21 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void removeFromExecution(Locator activityLoc) {
+		removeFromExecution(getDefaultRealm(), activityLoc);
+	}
+
+	@Override
 	public void removeFromExecution(String realm, Locator activityLoc) {
 		Locator rootElemLoc = activityLoc.trim(3);
 		Controller controller = this.controllers.removeElement(realm, rootElemLoc);
 		if (controller != null)
 			getExecutor().submit(() -> notifyObserverRemove(controller));
+	}
+
+	@Override
+	public void clearAllCurrentExecutions() {
+		clearAllCurrentExecutions(getDefaultRealm());
 	}
 
 	@Override
@@ -201,6 +265,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	protected void restartActivityExecution(PrivilegeContext ctx) {
 		getContainer().getRealmNames().forEach(realmName -> reloadActivitiesInExecution(ctx, realmName));
+	}
+
+	@Override
+	public void reloadActivitiesInExecution(PrivilegeContext ctx) {
+		reloadActivitiesInExecution(ctx, getDefaultRealm());
 	}
 
 	@Override
@@ -251,6 +320,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void triggerExecution() {
+		triggerExecution(getDefaultRealm());
+	}
+
+	@Override
 	public void triggerExecution(String realm) {
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.Paused) {
@@ -298,6 +372,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void toExecuted(Locator actionLoc) {
+		toExecuted(getDefaultRealm(), actionLoc);
+	}
+
+	@Override
 	public void toExecuted(String realm, Locator locator) {
 		getExecutor().execute(() -> {
 			try {
@@ -319,6 +398,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void toStopped(Locator actionLoc) {
+		toStopped(getDefaultRealm(), actionLoc);
 	}
 
 	@Override
@@ -344,6 +428,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void toError(Locator actionLoc) {
+		toExecuted(getDefaultRealm(), actionLoc);
+	}
+
+	@Override
 	public void toError(String realm, Locator locator) {
 		getExecutor().execute(() -> {
 			try {
@@ -366,6 +455,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
+	public void toWarning(Locator actionLoc) {
+		toWarning(getDefaultRealm(), actionLoc);
+	}
+
+	@Override
 	public void toWarning(String realm, Locator locator) {
 		getExecutor().execute(() -> {
 			try {
@@ -385,6 +479,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void archiveActivity(Locator activityLoc) {
+		archiveActivity(getDefaultRealm(), activityLoc);
 	}
 
 	@Override
