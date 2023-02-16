@@ -36,16 +36,17 @@ import li.strolch.utils.dbc.DBC;
  */
 public class RestfulStrolchComponent extends StrolchComponent {
 
-	private static final String PARAM_CORS_ENABLED = "corsEnabled"; //$NON-NLS-1$
-	private static final String PARAM_CORS_ORIGIN = "corsOrigin"; //$NON-NLS-1$
-	private static final String PARAM_REST_LOGGING = "restLogging"; //$NON-NLS-1$
-	private static final String PARAM_REST_LOGGING_ENTITY = "restLoggingEntity"; //$NON-NLS-1$
-	private static final String PARAM_HTTP_CACHE_MODE = "httpCacheMode"; //$NON-NLS-1$
-	private static final String PARAM_SECURE_COOKIE = "secureCookie"; //$NON-NLS-1$
-	private static final String PARAM_COOKIE_MAX_AGE = "cookieMaxAge"; //$NON-NLS-1$
-	private static final String PARAM_DOMAIN = "domain"; //$NON-NLS-1$
-	private static final String PARAM_BASIC_AUTH_ENABLED = "basicAuthEnabled"; //$NON-NLS-1$
-	private static final String PARAM_HIDE_VERSION_FROM_UNAUTHORIZED_CLIENTS = "hideVersionFromUnauthorizedClients"; //$NON-NLS-1$
+	private static final String PARAM_CORS_ENABLED = "corsEnabled";
+	private static final String PARAM_CORS_ORIGIN = "corsOrigin";
+	private static final String PARAM_REST_LOGGING = "restLogging";
+	private static final String PARAM_REST_LOGGING_ENTITY = "restLoggingEntity";
+	private static final String PARAM_HTTP_CACHE_MODE = "httpCacheMode";
+	private static final String PARAM_SECURE_COOKIE = "secureCookie";
+	private static final String PARAM_COOKIE_MAX_AGE = "cookieMaxAge";
+	private static final String PARAM_DOMAIN = "domain";
+	private static final String PARAM_PATH = "path";
+	private static final String PARAM_BASIC_AUTH_ENABLED = "basicAuthEnabled";
+	private static final String PARAM_HIDE_VERSION_FROM_UNAUTHORIZED_CLIENTS = "hideVersionFromUnauthorizedClients";
 
 	/**
 	 * Allowed values:
@@ -58,7 +59,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 *
 	 * @see org.glassfish.jersey.server.ServerProperties#TRACING
 	 */
-	private static final String PARAM_REST_TRACING = "restTracing"; //$NON-NLS-1$
+	private static final String PARAM_REST_TRACING = "restTracing";
 
 	/**
 	 * Allowed values:
@@ -70,7 +71,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 *
 	 * @see org.glassfish.jersey.server.ServerProperties#TRACING_THRESHOLD
 	 */
-	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold"; //$NON-NLS-1$
+	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold";
 
 	private static RestfulStrolchComponent instance;
 
@@ -82,6 +83,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private boolean restLoggingEntity;
 	private boolean secureCookie;
 	private String domain;
+	private String path;
 	private int cookieMaxAge;
 	private boolean basicAuthEnabled;
 	private boolean hideVersionFromUnauthorizedClients;
@@ -136,6 +138,18 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return domain;
 	}
 
+	public boolean isDomainSet() {
+		return this.domain != null;
+	}
+
+	public boolean isPathSet() {
+		return this.path != null;
+	}
+
+	public String getPath() {
+		return this.path;
+	}
+
 	public boolean isBasicAuthEnabled() {
 		return this.basicAuthEnabled;
 	}
@@ -150,7 +164,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.corsEnabled = configuration.getBoolean(PARAM_CORS_ENABLED, Boolean.FALSE);
 		if (this.corsEnabled) {
 			this.corsOrigin = configuration.getString(PARAM_CORS_ORIGIN, null);
-			logger.info("Enabling CORS for origin: " + this.corsOrigin); //$NON-NLS-1$
+			logger.info("Enabling CORS for origin: " + this.corsOrigin);
 			AccessControlResponseFilter.setCorsEnabled(true);
 			AccessControlResponseFilter.setOrigin(this.corsOrigin);
 		}
@@ -158,10 +172,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		// restful logging and tracing
 		this.restLogging = configuration.getBoolean(PARAM_REST_LOGGING, Boolean.FALSE);
 		this.restLoggingEntity = configuration.getBoolean(PARAM_REST_LOGGING_ENTITY, Boolean.FALSE);
-		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF"); //$NON-NLS-1$
-		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE"); //$NON-NLS-1$
+		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF");
+		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE");
 
-		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}"; //$NON-NLS-1$
+		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}";
 		logger.info(MessageFormat.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing,
 				this.restTracingThreshold));
 
@@ -174,6 +188,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.domain = configuration.getString(PARAM_DOMAIN, "");
 		if (this.domain.isEmpty())
 			this.domain = null;
+		this.path = configuration.getString(PARAM_PATH, "");
+		if (this.path.isEmpty())
+			this.path = null;
 		this.basicAuthEnabled = configuration.getBoolean(PARAM_BASIC_AUTH_ENABLED, true);
 		this.hideVersionFromUnauthorizedClients = configuration.getBoolean(PARAM_HIDE_VERSION_FROM_UNAUTHORIZED_CLIENTS,
 				false);
@@ -186,7 +203,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	@Override
 	public void start() throws Exception {
-		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance); //$NON-NLS-1$
+		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance);
 		instance = this;
 		super.start();
 	}
@@ -201,7 +218,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 * @return the RestfulStrolchComponent
 	 */
 	public static RestfulStrolchComponent getInstance() {
-		DBC.PRE.assertNotNull("Not yet initialized!", instance); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Not yet initialized!", instance);
 		return instance;
 	}
 
