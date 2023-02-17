@@ -200,6 +200,14 @@ public class StrolchTimedStateTest {
 		assertEquals(2, floatState.getTimeEvolution().getValues().size());
 	}
 
+	@Test
+	public void testTrimTimedState4() {
+		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(20);
+		FloatTimedState floatState = new FloatTimedState(STATE_FLOAT_ID, STATE_FLOAT_ID);
+		assertFalse(floatState.trim(now, true));
+		assertFalse(floatState.trim(20));
+	}
+
 	private static Set<AString> asSet(String value) {
 		HashSet<AString> hashSet = new HashSet<>();
 		hashSet.add(new AString(value));

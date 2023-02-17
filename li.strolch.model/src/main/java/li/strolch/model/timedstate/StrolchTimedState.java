@@ -207,8 +207,12 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 		ITimeVariable<T> timeEvolution = getTimeEvolution();
 
 		long time = timeStamp.toInstant().toEpochMilli();
-		if (keepLastValue && timeEvolution.getFutureValues(time).isEmpty())
-			time = timeEvolution.getValueAt(time).getTime();
+		if (keepLastValue && timeEvolution.getFutureValues(time).isEmpty()) {
+			ITimeValue<T> valueAt = timeEvolution.getValueAt(time);
+			if (valueAt == null)
+				return false;
+			time = valueAt.getTime();
+		}
 
 		return !timeEvolution.removePastValues(time).isEmpty();
 	}
