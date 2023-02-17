@@ -90,6 +90,16 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	}
 
 	@Override
+	public boolean isInterpretationDefined() {
+		return !INTERPRETATION_NONE.equals(this.interpretation);
+	}
+
+	@Override
+	public boolean isInterpretationEmpty() {
+		return INTERPRETATION_NONE.equals(this.interpretation);
+	}
+
+	@Override
 	public String getUom() {
 		return this.uom;
 	}
@@ -102,6 +112,16 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		} else {
 			this.uom = uom;
 		}
+	}
+
+	@Override
+	public boolean isUomDefined() {
+		return !UOM_NONE.equals(this.uom);
+	}
+
+	@Override
+	public boolean isUomEmpty() {
+		return UOM_NONE.equals(this.uom);
 	}
 
 	@Override

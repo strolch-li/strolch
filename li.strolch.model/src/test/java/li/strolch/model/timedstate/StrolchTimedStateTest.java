@@ -18,8 +18,10 @@ package li.strolch.model.timedstate;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -127,6 +129,75 @@ public class StrolchTimedStateTest {
 
 		ITimeValue<StringSetValue> valueAt30 = booleanState.getTimeEvolution().getValueAt(STATE_TIME_30);
 		assertEquals(asSet(STATE_STRING_TIME_30), valueAt30.getValue().getValue());
+	}
+
+	@Test
+	public void testTrimTimedState1() {
+
+		Resource myRes = createResource("@1", "Test With States", "Stated");
+		FloatTimedState floatState = myRes.getTimedState(STATE_FLOAT_ID);
+
+		boolean trimmed = floatState.trim(20);
+		assertFalse(trimmed);
+		assertEquals(4, floatState.getTimeEvolution().getValues().size());
+
+		long now = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(20).toInstant().toEpochMilli();
+
+		for (int i = 0; i < 16; i++) {
+			floatState.getTimeEvolution().setValueAt(now, new FloatValue(i));
+			now += 10;
+		}
+
+		assertEquals(20, floatState.getTimeEvolution().getValues().size());
+		trimmed = floatState.trim(20);
+		assertFalse(trimmed);
+	}
+
+	@Test
+	public void testTrimTimedState2() {
+
+		Resource myRes = createResource("@1", "Test With States", "Stated");
+		FloatTimedState floatState = myRes.getTimedState(STATE_FLOAT_ID);
+
+		assertFalse(floatState.trim(20));
+		assertEquals(4, floatState.getTimeEvolution().getValues().size());
+
+		long now = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(20).toInstant().toEpochMilli();
+
+		for (int i = 0; i < 50; i++) {
+			floatState.getTimeEvolution().setValueAt(now, new FloatValue(i));
+			now += 10;
+		}
+
+		assertEquals(54, floatState.getTimeEvolution().getValues().size());
+		assertTrue(floatState.trim(20));
+		assertEquals(20, floatState.getTimeEvolution().getValues().size());
+	}
+
+	@Test
+	public void testTrimTimedState3() {
+		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(20);
+
+		Resource myRes = createResource("@1", "Test With States", "Stated");
+		FloatTimedState floatState = myRes.getTimedState(STATE_FLOAT_ID);
+		assertEquals(4, floatState.getTimeEvolution().getValues().size());
+
+		assertTrue(floatState.trim(now, true));
+		assertEquals(1, floatState.getTimeEvolution().getValues().size());
+		assertEquals(STATE_TIME_30, floatState.getTimeEvolution().getValues().iterator().next().getTime().longValue());
+
+		assertFalse(floatState.trim(now, true));
+		assertEquals(1, floatState.getTimeEvolution().getValues().size());
+
+		assertTrue(floatState.trim(now, false));
+		assertEquals(0, floatState.getTimeEvolution().getValues().size());
+
+		ZonedDateTime later = now.plusDays(1);
+		floatState.setStateFromStringAt(later.toInstant().toEpochMilli(), "55.0");
+		floatState.setStateFromStringAt(now.toInstant().toEpochMilli(), "56.0");
+		assertEquals(2, floatState.getTimeEvolution().getValues().size());
+		assertFalse(floatState.trim(now, true));
+		assertEquals(2, floatState.getTimeEvolution().getValues().size());
 	}
 
 	private static Set<AString> asSet(String value) {
