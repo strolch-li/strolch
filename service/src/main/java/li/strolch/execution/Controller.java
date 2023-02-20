@@ -2,11 +2,9 @@ package li.strolch.execution;
 
 import static java.util.Collections.synchronizedMap;
 import static li.strolch.execution.EventBasedExecutionHandler.PROP_LOCK_RETRIES;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import li.strolch.agent.api.ObserverEvent;
@@ -15,16 +13,12 @@ import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.*;
 import li.strolch.execution.policy.ExecutionPolicy;
-import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
@@ -455,52 +449,6 @@ public class Controller {
 		command.setAction(action);
 		command.validate();
 		command.doCommand();
-	}
-
-	/**
-	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#ERROR}
-	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
-	 */
-	public void asyncToError(Locator actionLoc) {
-		this.executionHandler.getExecutor().submit(() -> {
-			try {
-				toError(actionLoc);
-			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to error due to " + e.getMessage(), e);
-
-				if (this.agent.hasComponent(OperationsLog.class)) {
-					this.agent.getComponent(OperationsLog.class)
-							.addMessage(new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
-									"execution.handler.failed.error").withException(e).value("reason", e));
-				}
-			}
-		});
-	}
-
-	/**
-	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#WARNING}
-	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
-	 */
-	public void asyncToWarning(Locator actionLoc) {
-		this.executionHandler.getExecutor().submit(() -> {
-			try {
-				toWarning(actionLoc);
-			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to warning due to " + e.getMessage(), e);
-
-				if (this.agent.hasComponent(OperationsLog.class)) {
-					this.agent.getComponent(OperationsLog.class)
-							.addMessage(new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
-									"execution.handler.failed.warning").withException(e).value("reason", e));
-				}
-			}
-		});
 	}
 
 	protected void lockWithRetries(StrolchTransaction tx) throws StrolchLockException {

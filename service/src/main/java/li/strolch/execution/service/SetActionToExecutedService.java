@@ -1,6 +1,5 @@
 package li.strolch.execution.service;
 
-import li.strolch.execution.Controller;
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.command.SetActionToExecutedCommand;
 import li.strolch.model.activity.Action;
@@ -27,10 +26,8 @@ public class SetActionToExecutedService extends AbstractService<LocatorArgument,
 
 		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
 		String realm = getArgOrUserRealm(arg);
-		Controller controller = executionHandler.getController(realm, arg.locator.trim(3));
-		if (controller != null) {
-			controller.toExecuted(arg.locator);
-			executionHandler.triggerExecution(realm);
+		if (executionHandler.isControlling(realm, arg.locator.trim(3))) {
+			executionHandler.toExecuted(realm, arg.locator);
 			return ServiceResult.success();
 		}
 

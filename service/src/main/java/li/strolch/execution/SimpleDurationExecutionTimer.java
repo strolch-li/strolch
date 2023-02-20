@@ -1,23 +1,18 @@
 package li.strolch.execution;
 
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
-import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
 import li.strolch.utils.time.PeriodDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +69,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 				SimulationTask task = new SimulationTask(realm, container, actionLocator);
 				ScheduledFuture<?> future = getExecutor().schedule(task, duration, TimeUnit.MILLISECONDS);
 				this.simulationTasks.put(actionLocator, future);
-				logger.info("Registered execution timer for " + actionLocator);
+				logger.info("Scheduled a delay of " + formatMillisecondsDuration(duration) + " for " + actionLocator);
 			}
 		}
 	}
@@ -87,31 +82,9 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 		this.simulationTasks.remove(locator);
 		ExecutionHandler executionHandler = container.getComponent(ExecutionHandler.class);
-		Controller controller = executionHandler.getController(realm, locator);
-		if (controller == null) {
-			logger.warn("Controller already remove for " + locator);
-			return;
-		}
 
-		if (controller.isStopped(locator)) {
-			logger.warn("Execution for " + locator + " is already stopped.");
-			return;
-		}
-
-		try {
-			controller.toExecuted(locator);
-			executionHandler.triggerExecution(realm);
-		} catch (Exception e) {
-			logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
-
-			if (this.agent.getContainer().hasComponent(OperationsLog.class)) {
-				this.agent.getContainer()
-						.getComponent(OperationsLog.class)
-						.addMessage(new LogMessage(realm, SYSTEM_USER_AGENT, locator, LogSeverity.Exception,
-								LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
-								"execution.handler.failed.executed").withException(e).value("reason", e));
-			}
-		}
+		logger.info("Completing task " + locator);
+		executionHandler.toExecuted(realm, locator);
 	}
 
 	private class SimulationTask implements Runnable {

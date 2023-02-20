@@ -1,6 +1,5 @@
 package li.strolch.execution.service;
 
-import li.strolch.execution.Controller;
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.command.SetActionToErrorCommand;
 import li.strolch.model.activity.Action;
@@ -26,9 +25,9 @@ public class SetActionToErrorService extends AbstractService<LocatorArgument, Se
 	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
 
 		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
-		Controller controller = executionHandler.getController(getArgOrUserRealm(arg), arg.locator.trim(3));
-		if (controller != null) {
-			controller.toError(arg.locator);
+		String realm = getArgOrUserRealm(arg);
+		if (executionHandler.isControlling(realm, arg.locator.trim(3))) {
+			executionHandler.toError(realm, arg.locator);
 			return ServiceResult.success();
 		}
 

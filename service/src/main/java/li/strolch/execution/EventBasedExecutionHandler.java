@@ -44,6 +44,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		this.controllers = synchronizedMapOfMaps(new MapOfMaps<>(true));
 	}
 
+	private static Locator trimLocator(Locator locator) {
+		return locator.trim(3);
+	}
+
 	@Override
 	public boolean isControlling(Activity activity) {
 		return this.controllers.containsElement(getDefaultRealm(), activity.getLocator());
@@ -56,11 +60,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public boolean isControlling(Locator locator) {
-		return this.controllers.containsElement(getDefaultRealm(), locator);
+		return this.controllers.containsElement(getDefaultRealm(), trimLocator(locator));
 	}
 
 	public boolean isControlling(String realm, Locator locator) {
-		return this.controllers.containsElement(realm, locator);
+		return this.controllers.containsElement(realm, trimLocator(locator));
 	}
 
 	@Override
@@ -93,7 +97,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public Controller getController(String realm, Locator locator) {
-		return this.controllers.getElement(realm, locator.trim(3));
+		return this.controllers.getElement(realm, trimLocator(locator));
 	}
 
 	@Override
@@ -180,6 +184,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		if (this.controllers.containsElement(realm, activity.getLocator()))
 			throw new IllegalStateException(activity.getLocator() + " is already registered for execution!");
 
+		logger.info("Added " + activity.getLocator() + " @ " + realm);
 		Controller controller = newController(realm, activity);
 		this.controllers.addElement(realm, activity.getLocator(), controller);
 		notifyObserverAdd(controller);
@@ -221,9 +226,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			throw new IllegalStateException(
 					"ExecutionHandler state is " + state + ", can not add activities for execution!");
 
-		Controller controller = this.controllers.getElement(realm, activityLoc);
+		Locator trimmedLocator = trimLocator(activityLoc);
+		Controller controller = this.controllers.getElement(realm, trimmedLocator);
 		if (controller == null)
-			throw new IllegalStateException("No controller registered for activity " + activityLoc);
+			throw new IllegalStateException("No controller registered for activity " + trimmedLocator);
 
 		toExecution(controller);
 	}
@@ -246,8 +252,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void removeFromExecution(String realm, Locator activityLoc) {
-		Locator rootElemLoc = activityLoc.trim(3);
-		Controller controller = this.controllers.removeElement(realm, rootElemLoc);
+		Controller controller = this.controllers.removeElement(realm, trimLocator(activityLoc));
 		if (controller != null)
 			getExecutor().submit(() -> notifyObserverRemove(controller));
 	}
@@ -332,10 +337,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
-		logger.info("Triggering execution...");
-		synchronized (this.controllers) {
-			controllerStream(realm).forEach(this::toExecution);
-		}
+		logger.info("Triggering execution for all controllers on realm " + realm + "...");
+		getExecutor().execute(() -> {
+			synchronized (this.controllers) {
+				controllerStream(realm).forEach(this::toExecution);
+			}
+		});
 	}
 
 	protected void toExecution(Controller controller) {
@@ -347,6 +354,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
+		logger.info("Added toExecution task for " + controller.getLocator() + " @ " + realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -378,10 +386,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toExecuted(String realm, Locator locator) {
+		logger.info("Added toExecuted task for " + locator + " @ " + realm);
 		getExecutor().execute(() -> {
 			try {
 
-				Controller controller = this.controllers.getElement(realm, locator.trim(3));
+				Controller controller = this.controllers.getElement(realm, trimLocator(locator));
 				if (controller != null)
 					controller.toExecuted(locator);
 
@@ -407,10 +416,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toStopped(String realm, Locator locator) {
+		logger.warn("Added toStopped task for " + locator + " @ " + realm);
 		getExecutor().execute(() -> {
 			try {
 
-				Controller controller = this.controllers.getElement(realm, locator.trim(3));
+				Controller controller = this.controllers.getElement(realm, trimLocator(locator));
 				if (controller != null)
 					controller.toStopped(locator);
 
@@ -429,15 +439,16 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toError(Locator actionLoc) {
-		toExecuted(getDefaultRealm(), actionLoc);
+		toError(getDefaultRealm(), actionLoc);
 	}
 
 	@Override
 	public void toError(String realm, Locator locator) {
+		logger.error("Added toError task for " + locator + " @ " + realm);
 		getExecutor().execute(() -> {
 			try {
 
-				Controller controller = this.controllers.getElement(realm, locator.trim(3));
+				Controller controller = this.controllers.getElement(realm, trimLocator(locator));
 				if (controller != null)
 					controller.toError(locator);
 
@@ -461,10 +472,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toWarning(String realm, Locator locator) {
+		logger.warn("Added toWarning task for " + locator + " @ " + realm);
 		getExecutor().execute(() -> {
 			try {
 
-				Controller controller = this.controllers.getElement(realm, locator.trim(3));
+				Controller controller = this.controllers.getElement(realm, trimLocator(locator));
 				if (controller != null)
 					controller.toWarning(locator);
 
@@ -488,23 +500,25 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void archiveActivity(String realm, Locator activityLoc) {
+		logger.info("Added archiveActivity task for " + activityLoc + " @ " + realm);
+		Locator trimmedLocator = trimLocator(activityLoc);
 		getExecutor().execute(() -> {
 			try {
 				runAsAgent(ctx -> {
 					try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), ArchiveActivityCommand.class,
 							false)) {
 						ArchiveActivityCommand command = new ArchiveActivityCommand(tx);
-						command.setActivityLoc(activityLoc);
+						command.setActivityLoc(trimmedLocator);
 						tx.addCommand(command);
 						tx.commitOnClose();
 					}
 				});
 			} catch (Exception e) {
-				logger.error("Failed to archive " + activityLoc + " due to " + e.getMessage(), e);
+				logger.error("Failed to archive " + trimmedLocator + " due to " + e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
-							new LogMessage(realm, SYSTEM_USER_AGENT, activityLoc, LogSeverity.Exception,
+							new LogMessage(realm, SYSTEM_USER_AGENT, trimmedLocator, LogSeverity.Exception,
 									LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 									"execution.handler.failed.archive").withException(e).value("reason", e));
 				}

@@ -2,11 +2,9 @@ package li.strolch.execution.policy;
 
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import li.strolch.exception.StrolchException;
-import li.strolch.execution.ExecutionHandler;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -123,8 +121,7 @@ public class SimpleExecution extends ExecutionPolicy {
 	protected void toExecuted() throws Exception {
 		cancelWarningTask();
 		stop();
-		getController().toExecuted(this.actionLoc);
-		getComponent(ExecutionHandler.class).triggerExecution(this.realm);
+		getExecutionHandler().toExecuted(this.realm, this.actionLoc);
 	}
 
 	protected void toError(LogMessage message) {
@@ -132,42 +129,31 @@ public class SimpleExecution extends ExecutionPolicy {
 		stop();
 		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
 		addMessage(message);
-		getController().asyncToError(message.getLocator());
+		getExecutionHandler().toError(this.realm, message.getLocator());
 	}
 
 	protected void toWarning(LogMessage message) {
 		cancelWarningTask();
 		addMessage(message);
-		getController().asyncToWarning(message.getLocator());
+		getExecutionHandler().toWarning(this.realm, message.getLocator());
 	}
 
 	protected StrolchTransaction openLocalTx(PrivilegeContext ctx, boolean readOnly) throws StrolchException {
 		return getContainer().getRealm(ctx.getCertificate()).openTx(ctx.getCertificate(), getClass(), readOnly);
 	}
 
-	protected void runWithFreshAction(Consumer<Action> consumer) {
-		runWithFreshAction(consumer, true);
+	protected void runWithFreshActionReadonly(BiConsumer<StrolchTransaction, Action> consumer,
+			Supplier<String> failMsgSupplier) {
+		runWithFreshAction(true, consumer, failMsgSupplier);
 	}
 
-	protected void runWithFreshAction(Consumer<Action> consumer, boolean readOnly) {
-		try {
-			runAsAgent(ctx -> {
-				try (StrolchTransaction tx = openLocalTx(ctx, readOnly)) {
-					tx.lock(this.actionLoc.trim(3));
-					Action action = tx.findElement(this.actionLoc);
-					consumer.accept(action);
-				}
-			});
-		} catch (Exception e) {
-			logger.error("Failed to perform consumer " + consumer.toString(), e);
-		}
+	protected void runWithFreshActionWritable(BiConsumer<StrolchTransaction, Action> consumer,
+			Supplier<String> failMsgSupplier) {
+		runWithFreshAction(false, consumer, failMsgSupplier);
 	}
 
-	protected void runWithFreshAction(BiConsumer<StrolchTransaction, Action> consumer) {
-		runWithFreshAction(true, consumer);
-	}
-
-	protected void runWithFreshAction(boolean readOnly, BiConsumer<StrolchTransaction, Action> consumer) {
+	private void runWithFreshAction(boolean readOnly, BiConsumer<StrolchTransaction, Action> consumer,
+			Supplier<String> failMsgSupplier) {
 		try {
 			runAsAgent(ctx -> {
 				try (StrolchTransaction tx = openLocalTx(ctx, readOnly)) {
@@ -180,7 +166,7 @@ public class SimpleExecution extends ExecutionPolicy {
 				}
 			});
 		} catch (Exception e) {
-			logger.error("Failed to perform consumer " + consumer.toString(), e);
+			logger.error(failMsgSupplier.get(), e);
 		}
 	}
 }

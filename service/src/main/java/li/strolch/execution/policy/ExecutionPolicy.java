@@ -286,6 +286,51 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Delays the given {@link Runnable} by the given duration, but randomly changing the duration in milliseconds by
+	 * the given min and max factors
+	 */
+	protected void delayRandom(Duration duration, double minFactor, double maxFactor, Runnable runnable) {
+		long durationMs = duration.toMillis();
+		delayRandom(durationMs, minFactor, maxFactor, TimeUnit.MILLISECONDS, runnable);
+	}
+
+	/**
+	 * Delays the given {@link Runnable} by the given duration, but randomly changing the duration in milliseconds by
+	 * the given min and max factors
+	 */
+	protected void delayRandom(long duration, double minFactor, double maxFactor, TimeUnit delayUnit,
+			Runnable runnable) {
+		delayRandom((long) (duration * minFactor), (long) (duration * maxFactor), delayUnit, runnable);
+	}
+
+	/**
+	 * Delays the given {@link Runnable} by randomly choosing a value by calling
+	 * {@link ThreadLocalRandom#nextLong(long, long)} passing min and max as origin and bound respectively
+	 */
+	protected void delayRandom(long min, long max, TimeUnit delayUnit, Runnable runnable) {
+		long delay = ThreadLocalRandom.current().nextLong(min, max + 1);
+		delayRandom(delay, delayUnit, runnable);
+	}
+
+	/**
+	 * Delays the given {@link Runnable} by the given delay value
+	 *
+	 * @param delay
+	 * 		the delay time
+	 * @param delayUnit
+	 * 		the UOM of the delay time
+	 */
+	protected void delayRandom(long delay, TimeUnit delayUnit, Runnable runnable) {
+		long delayMs = delayUnit.toMillis(delay);
+		if (delayMs < 20) {
+			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
+			delayMs = 20;
+		}
+		logger.info("Delaying runnable " + runnable + " by " + formatMillisecondsDuration(delayMs));
+		getDelayedExecutionTimer().delay(delayMs, runnable);
+	}
+
+	/**
 	 * Async method to delay setting the given {@link Action} to executed by the duration defined by the
 	 * {@link DurationParameter} found by calling {@link Action#findParameter(String, String, boolean)}
 	 */
