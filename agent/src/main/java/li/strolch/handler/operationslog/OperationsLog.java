@@ -62,7 +62,7 @@ public class OperationsLog extends StrolchComponent {
 		for (String realmName : realmNames) {
 			StrolchRealm realm = getContainer().getRealm(realmName);
 			if (!realm.getMode().isTransient())
-				this.queue.offer(() -> loadMessages(realmName));
+				this.queue.add(() -> loadMessages(realmName));
 		}
 
 		this.run = true;
@@ -130,24 +130,23 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public void addMessage(LogMessage logMessage) {
-		if (this.logMessagesByRealmAndId != null)
-			this.queue.offer(() -> _addMessage(logMessage));
+		this.queue.add(() -> _addMessage(logMessage));
 	}
 
 	public void removeMessage(LogMessage message) {
-		this.queue.offer(() -> _removeMessage(message));
+		this.queue.add(() -> _removeMessage(message));
 	}
 
 	public void removeMessages(Collection<LogMessage> logMessages) {
-		this.queue.offer(() -> _removeMessages(logMessages));
+		this.queue.add(() -> _removeMessages(logMessages));
 	}
 
 	public void updateState(String realmName, Locator locator, LogMessageState state) {
-		this.queue.offer(() -> _updateState(realmName, locator, state));
+		this.queue.add(() -> _updateState(realmName, locator, state));
 	}
 
 	public void updateState(String realmName, String id, LogMessageState state) {
-		this.queue.offer(() -> _updateState(realmName, id, state));
+		this.queue.add(() -> _updateState(realmName, id, state));
 	}
 
 	private void _addMessage(LogMessage logMessage) {
@@ -307,7 +306,7 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public void clearMessages(String realm, Locator locator) {
-		this.queue.offer(() -> {
+		this.queue.add(() -> {
 			LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 			if (logMessages != null)
 				logMessages.remove(locator);
