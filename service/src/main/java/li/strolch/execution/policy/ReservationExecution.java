@@ -99,16 +99,17 @@ public class ReservationExecution extends DurationExecution {
 	}
 
 	protected boolean jobCountSemaphoreSatisfied(Action action) {
-		StringListParameter jobCountSemaphoreTypesP = action.findParameter(BAG_OBJECTIVES,
-				PARAM_JOB_COUNT_SEMAPHORE_TYPES, false);
+		StringListParameter jobCountSemaphoreTypesP = action.findObjectivesParam(PARAM_JOB_COUNT_SEMAPHORE_TYPES,
+				false);
 		String[] types = jobCountSemaphoreTypesP == null ?
 				new String[] { action.getRootElement().getType() } :
 				jobCountSemaphoreTypesP.getValue().toArray(String[]::new);
 
-		long nrOfActivitiesInExecution = tx().streamActivities(types).filter(Activity::inExecutionPlanningPhase)
+		long nrOfActivitiesInExecution = tx().streamActivities(types)
+				.filter(Activity::inExecutionPlanningPhase)
 				.count();
 
-		IntegerParameter jobCountSemaphoreP = action.findParameter(BAG_OBJECTIVES, PARAM_JOB_COUNT_SEMAPHORE, true);
+		IntegerParameter jobCountSemaphoreP = action.findObjectivesParam(PARAM_JOB_COUNT_SEMAPHORE, true);
 		if (nrOfActivitiesInExecution < jobCountSemaphoreP.getValue())
 			return true;
 
