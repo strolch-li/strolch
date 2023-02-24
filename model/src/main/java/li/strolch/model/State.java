@@ -72,8 +72,8 @@ public enum State {
 	}
 
 	/**
-	 * @return true if the state is one of {@link #EXECUTION}, {@link #STOPPED}, {@link #WARNING},
-	 * {@link #ERROR} or {@link #EXECUTED}
+	 * @return true if the state is one of {@link #EXECUTION}, {@link #STOPPED}, {@link #WARNING}, {@link #ERROR} or
+	 * {@link #EXECUTED}
 	 */
 	public boolean inExecutionPhase() {
 		return this == EXECUTION || this == STOPPED || this == WARNING || this == ERROR;
@@ -124,7 +124,7 @@ public enum State {
 	/**
 	 * @return true if the state is {@link #PLANNED}
 	 */
-	public boolean isInPlanned() {
+	public boolean isPlanned() {
 		return this == PLANNED;
 	}
 
@@ -192,10 +192,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if state >= {@link #EXECUTED}
+	 * @return true if {@link #PLANNED} or {@link #STOPPED}
 	 */
-	public boolean canNotSetToExecution() {
-		return this.compareTo(State.EXECUTED) >= 0;
+	public boolean canSetToExecution() {
+		return this == PLANNED || this == STOPPED;
 	}
 
 	/**
@@ -206,10 +206,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #ERROR} or {@link #STOPPED} or {@link #WARNING}
+	 * @return true if {@link #EXECUTION} or {@link #ERROR} or {@link #STOPPED} or {@link #WARNING}
 	 */
 	public boolean canSetToStopped() {
-		return this == ERROR || this == State.STOPPED || this == State.WARNING;
+		return this == State.EXECUTION || this == ERROR || this == State.STOPPED || this == State.WARNING;
 	}
 
 	/**
