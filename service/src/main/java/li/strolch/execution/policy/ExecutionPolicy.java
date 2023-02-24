@@ -269,7 +269,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * @return the {@link DurationParameter}
 	 */
 	protected DurationParameter findActionDuration(Action action) {
-		return action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true);
+		return action.findObjectivesParam(PARAM_DURATION, true);
 	}
 
 	/**

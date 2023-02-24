@@ -1,6 +1,5 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
 
 import li.strolch.model.activity.Action;
@@ -26,7 +25,7 @@ public class DurationExecution extends SimpleExecution {
 	public void toExecution(Action action) {
 		if (this.delayToExecuted) {
 			super.toExecution(action);
-			if (action.findParameter(BAG_OBJECTIVES, PARAM_DURATION, true).isEmpty())
+			if (action.findObjectivesParam(PARAM_DURATION, true).isEmpty())
 				toExecuted(action);
 			else
 				delayToExecuted(action);
