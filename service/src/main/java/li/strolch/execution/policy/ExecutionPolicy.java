@@ -1,6 +1,5 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
@@ -159,7 +158,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * executed
 	 */
 	public boolean isExecutable(Action action) {
-		return true;
+		State state = action.getState();
+		return state.isPlanned() || state.isStopped();
 	}
 
 	/**

@@ -34,7 +34,7 @@ import li.strolch.utils.dbc.DBC;
  * objects of the action are already constructed and {@link Action#getResourceId()} is set.
  *
  * <br>
- *
+ * <p>
  * It iterates the {@link IValueChange} operators and registers the resulting changes on the {@link StrolchTimedState}
  * objects assigned to the {@link Resource}.
  *
@@ -67,11 +67,15 @@ public class PlanActivityCommand extends PlanningCommand {
 
 	@Override
 	public Void visitAction(Action action) {
+		State currentState = action.getState();
+		if (currentState.compareTo(State.PLANNED) >= 0)
+			return null;
+
 		PolicyDef planningPolicyDef = action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING);
 		PlanningPolicy planningPolicy = tx().getPolicy(PlanningPolicy.class, planningPolicyDef);
 		planningPolicy.plan(action);
-		if (action.getState() == State.PLANNED)
-			getConfirmationPolicy(action).toPlanned(action);
+		if (action.getState() != currentState)
+			getConfirmationPolicy(action).doConfirmation(action);
 		return null;
 	}
 }

@@ -183,13 +183,14 @@ public class Controller {
 	}
 
 	/**
-	 * Executes the activity in the given TX by calling the {@link ExecuteActivityCommand}
+	 * Executes the activity in the given TX by calling the {@link PlanAndExecuteActivityCommand}
 	 *
 	 * @param tx
 	 * 		the TX
 	 *
 	 * @return true if execute should be called again, i.e. the
-	 * {@link ExecuteActivityCommand#needsRetriggerOfExecution()} returns true and the activity isn't complete yet
+	 * {@link PlanAndExecuteActivityCommand#needsRetriggerOfExecution()} returns true and the activity isn't complete
+	 * yet
 	 */
 	protected boolean internalExecute(StrolchTransaction tx) {
 		if (this.activity.getState().isExecuted()) {
@@ -205,7 +206,7 @@ public class Controller {
 			return false;
 		}
 
-		ExecuteActivityCommand command = new ExecuteActivityCommand(tx);
+		PlanAndExecuteActivityCommand command = new PlanAndExecuteActivityCommand(tx);
 		command.setController(this);
 		command.validate();
 		command.doCommand();

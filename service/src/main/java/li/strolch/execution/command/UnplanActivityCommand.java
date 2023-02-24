@@ -30,11 +30,11 @@ import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
 /**
- * Command to unplan an {@link Activity} from a {@link Resource}. This {@link Command} assumes that the {@link
- * IValueChange} objects of the action are already constructed and {@link Action#getResourceId()} is set.
+ * Command to unplan an {@link Activity} from a {@link Resource}. This {@link Command} assumes that the
+ * {@link IValueChange} objects of the action are already constructed and {@link Action#getResourceId()} is set.
  *
  * <br>
- *
+ * <p>
  * It iterates the {@link IValueChange} operators and unregisters the changes from the {@link StrolchTimedState} objects
  * on the {@link Resource}.
  *
@@ -67,6 +67,10 @@ public class UnplanActivityCommand extends PlanningCommand {
 
 	@Override
 	public Void visitAction(Action action) {
+		State currentState = action.getState();
+		if (currentState == State.CREATED)
+			return null;
+
 		PolicyDef planningPolicyDef = action.findPolicy(PlanningPolicy.class, DEFAULT_PLANNING);
 		PlanningPolicy planningPolicy = tx().getPolicy(PlanningPolicy.class, planningPolicyDef);
 		planningPolicy.unplan(action);

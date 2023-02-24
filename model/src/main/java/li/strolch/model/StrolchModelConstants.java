@@ -120,5 +120,6 @@ public class StrolchModelConstants {
 		public static final String PARAM_ACTIVITY = "activity";
 		public static final String PARAM_JOB_COUNT_SEMAPHORE = "jobCountSemaphore";
 		public static final String PARAM_JOB_COUNT_SEMAPHORE_TYPES = "jobCountSemaphoreTypes";
+		public static final String PARAM_ATOMIC_PARALLEL_EXECUTION = "atomicParallelExecution";
 	}
 }
