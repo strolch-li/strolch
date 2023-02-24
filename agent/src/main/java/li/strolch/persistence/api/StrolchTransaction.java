@@ -581,7 +581,7 @@ public interface StrolchTransaction extends AutoCloseable {
 
 	/**
 	 * Performs a read-lock on the given element. This means that the given element is locked by calling
-	 * {@link #lock(StrolchRootElement)}, then the object is removed from cache, and then the object is ready again from
+	 * {@link #lock(StrolchRootElement)}, then the object is removed from cache, and then the object is read again from
 	 * the {@link ElementMap} so that we have the most current version of the element.
 	 */
 	<T extends StrolchRootElement> T readLock(T element) throws StrolchLockException;
