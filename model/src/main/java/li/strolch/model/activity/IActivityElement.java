@@ -18,6 +18,7 @@ package li.strolch.model.activity;
 import java.util.function.Predicate;
 
 import li.strolch.exception.StrolchModelException;
+import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.*;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
@@ -65,8 +66,8 @@ public interface IActivityElement extends StrolchElement {
 
 	/**
 	 * <p>
-	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, or otherwise queries its parent, until the root element is reached.
+	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, or otherwise queries its parent, until the root element is reached.
 	 * </p>
 	 *
 	 * <p>
@@ -79,8 +80,8 @@ public interface IActivityElement extends StrolchElement {
 
 	/**
 	 * <p>
-	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id {@link
-	 * StrolchModelConstants#BAG_RELATIONS}, or otherwise queries its parent, until the root element is reached.
+	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants#BAG_RELATIONS}, or otherwise queries its parent, until the root element is reached.
 	 * </p>
 	 *
 	 * <p>
@@ -90,6 +91,62 @@ public interface IActivityElement extends StrolchElement {
 	 * @see GroupedParameterizedElement#getRelationParam(String, boolean)
 	 */
 	<U, T extends Parameter<U>> T findRelationParam(String paramKey, boolean assertExists);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants.PolicyConstants#BAG_OBJECTIVES}, or otherwise queries its parent, until the root
+	 * element is reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the parameter does not exist, null is returned
+	 * </p>
+	 *
+	 * @see GroupedParameterizedElement#getParameter(String)
+	 */
+	<U, T extends Parameter<U>> T findObjectivesParam(String paramKey);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter} on the {@link ParameterBag} with the id
+	 * {@link StrolchModelConstants.PolicyConstants#BAG_OBJECTIVES}, or otherwise queries its parent, until the root
+	 * element is reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the parameter does not exist and {@code assertExists} is true, then a {@link StrolchModelException} is thrown
+	 * </p>
+	 *
+	 * @see GroupedParameterizedElement#getParameter(String, String, boolean)
+	 */
+	<U, T extends Parameter<U>> T findObjectivesParam(String paramKey, boolean assertExists);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter} on the default parameter bag, or otherwise queries its
+	 * parent, until the root element is reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the parameter does not exist, null is returned
+	 * </p>
+	 *
+	 * @see GroupedParameterizedElement#getParameter(String)
+	 */
+	<U, T extends Parameter<U>> T findParameter(String paramKey);
+
+	/**
+	 * <p>
+	 * Checks if this element contains the {@link Parameter} on the default parameter bag, or otherwise queries its
+	 * parent, until the root element is reached.
+	 * </p>
+	 *
+	 * <p>
+	 * If the parameter does not exist and {@code assertExists} is true, then a {@link StrolchModelException} is thrown
+	 * </p>
+	 */
+	<U, T extends Parameter<U>> T findParameter(String paramKey, boolean assertExists) throws StrolchModelException;
 
 	/**
 	 * <p>

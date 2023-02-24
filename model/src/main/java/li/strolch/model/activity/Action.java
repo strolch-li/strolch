@@ -16,7 +16,9 @@
 
 package li.strolch.model.activity;
 
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
@@ -410,6 +412,16 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public <U, T extends Parameter<U>> T findObjectivesParam(String paramKey) {
+		return findParameter(BAG_OBJECTIVES, paramKey);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findObjectivesParam(String paramKey, boolean assertExists) {
+		return findParameter(BAG_OBJECTIVES, paramKey, assertExists);
+	}
+
+	@Override
 	public <U, T extends Parameter<U>> T findRelationParam(String paramKey) {
 		return findParameter(BAG_RELATIONS, paramKey);
 	}
@@ -417,6 +429,16 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	@Override
 	public <U, T extends Parameter<U>> T findRelationParam(String paramKey, boolean assertExists) {
 		return findParameter(BAG_RELATIONS, paramKey, assertExists);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findParameter(String paramKey) {
+		return findParameter(BAG_PARAMETERS, paramKey);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findParameter(String paramKey, boolean assertExists) {
+		return findParameter(BAG_PARAMETERS, paramKey, assertExists);
 	}
 
 	@Override

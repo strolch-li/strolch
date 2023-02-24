@@ -16,7 +16,9 @@
 package li.strolch.model.activity;
 
 import static java.util.stream.Collectors.toList;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
 import static li.strolch.utils.collections.CollectionsHelper.singletonCollector;
 
 import java.text.MessageFormat;
@@ -772,6 +774,16 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public <U, T extends Parameter<U>> T findObjectivesParam(String paramKey) {
+		return findParameter(BAG_OBJECTIVES, paramKey);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findObjectivesParam(String paramKey, boolean assertExists) {
+		return findParameter(BAG_OBJECTIVES, paramKey, assertExists);
+	}
+
+	@Override
 	public <U, T extends Parameter<U>> T findRelationParam(String paramKey) {
 		return findParameter(BAG_RELATIONS, paramKey);
 	}
@@ -782,6 +794,15 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public <U, T extends Parameter<U>> T findParameter(String paramKey) {
+		return findParameter(BAG_PARAMETERS, paramKey);
+	}
+
+	@Override
+	public <U, T extends Parameter<U>> T findParameter(String paramKey, boolean assertExists) {
+		return findParameter(BAG_PARAMETERS, paramKey, assertExists);
+	}
+
 	public <U, T extends Parameter<U>> T findParameter(String bagKey, String paramKey) {
 
 		T parameter = getParameter(bagKey, paramKey);
