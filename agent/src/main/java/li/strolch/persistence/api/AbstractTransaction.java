@@ -312,6 +312,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public <T extends StrolchRootElement> T readLock(T element) throws StrolchLockException {
+		if (hasLock(element))
+			return element;
+
 		lock(element);
 
 		Locator locator = element.getLocator();
