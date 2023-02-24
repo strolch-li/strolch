@@ -154,12 +154,6 @@ public class Controller {
 
 				boolean trigger = internalExecute(tx);
 
-				// we trigger execution for the same activity if the controller says it is needed
-				if (trigger) {
-					logger.info("Triggering additional execution of controller " + this + " after execution.");
-					triggerExecute(tx);
-				}
-
 				if (tx.needsCommit())
 					tx.commitOnClose();
 
