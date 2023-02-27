@@ -235,7 +235,7 @@ public enum State {
 
 	public static State parseAllowNull(String s) {
 		for (State state : values()) {
-			if (state.state.toLowerCase().equals(s.toLowerCase()))
+			if (state.state.equalsIgnoreCase(s))
 				return state;
 		}
 
@@ -245,7 +245,7 @@ public enum State {
 	public static State parse(String s) {
 		DBC.PRE.assertNotEmpty("Value may not be null", s);
 		for (State state : values()) {
-			if (state.state.toLowerCase().equals(s.toLowerCase()))
+			if (state.state.equalsIgnoreCase(s))
 				return state;
 		}
 
@@ -253,8 +253,15 @@ public enum State {
 	}
 
 	public static State getState(Activity activity) {
-
 		Set<State> states = activity.elementStream().map(e -> e.getValue().getState()).collect(toSet());
+		return getState(states);
+	}
+
+	public static State getState(Set<State> states) {
+
+		// if no states
+		if (states.isEmpty())
+			return CREATED;
 
 		// if only one state
 		if (states.size() == 1)
