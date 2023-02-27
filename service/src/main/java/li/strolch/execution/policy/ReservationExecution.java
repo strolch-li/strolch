@@ -2,8 +2,10 @@ package li.strolch.execution.policy;
 
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.*;
+import static li.strolch.utils.ObjectHelper.isIn;
 
 import li.strolch.exception.StrolchModelException;
+import li.strolch.execution.Controller;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.activity.Action;
@@ -105,8 +107,11 @@ public class ReservationExecution extends DurationExecution {
 				new String[] { action.getRootElement().getType() } :
 				jobCountSemaphoreTypesP.getValue().toArray(String[]::new);
 
-		long nrOfActivitiesInExecution = tx().streamActivities(types)
-				.filter(Activity::inExecutionPlanningPhase)
+		long nrOfActivitiesInExecution = getExecutionHandler().getControllers(tx().getRealmName())
+				.stream()
+				.map(Controller::getActivity)
+				.filter(a -> isIn(a.getType(), types, false))
+				.filter(Activity::inExecutionPhase)
 				.count();
 
 		IntegerParameter jobCountSemaphoreP = action.findObjectivesParam(PARAM_JOB_COUNT_SEMAPHORE, true);
