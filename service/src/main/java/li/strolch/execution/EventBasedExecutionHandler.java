@@ -289,7 +289,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				// we only want to restart activities which were in execution
 				State state = activity.getState();
-				if (!state.inExecutionPhase())
+				if (!state.inExecutionPlanningPhase())
 					return;
 
 				if (activity.isReadOnly())
