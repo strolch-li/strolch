@@ -197,7 +197,9 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 			boolean anyActionNotExecutable = activity.streamActionsDeep().anyMatch(a -> {
 				if (!a.getState().canSetToExecution())
 					return false;
-				boolean executable = getExecutionPolicy(a).isExecutable(a);
+				ExecutionPolicy executionPolicy = getExecutionPolicy(a);
+				executionPolicy.initialize(a);
+				boolean executable = executionPolicy.isExecutable(a);
 				if (!executable)
 					logger.info("Action " + a.getLocator() + " is not executable yet!");
 				return !executable;
