@@ -213,7 +213,7 @@ public class Controller {
 
 		updateObservers();
 
-		return command.needsRetriggerOfExecution() && !this.activity.inClosedPhase();
+		return command.needsRetriggerOfExecution();
 	}
 
 	/**
