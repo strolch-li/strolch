@@ -179,6 +179,19 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} before the given element
 	 *
+	 * @param elementId
+	 * 		the id of the element before which to add the other element
+	 * @param elementToAdd
+	 * 		the element to add
+	 */
+	public void addElementBefore(String elementId, IActivityElement elementToAdd) {
+		IActivityElement element = getElement(elementId);
+		addElementBefore(element, elementToAdd);
+	}
+
+	/**
+	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} before the given element
+	 *
 	 * @param element
 	 * 		the element before which to add the other element
 	 * @param elementToAdd
@@ -211,8 +224,21 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} after the given element
 	 *
+	 * @param elementId
+	 * 		the id of the element after which to add the other element
+	 * @param elementToAdd
+	 * 		the element to add
+	 */
+	public void addElementAfter(String elementId, IActivityElement elementToAdd) {
+		IActivityElement element = getElement(elementId);
+		addElementAfter(element, elementToAdd);
+	}
+
+	/**
+	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} after the given element
+	 *
 	 * @param element
-	 * 		the element before which to add the other element
+	 * 		the element after which to add the other element
 	 * @param elementToAdd
 	 * 		the element to add
 	 */
