@@ -193,23 +193,13 @@ public class ISO8601 implements DateFormat {
 	}
 
 	public static DateTimeFormatter getIso8601Formatter(ChronoField precision) {
-		switch (precision) {
-
-		case SECOND_OF_MINUTE:
-			return OFFSET_DATE_TIME_SECONDS;
-
-		case MILLI_OF_SECOND:
-			return OFFSET_DATE_TIME_MILLIS;
-
-		case MICRO_OF_SECOND:
-			return OFFSET_DATE_TIME_MICROS;
-
-		case NANO_OF_SECOND:
-			return OFFSET_DATE_TIME_NANOS;
-
-		default:
-			throw new IllegalArgumentException("Unsupported precision " + precision);
-		}
+		return switch (precision) {
+			case SECOND_OF_MINUTE -> OFFSET_DATE_TIME_SECONDS;
+			case MILLI_OF_SECOND -> OFFSET_DATE_TIME_MILLIS;
+			case MICRO_OF_SECOND -> OFFSET_DATE_TIME_MICROS;
+			case NANO_OF_SECOND -> OFFSET_DATE_TIME_NANOS;
+			default -> throw new IllegalArgumentException("Unsupported precision " + precision);
+		};
 	}
 
 	public static void main(String[] args) {
