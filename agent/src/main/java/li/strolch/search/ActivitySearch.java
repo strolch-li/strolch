@@ -34,4 +34,10 @@ public class ActivitySearch extends StrolchSearch<Activity> {
 		super.where(expression);
 		return this;
 	}
+
+	@Override
+	public ActivitySearch internal() {
+		super.internal();
+		return this;
+	}
 }
