@@ -1882,9 +1882,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public void validatePassword(Locale locale, char[] password) throws PrivilegeException {
+	public void validatePassword(Locale locale, char[] password) throws PasswordStrengthException {
 		if (!this.passwordStrengthHandler.validateStrength(password))
-			throw new PrivilegeException(this.passwordStrengthHandler.getDescription(locale));
+			throw new PasswordStrengthException(this.passwordStrengthHandler.getDescription(locale));
 	}
 
 	@Override

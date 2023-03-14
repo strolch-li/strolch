@@ -20,6 +20,7 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 import li.strolch.privilege.model.Certificate;
@@ -47,8 +48,11 @@ public class AuthenticationResponseFilter implements ContainerResponseFilter {
 			logger.info("Invalidating single usage certificate for " + cert.getUsername());
 			RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
 		} else if (cert.getUsage().isSetPassword()) {
-			logger.info("Invalidating SET_PASSWORD usage certificate for " + cert.getUsername());
-			RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
+			// if not acceptable, then user can try again
+			if (responseContext.getStatusInfo().toEnum() != Response.Status.NOT_ACCEPTABLE) {
+				logger.info("Invalidating SET_PASSWORD usage certificate for " + cert.getUsername());
+				RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
+			}
 		}
 	}
 }
