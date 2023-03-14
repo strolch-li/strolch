@@ -3,6 +3,7 @@ package li.strolch.privilege.handler;
 import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
 
 import java.text.MessageFormat;
+import java.util.concurrent.CompletableFuture;
 
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.SmtpMailer;
@@ -24,10 +25,13 @@ public class MailUserChallengeHandler extends UserChallengeHandler {
 		String text = sb.toString();
 		String recipient = user.getEmail();
 		if (StringHelper.isEmpty(recipient)) {
-			String msg = "User {0} has no property {1}";
-			throw new RuntimeException(MessageFormat.format(msg, user.getUsername(), EMAIL));
+			String msg = "User {0} has no property {1}, so can not initiate challenge!";
+			logger.error(MessageFormat.format(msg, user.getUsername(), EMAIL));
+			return;
 		}
 
-		SmtpMailer.getInstance().sendMail(subject, text, recipient);
+		// send e-mail async
+		CompletableFuture.runAsync(() -> SmtpMailer.getInstance().sendMail(subject, text, recipient))
+				.whenComplete((unused, throwable) -> logger.error("Failed to send e-mail for user " + user, throwable));
 	}
 }
