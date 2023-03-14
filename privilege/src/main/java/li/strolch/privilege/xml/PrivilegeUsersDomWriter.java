@@ -90,7 +90,7 @@ public class PrivilegeUsersDomWriter {
 			// add password change requested element
 			if (user.isPasswordChangeRequested()) {
 				Element passwordChangeRequestedElement = doc.createElement(XmlConstants.XML_PASSWORD_CHANGE_REQUESTED);
-				localeElement.setTextContent(Boolean.toString(true));
+				passwordChangeRequestedElement.setTextContent(Boolean.toString(true));
 				userElement.appendChild(passwordChangeRequestedElement);
 			}
 
