@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="StrolchModel-1.6.xsd" xsi:schemaLocation="StrolchModel-1.6.xsd">
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/schema/StrolchModel.xsd"
+              xsi:schemaLocation="https://strolch.li/schema/StrolchModel.xsd https://strolch.li/xsd/StrolchModel-2.0.xsd">
 
-	<Order Id="@test1" Name="Test Order" Type="Order">
-		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-		</ParameterBag>
-	</Order>
-	<Resource Id="@test1" Name="Test Resource" Type="Resource">
-		<ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
-			<Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true" />
-		</ParameterBag>
-	</Resource>
+    <Order Id="@test1" Name="Test Order" Type="Order">
+        <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+            <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+        </ParameterBag>
+    </Order>
+    <Resource Id="@test1" Name="Test Resource" Type="Resource">
+        <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
+            <Parameter Id="@param1" Name="Boolean Param" Type="Boolean" Value="true"/>
+        </ParameterBag>
+    </Resource>
 
-	<IncludeFile file="resources/Resources.xml" />
-	<IncludeFile file="orders/Orders.xml" />
-	<IncludeFile file="activities/Activities.xml" />
+    <IncludeFile file="resources/Resources.xml"/>
+    <IncludeFile file="orders/Orders.xml"/>
+    <IncludeFile file="activities/Activities.xml"/>
 
 </StrolchModel>

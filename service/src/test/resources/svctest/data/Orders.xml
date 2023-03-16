@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
-              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/schema/StrolchModel.xsd"
+              xsi:schemaLocation="https://strolch.li/schema/StrolchModel.xsd https://strolch.li/xsd/StrolchModel-2.0.xsd">
     <Order Id="myCarOrder" Name="Car Production Order" Type="ProductionOrder" Date="2013-11-20T07:42:57.699+01:00" State="Created">
         <ParameterBag Id="@bag01" Name="Test Bag" Type="TestBag">
             <Parameter Id="@param7" Name="StringList Param" Type="StringList" Value="Hello;World"/>
