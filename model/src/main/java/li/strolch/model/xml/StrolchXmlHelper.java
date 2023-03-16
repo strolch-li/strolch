@@ -31,6 +31,10 @@ import org.slf4j.LoggerFactory;
 public class StrolchXmlHelper {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchXmlHelper.class);
+	public static final String W3C_XSD_URI = "http://www.w3.org/2001/XMLSchema-instance";
+	public static final String STROLCH_MODEL_NS_URI = "https://strolch.li/xsd/StrolchModel-2.0.xsd";
+	public static final String STROLCH_MODEL_NS = "https://strolch.li/schema/StrolchModel.xsd";
+	public static final String STROLCH_MODEL_XSD_LOCATION = STROLCH_MODEL_NS + " " + STROLCH_MODEL_NS_URI;
 
 	public static Resource parseAndReturnResource(String xml, String id) {
 		return parse(xml).getResource(id);
@@ -74,19 +78,19 @@ public class StrolchXmlHelper {
 	}
 
 	public static List<StrolchRootElement> parseFile(File file) {
-		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+		StrolchElementListenerToListListener elementListener = new StrolchElementListenerToListListener();
 		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
 		return elementListener.getElements();
 	}
 
 	public static Stream<StrolchRootElement> parseFileAsStream(File file) {
-		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+		StrolchElementListenerToListListener elementListener = new StrolchElementListenerToListListener();
 		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
 		return elementListener.streamElements();
 	}
 
 	public static List<StrolchRootElement> parseStream(InputStream stream, String encoding) {
-		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
+		StrolchElementListenerToListListener elementListener = new StrolchElementListenerToListListener();
 		new XmlModelSaxStreamReader(elementListener, stream, encoding).parseStream();
 		return elementListener.getElements();
 	}
@@ -102,9 +106,13 @@ public class StrolchXmlHelper {
 	}
 
 	public static void writeToFile(File file, Stream<? extends StrolchRootElement> elements) {
+		writeToFile(file, elements, false);
+	}
+
+	public static void writeToFile(File file, Stream<? extends StrolchRootElement> elements, boolean withNamespace) {
 		int size;
 		try (OutputStream out = Files.newOutputStream(file.toPath())) {
-			size = writeToStream(out, elements);
+			size = writeToStream(out, elements, withNamespace);
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to write elements to " + file, e);
 		}
@@ -135,7 +143,12 @@ public class StrolchXmlHelper {
 	}
 
 	public static int writeToStream(OutputStream out, Stream<? extends StrolchRootElement> elements) throws Exception {
-		XMLStreamWriter writer = prepareXmlStreamWriter(out);
+		return writeToStream(out, elements, false);
+	}
+
+	public static int writeToStream(OutputStream out, Stream<? extends StrolchRootElement> elements,
+			boolean withNamespace) throws Exception {
+		XMLStreamWriter writer = prepareXmlStreamWriter(out, withNamespace);
 		AtomicInteger size = new AtomicInteger();
 		elements.peek(e -> size.incrementAndGet()).forEach(e -> e.accept(new StrolchElementToSaxWriterVisitor(writer)));
 		writer.writeEndDocument();
@@ -153,20 +166,40 @@ public class StrolchXmlHelper {
 
 	public static XMLStreamWriter prepareXmlStreamWriter(OutputStream out)
 			throws FactoryConfigurationError, XMLStreamException {
+		return prepareXmlStreamWriter(out, false);
+	}
+
+	public static XMLStreamWriter prepareXmlStreamWriter(OutputStream out, boolean withNamespace)
+			throws FactoryConfigurationError, XMLStreamException {
 
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		XMLStreamWriter writer = factory.createXMLStreamWriter(out, DEFAULT_ENCODING);
 
-		return prepareXmlStreamWriter(writer);
+		if (withNamespace)
+			writer.setDefaultNamespace(STROLCH_MODEL_NS);
+
+		return prepareXmlStreamWriter(writer, withNamespace);
 	}
 
 	public static XMLStreamWriter prepareXmlStreamWriter(XMLStreamWriter writer)
+			throws FactoryConfigurationError, XMLStreamException {
+		return prepareXmlStreamWriter(writer, false);
+	}
+
+	public static XMLStreamWriter prepareXmlStreamWriter(XMLStreamWriter writer, boolean withNamespace)
 			throws FactoryConfigurationError, XMLStreamException {
 
 		writer = new IndentingXMLStreamWriter(writer);
 
 		writer.writeStartDocument(DEFAULT_ENCODING, DEFAULT_XML_VERSION);
 		writer.writeStartElement(Tags.STROLCH_MODEL);
+
+		if (withNamespace) {
+			writer.writeAttribute(STROLCH_MODEL_NS, "xmlns:xsi", W3C_XSD_URI);
+			writer.writeAttribute(STROLCH_MODEL_NS, "xmlns", STROLCH_MODEL_NS);
+			writer.writeAttribute(STROLCH_MODEL_NS, "xsi:schemaLocation", STROLCH_MODEL_XSD_LOCATION);
+		}
+
 		return writer;
 	}
 }
