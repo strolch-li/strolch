@@ -11,7 +11,6 @@ public class ReportElement {
 	private final Function<String, String> columnGetter;
 
 	public ReportElement(List<String> columnKeys, Function<String, String> columnGetter) {
-		super();
 		this.columnGetter = columnGetter;
 		this.columnKeys = columnKeys;
 	}
