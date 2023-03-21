@@ -142,7 +142,9 @@ public class GenericReport extends ReportPolicy {
 		if (this.reportRes.hasParameterBag(BAG_ORDERING)) {
 			ParameterBag orderingBag = this.reportRes.getParameterBag(BAG_ORDERING, true);
 			if (orderingBag.hasParameters()) {
-				this.orderingParams = orderingBag.getParameters().stream().map(e -> (StringParameter) e)
+				this.orderingParams = orderingBag.getParameters()
+						.stream()
+						.map(e -> (StringParameter) e)
 						.collect(toList());
 				this.orderingParams.sort(comparingInt(AbstractParameter::getIndex));
 			}
@@ -493,17 +495,24 @@ public class GenericReport extends ReportPolicy {
 	 */
 	@Override
 	public Stream<ReportElement> doReport() {
-		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> {
-			StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
-			Object value = evaluateColumnValue(columnDefP, e, false);
-			if (value instanceof ZonedDateTime)
-				return ISO8601.toString((ZonedDateTime) value);
-			if (value instanceof Date)
-				return ISO8601.toString((Date) value);
-			if (value instanceof Parameter)
-				return ((Parameter<?>) value).getValueAsString();
+		return buildStream().map(e -> new ReportElement(this.columnIds, columnId -> formatColumn(e, columnId)));
+	}
+
+	protected String formatColumn(Map<String, StrolchRootElement> row, String columnId) {
+		StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
+		Object value = evaluateColumnValue(columnDefP, row, false);
+		if (value instanceof ZonedDateTime) {
+			return ISO8601.toString((ZonedDateTime) value);
+		} else if (value instanceof Date) {
+			return ISO8601.toString((Date) value);
+		} else if (value instanceof Parameter) {
+			return formatColumn((Parameter<?>) value);
+		} else
 			return value.toString();
-		}));
+	}
+
+	protected String formatColumn(Parameter<?> param) {
+		return param.getValueAsString();
 	}
 
 	@Override
@@ -584,20 +593,14 @@ public class GenericReport extends ReportPolicy {
 				if (!this.directCriteria.contains(type))
 					return;
 				StringParameter filterCriteriaP = this.filterCriteriaParams.get(type);
-				Stream<? extends StrolchRootElement> stream;
-				switch (filterCriteriaP.getInterpretation()) {
-				case INTERPRETATION_RESOURCE_REF:
-					stream = tx().streamResources(filterCriteriaP.getUom());
-					break;
-				case INTERPRETATION_ORDER_REF:
-					stream = tx().streamOrders(filterCriteriaP.getUom());
-					break;
-				case INTERPRETATION_ACTIVITY_REF:
-					stream = tx().streamActivities(filterCriteriaP.getUom());
-					break;
-				default:
-					throw new IllegalArgumentException("Unhandled element type " + filterCriteriaP.getInterpretation());
-				}
+				Stream<? extends StrolchRootElement> stream = switch (filterCriteriaP.getInterpretation()) {
+					case INTERPRETATION_RESOURCE_REF -> tx().streamResources(filterCriteriaP.getUom());
+					case INTERPRETATION_ORDER_REF -> tx().streamOrders(filterCriteriaP.getUom());
+					case INTERPRETATION_ACTIVITY_REF -> tx().streamActivities(filterCriteriaP.getUom());
+					default -> throw new IllegalArgumentException(
+							"Unhandled filter criteria interpretation " + filterCriteriaP.getInterpretation() + " for "
+									+ filterCriteriaP.getLocator());
+				};
 
 				stream = stream.map(this::mapFilterCriteria).filter(this::filterDirectCriteria);
 
@@ -628,8 +631,10 @@ public class GenericReport extends ReportPolicy {
 			}
 
 			// stop if we have enough data
-			if (result.stream().filter(e -> !this.directCriteria.contains(e.getKey()))
-					.mapToInt(e -> e.getValue().size()).allMatch(v -> v >= maxFacetValues))
+			if (result.stream()
+					.filter(e -> !this.directCriteria.contains(e.getKey()))
+					.mapToInt(e -> e.getValue().size())
+					.allMatch(v -> v >= maxFacetValues))
 				break;
 		}
 
@@ -705,8 +710,8 @@ public class GenericReport extends ReportPolicy {
 	}
 
 	/**
-	 * Implements a sorting of the given two rows. This implementation using the ordering as is defined in {@link
-	 * ReportConstants#BAG_ORDERING}
+	 * Implements a sorting of the given two rows. This implementation using the ordering as is defined in
+	 * {@link ReportConstants#BAG_ORDERING}
 	 *
 	 * @param row1
 	 * 		the left side
@@ -767,8 +772,8 @@ public class GenericReport extends ReportPolicy {
 	}
 
 	/**
-	 * Returns true if a filter is defined, i.e. {@link ParameterBag ParameterBags} of type {@link
-	 * ReportConstants#TYPE_FILTER}, a date range
+	 * Returns true if a filter is defined, i.e. {@link ParameterBag ParameterBags} of type
+	 * {@link ReportConstants#TYPE_FILTER}, a date range
 	 *
 	 * @return true if a filter is defined
 	 */
@@ -934,7 +939,7 @@ public class GenericReport extends ReportPolicy {
 				columnValue = parameter;
 		} else {
 			columnValue = lookupParameter(columnDefP, column, allowNull) //
-					.orElseGet(() -> allowNull ? null : new StringParameter());
+					.orElseGet(() -> allowNull ? null : new StringParameter(columnDefP.getValue(), columnDef, ""));
 		}
 
 		return columnValue;
@@ -1129,7 +1134,9 @@ public class GenericReport extends ReportPolicy {
 							+ dependency.getLocator() + " has no ParameterBag " + BAG_RELATIONS);
 
 		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType)
-				.stream().filter(p -> p.getValueType() == StrolchValueType.STRING).collect(toList());
+				.stream()
+				.filter(p -> p.getValueType() == StrolchValueType.STRING)
+				.collect(toList());
 
 		if (relationParams.isEmpty())
 			throw new IllegalStateException("Found no relation parameters with UOM " + joinType + " of type "

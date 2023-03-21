@@ -38,6 +38,7 @@ public class ISO8601 implements DateFormat {
 	private static final Logger logger = LoggerFactory.getLogger(ISO8601.class);
 
 	public static final Date EMPTY_VALUE = parseToDate("-");
+	public static final ZonedDateTime YEAR_3000 = LocalDate.of(3000, 1, 1).atStartOfDay(systemDefault());
 
 	public static final ZonedDateTime EMPTY_VALUE_ZONED_DATE = ZonedDateTime.ofInstant(EMPTY_VALUE.toInstant(),
 			systemDefault());
@@ -193,23 +194,13 @@ public class ISO8601 implements DateFormat {
 	}
 
 	public static DateTimeFormatter getIso8601Formatter(ChronoField precision) {
-		switch (precision) {
-
-		case SECOND_OF_MINUTE:
-			return OFFSET_DATE_TIME_SECONDS;
-
-		case MILLI_OF_SECOND:
-			return OFFSET_DATE_TIME_MILLIS;
-
-		case MICRO_OF_SECOND:
-			return OFFSET_DATE_TIME_MICROS;
-
-		case NANO_OF_SECOND:
-			return OFFSET_DATE_TIME_NANOS;
-
-		default:
-			throw new IllegalArgumentException("Unsupported precision " + precision);
-		}
+		return switch (precision) {
+			case SECOND_OF_MINUTE -> OFFSET_DATE_TIME_SECONDS;
+			case MILLI_OF_SECOND -> OFFSET_DATE_TIME_MILLIS;
+			case MICRO_OF_SECOND -> OFFSET_DATE_TIME_MICROS;
+			case NANO_OF_SECOND -> OFFSET_DATE_TIME_NANOS;
+			default -> throw new IllegalArgumentException("Unsupported precision " + precision);
+		};
 	}
 
 	public static void main(String[] args) {

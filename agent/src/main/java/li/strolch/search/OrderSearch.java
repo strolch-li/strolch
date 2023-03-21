@@ -55,4 +55,10 @@ public class OrderSearch extends StrolchSearch<Order> {
 		super.where(state().isEqualTo(state));
 		return this;
 	}
+
+	@Override
+	public OrderSearch internal() {
+		super.internal();
+		return this;
+	}
 }

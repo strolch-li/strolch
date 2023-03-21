@@ -25,4 +25,10 @@ public class ResourceSearch extends StrolchSearch<Resource> {
 		super.where(expression);
 		return this;
 	}
+
+	@Override
+	public ResourceSearch internal() {
+		super.internal();
+		return this;
+	}
 }

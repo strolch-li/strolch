@@ -130,7 +130,8 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public void addMessage(LogMessage logMessage) {
-		this.queue.add(() -> _addMessage(logMessage));
+		if (this.queue != null)
+			this.queue.add(() -> _addMessage(logMessage));
 	}
 
 	public void removeMessage(LogMessage message) {

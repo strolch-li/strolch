@@ -19,10 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import li.strolch.privilege.base.AccessDeniedException;
-import li.strolch.privilege.base.NotAuthenticatedException;
-import li.strolch.privilege.base.PrivilegeConflictResolution;
-import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.base.*;
 import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
@@ -40,8 +37,8 @@ public interface PrivilegeHandler {
 	///
 
 	/**
-	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g. s {@link
-	 * #PRIVILEGE_ACTION_PERSIST} and {@link #PRIVILEGE_ACTION_GET_POLICIES}
+	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g. s
+	 * {@link #PRIVILEGE_ACTION_PERSIST} and {@link #PRIVILEGE_ACTION_GET_POLICIES}
 	 */
 	String PRIVILEGE_ACTION = "PrivilegeAction";
 
@@ -360,7 +357,7 @@ public interface PrivilegeHandler {
 	 *
 	 * <p>
 	 * If the password given is null, then the user is created, but can not not login! Otherwise the password must meet
-	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(char[])}
+	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(Locale, char[])}
 	 * </p>
 	 *
 	 * @param certificate
@@ -369,7 +366,7 @@ public interface PrivilegeHandler {
 	 * 		the {@link UserRep} containing the information to create the new {@link User}
 	 * @param password
 	 * 		the password of the new user. If the password is null, then this is accepted but the user can not login,
-	 * 		otherwise the password must be validated against {@link PrivilegeHandler#validatePassword(char[])}
+	 * 		otherwise the password must be validated against {@link PrivilegeHandler#validatePassword(Locale, char[])}
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user for this certificate may not perform the action
@@ -386,8 +383,6 @@ public interface PrivilegeHandler {
 	 * 		the {@link Certificate} of the user which has the privilege to perform this action
 	 * @param userReps
 	 * 		the list of users to add or update
-	 *
-	 * @throws PrivilegeException
 	 */
 	void addOrUpdateUsers(Certificate certificate, List<UserRep> userReps) throws PrivilegeException;
 
@@ -397,7 +392,7 @@ public interface PrivilegeHandler {
 	 * will be updated on the existing user. The username on the given {@link UserRep} must be set and correspond to an
 	 * existing user.
 	 * </p>
-	 *
+	 * <p>
 	 * The following fields are considered updateable:
 	 * <ul>
 	 * <li>{@link UserRep#getFirstname()}</li>
@@ -429,7 +424,7 @@ public interface PrivilegeHandler {
 	 *
 	 * <p>
 	 * If the password given is null, then the user is created, but can not not login! Otherwise the password must meet
-	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(char[])}
+	 * the requirements of the implementation under {@link PrivilegeHandler#validatePassword(Locale, char[])}
 	 * </p>
 	 *
 	 * @param certificate
@@ -438,7 +433,7 @@ public interface PrivilegeHandler {
 	 * 		the {@link UserRep} containing the information to replace the existing {@link User}
 	 * @param password
 	 * 		the password of the new user. If the password is null, then this is accepted but the user can not login,
-	 * 		otherwise the password must be validated against {@link PrivilegeHandler#validatePassword(char[])}
+	 * 		otherwise the password must be validated against {@link PrivilegeHandler#validatePassword(Locale, char[])}
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user for this certificate may not perform the action
@@ -515,8 +510,8 @@ public interface PrivilegeHandler {
 	/**
 	 * <p>
 	 * Changes the password for the {@link User} with the given username. If the password is null, then the {@link User}
-	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under {@link
-	 * PrivilegeHandler#validatePassword(char[])}
+	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under
+	 * {@link PrivilegeHandler#validatePassword(Locale, char[])}
 	 * </p>
 	 *
 	 * <p>
@@ -529,7 +524,8 @@ public interface PrivilegeHandler {
 	 * 		the username of the {@link User} for which the password is to be changed
 	 * @param password
 	 * 		the new password for this user. If the password is null, then the {@link User} can not login anymore. Otherwise
-	 * 		the password must meet the requirements of the implementation under {@link PrivilegeHandler#validatePassword(char[])}
+	 * 		the password must meet the requirements of the implementation under
+	 *        {@link PrivilegeHandler#validatePassword(Locale, char[])}
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user for this certificate may not perform the action
@@ -653,7 +649,7 @@ public interface PrivilegeHandler {
 	 * 		the username of the {@link User} which is registered in the {@link PersistenceHandler}
 	 * @param password
 	 * 		the password with which this user is to be authenticated. Null passwords are not accepted and they must meet
-	 * 		the requirements of the {@link #validatePassword(char[])}-method
+	 * 		the requirements of the {@link #validatePassword(Locale, char[])}-method
 	 * @param keepAlive
 	 * 		should this session be kept alive
 	 *
@@ -672,7 +668,7 @@ public interface PrivilegeHandler {
 	 * 		the username of the {@link User} which is registered in the {@link PersistenceHandler}
 	 * @param password
 	 * 		the password with which this user is to be authenticated. Null passwords are not accepted and they must meet
-	 * 		the requirements of the {@link #validatePassword(char[])}-method
+	 * 		the requirements of the {@link #validatePassword(Locale, char[])}-method
 	 * @param source
 	 * 		the source of the authentication request, i.e. remote IP
 	 * @param usage
@@ -763,7 +759,7 @@ public interface PrivilegeHandler {
 	/**
 	 * Checks if the given {@link Certificate} is valid. This means that the certificate is for a valid session and that
 	 * the user exists for the certificate. This method checks if the {@link Certificate} has been tampered with
-	 *
+	 * <p>
 	 * Returns the {@link PrivilegeContext} for the given {@link Certificate}. The {@link PrivilegeContext} is an
 	 * encapsulated state of a user's privileges so that for the duration of a user's call, the user can perform their
 	 * actions and do not need to access the {@link PrivilegeHandler} anymore
@@ -798,7 +794,7 @@ public interface PrivilegeHandler {
 	/**
 	 * Checks if the given {@link Certificate} is valid. This means that the certificate is for a valid session and that
 	 * the user exists for the certificate. This method checks if the {@link Certificate} has been tampered with
-	 *
+	 * <p>
 	 * Returns the {@link PrivilegeContext} for the given {@link Certificate}. The {@link PrivilegeContext} is an
 	 * encapsulated state of a user's privileges so that for the duration of a user's call, the user can perform their
 	 * actions and do not need to access the {@link PrivilegeHandler} anymore
@@ -820,7 +816,7 @@ public interface PrivilegeHandler {
 	/**
 	 * @see li.strolch.privilege.handler.PasswordStrengthHandler#validateStrength(char[])
 	 */
-	void validatePassword(Locale locale, char[] password) throws PrivilegeException;
+	void validatePassword(Locale locale, char[] password) throws PasswordStrengthException;
 
 	/**
 	 * <p>
@@ -908,9 +904,9 @@ public interface PrivilegeHandler {
 
 	/**
 	 * Special method to open a {@link PrivilegeContext} as a System user, meaning the given systemUsername corresponds
-	 * to an account which has the state {@link UserState#SYSTEM}. This is used in cases where a system user's {@link
-	 * PrivilegeContext} should be open for a longer period of time, or where opening many {@link PrivilegeContext} is
-	 * resource intensive e.g. on low power devices.
+	 * to an account which has the state {@link UserState#SYSTEM}. This is used in cases where a system user's
+	 * {@link PrivilegeContext} should be open for a longer period of time, or where opening many
+	 * {@link PrivilegeContext} is resource intensive e.g. on low power devices.
 	 *
 	 * @param systemUsername
 	 * 		the username of the system user to perform the action as

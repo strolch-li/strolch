@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<StrolchModel xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd">
+<StrolchModel xmlns="https://strolch.li/schema/StrolchModel.xsd">
 
     <Resource Id="Product" Name="Product Template" Type="Template">
         <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">

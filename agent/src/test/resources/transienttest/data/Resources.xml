@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/xsd/StrolchModel-1.6.xsd"
-              xsi:schemaLocation="https://strolch.li/xsd/StrolchModel-1.6.xsd StrolchModel-1.6.xsd">
+<StrolchModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://strolch.li/schema/StrolchModel.xsd"
+              xsi:schemaLocation="https://strolch.li/schema/StrolchModel.xsd https://strolch.li/xsd/StrolchModel-2.0.xsd">
     <Resource Id="otherResource" Name="Yellow" Type="OtherResource">
         <ParameterBag Id="parameters" Name="parameters" Type="Parameters">
             <Parameter Id="color" Name="Color" Type="String" Value="yellow"/>

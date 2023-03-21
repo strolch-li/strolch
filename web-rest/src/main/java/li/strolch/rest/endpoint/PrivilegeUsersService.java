@@ -15,17 +15,13 @@
  */
 package li.strolch.rest.endpoint;
 
+import static jakarta.ws.rs.core.Response.Status.NOT_ACCEPTABLE;
 import static java.util.Comparator.comparing;
 import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
 import static li.strolch.rest.helper.ResponseUtil.toResponse;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Base64;
@@ -33,11 +29,17 @@ import java.util.List;
 import java.util.Locale;
 
 import com.google.gson.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Tags;
 import li.strolch.model.json.PrivilegeElementFromJsonVisitor;
 import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.base.PasswordStrengthException;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.UserRep;
@@ -312,8 +314,11 @@ public class PrivilegeUsersService {
 		arg.password = passwordString.toCharArray();
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
-		if (svcResult.isNok())
+		if (svcResult.isNok()) {
+			if (svcResult.getRootCause() instanceof PasswordStrengthException)
+				return toResponse(NOT_ACCEPTABLE, svcResult.getRootCause());
 			return toResponse(svcResult);
+		}
 
 		// if user changes their own password, then invalidate the session
 		if (cert.getUsername().equals(username)) {

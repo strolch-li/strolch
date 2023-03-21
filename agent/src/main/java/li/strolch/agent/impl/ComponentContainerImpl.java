@@ -78,7 +78,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	@Override
 	public boolean hasComponent(Class<?> clazz) {
-		return this.componentMap.containsKey(clazz);
+		return this.componentMap != null && this.componentMap.containsKey(clazz);
 	}
 
 	@Override
