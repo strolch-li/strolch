@@ -229,7 +229,7 @@ public class OrderModelTestRunner {
 
 		// create 15 orders
 		List<Order> orders = new ArrayList<>();
-		orders.addAll(createOrders(orders.size(), 5, "@", "My Order", "MyType1"));
+		orders.addAll(createOrders(0, 5, "@", "My Order", "MyType1"));
 		orders.addAll(createOrders(orders.size(), 5, "@", "Other Order", "MyType2"));
 		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order", "MyType3"));
 

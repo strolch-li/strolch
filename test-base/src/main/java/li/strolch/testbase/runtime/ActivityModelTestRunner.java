@@ -164,7 +164,7 @@ public class ActivityModelTestRunner {
 
 		// create 15 activities
 		List<Activity> activities = new ArrayList<>();
-		activities.addAll(createActivities(activities.size(), 5, "@", "My Activity", "MyType1", TimeOrdering.SERIES));
+		activities.addAll(createActivities(0, 5, "@", "My Activity", "MyType1", TimeOrdering.SERIES));
 		activities
 				.addAll(createActivities(activities.size(), 5, "@", "Other Activity", "MyType2", TimeOrdering.SERIES));
 		activities.addAll(createActivities(activities.size(), 5, "@", "Further Activity", "MyType3",

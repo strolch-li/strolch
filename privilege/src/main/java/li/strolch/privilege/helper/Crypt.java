@@ -81,7 +81,7 @@ public class Crypt {
 				setAlgorithm(parts[1], true);
 
 				Map<String, String> algOptions = parseAlgOptions(parts[2]);
-				if (algOptions == null)
+				if (!algOptions.containsKey("rounds"))
 					this.iterations = DEFAULT_SMALL_ITERATIONS;
 				else
 					this.iterations = Integer.parseInt(algOptions.get("rounds"));

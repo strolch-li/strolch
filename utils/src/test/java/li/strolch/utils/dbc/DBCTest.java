@@ -31,31 +31,21 @@ import org.junit.Test;
  *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  * @version $Revision: 1.0 $
- * @generatedBy CodePro at 2/2/14 8:13 PM
  */
 @SuppressWarnings("nls")
 public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertEquals_1() {
 		String msg = "";
-		Object value1 = null;
-		Object value2 = null;
-
-		DBC.PRE.assertEquals(msg, value1, value2);
-
-		// add additional test code here
+		DBC.PRE.assertEquals(msg, null, null);
 	}
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertEquals_2() {
@@ -63,48 +53,43 @@ public class DBCTest {
 		Object value2 = new Object();
 		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
 
-		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> DBC.PRE.assertEquals(msg, value1, value2));
+		DbcException dbcException = Assert.assertThrows(DbcException.class,
+				() -> DBC.PRE.assertEquals(msg, value1, value2));
 
 		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertEquals_3() {
-		Object value1 = null;
 		Object value2 = new Object();
-		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
+		String msg = MessageFormat.format("{0}: {1} != {2}", "", null, value2);
 
-		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> DBC.PRE.assertEquals(msg, value1, value2));
+		DbcException dbcException = Assert.assertThrows(DbcException.class,
+				() -> DBC.PRE.assertEquals(msg, null, value2));
 
 		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertEquals_4() {
 		Object value1 = new Object();
-		Object value2 = null;
 
-		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, value2);
+		String msg = MessageFormat.format("{0}: {1} != {2}", "", value1, null);
 
-		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> DBC.PRE.assertEquals(msg, value1, value2));
+		DbcException dbcException = Assert.assertThrows(DbcException.class,
+				() -> DBC.PRE.assertEquals(msg, value1, null));
 
 		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertEquals_5() {
@@ -122,27 +107,22 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotEquals_1() {
 		String msg = "";
-		Object value1 = null;
-		Object value2 = null;
 
 		String ex = "{0}: {1} == {2}";
-		String expectedMsg = MessageFormat.format(ex, msg, value1, value2);
+		String expectedMsg = MessageFormat.format(ex, msg, null, null);
 
-		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> DBC.PRE.assertNotEquals(expectedMsg, value1, value2));
+		DbcException dbcException = Assert.assertThrows(DbcException.class,
+				() -> DBC.PRE.assertNotEquals(expectedMsg, null, null));
 
 		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotEquals_2() {
@@ -155,36 +135,28 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotEquals_3() {
 		String msg = "";
-		Object value1 = null;
 		Object value2 = new Object();
 
-		DBC.PRE.assertNotEquals(msg, value1, value2);
+		DBC.PRE.assertNotEquals(msg, null, value2);
 	}
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotEquals_4() {
 		String msg = "";
 		Object value1 = new Object();
-		Object value2 = null;
 
-		DBC.PRE.assertNotEquals(msg, value1, value2);
+		DBC.PRE.assertNotEquals(msg, value1, null);
 	}
 
 	/**
 	 * Run the void assertEquals(String,Object,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotEquals_5() {
@@ -195,15 +167,14 @@ public class DBCTest {
 		String ex = "{0}: {1} == {2}";
 		String expectedMsg = MessageFormat.format(ex, msg, value1, value2);
 
-		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> DBC.PRE.assertNotEquals(expectedMsg, value1, value2));
+		DbcException dbcException = Assert.assertThrows(DbcException.class,
+				() -> DBC.PRE.assertNotEquals(expectedMsg, value1, value2));
 
 		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
 	 * Run the void assertExists(String,File) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertExists_1() {
@@ -215,8 +186,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertExists(String,File) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertExists_2() {
@@ -230,8 +199,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertFalse(String,boolean) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertFalse_1() {
@@ -245,8 +212,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertFalse(String,boolean) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertFalse_2() {
@@ -260,8 +225,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotEmpty(String,String) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotEmpty_1() {
@@ -275,8 +238,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotEmpty(String,String) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotEmpty_2() {
@@ -288,8 +249,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotExists(String,File) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotExists_1() {
@@ -303,8 +262,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotExists(String,File) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotExists_2() {
@@ -318,26 +275,22 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNotNull(String,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotNull_1() {
 		String msg = "";
-		Object value = null;
 
 		String ex = "{0}: Illegal null value";
-		String expectedMsg = MessageFormat.format(ex, msg, value);
+		String expectedMsg = MessageFormat.format(ex, msg, null);
 
-		DbcException dbcException = Assert.assertThrows(DbcException.class, () -> DBC.PRE.assertNotNull(expectedMsg, value));
+		DbcException dbcException = Assert.assertThrows(DbcException.class,
+				() -> DBC.PRE.assertNotNull(expectedMsg, null));
 
 		assertThat(dbcException.getMessage(), containsString(msg));
 	}
 
 	/**
 	 * Run the void assertNotNull(String,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNotNull_2() {
@@ -351,8 +304,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNull(String,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNull_1() {
@@ -367,23 +318,18 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertNull(String,Object) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertNull_2() {
 		String msg = "";
-		Object value = null;
 
-		DBC.PRE.assertNull(msg, value);
+		DBC.PRE.assertNull(msg, null);
 
 		// add additional test code here
 	}
 
 	/**
 	 * Run the void assertTrue(String,boolean) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertTrue_1() {
@@ -397,8 +343,6 @@ public class DBCTest {
 
 	/**
 	 * Run the void assertTrue(String,boolean) method test.
-	 *
-	 * @generatedBy CodePro at 2/2/14 8:13 PM
 	 */
 	@Test
 	public void testAssertTrue_2() {

@@ -53,7 +53,7 @@ public class StrolchElementFromDomVisitor {
 			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(date));
 		}
 
-		if (state == null || state.isEmpty()) {
+		if (state.isEmpty()) {
 			order.setState(State.CREATED);
 		} else {
 			order.setState(State.parse(state));
@@ -169,7 +169,7 @@ public class StrolchElementFromDomVisitor {
 		String id = element.getAttribute(Tags.ID);
 		String name = element.getAttribute(Tags.NAME);
 
-		if (id != null && name != null) {
+		if (!id.isEmpty() && !name.isEmpty()) {
 			strolchElement.setId(id);
 			strolchElement.setName(name);
 		} else {

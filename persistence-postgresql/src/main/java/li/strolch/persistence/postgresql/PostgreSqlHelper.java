@@ -92,7 +92,7 @@ public class PostgreSqlHelper {
 				}
 				sb.append(" )\n");
 			}
-		} else if (!mm.isEquals() && mm.isCaseSensitve()) {
+		} else if (mm.isCaseSensitve()) {
 			if (query.length == 1) {
 				sb.append(column).append(" like ?\n");
 				values.add("%" + query[0] + "%");

@@ -160,7 +160,7 @@ public class ResourceModelTestRunner {
 
 		// create 15 resources
 		List<Resource> resources = new ArrayList<>();
-		resources.addAll(createResources(resources.size(), 5, "@", "My Resource", "MyType1"));
+		resources.addAll(createResources(0, 5, "@", "My Resource", "MyType1"));
 		resources.addAll(createResources(resources.size(), 5, "@", "Other Resource", "MyType2"));
 		resources.addAll(createResources(resources.size(), 5, "@", "Further Resource", "MyType3"));
 
