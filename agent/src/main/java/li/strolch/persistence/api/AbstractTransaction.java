@@ -560,7 +560,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				throw new StrolchModelException(MessageFormat.format(msg, locator));
 			}
 
-			@SuppressWarnings("ConstantConditions")
 			Resource resource = (Resource) rootElement;
 			String stateId = elements.get(4);
 
