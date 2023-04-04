@@ -560,7 +560,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				throw new StrolchModelException(MessageFormat.format(msg, locator));
 			}
 
-			Resource resource = (Resource) rootElement;
+			Resource resource = rootElement.asResource();
 			String stateId = elements.get(4);
 
 			StrolchTimedState<IValue<?>> timedState = resource.getTimedState(stateId);
