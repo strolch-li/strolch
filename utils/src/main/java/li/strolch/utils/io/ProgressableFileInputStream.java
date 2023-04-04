@@ -31,6 +31,8 @@ import java.io.IOException;
  */
 public class ProgressableFileInputStream extends FileInputStream {
 
+	private final Object lock = new Object();
+
 	private final long fileSize;
 	private volatile long bytesRead;
 	private volatile boolean closed;
@@ -54,7 +56,7 @@ public class ProgressableFileInputStream extends FileInputStream {
 	 */
 	@Override
 	public int read() throws IOException {
-		synchronized (this) {
+		synchronized (this.lock) {
 			this.bytesRead++;
 		}
 		return super.read();
@@ -67,7 +69,7 @@ public class ProgressableFileInputStream extends FileInputStream {
 	public int read(byte[] b, int off, int len) throws IOException {
 		int read = super.read(b, off, len);
 		if (read != -1) {
-			synchronized (this) {
+			synchronized (this.lock) {
 				this.bytesRead += read;
 			}
 		}
@@ -81,7 +83,7 @@ public class ProgressableFileInputStream extends FileInputStream {
 	public int read(byte[] b) throws IOException {
 		int read = super.read(b);
 		if (read != -1) {
-			synchronized (this) {
+			synchronized (this.lock) {
 				this.bytesRead += read;
 			}
 		}
@@ -95,7 +97,7 @@ public class ProgressableFileInputStream extends FileInputStream {
 	public long skip(long n) throws IOException {
 		long skip = super.skip(n);
 		if (skip != -1) {
-			synchronized (this) {
+			synchronized (this.lock) {
 				this.bytesRead += skip;
 			}
 		}
@@ -126,10 +128,8 @@ public class ProgressableFileInputStream extends FileInputStream {
 	 * @return the number of bytes already read
 	 */
 	public long getBytesRead() {
-		synchronized (this) {
-			if (this.bytesRead > this.fileSize)
-				this.bytesRead = this.fileSize;
-			return this.bytesRead;
+		synchronized (this.lock) {
+			return Math.min(this.bytesRead, this.fileSize);
 		}
 	}
 
@@ -141,10 +141,8 @@ public class ProgressableFileInputStream extends FileInputStream {
 	public int getPercentComplete() {
 
 		long currentRead;
-		synchronized (this) {
-			if (this.bytesRead > this.fileSize)
-				this.bytesRead = this.fileSize;
-			currentRead = this.bytesRead;
+		synchronized (this.lock) {
+			currentRead = Math.min(this.bytesRead, this.fileSize);
 		}
 
 		double read = (100.0d / this.fileSize * currentRead);
