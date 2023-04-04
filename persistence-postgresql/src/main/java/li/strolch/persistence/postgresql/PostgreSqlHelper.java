@@ -130,39 +130,4 @@ public class PostgreSqlHelper {
 
 		return sb.toString();
 	}
-
-	public static void main(String[] args) {
-		ArrayList<Object> values = new ArrayList<>();
-		String sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_INSENSITIVE, values, "foo", "bar", "fub");
-		System.out.println(sql);
-		System.out.println();
-
-		sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_INSENSITIVE, values, "foo");
-		System.out.println(sql);
-		System.out.println();
-
-		sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_SENSITIVE, values, "foo", "bar", "fub");
-		System.out.println(sql);
-		System.out.println();
-
-		sql = toSql("name", "  ", StringMatchMode.CONTAINS_CASE_SENSITIVE, values, "foo");
-		System.out.println(sql);
-		System.out.println();
-
-		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_INSENSITIVE, values, "foo", "bar", "fub");
-		System.out.println(sql);
-		System.out.println();
-
-		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_INSENSITIVE, values, "foo");
-		System.out.println(sql);
-		System.out.println();
-
-		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_SENSITIVE, values, "foo", "bar", "fub");
-		System.out.println(sql);
-		System.out.println();
-
-		sql = toSql("name", "  ", StringMatchMode.EQUALS_CASE_SENSITIVE, values, "foo");
-		System.out.println(sql);
-		System.out.println();
-	}
 }
