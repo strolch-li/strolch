@@ -96,10 +96,8 @@ public class ProgressableFileInputStream extends FileInputStream {
 	@Override
 	public long skip(long n) throws IOException {
 		long skip = super.skip(n);
-		if (skip != -1) {
-			synchronized (this.lock) {
-				this.bytesRead += skip;
-			}
+		synchronized (this.lock) {
+			this.bytesRead += skip;
 		}
 		return skip;
 	}
