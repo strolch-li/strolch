@@ -3,7 +3,6 @@ package javanet.staxutils;
 /**
  * Characters that represent line breaks and indentation. These are represented as String-valued JavaBean properties.
  */
-@SuppressWarnings("nls")
 public interface Indentation {
 
 	/**

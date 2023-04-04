@@ -34,7 +34,6 @@ import li.strolch.agent.impl.DataStoreMode;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@SuppressWarnings("nls")
 public class RealmTest {
 
 	@Test

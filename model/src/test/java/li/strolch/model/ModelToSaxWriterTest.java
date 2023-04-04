@@ -34,7 +34,6 @@ import li.strolch.model.xml.XmlModelSaxStreamReader;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@SuppressWarnings("nls")
 public class ModelToSaxWriterTest extends ModelMarshallingTest {
 
 	@Override

@@ -565,7 +565,6 @@ public class FileHelper {
 	 *
 	 * @return the humanized form of the files size
 	 */
-	@SuppressWarnings("nls")
 	public static String humanizeFileSize(long fileSize) {
 		return DataUnit.Bytes.humanizeBytesValue(fileSize);
 	}

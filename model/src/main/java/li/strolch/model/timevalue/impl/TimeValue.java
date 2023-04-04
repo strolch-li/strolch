@@ -65,7 +65,6 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 		return this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public int compareTo(final ITimeValue<T> arg0) {
 		return getTime().compareTo(arg0.getTime());

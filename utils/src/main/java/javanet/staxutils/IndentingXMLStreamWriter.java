@@ -65,7 +65,6 @@ import javanet.staxutils.helpers.StreamWriterDelegate;
  *
  * @author <a href="mailto:jk2006@engineer.com">John Kristian</a>
  */
-@SuppressWarnings("nls")
 public class IndentingXMLStreamWriter extends StreamWriterDelegate implements Indentation {
 
 	public IndentingXMLStreamWriter(XMLStreamWriter out) {

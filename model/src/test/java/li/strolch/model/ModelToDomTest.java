@@ -31,7 +31,6 @@ import li.strolch.model.xml.StrolchElementToDomVisitor;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@SuppressWarnings("nls")
 public class ModelToDomTest extends ModelMarshallingTest {
 
 	protected Resource formatAndParseResource(Resource resource) {
