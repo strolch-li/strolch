@@ -24,11 +24,11 @@ import java.util.Map.Entry;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
-import li.strolch.handler.operationslog.OperationsLog;
-import li.strolch.model.Locator;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.Version;
 import li.strolch.utils.collections.MapOfLists;
@@ -141,8 +141,8 @@ public class Migrations {
 				for (Version version : list) {
 					LogMessage logMessage = new LogMessage(realm, SYSTEM_USER_AGENT,
 							locator.append(StrolchAgent.getUniqueId()), LogSeverity.Info, LogMessageState.Information,
-							ResourceBundle.getBundle("strolch-service"), "execution.handler.migrations.version")
-							.value("version", version.toString());
+							ResourceBundle.getBundle("strolch-service"), "execution.handler.migrations.version").value(
+							"version", version.toString());
 					operationsLog.addMessage(logMessage);
 				}
 			}
@@ -150,8 +150,7 @@ public class Migrations {
 	}
 
 	/**
-	 * @param cert
-	 * @param codeMigrationsByRealm
+	 *
 	 */
 	public void runCodeMigrations(Certificate cert, Map<String, MigrationVersion> currentVersions,
 			MapOfLists<String, CodeMigration> codeMigrationsByRealm) {
@@ -234,25 +233,30 @@ public class Migrations {
 		Map<String, SortedSet<DataMigration>> migrationsByRealm = new HashMap<>();
 
 		File dataDir = new File(migrationsPath, "data");
-		if (dataDir.exists()) {
-			DBC.PRE.assertTrue("migrations/data must be a directory!", dataDir.isDirectory());
+		if (!dataDir.exists())
+			return migrationsByRealm;
 
-			// only list directories where name is a realmName
-			File[] realmMigrations = dataDir.listFiles(path -> realmNames.contains(path.getName()));
+		DBC.PRE.assertTrue("migrations/data must be a directory!", dataDir.isDirectory());
 
-			for (File realmMigration : realmMigrations) {
-				String realm = realmMigration.getName();
+		// only list directories where name is a realmName
+		File[] realmMigrations = dataDir.listFiles(path -> realmNames.contains(path.getName()));
+		if (realmMigrations == null)
+			return migrationsByRealm;
 
-				SortedSet<DataMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
-				migrationsByRealm.put(realm, migrations);
+		for (File realmMigration : realmMigrations) {
+			String realm = realmMigration.getName();
 
-				File[] migrationFiles = realmMigration
-						.listFiles(pathname -> pathname.getName().endsWith(".xml"));
-				for (File file : migrationFiles) {
-					String name = file.getName();
-					Version version = Version.valueOf(name.substring(0, name.length() - 4));
-					migrations.add(new DataMigration(realm, version, file));
-				}
+			SortedSet<DataMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
+			migrationsByRealm.put(realm, migrations);
+
+			File[] migrationFiles = realmMigration.listFiles(pathname -> pathname.getName().endsWith(".xml"));
+			if (migrationFiles == null)
+				continue;
+
+			for (File file : migrationFiles) {
+				String name = file.getName();
+				Version version = Version.valueOf(name.substring(0, name.length() - 4));
+				migrations.add(new DataMigration(realm, version, file));
 			}
 		}
 
@@ -265,24 +269,29 @@ public class Migrations {
 		Map<String, SortedSet<CodeMigration>> migrationsByRealm = new HashMap<>(); //new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 
 		File codeDir = new File(migrationsPath, "code");
-		if (codeDir.exists()) {
-			DBC.PRE.assertTrue("migrations/code must be a directory!", codeDir.isDirectory());
+		if (!codeDir.exists())
+			return migrationsByRealm;
 
-			File[] realmMigrations = codeDir.listFiles(path -> realmNames.contains(path.getName()));
+		DBC.PRE.assertTrue("migrations/code must be a directory!", codeDir.isDirectory());
 
-			for (File realmMigration : realmMigrations) {
-				String realm = realmMigration.getName();
+		File[] realmMigrations = codeDir.listFiles(path -> realmNames.contains(path.getName()));
+		if (realmMigrations == null)
+			return migrationsByRealm;
 
-				SortedSet<CodeMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
-				migrationsByRealm.put(realm, migrations);
+		for (File realmMigration : realmMigrations) {
+			String realm = realmMigration.getName();
 
-				File[] migrationFiles = realmMigration
-						.listFiles(pathname -> pathname.getName().endsWith(".xml"));
-				for (File file : migrationFiles) {
-					String name = file.getName();
-					Version version = Version.valueOf(name.substring(0, name.length() - 4));
-					migrations.add(new CodeMigration(realm, version, file));
-				}
+			SortedSet<CodeMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
+			migrationsByRealm.put(realm, migrations);
+
+			File[] migrationFiles = realmMigration.listFiles(pathname -> pathname.getName().endsWith(".xml"));
+			if (migrationFiles == null)
+				continue;
+
+			for (File file : migrationFiles) {
+				String name = file.getName();
+				Version version = Version.valueOf(name.substring(0, name.length() - 4));
+				migrations.add(new CodeMigration(realm, version, file));
 			}
 		}
 
