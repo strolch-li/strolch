@@ -10,15 +10,15 @@ import java.util.stream.Stream;
 public class SynchronizedCollections {
 
 	public static <T, U> MapOfLists<T, U> synchronizedMapOfLists(MapOfLists<T, U> mapOfLists) {
-		return new SynchronizedMapOfLists<T, U>(mapOfLists);
+		return new SynchronizedMapOfLists<>(mapOfLists);
 	}
 
 	public static <T, U> MapOfSets<T, U> synchronizedMapOfSets(MapOfSets<T, U> mapOfSets) {
-		return new SynchronizedMapOfSets<T, U>(mapOfSets);
+		return new SynchronizedMapOfSets<>(mapOfSets);
 	}
 
 	public static <T, U, V> MapOfMaps<T, U, V> synchronizedMapOfMaps(MapOfMaps<T, U, V> mapOfMaps) {
-		return new SynchronizedMapOfMaps<T, U, V>(mapOfMaps);
+		return new SynchronizedMapOfMaps<>(mapOfMaps);
 	}
 
 	private static class SynchronizedMapOfLists<T, U> extends MapOfLists<T, U> {

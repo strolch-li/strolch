@@ -40,9 +40,9 @@ public class OrderModelTestRunner {
 	private static final String NAME = "Test Order";
 	private static final String TYPE = "ToStock";
 
-	private RuntimeMock runtimeMock;
-	private String realmName;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final String realmName;
+	private final Certificate certificate;
 
 	public OrderModelTestRunner(RuntimeMock runtimeMock, String realmName) {
 		this.runtimeMock = runtimeMock;

@@ -20,7 +20,6 @@ import static li.strolch.model.Tags.Json.*;
 import java.util.Properties;
 
 import com.google.gson.JsonObject;
-import li.strolch.model.Tags;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

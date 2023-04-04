@@ -22,10 +22,10 @@ import java.io.Serializable;
  */
 public class FilePart implements Serializable {
 
-	private String fileName;
+	private final String fileName;
 	private long fileLength;
 	private String fileHash;
-	private String fileType;
+	private final String fileType;
 
 	private long partOffset;
 	private int partLength;

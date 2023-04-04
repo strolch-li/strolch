@@ -12,8 +12,8 @@ import li.strolch.utils.Version;
  */
 public class MigrationVersion {
 
-	private Version dataVersion;
-	private Version codeVersion;
+	private final Version dataVersion;
+	private final Version codeVersion;
 
 	public MigrationVersion(Version dataVersion, Version codeVersion) {
 		this.dataVersion = dataVersion;

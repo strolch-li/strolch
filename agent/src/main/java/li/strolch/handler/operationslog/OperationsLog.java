@@ -355,6 +355,6 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	private interface LogTask {
-		void run() throws Exception;
+		void run();
 	}
 }

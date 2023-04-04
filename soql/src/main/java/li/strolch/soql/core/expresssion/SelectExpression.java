@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class SelectExpression extends AbstractObjectExpression {
 
-	private List<IObjectExpression> children = new ArrayList<>();
+	private final List<IObjectExpression> children = new ArrayList<>();
 
 	/**
 	 * @param inputObjects

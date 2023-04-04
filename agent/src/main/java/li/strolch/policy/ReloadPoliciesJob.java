@@ -12,7 +12,7 @@ public class ReloadPoliciesJob extends StrolchJob {
 	}
 
 	@Override
-	protected void execute(PrivilegeContext ctx) throws Exception {
+	protected void execute(PrivilegeContext ctx) {
 		PolicyHandler policyHandler = getContainer().getComponent(PolicyHandler.class);
 		policyHandler.reloadPolicies();
 	}

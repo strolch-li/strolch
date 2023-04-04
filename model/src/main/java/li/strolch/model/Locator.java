@@ -68,7 +68,7 @@ public class Locator {
 			throw new StrolchException(
 					"The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
 		}
-		this.pathElements = Collections.unmodifiableList(new ArrayList<>(pathElements));
+		this.pathElements = List.copyOf(pathElements);
 	}
 
 	/**

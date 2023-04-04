@@ -45,7 +45,7 @@ public class LogMessageSaxParser implements SaxParser<LogMessage> {
 	}
 
 	@Override
-	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException {
+	public void write(XMLStreamWriter xmlWriter) {
 		new LogMessageToSaxWriterVisitor(xmlWriter).visit(this.logMessage);
 	}
 }

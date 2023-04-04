@@ -24,14 +24,12 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import li.strolch.agent.api.ActivityMap;
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
@@ -88,12 +86,7 @@ public class XmlExportModelCommand extends Command {
 
 	private void cleanUpExisting(final String exportName) {
 		File parentFile = this.modelFile.getParentFile();
-		File[] existingFiles = parentFile.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.startsWith(exportName) && name.endsWith(".xml");
-			}
-		});
+		File[] existingFiles = parentFile.listFiles((dir, name) -> name.startsWith(exportName) && name.endsWith(".xml"));
 
 		for (File file : existingFiles) {
 			file.delete();

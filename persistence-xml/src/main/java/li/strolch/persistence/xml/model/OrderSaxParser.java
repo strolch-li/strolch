@@ -68,7 +68,7 @@ public class OrderSaxParser implements SaxParser<Order> {
 	}
 
 	@Override
-	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException {
+	public void write(XMLStreamWriter xmlWriter) {
 		this.order.accept(new StrolchElementToSaxWriterVisitor(xmlWriter));
 	}
 }

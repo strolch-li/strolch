@@ -40,7 +40,7 @@ public class PrivilegeSetUserStateService extends AbstractService<PrivilegeSetUs
 	}
 
 	@Override
-	protected PrivilegeUserResult internalDoService(PrivilegeSetUserStateArgument arg) throws Exception {
+	protected PrivilegeUserResult internalDoService(PrivilegeSetUserStateArgument arg) {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();

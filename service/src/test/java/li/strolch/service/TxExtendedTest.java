@@ -78,7 +78,7 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String type = "MyType";
 
@@ -295,7 +295,7 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String type = "MyType";
 

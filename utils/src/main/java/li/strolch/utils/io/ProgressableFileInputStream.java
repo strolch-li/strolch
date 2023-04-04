@@ -31,7 +31,7 @@ import java.io.IOException;
  */
 public class ProgressableFileInputStream extends FileInputStream {
 
-	private volatile long fileSize;
+	private final long fileSize;
 	private volatile long bytesRead;
 	private volatile boolean closed;
 

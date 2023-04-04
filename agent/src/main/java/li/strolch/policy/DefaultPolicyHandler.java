@@ -148,7 +148,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> Class<T> visit(KeyPolicyDef policyDef) throws ClassNotFoundException {
+	public <T> Class<T> visit(KeyPolicyDef policyDef) {
 		Class<?> clazz = this.classByTypeMap.getElement(policyDef.getType(), policyDef.getValue());
 		if (clazz == null)
 			throw new StrolchPolicyException(MessageFormat.format("No policy is configured for {0}", policyDef));

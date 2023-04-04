@@ -17,7 +17,6 @@ package li.strolch.command;
 
 import static org.junit.Assert.assertEquals;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -33,7 +32,7 @@ public class UpdateOrderCommandTest extends AbstractRealmCommandTest {
 	private Order order;
 
 	@Before
-	public void before() throws Exception {
+	public void before() {
 		this.order = ModelGenerator.createOrder("myCarOrder", "Modified Car Order", "ProductionOrder");
 	}
 

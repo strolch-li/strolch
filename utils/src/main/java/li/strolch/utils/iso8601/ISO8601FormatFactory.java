@@ -26,7 +26,7 @@ import li.strolch.utils.helper.MathHelper;
  */
 public class ISO8601FormatFactory implements FormatFactory {
 
-	private static ISO8601FormatFactory instance = new ISO8601FormatFactory();
+	private static final ISO8601FormatFactory instance = new ISO8601FormatFactory();
 
 	/**
 	 * the singleton constructor

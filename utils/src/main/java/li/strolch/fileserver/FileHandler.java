@@ -42,8 +42,8 @@ public class FileHandler {
 	 */
 	public static final int MAX_PART_SIZE = 1048576;
 
-	private String basePath;
-	private boolean verbose;
+	private final String basePath;
+	private final boolean verbose;
 
 	/**
 	 *

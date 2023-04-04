@@ -25,8 +25,8 @@ import li.strolch.model.timevalue.impl.*;
  */
 public class SetStateValueVisitor implements TimedStateVisitor<Void> {
 
-	private long time;
-	private Object value;
+	private final long time;
+	private final Object value;
 
 	public SetStateValueVisitor(long time, Object value) {
 		this.time = time;

@@ -16,7 +16,6 @@
 package li.strolch.persistence.xml;
 
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
-import static li.strolch.db.DbConstants.PROP_DB_IGNORE_REALM;
 import static li.strolch.db.DbConstants.PROP_USE_ENV;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 import static li.strolch.utils.helper.StringHelper.isEmpty;

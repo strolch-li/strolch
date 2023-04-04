@@ -17,7 +17,7 @@ public class StrolchSystemActionWithResult<T> extends SystemActionWithResult<T> 
 
 	public static final Logger logger = LoggerFactory.getLogger(StrolchSystemAction.class);
 
-	private PrivilegedRunnableWithResult<T> runnable;
+	private final PrivilegedRunnableWithResult<T> runnable;
 
 	public StrolchSystemActionWithResult(PrivilegedRunnableWithResult<T> runnable) {
 		this.runnable = runnable;

@@ -36,8 +36,7 @@ public class CharsetResponseFilter implements ContainerResponseFilter {
 	private static final String UTF_8 = "utf-8"; //$NON-NLS-1$
 
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
 		MediaType contentType = responseContext.getMediaType();
 		if (contentType != null) {

@@ -32,8 +32,8 @@ import li.strolch.utils.helper.StringHelper;
 public class ComponentDependencyAnalyzer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentDependencyAnalyzer.class);
-	private StrolchConfiguration strolchConfiguration;
-	private Map<String, ComponentController> controllerMap;
+	private final StrolchConfiguration strolchConfiguration;
+	private final Map<String, ComponentController> controllerMap;
 
 	public ComponentDependencyAnalyzer(StrolchConfiguration strolchConfiguration,
 			Map<String, ComponentController> controllerMap) {

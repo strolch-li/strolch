@@ -43,7 +43,7 @@ public class ReservationExecutionTest extends RuntimeMock {
 	}
 
 	@Test
-	public void shouldNotExecuteWhenReserved() throws InterruptedException {
+	public void shouldNotExecuteWhenReserved() {
 
 		Locator activityLoc = Locator.valueOf(Tags.ACTIVITY, "ToStock", "produceMachine1");
 

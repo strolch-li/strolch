@@ -35,8 +35,7 @@ public class HttpCacheResponseFilter implements ContainerResponseFilter {
 	private static String cacheMode = NO_CACHE;
 	
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
 		MultivaluedMap<String, Object> headers = responseContext.getHeaders();
 		headers.add(HttpHeaders.CACHE_CONTROL, cacheMode);

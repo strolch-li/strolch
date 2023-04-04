@@ -47,7 +47,7 @@ public class AuditSaxParser implements SaxParser<Audit> {
 	}
 
 	@Override
-	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException {
+	public void write(XMLStreamWriter xmlWriter) {
 		this.audit.accept(new AuditToSaxWriterVisitor(xmlWriter));
 	}
 }

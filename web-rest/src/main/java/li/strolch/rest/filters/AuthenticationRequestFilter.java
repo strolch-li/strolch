@@ -16,8 +16,6 @@
 package li.strolch.rest.filters;
 
 import static li.strolch.rest.StrolchRestfulConstants.*;
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_SOURCE;
 import static li.strolch.utils.helper.StringHelper.*;
 
 import jakarta.annotation.Priority;

@@ -68,7 +68,7 @@ public class ResourceSaxParser implements SaxParser<Resource> {
 	}
 
 	@Override
-	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException {
+	public void write(XMLStreamWriter xmlWriter) {
 		this.resource.accept(new StrolchElementToSaxWriterVisitor(xmlWriter));
 	}
 }

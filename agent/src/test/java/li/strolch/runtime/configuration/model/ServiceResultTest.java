@@ -17,7 +17,7 @@ package li.strolch.runtime.configuration.model;
 
 public class ServiceResultTest {
 
-	private int result;
+	private final int result;
 
 	public ServiceResultTest(int result) {
 		this.result = result;

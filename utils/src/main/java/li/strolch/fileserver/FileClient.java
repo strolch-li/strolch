@@ -29,10 +29,8 @@ public interface FileClient {
 	 * @param filePart
 	 * 		the part of the file
 	 *
-	 * @throws RemoteException
-	 * 		if something goes wrong with the remote call
 	 */
-	void uploadFilePart(FilePart filePart) throws RemoteException;
+	void uploadFilePart(FilePart filePart);
 
 	/**
 	 * Remote method with which a client can delete files from the server. It only deletes single files if they exist
@@ -42,10 +40,8 @@ public interface FileClient {
 	 *
 	 * @return true if the file was deleted, false if the file did not exist
 	 *
-	 * @throws RemoteException
-	 * 		if something goes wrong with the remote call
 	 */
-	boolean deleteFile(FileDeletion fileDeletion) throws RemoteException;
+	boolean deleteFile(FileDeletion fileDeletion);
 
 	/**
 	 * Remote method which a client can request part of a file. The server will fill the given {@link FilePart} with a
@@ -58,8 +54,6 @@ public interface FileClient {
 	 *
 	 * @return the same file part, yet with the part of the file requested as a byte array
 	 *
-	 * @throws RemoteException
-	 * 		if something goes wrong with the remote call
 	 */
-	FilePart requestFile(FilePart filePart) throws RemoteException;
+	FilePart requestFile(FilePart filePart);
 }

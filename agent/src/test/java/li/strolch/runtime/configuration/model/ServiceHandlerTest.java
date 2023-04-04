@@ -17,5 +17,5 @@ package li.strolch.runtime.configuration.model;
 
 public interface ServiceHandlerTest {
 
-	public ServiceResultTest doService();
+	ServiceResultTest doService();
 }

@@ -3,6 +3,7 @@ package li.strolch.privilege.test;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import li.strolch.privilege.base.PrivilegeException;
@@ -59,9 +60,9 @@ public class AbstractPrivilegeTest {
 			File dstRoles = new File(targetPath, rolesFilename);
 
 			// write config
-			String config = new String(Files.readAllBytes(privilegeConfigFile.toPath()), "UTF-8");
+			String config = new String(Files.readAllBytes(privilegeConfigFile.toPath()), StandardCharsets.UTF_8);
 			config = config.replace("${target}", dst);
-			Files.write(dstConfig.toPath(), config.getBytes("UTF-8"));
+			Files.write(dstConfig.toPath(), config.getBytes(StandardCharsets.UTF_8));
 
 			// copy model
 			Files.copy(privilegeUsersFile.toPath(), dstUsers.toPath());

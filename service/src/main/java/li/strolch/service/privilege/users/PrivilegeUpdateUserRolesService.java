@@ -45,7 +45,7 @@ public class PrivilegeUpdateUserRolesService extends AbstractService<JsonService
 	}
 
 	@Override
-	protected PrivilegeUserResult internalDoService(JsonServiceArgument arg) throws Exception {
+	protected PrivilegeUserResult internalDoService(JsonServiceArgument arg) {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();

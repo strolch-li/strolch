@@ -69,7 +69,7 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 		Object object = restrictable.getPrivilegeValue();
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
-		if (!(object instanceof Certificate)) {
+		if (!(object instanceof Certificate cert)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
 					"Privilege.illegalArgument.noncertificate"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
@@ -77,7 +77,6 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 		}
 
 		// get object
-		Certificate cert = (Certificate) object;
 
 		// first validate same organisation
 		if (!isStrolchAdminAndIgnoreOrganisation(cert) && !assertUserInSameOrganisation(ctx, cert, assertHasPrivilege))

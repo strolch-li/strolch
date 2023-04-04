@@ -66,10 +66,9 @@ public class StrolchElementFromDomVisitor {
 		NodeList childNodes = resourceElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node item = childNodes.item(i);
-			if (!(item instanceof Element))
+			if (!(item instanceof Element timedStateElem))
 				continue;
 
-			Element timedStateElem = (Element) item;
 			if (!timedStateElem.getNodeName().equals(Tags.TIMED_STATE))
 				continue;
 
@@ -112,10 +111,9 @@ public class StrolchElementFromDomVisitor {
 			NodeList timeValueElems = timedStateElem.getChildNodes();
 			for (int j = 0; j < timeValueElems.getLength(); j++) {
 				Node timeValueItem = timeValueElems.item(j);
-				if (!(timeValueItem instanceof Element))
+				if (!(timeValueItem instanceof Element timeValueElem))
 					continue;
 
-				Element timeValueElem = (Element) timeValueItem;
 				if (!timeValueElem.getNodeName().equals(Tags.VALUE))
 					continue;
 
@@ -143,10 +141,8 @@ public class StrolchElementFromDomVisitor {
 		NodeList childNodes = activityElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node item = childNodes.item(i);
-			if (!(item instanceof Element))
+			if (!(item instanceof Element childElem))
 				continue;
-
-			Element childElem = (Element) item;
 
 			switch (childElem.getNodeName()) {
 			case Tags.ACTIVITY:
@@ -192,10 +188,9 @@ public class StrolchElementFromDomVisitor {
 		NodeList bags = element.getChildNodes();
 		for (int i = 0; i < bags.getLength(); i++) {
 			Node item = bags.item(i);
-			if (!(item instanceof Element))
+			if (!(item instanceof Element bagElement))
 				continue;
 
-			Element bagElement = (Element) item;
 			if (!bagElement.getNodeName().equals(Tags.PARAMETER_BAG))
 				continue;
 
@@ -225,10 +220,9 @@ public class StrolchElementFromDomVisitor {
 		NodeList parameterElements = element.getChildNodes();
 		for (int i = 0; i < parameterElements.getLength(); i++) {
 			Node item = parameterElements.item(i);
-			if (!(item instanceof Element))
+			if (!(item instanceof Element paramElement))
 				continue;
 
-			Element paramElement = (Element) item;
 			if (!paramElement.getNodeName().equals(Tags.PARAMETER))
 				continue;
 
@@ -299,10 +293,9 @@ public class StrolchElementFromDomVisitor {
 		NodeList valueChangeNodes = element.getChildNodes();
 		for (int i = 0; i < valueChangeNodes.getLength(); i++) {
 			Node item = valueChangeNodes.item(i);
-			if (!(item instanceof Element))
+			if (!(item instanceof Element valueChangeElem))
 				continue;
 
-			Element valueChangeElem = (Element) item;
 			if (!valueChangeElem.getNodeName().equals(Tags.VALUE_CHANGE))
 				continue;
 
@@ -328,20 +321,18 @@ public class StrolchElementFromDomVisitor {
 		NodeList childNodes = element.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node resourceChildItem = childNodes.item(i);
-			if (!(resourceChildItem instanceof Element))
+			if (!(resourceChildItem instanceof Element policiesElem))
 				continue;
 
-			Element policiesElem = (Element) resourceChildItem;
 			if (!policiesElem.getNodeName().equals(Tags.POLICIES))
 				continue;
 
 			NodeList policyChildNodes = policiesElem.getChildNodes();
 			for (int j = 0; j < policyChildNodes.getLength(); j++) {
 				Node policiesChildItem = policyChildNodes.item(j);
-				if (!(policiesChildItem instanceof Element))
+				if (!(policiesChildItem instanceof Element policyElem))
 					continue;
 
-				Element policyElem = (Element) policiesChildItem;
 				if (!policyElem.getNodeName().equals(Tags.POLICY))
 					continue;
 
@@ -360,10 +351,9 @@ public class StrolchElementFromDomVisitor {
 		NodeList childNodes = element.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node resourceChildItem = childNodes.item(i);
-			if (!(resourceChildItem instanceof Element))
+			if (!(resourceChildItem instanceof Element versionElem))
 				continue;
 
-			Element versionElem = (Element) resourceChildItem;
 			if (!versionElem.getNodeName().equals(Tags.VERSION))
 				continue;
 

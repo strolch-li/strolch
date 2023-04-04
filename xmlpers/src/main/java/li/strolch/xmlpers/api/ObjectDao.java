@@ -36,7 +36,7 @@ public class ObjectDao {
 	private final ObjectFilter objectFilter;
 	private final FileDao fileDao;
 	private final PersistenceTransaction tx;
-	private PersistenceContextFactoryDelegator ctxFactoryDelegator;
+	private final PersistenceContextFactoryDelegator ctxFactoryDelegator;
 
 	public ObjectDao(PersistenceTransaction tx, FileDao fileDao, ObjectFilter objectFilter) {
 		this.tx = tx;

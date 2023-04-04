@@ -102,22 +102,15 @@ public class TransactionResult {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX");
 		switch (this.state) {
-		case OPEN:
-			sb.append(" is still open after ");
-			break;
-		case COMMITTED:
-			sb.append(" was completed after ");
-			break;
-		case ROLLED_BACK:
-			sb.append(" was rolled back after ");
-			break;
-		case FAILED:
-			sb.append(" has failed after ");
-			break;
-		default:
+		case OPEN -> sb.append(" is still open after ");
+		case COMMITTED -> sb.append(" was completed after ");
+		case ROLLED_BACK -> sb.append(" was rolled back after ");
+		case FAILED -> sb.append(" has failed after ");
+		default -> {
 			sb.append(" is in unhandled state ");
 			sb.append(this.state);
 			sb.append(" after ");
+		}
 		}
 
 		sb.append(StringHelper.formatNanoDuration(this.txDuration));

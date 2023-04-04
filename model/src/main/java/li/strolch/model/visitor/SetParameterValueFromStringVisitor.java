@@ -22,7 +22,7 @@ import li.strolch.model.parameter.*;
  */
 public class SetParameterValueFromStringVisitor implements ParameterVisitor<Void> {
 
-	private String value;
+	private final String value;
 
 	public SetParameterValueFromStringVisitor(String value) {
 		this.value = value;

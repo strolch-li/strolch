@@ -65,7 +65,7 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 
 	@SuppressWarnings("nls")
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
 		case "Resource":

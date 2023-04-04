@@ -2,8 +2,6 @@ package li.strolch.execution.service;
 
 import li.strolch.execution.Controller;
 import li.strolch.execution.ExecutionHandler;
-import li.strolch.model.State;
-import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.LocatorArgument;

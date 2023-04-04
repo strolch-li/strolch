@@ -63,7 +63,7 @@ public class ObjectCache {
 	/**
 	 * object The objectKey that shall be cached
 	 */
-	private Object objectKey;
+	private final Object objectKey;
 
 	/**
 	 * object The object that shall be cached

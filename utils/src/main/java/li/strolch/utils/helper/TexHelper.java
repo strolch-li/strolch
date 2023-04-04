@@ -3,6 +3,7 @@ package li.strolch.utils.helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -89,7 +90,8 @@ public class TexHelper {
 			// then write TEX file
 			String texFileName = fileName + ".tex";
 			File texFileS = new File(tmpPathF, texFileName);
-			try (OutputStreamWriter out = new OutputStreamWriter(Files.newOutputStream(texFileS.toPath()), "UTF-8")) {
+			try (OutputStreamWriter out = new OutputStreamWriter(Files.newOutputStream(texFileS.toPath()),
+					StandardCharsets.UTF_8)) {
 				out.write(data);
 			}
 

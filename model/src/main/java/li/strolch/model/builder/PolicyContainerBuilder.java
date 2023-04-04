@@ -15,7 +15,7 @@ public class PolicyContainerBuilder<T extends ParameterBagContainerBuilder<T>> e
 		if (this.policies == null) {
 			@SuppressWarnings("unchecked")
 			T t = (T) this;
-			this.policies = new PoliciesBuilder<T>(t);
+			this.policies = new PoliciesBuilder<>(t);
 		}
 		return policies;
 	}

@@ -40,16 +40,16 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	private final ObjectDao objectDao;
 	private final MetadataDao metadataDao;
 
-	private FileDao fileDao;
+	private final FileDao fileDao;
 
 	private TransactionCloseStrategy closeStrategy;
 
 	private TransactionState state;
-	private long startTime;
-	private Date startTimeDate;
+	private final long startTime;
+	private final Date startTimeDate;
 	private TransactionResult txResult;
 
-	private Set<LockableObject> lockedObjects;
+	private final Set<LockableObject> lockedObjects;
 
 	public DefaultPersistenceTransaction(PersistenceManager manager, IoMode ioMode, boolean verbose,
 			boolean allowOverwriteOnCreate) {

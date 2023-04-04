@@ -15,8 +15,6 @@
  */
 package li.strolch.exception;
 
-import java.util.Locale;
-
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.utils.I18nMessage;

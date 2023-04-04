@@ -10,9 +10,9 @@ import java.time.format.DateTimeFormatter;
 
 public class SimpleGs1 {
 
-	private String gtin;
-	private ZonedDateTime expirationDate;
-	private String batchNo;
+	private final String gtin;
+	private final ZonedDateTime expirationDate;
+	private final String batchNo;
 
 	private SimpleGs1(String gs1) {
 		if (gs1.length() < 32 || gs1.length() > 46)

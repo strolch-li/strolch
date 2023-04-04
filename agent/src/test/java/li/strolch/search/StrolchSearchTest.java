@@ -366,9 +366,9 @@ public class StrolchSearchTest {
 
 	public class BallSearch extends ResourceSearch {
 
-		private String id;
-		private String status;
-		private String color;
+		private final String id;
+		private final String status;
+		private final String color;
 
 		public BallSearch(String id, String status, String color) {
 			this.id = id;

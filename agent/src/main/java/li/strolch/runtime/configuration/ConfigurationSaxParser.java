@@ -196,7 +196,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		@Override
-		public void characters(char[] ch, int start, int length) throws SAXException {
+		public void characters(char[] ch, int start, int length) {
 			if (this.valueBuffer != null)
 				this.valueBuffer.append(ch, start, length);
 		}
@@ -209,15 +209,14 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			if (qName.equals(APPLICATION_NAME)) {
 				this.valueBuffer = new StringBuilder();
 			}
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String qName) throws SAXException {
+		public void endElement(String uri, String localName, String qName) {
 			if (qName.equals(APPLICATION_NAME)) {
 				String applicationName = this.valueBuffer.toString();
 				this.configurationBuilder.runtimeBuilder().setApplicationName(applicationName);
@@ -233,15 +232,14 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			switch (qName) {
 			case NAME, API, IMPL, DEPENDS -> this.valueBuffer = new StringBuilder();
 			}
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String qName) throws SAXException {
+		public void endElement(String uri, String localName, String qName) {
 			switch (qName) {
 			case NAME -> {
 				String name = this.valueBuffer.toString();
@@ -275,8 +273,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		private String propertyName;
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			if (this.propertyName != null) {
 				String msg = "Opening another tag {0} although {1} is still open!"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, this.propertyName, qName);
@@ -288,7 +285,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String qName) throws SAXException {
+		public void endElement(String uri, String localName, String qName) {
 			if (this.propertyName == null || !this.propertyName.equals(qName)) {
 				String msg = "Previous tag {0} was not closed before new tag {1}!"; //$NON-NLS-1$
 				msg = MessageFormat.format(msg, this.propertyName, qName);

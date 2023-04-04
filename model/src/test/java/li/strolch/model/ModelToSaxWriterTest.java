@@ -95,7 +95,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 		activity.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
 
-		System.out.println(out.toString());
+		System.out.println(out);
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		XmlModelSaxStreamReader saxStreamReader = new XmlModelSaxStreamReader(listener,

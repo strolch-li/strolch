@@ -49,7 +49,7 @@ public class FloatTimeVariableTest {
 	public void init() {
 		this.timeVariable = new TimeVariable<>();
 		for (long i = 0; i < MAX; i += STEP) {
-			this.timeVariable.setValueAt(Long.valueOf(i), new FloatValue(i));
+			this.timeVariable.setValueAt(i, new FloatValue(i));
 		}
 	}
 

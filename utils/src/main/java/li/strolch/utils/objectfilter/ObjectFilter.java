@@ -164,22 +164,19 @@ public class ObjectFilter {
 			// of the cases here will be mistakes...
 			Operation op = cached.getOperation();
 			switch (op) {
-			case ADD:
-				throw new IllegalStateException(
-						"Stale State exception: Invalid + after + for " + objectKey); //$NON-NLS-1$
-			case MODIFY:
-				throw new IllegalStateException(
-						"Stale State exception: Invalid + after += for " + objectKey); //$NON-NLS-1$
-			case REMOVE:
+			case ADD -> throw new IllegalStateException(
+					"Stale State exception: Invalid + after + for " + objectKey); //$NON-NLS-1$
+			case MODIFY -> throw new IllegalStateException(
+					"Stale State exception: Invalid + after += for " + objectKey); //$NON-NLS-1$
+			case REMOVE -> {
 				// replace key if necessary
 				replaceKey(cached, objectKey, objectToAdd);
 
 				// update operation's object
 				cached.setObject(objectToAdd);
 				cached.setOperation(Operation.MODIFY);
-				break;
-			default:
-				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
+			}
+			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
 		} // else of object not in cache
 
@@ -235,19 +232,16 @@ public class ObjectFilter {
 			// The object is in cache: update the version as required.
 			Operation op = cached.getOperation();
 			switch (op) {
-			case ADD:
-			case MODIFY:
+			case ADD, MODIFY -> {
 				// replace key if necessary
 				replaceKey(cached, objectKey, objectToUpdate);
 
 				// update operation's object
 				cached.setObject(objectToUpdate);
-				break;
-			case REMOVE:
-				throw new IllegalStateException(
-						"Stale State exception: Invalid += after - for " + objectKey); //$NON-NLS-1$
-			default:
-				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
+			}
+			case REMOVE -> throw new IllegalStateException(
+					"Stale State exception: Invalid += after - for " + objectKey); //$NON-NLS-1$
+			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
 		} // else of object not in cache
 
@@ -308,24 +302,21 @@ public class ObjectFilter {
 			// The object is in cache: update the version as required.
 			Operation op = cached.getOperation();
 			switch (op) {
-			case ADD:
+			case ADD ->
 				// this is a case where we're removing the object from the cache, since we are
 				// removing it now and it was added previously.
-				this.cache.removeElement(key, objectKey);
-				break;
-			case MODIFY:
+					this.cache.removeElement(key, objectKey);
+			case MODIFY -> {
 				// replace key if necessary
 				replaceKey(cached, objectKey, objectToRemove);
 
 				// update operation's object
 				cached.setObject(objectToRemove);
 				cached.setOperation(Operation.REMOVE);
-				break;
-			case REMOVE:
-				throw new IllegalStateException(
-						"Stale State exception: Invalid - after - for " + objectKey); //$NON-NLS-1$
-			default:
-				throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
+			}
+			case REMOVE -> throw new IllegalStateException(
+					"Stale State exception: Invalid - after - for " + objectKey); //$NON-NLS-1$
+			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
 			} // switch
 		}
 

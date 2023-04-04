@@ -372,10 +372,9 @@ public class Version implements Comparable<Version> {
 	public boolean equals(final Object object) {
 		if (object == this)
 			return true;
-		if (!(object instanceof Version))
+		if (!(object instanceof Version other))
 			return false;
 
-		Version other = (Version) object;
 		return (this.major == other.major) && (this.minor == other.minor) && (this.micro == other.micro)
 				&& this.qualifier.equals(other.qualifier);
 	}
@@ -395,10 +394,9 @@ public class Version implements Comparable<Version> {
 	public boolean equalsIgnoreQualifier(final Object object) {
 		if (object == this)
 			return true;
-		if (!(object instanceof Version))
+		if (!(object instanceof Version other))
 			return false;
 
-		Version other = (Version) object;
 		return (this.major == other.major) && (this.minor == other.minor) && (this.micro == other.micro);
 	}
 

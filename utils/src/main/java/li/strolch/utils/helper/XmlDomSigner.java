@@ -34,11 +34,11 @@ public class XmlDomSigner {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlDomSigner.class);
 
-	private KeyStore keyStore;
-	private String privateKeyAlias;
-	private String trustAlias;
+	private final KeyStore keyStore;
+	private final String privateKeyAlias;
+	private final String trustAlias;
 
-	private char[] password;
+	private final char[] password;
 
 	public XmlDomSigner(File keyStorePath, String privateKeyAlias, String trustAlias, char[] password) {
 

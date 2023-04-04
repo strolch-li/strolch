@@ -41,8 +41,8 @@ public class Migrations {
 
 	private static final Logger logger = LoggerFactory.getLogger(Migrations.class);
 
-	private ComponentContainer container;
-	private Set<String> realmNames;
+	private final ComponentContainer container;
+	private final Set<String> realmNames;
 	private boolean verbose;
 
 	private Map<String, SortedSet<DataMigration>> dataMigrations;
@@ -168,7 +168,7 @@ public class Migrations {
 			MigrationVersion currentVersion = currentVersions.get(realm);
 
 			List<CodeMigration> listOfMigrations = codeMigrationsByRealm.getList(realm);
-			SortedSet<CodeMigration> migrations = new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+			SortedSet<CodeMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
 			migrations.addAll(listOfMigrations);
 
 			Version nextVersion = currentVersion.getCodeVersion().add(0, 0, 1);
@@ -244,8 +244,7 @@ public class Migrations {
 			for (File realmMigration : realmMigrations) {
 				String realm = realmMigration.getName();
 
-				SortedSet<DataMigration> migrations = new TreeSet<>(
-						(o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+				SortedSet<DataMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
 				migrationsByRealm.put(realm, migrations);
 
 				File[] migrationFiles = realmMigration
@@ -275,8 +274,7 @@ public class Migrations {
 			for (File realmMigration : realmMigrations) {
 				String realm = realmMigration.getName();
 
-				SortedSet<CodeMigration> migrations = new TreeSet<>(
-						(o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+				SortedSet<CodeMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
 				migrationsByRealm.put(realm, migrations);
 
 				File[] migrationFiles = realmMigration

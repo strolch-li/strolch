@@ -34,7 +34,6 @@ import com.google.gson.JsonObject;
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -141,14 +140,14 @@ public class StrolchAgent {
 	/**
 	 * @see PrivilegeHandler#runAs(String, PrivilegedRunnable)
 	 */
-	public void runAs(String systemUser, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	public void runAs(String systemUser, PrivilegedRunnable runnable) throws Exception {
 		getPrivilegeHandler().runAs(systemUser, runnable);
 	}
 
 	/**
 	 * @see PrivilegeHandler#runAsAgent(PrivilegedRunnable)
 	 */
-	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	public void runAsAgent(PrivilegedRunnable runnable) throws Exception {
 		getPrivilegeHandler().runAsAgent(runnable);
 	}
 
@@ -156,14 +155,14 @@ public class StrolchAgent {
 	 * @see PrivilegeHandler#runAsAgentWithResult(PrivilegedRunnableWithResult)
 	 */
 	public <T> T runAsWithResult(String systemUser, PrivilegedRunnableWithResult<T> runnable)
-			throws PrivilegeException, Exception {
+			throws Exception {
 		return getPrivilegeHandler().runAsWithResult(systemUser, runnable);
 	}
 
 	/**
 	 * @see PrivilegeHandler#runAsAgentWithResult(PrivilegedRunnableWithResult)
 	 */
-	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
 		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 

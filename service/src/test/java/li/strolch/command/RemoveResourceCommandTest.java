@@ -18,7 +18,6 @@ package li.strolch.command;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;

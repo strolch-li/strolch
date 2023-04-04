@@ -66,7 +66,7 @@ public class SerialisationTest extends BaseTest {
 		final JsonObject jsonObject = response.asJson();
 		assertEquals(expected.trim(), jsonObject.toString());
 
-		System.out.println(jsonObject.toString());
+		System.out.println(jsonObject);
 	}
 
 }

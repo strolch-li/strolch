@@ -24,12 +24,12 @@ import li.strolch.model.activity.Activity;
 public interface OrderVisitor<U> extends StrolchRootElementVisitor<U> {
 
 	@Override
-	public default U visitActivity(Activity activity) {
+	default U visitActivity(Activity activity) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + activity.getClass());
 	}
 
 	@Override
-	public default U visitResource(Resource resource) {
+	default U visitResource(Resource resource) {
 		throw new UnsupportedOperationException(getClass().getName() + " can not handle " + resource.getClass());
 	}
 }

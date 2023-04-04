@@ -29,7 +29,7 @@ public class PerformanceTransientTest extends PerformanceTest {
 	public static final String CONFIG_SRC = "src/runtime_transient"; //$NON-NLS-1$
 
 	@BeforeClass
-	public static void beforeClass() throws Exception {
+	public static void beforeClass() {
 		buildRuntime(CONFIG_SRC, RUNTIME_PATH, DataType.xml);
 	}
 

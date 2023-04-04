@@ -32,7 +32,7 @@ public interface DateFormat {
 	 *
 	 * @return the formatted string of the long value
 	 */
-	public String format(long timepoint);
+	String format(long timepoint);
 
 	/**
 	 * format a Date to string
@@ -42,7 +42,7 @@ public interface DateFormat {
 	 *
 	 * @return the formatted string of the long value
 	 */
-	public String format(Date date);
+	String format(Date date);
 
 	/**
 	 * parse a string to long
@@ -52,7 +52,7 @@ public interface DateFormat {
 	 *
 	 * @return the value parsed
 	 */
-	public long parseLong(String s);
+	long parseLong(String s);
 
 	/**
 	 * parse a string to Date
@@ -62,5 +62,5 @@ public interface DateFormat {
 	 *
 	 * @return the value parsed
 	 */
-	public Date parse(String s);
+	Date parse(String s);
 }

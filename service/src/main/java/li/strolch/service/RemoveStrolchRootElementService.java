@@ -49,16 +49,9 @@ public class RemoveStrolchRootElementService extends AbstractService<LocatorArgu
 			StrolchRootElement rootElement = tx.findElement(arg.locator);
 
 			switch (rootElement.getObjectType()) {
-			case Tags.RESOURCE:
-				tx.remove((Resource) rootElement);
-				break;
-			case Tags.ORDER:
-				tx.remove((Order) rootElement);
-				break;
-			case Tags.ACTIVITY:
-				tx.remove((Activity) rootElement);
-				break;
-
+			case Tags.RESOURCE -> tx.remove((Resource) rootElement);
+			case Tags.ORDER -> tx.remove((Order) rootElement);
+			case Tags.ACTIVITY -> tx.remove((Activity) rootElement);
 			}
 
 			tx.commitOnClose();

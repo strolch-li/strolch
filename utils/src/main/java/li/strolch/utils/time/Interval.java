@@ -212,9 +212,8 @@ public final class Interval
     private static Interval parseEndDateTime(Instant start, ZoneOffset offset, CharSequence endStr) {
         try {
             TemporalAccessor temporal = DateTimeFormatter.ISO_DATE_TIME.parseBest(endStr, OffsetDateTime::from, LocalDateTime::from);
-            if (temporal instanceof OffsetDateTime) {
-                OffsetDateTime odt = (OffsetDateTime) temporal;
-                return Interval.of(start, odt.toInstant());
+            if (temporal instanceof OffsetDateTime odt) {
+				return Interval.of(start, odt.toInstant());
             } else {
                 // infer offset from start if not specified by end
                 LocalDateTime ldt = (LocalDateTime) temporal;
@@ -557,9 +556,8 @@ public final class Interval
         if (this == obj) {
             return true;
         }
-        if (obj instanceof Interval) {
-            Interval other = (Interval) obj;
-            return start.equals(other.start) && end.equals(other.end);
+        if (obj instanceof Interval other) {
+			return start.equals(other.start) && end.equals(other.end);
         }
         return false;
     }

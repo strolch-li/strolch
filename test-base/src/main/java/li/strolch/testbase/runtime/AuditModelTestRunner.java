@@ -33,9 +33,9 @@ import li.strolch.utils.collections.DateRange;
  */
 public class AuditModelTestRunner {
 
-	private RuntimeMock runtimeMock;
-	private String realmName;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final String realmName;
+	private final Certificate certificate;
 
 	public AuditModelTestRunner(RuntimeMock runtimeMock, String realmName) {
 		this.runtimeMock = runtimeMock;

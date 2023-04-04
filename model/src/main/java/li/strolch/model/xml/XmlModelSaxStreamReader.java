@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
@@ -40,7 +39,7 @@ import org.xml.sax.SAXException;
  */
 public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
-	private InputSource source;
+	private final InputSource source;
 
 	public XmlModelSaxStreamReader(StrolchElementListener listener, InputStream stream) {
 		this(listener, stream, DEFAULT_ENCODING);
@@ -72,13 +71,12 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 		switch (qName) {
-
-		case Tags.INCLUDE_FILE:
+		case Tags.INCLUDE_FILE -> {
 			String msg = "The {0} can''t handle Tags of type {1}";
 			msg = MessageFormat.format(msg, XmlModelSaxStreamReader.class.getName(), Tags.INCLUDE_FILE);
 			throw new IllegalArgumentException(msg); //$NON-NLS-1$
-		default:
-			super.startElement(uri, localName, qName, attributes);
+		}
+		default -> super.startElement(uri, localName, qName, attributes);
 		}
 	}
 

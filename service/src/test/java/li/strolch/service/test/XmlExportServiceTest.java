@@ -111,12 +111,7 @@ public class XmlExportServiceTest {
 
 	private void assertNumberOfFilesCreated(final String modelFileName, int nrOfExpectedFiles) {
 		File dataPath = new File(RUNTIME_PATH, "data");
-		String[] list = dataPath.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.startsWith(modelFileName);
-			}
-		});
+		String[] list = dataPath.list((dir, name) -> name.startsWith(modelFileName));
 		assertEquals(nrOfExpectedFiles, list.length);
 	}
 }

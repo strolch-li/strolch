@@ -35,7 +35,7 @@ public interface FileProgressListener {
 	 * @param size
 	 * 		the size of the job which is to be accomplished
 	 */
-	public void begin(int percent, long position, long size);
+	void begin(int percent, long position, long size);
 
 	/**
 	 * Notifies the listener of incremental progress
@@ -45,7 +45,7 @@ public interface FileProgressListener {
 	 * @param position
 	 * 		the position relative to the job size
 	 */
-	public void progress(int percent, long position);
+	void progress(int percent, long position);
 
 	/**
 	 * Notifies the listener that the progress is completed
@@ -56,5 +56,5 @@ public interface FileProgressListener {
 	 * 		the position where the job finished. Ideally the value would be the same as the size given at {@link
 	 * 		#begin(int, long, long)} but in case of errors it can be different
 	 */
-	public void end(int percent, long position);
+	void end(int percent, long position);
 }

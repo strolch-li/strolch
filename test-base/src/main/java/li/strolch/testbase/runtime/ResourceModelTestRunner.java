@@ -36,9 +36,9 @@ public class ResourceModelTestRunner {
 	private static final String NAME = "Test Resource"; //$NON-NLS-1$
 	private static final String TYPE = "Box"; //$NON-NLS-1$
 
-	private RuntimeMock runtimeMock;
-	private String realmName;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final String realmName;
+	private final Certificate certificate;
 
 	public ResourceModelTestRunner(RuntimeMock runtimeMock, String realmName) {
 		this.runtimeMock = runtimeMock;

@@ -18,8 +18,8 @@ public class ExecutorPool {
 
 	private static final Logger logger = LoggerFactory.getLogger(ExecutorPool.class);
 
-	private Map<String, ExecutorService> executors;
-	private Map<String, ScheduledExecutorService> scheduledExecutors;
+	private final Map<String, ExecutorService> executors;
+	private final Map<String, ScheduledExecutorService> scheduledExecutors;
 
 	public ExecutorPool() {
 		this.executors = Collections.synchronizedMap(new HashMap<>());

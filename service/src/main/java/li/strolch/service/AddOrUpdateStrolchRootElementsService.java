@@ -50,27 +50,27 @@ public class AddOrUpdateStrolchRootElementsService
 			for (StrolchRootElement rootElement : arg.rootElements) {
 
 				switch (rootElement.getObjectType()) {
-				case Tags.RESOURCE:
+				case Tags.RESOURCE -> {
 					if (tx.hasResource(rootElement.getType(), rootElement.getId())) {
 						tx.update((Resource) rootElement);
 					} else {
 						tx.add((Resource) rootElement);
 					}
-					break;
-				case Tags.ORDER:
+				}
+				case Tags.ORDER -> {
 					if (tx.hasOrder(rootElement.getType(), rootElement.getId())) {
 						tx.update((Order) rootElement);
 					} else {
 						tx.add((Order) rootElement);
 					}
-					break;
-				case Tags.ACTIVITY:
+				}
+				case Tags.ACTIVITY -> {
 					if (tx.hasActivity(rootElement.getType(), rootElement.getId())) {
 						tx.update((Activity) rootElement);
 					} else {
 						tx.add((Activity) rootElement);
 					}
-					break;
+				}
 				}
 			}
 

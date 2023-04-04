@@ -91,19 +91,13 @@ public class DateHelper {
 			labelString = bundle.getString(prefixKey) + " " + selectedPeriodNumber + " ";
 		}
 
-		switch (selectedPeriodUnit) {
-		case 'D':
-			labelString = labelString + (selectedPeriodNumber > 1 ? bundle.getString("days") : bundle.getString("day"));
-			break;
-		case 'W':
-			labelString =
-					labelString + (selectedPeriodNumber > 1 ? bundle.getString("weeks") : bundle.getString("week"));
-			break;
-		case 'M':
-			labelString =
+		labelString = switch (selectedPeriodUnit) {
+			case 'D' -> labelString + (selectedPeriodNumber > 1 ? bundle.getString("days") : bundle.getString("day"));
+			case 'W' -> labelString + (selectedPeriodNumber > 1 ? bundle.getString("weeks") : bundle.getString("week"));
+			case 'M' ->
 					labelString + (selectedPeriodNumber > 1 ? bundle.getString("months") : bundle.getString("month"));
-			break;
-		}
+			default -> labelString;
+		};
 
 		return labelString;
 	}

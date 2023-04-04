@@ -30,7 +30,7 @@ public interface RealmHandler {
 	 * 
 	 * @return the set of names of the configured {@link StrolchRealm StrolchRealms}
 	 */
-	public Set<String> getRealmNames();
+	Set<String> getRealmNames();
 
 	/**
 	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constante
@@ -43,5 +43,5 @@ public interface RealmHandler {
 	 * @throws StrolchException
 	 *             if the {@link StrolchRealm} does not exist with the given name
 	 */
-	public StrolchRealm getRealm(String realm);
+	StrolchRealm getRealm(String realm);
 }

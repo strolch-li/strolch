@@ -14,24 +14,24 @@ import org.junit.Test;
 public class SsoHandlerTest extends AbstractPrivilegeTest {
 
 	@BeforeClass
-	public static void init() throws Exception {
+	public static void init() {
 		removeConfigs(SsoHandlerTest.class.getSimpleName());
 		prepareConfigs(SsoHandlerTest.class.getSimpleName(), "PrivilegeConfig.xml", "PrivilegeUsers.xml",
 				"PrivilegeRoles.xml");
 	}
 
 	@AfterClass
-	public static void destroy() throws Exception {
+	public static void destroy() {
 		removeConfigs(SsoHandlerTest.class.getSimpleName());
 	}
 
 	@Before
-	public void setup() throws Exception {
+	public void setup() {
 		initialize(SsoHandlerTest.class.getSimpleName(), "PrivilegeConfig.xml");
 	}
 
 	@Test
-	public void testSsoAdmin() throws Exception {
+	public void testSsoAdmin() {
 
 		try {
 			Map<String, String> data = new HashMap<>();

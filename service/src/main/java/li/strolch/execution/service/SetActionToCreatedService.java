@@ -21,7 +21,7 @@ public class SetActionToCreatedService extends AbstractService<LocatorArgument, 
 	}
 
 	@Override
-	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
+	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			tx.lock(arg.locator.trim(3));

@@ -64,7 +64,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	private static final String removeSql = "delete from audits where id = ?";
 	private static final String removeAllSql = "delete from audits where element_type = ? and date between ? and ?";
 
-	private PostgreSqlStrolchTransaction tx;
+	private final PostgreSqlStrolchTransaction tx;
 
 	public PostgreSqlAuditDao(PostgreSqlStrolchTransaction postgreSqlStrolchTransaction) {
 		this.tx = postgreSqlStrolchTransaction;

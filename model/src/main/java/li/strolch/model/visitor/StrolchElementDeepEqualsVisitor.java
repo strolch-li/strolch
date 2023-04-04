@@ -41,8 +41,8 @@ import li.strolch.utils.dbc.DBC;
  */
 public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<List<Locator>> {
 
-	private List<Locator> mismatchedLocators;
-	private StrolchElement srcElement;
+	private final List<Locator> mismatchedLocators;
+	private final StrolchElement srcElement;
 
 	public StrolchElementDeepEqualsVisitor(StrolchElement srcElement) {
 		this.srcElement = srcElement;

@@ -46,27 +46,27 @@ public class AddOrUpdateStrolchRootElementService extends AbstractService<Strolc
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			switch (arg.rootElement.getObjectType()) {
-			case Tags.RESOURCE:
+			case Tags.RESOURCE -> {
 				if (tx.hasResource(arg.rootElement.getType(), arg.rootElement.getId())) {
 					tx.update((Resource) arg.rootElement);
 				} else {
 					tx.add((Resource) arg.rootElement);
 				}
-				break;
-			case Tags.ORDER:
+			}
+			case Tags.ORDER -> {
 				if (tx.hasOrder(arg.rootElement.getType(), arg.rootElement.getId())) {
 					tx.update((Order) arg.rootElement);
 				} else {
 					tx.add((Order) arg.rootElement);
 				}
-				break;
-			case Tags.ACTIVITY:
+			}
+			case Tags.ACTIVITY -> {
 				if (tx.hasActivity(arg.rootElement.getType(), arg.rootElement.getId())) {
 					tx.update((Activity) arg.rootElement);
 				} else {
 					tx.add((Activity) arg.rootElement);
 				}
-				break;
+			}
 			}
 
 			tx.commitOnClose();

@@ -45,7 +45,7 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 	}
 
 	@Override
-	protected ServiceResult internalDoService(StringMapArgument arg) throws Exception {
+	protected ServiceResult internalDoService(StringMapArgument arg) {
 
 		String username = arg.map.get(Tags.Json.USERNAME);
 		String state = arg.map.get(Tags.Json.STATE);

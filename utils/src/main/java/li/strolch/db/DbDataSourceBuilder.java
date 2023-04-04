@@ -23,5 +23,5 @@ import java.util.Properties;
  */
 public interface DbDataSourceBuilder {
 
-	public DataSource build(String realm, String url, String username, String password, Properties properties);
+	DataSource build(String realm, String url, String username, String password, Properties properties);
 }

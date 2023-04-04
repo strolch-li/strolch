@@ -17,7 +17,6 @@ package li.strolch.command;
 
 import static org.junit.Assert.assertEquals;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -33,7 +32,7 @@ public class UpdateResourceCommandTest extends AbstractRealmCommandTest {
 	private Resource resource;
 
 	@Before
-	public void before() throws Exception {
+	public void before() {
 		this.resource = ModelGenerator.createResource("yellow", "Modified Yellow Ball", "Ball");
 	}
 

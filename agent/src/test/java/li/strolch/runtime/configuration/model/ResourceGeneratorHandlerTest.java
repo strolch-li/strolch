@@ -19,5 +19,5 @@ import li.strolch.model.Resource;
 
 public interface ResourceGeneratorHandlerTest {
 
-	public Resource getTestResource(String id, String name, String type);
+	Resource getTestResource(String id, String name, String type);
 }

@@ -15,7 +15,6 @@
  */
 package li.strolch.rest.endpoint;
 
-import static li.strolch.model.Tags.Json.COMPONENT_NAME;
 import static li.strolch.model.Tags.Json.*;
 
 import jakarta.servlet.http.HttpServletRequest;

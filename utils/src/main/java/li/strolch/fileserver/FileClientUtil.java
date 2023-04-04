@@ -213,12 +213,7 @@ public class FileClientUtil {
 
 	public static void deleteFile(FileClient rmiFileClient, FileDeletion fileDeletion) {
 
-		try {
-			rmiFileClient.deleteFile(fileDeletion);
-		} catch (RemoteException e) {
-			String msg = "Deleting the file {0} failed because of an underlying exception {1}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, fileDeletion.getFileName(), e.getLocalizedMessage());
-			throw new RuntimeException(msg);
-		}
+		rmiFileClient.deleteFile(fileDeletion);
+
 	}
 }

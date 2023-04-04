@@ -391,7 +391,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	}
 
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
 		case STROLCH_BOOTSTRAP:
@@ -427,7 +427,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(String uri, String localName, String qName) {
 
 		switch (qName) {
 		case STROLCH_BOOTSTRAP:
@@ -466,7 +466,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	}
 
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+	public void characters(char[] ch, int start, int length) {
 		if (this.textB != null)
 			this.textB.append(ch, start, length);
 	}

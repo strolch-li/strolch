@@ -252,13 +252,13 @@ public class SearchBuilder {
 			return searchResult.orderById(descending);
 
 		switch (orderBy) {
-		case Tags.Json.ID:
+		case Tags.Json.ID -> {
 			return searchResult.orderById(descending);
-		case Tags.Json.NAME:
+		}
+		case Tags.Json.NAME -> {
 			return searchResult.orderByName(descending);
-		default:
-			logger.warn("Unhandled ordering " + orderBy);
-			break;
+		}
+		default -> logger.warn("Unhandled ordering " + orderBy);
 		}
 
 		return searchResult;

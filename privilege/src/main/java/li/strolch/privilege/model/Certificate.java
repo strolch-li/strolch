@@ -308,9 +308,8 @@ public final class Certificate implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Certificate))
+		if (!(obj instanceof Certificate other))
 			return false;
-		Certificate other = (Certificate) obj;
 		if (this.authToken == null) {
 			if (other.authToken != null)
 				return false;

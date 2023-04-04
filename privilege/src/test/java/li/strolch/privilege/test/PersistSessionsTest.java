@@ -13,19 +13,19 @@ import org.junit.Test;
 public class PersistSessionsTest extends AbstractPrivilegeTest {
 
 	@BeforeClass
-	public static void init() throws Exception {
+	public static void init() {
 		removeConfigs(PersistSessionsTest.class.getSimpleName());
 		prepareConfigs(PersistSessionsTest.class.getSimpleName(), "PrivilegeConfig.xml", "PrivilegeUsers.xml",
 				"PrivilegeRoles.xml");
 	}
 
 	@AfterClass
-	public static void destroy() throws Exception {
+	public static void destroy() {
 		removeConfigs(PersistSessionsTest.class.getSimpleName());
 	}
 
 	@Before
-	public void setup() throws Exception {
+	public void setup() {
 		initialize(PersistSessionsTest.class.getSimpleName(), "PrivilegeConfig.xml");
 	}
 

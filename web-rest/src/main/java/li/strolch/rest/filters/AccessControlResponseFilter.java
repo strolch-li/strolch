@@ -69,8 +69,7 @@ public class AccessControlResponseFilter implements ContainerResponseFilter {
 	}
 
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
 		if (!corsEnabled)
 			return;

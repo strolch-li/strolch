@@ -37,9 +37,9 @@ public class ActivityModelTestRunner {
 	private static final String NAME = "Test Activity";
 	private static final String TYPE = "Produce";
 
-	private RuntimeMock runtimeMock;
-	private String realmName;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final String realmName;
+	private final Certificate certificate;
 
 	public ActivityModelTestRunner(RuntimeMock runtimeMock, String realmName) {
 		this.runtimeMock = runtimeMock;

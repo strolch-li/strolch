@@ -183,13 +183,11 @@ public class DbSchemaVersionCheck {
 	 *
 	 * @return the migration state
 	 *
-	 * @throws SQLException
-	 * 		if something goes wrong
 	 * @throws DbException
 	 * 		if something goes wrong
 	 */
 	public DbMigrationState detectMigrationState(String realm, Version expectedDbVersion, Version currentVersion)
-			throws SQLException, DbException {
+			throws DbException {
 
 		// no version, then we need to create it
 		if (currentVersion == null)

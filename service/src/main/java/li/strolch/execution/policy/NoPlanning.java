@@ -1,6 +1,5 @@
 package li.strolch.execution.policy;
 
-import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;

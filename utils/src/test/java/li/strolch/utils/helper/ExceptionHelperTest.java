@@ -12,8 +12,10 @@ public class ExceptionHelperTest {
 
 		Exception e = nestedException();
 		assertEquals("java.lang.RuntimeException: Third", ExceptionHelper.getExceptionMessage(e));
-		assertEquals("java.lang.RuntimeException: Third\n" + "java.lang.RuntimeException: Second\n"
-				+ "java.lang.RuntimeException: First", ExceptionHelper.getExceptionMessageWithCauses(e));
+		assertEquals("""
+				java.lang.RuntimeException: Third
+				java.lang.RuntimeException: Second
+				java.lang.RuntimeException: First""", ExceptionHelper.getExceptionMessageWithCauses(e));
 	}
 
 	@Test
@@ -26,8 +28,10 @@ public class ExceptionHelperTest {
 		assertTrue(formatException.contains("java.lang.RuntimeException: Third"));
 
 		formatException = ExceptionHelper.formatExceptionMessage(e);
-		assertEquals("java.lang.RuntimeException: Third\n" + "cause: java.lang.RuntimeException: Second\n"
-				+ "cause: java.lang.RuntimeException: First", formatException);
+		assertEquals("""
+				java.lang.RuntimeException: Third
+				cause: java.lang.RuntimeException: Second
+				cause: java.lang.RuntimeException: First""", formatException);
 	}
 
 	private Exception nestedException() {

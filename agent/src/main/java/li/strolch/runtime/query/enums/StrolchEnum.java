@@ -31,7 +31,7 @@ public class StrolchEnum {
 
 	private String name;
 	private String locale;
-	private Map<String, String> values;
+	private final Map<String, String> values;
 
 	private Locale localeL;
 

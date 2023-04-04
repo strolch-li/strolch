@@ -164,7 +164,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	protected abstract String getLastName(String username, Attributes attrs) throws NamingException;
 
-	protected abstract Locale getLocale(Attributes attrs) throws NamingException;
+	protected abstract Locale getLocale(Attributes attrs);
 
 	protected abstract Set<String> getLdapGroups(String username, Attributes attrs) throws NamingException;
 

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class DbConnectionCheck {
 
 	private static final Logger logger = LoggerFactory.getLogger(DbConnectionCheck.class);
-	private Map<String, DataSource> dsMap;
+	private final Map<String, DataSource> dsMap;
 
 	/**
 	 * @param dsMap

@@ -17,7 +17,7 @@ package li.strolch.xmlpers.api;
 
 public interface ParserFactory<T> {
 
-	public DomParser<T> getDomParser();
+	DomParser<T> getDomParser();
 
-	public SaxParser<T> getSaxParser();
+	SaxParser<T> getSaxParser();
 }

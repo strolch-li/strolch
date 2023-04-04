@@ -47,7 +47,7 @@ public class MigrationsTest {
 	protected static Certificate certificate;
 
 	@BeforeClass
-	public static void beforeClass() throws Exception {
+	public static void beforeClass() {
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

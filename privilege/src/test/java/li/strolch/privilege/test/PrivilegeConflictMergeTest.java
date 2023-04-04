@@ -29,19 +29,19 @@ import org.junit.Test;
 public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 
 	@BeforeClass
-	public static void init() throws Exception {
+	public static void init() {
 		removeConfigs(PrivilegeConflictMergeTest.class.getSimpleName());
 		prepareConfigs(PrivilegeConflictMergeTest.class.getSimpleName(), "PrivilegeConfigMerge.xml",
 				"PrivilegeUsersMerge.xml", "PrivilegeRolesMerge.xml");
 	}
 
 	@AfterClass
-	public static void destroy() throws Exception {
+	public static void destroy() {
 		removeConfigs(PrivilegeConflictMergeTest.class.getSimpleName());
 	}
 
 	@Before
-	public void setup() throws Exception {
+	public void setup() {
 		initialize(PrivilegeConflictMergeTest.class.getSimpleName(), "PrivilegeConfigMerge.xml");
 	}
 

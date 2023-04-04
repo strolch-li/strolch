@@ -13,7 +13,7 @@ public class ChainedMethodExpression extends AbstractObjectExpression {
 
 	private String objectKey;
 
-	private List<MethodExpression> methodExpressions = new ArrayList<>();
+	private final List<MethodExpression> methodExpressions = new ArrayList<>();
 
 	@Override
 	public Class<?> getType(final Map<String, Object> inputObjects, final Map<String, Object> queryParameter) {

@@ -328,14 +328,14 @@ public class XmlModelSaxReader extends DefaultHandler {
 	}
 
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+	public void characters(char[] ch, int start, int length) {
 		if (this.textBuffer != null) {
 			this.textBuffer.append(ch, start, length);
 		}
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(String uri, String localName, String qName) {
 
 		switch (qName) {
 		case RESOURCE:

@@ -68,7 +68,7 @@ public class ActivitySaxParser implements SaxParser<Activity> {
 	}
 
 	@Override
-	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException {
+	public void write(XMLStreamWriter xmlWriter) {
 		this.activity.accept(new StrolchElementToSaxWriterVisitor(xmlWriter));
 	}
 }

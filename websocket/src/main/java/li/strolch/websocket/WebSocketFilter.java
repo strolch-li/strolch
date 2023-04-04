@@ -2,7 +2,6 @@ package li.strolch.websocket;
 
 import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
 
-import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
 
 import jakarta.servlet.*;
@@ -28,7 +27,7 @@ public class WebSocketFilter implements Filter {
 		chain.doFilter(request, response);
 	}
 
-	public void init(FilterConfig config) throws ServletException {
+	public void init(FilterConfig config) {
 	}
 
 	public void destroy() {

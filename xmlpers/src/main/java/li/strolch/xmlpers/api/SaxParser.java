@@ -22,11 +22,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public interface SaxParser<T> {
 
-	public T getObject();
+	T getObject();
 
-	public void setObject(T object);
+	void setObject(T object);
 
-	public DefaultHandler getDefaultHandler();
+	DefaultHandler getDefaultHandler();
 
-	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException;
+	void write(XMLStreamWriter xmlWriter) throws XMLStreamException;
 }

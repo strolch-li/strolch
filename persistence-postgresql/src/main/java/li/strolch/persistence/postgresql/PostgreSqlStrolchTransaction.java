@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	private static final Logger logger = LoggerFactory.getLogger(PostgreSqlStrolchTransaction.class);
-	private PostgreSqlPersistenceHandler persistenceHandler;
+	private final PostgreSqlPersistenceHandler persistenceHandler;
 
 	private PostgreSqlOrderDao orderDao;
 	private PostgreSqlResourceDao resourceDao;
@@ -43,7 +43,7 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	protected void writeChanges() throws Exception {
+	protected void writeChanges() {
 
 		// first perform DAOs
 		if (this.orderDao != null)

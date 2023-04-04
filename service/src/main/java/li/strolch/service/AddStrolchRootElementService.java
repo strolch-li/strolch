@@ -46,16 +46,9 @@ public class AddStrolchRootElementService extends AbstractService<StrolchRootEle
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			switch (arg.rootElement.getObjectType()) {
-			case Tags.RESOURCE:
-				tx.add((Resource) arg.rootElement);
-				break;
-			case Tags.ORDER:
-				tx.add((Order) arg.rootElement);
-				break;
-			case Tags.ACTIVITY:
-				tx.add((Activity) arg.rootElement);
-				break;
-
+			case Tags.RESOURCE -> tx.add((Resource) arg.rootElement);
+			case Tags.ORDER -> tx.add((Order) arg.rootElement);
+			case Tags.ACTIVITY -> tx.add((Activity) arg.rootElement);
 			}
 
 			tx.commitOnClose();

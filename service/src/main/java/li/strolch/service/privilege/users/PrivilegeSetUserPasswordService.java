@@ -40,7 +40,7 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 	}
 
 	@Override
-	protected ServiceResult internalDoService(PrivilegeSetUserPasswordArgument arg) throws Exception {
+	protected ServiceResult internalDoService(PrivilegeSetUserPasswordArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD)) {
 			tx.setSuppressAudits(true);

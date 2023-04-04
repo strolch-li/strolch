@@ -70,7 +70,7 @@ public class TxModifyTest extends AbstractRealmServiceTest<ServiceArgument, Serv
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String type = "Car";
 			String id = "car001";
@@ -122,7 +122,7 @@ public class TxModifyTest extends AbstractRealmServiceTest<ServiceArgument, Serv
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String type = "Car";
 			String id = "car002";

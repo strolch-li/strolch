@@ -37,7 +37,7 @@ import li.strolch.xmlpers.objref.TypeRef;
  */
 public class XmlAuditDao implements AuditDao {
 
-	private PersistenceTransaction tx;
+	private final PersistenceTransaction tx;
 
 	public XmlAuditDao(StrolchTransaction tx) {
 		XmlStrolchTransaction strolchTx = (XmlStrolchTransaction) tx;
@@ -67,9 +67,6 @@ public class XmlAuditDao implements AuditDao {
 		long size = 0;
 		Set<String> types = queryTypes();
 		for (String type : types) {
-			// SubTypeRef subTypeRef = getTypeRef(type);
-			// size += this.tx.getMetadataDao().querySize(subTypeRef);
-
 			size += querySize(type, dateRange);
 		}
 		return size;

@@ -19,8 +19,8 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 
 public class VersioningTestRunner {
 
-	private RuntimeMock runtimeMock;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final Certificate certificate;
 
 	public VersioningTestRunner(RuntimeMock runtimeMock) {
 		this.runtimeMock = runtimeMock;

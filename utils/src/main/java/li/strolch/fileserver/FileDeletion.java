@@ -22,8 +22,8 @@ import java.io.Serializable;
  */
 public class FileDeletion implements Serializable {
 
-	private String fileName;
-	private String fileType;
+	private final String fileName;
+	private final String fileType;
 
 	/**
 	 * @param fileName

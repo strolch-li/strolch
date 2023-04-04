@@ -20,7 +20,6 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -492,7 +491,7 @@ public class ReportResource {
 		// go through all filters and add to the map of sets
 		for (JsonElement elem : filters.getAsJsonArray()) {
 			if (!elem.isJsonObject()) {
-				logger.warn("There are wrong formatted filters:\n" + elem.toString());
+				logger.warn("There are wrong formatted filters:\n" + elem);
 				continue;
 			}
 

@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class OrExpression extends AbstractBooleanExpression {
 
-	private List<AndExpression> children = new ArrayList<>();
+	private final List<AndExpression> children = new ArrayList<>();
 
 	/**
 	 * @return true if at least one child expression returns true

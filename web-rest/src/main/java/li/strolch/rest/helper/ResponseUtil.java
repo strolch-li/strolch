@@ -184,9 +184,8 @@ public class ResponseUtil {
 			response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 		} else {
 			Throwable rootCause = getRootCause(t);
-			if (rootCause instanceof StrolchUserMessageException
+			if (rootCause instanceof StrolchUserMessageException ex
 					&& ((StrolchUserMessageException) rootCause).hasI18n()) {
-				StrolchUserMessageException ex = (StrolchUserMessageException) rootCause;
 				response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 			}
 		}

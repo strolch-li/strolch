@@ -38,7 +38,7 @@ public enum StringMatchMode {
 	 * @param caseSensitive
 	 * 		true if should be a case insensitive match
 	 */
-	private StringMatchMode(boolean equals, boolean caseSensitive) {
+	StringMatchMode(boolean equals, boolean caseSensitive) {
 		this.equals = equals;
 		this.caseSensitve = caseSensitive;
 	}

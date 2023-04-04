@@ -30,7 +30,7 @@ public interface WorktimeFormat {
 	 *
 	 * @return formatted string if the long argument
 	 */
-	public String format(long l);
+	String format(long l);
 
 	/**
 	 * parse a string to long
@@ -40,6 +40,6 @@ public interface WorktimeFormat {
 	 *
 	 * @return the long value parsed
 	 */
-	public long parse(String s);
+	long parse(String s);
 
 }

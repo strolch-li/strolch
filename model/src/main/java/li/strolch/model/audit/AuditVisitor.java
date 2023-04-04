@@ -20,5 +20,5 @@ package li.strolch.model.audit;
  */
 public interface AuditVisitor<U> {
 
-	public U visitAudit(Audit audit);
+	U visitAudit(Audit audit);
 }

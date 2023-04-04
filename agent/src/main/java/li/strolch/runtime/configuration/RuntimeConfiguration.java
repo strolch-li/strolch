@@ -32,7 +32,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	private final File dataPath;
 	private final File tempPath;
 
-	private Locale locale;
+	private final Locale locale;
 
 	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
 			File configPathF, File dataPathF, File tempPathF) {

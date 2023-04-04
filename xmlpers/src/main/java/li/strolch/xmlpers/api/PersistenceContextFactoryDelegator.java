@@ -24,8 +24,8 @@ import java.util.Map;
  */
 public class PersistenceContextFactoryDelegator {
 
-	private Map<String, PersistenceContextFactory<?>> contextFactoryCacheByType;
-	private Map<Class<?>, PersistenceContextFactory<?>> contextFactoryCacheByClass;
+	private final Map<String, PersistenceContextFactory<?>> contextFactoryCacheByType;
+	private final Map<Class<?>, PersistenceContextFactory<?>> contextFactoryCacheByClass;
 
 	public PersistenceContextFactoryDelegator() {
 		this.contextFactoryCacheByType = new HashMap<>();

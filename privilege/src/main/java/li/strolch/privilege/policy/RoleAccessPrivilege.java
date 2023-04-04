@@ -66,7 +66,7 @@ public class RoleAccessPrivilege implements PrivilegePolicy {
 			return true;
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
-		if (!(object instanceof Tuple)) {
+		if (!(object instanceof Tuple tuple)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages
 					.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
@@ -77,25 +77,19 @@ public class RoleAccessPrivilege implements PrivilegePolicy {
 		if (privilege.isAllAllowed())
 			return true;
 
-		Tuple tuple = (Tuple) object;
-
 		// get role name as privilege value
 		Role oldRole = tuple.getFirst();
 		Role newRole = tuple.getSecond();
 
 		switch (privilegeName) {
-
-		case PrivilegeHandler.PRIVILEGE_GET_ROLE:
-		case PrivilegeHandler.PRIVILEGE_ADD_ROLE:
-		case PrivilegeHandler.PRIVILEGE_REMOVE_ROLE: {
+		case PrivilegeHandler.PRIVILEGE_GET_ROLE, PrivilegeHandler.PRIVILEGE_ADD_ROLE, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE -> {
 			DBC.INTERIM.assertNull("For " + privilegeName + " first must be null!", oldRole);
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newRole);
 
 			String privilegeValue = newRole.getName();
 			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
-
-		case PrivilegeHandler.PRIVILEGE_MODIFY_ROLE: {
+		case PrivilegeHandler.PRIVILEGE_MODIFY_ROLE -> {
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldRole);
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newRole);
 
@@ -104,13 +98,12 @@ public class RoleAccessPrivilege implements PrivilegePolicy {
 
 			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
-
-		default:
-
-			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.roleAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+		default -> {
+			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
+					"Privilege.roleAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
 			msg = MessageFormat.format(msg, privilegeName);
 			throw new PrivilegeException(msg);
+		}
 		}
 	}
 }

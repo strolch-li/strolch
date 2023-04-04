@@ -44,17 +44,17 @@ public class PrivilegeContext {
 	// object state
 	//
 
-	private UserRep userRep;
-	private Certificate certificate;
-	private Map<String, IPrivilege> privileges;
-	private Map<String, PrivilegePolicy> policies;
+	private final UserRep userRep;
+	private final Certificate certificate;
+	private final Map<String, IPrivilege> privileges;
+	private final Map<String, PrivilegePolicy> policies;
 
 	public PrivilegeContext(UserRep userRep, Certificate certificate, Map<String, IPrivilege> privileges,
 			Map<String, PrivilegePolicy> policies) {
 		this.userRep = userRep;
 		this.certificate = certificate;
-		this.privileges = Collections.unmodifiableMap(new HashMap<>(privileges));
-		this.policies = Collections.unmodifiableMap(new HashMap<>(policies));
+		this.privileges = Map.copyOf(privileges);
+		this.policies = Map.copyOf(policies);
 	}
 
 	public UserRep getUserRep() {

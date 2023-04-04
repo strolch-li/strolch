@@ -125,7 +125,7 @@ public abstract class AbstractRealmCommandTest {
 
 	private class FailCommandFacade extends Command {
 
-		private Command command;
+		private final Command command;
 
 		/**
 		 *

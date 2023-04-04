@@ -116,7 +116,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	}
 
 	@Override
-	protected Locale getLocale(Attributes attrs) throws NamingException {
+	protected Locale getLocale(Attributes attrs) {
 		return this.defaultLocale;
 	}
 

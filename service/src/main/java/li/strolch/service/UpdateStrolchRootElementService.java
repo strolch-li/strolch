@@ -46,16 +46,9 @@ public class UpdateStrolchRootElementService extends AbstractService<StrolchRoot
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			switch (arg.rootElement.getObjectType()) {
-			case Tags.RESOURCE:
-				tx.update((Resource) arg.rootElement);
-				break;
-			case Tags.ORDER:
-				tx.update((Order) arg.rootElement);
-				break;
-			case Tags.ACTIVITY:
-				tx.update((Activity) arg.rootElement);
-				break;
-
+			case Tags.RESOURCE -> tx.update((Resource) arg.rootElement);
+			case Tags.ORDER -> tx.update((Order) arg.rootElement);
+			case Tags.ACTIVITY -> tx.update((Activity) arg.rootElement);
 			}
 
 			tx.commitOnClose();

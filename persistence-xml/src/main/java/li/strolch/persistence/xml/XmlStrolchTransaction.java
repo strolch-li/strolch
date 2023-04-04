@@ -28,8 +28,8 @@ import li.strolch.xmlpers.api.TransactionResult;
 
 public class XmlStrolchTransaction extends AbstractTransaction {
 
-	private XmlPersistenceHandler persistenceHandler;
-	private PersistenceTransaction tx;
+	private final XmlPersistenceHandler persistenceHandler;
+	private final PersistenceTransaction tx;
 
 	public XmlStrolchTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
 			String action, boolean readOnly, PersistenceTransaction tx, XmlPersistenceHandler persistenceHandler) {
@@ -43,17 +43,17 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	protected void writeChanges() throws Exception {
+	protected void writeChanges() {
 		// do nothing
 	}
 
 	@Override
-	protected void rollback() throws Exception {
+	protected void rollback() {
 		this.tx.autoCloseableRollback();
 	}
 
 	@Override
-	protected void commit() throws Exception {
+	protected void commit() {
 		if (!this.tx.hasTransactionResult()) {
 			TransactionResult result = new TransactionResult();
 			this.tx.setTransactionResult(result);

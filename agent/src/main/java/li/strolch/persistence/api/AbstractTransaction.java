@@ -1687,7 +1687,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		}
 	}
 
-	protected abstract void writeChanges() throws Exception;
+	protected abstract void writeChanges();
 
 	protected abstract void rollback() throws Exception;
 

@@ -146,8 +146,8 @@ public class ServiceLockingTest {
 
 	private class LockingRunner extends Thread {
 
-		private LockingServiceTest svc;
-		private LockingArgumentTest arg;
+		private final LockingServiceTest svc;
+		private final LockingArgumentTest arg;
 
 		private ServiceResult result;
 

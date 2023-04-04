@@ -16,7 +16,7 @@ import org.junit.Test;
 public class StatementTest extends BaseTest {
 
 	@Test
-	public void test0() throws Exception {
+	public void test0() {
 
 		String s = "SELECT r FROM Resource r";
 
@@ -36,7 +36,7 @@ public class StatementTest extends BaseTest {
 	}
 
 	@Test
-	public void test1() throws Exception {
+	public void test1() {
 
 		String s = "SELECT r, a, a.getId() FROM Resource r, Activity a";
 
@@ -60,7 +60,7 @@ public class StatementTest extends BaseTest {
 	 * positive test of a comparison expression in a WHERE clause
 	 */
 	@Test
-	public void test2() throws Exception {
+	public void test2() {
 
 		String s = "SELECT r FROM Resource r WHERE r.getId() = \"testId\"";
 
@@ -82,7 +82,7 @@ public class StatementTest extends BaseTest {
 	 * negative test of a comparison expression in a WHERE clause
 	 */
 	@Test
-	public void test3() throws Exception {
+	public void test3() {
 
 		String s = "SELECT r FROM Resource r WHERE r.getId() = \"testIdNoMatch\"";
 
@@ -104,7 +104,7 @@ public class StatementTest extends BaseTest {
 	 * positive test of a AND combined comparison expressions in WHERE clause
 	 */
 	@Test
-	public void test4() throws Exception {
+	public void test4() {
 
 		String s = "SELECT r, a FROM Resource r, Activity a WHERE r.getId() = a.getId() AND r.getId() = \"testId\"";
 
@@ -126,7 +126,7 @@ public class StatementTest extends BaseTest {
 	 * positive test of a comparison expression with query parameter
 	 */
 	@Test
-	public void test5() throws Exception {
+	public void test5() {
 
 		String s = "SELECT a FROM Activity a WHERE a.getId() = :outer_var";
 
@@ -148,7 +148,7 @@ public class StatementTest extends BaseTest {
 	 * positive test of a method call in comparison expression of a WHERE clause
 	 */
 	@Test
-	public void test6() throws Exception {
+	public void test6() {
 
 		String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getValue() < :parameter";
 
@@ -172,7 +172,7 @@ public class StatementTest extends BaseTest {
 	 * negative test of a method call in comparison expression of a WHERE clause
 	 */
 	@Test
-	public void test8() throws Exception {
+	public void test8() {
 
 		String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getValue() > :parameter";
 
@@ -196,7 +196,7 @@ public class StatementTest extends BaseTest {
 	 * negative test of a method call in SELECT statement
 	 */
 	@Test
-	public void test9() throws Exception {
+	public void test9() {
 
 		String s = "SELECT a.getParameterBag(:param_1) FROM Resource a";
 
@@ -228,7 +228,7 @@ public class StatementTest extends BaseTest {
 	 * positive test of a method call with multiple method arguments
 	 */
 	@Test
-	public void test10() throws Exception {
+	public void test10() {
 
 		String s = "SELECT a.getParameter(:param_1,:param_2) FROM Activity a";
 
@@ -260,7 +260,7 @@ public class StatementTest extends BaseTest {
 	 * positive test of a chained method call in SELECT clause
 	 */
 	@Test
-	public void test11() throws Exception {
+	public void test11() {
 
 		String s = "SELECT a.getParameterBag(:param_1).getId() FROM Activity a";
 
@@ -285,7 +285,7 @@ public class StatementTest extends BaseTest {
 	 * positive test of a chained method call in WHERE clause
 	 */
 	@Test
-	public void test12() throws Exception {
+	public void test12() {
 
 		String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getType() = \"Float\"";
 
@@ -309,7 +309,7 @@ public class StatementTest extends BaseTest {
 	 * negative test of a chained method call in WHERE clause
 	 */
 	@Test
-	public void test14() throws Exception {
+	public void test14() {
 
 		String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getType() = :p_3";
 
@@ -334,7 +334,7 @@ public class StatementTest extends BaseTest {
 	 * test an where expression with a NOT inversion
 	 */
 	@Test
-	public void test15() throws Exception {
+	public void test15() {
 
 		String s = "SELECT a FROM Activity a WHERE NOT a.getParameter(:p_1, :p_2).getType() = :p_3";
 
@@ -359,7 +359,7 @@ public class StatementTest extends BaseTest {
 	 * test null pointer in chained method calls, when the first call returns null
 	 */
 	@Test
-	public void test16() throws Exception {
+	public void test16() {
 
 		String s = "SELECT a FROM Activity a WHERE a.getParameter(:p_1, :p_2).getType() = :p_3";
 

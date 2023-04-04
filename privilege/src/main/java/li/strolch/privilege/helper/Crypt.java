@@ -153,22 +153,10 @@ public class Crypt {
 
 		sb.append("$");
 		switch (this.algorithm) {
-		case "MD5":
-			sb.append("1");
-			break;
-
-		case "PBKDF2WithHmacSHA256":
-		case "SHA-256":
-			sb.append("5");
-			break;
-
-		case "PBKDF2WithHmacSHA512":
-		case "SHA-512":
-			sb.append("6");
-			break;
-
-		default:
-			throw new IllegalStateException("Unhandled algorithm " + this.algorithm);
+		case "MD5" -> sb.append("1");
+		case "PBKDF2WithHmacSHA256", "SHA-256" -> sb.append("5");
+		case "PBKDF2WithHmacSHA512", "SHA-512" -> sb.append("6");
+		default -> throw new IllegalStateException("Unhandled algorithm " + this.algorithm);
 		}
 
 		if (this.iterations != 0 && this.iterations != DEFAULT_SMALL_ITERATIONS) {
@@ -206,21 +194,19 @@ public class Crypt {
 
 	private void setAlgorithm(String id, boolean hasSalt) {
 		switch (id) {
-		case "1":
+		case "1" -> {
 			this.algorithm = "MD5";
 			this.keyLength = 0;
-			break;
-		case "5":
+		}
+		case "5" -> {
 			this.algorithm = hasSalt ? "PBKDF2WithHmacSHA256" : "SHA-256";
 			this.keyLength = 256;
-			break;
-		case "6":
+		}
+		case "6" -> {
 			this.algorithm = hasSalt ? "PBKDF2WithHmacSHA512" : "SHA-512";
 			this.keyLength = 256;
-			break;
-
-		default:
-			throw new IllegalStateException("Unhandled ID " + id);
+		}
+		default -> throw new IllegalStateException("Unhandled ID " + id);
 		}
 	}
 }

@@ -78,11 +78,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			T argument) {
 		DBC.PRE.assertNotNull("Certificate my not be null!", certificate);
 
-		if (!(svc instanceof AbstractService))
+		if (!(svc instanceof AbstractService<T, U> service))
 			throw new IllegalArgumentException(
 					"This service handle expects all services to be instance of " + AbstractService.class.getName());
-
-		AbstractService<T, U> service = (AbstractService<T, U>) svc;
 
 		long start = System.nanoTime();
 

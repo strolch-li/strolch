@@ -59,7 +59,7 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	@Override
 	protected Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
-			Set<String> strolchRoles) throws NamingException {
+			Set<String> strolchRoles) {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put(ORGANISATION, this.organisation);

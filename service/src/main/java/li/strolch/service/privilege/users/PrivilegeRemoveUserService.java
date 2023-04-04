@@ -37,7 +37,7 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 	}
 
 	@Override
-	protected ServiceResult internalDoService(PrivilegeUserNameArgument arg) throws Exception {
+	protected ServiceResult internalDoService(PrivilegeUserNameArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_USER)) {
 			tx.setSuppressAudits(true);

@@ -95,9 +95,9 @@ public class ServiceExecutionHandler extends StrolchComponent {
 
 	public class ServiceContext<T extends ServiceArgument, U extends ServiceResult> {
 
-		private Certificate certificate;
-		private Service<T, U> service;
-		private T argument;
+		private final Certificate certificate;
+		private final Service<T, U> service;
+		private final T argument;
 
 		public ServiceContext(Certificate certificate, Service<T, U> service, T argument) {
 			this.certificate = certificate;

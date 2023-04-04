@@ -82,9 +82,7 @@ public class UserRep implements Serializable {
 
 		if (propertyMap != null) {
 			this.properties = new HashMap<>();
-			propertyMap.forEach((key, value) -> {
-				this.properties.put(key.trim(), value.trim());
-			});
+			propertyMap.forEach((key, value) -> this.properties.put(key.trim(), value.trim()));
 		}
 
 		this.history = history;

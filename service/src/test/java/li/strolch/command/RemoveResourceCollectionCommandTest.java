@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;

@@ -22,5 +22,5 @@ import li.strolch.persistence.api.TransactionResult;
  */
 public interface DaoCommand {
 
-	public void doComand(TransactionResult txResult);
+	void doComand(TransactionResult txResult);
 }

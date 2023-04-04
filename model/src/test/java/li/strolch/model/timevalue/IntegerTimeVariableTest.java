@@ -42,7 +42,7 @@ public class IntegerTimeVariableTest {
 	private static final Long PICK = 50L;
 
 	private TimeVariable<IntegerValue> timeVariable;
-	private Map<Long, IntegerValue> expectedValues = new HashMap<>();
+	private final Map<Long, IntegerValue> expectedValues = new HashMap<>();
 
 	/**
 	 * set the values ascending with a difference of STEP
@@ -52,7 +52,7 @@ public class IntegerTimeVariableTest {
 		this.timeVariable = new TimeVariable<>();
 		for (int i = 0; i < MAX; i += STEP) {
 			IntegerValue expectedValue = new IntegerValue(i);
-			Long time = Long.valueOf(i);
+			Long time = (long) i;
 			this.expectedValues.put(time, expectedValue);
 			this.timeVariable.setValueAt(time, expectedValue);
 		}

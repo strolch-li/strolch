@@ -133,8 +133,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 			this.text = new StringBuilder();
 
@@ -189,82 +188,42 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		}
 
 		@Override
-		public void characters(char[] ch, int start, int length) throws SAXException {
+		public void characters(char[] ch, int start, int length) {
 			this.text.append(ch, start, length);
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String qName) throws SAXException {
+		public void endElement(String uri, String localName, String qName) {
 
 			switch (qName) {
-			case XML_FIRSTNAME:
-
-				this.firstName = this.text.toString().trim();
-				break;
-
-			case XML_LASTNAME:
-
-				this.lastname = this.text.toString().trim();
-				break;
-
-			case XML_STATE:
-
-				this.userState = UserState.valueOf(this.text.toString().trim());
-				break;
-
-			case XML_LOCALE:
-
-				this.locale = Locale.forLanguageTag(this.text.toString().trim());
-				break;
-
-			case XML_PASSWORD_CHANGE_REQUESTED:
-
-				this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
-				break;
-
-			case XML_FIRST_LOGIN:
-
-				this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				break;
-
-			case XML_LAST_LOGIN:
-
-				this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				break;
-
-			case XML_LAST_PASSWORD_CHANGE:
-
-				this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
-				break;
-
-			case XML_ROLE:
-
-				this.userRoles.add(this.text.toString().trim());
-				break;
-
-			case XML_USER:
-
+			case XML_FIRSTNAME -> this.firstName = this.text.toString().trim();
+			case XML_LASTNAME -> this.lastname = this.text.toString().trim();
+			case XML_STATE -> this.userState = UserState.valueOf(this.text.toString().trim());
+			case XML_LOCALE -> this.locale = Locale.forLanguageTag(this.text.toString().trim());
+			case XML_PASSWORD_CHANGE_REQUESTED ->
+					this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
+			case XML_FIRST_LOGIN -> this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+			case XML_LAST_LOGIN -> this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+			case XML_LAST_PASSWORD_CHANGE ->
+					this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
+			case XML_ROLE -> this.userRoles.add(this.text.toString().trim());
+			case XML_USER -> {
 				if (this.history == null)
 					this.history = new UserHistory();
-
 				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
 						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
 						this.locale, this.parameters, this.passwordChangeRequested, this.history);
 				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
-
 				getUsers().add(user);
-				break;
-
-			default:
-
+			}
+			default -> {
 				if (!(qName.equals(XML_ROLES) //
 						|| qName.equals(XML_PARAMETER) //
 						|| qName.equals(XML_HISTORY) //
 						|| qName.equals(XML_PARAMETERS))) {
 					throw new IllegalArgumentException("Unhandled tag " + qName);
 				}
-
-				break;
+			}
 			}
 		}
 
@@ -283,22 +242,19 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		public Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 			switch (qName) {
-			case XML_PROPERTY:
-
+			case XML_PROPERTY -> {
 				String key = attributes.getValue(XML_ATTR_NAME).trim();
 				String value = attributes.getValue(XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
-				break;
-
-			default:
-
+			}
+			default -> {
 				if (!qName.equals(XML_PROPERTIES)) {
 					throw new IllegalArgumentException("Unhandled tag " + qName);
 				}
+			}
 			}
 		}
 

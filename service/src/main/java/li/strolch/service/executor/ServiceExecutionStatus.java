@@ -24,7 +24,7 @@ import li.strolch.utils.helper.StringHelper;
  */
 public class ServiceExecutionStatus {
 
-	private String serviceName;
+	private final String serviceName;
 	private volatile boolean started;
 	private volatile ServiceResult result;
 

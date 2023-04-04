@@ -50,7 +50,7 @@ public class StringTimeVariableTest {
 
 	private TimeVariable<IValue<Set<AString>>> timeVariable;
 
-	private Map<Long, StringSetValue> testSets = new HashMap<>();
+	private final Map<Long, StringSetValue> testSets = new HashMap<>();
 
 	@Before
 	public void init() {

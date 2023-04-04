@@ -88,7 +88,7 @@ public class LockableObject {
 				throw new XmlPersistenceException(msg);
 			}
 			if (logger.isDebugEnabled())
-				logger.debug("locked " + toString()); //$NON-NLS-1$
+				logger.debug("locked " + this); //$NON-NLS-1$
 		} catch (InterruptedException e) {
 			throw new XmlPersistenceException("Thread interrupted: " + e.getMessage(), e); //$NON-NLS-1$
 		}
@@ -100,7 +100,7 @@ public class LockableObject {
 	public void releaseLock() {
 		while (this.lock.isHeldByCurrentThread() && this.lock.isLocked()) {
 			if (logger.isDebugEnabled())
-				logger.debug("unlocking " + toString()); //$NON-NLS-1$
+				logger.debug("unlocking " + this); //$NON-NLS-1$
 			this.lock.unlock();
 		}
 	}
