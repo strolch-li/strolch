@@ -343,7 +343,7 @@ public class ByteHelper {
 		sb.append(((b >>> 3) & 1));
 		sb.append(((b >>> 2) & 1));
 		sb.append(((b >>> 1) & 1));
-		sb.append(((b >>> 0) & 1));
+		sb.append(((b) & 1));
 
 		return sb.toString();
 	}
@@ -378,7 +378,7 @@ public class ByteHelper {
 		sb.append(((i >>> 3) & 1));
 		sb.append(((i >>> 2) & 1));
 		sb.append(((i >>> 1) & 1));
-		sb.append(((i >>> 0) & 1));
+		sb.append(((i) & 1));
 
 		return sb.toString();
 	}
@@ -435,7 +435,7 @@ public class ByteHelper {
 		sb.append(((i >>> 3) & 1));
 		sb.append(((i >>> 2) & 1));
 		sb.append(((i >>> 1) & 1));
-		sb.append(((i >>> 0) & 1));
+		sb.append(((i) & 1));
 
 		return sb.toString();
 	}
@@ -536,7 +536,7 @@ public class ByteHelper {
 		sb.append(((i >>> 3) & 1));
 		sb.append(((i >>> 2) & 1));
 		sb.append(((i >>> 1) & 1));
-		sb.append(((i >>> 0) & 1));
+		sb.append(((i) & 1));
 
 		return sb.toString();
 	}
