@@ -87,7 +87,6 @@ public class AString implements Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "AString [string=" + this.string + ", inverse=" + this.inverse + "]";
-		return sb;
+		return "AString [string=" + this.string + ", inverse=" + this.inverse + "]";
 	}
 }

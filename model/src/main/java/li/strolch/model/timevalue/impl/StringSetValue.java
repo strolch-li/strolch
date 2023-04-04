@@ -131,8 +131,7 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "StringSetValue [aStrings=" + getValueAsString() + "]";
-		return sb;
+		return "StringSetValue [aStrings=" + getValueAsString() + "]";
 	}
 
 	@Override

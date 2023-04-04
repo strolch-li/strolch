@@ -74,8 +74,7 @@ public class LongValue implements IValue<Long>, Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "LongValue [value=" + this.value + "]";
-		return sb;
+		return "LongValue [value=" + this.value + "]";
 	}
 
 	@Override

@@ -100,8 +100,7 @@ public class IntegerListValue implements IValue<List<Integer>>, Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "IntegerListValue [value=" + this.value + "]";
-		return sb;
+		return "IntegerListValue [value=" + this.value + "]";
 	}
 
 	@Override

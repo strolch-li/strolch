@@ -180,8 +180,7 @@ public class RuntimeMock {
 
 	public <T extends ServiceArgument, U extends ServiceResult> U doService(Certificate certificate,
 			Service<T, U> service, T argument) {
-		U result = getServiceHandler().doService(certificate, service, argument);
-		return result;
+		return getServiceHandler().doService(certificate, service, argument);
 	}
 
 	public <T extends ServiceArgument, U extends ServiceResult> U doServiceAssertResult(Certificate certificate,

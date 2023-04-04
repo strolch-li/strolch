@@ -45,10 +45,8 @@ public class MyParameter {
 
 	@Override
 	public String toString() {
-		String builder =
-				"Parameter [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", value=" + this.value
-						+ "]";
-		return builder;
+		return "Parameter [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", value=" + this.value
+				+ "]";
 	}
 
 	/**

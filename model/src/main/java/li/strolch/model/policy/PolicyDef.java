@@ -102,8 +102,7 @@ public abstract class PolicyDef {
 
 	@Override
 	public String toString() {
-		String sb = "PolicyDef [type=" + this.type + ", value=" + this.value + "]";
-		return sb;
+		return "PolicyDef [type=" + this.type + ", value=" + this.value + "]";
 	}
 
 	/**

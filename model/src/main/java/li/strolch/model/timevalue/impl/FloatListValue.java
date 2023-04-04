@@ -100,8 +100,7 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "FloatListValue [value=" + this.value + "]";
-		return sb;
+		return "FloatListValue [value=" + this.value + "]";
 	}
 
 	@Override

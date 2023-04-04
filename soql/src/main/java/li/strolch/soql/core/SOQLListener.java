@@ -41,8 +41,7 @@ public class SOQLListener extends SOQLBaseListener {
 
 	@Override
 	public void enterSelect_clause(Select_clauseContext ctx) {
-		SelectClause selectClause = new SelectClause();
-		pointer = selectClause;
+		pointer = new SelectClause();
 	}
 
 	@Override
@@ -65,8 +64,7 @@ public class SOQLListener extends SOQLBaseListener {
 
 	@Override
 	public void enterWhere_clause(Where_clauseContext ctx) {
-		WhereExpression whereExpression = new WhereExpression();
-		pointer = whereExpression;
+		pointer = new WhereExpression();
 	}
 
 	@Override

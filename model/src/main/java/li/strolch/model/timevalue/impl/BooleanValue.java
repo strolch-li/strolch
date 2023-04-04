@@ -74,8 +74,7 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "BooleanValue [value=" + this.value + "]";
-		return sb;
+		return "BooleanValue [value=" + this.value + "]";
 	}
 
 	@Override

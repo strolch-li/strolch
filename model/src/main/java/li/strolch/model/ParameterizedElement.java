@@ -1237,8 +1237,6 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	@Override
 	public String toString() {
 
-		String builder = "ParameterizedElement [id=" + this.id + ", name=" + this.name + ", type=" + this.type + "]";
-
-		return builder;
+		return "ParameterizedElement [id=" + this.id + ", name=" + this.name + ", type=" + this.type + "]";
 	}
 }

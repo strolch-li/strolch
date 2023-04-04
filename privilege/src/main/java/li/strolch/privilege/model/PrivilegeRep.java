@@ -169,13 +169,11 @@ public class PrivilegeRep implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		String builder =
-				"PrivilegeRep [name=" + this.name + ", policy=" + this.policy + ", allAllowed=" + this.allAllowed
-						+ ", denyList=" + (this.denyList == null ? "null" : this.denyList.size()) + ", allowList=" + (
-						this.allowList == null ?
-								"null" :
-								this.allowList.size()) + "]";
-		return builder;
+		return "PrivilegeRep [name=" + this.name + ", policy=" + this.policy + ", allAllowed=" + this.allAllowed
+				+ ", denyList=" + (this.denyList == null ? "null" : this.denyList.size()) + ", allowList=" + (
+				this.allowList == null ?
+						"null" :
+						this.allowList.size()) + "]";
 	}
 
 	@Override

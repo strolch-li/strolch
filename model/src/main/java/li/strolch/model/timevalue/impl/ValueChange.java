@@ -103,8 +103,7 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 
 	@Override
 	public String toString() {
-		String sb = "ValueChange [time=" + this.time + ", value=" + this.value + ", stateId=" + this.stateId + "]";
-		return sb;
+		return "ValueChange [time=" + this.time + ", value=" + this.value + ", stateId=" + this.stateId + "]";
 	}
 
 	@Override

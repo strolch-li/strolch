@@ -145,8 +145,7 @@ public final class Role {
 	 */
 	@Override
 	public String toString() {
-		String builder = "Role [name=" + this.name + ", privileges=" + this.privilegeMap.keySet() + "]";
-		return builder;
+		return "Role [name=" + this.name + ", privileges=" + this.privilegeMap.keySet() + "]";
 	}
 
 	@Override

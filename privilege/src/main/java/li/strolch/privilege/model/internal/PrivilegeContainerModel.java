@@ -205,7 +205,7 @@ public class PrivilegeContainerModel {
 
 	@Override
 	public String toString() {
-		String builder = "PrivilegeContainerModel [encryptionHandlerClassName=" + this.encryptionHandlerClassName
+		return "PrivilegeContainerModel [encryptionHandlerClassName=" + this.encryptionHandlerClassName
 				+ ", encryptionHandlerParameterMap=" + this.encryptionHandlerParameterMap.size()
 				+ ", passwordStrengthHandlerClassName=" + this.passwordStrengthHandlerClassName
 				+ ", passwordStrengthHandlerParameterMap=" + this.passwordStrengthHandlerParameterMap
@@ -215,6 +215,5 @@ public class PrivilegeContainerModel {
 				+ ", ssoHandlerParameterMap=" + this.ssoHandlerParameterMap.size() + ", privilegeHandlerParameterMap="
 				+ this.privilegeHandlerParameterMap.size() + ", parameterMap=" + this.parameterMap.size()
 				+ ", policies=" + this.policies.size() + "]";
-		return builder;
 	}
 }

@@ -74,8 +74,7 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "IntegerValue [value=" + this.value + "]";
-		return sb;
+		return "IntegerValue [value=" + this.value + "]";
 	}
 
 	@Override

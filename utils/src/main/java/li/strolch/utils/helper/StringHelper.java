@@ -160,8 +160,7 @@ public class StringHelper {
 	public static byte fromHexStringByte(String encoded) {
 		if (encoded.length() != 2)
 			throw new IllegalArgumentException("Input string must be exactly two characters long.");
-		byte result = (byte) Integer.parseInt(encoded, 16);
-		return result;
+		return (byte) Integer.parseInt(encoded, 16);
 	}
 
 	/**
@@ -657,15 +656,13 @@ public class StringHelper {
 		int start = Math.max(0, (i - maxContext));
 		int end = Math.min(i + maxContext, (Math.min(bytes1.length, bytes2.length)));
 
-		String sb = "Strings are not equal! Start of inequality is at " + i
+		return "Strings are not equal! Start of inequality is at " + i
 				+ ". Showing " + maxContext
 				+ " extra characters and start and end:\n"
 				+ "context s1: "
 				+ s1.substring(start, end) + "\n"
 				+ "context s2: "
 				+ s2.substring(start, end) + "\n";
-
-		return sb;
 	}
 
 	/**

@@ -30,13 +30,12 @@ public class ObserverEvent {
 	}
 
 	private static String collectSizeByType(Map.Entry<String, List<StrolchRootElement>> entry) {
-		String sizeByType = entry.getValue()
+		return entry.getValue()
 				.stream()
 				.collect(groupingBy(StrolchElement::getType))
 				.entrySet()
 				.stream()
 				.map(e -> e.getKey() + "=" + e.getValue().size())
 				.collect(joining(","));
-		return sizeByType;
 	}
 }

@@ -53,8 +53,7 @@ public class AesCryptoHelper {
 			outputStream.write(initVector);
 			outputStream.flush();
 
-			CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, cipher);
-			return cipherOutputStream;
+			return new CipherOutputStream(outputStream, cipher);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -87,8 +86,7 @@ public class AesCryptoHelper {
 			Cipher cipher = Cipher.getInstance(CIPHER);
 			cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(initVector));
 
-			CipherInputStream cipherInputStream = new CipherInputStream(inputStream, cipher);
-			return cipherInputStream;
+			return new CipherInputStream(inputStream, cipher);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -322,8 +320,7 @@ public class AesCryptoHelper {
 			Cipher cipher = Cipher.getInstance(CIPHER);
 			cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(initVector));
 
-			byte[] decryptedBytes = cipher.doFinal(encryptedBytes, 16, encryptedBytes.length - 16);
-			return decryptedBytes;
+			return cipher.doFinal(encryptedBytes, 16, encryptedBytes.length - 16);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -335,9 +332,8 @@ public class AesCryptoHelper {
 			SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 			KeySpec keySpec = new PBEKeySpec(password, salt, 65536, 256);
 			SecretKey secretKey = factory.generateSecret(keySpec);
-			SecretKey secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
 
-			return secret;
+			return new SecretKeySpec(secretKey.getEncoded(), "AES");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

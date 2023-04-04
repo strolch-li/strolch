@@ -73,8 +73,7 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	@Override
 	public String toString() {
-		String sb = "DoubleValue [value=" + this.value + "]";
-		return sb;
+		return "DoubleValue [value=" + this.value + "]";
 	}
 
 	@Override

@@ -78,8 +78,7 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 
 	@Override
 	public String toString() {
-		String sb = "TimeValue [time=" + this.time + ", value=" + this.value + "]";
-		return sb;
+		return "TimeValue [time=" + this.time + ", value=" + this.value + "]";
 	}
 
 	@Override

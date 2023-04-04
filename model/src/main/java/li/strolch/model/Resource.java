@@ -383,10 +383,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	@Override
 	public String toString() {
 
-		String builder =
-				"Resource [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", version=" + this.version;
-
-		return builder;
+		return "Resource [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", version=" + this.version;
 	}
 
 	@Override

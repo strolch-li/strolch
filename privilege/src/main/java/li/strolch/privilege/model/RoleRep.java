@@ -112,10 +112,8 @@ public class RoleRep implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		String builder =
-				"RoleRep [name=" + this.name + ", privilegeMap=" + (this.privileges == null ? "null" : this.privileges)
-						+ "]";
-		return builder;
+		return "RoleRep [name=" + this.name + ", privilegeMap=" + (this.privileges == null ? "null" : this.privileges)
+				+ "]";
 	}
 
 	@Override

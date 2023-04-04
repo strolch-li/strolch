@@ -368,9 +368,8 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public String toString() {
-		String builder = "Action [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", resourceId="
+		return "Action [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", resourceId="
 				+ this.resourceId + ", state=" + this.state + "]";
-		return builder;
 	}
 
 	@Override

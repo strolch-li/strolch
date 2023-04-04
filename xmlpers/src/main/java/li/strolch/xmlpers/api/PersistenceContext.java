@@ -82,9 +82,7 @@ public class PersistenceContext<T> {
 
 	@Override
 	public String toString() {
-		String builder =
-				"PersistenceContext [objectRef=" + this.objectRef + ", object=" + this.object + ", parserFactory="
-						+ this.parserFactory + "]";
-		return builder;
+		return "PersistenceContext [objectRef=" + this.objectRef + ", object=" + this.object + ", parserFactory="
+				+ this.parserFactory + "]";
 	}
 }

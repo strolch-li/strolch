@@ -79,8 +79,7 @@ public class ConfigurationParser {
 		globalEnvBuilder.merge(envBuilder);
 
 		// build configuration
-		StrolchConfiguration strolchConfiguration = globalEnvBuilder.build(configPathF, dataPathF, tempPathF);
 
-		return strolchConfiguration;
+		return globalEnvBuilder.build(configPathF, dataPathF, tempPathF);
 	}
 }

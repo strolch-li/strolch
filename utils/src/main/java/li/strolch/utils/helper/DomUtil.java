@@ -28,8 +28,7 @@ public class DomUtil {
 	public static DocumentBuilder createDocumentBuilder() {
 		try {
 			DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-			return docBuilder;
+			return dbfac.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			String msg = "No Xml Parser could be loaded: {0}";
 			msg = MessageFormat.format(msg, e.getMessage());

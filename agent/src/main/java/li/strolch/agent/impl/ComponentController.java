@@ -141,7 +141,6 @@ public class ComponentController {
 
 	@Override
 	public String toString() {
-		String builder = "ComponentController [component=" + this.component.getName() + "]";
-		return builder;
+		return "ComponentController [component=" + this.component.getName() + "]";
 	}
 }

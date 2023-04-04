@@ -195,8 +195,7 @@ public final class PrivilegeImpl implements IPrivilege {
 	 */
 	@Override
 	public String toString() {
-		String builder = "Privilege [name=" + this.name + ", policy=" + this.policy + "]";
-		return builder;
+		return "Privilege [name=" + this.name + ", policy=" + this.policy + "]";
 	}
 
 	@Override

@@ -107,10 +107,8 @@ public class PolicyDefs {
 
 	@Override
 	public String toString() {
-		String sb =
-				"PolicyDefs [parent=" + (this.parent == null ? "null" : this.parent.getLocator()) + ", policyDefMap="
-						+ this.policyDefMap + "]";
-		return sb;
+		return "PolicyDefs [parent=" + (this.parent == null ? "null" : this.parent.getLocator()) + ", policyDefMap="
+				+ this.policyDefMap + "]";
 	}
 
 	public boolean isReadOnly() {

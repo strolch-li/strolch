@@ -220,9 +220,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	@Override
 	public String toString() {
 
-		String builder = getClass().getSimpleName() + " [id=" + this.id + ", name=" + this.name + ", valueNow="
+		return getClass().getSimpleName() + " [id=" + this.id + ", name=" + this.name + ", valueNow="
 				+ this.state.getStateAt(System.currentTimeMillis()) + "]";
-
-		return builder;
 	}
 }

@@ -71,7 +71,6 @@ public class BookDomParser implements DomParser<Book> {
 		String priceS = rootElement.getAttribute("price");
 		double price = Double.parseDouble(priceS);
 
-		Book book = new Book(id, title, author, press, price);
-		this.book = book;
+		this.book = new Book(id, title, author, press, price);
 	}
 }

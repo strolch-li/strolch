@@ -357,10 +357,9 @@ public final class User {
 	 */
 	@Override
 	public String toString() {
-		String builder = "User [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
+		return "User [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
 				+ ", lastname=" + this.lastname + ", locale=" + this.locale + ", userState=" + this.userState
 				+ ", roles=" + this.roles + "]";
-		return builder;
 	}
 
 	@Override

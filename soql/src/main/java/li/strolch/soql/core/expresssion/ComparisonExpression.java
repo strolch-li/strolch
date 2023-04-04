@@ -23,7 +23,7 @@ public class ComparisonExpression extends AbstractBooleanExpression {
 	@Override
 	public boolean evaluate(Map<String, Object> inputObjects, Map<String, Object> queryParameter) {
 
-		boolean result = switch (operator) {
+		return switch (operator) {
 			case "=" -> evaluateEquals(inputObjects, queryParameter);
 			case "<>" -> !evaluateEquals(inputObjects, queryParameter);
 			case ">" -> evaluateMore(inputObjects, queryParameter);
@@ -33,8 +33,6 @@ public class ComparisonExpression extends AbstractBooleanExpression {
 			default -> throw new SOQLEvaluationException(
 					"Comparison with operator " + operator + " is not supported yet.");
 		};
-
-		return result;
 	}
 
 	/**

@@ -137,9 +137,7 @@ public class ClassHelper {
 	public static <T> Class<T> loadClass(String className) throws IllegalArgumentException {
 		try {
 
-			Class<T> clazz = (Class<T>) Class.forName(className);
-
-			return clazz;
+			return (Class<T>) Class.forName(className);
 
 		} catch (Exception e) {
 			String msg = MessageFormat.format("The class {0} could not be instantiated: ", className);

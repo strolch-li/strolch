@@ -53,9 +53,7 @@ public class TexHelper {
 		data = StringHelper.replacePropertiesIn(properties, data);
 		data = StringHelper.replacePropertiesIn(getI18nData(bundle), "%", data);
 
-		File renderedPdf = renderPdf(fileName, templatePath, data);
-
-		return renderedPdf;
+		return renderPdf(fileName, templatePath, data);
 	}
 
 	private File renderPdf(String fileName, File templatePath, String data) {

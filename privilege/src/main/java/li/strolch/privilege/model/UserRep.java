@@ -353,11 +353,9 @@ public class UserRep implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		String builder =
-				"UserRep [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
-						+ ", lastname=" + this.lastname + ", userState=" + this.userState + ", locale=" + this.locale
-						+ ", roles=" + this.roles + "]";
-		return builder;
+		return "UserRep [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
+				+ ", lastname=" + this.lastname + ", userState=" + this.userState + ", locale=" + this.locale
+				+ ", roles=" + this.roles + "]";
 	}
 
 	@Override

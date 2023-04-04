@@ -242,12 +242,10 @@ public class Version {
 
 	@Override
 	public String toString() {
-		String builder =
-				"Version [version=" + this.version + ", locator=" + this.locator + ", createdBy=" + this.createdBy
-						+ ", updatedBy=" + this.updatedBy + ", created=" + ISO8601FormatFactory.getInstance()
-						.formatDate(this.created) + ", updated=" + ISO8601FormatFactory.getInstance()
-						.formatDate(this.updated) + ", deleted=" + this.deleted + "]";
-		return builder;
+		return "Version [version=" + this.version + ", locator=" + this.locator + ", createdBy=" + this.createdBy
+				+ ", updatedBy=" + this.updatedBy + ", created=" + ISO8601FormatFactory.getInstance()
+				.formatDate(this.created) + ", updated=" + ISO8601FormatFactory.getInstance()
+				.formatDate(this.updated) + ", deleted=" + this.deleted + "]";
 	}
 
 	/**
