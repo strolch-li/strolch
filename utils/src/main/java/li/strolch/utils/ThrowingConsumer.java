@@ -14,5 +14,5 @@ public interface ThrowingConsumer<T> extends Consumer<T> {
 		}
 	}
 
-	void acceptThrows(T elem);
+	void acceptThrows(T elem) throws Exception;
 }

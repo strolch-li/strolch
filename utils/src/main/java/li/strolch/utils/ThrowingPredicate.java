@@ -14,5 +14,5 @@ public interface ThrowingPredicate<T> extends Predicate<T> {
 		}
 	}
 
-	boolean testThrows(T t);
+	boolean testThrows(T t) throws Exception;
 }
