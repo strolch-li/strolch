@@ -93,7 +93,7 @@ public class CachedRealm extends InternalStrolchRealm {
 		if (isAuditTrailEnabled())
 			this.auditTrail = new CachedAuditTrail();
 		else
-			this.auditTrail = new NoStrategyAuditTrail(getRealm());
+			this.auditTrail = new NoStrategyAuditTrail();
 	}
 
 	@Override

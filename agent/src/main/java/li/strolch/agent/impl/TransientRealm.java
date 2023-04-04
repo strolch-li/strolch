@@ -103,7 +103,7 @@ public class TransientRealm extends InternalStrolchRealm {
 		if (isAuditTrailEnabled())
 			this.auditTrail = new TransientAuditTrail();
 		else
-			this.auditTrail = new NoStrategyAuditTrail(getRealm());
+			this.auditTrail = new NoStrategyAuditTrail();
 	}
 
 	@Override

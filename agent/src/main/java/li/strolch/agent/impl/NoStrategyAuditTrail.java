@@ -28,10 +28,7 @@ import li.strolch.utils.collections.DateRange;
  */
 public class NoStrategyAuditTrail implements AuditTrail {
 
-	private final String realm;
-
-	public NoStrategyAuditTrail(String realm) {
-		this.realm = realm;
+	public NoStrategyAuditTrail() {
 	}
 
 	@Override
