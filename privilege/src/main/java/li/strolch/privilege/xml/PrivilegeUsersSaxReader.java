@@ -244,17 +244,14 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-			switch (qName) {
-			case XML_PROPERTY -> {
+			if (qName.equals(XML_PROPERTY)) {
 				String key = attributes.getValue(XML_ATTR_NAME).trim();
 				String value = attributes.getValue(XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
-			}
-			default -> {
+			} else {
 				if (!qName.equals(XML_PROPERTIES)) {
 					throw new IllegalArgumentException("Unhandled tag " + qName);
 				}
-			}
 			}
 		}
 

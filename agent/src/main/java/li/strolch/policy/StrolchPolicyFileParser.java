@@ -70,10 +70,8 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
-		switch (qName) {
-		case POLICY_TYPE -> this.policyType = null;
-		default -> {
-		}
+		if (qName.equals(POLICY_TYPE)) {
+			this.policyType = null;
 		}
 	}
 

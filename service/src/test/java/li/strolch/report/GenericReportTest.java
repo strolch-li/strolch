@@ -132,12 +132,8 @@ public class GenericReportTest {
 					.forEach(e -> {
 
 						String slotName = e.get("slot").getAsString();
-						switch (slotName) {
-						case "Slot 3":
-							break;
-						default:
+						if (!slotName.equals("Slot 3")) {
 							fail("Unexpected slot name " + slotName + ", should have been filtered!");
-							break;
 						}
 					});
 		}
