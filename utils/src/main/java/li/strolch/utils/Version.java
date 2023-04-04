@@ -62,8 +62,8 @@ public class Version implements Comparable<Version> {
 	private final int micro;
 	private final String qualifier;
 
-	private transient String versionString;
-	private boolean osgiStyle;
+	private final transient String versionString;
+	private final boolean osgiStyle;
 
 	/**
 	 * The empty version "0.0.0".
@@ -109,7 +109,7 @@ public class Version implements Comparable<Version> {
 	 * 		If the numerical components are negative or the qualifier string is invalid.
 	 */
 	public Version(final int major, final int minor, final int micro, String qualifier) {
-		this(major, minor, micro, null, false);
+		this(major, minor, micro, qualifier, false);
 	}
 
 	/**
@@ -135,7 +135,8 @@ public class Version implements Comparable<Version> {
 		this.minor = minor;
 		this.micro = micro;
 		this.qualifier = qualifier == null ? "" : qualifier;
-		this.versionString = null;
+		this.osgiStyle = osgiStyle;
+		this.versionString = toString(this.osgiStyle);
 		validate();
 	}
 
@@ -156,6 +157,7 @@ public class Version implements Comparable<Version> {
 		int mic = 0;
 		String qual = StringHelper.EMPTY;
 
+		boolean osgiStyle = false;
 		try {
 			StringTokenizer st = new StringTokenizer(version,
 					SEPARATOR + MAVEN_QUALIFIER_SEPARATOR + OSGI_QUALIFIER_SEPARATOR, true);
@@ -172,7 +174,7 @@ public class Version implements Comparable<Version> {
 					if (st.hasMoreTokens()) { // qualifier
 
 						String qualifierSeparator = st.nextToken(); // consume delimiter
-						this.osgiStyle = qualifierSeparator.equals(OSGI_QUALIFIER_SEPARATOR);
+						osgiStyle = qualifierSeparator.equals(OSGI_QUALIFIER_SEPARATOR);
 
 						qual = st.nextToken(StringHelper.EMPTY); // remaining string
 
@@ -190,7 +192,8 @@ public class Version implements Comparable<Version> {
 		this.minor = min;
 		this.micro = mic;
 		this.qualifier = qual;
-		this.versionString = null;
+		this.osgiStyle = osgiStyle;
+		this.versionString = toString(this.osgiStyle);
 		validate();
 	}
 
@@ -452,8 +455,6 @@ public class Version implements Comparable<Version> {
 	 */
 	@Override
 	public String toString() {
-		if (this.versionString == null)
-			this.versionString = toString(this.osgiStyle);
 		return this.versionString;
 	}
 
