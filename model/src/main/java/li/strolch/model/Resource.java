@@ -381,6 +381,16 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Resource r = (Resource) obj;
+		return this.type.equals(r.type) && this.id.equals(r.id);
+	}
+
+	@Override
 	public String toString() {
 
 		return "Resource [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", version=" + this.version;

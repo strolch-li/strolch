@@ -293,6 +293,16 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Order o = (Order) obj;
+		return this.type.equals(o.type) && this.id.equals(o.id);
+	}
+
+	@Override
 	public String toString() {
 
 		return "Order [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", state=" + this.state

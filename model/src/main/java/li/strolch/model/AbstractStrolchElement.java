@@ -142,15 +142,10 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null || getClass() != obj.getClass())
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
 		AbstractStrolchElement other = (AbstractStrolchElement) obj;
 		if (this.id == null) {
 			return other.id == null;

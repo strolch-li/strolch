@@ -767,6 +767,16 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Activity a = (Activity) obj;
+		return this.parent == a.parent && this.type.equals(a.type) && this.id.equals(a.id);
+	}
+
+	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Activity [id=");
