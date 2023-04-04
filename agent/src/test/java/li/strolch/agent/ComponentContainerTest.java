@@ -100,7 +100,7 @@ public class ComponentContainerTest {
 				ComponentContainer container = agent.getContainer();
 				ServiceHandlerTest serviceHandler = container.getComponent(ServiceHandlerTest.class);
 				ServiceResultTest result = serviceHandler.doService();
-				assertEquals(1, result.getResult());
+				assertEquals(1, result.result());
 			});
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -114,7 +114,7 @@ public class ComponentContainerTest {
 
 		ServiceHandlerTest serviceHandler = container.getComponent(ServiceHandlerTest.class);
 		ServiceResultTest result = serviceHandler.doService();
-		assertEquals(1, result.getResult());
+		assertEquals(1, result.result());
 
 		ResourceGeneratorHandlerTest resourceGeneratorHandler = container
 				.getComponent(ResourceGeneratorHandlerTest.class);
@@ -134,7 +134,7 @@ public class ComponentContainerTest {
 
 		ServiceHandlerTest serviceHandler = container.getComponent(ServiceHandlerTest.class);
 		ServiceResultTest result = serviceHandler.doService();
-		assertEquals(1, result.getResult());
+		assertEquals(1, result.result());
 
 		Certificate certificate = login(agent);
 		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)

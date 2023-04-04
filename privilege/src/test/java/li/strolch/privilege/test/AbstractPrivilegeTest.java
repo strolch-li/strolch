@@ -3,7 +3,6 @@ package li.strolch.privilege.test;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import li.strolch.privilege.base.PrivilegeException;

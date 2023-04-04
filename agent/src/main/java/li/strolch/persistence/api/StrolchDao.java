@@ -66,7 +66,7 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	/**
 	 * Queries the current list of types from the underlying persistence layer
 	 *
-	 * @return the list of types
+	 * @return the set of types
 	 *
 	 * @throws StrolchPersistenceException
 	 * 		if something goes wrong
@@ -338,5 +338,7 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 * @throws StrolchPersistenceException
 	 * 		if something goes wrong
 	 */
-	void flush() throws StrolchPersistenceException;
+	default void flush() throws StrolchPersistenceException {
+		// empty implementation
+	}
 }
