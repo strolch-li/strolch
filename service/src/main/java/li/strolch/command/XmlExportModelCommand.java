@@ -85,10 +85,13 @@ public class XmlExportModelCommand extends Command {
 
 	private void cleanUpExisting(final String exportName) {
 		File parentFile = this.modelFile.getParentFile();
-		File[] existingFiles = parentFile.listFiles((dir, name) -> name.startsWith(exportName) && name.endsWith(".xml"));
-
-		for (File file : existingFiles) {
-			file.delete();
+		File[] existingFiles = parentFile.listFiles(
+				(dir, name) -> name.startsWith(exportName) && name.endsWith(".xml"));
+		if (existingFiles != null) {
+			for (File file : existingFiles) {
+				if (!file.delete())
+					throw new IllegalStateException("Failed to delete file " + file);
+			}
 		}
 	}
 
@@ -253,8 +256,8 @@ public class XmlExportModelCommand extends Command {
 
 		} catch (Exception e) {
 			for (File createdFile : createdFiles) {
-				if (createdFile.exists())
-					createdFile.delete();
+				if (createdFile.exists() && !createdFile.delete())
+					throw new IllegalStateException("Failed to delete file " + createdFile);
 			}
 			String msg = "Failed to write model to file {0} due to {1}";
 			msg = MessageFormat.format(msg, this.modelFile, e.getMessage());
