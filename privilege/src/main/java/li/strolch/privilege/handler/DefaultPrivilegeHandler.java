@@ -132,6 +132,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * flag if session refreshing is allowed
 	 */
 	protected boolean allowSessionRefresh;
+	protected boolean disallowSourceChange;
 
 	protected PrivilegeConflictResolution privilegeConflictResolution;
 	private String identifier;
@@ -629,8 +630,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (isEmpty(userRep.getFirstname()) && isEmpty(userRep.getLastname()) && userRep.getLocale() == null && (
 				userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
 			throw new PrivilegeModelException(
-					format("All updateable fields are empty for update of user {0}",
-							userRep.getUsername()));
+					format("All updateable fields are empty for update of user {0}", userRep.getUsername()));
 		}
 
 		String userId = existingUser.getUserId();
@@ -856,8 +856,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeModelException(format("User {0} does not exist!", username));
 
 		if (existingUser.getUserState().isRemote())
-			throw new PrivilegeModelException(
-					format("User {0} is remote and can not set password!", username));
+			throw new PrivilegeModelException(format("User {0} is remote and can not set password!", username));
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPassword(),
@@ -1327,8 +1326,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// validate user has at least one role
 			Set<String> userRoles = user.getRoles();
 			if (userRoles.isEmpty())
-				throw new InvalidCredentialsException(
-						format("User {0} does not have any roles defined!", username));
+				throw new InvalidCredentialsException(format("User {0} does not have any roles defined!", username));
 
 			if (user.isPasswordChangeRequested()) {
 				if (usage == Usage.SINGLE)
@@ -1639,8 +1637,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		byte[] pwHash = user.getPassword();
 		if (pwHash == null)
-			throw new InvalidCredentialsException(
-					format("User {0} has no password and may not login!", username));
+			throw new InvalidCredentialsException(format("User {0} has no password and may not login!", username));
 		byte[] salt = user.getSalt();
 
 		// we only work with hashed passwords
@@ -1873,10 +1870,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		certificate.setLastAccess(ZonedDateTime.now());
 
-		// TODO decide if we want to assert source did not change!
-		// if (!source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
-		// 	logger.warn("Source has changed for certificate " + certificate.toString() + " to " + source);
-		// }
+		// assert source did not change
+		if (this.disallowSourceChange && !source.equals(SOURCE_UNKNOWN) && !certificate.getSource().equals(source)) {
+			invalidate(certificate);
+			throw new NotAuthenticatedException("Source has changed for certificate " + certificate + " to " + source);
+		}
 
 		return privilegeContext;
 	}
@@ -1961,6 +1959,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		handleSecretParams(parameterMap);
 
 		this.allowSessionRefresh = Boolean.parseBoolean(parameterMap.get(PARAM_ALLOW_SESSION_REFRESH));
+		this.disallowSourceChange = Boolean.parseBoolean(parameterMap.get(PARAM_DISALLOW_SOURCE_CHANGE));
 
 		// validate policies on privileges of Roles
 		for (Role role : persistenceHandler.getAllRoles()) {
@@ -2021,8 +2020,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			this.persistSessionsPath = persistSessionsPath;
-			logger.info(format("Enabling persistence of sessions to {0}",
-					this.persistSessionsPath.getAbsolutePath()));
+			logger.info(format("Enabling persistence of sessions to {0}", this.persistSessionsPath.getAbsolutePath()));
 		} else {
 			String msg = "Parameter {0} has illegal value {1}. Overriding with {2}";
 			msg = format(msg, PARAM_PERSIST_SESSIONS, persistSessionsS, Boolean.FALSE);
@@ -2277,8 +2275,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// validate user has at least one role
 		if (user.getRoles().isEmpty()) {
-			String msg = format("The system user {0} does not have any roles defined!",
-					user.getUsername());
+			String msg = format("The system user {0} does not have any roles defined!", user.getUsername());
 			throw new PrivilegeException(msg);
 		}
 

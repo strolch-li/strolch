@@ -175,6 +175,11 @@ public interface PrivilegeHandler {
 	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh";
 
 	/**
+	 * configuration parameter to define if a session's source change is disallowed
+	 */
+	String PARAM_DISALLOW_SOURCE_CHANGE = "disallowSourceChange";
+
+	/**
 	 * configuration parameter to define if username is case insensitive
 	 */
 	String PARAM_CASE_INSENSITIVE_USERNAME = "caseInsensitiveUsername";
