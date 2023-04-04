@@ -796,22 +796,6 @@ public class SynchronizedCollections {
 		SynchronizedSet(Set<E> s, Object mutex) {
 			super(s, mutex);
 		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			synchronized (this.mutex) {
-				return c.equals(o);
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			synchronized (this.mutex) {
-				return c.hashCode();
-			}
-		}
 	}
 
 	private static class SynchronizedSortedSet<E> extends SynchronizedSet<E> implements SortedSet<E> {

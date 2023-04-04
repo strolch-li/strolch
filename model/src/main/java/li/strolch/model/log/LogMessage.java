@@ -116,11 +116,6 @@ public class LogMessage extends I18nMessage {
 		return this;
 	}
 
-	@Override
-	public String toString() {
-		return getMessage(Locale.getDefault());
-	}
-
 	public JsonObject toJson() {
 
 		JsonObject jsonObject = new JsonObject();
