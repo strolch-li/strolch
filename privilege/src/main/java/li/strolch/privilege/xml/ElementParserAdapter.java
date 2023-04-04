@@ -16,7 +16,6 @@
 package li.strolch.privilege.xml;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 public abstract class ElementParserAdapter implements ElementParser {
 

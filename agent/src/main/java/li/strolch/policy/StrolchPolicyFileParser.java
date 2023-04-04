@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import li.strolch.utils.dbc.DBC;

@@ -21,7 +21,6 @@ import javax.xml.stream.XMLStreamWriter;
 import li.strolch.xmlpers.api.SaxParser;
 import li.strolch.xmlpers.test.model.Book;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**

@@ -19,7 +19,6 @@ import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.text.MessageFormat;

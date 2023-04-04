@@ -18,7 +18,6 @@ import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class StrolchBootstrapper extends DefaultHandler {

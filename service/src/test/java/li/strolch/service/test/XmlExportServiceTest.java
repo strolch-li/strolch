@@ -19,7 +19,6 @@ import static li.strolch.model.StrolchModelConstants.TEMPLATE;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FilenameFilter;
 
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.*;

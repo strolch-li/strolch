@@ -31,7 +31,6 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**

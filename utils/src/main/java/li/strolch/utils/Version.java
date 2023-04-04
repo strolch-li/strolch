@@ -7,7 +7,7 @@ import li.strolch.utils.helper.StringHelper;
 
 /**
  * This class has been adapted from org.osgi.framework.Version
- *
+ * <p>
  * Version identifier.
  *
  * <p>
@@ -71,8 +71,8 @@ public class Version implements Comparable<Version> {
 	public static final Version emptyVersion = new Version(0, 0, 0);
 
 	/**
-	 * Creates a version identifier from the specified numerical components. This instance will have {@link
-	 * #isOsgiStyle()} return false
+	 * Creates a version identifier from the specified numerical components. This instance will have
+	 * {@link #isOsgiStyle()} return false
 	 *
 	 * <p>
 	 * The qualifier is set to the empty string.
@@ -183,9 +183,7 @@ public class Version implements Comparable<Version> {
 				}
 			}
 		} catch (NoSuchElementException e) {
-			IllegalArgumentException iae = new IllegalArgumentException("invalid format: " + version);
-			iae.initCause(e);
-			throw iae;
+			throw new IllegalArgumentException("invalid format: " + version, e);
 		}
 
 		this.major = maj;
@@ -447,8 +445,8 @@ public class Version implements Comparable<Version> {
 	 * Returns the string representation of this version identifier.
 	 *
 	 * <p>
-	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or {@code
-	 * major.minor.micro.qualifier} otherwise.
+	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or
+	 * {@code major.minor.micro.qualifier} otherwise.
 	 *
 	 * @return The string representation of this version identifier.
 	 */

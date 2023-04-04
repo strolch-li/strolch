@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;

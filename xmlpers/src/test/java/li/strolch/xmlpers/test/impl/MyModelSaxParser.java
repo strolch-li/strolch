@@ -22,7 +22,6 @@ import li.strolch.xmlpers.api.SaxParser;
 import li.strolch.xmlpers.test.model.MyModel;
 import li.strolch.xmlpers.test.model.MyParameter;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {

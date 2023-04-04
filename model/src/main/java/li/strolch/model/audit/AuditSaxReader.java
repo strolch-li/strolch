@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 import li.strolch.model.Tags;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**

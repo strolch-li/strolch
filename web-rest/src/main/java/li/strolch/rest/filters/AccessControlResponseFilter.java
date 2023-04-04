@@ -15,7 +15,6 @@
  */
 package li.strolch.rest.filters;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 
 import jakarta.annotation.Priority;

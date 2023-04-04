@@ -18,7 +18,6 @@ package li.strolch.privilege.xml;
 import static li.strolch.privilege.helper.XmlConstants.*;
 
 import java.io.File;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 

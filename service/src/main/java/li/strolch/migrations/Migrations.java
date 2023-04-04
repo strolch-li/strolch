@@ -18,7 +18,6 @@ package li.strolch.migrations;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
