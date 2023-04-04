@@ -92,8 +92,8 @@ public class Migrations {
 			if (this.verbose)
 				logger.info("[" + realm + "] Performing all migrations after " + currentVersion);
 
-			Version nextPossibleCodeVersion = currentVersion.getCodeVersion().add(0, 0, 1);
-			Version nextPossibleDataVersion = currentVersion.getDataVersion().add(0, 0, 1);
+			Version nextPossibleCodeVersion = currentVersion.codeVersion().add(0, 0, 1);
+			Version nextPossibleDataVersion = currentVersion.dataVersion().add(0, 0, 1);
 			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleCodeVersion, null);
 			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleDataVersion, null);
 
@@ -170,16 +170,16 @@ public class Migrations {
 			SortedSet<CodeMigration> migrations = new TreeSet<>(Comparator.comparing(Migration::getVersion));
 			migrations.addAll(listOfMigrations);
 
-			Version nextVersion = currentVersion.getCodeVersion().add(0, 0, 1);
+			Version nextVersion = currentVersion.codeVersion().add(0, 0, 1);
 			CodeMigration nextMigration = new CodeMigration(realm, nextVersion);
 
 			SortedSet<CodeMigration> migrationsToRun = migrations.tailSet(nextMigration);
 			for (CodeMigration migration : migrationsToRun) {
 				DBC.INTERIM.assertEquals("Realms do not match!", realm, migration.getRealm());
 				Version migrateVersion = migration.getVersion();
-				boolean isLaterMigration = migrateVersion.compareTo(currentVersion.getCodeVersion()) > 0;
+				boolean isLaterMigration = migrateVersion.compareTo(currentVersion.codeVersion()) > 0;
 				DBC.INTERIM.assertTrue(
-						"Current version " + currentVersion.getCodeVersion() + " is not before next " + migrateVersion,
+						"Current version " + currentVersion.codeVersion() + " is not before next " + migrateVersion,
 						isLaterMigration);
 
 				String msg = "[{0}] Running code migration {1} {2}";
@@ -295,8 +295,8 @@ public class Migrations {
 
 		for (Entry<String, MigrationVersion> entry : currentVersions.entrySet()) {
 			String realm = entry.getKey();
-			Version nextPossibleCodeVersion = entry.getValue().getCodeVersion().add(0, 0, 1);
-			Version nextPossibleDataVersion = entry.getValue().getDataVersion().add(0, 0, 1);
+			Version nextPossibleCodeVersion = entry.getValue().codeVersion().add(0, 0, 1);
+			Version nextPossibleDataVersion = entry.getValue().dataVersion().add(0, 0, 1);
 			CodeMigration currentCodeMigration = new CodeMigration(realm, nextPossibleCodeVersion, null);
 			DataMigration currentDataMigration = new DataMigration(realm, nextPossibleDataVersion, null);
 

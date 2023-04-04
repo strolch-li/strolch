@@ -70,8 +70,8 @@ public class MigrationsTest {
 		MigrationsHandler migrationsHandler = runtimeMock.getContainer().getComponent(MigrationsHandler.class);
 		Map<String, MigrationVersion> currentVersions = migrationsHandler.getCurrentVersions(certificate);
 		String defRealm = StrolchConstants.DEFAULT_REALM;
-		assertEquals("1.1.1", currentVersions.get(defRealm).getDataVersion().toString());
-		assertEquals("0.0.0", currentVersions.get("other").getCodeVersion().toString());
+		assertEquals("1.1.1", currentVersions.get(defRealm).dataVersion().toString());
+		assertEquals("0.0.0", currentVersions.get("other").codeVersion().toString());
 
 		MapOfLists<String, Version> lastMigrations = migrationsHandler.getLastMigrations();
 		List<Version> expectedMigrations = Arrays
@@ -85,8 +85,8 @@ public class MigrationsTest {
 
 		// assert new current version
 		currentVersions = migrationsHandler.getCurrentVersions(certificate);
-		assertEquals("1.1.1", currentVersions.get(defRealm).getDataVersion().toString());
-		assertEquals("0.0.0", currentVersions.get("other").getCodeVersion().toString());
+		assertEquals("1.1.1", currentVersions.get(defRealm).dataVersion().toString());
+		assertEquals("0.0.0", currentVersions.get("other").codeVersion().toString());
 
 		MapOfLists<String, CodeMigration> codeMigrationsByRealm = new MapOfLists<>();
 		// add migrations in wrong sequence - should be fixed by migration handler
@@ -102,8 +102,8 @@ public class MigrationsTest {
 
 		// assert new current version
 		currentVersions = migrationsHandler.getCurrentVersions(certificate);
-		assertEquals("1.2.0.a", currentVersions.get(defRealm).getCodeVersion().toString());
-		assertEquals("0.0.0", currentVersions.get("other").getDataVersion().toString());
+		assertEquals("1.2.0.a", currentVersions.get(defRealm).codeVersion().toString());
+		assertEquals("0.0.0", currentVersions.get("other").dataVersion().toString());
 	}
 
 	private static class MyMigration0 extends CodeMigration {

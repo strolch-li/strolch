@@ -10,27 +10,21 @@ import li.strolch.utils.Version;
  *
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
  */
-public class MigrationVersion {
-
-	private final Version dataVersion;
-	private final Version codeVersion;
-
-	public MigrationVersion(Version dataVersion, Version codeVersion) {
-		this.dataVersion = dataVersion;
-		this.codeVersion = codeVersion;
-	}
+public record MigrationVersion(Version dataVersion, Version codeVersion) {
 
 	/**
 	 * @return the dataVersion
 	 */
-	public Version getDataVersion() {
+	@Override
+	public Version dataVersion() {
 		return dataVersion;
 	}
 
 	/**
 	 * @return the codeVersion
 	 */
-	public Version getCodeVersion() {
+	@Override
+	public Version codeVersion() {
 		return codeVersion;
 	}
 
