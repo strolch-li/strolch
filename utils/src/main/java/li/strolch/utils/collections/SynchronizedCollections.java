@@ -169,6 +169,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.m.equals(o);
 			}
@@ -351,6 +353,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.m.equals(o);
 			}
@@ -513,6 +517,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.m.equals(o);
 			}
@@ -672,6 +678,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.c.equals(o);
 			}
@@ -698,6 +706,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return list.equals(o);
 			}
@@ -945,6 +955,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return m.equals(o);
 			}
