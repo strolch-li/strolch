@@ -70,7 +70,6 @@ public class ObjectCache {
 	 */
 	private Object object;
 
-	@SuppressWarnings("nls")
 	public ObjectCache(long id, String key, Object objectKey, Object object, Operation operation) {
 
 		this.id = id;
@@ -80,16 +79,9 @@ public class ObjectCache {
 		this.operation = operation;
 
 		if (logger.isDebugEnabled()) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Instanciated Cache: ID");
-			sb.append(this.id);
-			sb.append(" / ");
-			sb.append(key);
-			sb.append(" OP: ");
-			sb.append(this.operation);
-			sb.append(" / ");
-			sb.append(objectKey.toString());
-			logger.debug(sb.toString());
+			String sb = "Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation + " / "
+					+ objectKey.toString();
+			logger.debug(sb);
 		}
 	}
 

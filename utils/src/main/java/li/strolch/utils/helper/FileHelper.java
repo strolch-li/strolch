@@ -171,14 +171,14 @@ public class FileHelper {
 	 */
 	public static String readFileToString(File file) {
 
-		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
 
 			StringBuilder sb = new StringBuilder();
 
 			String line;
 
 			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(line + "\n"); //$NON-NLS-1$
+				sb.append(line).append("\n"); //$NON-NLS-1$
 			}
 
 			return sb.toString();
@@ -201,14 +201,14 @@ public class FileHelper {
 	 */
 	public static String readStreamToString(InputStream stream) {
 
-		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));) {
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream))) {
 
 			StringBuilder sb = new StringBuilder();
 
 			String line;
 
 			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(line + "\n"); //$NON-NLS-1$
+				sb.append(line).append("\n"); //$NON-NLS-1$
 			}
 
 			return sb.toString();
@@ -247,7 +247,7 @@ public class FileHelper {
 	 */
 	public static void writeStringToFile(String string, File dstFile) {
 
-		try (BufferedWriter bufferedwriter = new BufferedWriter(new FileWriter(dstFile));) {
+		try (BufferedWriter bufferedwriter = new BufferedWriter(new FileWriter(dstFile))) {
 			bufferedwriter.write(string);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$

@@ -47,7 +47,6 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 		return this;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public void write(XMLStreamWriter writer) throws XMLStreamException {
 
@@ -59,7 +58,6 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 		writer.writeAttribute("price", Double.toString(this.book.getPrice()));
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 

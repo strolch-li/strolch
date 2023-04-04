@@ -58,14 +58,10 @@ public class SystemHelper {
 	 * @see java.lang.Object#toString()
 	 */
 	public static String asString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("OS: ").append(osName);
-		sb.append(" ").append(osVersion);
-		sb.append(" Arch: ").append(osArch);
-		sb.append(" on Java ").append(javaVendor);
-		sb.append(" ").append(javaVersion);
-		sb.append(" CPU Cores: ").append(nrOfCores);
-		return sb.toString();
+		String sb =
+				"OS: " + osName + " " + osVersion + " Arch: " + osArch + " on Java " + javaVendor + " " + javaVersion
+						+ " CPU Cores: " + nrOfCores;
+		return sb;
 	}
 
 	public static String getUserDir() {
@@ -109,16 +105,12 @@ public class SystemHelper {
 	}
 
 	public static String getMemorySummary() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("System Memory available "); //$NON-NLS-1$
-		sb.append(SystemHelper.getMaxMemory());
-		sb.append(",  Total: "); //$NON-NLS-1$
-		sb.append(SystemHelper.getTotalMemory());
-		sb.append(",  Used: "); //$NON-NLS-1$
-		sb.append(SystemHelper.getUsedMemory());
-		sb.append(",  Free: "); //$NON-NLS-1$
-		sb.append(SystemHelper.getFreeMemory());
-		return sb.toString();
+		String sb = "System Memory available " //$NON-NLS-1$
+				+ SystemHelper.getMaxMemory() + ",  Total: " //$NON-NLS-1$
+				+ SystemHelper.getTotalMemory() + ",  Used: " //$NON-NLS-1$
+				+ SystemHelper.getUsedMemory() + ",  Free: " //$NON-NLS-1$
+				+ SystemHelper.getFreeMemory();
+		return sb;
 	}
 
 	public static void main(String[] args) {

@@ -92,7 +92,7 @@ public class LogMessagesTestRunner {
 				LogMessage m = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, "li.strolch.testbase", StrolchAgent.getUniqueId()),
 						LogSeverity.Exception, LogMessageState.Information, bundle, "test-message").value("reason",
-						"" + i);
+						String.valueOf(i));
 				this.operationsLog.addMessage(m);
 				ids.add(m.getId());
 			}

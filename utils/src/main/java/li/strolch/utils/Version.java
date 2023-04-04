@@ -506,10 +506,7 @@ public class Version implements Comparable<Version> {
 	 * @return This only the major and minor version in a string
 	 */
 	public String toMajorAndMinorString() {
-		StringBuilder result = new StringBuilder(20);
-		result.append(this.major);
-		result.append(SEPARATOR);
-		result.append(this.minor);
-		return result.toString();
+		String result = this.major + SEPARATOR + this.minor;
+		return result;
 	}
 }

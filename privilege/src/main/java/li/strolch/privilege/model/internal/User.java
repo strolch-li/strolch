@@ -355,26 +355,12 @@ public final class User {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("User [userId=");
-		builder.append(this.userId);
-		builder.append(", username=");
-		builder.append(this.username);
-		builder.append(", firstname=");
-		builder.append(this.firstname);
-		builder.append(", lastname=");
-		builder.append(this.lastname);
-		builder.append(", locale=");
-		builder.append(this.locale);
-		builder.append(", userState=");
-		builder.append(this.userState);
-		builder.append(", roles=");
-		builder.append(this.roles);
-		builder.append("]");
-		return builder.toString();
+		String builder = "User [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
+				+ ", lastname=" + this.lastname + ", locale=" + this.locale + ", userState=" + this.userState
+				+ ", roles=" + this.roles + "]";
+		return builder;
 	}
 
 	@Override
@@ -395,10 +381,8 @@ public final class User {
 			return false;
 		User other = (User) obj;
 		if (this.userId == null) {
-			if (other.userId != null)
-				return false;
-		} else if (!this.userId.equals(other.userId))
-			return false;
-		return true;
+			return other.userId == null;
+		} else
+			return this.userId.equals(other.userId);
 	}
 }

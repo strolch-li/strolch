@@ -203,33 +203,18 @@ public class PrivilegeContainerModel {
 		return this.policies;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("PrivilegeContainerModel [encryptionHandlerClassName=");
-		builder.append(this.encryptionHandlerClassName);
-		builder.append(", encryptionHandlerParameterMap=");
-		builder.append(this.encryptionHandlerParameterMap.size());
-		builder.append(", passwordStrengthHandlerClassName=");
-		builder.append(this.passwordStrengthHandlerClassName);
-		builder.append(", passwordStrengthHandlerParameterMap=");
-		builder.append(this.passwordStrengthHandlerParameterMap);
-		builder.append(", persistenceHandlerClassName=");
-		builder.append(this.persistenceHandlerClassName);
-		builder.append(", persistenceHandlerParameterMap=");
-		builder.append(this.persistenceHandlerParameterMap.size());
-		builder.append(", challengeHandlerParameterMap=");
-		builder.append(this.challengeHandlerParameterMap.size());
-		builder.append(", ssoHandlerParameterMap=");
-		builder.append(this.ssoHandlerParameterMap.size());
-		builder.append(", privilegeHandlerParameterMap=");
-		builder.append(this.privilegeHandlerParameterMap.size());
-		builder.append(", parameterMap=");
-		builder.append(this.parameterMap.size());
-		builder.append(", policies=");
-		builder.append(this.policies.size());
-		builder.append("]");
-		return builder.toString();
+		String builder = "PrivilegeContainerModel [encryptionHandlerClassName=" + this.encryptionHandlerClassName
+				+ ", encryptionHandlerParameterMap=" + this.encryptionHandlerParameterMap.size()
+				+ ", passwordStrengthHandlerClassName=" + this.passwordStrengthHandlerClassName
+				+ ", passwordStrengthHandlerParameterMap=" + this.passwordStrengthHandlerParameterMap
+				+ ", persistenceHandlerClassName=" + this.persistenceHandlerClassName
+				+ ", persistenceHandlerParameterMap=" + this.persistenceHandlerParameterMap.size()
+				+ ", challengeHandlerParameterMap=" + this.challengeHandlerParameterMap.size()
+				+ ", ssoHandlerParameterMap=" + this.ssoHandlerParameterMap.size() + ", privilegeHandlerParameterMap="
+				+ this.privilegeHandlerParameterMap.size() + ", parameterMap=" + this.parameterMap.size()
+				+ ", policies=" + this.policies.size() + "]";
+		return builder;
 	}
 }

@@ -39,7 +39,6 @@ public abstract class AbstractPersistenceTest {
 
 	protected PersistenceManager persistenceManager;
 
-	@SuppressWarnings("nls")
 	protected static void cleanPath(String path) {
 
 		File file = new File(path).getAbsoluteFile();

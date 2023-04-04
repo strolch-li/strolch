@@ -466,16 +466,16 @@ public class StringHelper {
 
 		if (value.length() < length) {
 
-			String tmp = value;
+			StringBuilder tmp = new StringBuilder(value);
 			while (tmp.length() != length) {
 				if (beginning) {
-					tmp = c + tmp;
+					tmp.insert(0, c);
 				} else {
-					tmp = tmp + c;
+					tmp.append(c);
 				}
 			}
 
-			return tmp;
+			return tmp.toString();
 
 		} else if (shorten) {
 
@@ -657,18 +657,15 @@ public class StringHelper {
 		int start = Math.max(0, (i - maxContext));
 		int end = Math.min(i + maxContext, (Math.min(bytes1.length, bytes2.length)));
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("Strings are not equal! Start of inequality is at ").append(i); //$NON-NLS-1$
-		sb.append(". Showing ").append(maxContext); //$NON-NLS-1$
-		sb.append(" extra characters and start and end:\n"); //$NON-NLS-1$
-		sb.append("context s1: "); //$NON-NLS-1$
-		sb.append(s1, start, end);
-		sb.append("\n"); //$NON-NLS-1$
-		sb.append("context s2: "); //$NON-NLS-1$
-		sb.append(s2, start, end);
-		sb.append("\n"); //$NON-NLS-1$
+		String sb = "Strings are not equal! Start of inequality is at " + i //$NON-NLS-1$
+				+ ". Showing " + maxContext //$NON-NLS-1$
+				+ " extra characters and start and end:\n" //$NON-NLS-1$
+				+ "context s1: " //$NON-NLS-1$
+				+ s1.substring(start, end) + "\n" //$NON-NLS-1$
+				+ "context s2: " //$NON-NLS-1$
+				+ s2.substring(start, end) + "\n"; //$NON-NLS-1$
 
-		return sb.toString();
+		return sb;
 	}
 
 	/**

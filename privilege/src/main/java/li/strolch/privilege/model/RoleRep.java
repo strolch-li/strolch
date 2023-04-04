@@ -110,16 +110,12 @@ public class RoleRep implements Serializable {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("RoleRep [name=");
-		builder.append(this.name);
-		builder.append(", privilegeMap=");
-		builder.append((this.privileges == null ? "null" : this.privileges));
-		builder.append("]");
-		return builder.toString();
+		String builder =
+				"RoleRep [name=" + this.name + ", privilegeMap=" + (this.privileges == null ? "null" : this.privileges)
+						+ "]";
+		return builder;
 	}
 
 	@Override
@@ -140,11 +136,9 @@ public class RoleRep implements Serializable {
 			return false;
 		RoleRep other = (RoleRep) obj;
 		if (this.name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!this.name.equals(other.name))
-			return false;
-		return true;
+			return other.name == null;
+		} else
+			return this.name.equals(other.name);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

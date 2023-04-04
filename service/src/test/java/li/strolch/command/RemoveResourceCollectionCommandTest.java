@@ -48,7 +48,7 @@ public class RemoveResourceCollectionCommandTest extends AbstractRealmCommandTes
 
 		List<Resource> resources = new ArrayList<>(this.locators.size());
 		for (Locator locator : this.locators) {
-			resources.add((Resource) tx.findElement(locator));
+			resources.add(tx.findElement(locator));
 		}
 
 		RemoveResourceCollectionCommand command = new RemoveResourceCollectionCommand(tx);

@@ -76,16 +76,10 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 		return new TimeValue<>(this.time, (T) this.value.getCopy());
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("TimeValue [time=");
-		sb.append(this.time);
-		sb.append(", value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		String sb = "TimeValue [time=" + this.time + ", value=" + this.value + "]";
+		return sb;
 	}
 
 	@Override

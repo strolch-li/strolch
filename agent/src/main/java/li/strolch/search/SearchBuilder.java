@@ -188,7 +188,7 @@ public class SearchBuilder {
 				else
 					predicate = containsIgnoreCase(value);
 
-				if (bagId.isEmpty() || !bagId.equals("?")) {
+				if (!bagId.equals("?")) {
 					se = add(and, negate, se, param(bagId, paramId, predicate));
 				} else {
 					se = add(and, negate, se, element -> {

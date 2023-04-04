@@ -20,5 +20,5 @@ public enum IoOperation {
 	CREATE,
 	READ,
 	UPDATE,
-	DELETE;
+	DELETE
 }

@@ -101,7 +101,7 @@ public class PrivilegeConfigDomWriter {
 		// Policies
 		Element policiesElem = doc.createElement(XML_POLICIES);
 		rootElement.appendChild(policiesElem);
-		this.containerModel.getPolicies().entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+		this.containerModel.getPolicies().entrySet().stream().sorted(Entry.comparingByKey())
 				.forEach(entry -> {
 					Element policyElem = doc.createElement(XML_POLICY);
 					policyElem.setAttribute(XML_ATTR_NAME, entry.getKey());

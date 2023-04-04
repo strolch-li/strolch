@@ -167,22 +167,15 @@ public class PrivilegeRep implements Serializable {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("PrivilegeRep [name=");
-		builder.append(this.name);
-		builder.append(", policy=");
-		builder.append(this.policy);
-		builder.append(", allAllowed=");
-		builder.append(this.allAllowed);
-		builder.append(", denyList=");
-		builder.append((this.denyList == null ? "null" : this.denyList.size()));
-		builder.append(", allowList=");
-		builder.append((this.allowList == null ? "null" : this.allowList.size()));
-		builder.append("]");
-		return builder.toString();
+		String builder =
+				"PrivilegeRep [name=" + this.name + ", policy=" + this.policy + ", allAllowed=" + this.allAllowed
+						+ ", denyList=" + (this.denyList == null ? "null" : this.denyList.size()) + ", allowList=" + (
+						this.allowList == null ?
+								"null" :
+								this.allowList.size()) + "]";
+		return builder;
 	}
 
 	@Override
@@ -203,11 +196,9 @@ public class PrivilegeRep implements Serializable {
 			return false;
 		PrivilegeRep other = (PrivilegeRep) obj;
 		if (this.name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!this.name.equals(other.name))
-			return false;
-		return true;
+			return other.name == null;
+		} else
+			return this.name.equals(other.name);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

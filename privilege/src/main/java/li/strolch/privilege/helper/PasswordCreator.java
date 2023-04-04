@@ -43,7 +43,6 @@ public class PasswordCreator {
 	 * @throws Exception
 	 * 		thrown if anything goes wrong
 	 */
-	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception {
 
 		while (true) {
@@ -110,8 +109,8 @@ public class PasswordCreator {
 
 			Map<String, String> parameterMap = new HashMap<>();
 			parameterMap.put(XmlConstants.XML_PARAM_HASH_ALGORITHM, hashAlgorithm);
-			parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, "" + iterations);
-			parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, "" + keyLength);
+			parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, String.valueOf(iterations));
+			parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, String.valueOf(keyLength));
 
 			DefaultEncryptionHandler encryptionHandler = new DefaultEncryptionHandler();
 			encryptionHandler.initialize(parameterMap);

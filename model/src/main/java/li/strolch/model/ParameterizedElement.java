@@ -1234,20 +1234,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		return this.parent.getRootElement();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 
-		StringBuilder builder = new StringBuilder();
+		String builder = "ParameterizedElement [id=" + this.id + ", name=" + this.name + ", type=" + this.type + "]";
 
-		builder.append("ParameterizedElement [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
-		builder.append("]");
-
-		return builder.toString();
+		return builder;
 	}
 }

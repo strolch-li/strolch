@@ -74,7 +74,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	 * 		destination order
 	 */
 	public void deepEquals(Order srcOrder, Order dstOrder) {
-		deepEquals((StrolchRootElement) srcOrder, (StrolchRootElement) dstOrder);
+		deepEquals(srcOrder, (StrolchRootElement) dstOrder);
 
 		if (!srcOrder.getState().equals(dstOrder.getState()))
 			addLocator(dstOrder.getLocator().append(Tags.STATE));
@@ -91,7 +91,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	 * 		destination resource
 	 */
 	public void deepEquals(Resource srcRes, Resource dstRes) {
-		deepEquals((StrolchRootElement) srcRes, (StrolchRootElement) dstRes);
+		deepEquals(srcRes, (StrolchRootElement) dstRes);
 
 		Set<String> srcTimedStateKeySet = srcRes.getTimedStateKeySet();
 		for (String timedStateKey : srcTimedStateKeySet) {
@@ -124,7 +124,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	 * 		destination activity
 	 */
 	public void deepEquals(Activity srcActivity, Activity dstActivity) {
-		deepEquals((StrolchRootElement) srcActivity, (StrolchRootElement) dstActivity);
+		deepEquals(srcActivity, (StrolchRootElement) dstActivity);
 
 		if (!srcActivity.getTimeOrdering().equals(dstActivity.getTimeOrdering()))
 			addLocator(dstActivity.getLocator().append(Tags.TIME_ORDERING));
@@ -162,7 +162,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	}
 
 	private void deepEquals(StrolchRootElement srcElement, StrolchRootElement dstElement) {
-		deepEquals((StrolchElement) srcElement, (StrolchElement) dstElement);
+		deepEquals(srcElement, (StrolchElement) dstElement);
 		deepEquals((GroupedParameterizedElement) srcElement, (GroupedParameterizedElement) dstElement);
 
 		if (srcElement.hasVersion() && dstElement.hasVersion())
@@ -226,8 +226,8 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	}
 
 	private void deepEquals(Action srcAction, Action dstAction) {
-		deepEquals((StrolchElement) srcAction, (StrolchElement) dstAction);
-		deepEquals((GroupedParameterizedElement) srcAction, (GroupedParameterizedElement) dstAction);
+		deepEquals(srcAction, (StrolchElement) dstAction);
+		deepEquals(srcAction, (GroupedParameterizedElement) dstAction);
 
 		if (!srcAction.getResourceId().equals(dstAction.getResourceId()))
 			addLocator(dstAction.getLocator().append(Tags.RESOURCE_ID));
@@ -279,7 +279,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	}
 
 	private void deepEquals(ParameterBag srcBag, ParameterBag dstBag) {
-		deepEquals((StrolchElement) srcBag, (StrolchElement) dstBag);
+		deepEquals(srcBag, (StrolchElement) dstBag);
 
 		Set<String> srcParamKeySet = srcBag.getParameterKeySet();
 		for (String paramKey : srcParamKeySet) {
@@ -303,7 +303,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	}
 
 	private void deepEquals(Parameter<?> srcParam, Parameter<?> dstParam) {
-		deepEquals((StrolchElement) srcParam, (StrolchElement) dstParam);
+		deepEquals(srcParam, (StrolchElement) dstParam);
 		if (!srcParam.getUom().equals(dstParam.getUom()))
 			addLocator(dstParam.getLocator().append(Tags.UOM));
 		if (!srcParam.getInterpretation().equals(dstParam.getInterpretation()))
@@ -318,7 +318,7 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	}
 
 	private void deepEquals(StrolchTimedState<?> srcState, StrolchTimedState<?> dstState) {
-		deepEquals((StrolchElement) srcState, (StrolchElement) dstState);
+		deepEquals(srcState, (StrolchElement) dstState);
 		final ITimeVariable<?> srcTimeEvolution = srcState.getTimeEvolution();
 		final ITimeVariable<?> dstTimeEvolution = dstState.getTimeEvolution();
 

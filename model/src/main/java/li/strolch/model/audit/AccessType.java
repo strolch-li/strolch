@@ -26,5 +26,5 @@ public enum AccessType {
 	READ,
 	CREATE,
 	UPDATE,
-	DELETE;
+	DELETE
 }

@@ -480,7 +480,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		if (!this.withoutObjectType)
 			rootJ.addProperty(OBJECT_TYPE, ACTIVITY);
 
-		toJson((AbstractStrolchElement) element, rootJ);
+		toJson(element, rootJ);
 		rootJ.addProperty(TIME_ORDERING, element.getTimeOrdering().getName());
 		rootJ.addProperty(STATE, element.getState().getName());
 		rootJ.addProperty(START, formatDate(element.getStart()));

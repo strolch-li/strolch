@@ -239,7 +239,7 @@ public class Migrations {
 			DBC.PRE.assertTrue("migrations/data must be a directory!", dataDir.isDirectory());
 
 			// only list directories where name is a realmName
-			File[] realmMigrations = dataDir.listFiles((FileFilter) path -> realmNames.contains(path.getName()));
+			File[] realmMigrations = dataDir.listFiles(path -> realmNames.contains(path.getName()));
 
 			for (File realmMigration : realmMigrations) {
 				String realm = realmMigration.getName();
@@ -248,7 +248,7 @@ public class Migrations {
 				migrationsByRealm.put(realm, migrations);
 
 				File[] migrationFiles = realmMigration
-						.listFiles((FileFilter) pathname -> pathname.getName().endsWith(".xml"));
+						.listFiles(pathname -> pathname.getName().endsWith(".xml"));
 				for (File file : migrationFiles) {
 					String name = file.getName();
 					Version version = Version.valueOf(name.substring(0, name.length() - 4));
@@ -269,7 +269,7 @@ public class Migrations {
 		if (codeDir.exists()) {
 			DBC.PRE.assertTrue("migrations/code must be a directory!", codeDir.isDirectory());
 
-			File[] realmMigrations = codeDir.listFiles((FileFilter) path -> realmNames.contains(path.getName()));
+			File[] realmMigrations = codeDir.listFiles(path -> realmNames.contains(path.getName()));
 
 			for (File realmMigration : realmMigrations) {
 				String realm = realmMigration.getName();
@@ -278,7 +278,7 @@ public class Migrations {
 				migrationsByRealm.put(realm, migrations);
 
 				File[] migrationFiles = realmMigration
-						.listFiles((FileFilter) pathname -> pathname.getName().endsWith(".xml"));
+						.listFiles(pathname -> pathname.getName().endsWith(".xml"));
 				for (File file : migrationFiles) {
 					String name = file.getName();
 					Version version = Version.valueOf(name.substring(0, name.length() - 4));

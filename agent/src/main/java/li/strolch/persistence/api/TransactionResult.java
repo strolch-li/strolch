@@ -211,7 +211,6 @@ public class TransactionResult {
 		return this.created + this.read + this.updated + this.deleted;
 	}
 
-	@SuppressWarnings("nls")
 	public String getLogMessage() {
 
 		StringBuilder sb = new StringBuilder();

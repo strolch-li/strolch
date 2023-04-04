@@ -351,26 +351,13 @@ public class UserRep implements Serializable {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("UserRep [userId=");
-		builder.append(this.userId);
-		builder.append(", username=");
-		builder.append(this.username);
-		builder.append(", firstname=");
-		builder.append(this.firstname);
-		builder.append(", lastname=");
-		builder.append(this.lastname);
-		builder.append(", userState=");
-		builder.append(this.userState);
-		builder.append(", locale=");
-		builder.append(this.locale);
-		builder.append(", roles=");
-		builder.append(this.roles);
-		builder.append("]");
-		return builder.toString();
+		String builder =
+				"UserRep [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
+						+ ", lastname=" + this.lastname + ", userState=" + this.userState + ", locale=" + this.locale
+						+ ", roles=" + this.roles + "]";
+		return builder;
 	}
 
 	@Override
@@ -391,11 +378,9 @@ public class UserRep implements Serializable {
 			return false;
 		UserRep other = (UserRep) obj;
 		if (this.username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!this.username.equals(other.username))
-			return false;
-		return true;
+			return other.username == null;
+		} else
+			return this.username.equals(other.username);
 	}
 
 	@Override

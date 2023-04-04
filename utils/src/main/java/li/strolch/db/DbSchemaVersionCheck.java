@@ -228,7 +228,7 @@ public class DbSchemaVersionCheck {
 
 		String dbVersionPropFile = MessageFormat.format(RESOURCE_DB_VERSION, app);
 
-		try (InputStream stream = ctxClass.getResourceAsStream(dbVersionPropFile);) {
+		try (InputStream stream = ctxClass.getResourceAsStream(dbVersionPropFile)) {
 			DBC.PRE.assertNotNull(
 					MessageFormat.format("Resource file with name {0} does not exist!", dbVersionPropFile), stream);
 			dbVersionProps.load(stream);

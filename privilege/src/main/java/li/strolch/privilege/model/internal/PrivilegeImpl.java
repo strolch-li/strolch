@@ -193,16 +193,10 @@ public final class PrivilegeImpl implements IPrivilege {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Privilege [name=");
-		builder.append(this.name);
-		builder.append(", policy=");
-		builder.append(this.policy);
-		builder.append("]");
-		return builder.toString();
+		String builder = "Privilege [name=" + this.name + ", policy=" + this.policy + "]";
+		return builder;
 	}
 
 	@Override
@@ -223,10 +217,8 @@ public final class PrivilegeImpl implements IPrivilege {
 			return false;
 		PrivilegeImpl other = (PrivilegeImpl) obj;
 		if (this.name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!this.name.equals(other.name))
-			return false;
-		return true;
+			return other.name == null;
+		} else
+			return this.name.equals(other.name);
 	}
 }

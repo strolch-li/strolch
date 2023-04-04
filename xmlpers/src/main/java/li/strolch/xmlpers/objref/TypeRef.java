@@ -92,10 +92,8 @@ public class TypeRef extends ObjectRef {
 		} else if (!this.name.equals(other.name))
 			return false;
 		if (this.type == null) {
-			if (other.type != null)
-				return false;
-		} else if (!this.type.equals(other.type))
-			return false;
-		return true;
+			return other.type == null;
+		} else
+			return this.type.equals(other.type);
 	}
 }

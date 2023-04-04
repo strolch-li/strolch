@@ -75,7 +75,7 @@ public enum StringMatchMode {
 			return value1.toLowerCase().contains(value2.toLowerCase());
 
 		if (!isCaseSensitve())
-			return value1.toLowerCase().equals(value2.toLowerCase());
+			return value1.equalsIgnoreCase(value2);
 
 		if (!isEquals())
 			return value1.contains(value2);

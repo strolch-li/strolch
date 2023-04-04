@@ -19,5 +19,5 @@ public enum TransactionState {
 	OPEN, // 
 	COMMITTED, // 
 	ROLLED_BACK, //
-	FAILED;
+	FAILED
 }

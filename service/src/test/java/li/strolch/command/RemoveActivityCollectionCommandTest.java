@@ -48,7 +48,7 @@ public class RemoveActivityCollectionCommandTest extends AbstractRealmCommandTes
 
 		List<Activity> activities = new ArrayList<>(this.locators.size());
 		for (Locator locator : this.locators) {
-			activities.add((Activity) tx.findElement(locator));
+			activities.add(tx.findElement(locator));
 		}
 
 		RemoveActivityCollectionCommand command = new RemoveActivityCollectionCommand(tx);

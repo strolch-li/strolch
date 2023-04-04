@@ -321,10 +321,8 @@ public final class Certificate implements Serializable {
 		} else if (!this.sessionId.equals(other.sessionId))
 			return false;
 		if (this.username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!this.username.equals(other.username))
-			return false;
-		return true;
+			return other.username == null;
+		} else
+			return this.username.equals(other.username);
 	}
 }

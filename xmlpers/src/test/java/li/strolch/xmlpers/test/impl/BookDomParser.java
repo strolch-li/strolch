@@ -40,7 +40,6 @@ public class BookDomParser implements DomParser<Book> {
 		this.book = object;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public Document toDom() {
 
@@ -59,7 +58,6 @@ public class BookDomParser implements DomParser<Book> {
 
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public void fromDom(Document document) {
 

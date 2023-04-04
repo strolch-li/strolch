@@ -67,12 +67,12 @@ public class ProcessHelper {
 
 			long start = System.nanoTime();
 			logger.info(MessageFormat.format("Starting command (Timeout {0} {1}) {2}", timeout, unit.name(),
-					Arrays.stream(commandAndArgs).collect(Collectors.joining(" "))));
+					String.join(" ", commandAndArgs)));
 			final Process process = pb.start();
 			int[] returnValue = new int[1];
 
 			try (BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));) {
+					BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 
 				Thread errorIn = new Thread(() -> readStream(sb, "[ERROR] ", errorStream), "errorIn");
 				errorIn.start();
@@ -93,8 +93,8 @@ public class ProcessHelper {
 					returnValue[0] = -1;
 				}
 
-				errorIn.join(100l);
-				infoIn.join(100l);
+				errorIn.join(100L);
+				infoIn.join(100L);
 				sb.append("=====================================\n"); //$NON-NLS-1$
 			}
 
@@ -126,7 +126,7 @@ public class ProcessHelper {
 		String line;
 		try {
 			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(prefix + line + StringHelper.NEW_LINE);
+				sb.append(prefix).append(line).append(StringHelper.NEW_LINE);
 			}
 		} catch (IOException e) {
 			String msg = "Faild to read from {0} stream: {1}"; //$NON-NLS-1$

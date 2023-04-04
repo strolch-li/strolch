@@ -1,6 +1,5 @@
 package li.strolch.utils.collections;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -129,11 +128,11 @@ public class MapOfTest {
 		Set<String> set;
 		set = mapOfSets.getSet("a");
 		assertNotNull(set);
-		assertEquals(new HashSet<>(asList("1", "2")), set);
+		assertEquals(new HashSet<>(List.of("1", "2")), set);
 
 		set = mapOfSets.getSet("b");
 		assertNotNull(set);
-		assertEquals(new HashSet<>(asList("3", "4")), set);
+		assertEquals(new HashSet<>(List.of("3", "4")), set);
 
 		mapOfSets.computeIfAbsent("c", s -> {
 			Set<String> items = new HashSet<>();
@@ -143,11 +142,11 @@ public class MapOfTest {
 
 		set = mapOfSets.getSet("c");
 		assertNotNull(set);
-		assertEquals(new HashSet<>(asList("5")), set);
+		assertEquals(new HashSet<>(List.of("5")), set);
 
 		set = mapOfSets.getSetOrDefault("a", emptySet());
 		assertNotNull(set);
-		assertEquals(new HashSet<>(asList("1", "2")), set);
+		assertEquals(new HashSet<>(List.of("1", "2")), set);
 
 		set = mapOfSets.getSetOrDefault("d", emptySet());
 		assertNotNull(set);
@@ -156,7 +155,7 @@ public class MapOfTest {
 		mapOfSets.forEach((key, items) -> {
 			if (key.equals("a")) {
 				assertNotNull(items);
-				assertEquals(new HashSet<>(asList("1", "2")), items);
+				assertEquals(new HashSet<>(List.of("1", "2")), items);
 			}
 		});
 	}

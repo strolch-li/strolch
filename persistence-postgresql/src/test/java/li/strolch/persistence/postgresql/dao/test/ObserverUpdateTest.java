@@ -80,7 +80,7 @@ public class ObserverUpdateTest {
 			runtimeMock.destroyRuntime();
 	}
 
-	public final class ElementAddedObserver implements Observer {
+	public static final class ElementAddedObserver implements Observer {
 
 		Map<String, ModificationResult> results = new HashMap<>();
 

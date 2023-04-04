@@ -40,7 +40,6 @@ public class MyModelDomParser implements DomParser<MyModel> {
 		this.resource = resource;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public Document toDom() {
 
@@ -68,7 +67,6 @@ public class MyModelDomParser implements DomParser<MyModel> {
 		return document;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public void fromDom(Document document) {
 

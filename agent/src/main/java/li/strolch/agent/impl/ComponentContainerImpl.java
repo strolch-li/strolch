@@ -300,7 +300,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.started") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
-						.value("components", "" + this.controllerMap.size()) //
+						.value("components", String.valueOf(this.controllerMap.size())) //
 						.value("took", tookS));
 			}
 		}
@@ -325,7 +325,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
-						.value("components", "" + this.controllerMap.size()));
+						.value("components", String.valueOf(this.controllerMap.size())));
 			}
 		}
 

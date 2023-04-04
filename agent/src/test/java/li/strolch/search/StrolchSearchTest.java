@@ -341,7 +341,7 @@ public class StrolchSearchTest {
 		}
 	}
 
-	public class NewBallSearch extends ResourceSearch {
+	public static class NewBallSearch extends ResourceSearch {
 
 		@Override
 		protected void define() {
@@ -364,7 +364,7 @@ public class StrolchSearchTest {
 		}
 	}
 
-	public class BallSearch extends ResourceSearch {
+	public static class BallSearch extends ResourceSearch {
 
 		private final String id;
 		private final String status;

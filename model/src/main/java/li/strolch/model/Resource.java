@@ -380,22 +380,13 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		return visitor.visitResource(this);
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 
-		StringBuilder builder = new StringBuilder();
+		String builder =
+				"Resource [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", version=" + this.version;
 
-		builder.append("Resource [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
-		builder.append(", version=");
-		builder.append(this.version);
-
-		return builder.toString();
+		return builder;
 	}
 
 	@Override

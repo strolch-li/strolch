@@ -218,12 +218,11 @@ public class DateRange {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(this.fromDate == null ? "-" : ISO8601.toString(this.fromDate));
-		sb.append((this.fromInclusive ? " (inc)" : " (exc)"));
-		sb.append(" - ");
-		sb.append(this.toDate == null ? "-" : ISO8601.toString(this.toDate));
-		sb.append((this.toInclusive ? " (inc)" : " (exc)"));
-		return sb.toString();
+		String sb = (this.fromDate == null ? "-" : ISO8601.toString(this.fromDate)) + (this.fromInclusive ?
+				" (inc)" :
+				" (exc)") + " - " + (this.toDate == null ? "-" : ISO8601.toString(this.toDate)) + (this.toInclusive ?
+				" (inc)" :
+				" (exc)");
+		return sb;
 	}
 }

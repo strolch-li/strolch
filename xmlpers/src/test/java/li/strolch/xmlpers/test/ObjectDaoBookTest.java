@@ -141,7 +141,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 			String press = "Penguin Books"; //$NON-NLS-1$
 			double price = 21.30;
 
-			Book book = createBook((long) i, title, author, press, price);
+			Book book = createBook(i, title, author, press, price);
 			books.add(book);
 		}
 

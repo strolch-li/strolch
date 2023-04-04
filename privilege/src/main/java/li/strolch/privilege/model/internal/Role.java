@@ -143,16 +143,10 @@ public final class Role {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Role [name=");
-		builder.append(this.name);
-		builder.append(", privileges=");
-		builder.append(this.privilegeMap.keySet());
-		builder.append("]");
-		return builder.toString();
+		String builder = "Role [name=" + this.name + ", privileges=" + this.privilegeMap.keySet() + "]";
+		return builder;
 	}
 
 	@Override
@@ -173,10 +167,8 @@ public final class Role {
 			return false;
 		Role other = (Role) obj;
 		if (this.name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!this.name.equals(other.name))
-			return false;
-		return true;
+			return other.name == null;
+		} else
+			return this.name.equals(other.name);
 	}
 }

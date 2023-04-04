@@ -158,7 +158,7 @@ public class GenericReportTest {
 			List<JsonObject> result = report.filter("Product", "product01") //
 					.dateRange(dateRange) //
 					.doReportAsJson() //
-					.collect(toList());
+					.toList();
 			assertTrue(result.isEmpty());
 		}
 
@@ -172,7 +172,7 @@ public class GenericReportTest {
 			List<JsonObject> result = report.filter("Product", "product01") //
 					.dateRange(dateRange) //
 					.doReportAsJson() //
-					.collect(toList());
+					.toList();
 			assertEquals(2, result.size());
 		}
 	}
@@ -191,7 +191,7 @@ public class GenericReportTest {
 				DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
 				List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
-						.collect(toList());
+						.toList();
 				assertTrue(result.isEmpty());
 			}
 
@@ -202,7 +202,7 @@ public class GenericReportTest {
 				DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
 				List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
-						.collect(toList());
+						.toList();
 				assertEquals(2, result.size());
 			}
 
@@ -213,7 +213,7 @@ public class GenericReportTest {
 				DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
 				List<JsonObject> result = report.filter("Product", "product01", "product02").dateRange(dateRange)
-						.doReportAsJson().collect(toList());
+						.doReportAsJson().toList();
 				assertEquals(4, result.size());
 			}
 		}

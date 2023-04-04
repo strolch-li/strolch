@@ -55,7 +55,7 @@ public class DbConnectionCheck {
 
 			logger.info("Checking connection " + ds);
 
-			try (Connection con = ds.getConnection(); Statement st = con.createStatement();) {
+			try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
 				try (ResultSet rs = st.executeQuery("select version()")) { //$NON-NLS-1$
 					if (rs.next()) {

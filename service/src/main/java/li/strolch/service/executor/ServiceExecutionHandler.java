@@ -93,7 +93,7 @@ public class ServiceExecutionHandler extends StrolchComponent {
 		}
 	}
 
-	public class ServiceContext<T extends ServiceArgument, U extends ServiceResult> {
+	public static class ServiceContext<T extends ServiceArgument, U extends ServiceResult> {
 
 		private final Certificate certificate;
 		private final Service<T, U> service;

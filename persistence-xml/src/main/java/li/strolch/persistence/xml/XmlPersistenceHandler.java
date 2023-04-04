@@ -198,7 +198,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		super.start();
 	}
 
-	class PersistenceStore {
+	static class PersistenceStore {
 		PersistenceManager persistenceManager;
 		File dbStorePathF;
 	}

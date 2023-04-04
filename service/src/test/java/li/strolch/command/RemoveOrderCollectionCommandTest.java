@@ -48,7 +48,7 @@ public class RemoveOrderCollectionCommandTest extends AbstractRealmCommandTest {
 
 		List<Order> orders = new ArrayList<>(this.locators.size());
 		for (Locator locator : this.locators) {
-			orders.add((Order) tx.findElement(locator));
+			orders.add(tx.findElement(locator));
 		}
 
 		RemoveOrderCollectionCommand command = new RemoveOrderCollectionCommand(tx);

@@ -308,7 +308,7 @@ public class AuditModelTestRunner {
 		}
 	}
 
-	private final class AuditByIdComparator implements Comparator<Audit> {
+	private static final class AuditByIdComparator implements Comparator<Audit> {
 		@Override
 		public int compare(Audit o1, Audit o2) {
 			return o1.getId().compareTo(o2.getId());

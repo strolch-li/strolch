@@ -175,7 +175,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 			return PeriodDuration.of((Duration) amount);
 		}
 		if (amount instanceof ChronoPeriod) {
-			if (IsoChronology.INSTANCE.equals(((ChronoPeriod) amount).getChronology()) == false) {
+			if (!IsoChronology.INSTANCE.equals(((ChronoPeriod) amount).getChronology())) {
 				throw new DateTimeException("Period requires ISO chronology: " + amount);
 			}
 		}

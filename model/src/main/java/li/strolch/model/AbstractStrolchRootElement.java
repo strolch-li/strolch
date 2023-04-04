@@ -69,8 +69,8 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 
 		// validate we have same objects
 		List<String> objectTypes = elements.stream().map(StrolchRootElement::getObjectType).distinct()
-				.collect(Collectors.toList());
-		List<String> types = elements.stream().map(StrolchRootElement::getType).distinct().collect(Collectors.toList());
+				.toList();
+		List<String> types = elements.stream().map(StrolchRootElement::getType).distinct().toList();
 		if (objectTypes.size() != 1)
 			throw new IllegalStateException(
 					"Only allow to have one type of object: " + elements.stream().map(StrolchElement::getId)

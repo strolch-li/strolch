@@ -99,9 +99,7 @@ public abstract class Command implements Restrictable {
 		PolicyDefs policyDefs = policyContainer.getPolicyDefs();
 		PolicyDef policyDef = policyDefs.getPolicyDef(policyClass.getSimpleName());
 		PolicyHandler policyHandler = getComponent(PolicyHandler.class);
-		@SuppressWarnings("unchecked")
-		T policy = (T) policyHandler.getPolicy(policyDef, tx());
-		return policy;
+		return policyHandler.getPolicy(policyDef, tx());
 	}
 
 	/**

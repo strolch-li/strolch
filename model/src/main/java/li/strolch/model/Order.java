@@ -295,23 +295,11 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	@Override
 	public String toString() {
 
-		StringBuilder builder = new StringBuilder();
+		String builder =
+				"Order [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", state=" + this.state
+						+ ", date=" + ISO8601.toString(this.date) + ", version=" + this.version + "]";
 
-		builder.append("Order [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
-		builder.append(", state=");
-		builder.append(this.state);
-		builder.append(", date=");
-		builder.append(ISO8601.toString(this.date));
-		builder.append(", version=");
-		builder.append(this.version);
-		builder.append("]");
-
-		return builder.toString();
+		return builder;
 	}
 
 	@Override

@@ -74,7 +74,7 @@ public class ParallelTests {
 		}
 	}
 
-	public class ParallelTask extends ForkJoinTask<Void> {
+	public static class ParallelTask extends ForkJoinTask<Void> {
 
 		@Override
 		public Void getRawResult() {

@@ -334,18 +334,11 @@ public class ByteHelper {
 	 */
 	public static String asBinary(byte b) {
 
-		StringBuilder sb = new StringBuilder();
+		String sb =
+				String.valueOf((b >>> 7) & 1) + ((b >>> 6) & 1) + ((b >>> 5) & 1) + ((b >>> 4) & 1) + ((b >>> 3) & 1)
+						+ ((b >>> 2) & 1) + ((b >>> 1) & 1) + ((b) & 1);
 
-		sb.append(((b >>> 7) & 1));
-		sb.append(((b >>> 6) & 1));
-		sb.append(((b >>> 5) & 1));
-		sb.append(((b >>> 4) & 1));
-		sb.append(((b >>> 3) & 1));
-		sb.append(((b >>> 2) & 1));
-		sb.append(((b >>> 1) & 1));
-		sb.append(((b) & 1));
-
-		return sb.toString();
+		return sb;
 	}
 
 	/**
@@ -358,29 +351,13 @@ public class ByteHelper {
 	 */
 	public static String asBinary(short i) {
 
-		StringBuilder sb = new StringBuilder();
+		String sb =
+				String.valueOf((i >>> 15) & 1) + ((i >>> 14) & 1) + ((i >>> 13) & 1) + ((i >>> 12) & 1) + ((i >>> 11)
+						& 1) + ((i >>> 10) & 1) + ((i >>> 9) & 1) + ((i >>> 8) & 1) + StringHelper.SPACE + ((i >>> 7)
+						& 1) + ((i >>> 6) & 1) + ((i >>> 5) & 1) + ((i >>> 4) & 1) + ((i >>> 3) & 1) + ((i >>> 2) & 1)
+						+ ((i >>> 1) & 1) + ((i) & 1);
 
-		sb.append(((i >>> 15) & 1));
-		sb.append(((i >>> 14) & 1));
-		sb.append(((i >>> 13) & 1));
-		sb.append(((i >>> 12) & 1));
-		sb.append(((i >>> 11) & 1));
-		sb.append(((i >>> 10) & 1));
-		sb.append(((i >>> 9) & 1));
-		sb.append(((i >>> 8) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 7) & 1));
-		sb.append(((i >>> 6) & 1));
-		sb.append(((i >>> 5) & 1));
-		sb.append(((i >>> 4) & 1));
-		sb.append(((i >>> 3) & 1));
-		sb.append(((i >>> 2) & 1));
-		sb.append(((i >>> 1) & 1));
-		sb.append(((i) & 1));
-
-		return sb.toString();
+		return sb;
 	}
 
 	/**
@@ -393,51 +370,16 @@ public class ByteHelper {
 	 */
 	public static String asBinary(int i) {
 
-		StringBuilder sb = new StringBuilder();
+		String sb =
+				String.valueOf((i >>> 31) & 1) + ((i >>> 30) & 1) + ((i >>> 29) & 1) + ((i >>> 28) & 1) + ((i >>> 27)
+						& 1) + ((i >>> 26) & 1) + ((i >>> 25) & 1) + ((i >>> 24) & 1) + StringHelper.SPACE + ((i >>> 23)
+						& 1) + ((i >>> 22) & 1) + ((i >>> 21) & 1) + ((i >>> 20) & 1) + ((i >>> 19) & 1) + ((i >>> 18)
+						& 1) + ((i >>> 17) & 1) + ((i >>> 16) & 1) + StringHelper.SPACE + ((i >>> 15) & 1) + ((i >>> 14)
+						& 1) + ((i >>> 13) & 1) + ((i >>> 12) & 1) + ((i >>> 11) & 1) + ((i >>> 10) & 1) + ((i >>> 9)
+						& 1) + ((i >>> 8) & 1) + StringHelper.SPACE + ((i >>> 7) & 1) + ((i >>> 6) & 1) + ((i >>> 5)
+						& 1) + ((i >>> 4) & 1) + ((i >>> 3) & 1) + ((i >>> 2) & 1) + ((i >>> 1) & 1) + ((i) & 1);
 
-		sb.append(((i >>> 31) & 1));
-		sb.append(((i >>> 30) & 1));
-		sb.append(((i >>> 29) & 1));
-		sb.append(((i >>> 28) & 1));
-		sb.append(((i >>> 27) & 1));
-		sb.append(((i >>> 26) & 1));
-		sb.append(((i >>> 25) & 1));
-		sb.append(((i >>> 24) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 23) & 1));
-		sb.append(((i >>> 22) & 1));
-		sb.append(((i >>> 21) & 1));
-		sb.append(((i >>> 20) & 1));
-		sb.append(((i >>> 19) & 1));
-		sb.append(((i >>> 18) & 1));
-		sb.append(((i >>> 17) & 1));
-		sb.append(((i >>> 16) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 15) & 1));
-		sb.append(((i >>> 14) & 1));
-		sb.append(((i >>> 13) & 1));
-		sb.append(((i >>> 12) & 1));
-		sb.append(((i >>> 11) & 1));
-		sb.append(((i >>> 10) & 1));
-		sb.append(((i >>> 9) & 1));
-		sb.append(((i >>> 8) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 7) & 1));
-		sb.append(((i >>> 6) & 1));
-		sb.append(((i >>> 5) & 1));
-		sb.append(((i >>> 4) & 1));
-		sb.append(((i >>> 3) & 1));
-		sb.append(((i >>> 2) & 1));
-		sb.append(((i >>> 1) & 1));
-		sb.append(((i) & 1));
-
-		return sb.toString();
+		return sb;
 	}
 
 	/**
@@ -450,94 +392,23 @@ public class ByteHelper {
 	 */
 	public static String asBinary(long i) {
 
-		StringBuilder sb = new StringBuilder();
+		String sb =
+				String.valueOf((i >>> 63) & 1) + ((i >>> 62) & 1) + ((i >>> 61) & 1) + ((i >>> 60) & 1) + ((i >>> 59)
+						& 1) + ((i >>> 58) & 1) + ((i >>> 57) & 1) + ((i >>> 56) & 1) + StringHelper.SPACE + ((i >>> 55)
+						& 1) + ((i >>> 54) & 1) + ((i >>> 53) & 1) + ((i >>> 52) & 1) + ((i >>> 51) & 1) + ((i >>> 50)
+						& 1) + ((i >>> 49) & 1) + ((i >>> 48) & 1) + StringHelper.SPACE + ((i >>> 47) & 1) + ((i >>> 46)
+						& 1) + ((i >>> 45) & 1) + ((i >>> 44) & 1) + ((i >>> 43) & 1) + ((i >>> 42) & 1) + ((i >>> 41)
+						& 1) + ((i >>> 40) & 1) + StringHelper.SPACE + ((i >>> 39) & 1) + ((i >>> 38) & 1) + ((i >>> 37)
+						& 1) + ((i >>> 36) & 1) + ((i >>> 35) & 1) + ((i >>> 34) & 1) + ((i >>> 33) & 1) + ((i >>> 32)
+						& 1) + StringHelper.SPACE + ((i >>> 31) & 1) + ((i >>> 30) & 1) + ((i >>> 29) & 1) + ((i >>> 28)
+						& 1) + ((i >>> 27) & 1) + ((i >>> 26) & 1) + ((i >>> 25) & 1) + ((i >>> 24) & 1)
+						+ StringHelper.SPACE + ((i >>> 23) & 1) + ((i >>> 22) & 1) + ((i >>> 21) & 1) + ((i >>> 20) & 1)
+						+ ((i >>> 19) & 1) + ((i >>> 18) & 1) + ((i >>> 17) & 1) + ((i >>> 16) & 1) + StringHelper.SPACE
+						+ ((i >>> 15) & 1) + ((i >>> 14) & 1) + ((i >>> 13) & 1) + ((i >>> 12) & 1) + ((i >>> 11) & 1)
+						+ ((i >>> 10) & 1) + ((i >>> 9) & 1) + ((i >>> 8) & 1) + StringHelper.SPACE + ((i >>> 7) & 1)
+						+ ((i >>> 6) & 1) + ((i >>> 5) & 1) + ((i >>> 4) & 1) + ((i >>> 3) & 1) + ((i >>> 2) & 1) + (
+						(i >>> 1) & 1) + ((i) & 1);
 
-		sb.append(((i >>> 63) & 1));
-		sb.append(((i >>> 62) & 1));
-		sb.append(((i >>> 61) & 1));
-		sb.append(((i >>> 60) & 1));
-		sb.append(((i >>> 59) & 1));
-		sb.append(((i >>> 58) & 1));
-		sb.append(((i >>> 57) & 1));
-		sb.append(((i >>> 56) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 55) & 1));
-		sb.append(((i >>> 54) & 1));
-		sb.append(((i >>> 53) & 1));
-		sb.append(((i >>> 52) & 1));
-		sb.append(((i >>> 51) & 1));
-		sb.append(((i >>> 50) & 1));
-		sb.append(((i >>> 49) & 1));
-		sb.append(((i >>> 48) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 47) & 1));
-		sb.append(((i >>> 46) & 1));
-		sb.append(((i >>> 45) & 1));
-		sb.append(((i >>> 44) & 1));
-		sb.append(((i >>> 43) & 1));
-		sb.append(((i >>> 42) & 1));
-		sb.append(((i >>> 41) & 1));
-		sb.append(((i >>> 40) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 39) & 1));
-		sb.append(((i >>> 38) & 1));
-		sb.append(((i >>> 37) & 1));
-		sb.append(((i >>> 36) & 1));
-		sb.append(((i >>> 35) & 1));
-		sb.append(((i >>> 34) & 1));
-		sb.append(((i >>> 33) & 1));
-		sb.append(((i >>> 32) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 31) & 1));
-		sb.append(((i >>> 30) & 1));
-		sb.append(((i >>> 29) & 1));
-		sb.append(((i >>> 28) & 1));
-		sb.append(((i >>> 27) & 1));
-		sb.append(((i >>> 26) & 1));
-		sb.append(((i >>> 25) & 1));
-		sb.append(((i >>> 24) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 23) & 1));
-		sb.append(((i >>> 22) & 1));
-		sb.append(((i >>> 21) & 1));
-		sb.append(((i >>> 20) & 1));
-		sb.append(((i >>> 19) & 1));
-		sb.append(((i >>> 18) & 1));
-		sb.append(((i >>> 17) & 1));
-		sb.append(((i >>> 16) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 15) & 1));
-		sb.append(((i >>> 14) & 1));
-		sb.append(((i >>> 13) & 1));
-		sb.append(((i >>> 12) & 1));
-		sb.append(((i >>> 11) & 1));
-		sb.append(((i >>> 10) & 1));
-		sb.append(((i >>> 9) & 1));
-		sb.append(((i >>> 8) & 1));
-
-		sb.append(StringHelper.SPACE);
-
-		sb.append(((i >>> 7) & 1));
-		sb.append(((i >>> 6) & 1));
-		sb.append(((i >>> 5) & 1));
-		sb.append(((i >>> 4) & 1));
-		sb.append(((i >>> 3) & 1));
-		sb.append(((i >>> 2) & 1));
-		sb.append(((i >>> 1) & 1));
-		sb.append(((i) & 1));
-
-		return sb.toString();
+		return sb;
 	}
 }

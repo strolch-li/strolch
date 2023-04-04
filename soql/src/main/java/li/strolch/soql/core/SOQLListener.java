@@ -151,8 +151,6 @@ public class SOQLListener extends SOQLBaseListener {
 			((SelectExpression) pointer).addExpression(chainedMethodExpression);
 		} else if (pointer instanceof ComparisonExpression) {
 			((ComparisonExpression) pointer).addOperand(chainedMethodExpression);
-		} else if (pointer instanceof SelectExpression) {
-			((SelectExpression) pointer).addExpression(chainedMethodExpression);
 		}
 		pointer = chainedMethodExpression;
 	}

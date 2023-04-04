@@ -93,7 +93,7 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 		}
 	}
 
-	public class PolicyType {
+	public static class PolicyType {
 		private final String type;
 		private final String api;
 		private final Map<String, String> policyByKeyMap;

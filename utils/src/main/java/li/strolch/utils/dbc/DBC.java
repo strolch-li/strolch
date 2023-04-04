@@ -177,7 +177,7 @@ public enum DBC {
 		}
 	}
 
-	public class DbcException extends RuntimeException {
+	public static class DbcException extends RuntimeException {
 
 		public DbcException(String message) {
 			super(message);

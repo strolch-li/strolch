@@ -807,8 +807,7 @@ public class GenericReport extends ReportPolicy {
 		if (this.filtersById != null && !this.filtersById.isEmpty() && this.filtersById.containsSet(
 				element.getType())) {
 
-			if (!this.filtersById.getSet(element.getType()).contains(element.getId()))
-				return false;
+			return this.filtersById.getSet(element.getType()).contains(element.getId());
 		}
 
 		// otherwise we want to keep this row
@@ -1132,7 +1131,7 @@ public class GenericReport extends ReportPolicy {
 		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType)
 				.stream()
 				.filter(p -> p.getValueType() == StrolchValueType.STRING)
-				.collect(toList());
+				.toList();
 
 		if (relationParams.isEmpty())
 			throw new IllegalStateException("Found no relation parameters with UOM " + joinType + " of type "

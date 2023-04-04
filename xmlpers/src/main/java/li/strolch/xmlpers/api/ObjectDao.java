@@ -209,7 +209,7 @@ public class ObjectDao {
 		assertIsIdRef(objectRef);
 
 		this.tx.lock(objectRef);
-		PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
+		PersistenceContext<T> ctx = objectRef.createPersistenceContext(this.tx);
 		return this.fileDao.exists(ctx);
 	}
 
@@ -218,7 +218,7 @@ public class ObjectDao {
 		assertIsIdRef(objectRef);
 
 		this.tx.lock(objectRef);
-		PersistenceContext<T> ctx = objectRef.<T>createPersistenceContext(this.tx);
+		PersistenceContext<T> ctx = objectRef.createPersistenceContext(this.tx);
 		this.fileDao.performRead(ctx);
 		return ctx.getObject();
 	}
@@ -281,7 +281,7 @@ public class ObjectDao {
 
 	public <T> PersistenceContext<T> createCtx(ObjectRef objectRef, long lastModified) {
 		String type = objectRef.getType();
-		PersistenceContextFactory<T> ctxFactory = this.ctxFactoryDelegator.<T>getCtxFactory(type);
+		PersistenceContextFactory<T> ctxFactory = this.ctxFactoryDelegator.getCtxFactory(type);
 		PersistenceContext<T> ctx = ctxFactory.createCtx(objectRef);
 		ctx.setLastModified(lastModified);
 		return ctx;

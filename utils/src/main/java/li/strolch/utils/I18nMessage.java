@@ -226,11 +226,9 @@ public class I18nMessage {
 		} else if (!this.key.equals(other.key))
 			return false;
 		if (this.values == null) {
-			if (other.values != null)
-				return false;
-		} else if (!this.values.equals(other.values))
-			return false;
-		return true;
+			return other.values == null;
+		} else
+			return this.values.equals(other.values);
 	}
 
 	@Override

@@ -153,13 +153,9 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 		}
 		AbstractStrolchElement other = (AbstractStrolchElement) obj;
 		if (this.id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!this.id.equals(other.id)) {
-			return false;
-		}
-		return true;
+			return other.id == null;
+		} else
+			return this.id.equals(other.id);
 	}
 
 	@Override

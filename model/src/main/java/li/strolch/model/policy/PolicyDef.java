@@ -102,13 +102,8 @@ public abstract class PolicyDef {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("PolicyDef [type=");
-		sb.append(this.type);
-		sb.append(", value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		String sb = "PolicyDef [type=" + this.type + ", value=" + this.value + "]";
+		return sb;
 	}
 
 	/**

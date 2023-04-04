@@ -43,20 +43,12 @@ public class MyParameter {
 		this.value = value;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Parameter [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
-		builder.append(", value=");
-		builder.append(this.value);
-		builder.append("]");
-		return builder.toString();
+		String builder =
+				"Parameter [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", value=" + this.value
+						+ "]";
+		return builder;
 	}
 
 	/**

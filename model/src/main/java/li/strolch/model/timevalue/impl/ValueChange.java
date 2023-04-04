@@ -101,18 +101,10 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 		return Objects.hash(time, value);
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("ValueChange [time=");
-		sb.append(this.time);
-		sb.append(", value=");
-		sb.append(this.value);
-		sb.append(", stateId=");
-		sb.append(this.stateId);
-		sb.append("]");
-		return sb.toString();
+		String sb = "ValueChange [time=" + this.time + ", value=" + this.value + ", stateId=" + this.stateId + "]";
+		return sb;
 	}
 
 	@Override

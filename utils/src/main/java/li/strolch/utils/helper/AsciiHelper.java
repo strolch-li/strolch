@@ -212,7 +212,6 @@ public class AsciiHelper {
 	 *
 	 * @return String
 	 */
-	@SuppressWarnings("nls")
 	public static String getAsciiText(char c) {
 		// else if(c == ) { return "";}
 		if (c == NUL) {

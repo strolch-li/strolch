@@ -139,13 +139,9 @@ public class ComponentController {
 		return false;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("ComponentController [component=");
-		builder.append(this.component.getName());
-		builder.append("]");
-		return builder.toString();
+		String builder = "ComponentController [component=" + this.component.getName() + "]";
+		return builder;
 	}
 }

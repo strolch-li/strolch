@@ -80,24 +80,14 @@ public class AString implements Serializable {
 			return false;
 		}
 		if (this.string == null) {
-			if (other.string != null) {
-				return false;
-			}
-		} else if (!this.string.equals(other.string)) {
-			return false;
-		}
-		return true;
+			return other.string == null;
+		} else
+			return this.string.equals(other.string);
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("AString [string=");
-		sb.append(this.string);
-		sb.append(", inverse=");
-		sb.append(this.inverse);
-		sb.append("]");
-		return sb.toString();
+		String sb = "AString [string=" + this.string + ", inverse=" + this.inverse + "]";
+		return sb;
 	}
 }

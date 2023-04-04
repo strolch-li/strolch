@@ -162,7 +162,7 @@ public class SimpleModelTest {
 
 			// get products
 			List<Resource> products = articles.stream().map(a -> tx.getResourceByRelation(a, "product", true))
-					.distinct().collect(Collectors.toList());
+					.distinct().toList();
 			assertEquals(1, products.size());
 
 			// search for all orders in state PLANNED and with customer

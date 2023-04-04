@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.joining;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -209,6 +210,6 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 
 	@Override
 	public boolean containsAll(List<E> values) {
-		return this.value.containsAll(values);
+		return new HashSet<>(this.value).containsAll(values);
 	}
 }

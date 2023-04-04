@@ -98,14 +98,10 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("FloatListValue [value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		String sb = "FloatListValue [value=" + this.value + "]";
+		return sb;
 	}
 
 	@Override
