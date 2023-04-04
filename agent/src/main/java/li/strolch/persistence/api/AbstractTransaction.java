@@ -218,7 +218,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public StrolchTransactionException fail(String string) {
-		rollbackOnClose();
+		setCloseStrategy(TransactionCloseStrategy.ROLLBACK);
 		return new StrolchTransactionException(string);
 	}
 
@@ -307,6 +307,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		case RESOURCE -> resourceCache().addElement(element.getType(), element.getId(), (Resource) element);
 		case ORDER -> orderCache().addElement(element.getType(), element.getId(), (Order) element);
 		case ACTIVITY -> activityCache().addElement(element.getType(), element.getId(), (Activity) element);
+		default -> throw new IllegalStateException("Unexpected object type " + element.getObjectType());
 		}
 	}
 
@@ -513,8 +514,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			case Tags.RESOURCE -> getResourceBy(type, id);
 			case Tags.ORDER -> getOrderBy(type, id);
 			case Tags.ACTIVITY -> getActivityBy(type, id);
-			default -> throw new StrolchModelException(
-					MessageFormat.format("Unknown object class {0}", objectClassType));
+			default -> throw new IllegalStateException("Unexpected object type " + objectClassType);
 		};
 
 		if (rootElement == null) {
@@ -1598,8 +1598,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 					rollback();
 					handleRollback(start);
 				} catch (Exception exc) {
-					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(),
-							exc);
+					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(), exc);
 				}
 				logger.error("Transaction failed due to " + e.getMessage(), e);
 				handleFailure(false, start, ex);
