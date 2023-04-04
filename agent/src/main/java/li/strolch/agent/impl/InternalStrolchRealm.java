@@ -25,6 +25,7 @@ import li.strolch.agent.api.*;
 import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	public static final String PROP_TRY_LOCK_TIME = "tryLockTime";
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
 	private final String realm;
-	private LockHandler lockHandler;
+	private ElementLockingHandler<Locator> lockHandler;
 	private boolean auditTrailEnabled;
 	private boolean auditTrailEnabledForRead;
 	private boolean versioningEnabled;
@@ -80,15 +81,15 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 		// audits
 		String enableAuditKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL);
-		this.auditTrailEnabled = configuration.getBoolean(enableAuditKey, Boolean.FALSE);
+		this.auditTrailEnabled = configuration.getBoolean(enableAuditKey, false);
 
 		// audits for read
 		String enableAuditForReadKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL_FOR_READ);
-		this.auditTrailEnabledForRead = configuration.getBoolean(enableAuditForReadKey, Boolean.FALSE);
+		this.auditTrailEnabledForRead = configuration.getBoolean(enableAuditForReadKey, false);
 
 		// observer updates
 		String updateObserversKey = makeRealmKey(getRealm(), PROP_ENABLE_OBSERVER_UPDATES);
-		this.updateObservers = configuration.getBoolean(updateObserversKey, Boolean.FALSE);
+		this.updateObservers = configuration.getBoolean(updateObserversKey, false);
 		if (this.updateObservers) {
 			this.observerHandler = new DefaultObserverHandler(container.getAgent(), this);
 		}
@@ -98,11 +99,12 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		String propTryLockTime = makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
 		long time = configuration.getLong(propTryLockTime, 10L);
-		this.lockHandler = new DefaultLockHandler(this.container.getAgent(), this.realm, timeUnit, time);
+		this.lockHandler = new ElementLockingHandler<>(this.container.getAgent().getScheduledExecutor(), timeUnit,
+				time);
 
 		// versioning
 		String enableVersioningKey = makeRealmKey(getRealm(), PROP_ENABLE_VERSIONING);
-		this.versioningEnabled = configuration.getBoolean(enableVersioningKey, Boolean.FALSE);
+		this.versioningEnabled = configuration.getBoolean(enableVersioningKey, false);
 
 		if (this.auditTrailEnabled)
 			logger.info("Enabling AuditTrail for realm " + getRealm());
@@ -121,8 +123,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		else
 			logger.info("Versioning not enabled for realm " + getRealm());
 
-		logger.info(
-				MessageFormat.format("Using a locking try timeout of {0}s", timeUnit.toSeconds(time)));
+		logger.info(MessageFormat.format("Using a locking try timeout of {0}s", timeUnit.toSeconds(time)));
 	}
 
 	@Override

@@ -154,8 +154,7 @@ public class StrolchAgent {
 	/**
 	 * @see PrivilegeHandler#runAsAgentWithResult(PrivilegedRunnableWithResult)
 	 */
-	public <T> T runAsWithResult(String systemUser, PrivilegedRunnableWithResult<T> runnable)
-			throws Exception {
+	public <T> T runAsWithResult(String systemUser, PrivilegedRunnableWithResult<T> runnable) throws Exception {
 		return getPrivilegeHandler().runAsWithResult(systemUser, runnable);
 	}
 
@@ -311,8 +310,7 @@ public class StrolchAgent {
 		this.container = container;
 
 		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
-		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(),
-				config.getEnvironment()));
+		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(), config.getEnvironment()));
 	}
 
 	protected void assertContainerStarted() {
@@ -357,8 +355,7 @@ public class StrolchAgent {
 						runtimeConfiguration.getTimezone(), properties);
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
-				String msg = MessageFormat.format("Failed to read version properties for agent: {0}",
-						e.getMessage());
+				String msg = MessageFormat.format("Failed to read version properties for agent: {0}", e.getMessage());
 				queryResult.getErrors().add(msg);
 				logger.error(msg, e);
 			}
