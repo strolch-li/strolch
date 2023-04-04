@@ -35,6 +35,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import javanet.staxutils.helpers.StreamWriterDelegate;
+import li.strolch.utils.helper.ExceptionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A filter that indents an XML stream. To apply it, construct a filter that contains another {@link XMLStreamWriter},
@@ -66,6 +69,8 @@ import javanet.staxutils.helpers.StreamWriterDelegate;
  * @author <a href="mailto:jk2006@engineer.com">John Kristian</a>
  */
 public class IndentingXMLStreamWriter extends StreamWriterDelegate implements Indentation {
+
+	private static final Logger logger = LoggerFactory.getLogger(IndentingXMLStreamWriter.class);
 
 	public IndentingXMLStreamWriter(XMLStreamWriter out) {
 		this(out, DEFAULT_INDENT, NORMAL_END_OF_LINE);
@@ -270,8 +275,8 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 			while (this.depth > 0) {
 				writeEndElement(); // indented
 			}
-		} catch (Exception ignored) {
-			ignored.printStackTrace();
+		} catch (Exception ignorable) {
+			logger.error("Ignoring exception " + ExceptionHelper.getExceptionMessage(ignorable, true), ignorable);
 		}
 		this.out.writeEndDocument();
 		afterEndDocument();
