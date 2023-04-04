@@ -49,8 +49,8 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 
 	@Override
 	public StrolchEnum getEnum(Certificate certificate, String name, Locale locale, boolean withoutHidden) {
-		DBC.PRE.assertNotEmpty("Enum name must be given!", name); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("Locale must be given!", locale); //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("Enum name must be given!", name);
+		DBC.PRE.assertNotNull("Locale must be given!", locale);
 
 		try (StrolchTransaction tx = openTx(certificate, true)) {
 			return getEnum(tx, name, locale, withoutHidden);
@@ -102,7 +102,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 		if (enumeration.hasParameterBag(localeS))
 			return enumeration.getParameterBag(localeS);
 
-		String msg = "No enumeration exists for language {0} on enumeration {1}"; //$NON-NLS-1$
+		String msg = "No enumeration exists for language {0} on enumeration {1}";
 		msg = MessageFormat.format(msg, locale, enumeration.getLocator());
 		throw new StrolchException(msg);
 	}

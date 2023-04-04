@@ -25,8 +25,8 @@ import org.junit.Test;
  */
 public class PerformanceXmlTest extends PerformanceTest {
 
-	public static final String RUNTIME_PATH = "target/runtime_xml_test/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/runtime_xml"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/runtime_xml_test/";
+	public static final String CONFIG_SRC = "src/runtime_xml";
 
 	@BeforeClass
 	public static void beforeClass() {

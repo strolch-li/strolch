@@ -178,7 +178,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			case XmlConstants.XML_ROLE -> {
 				Role role = new Role(this.roleName, this.privileges);
 				getRoles().add(role);
-				logger.info(MessageFormat.format("New Role: {0}", role)); //$NON-NLS-1$
+				logger.info(MessageFormat.format("New Role: {0}", role));
 				init();
 			}
 			}

@@ -78,9 +78,9 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		switch (locator.toString()) {
 		case STROLCH_CONFIGURATION_ENV -> {
 			String env = attributes.getValue(ID);
-			DBC.PRE.assertNotEmpty("attribute 'id' must be set on element 'env'", env); //$NON-NLS-1$
+			DBC.PRE.assertNotEmpty("attribute 'id' must be set on element 'env'", env);
 			if (this.envBuilders.containsKey(env)) {
-				String msg = "Environment {0} already exists!"; //$NON-NLS-1$
+				String msg = "Environment {0} already exists!";
 				throw new IllegalStateException(MessageFormat.format(msg, env));
 			}
 			this.currentEnvironment = env;
@@ -128,14 +128,14 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 	private ConfigurationBuilder getEnvBuilder(String environment) {
 		if (StringHelper.isEmpty(environment))
-			throw new IllegalStateException("environment must be set!"); //$NON-NLS-1$
+			throw new IllegalStateException("environment must be set!");
 		else if (environment.equals(ENV_GLOBAL))
 			return this.globalEnvBuilder;
 
 		ConfigurationBuilder envBuilder = this.envBuilders.get(environment);
 		if (envBuilder == null)
 			throw new IllegalStateException(
-					MessageFormat.format("No ConfigurationBuilder exists for env {0}", environment)); //$NON-NLS-1$
+					MessageFormat.format("No ConfigurationBuilder exists for env {0}", environment));
 
 		return envBuilder;
 	}
@@ -173,7 +173,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 	private void assertExpectedLocator(Locator expectedLocator, Locator actualLocator) {
 		if (!expectedLocator.equals(actualLocator)) {
-			String msg = "Locator mismatch. Expected {0}. Current: {1}"; //$NON-NLS-1$
+			String msg = "Locator mismatch. Expected {0}. Current: {1}";
 			msg = MessageFormat.format(msg, expectedLocator, actualLocator);
 			throw new IllegalStateException(msg);
 		}
@@ -185,8 +185,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		protected StringBuilder valueBuffer;
 
 		public ElementHandler(ConfigurationBuilder configurationBuilder, Locator locator) {
-			DBC.PRE.assertNotNull("configurationBuilder must be set!", configurationBuilder); //$NON-NLS-1$
-			DBC.PRE.assertNotNull("locator must be set!", locator); //$NON-NLS-1$
+			DBC.PRE.assertNotNull("configurationBuilder must be set!", configurationBuilder);
+			DBC.PRE.assertNotNull("locator must be set!", locator);
 			this.configurationBuilder = configurationBuilder;
 			this.locator = locator;
 		}
@@ -275,7 +275,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			if (this.propertyName != null) {
-				String msg = "Opening another tag {0} although {1} is still open!"; //$NON-NLS-1$
+				String msg = "Opening another tag {0} although {1} is still open!";
 				msg = MessageFormat.format(msg, this.propertyName, qName);
 				throw new IllegalStateException(msg);
 			}
@@ -287,7 +287,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) {
 			if (this.propertyName == null || !this.propertyName.equals(qName)) {
-				String msg = "Previous tag {0} was not closed before new tag {1}!"; //$NON-NLS-1$
+				String msg = "Previous tag {0} was not closed before new tag {1}!";
 				msg = MessageFormat.format(msg, this.propertyName, qName);
 				throw new IllegalStateException(msg);
 			}
@@ -394,7 +394,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		public void addProperty(String key, String value) {
 			if (StringHelper.isEmpty(key))
-				throw new IllegalStateException("Key is empty!"); //$NON-NLS-1$
+				throw new IllegalStateException("Key is empty!");
 			this.properties.put(key, value);
 		}
 

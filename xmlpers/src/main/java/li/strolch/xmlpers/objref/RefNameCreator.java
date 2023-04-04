@@ -19,7 +19,7 @@ import li.strolch.utils.helper.StringHelper;
 
 public class RefNameCreator {
 
-	protected static final String SLASH = "/"; //$NON-NLS-1$
+	protected static final String SLASH = "/";
 
 	// FIXME validate each name part that it is a valid literal for file names...
 
@@ -53,19 +53,19 @@ public class RefNameCreator {
 
 	private static void assertType(String type) {
 		if (StringHelper.isEmpty(type)) {
-			throw new IllegalArgumentException("type may not be empty!"); //$NON-NLS-1$
+			throw new IllegalArgumentException("type may not be empty!");
 		}
 	}
 
 	private static void assertSubType(String subType) {
 		if (StringHelper.isEmpty(subType)) {
-			throw new IllegalArgumentException("subType may not be empty!"); //$NON-NLS-1$
+			throw new IllegalArgumentException("subType may not be empty!");
 		}
 	}
 
 	private static void assertId(String id) {
 		if (StringHelper.isEmpty(id)) {
-			throw new IllegalArgumentException("id may not be empty!"); //$NON-NLS-1$
+			throw new IllegalArgumentException("id may not be empty!");
 		}
 	}
 }

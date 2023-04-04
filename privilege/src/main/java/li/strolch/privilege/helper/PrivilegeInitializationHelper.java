@@ -56,7 +56,7 @@ public class PrivilegeInitializationHelper {
 
 		// make sure file exists
 		if (!privilegeXmlFile.exists()) {
-			String msg = "Privilege file does not exist at path {0}"; //$NON-NLS-1$
+			String msg = "Privilege file does not exist at path {0}";
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
@@ -65,7 +65,7 @@ public class PrivilegeInitializationHelper {
 		try (InputStream fin = Files.newInputStream(privilegeXmlFile.toPath())) {
 			return initializeFromXml(fin);
 		} catch (Exception e) {
-			String msg = "Failed to load configuration from {0}"; //$NON-NLS-1$
+			String msg = "Failed to load configuration from {0}";
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
 			throw new PrivilegeException(msg, e);
 		}
@@ -109,7 +109,7 @@ public class PrivilegeInitializationHelper {
 		try {
 			encryptionHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			String msg = "EncryptionHandler {0} could not be initialized"; //$NON-NLS-1$
+			String msg = "EncryptionHandler {0} could not be initialized";
 			msg = MessageFormat.format(msg, encryptionHandlerClassName);
 			throw new PrivilegeException(msg, e);
 		}
@@ -126,7 +126,7 @@ public class PrivilegeInitializationHelper {
 		try {
 			passwordStrengthHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			String msg = "PasswordStrengthHandler {0} could not be initialized"; //$NON-NLS-1$
+			String msg = "PasswordStrengthHandler {0} could not be initialized";
 			msg = MessageFormat.format(msg, passwordStrengthHandlerClassName);
 			throw new PrivilegeException(msg, e);
 		}
@@ -138,7 +138,7 @@ public class PrivilegeInitializationHelper {
 		try {
 			persistenceHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			String msg = "PersistenceHandler {0} could not be initialized"; //$NON-NLS-1$
+			String msg = "PersistenceHandler {0} could not be initialized";
 			msg = MessageFormat.format(msg, persistenceHandlerClassName);
 			throw new PrivilegeException(msg, e);
 		}
@@ -151,7 +151,7 @@ public class PrivilegeInitializationHelper {
 		try {
 			challengeHandler.initialize(parameterMap);
 		} catch (Exception e) {
-			String msg = "UserChallengeHandler {0} could not be initialized"; //$NON-NLS-1$
+			String msg = "UserChallengeHandler {0} could not be initialized";
 			msg = MessageFormat.format(msg, persistenceHandlerClassName);
 			throw new PrivilegeException(msg, e);
 		}
@@ -167,7 +167,7 @@ public class PrivilegeInitializationHelper {
 			try {
 				ssoHandler.initialize(parameterMap);
 			} catch (Exception e) {
-				String msg = "SingleSignOnHandler {0} could not be initialized"; //$NON-NLS-1$
+				String msg = "SingleSignOnHandler {0} could not be initialized";
 				msg = MessageFormat.format(msg, ssoHandlerClassName);
 				throw new PrivilegeException(msg, e);
 			}
@@ -190,7 +190,7 @@ public class PrivilegeInitializationHelper {
 			privilegeHandler.initialize(parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
 					challengeHandler, ssoHandler, policyMap);
 		} catch (Exception e) {
-			String msg = "PrivilegeHandler {0} could not be initialized"; //$NON-NLS-1$
+			String msg = "PrivilegeHandler {0} could not be initialized";
 			msg = MessageFormat.format(msg, privilegeHandler.getClass().getName());
 			throw new PrivilegeException(msg, e);
 		}

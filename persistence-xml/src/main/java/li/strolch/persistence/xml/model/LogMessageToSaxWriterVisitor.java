@@ -27,7 +27,7 @@ public class LogMessageToSaxWriterVisitor {
 			writeElement(logMessage);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write LogMessage {0} due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to write LogMessage {0} due to {1}";
 			msg = MessageFormat.format(msg, logMessage.getId(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}

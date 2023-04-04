@@ -26,8 +26,8 @@ import org.junit.Test;
 
 public class GenericReportTest {
 
-	private static final String RUNTIME_PATH = "target/GenericReportTest/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/reporttest"; //$NON-NLS-1$
+	private static final String RUNTIME_PATH = "target/GenericReportTest/";
+	private static final String CONFIG_SRC = "src/test/resources/reporttest";
 
 	private static RuntimeMock runtimeMock;
 	private static Certificate certificate;

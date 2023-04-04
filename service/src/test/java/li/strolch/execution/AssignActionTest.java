@@ -51,7 +51,7 @@ import org.junit.Test;
 public class AssignActionTest {
 
 	private static final String RUNTIME_PATH = "target/" + AssignActionTest.class.getSimpleName();
-	private static final String CONFIG_SRC = "src/test/resources/executiontest"; //$NON-NLS-1$
+	private static final String CONFIG_SRC = "src/test/resources/executiontest";
 	private static RuntimeMock runtimeMock;
 	private static StrolchTransaction tx;
 

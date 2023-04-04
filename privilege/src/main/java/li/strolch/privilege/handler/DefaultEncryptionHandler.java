@@ -170,11 +170,11 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 		// test non-salt hash algorithm
 		try {
-			hashPasswordWithoutSalt("test".toCharArray()); //$NON-NLS-1$
+			hashPasswordWithoutSalt("test".toCharArray());
 			DefaultEncryptionHandler.logger.info(MessageFormat
-					.format("Using non-salt hashing algorithm {0}", this.nonSaltAlgorithm)); //$NON-NLS-1$
+					.format("Using non-salt hashing algorithm {0}", this.nonSaltAlgorithm));
 		} catch (Exception e) {
-			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
 			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XML_PARAM_HASH_ALGORITHM_NON_SALT,
 					e.getLocalizedMessage());
 			throw new PrivilegeException(msg, e);
@@ -182,11 +182,11 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 		// test hash algorithm
 		try {
-			hashPassword("test".toCharArray(), "test".getBytes()); //$NON-NLS-1$
+			hashPassword("test".toCharArray(), "test".getBytes());
 			DefaultEncryptionHandler.logger
-					.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm)); //$NON-NLS-1$
+					.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm));
 		} catch (Exception e) {
-			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
 			msg = MessageFormat
 					.format(msg, EncryptionHandler.class.getName(), XML_PARAM_HASH_ALGORITHM, e.getLocalizedMessage());
 			throw new PrivilegeException(msg, e);

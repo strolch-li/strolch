@@ -75,7 +75,7 @@ public class PrivilegeContext {
 
 	public void assertHasPrivilege(String privilegeName) throws AccessDeniedException {
 		if (!this.privileges.containsKey(privilegeName)) {
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), //$NON-NLS-1$
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"),
 					userRep.getUsername(), privilegeName);
 			throw new AccessDeniedException(msg);
 		}
@@ -87,7 +87,7 @@ public class PrivilegeContext {
 
 	public void assertHasRole(String roleName) throws AccessDeniedException {
 		if (!this.userRep.hasRole(roleName)) {
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.role"), //$NON-NLS-1$
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.role"),
 					userRep.getUsername(), roleName);
 			throw new AccessDeniedException(msg);
 		}
@@ -99,7 +99,7 @@ public class PrivilegeContext {
 				return;
 		}
 
-		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.role"), //$NON-NLS-1$
+		String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.role"),
 				userRep.getUsername(), String.join(", ", roleNames));
 		throw new AccessDeniedException(msg);
 	}
@@ -121,7 +121,7 @@ public class PrivilegeContext {
 	public PrivilegePolicy getPolicy(String policyName) throws PrivilegeException {
 		PrivilegePolicy policy = this.policies.get(policyName);
 		if (policy == null) {
-			String msg = "The PrivilegePolicy {0} does not exist on the PrivilegeContext!"; //$NON-NLS-1$
+			String msg = "The PrivilegePolicy {0} does not exist on the PrivilegeContext!";
 			throw new PrivilegeException(MessageFormat.format(msg, policyName));
 		}
 		return policy;
@@ -173,7 +173,7 @@ public class PrivilegeContext {
 		IPrivilege privilege = this.privileges.get(privilegeName);
 		if (privilege == null) {
 			String msg = MessageFormat
-					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"), //$NON-NLS-1$
+					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
 							getUsername(), privilegeName, restrictable.getClass().getName(),
 							restrictable.getPrivilegeValue());
 			throw new AccessDeniedException(msg);

@@ -102,29 +102,29 @@ public class UserRep implements Serializable {
 	public void validate() {
 
 		if (StringHelper.isEmpty(this.userId))
-			throw new PrivilegeException("userId is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("userId is null or empty");
 
 		if (StringHelper.isEmpty(this.username))
-			throw new PrivilegeException("username is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("username is null or empty");
 
 		// username must be at least 2 characters in length
 		if (this.username.length() < 2) {
 			String msg = MessageFormat
-					.format("The given username ''{0}'' is shorter than 2 characters", this.username); //$NON-NLS-1$
+					.format("The given username ''{0}'' is shorter than 2 characters", this.username);
 			throw new PrivilegeException(msg);
 		}
 
 		if (this.userState == null)
-			throw new PrivilegeException("userState is null"); //$NON-NLS-1$
+			throw new PrivilegeException("userState is null");
 
 		if (StringHelper.isEmpty(this.firstname))
-			throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("firstname is null or empty");
 
 		if (StringHelper.isEmpty(this.lastname))
-			throw new PrivilegeException("lastname is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("lastname is null or empty");
 
 		if (this.roles == null || this.roles.isEmpty())
-			throw new PrivilegeException("roles is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("roles is null or empty");
 	}
 
 	/**

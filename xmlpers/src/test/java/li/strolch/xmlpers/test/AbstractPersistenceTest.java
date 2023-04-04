@@ -71,7 +71,7 @@ public abstract class AbstractPersistenceTest {
 	}
 
 	protected void setup(Properties properties) {
-		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
+		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true");
 		this.persistenceManager = PersistenceManagerLoader.load(properties);
 		this.persistenceManager.getCtxFactory()
 				.registerPersistenceContextFactory(MyModel.class, TestConstants.TYPE_RES, new MyModelContextFactory());

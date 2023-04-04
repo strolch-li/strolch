@@ -38,16 +38,16 @@ import org.slf4j.LoggerFactory;
  */
 public class StringHelper {
 
-	public static final String NEW_LINE = "\n"; //$NON-NLS-1$
-	public static final String EMPTY = ""; //$NON-NLS-1$
-	public static final String SPACE = " "; //$NON-NLS-1$
-	public static final String NULL = "null"; //$NON-NLS-1$
-	public static final String DASH = "-"; //$NON-NLS-1$
-	public static final String UNDERLINE = "_"; //$NON-NLS-1$
-	public static final String COMMA = ","; //$NON-NLS-1$
-	public static final String DOT = "."; //$NON-NLS-1$
-	public static final String SEMICOLON = ";"; //$NON-NLS-1$
-	public static final String COLON = ":"; //$NON-NLS-1$
+	public static final String NEW_LINE = "\n";
+	public static final String EMPTY = "";
+	public static final String SPACE = " ";
+	public static final String NULL = "null";
+	public static final String DASH = "-";
+	public static final String UNDERLINE = "_";
+	public static final String COMMA = ",";
+	public static final String DOT = ".";
+	public static final String SEMICOLON = ";";
+	public static final String COLON = ":";
 
 	private static final Logger logger = LoggerFactory.getLogger(StringHelper.class);
 
@@ -100,7 +100,7 @@ public class StringHelper {
 			}
 		}
 
-		return new String(hex, StandardCharsets.US_ASCII); //$NON-NLS-1$
+		return new String(hex, StandardCharsets.US_ASCII);
 
 	}
 
@@ -153,13 +153,13 @@ public class StringHelper {
 			pos++;
 		}
 
-		return new String(hex, StandardCharsets.US_ASCII); //$NON-NLS-1$
+		return new String(hex, StandardCharsets.US_ASCII);
 
 	}
 
 	public static byte fromHexStringByte(String encoded) {
 		if (encoded.length() != 2)
-			throw new IllegalArgumentException("Input string must be exactly two characters long."); //$NON-NLS-1$
+			throw new IllegalArgumentException("Input string must be exactly two characters long.");
 		byte result = (byte) Integer.parseInt(encoded, 16);
 		return result;
 	}
@@ -174,7 +174,7 @@ public class StringHelper {
 	 */
 	public static byte[] fromHexString(String encoded) {
 		if ((encoded.length() % 2) != 0)
-			throw new IllegalArgumentException("Input string must contain an even number of characters."); //$NON-NLS-1$
+			throw new IllegalArgumentException("Input string must contain an even number of characters.");
 
 		final byte[] result = new byte[encoded.length() / 2];
 		final char[] enc = encoded.toCharArray();
@@ -272,7 +272,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashMd5(byte[] bytes) {
-		return hash("MD5", bytes); //$NON-NLS-1$
+		return hash("MD5", bytes);
 	}
 
 	/**
@@ -310,7 +310,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha1(byte[] bytes) {
-		return hash("SHA-1", bytes); //$NON-NLS-1$
+		return hash("SHA-1", bytes);
 	}
 
 	/**
@@ -348,7 +348,7 @@ public class StringHelper {
 	 * @return the hash or null, if an exception was thrown
 	 */
 	public static byte[] hashSha256(byte[] bytes) {
-		return hash("SHA-256", bytes); //$NON-NLS-1$
+		return hash("SHA-256", bytes);
 	}
 
 	/**
@@ -382,7 +382,7 @@ public class StringHelper {
 			return digest.digest(string.getBytes());
 
 		} catch (NoSuchAlgorithmException e) {
-			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm); //$NON-NLS-1$
+			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm);
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -418,7 +418,7 @@ public class StringHelper {
 			return digest.digest(bytes);
 
 		} catch (NoSuchAlgorithmException e) {
-			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm); //$NON-NLS-1$
+			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm);
 			throw new RuntimeException(msg, e);
 		}
 	}
@@ -479,8 +479,8 @@ public class StringHelper {
 
 		} else if (shorten) {
 
-			logger.warn(MessageFormat.format("Shortening length of value: {0}", value)); //$NON-NLS-1$
-			logger.warn(MessageFormat.format("Length is: {0} max: {1}", value.length(), length)); //$NON-NLS-1$
+			logger.warn(MessageFormat.format("Shortening length of value: {0}", value));
+			logger.warn(MessageFormat.format("Length is: {0} max: {1}", value.length(), length));
 
 			return value.substring(0, length);
 		}
@@ -549,7 +549,7 @@ public class StringHelper {
 			// if no stop found, then break as another sequence should be able to start
 			if (stop == -1) {
 				logger.error(
-						MessageFormat.format("Sequence starts at offset {0} but does not end!", pos)); //$NON-NLS-1$
+						MessageFormat.format("Sequence starts at offset {0} but does not end!", pos));
 				tmpValue = value;
 				break;
 			}
@@ -559,7 +559,7 @@ public class StringHelper {
 			String sequence = tmpValue.substring(pos + tagLength, stop);
 
 			// make sure sequence doesn't contain $ { } characters
-			if (sequence.contains(startTag) || sequence.contains("}")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			if (sequence.contains(startTag) || sequence.contains("}")) { //$NON-NLS-2$ //$NON-NLS-3$
 				String msg = "Enclosed sequence in offsets {0} - {1} contains one of the illegal chars: {2} { }: {3}";
 				msg = MessageFormat.format(msg, pos, stop, prefix, sequence);
 				logger.error(msg);
@@ -578,7 +578,7 @@ public class StringHelper {
 			}
 
 			// property exists, so replace in value
-			tmpValue = tmpValue.replace(startTag + sequence + "}", property); //$NON-NLS-1$ //$NON-NLS-2$
+			tmpValue = tmpValue.replace(startTag + sequence + "}", property); //$NON-NLS-2$
 		}
 
 		return tmpValue;
@@ -657,13 +657,13 @@ public class StringHelper {
 		int start = Math.max(0, (i - maxContext));
 		int end = Math.min(i + maxContext, (Math.min(bytes1.length, bytes2.length)));
 
-		String sb = "Strings are not equal! Start of inequality is at " + i //$NON-NLS-1$
-				+ ". Showing " + maxContext //$NON-NLS-1$
-				+ " extra characters and start and end:\n" //$NON-NLS-1$
-				+ "context s1: " //$NON-NLS-1$
-				+ s1.substring(start, end) + "\n" //$NON-NLS-1$
-				+ "context s2: " //$NON-NLS-1$
-				+ s2.substring(start, end) + "\n"; //$NON-NLS-1$
+		String sb = "Strings are not equal! Start of inequality is at " + i
+				+ ". Showing " + maxContext
+				+ " extra characters and start and end:\n"
+				+ "context s1: "
+				+ s1.substring(start, end) + "\n"
+				+ "context s2: "
+				+ s2.substring(start, end) + "\n";
 
 		return sb;
 	}
@@ -690,17 +690,17 @@ public class StringHelper {
 	 */
 	public static String formatNanoDuration(final long nanos) {
 		if (nanos >= 3600000000000L) {
-			return String.format("%.0fh", (nanos / 3600000000000.0D)); //$NON-NLS-1$
+			return String.format("%.0fh", (nanos / 3600000000000.0D));
 		} else if (nanos >= 60000000000L) {
-			return String.format("%.0fm", (nanos / 60000000000.0D)); //$NON-NLS-1$
+			return String.format("%.0fm", (nanos / 60000000000.0D));
 		} else if (nanos >= 1000000000L) {
-			return String.format("%.0fs", (nanos / 1000000000.0D)); //$NON-NLS-1$
+			return String.format("%.0fs", (nanos / 1000000000.0D));
 		} else if (nanos >= 1000000L) {
-			return String.format("%.0fms", (nanos / 1000000.0D)); //$NON-NLS-1$
+			return String.format("%.0fms", (nanos / 1000000.0D));
 		} else if (nanos >= 1000L) {
-			return String.format("%.0fus", (nanos / 1000.0D)); //$NON-NLS-1$
+			return String.format("%.0fus", (nanos / 1000.0D));
 		} else {
-			return nanos + "ns"; //$NON-NLS-1$
+			return nanos + "ns";
 		}
 	}
 
@@ -798,14 +798,14 @@ public class StringHelper {
 	public static boolean parseBoolean(String value) throws RuntimeException {
 		if (isEmpty(value))
 			throw new RuntimeException(
-					"Value to parse to boolean is empty! Expected case insensitive true or false"); //$NON-NLS-1$
+					"Value to parse to boolean is empty! Expected case insensitive true or false");
 		String tmp = value.toLowerCase();
 		if (tmp.equals(Boolean.TRUE.toString())) {
 			return true;
 		} else if (tmp.equals(Boolean.FALSE.toString())) {
 			return false;
 		} else {
-			String msg = "Value {0} can not be parsed to boolean! Expected case insensitive true or false"; //$NON-NLS-1$
+			String msg = "Value {0} can not be parsed to boolean! Expected case insensitive true or false";
 			msg = MessageFormat.format(msg, value);
 			throw new RuntimeException(msg);
 		}
@@ -816,13 +816,13 @@ public class StringHelper {
 		for (int i = 0; i < values.length; i++) {
 			sb.append(values[i]);
 			if (i < values.length - 1)
-				sb.append(", "); //$NON-NLS-1$
+				sb.append(", ");
 		}
 		return sb.toString();
 	}
 
 	public static String[] splitCommaSeparated(String values) {
-		String[] split = values.split(","); //$NON-NLS-1$
+		String[] split = values.split(",");
 		for (int i = 0; i < split.length; i++) {
 			split[i] = split[i].trim();
 		}

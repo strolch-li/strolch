@@ -24,34 +24,34 @@ import li.strolch.utils.helper.XmlHelper;
 
 public class ConfigurationParser {
 
-	public static final String STROLCH_CONFIGURATION_XML = "StrolchConfiguration.xml"; //$NON-NLS-1$
+	public static final String STROLCH_CONFIGURATION_XML = "StrolchConfiguration.xml";
 
 	public static StrolchConfiguration parseConfiguration(String environment, File configPathF, File dataPathF,
 			File tempPathF) {
-		DBC.PRE.assertNotEmpty("environment value must be set!", environment); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("configPathF must be set!", configPathF); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("dataPathF must be set!", dataPathF); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("tempPathF must be set!", tempPathF); //$NON-NLS-1$
-		DBC.PRE.assertNotEquals("environment must be a value other than 'global'!", ConfigurationTags.ENV_GLOBAL, //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("environment value must be set!", environment);
+		DBC.PRE.assertNotNull("configPathF must be set!", configPathF);
+		DBC.PRE.assertNotNull("dataPathF must be set!", dataPathF);
+		DBC.PRE.assertNotNull("tempPathF must be set!", tempPathF);
+		DBC.PRE.assertNotEquals("environment must be a value other than 'global'!", ConfigurationTags.ENV_GLOBAL,
 				environment);
 
 		// config path: readable directory
 		if (!configPathF.isDirectory() || !configPathF.canRead()) {
-			String msg = "Config path is not readable at {0}"; //$NON-NLS-1$
+			String msg = "Config path is not readable at {0}";
 			msg = MessageFormat.format(msg, configPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 
 		// data path: writable directory
 		if (!dataPathF.isDirectory() || !dataPathF.canRead() || !dataPathF.canWrite()) {
-			String msg = "Data path is not a directory or readable or writeable at {0}"; //$NON-NLS-1$
+			String msg = "Data path is not a directory or readable or writeable at {0}";
 			msg = MessageFormat.format(msg, dataPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 
 		// tmp path: writable directory
 		if (!tempPathF.isDirectory() || !tempPathF.canRead() || !tempPathF.canWrite()) {
-			String msg = "Temp path is not a directory or readable or writeable at {0}"; //$NON-NLS-1$
+			String msg = "Temp path is not a directory or readable or writeable at {0}";
 			msg = MessageFormat.format(msg, tempPathF);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -59,7 +59,7 @@ public class ConfigurationParser {
 		// get path to configuration file
 		File configurationFile = new File(configPathF, STROLCH_CONFIGURATION_XML);
 		if (!configurationFile.isFile() || !configurationFile.canRead()) {
-			String msg = "Configuration file is not readable at {0}"; //$NON-NLS-1$
+			String msg = "Configuration file is not readable at {0}";
 			msg = MessageFormat.format(msg, configurationFile);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -72,7 +72,7 @@ public class ConfigurationParser {
 		ConfigurationBuilder globalEnvBuilder = configurationParser.getGlobalEnvBuilder();
 		ConfigurationBuilder envBuilder = configurationParser.getEnvBuilder();
 		if (envBuilder == null) {
-			String msg = "The environment {0} does not exist!"; //$NON-NLS-1$
+			String msg = "The environment {0} does not exist!";
 			msg = MessageFormat.format(msg, environment);
 			throw new StrolchConfigurationException(msg);
 		}

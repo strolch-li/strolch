@@ -32,9 +32,9 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 @SuppressWarnings("nls")
 public class ResourceModelTestRunner {
 
-	private static final String ID = "@testResource"; //$NON-NLS-1$
-	private static final String NAME = "Test Resource"; //$NON-NLS-1$
-	private static final String TYPE = "Box"; //$NON-NLS-1$
+	private static final String ID = "@testResource";
+	private static final String NAME = "Test Resource";
+	private static final String TYPE = "Box";
 
 	private final RuntimeMock runtimeMock;
 	private final String realmName;
@@ -52,7 +52,7 @@ public class ResourceModelTestRunner {
 
 		// create
 		Resource newResource = createResource("MyTestResource", "Test Name",
-				"TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				"TestType");//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newResource);
@@ -71,11 +71,11 @@ public class ResourceModelTestRunner {
 
 		// create three resources
 		Resource resource1 = createResource("myTestResource1", "Test Name",
-				"QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				"QTestType1");//$NON-NLS-2$ //$NON-NLS-3$
 		Resource resource2 = createResource("myTestResource2", "Test Name",
-				"QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				"QTestType2");//$NON-NLS-2$ //$NON-NLS-3$
 		Resource resource3 = createResource("myTestResource3", "Test Name",
-				"QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				"QTestType3");//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(resource1);
@@ -118,11 +118,11 @@ public class ResourceModelTestRunner {
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			readResource = tx.getResourceBy(TYPE, ID);
 		}
-		assertNotNull("Should read Resource with id " + ID, readResource); //$NON-NLS-1$
+		assertNotNull("Should read Resource with id " + ID, readResource);
 
 		// update
 		StringParameter sParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
-		String newStringValue = "Giddiya!"; //$NON-NLS-1$
+		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
@@ -135,10 +135,10 @@ public class ResourceModelTestRunner {
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			updatedResource = tx.getResourceBy(TYPE, ID);
 		}
-		assertNotNull("Should read Resource with id " + ID, updatedResource); //$NON-NLS-1$
+		assertNotNull("Should read Resource with id " + ID, updatedResource);
 		if (this.runtimeMock.getRealm(this.realmName).getMode() != DataStoreMode.CACHED)
 			assertNotSame("Objects can't be the same reference after re-reading!", readResource,
-					updatedResource); //$NON-NLS-1$
+					updatedResource);
 		StringParameter updatedParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		assertEquals(newStringValue, updatedParam.getValue());
 
@@ -152,7 +152,7 @@ public class ResourceModelTestRunner {
 		// fail to re-read
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			Resource resource = tx.getResourceBy(TYPE, ID);
-			assertNull("Should no read Resource with id " + ID, resource); //$NON-NLS-1$
+			assertNull("Should no read Resource with id " + ID, resource);
 		}
 	}
 

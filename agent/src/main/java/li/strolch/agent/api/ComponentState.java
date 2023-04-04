@@ -59,7 +59,7 @@ public enum ComponentState {
 	}
 
 	private IllegalStateException getIllegalStateEx(ComponentState newState, String componentName) {
-		String msg = "Moving from state {0} to state {1} is not allowed for component " + componentName; //$NON-NLS-1$
+		String msg = "Moving from state {0} to state {1} is not allowed for component " + componentName;
 		msg = MessageFormat.format(msg, this, newState);
 		throw new IllegalStateException(msg);
 	}

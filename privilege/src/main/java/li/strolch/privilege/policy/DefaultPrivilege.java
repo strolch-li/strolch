@@ -74,7 +74,7 @@ public class DefaultPrivilege implements PrivilegePolicy {
 		// DefaultPrivilege policy expects the privilege value to be a string
 		if (!(object instanceof String)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nonstring"); //$NON-NLS-1$
+					.getString("Privilege.illegalArgument.nonstring");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}

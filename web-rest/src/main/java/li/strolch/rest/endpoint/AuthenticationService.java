@@ -106,7 +106,7 @@ public class AuthenticationService {
 		} catch (InvalidCredentialsException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
 			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid"); //$NON-NLS-1$
+			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid");
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (AccessDeniedException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
@@ -124,7 +124,7 @@ public class AuthenticationService {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
+			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
 			return Response.serverError().entity(loginResult.toString()).build();
 		}
 	}
@@ -145,7 +145,7 @@ public class AuthenticationService {
 		} catch (InvalidCredentialsException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
 			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid"); //$NON-NLS-1$
+			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid");
 			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
 		} catch (AccessDeniedException e) {
 			logger.error("Authentication failed due to: " + e.getMessage());
@@ -163,7 +163,7 @@ public class AuthenticationService {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
+			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
 			return Response.serverError().entity(loginResult.toString()).build();
 		}
 	}
@@ -185,7 +185,7 @@ public class AuthenticationService {
 
 			logoutResult.addProperty("username", certificate.getUsername());
 			logoutResult.addProperty("authToken", authToken);
-			logoutResult.addProperty("msg", //$NON-NLS-1$
+			logoutResult.addProperty("msg",
 					MessageFormat.format("{0} has been logged out.", certificate.getUsername()));
 			return Response.ok().entity(logoutResult.toString()).build();
 
@@ -198,7 +198,7 @@ public class AuthenticationService {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
 			logoutResult.addProperty("msg",
-					MessageFormat.format("{0}: {1}", e.getClass().getName(), msg)); //$NON-NLS-1$
+					MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
 			return Response.serverError().entity(logoutResult.toString()).build();
 		}
 	}

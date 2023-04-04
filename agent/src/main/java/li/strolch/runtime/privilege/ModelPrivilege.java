@@ -50,7 +50,7 @@ public class ModelPrivilege implements PrivilegePolicy {
 		// DefaultPrivilege policy expects the privilege value to be a string
 		if (!(object instanceof StrolchRootElement rootElement)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nonstrolchrootelement"); //$NON-NLS-1$
+					.getString("Privilege.illegalArgument.nonstrolchrootelement");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}

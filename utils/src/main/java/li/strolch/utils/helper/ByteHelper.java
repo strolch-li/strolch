@@ -191,7 +191,7 @@ public class ByteHelper {
 	public static long toLong(byte[] bytes) {
 
 		if (bytes.length != 8)
-			throw new IllegalArgumentException("The input byte array for a long must have 8 values"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The input byte array for a long must have 8 values");
 
 		return ((long) (bytes[0] & 0xff) << 56) //
 				| ((long) (bytes[1] & 0xff) << 48) //
@@ -215,7 +215,7 @@ public class ByteHelper {
 	public static int toInt(byte[] bytes) {
 
 		if (bytes.length != 4)
-			throw new IllegalArgumentException("The input byte array for an int must have 4 values"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The input byte array for an int must have 4 values");
 
 		return ((bytes[0] & 0xff) << 24) //
 				| ((bytes[1] & 0xff) << 16) //
@@ -235,7 +235,7 @@ public class ByteHelper {
 	public static short toShort(byte[] bytes) {
 
 		if (bytes.length != 2)
-			throw new IllegalArgumentException("The input byte array for a short must have 2 values"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The input byte array for a short must have 2 values");
 
 		return (short) (((bytes[0] & 0xff) << 8) //
 				| ((bytes[1] & 0xff)));

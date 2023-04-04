@@ -20,19 +20,19 @@ package li.strolch.runtime.configuration;
  */
 public class ConfigurationTags {
 
-	public static final String ENV_GLOBAL = "global"; //$NON-NLS-1$
+	public static final String ENV_GLOBAL = "global";
 
-	public static final String STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES = "StrolchConfiguration/env/Component/Properties"; //$NON-NLS-1$
-	public static final String STROLCH_CONFIGURATION_ENV_COMPONENT = "StrolchConfiguration/env/Component"; //$NON-NLS-1$
-	public static final String STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES = "StrolchConfiguration/env/Runtime/Properties"; //$NON-NLS-1$
-	public static final String STROLCH_CONFIGURATION_ENV_RUNTIME = "StrolchConfiguration/env/Runtime"; //$NON-NLS-1$
-	public static final String STROLCH_CONFIGURATION_ENV = "StrolchConfiguration/env"; //$NON-NLS-1$
+	public static final String STROLCH_CONFIGURATION_ENV_COMPONENT_PROPERTIES = "StrolchConfiguration/env/Component/Properties";
+	public static final String STROLCH_CONFIGURATION_ENV_COMPONENT = "StrolchConfiguration/env/Component";
+	public static final String STROLCH_CONFIGURATION_ENV_RUNTIME_PROPERTIES = "StrolchConfiguration/env/Runtime/Properties";
+	public static final String STROLCH_CONFIGURATION_ENV_RUNTIME = "StrolchConfiguration/env/Runtime";
+	public static final String STROLCH_CONFIGURATION_ENV = "StrolchConfiguration/env";
 
-	public static final String APPLICATION_NAME = "applicationName"; //$NON-NLS-1$
-	public static final String ID = "id"; //$NON-NLS-1$
-	public static final String DEPENDS = "depends"; //$NON-NLS-1$
-	public static final String IMPL = "impl"; //$NON-NLS-1$
-	public static final String API = "api"; //$NON-NLS-1$
-	public static final String NAME = "name"; //$NON-NLS-1$
+	public static final String APPLICATION_NAME = "applicationName";
+	public static final String ID = "id";
+	public static final String DEPENDS = "depends";
+	public static final String IMPL = "impl";
+	public static final String API = "api";
+	public static final String NAME = "name";
 
 }

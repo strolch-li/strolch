@@ -188,7 +188,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 */
 	protected void validateValue(T value) throws StrolchException {
 		if (value == null) {
-			String msg = "Can not set null value on Parameter {0}"; //$NON-NLS-1$
+			String msg = "Can not set null value on Parameter {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}

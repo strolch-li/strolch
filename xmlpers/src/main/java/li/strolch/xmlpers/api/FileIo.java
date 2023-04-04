@@ -42,8 +42,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class FileIo {
 
-	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
-	public static final String DEFAULT_ENCODING = "utf-8"; //$NON-NLS-1$
+	public static final String DEFAULT_XML_VERSION = "1.0";
+	public static final String DEFAULT_ENCODING = "utf-8";
 
 	private static final Logger logger = LoggerFactory.getLogger(FileIo.class);
 	public static final String TMP_PREFIX = ".tmp_";
@@ -94,13 +94,13 @@ public class FileIo {
 				if (!this.tmpPath.delete())
 					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
 			}
-			String msg = "Writing to file {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			String msg = "Writing to file {0} failed due to internal error: {1}";
 			msg = MessageFormat.format(msg, this.path.getAbsolutePath(), e.getMessage());
 			throw new XmlException(msg, e);
 		}
 
 		if (logger.isDebugEnabled()) {
-			String msg = "Wrote SAX to {0}"; //$NON-NLS-1$
+			String msg = "Wrote SAX to {0}";
 			logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
 		}
 	}
@@ -117,7 +117,7 @@ public class FileIo {
 			sp.parse(this.path, defaultHandler);
 
 			if (logger.isDebugEnabled()) {
-				String msg = "SAX parsed file {0}"; //$NON-NLS-1$
+				String msg = "SAX parsed file {0}";
 				logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
 			}
 
@@ -125,7 +125,7 @@ public class FileIo {
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 
-			String msg = "Parsing of file {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			String msg = "Parsing of file {0} failed due to internal error: {1}";
 			throw new XmlPersistenceException(MessageFormat.format(msg, this.path.getAbsolutePath(), e.getMessage()),
 					e);
 		}
@@ -147,19 +147,19 @@ public class FileIo {
 			}
 
 			if (!lineSep.equals(StringHelper.NEW_LINE)) {
-				logger.info("Overriding line separator to \\n"); //$NON-NLS-1$
+				logger.info("Overriding line separator to \\n");
 				System.setProperty(XmlHelper.PROP_LINE_SEPARATOR, StringHelper.NEW_LINE);
 			}
 
 			// Set up a transformer
 			TransformerFactory transfac = TransformerFactory.newInstance();
 			Transformer transformer = transfac.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); //$NON-NLS-1$
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
 			transformer
-					.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-1$ //$NON-NLS-2$
+					.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
@@ -170,7 +170,7 @@ public class FileIo {
 			}
 
 			if (logger.isDebugEnabled()) {
-				String msg = MessageFormat.format("Wrote DOM to {0}", this.tmpPath.getAbsolutePath()); //$NON-NLS-1$
+				String msg = MessageFormat.format("Wrote DOM to {0}", this.tmpPath.getAbsolutePath());
 				logger.info(msg);
 			}
 
@@ -189,7 +189,7 @@ public class FileIo {
 				if (!this.tmpPath.delete())
 					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
 			}
-			String msg = "Writing to file {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			String msg = "Writing to file {0} failed due to internal error: {1}";
 			msg = MessageFormat.format(msg, this.tmpPath.getAbsolutePath(), e.getMessage());
 			throw new XmlException(msg, e);
 
@@ -208,7 +208,7 @@ public class FileIo {
 			domParser.fromDom(document);
 
 			if (logger.isDebugEnabled()) {
-				String msg = "DOM parsed file {0}"; //$NON-NLS-1$
+				String msg = "DOM parsed file {0}";
 				msg = MessageFormat.format(msg, this.path.getAbsolutePath());
 				logger.info(msg);
 			}
@@ -216,7 +216,7 @@ public class FileIo {
 			ctx.setObject(domParser.getObject());
 
 		} catch (SAXException | IOException e) {
-			String msg = "Parsing {0} failed due to internal error: {1}"; //$NON-NLS-1$
+			String msg = "Parsing {0} failed due to internal error: {1}";
 			msg = MessageFormat.format(msg, this.path.getAbsolutePath(), e.getMessage());
 			throw new XmlPersistenceException(msg, e);
 		}

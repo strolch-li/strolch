@@ -75,7 +75,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	public void setType(String type) {
 		assertNotReadonly();
 		if (isEmpty(type)) {
-			String msg = "Type may not be empty on element {0}"; //$NON-NLS-1$
+			String msg = "Type may not be empty on element {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}
@@ -138,7 +138,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 			this.parameterBagMap = new HashMap<>(1, 1.0F);
 		ParameterBag bag = this.parameterBagMap.get(BAG_PARAMETERS);
 		if (bag == null) {
-			String msg = "No parameter bag exists with key {0}"; //$NON-NLS-1$
+			String msg = "No parameter bag exists with key {0}";
 			msg = MessageFormat.format(msg, BAG_PARAMETERS);
 			throw new StrolchException(msg);
 		}
@@ -153,7 +153,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 			this.parameterBagMap = new HashMap<>(1, 1.0F);
 		ParameterBag bag = this.parameterBagMap.get(bagKey);
 		if (bag == null) {
-			String msg = "No parameter bag exists with key {0}"; //$NON-NLS-1$
+			String msg = "No parameter bag exists with key {0}";
 			msg = MessageFormat.format(msg, bagKey);
 			throw new StrolchException(msg);
 		}

@@ -221,13 +221,13 @@ public enum StrolchValueType {
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Parameters of type {0} are not supported!", getType()));
 		}
 
 		@Override
@@ -261,13 +261,13 @@ public enum StrolchValueType {
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Parameters of type {0} are not supported!", getType()));
 		}
 
 		@Override
@@ -307,13 +307,13 @@ public enum StrolchValueType {
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Parameters of type {0} are not supported!", getType()));
 		}
 	},
 
@@ -342,13 +342,13 @@ public enum StrolchValueType {
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Parameters of type {0} are not supported!", getType()));
 		}
 	},
 
@@ -462,13 +462,13 @@ public enum StrolchValueType {
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Parameters of type {0} are not supported!", getType()));
 		}
 
 		@Override
@@ -504,13 +504,13 @@ public enum StrolchValueType {
 		@Override
 		public StrolchTimedState<? extends IValue<?>> timedStateInstance() {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("TimeStates of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
 		public IValue<?> valueInstance(String valueAsString) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Values of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Values of type {0} are not supported!", getType()));
 		}
 
 		@Override
@@ -531,19 +531,19 @@ public enum StrolchValueType {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Formatting of type {0} is not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Formatting of type {0} is not supported!", getType()));
 		}
 
 		@Override
 		public Object parseValue(String value) {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Parsing value of type {0} is not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Parsing value of type {0} is not supported!", getType()));
 		}
 
 		@Override
 		public Parameter<?> parameterInstance() {
 			throw new UnsupportedOperationException(
-					MessageFormat.format("Parameters of type {0} are not supported!", getType())); //$NON-NLS-1$
+					MessageFormat.format("Parameters of type {0} are not supported!", getType()));
 		}
 
 		@Override

@@ -55,7 +55,7 @@ public class OrderModelTestRunner {
 	public void runCreateOrderTest() {
 
 		// create
-		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType");//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newOrder);
@@ -77,9 +77,9 @@ public class OrderModelTestRunner {
 		}
 
 		// create three orders
-		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1");//$NON-NLS-2$ //$NON-NLS-3$
+		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2");//$NON-NLS-2$ //$NON-NLS-3$
+		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3");//$NON-NLS-2$ //$NON-NLS-3$
 
 		order1.setDate(LocalDate.of(2018, 3, 1));
 		order2.setDate(LocalDate.of(2019, 4, 1));

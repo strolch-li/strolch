@@ -98,7 +98,7 @@ public class DbSchemaCreationTest {
 			}
 
 		} catch (SQLException e) {
-			String msg = "Failed to open DB connection to URL {0} due to: {1}"; //$NON-NLS-1$
+			String msg = "Failed to open DB connection to URL {0} due to: {1}";
 			msg = MessageFormat.format(msg, dbUrl, e.getMessage());
 			throw new DbException(msg, e);
 		}

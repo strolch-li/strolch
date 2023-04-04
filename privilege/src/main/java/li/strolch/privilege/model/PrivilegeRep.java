@@ -72,18 +72,18 @@ public class PrivilegeRep implements Serializable {
 	public void validate() {
 
 		if (StringHelper.isEmpty(this.name)) {
-			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No name defined!");
 		}
 
 		if (StringHelper.isEmpty(this.policy)) {
-			throw new PrivilegeException("policy is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("policy is null!");
 		}
 
 		if (this.denyList == null) {
-			throw new PrivilegeException("denyList is null"); //$NON-NLS-1$
+			throw new PrivilegeException("denyList is null");
 		}
 		if (this.allowList == null) {
-			throw new PrivilegeException("allowList is null"); //$NON-NLS-1$
+			throw new PrivilegeException("allowList is null");
 		}
 	}
 

@@ -59,7 +59,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * 		the privilegeContext to set
 	 */
 	public final void setPrivilegeContext(PrivilegeContext privilegeContext) {
-		DBC.PRE.assertNull("PrivilegeContext is already set!", this.privilegeContext); //$NON-NLS-1$
+		DBC.PRE.assertNull("PrivilegeContext is already set!", this.privilegeContext);
 		this.privilegeContext = privilegeContext;
 	}
 
@@ -548,7 +548,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 
 		if (isArgumentRequired() && argument == null) {
 
-			String msg = "Failed to perform service {0} because no argument was passed although it is required!"; //$NON-NLS-1$
+			String msg = "Failed to perform service {0} because no argument was passed although it is required!";
 			msg = MessageFormat.format(msg, getClass());
 			logger.error(msg);
 
@@ -562,7 +562,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 
 			U serviceResult = internalDoService(argument);
 			if (serviceResult == null) {
-				String msg = "Service {0} is not properly implemented as it returned a null result!"; //$NON-NLS-1$
+				String msg = "Service {0} is not properly implemented as it returned a null result!";
 				msg = MessageFormat.format(msg, this.getClass().getName());
 				throw new StrolchException(msg);
 			}

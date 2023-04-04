@@ -47,7 +47,7 @@ public class PersistenceContextFactoryDelegator {
 		if (ctxFactory != null)
 			return ctxFactory;
 
-		String msg = "No context factory is registered for {0}"; //$NON-NLS-1$
+		String msg = "No context factory is registered for {0}";
 		msg = MessageFormat.format(msg, classType);
 		throw new IllegalArgumentException(msg);
 	}
@@ -60,7 +60,7 @@ public class PersistenceContextFactoryDelegator {
 		if (ctxFactory != null)
 			return ctxFactory;
 
-		String msg = "No context factory is registered for type {0}"; //$NON-NLS-1$
+		String msg = "No context factory is registered for type {0}";
 		msg = MessageFormat.format(msg, type);
 		throw new IllegalArgumentException(msg);
 	}

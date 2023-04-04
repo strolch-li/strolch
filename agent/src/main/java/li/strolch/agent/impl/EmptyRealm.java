@@ -45,13 +45,13 @@ public class EmptyRealm extends InternalStrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		return new TransientTransaction(this.container, this, certificate, action, readOnly);
 	}
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		return new TransientTransaction(this.container, this, certificate, clazz.getName(),readOnly);
 	}
 
@@ -91,7 +91,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 	@Override
 	public void start(PrivilegeContext privilegeContext) {
 		super.start(privilegeContext);
-		logger.info(MessageFormat.format("Initialized EMPTY Realm {0}", getRealm())); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Initialized EMPTY Realm {0}", getRealm()));
 	}
 
 	@Override

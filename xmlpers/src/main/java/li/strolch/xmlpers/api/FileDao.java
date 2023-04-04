@@ -45,7 +45,7 @@ public class FileDao {
 
 	private void assertIsIdRef(IoOperation ioOperation, ObjectRef objectRef) {
 		if (!objectRef.isLeaf()) {
-			String msg = "A {0} operation can only be performed with IdRefs!"; //$NON-NLS-1$
+			String msg = "A {0} operation can only be performed with IdRefs!";
 			msg = MessageFormat.format(msg, ioOperation);
 			throw new XmlPersistenceException(msg);
 		}
@@ -100,7 +100,7 @@ public class FileDao {
 		logPath(IoOperation.DELETE, path, objectRef);
 		assertPathIsFileAndWritable(path, objectRef);
 		if (!path.delete()) {
-			String msg = "Failed to delete file {0}"; //$NON-NLS-1$
+			String msg = "Failed to delete file {0}";
 			throw new RuntimeException(MessageFormat.format(msg, path.getAbsolutePath()));
 		}
 
@@ -115,25 +115,25 @@ public class FileDao {
 			return;
 
 		if (objectRef.isLeaf()) {
-			throw new IllegalArgumentException("IdRefs don't reference directories!"); //$NON-NLS-1$
+			throw new IllegalArgumentException("IdRefs don't reference directories!");
 		}
 
 		File directoryPath = objectRef.getPath(this.pathBuilder);
 		if (!directoryPath.getAbsolutePath().startsWith(this.pathBuilder.getRootPath().getAbsolutePath())) {
-			String msg = "The path for {0} is invalid as not child of {1}"; //$NON-NLS-1$
+			String msg = "The path for {0} is invalid as not child of {1}";
 			msg = MessageFormat.format(msg, directoryPath.getAbsolutePath(),
 					this.pathBuilder.getRootPath().getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
 
 		if (!directoryPath.isDirectory()) {
-			String msg = "The path for {0} is not a directory: {1}"; //$NON-NLS-1$
+			String msg = "The path for {0} is not a directory: {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
 		String[] list = directoryPath.list();
 		if (list == null) {
-			String msg = "The path for {0} is not a directory: {1}"; //$NON-NLS-1$
+			String msg = "The path for {0} is not a directory: {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
@@ -144,14 +144,14 @@ public class FileDao {
 
 		// delete
 		if (!directoryPath.delete()) {
-			String msg = "Deletion of empty directory for {0} at {1} failed! Check file permissions!"; //$NON-NLS-1$
+			String msg = "Deletion of empty directory for {0} at {1} failed! Check file permissions!";
 			msg = MessageFormat.format(msg, objectRef.getName(), directoryPath.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
 
 		// log
 		if (this.verbose) {
-			String msg = "Deleted empty directory for {0} at {1}"; //$NON-NLS-1$
+			String msg = "Deleted empty directory for {0} at {1}";
 			logger.info(MessageFormat.format(msg, objectRef.getName(), directoryPath));
 		}
 
@@ -162,7 +162,7 @@ public class FileDao {
 
 	private void logPath(IoOperation operation, File path, ObjectRef objectRef) {
 		if (this.verbose) {
-			String msg = "Path for operation {0} for {1} is at {2}"; //$NON-NLS-1$
+			String msg = "Path for operation {0} for {1} is at {2}";
 			msg = MessageFormat.format(msg, operation, objectRef.getName(), path.getAbsolutePath());
 			logger.info(msg);
 		}
@@ -172,7 +172,7 @@ public class FileDao {
 		ObjectRef parentRef = objectRef.getParent(this.tx);
 		File parentFile = parentRef.getPath(this.pathBuilder);
 		if (!parentFile.exists() && !parentFile.mkdirs()) {
-			String msg = "Could not create parent path for {0} at {1}"; //$NON-NLS-1$
+			String msg = "Could not create parent path for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
@@ -180,14 +180,14 @@ public class FileDao {
 
 	private void assertPathIsFileAndWritable(File path, ObjectRef objectRef) {
 		if (!path.exists()) {
-			String msg = "Persistence unit does not exist for {0} at {1}"; //$NON-NLS-1$
+			String msg = "Persistence unit does not exist for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
 
 		if (!path.isFile() || !path.canWrite()) {
 			String msg;
-			msg = "Persistence unit is not a file or is not readable for {0} at {1}"; //$NON-NLS-1$
+			msg = "Persistence unit is not a file or is not readable for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
@@ -195,14 +195,14 @@ public class FileDao {
 
 	private void assertPathIsDirectoryAndWritable(File path, ObjectRef objectRef) {
 		if (!path.exists()) {
-			String msg = "Persistence path does not exist for {0} at {1}"; //$NON-NLS-1$
+			String msg = "Persistence path does not exist for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
 
 		if (!path.isDirectory() || !path.canWrite()) {
 			String msg;
-			msg = "Persistence path is not a directory or is not readable for {0} at {1}"; //$NON-NLS-1$
+			msg = "Persistence path is not a directory or is not readable for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
@@ -210,7 +210,7 @@ public class FileDao {
 
 	private void assertPathNotExists(File path, ObjectRef objectRef) {
 		if (path.exists()) {
-			String msg = "Persistence unit already exists for {0} at {1}"; //$NON-NLS-1$
+			String msg = "Persistence unit already exists for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			if (this.allowOverwriteOnCreate) {
 				logger.error(msg);

@@ -93,7 +93,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		} catch (PrivilegeException e) {
 
 			long end = System.nanoTime();
-			String msg = "User {0}: Service {1} failed after {2} due to {3}"; //$NON-NLS-1$
+			String msg = "User {0}: Service {1} failed after {2} due to {3}";
 			String svcName = service.getClass().getName();
 			msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(end - start), e.getMessage());
 			logger.error(msg);
@@ -144,7 +144,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		} catch (Exception e) {
 			long end = System.nanoTime();
-			String msg = "User {0}: Service failed {1} after {2} due to {3}"; //$NON-NLS-1$
+			String msg = "User {0}: Service failed {1} after {2} due to {3}";
 			msg = MessageFormat.format(msg, username, service.getClass().getName(), formatNanoDuration(end - start),
 					e.getMessage());
 			logger.error(msg);
@@ -173,7 +173,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		long end = System.nanoTime();
 
-		String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
+		String msg = "User {0}: Service {1} took {2}";
 		String username = certificate.getUsername();
 		String svcName = service.getClass().getName();
 

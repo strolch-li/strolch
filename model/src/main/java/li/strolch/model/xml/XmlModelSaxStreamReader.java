@@ -74,7 +74,7 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 		case Tags.INCLUDE_FILE -> {
 			String msg = "The {0} can''t handle Tags of type {1}";
 			msg = MessageFormat.format(msg, XmlModelSaxStreamReader.class.getName(), Tags.INCLUDE_FILE);
-			throw new IllegalArgumentException(msg); //$NON-NLS-1$
+			throw new IllegalArgumentException(msg);
 		}
 		default -> super.startElement(uri, localName, qName, attributes);
 		}
@@ -93,12 +93,12 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;
-			String msg = "SAX parsed stream took {0}"; //$NON-NLS-1$
+			String msg = "SAX parsed stream took {0}";
 			logger.info(MessageFormat.format(msg, StringHelper.formatNanoDuration(this.statistics.durationNanos)));
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 
-			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
+			String msg = "Parsing failed due to internal error: {0}";
 			throw new StrolchException(MessageFormat.format(msg, e.getMessage()), e);
 		}
 	}

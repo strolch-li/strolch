@@ -139,7 +139,7 @@ public class FileHelper {
 	public static byte[] readFile(File file) {
 		if (file.length() > MAX_FILE_SIZE)
 			throw new RuntimeException(
-					String.format("Only allowed to read files up to %s. File too large: %s", //$NON-NLS-1$
+					String.format("Only allowed to read files up to %s. File too large: %s",
 							humanizeFileSize(MAX_FILE_SIZE), humanizeFileSize(file.length())));
 
 		byte[] data = new byte[(int) file.length()];
@@ -153,9 +153,9 @@ public class FileHelper {
 				pos += read;
 			}
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Filed does not exist " + file.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Filed does not exist " + file.getAbsolutePath());
 		} catch (IOException e) {
-			throw new RuntimeException("Could not read file " + file.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Could not read file " + file.getAbsolutePath());
 		}
 
 		return data;
@@ -178,15 +178,15 @@ public class FileHelper {
 			String line;
 
 			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(line).append("\n"); //$NON-NLS-1$
+				sb.append(line).append("\n");
 			}
 
 			return sb.toString();
 
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("File does not exist " + file.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("File does not exist " + file.getAbsolutePath());
 		} catch (IOException e) {
-			throw new RuntimeException("Could not read file " + file.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Could not read file " + file.getAbsolutePath());
 		}
 	}
 
@@ -208,13 +208,13 @@ public class FileHelper {
 			String line;
 
 			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(line).append("\n"); //$NON-NLS-1$
+				sb.append(line).append("\n");
 			}
 
 			return sb.toString();
 
 		} catch (IOException e) {
-			throw new RuntimeException("Could not read strean " + stream); //$NON-NLS-1$
+			throw new RuntimeException("Could not read strean " + stream);
 		}
 	}
 
@@ -231,9 +231,9 @@ public class FileHelper {
 		try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(dstFile.toPath()))) {
 			out.write(bytes);
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath());
 		} catch (IOException e) {
-			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath());
 		}
 	}
 
@@ -250,9 +250,9 @@ public class FileHelper {
 		try (BufferedWriter bufferedwriter = new BufferedWriter(new FileWriter(dstFile))) {
 			bufferedwriter.write(string);
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath());
 		} catch (IOException e) {
-			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath());
 		}
 	}
 
@@ -292,25 +292,25 @@ public class FileHelper {
 				boolean done = FileHelper.deleteFiles(children, log);
 				if (!done) {
 					worked = false;
-					logger.warn("Could not empty the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
+					logger.warn("Could not empty the directory: " + file.getAbsolutePath());
 				} else {
 					done = file.delete();
 					if (done) {
 						if (log)
-							logger.info("Deleted DIR  " + file.getAbsolutePath()); //$NON-NLS-1$
+							logger.info("Deleted DIR  " + file.getAbsolutePath());
 					} else {
 						worked = false;
-						logger.warn("Could not delete the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
+						logger.warn("Could not delete the directory: " + file.getAbsolutePath());
 					}
 				}
 			} else {
 				boolean done = file.delete();
 				if (done) {
 					if (log)
-						FileHelper.logger.info("Deleted FILE " + file.getAbsolutePath()); //$NON-NLS-1$
+						FileHelper.logger.info("Deleted FILE " + file.getAbsolutePath());
 				} else {
 					worked = false;
-					FileHelper.logger.warn(("Could not delete the file: " + file.getAbsolutePath())); //$NON-NLS-1$
+					FileHelper.logger.warn(("Could not delete the file: " + file.getAbsolutePath()));
 				}
 			}
 		}
@@ -334,7 +334,7 @@ public class FileHelper {
 	public static boolean copy(File[] srcFiles, File dstDirectory, boolean checksum) {
 
 		if (!dstDirectory.isDirectory() || !dstDirectory.canWrite()) {
-			String msg = "Destination is not a directory or is not writeable: {0}"; //$NON-NLS-1$
+			String msg = "Destination is not a directory or is not writeable: {0}";
 			throw new IllegalArgumentException(MessageFormat.format(msg, dstDirectory.getAbsolutePath()));
 		}
 
@@ -344,7 +344,7 @@ public class FileHelper {
 			if (srcFile.isDirectory()) {
 				dstFile.mkdir();
 				if (!copy(srcFile.listFiles(), dstFile, checksum)) {
-					String msg = "Failed to copy contents of {0} to {1}"; //$NON-NLS-1$
+					String msg = "Failed to copy contents of {0} to {1}";
 					msg = MessageFormat.format(msg, srcFile.getAbsolutePath(), dstFile.getAbsolutePath());
 					logger.error(msg);
 					return false;
@@ -390,7 +390,7 @@ public class FileHelper {
 				String toFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
 					FileHelper.logger.error(
-							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
+							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}",
 									fromFileMD5, toFileMD5));
 					toFile.delete();
 
@@ -400,7 +400,7 @@ public class FileHelper {
 
 			// cleanup if files are not the same length
 			if (fromFile.length() != toFile.length()) {
-				String msg = "Copying failed, as new files are not the same length: {0} / {1}"; //$NON-NLS-1$
+				String msg = "Copying failed, as new files are not the same length: {0} / {1}";
 				msg = MessageFormat.format(msg, fromFile.length(), toFile.length());
 				FileHelper.logger.error(msg);
 				toFile.delete();
@@ -410,7 +410,7 @@ public class FileHelper {
 
 		} catch (Exception e) {
 			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile,
-					toFile); //$NON-NLS-1$
+					toFile);
 			FileHelper.logger.error(msg, e);
 			return false;
 		}
@@ -435,11 +435,11 @@ public class FileHelper {
 			return true;
 		}
 
-		FileHelper.logger.warn("Simple File.renameTo failed, trying copy/delete..."); //$NON-NLS-1$
+		FileHelper.logger.warn("Simple File.renameTo failed, trying copy/delete...");
 
 		// delete if copy was successful, otherwise move will fail
 		if (FileHelper.copy(fromFile, toFile, true)) {
-			FileHelper.logger.info("Deleting fromFile: " + fromFile.getAbsolutePath()); //$NON-NLS-1$
+			FileHelper.logger.info("Deleting fromFile: " + fromFile.getAbsolutePath());
 			return fromFile.delete();
 		}
 
@@ -579,7 +579,7 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileMd5(File file) {
-		return FileHelper.hashFile(file, "MD5"); //$NON-NLS-1$
+		return FileHelper.hashFile(file, "MD5");
 	}
 
 	/**
@@ -592,7 +592,7 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileSha1(File file) {
-		return FileHelper.hashFile(file, "SHA-1"); //$NON-NLS-1$
+		return FileHelper.hashFile(file, "SHA-1");
 	}
 
 	/**
@@ -605,7 +605,7 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileSha256(File file) {
-		return FileHelper.hashFile(file, "SHA-256"); //$NON-NLS-1$
+		return FileHelper.hashFile(file, "SHA-256");
 	}
 
 	/**
@@ -635,7 +635,7 @@ public class FileHelper {
 			return complete.digest();
 		} catch (Exception e) {
 			throw new RuntimeException(
-					"Something went wrong while hashing file: " + file.getAbsolutePath()); //$NON-NLS-1$
+					"Something went wrong while hashing file: " + file.getAbsolutePath());
 		}
 	}
 
@@ -657,7 +657,7 @@ public class FileHelper {
 
 		} catch (IOException e) {
 			throw new RuntimeException(
-					"Could not create and append the bytes to the file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+					"Could not create and append the bytes to the file " + dstFile.getAbsolutePath());
 		}
 	}
 }

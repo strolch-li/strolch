@@ -53,9 +53,9 @@ import li.strolch.xmlpers.api.*;
 public class XmlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
 	public static final String PROP_DB_STORE_PATH = "dbStorePath";
-	public static final String PROP_DB_IGNORE_REALM = "ignoreRealm"; //$NON-NLS-1$
+	public static final String PROP_DB_IGNORE_REALM = "ignoreRealm";
 	public static final String PROP_ALLOW_DATA_INIT_ON_EMPTY_DB = "allowDataInitOnEmptyDb";
-	public static final String PROP_VERBOSE = "verbose"; //$NON-NLS-1$
+	public static final String PROP_VERBOSE = "verbose";
 
 	private Map<String, PersistenceStore> persistenceStoreMap;
 

@@ -93,7 +93,7 @@ public class CachedAuditTrail extends TransientAuditTrail {
 		// last is to perform DB changes
 		long daoRemoved = getDbDao(tx).removeAll(type, dateRange);
 		if (removed != daoRemoved) {
-			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!"; //$NON-NLS-1$
+			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!";
 			logger.error(MessageFormat.format(msg, removed, daoRemoved));
 		}
 		return removed;

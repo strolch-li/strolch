@@ -323,7 +323,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		default:
 			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -426,7 +426,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		default:
 			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 }

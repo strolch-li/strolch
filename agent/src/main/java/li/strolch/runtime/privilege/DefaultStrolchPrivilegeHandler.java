@@ -50,8 +50,8 @@ import li.strolch.utils.helper.XmlHelper;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
 
-	public static final String PROP_PRIVILEGE_CONFIG_FILE = "privilegeConfigFile"; //$NON-NLS-1$
-	public static final String PRIVILEGE_CONFIG_XML = "PrivilegeConfig.xml"; //$NON-NLS-1$
+	public static final String PROP_PRIVILEGE_CONFIG_FILE = "privilegeConfigFile";
+	public static final String PRIVILEGE_CONFIG_XML = "PrivilegeConfig.xml";
 
 	private li.strolch.privilege.handler.PrivilegeHandler privilegeHandler;
 
@@ -100,7 +100,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 		// make sure file exists
 		if (!privilegeXmlFile.exists()) {
-			String msg = "Privilege file does not exist at path {0}"; //$NON-NLS-1$
+			String msg = "Privilege file does not exist at path {0}";
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
@@ -132,7 +132,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			return PrivilegeInitializationHelper.initializeFromXml(containerModel);
 
 		} catch (Exception e) {
-			String msg = "Failed to load Privilege configuration from {0}"; //$NON-NLS-1$
+			String msg = "Failed to load Privilege configuration from {0}";
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
 			throw new PrivilegeException(msg, e);
 		}

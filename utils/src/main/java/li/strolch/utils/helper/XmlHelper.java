@@ -54,17 +54,17 @@ public class XmlHelper {
 	/**
 	 * PROP_LINE_SEPARATOR = "line.separator" : the system property to fetch defined line separator
 	 */
-	public static final String PROP_LINE_SEPARATOR = "line.separator"; //$NON-NLS-1$
+	public static final String PROP_LINE_SEPARATOR = "line.separator";
 
 	/**
 	 * UNIX_LINE_SEP = "\n" : mostly we want this line separator, instead of the windows version
 	 */
-	public static final String UNIX_LINE_SEP = "\n"; //$NON-NLS-1$
+	public static final String UNIX_LINE_SEP = "\n";
 
 	/**
 	 * DEFAULT_ENCODING = "utf-8" : defines the default UTF-8 encoding expected of XML files
 	 */
-	public static final String DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
+	public static final String DEFAULT_ENCODING = "UTF-8";
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
@@ -79,11 +79,11 @@ public class XmlHelper {
 		try (InputStream xmlFileInputStream = Files.newInputStream(xmlFile.toPath())) {
 
 			parseDocument(xmlFileInputStream, xmlHandler);
-			String msg = "SAX parsed file {0}"; //$NON-NLS-1$
+			String msg = "SAX parsed file {0}";
 			logger.info(MessageFormat.format(msg, xmlFile.getAbsolutePath()));
 
 		} catch (IOException e) {
-			String msg = "Failed to parse XML file: {0} due to: {1}"; //$NON-NLS-1$
+			String msg = "Failed to parse XML file: {0} due to: {1}";
 			msg = MessageFormat.format(msg, xmlFile.getAbsolutePath(), e.getMessage());
 			throw new XmlException(msg, e);
 		}
@@ -105,11 +105,11 @@ public class XmlHelper {
 			sp.parse(xmlFileInputStream, xmlHandler);
 
 		} catch (ParserConfigurationException e) {
-			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e);
 		} catch (SAXException e) {
-			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e);
 		} catch (IOException e) {
-			throw new XmlException("The XML stream not be read: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new XmlException("The XML stream not be read: " + e.getMessage(), e);
 		}
 	}
 
@@ -143,11 +143,11 @@ public class XmlHelper {
 			sp.parse(xmlInputSource, xmlHandler);
 
 		} catch (ParserConfigurationException e) {
-			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e);
 		} catch (SAXException e) {
-			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new XmlException("The XML stream is not parseable: " + e.getMessage(), e);
 		} catch (IOException e) {
-			throw new XmlException("The XML stream not be read: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new XmlException("The XML stream not be read: " + e.getMessage(), e);
 		}
 	}
 
@@ -232,7 +232,7 @@ public class XmlHelper {
 			writeDocument(document, new StreamResult(new RemoveCRFilterWriter(new OutputStreamWriter(out, encoding))),
 					encoding);
 		} catch (IOException e) {
-			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -268,7 +268,7 @@ public class XmlHelper {
 					DEFAULT_ENCODING);
 			return out.toString(DEFAULT_ENCODING);
 		} catch (UnsupportedEncodingException e) {
-			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
 		}
 	}
 
@@ -296,19 +296,19 @@ public class XmlHelper {
 				docEncoding = encoding;
 			}
 
-			if (!lineSep.equals("\n")) { //$NON-NLS-1$
+			if (!lineSep.equals("\n")) {
 				System.setProperty(PROP_LINE_SEPARATOR, UNIX_LINE_SEP);
 			}
 
 			// Set up a transformer
 			TransformerFactory transfac = TransformerFactory.newInstance();
 			Transformer transformer = transfac.newTransformer();
-			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no"); //$NON-NLS-1$
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
-			transformer.setOutputProperty(OutputKeys.METHOD, "xml"); //$NON-NLS-1$
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, docEncoding);
 			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount",
-					"2"); //$NON-NLS-1$ //$NON-NLS-2$
+					"2"); //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
@@ -317,7 +317,7 @@ public class XmlHelper {
 
 		} catch (Exception e) {
 
-			throw new XmlException("Exception while exporting to file: " + e, e); //$NON-NLS-1$
+			throw new XmlException("Exception while exporting to file: " + e, e);
 
 		} finally {
 
@@ -342,7 +342,7 @@ public class XmlHelper {
 			return docBuilder.newDocument();
 
 		} catch (DOMException | ParserConfigurationException e) {
-			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
 		}
 	}
 

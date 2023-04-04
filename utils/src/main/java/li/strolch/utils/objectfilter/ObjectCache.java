@@ -94,7 +94,7 @@ public class ObjectCache {
 	public void setObject(Object object) {
 		if (logger.isDebugEnabled()) {
 			logger.debug(
-					MessageFormat.format("Updating ID {0} to value {1}", this.id, object.toString())); //$NON-NLS-1$
+					MessageFormat.format("Updating ID {0} to value {1}", this.id, object.toString()));
 		}
 		this.object = object;
 	}
@@ -107,7 +107,7 @@ public class ObjectCache {
 	 */
 	public void setOperation(Operation newOperation) {
 		if (logger.isDebugEnabled()) {
-			String msg = "Updating Operation of ID {0} from {1} to {2}"; //$NON-NLS-1$
+			String msg = "Updating Operation of ID {0} from {1} to {2}";
 			msg = MessageFormat.format(msg, this.id, this.operation, newOperation);
 			logger.debug(msg);
 		}

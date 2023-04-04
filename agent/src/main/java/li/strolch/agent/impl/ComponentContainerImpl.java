@@ -86,7 +86,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
 		T component = (T) this.componentMap.get(clazz);
 		if (component == null) {
-			String msg = "The component does not exist for class {0}"; //$NON-NLS-1$
+			String msg = "The component does not exist for class {0}";
 			msg = MessageFormat.format(msg, clazz.getName());
 			throw new IllegalArgumentException(msg);
 		}
@@ -162,13 +162,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 			Class<?> implClass = Class.forName(impl);
 
 			if (!apiClass.isAssignableFrom(implClass)) {
-				String msg = "Component {0} has invalid configuration: Impl class {1} is not assignable to Api class {2}"; //$NON-NLS-1$
+				String msg = "Component {0} has invalid configuration: Impl class {1} is not assignable to Api class {2}";
 				msg = MessageFormat.format(msg, componentName, impl, api);
 				throw new StrolchConfigurationException(msg);
 			}
 
 			if (!StrolchComponent.class.isAssignableFrom(implClass)) {
-				String msg = "Component {0} has invalid configuration: Impl class {1} is not a subclass of {2}"; //$NON-NLS-1$
+				String msg = "Component {0} has invalid configuration: Impl class {1} is not a subclass of {2}";
 				msg = MessageFormat.format(msg, componentName, impl, StrolchComponent.class.getName());
 				throw new StrolchConfigurationException(msg);
 			}
@@ -185,14 +185,14 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		} catch (NoSuchMethodException e) {
 
-			String msg = "Could not load class for component {0} due to missing constructor with signature (ComponentContainer.class, String.class)"; //$NON-NLS-1$
+			String msg = "Could not load class for component {0} due to missing constructor with signature (ComponentContainer.class, String.class)";
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
 			throw new StrolchConfigurationException(msg, e);
 
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException |
 				 IllegalArgumentException | InvocationTargetException e) {
 
-			String msg = "Could not load class for component {0} due to: {1}"; //$NON-NLS-1$
+			String msg = "Could not load class for component {0} due to: {1}";
 			msg = MessageFormat.format(msg, componentName, e.getMessage());
 			throw new StrolchConfigurationException(msg, e);
 		}
@@ -205,7 +205,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		// set the application locale
 		Locale.setDefault(strolchConfiguration.getRuntimeConfiguration().getLocale());
-		String msg = "Application {0}:{1} is using locale {2} and timezone {3}"; //$NON-NLS-1$
+		String msg = "Application {0}:{1} is using locale {2} and timezone {3}";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		System.setProperty("user.timezone", getTimezone());
@@ -238,7 +238,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.state = ComponentState.SETUP;
 
 		long took = System.nanoTime() - start;
-		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}"; //$NON-NLS-1$
+		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}";
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size(),
 				formatNanoDuration(took)));
 	}
@@ -249,7 +249,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		long start = System.nanoTime();
 
 		// now we can initialize the components
-		String msg = "{0}:{1} Initializing {2} Strolch Components..."; //$NON-NLS-1$
+		String msg = "{0}:{1} Initializing {2} Strolch Components...";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
@@ -260,7 +260,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.state = ComponentState.INITIALIZED;
 
 		long took = System.nanoTime() - start;
-		msg = "{0}:{1} All {2} Strolch Components have been initialized. Took {3}"; //$NON-NLS-1$
+		msg = "{0}:{1} All {2} Strolch Components have been initialized. Took {3}";
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
 				formatNanoDuration(took)));
 	}
@@ -270,7 +270,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long start = System.nanoTime();
 
-		String msg = "{0}:{1} Starting {2} Strolch Components..."; //$NON-NLS-1$
+		String msg = "{0}:{1} Starting {2} Strolch Components...";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
@@ -305,7 +305,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			}
 		}
 
-		msg = "{0}:{1} All {2} Strolch Components started for version {3}. Took {4}. Strolch is now ready to be used. Have fun =))"; //$NON-NLS-1$
+		msg = "{0}:{1} All {2} Strolch Components started for version {3}. Took {4}. Strolch is now ready to be used. Have fun =))";
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
 				getAgent().getVersion().getAppVersion().getArtifactVersion(), tookS));
 	}
@@ -329,17 +329,17 @@ public class ComponentContainerImpl implements ComponentContainer {
 			}
 		}
 
-		String msg = "{0}:{1} Stopping {2} Strolch Components..."; //$NON-NLS-1$
+		String msg = "{0}:{1} Stopping {2} Strolch Components...";
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 
 		if (this.dependencyAnalyzer == null) {
-			logger.info("Strolch was not yet setup, nothing to stop"); //$NON-NLS-1$
+			logger.info("Strolch was not yet setup, nothing to stop");
 		} else {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 			containerStateHandler.stop(rootUpstreamComponents);
 
 			long took = System.nanoTime() - start;
-			msg = "{0}:{1} All {2} Strolch Components have been stopped. Took {3}"; //$NON-NLS-1$
+			msg = "{0}:{1} All {2} Strolch Components have been stopped. Took {3}";
 			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
 					formatNanoDuration(took)));
 		}
@@ -352,19 +352,19 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long start = System.nanoTime();
 
-		String msg = "{0}:{1} Destroying {2} Strolch Components..."; //$NON-NLS-1$
+		String msg = "{0}:{1} Destroying {2} Strolch Components...";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
 
 		if (this.dependencyAnalyzer == null) {
-			logger.info("Strolch was not yet setup, nothing to destroy"); //$NON-NLS-1$
+			logger.info("Strolch was not yet setup, nothing to destroy");
 		} else {
 			Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootDownstreamComponents();
 			containerStateHandler.destroy(rootUpstreamComponents);
 
 			long took = System.nanoTime() - start;
-			msg = "{0}:{1} All {2} Strolch Components have been destroyed! Took {3}"; //$NON-NLS-1$
+			msg = "{0}:{1} All {2} Strolch Components have been destroyed! Took {3}";
 			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
 					formatNanoDuration(took)));
 			this.controllerMap.clear();

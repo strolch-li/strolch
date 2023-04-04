@@ -75,7 +75,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 	@Override
 	public void setTransactionResult(TransactionResult txResult) throws IllegalStateException {
 		if (this.txResult != null) {
-			String msg = "The transaction already has a result set!"; //$NON-NLS-1$
+			String msg = "The transaction already has a result set!";
 			throw new IllegalStateException(msg);
 		}
 		this.txResult = txResult;
@@ -121,7 +121,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 		try {
 			long start = System.nanoTime();
 			if (this.state == TransactionState.COMMITTED)
-				throw new IllegalStateException("Transaction has already been committed!"); //$NON-NLS-1$
+				throw new IllegalStateException("Transaction has already been committed!");
 
 			if (this.state != TransactionState.ROLLED_BACK) {
 				this.state = TransactionState.ROLLED_BACK;
@@ -160,10 +160,10 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			List<Object> removed = this.objectFilter.getRemoved(key);
 			if (removed.isEmpty()) {
 				if (this.verbose)
-					logger.info("No objects removed in this tx."); //$NON-NLS-1$
+					logger.info("No objects removed in this tx.");
 			} else {
 				if (this.verbose)
-					logger.info(removed.size() + " objects removed in this tx."); //$NON-NLS-1$
+					logger.info(removed.size() + " objects removed in this tx.");
 
 				for (Object object : removed) {
 					@SuppressWarnings("unchecked")
@@ -175,10 +175,10 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			List<Object> updated = this.objectFilter.getUpdated(key);
 			if (updated.isEmpty()) {
 				if (this.verbose)
-					logger.info("No objects updated in this tx."); //$NON-NLS-1$
+					logger.info("No objects updated in this tx.");
 			} else {
 				if (this.verbose)
-					logger.info(updated.size() + " objects updated in this tx."); //$NON-NLS-1$
+					logger.info(updated.size() + " objects updated in this tx.");
 
 				for (Object object : updated) {
 					@SuppressWarnings("unchecked")
@@ -190,10 +190,10 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			List<Object> added = this.objectFilter.getAdded(key);
 			if (added.isEmpty()) {
 				if (this.verbose)
-					logger.info("No objects added in this tx."); //$NON-NLS-1$
+					logger.info("No objects added in this tx.");
 			} else {
 				if (this.verbose)
-					logger.info(added.size() + " objects added in this tx."); //$NON-NLS-1$
+					logger.info(added.size() + " objects added in this tx.");
 
 				for (Object object : added) {
 					@SuppressWarnings("unchecked")

@@ -48,7 +48,7 @@ public class StrolchElementFromDomVisitor {
 		String state = element.getAttribute(Tags.STATE);
 
 		if (StringHelper.isEmpty(date)) {
-			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse("-")); //$NON-NLS-1$
+			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse("-"));
 		} else {
 			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(date));
 		}
@@ -102,7 +102,7 @@ public class StrolchElementFromDomVisitor {
 				} else if (hidden.equalsIgnoreCase(Boolean.FALSE.toString())) {
 					timedState.setHidden(false);
 				} else {
-					String msg = "Boolean string must be either {0} or {1}"; //$NON-NLS-1$
+					String msg = "Boolean string must be either {0} or {1}";
 					msg = MessageFormat.format(msg, Boolean.TRUE.toString(), Boolean.FALSE.toString());
 					throw new StrolchException(msg);
 				}
@@ -173,7 +173,7 @@ public class StrolchElementFromDomVisitor {
 			strolchElement.setId(id);
 			strolchElement.setName(name);
 		} else {
-			String msg = "Check the values of the element: {0} either id or name attribute is null!"; //$NON-NLS-1$
+			String msg = "Check the values of the element: {0} either id or name attribute is null!";
 			msg = MessageFormat.format(msg, element.getNodeName());
 			throw new StrolchException(msg);
 		}
@@ -268,7 +268,7 @@ public class StrolchElementFromDomVisitor {
 			} else if (hidden.equalsIgnoreCase(Boolean.FALSE.toString())) {
 				param.setHidden(false);
 			} else {
-				String msg = "Boolean string must be either {0} or {1}"; //$NON-NLS-1$
+				String msg = "Boolean string must be either {0} or {1}";
 				msg = MessageFormat.format(msg, Boolean.TRUE.toString(), Boolean.FALSE.toString());
 				throw new StrolchException(msg);
 			}

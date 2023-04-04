@@ -84,7 +84,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setType(String type) {
 		assertNotReadonly();
 		if (StringHelper.isEmpty(type)) {
-			String msg = "Type may not be empty on element {0}"; //$NON-NLS-1$
+			String msg = "Type may not be empty on element {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}

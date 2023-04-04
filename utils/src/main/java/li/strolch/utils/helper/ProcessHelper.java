@@ -50,15 +50,15 @@ public class ProcessHelper {
 			String... commandAndArgs) {
 
 		if (workingDirectory != null && !workingDirectory.isDirectory()) {
-			String msg = "Working directory does not exist or is not a directory at {0}"; //$NON-NLS-1$
+			String msg = "Working directory does not exist or is not a directory at {0}";
 			msg = MessageFormat.format(msg, workingDirectory.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 		if (commandAndArgs == null || commandAndArgs.length == 0)
-			throw new RuntimeException("No command passed!"); //$NON-NLS-1$
+			throw new RuntimeException("No command passed!");
 
 		final StringBuffer sb = new StringBuffer();
-		sb.append("=====================================\n"); //$NON-NLS-1$
+		sb.append("=====================================\n");
 		try {
 
 			ProcessBuilder pb = new ProcessBuilder(commandAndArgs);
@@ -95,17 +95,17 @@ public class ProcessHelper {
 
 				errorIn.join(100L);
 				infoIn.join(100L);
-				sb.append("=====================================\n"); //$NON-NLS-1$
+				sb.append("=====================================\n");
 			}
 
 			logger.info("Command ended after " + StringHelper.formatNanoDuration(System.nanoTime() - start));
 			return new ProcessResult(returnValue[0], sb.toString(), null);
 
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to perform command: " + e.getLocalizedMessage(), e); //$NON-NLS-1$
+			throw new RuntimeException("Failed to perform command: " + e.getLocalizedMessage(), e);
 		} catch (InterruptedException e) {
-			logger.error("Interrupted!"); //$NON-NLS-1$
-			sb.append("[FATAL] Interrupted"); //$NON-NLS-1$
+			logger.error("Interrupted!");
+			sb.append("[FATAL] Interrupted");
 			return new ProcessResult(-1, sb.toString(), e);
 		}
 	}
@@ -129,9 +129,9 @@ public class ProcessHelper {
 				sb.append(prefix).append(line).append(StringHelper.NEW_LINE);
 			}
 		} catch (IOException e) {
-			String msg = "Faild to read from {0} stream: {1}"; //$NON-NLS-1$
+			String msg = "Faild to read from {0} stream: {1}";
 			msg = MessageFormat.format(msg, prefix, e.getMessage());
-			sb.append("[FATAL] "); //$NON-NLS-1$
+			sb.append("[FATAL] ");
 			sb.append(msg);
 			sb.append(StringHelper.NEW_LINE);
 		}
@@ -141,17 +141,17 @@ public class ProcessHelper {
 
 		ProcessResult processResult;
 		if (SystemHelper.isLinux()) {
-			processResult = runCommand("xdg-open " + pdfPath.getAbsolutePath()); //$NON-NLS-1$
+			processResult = runCommand("xdg-open " + pdfPath.getAbsolutePath());
 		} else if (SystemHelper.isMacOS()) {
-			processResult = runCommand("open " + pdfPath.getAbsolutePath()); //$NON-NLS-1$
+			processResult = runCommand("open " + pdfPath.getAbsolutePath());
 		} else if (SystemHelper.isWindows()) {
 			// remove the first char (/) from the report path (/D:/temp.....)
 			String pdfFile = pdfPath.getAbsolutePath();
 			if (pdfFile.charAt(0) == '/')
 				pdfFile = pdfFile.substring(1);
-			processResult = runCommand("rundll32 url.dll,FileProtocolHandler " + pdfFile); //$NON-NLS-1$
+			processResult = runCommand("rundll32 url.dll,FileProtocolHandler " + pdfFile);
 		} else {
-			String msg = MessageFormat.format("Unexpected OS: {0}", SystemHelper.osName); //$NON-NLS-1$
+			String msg = MessageFormat.format("Unexpected OS: {0}", SystemHelper.osName);
 			throw new UnsupportedOperationException(msg);
 		}
 
@@ -160,12 +160,12 @@ public class ProcessHelper {
 
 	public static void logProcessResult(ProcessResult processResult) {
 		if (processResult.returnValue == 0) {
-			logger.info("Process executed successfully"); //$NON-NLS-1$
+			logger.info("Process executed successfully");
 		} else if (processResult.returnValue == -1) {
-			logger.error("Process execution failed:\n" + processResult.processOutput); //$NON-NLS-1$
+			logger.error("Process execution failed:\n" + processResult.processOutput);
 			logger.error(processResult.throwable.getMessage(), processResult.throwable);
 		} else {
-			String msg = "Process execution was not successful with return value:{0}\n{1}"; //$NON-NLS-1$
+			String msg = "Process execution was not successful with return value:{0}\n{1}";
 			logger.info(MessageFormat.format(msg, processResult.returnValue, processResult.processOutput));
 		}
 	}

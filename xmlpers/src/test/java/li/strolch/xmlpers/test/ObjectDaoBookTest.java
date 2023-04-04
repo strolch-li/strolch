@@ -39,7 +39,7 @@ import org.junit.Test;
  */
 public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
-	private static final String BASEPATH = "target/db/ObjectDaoTest/"; //$NON-NLS-1$
+	private static final String BASEPATH = "target/db/ObjectDaoTest/";
 
 	@Before
 	public void before() {
@@ -136,9 +136,9 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		// create a list of books
 		List<Book> books = new ArrayList<>(10);
 		for (int i = 0; i < 10; i++) {
-			String title = "Bulk Test Book. " + i; //$NON-NLS-1$
-			String author = "Nick Hornby"; //$NON-NLS-1$
-			String press = "Penguin Books"; //$NON-NLS-1$
+			String title = "Bulk Test Book. " + i;
+			String author = "Nick Hornby";
+			String press = "Penguin Books";
 			double price = 21.30;
 
 			Book book = createBook(i, title, author, press, price);
@@ -157,7 +157,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 			TypeRef typeRef = tx.getManager().getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
 			ObjectDao objectDao = tx.getObjectDao();
 			books = objectDao.queryAll(typeRef, file -> true);
-			assertEquals("Expected to find 10 entries!", 10, books.size()); //$NON-NLS-1$
+			assertEquals("Expected to find 10 entries!", 10, books.size());
 
 			// delete them all
 			objectDao.removeAll(books);
@@ -168,7 +168,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 			TypeRef typeRef = tx.getManager().getObjectRefCache().getTypeRef(TestConstants.TYPE_BOOK);
 			ObjectDao objectDao = tx.getObjectDao();
 			books = objectDao.queryAll(typeRef, file -> true);
-			assertEquals("Expected to find 0 entries!", 0, books.size()); //$NON-NLS-1$
+			assertEquals("Expected to find 0 entries!", 0, books.size());
 		}
 	}
 
@@ -178,9 +178,9 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
 		String classType = TestConstants.TYPE_BOOK;
 		long id = System.currentTimeMillis();
-		String title = "About a boy"; //$NON-NLS-1$
-		String author = "Nick Hornby"; //$NON-NLS-1$
-		String press = "Penguin Books"; //$NON-NLS-1$
+		String title = "About a boy";
+		String author = "Nick Hornby";
+		String press = "Penguin Books";
 		double price = 21.30;
 
 		// create a book
@@ -193,7 +193,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
 			Book book = tx.getObjectDao().queryById(objectRef);
-			assertNotNull("Expected to read book by ID", book); //$NON-NLS-1$
+			assertNotNull("Expected to read book by ID", book);
 		}
 
 		// delete by id
@@ -206,7 +206,7 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfTypeRef(classType, Long.toString(id));
 			Book book = tx.getObjectDao().queryById(objectRef);
-			assertNull("Expected that book was deleted by ID, thus can not be read anymore", book); //$NON-NLS-1$
+			assertNull("Expected that book was deleted by ID, thus can not be read anymore", book);
 		}
 	}
 }

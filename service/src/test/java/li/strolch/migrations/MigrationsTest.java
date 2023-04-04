@@ -40,8 +40,8 @@ import org.junit.Test;
 
 public class MigrationsTest {
 
-	public static final String RUNTIME_PATH = "target/migrationstest/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/migrationstest"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/migrationstest/";
+	public static final String CONFIG_SRC = "src/test/resources/migrationstest";
 
 	protected static RuntimeMock runtimeMock;
 	protected static Certificate certificate;

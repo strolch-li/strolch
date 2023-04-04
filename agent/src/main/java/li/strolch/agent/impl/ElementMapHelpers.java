@@ -31,13 +31,13 @@ public class ElementMapHelpers {
 
 		String interpretation = refP.getInterpretation();
 		if (!interpretation.equals(expectedInterpretation)) {
-			String msg = "{0} is not an expected element reference as its interpretation is {1} instead of {2}"; //$NON-NLS-1$
+			String msg = "{0} is not an expected element reference as its interpretation is {1} instead of {2}";
 			throw new StrolchException(
 					MessageFormat.format(msg, refP.getLocator(), interpretation, expectedInterpretation));
 		}
 
 		if (refP.getUom().equals(UOM_NONE)) {
-			String msg = "{0} is not an expected element reference as its UOM is not set to a type it is set to {1}!"; //$NON-NLS-1$
+			String msg = "{0} is not an expected element reference as its UOM is not set to a type it is set to {1}!";
 			throw new StrolchException(MessageFormat.format(msg, refP.getLocator(), UOM_NONE));
 		}
 	}

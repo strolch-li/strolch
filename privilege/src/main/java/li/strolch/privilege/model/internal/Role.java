@@ -53,10 +53,10 @@ public final class Role {
 	public Role(String name, Map<String, IPrivilege> privilegeMap) {
 
 		if (StringHelper.isEmpty(name)) {
-			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No name defined!");
 		}
 		if (privilegeMap == null) {
-			throw new PrivilegeException("No privileges defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No privileges defined!");
 		}
 
 		this.name = name;
@@ -73,11 +73,11 @@ public final class Role {
 
 		String name = roleRep.getName();
 		if (StringHelper.isEmpty(name)) {
-			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No name defined!");
 		}
 
 		if (roleRep.getPrivileges() == null) {
-			throw new PrivilegeException("Privileges may not be null!"); //$NON-NLS-1$
+			throw new PrivilegeException("Privileges may not be null!");
 		}
 
 		// build privileges from rep

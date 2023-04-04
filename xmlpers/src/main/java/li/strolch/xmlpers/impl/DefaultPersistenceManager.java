@@ -45,7 +45,7 @@ public class DefaultPersistenceManager implements PersistenceManager {
 
 	public void initialize(Properties properties) {
 		if (this.initialized)
-			throw new IllegalStateException("Already initialized!"); //$NON-NLS-1$
+			throw new IllegalStateException("Already initialized!");
 
 		String context = DefaultPersistenceManager.class.getSimpleName();
 
@@ -65,13 +65,13 @@ public class DefaultPersistenceManager implements PersistenceManager {
 		File basePathF = new File(basePath).getAbsoluteFile();
 		if (!basePathF.exists())
 			throw new XmlPersistenceException(
-					MessageFormat.format("The database store path does not exist at {0}", //$NON-NLS-1$
+					MessageFormat.format("The database store path does not exist at {0}",
 							basePathF.getAbsolutePath()));
 		if (!basePathF.canWrite())
 			throw new XmlPersistenceException(
-					MessageFormat.format("The database store path is not writeable at {0}", //$NON-NLS-1$
+					MessageFormat.format("The database store path is not writeable at {0}",
 							basePathF.getAbsolutePath()));
-		logger.info(MessageFormat.format("Using base path {0}", basePathF)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Using base path {0}", basePathF));
 
 		this.verbose = verbose;
 		this.allowOverwriteOnCreate = allowOverwriteOnCreate;

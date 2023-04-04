@@ -127,7 +127,7 @@ public class MigrationsHandler extends StrolchComponent {
 		}
 
 		if (pollMigrations) {
-			this.migrationTimer = new Timer("MigrationTimer", true); //$NON-NLS-1$
+			this.migrationTimer = new Timer("MigrationTimer", true);
 			long checkInterval = TimeUnit.MINUTES.toMillis(pollWait);
 			this.migrationTimer.schedule(new MigrationPollTask(), checkInterval, checkInterval);
 		}

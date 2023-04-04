@@ -62,7 +62,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	protected boolean observeAccessReads;
 
 	public AuditingElementMapFacade(ElementMap<T> elementMap, boolean readOnly, boolean observeAccessReads) {
-		DBC.PRE.assertNotNull("ElementMap must be set!", elementMap); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("ElementMap must be set!", elementMap);
 		this.elementMap = elementMap;
 		this.readOnly = readOnly;
 		this.observeAccessReads = observeAccessReads;

@@ -290,6 +290,6 @@ public class ObjectDao {
 	private void assertNotClosed() {
 		if (!this.tx.isOpen())
 			throw new IllegalStateException(
-					"Transaction has been closed and thus no operation can be performed!"); //$NON-NLS-1$
+					"Transaction has been closed and thus no operation can be performed!");
 	}
 }

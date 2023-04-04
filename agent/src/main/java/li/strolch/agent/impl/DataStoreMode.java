@@ -66,6 +66,6 @@ public enum DataStoreMode {
 				return dataStoreMode;
 		}
 
-		throw new IllegalArgumentException(MessageFormat.format("There is no data store mode ''{0}''", modeS)); //$NON-NLS-1$
+		throw new IllegalArgumentException(MessageFormat.format("There is no data store mode ''{0}''", modeS));
 	}
 }

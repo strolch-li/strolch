@@ -44,7 +44,7 @@ public class Locator {
 	/**
 	 * The separator used when formatting a {@link Locator} object ot a string
 	 */
-	public static final String PATH_SEPARATOR = "/"; //$NON-NLS-1$
+	public static final String PATH_SEPARATOR = "/";
 
 	/**
 	 * {@link List} of path elements, with the first being the top level or root element
@@ -66,7 +66,7 @@ public class Locator {
 	private Locator(List<String> pathElements) throws StrolchException {
 		if (pathElements == null) {
 			throw new StrolchException(
-					"The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
+					"The path elements may not be null and must contain at least 1 item");
 		}
 		this.pathElements = List.copyOf(pathElements);
 	}
@@ -216,7 +216,7 @@ public class Locator {
 	 */
 	private List<String> parsePath(String path) throws StrolchException {
 		if (StringHelper.isEmpty(path)) {
-			throw new StrolchException("A path may not be empty!"); //$NON-NLS-1$
+			throw new StrolchException("A path may not be empty!");
 		}
 		String[] elements = path.split(Locator.PATH_SEPARATOR);
 		return Arrays.asList(elements);
@@ -414,7 +414,7 @@ public class Locator {
 		 */
 		public Locator build() {
 			if (this.pathElements.isEmpty()) {
-				throw new StrolchException("The path elements must contain at least 1 item"); //$NON-NLS-1$
+				throw new StrolchException("The path elements must contain at least 1 item");
 			}
 			return new Locator(this.pathElements);
 		}

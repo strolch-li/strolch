@@ -42,11 +42,11 @@ import org.postgresql.Driver;
  */
 public class PostgreSqlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
-	public static final String SCRIPT_PREFIX_STROLCH = "strolch"; //$NON-NLS-1$
-	public static final String SCRIPT_PREFIX_ARCHIVE = "archive"; //$NON-NLS-1$
-	public static final String PROP_DATA_TYPE = "dataType"; //$NON-NLS-1$
-	public static final String DATA_TYPE_XML = "xml"; //$NON-NLS-1$
-	public static final String DATA_TYPE_JSON = "json"; //$NON-NLS-1$
+	public static final String SCRIPT_PREFIX_STROLCH = "strolch";
+	public static final String SCRIPT_PREFIX_ARCHIVE = "archive";
+	public static final String PROP_DATA_TYPE = "dataType";
+	public static final String DATA_TYPE_XML = "xml";
+	public static final String DATA_TYPE_JSON = "json";
 
 	private Map<String, DataSource> dsMap;
 	private DataType dataType;
@@ -106,10 +106,10 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 		// if allowed, perform DB initialization
 		if (!allowDataInitOnSchemaCreate) {
-			logger.info("Data Initialization not enabled as 'allowDataInitOnSchemaCreate' is false!"); //$NON-NLS-1$
+			logger.info("Data Initialization not enabled as 'allowDataInitOnSchemaCreate' is false!");
 		} else {
 			Map<String, DbMigrationState> dbMigrationStates = schemaVersionCheck.getDbMigrationStates();
-			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required..."; //$NON-NLS-1$
+			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required...";
 			logger.info(MessageFormat.format(msg, dbMigrationStates.size()));
 			PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler();
 			StrolchAgent agent = getContainer().getAgent();
@@ -145,14 +145,14 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 		DataSource ds = this.dsMap.get(realm);
 		if (ds == null) {
 			String msg = MessageFormat.format("There is no DataSource registered for the realm {0}",
-					realm); //$NON-NLS-1$
+					realm);
 			throw new StrolchPersistenceException(msg);
 		}
 
 		try {
 			return ds.getConnection();
 		} catch (Exception e) {
-			String msg = "Failed to open a connection to {0} due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to open a connection to {0} due to {1}";
 			throw new StrolchPersistenceException(MessageFormat.format(msg, ds, e.getMessage()), e);
 		}
 	}

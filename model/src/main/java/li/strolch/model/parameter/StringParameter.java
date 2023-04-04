@@ -97,7 +97,7 @@ public class StringParameter extends AbstractParameter<String> {
 	public void setValueE(Enum<?> value) {
 		assertNotReadonly();
 		if (value == null) {
-			String msg = "Can not set null value on Parameter {0}"; //$NON-NLS-1$
+			String msg = "Can not set null value on Parameter {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}

@@ -576,7 +576,7 @@ public class Activity extends AbstractStrolchRootElement
 			String next = locator.get(i);
 
 			if (!(element instanceof Activity)) {
-				String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified"; //$NON-NLS-1$
+				String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified";
 				throw new StrolchModelException(MessageFormat.format(msg, locator, next));
 			}
 

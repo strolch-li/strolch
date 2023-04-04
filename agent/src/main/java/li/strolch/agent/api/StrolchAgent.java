@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StrolchAgent {
 
-	public static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
+	public static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties";
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
@@ -295,7 +295,7 @@ public class StrolchAgent {
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
-		String msg = "[{0}] Setting up Strolch Container using the following paths:"; //$NON-NLS-1$
+		String msg = "[{0}] Setting up Strolch Container using the following paths:";
 		logger.info(MessageFormat.format(msg, environment));
 		logger.info(" - Config: " + configPathF.getAbsolutePath());
 		logger.info(" - Data: " + dataPathF.getAbsolutePath());
@@ -312,12 +312,12 @@ public class StrolchAgent {
 
 		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
 		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(),
-				config.getEnvironment())); //$NON-NLS-1$
+				config.getEnvironment()));
 	}
 
 	protected void assertContainerStarted() {
 		if (this.container == null || this.container.getState() != ComponentState.STARTED) {
-			String msg = "Container is not yet started!"; //$NON-NLS-1$
+			String msg = "Container is not yet started!";
 			throw new IllegalStateException(msg);
 		}
 	}
@@ -358,7 +358,7 @@ public class StrolchAgent {
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
 				String msg = MessageFormat.format("Failed to read version properties for agent: {0}",
-						e.getMessage()); //$NON-NLS-1$
+						e.getMessage());
 				queryResult.getErrors().add(msg);
 				logger.error(msg, e);
 			}
@@ -370,7 +370,7 @@ public class StrolchAgent {
 					ComponentVersion componentVersion = component.getVersion();
 					queryResult.add(componentVersion);
 				} catch (Exception e) {
-					String msg = "Failed to read version properties for component {0} due to: {1}"; //$NON-NLS-1$
+					String msg = "Failed to read version properties for component {0} due to: {1}";
 					msg = MessageFormat.format(msg, component.getName(), e.getMessage());
 					queryResult.getErrors().add(msg);
 					logger.error(msg, e);

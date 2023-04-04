@@ -25,8 +25,8 @@ import org.junit.Test;
  */
 public class PerformanceTransientTest extends PerformanceTest {
 
-	public static final String RUNTIME_PATH = "target/runtime_transient_test/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/runtime_transient"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/runtime_transient_test/";
+	public static final String CONFIG_SRC = "src/runtime_transient";
 
 	@BeforeClass
 	public static void beforeClass() {

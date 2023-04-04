@@ -49,7 +49,7 @@ public class AuditSaxReader extends DefaultHandler {
 		case Tags.Audit.USERNAME, Tags.Audit.FIRSTNAME, Tags.Audit.LASTNAME, Tags.Audit.DATE, Tags.Audit.ELEMENT_TYPE, Tags.Audit.ELEMENT_SUB_TYPE, Tags.Audit.ELEMENT_ACCESSED, Tags.Audit.NEW_VERSION, Tags.Audit.ACTION, Tags.Audit.ACCESS_TYPE ->
 				this.sb = new StringBuilder();
 		default -> throw new IllegalArgumentException(
-				MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+				MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -102,7 +102,7 @@ public class AuditSaxReader extends DefaultHandler {
 			this.sb = null;
 		}
 		default -> throw new IllegalArgumentException(
-				MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+				MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 

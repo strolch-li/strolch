@@ -31,7 +31,7 @@ public class DomUtil {
 			DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 			return docBuilder;
 		} catch (ParserConfigurationException e) {
-			String msg = "No Xml Parser could be loaded: {0}"; //$NON-NLS-1$
+			String msg = "No Xml Parser could be loaded: {0}";
 			msg = MessageFormat.format(msg, e.getMessage());
 			throw new RuntimeException(msg, e);
 		}

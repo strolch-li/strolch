@@ -48,7 +48,7 @@ public enum IoMode {
 	 * @param fileIo
 	 */
 	public <T> void write(PersistenceContext<T> ctx, FileIo fileIo) {
-		throw new UnsupportedOperationException("Override me!"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("Override me!");
 	}
 
 	/**
@@ -56,6 +56,6 @@ public enum IoMode {
 	 * @param fileIo
 	 */
 	public <T> void read(PersistenceContext<T> ctx, FileIo fileIo) {
-		throw new UnsupportedOperationException("Override me!"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("Override me!");
 	}
 }

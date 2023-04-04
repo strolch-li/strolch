@@ -37,7 +37,7 @@ import org.junit.Test;
  */
 public class TransactionResultTest extends AbstractPersistenceTest {
 
-	private static final String BASEPATH = "target/db/TxResultTest/"; //$NON-NLS-1$
+	private static final String BASEPATH = "target/db/TxResultTest/";
 
 	@Before
 	public void setup() {
@@ -54,16 +54,16 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		performChanges(txResult);
 		String logMessage = txResult.getLogMessage();
 		logger.info(logMessage);
-		assertThat(logMessage, containsString("TX was completed after")); //$NON-NLS-1$
-		assertThat(logMessage, containsString("30 objects in 2 types were modified")); //$NON-NLS-1$
-		assertThat(txResult.getKeys(), containsInAnyOrder("Resource", "Book")); //$NON-NLS-1$ //$NON-NLS-2$
+		assertThat(logMessage, containsString("TX was completed after"));
+		assertThat(logMessage, containsString("30 objects in 2 types were modified"));
+		assertThat(txResult.getKeys(), containsInAnyOrder("Resource", "Book")); //$NON-NLS-2$
 
-		ModificationResult resourceModificationResult = txResult.getModificationResult("Resource"); //$NON-NLS-1$
+		ModificationResult resourceModificationResult = txResult.getModificationResult("Resource");
 		assertEquals(20, resourceModificationResult.getCreated().size());
 		assertEquals(0, resourceModificationResult.getUpdated().size());
 		assertEquals(0, resourceModificationResult.getDeleted().size());
 
-		ModificationResult bookModificationResult = txResult.getModificationResult("Book"); //$NON-NLS-1$
+		ModificationResult bookModificationResult = txResult.getModificationResult("Book");
 		assertEquals(10, bookModificationResult.getCreated().size());
 		assertEquals(0, bookModificationResult.getUpdated().size());
 		assertEquals(0, bookModificationResult.getDeleted().size());
@@ -80,17 +80,17 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		List<MyModel> resources = new ArrayList<>(10);
 		int i = 0;
 		for (; i < 10; i++) {
-			String id = RES_ID + "_" + i; //$NON-NLS-1$
-			String name = "Tx Result Test 1 Object. " + i; //$NON-NLS-1$
-			String type = "testTxResult1"; //$NON-NLS-1$
+			String id = RES_ID + "_" + i;
+			String name = "Tx Result Test 1 Object. " + i;
+			String type = "testTxResult1";
 
 			MyModel resource = createResource(id, name, type);
 			resources.add(resource);
 		}
 		for (; i < 20; i++) {
-			String id = RES_ID + "_" + i; //$NON-NLS-1$
-			String name = "Tx Result Test 2 Object. " + i; //$NON-NLS-1$
-			String type = "testTxResult2"; //$NON-NLS-1$
+			String id = RES_ID + "_" + i;
+			String name = "Tx Result Test 2 Object. " + i;
+			String type = "testTxResult2";
 
 			MyModel resource = createResource(id, name, type);
 			resources.add(resource);
@@ -100,9 +100,9 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		List<Book> books = new ArrayList<>(10);
 		i = 0;
 		for (; i < 10; i++) {
-			String title = "Tx Result Test Book " + i; //$NON-NLS-1$
+			String title = "Tx Result Test Book " + i;
 			Book book = new Book((long) i, title, "Douglas Adams", "Apress",
-					Math.random() * i); //$NON-NLS-1$ //$NON-NLS-2$
+					Math.random() * i); //$NON-NLS-2$
 			books.add(book);
 		}
 

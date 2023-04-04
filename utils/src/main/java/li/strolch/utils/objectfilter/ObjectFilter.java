@@ -98,7 +98,7 @@ public class ObjectFilter {
 	private void replaceKey(ObjectCache cached, Object newObjectKey, Object newObject) {
 		if (cached.getObjectKey() != newObjectKey) {
 			if (ObjectFilter.logger.isDebugEnabled()) {
-				String msg = "Replacing key for object as they are not the same reference: old: {0} / new: {1}"; //$NON-NLS-1$
+				String msg = "Replacing key for object as they are not the same reference: old: {0} / new: {1}";
 				msg = MessageFormat.format(msg, cached.getObjectKey(), newObjectKey);
 				ObjectFilter.logger.warn(msg);
 			}
@@ -139,7 +139,7 @@ public class ObjectFilter {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger
-					.debug(MessageFormat.format("add object {0} with key {1}", objectToAdd, key)); //$NON-NLS-1$
+					.debug(MessageFormat.format("add object {0} with key {1}", objectToAdd, key));
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.getElement(key, objectKey);
@@ -154,7 +154,7 @@ public class ObjectFilter {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
-				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
 				throw new IllegalArgumentException(MessageFormat
 						.format(msg, Long.toString(id), Operation.ADD.toString(), existingKey, key,
 								objectKey.toString()));
@@ -165,9 +165,9 @@ public class ObjectFilter {
 			Operation op = cached.getOperation();
 			switch (op) {
 			case ADD -> throw new IllegalStateException(
-					"Stale State exception: Invalid + after + for " + objectKey); //$NON-NLS-1$
+					"Stale State exception: Invalid + after + for " + objectKey);
 			case MODIFY -> throw new IllegalStateException(
-					"Stale State exception: Invalid + after += for " + objectKey); //$NON-NLS-1$
+					"Stale State exception: Invalid + after += for " + objectKey);
 			case REMOVE -> {
 				// replace key if necessary
 				replaceKey(cached, objectKey, objectToAdd);
@@ -176,7 +176,7 @@ public class ObjectFilter {
 				cached.setObject(objectToAdd);
 				cached.setOperation(Operation.MODIFY);
 			}
-			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
+			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op);
 			} // switch
 		} // else of object not in cache
 
@@ -215,7 +215,7 @@ public class ObjectFilter {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger
-					.debug(MessageFormat.format("update object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
+					.debug(MessageFormat.format("update object {0} with key {1}", objectKey, key));
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.getElement(key, objectKey);
@@ -240,8 +240,8 @@ public class ObjectFilter {
 				cached.setObject(objectToUpdate);
 			}
 			case REMOVE -> throw new IllegalStateException(
-					"Stale State exception: Invalid += after - for " + objectKey); //$NON-NLS-1$
-			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
+					"Stale State exception: Invalid += after - for " + objectKey);
+			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op);
 			} // switch
 		} // else of object not in cache
 
@@ -280,7 +280,7 @@ public class ObjectFilter {
 
 		if (ObjectFilter.logger.isDebugEnabled())
 			ObjectFilter.logger
-					.debug(MessageFormat.format("remove object {0} with key {1}", objectKey, key)); //$NON-NLS-1$
+					.debug(MessageFormat.format("remove object {0} with key {1}", objectKey, key));
 
 		// BEWARE: you fix a bug here, be sure to update BOTH tables on the logic.
 		ObjectCache cached = this.cache.getElement(key, objectKey);
@@ -293,7 +293,7 @@ public class ObjectFilter {
 
 			String existingKey = cached.getKey();
 			if (!existingKey.equals(key)) {
-				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}"; //$NON-NLS-1$
+				String msg = "Invalid key provided for object with transaction ID {0} and operation {1}:  existing key is {2}, new key is {3}. Object may be present in the same filter instance only once, registered using one key only. Object:{4}";
 				throw new IllegalArgumentException(MessageFormat
 						.format(msg, Long.toString(id), Operation.REMOVE.toString(), existingKey, key,
 								objectKey.toString()));
@@ -315,8 +315,8 @@ public class ObjectFilter {
 				cached.setOperation(Operation.REMOVE);
 			}
 			case REMOVE -> throw new IllegalStateException(
-					"Stale State exception: Invalid - after - for " + objectKey); //$NON-NLS-1$
-			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op); //$NON-NLS-1$
+					"Stale State exception: Invalid - after - for " + objectKey);
+			default -> throw new IllegalStateException("Stale State exception: Unhandled state " + op);
 			} // switch
 		}
 
@@ -849,7 +849,7 @@ public class ObjectFilter {
 	public synchronized long dispenseID() {
 		ObjectFilter.id++;
 		if (ObjectFilter.id == Long.MAX_VALUE) {
-			ObjectFilter.logger.error("Rolling IDs of objectFilter back to 1. Hope this is fine."); //$NON-NLS-1$
+			ObjectFilter.logger.error("Rolling IDs of objectFilter back to 1. Hope this is fine.");
 			ObjectFilter.id = 1;
 		}
 		return ObjectFilter.id;

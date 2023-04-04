@@ -46,15 +46,15 @@ public class RealmTest extends AbstractModelTest {
 	public static final String DB_URL1 = "jdbc:postgresql://localhost/testdb1";
 	public static final String DB_URL2 = "jdbc:postgresql://localhost/testdb2";
 
-	private static final String TEST_USER2 = "testuser2"; //$NON-NLS-1$
-	private static final String TEST_USER1 = "testuser1"; //$NON-NLS-1$
-	private static final String TEST = "test"; //$NON-NLS-1$
-	private static final String FIRST = "first"; //$NON-NLS-1$
-	private static final String SECOND = "second"; //$NON-NLS-1$
+	private static final String TEST_USER2 = "testuser2";
+	private static final String TEST_USER1 = "testuser1";
+	private static final String TEST = "test";
+	private static final String FIRST = "first";
+	private static final String SECOND = "second";
 
-	public static final String RUNTIME_PATH = "target/realmtest/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/realmtest"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/realmtest/";
+	public static final String DB_STORE_PATH_DIR = "dbStore";
+	public static final String CONFIG_SRC = "src/test/resources/realmtest";
 
 	protected static RuntimeMock runtimeMock;
 
@@ -92,9 +92,9 @@ public class RealmTest extends AbstractModelTest {
 	@Test
 	public void testDifferentRealms() {
 
-		String expectedId1 = "@realmTestId1"; //$NON-NLS-1$
-		String expectedId2 = "@realmTestId2"; //$NON-NLS-1$
-		String type = "Bla"; //$NON-NLS-1$
+		String expectedId1 = "@realmTestId1";
+		String expectedId2 = "@realmTestId2";
+		String type = "Bla";
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
 		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.toCharArray());
@@ -102,7 +102,7 @@ public class RealmTest extends AbstractModelTest {
 		{
 			StrolchRealm firstRealm = runtimeMock.getRealm(FIRST);
 			assertEquals(DataStoreMode.CACHED, firstRealm.getMode());
-			Resource expectedRes1 = ModelGenerator.createResource(expectedId1, "Bla bla", type); //$NON-NLS-1$
+			Resource expectedRes1 = ModelGenerator.createResource(expectedId1, "Bla bla", type);
 			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST, false)) {
 				tx.add(expectedRes1);
 				tx.commitOnClose();
@@ -110,14 +110,14 @@ public class RealmTest extends AbstractModelTest {
 
 			try (StrolchTransaction tx = firstRealm.openTx(certificate, TEST, true)) {
 				Resource res = tx.getResourceBy(type, expectedId1);
-				assertEquals("Should find object previously added in same realm!", expectedRes1, res); //$NON-NLS-1$
+				assertEquals("Should find object previously added in same realm!", expectedRes1, res);
 			}
 		}
 
 		{
 			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
 			assertEquals(DataStoreMode.CACHED, secondRealm.getMode());
-			Resource expectedRes2 = ModelGenerator.createResource(expectedId2, "Bla bla", type); //$NON-NLS-1$
+			Resource expectedRes2 = ModelGenerator.createResource(expectedId2, "Bla bla", type);
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST, false)) {
 				tx.add(expectedRes2);
 				tx.commitOnClose();
@@ -125,7 +125,7 @@ public class RealmTest extends AbstractModelTest {
 
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST, true)) {
 				Resource res = tx.getResourceBy(type, expectedId2);
-				assertEquals("Should find object previously added in same realm!", expectedRes2, res); //$NON-NLS-1$
+				assertEquals("Should find object previously added in same realm!", expectedRes2, res);
 			}
 		}
 
@@ -133,7 +133,7 @@ public class RealmTest extends AbstractModelTest {
 			StrolchRealm secondRealm = runtimeMock.getRealm(SECOND);
 			try (StrolchTransaction tx = secondRealm.openTx(certificate, TEST, true)) {
 				Resource res = tx.getResourceBy(type, expectedId1);
-				assertNull("Should not find object added in differenct realm!", res); //$NON-NLS-1$
+				assertNull("Should not find object added in differenct realm!", res);
 			}
 		}
 	}

@@ -185,9 +185,9 @@ public class XmlDomSigner {
 			Transformer transformer = tf.newTransformer();
 
 			if (indent) {
-				transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount",
-						"2"); //$NON-NLS-1$ //$NON-NLS-2$
+						"2"); //$NON-NLS-2$
 			}
 
 			transformer.transform(new DOMSource(doc), new StreamResult(out));

@@ -64,7 +64,7 @@ public class ValueTests {
 	public void testStringSetInverse() {
 		Set<AString> aStrings = new HashSet<>();
 		for (int i = 0; i < 10; i++) {
-			aStrings.add(new AString("string " + i)); //$NON-NLS-1$
+			aStrings.add(new AString("string " + i));
 		}
 		IValue<Set<AString>> value = new StringSetValue(aStrings);
 		IValue<Set<AString>> inverse = value.getInverse();
@@ -80,13 +80,13 @@ public class ValueTests {
 
 		Set<AString> aStrings1 = new HashSet<>();
 		for (int i = 0; i < 10; i++) {
-			aStrings1.add(new AString("string " + i)); //$NON-NLS-1$
+			aStrings1.add(new AString("string " + i));
 		}
 		IValue<Set<AString>> value1 = new StringSetValue(aStrings1);
 
 		Set<AString> aStrings2 = new HashSet<>();
 		for (int i = 0; i < 9; i++) {
-			aStrings2.add(new AString("string " + i, true)); //$NON-NLS-1$
+			aStrings2.add(new AString("string " + i, true));
 		}
 		IValue<Set<AString>> value2 = new StringSetValue(aStrings2);
 

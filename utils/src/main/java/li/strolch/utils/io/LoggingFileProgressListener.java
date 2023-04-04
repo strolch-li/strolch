@@ -35,19 +35,19 @@ public class LoggingFileProgressListener implements FileProgressListener {
 
 	@Override
 	public void begin(int percent, long position, long size) {
-		String msg = "Starting to read {0} {1} of {2} ({3}%)"; //$NON-NLS-1$
+		String msg = "Starting to read {0} {1} of {2} ({3}%)";
 		log(MessageFormat.format(msg, this.name, position, FileHelper.humanizeFileSize(size), percent));
 	}
 
 	@Override
 	public void progress(int percent, long position) {
-		String msg = "Read {0}% of {1} at position {2}"; //$NON-NLS-1$
+		String msg = "Read {0}% of {1} at position {2}";
 		log(MessageFormat.format(msg, percent, this.name, FileHelper.humanizeFileSize(position)));
 	}
 
 	@Override
 	public void end(int percent, long position) {
-		String msg = "Finished reading {0} at position {1} ({2}%)"; //$NON-NLS-1$
+		String msg = "Finished reading {0} at position {1} ({2}%)";
 		log(MessageFormat.format(msg, this.name, FileHelper.humanizeFileSize(position), percent));
 	}
 

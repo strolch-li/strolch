@@ -32,12 +32,12 @@ public class SystemHelper {
 		return SystemHelper.instance;
 	}
 
-	public static final String osName = System.getProperty("os.name"); //$NON-NLS-1$
-	public static final String osArch = System.getProperty("os.arch"); //$NON-NLS-1$
-	public static final String osVersion = System.getProperty("os.version"); //$NON-NLS-1$
-	public static final String javaVendor = System.getProperty("java.vendor"); //$NON-NLS-1$
-	public static final String javaVersion = System.getProperty("java.version"); //$NON-NLS-1$
-	private static final int nrOfCores = Runtime.getRuntime().availableProcessors(); //$NON-NLS-1$
+	public static final String osName = System.getProperty("os.name");
+	public static final String osArch = System.getProperty("os.arch");
+	public static final String osVersion = System.getProperty("os.version");
+	public static final String javaVendor = System.getProperty("java.vendor");
+	public static final String javaVersion = System.getProperty("java.version");
+	private static final int nrOfCores = Runtime.getRuntime().availableProcessors();
 
 	/**
 	 * private constructor
@@ -105,10 +105,10 @@ public class SystemHelper {
 	}
 
 	public static String getMemorySummary() {
-		String sb = "System Memory available " //$NON-NLS-1$
-				+ SystemHelper.getMaxMemory() + ",  Total: " //$NON-NLS-1$
-				+ SystemHelper.getTotalMemory() + ",  Used: " //$NON-NLS-1$
-				+ SystemHelper.getUsedMemory() + ",  Free: " //$NON-NLS-1$
+		String sb = "System Memory available "
+				+ SystemHelper.getMaxMemory() + ",  Total: "
+				+ SystemHelper.getTotalMemory() + ",  Used: "
+				+ SystemHelper.getUsedMemory() + ",  Free: "
 				+ SystemHelper.getFreeMemory();
 		return sb;
 	}

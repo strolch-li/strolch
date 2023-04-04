@@ -45,14 +45,14 @@ public class PrivilegePolicyHelper {
 	 */
 	public static String preValidate(IPrivilege privilege, Restrictable restrictable) throws PrivilegeException {
 		if (privilege == null)
-			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.privilegeNull")); //$NON-NLS-1$
+			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.privilegeNull"));
 		if (restrictable == null)
-			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.restrictableNull")); //$NON-NLS-1$
+			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.restrictableNull"));
 
 		// get the PrivilegeName
 		String privilegeName = restrictable.getPrivilegeName();
 		if (StringHelper.isEmpty(privilegeName)) {
-			String msg = PrivilegeMessages.getString("Privilege.privilegeNameEmpty"); //$NON-NLS-1$
+			String msg = PrivilegeMessages.getString("Privilege.privilegeNameEmpty");
 			throw new PrivilegeException(MessageFormat.format(msg, restrictable));
 		}
 
@@ -107,7 +107,7 @@ public class PrivilegePolicyHelper {
 
 		if (assertHasPrivilege) {
 			String msg = MessageFormat
-					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"), //$NON-NLS-1$
+					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"),
 							ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 
 			throw new AccessDeniedException(msg);

@@ -64,7 +64,7 @@ public class TypeRef extends ObjectRef {
 	@Override
 	public <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx) {
 		String msg = MessageFormat
-				.format("{0} is not a leaf and can thus not have a Persistence Context", getName()); //$NON-NLS-1$
+				.format("{0} is not a leaf and can thus not have a Persistence Context", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 

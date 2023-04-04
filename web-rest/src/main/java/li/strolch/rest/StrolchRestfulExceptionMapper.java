@@ -37,7 +37,7 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 	@Override
 	public Response toResponse(Exception ex) {
 
-		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex); //$NON-NLS-1$
+		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex);
 
 		if (ex instanceof NotFoundException)
 			return ResponseUtil.toResponse(Status.NOT_FOUND, ex);

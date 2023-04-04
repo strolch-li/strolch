@@ -25,7 +25,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchBootstrapper.class);
 
-	public static final String APP_VERSION_PROPERTIES = "/appVersion.properties"; //$NON-NLS-1$
+	public static final String APP_VERSION_PROPERTIES = "/appVersion.properties";
 
 	private static final String SYS_PROP_USER_DIR = "user.dir";
 	private static final String STROLCH_BOOTSTRAP = "StrolchBootstrap";
@@ -44,9 +44,9 @@ public class StrolchBootstrapper extends DefaultHandler {
 	public static final String ENV_STROLCH_ENV = "STROLCH_ENV";
 	public static final String ENV_STROLCH_PATH = "STROLCH_PATH";
 
-	public static final String PATH_CONFIG = "config"; //$NON-NLS-1$
-	public static final String PATH_DATA = "data"; //$NON-NLS-1$
-	public static final String PATH_TEMP = "temp"; //$NON-NLS-1$
+	public static final String PATH_CONFIG = "config";
+	public static final String PATH_DATA = "data";
+	public static final String PATH_TEMP = "temp";
 
 	// input
 	private String environment;
@@ -145,7 +145,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 		// root path: readable directory
 		if (!rootSrcPath.isDirectory() || !rootSrcPath.canRead()) {
-			String msg = "[{0}] Root src path is not readable at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Root src path is not readable at {1}";
 			msg = MessageFormat.format(msg, environment, rootSrcPath);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -154,7 +154,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 		File configPathF = new File(rootSrcPath, PATH_CONFIG);
 		File configurationFile = new File(configPathF, ConfigurationParser.STROLCH_CONFIGURATION_XML);
 		if (!configurationFile.isFile() || !configurationFile.canRead()) {
-			String msg = "[{0}] Source Configuration file is not readable at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Source Configuration file is not readable at {1}";
 			msg = MessageFormat.format(msg, environment, configurationFile);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -162,27 +162,27 @@ public class StrolchBootstrapper extends DefaultHandler {
 		// if destination exists, make sure it is a directory and empty
 		if (rootDstPath.exists()) {
 			if (!rootDstPath.isDirectory()) {
-				String msg = "[{0}] Destination root exists and is not a directory at {1}"; //$NON-NLS-1$
+				String msg = "[{0}] Destination root exists and is not a directory at {1}";
 				msg = MessageFormat.format(msg, environment, rootDstPath.getAbsolutePath());
 				throw new StrolchConfigurationException(msg);
 			}
 			if (requireNonNull(rootDstPath.list()).length != 0) {
-				String msg = "[{0}] Destination root exists and is not empty at {1}"; //$NON-NLS-1$
+				String msg = "[{0}] Destination root exists and is not empty at {1}";
 				msg = MessageFormat.format(msg, environment, rootDstPath.getAbsolutePath());
 				throw new StrolchConfigurationException(msg);
 			}
 		} else if (!rootDstPath.mkdir()) {
-			String msg = "[{0}] Destination root does not exist and could not be created. Either parent does not exist, or permission is denied at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Destination root does not exist and could not be created. Either parent does not exist, or permission is denied at {1}";
 			msg = MessageFormat.format(msg, environment, rootDstPath.getAbsolutePath());
 			throw new StrolchConfigurationException(msg);
 		}
 
-		String msg = "[{0}] Copying source {1} to {2}"; //$NON-NLS-1$
+		String msg = "[{0}] Copying source {1} to {2}";
 		logger.info(
 				MessageFormat.format(msg, environment, rootSrcPath.getAbsolutePath(), rootDstPath.getAbsolutePath()));
 
 		if (!FileHelper.copy(rootSrcPath.listFiles(), rootDstPath, true)) {
-			msg = "[{0}] Failed to copy source files from {1} to {2}"; //$NON-NLS-1$
+			msg = "[{0}] Failed to copy source files from {1} to {2}";
 			msg = MessageFormat.format(msg, environment, rootSrcPath.getAbsolutePath(), rootDstPath.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
@@ -271,13 +271,13 @@ public class StrolchBootstrapper extends DefaultHandler {
 	private StrolchAgent setup() {
 
 		DBC.PRE.assertNotEmpty("Environment must be set!", this.environment);
-		DBC.PRE.assertNotNull("configPathF must be set!", this.configPathF); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("dataPathF must be set!", this.dataPathF); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("tempPathF must be set!", this.tempPathF); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("configPathF must be set!", this.configPathF);
+		DBC.PRE.assertNotNull("dataPathF must be set!", this.dataPathF);
+		DBC.PRE.assertNotNull("tempPathF must be set!", this.tempPathF);
 
 		// config path: readable directory
 		if (!this.configPathF.isDirectory() || !this.configPathF.canRead()) {
-			String msg = "[{0}] Config path is not readable at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Config path is not readable at {1}";
 			msg = MessageFormat.format(msg, environment, this.configPathF);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -285,31 +285,31 @@ public class StrolchBootstrapper extends DefaultHandler {
 		// get path to configuration file
 		File configurationFile = new File(this.configPathF, ConfigurationParser.STROLCH_CONFIGURATION_XML);
 		if (!configurationFile.isFile() || !configurationFile.canRead()) {
-			String msg = "[{0}] Configuration file is not readable at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Configuration file is not readable at {1}";
 			msg = MessageFormat.format(msg, environment, configurationFile);
 			throw new StrolchConfigurationException(msg);
 		}
 
 		// data path: writable directory
 		if (!this.dataPathF.exists() && !this.dataPathF.mkdir()) {
-			String msg = "[{0}] Could not create missing data path at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Could not create missing data path at {1}";
 			msg = MessageFormat.format(msg, environment, this.dataPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 		if (!this.dataPathF.isDirectory() || !this.dataPathF.canRead() || !this.dataPathF.canWrite()) {
-			String msg = "[{0}] Data path is not a directory or readable or writeable at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Data path is not a directory or readable or writeable at {1}";
 			msg = MessageFormat.format(msg, environment, this.dataPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 
 		// tmp path: writable directory
 		if (!this.tempPathF.exists() && !this.tempPathF.mkdir()) {
-			String msg = "[{0}] Could not create missing temp path at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Could not create missing temp path at {1}";
 			msg = MessageFormat.format(msg, environment, this.tempPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 		if (!this.tempPathF.isDirectory() || !this.tempPathF.canRead() || !this.tempPathF.canWrite()) {
-			String msg = "[{0}] Temp path is not a directory or readable or writeable at {1}"; //$NON-NLS-1$
+			String msg = "[{0}] Temp path is not a directory or readable or writeable at {1}";
 			msg = MessageFormat.format(msg, environment, this.tempPathF);
 			throw new StrolchConfigurationException(msg);
 		}

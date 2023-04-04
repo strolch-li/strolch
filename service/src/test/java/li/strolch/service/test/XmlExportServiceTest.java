@@ -35,8 +35,8 @@ import org.junit.Test;
  */
 public class XmlExportServiceTest {
 
-	private static final String RUNTIME_PATH = "target/transienttest/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/transienttest"; //$NON-NLS-1$
+	private static final String RUNTIME_PATH = "target/transienttest/";
+	private static final String CONFIG_SRC = "src/test/resources/transienttest";
 	protected static RuntimeMock runtimeMock;
 	private static Certificate certificate;
 

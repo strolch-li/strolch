@@ -36,13 +36,13 @@ import li.strolch.utils.dbc.DBC;
  */
 public class DefaultRealmHandler extends StrolchComponent implements RealmHandler {
 
-	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail"; //$NON-NLS-1$
-	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead"; //$NON-NLS-1$
-	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates"; //$NON-NLS-1$
-	public static final String PROP_ENABLE_VERSIONING = "enableVersioning"; //$NON-NLS-1$
-	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode"; //$NON-NLS-1$
-	public static final String PREFIX_DATA_STORE_FILE = "dataStoreFile"; //$NON-NLS-1$
-	public static final String PROP_REALMS = "realms"; //$NON-NLS-1$
+	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail";
+	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead";
+	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates";
+	public static final String PROP_ENABLE_VERSIONING = "enableVersioning";
+	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode";
+	public static final String PREFIX_DATA_STORE_FILE = "dataStoreFile";
+	public static final String PROP_REALMS = "realms";
 
 	protected Map<String, InternalStrolchRealm> realms;
 
@@ -57,10 +57,10 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 
 	@Override
 	public StrolchRealm getRealm(String realm) throws StrolchException {
-		DBC.PRE.assertNotEmpty("Realm name must be set!", realm); //$NON-NLS-1$
+		DBC.PRE.assertNotEmpty("Realm name must be set!", realm);
 		StrolchRealm strolchRealm = this.realms.get(realm);
 		if (strolchRealm == null) {
-			String msg = "No realm is configured with the name {0}"; //$NON-NLS-1$
+			String msg = "No realm is configured with the name {0}";
 			msg = MessageFormat.format(msg, realm);
 			throw new StrolchException(msg);
 		}

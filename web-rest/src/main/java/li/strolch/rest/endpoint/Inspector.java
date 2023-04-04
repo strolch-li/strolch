@@ -647,7 +647,7 @@ public class Inspector {
 			resource = tx.getResourceBy(type, id);
 		}
 		if (resource == null) {
-			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id));
 		}
 
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
@@ -670,7 +670,7 @@ public class Inspector {
 			resource = tx.getResourceBy(type, id);
 		}
 		if (resource == null) {
-			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id)); //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format("No Resource exists for {0}/{1}", type, id));
 		}
 
 		String asXml = resource.accept(new StrolchElementToXmlStringVisitor());
@@ -690,7 +690,7 @@ public class Inspector {
 			order = tx.getOrderBy(type, id);
 		}
 		if (order == null) {
-			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id));
 		}
 
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
@@ -712,7 +712,7 @@ public class Inspector {
 			order = tx.getOrderBy(type, id);
 		}
 		if (order == null) {
-			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id)); //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format("No Order exists for {0}/{1}", type, id));
 		}
 
 		String asXml = order.accept(new StrolchElementToXmlStringVisitor());
@@ -732,7 +732,7 @@ public class Inspector {
 			activity = tx.getActivityBy(type, id);
 		}
 		if (activity == null) {
-			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id));
 		}
 
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
@@ -754,7 +754,7 @@ public class Inspector {
 			activity = tx.getActivityBy(type, id);
 		}
 		if (activity == null) {
-			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id)); //$NON-NLS-1$
+			throw new StrolchException(MessageFormat.format("No Activity exists for {0}/{1}", type, id));
 		}
 
 		String asXml = activity.accept(new StrolchElementToXmlStringVisitor());

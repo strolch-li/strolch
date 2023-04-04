@@ -50,7 +50,7 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	private final boolean observeAccessReads;
 
 	public AuditingAuditMapFacade(AuditTrail auditTrail, boolean observeAccessReads) {
-		DBC.PRE.assertNotNull("auditTrail must be set!", auditTrail); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("auditTrail must be set!", auditTrail);
 		this.auditTrail = auditTrail;
 		this.observeAccessReads = observeAccessReads;
 

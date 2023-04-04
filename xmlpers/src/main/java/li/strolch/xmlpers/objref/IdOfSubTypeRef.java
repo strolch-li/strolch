@@ -67,13 +67,13 @@ public class IdOfSubTypeRef extends ObjectRef {
 
 	@Override
 	public ObjectRef getChildIdRef(PersistenceTransaction tx, String id) {
-		String msg = MessageFormat.format("Already a leaf: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("Already a leaf: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
 	@Override
 	public ObjectRef getChildTypeRef(PersistenceTransaction tx, String type) {
-		String msg = MessageFormat.format("Already a leaf: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("Already a leaf: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 

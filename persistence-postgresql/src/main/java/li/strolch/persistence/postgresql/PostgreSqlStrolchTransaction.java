@@ -65,7 +65,7 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 				try {
 					this.connection.close();
 				} catch (Exception e) {
-					logger.error("Failed to close connection due to " + e.getMessage(), e); //$NON-NLS-1$
+					logger.error("Failed to close connection due to " + e.getMessage(), e);
 				}
 			}
 		}

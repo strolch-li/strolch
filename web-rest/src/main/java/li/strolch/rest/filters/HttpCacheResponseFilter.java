@@ -30,7 +30,7 @@ import jakarta.ws.rs.ext.Provider;
 @Priority(Priorities.HEADER_DECORATOR)
 public class HttpCacheResponseFilter implements ContainerResponseFilter {
 
-	public static final String NO_CACHE = "no-cache"; //$NON-NLS-1$
+	public static final String NO_CACHE = "no-cache";
 
 	private static String cacheMode = NO_CACHE;
 	

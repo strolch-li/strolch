@@ -90,22 +90,22 @@ public final class Certificate implements Serializable {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
-			throw new PrivilegeException("sessionId is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("sessionId is null!");
 		}
 		if (StringHelper.isEmpty(username)) {
-			throw new PrivilegeException("username is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("username is null!");
 		}
 		if (StringHelper.isEmpty(authToken)) {
-			throw new PrivilegeException("authToken is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("authToken is null!");
 		}
 		if (userState == null) {
-			throw new PrivilegeException("userState is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("userState is null!");
 		}
 		if (usage == null) {
-			throw new PrivilegeException("usage is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("usage is null!");
 		}
 		if (source == null) {
-			throw new PrivilegeException("source is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("source is null!");
 		}
 
 		this.usage = usage;

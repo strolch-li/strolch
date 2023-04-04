@@ -39,8 +39,8 @@ import org.junit.Test;
  */
 public class ServiceLockingTest {
 
-	private static final String RUNTIME_PATH = "target/lockingTest/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/transienttest"; //$NON-NLS-1$
+	private static final String RUNTIME_PATH = "target/lockingTest/";
+	private static final String CONFIG_SRC = "src/test/resources/transienttest";
 
 	private static final String RESOURCE_LOCATOR = "Resource/TestType/MyTestResource";
 

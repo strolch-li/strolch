@@ -181,19 +181,19 @@ public class PrivilegeContainerModel {
 			this.policies.put(privilegeName, clazz);
 
 		} catch (InstantiationException | InvocationTargetException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} could not be instantiated."; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} could not be instantiated.";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		} catch (IllegalAccessException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} can not be accessed."; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} can not be accessed.";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		} catch (ClassNotFoundException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} does not exist."; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} does not exist.";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		} catch (NoSuchMethodException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} has missing parameterless constructor"; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} has missing parameterless constructor";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		}

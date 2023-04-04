@@ -213,7 +213,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
 						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
 						this.locale, this.parameters, this.passwordChangeRequested, this.history);
-				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
+				logger.info(MessageFormat.format("New User: {0}", user));
 				getUsers().add(user);
 			}
 			default -> {

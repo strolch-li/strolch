@@ -74,7 +74,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 			this.properties.setProperty(key, value);
 		}
 		default -> throw new IllegalArgumentException(
-				MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+				MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -138,7 +138,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 
 		default:
 			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 

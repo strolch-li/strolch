@@ -59,7 +59,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 			writeElement(activity);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write Activity {0} due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to write Activity {0} due to {1}";
 			msg = MessageFormat.format(msg, activity.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}
@@ -74,7 +74,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 			writeElement(order);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write Order {0} due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to write Order {0} due to {1}";
 			msg = MessageFormat.format(msg, order.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}
@@ -89,7 +89,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 			writeElement(resource);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write Resource {0} due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to write Resource {0} due to {1}";
 			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}

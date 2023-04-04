@@ -117,7 +117,7 @@ public class DbSchemaVersionCheck {
 			currentVersion = getCurrentVersion(con, this.app);
 			con.commit();
 		} catch (SQLException e) {
-			String msg = "Failed to open DB connection to {0} due to: {1}"; //$NON-NLS-1$
+			String msg = "Failed to open DB connection to {0} due to: {1}";
 			msg = MessageFormat.format(msg, ds, e.getMessage());
 			throw new DbException(msg, e);
 		}
@@ -139,7 +139,7 @@ public class DbSchemaVersionCheck {
 			return migrationType;
 
 		} catch (SQLException e) {
-			String msg = "Failed to open DB connection to {0} due to: {1}"; //$NON-NLS-1$
+			String msg = "Failed to open DB connection to {0} due to: {1}";
 			msg = MessageFormat.format(msg, ds, e.getMessage());
 			throw new DbException(msg, e);
 		}

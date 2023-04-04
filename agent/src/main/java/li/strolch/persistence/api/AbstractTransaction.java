@@ -86,10 +86,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate, String action,
 			boolean readOnly) {
-		DBC.PRE.assertNotNull("container must be set!", container); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("realm must be set!", realm); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("certificate must be set!", certificate); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("action must be set!", action); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("container must be set!", container);
+		DBC.PRE.assertNotNull("realm must be set!", realm);
+		DBC.PRE.assertNotNull("certificate must be set!", certificate);
+		DBC.PRE.assertNotNull("action must be set!", action);
 
 		TransactionThreadLocal.setTx(this);
 
@@ -499,7 +499,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		// Order/<type>/<id>/Bag/<id>/<param_id>
 
 		if (locator.getSize() < 3) {
-			String msg = "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}"; //$NON-NLS-1$
+			String msg = "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}";
 			msg = MessageFormat.format(msg, locator.toString());
 			throw new StrolchModelException(msg);
 		}
@@ -514,13 +514,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			case Tags.ORDER -> getOrderBy(type, id);
 			case Tags.ACTIVITY -> getActivityBy(type, id);
 			default -> throw new StrolchModelException(
-					MessageFormat.format("Unknown object class {0}", objectClassType)); //$NON-NLS-1$
+					MessageFormat.format("Unknown object class {0}", objectClassType));
 		};
 
 		if (rootElement == null) {
 			if (allowNull)
 				return null;
-			String msg = "No top level object could be found with locator {0}"; //$NON-NLS-1$
+			String msg = "No top level object could be found with locator {0}";
 			throw new StrolchModelException(MessageFormat.format(msg, locator));
 		}
 
@@ -536,7 +536,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			if (bag == null) {
 				if (allowNull)
 					return null;
-				String msg = "Could not find ParameterBag for locator {0} on element {1}"; //$NON-NLS-1$
+				String msg = "Could not find ParameterBag for locator {0} on element {1}";
 				throw new StrolchModelException(MessageFormat.format(msg, locator, rootElement.getLocator()));
 			}
 
@@ -548,7 +548,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			if (parameter == null) {
 				if (allowNull)
 					return null;
-				String msg = "Could not find Parameter for locator {0} on element {1}"; //$NON-NLS-1$
+				String msg = "Could not find Parameter for locator {0} on element {1}";
 				throw new StrolchModelException(MessageFormat.format(msg, locator, bag.getLocator()));
 			}
 			return (T) parameter;
@@ -556,7 +556,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		} else if (stateOrBagOrActivity.equals(Tags.TIMED_STATE)) {
 
 			if (elements.size() != 5) {
-				String msg = "Missing state Id on locator {0}"; //$NON-NLS-1$
+				String msg = "Missing state Id on locator {0}";
 				throw new StrolchModelException(MessageFormat.format(msg, locator));
 			}
 
@@ -574,7 +574,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				String next = iter.next();
 
 				if (!(element instanceof Activity)) {
-					String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified"; //$NON-NLS-1$
+					String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified";
 					throw new StrolchModelException(MessageFormat.format(msg, locator, next));
 				}
 
@@ -587,7 +587,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (allowNull)
 			return null;
 
-		String msg = "Invalid locator {0} with part {1}"; //$NON-NLS-1$
+		String msg = "Invalid locator {0} with part {1}";
 		throw new StrolchModelException(MessageFormat.format(msg, locator, stateOrBagOrActivity));
 	}
 
@@ -776,7 +776,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
 
 		if (assertExists && refP.isEmpty()) {
-			String msg = "The Order with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
+			String msg = "The Order with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\"";
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
@@ -890,7 +890,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
 
 		if (assertExists && refP.isEmpty()) {
-			String msg = "The Resource with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
+			String msg = "The Resource with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\"";
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
@@ -1020,7 +1020,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ACTIVITY_REF, refP);
 
 		if (assertExists && refP.isEmpty()) {
-			String msg = "The Activity with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\""; //$NON-NLS-1$
+			String msg = "The Activity with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\"";
 			throw new StrolchException(MessageFormat.format(msg, refP.getUom(), refP.getValue(), refP.getLocator()));
 		}
 
@@ -1553,7 +1553,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		} catch (Exception e) {
 			this.closeStrategy = TransactionCloseStrategy.ROLLBACK;
 
-			String msg = "Strolch Transaction for realm {0} failed due to {1}"; //$NON-NLS-1$
+			String msg = "Strolch Transaction for realm {0} failed due to {1}";
 			msg = MessageFormat.format(msg, getRealmName(), getExceptionMessage(e));
 			throw new StrolchTransactionException(msg, e);
 		}
@@ -1599,7 +1599,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 					handleRollback(start);
 				} catch (Exception exc) {
 					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(),
-							exc); //$NON-NLS-1$
+							exc);
 				}
 				logger.error("Transaction failed due to " + e.getMessage(), e);
 				handleFailure(false, start, ex);
@@ -1623,7 +1623,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableRollback() {
 		long start = System.nanoTime();
-		logger.warn(MessageFormat.format("Rolling back TX for realm {0}...", getRealmName())); //$NON-NLS-1$
+		logger.warn(MessageFormat.format("Rolling back TX for realm {0}...", getRealmName()));
 		try {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
 			undoCommands();
@@ -1709,22 +1709,22 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append("TX user=");
 		sb.append(this.certificate.getUsername());
 
-		sb.append(", realm="); //$NON-NLS-1$
+		sb.append(", realm=");
 		sb.append(getRealmName());
 
-		sb.append(", took="); //$NON-NLS-1$
+		sb.append(", took=");
 		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
-			sb.append(", close="); //$NON-NLS-1$
+			sb.append(", close=");
 			sb.append(formatNanoDuration(closeDuration));
 		}
 
 		if (isAuditTrailEnabled() && auditTrailDuration >= 100000000L) {
-			sb.append(", auditTrail="); //$NON-NLS-1$
+			sb.append(", auditTrail=");
 			sb.append(formatNanoDuration(auditTrailDuration));
 		}
 
@@ -1747,27 +1747,27 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append("TX user=");
 		sb.append(this.certificate.getUsername());
 
-		sb.append(", realm="); //$NON-NLS-1$
+		sb.append(", realm=");
 		sb.append(getRealmName());
 
-		sb.append(", took="); //$NON-NLS-1$
+		sb.append(", took=");
 		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
-			sb.append(", close="); //$NON-NLS-1$
+			sb.append(", close=");
 			sb.append(formatNanoDuration(closeDuration));
 		}
 
 		if (isAuditTrailEnabled() && auditTrailDuration >= 100000000L) {
-			sb.append(", auditTrail="); //$NON-NLS-1$
+			sb.append(", auditTrail=");
 			sb.append(formatNanoDuration(auditTrailDuration));
 		}
 
 		if (isObserverUpdatesEnabled() && observerUpdateDuration >= 100000000L) {
-			sb.append(", updates="); //$NON-NLS-1$
+			sb.append(", updates=");
 			sb.append(formatNanoDuration(observerUpdateDuration));
 		}
 		logger.info(sb.toString());
@@ -1786,17 +1786,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append("TX ROLLBACK user=");
 		sb.append(this.certificate.getUsername());
 
-		sb.append(", realm="); //$NON-NLS-1$
+		sb.append(", realm=");
 		sb.append(getRealmName());
 
-		sb.append(" failed="); //$NON-NLS-1$
+		sb.append(" failed=");
 		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
-			sb.append(", close="); //$NON-NLS-1$
+			sb.append(", close=");
 			sb.append(formatNanoDuration(closeDuration));
 		}
 		logger.warn(sb.toString());
@@ -1816,17 +1816,17 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		sb.append("TX FAILED user=");
 		sb.append(this.certificate.getUsername());
 
-		sb.append(", realm="); //$NON-NLS-1$
+		sb.append(", realm=");
 		sb.append(getRealmName());
 
-		sb.append(" failed="); //$NON-NLS-1$
+		sb.append(" failed=");
 		sb.append(formatNanoDuration(txDuration));
 
 		sb.append(", action=");
 		sb.append(this.action);
 
 		if (closeDuration >= 100000000L) {
-			sb.append(", close="); //$NON-NLS-1$
+			sb.append(", close=");
 			sb.append(formatNanoDuration(closeDuration));
 		}
 
@@ -1838,7 +1838,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 					"agent.tx.failed").withException(e).value("reason", e));
 		}
 
-		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}"; //$NON-NLS-1$
+		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}";
 		msg = MessageFormat.format(msg, getRealmName(), getExceptionMessage(e), sb.toString());
 		StrolchTransactionException ex = new StrolchTransactionException(msg, e);
 

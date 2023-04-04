@@ -70,7 +70,7 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple tuple)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
-					"Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
+					"Privilege.illegalArgument.nontuple");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -109,7 +109,7 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		}
 		default -> {
 			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
-					"Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+					"Privilege.userAccessPrivilege.unknownPrivilege");
 			msg = MessageFormat.format(msg, privilegeName);
 			throw new PrivilegeException(msg);
 		}

@@ -55,7 +55,7 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 			modelFile = modelFileName;
 
 			if (!modelFile.exists()) {
-				String msg = "Model File does not exist at {0}"; //$NON-NLS-1$
+				String msg = "Model File does not exist at {0}";
 				msg = MessageFormat.format(msg, modelFile.getAbsolutePath());
 				throw new StrolchException(msg);
 			}
@@ -65,7 +65,7 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 			modelFile = new File(dataPath, arg.modelFileName);
 
 			if (!modelFile.exists()) {
-				String msg = "Model File does not exist with name {0} in data path {1}"; //$NON-NLS-1$
+				String msg = "Model File does not exist with name {0} in data path {1}";
 				msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
 				throw new StrolchException(msg);
 			}

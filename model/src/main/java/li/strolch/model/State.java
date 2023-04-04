@@ -29,16 +29,16 @@ import li.strolch.utils.dbc.DBC;
  */
 public enum State {
 
-	CREATED("Created"), //$NON-NLS-1$
-	PLANNING("Planning"), //$NON-NLS-1$
-	PLANNED("Planned"), //$NON-NLS-1$
-	EXECUTABLE("Executable"), //$NON-NLS-1$
-	EXECUTION("Execution"), //$NON-NLS-1$
-	WARNING("Warning"), //$NON-NLS-1$
-	ERROR("Error"), //$NON-NLS-1$
-	STOPPED("Stopped"), //$NON-NLS-1$
-	EXECUTED("Executed"), //$NON-NLS-1$
-	CLOSED("Closed"); //$NON-NLS-1$
+	CREATED("Created"),
+	PLANNING("Planning"),
+	PLANNED("Planned"),
+	EXECUTABLE("Executable"),
+	EXECUTION("Execution"),
+	WARNING("Warning"),
+	ERROR("Error"),
+	STOPPED("Stopped"),
+	EXECUTED("Executed"),
+	CLOSED("Closed");
 
 	private final String state;
 

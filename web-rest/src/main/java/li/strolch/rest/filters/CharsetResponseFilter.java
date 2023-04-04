@@ -33,7 +33,7 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class CharsetResponseFilter implements ContainerResponseFilter {
 
-	private static final String UTF_8 = "utf-8"; //$NON-NLS-1$
+	private static final String UTF_8 = "utf-8";
 
 	@Override
 	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {

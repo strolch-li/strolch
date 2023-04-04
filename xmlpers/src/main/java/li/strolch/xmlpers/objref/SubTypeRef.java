@@ -63,14 +63,14 @@ public class SubTypeRef extends ObjectRef {
 
 	@Override
 	public ObjectRef getChildTypeRef(PersistenceTransaction tx, String type) {
-		String msg = MessageFormat.format("A SubType has no child type: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("A SubType has no child type: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
 	@Override
 	public <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx) {
 		String msg = MessageFormat
-				.format("{0} is not a leaf and can thus not have a Persistence Context", getName()); //$NON-NLS-1$
+				.format("{0} is not a leaf and can thus not have a Persistence Context", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 

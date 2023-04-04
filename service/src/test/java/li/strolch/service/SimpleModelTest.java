@@ -24,8 +24,8 @@ import org.junit.Test;
 
 public class SimpleModelTest {
 
-	private static final String RUNTIME_PATH = "target/SimpleModelTest/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/transienttest"; //$NON-NLS-1$
+	private static final String RUNTIME_PATH = "target/SimpleModelTest/";
+	private static final String CONFIG_SRC = "src/test/resources/transienttest";
 
 	private static RuntimeMock runtimeMock;
 	private static Certificate certificate;

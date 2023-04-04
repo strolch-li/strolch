@@ -20,6 +20,6 @@ package li.strolch.xmlpers.test.impl;
  */
 public class TestConstants {
 
-	public static final String TYPE_RES = "Resource"; //$NON-NLS-1$
-	public static final String TYPE_BOOK = "Book"; //$NON-NLS-1$
+	public static final String TYPE_RES = "Resource";
+	public static final String TYPE_BOOK = "Book";
 }

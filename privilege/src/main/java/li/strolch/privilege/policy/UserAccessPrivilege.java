@@ -67,7 +67,7 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple tuple)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
+					.getString("Privilege.illegalArgument.nontuple");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -124,7 +124,7 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 			return checkByAllowDenyValues(ctx, privilege, restrictable, roleName, assertHasPrivilege);
 		}
 		default -> {
-			String msg = PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+			String msg = PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege");
 			msg = MessageFormat.format(msg, privilegeName, this.getClass().getName());
 			throw new PrivilegeException(msg);
 		}

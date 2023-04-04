@@ -94,16 +94,16 @@ public final class User {
 			Map<String, String> propertyMap, boolean passwordChangeRequested, UserHistory history) {
 
 		if (StringHelper.isEmpty(userId))
-			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No UserId defined!");
 		if (userState == null)
-			throw new PrivilegeException("No userState defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No userState defined!");
 		if (StringHelper.isEmpty(username))
-			throw new PrivilegeException("No username defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No username defined!");
 		if (userState != UserState.SYSTEM) {
 			if (StringHelper.isEmpty(lastname))
-				throw new PrivilegeException("No lastname defined!"); //$NON-NLS-1$
+				throw new PrivilegeException("No lastname defined!");
 			if (StringHelper.isEmpty(firstname))
-				throw new PrivilegeException("No firstname defined!"); //$NON-NLS-1$
+				throw new PrivilegeException("No firstname defined!");
 		}
 
 		if (history == null)

@@ -74,19 +74,19 @@ public final class PrivilegeImpl implements IPrivilege {
 	public PrivilegeImpl(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 
 		if (StringHelper.isEmpty(name)) {
-			throw new PrivilegeException("No name defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No name defined!");
 		}
 		if (StringHelper.isEmpty(policy)) {
 			throw new PrivilegeException(
-					MessageFormat.format("Policy may not be empty for Privilege {0}!", name)); //$NON-NLS-1$
+					MessageFormat.format("Policy may not be empty for Privilege {0}!", name));
 		}
 		if (denyList == null) {
 			throw new PrivilegeException(
-					MessageFormat.format("denyList is null for Privilege {0}!", name)); //$NON-NLS-1$
+					MessageFormat.format("denyList is null for Privilege {0}!", name));
 		}
 		if (allowList == null) {
 			throw new PrivilegeException(
-					MessageFormat.format("allowList is null for Privilege {0}!", name)); //$NON-NLS-1$
+					MessageFormat.format("allowList is null for Privilege {0}!", name));
 		}
 
 		this.name = name;

@@ -56,7 +56,7 @@ public class RoleRep implements Serializable {
 	 */
 	public void validate() {
 		if (StringHelper.isEmpty(this.name))
-			throw new PrivilegeException("name is null"); //$NON-NLS-1$
+			throw new PrivilegeException("name is null");
 
 		if (this.privileges != null && !this.privileges.isEmpty()) {
 			for (PrivilegeRep privilege : this.privileges) {

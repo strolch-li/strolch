@@ -100,7 +100,7 @@ public class DateRange {
 
 	private void validate() {
 		if (this.toDate != null && this.fromDate != null)
-			DBC.INTERIM.assertTrue("From must be before to!", this.toDate.compareTo(this.fromDate) >= 0); //$NON-NLS-1$
+			DBC.INTERIM.assertTrue("From must be before to!", this.toDate.compareTo(this.fromDate) >= 0);
 	}
 
 	public boolean isFromInclusive() {
@@ -191,7 +191,7 @@ public class DateRange {
 	}
 
 	public boolean contains(ZonedDateTime date) {
-		DBC.PRE.assertNotNull("Date must be given!", date); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Date must be given!", date);
 		if (this.fromDate == null && this.toDate == null)
 			return true;
 

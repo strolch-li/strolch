@@ -64,12 +64,12 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		if (modelFile.exists()) {
 			if (!arg.overwrite) {
 				if (modelFileName.isAbsolute()) {
-					String msg = "Model File already exists at path {0}"; //$NON-NLS-1$
+					String msg = "Model File already exists at path {0}";
 					msg = MessageFormat.format(msg, arg.modelFileName);
 					return ServiceResult.error(msg);
 				}
 
-				String msg = "Model File already exists with name {0} in data path {1}"; //$NON-NLS-1$
+				String msg = "Model File already exists with name {0} in data path {1}";
 				msg = MessageFormat.format(msg, arg.modelFileName, dataPath);
 				return ServiceResult.error(msg);
 			}
@@ -101,9 +101,9 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		ModelStatistics statistics = command.getStatistics();
 		String msg = "Wrote XML Model file {0} for realm {1}: {2} at path: {3}";
 		logger.info(MessageFormat.format(msg, modelFile.getName(), realm, statistics, modelFile.getAbsolutePath()));
-		logger.info(MessageFormat.format("Wrote {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Wrote {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Wrote {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Wrote {0} Orders", statistics.nrOfOrders));
+		logger.info(MessageFormat.format("Wrote {0} Resources", statistics.nrOfResources));
+		logger.info(MessageFormat.format("Wrote {0} Activities", statistics.nrOfActivities));
 		return ServiceResult.success();
 	}
 }
