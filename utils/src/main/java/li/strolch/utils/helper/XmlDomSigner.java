@@ -167,9 +167,9 @@ public class XmlDomSigner {
 				}
 				throw new RuntimeException("Uh-oh validation, failed!");
 			}
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
-			if (e instanceof RuntimeException)
-				throw (RuntimeException) e;
 			throw new RuntimeException("Failed to validate document", e);
 		}
 	}
@@ -186,8 +186,7 @@ public class XmlDomSigner {
 
 			if (indent) {
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-				transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount",
-						"2"); //$NON-NLS-2$
+				transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-2$
 			}
 
 			transformer.transform(new DOMSource(doc), new StreamResult(out));
