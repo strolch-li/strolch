@@ -12,15 +12,35 @@ public abstract class TimedStateBuilder<T extends StrolchTimedState<?>> {
 	protected final String id;
 	protected final String name;
 
-	protected final boolean hidden = false;
+	protected boolean hidden = false;
 	protected int index;
-	protected final String interpretation = INTERPRETATION_NONE;
-	protected final String uom = UOM_NONE;
+	protected String interpretation = INTERPRETATION_NONE;
+	protected String uom = UOM_NONE;
 
 	public TimedStateBuilder(ResourceBuilder builder, String id, String name) {
 		this.builder = builder;
 		this.id = id;
 		this.name = name;
+	}
+
+	public TimedStateBuilder<T> hidden(boolean hidden) {
+		this.hidden = hidden;
+		return this;
+	}
+
+	public TimedStateBuilder<T> index(int index) {
+		this.index = index;
+		return this;
+	}
+
+	public TimedStateBuilder<T> interpretation(String interpretation) {
+		this.interpretation = interpretation;
+		return this;
+	}
+
+	public TimedStateBuilder<T> uom(String uom) {
+		this.uom = uom;
+		return this;
 	}
 
 	public ResourceBuilder end() {
