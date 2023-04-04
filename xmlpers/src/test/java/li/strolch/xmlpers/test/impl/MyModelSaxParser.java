@@ -79,9 +79,7 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 			String value = attributes.getValue("value");
 			this.resource.addParameter(new MyParameter(id, name, type, value));
 		}
-		default -> {
-			throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
-		}
+		default -> throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
 		}
 	}
 }
