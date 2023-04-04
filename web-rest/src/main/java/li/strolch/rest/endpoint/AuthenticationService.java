@@ -197,8 +197,7 @@ public class AuthenticationService {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			String msg = e.getMessage();
-			logoutResult.addProperty("msg",
-					MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
+			logoutResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
 			return Response.serverError().entity(logoutResult.toString()).build();
 		}
 	}
@@ -469,7 +468,16 @@ public class AuthenticationService {
 
 	private static NewCookie getNewCookie(String strolchAuthorization, String authToken, String path, String domain,
 			int version, String comment, int cookieMaxAge, Date expiry, boolean secureCookie, boolean httpOnly) {
-		return new NewCookie(strolchAuthorization, authToken, path, domain, version, comment, cookieMaxAge, expiry,
-				secureCookie, httpOnly);
+		return new NewCookie.Builder(strolchAuthorization) //
+				.value(authToken)
+				.path(path)
+				.domain(domain)
+				.version(version)
+				.comment(comment)
+				.maxAge(cookieMaxAge)
+				.expiry(expiry)
+				.secure(secureCookie)
+				.httpOnly(httpOnly)
+				.build();
 	}
 }
