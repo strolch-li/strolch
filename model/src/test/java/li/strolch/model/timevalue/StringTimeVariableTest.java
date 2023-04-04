@@ -55,7 +55,7 @@ public class StringTimeVariableTest {
 	@Before
 	public void init() {
 		this.timeVariable = new TimeVariable<>();
-		for (Long i = 0L; i < MAX; i += STEP) {
+		for (long i = 0L; i < MAX; i += STEP) {
 			Set<AString> testSet = new HashSet<>();
 			StringSetValue testValue = new StringSetValue(testSet);
 			this.testSets.put(i, testValue);
@@ -119,7 +119,7 @@ public class StringTimeVariableTest {
 	public void testCompact() {
 
 		this.timeVariable = new TimeVariable<>();
-		for (Long i = 0L; i < MAX; i += STEP) {
+		for (long i = 0L; i < MAX; i += STEP) {
 			Set<AString> testSet = new HashSet<>();
 			StringSetValue testValue = new StringSetValue(testSet);
 			this.testSets.put(i, testValue);

@@ -78,7 +78,7 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 		return this.policyModel;
 	}
 
-	public class PolicyModel {
+	public static class PolicyModel {
 		private final Map<String, PolicyType> policyTypes;
 
 		public PolicyModel() {

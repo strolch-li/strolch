@@ -52,7 +52,7 @@ public class IntegerTimeVariableTest {
 		this.timeVariable = new TimeVariable<>();
 		for (int i = 0; i < MAX; i += STEP) {
 			IntegerValue expectedValue = new IntegerValue(i);
-			Long time = (long) i;
+			long time = (long) i;
 			this.expectedValues.put(time, expectedValue);
 			this.timeVariable.setValueAt(time, expectedValue);
 		}
@@ -71,12 +71,12 @@ public class IntegerTimeVariableTest {
 	public void testGetFutureValues() {
 		Collection<ITimeValue<IntegerValue>> futureValues = this.timeVariable.getFutureValues(PICK);
 		Long expectedTime = PICK;
-		Integer expectedValue = PICK.intValue();
+		int expectedValue = PICK.intValue();
 		for (ITimeValue<IntegerValue> value : futureValues) {
 			assertEquals(expectedTime, value.getTime());
 			assertTrue(value.getValue().matches(new IntegerValue(expectedValue)));
 			expectedTime += STEP;
-			expectedValue += STEP.intValue();
+			expectedValue += STEP;
 		}
 	}
 
@@ -87,12 +87,12 @@ public class IntegerTimeVariableTest {
 	public void testGetPastValues() {
 		Collection<ITimeValue<IntegerValue>> pastValues = this.timeVariable.getPastValues(MAX);
 		Long expectedTime = 0L;
-		Integer expectedValue = expectedTime.intValue();
+		int expectedValue = expectedTime.intValue();
 		for (ITimeValue<IntegerValue> value : pastValues) {
 			assertEquals(expectedTime, value.getTime());
 			assertTrue(value.getValue().matches(new IntegerValue(expectedValue)));
 			expectedTime += STEP;
-			expectedValue += STEP.intValue();
+			expectedValue += STEP;
 		}
 	}
 
@@ -102,7 +102,7 @@ public class IntegerTimeVariableTest {
 	@Test
 	public void testApplyChange() {
 
-		IntegerValue integerValue = new IntegerValue(STEP.intValue());
+		IntegerValue integerValue = new IntegerValue(STEP);
 
 		IValueChange<IntegerValue> change = new ValueChange<>(PICK, integerValue);
 		this.timeVariable.applyChange(change, false);
@@ -115,7 +115,7 @@ public class IntegerTimeVariableTest {
 			assertEquals(expectedTime, value.getTime());
 			assertTrue(expectedValue.matches(value.getValue()));
 			expectedTime += STEP;
-			expectedValue = expectedValue.add(STEP.intValue());
+			expectedValue = expectedValue.add(STEP);
 		}
 	}
 
@@ -125,8 +125,8 @@ public class IntegerTimeVariableTest {
 	@Test
 	public void testCompact() {
 		this.timeVariable = new TimeVariable<>();
-		for (Long i = 0L; i < MAX; i += STEP) {
-			this.timeVariable.setValueAt(i, new IntegerValue(STEP.intValue()));
+		for (long i = 0L; i < MAX; i += STEP) {
+			this.timeVariable.setValueAt(i, new IntegerValue(STEP));
 		}
 
 		// call
