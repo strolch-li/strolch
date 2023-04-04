@@ -26,8 +26,8 @@ public class XmlExportModelArgument extends ServiceArgument {
 	public boolean overwrite;
 	public boolean multiFile;
 	public boolean doOrders = true;
-	public final boolean doResources = true;
-	public final boolean doActivities = true;
+	public boolean doResources = true;
+	public boolean doActivities = true;
 	public final Set<String> orderTypes = new HashSet<>();
 	public final Set<String> resourceTypes = new HashSet<>();
 	public final Set<String> activityTypes = new HashSet<>();
@@ -55,21 +55,21 @@ public class XmlExportModelArgument extends ServiceArgument {
 		if (this.doActivities)
 			builder.append(", activities");
 
-		if (this.resourceTypes != null && !this.resourceTypes.isEmpty()) {
+		if (!this.resourceTypes.isEmpty()) {
 			builder.append(", resourceTypes=");
 			builder.append(this.resourceTypes);
 		} else {
 			builder.append(", resourceTypes=*");
 		}
 
-		if (this.orderTypes != null && !this.orderTypes.isEmpty()) {
+		if (!this.orderTypes.isEmpty()) {
 			builder.append(", orderTypes=");
 			builder.append(this.orderTypes);
 		} else {
 			builder.append(", orderTypes=*");
 		}
 
-		if (this.activityTypes != null && !this.activityTypes.isEmpty()) {
+		if (!this.activityTypes.isEmpty()) {
 			builder.append(", activityTypes=");
 			builder.append(this.activityTypes);
 		} else {
