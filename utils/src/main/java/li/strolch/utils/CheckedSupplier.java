@@ -2,5 +2,5 @@ package li.strolch.utils;
 
 @FunctionalInterface
 public interface CheckedSupplier<T> {
-	T get();
+	T get() throws Exception;
 }

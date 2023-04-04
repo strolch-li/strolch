@@ -2,5 +2,5 @@ package li.strolch.utils;
 
 @FunctionalInterface
 public interface CheckedRunnable {
-	void run();
+	void run() throws Exception;
 }

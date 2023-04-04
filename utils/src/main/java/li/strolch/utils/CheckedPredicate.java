@@ -2,5 +2,5 @@ package li.strolch.utils;
 
 @FunctionalInterface
 public interface CheckedPredicate {
-	boolean test();
+	boolean test() throws Exception;
 }
