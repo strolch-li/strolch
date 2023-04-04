@@ -332,6 +332,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(byte b) {
 
 		StringBuilder sb = new StringBuilder();
@@ -356,6 +357,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(short i) {
 
 		StringBuilder sb = new StringBuilder();
@@ -391,6 +393,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(int i) {
 
 		StringBuilder sb = new StringBuilder();
@@ -448,6 +451,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(long i) {
 
 		StringBuilder sb = new StringBuilder();

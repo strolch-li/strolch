@@ -52,9 +52,8 @@ public class IntegerTimeVariableTest {
 		this.timeVariable = new TimeVariable<>();
 		for (int i = 0; i < MAX; i += STEP) {
 			IntegerValue expectedValue = new IntegerValue(i);
-			long time = (long) i;
-			this.expectedValues.put(time, expectedValue);
-			this.timeVariable.setValueAt(time, expectedValue);
+			this.expectedValues.put((long) i, expectedValue);
+			this.timeVariable.setValueAt(i, expectedValue);
 		}
 	}
 

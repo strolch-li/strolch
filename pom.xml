@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>li.strolch</groupId>
@@ -27,12 +27,12 @@
     <licenses>
         <license>
             <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
     <organization>
         <name>Strolch</name>
-        <url>http://www.strolch.li</url>
+        <url>https://www.strolch.li</url>
     </organization>
 
     <developers>
@@ -40,7 +40,7 @@
             <id>eitch</id>
             <name>Robert von Burg</name>
             <email>eitch@eitchnet.ch</email>
-            <url>http://www.eitchnet.ch</url>
+            <url>https://www.eitchnet.ch</url>
             <roles>
                 <role>architect</role>
                 <role>developer</role>
@@ -765,52 +765,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs-maven-plugin.version}</version>
-                <reportSets>
-                    <reportSet>
-                        <id>spotbugs</id>
-                        <inherited>false</inherited>
-                        <reports>
-                            <report>spotbugs</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${pmd-maven-plugin.version}</version>
-                <reportSets>
-                    <reportSet>
-                        <!-- aggregate reportSet, to define in poms having modules -->
-                        <id>aggregate</id>
-                        <inherited>false</inherited> <!-- don't run aggregate in child modules -->
-                        <reports>
-                            <report>aggregate-pmd</report>
-                            <report>aggregate-cpd</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <configuration>
-                    <failBuildOnCVSS>8</failBuildOnCVSS>
-                    <yarnAuditAnalyzerEnabled>false</yarnAuditAnalyzerEnabled>
-                    <suppressionFiles>${dependency-check-suppressions-file}</suppressionFiles>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
             </plugin>
         </plugins>
     </reporting>
