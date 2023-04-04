@@ -30,17 +30,17 @@ public class TransientTransaction extends AbstractTransaction {
 	}
 
 	@Override
-	protected void writeChanges() {
+	protected void writeChanges() throws Exception {
 		// do nothing
 	}
 
 	@Override
-	protected void rollback() {
+	protected void rollback() throws Exception {
 		getTxResult().setState(TransactionState.ROLLED_BACK);
 	}
 
 	@Override
-	protected void commit() {
+	protected void commit() throws Exception {
 		getTxResult().setState(TransactionState.COMMITTED);
 	}
 

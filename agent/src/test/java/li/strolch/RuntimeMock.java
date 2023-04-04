@@ -201,6 +201,6 @@ public class RuntimeMock implements AutoCloseable {
 
 	public interface StrolchRunnable {
 
-		void run(StrolchAgent agent);
+		void run(StrolchAgent agent) throws Exception;
 	}
 }
