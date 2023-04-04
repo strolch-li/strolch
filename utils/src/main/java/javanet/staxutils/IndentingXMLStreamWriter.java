@@ -31,11 +31,12 @@
  */
 package javanet.staxutils;
 
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import javanet.staxutils.helpers.StreamWriterDelegate;
-import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,7 +277,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 				writeEndElement(); // indented
 			}
 		} catch (Exception ignorable) {
-			logger.error("Ignoring exception " + ExceptionHelper.getExceptionMessage(ignorable, true), ignorable);
+			logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
 		}
 		this.out.writeEndDocument();
 		afterEndDocument();
@@ -296,7 +297,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 					afterMarkup(); // indentation was written
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Failed beforeMarkup: " + getExceptionMessage(e, true), e);
 			}
 		}
 	}
@@ -345,7 +346,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 			try {
 				writeNewLine(this.depth - 1);
 			} catch (Exception ignorable) {
-				logger.error("Ignoring exception " + ExceptionHelper.getExceptionMessage(ignorable, true), ignorable);
+				logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
 			}
 		}
 	}
@@ -367,7 +368,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 			try {
 				writeNewLine(0);
 			} catch (Exception ignorable) {
-				logger.error("Ignoring exception " + ExceptionHelper.getExceptionMessage(ignorable, true), ignorable);
+				logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
 			}
 		}
 		this.stack[this.depth] = 0; // start fresh
