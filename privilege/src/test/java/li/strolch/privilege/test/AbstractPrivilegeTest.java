@@ -60,9 +60,9 @@ public class AbstractPrivilegeTest {
 			File dstRoles = new File(targetPath, rolesFilename);
 
 			// write config
-			String config = new String(Files.readAllBytes(privilegeConfigFile.toPath()), StandardCharsets.UTF_8);
+			String config = Files.readString(privilegeConfigFile.toPath());
 			config = config.replace("${target}", dst);
-			Files.write(dstConfig.toPath(), config.getBytes(StandardCharsets.UTF_8));
+			Files.writeString(dstConfig.toPath(), config);
 
 			// copy model
 			Files.copy(privilegeUsersFile.toPath(), dstUsers.toPath());
