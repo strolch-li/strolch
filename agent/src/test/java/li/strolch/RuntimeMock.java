@@ -51,8 +51,8 @@ public class RuntimeMock implements AutoCloseable {
 
 	private ComponentContainer container;
 	private StrolchAgent agent;
-	private File targetPathF;
-	private File srcPathF;
+	private final File targetPathF;
+	private final File srcPathF;
 
 	public RuntimeMock(String targetPath, String srcPath) {
 		this.targetPathF = new File(targetPath);
@@ -115,8 +115,8 @@ public class RuntimeMock implements AutoCloseable {
 						this.targetPathF.getAbsolutePath()));
 
 		// setup the container
-		this.agent = new StrolchBootstrapper(getAppVersion())
-				.setupByCopyingRoot("dev", this.srcPathF, this.targetPathF);
+		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", this.srcPathF,
+				this.targetPathF);
 
 		return this;
 	}
@@ -196,8 +196,7 @@ public class RuntimeMock implements AutoCloseable {
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to read " + StrolchAgent.AGENT_VERSION_PROPERTIES, e);
 		}
-		StrolchVersion version = new StrolchVersion(properties);
-		return version;
+		return new StrolchVersion(properties);
 	}
 
 	public interface StrolchRunnable {

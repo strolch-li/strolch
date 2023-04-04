@@ -25,9 +25,9 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 public class ComponentController {
 
-	private StrolchComponent component;
-	private Set<ComponentController> upstreamDependencies;
-	private Set<ComponentController> downstreamDependencies;
+	private final StrolchComponent component;
+	private final Set<ComponentController> upstreamDependencies;
+	private final Set<ComponentController> downstreamDependencies;
 
 	public ComponentController(StrolchComponent component) {
 		if (component == null)

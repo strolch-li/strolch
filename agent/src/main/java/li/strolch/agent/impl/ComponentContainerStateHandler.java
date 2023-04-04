@@ -35,8 +35,8 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
 public class ComponentContainerStateHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerStateHandler.class);
-	private ComponentDependencyAnalyzer dependencyAnalyzer;
-	private StrolchConfiguration strolchConfiguration;
+	private final ComponentDependencyAnalyzer dependencyAnalyzer;
+	private final StrolchConfiguration strolchConfiguration;
 
 	public ComponentContainerStateHandler(ComponentDependencyAnalyzer dependencyAnalyzer,
 			StrolchConfiguration strolchConfiguration) {

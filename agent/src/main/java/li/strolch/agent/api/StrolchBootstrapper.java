@@ -68,7 +68,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	private File dataPathF;
 	private File tempPathF;
 
-	private StrolchVersion appVersion;
+	private final StrolchVersion appVersion;
 
 	/**
 	 * <p>

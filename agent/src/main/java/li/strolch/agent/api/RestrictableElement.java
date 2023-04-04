@@ -24,8 +24,8 @@ import li.strolch.privilege.model.Restrictable;
  */
 public class RestrictableElement implements Restrictable {
 
-	private String name;
-	private Object value;
+	private final String name;
+	private final Object value;
 
 	public RestrictableElement(String name, Object value) {
 		super();
