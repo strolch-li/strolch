@@ -30,7 +30,7 @@ import li.strolch.xmlpers.objref.TypeRef;
 
 public abstract class AbstractDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
-	protected PersistenceTransaction tx;
+	protected final PersistenceTransaction tx;
 
 	protected AbstractDao(StrolchTransaction tx) {
 		XmlStrolchTransaction strolchTx = (XmlStrolchTransaction) tx;

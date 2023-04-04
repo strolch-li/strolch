@@ -12,10 +12,10 @@ public abstract class TimedStateBuilder<T extends StrolchTimedState<?>> {
 	protected final String id;
 	protected final String name;
 
-	protected boolean hidden = false;
+	protected final boolean hidden = false;
 	protected int index;
-	protected String interpretation = INTERPRETATION_NONE;
-	protected String uom = UOM_NONE;
+	protected final String interpretation = INTERPRETATION_NONE;
+	protected final String uom = UOM_NONE;
 
 	public TimedStateBuilder(ResourceBuilder builder, String id, String name) {
 		this.builder = builder;

@@ -8,7 +8,7 @@ import li.strolch.policy.StrolchPolicy;
 
 public abstract class PlanningPolicy extends StrolchPolicy {
 
-	public static PolicyDef DEFAULT_PLANNING = PolicyDef.getKeyPolicy(PlanningPolicy.class, "DefaultPlanning");
+	public static final PolicyDef DEFAULT_PLANNING = PolicyDef.getKeyPolicy(PlanningPolicy.class, "DefaultPlanning");
 
 	public PlanningPolicy(StrolchTransaction tx) {
 		super(tx);

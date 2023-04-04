@@ -48,7 +48,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	private Controller controller;
 	private boolean stopped;
 
-	protected String realm;
+	protected final String realm;
 	protected String actionType;
 	protected Locator resourceLoc;
 	protected Locator actionLoc;

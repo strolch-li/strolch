@@ -51,8 +51,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(XmlModelSaxReader.class);
 
-	protected StrolchElementListener listener;
-	protected ModelStatistics statistics;
+	protected final StrolchElementListener listener;
+	protected final ModelStatistics statistics;
 
 	private GroupedParameterizedElement parameterizedElement;
 	private TextParameter textParam;

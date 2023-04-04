@@ -123,7 +123,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		String lastname;
 		UserState userState;
 		Locale locale;
-		Set<String> userRoles;
+		final Set<String> userRoles;
 		Map<String, String> parameters;
 		UserHistory history;
 		boolean passwordChangeRequested;
@@ -239,7 +239,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 		// <Property name="organizationalUnit" value="Development" />
 
-		public Map<String, String> parameterMap = new HashMap<>();
+		public final Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {

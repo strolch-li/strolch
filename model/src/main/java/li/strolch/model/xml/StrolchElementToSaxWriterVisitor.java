@@ -46,7 +46,7 @@ import li.strolch.utils.iso8601.ISO8601;
  */
 public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisitor<Void> {
 
-	protected XMLStreamWriter writer;
+	protected final XMLStreamWriter writer;
 
 	public StrolchElementToSaxWriterVisitor(XMLStreamWriter writer) {
 		this.writer = writer;

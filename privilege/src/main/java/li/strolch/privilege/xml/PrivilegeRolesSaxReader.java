@@ -189,7 +189,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 //	      <Property name="organizationalUnit" value="Development" />
 
-		public Map<String, String> parameterMap = new HashMap<>();
+		public final Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {

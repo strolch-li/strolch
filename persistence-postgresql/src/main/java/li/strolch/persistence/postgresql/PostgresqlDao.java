@@ -66,10 +66,10 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	private static final String queryAllByTypeAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
 
 	protected final DataType dataType;
-	protected Connection connection;
+	protected final Connection connection;
 	protected final TransactionResult txResult;
 	protected final boolean versioningEnabled;
-	protected List<DaoCommand> commands;
+	protected final List<DaoCommand> commands;
 
 	public PostgresqlDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {

@@ -159,7 +159,7 @@ public class LockingTest extends AbstractPersistenceTest {
 	public abstract class AbstractWorker extends Thread {
 
 		protected boolean success;
-		protected String resourceId;
+		protected final String resourceId;
 
 		public AbstractWorker(String name, String resourceId) {
 			super(name);

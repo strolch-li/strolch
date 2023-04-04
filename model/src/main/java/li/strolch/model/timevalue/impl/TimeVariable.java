@@ -33,7 +33,7 @@ import li.strolch.model.timevalue.IValueChange;
 @SuppressWarnings("rawtypes")
 public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Serializable {
 
-	public NavigableSet<ITimeValue<T>> container = new TreeSet<>();
+	public final NavigableSet<ITimeValue<T>> container = new TreeSet<>();
 	private boolean readonly;
 
 	@Override

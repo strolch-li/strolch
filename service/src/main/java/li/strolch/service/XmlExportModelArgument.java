@@ -26,11 +26,11 @@ public class XmlExportModelArgument extends ServiceArgument {
 	public boolean overwrite;
 	public boolean multiFile;
 	public boolean doOrders = true;
-	public boolean doResources = true;
-	public boolean doActivities = true;
-	public Set<String> orderTypes = new HashSet<>();
-	public Set<String> resourceTypes = new HashSet<>();
-	public Set<String> activityTypes = new HashSet<>();
+	public final boolean doResources = true;
+	public final boolean doActivities = true;
+	public final Set<String> orderTypes = new HashSet<>();
+	public final Set<String> resourceTypes = new HashSet<>();
+	public final Set<String> activityTypes = new HashSet<>();
 
 	@Override
 	public String toString() {

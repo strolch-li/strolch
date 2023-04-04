@@ -47,7 +47,7 @@ public abstract class StreamWriterDelegate implements XMLStreamWriter {
 		this.out = out;
 	}
 
-	protected XMLStreamWriter out;
+	protected final XMLStreamWriter out;
 
 	@Override
 	public Object getProperty(String name) throws IllegalArgumentException {

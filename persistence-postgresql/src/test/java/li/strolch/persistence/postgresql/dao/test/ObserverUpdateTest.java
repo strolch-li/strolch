@@ -82,7 +82,7 @@ public class ObserverUpdateTest {
 
 	public static final class ElementAddedObserver implements Observer {
 
-		Map<String, ModificationResult> results = new HashMap<>();
+		final Map<String, ModificationResult> results = new HashMap<>();
 
 		private ModificationResult getModificationResult(String key) {
 			ModificationResult result = this.results.get(key);

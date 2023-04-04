@@ -48,7 +48,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Void> {
 
-	protected ContentHandler contentHandler;
+	protected final ContentHandler contentHandler;
 
 	public StrolchElementToSaxVisitor(ContentHandler contentHandler) {
 		this.contentHandler = contentHandler;

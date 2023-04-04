@@ -42,10 +42,10 @@ import org.slf4j.LoggerFactory;
 public abstract class PostgreSqlInitializer extends SystemAction {
 
 	protected static final Logger logger = LoggerFactory.getLogger(PostgreSqlInitializer.class);
-	protected StrolchAgent agent;
-	protected PostgreSqlPersistenceHandler persistenceHandler;
-	protected RuntimeConfiguration runtimeConfig;
-	protected ComponentConfiguration realmConfig;
+	protected final StrolchAgent agent;
+	protected final PostgreSqlPersistenceHandler persistenceHandler;
+	protected final RuntimeConfiguration runtimeConfig;
+	protected final ComponentConfiguration realmConfig;
 
 	public PostgreSqlInitializer(StrolchAgent agent, PostgreSqlPersistenceHandler persistenceHandler) {
 		this.agent = agent;

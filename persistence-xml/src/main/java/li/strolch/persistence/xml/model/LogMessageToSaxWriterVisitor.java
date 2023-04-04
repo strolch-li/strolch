@@ -15,7 +15,7 @@ import li.strolch.utils.iso8601.ISO8601;
 
 public class LogMessageToSaxWriterVisitor {
 
-	protected XMLStreamWriter writer;
+	protected final XMLStreamWriter writer;
 
 	public LogMessageToSaxWriterVisitor(XMLStreamWriter writer) {
 		this.writer = writer;

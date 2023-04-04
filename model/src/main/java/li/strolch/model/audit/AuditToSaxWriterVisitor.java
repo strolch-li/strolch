@@ -11,7 +11,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 
-	protected XMLStreamWriter writer;
+	protected final XMLStreamWriter writer;
 
 	public AuditToSaxWriterVisitor(XMLStreamWriter writer) {
 		this.writer = writer;
