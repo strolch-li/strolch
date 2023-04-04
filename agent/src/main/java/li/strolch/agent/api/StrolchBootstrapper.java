@@ -406,7 +406,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 			}
 
 			String defaultS = attributes.getValue(DEFAULT);
-			this.defaultAllowed = defaultS == null ? false : StringHelper.parseBoolean(defaultS);
+			this.defaultAllowed = defaultS != null && StringHelper.parseBoolean(defaultS);
 
 			break;
 

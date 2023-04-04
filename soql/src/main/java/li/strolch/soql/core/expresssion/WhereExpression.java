@@ -11,7 +11,7 @@ public class WhereExpression extends AbstractBooleanExpression {
 
 	@Override
 	public boolean evaluate(Map<String, Object> inputObjects, Map<String, Object> queryParameter) {
-		return (orExpression == null) ? true : orExpression.evaluate(inputObjects, queryParameter);
+		return orExpression == null || orExpression.evaluate(inputObjects, queryParameter);
 	}
 
 	public void setOrExpression(OrExpression orExpression) {
