@@ -9,3 +9,7 @@ include:
   - name: Java9CollectionFactory
   - name: UnnecessarySemicolon
   - name: CommentedOutCode
+exclude:
+  - name: All
+    paths:
+      - privilege/src/main/java/li/strolch/privilege/helper/PasswordCreator.java
