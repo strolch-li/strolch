@@ -15,6 +15,7 @@
  */
 package li.strolch.rest;
 
+import static java.util.function.Function.identity;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INVALIDATE_SESSION;
 
@@ -55,7 +56,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultStrolchSessionHandler.class);
 	private PrivilegeHandler privilegeHandler;
-	private Map<String, Certificate> certificateMap;
+	private final Map<String, Certificate> certificateMap;
 	private boolean reloadSessions;
 	private int sessionTtlMinutes;
 	private int maxKeepAliveMinutes;
@@ -65,6 +66,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	public DefaultStrolchSessionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
+		this.certificateMap = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -94,20 +96,18 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public void start() throws Exception {
 		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-		this.certificateMap = new ConcurrentHashMap<>();
+		this.certificateMap.clear();
 
 		if (this.reloadSessions) {
-			List<Certificate> certificates = runAsAgentWithResult(ctx -> {
+			Map<String, Certificate> certificates = runAsAgentWithResult(ctx -> {
 				Certificate cert = ctx.getCertificate();
 				return this.privilegeHandler.getPrivilegeHandler()
 						.getCertificates(cert)
 						.stream()
 						.filter(c -> !c.getUserState().isSystem())
-						.collect(Collectors.toList());
+						.collect(Collectors.toMap(Certificate::getAuthToken, identity()));
 			});
-			for (Certificate certificate : certificates) {
-				this.certificateMap.put(certificate.getAuthToken(), certificate);
-			}
+			this.certificateMap.putAll(certificates);
 
 			checkSessionsForTimeout();
 			logger.info("Restored " + certificates.size() + " sessions of which " + (certificates.size()
@@ -131,17 +131,20 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			if (this.privilegeHandler != null)
 				persistSessions();
 
-		} else if (this.certificateMap != null) {
+		} else {
+			Map<String, Certificate> certificateMap;
 			synchronized (this.certificateMap) {
-				for (Certificate certificate : this.certificateMap.values()) {
-					try {
-						this.privilegeHandler.invalidate(certificate);
-					} catch (Exception e) {
-						logger.error("Failed to invalidate certificate " + certificate, e);
-					}
-				}
+				certificateMap = new HashMap<>(this.certificateMap);
 				this.certificateMap.clear();
 			}
+			for (Certificate certificate : certificateMap.values()) {
+				try {
+					this.privilegeHandler.invalidate(certificate);
+				} catch (Exception e) {
+					logger.error("Failed to invalidate certificate " + certificate, e);
+				}
+			}
+
 		}
 
 		this.privilegeHandler = null;
@@ -150,7 +153,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	@Override
 	public void destroy() throws Exception {
-		this.certificateMap = null;
+		this.certificateMap.clear();
 		super.destroy();
 	}
 
@@ -318,14 +321,10 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	private void checkSessionsForTimeout() {
-		Map<String, Certificate> certificateMap;
-		synchronized (this.certificateMap) {
-			certificateMap = new HashMap<>(this.certificateMap);
-		}
-
 		ZonedDateTime maxKeepAliveTime = ZonedDateTime.now().minus(this.maxKeepAliveMinutes, ChronoUnit.MINUTES);
 		ZonedDateTime timeOutTime = ZonedDateTime.now().minus(this.sessionTtlMinutes, ChronoUnit.MINUTES);
 
+		Map<String, Certificate> certificateMap = getCertificateMapCopy();
 		for (Certificate certificate : certificateMap.values()) {
 			if (certificate.isKeepAlive()) {
 
@@ -359,12 +358,12 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	public UserSession getSession(Certificate certificate, String source, String sessionId) throws PrivilegeException {
 		PrivilegeContext ctx = this.privilegeHandler.validate(certificate, source);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
-		synchronized (this.certificateMap) {
-			for (Certificate cert : certificateMap.values()) {
-				if (cert.getSessionId().equals(sessionId)) {
-					ctx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_SESSION, cert));
-					return new UserSession(cert);
-				}
+
+		Map<String, Certificate> certificateMap = getCertificateMapCopy();
+		for (Certificate cert : certificateMap.values()) {
+			if (cert.getSessionId().equals(sessionId)) {
+				ctx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_SESSION, cert));
+				return new UserSession(cert);
 			}
 		}
 
@@ -376,14 +375,14 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		PrivilegeContext ctx = this.privilegeHandler.validate(certificate, source);
 		ctx.assertHasPrivilege(PRIVILEGE_GET_SESSION);
 		List<UserSession> sessions = new ArrayList<>(this.certificateMap.size());
-		synchronized (this.certificateMap) {
-			for (Certificate cert : certificateMap.values()) {
-				try {
-					ctx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_SESSION, cert));
-					sessions.add(new UserSession(cert));
-				} catch (AccessDeniedException e) {
-					// no, user may not get this session
-				}
+
+		Map<String, Certificate> certificateMap = getCertificateMapCopy();
+		for (Certificate cert : certificateMap.values()) {
+			try {
+				ctx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_SESSION, cert));
+				sessions.add(new UserSession(cert));
+			} catch (AccessDeniedException e) {
+				// no, user may not get this session
 			}
 		}
 
@@ -395,12 +394,9 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		PrivilegeContext ctx = this.privilegeHandler.validate(certificate);
 		ctx.assertHasPrivilege(PRIVILEGE_INVALIDATE_SESSION);
 
-		Map<String, Certificate> map;
-		synchronized (this.certificateMap) {
-			map = new HashMap<>(this.certificateMap);
-		}
 		boolean ok = false;
-		for (Certificate cert : map.values()) {
+		Map<String, Certificate> certificateMap = getCertificateMapCopy();
+		for (Certificate cert : certificateMap.values()) {
 			if (cert.getSessionId().equals(sessionId)) {
 				ctx.validateAction(new SimpleRestrictable(PRIVILEGE_INVALIDATE_SESSION, cert));
 				invalidate(cert);
@@ -421,16 +417,21 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			throw new AccessDeniedException(MessageFormat.format(msg, certificate.getUsername(), sessionId));
 		}
 
-		synchronized (this.certificateMap) {
-			for (Certificate cert : certificateMap.values()) {
-				if (cert.getSessionId().equals(sessionId)) {
-					if (!cert.getLocale().equals(locale)) {
-						cert.setLocale(locale);
-						persistSessions();
-					}
-					break;
+		Map<String, Certificate> certificateMap = getCertificateMapCopy();
+		for (Certificate cert : certificateMap.values()) {
+			if (cert.getSessionId().equals(sessionId)) {
+				if (!cert.getLocale().equals(locale)) {
+					cert.setLocale(locale);
+					persistSessions();
 				}
+				break;
 			}
+		}
+	}
+
+	private Map<String, Certificate> getCertificateMapCopy() {
+		synchronized (this.certificateMap) {
+			return new HashMap<>(this.certificateMap);
 		}
 	}
 }
