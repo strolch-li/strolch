@@ -34,6 +34,7 @@ package li.strolch.utils.time;
 import static java.time.temporal.ChronoUnit.*;
 import static li.strolch.utils.time.PeriodHelper.daysIn;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.*;
 import java.time.chrono.ChronoPeriod;
@@ -71,6 +72,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	/**
 	 * A serialization identifier for this class.
 	 */
+	@Serial
 	private static final long serialVersionUID = 8815521625671589L;
 	/**
 	 * The supported units.
@@ -338,6 +340,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 *
 	 * @return the singleton instance
 	 */
+	@Serial
 	private Object readResolve() {
 		return PeriodDuration.of(period, duration);
 	}
