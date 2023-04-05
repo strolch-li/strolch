@@ -89,8 +89,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		return this.dataType;
 	}
 
-	protected abstract String getClassName();
-
 	protected abstract String getTableName();
 
 	protected abstract T parseFromXml(String id, String type, SQLXML xml);
@@ -490,7 +488,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	protected void internalRemove(T element) {
 
 		// first find out how many there are
-		long count = 0;
+		long count;
 		String sql = MessageFormat.format(querySizeOfElementSqlS, getTableName());
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, element.getType());
