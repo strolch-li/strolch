@@ -229,7 +229,7 @@ public class GenericReport extends ReportPolicy {
 	}
 
 	@Override
-	public long getCounter() {
+	public synchronized long getCounter() {
 		return this.counter;
 	}
 
