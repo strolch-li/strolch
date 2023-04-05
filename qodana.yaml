@@ -13,3 +13,4 @@ exclude:
   - name: All
     paths:
       - privilege/src/main/java/li/strolch/privilege/helper/PasswordCreator.java
+      - agent/src/main/java/li/strolch/agent/api/LoggingLoader.java
