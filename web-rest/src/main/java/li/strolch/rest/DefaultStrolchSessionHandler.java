@@ -22,6 +22,7 @@ import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -93,13 +94,16 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	@Override
 	public void start() throws Exception {
 		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-		this.certificateMap = Collections.synchronizedMap(new HashMap<>());
+		this.certificateMap = new ConcurrentHashMap<>();
 
 		if (this.reloadSessions) {
 			List<Certificate> certificates = runAsAgentWithResult(ctx -> {
 				Certificate cert = ctx.getCertificate();
-				return this.privilegeHandler.getPrivilegeHandler().getCertificates(cert).stream()
-						.filter(c -> !c.getUserState().isSystem()).collect(Collectors.toList());
+				return this.privilegeHandler.getPrivilegeHandler()
+						.getCertificates(cert)
+						.stream()
+						.filter(c -> !c.getUserState().isSystem())
+						.collect(Collectors.toList());
 			});
 			for (Certificate certificate : certificates) {
 				this.certificateMap.put(certificate.getAuthToken(), certificate);
@@ -271,8 +275,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error(MessageFormat.format("No session was registered with token {0}",
-					certificate.getAuthToken()));
+			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken()));
 
 		this.privilegeHandler.invalidate(certificate);
 	}
@@ -347,8 +350,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error(MessageFormat.format("No session was registered with token {0}",
-					certificate.getAuthToken()));
+			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken()));
 
 		this.privilegeHandler.sessionTimeout(certificate);
 	}

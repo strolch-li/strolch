@@ -15,9 +15,8 @@
  */
 package li.strolch.service.executor;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
@@ -46,7 +45,7 @@ public class ServiceExecutionHandler extends StrolchComponent {
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 
-		this.serviceContextMap = Collections.synchronizedMap(new HashMap<>());
+		this.serviceContextMap = new ConcurrentHashMap<>();
 		super.initialize(configuration);
 	}
 

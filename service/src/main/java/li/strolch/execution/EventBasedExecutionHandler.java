@@ -7,6 +7,7 @@ import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -610,7 +611,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	private void evaluateStateByRealm() throws Exception {
-		this.statesByRealm = Collections.synchronizedMap(new HashMap<>());
+		this.statesByRealm = new ConcurrentHashMap<>();
 
 		runAsAgent(ctx -> getContainer().getRealmNames().forEach(realm -> {
 			try (StrolchTransaction tx = openTx(realm, ctx.getCertificate(), false)) {
