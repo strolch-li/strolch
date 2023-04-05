@@ -91,8 +91,8 @@ public class ObjectFilter {
 	 * Default constructor initializing the filter
 	 */
 	public ObjectFilter() {
-		this.cache = new MapOfMaps<>();
-		this.keySet = new HashSet<>();
+		this.cache = new MapOfMaps<>(1);
+		this.keySet = new HashSet<>(1);
 	}
 
 	private void replaceKey(ObjectCache cached, Object newObjectKey, Object newObject) {
