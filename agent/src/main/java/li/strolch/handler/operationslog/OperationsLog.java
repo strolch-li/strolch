@@ -90,11 +90,13 @@ public class OperationsLog extends StrolchComponent {
 
 				poll.run();
 
-			} catch (Exception e) {
-				if (e instanceof InterruptedException && !this.run)
+			} catch (InterruptedException e) {
+				if (!this.run)
 					logger.warn("Interrupted!");
 				else
 					logger.error("Failed to perform a task", e);
+			} catch (Exception e) {
+				logger.error("Failed to perform a task", e);
 			}
 		}
 	}
