@@ -28,7 +28,7 @@ import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.PersistenceConstants;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
-import li.strolch.xmlpers.objref.LockableObject;
+import li.strolch.utils.concurrent.LockableObject;
 import li.strolch.xmlpers.test.model.MyModel;
 import org.junit.Before;
 import org.junit.BeforeClass;

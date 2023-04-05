@@ -25,7 +25,7 @@ import li.strolch.agent.api.*;
 import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.utils.ElementLockingHandler;
+import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

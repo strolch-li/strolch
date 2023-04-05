@@ -23,7 +23,7 @@ import java.text.MessageFormat;
 import java.util.Properties;
 
 import li.strolch.xmlpers.api.*;
-import li.strolch.xmlpers.objref.LockableObject;
+import li.strolch.utils.concurrent.LockableObject;
 import li.strolch.xmlpers.objref.ObjectReferenceCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -15,7 +15,7 @@
  */
 package li.strolch.xmlpers.api;
 
-import li.strolch.xmlpers.objref.LockableObject;
+import li.strolch.utils.concurrent.LockableObject;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
