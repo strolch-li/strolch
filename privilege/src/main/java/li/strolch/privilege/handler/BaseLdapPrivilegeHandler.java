@@ -27,7 +27,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	private String domain;
 
 	@Override
-	public synchronized void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
+	public void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
 			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
 			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
 			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {

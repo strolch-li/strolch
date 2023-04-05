@@ -26,7 +26,7 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	private String realm;
 
 	@Override
-	public synchronized void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
+	public void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
 			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
 			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
 			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {

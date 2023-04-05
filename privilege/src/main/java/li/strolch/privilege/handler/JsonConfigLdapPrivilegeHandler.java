@@ -30,7 +30,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	private HashMap<String, String> userLdapGroupOverrides;
 
 	@Override
-	public synchronized void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
+	public void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
 			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
 			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
 			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
