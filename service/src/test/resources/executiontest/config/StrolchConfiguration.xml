@@ -52,6 +52,9 @@
 			<name>ExecutionHandler</name>
 			<api>li.strolch.execution.ExecutionHandler</api>
 			<impl>li.strolch.execution.EventBasedExecutionHandler</impl>
+			<Properties>
+				<restartExecution>false</restartExecution>
+			</Properties>
 		</Component>
 
 	</env>
