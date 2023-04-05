@@ -11,6 +11,7 @@ import javax.naming.directory.Attributes;
 import java.io.File;
 import java.io.FileReader;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,12 +30,12 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	private HashMap<String, String> userLdapGroupOverrides;
 
 	@Override
-	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PasswordStrengthHandler passwordStrengthHandler, PersistenceHandler persistenceHandler,
-			UserChallengeHandler userChallengeHandler, SingleSignOnHandler ssoHandler,
-			Map<String, Class<PrivilegePolicy>> policyMap) {
+	public synchronized void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
+			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
+			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
+			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
-		super.initialize(parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
+		super.initialize(executorService, parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
 				userChallengeHandler, ssoHandler, policyMap);
 
 		this.realm = parameterMap.get(REALM);
@@ -48,9 +49,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		DBC.PRE.assertNotEmpty("configFile param must be set!", configFileS);
 		File configFile = new File(configFileS);
 		if (!configFile.exists() || !configFile.isFile() || !configFile.canRead())
-			throw new IllegalStateException(
-					"configFile does not exist, is not a file, or can not be read at path " + configFile
-							.getAbsolutePath());
+			throw new IllegalStateException("configFile does not exist, is not a file, or can not be read at path "
+					+ configFile.getAbsolutePath());
 
 		// parse the configuration file
 		JsonObject configJ;
@@ -133,7 +133,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 			logger.info("Overriding LDAP group for user " + username + " to " + overrideGroup);
 		}
 
-		Set<String> relevantLdapGroups = ldapGroups.stream().filter(s -> this.ldapGroupNames.contains(s))
+		Set<String> relevantLdapGroups = ldapGroups.stream()
+				.filter(s -> this.ldapGroupNames.contains(s))
 				.collect(toSet());
 		if (relevantLdapGroups.isEmpty())
 			throw new IllegalStateException("User " + username

@@ -824,6 +824,16 @@ public interface PrivilegeHandler {
 	void validatePassword(Locale locale, char[] password) throws PasswordStrengthException;
 
 	/**
+	 * Starts the privilege handler, starting any threads and services which might be needed
+	 */
+	void start();
+
+	/**
+	 * Stops the privilege handler, starting any threads and services which might be needed
+	 */
+	void stop();
+
+	/**
 	 * <p>
 	 * Informs this {@link PersistenceHandler} to reload the data from the backend
 	 * </p>

@@ -21,7 +21,10 @@ import static li.strolch.privilege.helper.XmlConstants.*;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 import java.io.File;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
@@ -46,8 +49,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(XmlPersistenceHandler.class);
 
-	private Map<String, User> userMap;
-	private Map<String, Role> roleMap;
+	private final Map<String, User> userMap;
+	private final Map<String, Role> roleMap;
 
 	private boolean userMapDirty;
 	private boolean roleMapDirty;
@@ -58,6 +61,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private File rolesPath;
 
 	private boolean caseInsensitiveUsername;
+
+	public XmlPersistenceHandler() {
+		this.roleMap = new ConcurrentHashMap<>();
+		this.userMap = new ConcurrentHashMap<>();
+	}
 
 	@Override
 	public Map<String, String> getParameterMap() {
@@ -212,27 +220,23 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public boolean reload() {
 
-		this.roleMap = Collections.synchronizedMap(new HashMap<>());
-		this.userMap = Collections.synchronizedMap(new HashMap<>());
-
 		// parse models xml file to XML document
-		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader();
+		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader(this.caseInsensitiveUsername);
 		XmlHelper.parseDocument(this.usersPath, usersXmlHandler);
 
 		PrivilegeRolesSaxReader rolesXmlHandler = new PrivilegeRolesSaxReader();
 		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler);
 
 		// ROLES
-		List<Role> roles = rolesXmlHandler.getRoles();
-		for (Role role : roles) {
-			this.roleMap.put(role.getName(), role);
+		synchronized (this.roleMap) {
+			this.roleMap.clear();
+			this.roleMap.putAll(rolesXmlHandler.getRoles());
 		}
 
 		// USERS
-		List<User> users = usersXmlHandler.getUsers();
-		for (User user : users) {
-			this.userMap
-					.put(this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername(), user);
+		synchronized (this.userMap) {
+			this.userMap.clear();
+			this.userMap.putAll(usersXmlHandler.getUsers());
 		}
 
 		this.userMapDirty = false;
@@ -242,7 +246,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		logger.info(format("Read {0} Roles", this.roleMap.size()));
 
 		// validate referenced roles exist
-		for (User user : users) {
+		for (User user : this.userMap.values()) {
 			for (String roleName : user.getRoles()) {
 
 				// validate that role exists

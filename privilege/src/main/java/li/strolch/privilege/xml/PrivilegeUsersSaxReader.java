@@ -40,16 +40,18 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private final List<User> users;
+	private final Map<String, User> users;
+	private final boolean caseInsensitiveUsername;
 
-	public PrivilegeUsersSaxReader() {
-		this.users = new ArrayList<>();
+	public PrivilegeUsersSaxReader(boolean caseInsensitiveUsername) {
+		this.caseInsensitiveUsername = caseInsensitiveUsername;
+		this.users = new HashMap<>();
 	}
 
 	/**
 	 * @return the users
 	 */
-	public List<User> getUsers() {
+	public Map<String, User> getUsers() {
 		return this.users;
 	}
 
@@ -88,25 +90,25 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			this.buildersStack.peek().notifyChild(elementParser);
 	}
 
-//	<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
-//	  <Firstname>Application</Firstname>
-//	  <Lastname>Administrator</Lastname>
-//	  <State>ENABLED</State>
-//	  <Locale>en-GB</Locale>
-//	  <Roles>
-//	    <Role>PrivilegeAdmin</Role>
-//	    <Role>AppUser</Role>
-//	  </Roles>
-//	  <Properties>
-//	    <Property name="organization" value="eitchnet.ch" />
-//	    <Property name="organizationalUnit" value="Development" />
-//	  </Properties>
-//    <History>
-//      <FirstLogin>2021-02-19T15:32:09.592+01:00</FirstLogin>
-//      <LastLogin>2021-02-19T15:32:09.592+01:00</LastLogin>
-//      <LastPasswordChange>2021-02-19T15:32:09.592+01:00</LastPasswordChange>
-//    </History>
-//	</User>
+	//	<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+	//	  <Firstname>Application</Firstname>
+	//	  <Lastname>Administrator</Lastname>
+	//	  <State>ENABLED</State>
+	//	  <Locale>en-GB</Locale>
+	//	  <Roles>
+	//	    <Role>PrivilegeAdmin</Role>
+	//	    <Role>AppUser</Role>
+	//	  </Roles>
+	//	  <Properties>
+	//	    <Property name="organization" value="eitchnet.ch" />
+	//	    <Property name="organizationalUnit" value="Development" />
+	//	  </Properties>
+	//    <History>
+	//      <FirstLogin>2021-02-19T15:32:09.592+01:00</FirstLogin>
+	//      <LastLogin>2021-02-19T15:32:09.592+01:00</LastLogin>
+	//      <LastPasswordChange>2021-02-19T15:32:09.592+01:00</LastPasswordChange>
+	//    </History>
+	//	</User>
 
 	public class UserParser extends ElementParserAdapter {
 
@@ -210,11 +212,14 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			case XML_USER -> {
 				if (this.history == null)
 					this.history = new UserHistory();
+
 				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
 						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
 						this.locale, this.parameters, this.passwordChangeRequested, this.history);
+
 				logger.info(MessageFormat.format("New User: {0}", user));
-				getUsers().add(user);
+				String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
+				users.put(username, user);
 			}
 			default -> {
 				if (!(qName.equals(XML_ROLES) //

@@ -1,16 +1,20 @@
 package li.strolch.privilege.test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.helper.PrivilegeInitializationHelper;
+import li.strolch.privilege.helper.PrivilegeInitializer;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.utils.helper.FileHelper;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,12 +22,24 @@ public class AbstractPrivilegeTest {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractPrivilegeTest.class);
 
+	protected static ScheduledExecutorService executorService;
 	protected PrivilegeHandler privilegeHandler;
 	protected PrivilegeContext ctx;
 
+	@BeforeClass
+	public static void beforeClass() {
+		executorService = Executors.newScheduledThreadPool(1);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		if (executorService != null)
+			executorService.shutdownNow();
+	}
+
 	protected void login(String username, char[] password) {
 		Certificate certificate = privilegeHandler.authenticate(username, password, false);
-		assertTrue("Certificate is null!", certificate != null);
+		assertNotNull("Certificate is null!", certificate);
 		this.ctx = privilegeHandler.validate(certificate);
 	}
 
@@ -101,7 +117,7 @@ public class AbstractPrivilegeTest {
 	protected void initialize(String dst, String configFilename) {
 		try {
 			File privilegeConfigFile = getPrivilegeConfigFile(dst, configFilename);
-			this.privilegeHandler = PrivilegeInitializationHelper.initializeFromXml(privilegeConfigFile);
+			this.privilegeHandler = new PrivilegeInitializer(executorService).initializeFromXml(privilegeConfigFile);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw new RuntimeException("Initialization failed", e);

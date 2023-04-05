@@ -38,13 +38,13 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private final List<Role> roles;
+	private final Map<String, Role> roles;
 
 	public PrivilegeRolesSaxReader() {
-		this.roles = new ArrayList<>();
+		this.roles = new HashMap<>();
 	}
 
-	public List<Role> getRoles() {
+	public Map<String, Role> getRoles() {
 		return this.roles;
 	}
 
@@ -84,19 +84,19 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.buildersStack.peek().notifyChild(elementParser);
 	}
 
-//	<Role name="AppUser">
-//	  <Privilege name="li.strolch.privilege.test.model.TestRestrictable">
-//	    <AllAllowed>true</AllAllowed>
-//	  </Privilege>
-//	</Role>
-//	<Role name="system_admin_privileges">
-//	  <Privilege name="li.strolch.privilege.test.model.TestSystemUserAction">
-//	    <AllAllowed>true</AllAllowed>
-//	  </Privilege>
-//	  <Privilege name="li.strolch.privilege.test.model.TestSystemRestrictable">
-//	    <AllAllowed>true</AllAllowed>
-//	  </Privilege>
-//	</Role>
+	//	<Role name="AppUser">
+	//	  <Privilege name="li.strolch.privilege.test.model.TestRestrictable">
+	//	    <AllAllowed>true</AllAllowed>
+	//	  </Privilege>
+	//	</Role>
+	//	<Role name="system_admin_privileges">
+	//	  <Privilege name="li.strolch.privilege.test.model.TestSystemUserAction">
+	//	    <AllAllowed>true</AllAllowed>
+	//	  </Privilege>
+	//	  <Privilege name="li.strolch.privilege.test.model.TestSystemRestrictable">
+	//	    <AllAllowed>true</AllAllowed>
+	//	  </Privilege>
+	//	</Role>
 
 	public class RoleParser extends ElementParserAdapter {
 
@@ -177,7 +177,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			}
 			case XmlConstants.XML_ROLE -> {
 				Role role = new Role(this.roleName, this.privileges);
-				getRoles().add(role);
+				roles.put(role.getName(), role);
 				logger.info(MessageFormat.format("New Role: {0}", role));
 				init();
 			}
@@ -187,7 +187,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 	static class PropertyParser extends ElementParserAdapter {
 
-//	      <Property name="organizationalUnit" value="Development" />
+		//	      <Property name="organizationalUnit" value="Development" />
 
 		public final Map<String, String> parameterMap = new HashMap<>();
 
@@ -197,9 +197,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
 				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
-			} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
-				// NO-OP
-			} else {
+			} else if (!qName.equals(XmlConstants.XML_PROPERTIES)) {
 				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}

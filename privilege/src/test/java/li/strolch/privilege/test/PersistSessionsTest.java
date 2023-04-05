@@ -30,7 +30,7 @@ public class PersistSessionsTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
-	public void shouldPersistAndReloadSessions() {
+	public void shouldPersistAndReloadSessions() throws InterruptedException {
 
 		// assert no sessions file
 		File sessionsFile = new File("target/PersistSessionsTest/sessions.dat");
@@ -39,6 +39,8 @@ public class PersistSessionsTest extends AbstractPrivilegeTest {
 		// login and assert sessions file was written
 		login("admin", "admin".toCharArray());
 		this.privilegeHandler.validate(ctx.getCertificate());
+		// persisting is async, once per second
+		Thread.sleep(1200L);
 		assertTrue("Sessions File should have been created!", sessionsFile.isFile());
 
 		// re-initialize and assert still logged in

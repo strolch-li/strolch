@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.UserState;
@@ -26,12 +27,12 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	private String domain;
 
 	@Override
-	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PasswordStrengthHandler passwordStrengthHandler, PersistenceHandler persistenceHandler,
-			UserChallengeHandler userChallengeHandler, SingleSignOnHandler ssoHandler,
-			Map<String, Class<PrivilegePolicy>> policyMap) {
+	public synchronized void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
+			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
+			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
+			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
-		super.initialize(parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
+		super.initialize(executorService, parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
 				userChallengeHandler, ssoHandler, policyMap);
 
 		this.providerUrl = parameterMap.get("providerUrl");

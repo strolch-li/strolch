@@ -27,6 +27,10 @@ import java.nio.file.Files;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,6 +42,7 @@ import li.strolch.privilege.xml.CertificateStubsDomWriter;
 import li.strolch.privilege.xml.CertificateStubsSaxReader;
 import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
 import li.strolch.utils.collections.Tuple;
+import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.AesCryptoHelper;
 import org.slf4j.Logger;
@@ -138,6 +143,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private String identifier;
 
 	private Map<String, String> parameterMap;
+
+	private ElementLockingHandler<String> lockingHandler;
+	private ScheduledExecutorService executorService;
+	private Future<?> persistSessionsTask;
 
 	@Override
 	public SingleSignOnHandler getSsoHandler() {
@@ -381,6 +390,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep addUser(Certificate certificate, UserRep userRepParam, char[] password) {
+		return this.lockingHandler.lockedExecuteWithResult(userRepParam.getUsername(),
+				() -> internalAddUser(certificate, userRepParam, password));
+	}
+
+	public UserRep internalAddUser(Certificate certificate, UserRep userRepParam, char[] password) {
 		try {
 
 			// validate user actually has this type of privilege
@@ -449,6 +463,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public void addOrUpdateUsers(Certificate certificate, List<UserRep> userReps) throws PrivilegeException {
+		this.lockingHandler.lockedExecute(PrivilegeHandler.class.getSimpleName(),
+				() -> internalAddOrUpdateUsers(certificate, userReps));
+	}
+
+	private void internalAddOrUpdateUsers(Certificate certificate, List<UserRep> userReps) throws PrivilegeException {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -525,7 +544,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public UserRep replaceUser(Certificate certificate, UserRep userRep, char[] password) {
+	public UserRep replaceUser(Certificate certificate, UserRep userRep, char[] password) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(userRep.getUsername(),
+				() -> internalReplaceUser(certificate, userRep, password));
+	}
+
+	private UserRep internalReplaceUser(Certificate certificate, UserRep userRep, char[] password) {
 		try {
 
 			// validate user actually has this type of privilege
@@ -616,6 +640,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep updateUser(Certificate certificate, UserRep userRep) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(userRep.getUsername(),
+				() -> internalUpdateUser(certificate, userRep));
+	}
+
+	public UserRep internalUpdateUser(Certificate certificate, UserRep userRep) throws PrivilegeException {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -687,6 +716,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep removeUser(Certificate certificate, String username) {
+		return this.lockingHandler.lockedExecuteWithResult(username, () -> internalRemoveUser(certificate, username));
+	}
+
+	private UserRep internalRemoveUser(Certificate certificate, String username) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -713,6 +746,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep addRoleToUser(Certificate certificate, String username, String roleName) {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> internalAddRoleToUser(certificate, username, roleName));
+	}
+
+	private UserRep internalAddRoleToUser(Certificate certificate, String username, String roleName) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -765,6 +803,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep removeRoleFromUser(Certificate certificate, String username, String roleName) {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> internalRemoveRoleFromUser(certificate, username, roleName));
+	}
+
+	private UserRep internalRemoveRoleFromUser(Certificate certificate, String username, String roleName) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -808,6 +851,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> internalSetUserLocale(certificate, username, locale));
+	}
+
+	private UserRep internalSetUserLocale(Certificate certificate, String username, Locale locale) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -845,6 +893,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public void requirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
+		this.lockingHandler.lockedExecute(username, () -> internalRequirePasswordChange(certificate, username));
+	}
+
+	private void internalRequirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -878,6 +930,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public void setUserPassword(Certificate certificate, String username, char[] password) {
+		this.lockingHandler.lockedExecute(username, () -> internalSetUserPassword(certificate, username, password));
+	}
+
+	private void internalSetUserPassword(Certificate certificate, String username, char[] password) {
 		try {
 
 			// validate user actually has this type of privilege
@@ -944,6 +1000,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep setUserState(Certificate certificate, String username, UserState state) {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> internalSetUserState(certificate, username, state));
+	}
+
+	private UserRep internalSetUserState(Certificate certificate, String username, UserState state) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -974,6 +1035,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public RoleRep addRole(Certificate certificate, RoleRep roleRep) {
+		return this.lockingHandler.lockedExecuteWithResult(roleRep.getName(),
+				() -> internalAddRole(certificate, roleRep));
+	}
+
+	private RoleRep internalAddRole(Certificate certificate, RoleRep roleRep) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -1007,6 +1073,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public RoleRep replaceRole(Certificate certificate, RoleRep roleRep) {
+		return this.lockingHandler.lockedExecuteWithResult(roleRep.getName(),
+				() -> internalReplaceRole(certificate, roleRep));
+	}
+
+	private RoleRep internalReplaceRole(Certificate certificate, RoleRep roleRep) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -1047,6 +1118,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public RoleRep removeRole(Certificate certificate, String roleName) {
+		return this.lockingHandler.lockedExecuteWithResult(roleName, () -> internalRemoveRole(certificate, roleName));
+	}
+
+	private RoleRep internalRemoveRole(Certificate certificate, String roleName) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -1083,6 +1158,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public RoleRep addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
+		return this.lockingHandler.lockedExecuteWithResult(roleName,
+				() -> internalAddOrReplacePrivilegeOnRole(certificate, roleName, privilegeRep));
+	}
+
+	private RoleRep internalAddOrReplacePrivilegeOnRole(Certificate certificate, String roleName,
+			PrivilegeRep privilegeRep) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -1142,6 +1223,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public RoleRep removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
+		return this.lockingHandler.lockedExecuteWithResult(roleName,
+				() -> internalRemovePrivilegeFromRole(certificate, roleName, privilegeName));
+	}
+
+	private RoleRep internalRemovePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = validate(certificate);
@@ -1192,16 +1278,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 		the new user to update with
 	 */
 	private void updateExistingSessionsForUser(User newUser) {
-		synchronized (this.privilegeContextMap) {
-			List<PrivilegeContext> ctxs = new ArrayList<>(this.privilegeContextMap.values());
-			for (PrivilegeContext ctx : ctxs) {
-				if (ctx.getUserRep().getUsername().equals(newUser.getUsername())) {
-					Certificate cert = ctx.getCertificate();
-					cert = buildCertificate(cert.getUsage(), newUser, cert.getAuthToken(), cert.getSessionId(),
-							cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
-					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, newUser);
-					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
-				}
+		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
+		for (PrivilegeContext ctx : contexts) {
+			if (ctx.getUserRep().getUsername().equals(newUser.getUsername())) {
+				Certificate cert = ctx.getCertificate();
+				cert = buildCertificate(cert.getUsage(), newUser, cert.getAuthToken(), cert.getSessionId(),
+						cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
+				PrivilegeContext privilegeContext = buildPrivilegeContext(cert, newUser);
+				this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 			}
 		}
 	}
@@ -1213,34 +1297,27 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 		the role to update with
 	 */
 	private void updateExistingSessionsWithNewRole(Role role) {
-		synchronized (this.privilegeContextMap) {
-			List<PrivilegeContext> ctxs = new ArrayList<>(this.privilegeContextMap.values());
-			for (PrivilegeContext ctx : ctxs) {
-				if (ctx.getUserRep().hasRole(role.getName())) {
-					User user = this.persistenceHandler.getUser(ctx.getUsername());
-					if (user == null)
-						continue;
+		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
+		for (PrivilegeContext ctx : contexts) {
+			if (ctx.getUserRep().hasRole(role.getName())) {
+				User user = this.persistenceHandler.getUser(ctx.getUsername());
+				if (user == null)
+					continue;
 
-					Certificate cert = ctx.getCertificate();
-					cert = buildCertificate(cert.getUsage(), user, cert.getAuthToken(), cert.getSessionId(),
-							cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
-					PrivilegeContext privilegeContext = buildPrivilegeContext(cert, user);
-					this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
-				}
+				Certificate cert = ctx.getCertificate();
+				cert = buildCertificate(cert.getUsage(), user, cert.getAuthToken(), cert.getSessionId(),
+						cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
+				PrivilegeContext privilegeContext = buildPrivilegeContext(cert, user);
+				this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 			}
 		}
 	}
 
 	private void invalidSessionsFor(User user) {
-		List<PrivilegeContext> ctxs;
-		synchronized (this.privilegeContextMap) {
-			ctxs = new ArrayList<>(this.privilegeContextMap.values());
-		}
-
-		for (PrivilegeContext ctx : ctxs) {
-			if (ctx.getUserRep().getUsername().equals(user.getUsername())) {
+		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
+		for (PrivilegeContext ctx : contexts) {
+			if (ctx.getUserRep().getUsername().equals(user.getUsername()))
 				invalidate(ctx.getCertificate());
-			}
 		}
 	}
 
@@ -1251,6 +1328,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public void initiateChallengeFor(Usage usage, String username, String source) {
+		this.lockingHandler.lockedExecute(username, () -> internalInitiateChallengeFor(usage, username, source));
+	}
+
+	private void internalInitiateChallengeFor(Usage usage, String username, String source) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		// get User
@@ -1272,6 +1353,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public Certificate validateChallenge(String username, String challenge, String source) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> internalValidateChallenge(username, challenge, source));
+	}
+
+	private Certificate internalValidateChallenge(String username, String challenge, String source)
+			throws PrivilegeException {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		// get User
@@ -1311,6 +1398,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive) {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> internalAuthenticate(username, password, source, usage, keepAlive));
+	}
+
+	private Certificate internalAuthenticate(String username, char[] password, String source, Usage usage,
+			boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		try {
@@ -1381,13 +1474,20 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public Certificate authenticateSingleSignOn(Object data, String source, boolean keepAlive)
-			throws PrivilegeException {
+	public Certificate authenticateSingleSignOn(Object data, String source, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 		if (this.ssoHandler == null)
 			throw new IllegalStateException("The SSO Handler is not configured!");
 
 		User user = this.ssoHandler.authenticateSingleSignOn(data);
+
+		return this.lockingHandler.lockedExecuteWithResult(user.getUsername(),
+				() -> internalAuthenticateSingleSignOn(user, source, keepAlive));
+	}
+
+	private Certificate internalAuthenticateSingleSignOn(User user, String source, boolean keepAlive)
+			throws PrivilegeException {
+
 		DBC.PRE.assertEquals("SSO Users must have UserState.REMOTE!", UserState.REMOTE, user.getUserState());
 		user.getHistory().setLastLogin(ZonedDateTime.now());
 
@@ -1427,6 +1527,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public Certificate refresh(Certificate certificate, String source) throws AccessDeniedException {
+		return this.lockingHandler.lockedExecuteWithResult(certificate.getUsername(),
+				() -> internalRefresh(certificate, source));
+	}
+
+	private Certificate internalRefresh(Certificate certificate, String source) throws AccessDeniedException {
 		DBC.PRE.assertNotNull("certificate must not be null!", certificate);
 
 		try {
@@ -1490,29 +1595,36 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getLocale(), userRoles, new HashMap<>(user.getProperties()));
 	}
 
-	private synchronized boolean persistSessions() {
+	private boolean persistSessions() {
 		if (!this.persistSessions)
 			return false;
 
-		List<Certificate> sessions = new ArrayList<>(this.privilegeContextMap.values()).stream()
-				.map(PrivilegeContext::getCertificate)
-				.filter(c -> !c.getUserState().isSystem())
-				.collect(Collectors.toList());
+		// async execution, max. once per second
+		if (this.persistSessionsTask != null)
+			this.persistSessionsTask.cancel(true);
+		this.persistSessionsTask = this.executorService.schedule(
+				() -> this.lockingHandler.lockedExecute("persist-sessions", () -> {
 
-		try (OutputStream fout = Files.newOutputStream(this.persistSessionsPath.toPath());
-				OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, fout)) {
+					List<Certificate> sessions = new ArrayList<>(this.privilegeContextMap.values()).stream()
+							.map(PrivilegeContext::getCertificate)
+							.filter(c -> !c.getUserState().isSystem())
+							.collect(Collectors.toList());
 
-			CertificateStubsDomWriter writer = new CertificateStubsDomWriter(sessions, outputStream);
-			writer.write();
-			outputStream.flush();
+					try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
+							OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
 
-		} catch (Exception e) {
-			logger.error("Failed to persist sessions!", e);
-			if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
-				logger.error("Failed to delete sessions file after failing to write to it, at "
-						+ this.persistSessionsPath.getAbsolutePath());
-			}
-		}
+						CertificateStubsDomWriter writer = new CertificateStubsDomWriter(sessions, outputStream);
+						writer.write();
+						outputStream.flush();
+
+					} catch (Exception e) {
+						logger.error("Failed to persist sessions!", e);
+						if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
+							logger.error("Failed to delete sessions file after failing to write to it, at "
+									+ this.persistSessionsPath.getAbsolutePath());
+						}
+					}
+				}), 1, TimeUnit.SECONDS);
 
 		return true;
 	}
@@ -1605,7 +1717,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @throws InvalidCredentialsException
 	 * 		if the given credentials are invalid, the user does not exist, or has no password set
 	 */
-	protected synchronized User checkCredentialsAndUserState(String username, char[] password)
+	protected User checkCredentialsAndUserState(String username, char[] password)
 			throws InvalidCredentialsException, AccessDeniedException {
 
 		// and validate the password
@@ -1906,6 +2018,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public void start() {
+		this.lockingHandler.start();
+	}
+
+	@Override
+	public void stop() {
+		this.lockingHandler.stop();
+	}
+
+	@Override
 	public boolean reload(Certificate certificate, String source) {
 
 		// validate who is doing this
@@ -1936,16 +2058,18 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * 		map of {@link PrivilegePolicy} classes
 	 *
 	 * @throws PrivilegeException
-	 * 		if the this method is called multiple times or an initialization exception occurs
+	 * 		if this method is called multiple times or an initialization exception occurs
 	 */
-	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PasswordStrengthHandler passwordStrengthHandler, PersistenceHandler persistenceHandler,
-			UserChallengeHandler userChallengeHandler, SingleSignOnHandler ssoHandler,
-			Map<String, Class<PrivilegePolicy>> policyMap) {
+	public synchronized void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
+			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
+			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
+			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
 		if (this.initialized)
 			throw new PrivilegeModelException("Already initialized!");
 
+		this.executorService = executorService;
+		this.lockingHandler = new ElementLockingHandler<>(executorService, TimeUnit.SECONDS, 10L);
 		this.policyMap = policyMap;
 		this.encryptionHandler = encryptionHandler;
 		this.passwordStrengthHandler = passwordStrengthHandler;
@@ -1969,7 +2093,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// validate privilege conflicts
 		validatePrivilegeConflicts();
 
-		this.privilegeContextMap = Collections.synchronizedMap(new HashMap<>());
+		this.privilegeContextMap = new ConcurrentHashMap<>();
 
 		loadSessions();
 
