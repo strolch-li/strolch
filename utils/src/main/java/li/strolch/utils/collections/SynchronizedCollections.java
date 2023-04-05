@@ -2,6 +2,7 @@ package li.strolch.utils.collections;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.*;
@@ -533,6 +534,7 @@ public class SynchronizedCollections {
 	}
 
 	private static class SynchronizedCollection<E> implements Collection<E>, Serializable {
+		@Serial
 		private static final long serialVersionUID = 0L;
 
 		final Collection<E> c;
@@ -668,6 +670,7 @@ public class SynchronizedCollections {
 			return c.parallelStream();
 		}
 
+		@Serial
 		private void writeObject(ObjectOutputStream s) throws IOException {
 			synchronized (this.mutex) {
 				s.defaultWriteObject();
@@ -1051,6 +1054,7 @@ public class SynchronizedCollections {
 			}
 		}
 
+		@Serial
 		private void writeObject(ObjectOutputStream s) throws IOException {
 			synchronized (this.mutex) {
 				s.defaultWriteObject();
