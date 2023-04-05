@@ -51,6 +51,9 @@ public class ElementLockingHandler<T> {
 		lock(element);
 		try {
 			action.run();
+		} catch (RuntimeException e) {
+			logger.error("Failed to execute action " + action + " for locked element " + element, e);
+			throw e;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to execute action " + action + " for locked element " + element, e);
 		} finally {
@@ -76,6 +79,9 @@ public class ElementLockingHandler<T> {
 		lock(element);
 		try {
 			return action.get();
+		} catch (RuntimeException e) {
+			logger.error("Failed to execute action " + action + " for locked element " + element, e);
+			throw e;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to execute action " + action + " for locked element " + element, e);
 		} finally {
