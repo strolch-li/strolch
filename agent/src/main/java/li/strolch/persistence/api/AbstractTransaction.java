@@ -1118,7 +1118,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			if (this.activityCache != null)
 				this.activityCache.removeElement(locator.get(1), locator.get(2));
 		}
-
+		default -> throw new IllegalStateException("Unexpected object type " + locator.get(0));
 		}
 		if (this.objectFilter != null)
 			this.objectFilter.removeObjectCache(locator.get(0), locator);
