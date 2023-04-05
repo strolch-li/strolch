@@ -58,7 +58,7 @@ public abstract class UserChallengeHandler {
 	 * @param source
 	 * 		the source of the challenge initialization
 	 */
-	public synchronized void initiateChallengeFor(Usage usage, User user, String source) {
+	public void initiateChallengeFor(Usage usage, User user, String source) {
 
 		String challenge = generateChallenge();
 		UserChallenge userChallenge = new UserChallenge(usage, user, challenge, source);
@@ -80,7 +80,7 @@ public abstract class UserChallengeHandler {
 	 * @throws PrivilegeException
 	 * 		if anything goes wrong
 	 */
-	public synchronized UserChallenge validateResponse(User user, String challenge) throws PrivilegeException {
+	public UserChallenge validateResponse(User user, String challenge) throws PrivilegeException {
 
 		// get the challenge
 		UserChallenge userChallenge = this.challenges.get(user);

@@ -42,7 +42,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	}
 
 	@Override
-	protected synchronized User checkCredentialsAndUserState(String username, char[] password)
+	protected User checkCredentialsAndUserState(String username, char[] password)
 			throws AccessDeniedException {
 
 		// first see if this is a local user
