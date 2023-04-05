@@ -240,7 +240,7 @@ public class FileHelper {
 
 			File dstFile = new File(dstDirectory, srcFile.getName());
 			if (srcFile.isDirectory()) {
-				if (!dstFile.mkdir())
+				if (!dstFile.isDirectory() && !dstFile.mkdir())
 					throw new IllegalStateException("Failed to create directory " + dstFile);
 				if (!copy(srcFile.listFiles(), dstFile, checksum)) {
 					String msg = "Failed to copy contents of {0} to {1}";
