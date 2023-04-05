@@ -407,7 +407,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeModelException(format(msg, userRepParam.getUsername()));
 			}
 
-			UserRep userRep = userRepParam.clone();
+			UserRep userRep = userRepParam.getCopy();
 
 			// set userId
 			userRep.setUserId(getUniqueId());
@@ -477,7 +477,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		List<User> toUpdate = new ArrayList<>();
 
 		for (UserRep e : userReps) {
-			UserRep userRep = e.clone();
+			UserRep userRep = e.getCopy();
 
 			User user;
 			User existingUser = this.persistenceHandler.getUser(userRep.getUsername());

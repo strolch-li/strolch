@@ -381,8 +381,7 @@ public class UserRep implements Serializable {
 			return this.username.equals(other.username);
 	}
 
-	@Override
-	public UserRep clone() {
+	public UserRep getCopy() {
 
 		Set<String> roles = new HashSet<>(this.roles);
 		Map<String, String> propertyMap = this.properties == null ? null : new HashMap<>(this.properties);
