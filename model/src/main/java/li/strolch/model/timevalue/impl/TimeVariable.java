@@ -174,11 +174,6 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 	}
 
 	@Override
-	public boolean equals(ITimeVariable<T> o) {
-		return equals((Object) o);
-	}
-
-	@Override
 	public boolean equals(Object o) {
 		if (this == o)
 			return true;

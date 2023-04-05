@@ -156,5 +156,6 @@ public interface ITimeVariable<T extends IValue> {
 	 * Returns true if the given {@link ITimeVariable} is equal to this {@link ITimeVariable} by validating that the
 	 * values {@link IValue IValues} have the same time and actual value
 	 */
-	boolean equals(ITimeVariable<T> other);
+	@Override
+	boolean equals(Object other);
 }
