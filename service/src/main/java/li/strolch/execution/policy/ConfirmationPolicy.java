@@ -73,6 +73,9 @@ public class ConfirmationPolicy extends StrolchPolicy {
 		case STOPPED -> toStopped(action);
 		case EXECUTED -> toExecuted(action);
 		case CLOSED -> toClosed(action);
+		case EXECUTABLE -> {
+			// do nothing
+		}
 		}
 	}
 }
