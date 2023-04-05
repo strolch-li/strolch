@@ -840,7 +840,7 @@ public class ObjectFilter {
 	 * @return true if the cache is empty, false otherwise
 	 */
 	public boolean isEmpty() {
-		return this.cache.size() == 0;
+		return this.cache.isEmpty();
 	}
 
 	/**
