@@ -89,7 +89,7 @@ public class ByteHelper {
 	public static long setBit(long data, int position) {
 		if (position > 63)
 			throw new IllegalStateException("Position " + position + " is not available in a long!");
-		return (data | (1 << position));
+		return (data | (1L << position));
 	}
 
 	public static byte clearBit(byte data, int position) {
@@ -113,7 +113,7 @@ public class ByteHelper {
 	public static long clearBit(long data, int position) {
 		if (position > 63)
 			throw new IllegalStateException("Position " + position + " is not available in a long!");
-		return (data & ~(1 << position));
+		return (data & ~(1L << position));
 	}
 
 	public static int countSetBits(byte data) {
