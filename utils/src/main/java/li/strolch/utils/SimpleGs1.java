@@ -48,11 +48,4 @@ public class SimpleGs1 {
 		return "SimpleGs1{" + "gtin='" + gtin + '\'' + ", expirationDate=" + expirationDate + ", batchNo='" + batchNo
 				+ '\'' + '}';
 	}
-
-	public static void main(String[] args) {
-		String example = "01076806134200251723090110D72375";
-		//String example = "0107680671300017172106301092405";
-		SimpleGs1 gs1 = SimpleGs1.valueOf(example);
-		System.out.println(gs1);
-	}
 }
