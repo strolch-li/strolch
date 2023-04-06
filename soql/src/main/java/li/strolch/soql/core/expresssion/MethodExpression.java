@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import li.strolch.soql.core.SOQLEvaluationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * extract state field value by reflection
@@ -14,6 +16,8 @@ import li.strolch.soql.core.SOQLEvaluationException;
  * @author msmock
  */
 public class MethodExpression extends AbstractObjectExpression {
+
+	private static final Logger logger = LoggerFactory.getLogger(MethodExpression.class);
 
 	private Object object;
 	private String methodName;
@@ -57,7 +61,7 @@ public class MethodExpression extends AbstractObjectExpression {
 		try {
 			result = method.invoke(object, arguments.toArray());
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			e.printStackTrace();
+			logger.error("Failed to call method " + this.methodName + " on class " + object.getClass().getName(), e);
 			return null;
 		}
 
