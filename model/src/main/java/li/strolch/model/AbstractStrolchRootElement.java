@@ -59,6 +59,7 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 		case Tags.RESOURCE -> relationP.setInterpretation(INTERPRETATION_RESOURCE_REF);
 		case Tags.ORDER -> relationP.setInterpretation(INTERPRETATION_ORDER_REF);
 		case Tags.ACTIVITY -> relationP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
+		default -> throw new IllegalStateException("Unexpected value: " + element.getObjectType());
 		}
 
 		relationP.setUom(element.getType());
@@ -89,6 +90,7 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 			case Tags.RESOURCE -> relationsP.setInterpretation(INTERPRETATION_RESOURCE_REF);
 			case Tags.ORDER -> relationsP.setInterpretation(INTERPRETATION_ORDER_REF);
 			case Tags.ACTIVITY -> relationsP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
+			default -> throw new IllegalStateException("Unexpected value: " + objectTypes.get(0));
 			}
 
 			relationsP.setUom(types.get(0));
