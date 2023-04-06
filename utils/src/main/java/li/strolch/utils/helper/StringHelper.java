@@ -537,7 +537,7 @@ public class StringHelper {
 
 		// get first occurrence of $ character
 		int pos = -1;
-		int stop = 0;
+		int stop;
 
 		// loop on prefix positions
 		while ((pos = tmpValue.indexOf(startTag, pos)) != -1) {
