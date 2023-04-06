@@ -276,7 +276,7 @@ public class FileHelper {
 		try (BufferedInputStream inBuffer = new BufferedInputStream(Files.newInputStream(fromFile.toPath()));
 				BufferedOutputStream outBuffer = new BufferedOutputStream(Files.newOutputStream(toFile.toPath()))) {
 
-			int theByte = 0;
+			int theByte;
 
 			while ((theByte = inBuffer.read()) > -1) {
 				outBuffer.write(theByte);
