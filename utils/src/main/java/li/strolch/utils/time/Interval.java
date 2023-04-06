@@ -31,6 +31,7 @@
  */
 package li.strolch.utils.time;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -68,6 +69,7 @@ public final class Interval
     /**
      * Serialization version.
      */
+    @Serial
     private static final long serialVersionUID = 8375285238652L;
 
     /**
