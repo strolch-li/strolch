@@ -181,6 +181,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 				logger.info(MessageFormat.format("New Role: {0}", role));
 				init();
 			}
+			default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
 		}
 	}
