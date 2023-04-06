@@ -79,15 +79,9 @@ public class FileIo {
 				xmlWriter.flush();
 			}
 
-			if (this.path.exists() && !this.path.delete())
-				throw new IllegalStateException("Failed to delete existing file " + this.path.getAbsolutePath());
-			if (!this.tmpPath.renameTo(this.path)) {
-				throw new IllegalStateException(
-						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
-			}
-
-			if (ctx.getLastModified() != -1L)
-				this.path.setLastModified(ctx.getLastModified());
+			if (logger.isDebugEnabled())
+				logger.info(MessageFormat.format("Wrote SAX to {0}", this.tmpPath.getAbsolutePath()));
+			moveTmpFileToPath(ctx.getLastModified());
 
 		} catch (FactoryConfigurationError | XMLStreamException | IOException e) {
 			if (this.tmpPath.exists()) {
@@ -158,8 +152,7 @@ public class FileIo {
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
-			transformer
-					.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-2$
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
@@ -169,20 +162,9 @@ public class FileIo {
 				transformer.transform(xmlSource, result);
 			}
 
-			if (logger.isDebugEnabled()) {
-				String msg = MessageFormat.format("Wrote DOM to {0}", this.tmpPath.getAbsolutePath());
-				logger.info(msg);
-			}
-
-			if (this.path.exists() && !this.path.delete())
-				throw new IllegalStateException("Failed to delete existing file " + this.path.getAbsolutePath());
-			if (!this.tmpPath.renameTo(this.path)) {
-				throw new IllegalStateException(
-						"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
-			}
-
-			if (ctx.getLastModified() != -1L)
-				this.path.setLastModified(ctx.getLastModified());
+			if (logger.isDebugEnabled())
+				logger.info(MessageFormat.format("Wrote DOM to {0}", this.tmpPath.getAbsolutePath()));
+			moveTmpFileToPath(ctx.getLastModified());
 
 		} catch (IOException | TransformerFactoryConfigurationError | TransformerException e) {
 			if (this.tmpPath.exists()) {
@@ -195,6 +177,20 @@ public class FileIo {
 
 		} finally {
 			System.setProperty(XmlHelper.PROP_LINE_SEPARATOR, lineSep);
+		}
+	}
+
+	private void moveTmpFileToPath(long lastModified) {
+		if (this.path.exists() && !this.path.delete())
+			throw new IllegalStateException("Failed to delete existing file " + this.path.getAbsolutePath());
+		if (!this.tmpPath.renameTo(this.path)) {
+			throw new IllegalStateException(
+					"Failed to rename temp file " + this.tmpPath.getName() + " to " + this.path.getAbsolutePath());
+		}
+
+		if (lastModified != -1L) {
+			if (!this.path.setLastModified(lastModified))
+				logger.error("Failed to set last modified of path " + this.path.getAbsolutePath());
 		}
 	}
 
