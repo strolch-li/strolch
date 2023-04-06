@@ -112,6 +112,11 @@ public class IntegerParameter extends AbstractParameter<Integer> {
 		return this.value.equals(otherValue);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
+
 	public void add(int value) {
 		assertNotReadonly();
 		this.value += value;

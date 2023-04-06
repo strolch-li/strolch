@@ -290,6 +290,11 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
+
+	@Override
 	public void setReadOnly() {
 		if (this.parameterBagMap != null) {
 			for (ParameterBag bag : this.parameterBagMap.values())

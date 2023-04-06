@@ -1204,6 +1204,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
+
+	@Override
 	public void setReadOnly() {
 		if (this.parameterMap != null) {
 			for (Parameter<?> param : this.parameterMap.values()) {
