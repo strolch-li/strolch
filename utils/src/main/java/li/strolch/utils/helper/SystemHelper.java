@@ -109,8 +109,4 @@ public class SystemHelper {
 				+ SystemHelper.getUsedMemory() + ",  Free: "
 				+ SystemHelper.getFreeMemory();
 	}
-
-	public static void main(String[] args) {
-		System.getProperties().list(System.out);
-	}
 }
