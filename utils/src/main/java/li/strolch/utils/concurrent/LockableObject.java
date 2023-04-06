@@ -17,12 +17,8 @@ package li.strolch.utils.concurrent;
 
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class LockableObject {
 
-	private static final Logger logger = LoggerFactory.getLogger(LockableObject.class);
 	private static long tryLockTime = 10000L;
 
 	public static void setTryLockTime(long tryLockTime) {
@@ -59,8 +55,6 @@ public class LockableObject {
 	 */
 	public void releaseLock() {
 		while (this.elementLock.isHeldByCurrentThread() && this.elementLock.isLocked()) {
-			if (logger.isDebugEnabled())
-				logger.debug("unlocking " + this);
 			this.elementLock.unlock();
 		}
 	}
