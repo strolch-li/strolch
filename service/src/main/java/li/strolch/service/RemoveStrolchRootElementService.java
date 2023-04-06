@@ -52,6 +52,7 @@ public class RemoveStrolchRootElementService extends AbstractService<LocatorArgu
 			case Tags.RESOURCE -> tx.remove((Resource) rootElement);
 			case Tags.ORDER -> tx.remove((Order) rootElement);
 			case Tags.ACTIVITY -> tx.remove((Activity) rootElement);
+			default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
 			}
 
 			tx.commitOnClose();
