@@ -9,10 +9,7 @@ import static li.strolch.model.log.LogMessageState.Information;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -30,8 +27,8 @@ public class OperationsLog extends StrolchComponent {
 
 	private LinkedBlockingQueue<LogTask> queue;
 
-	private Map<String, LinkedHashSet<LogMessage>> logMessagesByRealmAndId;
-	private Map<String, LinkedHashMap<Locator, LinkedHashSet<LogMessage>>> logMessagesByLocator;
+	private Map<String, Set<LogMessage>> logMessagesByRealmAndId;
+	private Map<String, Map<Locator, Set<LogMessage>>> logMessagesByLocator;
 	private int maxMessages;
 	private ExecutorService executorService;
 	private Future<?> handleQueueTask;
@@ -47,8 +44,8 @@ public class OperationsLog extends StrolchComponent {
 		this.maxMessages = configuration.getInt("maxMessages", 10000);
 
 		this.queue = new LinkedBlockingQueue<>();
-		this.logMessagesByRealmAndId = new HashMap<>();
-		this.logMessagesByLocator = new HashMap<>();
+		this.logMessagesByRealmAndId = new ConcurrentHashMap<>();
+		this.logMessagesByLocator = new ConcurrentHashMap<>();
 
 		this.executorService = getSingleThreadExecutor("OperationsLog");
 
@@ -155,14 +152,14 @@ public class OperationsLog extends StrolchComponent {
 	private void _addMessage(LogMessage logMessage) {
 		// store in global list
 		String realmName = logMessage.getRealm();
-		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
+		Set<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
 				OperationsLog::newHashSet);
 		logMessages.add(logMessage);
 
 		// store under locator
-		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator.computeIfAbsent(
-				realmName, this::newBoundedLocatorMap);
-		LinkedHashSet<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
+		Map<Locator, Set<LogMessage>> logMessagesLocator = this.logMessagesByLocator.computeIfAbsent(realmName,
+				this::newBoundedLocatorMap);
+		Set<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
 				OperationsLog::newHashSet);
 		messages.add(logMessage);
 
@@ -177,9 +174,9 @@ public class OperationsLog extends StrolchComponent {
 
 	private void _removeMessage(LogMessage message) {
 		String realmName = message.getRealm();
-		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> byLocator = this.logMessagesByLocator.get(realmName);
+		Map<Locator, Set<LogMessage>> byLocator = this.logMessagesByLocator.get(realmName);
 		if (byLocator != null) {
-			LinkedHashSet<LogMessage> messages = byLocator.get(message.getLocator());
+			Set<LogMessage> messages = byLocator.get(message.getLocator());
 			if (messages != null) {
 				messages.remove(message);
 				if (messages.isEmpty())
@@ -187,7 +184,7 @@ public class OperationsLog extends StrolchComponent {
 			}
 		}
 
-		LinkedHashSet<LogMessage> messages = this.logMessagesByRealmAndId.get(realmName);
+		Set<LogMessage> messages = this.logMessagesByRealmAndId.get(realmName);
 		if (messages != null)
 			messages.remove(message);
 
@@ -203,10 +200,10 @@ public class OperationsLog extends StrolchComponent {
 
 		messagesByRealm.forEach((realmName, messages) -> {
 
-			LinkedHashMap<Locator, LinkedHashSet<LogMessage>> byLocator = this.logMessagesByLocator.get(realmName);
+			Map<Locator, Set<LogMessage>> byLocator = this.logMessagesByLocator.get(realmName);
 			if (byLocator != null) {
 				messages.forEach(logMessage -> {
-					LinkedHashSet<LogMessage> tmp = byLocator.get(logMessage.getLocator());
+					Set<LogMessage> tmp = byLocator.get(logMessage.getLocator());
 					if (tmp != null) {
 						tmp.remove(logMessage);
 						if (tmp.isEmpty())
@@ -215,7 +212,7 @@ public class OperationsLog extends StrolchComponent {
 				});
 			}
 
-			LinkedHashSet<LogMessage> byRealm = this.logMessagesByRealmAndId.get(realmName);
+			Set<LogMessage> byRealm = this.logMessagesByRealmAndId.get(realmName);
 			if (byRealm != null)
 				messages.removeIf(logMessage -> !byRealm.remove(logMessage));
 
@@ -238,7 +235,7 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	private void _updateState(String realmName, String id, LogMessageState state) {
-		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realmName);
+		Set<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realmName);
 		if (logMessages == null)
 			return;
 
@@ -254,7 +251,7 @@ public class OperationsLog extends StrolchComponent {
 		}
 	}
 
-	private List<LogMessage> _pruneMessages(String realm, LinkedHashSet<LogMessage> logMessages) {
+	private List<LogMessage> _pruneMessages(String realm, Set<LogMessage> logMessages) {
 		if (logMessages.size() < this.maxMessages)
 			return emptyList();
 
@@ -310,24 +307,24 @@ public class OperationsLog extends StrolchComponent {
 
 	public void clearMessages(String realm, Locator locator) {
 		this.queue.add(() -> {
-			LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
+			Map<Locator, Set<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 			if (logMessages != null)
 				logMessages.remove(locator);
 		});
 	}
 
-	public synchronized Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
-		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
+	public Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
+		Map<Locator, Set<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 		if (logMessages == null)
 			return Optional.empty();
-		LinkedHashSet<LogMessage> result = logMessages.get(locator);
+		Set<LogMessage> result = logMessages.get(locator);
 		if (result == null)
 			return Optional.empty();
 		return Optional.of(new HashSet<>(result));
 	}
 
-	public synchronized List<LogMessage> getMessages(String realm) {
-		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
+	public List<LogMessage> getMessages(String realm) {
+		Set<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
 		if (logMessages == null)
 			return emptyList();
 
@@ -343,17 +340,17 @@ public class OperationsLog extends StrolchComponent {
 				.withException(e));
 	}
 
-	private LinkedHashMap<Locator, LinkedHashSet<LogMessage>> newBoundedLocatorMap(String realm) {
-		return new LinkedHashMap<>() {
+	private Map<Locator, Set<LogMessage>> newBoundedLocatorMap(String realm) {
+		return Collections.synchronizedMap(new LinkedHashMap<>() {
 			@Override
-			protected boolean removeEldestEntry(java.util.Map.Entry<Locator, LinkedHashSet<LogMessage>> eldest) {
+			protected boolean removeEldestEntry(Map.Entry<Locator, Set<LogMessage>> eldest) {
 				return size() > maxMessages;
 			}
-		};
+		});
 	}
 
-	private static LinkedHashSet<LogMessage> newHashSet(Object o) {
-		return new LinkedHashSet<>();
+	private static Set<LogMessage> newHashSet(Object o) {
+		return Collections.synchronizedSet(new HashSet<>());
 	}
 
 	private interface LogTask {
