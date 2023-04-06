@@ -259,6 +259,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 				String depends = this.valueBuffer.toString();
 				this.configurationBuilder.componentBuilder().addDependency(depends);
 			}
+			default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
 		}
 
