@@ -65,12 +65,10 @@ public class DefaultPersistenceManager implements PersistenceManager {
 		File basePathF = new File(basePath).getAbsoluteFile();
 		if (!basePathF.exists())
 			throw new XmlPersistenceException(
-					MessageFormat.format("The database store path does not exist at {0}",
-							basePathF.getAbsolutePath()));
+					MessageFormat.format("The database store path does not exist at {0}", basePathF.getAbsolutePath()));
 		if (!basePathF.canWrite())
-			throw new XmlPersistenceException(
-					MessageFormat.format("The database store path is not writeable at {0}",
-							basePathF.getAbsolutePath()));
+			throw new XmlPersistenceException(MessageFormat.format("The database store path is not writeable at {0}",
+					basePathF.getAbsolutePath()));
 		logger.info(MessageFormat.format("Using base path {0}", basePathF));
 
 		this.verbose = verbose;
@@ -103,7 +101,7 @@ public class DefaultPersistenceManager implements PersistenceManager {
 	}
 
 	@Override
-	public synchronized PersistenceTransaction openTx() {
+	public PersistenceTransaction openTx() {
 		return new DefaultPersistenceTransaction(this, this.ioMode, this.verbose, this.allowOverwriteOnCreate);
 	}
 }
