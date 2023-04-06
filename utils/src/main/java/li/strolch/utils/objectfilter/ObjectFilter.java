@@ -823,7 +823,7 @@ public class ObjectFilter {
 	}
 
 	/**
-	 * @return the set of keys used to register objects
+	 * @return the size of the key set
 	 */
 	public int sizeKeySet() {
 		return this.keySet.size();
