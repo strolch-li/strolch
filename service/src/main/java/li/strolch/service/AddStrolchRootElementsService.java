@@ -50,6 +50,7 @@ public class AddStrolchRootElementsService extends AbstractService<StrolchRootEl
 				case Tags.RESOURCE -> tx.add((Resource) rootElement);
 				case Tags.ORDER -> tx.add((Order) rootElement);
 				case Tags.ACTIVITY -> tx.add((Activity) rootElement);
+				default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
 				}
 			}
 			tx.commitOnClose();
