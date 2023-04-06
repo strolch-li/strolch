@@ -31,7 +31,7 @@ public class DateParamBuilder<T extends ParameterBagContainerBuilder<T>>
 	@Override
 	public DateParameter build() {
 		DateParameter parameter = new DateParameter();
-		build(parameter);
+		applyParameter(parameter);
 		if (this.valueZdt != null)
 			parameter.setValueFromZonedDateTime(this.valueZdt);
 		if (this.valueLdt != null)

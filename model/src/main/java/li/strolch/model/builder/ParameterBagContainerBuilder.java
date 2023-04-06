@@ -143,9 +143,9 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 			throw new IllegalStateException("Mapping already exists for " + paramId);
 	}
 
-	protected void build(ParameterBagContainer element) {
+	protected void applyParameters(ParameterBagContainer element) {
 
-		this.parametersBags.values().forEach(bagBuilder -> bagBuilder.build(element));
+		this.parametersBags.values().forEach(bagBuilder -> bagBuilder.applyBag(element));
 
 		this.singleRelations.forEach((paramId, keys) -> {
 			ParameterBag relationsBag = getRelationsBag(element);

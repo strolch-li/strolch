@@ -15,6 +15,6 @@ public class LongListParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public LongListParameter build() {
-		return build(new LongListParameter());
+		return applyParameter(new LongListParameter());
 	}
 }

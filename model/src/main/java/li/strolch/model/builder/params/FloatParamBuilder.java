@@ -13,6 +13,6 @@ public class FloatParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public FloatParameter build() {
-		return build(new FloatParameter());
+		return applyParameter(new FloatParameter());
 	}
 }

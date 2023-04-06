@@ -49,7 +49,7 @@ public abstract class TimedStateBuilder<T extends StrolchTimedState<?>> {
 
 	public abstract T build();
 
-	protected T build(T state) {
+	protected T applyTimedState(T state) {
 		state.setId(this.id);
 		state.setName(this.name);
 		state.setHidden(this.hidden);

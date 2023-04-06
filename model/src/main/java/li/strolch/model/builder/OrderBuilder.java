@@ -27,7 +27,7 @@ public class OrderBuilder extends RootElementBuilder<OrderBuilder> {
 	@Override
 	public Order build() {
 		Order order = new Order(getId(), getName(), getType());
-		super.build(order);
+		super.applyRootElement(order);
 		order.setDate(ISO8601.EMPTY_VALUE_ZONED_DATE);
 		order.setState(State.CREATED);
 		return order;

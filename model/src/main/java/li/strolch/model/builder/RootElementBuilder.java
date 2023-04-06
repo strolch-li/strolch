@@ -9,8 +9,8 @@ public abstract class RootElementBuilder<T extends ParameterBagContainerBuilder<
 		super(id, name, type);
 	}
 
-	protected void build(StrolchRootElement element) {
-		build((PolicyContainer) element);
+	protected void applyRootElement(StrolchRootElement element) {
+		applyPolicyContainer(element);
 	}
 
 	public abstract StrolchRootElement build();

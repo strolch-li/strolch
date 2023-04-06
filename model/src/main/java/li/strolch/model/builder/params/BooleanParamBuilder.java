@@ -13,6 +13,6 @@ public class BooleanParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public BooleanParameter build() {
-		return build(new BooleanParameter());
+		return applyParameter(new BooleanParameter());
 	}
 }

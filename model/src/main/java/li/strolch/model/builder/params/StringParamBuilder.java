@@ -40,6 +40,6 @@ public class StringParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public StringParameter build() {
-		return build(new StringParameter());
+		return applyParameter(new StringParameter());
 	}
 }

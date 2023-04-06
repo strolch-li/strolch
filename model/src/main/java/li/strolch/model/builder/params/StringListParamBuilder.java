@@ -35,6 +35,6 @@ public class StringListParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public StringListParameter build() {
-		return build(new StringListParameter());
+		return applyParameter(new StringListParameter());
 	}
 }

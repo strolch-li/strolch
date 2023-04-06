@@ -99,7 +99,7 @@ public class BagBuilder<T extends ParameterBagContainerBuilder<T>> {
 		return this.builder;
 	}
 
-	public void build(ParameterBagContainer element) {
+	public void applyBag(ParameterBagContainer element) {
 		ParameterBag bag = new ParameterBag(this.id, this.name, this.type);
 		this.parameters.forEach(b -> bag.addParameter(b.build()));
 		element.addParameterBag(bag);

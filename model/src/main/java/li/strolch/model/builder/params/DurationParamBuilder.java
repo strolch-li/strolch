@@ -14,6 +14,6 @@ public class DurationParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public DurationParameter build() {
-		return build(new DurationParameter());
+		return applyParameter(new DurationParameter());
 	}
 }

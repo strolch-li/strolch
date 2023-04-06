@@ -66,7 +66,7 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 	@Override
 	public Activity build() {
 		Activity activity = new Activity(getId(), getName(), getType(), this.timeOrdering);
-		super.build(activity);
+		super.applyRootElement(activity);
 
 		this.builders.forEach(b -> activity.addElement(b.build()));
 

@@ -13,6 +13,6 @@ public class IntegerParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public IntegerParameter build() {
-		return build(new IntegerParameter());
+		return applyParameter(new IntegerParameter());
 	}
 }
