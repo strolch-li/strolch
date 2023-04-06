@@ -152,7 +152,7 @@ public class Version implements Comparable<Version> {
 	 * 		If {@code version} is improperly formatted.
 	 */
 	private Version(final String version) {
-		int maj = 0;
+		int maj;
 		int min = 0;
 		int mic = 0;
 		String qual = StringHelper.EMPTY;
