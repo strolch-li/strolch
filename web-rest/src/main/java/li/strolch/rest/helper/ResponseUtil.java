@@ -179,8 +179,7 @@ public class ResponseUtil {
 	public static Response toResponse(Status status, Throwable t) {
 		JsonObject response = new JsonObject();
 
-		if (t instanceof StrolchUserMessageException && ((StrolchUserMessageException) t).hasI18n()) {
-			StrolchUserMessageException ex = (StrolchUserMessageException) t;
+		if (t instanceof StrolchUserMessageException ex && ((StrolchUserMessageException) t).hasI18n()) {
 			response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 		} else {
 			Throwable rootCause = getRootCause(t);
