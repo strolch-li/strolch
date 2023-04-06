@@ -183,7 +183,7 @@ public class OrderModelTestRunner {
 		}
 
 		// read
-		Order readOrder = null;
+		Order readOrder;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			readOrder = tx.getOrderBy(TYPE, ID);
@@ -201,7 +201,7 @@ public class OrderModelTestRunner {
 		}
 
 		// read updated
-		Order updatedOrder = null;
+		Order updatedOrder;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			updatedOrder = tx.getOrderBy(TYPE, ID);
 		}

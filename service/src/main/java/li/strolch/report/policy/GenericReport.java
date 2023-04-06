@@ -9,6 +9,7 @@ import static li.strolch.utils.helper.StringHelper.EMPTY;
 
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
@@ -58,7 +59,7 @@ public class GenericReport extends ReportPolicy {
 	protected Map<ReportFilterPolicy, TypedTuple<StringParameter, StringParameter>> filtersByPolicy;
 	protected MapOfSets<String, String> filtersById;
 
-	protected long counter;
+	protected AtomicLong counter;
 	protected boolean withPage;
 	protected int offset = -1;
 	protected int limit = -1;
@@ -67,6 +68,7 @@ public class GenericReport extends ReportPolicy {
 
 	public GenericReport(StrolchTransaction tx) {
 		super(tx);
+		this.counter = new AtomicLong(0L);
 	}
 
 	/**
@@ -230,7 +232,7 @@ public class GenericReport extends ReportPolicy {
 
 	@Override
 	public synchronized long getCounter() {
-		return this.counter;
+		return this.counter.get();
 	}
 
 	/**
@@ -336,10 +338,6 @@ public class GenericReport extends ReportPolicy {
 		return this;
 	}
 
-	protected synchronized void incrementCounter() {
-		this.counter++;
-	}
-
 	/**
 	 * Builds the stream of rows on which further transformations can be performed. Each row is a {@link Map} for where
 	 * the key is an element type, and the value is the associated element
@@ -375,7 +373,7 @@ public class GenericReport extends ReportPolicy {
 		if (hasFilter())
 			stream = stream.filter(this::filter);
 
-		stream = stream.peek(e -> incrementCounter());
+		stream = stream.peek(e -> this.counter.incrementAndGet());
 
 		if (withOrdering && hasOrdering())
 			stream = stream.sorted(this::sort);
