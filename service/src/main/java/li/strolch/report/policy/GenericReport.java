@@ -59,7 +59,7 @@ public class GenericReport extends ReportPolicy {
 	protected Map<ReportFilterPolicy, TypedTuple<StringParameter, StringParameter>> filtersByPolicy;
 	protected MapOfSets<String, String> filtersById;
 
-	protected AtomicLong counter;
+	protected final AtomicLong counter;
 	protected boolean withPage;
 	protected int offset = -1;
 	protected int limit = -1;
