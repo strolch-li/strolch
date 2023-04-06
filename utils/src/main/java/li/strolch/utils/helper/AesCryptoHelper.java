@@ -80,7 +80,8 @@ public class AesCryptoHelper {
 
 			// read the initialization vector from the normal input stream
 			byte[] initVector = new byte[16];
-			inputStream.read(initVector);
+			if (inputStream.read(initVector) == -1)
+				throw new IllegalStateException("Failed to read init vector!");
 
 			// init cipher
 			Cipher cipher = Cipher.getInstance(CIPHER);
@@ -196,7 +197,6 @@ public class AesCryptoHelper {
 		}
 
 		logger.info("Decrypted file " + encryptedFileS + " to " + decryptedFileS);
-
 	}
 
 	public static void decrypt(char[] password, byte[] salt, InputStream fis, OutputStream fos) {
@@ -219,7 +219,8 @@ public class AesCryptoHelper {
 
 			// read the initialization vector
 			byte[] initVector = new byte[16];
-			fis.read(initVector);
+			if (fis.read(initVector) == -1)
+				throw new IllegalStateException("Failed to read init vector!");
 
 			// init cipher
 			Cipher cipher = Cipher.getInstance(CIPHER);
@@ -246,10 +247,6 @@ public class AesCryptoHelper {
 
 	public static byte[] encrypt(char[] password, byte[] salt, String clearText) {
 		return encrypt(password, salt, clearText.getBytes());
-	}
-
-	public static byte[] encrypt(SecretKey secret, byte[] salt, String clearText) {
-		return encrypt(secret, clearText.getBytes());
 	}
 
 	public static byte[] encrypt(char[] password, byte[] salt, byte[] clearTextBytes) {
