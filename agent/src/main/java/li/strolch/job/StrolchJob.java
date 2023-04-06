@@ -48,6 +48,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchJob.class);
 
+	private final Object mutex;
+
 	private final StrolchAgent agent;
 	private final String id;
 	private final String name;
@@ -76,6 +78,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	private ZonedDateTime cronStartDate;
 
 	public StrolchJob(StrolchAgent agent, String id, String name, JobMode jobMode) {
+		this.mutex = new Object();
 		this.agent = agent;
 		this.id = id;
 		this.name = name;
@@ -142,38 +145,6 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		return this.agent;
 	}
 
-	public long getInitialDelay() {
-		return this.initialDelay;
-	}
-
-	public void setInitialDelay(long initialDelay) {
-		this.initialDelay = initialDelay;
-	}
-
-	public TimeUnit getInitialDelayTimeUnit() {
-		return this.initialDelayTimeUnit;
-	}
-
-	public void setInitialDelayTimeUnit(TimeUnit initialDelayTimeUnit) {
-		this.initialDelayTimeUnit = initialDelayTimeUnit;
-	}
-
-	public long getDelay() {
-		return this.delay;
-	}
-
-	public void setDelay(long delay) {
-		this.delay = delay;
-	}
-
-	public TimeUnit getDelayTimeUnit() {
-		return this.delayTimeUnit;
-	}
-
-	public void setDelayTimeUnit(TimeUnit delayTimeUnit) {
-		this.delayTimeUnit = delayTimeUnit;
-	}
-
 	protected ComponentContainer getContainer() {
 		return getAgent().getContainer();
 	}
@@ -234,7 +205,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 *
 	 * @return the newly created transaction
 	 */
-	protected synchronized StrolchTransaction openTx(Certificate cert) {
+	protected StrolchTransaction openTx(Certificate cert) {
 		StrolchRealm realm = getContainer().getRealm(cert);
 		this.realmName = realm.getRealm();
 		return realm.openTx(cert, this.getClass(), false);
@@ -248,7 +219,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 *
 	 * @return the newly created transaction
 	 */
-	protected synchronized StrolchTransaction openTx(Certificate cert, boolean readOnly) {
+	protected StrolchTransaction openTx(Certificate cert, boolean readOnly) {
 		StrolchRealm realm = getContainer().getRealm(cert);
 		this.realmName = realm.getRealm();
 		return realm.openTx(cert, this.getClass(), readOnly);
@@ -257,22 +228,25 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	/**
 	 * Executes this job now, but if the job is currently running, then it is blocked till the job is complete
 	 */
-	public synchronized void runNow() throws Exception {
+	public void runNow() throws Exception {
 		doWork();
 		schedule();
 		if (this.lastException != null)
 			throw this.lastException;
 	}
 
-	private synchronized void doWork() {
-		this.running = true;
+	private void doWork() {
+		synchronized (this.mutex) {
+			if (this.running)
+				throw new IllegalStateException("Already running!");
+			this.running = true;
+		}
 		long start = System.currentTimeMillis();
 
 		try {
 			runAsAgent(this::execute);
 			this.lastException = null;
 		} catch (Exception e) {
-			this.running = false;
 			this.lastException = e;
 			logger.error("Execution of Job " + getName() + " failed.", e);
 
@@ -284,14 +258,17 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
 						"job.failed").withException(e).value("jobName", getClass().getName()).value("reason", e));
 			}
-		}
+		} finally {
+			long took = System.currentTimeMillis() - start;
+			this.totalDuration += took;
+			this.lastDuration = took;
+			this.lastExecution = ZonedDateTime.now();
+			this.nrOfExecutions++;
 
-		long took = System.currentTimeMillis() - start;
-		this.totalDuration += took;
-		this.lastDuration = took;
-		this.running = false;
-		this.lastExecution = ZonedDateTime.now();
-		this.nrOfExecutions++;
+			synchronized (this.mutex) {
+				this.running = false;
+			}
+		}
 	}
 
 	@Override
@@ -337,7 +314,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 *
 	 * @return this instance for chaining
 	 */
-	public synchronized StrolchJob schedule() {
+	public StrolchJob schedule() {
 		if (this.mode == JobMode.Manual) {
 			logger.info("Not scheduling " + getName() + " as mode is " + this.mode);
 			return this;
@@ -418,7 +395,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		return this.getClass().getName();
 	}
 
-	public synchronized JsonObject toJson() {
+	public JsonObject toJson() {
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty(Tags.Json.ID, this.id);
@@ -433,7 +410,9 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		jsonObject.addProperty("delay", this.delay);
 		jsonObject.addProperty("delayTimeUnit", this.delayTimeUnit == null ? "-" : this.delayTimeUnit.name());
 
-		jsonObject.addProperty("running", this.running);
+		synchronized (this.mutex) {
+			jsonObject.addProperty("running", this.running);
+		}
 		jsonObject.addProperty("totalDuration", formatMillisecondsDuration(this.totalDuration));
 		jsonObject.addProperty("lastDuration", formatMillisecondsDuration(this.lastDuration));
 
