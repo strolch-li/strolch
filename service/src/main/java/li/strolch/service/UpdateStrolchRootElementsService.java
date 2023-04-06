@@ -50,6 +50,7 @@ public class UpdateStrolchRootElementsService extends AbstractService<StrolchRoo
 				case Tags.RESOURCE -> tx.update((Resource) rootElement);
 				case Tags.ORDER -> tx.update((Order) rootElement);
 				case Tags.ACTIVITY -> tx.update((Activity) rootElement);
+				default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
 				}
 			}
 			tx.commitOnClose();
