@@ -777,6 +777,11 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(type, id);
+	}
+
+	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Activity [id=");

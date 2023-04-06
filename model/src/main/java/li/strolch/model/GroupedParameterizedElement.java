@@ -290,9 +290,10 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
+	public abstract boolean equals(Object obj);
+
+	@Override
+	public abstract int hashCode();
 
 	@Override
 	public void setReadOnly() {

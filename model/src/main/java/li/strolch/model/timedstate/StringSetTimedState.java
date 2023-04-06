@@ -15,6 +15,8 @@
  */
 package li.strolch.model.timedstate;
 
+import java.util.Objects;
+
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.visitor.StrolchElementVisitor;
@@ -30,6 +32,21 @@ public class StringSetTimedState extends AbstractStrolchTimedState<StringSetValu
 
 	public StringSetTimedState(String id, String name) {
 		super(id, name);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		StringSetTimedState o = (StringSetTimedState) obj;
+		return this.parent == o.parent && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, id);
 	}
 
 	@Override

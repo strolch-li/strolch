@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Objects;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
@@ -157,6 +158,21 @@ public class DateParameter extends AbstractParameter<Date> {
 
 	public boolean isEqualTo(ZonedDateTime otherValue) {
 		return this.value.equals(otherValue);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		DateParameter o = (DateParameter) obj;
+		return this.parent == o.parent && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, id);
 	}
 
 	public void setValueFromLocalDateTime(LocalDateTime localDateTime) {

@@ -15,6 +15,8 @@
  */
 package li.strolch.model;
 
+import java.util.Objects;
+
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.visitor.StrolchElementVisitor;
 
@@ -42,6 +44,21 @@ public class ParameterBag extends ParameterizedElement {
 	 */
 	public ParameterBag(String id, String name, String type) {
 		super(id, name, type);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		ParameterBag r = (ParameterBag) obj;
+		return this.type.equals(r.type) && this.id.equals(r.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, id);
 	}
 
 	@Override

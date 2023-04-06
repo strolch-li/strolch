@@ -133,25 +133,10 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
-		return result;
-	}
+	public abstract boolean equals(Object obj);
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		AbstractStrolchElement other = (AbstractStrolchElement) obj;
-		if (this.id == null) {
-			return other.id == null;
-		} else
-			return this.id.equals(other.id);
-	}
+	public abstract int hashCode();
 
 	@Override
 	public abstract String toString();

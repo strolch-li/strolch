@@ -367,6 +367,21 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Action a = (Action) obj;
+		return this.parent == a.parent && this.type.equals(a.type) && this.id.equals(a.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, type, id);
+	}
+
+	@Override
 	public String toString() {
 		return "Action [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", resourceId="
 				+ this.resourceId + ", state=" + this.state + "]";

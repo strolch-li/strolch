@@ -391,6 +391,11 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(type, id);
+	}
+
+	@Override
 	public String toString() {
 
 		return "Resource [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", version=" + this.version;

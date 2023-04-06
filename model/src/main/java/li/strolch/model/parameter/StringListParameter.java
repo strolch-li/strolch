@@ -18,6 +18,7 @@ package li.strolch.model.parameter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
@@ -69,6 +70,21 @@ public class StringListParameter extends AbstractListParameter<String> {
 	@Override
 	public StrolchValueType getValueType() {
 		return StrolchValueType.STRING_LIST;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		StringListParameter o = (StringListParameter) obj;
+		return this.parent == o.parent && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, id);
 	}
 
 	@Override

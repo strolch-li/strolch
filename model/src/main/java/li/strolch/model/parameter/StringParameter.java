@@ -16,6 +16,7 @@
 package li.strolch.model.parameter;
 
 import java.text.MessageFormat;
+import java.util.Objects;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
@@ -139,6 +140,21 @@ public class StringParameter extends AbstractParameter<String> {
 	@Override
 	public boolean isEqualTo(String otherValue) {
 		return this.value.equals(otherValue);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		StringParameter o = (StringParameter) obj;
+		return this.parent == o.parent && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, id);
 	}
 
 	@Override

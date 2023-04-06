@@ -18,6 +18,7 @@ package li.strolch.model;
 import java.text.MessageFormat;
 import java.time.*;
 import java.util.Date;
+import java.util.Objects;
 
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -300,6 +301,11 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 			return false;
 		Order o = (Order) obj;
 		return this.type.equals(o.type) && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, id);
 	}
 
 	@Override

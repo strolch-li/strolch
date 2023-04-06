@@ -17,6 +17,7 @@ package li.strolch.model.parameter;
 
 import java.time.Duration;
 import java.time.Period;
+import java.util.Objects;
 
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
@@ -131,6 +132,21 @@ public class DurationParameter extends AbstractParameter<PeriodDuration> {
 	@Override
 	public boolean isEqualTo(PeriodDuration otherValue) {
 		return this.value.equals(otherValue);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		DurationParameter o = (DurationParameter) obj;
+		return this.parent == o.parent && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, id);
 	}
 
 	public long toMillis() {

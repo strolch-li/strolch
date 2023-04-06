@@ -15,7 +15,10 @@
  */
 package li.strolch.model.parameter;
 
+import java.util.Objects;
+
 import li.strolch.model.StrolchValueType;
+import li.strolch.model.timedstate.FloatTimedState;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
@@ -106,6 +109,21 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	@Override
 	public boolean isEqualTo(Boolean otherValue) {
 		return this.value.equals(otherValue);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		BooleanParameter o = (BooleanParameter) obj;
+		return this.parent == o.parent && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, id);
 	}
 
 	public void flip() {
