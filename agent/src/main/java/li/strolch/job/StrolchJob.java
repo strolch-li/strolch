@@ -3,6 +3,7 @@ package li.strolch.job;
 import static java.time.ZoneId.systemDefault;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
@@ -173,34 +174,6 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		this.delayTimeUnit = delayTimeUnit;
 	}
 
-	public synchronized long getLastDuration() {
-		return lastDuration;
-	}
-
-	public synchronized long getTotalDuration() {
-		return totalDuration;
-	}
-
-	public synchronized long getNrOfExecutions() {
-		return nrOfExecutions;
-	}
-
-	public synchronized boolean isRunning() {
-		return running;
-	}
-
-	public synchronized String getRealmName() {
-		return realmName;
-	}
-
-	public ZonedDateTime getLastExecution() {
-		return lastExecution;
-	}
-
-	public synchronized Exception getLastException() {
-		return lastException;
-	}
-
 	protected ComponentContainer getContainer() {
 		return getAgent().getContainer();
 	}
@@ -261,7 +234,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 *
 	 * @return the newly created transaction
 	 */
-	protected StrolchTransaction openTx(Certificate cert) {
+	protected synchronized StrolchTransaction openTx(Certificate cert) {
 		StrolchRealm realm = getContainer().getRealm(cert);
 		this.realmName = realm.getRealm();
 		return realm.openTx(cert, this.getClass(), false);
@@ -275,7 +248,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 *
 	 * @return the newly created transaction
 	 */
-	protected StrolchTransaction openTx(Certificate cert, boolean readOnly) {
+	protected synchronized StrolchTransaction openTx(Certificate cert, boolean readOnly) {
 		StrolchRealm realm = getContainer().getRealm(cert);
 		this.realmName = realm.getRealm();
 		return realm.openTx(cert, this.getClass(), readOnly);
@@ -284,7 +257,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	/**
 	 * Executes this job now, but if the job is currently running, then it is blocked till the job is complete
 	 */
-	public void runNow() throws Exception {
+	public synchronized void runNow() throws Exception {
 		doWork();
 		schedule();
 		if (this.lastException != null)
@@ -305,13 +278,11 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 
 			if (getContainer().hasComponent(OperationsLog.class)) {
 				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
-				operationsLog.addMessage(
-						new LogMessage(this.realmName == null ? StrolchConstants.DEFAULT_REALM : this.realmName,
-								SYSTEM_USER_AGENT, Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()),
-								LogSeverity.Exception, LogMessageState.Information,
-								ResourceBundle.getBundle("strolch-agent"), "job.failed").withException(e)
-								.value("jobName", getClass().getName())
-								.value("reason", e));
+				String realmName = this.realmName == null ? DEFAULT_REALM : this.realmName;
+				operationsLog.addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
+						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Exception,
+						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+						"job.failed").withException(e).value("jobName", getClass().getName()).value("reason", e));
 			}
 		}
 
@@ -366,7 +337,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 *
 	 * @return this instance for chaining
 	 */
-	public StrolchJob schedule() {
+	public synchronized StrolchJob schedule() {
 		if (this.mode == JobMode.Manual) {
 			logger.info("Not scheduling " + getName() + " as mode is " + this.mode);
 			return this;
@@ -447,7 +418,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		return this.getClass().getName();
 	}
 
-	public JsonObject toJson() {
+	public synchronized JsonObject toJson() {
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty(Tags.Json.ID, this.id);
@@ -463,16 +434,14 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		jsonObject.addProperty("delayTimeUnit", this.delayTimeUnit == null ? "-" : this.delayTimeUnit.name());
 
 		jsonObject.addProperty("running", this.running);
-		jsonObject.addProperty("totalDuration", formatMillisecondsDuration(getTotalDuration()));
-		jsonObject.addProperty("lastDuration", formatMillisecondsDuration(getLastDuration()));
+		jsonObject.addProperty("totalDuration", formatMillisecondsDuration(this.totalDuration));
+		jsonObject.addProperty("lastDuration", formatMillisecondsDuration(this.lastDuration));
 
-		ZonedDateTime lastExecution = getLastExecution();
-
-		if (lastExecution == null) {
+		if (this.lastExecution == null) {
 			jsonObject.addProperty("lastExecution", "-");
 		} else {
 			jsonObject.addProperty("lastExecution",
-					lastExecution.format(ISO_OFFSET_DATE_TIME.withZone(systemDefault())));
+					this.lastExecution.format(ISO_OFFSET_DATE_TIME.withZone(systemDefault())));
 		}
 
 		if (this.future == null) {
@@ -486,9 +455,9 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			jsonObject.addProperty("nextExecution", nextExecution);
 		}
 
-		jsonObject.addProperty("nrOfExecutions", getNrOfExecutions());
+		jsonObject.addProperty("nrOfExecutions", this.nrOfExecutions);
 
-		Exception lastException = getLastException();
+		Exception lastException = this.lastException;
 		if (lastException != null)
 			jsonObject.addProperty("lastException", ExceptionHelper.formatExceptionMessage(lastException));
 
