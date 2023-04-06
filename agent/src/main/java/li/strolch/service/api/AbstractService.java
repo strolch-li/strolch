@@ -157,8 +157,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
-	 * Returns the {@link StrolchRealm} with the given name. If the realm does not exist, then a {@link
-	 * StrolchException} is thrown
+	 * Returns the {@link StrolchRealm} with the given name. If the realm does not exist, then a
+	 * {@link StrolchException} is thrown
 	 *
 	 * @param realm
 	 * 		the name of the {@link StrolchRealm} to return
@@ -351,9 +351,9 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
-	 * Opens a {@link StrolchTransaction} where the realm retrieved using {@link ComponentContainer#getRealm(Certificate)},
-	 * the action for the TX is this implementation's class name. This transaction should be used in a try-with-resource
-	 * clause so it is properly closed
+	 * Opens a {@link StrolchTransaction} where the realm retrieved using
+	 * {@link ComponentContainer#getRealm(Certificate)}, the action for the TX is this implementation's class name. This
+	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
@@ -365,9 +365,9 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
-	 * Opens a {@link StrolchTransaction} where the realm retrieved using {@link ComponentContainer#getRealm(Certificate)},
-	 * the action for the TX is this implementation's class name. This transaction should be used in a try-with-resource
-	 * clause so it is properly closed
+	 * Opens a {@link StrolchTransaction} where the realm retrieved using
+	 * {@link ComponentContainer#getRealm(Certificate)}, the action for the TX is this implementation's class name. This
+	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 *
 	 * @param readOnly
 	 * 		flag to denote if this TX should be read only
@@ -382,8 +382,9 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
-	 * Opens a {@link StrolchTransaction} where the realm retrieved using {@link ComponentContainer#getRealm(Certificate)}.
-	 * This transaction should be used in a try-with-resource clause so it is properly closed
+	 * Opens a {@link StrolchTransaction} where the realm retrieved using
+	 * {@link ComponentContainer#getRealm(Certificate)}. This transaction should be used in a try-with-resource clause
+	 * so it is properly closed
 	 *
 	 * @param action
 	 * 		the action to use for the opened TX
@@ -504,8 +505,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
-	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @param runnable
 	 * 		the action to perform
@@ -520,8 +521,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user {@link
-	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
 	 * @param runnable
 	 * 		the action to perform
@@ -540,8 +541,8 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 
 	/**
 	 * This method is final as it enforces that the argument is valid, and catches all exceptions and enforces that a
-	 * service result is returned. A concrete implementation will implement the business logic in {@link
-	 * #internalDoService(ServiceArgument)}
+	 * service result is returned. A concrete implementation will implement the business logic in
+	 * {@link #internalDoService(ServiceArgument)}
 	 */
 	@Override
 	public final U doService(T argument) {
@@ -569,15 +570,15 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 
 			return serviceResult;
 
+		} catch (StrolchUserMessageException e) {
+			U result = getResultInstance();
+			result.setMessage(e.getMessage());
+			result.setState(ServiceResultState.WARNING);
+			result.setI18nMessage(e.getI18n());
+			return result;
 		} catch (Exception e) {
 			U result = getResultInstance();
 			result.setMessage(e.getMessage());
-
-			if (e instanceof StrolchUserMessageException) {
-				result.setState(ServiceResultState.WARNING);
-				result.setI18nMessage(((StrolchUserMessageException) e).getI18n());
-				return result;
-			}
 
 			Throwable rootCause = getRootCause(e);
 			if (rootCause instanceof StrolchUserMessageException) {
