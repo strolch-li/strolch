@@ -30,7 +30,6 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.collections.MapOfSets;
-import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
@@ -39,11 +38,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	private final Set<String> ignoredTimedStates;
 	private final Set<String> ignoredBagTypes;
 
-	private BiConsumer<ParameterBag, JsonObject> bagHook;
-	private BiConsumer<Resource, JsonObject> resourceHook;
-	private BiConsumer<Order, JsonObject> orderHook;
-	private BiConsumer<Activity, JsonObject> activityHook;
-	private BiConsumer<Action, JsonObject> actionHook;
+	private List<BiConsumer<ParameterBag, JsonObject>> bagHooks;
+	private List<BiConsumer<Resource, JsonObject>> resourceHooks;
+	private List<BiConsumer<Order, JsonObject>> orderHooks;
+	private List<BiConsumer<Activity, JsonObject>> activityHooks;
+	private List<BiConsumer<Action, JsonObject>> actionHooks;
 
 	private boolean flat;
 	private final Set<String> flatBags;
@@ -220,35 +219,37 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	public StrolchElementToJsonVisitor bagHook(BiConsumer<ParameterBag, JsonObject> hook) {
-		this.bagHook = hook;
+		if (this.bagHooks == null)
+			this.bagHooks = new ArrayList<>();
+		this.bagHooks.add(hook);
 		return this;
 	}
 
 	public StrolchElementToJsonVisitor resourceHook(BiConsumer<Resource, JsonObject> hook) {
-		DBC.PRE.assertNotNull("hook must not be null", hook);
-		DBC.PRE.assertNull("resourceHook already set!", this.resourceHook);
-		this.resourceHook = hook;
+		if (this.resourceHooks == null)
+			this.resourceHooks = new ArrayList<>();
+		this.resourceHooks.add(hook);
 		return this;
 	}
 
 	public StrolchElementToJsonVisitor orderHook(BiConsumer<Order, JsonObject> hook) {
-		DBC.PRE.assertNotNull("hook must not be null", hook);
-		DBC.PRE.assertNull("orderHook already set!", this.orderHook);
-		this.orderHook = hook;
+		if (this.orderHooks == null)
+			this.orderHooks = new ArrayList<>();
+		this.orderHooks.add(hook);
 		return this;
 	}
 
 	public StrolchElementToJsonVisitor activityHook(BiConsumer<Activity, JsonObject> hook) {
-		DBC.PRE.assertNotNull("hook must not be null", hook);
-		DBC.PRE.assertNull("activityHook already set!", this.activityHook);
-		this.activityHook = hook;
+		if (this.activityHooks == null)
+			this.activityHooks = new ArrayList<>();
+		this.activityHooks.add(hook);
 		return this;
 	}
 
 	public StrolchElementToJsonVisitor actionHook(BiConsumer<Action, JsonObject> hook) {
-		DBC.PRE.assertNotNull("hook must not be null", hook);
-		DBC.PRE.assertNull("actionHook already set!", this.actionHook);
-		this.actionHook = hook;
+		if (this.actionHooks == null)
+			this.actionHooks = new ArrayList<>();
+		this.actionHooks.add(hook);
 		return this;
 	}
 
@@ -417,8 +418,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			Set<String> ignoredParamIds = this.ignoredKeys.getSet(bag.getId());
 			addParameterBagFlat(bagJ, ignoredParamIds, bag);
 
-			if (this.bagHook != null)
-				this.bagHook.accept(bag, bagJ);
+			if (this.bagHooks != null && !this.bagHooks.isEmpty())
+				this.bagHooks.forEach(e -> e.accept(bag, bagJ));
 
 			return bagJ;
 		}
@@ -439,8 +440,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		addStates(element, rootJ);
 		addPolicies(element, rootJ);
 
-		if (this.resourceHook != null)
-			this.resourceHook.accept(element, rootJ);
+		if (this.resourceHooks != null && !this.resourceHooks.isEmpty())
+			this.resourceHooks.forEach(e -> e.accept(element, rootJ));
 
 		return rootJ;
 	}
@@ -459,8 +460,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		addParameterizedElements(element, rootJ);
 		addPolicies(element, rootJ);
 
-		if (this.orderHook != null)
-			this.orderHook.accept(element, rootJ);
+		if (this.orderHooks != null && !this.orderHooks.isEmpty())
+			this.orderHooks.forEach(e -> e.accept(element, rootJ));
 
 		return rootJ;
 	}
@@ -491,8 +492,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		addParameterizedElements(element, rootJ);
 		addPolicies(element, rootJ);
 
-		if (this.activityHook != null)
-			this.activityHook.accept(element, rootJ);
+		if (this.activityHooks != null && !this.activityHooks.isEmpty())
+			this.activityHooks.forEach(e -> e.accept(element, rootJ));
 
 		if (currentDepth >= this.activityDepth)
 			return rootJ;
@@ -538,8 +539,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		addParameterizedElements(element, rootJ);
 		addPolicies(element, rootJ);
 
-		if (this.actionHook != null)
-			this.actionHook.accept(element, rootJ);
+		if (this.actionHooks != null && !this.actionHooks.isEmpty())
+			this.actionHooks.forEach(e -> e.accept(element, rootJ));
 
 		// value changes
 		if (!this.withoutValueChanges && element.hasChanges()) {
@@ -690,8 +691,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 				.sorted(comparing(Parameter::getIndex))
 				.forEach(param -> paramsJ.add(param.getId(), paramToJsonFull(param)));
 
-		if (this.bagHook != null)
-			this.bagHook.accept(bag, bagJ);
+		if (this.bagHooks != null && !this.bagHooks.isEmpty())
+			this.bagHooks.forEach(e -> e.accept(bag, bagJ));
 
 		return bagJ;
 	}
