@@ -67,12 +67,15 @@ public class TexHelper {
 			}
 
 			// clean old builds
-			Arrays.asList(texPath.toFile().listFiles(
-					file -> (System.currentTimeMillis() - file.lastModified()) > TimeUnit.MINUTES.toMillis(1)))
-					.forEach(file -> {
-						logger.info("Deleting old path " + file);
-						FileHelper.deleteFile(file, false);
-					});
+			File[] texFiles = texPath.toFile()
+					.listFiles(
+							file -> (System.currentTimeMillis() - file.lastModified()) > TimeUnit.MINUTES.toMillis(1));
+			if (texFiles == null)
+				throw new IllegalStateException("No tex files found!");
+			Arrays.asList(texFiles).forEach(file -> {
+				logger.info("Deleting old path " + file);
+				FileHelper.deleteFile(file, false);
+			});
 
 			// prepare a temporary directory by copying tex files
 			File tmpPathF = texPath.resolve(StringHelper.getUniqueId()).toFile();
@@ -82,8 +85,8 @@ public class TexHelper {
 
 			if (!FileHelper.copy(templatePath.getParentFile().listFiles(), tmpPathF, false))
 				throw new RuntimeException(
-						"Failed to copy " + templatePath.getParentFile().getAbsolutePath() + " to tmpPath " + tmpPathF
-								.getAbsolutePath());
+						"Failed to copy " + templatePath.getParentFile().getAbsolutePath() + " to tmpPath "
+								+ tmpPathF.getAbsolutePath());
 
 			// then write TEX file
 			String texFileName = fileName + ".tex";
@@ -95,8 +98,8 @@ public class TexHelper {
 
 			// do PDF generation
 			String cmd = "pdflatex";
-			ProcessHelper.ProcessResult processResult = ProcessHelper
-					.runCommand(tmpPathF, cmd, "-halt-on-error", "-file-line-error", texFileName);
+			ProcessHelper.ProcessResult processResult = ProcessHelper.runCommand(tmpPathF, cmd, "-halt-on-error",
+					"-file-line-error", texFileName);
 			if (processResult.returnValue != 0) {
 				logger.error(processResult.processOutput);
 				throw new RuntimeException(
