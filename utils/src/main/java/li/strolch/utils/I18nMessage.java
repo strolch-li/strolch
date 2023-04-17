@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.CodeSource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -27,7 +28,8 @@ import org.slf4j.LoggerFactory;
 public class I18nMessage {
 
 	private static final Logger logger = LoggerFactory.getLogger(I18nMessage.class);
-	private static MapOfMaps<String, Locale, ResourceBundle> bundleMap;
+	private static final MapOfMaps<String, Locale, ResourceBundle> bundleMap = new MapOfMaps<>();
+	private static final AtomicBoolean loaded = new AtomicBoolean(false);
 	private static final MapOfSets<String, String> missingKeysMap = synchronizedMapOfSets(new MapOfSets<>());
 
 	private final String bundleName;
@@ -252,36 +254,32 @@ public class I18nMessage {
 	}
 
 	private static MapOfMaps<String, Locale, ResourceBundle> getBundleMap() {
-		if (bundleMap == null) {
-			synchronized (logger) {
-				bundleMap = findAllBundles();
-			}
+		synchronized (loaded) {
+			if (!loaded.get())
+				findAllBundles();
+			return bundleMap;
 		}
-
-		return bundleMap;
 	}
 
-	private static MapOfMaps<String, Locale, ResourceBundle> findAllBundles() {
+	private static void findAllBundles() {
 		try {
 			CodeSource src = I18nMessage.class.getProtectionDomain().getCodeSource();
 			if (src == null) {
 				logger.error(
 						"Failed to find CodeSource for ProtectionDomain " + I18nMessage.class.getProtectionDomain());
-				return new MapOfMaps<>();
+				return;
 			}
 
 			File jarLocationF = new File(src.getLocation().toURI());
 			if (!(jarLocationF.exists() && jarLocationF.getParentFile().isDirectory())) {
 				logger.info("Found JAR repository at " + jarLocationF.getParentFile());
-				return new MapOfMaps<>();
+				return;
 			}
-
-			MapOfMaps<String, Locale, ResourceBundle> bundleMap = new MapOfMaps<>();
 
 			File jarD = jarLocationF.getParentFile();
 			File[] jarFiles = jarD.listFiles((dir, name) -> name.endsWith(".jar"));
 			if (jarFiles == null)
-				return new MapOfMaps<>();
+				return;
 
 			for (File file : jarFiles) {
 
@@ -355,11 +353,11 @@ public class I18nMessage {
 			}
 
 			logger.info("Done.");
-			return bundleMap;
 
 		} catch (Exception e) {
 			logger.error("Failed to find all property files!", e);
-			return new MapOfMaps<>();
+		} finally {
+			loaded.set(true);
 		}
 	}
 
