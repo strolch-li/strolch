@@ -236,7 +236,7 @@ public class StrolchAgent {
 	 * Initializes the underlying container and prepares the executor services. Before calling this method,
 	 * {@link #setup(String, File, File, File)} must have ben called
 	 */
-	public void initialize() {
+	public synchronized void initialize() {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
 
@@ -264,7 +264,7 @@ public class StrolchAgent {
 	/**
 	 * Destroys the container and the executor services
 	 */
-	public void destroy() {
+	public synchronized void destroy() {
 
 		if (this.executorPool != null)
 			this.executorPool.destroy();
