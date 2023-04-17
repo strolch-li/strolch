@@ -22,13 +22,13 @@ import li.strolch.agent.impl.SimplePostInitializer;
  * @author Robert von Burg <eitch@eitchnet.ch>
  * 
  */
-public class PostInitializer extends SimplePostInitializer {
+public class TutorialPostInitializer extends SimplePostInitializer {
 
 	/**
 	 * @param container
 	 * @param componentName
 	 */
-	public PostInitializer(ComponentContainer container, String componentName) {
+	public TutorialPostInitializer(ComponentContainer container, String componentName) {
 		super(container, componentName);
 	}
 
