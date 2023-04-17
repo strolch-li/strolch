@@ -42,21 +42,12 @@ public class ExecutorPool {
 	}
 
 	public void destroy() {
-
-		for (String poolName : this.executors.keySet()) {
-			logger.info("Shutting down executor pool " + poolName);
-			ExecutorService executor = this.executors.get(poolName);
-			shutdownExecutor(poolName, executor);
-		}
-
-		for (String poolName : this.scheduledExecutors.keySet()) {
-			logger.info("Shutting down scheduled executor pool " + poolName);
-			ExecutorService executor = this.scheduledExecutors.get(poolName);
-			shutdownExecutor(poolName, executor);
-		}
+		this.executors.forEach(this::shutdownExecutor);
+		this.scheduledExecutors.forEach(this::shutdownExecutor);
 	}
 
 	private void shutdownExecutor(String name, ExecutorService executor) {
+		logger.info("Shutting down executor pool " + name);
 		try {
 			List<Runnable> tasks = executor.shutdownNow();
 			if (!tasks.isEmpty()) {
