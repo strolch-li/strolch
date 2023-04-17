@@ -21,7 +21,7 @@ public class Crc {
 				if ((w & 0x8000) != 0) {
 					w = (w << 1) ^ poly;
 				} else {
-					w = w << 1;
+					w <<= 1;
 				}
 			}
 			crcTable[x] = (short) w;

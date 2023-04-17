@@ -187,7 +187,7 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		Long byType = this.deletedAllByType.get(type);
 		if (byType == null)
 			byType = 0L;
-		byType = byType + removed;
+		byType += removed;
 		this.deletedAllByType.put(type, byType);
 
 		this.deletedAll += removed;
