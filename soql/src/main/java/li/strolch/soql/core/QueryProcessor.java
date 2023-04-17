@@ -155,7 +155,7 @@ public class QueryProcessor {
 	private CompiledStatement compile(ParseTree tree) {
 
 		ParseTreeWalker walker = new ParseTreeWalker();
-		SOQLListener listener = new SOQLListener();
+		StrolchSOQLListener listener = new StrolchSOQLListener();
 		walker.walk(listener, tree);
 
 		CompiledStatement soqlStatement = new CompiledStatement();

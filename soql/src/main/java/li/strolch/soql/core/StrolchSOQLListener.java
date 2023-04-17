@@ -10,7 +10,7 @@ import li.strolch.soql.core.expresssion.*;
 /**
  * @author msmock
  */
-public class SOQLListener extends SOQLBaseListener {
+public class StrolchSOQLListener extends SOQLBaseListener {
 
 	// the map of entities declared in the FROM clause with their nicknames as keys
 	private final Map<String, String> entities = new HashMap<>();
