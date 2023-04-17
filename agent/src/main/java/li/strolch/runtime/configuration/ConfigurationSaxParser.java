@@ -235,6 +235,9 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			switch (qName) {
 			case NAME, API, IMPL, DEPENDS -> this.valueBuffer = new StringBuilder();
+			default -> {
+				// no nothing for others, as only these are text elements
+			}
 			}
 		}
 
