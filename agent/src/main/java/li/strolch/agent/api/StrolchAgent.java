@@ -202,7 +202,7 @@ public class StrolchAgent {
 		return getExecutor("Agent");
 	}
 
-	public synchronized ExecutorService getExecutor(String poolName) {
+	public ExecutorService getExecutor(String poolName) {
 		return this.executorPool.getExecutor(poolName);
 	}
 
@@ -215,7 +215,7 @@ public class StrolchAgent {
 		return getSingleThreadExecutor("Agent");
 	}
 
-	public synchronized ExecutorService getSingleThreadExecutor(String poolName) {
+	public ExecutorService getSingleThreadExecutor(String poolName) {
 		return this.executorPool.getSingleThreadExecutor(poolName);
 	}
 
@@ -228,7 +228,7 @@ public class StrolchAgent {
 		return getScheduledExecutor("Agent");
 	}
 
-	public synchronized ScheduledExecutorService getScheduledExecutor(String poolName) {
+	public ScheduledExecutorService getScheduledExecutor(String poolName) {
 		return this.executorPool.getScheduledExecutor(poolName);
 	}
 
@@ -236,7 +236,7 @@ public class StrolchAgent {
 	 * Initializes the underlying container and prepares the executor services. Before calling this method,
 	 * {@link #setup(String, File, File, File)} must have ben called
 	 */
-	public synchronized void initialize() {
+	public void initialize() {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
 
@@ -264,7 +264,7 @@ public class StrolchAgent {
 	/**
 	 * Destroys the container and the executor services
 	 */
-	public synchronized void destroy() {
+	public void destroy() {
 
 		if (this.executorPool != null)
 			this.executorPool.destroy();
@@ -323,14 +323,14 @@ public class StrolchAgent {
 	/**
 	 * @return Returns the pseudo unique Id to be used during object creation from external services.
 	 */
-	public static synchronized String getUniqueId() {
+	public static String getUniqueId() {
 		return StringHelper.getUniqueId();
 	}
 
 	/**
 	 * @return Returns the pseudo unique Id to be used during object creation from external services.
 	 */
-	public static synchronized Long getUniqueIdLong() {
+	public static Long getUniqueIdLong() {
 		return StringHelper.getUniqueIdLong();
 	}
 
