@@ -10,6 +10,7 @@ include:
   - name: ReplaceWithOperatorAssignment
   - name: SystemOutErr
   - name: UnnecessarySemicolon
+  - name: AssignmentToStaticFieldFromInstanceMethod
 exclude:
   - name: All
     paths:
