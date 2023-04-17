@@ -32,8 +32,8 @@ import li.strolch.utils.dbc.DBC;
 
 /**
  * <p>
- * This {@link AuditTrail} facade registers all actions performed i.e. it registers which {@link StrolchRootElement
- * StrolchRootElements} are retrieved, created, updated and deleted.
+ * This {@link AuditTrail} facade registers all actions performed i.e. it registers which
+ * {@link StrolchRootElement StrolchRootElements} are retrieved, created, updated and deleted.
  * </p>
  *
  * <p>
@@ -380,7 +380,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 		Long byType = this.deletedAllByType.get(type);
 		if (byType == null)
 			byType = 0L;
-		byType = byType + removed;
+		byType += removed;
 		this.deletedAllByType.put(type, byType);
 
 		return removed;

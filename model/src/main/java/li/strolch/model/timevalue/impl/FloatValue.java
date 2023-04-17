@@ -57,7 +57,7 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	@Override
 	public FloatValue add(Double o) {
-		this.value = this.value + o;
+		this.value += o;
 		return this;
 	}
 
