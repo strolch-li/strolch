@@ -210,7 +210,7 @@ public class ElementLockingHandler<T> {
 			}
 		}
 
-		logger.info("Pruned " + count + " T locks.");
+		logger.info("Pruned " + count + " locks.");
 	}
 
 	private TypedTuple<ElementLock, Long> newLock(T element) {
