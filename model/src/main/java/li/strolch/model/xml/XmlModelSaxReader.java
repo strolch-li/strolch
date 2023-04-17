@@ -322,8 +322,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 
 		default:
-			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -369,6 +368,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		case ACTION:
 
+			if (this.activityStack.isEmpty())
+				throw new IllegalStateException("Missing parent for action");
 			this.activityStack.peek().addElement((Action) parameterizedElement);
 			this.parameterizedElement = this.activityStack.peek();
 
@@ -425,8 +426,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 
 		default:
-			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 }
