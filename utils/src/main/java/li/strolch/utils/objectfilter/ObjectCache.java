@@ -71,18 +71,11 @@ public class ObjectCache {
 	private Object object;
 
 	public ObjectCache(long id, String key, Object objectKey, Object object, Operation operation) {
-
 		this.id = id;
 		this.key = key;
 		this.objectKey = objectKey;
 		this.object = object;
 		this.operation = operation;
-
-		if (logger.isDebugEnabled()) {
-			String sb = "Instanciated Cache: ID" + this.id + " / " + key + " OP: " + this.operation + " / "
-					+ objectKey.toString();
-			logger.debug(sb);
-		}
 	}
 
 	/**
@@ -92,10 +85,6 @@ public class ObjectCache {
 	 * 		the object to set
 	 */
 	public void setObject(Object object) {
-		if (logger.isDebugEnabled()) {
-			logger.debug(
-					MessageFormat.format("Updating ID {0} to value {1}", this.id, object.toString()));
-		}
 		this.object = object;
 	}
 
@@ -106,11 +95,6 @@ public class ObjectCache {
 	 * 		the operation to set
 	 */
 	public void setOperation(Operation newOperation) {
-		if (logger.isDebugEnabled()) {
-			String msg = "Updating Operation of ID {0} from {1} to {2}";
-			msg = MessageFormat.format(msg, this.id, this.operation, newOperation);
-			logger.debug(msg);
-		}
 		this.operation = newOperation;
 	}
 
