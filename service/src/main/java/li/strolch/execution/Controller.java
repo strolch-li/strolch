@@ -319,7 +319,7 @@ public class Controller {
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
-				internalToStopped(tx, action);
+				toStopped(tx, action);
 
 				tx.commitOnClose();
 			}
@@ -341,10 +341,10 @@ public class Controller {
 		if (!refreshActivity(tx))
 			throw new IllegalStateException("Activity " + actionLoc.trim(3) + " does not exist anymore!");
 		Action action = this.activity.getElementByLocator(actionLoc);
-		internalToStopped(tx, action);
+		toStopped(tx, action);
 	}
 
-	protected void internalToStopped(StrolchTransaction tx, Action action) {
+	public void toStopped(StrolchTransaction tx, Action action) {
 		SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
 		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 		command.setAction(action);
