@@ -78,7 +78,8 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 			throw new IllegalStateException("Action " + action.getLocator() + " is in illegal state " + currentState);
 
 		if (!currentState.canSetToExecution()) {
-			logger.warn("Action " + action.getLocator() + " can not be executed with state " + currentState);
+			if (currentState != State.EXECUTION)
+				logger.warn("Action " + action.getLocator() + " can not be executed with state " + currentState);
 			return;
 		}
 
