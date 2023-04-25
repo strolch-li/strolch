@@ -13,6 +13,6 @@ public class TextParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public TextParameter build() {
-		return build(new TextParameter());
+		return applyParameter(new TextParameter());
 	}
 }

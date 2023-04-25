@@ -18,7 +18,6 @@ package li.strolch.command;
 import java.text.MessageFormat;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;

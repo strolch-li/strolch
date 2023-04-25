@@ -28,10 +28,9 @@ import org.slf4j.LoggerFactory;
 public class FileStreamProgressWatcher implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileStreamProgressWatcher.class);
-	private ProgressableFileInputStream inputStream;
-	private boolean run = false;
-	private FileProgressListener progressListener;
-	private long millis;
+	private final ProgressableFileInputStream inputStream;
+	private final FileProgressListener progressListener;
+	private final long millis;
 
 	public FileStreamProgressWatcher(long millis, FileProgressListener progressListener,
 			ProgressableFileInputStream inputStream) {
@@ -42,36 +41,36 @@ public class FileStreamProgressWatcher implements Runnable {
 
 	@Override
 	public void run() {
-		this.run = true;
+		boolean run = true;
 		this.progressListener.begin(this.inputStream.getPercentComplete(), this.inputStream.getBytesRead(),
 				this.inputStream.getFileSize());
 
-		while (this.run) {
+		while (run) {
 			try {
 				int percentComplete = this.inputStream.getPercentComplete();
 				if (this.inputStream.isClosed()) {
-					logger.info(MessageFormat.format("Input Stream is closed at: {0}%", percentComplete)); //$NON-NLS-1$
-					this.run = false;
+					logger.info(MessageFormat.format("Input Stream is closed at: {0}%", percentComplete));
+					run = false;
 					this.progressListener.end(percentComplete, this.inputStream.getBytesRead());
 				} else if (percentComplete < 100) {
 					this.progressListener.progress(percentComplete, this.inputStream.getBytesRead());
-				} else if (percentComplete >= 100) {
-					this.run = false;
+				} else {
+					run = false;
 					this.progressListener.end(percentComplete, this.inputStream.getBytesRead());
 				}
 
-				if (this.run)
+				if (run)
 					Thread.sleep(this.millis);
 
 			} catch (InterruptedException e) {
-				this.run = false;
+				run = false;
 				int percentComplete = this.inputStream.getPercentComplete();
 				if (percentComplete != 100)
-					logger.info(MessageFormat.format("Work stopped: {0}", e.getLocalizedMessage())); //$NON-NLS-1$
+					logger.info(MessageFormat.format("Work stopped: {0}", e.getLocalizedMessage()));
 				this.progressListener.end(percentComplete, this.inputStream.getBytesRead());
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
-				this.run = false;
+				run = false;
 				int percentComplete = this.inputStream.getPercentComplete();
 				this.progressListener.end(percentComplete, Long.MAX_VALUE);
 			}

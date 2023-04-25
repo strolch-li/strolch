@@ -36,7 +36,7 @@ import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.*;
-import li.strolch.privilege.helper.PrivilegeInitializationHelper;
+import li.strolch.privilege.helper.PrivilegeInitializer;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Usage;
@@ -50,8 +50,8 @@ import li.strolch.utils.helper.XmlHelper;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
 
-	public static final String PROP_PRIVILEGE_CONFIG_FILE = "privilegeConfigFile"; //$NON-NLS-1$
-	public static final String PRIVILEGE_CONFIG_XML = "PrivilegeConfig.xml"; //$NON-NLS-1$
+	public static final String PROP_PRIVILEGE_CONFIG_FILE = "privilegeConfigFile";
+	public static final String PRIVILEGE_CONFIG_XML = "PrivilegeConfig.xml";
 
 	private li.strolch.privilege.handler.PrivilegeHandler privilegeHandler;
 
@@ -65,8 +65,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 		// initialize privilege
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
-		File privilegeConfigFile = configuration
-				.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML, runtimeConfiguration);
+		File privilegeConfigFile = configuration.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML,
+				runtimeConfiguration);
 		this.privilegeHandler = initializeFromXml(configuration, privilegeConfigFile);
 	}
 
@@ -81,8 +81,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 		ComponentConfiguration configuration = getConfiguration();
 		RuntimeConfiguration runtimeConfiguration = configuration.getRuntimeConfiguration();
-		File privilegeConfigFile = configuration
-				.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML, runtimeConfiguration);
+		File privilegeConfigFile = configuration.getConfigFile(PROP_PRIVILEGE_CONFIG_FILE, PRIVILEGE_CONFIG_XML,
+				runtimeConfiguration);
 		this.privilegeHandler = initializeFromXml(configuration, privilegeConfigFile);
 	}
 
@@ -92,15 +92,15 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	 * @param privilegeXmlFile
 	 * 		a {@link File} reference to the XML file containing the configuration for Privilege
 	 *
-	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and {@link
-	 * PersistenceHandler} are set and initialized as well
+	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
+	 * {@link PersistenceHandler} are set and initialized as well
 	 */
 	private li.strolch.privilege.handler.PrivilegeHandler initializeFromXml(ComponentConfiguration configuration,
 			File privilegeXmlFile) {
 
 		// make sure file exists
 		if (!privilegeXmlFile.exists()) {
-			String msg = "Privilege file does not exist at path {0}"; //$NON-NLS-1$
+			String msg = "Privilege file does not exist at path {0}";
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
@@ -129,10 +129,10 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 				xmlParams.put(XML_PARAM_BASE_PATH, configPath.getPath());
 			}
 
-			return PrivilegeInitializationHelper.initializeFromXml(containerModel);
+			return new PrivilegeInitializer(getScheduledExecutor(getName())).initializeFromXml(containerModel);
 
 		} catch (Exception e) {
-			String msg = "Failed to load Privilege configuration from {0}"; //$NON-NLS-1$
+			String msg = "Failed to load Privilege configuration from {0}";
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
 			throw new PrivilegeException(msg, e);
 		}
@@ -260,8 +260,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	@Override
 	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
-		return this.privilegeHandler
-				.runWithResult(StrolchConstants.SYSTEM_USER_AGENT, new StrolchSystemActionWithResult<>(runnable));
+		return this.privilegeHandler.runWithResult(StrolchConstants.SYSTEM_USER_AGENT,
+				new StrolchSystemActionWithResult<>(runnable));
 	}
 
 	@Override

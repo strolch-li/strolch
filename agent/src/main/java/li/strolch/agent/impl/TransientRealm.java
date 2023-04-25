@@ -53,13 +53,13 @@ public class TransientRealm extends InternalStrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		return new TransientTransaction(this.container, this, certificate, action, readOnly);
 	}
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		return new TransientTransaction(this.container, this, certificate, clazz.getName(), readOnly);
 	}
 
@@ -89,7 +89,7 @@ public class TransientRealm extends InternalStrolchRealm {
 
 		String key = StrolchConstants.makeRealmKey(getRealm(), DefaultRealmHandler.PREFIX_DATA_STORE_FILE);
 		if (!configuration.hasProperty(key)) {
-			String msg = "There is no data store file for realm {0}. Set a property with key {1}"; //$NON-NLS-1$
+			String msg = "There is no data store file for realm {0}. Set a property with key {1}";
 			msg = MessageFormat.format(msg, getRealm(), key);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -103,7 +103,7 @@ public class TransientRealm extends InternalStrolchRealm {
 		if (isAuditTrailEnabled())
 			this.auditTrail = new TransientAuditTrail();
 		else
-			this.auditTrail = new NoStrategyAuditTrail(getRealm());
+			this.auditTrail = new NoStrategyAuditTrail();
 	}
 
 	@Override
@@ -128,11 +128,11 @@ public class TransientRealm extends InternalStrolchRealm {
 
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
 		logger.info(MessageFormat
-				.format("Loaded XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(), //$NON-NLS-1$
+				.format("Loaded XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(),
 						getRealm(), durationS));
-		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources)); //$NON-NLS-1$
-		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities)); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders));
+		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources));
+		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities));
 	}
 
 	@Override

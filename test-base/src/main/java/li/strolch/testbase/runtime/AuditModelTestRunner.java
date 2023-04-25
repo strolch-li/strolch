@@ -33,9 +33,9 @@ import li.strolch.utils.collections.DateRange;
  */
 public class AuditModelTestRunner {
 
-	private RuntimeMock runtimeMock;
-	private String realmName;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final String realmName;
+	private final Certificate certificate;
 
 	public AuditModelTestRunner(RuntimeMock runtimeMock, String realmName) {
 		this.runtimeMock = runtimeMock;
@@ -51,15 +51,15 @@ public class AuditModelTestRunner {
 
 		Calendar cal = Calendar.getInstance();
 
-		cal.set(2000, 6, 1);
+		cal.set(2000, Calendar.JULY, 1);
 		Date beforeCurrent = cal.getTime();
-		cal.set(2000, 6, 2);
+		cal.set(2000, Calendar.JULY, 2);
 		Date current = cal.getTime();
-		cal.set(2000, 6, 3);
+		cal.set(2000, Calendar.JULY, 3);
 		Date afterCurrent = cal.getTime();
-		cal.set(2000, 1, 1);
+		cal.set(2000, Calendar.FEBRUARY, 1);
 		Date earlier = cal.getTime();
-		cal.set(2000, 11, 1);
+		cal.set(2000, Calendar.DECEMBER, 1);
 		Date later = cal.getTime();
 
 		DateRange earlierRange = new DateRange().from(earlier, true).to(beforeCurrent, true);
@@ -308,7 +308,7 @@ public class AuditModelTestRunner {
 		}
 	}
 
-	private final class AuditByIdComparator implements Comparator<Audit> {
+	private static final class AuditByIdComparator implements Comparator<Audit> {
 		@Override
 		public int compare(Audit o1, Audit o2) {
 			return o1.getId().compareTo(o2.getId());

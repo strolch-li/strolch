@@ -43,7 +43,6 @@ public class PasswordCreator {
 	 * @throws Exception
 	 * 		thrown if anything goes wrong
 	 */
-	@SuppressWarnings("nls")
 	public static void main(String[] args) throws Exception {
 
 		while (true) {
@@ -54,6 +53,8 @@ public class PasswordCreator {
 			while (hashAlgorithm == null) {
 				System.out.print("Hash Algorithm [" + DEFAULT_ALGORITHM + "]: ");
 				String readLine = r.readLine().trim();
+				if (readLine.equals("quit") || readLine.equals("exit"))
+					return;
 
 				if (readLine.isEmpty()) {
 					hashAlgorithm = DEFAULT_ALGORITHM;
@@ -64,7 +65,6 @@ public class PasswordCreator {
 						hashAlgorithm = readLine;
 					} catch (Exception e) {
 						System.err.println(e.getLocalizedMessage());
-						hashAlgorithm = null;
 					}
 				}
 			}
@@ -73,6 +73,8 @@ public class PasswordCreator {
 			while (iterations == -1) {
 				System.out.print("Hash iterations [" + DEFAULT_SMALL_ITERATIONS + "]: ");
 				String readLine = r.readLine().trim();
+				if (readLine.equals("quit") || readLine.equals("exit"))
+					return;
 
 				if (readLine.isEmpty()) {
 					iterations = DEFAULT_SMALL_ITERATIONS;
@@ -82,7 +84,6 @@ public class PasswordCreator {
 						iterations = Integer.parseInt(readLine);
 					} catch (Exception e) {
 						System.err.println(e.getLocalizedMessage());
-						iterations = -1;
 					}
 				}
 			}
@@ -91,6 +92,8 @@ public class PasswordCreator {
 			while (keyLength == -1) {
 				System.out.print("Hash keyLength [" + DEFAULT_KEY_LENGTH + "]: ");
 				String readLine = r.readLine().trim();
+				if (readLine.equals("quit") || readLine.equals("exit"))
+					return;
 
 				if (readLine.isEmpty()) {
 					keyLength = DEFAULT_KEY_LENGTH;
@@ -110,16 +113,24 @@ public class PasswordCreator {
 
 			Map<String, String> parameterMap = new HashMap<>();
 			parameterMap.put(XmlConstants.XML_PARAM_HASH_ALGORITHM, hashAlgorithm);
-			parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, "" + iterations);
-			parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, "" + keyLength);
+			parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, String.valueOf(iterations));
+			parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, String.valueOf(keyLength));
 
 			DefaultEncryptionHandler encryptionHandler = new DefaultEncryptionHandler();
 			encryptionHandler.initialize(parameterMap);
 
 			System.out.print("Password: ");
-			char[] password = r.readLine().trim().toCharArray();
+			String readLine = r.readLine().trim();
+			if (readLine.equals("quit") || readLine.equals("exit"))
+				return;
+
+			char[] password = readLine.trim().toCharArray();
 			System.out.print("Salt [random]: ");
-			String saltS = r.readLine().trim();
+			readLine = r.readLine().trim();
+			if (readLine.equals("quit") || readLine.equals("exit"))
+				return;
+
+			String saltS = readLine;
 			if (saltS.isEmpty()) {
 				saltS = encryptionHandler.nextToken();
 			}

@@ -13,7 +13,7 @@ public class IntegerListStateBuilder extends TimedStateBuilder<IntegerListTimedS
 	@Override
 	public IntegerListTimedState build() {
 		IntegerListTimedState state = new IntegerListTimedState();
-		build(state);
+		applyTimedState(state);
 		state.getTimeEvolution().setValueAt(0L, new IntegerListValue());
 		return state;
 	}

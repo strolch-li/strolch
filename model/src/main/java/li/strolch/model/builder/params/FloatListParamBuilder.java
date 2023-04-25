@@ -15,6 +15,6 @@ public class FloatListParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public FloatListParameter build() {
-		return build(new FloatListParameter());
+		return applyParameter(new FloatListParameter());
 	}
 }

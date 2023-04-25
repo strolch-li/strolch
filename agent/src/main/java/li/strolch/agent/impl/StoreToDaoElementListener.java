@@ -27,10 +27,10 @@ import li.strolch.persistence.api.StrolchTransaction;
 
 public class StoreToDaoElementListener implements StrolchElementListener {
 
-	private StrolchTransaction tx;
-	private ResourceDao resourceDao;
-	private OrderDao orderDao;
-	private ActivityDao activityDao;
+	private final StrolchTransaction tx;
+	private final ResourceDao resourceDao;
+	private final OrderDao orderDao;
+	private final ActivityDao activityDao;
 
 	public StoreToDaoElementListener(StrolchTransaction tx) {
 		this.tx = tx;

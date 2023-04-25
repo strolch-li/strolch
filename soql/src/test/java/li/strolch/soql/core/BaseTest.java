@@ -49,7 +49,7 @@ public abstract class BaseTest {
 	CompiledStatement compile(final ParseTree tree) {
 
 		final ParseTreeWalker walker = new ParseTreeWalker();
-		final SOQLListener listener = new SOQLListener();
+		final StrolchSOQLListener listener = new StrolchSOQLListener();
 		walker.walk(listener, tree);
 
 		final CompiledStatement soqlStatement = new CompiledStatement();

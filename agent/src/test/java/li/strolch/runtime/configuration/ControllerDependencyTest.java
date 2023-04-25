@@ -536,16 +536,16 @@ public class ControllerDependencyTest {
 	public void shouldAddDependencies() {
 
 		ComponentContainerImpl container = new ComponentContainerImpl(null);
-		StrolchComponent component = new StrolchComponent(container, "1"); //$NON-NLS-1$
+		StrolchComponent component = new StrolchComponent(container, "1");
 		ComponentController controller = new ComponentController(component);
 
-		StrolchComponent upstreamDependencyComp1 = new StrolchComponent(container, "1"); //$NON-NLS-1$
+		StrolchComponent upstreamDependencyComp1 = new StrolchComponent(container, "1");
 		ComponentController upstreamDependency1 = new ComponentController(upstreamDependencyComp1);
 
-		StrolchComponent upstreamDependencyComp2 = new StrolchComponent(container, "1"); //$NON-NLS-1$
+		StrolchComponent upstreamDependencyComp2 = new StrolchComponent(container, "1");
 		ComponentController upstreamDependency2 = new ComponentController(upstreamDependencyComp2);
 
-		StrolchComponent transitiveUpstreamDependencyComp2 = new StrolchComponent(container, "1"); //$NON-NLS-1$
+		StrolchComponent transitiveUpstreamDependencyComp2 = new StrolchComponent(container, "1");
 		ComponentController transitiveUpstreamDependency2 = new ComponentController(transitiveUpstreamDependencyComp2);
 
 		controller.addUpstreamDependency(upstreamDependency1);

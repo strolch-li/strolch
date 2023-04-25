@@ -24,13 +24,12 @@ import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.xmlpers.api.PersistenceTransaction;
-import li.strolch.xmlpers.objref.IdOfSubTypeRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
 
 public abstract class AbstractDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
-	protected PersistenceTransaction tx;
+	protected final PersistenceTransaction tx;
 
 	protected AbstractDao(StrolchTransaction tx) {
 		XmlStrolchTransaction strolchTx = (XmlStrolchTransaction) tx;
@@ -43,10 +42,6 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	}
 
 	protected abstract String getClassType();
-
-	protected IdOfSubTypeRef getIdRef(String type, String id) {
-		return this.tx.getManager().getObjectRefCache().getIdOfSubTypeRef(getClassType(), type, id);
-	}
 
 	protected SubTypeRef getTypeRef(String type) {
 		return this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), type);
@@ -158,11 +153,6 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	public long removeAllBy(String type) {
 		SubTypeRef typeRef = getTypeRef(type);
 		return this.tx.getObjectDao().removeAllBy(typeRef, file -> true);
-	}
-
-	@Override
-	public void flush() {
-		// nothing to do
 	}
 
 	@Override

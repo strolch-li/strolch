@@ -27,11 +27,11 @@ import java.util.concurrent.TimeUnit;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Tags;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
-import li.strolch.handler.operationslog.OperationsLog;
-import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -57,8 +57,6 @@ public class MigrationsHandler extends StrolchComponent {
 	private File migrationsPath;
 
 	private Timer migrationTimer;
-	private boolean pollMigrations;
-	private int pollWait;
 
 	public MigrationsHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -115,8 +113,8 @@ public class MigrationsHandler extends StrolchComponent {
 
 		this.runMigrationsOnStart = configuration.getBoolean(PROP_RUN_MIGRATIONS_ON_START, Boolean.FALSE);
 		this.verbose = configuration.getBoolean(PROP_VERBOSE, Boolean.FALSE);
-		this.pollMigrations = configuration.getBoolean(PROP_POLL_MIGRATIONS, Boolean.FALSE);
-		this.pollWait = configuration.getInt(PROP_POLL_WAIT, 5);
+		boolean pollMigrations = configuration.getBoolean(PROP_POLL_MIGRATIONS, Boolean.FALSE);
+		int pollWait = configuration.getInt(PROP_POLL_WAIT, 5);
 
 		RuntimeConfiguration runtimeConf = configuration.getRuntimeConfiguration();
 		this.migrationsPath = runtimeConf.getDataDir(MigrationsHandler.class.getName(), PATH_MIGRATIONS, false);
@@ -128,8 +126,8 @@ public class MigrationsHandler extends StrolchComponent {
 			this.migrations = migrations;
 		}
 
-		if (this.pollMigrations) {
-			this.migrationTimer = new Timer("MigrationTimer", true); //$NON-NLS-1$
+		if (pollMigrations) {
+			this.migrationTimer = new Timer("MigrationTimer", true);
 			long checkInterval = TimeUnit.MINUTES.toMillis(pollWait);
 			this.migrationTimer.schedule(new MigrationPollTask(), checkInterval, checkInterval);
 		}
@@ -205,8 +203,8 @@ public class MigrationsHandler extends StrolchComponent {
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(new LogMessage(Tags.AGENT, SYSTEM_USER_AGENT,
 							getLocator().append(StrolchAgent.getUniqueId()), LogSeverity.Exception,
-							LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "execution.handler.failed.executed")
-							.withException(e).value("reason", e));
+							LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+							"execution.handler.failed.executed").withException(e).value("reason", e));
 				}
 			}
 		}

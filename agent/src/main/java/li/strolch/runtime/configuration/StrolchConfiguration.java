@@ -45,7 +45,7 @@ public class StrolchConfiguration {
 	public ComponentConfiguration getComponentConfiguration(String componentName) {
 		ComponentConfiguration componentConfiguration = this.configurationByComponent.get(componentName);
 		if (componentConfiguration == null) {
-			String msg = "No configuration exists for the component {0}"; //$NON-NLS-1$
+			String msg = "No configuration exists for the component {0}";
 			msg = MessageFormat.format(msg, componentName);
 			throw new StrolchConfigurationException(msg);
 		}

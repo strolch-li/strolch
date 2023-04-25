@@ -181,19 +181,19 @@ public class PrivilegeContainerModel {
 			this.policies.put(privilegeName, clazz);
 
 		} catch (InstantiationException | InvocationTargetException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} could not be instantiated."; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} could not be instantiated.";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		} catch (IllegalAccessException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} can not be accessed."; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} can not be accessed.";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		} catch (ClassNotFoundException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} does not exist."; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} does not exist.";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		} catch (NoSuchMethodException e) {
-			String msg = "Configured Privilege Policy {0} with class {1} has missing parameterless constructor"; //$NON-NLS-1$
+			String msg = "Configured Privilege Policy {0} with class {1} has missing parameterless constructor";
 			msg = MessageFormat.format(msg, privilegeName, policyClassName);
 			throw new PrivilegeException(msg, e);
 		}
@@ -203,33 +203,17 @@ public class PrivilegeContainerModel {
 		return this.policies;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("PrivilegeContainerModel [encryptionHandlerClassName=");
-		builder.append(this.encryptionHandlerClassName);
-		builder.append(", encryptionHandlerParameterMap=");
-		builder.append(this.encryptionHandlerParameterMap.size());
-		builder.append(", passwordStrengthHandlerClassName=");
-		builder.append(this.passwordStrengthHandlerClassName);
-		builder.append(", passwordStrengthHandlerParameterMap=");
-		builder.append(this.passwordStrengthHandlerParameterMap);
-		builder.append(", persistenceHandlerClassName=");
-		builder.append(this.persistenceHandlerClassName);
-		builder.append(", persistenceHandlerParameterMap=");
-		builder.append(this.persistenceHandlerParameterMap.size());
-		builder.append(", challengeHandlerParameterMap=");
-		builder.append(this.challengeHandlerParameterMap.size());
-		builder.append(", ssoHandlerParameterMap=");
-		builder.append(this.ssoHandlerParameterMap.size());
-		builder.append(", privilegeHandlerParameterMap=");
-		builder.append(this.privilegeHandlerParameterMap.size());
-		builder.append(", parameterMap=");
-		builder.append(this.parameterMap.size());
-		builder.append(", policies=");
-		builder.append(this.policies.size());
-		builder.append("]");
-		return builder.toString();
+		return "PrivilegeContainerModel [encryptionHandlerClassName=" + this.encryptionHandlerClassName
+				+ ", encryptionHandlerParameterMap=" + this.encryptionHandlerParameterMap.size()
+				+ ", passwordStrengthHandlerClassName=" + this.passwordStrengthHandlerClassName
+				+ ", passwordStrengthHandlerParameterMap=" + this.passwordStrengthHandlerParameterMap
+				+ ", persistenceHandlerClassName=" + this.persistenceHandlerClassName
+				+ ", persistenceHandlerParameterMap=" + this.persistenceHandlerParameterMap.size()
+				+ ", challengeHandlerParameterMap=" + this.challengeHandlerParameterMap.size()
+				+ ", ssoHandlerParameterMap=" + this.ssoHandlerParameterMap.size() + ", privilegeHandlerParameterMap="
+				+ this.privilegeHandlerParameterMap.size() + ", parameterMap=" + this.parameterMap.size()
+				+ ", policies=" + this.policies.size() + "]";
 	}
 }

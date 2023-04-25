@@ -15,8 +15,6 @@
  */
 package li.strolch.rest.filters;
 
-import java.io.IOException;
-
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -30,13 +28,12 @@ import jakarta.ws.rs.ext.Provider;
 @Priority(Priorities.HEADER_DECORATOR)
 public class HttpCacheResponseFilter implements ContainerResponseFilter {
 
-	public static final String NO_CACHE = "no-cache"; //$NON-NLS-1$
+	public static final String NO_CACHE = "no-cache";
 
 	private static String cacheMode = NO_CACHE;
 	
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
 		MultivaluedMap<String, Object> headers = responseContext.getHeaders();
 		headers.add(HttpHeaders.CACHE_CONTROL, cacheMode);

@@ -23,13 +23,33 @@ public abstract class TimedStateBuilder<T extends StrolchTimedState<?>> {
 		this.name = name;
 	}
 
+	public TimedStateBuilder<T> hidden(boolean hidden) {
+		this.hidden = hidden;
+		return this;
+	}
+
+	public TimedStateBuilder<T> index(int index) {
+		this.index = index;
+		return this;
+	}
+
+	public TimedStateBuilder<T> interpretation(String interpretation) {
+		this.interpretation = interpretation;
+		return this;
+	}
+
+	public TimedStateBuilder<T> uom(String uom) {
+		this.uom = uom;
+		return this;
+	}
+
 	public ResourceBuilder end() {
 		return this.builder;
 	}
 
 	public abstract T build();
 
-	protected T build(T state) {
+	protected T applyTimedState(T state) {
 		state.setId(this.id);
 		state.setName(this.name);
 		state.setHidden(this.hidden);

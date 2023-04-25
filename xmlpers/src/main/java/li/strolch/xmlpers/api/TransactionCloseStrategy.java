@@ -34,6 +34,6 @@ public enum TransactionCloseStrategy {
 	 * @param tx
 	 */
 	public void close(PersistenceTransaction tx) {
-		throw new UnsupportedOperationException("Override in enum!"); //$NON-NLS-1$
+		throw new UnsupportedOperationException("Override in enum!");
 	}
 }

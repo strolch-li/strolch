@@ -6,7 +6,7 @@ import li.strolch.utils.dbc.DBC;
 
 public class TransactedRestrictable extends SimpleRestrictable {
 
-	private StrolchTransaction tx;
+	private final StrolchTransaction tx;
 
 	public TransactedRestrictable(StrolchTransaction tx, String name, Object value) {
 		super(name, value);

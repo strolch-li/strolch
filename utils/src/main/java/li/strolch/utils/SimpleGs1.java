@@ -10,9 +10,9 @@ import java.time.format.DateTimeFormatter;
 
 public class SimpleGs1 {
 
-	private String gtin;
-	private ZonedDateTime expirationDate;
-	private String batchNo;
+	private final String gtin;
+	private final ZonedDateTime expirationDate;
+	private final String batchNo;
 
 	private SimpleGs1(String gs1) {
 		if (gs1.length() < 32 || gs1.length() > 46)
@@ -47,12 +47,5 @@ public class SimpleGs1 {
 	public String toString() {
 		return "SimpleGs1{" + "gtin='" + gtin + '\'' + ", expirationDate=" + expirationDate + ", batchNo='" + batchNo
 				+ '\'' + '}';
-	}
-
-	public static void main(String[] args) {
-		String example = "01076806134200251723090110D72375";
-		//String example = "0107680671300017172106301092405";
-		SimpleGs1 gs1 = SimpleGs1.valueOf(example);
-		System.out.println(gs1);
 	}
 }

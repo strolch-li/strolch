@@ -56,7 +56,7 @@ public abstract class ParameterBuilder<R, S extends Parameter<R>, T extends Para
 		return this.builder;
 	}
 
-	protected S build(S parameter) {
+	protected S applyParameter(S parameter) {
 		parameter.setId(this.id);
 		parameter.setName(this.name);
 		parameter.setHidden(this.hidden);

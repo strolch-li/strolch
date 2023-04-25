@@ -28,8 +28,6 @@ public class ResourceGeneratorHandlerTestImpl extends StrolchComponent implement
 	@Override
 	public Resource getTestResource(String id, String name, String type) {
 
-		Resource resource = new Resource(id, name, type);
-
-		return resource;
+		return new Resource(id, name, type);
 	}
 }

@@ -4,7 +4,6 @@ import java.util.Date;
 
 import li.strolch.search.SearchPredicate;
 import li.strolch.search.ValueCoercer;
-import li.strolch.utils.ObjectHelper;
 import li.strolch.utils.collections.DateRange;
 
 /**

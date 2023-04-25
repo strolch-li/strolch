@@ -143,9 +143,9 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 			throw new IllegalStateException("Mapping already exists for " + paramId);
 	}
 
-	protected void build(ParameterBagContainer element) {
+	protected void applyParameters(ParameterBagContainer element) {
 
-		this.parametersBags.values().forEach(bagBuilder -> bagBuilder.build(element));
+		this.parametersBags.values().forEach(bagBuilder -> bagBuilder.applyBag(element));
 
 		this.singleRelations.forEach((paramId, keys) -> {
 			ParameterBag relationsBag = getRelationsBag(element);
@@ -165,16 +165,12 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 	}
 
 	protected String getInterpretation(String objectType) {
-		switch (objectType) {
-		case Tags.RESOURCE:
-			return INTERPRETATION_RESOURCE_REF;
-		case Tags.ORDER:
-			return INTERPRETATION_ORDER_REF;
-		case Tags.ACTIVITY:
-			return INTERPRETATION_ACTIVITY_REF;
-		default:
-			throw new IllegalArgumentException("Unexpected object type " + objectType);
-		}
+		return switch (objectType) {
+			case Tags.RESOURCE -> INTERPRETATION_RESOURCE_REF;
+			case Tags.ORDER -> INTERPRETATION_ORDER_REF;
+			case Tags.ACTIVITY -> INTERPRETATION_ACTIVITY_REF;
+			default -> throw new IllegalArgumentException("Unexpected object type " + objectType);
+		};
 	}
 
 	private ParameterBag getRelationsBag(ParameterBagContainer element) {

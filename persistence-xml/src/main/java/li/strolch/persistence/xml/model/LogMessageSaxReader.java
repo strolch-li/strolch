@@ -27,7 +27,6 @@ import li.strolch.model.Locator;
 import li.strolch.model.Tags;
 import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -57,46 +56,29 @@ public class LogMessageSaxReader extends DefaultHandler {
 	}
 
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-
-		case Tags.LOG_MESSAGE:
+		case Tags.LOG_MESSAGE -> {
 			this.id = attributes.getValue(Tags.ID);
 			this.dateTime = ISO8601.parseToZdt(attributes.getValue(Tags.DATE));
 			this.realm = attributes.getValue(Tags.REALM);
-			break;
-
-		case Tags.USERNAME:
-		case Tags.LOCATOR:
-		case Tags.SEVERITY:
-		case Tags.BUNDLE:
-		case Tags.KEY:
-		case Tags.MESSAGE:
-		case Tags.EXCEPTION:
-		case Tags.STATE:
-
-			this.sb = new StringBuilder();
-			break;
-
-		case Tags.PROPERTIES:
-			this.properties = new Properties();
-			break;
-
-		case Tags.PROPERTY:
+		}
+		case Tags.USERNAME, Tags.LOCATOR, Tags.SEVERITY, Tags.BUNDLE, Tags.KEY, Tags.MESSAGE, Tags.EXCEPTION, Tags.STATE ->
+				this.sb = new StringBuilder();
+		case Tags.PROPERTIES -> this.properties = new Properties();
+		case Tags.PROPERTY -> {
 			String key = attributes.getValue(Tags.KEY);
 			String value = attributes.getValue(Tags.VALUE);
 			this.properties.setProperty(key, value);
-			break;
-
-		default:
-			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+		}
+		default -> throw new IllegalArgumentException(
+				MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(String uri, String localName, String qName) {
 
 		switch (qName) {
 
@@ -155,12 +137,12 @@ public class LogMessageSaxReader extends DefaultHandler {
 
 		default:
 			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+	public void characters(char[] ch, int start, int length) {
 		if (this.sb != null)
 			this.sb.append(ch, start, length);
 	}

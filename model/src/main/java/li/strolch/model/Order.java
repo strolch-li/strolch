@@ -18,6 +18,7 @@ package li.strolch.model;
 import java.text.MessageFormat;
 import java.time.*;
 import java.util.Date;
+import java.util.Objects;
 
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
@@ -293,25 +294,25 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Order o = (Order) obj;
+		return this.type.equals(o.type) && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, id);
+	}
+
+	@Override
 	public String toString() {
 
-		StringBuilder builder = new StringBuilder();
-
-		builder.append("Order [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
-		builder.append(", state=");
-		builder.append(this.state);
-		builder.append(", date=");
-		builder.append(ISO8601.toString(this.date));
-		builder.append(", version=");
-		builder.append(this.version);
-		builder.append("]");
-
-		return builder.toString();
+		return "Order [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", state=" + this.state
+				+ ", date=" + ISO8601.toString(this.date) + ", version=" + this.version + "]";
 	}
 
 	@Override

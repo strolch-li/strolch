@@ -21,7 +21,7 @@ public class ClearAllCurrentExecutionsService extends AbstractService<ServiceArg
 	}
 
 	@Override
-	protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+	protected ServiceResult internalDoService(ServiceArgument arg) {
 
 		String realm = StringHelper.isEmpty(arg.realm) ? StrolchConstants.DEFAULT_REALM : arg.realm;
 

@@ -41,7 +41,7 @@ public class PrivilegeAddRoleToUserService
 	}
 
 	@Override
-	protected PrivilegeUserResult internalDoService(PrivilegeRoleUserNamesArgument arg) throws Exception {
+	protected PrivilegeUserResult internalDoService(PrivilegeRoleUserNamesArgument arg) {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();

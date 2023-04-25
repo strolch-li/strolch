@@ -25,7 +25,7 @@ public class MyModel {
 	private String id;
 	private String name;
 	private String type;
-	private Map<String, MyParameter> parameters = new HashMap<>();
+	private final Map<String, MyParameter> parameters = new HashMap<>();
 
 	/**
 	 *
@@ -46,7 +46,6 @@ public class MyModel {
 		this.type = type;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -59,7 +58,7 @@ public class MyModel {
 		builder.append(", parameters=");
 		for (Entry<String, MyParameter> param : this.parameters.entrySet()) {
 			builder.append("\n");
-			builder.append("  " + param.getKey() + " = " + param.getValue());
+			builder.append("  ").append(param.getKey()).append(" = ").append(param.getValue());
 		}
 		builder.append("]");
 		return builder.toString();

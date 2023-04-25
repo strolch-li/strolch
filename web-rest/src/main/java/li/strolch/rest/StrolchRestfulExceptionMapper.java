@@ -21,6 +21,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+
 import java.text.MessageFormat;
 
 import li.strolch.exception.StrolchAccessDeniedException;
@@ -37,18 +38,15 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 	@Override
 	public Response toResponse(Exception ex) {
 
-		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex); //$NON-NLS-1$
+		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex);
 
 		if (ex instanceof NotFoundException)
 			return ResponseUtil.toResponse(Status.NOT_FOUND, ex);
 
-		if (ex instanceof StrolchAccessDeniedException) {
-			StrolchAccessDeniedException e = (StrolchAccessDeniedException) ex;
+		if (ex instanceof StrolchAccessDeniedException e)
 			return ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
-		}
 
-		if (ex instanceof StrolchNotAuthenticatedException) {
-			StrolchNotAuthenticatedException e = (StrolchNotAuthenticatedException) ex;
+		if (ex instanceof StrolchNotAuthenticatedException e) {
 			logger.error("User tried to access resource, but was not authenticated: " + ex.getMessage());
 			return Response.status(Status.UNAUTHORIZED).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
 		}

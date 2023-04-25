@@ -29,7 +29,6 @@ import java.util.List;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.model.Order;
-import li.strolch.model.Tags;
 import li.strolch.model.json.OrderFromJsonVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxReader;
@@ -69,11 +68,6 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	public PostgreSqlOrderDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
 		super(dataType, connection, txResult, versioningEnabled);
-	}
-
-	@Override
-	protected String getClassName() {
-		return Tags.ORDER;
 	}
 
 	@Override

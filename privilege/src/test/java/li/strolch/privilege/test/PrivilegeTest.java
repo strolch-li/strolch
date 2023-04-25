@@ -694,7 +694,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
 		} catch (PrivilegeException e) {
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), //$NON-NLS-1$
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"),
 					BOB, PrivilegeHandler.PRIVILEGE_ADD_USER);
 			assertEquals(msg, e.getMessage());
 		} finally {

@@ -21,7 +21,10 @@ import static li.strolch.privilege.helper.XmlConstants.*;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 import java.io.File;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
@@ -46,8 +49,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(XmlPersistenceHandler.class);
 
-	private Map<String, User> userMap;
-	private Map<String, Role> roleMap;
+	private final Map<String, User> userMap;
+	private final Map<String, Role> roleMap;
 
 	private boolean userMapDirty;
 	private boolean roleMapDirty;
@@ -58,6 +61,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private File rolesPath;
 
 	private boolean caseInsensitiveUsername;
+
+	public XmlPersistenceHandler() {
+		this.roleMap = new ConcurrentHashMap<>();
+		this.userMap = new ConcurrentHashMap<>();
+	}
 
 	@Override
 	public Map<String, String> getParameterMap() {
@@ -154,7 +162,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		String basePath = this.parameterMap.get(XML_PARAM_BASE_PATH);
 		File basePathF = new File(basePath);
 		if (!basePathF.exists() && !basePathF.isDirectory()) {
-			String msg = "[{0}] Defined parameter {1} does not point to a valid path at {2}"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} does not point to a valid path at {2}";
 			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_BASE_PATH, basePathF.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
@@ -162,7 +170,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get users file name
 		String usersFileName = this.parameterMap.get(XML_PARAM_USERS_FILE);
 		if (StringHelper.isEmpty(usersFileName)) {
-			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!";
 			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE);
 			throw new PrivilegeException(msg);
 		}
@@ -170,25 +178,25 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get roles file name
 		String rolesFileName = this.parameterMap.get(XML_PARAM_ROLES_FILE);
 		if (StringHelper.isEmpty(rolesFileName)) {
-			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!";
 			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE);
 			throw new PrivilegeException(msg);
 		}
 
 		// validate users file exists
-		String usersPathS = basePath + "/" + usersFileName; //$NON-NLS-1$
+		String usersPathS = basePath + "/" + usersFileName;
 		File usersPath = new File(usersPathS);
 		if (!usersPath.exists()) {
-			String msg = "[{0}] Defined parameter {1} is invalid as users file does not exist at path {2}"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is invalid as users file does not exist at path {2}";
 			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE, usersPath.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
 
 		// validate roles file exists
-		String rolesPathS = basePath + "/" + rolesFileName; //$NON-NLS-1$
+		String rolesPathS = basePath + "/" + rolesFileName;
 		File rolesPath = new File(rolesPathS);
 		if (!rolesPath.exists()) {
-			String msg = "[{0}] Defined parameter {1} is invalid as roles file does not exist at path {2}"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is invalid as roles file does not exist at path {2}";
 			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE, rolesPath.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
@@ -200,7 +208,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.caseInsensitiveUsername = Boolean.parseBoolean(this.parameterMap.get(PARAM_CASE_INSENSITIVE_USERNAME));
 
 		if (reload())
-			logger.info("Privilege Data loaded."); //$NON-NLS-1$
+			logger.info("Privilege Data loaded.");
 	}
 
 	/**
@@ -212,37 +220,33 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public boolean reload() {
 
-		this.roleMap = Collections.synchronizedMap(new HashMap<>());
-		this.userMap = Collections.synchronizedMap(new HashMap<>());
-
 		// parse models xml file to XML document
-		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader();
+		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader(this.caseInsensitiveUsername);
 		XmlHelper.parseDocument(this.usersPath, usersXmlHandler);
 
 		PrivilegeRolesSaxReader rolesXmlHandler = new PrivilegeRolesSaxReader();
 		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler);
 
 		// ROLES
-		List<Role> roles = rolesXmlHandler.getRoles();
-		for (Role role : roles) {
-			this.roleMap.put(role.getName(), role);
+		synchronized (this.roleMap) {
+			this.roleMap.clear();
+			this.roleMap.putAll(rolesXmlHandler.getRoles());
 		}
 
 		// USERS
-		List<User> users = usersXmlHandler.getUsers();
-		for (User user : users) {
-			this.userMap
-					.put(this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername(), user);
+		synchronized (this.userMap) {
+			this.userMap.clear();
+			this.userMap.putAll(usersXmlHandler.getUsers());
 		}
 
 		this.userMapDirty = false;
 		this.roleMapDirty = false;
 
-		logger.info(format("Read {0} Users", this.userMap.size())); //$NON-NLS-1$
-		logger.info(format("Read {0} Roles", this.roleMap.size())); //$NON-NLS-1$
+		logger.info(format("Read {0} Users", this.userMap.size()));
+		logger.info(format("Read {0} Roles", this.roleMap.size()));
 
 		// validate referenced roles exist
-		for (User user : users) {
+		for (User user : this.userMap.values()) {
 			for (String roleName : user.getRoles()) {
 
 				// validate that role exists
@@ -267,7 +271,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get users file name
 		String usersFileName = this.parameterMap.get(XML_PARAM_USERS_FILE);
 		if (usersFileName == null || usersFileName.isEmpty()) {
-			String msg = "[{0}] Defined parameter {1} is invalid"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is invalid";
 			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE);
 			throw new PrivilegeException(msg);
 		}
@@ -275,7 +279,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// get roles file name
 		String rolesFileName = this.parameterMap.get(XML_PARAM_ROLES_FILE);
 		if (rolesFileName == null || rolesFileName.isEmpty()) {
-			String msg = "[{0}] Defined parameter {1} is invalid"; //$NON-NLS-1$
+			String msg = "[{0}] Defined parameter {1} is invalid";
 			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE);
 			throw new PrivilegeException(msg);
 		}

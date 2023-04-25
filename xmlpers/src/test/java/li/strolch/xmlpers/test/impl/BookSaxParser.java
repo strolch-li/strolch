@@ -21,7 +21,6 @@ import javax.xml.stream.XMLStreamWriter;
 import li.strolch.xmlpers.api.SaxParser;
 import li.strolch.xmlpers.test.model.Book;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -47,7 +46,6 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 		return this;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public void write(XMLStreamWriter writer) throws XMLStreamException {
 
@@ -59,12 +57,10 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 		writer.writeAttribute("price", Double.toString(this.book.getPrice()));
 	}
 
-	@SuppressWarnings("nls")
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-		switch (qName) {
-		case "Book":
+		if (qName.equals("Book")) {
 			String idS = attributes.getValue("id");
 			long id = Long.parseLong(idS);
 			Book book = new Book(id);
@@ -75,8 +71,7 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 			double price = Double.parseDouble(priceS);
 			book.setPrice(price);
 			this.book = book;
-			break;
-		default:
+		} else {
 			throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
 		}
 	}

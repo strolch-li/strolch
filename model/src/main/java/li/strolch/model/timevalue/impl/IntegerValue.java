@@ -72,14 +72,9 @@ public class IntegerValue implements IValue<Integer>, Serializable {
 		return this.value.toString();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("IntegerValue [value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		return "IntegerValue [value=" + this.value + "]";
 	}
 
 	@Override

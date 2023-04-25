@@ -64,7 +64,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 	private static final String removeSql = "delete from audits where id = ?";
 	private static final String removeAllSql = "delete from audits where element_type = ? and date between ? and ?";
 
-	private PostgreSqlStrolchTransaction tx;
+	private final PostgreSqlStrolchTransaction tx;
 
 	public PostgreSqlAuditDao(PostgreSqlStrolchTransaction postgreSqlStrolchTransaction) {
 		this.tx = postgreSqlStrolchTransaction;
@@ -87,12 +87,12 @@ public class PostgreSqlAuditDao implements AuditDao {
 					return true;
 
 				String msg = MessageFormat
-						.format("Non unique number of elements with type {0} and id {1}", type, id); //$NON-NLS-1$
+						.format("Non unique number of elements with type {0} and id {1}", type, id);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
 		}
 	}
 
@@ -127,7 +127,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
 		}
 	}
 
@@ -142,7 +142,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 				}
 			}
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
 
 		return keySet;
@@ -164,11 +164,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 				if (result.next())
 					throw new StrolchPersistenceException(
 							"Non unique result for query: " + queryBySql + " (type=" + type + ", id="
-									+ id); //$NON-NLS-1$
+									+ id);
 				return audit;
 			}
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
 	}
 
@@ -188,7 +188,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
 
 		return list;
@@ -204,12 +204,12 @@ public class PostgreSqlAuditDao implements AuditDao {
 			if (count != 1) {
 				throw new StrolchPersistenceException(MessageFormat
 						.format("Expected to insert 1 record, but inserted {0} for audit {2}", count,
-								audit.getId())); //$NON-NLS-1$
+								audit.getId()));
 			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to insert Audit {0} due to {1}", audit, //$NON-NLS-1$
+					MessageFormat.format("Failed to insert Audit {0} due to {1}", audit,
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -232,12 +232,12 @@ public class PostgreSqlAuditDao implements AuditDao {
 			if (count != 1) {
 				throw new StrolchPersistenceException(MessageFormat
 						.format("Expected to update 1 record, but updated {0} for audit {2}", count,
-								audit.getId())); //$NON-NLS-1$
+								audit.getId()));
 			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to update Audit {0} due to {1}", audit, //$NON-NLS-1$
+					MessageFormat.format("Failed to update Audit {0} due to {1}", audit,
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -257,13 +257,13 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
-				String msg = "Expected to delete 1 audit with id {0} but deleted {1} elements!"; //$NON-NLS-1$
+				String msg = "Expected to delete 1 audit with id {0} but deleted {1} elements!";
 				msg = MessageFormat.format(msg, audit.getId(), count);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {2}", //$NON-NLS-1$
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {2}",
 					audit.getId(), e.getLocalizedMessage()), e);
 		}
 	}
@@ -287,7 +287,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to remove all elements due to {0}", //$NON-NLS-1$
+					MessageFormat.format("Failed to remove all elements due to {0}",
 							e.getLocalizedMessage()), e);
 		}
 	}

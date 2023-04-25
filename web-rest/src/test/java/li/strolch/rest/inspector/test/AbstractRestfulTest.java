@@ -68,7 +68,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 	private static RuntimeMock runtimeMock;
 
 	@BeforeClass
-	public static void beforeClass() throws IllegalArgumentException, IOException {
+	public static void beforeClass() throws IllegalArgumentException {
 
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);

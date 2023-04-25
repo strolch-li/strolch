@@ -33,9 +33,9 @@ import org.junit.Test;
 
 public class ExistingDbTest {
 
-	private static final String TEST = "test"; //$NON-NLS-1$
-	public static final String RUNTIME_PATH = "target/existingDbRuntime/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/existingDbRuntime"; //$NON-NLS-1$
+	private static final String TEST = "test";
+	public static final String RUNTIME_PATH = "target/existingDbRuntime/";
+	public static final String CONFIG_SRC = "src/test/resources/existingDbRuntime";
 
 	protected static RuntimeMock runtimeMock;
 
@@ -72,11 +72,11 @@ public class ExistingDbTest {
 
 		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, TEST, true)) {
-			Resource resource = tx.getResourceBy("MyType", "@1"); //$NON-NLS-1$ //$NON-NLS-2$
-			assertNotNull("Should be able to read existing element from db", resource); //$NON-NLS-1$
+			Resource resource = tx.getResourceBy("MyType", "@1"); //$NON-NLS-2$
+			assertNotNull("Should be able to read existing element from db", resource);
 
-			Order order = tx.getOrderBy("MyType", "@1"); //$NON-NLS-1$//$NON-NLS-2$
-			assertNotNull("Should be able to read existing element from db", order); //$NON-NLS-1$
+			Order order = tx.getOrderBy("MyType", "@1");//$NON-NLS-2$
+			assertNotNull("Should be able to read existing element from db", order);
 		}
 	}
 }

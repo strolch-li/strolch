@@ -50,7 +50,7 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	private final boolean observeAccessReads;
 
 	public AuditingAuditMapFacade(AuditTrail auditTrail, boolean observeAccessReads) {
-		DBC.PRE.assertNotNull("auditTrail must be set!", auditTrail); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("auditTrail must be set!", auditTrail);
 		this.auditTrail = auditTrail;
 		this.observeAccessReads = observeAccessReads;
 
@@ -187,7 +187,7 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		Long byType = this.deletedAllByType.get(type);
 		if (byType == null)
 			byType = 0L;
-		byType = byType + removed;
+		byType += removed;
 		this.deletedAllByType.put(type, byType);
 
 		this.deletedAll += removed;

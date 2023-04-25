@@ -34,7 +34,6 @@ import com.google.gson.JsonObject;
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.exception.StrolchException;
 import li.strolch.persistence.api.StrolchTransaction;
-import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
@@ -54,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StrolchAgent {
 
-	public static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties"; //$NON-NLS-1$
+	public static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties";
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
@@ -141,29 +140,28 @@ public class StrolchAgent {
 	/**
 	 * @see PrivilegeHandler#runAs(String, PrivilegedRunnable)
 	 */
-	public void runAs(String systemUser, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	public void runAs(String systemUser, PrivilegedRunnable runnable) throws Exception {
 		getPrivilegeHandler().runAs(systemUser, runnable);
 	}
 
 	/**
 	 * @see PrivilegeHandler#runAsAgent(PrivilegedRunnable)
 	 */
-	public void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
+	public void runAsAgent(PrivilegedRunnable runnable) throws Exception {
 		getPrivilegeHandler().runAsAgent(runnable);
 	}
 
 	/**
 	 * @see PrivilegeHandler#runAsAgentWithResult(PrivilegedRunnableWithResult)
 	 */
-	public <T> T runAsWithResult(String systemUser, PrivilegedRunnableWithResult<T> runnable)
-			throws PrivilegeException, Exception {
+	public <T> T runAsWithResult(String systemUser, PrivilegedRunnableWithResult<T> runnable) throws Exception {
 		return getPrivilegeHandler().runAsWithResult(systemUser, runnable);
 	}
 
 	/**
 	 * @see PrivilegeHandler#runAsAgentWithResult(PrivilegedRunnableWithResult)
 	 */
-	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception {
+	public <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws Exception {
 		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
@@ -204,7 +202,7 @@ public class StrolchAgent {
 		return getExecutor("Agent");
 	}
 
-	public synchronized ExecutorService getExecutor(String poolName) {
+	public ExecutorService getExecutor(String poolName) {
 		return this.executorPool.getExecutor(poolName);
 	}
 
@@ -217,7 +215,7 @@ public class StrolchAgent {
 		return getSingleThreadExecutor("Agent");
 	}
 
-	public synchronized ExecutorService getSingleThreadExecutor(String poolName) {
+	public ExecutorService getSingleThreadExecutor(String poolName) {
 		return this.executorPool.getSingleThreadExecutor(poolName);
 	}
 
@@ -230,7 +228,7 @@ public class StrolchAgent {
 		return getScheduledExecutor("Agent");
 	}
 
-	public synchronized ScheduledExecutorService getScheduledExecutor(String poolName) {
+	public ScheduledExecutorService getScheduledExecutor(String poolName) {
 		return this.executorPool.getScheduledExecutor(poolName);
 	}
 
@@ -296,7 +294,7 @@ public class StrolchAgent {
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
-		String msg = "[{0}] Setting up Strolch Container using the following paths:"; //$NON-NLS-1$
+		String msg = "[{0}] Setting up Strolch Container using the following paths:";
 		logger.info(MessageFormat.format(msg, environment));
 		logger.info(" - Config: " + configPathF.getAbsolutePath());
 		logger.info(" - Data: " + dataPathF.getAbsolutePath());
@@ -312,13 +310,12 @@ public class StrolchAgent {
 		this.container = container;
 
 		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
-		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(),
-				config.getEnvironment())); //$NON-NLS-1$
+		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(), config.getEnvironment()));
 	}
 
 	protected void assertContainerStarted() {
 		if (this.container == null || this.container.getState() != ComponentState.STARTED) {
-			String msg = "Container is not yet started!"; //$NON-NLS-1$
+			String msg = "Container is not yet started!";
 			throw new IllegalStateException(msg);
 		}
 	}
@@ -326,14 +323,14 @@ public class StrolchAgent {
 	/**
 	 * @return Returns the pseudo unique Id to be used during object creation from external services.
 	 */
-	public static synchronized String getUniqueId() {
+	public static String getUniqueId() {
 		return StringHelper.getUniqueId();
 	}
 
 	/**
 	 * @return Returns the pseudo unique Id to be used during object creation from external services.
 	 */
-	public static synchronized Long getUniqueIdLong() {
+	public static Long getUniqueIdLong() {
 		return StringHelper.getUniqueIdLong();
 	}
 
@@ -358,8 +355,7 @@ public class StrolchAgent {
 						runtimeConfiguration.getTimezone(), properties);
 				queryResult.setAgentVersion(agentVersion);
 			} catch (IOException e) {
-				String msg = MessageFormat.format("Failed to read version properties for agent: {0}",
-						e.getMessage()); //$NON-NLS-1$
+				String msg = MessageFormat.format("Failed to read version properties for agent: {0}", e.getMessage());
 				queryResult.getErrors().add(msg);
 				logger.error(msg, e);
 			}
@@ -371,7 +367,7 @@ public class StrolchAgent {
 					ComponentVersion componentVersion = component.getVersion();
 					queryResult.add(componentVersion);
 				} catch (Exception e) {
-					String msg = "Failed to read version properties for component {0} due to: {1}"; //$NON-NLS-1$
+					String msg = "Failed to read version properties for component {0} due to: {1}";
 					msg = MessageFormat.format(msg, component.getName(), e.getMessage());
 					queryResult.getErrors().add(msg);
 					logger.error(msg, e);

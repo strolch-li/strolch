@@ -1,42 +1,38 @@
 /*
- * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.tutorialapp.postinitializer;
+package li.strolch.utils.concurrent;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.impl.SimplePostInitializer;
+import java.util.Locale;
+
+import li.strolch.utils.I18nMessage;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
- * 
  */
-public class PostInitializer extends SimplePostInitializer {
+public class ElementLockingException extends RuntimeException {
 
-	/**
-	 * @param container
-	 * @param componentName
-	 */
-	public PostInitializer(ComponentContainer container, String componentName) {
-		super(container, componentName);
+	public ElementLockingException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
-	@Override
-	public void start() throws Exception {
+	public ElementLockingException(String message) {
+		super(message);
+	}
 
-		logger.info("Started PostInitializer."); //$NON-NLS-1$
-
-		super.start();
+	public ElementLockingException(I18nMessage i18n) {
+		super(i18n.getMessage(Locale.getDefault()));
 	}
 }

@@ -17,7 +17,6 @@ package li.strolch.xmlpers.objref;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.Objects;
 
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
@@ -41,19 +40,19 @@ public class RootRef extends ObjectRef {
 
 	@Override
 	public String getType() {
-		String msg = MessageFormat.format("RootRef has no type: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("RootRef has no type: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
 	@Override
 	public ObjectRef getParent(PersistenceTransaction tx) {
-		String msg = MessageFormat.format("RootRef has no parent: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("RootRef has no parent: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
 	@Override
 	public ObjectRef getChildIdRef(PersistenceTransaction tx, String id) {
-		String msg = MessageFormat.format("RootRef has no child id: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("RootRef has no child id: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
@@ -70,22 +69,7 @@ public class RootRef extends ObjectRef {
 	@Override
 	public <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx) {
 		String msg = MessageFormat
-				.format("{0} is not a leaf and can thus not have a Persistence Context", getName()); //$NON-NLS-1$
+				.format("{0} is not a leaf and can thus not have a Persistence Context", getName());
 		throw new UnsupportedOperationException(msg);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		ObjectRef objectRef = (ObjectRef) o;
-		return Objects.equals(this.name, objectRef.name);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.name);
 	}
 }

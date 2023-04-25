@@ -40,7 +40,7 @@ import org.junit.Test;
  */
 public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 
-	private static final String BASEPATH = "target/db/ObjectDaoTest/"; //$NON-NLS-1$
+	private static final String BASEPATH = "target/db/ObjectDaoTest/";
 
 	@BeforeClass
 	public static void beforeClass() {
@@ -135,13 +135,13 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 	private void testBulk(IoMode ioMode) {
 
 		// context
-		String type = "testBulk" + ioMode.name(); //$NON-NLS-1$
+		String type = "testBulk" + ioMode.name();
 
 		// create a list of resources
 		List<MyModel> resources = new ArrayList<>(10);
 		for (int i = 0; i < 10; i++) {
-			String id = RES_ID + "_" + i; //$NON-NLS-1$
-			String name = "Bulk Test Object. " + i; //$NON-NLS-1$
+			String id = RES_ID + "_" + i;
+			String name = "Bulk Test Object. " + i;
 
 			MyModel resource = createResource(id, name, type);
 			resources.add(resource);
@@ -159,7 +159,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 			SubTypeRef subTypeRef = tx.getManager().getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
 			ObjectDao objectDao = tx.getObjectDao();
 			resources = objectDao.queryAll(subTypeRef, file -> true);
-			assertEquals("Expected to find 10 entries!", 10, resources.size()); //$NON-NLS-1$
+			assertEquals("Expected to find 10 entries!", 10, resources.size());
 
 			// delete them all
 			objectDao.removeAll(resources);
@@ -170,7 +170,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 			SubTypeRef subTypeRef = tx.getManager().getObjectRefCache().getSubTypeRef(TestConstants.TYPE_RES, type);
 			ObjectDao objectDao = tx.getObjectDao();
 			resources = objectDao.queryAll(subTypeRef, file -> true);
-			assertEquals("Expected to find 0 entries!", 0, resources.size()); //$NON-NLS-1$
+			assertEquals("Expected to find 0 entries!", 0, resources.size());
 		}
 	}
 
@@ -180,8 +180,8 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 
 		String classType = TestConstants.TYPE_RES;
 		String subType = ModelBuilder.RES_TYPE;
-		String id = "shouldPersistById"; //$NON-NLS-1$
-		String name = "shouldPersistById "; //$NON-NLS-1$
+		String id = "shouldPersistById";
+		String name = "shouldPersistById ";
 
 		// create a resource
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
@@ -193,7 +193,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
 			MyModel resource = tx.getObjectDao().queryById(objectRef);
-			assertNotNull("Expected to read resource by ID", resource); //$NON-NLS-1$
+			assertNotNull("Expected to read resource by ID", resource);
 		}
 
 		// delete by id
@@ -207,7 +207,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 			ObjectRef objectRef = tx.getManager().getObjectRefCache().getIdOfSubTypeRef(classType, subType, id);
 			MyModel resource = tx.getObjectDao().queryById(objectRef);
 			assertNull("Expected that resource was deleted by ID, thus can not be read anymore",
-					resource); //$NON-NLS-1$
+					resource);
 		}
 	}
 
@@ -232,12 +232,12 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		setup(IoMode.SAX);
 
 		String subType = ModelBuilder.RES_TYPE;
-		String name = "shouldPersistById "; //$NON-NLS-1$
+		String name = "shouldPersistById ";
 
 		// create
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			String id = "shouldAllowAllOperationsInSameTx_create"; //$NON-NLS-1$
+			String id = "shouldAllowAllOperationsInSameTx_create";
 			MyModel resource = createResource(id, name, subType);
 
 			tx.getObjectDao().add(resource);
@@ -246,7 +246,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		// create / modify
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			String id = "shouldAllowAllOperationsInSameTx_create_modify"; //$NON-NLS-1$
+			String id = "shouldAllowAllOperationsInSameTx_create_modify";
 			MyModel resource = createResource(id, name, subType);
 
 			tx.getObjectDao().add(resource);
@@ -256,7 +256,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		// create / delete
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			String id = "shouldAllowAllOperationsInSameTx_create_delete"; //$NON-NLS-1$
+			String id = "shouldAllowAllOperationsInSameTx_create_delete";
 			MyModel resource = createResource(id, name, subType);
 
 			tx.getObjectDao().add(resource);
@@ -266,7 +266,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 		// create / modify / delete 
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
 
-			String id = "shouldAllowAllOperationsInSameTx_create_modify_delete"; //$NON-NLS-1$
+			String id = "shouldAllowAllOperationsInSameTx_create_modify_delete";
 			MyModel resource = createResource(id, name, subType);
 
 			tx.getObjectDao().add(resource);
@@ -274,7 +274,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 			tx.getObjectDao().remove(resource);
 		}
 
-		String id = "shouldAllowAllOperationsInSameTx_read_modify"; //$NON-NLS-1$
+		String id = "shouldAllowAllOperationsInSameTx_read_modify";
 
 		// prepare for read/modify
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {

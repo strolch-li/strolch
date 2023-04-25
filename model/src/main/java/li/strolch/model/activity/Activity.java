@@ -576,7 +576,7 @@ public class Activity extends AbstractStrolchRootElement
 			String next = locator.get(i);
 
 			if (!(element instanceof Activity)) {
-				String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified"; //$NON-NLS-1$
+				String msg = "Invalid locator {0} with part {1} as not an Activity but deeper element specified";
 				throw new StrolchModelException(MessageFormat.format(msg, locator, next));
 			}
 
@@ -764,6 +764,21 @@ public class Activity extends AbstractStrolchRootElement
 		if (isReadOnly())
 			return getClone(true);
 		return this;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Activity a = (Activity) obj;
+		return this.parent == a.parent && this.type.equals(a.type) && this.id.equals(a.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, id);
 	}
 
 	@Override

@@ -188,7 +188,7 @@ public class SearchBuilder {
 				else
 					predicate = containsIgnoreCase(value);
 
-				if (bagId.isEmpty() || !bagId.equals("?")) {
+				if (!bagId.equals("?")) {
 					se = add(and, negate, se, param(bagId, paramId, predicate));
 				} else {
 					se = add(and, negate, se, element -> {
@@ -252,13 +252,13 @@ public class SearchBuilder {
 			return searchResult.orderById(descending);
 
 		switch (orderBy) {
-		case Tags.Json.ID:
+		case Tags.Json.ID -> {
 			return searchResult.orderById(descending);
-		case Tags.Json.NAME:
+		}
+		case Tags.Json.NAME -> {
 			return searchResult.orderByName(descending);
-		default:
-			logger.warn("Unhandled ordering " + orderBy);
-			break;
+		}
+		default -> logger.warn("Unhandled ordering " + orderBy);
 		}
 
 		return searchResult;

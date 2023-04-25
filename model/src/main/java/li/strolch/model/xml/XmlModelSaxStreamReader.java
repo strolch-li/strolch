@@ -26,7 +26,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
@@ -40,7 +39,7 @@ import org.xml.sax.SAXException;
  */
 public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
-	private InputSource source;
+	private final InputSource source;
 
 	public XmlModelSaxStreamReader(StrolchElementListener listener, InputStream stream) {
 		this(listener, stream, DEFAULT_ENCODING);
@@ -71,13 +70,11 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		switch (qName) {
-
-		case Tags.INCLUDE_FILE:
+		if (qName.equals(Tags.INCLUDE_FILE)) {
 			String msg = "The {0} can''t handle Tags of type {1}";
 			msg = MessageFormat.format(msg, XmlModelSaxStreamReader.class.getName(), Tags.INCLUDE_FILE);
-			throw new IllegalArgumentException(msg); //$NON-NLS-1$
-		default:
+			throw new IllegalArgumentException(msg);
+		} else {
 			super.startElement(uri, localName, qName, attributes);
 		}
 	}
@@ -95,12 +92,12 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;
-			String msg = "SAX parsed stream took {0}"; //$NON-NLS-1$
+			String msg = "SAX parsed stream took {0}";
 			logger.info(MessageFormat.format(msg, StringHelper.formatNanoDuration(this.statistics.durationNanos)));
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 
-			String msg = "Parsing failed due to internal error: {0}"; //$NON-NLS-1$
+			String msg = "Parsing failed due to internal error: {0}";
 			throw new StrolchException(MessageFormat.format(msg, e.getMessage()), e);
 		}
 	}

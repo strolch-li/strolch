@@ -7,7 +7,7 @@ import java.util.Map;
 public class SelectClause implements IExpression {
 
 	private IExpression parent;
-	private List<IObjectExpression> selectExpressions = new ArrayList<>();
+	private final List<IObjectExpression> selectExpressions = new ArrayList<>();
 
 	/**
 	 * @param inputObjects

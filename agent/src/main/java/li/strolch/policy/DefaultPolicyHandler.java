@@ -41,10 +41,10 @@ import li.strolch.utils.helper.XmlHelper;
 
 /**
  * <p>
- * This is the default Strolch {@link PolicyHandler} which implements {@link PolicyDefVisitor}. This {@link
- * PolicyHandler} parses a policy configuration file to handle the look-up of {@link KeyPolicyDef}
+ * This is the default Strolch {@link PolicyHandler} which implements {@link PolicyDefVisitor}. This
+ * {@link PolicyHandler} parses a policy configuration file to handle the look-up of {@link KeyPolicyDef}
  * </p>
- *
+ * <p>
  * This {@link StrolchComponent} uses two configuration properties:
  * <ul>
  * <li>{@link #PROP_READ_POLICY_FILE} - Default is false. If false then no configuration file is read. Useful if all
@@ -117,9 +117,9 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 				return constructor.newInstance(tx);
 			return constructor.newInstance(tx);
 
+		} catch (StrolchPolicyException e) {
+			throw e;
 		} catch (Exception e) {
-			if (e instanceof StrolchPolicyException)
-				throw (StrolchPolicyException) e;
 			throw new StrolchPolicyException(
 					MessageFormat.format("Failed to instantiate policy {0} due to {1}", policyDef, e.getMessage()), e);
 		}
@@ -148,7 +148,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> Class<T> visit(KeyPolicyDef policyDef) throws ClassNotFoundException {
+	public <T> Class<T> visit(KeyPolicyDef policyDef) {
 		Class<?> clazz = this.classByTypeMap.getElement(policyDef.getType(), policyDef.getValue());
 		if (clazz == null)
 			throw new StrolchPolicyException(MessageFormat.format("No policy is configured for {0}", policyDef));
@@ -208,8 +208,8 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 						if (!StrolchPolicy.class.isAssignableFrom(implClass)) {
 							throw new StrolchPolicyException(
 									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
-											+ " Key=" + key + " as " + className + " is not a " + StrolchPolicy.class
-											.getName());
+											+ " Key=" + key + " as " + className + " is not a "
+											+ StrolchPolicy.class.getName());
 						}
 
 						// assert is assignable to API class
@@ -220,8 +220,8 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 						}
 
 						// and assert is not abstract
-						if (Modifier.isAbstract(implClass.getModifiers()) || Modifier
-								.isInterface(implClass.getModifiers()))
+						if (Modifier.isAbstract(implClass.getModifiers()) || Modifier.isInterface(
+								implClass.getModifiers()))
 							throw new IllegalStateException(
 									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
 											+ " Key=" + key + " as " + className + " is abstract or an interface!");
@@ -236,8 +236,8 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 											+ " as constructor (StrolchTransaction) or (ComponentContainer, StrolchTransaction) does not exist!");
 						}
 
-						if (Modifier.isAbstract(constructor.getModifiers()) || Modifier
-								.isInterface(constructor.getModifiers()))
+						if (Modifier.isAbstract(constructor.getModifiers()) || Modifier.isInterface(
+								constructor.getModifiers()))
 							throw new IllegalStateException(
 									"Invalid " + StrolchPolicyFileParser.POLICY + " configuration for Type=" + type
 											+ " Key=" + key + " as constructor is abstract or an interface!");

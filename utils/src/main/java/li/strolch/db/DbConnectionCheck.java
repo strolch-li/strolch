@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 public class DbConnectionCheck {
 
 	private static final Logger logger = LoggerFactory.getLogger(DbConnectionCheck.class);
-	private Map<String, DataSource> dsMap;
+	private final Map<String, DataSource> dsMap;
 
 	/**
 	 * @param dsMap
@@ -55,16 +55,16 @@ public class DbConnectionCheck {
 
 			logger.info("Checking connection " + ds);
 
-			try (Connection con = ds.getConnection(); Statement st = con.createStatement();) {
+			try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
-				try (ResultSet rs = st.executeQuery("select version()")) { //$NON-NLS-1$
+				try (ResultSet rs = st.executeQuery("select version()")) {
 					if (rs.next()) {
-						logger.info(MessageFormat.format("Connected to: {0}", rs.getString(1))); //$NON-NLS-1$
+						logger.info(MessageFormat.format("Connected to: {0}", rs.getString(1)));
 					}
 				}
 
 			} catch (SQLException e) {
-				String msg = "Failed to open DB connection to {0} due to: {1}"; //$NON-NLS-1$
+				String msg = "Failed to open DB connection to {0} due to: {1}";
 				msg = MessageFormat.format(msg, ds, e.getMessage());
 				throw new DbException(msg, e);
 			}

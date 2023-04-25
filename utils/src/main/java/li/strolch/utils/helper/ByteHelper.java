@@ -89,7 +89,7 @@ public class ByteHelper {
 	public static long setBit(long data, int position) {
 		if (position > 63)
 			throw new IllegalStateException("Position " + position + " is not available in a long!");
-		return (data | (1 << position));
+		return (data | (1L << position));
 	}
 
 	public static byte clearBit(byte data, int position) {
@@ -113,7 +113,7 @@ public class ByteHelper {
 	public static long clearBit(long data, int position) {
 		if (position > 63)
 			throw new IllegalStateException("Position " + position + " is not available in a long!");
-		return (data & ~(1 << position));
+		return (data & ~(1L << position));
 	}
 
 	public static int countSetBits(byte data) {
@@ -191,7 +191,7 @@ public class ByteHelper {
 	public static long toLong(byte[] bytes) {
 
 		if (bytes.length != 8)
-			throw new IllegalArgumentException("The input byte array for a long must have 8 values"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The input byte array for a long must have 8 values");
 
 		return ((long) (bytes[0] & 0xff) << 56) //
 				| ((long) (bytes[1] & 0xff) << 48) //
@@ -215,7 +215,7 @@ public class ByteHelper {
 	public static int toInt(byte[] bytes) {
 
 		if (bytes.length != 4)
-			throw new IllegalArgumentException("The input byte array for an int must have 4 values"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The input byte array for an int must have 4 values");
 
 		return ((bytes[0] & 0xff) << 24) //
 				| ((bytes[1] & 0xff) << 16) //
@@ -235,7 +235,7 @@ public class ByteHelper {
 	public static short toShort(byte[] bytes) {
 
 		if (bytes.length != 2)
-			throw new IllegalArgumentException("The input byte array for a short must have 2 values"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The input byte array for a short must have 2 values");
 
 		return (short) (((bytes[0] & 0xff) << 8) //
 				| ((bytes[1] & 0xff)));
@@ -332,6 +332,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(byte b) {
 
 		StringBuilder sb = new StringBuilder();
@@ -343,7 +344,7 @@ public class ByteHelper {
 		sb.append(((b >>> 3) & 1));
 		sb.append(((b >>> 2) & 1));
 		sb.append(((b >>> 1) & 1));
-		sb.append(((b >>> 0) & 1));
+		sb.append(((b) & 1));
 
 		return sb.toString();
 	}
@@ -356,6 +357,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(short i) {
 
 		StringBuilder sb = new StringBuilder();
@@ -378,7 +380,7 @@ public class ByteHelper {
 		sb.append(((i >>> 3) & 1));
 		sb.append(((i >>> 2) & 1));
 		sb.append(((i >>> 1) & 1));
-		sb.append(((i >>> 0) & 1));
+		sb.append(((i) & 1));
 
 		return sb.toString();
 	}
@@ -391,6 +393,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(int i) {
 
 		StringBuilder sb = new StringBuilder();
@@ -435,7 +438,7 @@ public class ByteHelper {
 		sb.append(((i >>> 3) & 1));
 		sb.append(((i >>> 2) & 1));
 		sb.append(((i >>> 1) & 1));
-		sb.append(((i >>> 0) & 1));
+		sb.append(((i) & 1));
 
 		return sb.toString();
 	}
@@ -448,6 +451,7 @@ public class ByteHelper {
 	 *
 	 * @return the binary string
 	 */
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public static String asBinary(long i) {
 
 		StringBuilder sb = new StringBuilder();
@@ -536,7 +540,7 @@ public class ByteHelper {
 		sb.append(((i >>> 3) & 1));
 		sb.append(((i >>> 2) & 1));
 		sb.append(((i >>> 1) & 1));
-		sb.append(((i >>> 0) & 1));
+		sb.append(((i) & 1));
 
 		return sb.toString();
 	}

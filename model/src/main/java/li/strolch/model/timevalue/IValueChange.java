@@ -68,10 +68,10 @@ public interface IValueChange<T extends IValue> {
 	 *
 	 * @return true if this element is read only
 	 */
-	public boolean isReadOnly();
+	boolean isReadOnly();
 
 	/**
 	 * Sets this element to readOnly, so that it may not be modified. To modify it, call {@link #getClone()}
 	 */
-	public void setReadOnly();
+	void setReadOnly();
 }

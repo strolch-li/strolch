@@ -33,11 +33,11 @@ public class WebSocketObserverHandler implements Observer {
 
 	protected final StrolchAgent agent;
 	protected final String realmName;
-	protected ObserverHandler observerHandler;
-	protected WebSocketClient client;
+	protected final ObserverHandler observerHandler;
+	protected final WebSocketClient client;
 
-	protected MapOfSets<String, String> observedTypes;
-	protected Map<String, JsonObject> params;
+	protected final MapOfSets<String, String> observedTypes;
+	protected final Map<String, JsonObject> params;
 
 	public WebSocketObserverHandler(StrolchAgent agent, String realmName, ObserverHandler observerHandler,
 			WebSocketClient client) {

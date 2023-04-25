@@ -71,6 +71,9 @@ public class ReservationExecution extends DurationExecution {
 		switch (action.getType()) {
 		case TYPE_RESERVE -> setReservation(tx(), action, true);
 		case TYPE_RELEASE -> setReservation(tx(), action, false);
+		default -> {
+			// do nothing
+		}
 		}
 
 		super.toExecuted(action);

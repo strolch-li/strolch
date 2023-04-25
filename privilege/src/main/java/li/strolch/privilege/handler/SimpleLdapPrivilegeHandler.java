@@ -6,6 +6,7 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 
 import li.strolch.privilege.helper.LdapHelper;
 import li.strolch.privilege.policy.PrivilegePolicy;
@@ -25,12 +26,12 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	private String realm;
 
 	@Override
-	public synchronized void initialize(Map<String, String> parameterMap, EncryptionHandler encryptionHandler,
-			PasswordStrengthHandler passwordStrengthHandler, PersistenceHandler persistenceHandler,
-			UserChallengeHandler userChallengeHandler, SingleSignOnHandler ssoHandler,
-			Map<String, Class<PrivilegePolicy>> policyMap) {
+	public void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
+			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
+			PersistenceHandler persistenceHandler, UserChallengeHandler userChallengeHandler,
+			SingleSignOnHandler ssoHandler, Map<String, Class<PrivilegePolicy>> policyMap) {
 
-		super.initialize(parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
+		super.initialize(executorService, parameterMap, encryptionHandler, passwordStrengthHandler, persistenceHandler,
 				userChallengeHandler, ssoHandler, policyMap);
 
 		this.organisation = parameterMap.getOrDefault(ORGANISATION, "");
@@ -59,7 +60,7 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	@Override
 	protected Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
-			Set<String> strolchRoles) throws NamingException {
+			Set<String> strolchRoles) {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put(ORGANISATION, this.organisation);

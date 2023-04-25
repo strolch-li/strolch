@@ -15,6 +15,8 @@
  */
 package li.strolch.model.parameter;
 
+import java.util.Objects;
+
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
@@ -100,6 +102,21 @@ public class LongParameter extends AbstractParameter<Long> {
 	@Override
 	public boolean isEqualTo(Long otherValue) {
 		return this.value.equals(otherValue);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		LongParameter o = (LongParameter) obj;
+		return this.parent == o.parent && this.id.equals(o.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(parent, id);
 	}
 
 	public void add(long value) {

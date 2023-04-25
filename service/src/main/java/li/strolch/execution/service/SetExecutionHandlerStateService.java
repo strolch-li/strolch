@@ -23,7 +23,7 @@ public class SetExecutionHandlerStateService extends AbstractService<StringMapAr
 	}
 
 	@Override
-	protected ServiceResult internalDoService(StringMapArgument arg) throws Exception {
+	protected ServiceResult internalDoService(StringMapArgument arg) {
 
 		String realm = StringHelper.isEmpty(arg.realm) ? StrolchConstants.DEFAULT_REALM : arg.realm;
 		String state = arg.map.get("state");

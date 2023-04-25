@@ -33,7 +33,7 @@ import li.strolch.utils.Version;
 
 public class CurrentMigrationVersionQuery {
 
-	private ComponentContainer container;
+	private final ComponentContainer container;
 	private Map<String, MigrationVersion> currentVersions;
 
 	public CurrentMigrationVersionQuery(ComponentContainer container) {

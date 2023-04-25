@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
@@ -49,7 +48,7 @@ public class RemoveActivityCollectionCommandTest extends AbstractRealmCommandTes
 
 		List<Activity> activities = new ArrayList<>(this.locators.size());
 		for (Locator locator : this.locators) {
-			activities.add((Activity) tx.findElement(locator));
+			activities.add(tx.findElement(locator));
 		}
 
 		RemoveActivityCollectionCommand command = new RemoveActivityCollectionCommand(tx);

@@ -34,7 +34,6 @@ import li.strolch.model.xml.XmlModelSaxStreamReader;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@SuppressWarnings("nls")
 public class ModelToSaxWriterTest extends ModelMarshallingTest {
 
 	@Override
@@ -95,7 +94,7 @@ public class ModelToSaxWriterTest extends ModelMarshallingTest {
 		activity.accept(new StrolchElementToSaxWriterVisitor(writer));
 		writer.writeEndDocument();
 
-		System.out.println(out.toString());
+		System.out.println(out);
 
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		XmlModelSaxStreamReader saxStreamReader = new XmlModelSaxStreamReader(listener,

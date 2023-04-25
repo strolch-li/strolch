@@ -380,22 +380,25 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		return visitor.visitResource(this);
 	}
 
-	@SuppressWarnings("nls")
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Resource r = (Resource) obj;
+		return this.type.equals(r.type) && this.id.equals(r.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(type, id);
+	}
+
 	@Override
 	public String toString() {
 
-		StringBuilder builder = new StringBuilder();
-
-		builder.append("Resource [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
-		builder.append(", version=");
-		builder.append(this.version);
-
-		return builder.toString();
+		return "Resource [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", version=" + this.version;
 	}
 
 	@Override

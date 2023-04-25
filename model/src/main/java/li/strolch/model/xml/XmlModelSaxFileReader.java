@@ -22,11 +22,9 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
-import li.strolch.utils.helper.StringHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

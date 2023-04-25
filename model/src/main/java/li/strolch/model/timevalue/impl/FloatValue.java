@@ -57,7 +57,7 @@ public class FloatValue implements IValue<Double>, Serializable {
 
 	@Override
 	public FloatValue add(Double o) {
-		this.value = this.value + o;
+		this.value += o;
 		return this;
 	}
 
@@ -71,14 +71,9 @@ public class FloatValue implements IValue<Double>, Serializable {
 		return MathHelper.toPrecisionString(this.value, 8);
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("DoubleValue [value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		return "DoubleValue [value=" + this.value + "]";
 	}
 
 	@Override

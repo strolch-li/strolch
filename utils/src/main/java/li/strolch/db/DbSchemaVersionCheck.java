@@ -117,7 +117,7 @@ public class DbSchemaVersionCheck {
 			currentVersion = getCurrentVersion(con, this.app);
 			con.commit();
 		} catch (SQLException e) {
-			String msg = "Failed to open DB connection to {0} due to: {1}"; //$NON-NLS-1$
+			String msg = "Failed to open DB connection to {0} due to: {1}";
 			msg = MessageFormat.format(msg, ds, e.getMessage());
 			throw new DbException(msg, e);
 		}
@@ -139,7 +139,7 @@ public class DbSchemaVersionCheck {
 			return migrationType;
 
 		} catch (SQLException e) {
-			String msg = "Failed to open DB connection to {0} due to: {1}"; //$NON-NLS-1$
+			String msg = "Failed to open DB connection to {0} due to: {1}";
 			msg = MessageFormat.format(msg, ds, e.getMessage());
 			throw new DbException(msg, e);
 		}
@@ -183,13 +183,11 @@ public class DbSchemaVersionCheck {
 	 *
 	 * @return the migration state
 	 *
-	 * @throws SQLException
-	 * 		if something goes wrong
 	 * @throws DbException
 	 * 		if something goes wrong
 	 */
 	public DbMigrationState detectMigrationState(String realm, Version expectedDbVersion, Version currentVersion)
-			throws SQLException, DbException {
+			throws DbException {
 
 		// no version, then we need to create it
 		if (currentVersion == null)
@@ -230,7 +228,7 @@ public class DbSchemaVersionCheck {
 
 		String dbVersionPropFile = MessageFormat.format(RESOURCE_DB_VERSION, app);
 
-		try (InputStream stream = ctxClass.getResourceAsStream(dbVersionPropFile);) {
+		try (InputStream stream = ctxClass.getResourceAsStream(dbVersionPropFile)) {
 			DBC.PRE.assertNotNull(
 					MessageFormat.format("Resource file with name {0} does not exist!", dbVersionPropFile), stream);
 			dbVersionProps.load(stream);

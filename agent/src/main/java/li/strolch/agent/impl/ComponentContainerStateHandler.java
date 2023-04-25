@@ -35,8 +35,8 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
 public class ComponentContainerStateHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerStateHandler.class);
-	private ComponentDependencyAnalyzer dependencyAnalyzer;
-	private StrolchConfiguration strolchConfiguration;
+	private final ComponentDependencyAnalyzer dependencyAnalyzer;
+	private final StrolchConfiguration strolchConfiguration;
 
 	public ComponentContainerStateHandler(ComponentDependencyAnalyzer dependencyAnalyzer,
 			StrolchConfiguration strolchConfiguration) {
@@ -66,7 +66,7 @@ public class ComponentContainerStateHandler {
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Initialized component {0}. Took {1}"; //$NON-NLS-1$
+			String msg = "Initialized component {0}. Took {1}";
 			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
 
 		}
@@ -96,7 +96,7 @@ public class ComponentContainerStateHandler {
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Started component {0}. Took {1}"; //$NON-NLS-1$
+			String msg = "Started component {0}. Took {1}";
 			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
 		}
 
@@ -121,13 +121,13 @@ public class ComponentContainerStateHandler {
 			try {
 				component.stop();
 			} catch (Exception e) {
-				String msg = "Failed to stop component {0} due to {1}"; //$NON-NLS-1$
+				String msg = "Failed to stop component {0} due to {1}";
 				msg = MessageFormat.format(msg, componentName, e.getMessage());
 				logger.error(msg, e);
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Stopped component {0}. Took {1}"; //$NON-NLS-1$
+			String msg = "Stopped component {0}. Took {1}";
 			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
 		}
 
@@ -151,13 +151,13 @@ public class ComponentContainerStateHandler {
 			try {
 				component.destroy();
 			} catch (Exception e) {
-				String msg = "Failed to destroy component {0} due to {1}"; //$NON-NLS-1$
+				String msg = "Failed to destroy component {0} due to {1}";
 				msg = MessageFormat.format(msg, componentName, e.getMessage());
 				logger.error(msg, e);
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Destroyed component {0}. Took {1}"; //$NON-NLS-1$
+			String msg = "Destroyed component {0}. Took {1}";
 			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
 		}
 

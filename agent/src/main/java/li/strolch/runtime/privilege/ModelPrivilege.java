@@ -48,9 +48,9 @@ public class ModelPrivilege implements PrivilegePolicy {
 		Object object = restrictable.getPrivilegeValue();
 
 		// DefaultPrivilege policy expects the privilege value to be a string
-		if (!(object instanceof StrolchRootElement)) {
+		if (!(object instanceof StrolchRootElement rootElement)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nonstrolchrootelement"); //$NON-NLS-1$
+					.getString("Privilege.illegalArgument.nonstrolchrootelement");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -59,7 +59,6 @@ public class ModelPrivilege implements PrivilegePolicy {
 		if (privilege.isAllAllowed())
 			return true;
 
-		StrolchRootElement rootElement = (StrolchRootElement) object;
 		return checkByAllowDenyValues(ctx, privilege, restrictable, rootElement.getType(), assertHasPrivilege);
 	}
 }

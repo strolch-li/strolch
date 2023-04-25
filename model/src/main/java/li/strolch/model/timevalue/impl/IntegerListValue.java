@@ -98,14 +98,9 @@ public class IntegerListValue implements IValue<List<Integer>>, Serializable {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("IntegerListValue [value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		return "IntegerListValue [value=" + this.value + "]";
 	}
 
 	@Override

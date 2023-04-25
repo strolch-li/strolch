@@ -40,9 +40,9 @@ public class OrderModelTestRunner {
 	private static final String NAME = "Test Order";
 	private static final String TYPE = "ToStock";
 
-	private RuntimeMock runtimeMock;
-	private String realmName;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final String realmName;
+	private final Certificate certificate;
 
 	public OrderModelTestRunner(RuntimeMock runtimeMock, String realmName) {
 		this.runtimeMock = runtimeMock;
@@ -55,7 +55,7 @@ public class OrderModelTestRunner {
 	public void runCreateOrderTest() {
 
 		// create
-		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType");//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newOrder);
@@ -77,9 +77,9 @@ public class OrderModelTestRunner {
 		}
 
 		// create three orders
-		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+		Order order1 = createOrder("myTestOrder1", "Test Name", "QTestType1");//$NON-NLS-2$ //$NON-NLS-3$
+		Order order2 = createOrder("myTestOrder2", "Test Name", "QTestType2");//$NON-NLS-2$ //$NON-NLS-3$
+		Order order3 = createOrder("myTestOrder3", "Test Name", "QTestType3");//$NON-NLS-2$ //$NON-NLS-3$
 
 		order1.setDate(LocalDate.of(2018, 3, 1));
 		order2.setDate(LocalDate.of(2019, 4, 1));
@@ -183,7 +183,7 @@ public class OrderModelTestRunner {
 		}
 
 		// read
-		Order readOrder = null;
+		Order readOrder;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			readOrder = tx.getOrderBy(TYPE, ID);
@@ -201,7 +201,7 @@ public class OrderModelTestRunner {
 		}
 
 		// read updated
-		Order updatedOrder = null;
+		Order updatedOrder;
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			updatedOrder = tx.getOrderBy(TYPE, ID);
 		}
@@ -229,7 +229,7 @@ public class OrderModelTestRunner {
 
 		// create 15 orders
 		List<Order> orders = new ArrayList<>();
-		orders.addAll(createOrders(orders.size(), 5, "@", "My Order", "MyType1"));
+		orders.addAll(createOrders(0, 5, "@", "My Order", "MyType1"));
 		orders.addAll(createOrders(orders.size(), 5, "@", "Other Order", "MyType2"));
 		orders.addAll(createOrders(orders.size(), 5, "@", "Further Order", "MyType3"));
 

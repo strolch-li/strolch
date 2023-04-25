@@ -63,13 +63,11 @@ public class ModelBuilder {
 	}
 
 	public static Book createBook() {
-		Book book = new Book(BOOK_ID, BOOK_TITLE, BOOK_AUTHOR, BOOK_PRESS_1, BOOK_PRICE);
-		return book;
+		return new Book(BOOK_ID, BOOK_TITLE, BOOK_AUTHOR, BOOK_PRESS_1, BOOK_PRICE);
 	}
 
 	public static Book createBook(long id, String title, String author, String press, double price) {
-		Book book = new Book(id, title, author, press, price);
-		return book;
+		return new Book(id, title, author, press, price);
 	}
 
 	public static void updateBook(Book book) {

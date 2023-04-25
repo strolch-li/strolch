@@ -129,7 +129,7 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		 * @see javax.sql.DataSource#getConnection(java.lang.String, java.lang.String)
 		 */
 		@Override
-		public Connection getConnection(String username, String password) throws SQLException {
+		public Connection getConnection(String username, String password) {
 			throw new UnsupportedOperationException("Deprecated, use parameterless version!");
 		}
 

@@ -74,7 +74,7 @@ public class ActionTest {
 	 * no test. Just to see the XML serialization in the console
 	 */
 	// @Test
-	public void testToDOM() throws ParserConfigurationException, TransformerException {
+	public void showToDOM() throws ParserConfigurationException, TransformerException {
 
 		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = db.newDocument();

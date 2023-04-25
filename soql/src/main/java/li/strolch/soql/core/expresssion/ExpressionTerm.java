@@ -15,7 +15,7 @@ public class ExpressionTerm extends AbstractBooleanExpression {
 	@Override
 	public boolean evaluate(final Map<String, Object> inputObjects, final Map<String, Object> queryParameter) {
 		boolean result = comparisonExpression.evaluate(inputObjects, queryParameter);
-		return not ? !result : result;
+		return not != result;
 	}
 
 	public void setNot(boolean not) {

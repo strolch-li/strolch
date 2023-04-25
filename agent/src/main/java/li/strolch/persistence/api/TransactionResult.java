@@ -25,7 +25,7 @@ public class TransactionResult {
 	private TransactionState state;
 	private Exception failCause;
 
-	private long startNanos;
+	private final long startNanos;
 	private Date startTime;
 	private long txDuration;
 	private long closeDuration;
@@ -211,27 +211,19 @@ public class TransactionResult {
 		return this.created + this.read + this.updated + this.deleted;
 	}
 
-	@SuppressWarnings("nls")
 	public String getLogMessage() {
 
 		StringBuilder sb = new StringBuilder();
 		switch (this.state) {
-		case OPEN:
-			sb.append("TX is still open after ");
-			break;
-		case COMMITTED:
-			sb.append("TX was completed after ");
-			break;
-		case ROLLED_BACK:
-			sb.append("TX was rolled back after ");
-			break;
-		case FAILED:
-			sb.append("TX has failed after ");
-			break;
-		default:
+		case OPEN -> sb.append("TX is still open after ");
+		case COMMITTED -> sb.append("TX was completed after ");
+		case ROLLED_BACK -> sb.append("TX was rolled back after ");
+		case FAILED -> sb.append("TX has failed after ");
+		default -> {
 			sb.append("TX is in unhandled state ");
 			sb.append(this.state);
 			sb.append(" after ");
+		}
 		}
 
 		sb.append(StringHelper.formatNanoDuration(this.txDuration));

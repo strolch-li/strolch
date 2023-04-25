@@ -16,7 +16,6 @@
 package li.strolch.xmlpers.objref;
 
 import java.text.MessageFormat;
-import java.util.Objects;
 
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
@@ -63,29 +62,14 @@ public class SubTypeRef extends ObjectRef {
 
 	@Override
 	public ObjectRef getChildTypeRef(PersistenceTransaction tx, String type) {
-		String msg = MessageFormat.format("A SubType has no child type: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("A SubType has no child type: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
 	@Override
 	public <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx) {
 		String msg = MessageFormat
-				.format("{0} is not a leaf and can thus not have a Persistence Context", getName()); //$NON-NLS-1$
+				.format("{0} is not a leaf and can thus not have a Persistence Context", getName());
 		throw new UnsupportedOperationException(msg);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		ObjectRef objectRef = (ObjectRef) o;
-		return Objects.equals(this.name, objectRef.name);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.name);
 	}
 }

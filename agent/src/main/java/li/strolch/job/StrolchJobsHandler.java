@@ -68,9 +68,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 		runAsAgent(ctx -> {
 			for (String realmName : realmNames) {
 				try (StrolchTransaction tx = openTx(ctx.getCertificate(), realmName, true)) {
-					tx.streamResources(TYPE_STROLCH_JOB).forEach(jobRes -> {
-						loadJob(jobs, jobRes, catchExceptions);
-					});
+					tx.streamResources(TYPE_STROLCH_JOB).forEach(jobRes -> loadJob(jobs, jobRes, catchExceptions));
 				}
 			}
 		});

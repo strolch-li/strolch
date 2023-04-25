@@ -34,6 +34,7 @@ package li.strolch.utils.time;
 import static java.time.temporal.ChronoUnit.*;
 import static li.strolch.utils.time.PeriodHelper.daysIn;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.*;
 import java.time.chrono.ChronoPeriod;
@@ -71,12 +72,12 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	/**
 	 * A serialization identifier for this class.
 	 */
+	@Serial
 	private static final long serialVersionUID = 8815521625671589L;
 	/**
 	 * The supported units.
 	 */
-	private static final List<TemporalUnit> SUPPORTED_UNITS = Collections
-			.unmodifiableList(Arrays.<TemporalUnit>asList(YEARS, MONTHS, DAYS, SECONDS, NANOS));
+	private static final List<TemporalUnit> SUPPORTED_UNITS = List.of(YEARS, MONTHS, DAYS, SECONDS, NANOS);
 	/**
 	 * The number of seconds per day.
 	 */
@@ -176,7 +177,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 			return PeriodDuration.of((Duration) amount);
 		}
 		if (amount instanceof ChronoPeriod) {
-			if (IsoChronology.INSTANCE.equals(((ChronoPeriod) amount).getChronology()) == false) {
+			if (!IsoChronology.INSTANCE.equals(((ChronoPeriod) amount).getChronology())) {
 				throw new DateTimeException("Period requires ISO chronology: " + amount);
 			}
 		}
@@ -339,6 +340,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 *
 	 * @return the singleton instance
 	 */
+	@Serial
 	private Object readResolve() {
 		return PeriodDuration.of(period, duration);
 	}
@@ -364,18 +366,23 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	public long get(TemporalUnit unit) {
 		if (unit instanceof ChronoUnit) {
 			switch ((ChronoUnit) unit) {
-			case YEARS:
+			case YEARS -> {
 				return period.getYears();
-			case MONTHS:
+			}
+			case MONTHS -> {
 				return period.getMonths();
-			case DAYS:
+			}
+			case DAYS -> {
 				return period.getDays();
-			case SECONDS:
+			}
+			case SECONDS -> {
 				return duration.getSeconds();
-			case NANOS:
+			}
+			case NANOS -> {
 				return duration.getNano();
-			default:
-				break;
+			}
+			default -> {
+			}
 			}
 		}
 		throw new UnsupportedTemporalTypeException("Unsupported unit: " + unit);
@@ -670,8 +677,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 		if (this == otherAmount) {
 			return true;
 		}
-		if (otherAmount instanceof PeriodDuration) {
-			PeriodDuration other = (PeriodDuration) otherAmount;
+		if (otherAmount instanceof PeriodDuration other) {
 			return this.period.equals(other.period) && this.duration.equals(other.duration);
 		}
 		return false;
@@ -703,7 +709,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 		if (duration.isZero()) {
 			return period.toString();
 		}
-		return period.toString() + duration.toString().substring(1);
+		return period + duration.toString().substring(1);
 	}
 
 	@Override

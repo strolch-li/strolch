@@ -155,7 +155,7 @@ public class QueryProcessor {
 	private CompiledStatement compile(ParseTree tree) {
 
 		ParseTreeWalker walker = new ParseTreeWalker();
-		SOQLListener listener = new SOQLListener();
+		StrolchSOQLListener listener = new StrolchSOQLListener();
 		walker.walk(listener, tree);
 
 		CompiledStatement soqlStatement = new CompiledStatement();
@@ -184,21 +184,13 @@ public class QueryProcessor {
 			String clazzKey = entities.get(key);
 
 			switch (clazzKey) {
-			case Tags.RESOURCE:
-				result.put(key, new ResourceSearch().search(tx).toList());
-				break;
-
-			case Tags.ORDER:
-				result.put(key, new OrderSearch().search(tx).toList());
-				break;
-
-			case Tags.ACTIVITY:
-				result.put(key, new ActivitySearch().search(tx).toList());
-				break;
-
-			default:
+			case Tags.RESOURCE -> result.put(key, new ResourceSearch().search(tx).toList());
+			case Tags.ORDER -> result.put(key, new OrderSearch().search(tx).toList());
+			case Tags.ACTIVITY -> result.put(key, new ActivitySearch().search(tx).toList());
+			default -> {
 				String s = "Unable to resolve " + clazzKey + " " + key + " to strolch root entities.";
 				throw new SOQLParseException(s);
+			}
 			}
 		}
 

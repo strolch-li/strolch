@@ -54,7 +54,7 @@ public class ExpressionsSupport {
 	}
 
 	public static <T extends StrolchRootElement> ExpressionBuilder name() {
-		return element -> element.getName();
+		return StrolchElement::getName;
 	}
 
 	public static <T extends StrolchRootElement> SearchExpression<T> date(SearchPredicate predicate) {
@@ -252,15 +252,12 @@ public class ExpressionsSupport {
 			return null;
 
 		StrolchRootElement relation;
-		switch (param.getInterpretation()) {
-		case INTERPRETATION_RESOURCE_REF:
-			return tx.getResourceBy((StringParameter) param);
-		case INTERPRETATION_ORDER_REF:
-			return tx.getOrderBy((StringParameter) param);
-		case INTERPRETATION_ACTIVITY_REF:
-			return tx.getActivityBy((StringParameter) param);
-		}
+		return switch (param.getInterpretation()) {
+			case INTERPRETATION_RESOURCE_REF -> tx.getResourceBy((StringParameter) param);
+			case INTERPRETATION_ORDER_REF -> tx.getOrderBy((StringParameter) param);
+			case INTERPRETATION_ACTIVITY_REF -> tx.getActivityBy((StringParameter) param);
+			default -> null;
+		};
 
-		return null;
 	}
 }

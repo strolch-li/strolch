@@ -25,12 +25,12 @@ import org.junit.Test;
  */
 public class PerformancePostgreSqlTest extends PerformanceTest {
 
-	public static final String RUNTIME_PATH = "target/runtime_postgresql_test/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/runtime_postgresql"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/runtime_postgresql_test/";
+	public static final String CONFIG_SRC = "src/runtime_postgresql";
 
-	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
-	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
-	public static final String DB_PASSWORD = "test"; //$NON-NLS-1$
+	public static final String DB_URL = "jdbc:postgresql://localhost/testdb";
+	public static final String DB_USERNAME = "testuser";
+	public static final String DB_PASSWORD = "test";
 
 	@BeforeClass
 	public static void beforeClass() throws Exception {

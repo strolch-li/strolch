@@ -63,34 +63,19 @@ public class ObjectCache {
 	/**
 	 * object The objectKey that shall be cached
 	 */
-	private Object objectKey;
+	private final Object objectKey;
 
 	/**
 	 * object The object that shall be cached
 	 */
 	private Object object;
 
-	@SuppressWarnings("nls")
 	public ObjectCache(long id, String key, Object objectKey, Object object, Operation operation) {
-
 		this.id = id;
 		this.key = key;
 		this.objectKey = objectKey;
 		this.object = object;
 		this.operation = operation;
-
-		if (logger.isDebugEnabled()) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Instanciated Cache: ID");
-			sb.append(this.id);
-			sb.append(" / ");
-			sb.append(key);
-			sb.append(" OP: ");
-			sb.append(this.operation);
-			sb.append(" / ");
-			sb.append(objectKey.toString());
-			logger.debug(sb.toString());
-		}
 	}
 
 	/**
@@ -100,10 +85,6 @@ public class ObjectCache {
 	 * 		the object to set
 	 */
 	public void setObject(Object object) {
-		if (logger.isDebugEnabled()) {
-			logger.debug(
-					MessageFormat.format("Updating ID {0} to value {1}", this.id, object.toString())); //$NON-NLS-1$
-		}
 		this.object = object;
 	}
 
@@ -114,11 +95,6 @@ public class ObjectCache {
 	 * 		the operation to set
 	 */
 	public void setOperation(Operation newOperation) {
-		if (logger.isDebugEnabled()) {
-			String msg = "Updating Operation of ID {0} from {1} to {2}"; //$NON-NLS-1$
-			msg = MessageFormat.format(msg, this.id, this.operation, newOperation);
-			logger.debug(msg);
-		}
 		this.operation = newOperation;
 	}
 

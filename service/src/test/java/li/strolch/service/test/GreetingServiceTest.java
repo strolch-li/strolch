@@ -34,14 +34,14 @@ public class GreetingServiceTest extends AbstractServiceTest {
 
 		GreetingService greetingService = new GreetingService();
 		GreetingArgument greetingArgument = new GreetingArgument();
-		greetingArgument.name = "Robert"; //$NON-NLS-1$
+		greetingArgument.name = "Robert";
 
 		Certificate certificate = runtimeMock.getPrivilegeHandler()
-				.authenticate("jill", "jill".toCharArray()); //$NON-NLS-1$//$NON-NLS-2$
+				.authenticate("jill", "jill".toCharArray());//$NON-NLS-2$
 		try {
 			GreetingResult greetingResult = getServiceHandler()
 					.doService(certificate, greetingService, greetingArgument);
-			assertThat(greetingResult.getGreeting(), containsString("Hello Robert. Nice to meet you!")); //$NON-NLS-1$
+			assertThat(greetingResult.getGreeting(), containsString("Hello Robert. Nice to meet you!"));
 		} finally {
 			runtimeMock.getPrivilegeHandler().invalidate(certificate);
 		}

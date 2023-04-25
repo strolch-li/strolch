@@ -94,16 +94,16 @@ public final class User {
 			Map<String, String> propertyMap, boolean passwordChangeRequested, UserHistory history) {
 
 		if (StringHelper.isEmpty(userId))
-			throw new PrivilegeException("No UserId defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No UserId defined!");
 		if (userState == null)
-			throw new PrivilegeException("No userState defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No userState defined!");
 		if (StringHelper.isEmpty(username))
-			throw new PrivilegeException("No username defined!"); //$NON-NLS-1$
+			throw new PrivilegeException("No username defined!");
 		if (userState != UserState.SYSTEM) {
 			if (StringHelper.isEmpty(lastname))
-				throw new PrivilegeException("No lastname defined!"); //$NON-NLS-1$
+				throw new PrivilegeException("No lastname defined!");
 			if (StringHelper.isEmpty(firstname))
-				throw new PrivilegeException("No firstname defined!"); //$NON-NLS-1$
+				throw new PrivilegeException("No firstname defined!");
 		}
 
 		if (history == null)
@@ -355,26 +355,11 @@ public final class User {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("User [userId=");
-		builder.append(this.userId);
-		builder.append(", username=");
-		builder.append(this.username);
-		builder.append(", firstname=");
-		builder.append(this.firstname);
-		builder.append(", lastname=");
-		builder.append(this.lastname);
-		builder.append(", locale=");
-		builder.append(this.locale);
-		builder.append(", userState=");
-		builder.append(this.userState);
-		builder.append(", roles=");
-		builder.append(this.roles);
-		builder.append("]");
-		return builder.toString();
+		return "User [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
+				+ ", lastname=" + this.lastname + ", locale=" + this.locale + ", userState=" + this.userState
+				+ ", roles=" + this.roles + "]";
 	}
 
 	@Override
@@ -395,10 +380,8 @@ public final class User {
 			return false;
 		User other = (User) obj;
 		if (this.userId == null) {
-			if (other.userId != null)
-				return false;
-		} else if (!this.userId.equals(other.userId))
-			return false;
-		return true;
+			return other.userId == null;
+		} else
+			return this.userId.equals(other.userId);
 	}
 }

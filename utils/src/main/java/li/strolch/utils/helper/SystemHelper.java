@@ -32,12 +32,12 @@ public class SystemHelper {
 		return SystemHelper.instance;
 	}
 
-	public static final String osName = System.getProperty("os.name"); //$NON-NLS-1$
-	public static final String osArch = System.getProperty("os.arch"); //$NON-NLS-1$
-	public static final String osVersion = System.getProperty("os.version"); //$NON-NLS-1$
-	public static final String javaVendor = System.getProperty("java.vendor"); //$NON-NLS-1$
-	public static final String javaVersion = System.getProperty("java.version"); //$NON-NLS-1$
-	private static final int nrOfCores = Runtime.getRuntime().availableProcessors(); //$NON-NLS-1$
+	public static final String osName = System.getProperty("os.name");
+	public static final String osArch = System.getProperty("os.arch");
+	public static final String osVersion = System.getProperty("os.version");
+	public static final String javaVendor = System.getProperty("java.vendor");
+	public static final String javaVersion = System.getProperty("java.version");
+	private static final int nrOfCores = Runtime.getRuntime().availableProcessors();
 
 	/**
 	 * private constructor
@@ -58,14 +58,8 @@ public class SystemHelper {
 	 * @see java.lang.Object#toString()
 	 */
 	public static String asString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("OS: ").append(osName);
-		sb.append(" ").append(osVersion);
-		sb.append(" Arch: ").append(osArch);
-		sb.append(" on Java ").append(javaVendor);
-		sb.append(" ").append(javaVersion);
-		sb.append(" CPU Cores: ").append(nrOfCores);
-		return sb.toString();
+		return "OS: " + osName + " " + osVersion + " Arch: " + osArch + " on Java " + javaVendor + " " + javaVersion
+				+ " CPU Cores: " + nrOfCores;
 	}
 
 	public static String getUserDir() {
@@ -109,19 +103,10 @@ public class SystemHelper {
 	}
 
 	public static String getMemorySummary() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("System Memory available "); //$NON-NLS-1$
-		sb.append(SystemHelper.getMaxMemory());
-		sb.append(",  Total: "); //$NON-NLS-1$
-		sb.append(SystemHelper.getTotalMemory());
-		sb.append(",  Used: "); //$NON-NLS-1$
-		sb.append(SystemHelper.getUsedMemory());
-		sb.append(",  Free: "); //$NON-NLS-1$
-		sb.append(SystemHelper.getFreeMemory());
-		return sb.toString();
-	}
-
-	public static void main(String[] args) {
-		System.getProperties().list(System.out);
+		return "System Memory available "
+				+ SystemHelper.getMaxMemory() + ",  Total: "
+				+ SystemHelper.getTotalMemory() + ",  Used: "
+				+ SystemHelper.getUsedMemory() + ",  Free: "
+				+ SystemHelper.getFreeMemory();
 	}
 }

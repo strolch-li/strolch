@@ -31,10 +31,14 @@
  */
 package javanet.staxutils;
 
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import javanet.staxutils.helpers.StreamWriterDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A filter that indents an XML stream. To apply it, construct a filter that contains another {@link XMLStreamWriter},
@@ -65,8 +69,9 @@ import javanet.staxutils.helpers.StreamWriterDelegate;
  *
  * @author <a href="mailto:jk2006@engineer.com">John Kristian</a>
  */
-@SuppressWarnings("nls")
 public class IndentingXMLStreamWriter extends StreamWriterDelegate implements Indentation {
+
+	private static final Logger logger = LoggerFactory.getLogger(IndentingXMLStreamWriter.class);
 
 	public IndentingXMLStreamWriter(XMLStreamWriter out) {
 		this(out, DEFAULT_INDENT, NORMAL_END_OF_LINE);
@@ -271,8 +276,8 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 			while (this.depth > 0) {
 				writeEndElement(); // indented
 			}
-		} catch (Exception ignored) {
-			ignored.printStackTrace();
+		} catch (Exception ignorable) {
+			logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
 		}
 		this.out.writeEndDocument();
 		afterEndDocument();
@@ -292,7 +297,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 					afterMarkup(); // indentation was written
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Failed beforeMarkup: " + getExceptionMessage(e, true), e);
 			}
 		}
 	}
@@ -340,8 +345,8 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		if (this.depth > 0 && this.stack[this.depth] == WROTE_MARKUP) { // but not data
 			try {
 				writeNewLine(this.depth - 1);
-			} catch (Exception ignored) {
-				ignored.printStackTrace();
+			} catch (Exception ignorable) {
+				logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
 			}
 		}
 	}
@@ -362,8 +367,8 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 		if (this.stack[this.depth = 0] == WROTE_MARKUP) { // but not data
 			try {
 				writeNewLine(0);
-			} catch (Exception ignored) {
-				ignored.printStackTrace();
+			} catch (Exception ignorable) {
+				logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
 			}
 		}
 		this.stack[this.depth] = 0; // start fresh

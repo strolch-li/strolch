@@ -340,7 +340,7 @@ public class ActivityTest {
 	 * no test. Just to see the XML serialization in the console
 	 */
 	// @Test
-	public void testToDOM() throws ParserConfigurationException, TransformerException {
+	public void showToDOM() throws ParserConfigurationException, TransformerException {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();

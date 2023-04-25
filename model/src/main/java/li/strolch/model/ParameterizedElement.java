@@ -84,7 +84,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	public void setType(String type) {
 		assertNotReadonly();
 		if (StringHelper.isEmpty(type)) {
-			String msg = "Type may not be empty on element {0}"; //$NON-NLS-1$
+			String msg = "Type may not be empty on element {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}
@@ -1204,6 +1204,12 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	}
 
 	@Override
+	public abstract boolean equals(Object obj);
+
+	@Override
+	public abstract int hashCode();
+
+	@Override
 	public void setReadOnly() {
 		if (this.parameterMap != null) {
 			for (Parameter<?> param : this.parameterMap.values()) {
@@ -1234,20 +1240,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		return this.parent.getRootElement();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 
-		StringBuilder builder = new StringBuilder();
-
-		builder.append("ParameterizedElement [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
-		builder.append("]");
-
-		return builder.toString();
+		return "ParameterizedElement [id=" + this.id + ", name=" + this.name + ", type=" + this.type + "]";
 	}
 }

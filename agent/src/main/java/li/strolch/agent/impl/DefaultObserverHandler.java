@@ -140,7 +140,7 @@ public class DefaultObserverHandler implements ObserverHandler {
 			try {
 				observer.add(key, elements);
 			} catch (Exception e) {
-				String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
+				String msg = "Failed to update observer {0} with {1} due to {2}";
 				msg = MessageFormat.format(msg, key, observer, e.getMessage());
 				logger.error(msg, e);
 
@@ -158,7 +158,7 @@ public class DefaultObserverHandler implements ObserverHandler {
 			try {
 				observer.update(key, elements);
 			} catch (Exception e) {
-				String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
+				String msg = "Failed to update observer {0} with {1} due to {2}";
 				msg = MessageFormat.format(msg, key, observer, e.getMessage());
 				logger.error(msg, e);
 
@@ -176,7 +176,7 @@ public class DefaultObserverHandler implements ObserverHandler {
 			try {
 				observer.remove(key, elements);
 			} catch (Exception e) {
-				String msg = "Failed to update observer {0} with {1} due to {2}"; //$NON-NLS-1$
+				String msg = "Failed to update observer {0} with {1} due to {2}";
 				msg = MessageFormat.format(msg, key, observer, e.getMessage());
 				logger.error(msg, e);
 
@@ -199,14 +199,14 @@ public class DefaultObserverHandler implements ObserverHandler {
 	@Override
 	public void registerObserver(String key, Observer observer) {
 		this.observerMap.addElement(key, observer);
-		String msg = MessageFormat.format("Registered observer {0} with {1}", key, observer); //$NON-NLS-1$
+		String msg = MessageFormat.format("Registered observer {0} with {1}", key, observer);
 		logger.info(msg);
 	}
 
 	@Override
 	public void unregisterObserver(String key, Observer observer) {
 		if (this.observerMap.removeElement(key, observer)) {
-			String msg = MessageFormat.format("Unregistered observer {0} with {1}", key, observer); //$NON-NLS-1$
+			String msg = MessageFormat.format("Unregistered observer {0} with {1}", key, observer);
 			logger.info(msg);
 		}
 	}

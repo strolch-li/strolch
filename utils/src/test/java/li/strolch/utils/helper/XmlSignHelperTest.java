@@ -121,7 +121,6 @@ public class XmlSignHelperTest {
 		SimpleDateFormat simpleDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		simpleDf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String issueInstantS = simpleDf.format(issueInstant.getTime());
-		String notBeforeS = issueInstantS;
 		issueInstant.add(Calendar.SECOND, 10);
 		String notOnOrAfterS = simpleDf.format(issueInstant.getTime());
 
@@ -148,7 +147,7 @@ public class XmlSignHelperTest {
 		authnReqE.appendChild(issuerE);
 
 		Element conditionsE = doc.createElement("Conditions");
-		conditionsE.setAttribute("NotBefore", notBeforeS);
+		conditionsE.setAttribute("NotBefore", issueInstantS);
 		conditionsE.setAttribute("NotOnOrAfter", notOnOrAfterS);
 		authnReqE.appendChild(conditionsE);
 
@@ -166,7 +165,6 @@ public class XmlSignHelperTest {
 		SimpleDateFormat simpleDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		simpleDf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String issueInstantS = simpleDf.format(issueInstant.getTime());
-		String notBeforeS = issueInstantS;
 		issueInstant.add(Calendar.SECOND, 10);
 		String notOnOrAfterS = simpleDf.format(issueInstant.getTime());
 
@@ -196,7 +194,7 @@ public class XmlSignHelperTest {
 
 		Element conditionsE = doc.createElementNS("urn:oasis:names:tc:SAML:2.0:assertion", "Conditions");
 		conditionsE.setPrefix("saml");
-		conditionsE.setAttribute("NotBefore", notBeforeS);
+		conditionsE.setAttribute("NotBefore", issueInstantS);
 		conditionsE.setAttribute("NotOnOrAfter", notOnOrAfterS);
 		authnReqE.appendChild(conditionsE);
 

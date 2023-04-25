@@ -10,7 +10,7 @@ import li.strolch.soql.core.expresssion.*;
 /**
  * @author msmock
  */
-public class SOQLListener extends SOQLBaseListener {
+public class StrolchSOQLListener extends SOQLBaseListener {
 
 	// the map of entities declared in the FROM clause with their nicknames as keys
 	private final Map<String, String> entities = new HashMap<>();
@@ -41,8 +41,7 @@ public class SOQLListener extends SOQLBaseListener {
 
 	@Override
 	public void enterSelect_clause(Select_clauseContext ctx) {
-		SelectClause selectClause = new SelectClause();
-		pointer = selectClause;
+		pointer = new SelectClause();
 	}
 
 	@Override
@@ -65,8 +64,7 @@ public class SOQLListener extends SOQLBaseListener {
 
 	@Override
 	public void enterWhere_clause(Where_clauseContext ctx) {
-		WhereExpression whereExpression = new WhereExpression();
-		pointer = whereExpression;
+		pointer = new WhereExpression();
 	}
 
 	@Override
@@ -151,8 +149,6 @@ public class SOQLListener extends SOQLBaseListener {
 			((SelectExpression) pointer).addExpression(chainedMethodExpression);
 		} else if (pointer instanceof ComparisonExpression) {
 			((ComparisonExpression) pointer).addOperand(chainedMethodExpression);
-		} else if (pointer instanceof SelectExpression) {
-			((SelectExpression) pointer).addExpression(chainedMethodExpression);
 		}
 		pointer = chainedMethodExpression;
 	}

@@ -26,7 +26,7 @@ import li.strolch.utils.time.PeriodDuration;
  */
 public class SetParameterValueVisitor implements ParameterVisitor<Void> {
 
-	private Object value;
+	private final Object value;
 
 	public SetParameterValueVisitor(Object value) {
 		this.value = value;

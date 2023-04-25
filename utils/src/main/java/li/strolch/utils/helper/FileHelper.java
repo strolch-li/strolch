@@ -22,14 +22,13 @@ import static li.strolch.utils.helper.TempFileOptions.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Set;
 
 import li.strolch.utils.DataUnit;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ import org.slf4j.LoggerFactory;
  */
 public class FileHelper {
 
-	private static final int MAX_FILE_SIZE = 50 * 1024 * 1024;
 	private static final Logger logger = LoggerFactory.getLogger(FileHelper.class);
 
 	private static final DateTimeFormatter separatedDtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
@@ -129,68 +127,6 @@ public class FileHelper {
 	}
 
 	/**
-	 * Reads the contents of a file into a byte array.
-	 *
-	 * @param file
-	 * 		the file to read
-	 *
-	 * @return the contents of a file as a string
-	 */
-	public static byte[] readFile(File file) {
-		if (file.length() > MAX_FILE_SIZE)
-			throw new RuntimeException(
-					String.format("Only allowed to read files up to %s. File too large: %s", //$NON-NLS-1$
-							humanizeFileSize(MAX_FILE_SIZE), humanizeFileSize(file.length())));
-
-		byte[] data = new byte[(int) file.length()];
-		int pos = 0;
-
-		try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
-			byte[] bytes = new byte[8192];
-			int read;
-			while ((read = in.read(bytes)) != -1) {
-				System.arraycopy(bytes, 0, data, pos, read);
-				pos += read;
-			}
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Filed does not exist " + file.getAbsolutePath()); //$NON-NLS-1$
-		} catch (IOException e) {
-			throw new RuntimeException("Could not read file " + file.getAbsolutePath()); //$NON-NLS-1$
-		}
-
-		return data;
-	}
-
-	/**
-	 * Reads the contents of a file into a string. Note, no encoding is checked. It is expected to be UTF-8
-	 *
-	 * @param file
-	 * 		the file to read
-	 *
-	 * @return the contents of a file as a string
-	 */
-	public static String readFileToString(File file) {
-
-		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
-
-			StringBuilder sb = new StringBuilder();
-
-			String line;
-
-			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(line + "\n"); //$NON-NLS-1$
-			}
-
-			return sb.toString();
-
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("File does not exist " + file.getAbsolutePath()); //$NON-NLS-1$
-		} catch (IOException e) {
-			throw new RuntimeException("Could not read file " + file.getAbsolutePath()); //$NON-NLS-1$
-		}
-	}
-
-	/**
 	 * Reads the contents of a {@link InputStream} into a string. Note, no encoding is checked. It is expected to be
 	 * UTF-8
 	 *
@@ -201,58 +137,20 @@ public class FileHelper {
 	 */
 	public static String readStreamToString(InputStream stream) {
 
-		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));) {
+		try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream))) {
 
 			StringBuilder sb = new StringBuilder();
 
 			String line;
 
 			while ((line = bufferedReader.readLine()) != null) {
-				sb.append(line + "\n"); //$NON-NLS-1$
+				sb.append(line).append("\n");
 			}
 
 			return sb.toString();
 
 		} catch (IOException e) {
-			throw new RuntimeException("Could not read strean " + stream); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * Writes the given byte array to the given file
-	 *
-	 * @param bytes
-	 * 		the data to write to the file
-	 * @param dstFile
-	 * 		the path to which to write the data
-	 */
-	public static void writeToFile(byte[] bytes, File dstFile) {
-
-		try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(dstFile.toPath()))) {
-			out.write(bytes);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$
-		} catch (IOException e) {
-			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * Writes the string to dstFile
-	 *
-	 * @param string
-	 * 		string to write to file
-	 * @param dstFile
-	 * 		the file to write to
-	 */
-	public static void writeStringToFile(String string, File dstFile) {
-
-		try (BufferedWriter bufferedwriter = new BufferedWriter(new FileWriter(dstFile));) {
-			bufferedwriter.write(string);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Filed does not exist " + dstFile.getAbsolutePath()); //$NON-NLS-1$
-		} catch (IOException e) {
-			throw new RuntimeException("Could not write to file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Could not read strean " + stream);
 		}
 	}
 
@@ -292,25 +190,25 @@ public class FileHelper {
 				boolean done = FileHelper.deleteFiles(children, log);
 				if (!done) {
 					worked = false;
-					logger.warn("Could not empty the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
+					logger.warn("Could not empty the directory: " + file.getAbsolutePath());
 				} else {
 					done = file.delete();
 					if (done) {
 						if (log)
-							logger.info("Deleted DIR  " + file.getAbsolutePath()); //$NON-NLS-1$
+							logger.info("Deleted DIR  " + file.getAbsolutePath());
 					} else {
 						worked = false;
-						logger.warn("Could not delete the directory: " + file.getAbsolutePath()); //$NON-NLS-1$
+						logger.warn("Could not delete the directory: " + file.getAbsolutePath());
 					}
 				}
 			} else {
 				boolean done = file.delete();
 				if (done) {
 					if (log)
-						FileHelper.logger.info("Deleted FILE " + file.getAbsolutePath()); //$NON-NLS-1$
+						FileHelper.logger.info("Deleted FILE " + file.getAbsolutePath());
 				} else {
 					worked = false;
-					FileHelper.logger.warn(("Could not delete the file: " + file.getAbsolutePath())); //$NON-NLS-1$
+					FileHelper.logger.warn(("Could not delete the file: " + file.getAbsolutePath()));
 				}
 			}
 		}
@@ -334,7 +232,7 @@ public class FileHelper {
 	public static boolean copy(File[] srcFiles, File dstDirectory, boolean checksum) {
 
 		if (!dstDirectory.isDirectory() || !dstDirectory.canWrite()) {
-			String msg = "Destination is not a directory or is not writeable: {0}"; //$NON-NLS-1$
+			String msg = "Destination is not a directory or is not writeable: {0}";
 			throw new IllegalArgumentException(MessageFormat.format(msg, dstDirectory.getAbsolutePath()));
 		}
 
@@ -342,9 +240,10 @@ public class FileHelper {
 
 			File dstFile = new File(dstDirectory, srcFile.getName());
 			if (srcFile.isDirectory()) {
-				dstFile.mkdir();
+				if (!dstFile.isDirectory() && !dstFile.mkdir())
+					throw new IllegalStateException("Failed to create directory " + dstFile);
 				if (!copy(srcFile.listFiles(), dstFile, checksum)) {
-					String msg = "Failed to copy contents of {0} to {1}"; //$NON-NLS-1$
+					String msg = "Failed to copy contents of {0} to {1}";
 					msg = MessageFormat.format(msg, srcFile.getAbsolutePath(), dstFile.getAbsolutePath());
 					logger.error(msg);
 					return false;
@@ -377,7 +276,7 @@ public class FileHelper {
 		try (BufferedInputStream inBuffer = new BufferedInputStream(Files.newInputStream(fromFile.toPath()));
 				BufferedOutputStream outBuffer = new BufferedOutputStream(Files.newOutputStream(toFile.toPath()))) {
 
-			int theByte = 0;
+			int theByte;
 
 			while ((theByte = inBuffer.read()) > -1) {
 				outBuffer.write(theByte);
@@ -390,9 +289,10 @@ public class FileHelper {
 				String toFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(toFile));
 				if (!fromFileMD5.equals(toFileMD5)) {
 					FileHelper.logger.error(
-							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", //$NON-NLS-1$
-									fromFileMD5, toFileMD5));
-					toFile.delete();
+							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", fromFileMD5,
+									toFileMD5));
+					if (!toFile.delete())
+						throw new IllegalStateException("Failed to delete file " + toFile);
 
 					return false;
 				}
@@ -400,17 +300,17 @@ public class FileHelper {
 
 			// cleanup if files are not the same length
 			if (fromFile.length() != toFile.length()) {
-				String msg = "Copying failed, as new files are not the same length: {0} / {1}"; //$NON-NLS-1$
+				String msg = "Copying failed, as new files are not the same length: {0} / {1}";
 				msg = MessageFormat.format(msg, fromFile.length(), toFile.length());
 				FileHelper.logger.error(msg);
-				toFile.delete();
+				if (!toFile.delete())
+					throw new IllegalStateException("Failed to delete file " + toFile);
 
 				return false;
 			}
 
 		} catch (Exception e) {
-			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile,
-					toFile); //$NON-NLS-1$
+			String msg = MessageFormat.format("Failed to copy path from {0} to + {1} due to:", fromFile, toFile);
 			FileHelper.logger.error(msg, e);
 			return false;
 		}
@@ -435,11 +335,11 @@ public class FileHelper {
 			return true;
 		}
 
-		FileHelper.logger.warn("Simple File.renameTo failed, trying copy/delete..."); //$NON-NLS-1$
+		FileHelper.logger.warn("Simple File.renameTo failed, trying copy/delete...");
 
 		// delete if copy was successful, otherwise move will fail
 		if (FileHelper.copy(fromFile, toFile, true)) {
-			FileHelper.logger.info("Deleting fromFile: " + fromFile.getAbsolutePath()); //$NON-NLS-1$
+			FileHelper.logger.info("Deleting fromFile: " + fromFile.getAbsolutePath());
 			return fromFile.delete();
 		}
 
@@ -447,104 +347,7 @@ public class FileHelper {
 	}
 
 	/**
-	 * Finds the common parent for the files in the given list
-	 *
-	 * @param files
-	 * 		the files to find the common parent for
-	 *
-	 * @return the {@link File} representing the common parent, or null if there is none
-	 */
-	public static File findCommonParent(List<File> files) {
-
-		// be gentle with bad input data
-		if (files.size() == 0)
-			return null;
-		if (files.size() == 1)
-			return files.get(0).getParentFile();
-
-		File commonParent = null;
-		int commonParentDepth = -1;
-
-		// find the common parent among all the files
-		for (int i = 0; i < files.size() - 1; i++) {
-
-			// get first file
-			File file = files.get(i);
-
-			// get list of parents for this file
-			List<File> parents = new ArrayList<>();
-			File parent = file.getParentFile();
-			while (parent != null) {
-				parents.add(parent);
-				parent = parent.getParentFile();
-			}
-			// reverse
-			Collections.reverse(parents);
-
-			// and now the same for the next file
-			File fileNext = files.get(i + 1);
-			List<File> parentsNext = new ArrayList<>();
-			File parentNext = fileNext.getParentFile();
-			while (parentNext != null) {
-				parentsNext.add(parentNext);
-				parentNext = parentNext.getParentFile();
-			}
-			// reverse
-			Collections.reverse(parentsNext);
-
-			//logger.info("Files: " + file + " / " + fileNext);
-
-			// now find the common parent
-			File newCommonParent = null;
-			int newCommonParentDepth = -1;
-			for (int j = 0; j < (parents.size()); j++) {
-
-				// don't overflow the size of the next list of parents
-				if (j >= parentsNext.size())
-					break;
-
-				// if we once found a common parent, and our current depth is 
-				// greater than the one for the common parent, then stop as 
-				// there can't be a deeper parent
-				if (commonParent != null && j > commonParentDepth)
-					break;
-
-				// get the next parents to compare
-				File aParent = parents.get(j);
-				File bParent = parentsNext.get(j);
-
-				//logger.info("Comparing " + aParent + " |||| " + bParent);
-
-				// if they parent are the same, then break, as we won't 
-				// have another match
-				if (!aParent.equals(bParent))
-					break;
-
-				// save the parent and the depth where we found the parent
-				newCommonParent = aParent;
-				newCommonParentDepth = j;
-			}
-
-			// if no common parent was found, then break as there won't be one
-			if (commonParent == null && newCommonParent == null)
-				break;
-
-			// if there is no new common parent, then check the next file
-			if (newCommonParent == null)
-				continue;
-
-			// store the common parent
-			commonParent = newCommonParent;
-			commonParentDepth = newCommonParentDepth;
-			//logger.info("Temporary common parent: (" + commonParentDepth + ") " + commonParent);
-		}
-
-		//logger.info("Common parent: " + commonParent);
-		return commonParent;
-	}
-
-	/**
-	 * Returns the size of the file in a human readable form. Everything smaller than 1024 bytes is returned as x bytes,
+	 * Returns the size of the file in a human-readable form. Everything smaller than 1024 bytes is returned as x bytes,
 	 * next is KB, then MB and then GB
 	 *
 	 * @param file
@@ -557,7 +360,7 @@ public class FileHelper {
 	}
 
 	/**
-	 * Returns the size of the file in a human readable form. Everything smaller than 1024 bytes is returned as x bytes,
+	 * Returns the size of the file in a human-readable form. Everything smaller than 1024 bytes is returned as x bytes,
 	 * next is KB, then MB and then GB
 	 *
 	 * @param fileSize
@@ -565,14 +368,13 @@ public class FileHelper {
 	 *
 	 * @return the humanized form of the files size
 	 */
-	@SuppressWarnings("nls")
 	public static String humanizeFileSize(long fileSize) {
 		return DataUnit.Bytes.humanizeBytesValue(fileSize);
 	}
 
 	/**
-	 * Creates the MD5 hash of the given file, returning the hash as a byte array. Use {@link
-	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
+	 * Creates the MD5 hash of the given file, returning the hash as a byte array. Use
+	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 *
 	 * @param file
 	 * 		the file to hash
@@ -580,25 +382,12 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileMd5(File file) {
-		return FileHelper.hashFile(file, "MD5"); //$NON-NLS-1$
+		return FileHelper.hashFile(file, "MD5");
 	}
 
 	/**
-	 * Creates the SHA1 hash of the given file, returning the hash as a byte array. Use {@link
-	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
-	 *
-	 * @param file
-	 * 		the file to hash
-	 *
-	 * @return the hash as a byte array
-	 */
-	public static byte[] hashFileSha1(File file) {
-		return FileHelper.hashFile(file, "SHA-1"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Creates the SHA256 hash of the given file, returning the hash as a byte array. Use {@link
-	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
+	 * Creates the SHA256 hash of the given file, returning the hash as a byte array. Use
+	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 *
 	 * @param file
 	 * 		the file to hash
@@ -606,12 +395,12 @@ public class FileHelper {
 	 * @return the hash as a byte array
 	 */
 	public static byte[] hashFileSha256(File file) {
-		return FileHelper.hashFile(file, "SHA-256"); //$NON-NLS-1$
+		return FileHelper.hashFile(file, "SHA-256");
 	}
 
 	/**
-	 * Creates the hash of the given file with the given algorithm, returning the hash as a byte array. Use {@link
-	 * StringHelper#toHexString(byte[])} to create a HEX string of the bytes
+	 * Creates the hash of the given file with the given algorithm, returning the hash as a byte array. Use
+	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 *
 	 * @param file
 	 * 		the file to hash
@@ -635,30 +424,7 @@ public class FileHelper {
 
 			return complete.digest();
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"Something went wrong while hashing file: " + file.getAbsolutePath()); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * Helper method to append bytes to a specified file. The file is created if it does not exist otherwise the bytes
-	 * are simply appended
-	 *
-	 * @param dstFile
-	 * 		the file to append to
-	 * @param bytes
-	 * 		the bytes to append
-	 */
-	public static void appendFilePart(File dstFile, byte[] bytes) {
-
-		try (OutputStream outputStream = Files.newOutputStream(dstFile.toPath(), StandardOpenOption.APPEND)) {
-
-			outputStream.write(bytes);
-			outputStream.flush();
-
-		} catch (IOException e) {
-			throw new RuntimeException(
-					"Could not create and append the bytes to the file " + dstFile.getAbsolutePath()); //$NON-NLS-1$
+			throw new RuntimeException("Something went wrong while hashing file: " + file.getAbsolutePath());
 		}
 	}
 }

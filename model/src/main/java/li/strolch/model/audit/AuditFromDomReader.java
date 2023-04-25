@@ -35,53 +35,32 @@ public class AuditFromDomReader {
 
 		String idS = rootElement.getAttribute(Tags.Audit.ID);
 		DBC.INTERIM.assertNotEmpty("Id must be set!", idS);
-		audit.setId(Long.valueOf(idS));
+		audit.setId(Long.parseLong(idS));
 
 		NodeList childNodes = rootElement.getChildNodes();
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node item = childNodes.item(i);
-			if (!(item instanceof Element))
+			if (!(item instanceof Element element))
 				continue;
 
-			Element element = (Element) item;
 			String nodeName = element.getNodeName();
 			String txtContent = element.getTextContent();
 
 			switch (nodeName) {
-			case Tags.Audit.USERNAME:
-				audit.setUsername(txtContent);
-				break;
-			case Tags.Audit.FIRSTNAME:
-				audit.setFirstname(txtContent);
-				break;
-			case Tags.Audit.LASTNAME:
-				audit.setLastname(txtContent);
-				break;
-			case Tags.Audit.DATE:
-				audit.setDate(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
-				break;
-			case Tags.Audit.ELEMENT_TYPE:
-				audit.setElementType(txtContent);
-				break;
-			case Tags.Audit.ELEMENT_SUB_TYPE:
-				audit.setElementSubType(txtContent);
-				break;
-			case Tags.Audit.ELEMENT_ACCESSED:
-				audit.setElementAccessed(txtContent);
-				break;
-			case Tags.Audit.NEW_VERSION:
-				audit.setNewVersion(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
-				break;
-			case Tags.Audit.ACTION:
-				audit.setAction(txtContent);
-				break;
-			case Tags.Audit.ACCESS_TYPE:
-				audit.setAccessType(AccessType.valueOf(txtContent));
-				break;
-
-			default:
-				throw new IllegalArgumentException(
-						MessageFormat.format("Unhandled/Invalid tag {0} for Audit {1}", nodeName, idS));
+			case Tags.Audit.USERNAME -> audit.setUsername(txtContent);
+			case Tags.Audit.FIRSTNAME -> audit.setFirstname(txtContent);
+			case Tags.Audit.LASTNAME -> audit.setLastname(txtContent);
+			case Tags.Audit.DATE ->
+					audit.setDate(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
+			case Tags.Audit.ELEMENT_TYPE -> audit.setElementType(txtContent);
+			case Tags.Audit.ELEMENT_SUB_TYPE -> audit.setElementSubType(txtContent);
+			case Tags.Audit.ELEMENT_ACCESSED -> audit.setElementAccessed(txtContent);
+			case Tags.Audit.NEW_VERSION ->
+					audit.setNewVersion(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
+			case Tags.Audit.ACTION -> audit.setAction(txtContent);
+			case Tags.Audit.ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
+			default -> throw new IllegalArgumentException(
+					MessageFormat.format("Unhandled/Invalid tag {0} for Audit {1}", nodeName, idS));
 			}
 		}
 

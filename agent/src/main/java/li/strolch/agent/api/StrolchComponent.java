@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StrolchComponent {
 
-	public static final String COMPONENT_VERSION_PROPERTIES = "/componentVersion.properties"; //$NON-NLS-1$
+	public static final String COMPONENT_VERSION_PROPERTIES = "/componentVersion.properties";
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchComponent.class);
 	private final ComponentContainer container;
 	private final String componentName;
@@ -194,7 +194,7 @@ public class StrolchComponent {
 	 */
 	protected void assertStarted() {
 		if (getState() != ComponentState.STARTED) {
-			String msg = "Component {0} is not yet started!"; //$NON-NLS-1$
+			String msg = "Component {0} is not yet started!";
 			throw new IllegalStateException(MessageFormat.format(msg, this.componentName));
 		}
 	}
@@ -205,7 +205,7 @@ public class StrolchComponent {
 	 */
 	protected void assertContainerStarted() {
 		if (this.container.getState() != ComponentState.STARTED) {
-			String msg = "Container is not yet started!"; //$NON-NLS-1$
+			String msg = "Container is not yet started!";
 			throw new IllegalStateException(msg);
 		}
 	}
@@ -551,7 +551,7 @@ public class StrolchComponent {
 		if (this.version == null) {
 			try (InputStream stream = getClass().getResourceAsStream(COMPONENT_VERSION_PROPERTIES)) {
 				if (stream == null) {
-					throw new RuntimeException("/componentVersion.properties does not exist"); //$NON-NLS-1$
+					throw new RuntimeException("/componentVersion.properties does not exist");
 				}
 				Properties properties = new Properties();
 				properties.load(stream);

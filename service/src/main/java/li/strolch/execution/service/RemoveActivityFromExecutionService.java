@@ -21,7 +21,7 @@ public class RemoveActivityFromExecutionService extends AbstractService<LocatorA
 	}
 
 	@Override
-	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
+	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		String realm = StringHelper.isEmpty(arg.realm) ? StrolchConstants.DEFAULT_REALM : arg.realm;
 

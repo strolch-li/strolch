@@ -3,6 +3,7 @@ package li.strolch.utils.helper;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -52,9 +53,7 @@ public class TexHelper {
 		data = StringHelper.replacePropertiesIn(properties, data);
 		data = StringHelper.replacePropertiesIn(getI18nData(bundle), "%", data);
 
-		File renderedPdf = renderPdf(fileName, templatePath, data);
-
-		return renderedPdf;
+		return renderPdf(fileName, templatePath, data);
 	}
 
 	private File renderPdf(String fileName, File templatePath, String data) {
@@ -68,12 +67,15 @@ public class TexHelper {
 			}
 
 			// clean old builds
-			Arrays.asList(texPath.toFile().listFiles(
-					file -> (System.currentTimeMillis() - file.lastModified()) > TimeUnit.MINUTES.toMillis(1)))
-					.forEach(file -> {
-						logger.info("Deleting old path " + file);
-						FileHelper.deleteFile(file, false);
-					});
+			File[] texFiles = texPath.toFile()
+					.listFiles(
+							file -> (System.currentTimeMillis() - file.lastModified()) > TimeUnit.MINUTES.toMillis(1));
+			if (texFiles == null)
+				throw new IllegalStateException("No tex files found!");
+			Arrays.asList(texFiles).forEach(file -> {
+				logger.info("Deleting old path " + file);
+				FileHelper.deleteFile(file, false);
+			});
 
 			// prepare a temporary directory by copying tex files
 			File tmpPathF = texPath.resolve(StringHelper.getUniqueId()).toFile();
@@ -83,20 +85,21 @@ public class TexHelper {
 
 			if (!FileHelper.copy(templatePath.getParentFile().listFiles(), tmpPathF, false))
 				throw new RuntimeException(
-						"Failed to copy " + templatePath.getParentFile().getAbsolutePath() + " to tmpPath " + tmpPathF
-								.getAbsolutePath());
+						"Failed to copy " + templatePath.getParentFile().getAbsolutePath() + " to tmpPath "
+								+ tmpPathF.getAbsolutePath());
 
 			// then write TEX file
 			String texFileName = fileName + ".tex";
 			File texFileS = new File(tmpPathF, texFileName);
-			try (OutputStreamWriter out = new OutputStreamWriter(Files.newOutputStream(texFileS.toPath()), "UTF-8")) {
+			try (OutputStreamWriter out = new OutputStreamWriter(Files.newOutputStream(texFileS.toPath()),
+					StandardCharsets.UTF_8)) {
 				out.write(data);
 			}
 
 			// do PDF generation
 			String cmd = "pdflatex";
-			ProcessHelper.ProcessResult processResult = ProcessHelper
-					.runCommand(tmpPathF, cmd, "-halt-on-error", "-file-line-error", texFileName);
+			ProcessHelper.ProcessResult processResult = ProcessHelper.runCommand(tmpPathF, cmd, "-halt-on-error",
+					"-file-line-error", texFileName);
 			if (processResult.returnValue != 0) {
 				logger.error(processResult.processOutput);
 				throw new RuntimeException(

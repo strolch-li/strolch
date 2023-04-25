@@ -66,7 +66,7 @@ public abstract class AbstractionConfiguration {
 
 	public String[] getStringArray(String key, String defValue) {
 		String value = getValue(key, defValue);
-		String[] values = value.split(","); //$NON-NLS-1$
+		String[] values = value.split(",");
 		for (int i = 0; i < values.length; i++) {
 			values[i] = values[i].trim();
 		}
@@ -81,12 +81,12 @@ public abstract class AbstractionConfiguration {
 	public boolean getBoolean(String key, Boolean defValue) {
 		String value = this.configurationValues.get(key);
 		if (StringHelper.isNotEmpty(value)) {
-			if (value.equalsIgnoreCase("true")) //$NON-NLS-1$
+			if (value.equalsIgnoreCase("true"))
 				return true;
-			else if (value.equalsIgnoreCase("false")) //$NON-NLS-1$
+			else if (value.equalsIgnoreCase("false"))
 				return false;
 
-			String msg = "Component {0} has non-boolean configuration value for {1} = {2}!"; //$NON-NLS-1$
+			String msg = "Component {0} has non-boolean configuration value for {1} = {2}!";
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -103,7 +103,7 @@ public abstract class AbstractionConfiguration {
 			try {
 				return Integer.decode(value);
 			} catch (NumberFormatException e) {
-				String msg = "Component {0} has non-integer configuration value for {1} = {2}!"; //$NON-NLS-1$
+				String msg = "Component {0} has non-integer configuration value for {1} = {2}!";
 				msg = MessageFormat.format(msg, this.name, key, value);
 				throw new StrolchConfigurationException(msg);
 			}
@@ -121,7 +121,7 @@ public abstract class AbstractionConfiguration {
 			try {
 				return Long.parseLong(value);
 			} catch (NumberFormatException e) {
-				String msg = "Component {0} has non-long configuration value for {1} = {2}!"; //$NON-NLS-1$
+				String msg = "Component {0} has non-long configuration value for {1} = {2}!";
 				msg = MessageFormat.format(msg, this.name, key, value);
 				throw new StrolchConfigurationException(msg);
 			}
@@ -137,7 +137,7 @@ public abstract class AbstractionConfiguration {
 
 		File configFile = new File(configuration.getConfigPath(), value);
 		if (!configFile.isFile() || !configFile.canRead()) {
-			String msg = "Component {0} requires configuration file for configuration property ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			String msg = "Component {0} requires configuration file for configuration property ''{1}'' which does not exist with value: {2}";
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -149,7 +149,7 @@ public abstract class AbstractionConfiguration {
 
 		File dataDir = new File(configuration.getDataPath(), value);
 		if (checkExists && !dataDir.isDirectory() || !dataDir.canRead()) {
-			String msg = "Component {0} requires data directory for configuration property ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			String msg = "Component {0} requires data directory for configuration property ''{1}'' which does not exist with value: {2}";
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -161,7 +161,7 @@ public abstract class AbstractionConfiguration {
 
 		File dataFile = new File(configuration.getDataPath(), value);
 		if (checkExists && !dataFile.isFile() || !dataFile.canRead()) {
-			String msg = "Component {0} requires data file for configuration property ''{1}'' which does not exist with value: {2}"; //$NON-NLS-1$
+			String msg = "Component {0} requires data file for configuration property ''{1}'' which does not exist with value: {2}";
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -179,14 +179,14 @@ public abstract class AbstractionConfiguration {
 	}
 
 	private void logDefValueUse(String key, Object defValue) {
-		String msg = "{0}: Using default for key {1}={2}"; //$NON-NLS-1$
+		String msg = "{0}: Using default for key {1}={2}";
 		msg = MessageFormat.format(msg, this.name, key, defValue);
 		logger.info(msg);
 	}
 
 	private void assertDefValueExist(String key, Object defValue) {
 		if (defValue == null) {
-			String msg = "Component {0} is missing the configuration value with key ''{1}''!"; //$NON-NLS-1$
+			String msg = "Component {0} is missing the configuration value with key ''{1}''!";
 			msg = MessageFormat.format(msg, this.name, key);
 			throw new StrolchConfigurationException(msg);
 		}

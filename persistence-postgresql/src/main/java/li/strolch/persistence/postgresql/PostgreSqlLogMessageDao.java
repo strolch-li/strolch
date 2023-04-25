@@ -80,7 +80,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			return messages;
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e); //$NON-NLS-1$
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			if (count != 1) {
 				throw new StrolchPersistenceException(MessageFormat
 						.format("Expected to insert 1 log_message record, but inserted {0} for LogMessage {1}", count,
-								logMessage.getId())); //$NON-NLS-1$
+								logMessage.getId()));
 			}
 
 			int nrOfInserts = setValues(logMessage, valuesStatement);
@@ -104,7 +104,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to insert LogMessage {0} due to {1}", logMessage.getId(), //$NON-NLS-1$
+					MessageFormat.format("Failed to insert LogMessage {0} due to {1}", logMessage.getId(),
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -127,7 +127,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update LogMessage state {0} due to {1}", logMessage.getId(), //$NON-NLS-1$
+					.format("Failed to update LogMessage state {0} due to {1}", logMessage.getId(),
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -162,7 +162,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			remove(removeStatement, removeValuesStatement, logMessage);
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {1}", //$NON-NLS-1$
+			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {1}",
 					logMessage.getId(), e.getLocalizedMessage()), e);
 		}
 	}
@@ -187,13 +187,13 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 			int[] countAll = removeStatement.executeBatch();
 			if (countAll.length != nrOfRemoves) {
-				String msg = "Expected to delete {0} LogMessages but deleted {1} elements!"; //$NON-NLS-1$
+				String msg = "Expected to delete {0} LogMessages but deleted {1} elements!";
 				msg = MessageFormat.format(msg, nrOfRemoves, countAll.length);
 				throw new StrolchPersistenceException(msg);
 			}
 			for (int count : countAll) {
 				if (count != 1) {
-					String msg = "Expected to delete 1 LogMessages per delete statement but deleted {0} elements!"; //$NON-NLS-1$
+					String msg = "Expected to delete 1 LogMessages per delete statement but deleted {0} elements!";
 					msg = MessageFormat.format(msg, nrOfRemoves, count);
 					throw new StrolchPersistenceException(msg);
 				}
@@ -201,13 +201,13 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 			countAll = removeValuesStatement.executeBatch();
 			if (countAll.length != nrOfRemoves) {
-				String msg = "Expected to execute {0} delete value statements but executed {1} elements!"; //$NON-NLS-1$
+				String msg = "Expected to execute {0} delete value statements but executed {1} elements!";
 				msg = MessageFormat.format(msg, nrOfRemoves, countAll.length);
 				throw new StrolchPersistenceException(msg);
 			}
 			for (int i = 0; i < countAll.length; i++) {
 				if (countAll[i] != nrOfValueRemoves[i]) {
-					String msg = "Expected to delete {0} values for LogMessage {1} but deleted {2} elements!"; //$NON-NLS-1$
+					String msg = "Expected to delete {0} values for LogMessage {1} but deleted {2} elements!";
 					msg = MessageFormat.format(msg, nrOfValueRemoves[i], logMessages.get(i).getId(), countAll[i]);
 					throw new StrolchPersistenceException(msg);
 				}
@@ -227,14 +227,14 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 		int count = removeStatement.executeUpdate();
 		if (count != 1) {
-			String msg = "Expected to delete 1 LogMessage with id {0} but deleted {1} elements!"; //$NON-NLS-1$
+			String msg = "Expected to delete 1 LogMessage with id {0} but deleted {1} elements!";
 			msg = MessageFormat.format(msg, logMessage.getId(), count);
 			throw new StrolchPersistenceException(msg);
 		}
 
 		count = removeValuesStatement.executeUpdate();
 		if (count != logMessage.getValues().size()) {
-			String msg = "Expected to delete {0} values for LogMessage with id {1} but deleted {2} elements!"; //$NON-NLS-1$
+			String msg = "Expected to delete {0} values for LogMessage with id {1} but deleted {2} elements!";
 			msg = MessageFormat.format(msg, logMessage.getValues().size(), logMessage.getId(), count);
 			throw new StrolchPersistenceException(msg);
 		}
@@ -244,14 +244,14 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 		if (ints.length != nrOfInserts) {
 			throw new StrolchPersistenceException(MessageFormat
 					.format("Expected to insert {0} value record, but inserted {1} for LogMessage {2}", nrOfInserts,
-							ints.length, logMessage.getId())); //$NON-NLS-1$
+							ints.length, logMessage.getId()));
 		}
 
 		for (int i = 0; i < ints.length; i++) {
 			if (ints[i] != 1) {
 				throw new StrolchPersistenceException(MessageFormat
 						.format("Expected to insert 1 record per value, but inserted {0} for value at index {1} for LogMessage {2}",
-								ints[i], i, logMessage.getId())); //$NON-NLS-1$
+								ints[i], i, logMessage.getId()));
 			}
 		}
 	}

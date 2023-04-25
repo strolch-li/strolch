@@ -3,9 +3,8 @@ package li.strolch.execution;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +26,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 
 	public SimpleDurationExecutionTimer(StrolchAgent agent) {
 		this.agent = agent;
-		this.simulationTasks = Collections.synchronizedMap(new HashMap<>());
+		this.simulationTasks = new ConcurrentHashMap<>();
 	}
 
 	@Override

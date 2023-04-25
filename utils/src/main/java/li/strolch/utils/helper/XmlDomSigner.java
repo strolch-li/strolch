@@ -34,11 +34,11 @@ public class XmlDomSigner {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlDomSigner.class);
 
-	private KeyStore keyStore;
-	private String privateKeyAlias;
-	private String trustAlias;
+	private final KeyStore keyStore;
+	private final String privateKeyAlias;
+	private final String trustAlias;
 
-	private char[] password;
+	private final char[] password;
 
 	public XmlDomSigner(File keyStorePath, String privateKeyAlias, String trustAlias, char[] password) {
 
@@ -167,9 +167,9 @@ public class XmlDomSigner {
 				}
 				throw new RuntimeException("Uh-oh validation, failed!");
 			}
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
-			if (e instanceof RuntimeException)
-				throw (RuntimeException) e;
 			throw new RuntimeException("Failed to validate document", e);
 		}
 	}
@@ -185,9 +185,8 @@ public class XmlDomSigner {
 			Transformer transformer = tf.newTransformer();
 
 			if (indent) {
-				transformer.setOutputProperty(OutputKeys.INDENT, "yes"); //$NON-NLS-1$
-				transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount",
-						"2"); //$NON-NLS-1$ //$NON-NLS-2$
+				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+				transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-2$
 			}
 
 			transformer.transform(new DOMSource(doc), new StreamResult(out));

@@ -41,7 +41,7 @@ public class PrivilegeSetUserLocaleService
 	}
 
 	@Override
-	protected PrivilegeUserResult internalDoService(PrivilegeSetUserLocaleArgument arg) throws Exception {
+	protected PrivilegeUserResult internalDoService(PrivilegeSetUserLocaleArgument arg) {
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();

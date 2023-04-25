@@ -18,6 +18,7 @@ package li.strolch.xmlpers.objref;
 import java.io.File;
 import java.util.Objects;
 
+import li.strolch.utils.concurrent.LockableObject;
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.impl.PathBuilder;

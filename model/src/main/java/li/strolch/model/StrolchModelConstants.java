@@ -23,14 +23,14 @@ import li.strolch.privilege.base.PrivilegeConstants;
 
 public class StrolchModelConstants {
 
-	public static final String DEFAULT_XML_VERSION = "1.0"; //$NON-NLS-1$
+	public static final String DEFAULT_XML_VERSION = "1.0";
 
-	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name(); //$NON-NLS-1$
+	public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
 
 	/**
 	 * The type to set on {@link StrolchRootElement StrolchRootElements} when defining a template for a type of element
 	 */
-	public static final String TEMPLATE = "Template"; //$NON-NLS-1$
+	public static final String TEMPLATE = "Template";
 
 	public static final String SUFFIX_REF = "-Ref";
 
@@ -38,35 +38,35 @@ public class StrolchModelConstants {
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as an
 	 * enumeration
 	 */
-	public static final String INTERPRETATION_ENUMERATION = "Enumeration"; //$NON-NLS-1$
+	public static final String INTERPRETATION_ENUMERATION = "Enumeration";
 
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to a {@link Resource}
 	 */
-	public static final String INTERPRETATION_RESOURCE_REF = Tags.RESOURCE + SUFFIX_REF; //$NON-NLS-1$
+	public static final String INTERPRETATION_RESOURCE_REF = Tags.RESOURCE + SUFFIX_REF;
 
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to an {@link Order}
 	 */
-	public static final String INTERPRETATION_ORDER_REF = Tags.ORDER + SUFFIX_REF; //$NON-NLS-1$
+	public static final String INTERPRETATION_ORDER_REF = Tags.ORDER + SUFFIX_REF;
 
 	/**
 	 * This interpretation value indicates that the value of the {@link Parameter} should be understood as a reference
 	 * to an {@link Activity}
 	 */
-	public static final String INTERPRETATION_ACTIVITY_REF = Tags.ACTIVITY + SUFFIX_REF; //$NON-NLS-1$
+	public static final String INTERPRETATION_ACTIVITY_REF = Tags.ACTIVITY + SUFFIX_REF;
 
 	/**
 	 * This interpretation value indicates that the {@link Parameter} has no defined interpretation
 	 */
-	public static final String INTERPRETATION_NONE = "None"; //$NON-NLS-1$
+	public static final String INTERPRETATION_NONE = "None";
 
 	/**
 	 * This uom value indicates that the {@link Parameter} has no defined uom
 	 */
-	public static final String UOM_NONE = "None"; //$NON-NLS-1$
+	public static final String UOM_NONE = "None";
 
 	public static final String INTERNAL = "internal";
 

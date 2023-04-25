@@ -2,7 +2,6 @@ package li.strolch.model.log;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -114,11 +113,6 @@ public class LogMessage extends I18nMessage {
 	public LogMessage value(String key, Throwable e) {
 		super.value(key, e);
 		return this;
-	}
-
-	@Override
-	public String toString() {
-		return getMessage(Locale.getDefault());
 	}
 
 	public JsonObject toJson() {

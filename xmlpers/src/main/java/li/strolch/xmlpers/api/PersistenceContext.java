@@ -75,24 +75,14 @@ public class PersistenceContext<T> {
 			return false;
 		PersistenceContext<?> other = (PersistenceContext<?>) obj;
 		if (this.objectRef == null) {
-			if (other.objectRef != null)
-				return false;
-		} else if (!this.objectRef.equals(other.objectRef))
-			return false;
-		return true;
+			return other.objectRef == null;
+		} else
+			return this.objectRef.equals(other.objectRef);
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("PersistenceContext [objectRef=");
-		builder.append(this.objectRef);
-		builder.append(", object=");
-		builder.append(this.object);
-		builder.append(", parserFactory=");
-		builder.append(this.parserFactory);
-		builder.append("]");
-		return builder.toString();
+		return "PersistenceContext [objectRef=" + this.objectRef + ", object=" + this.object + ", parserFactory="
+				+ this.parserFactory + "]";
 	}
 }

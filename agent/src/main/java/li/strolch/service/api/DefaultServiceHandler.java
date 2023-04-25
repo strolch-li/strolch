@@ -17,6 +17,7 @@ package li.strolch.service.api;
 
 import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.service.api.ServiceResultState.*;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
@@ -78,11 +79,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			T argument) {
 		DBC.PRE.assertNotNull("Certificate my not be null!", certificate);
 
-		if (!(svc instanceof AbstractService))
+		if (!(svc instanceof AbstractService<T, U> service))
 			throw new IllegalArgumentException(
 					"This service handle expects all services to be instance of " + AbstractService.class.getName());
-
-		AbstractService<T, U> service = (AbstractService<T, U>) svc;
 
 		long start = System.nanoTime();
 
@@ -92,46 +91,16 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		try {
 			privilegeContext = this.privilegeHandler.validate(certificate);
 			privilegeContext.validateAction(service);
-		} catch (PrivilegeException e) {
-
-			long end = System.nanoTime();
-			String msg = "User {0}: Service {1} failed after {2} due to {3}"; //$NON-NLS-1$
-			String svcName = service.getClass().getName();
-			msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(end - start), e.getMessage());
-			logger.error(msg);
-
-			if (getContainer().hasComponent(OperationsLog.class)) {
-				String realmName = getRealmName(argument, certificate);
-				LogMessage logMessage = new LogMessage(realmName, username,
-						Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), service.getPrivilegeName(),
-								svcName), LogSeverity.Exception, LogMessageState.Information,
-						ResourceBundle.getBundle("strolch-agent"), "agent.service.failed.access.denied").value("user",
-						username).value("service", svcName).withException(e);
-
-				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
-				operationsLog.addMessage(logMessage);
-			}
-
-			I18nMessage i18n = new I18nMessage(ResourceBundle.getBundle("strolch-agent", certificate.getLocale()),
-					"agent.service.failed.access.denied").value("user", username)
-					.value("service", service.getClass().getSimpleName());
-
-			if (!this.throwOnPrivilegeFail) {
-				logger.error(e.getMessage(), e);
-
-				U result = service.getResultInstance();
-				result.setState(e instanceof PrivilegeModelException ?
-						ServiceResultState.EXCEPTION :
-						ServiceResultState.ACCESS_DENIED);
-				result.setMessage(i18n.getMessage());
-				result.i18n(i18n);
-				result.setThrowable(e);
-				return result;
-			}
-
-			if (e instanceof PrivilegeModelException)
+		} catch (PrivilegeModelException e) {
+			I18nMessage i18n = logAccessDenied(certificate, argument, service, start, username, e);
+			if (this.throwOnPrivilegeFail)
 				throw new StrolchException(i18n.getMessage(), e);
-			throw new StrolchAccessDeniedException(certificate, service, i18n, e);
+			return buildFailedResult(service, e, i18n);
+		} catch (PrivilegeException e) {
+			I18nMessage i18n = logAccessDenied(certificate, argument, service, start, username, e);
+			if (this.throwOnPrivilegeFail)
+				throw new StrolchAccessDeniedException(certificate, service, i18n, e);
+			return buildFailedResult(service, e, i18n);
 		}
 
 		try {
@@ -146,11 +115,62 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		} catch (Exception e) {
 			long end = System.nanoTime();
-			String msg = "User {0}: Service failed {1} after {2} due to {3}"; //$NON-NLS-1$
+			String msg = "User {0}: Service failed {1} after {2} due to {3}";
 			msg = MessageFormat.format(msg, username, service.getClass().getName(), formatNanoDuration(end - start),
 					e.getMessage());
 			logger.error(msg);
 			throw new StrolchException(msg, e);
+		}
+	}
+
+	private <T extends ServiceArgument, U extends ServiceResult> I18nMessage logAccessDenied(Certificate certificate,
+			T argument, AbstractService<T, U> service, long start, String username, PrivilegeException e) {
+		logger.error(buildFailMessage(service, start, username, e));
+		addOperationsLogMessage(certificate, argument, service, username, e, service.getClass().getName());
+		I18nMessage i18n = buildAccessDeniedMessage(certificate, service, username);
+		logger.error(e.getMessage(), e);
+		return i18n;
+	}
+
+	private static <T extends ServiceArgument, U extends ServiceResult> U buildFailedResult(
+			AbstractService<T, U> service, PrivilegeException e, I18nMessage i18n) {
+		U result = service.getResultInstance();
+		result.setState(e instanceof PrivilegeModelException ? EXCEPTION : ACCESS_DENIED);
+		result.setMessage(i18n.getMessage());
+		result.i18n(i18n);
+		result.setThrowable(e);
+		return result;
+	}
+
+	private static <T extends ServiceArgument, U extends ServiceResult> I18nMessage buildAccessDeniedMessage(
+			Certificate certificate, AbstractService<T, U> service, String username) {
+		return new I18nMessage(ResourceBundle.getBundle("strolch-agent", certificate.getLocale()),
+				"agent.service.failed.access.denied").value("user", username)
+				.value("service", service.getClass().getSimpleName());
+	}
+
+	private static <T extends ServiceArgument, U extends ServiceResult> String buildFailMessage(
+			AbstractService<T, U> service, long start, String username, PrivilegeException e) {
+		long end = System.nanoTime();
+		String msg = "User {0}: Service {1} failed after {2} due to {3}";
+		msg = MessageFormat.format(msg, username, service.getClass().getName(), formatNanoDuration(end - start),
+				e.getMessage());
+		return msg;
+	}
+
+	private <T extends ServiceArgument, U extends ServiceResult> void addOperationsLogMessage(Certificate certificate,
+			T argument, AbstractService<T, U> service, String username, PrivilegeException e, String svcName) {
+		if (getContainer().hasComponent(OperationsLog.class)) {
+			String realmName = getRealmName(argument, certificate);
+			LogMessage logMessage = new LogMessage(realmName, username,
+					Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), service.getPrivilegeName(), svcName),
+					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+					"agent.service.failed.access.denied").value("user", username)
+					.value("service", svcName)
+					.withException(e);
+
+			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
+			operationsLog.addMessage(logMessage);
 		}
 	}
 
@@ -175,7 +195,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		long end = System.nanoTime();
 
-		String msg = "User {0}: Service {1} took {2}"; //$NON-NLS-1$
+		String msg = "User {0}: Service {1} took {2}";
 		String username = certificate.getUsername();
 		String svcName = service.getClass().getName();
 
@@ -183,11 +203,11 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(end - start));
 
-		if (result.getState() == ServiceResultState.SUCCESS) {
+		if (result.getState() == SUCCESS) {
 			logger.info(msg);
-		} else if (result.getState() == ServiceResultState.WARNING) {
+		} else if (result.getState() == WARNING) {
 
-			msg = ServiceResultState.WARNING + ": " + msg;
+			msg = WARNING + ": " + msg;
 			logger.warn(msg);
 
 			if (isNotEmpty(result.getMessage()) && result.getThrowable() != null) {
@@ -198,8 +218,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				logger.warn("Reason: " + result.getThrowable().getMessage(), result.getThrowable());
 			}
 
-		} else if (result.getState() == ServiceResultState.FAILED || result.getState() == ServiceResultState.EXCEPTION
-				|| result.getState() == ServiceResultState.ACCESS_DENIED) {
+		} else if (result.getState() == FAILED || result.getState() == EXCEPTION
+				|| result.getState() == ACCESS_DENIED) {
 
 			msg = result.getState() + ": " + msg;
 			logger.error(msg);
@@ -221,8 +241,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			else
 				logger.error("Reason: " + reason, throwable);
 
-			if ((result.getState() == ServiceResultState.EXCEPTION
-					|| result.getState() == ServiceResultState.ACCESS_DENIED) //
+			if ((result.getState() == EXCEPTION || result.getState() == ACCESS_DENIED) //
 					&& getContainer().hasComponent(OperationsLog.class)) {
 
 				LogMessage logMessage;
@@ -235,8 +254,10 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				} else {
 					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
 							LogSeverity.Exception, LogMessageState.Information, bundle,
-							"agent.service.failed.ex").withException(throwable).value("service", svcName)
-							.value("reason", reason).value("exception", throwable);
+							"agent.service.failed.ex").withException(throwable)
+							.value("service", svcName)
+							.value("reason", reason)
+							.value("exception", throwable);
 				}
 
 				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);

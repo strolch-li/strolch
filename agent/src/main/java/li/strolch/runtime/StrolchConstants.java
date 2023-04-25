@@ -64,13 +64,13 @@ public class StrolchConstants extends StrolchModelConstants {
 	 */
 	public static class StrolchPrivilegeConstants {
 
-		public static final String PRIVILEGE = "Privilege"; //$NON-NLS-1$
-		public static final String CERTIFICATE = "Certificate"; //$NON-NLS-1$
-		public static final String LOGIN = "Login"; //$NON-NLS-1$
-		public static final String LOGOUT = "Logout"; //$NON-NLS-1$
-		public static final String SESSION_TIME_OUT = "SessionTimeout"; //$NON-NLS-1$
-		public static final String ROLE = "Role"; //$NON-NLS-1$
-		public static final String USER = "User"; //$NON-NLS-1$
+		public static final String PRIVILEGE = "Privilege";
+		public static final String CERTIFICATE = "Certificate";
+		public static final String LOGIN = "Login";
+		public static final String LOGOUT = "Logout";
+		public static final String SESSION_TIME_OUT = "SessionTimeout";
+		public static final String ROLE = "Role";
+		public static final String USER = "User";
 
 		public static final String PRIVILEGE_GET_ROLE = PrivilegeHandler.PRIVILEGE_GET_ROLE;
 		public static final String PRIVILEGE_ADD_ROLE = PrivilegeHandler.PRIVILEGE_ADD_ROLE;

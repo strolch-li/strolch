@@ -50,12 +50,7 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 	}
 
 	@Override
-	protected boolean isArgumentRequired() {
-		return true;
-	}
-
-	@Override
-	protected PerformanceTestResult internalDoService(PerformanceTestArgument arg) throws Exception {
+	protected PerformanceTestResult internalDoService(PerformanceTestArgument arg) {
 
 		this.arg = arg;
 		long start = System.currentTimeMillis();

@@ -34,13 +34,13 @@ import org.slf4j.LoggerFactory;
 
 public class CachedJsonDaoTest extends AbstractModelTest {
 
-	public static final String RUNTIME_PATH = "target/cachedJsonRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedJsonRuntime"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/cachedJsonRuntime/";
+	public static final String DB_STORE_PATH_DIR = "dbStore";
+	public static final String CONFIG_SRC = "src/test/resources/cachedJsonRuntime";
 
-	public static final String DB_URL = "jdbc:postgresql://localhost/testdb"; //$NON-NLS-1$
-	public static final String DB_USERNAME = "testuser"; //$NON-NLS-1$
-	public static final String DB_PASSWORD = "test"; //$NON-NLS-1$
+	public static final String DB_URL = "jdbc:postgresql://localhost/testdb";
+	public static final String DB_USERNAME = "testuser";
+	public static final String DB_PASSWORD = "test";
 
 	private static final Logger logger = LoggerFactory.getLogger(CachedJsonDaoTest.class);
 

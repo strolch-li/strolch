@@ -16,16 +16,15 @@
 package li.strolch.privilege.xml;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 // TODO write JavaDoc...
 public interface ElementParser {
 
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException;
+	void startElement(String uri, String localName, String qName, Attributes attributes);
 
-	public void characters(char[] ch, int start, int length) throws SAXException;
+	void characters(char[] ch, int start, int length);
 
-	public void endElement(String uri, String localName, String qName) throws SAXException;
+	void endElement(String uri, String localName, String qName);
 
-	public void notifyChild(ElementParser child);
+	void notifyChild(ElementParser child);
 }

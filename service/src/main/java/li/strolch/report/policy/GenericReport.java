@@ -9,6 +9,7 @@ import static li.strolch.utils.helper.StringHelper.EMPTY;
 
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
@@ -58,7 +59,7 @@ public class GenericReport extends ReportPolicy {
 	protected Map<ReportFilterPolicy, TypedTuple<StringParameter, StringParameter>> filtersByPolicy;
 	protected MapOfSets<String, String> filtersById;
 
-	protected long counter;
+	protected final AtomicLong counter;
 	protected boolean withPage;
 	protected int offset = -1;
 	protected int limit = -1;
@@ -67,6 +68,7 @@ public class GenericReport extends ReportPolicy {
 
 	public GenericReport(StrolchTransaction tx) {
 		super(tx);
+		this.counter = new AtomicLong(0L);
 	}
 
 	/**
@@ -229,8 +231,8 @@ public class GenericReport extends ReportPolicy {
 	}
 
 	@Override
-	public long getCounter() {
-		return this.counter;
+	public synchronized long getCounter() {
+		return this.counter.get();
 	}
 
 	/**
@@ -336,10 +338,6 @@ public class GenericReport extends ReportPolicy {
 		return this;
 	}
 
-	protected synchronized void incrementCounter() {
-		this.counter++;
-	}
-
 	/**
 	 * Builds the stream of rows on which further transformations can be performed. Each row is a {@link Map} for where
 	 * the key is an element type, and the value is the associated element
@@ -375,7 +373,7 @@ public class GenericReport extends ReportPolicy {
 		if (hasFilter())
 			stream = stream.filter(this::filter);
 
-		stream = stream.peek(e -> incrementCounter());
+		stream = stream.peek(e -> this.counter.incrementAndGet());
 
 		if (withOrdering && hasOrdering())
 			stream = stream.sorted(this::sort);
@@ -807,8 +805,7 @@ public class GenericReport extends ReportPolicy {
 		if (this.filtersById != null && !this.filtersById.isEmpty() && this.filtersById.containsSet(
 				element.getType())) {
 
-			if (!this.filtersById.getSet(element.getType()).contains(element.getId()))
-				return false;
+			return this.filtersById.getSet(element.getType()).contains(element.getId());
 		}
 
 		// otherwise we want to keep this row
@@ -1042,16 +1039,12 @@ public class GenericReport extends ReportPolicy {
 	}
 
 	protected Stream<? extends StrolchRootElement> getStreamFor(StringParameter objectTypeP) {
-		switch (objectTypeP.getInterpretation()) {
-		case INTERPRETATION_RESOURCE_REF:
-			return tx().streamResources(objectTypeP.getUom());
-		case INTERPRETATION_ORDER_REF:
-			return tx().streamOrders(objectTypeP.getUom());
-		case INTERPRETATION_ACTIVITY_REF:
-			return tx().streamActivities(objectTypeP.getUom());
-		default:
-			throw new IllegalArgumentException("Unhandled element type " + objectTypeP.getInterpretation());
-		}
+		return switch (objectTypeP.getInterpretation()) {
+			case INTERPRETATION_RESOURCE_REF -> tx().streamResources(objectTypeP.getUom());
+			case INTERPRETATION_ORDER_REF -> tx().streamOrders(objectTypeP.getUom());
+			case INTERPRETATION_ACTIVITY_REF -> tx().streamActivities(objectTypeP.getUom());
+			default -> throw new IllegalArgumentException("Unhandled element type " + objectTypeP.getInterpretation());
+		};
 	}
 
 	/**
@@ -1136,7 +1129,7 @@ public class GenericReport extends ReportPolicy {
 		List<Parameter<?>> relationParams = relationsBag.getParametersByInterpretationAndUom(interpretation, joinType)
 				.stream()
 				.filter(p -> p.getValueType() == StrolchValueType.STRING)
-				.collect(toList());
+				.toList();
 
 		if (relationParams.isEmpty())
 			throw new IllegalStateException("Found no relation parameters with UOM " + joinType + " of type "

@@ -31,7 +31,6 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -53,7 +52,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 	}
 
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
 		case XML_ROOT_CERTIFICATES:

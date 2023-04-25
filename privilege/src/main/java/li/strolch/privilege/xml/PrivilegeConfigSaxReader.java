@@ -15,6 +15,8 @@
  */
 package li.strolch.privilege.xml;
 
+import static li.strolch.privilege.helper.XmlConstants.*;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -46,15 +48,12 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 		switch (qName) {
-		case XmlConstants.XML_CONTAINER:
-			this.buildersStack.push(new ContainerParser());
-			break;
-		case XmlConstants.XML_PARAMETERS:
-			this.buildersStack.push(new ParametersParser());
-			break;
-		case XmlConstants.XML_POLICIES:
-			this.buildersStack.push(new PoliciesParser());
-			break;
+		case XML_CONTAINER -> this.buildersStack.push(new ContainerParser());
+		case XML_PARAMETERS -> this.buildersStack.push(new ParametersParser());
+		case XML_POLICIES -> this.buildersStack.push(new PoliciesParser());
+		default -> {
+			// nothing to do, probably handle on stack
+		}
 		}
 
 		if (!this.buildersStack.isEmpty())
@@ -73,14 +72,10 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		if (!this.buildersStack.isEmpty())
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
-		ElementParser elementParser = null;
-		switch (qName) {
-		case XmlConstants.XML_CONTAINER:
-		case XmlConstants.XML_PARAMETERS:
-		case XmlConstants.XML_POLICIES:
-			elementParser = this.buildersStack.pop();
-			break;
-		}
+		ElementParser elementParser = switch (qName) {
+			case XML_CONTAINER, XML_PARAMETERS, XML_POLICIES -> this.buildersStack.pop();
+			default -> null;
+		};
 
 		if (!this.buildersStack.isEmpty() && elementParser != null)
 			this.buildersStack.peek().notifyChild(elementParser);
@@ -91,97 +86,78 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		private String currentElement;
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 			switch (qName) {
-			case XmlConstants.XML_CONTAINER:
+			case XML_CONTAINER -> this.currentElement = qName;
+			case XML_HANDLER_ENCRYPTION -> {
 				this.currentElement = qName;
-				break;
-			case XmlConstants.XML_HANDLER_ENCRYPTION: {
-				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
+				String className = attributes.getValue(XML_ATTR_CLASS).trim();
 				getContainerModel().setEncryptionHandlerClassName(className);
-				break;
 			}
-			case XmlConstants.XML_HANDLER_PASSWORD_STRENGTH: {
+			case XML_HANDLER_PASSWORD_STRENGTH -> {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
+				String className = attributes.getValue(XML_ATTR_CLASS).trim();
 				getContainerModel().setPasswordStrengthHandlerClassName(className);
-				break;
 			}
-			case XmlConstants.XML_HANDLER_PERSISTENCE: {
+			case XML_HANDLER_PERSISTENCE -> {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
+				String className = attributes.getValue(XML_ATTR_CLASS).trim();
 				getContainerModel().setPersistenceHandlerClassName(className);
-				break;
 			}
-			case XmlConstants.XML_HANDLER_USER_CHALLENGE: {
+			case XML_HANDLER_USER_CHALLENGE -> {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
+				String className = attributes.getValue(XML_ATTR_CLASS).trim();
 				getContainerModel().setUserChallengeHandlerClassName(className);
-				break;
 			}
-			case XmlConstants.XML_HANDLER_SSO: {
+			case XML_HANDLER_SSO -> {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
+				String className = attributes.getValue(XML_ATTR_CLASS).trim();
 				getContainerModel().setSsoHandlerClassName(className);
-				break;
 			}
-			case XmlConstants.XML_HANDLER_PRIVILEGE: {
+			case XML_HANDLER_PRIVILEGE -> {
 				this.currentElement = qName;
-				String className = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
+				String className = attributes.getValue(XML_ATTR_CLASS).trim();
 				getContainerModel().setPrivilegeHandlerClassName(className);
-				break;
 			}
+			default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
 		}
 
 		@Override
 		public void notifyChild(ElementParser child) {
-			if (!(child instanceof ParametersParser))
+			if (!(child instanceof ParametersParser parametersChild))
 				return;
 
-			ParametersParser parametersChild = (ParametersParser) child;
-
 			switch (this.currentElement) {
-			case XmlConstants.XML_CONTAINER:
-				getContainerModel().setParameterMap(parametersChild.getParameterMap());
-				break;
-			case XmlConstants.XML_HANDLER_ENCRYPTION:
-				getContainerModel().setEncryptionHandlerParameterMap(parametersChild.getParameterMap());
-				break;
-			case XmlConstants.XML_HANDLER_PASSWORD_STRENGTH:
-				getContainerModel().setPasswordStrengthHandlerParameterMap(parametersChild.getParameterMap());
-				break;
-			case XmlConstants.XML_HANDLER_PERSISTENCE:
-				getContainerModel().setPersistenceHandlerParameterMap(parametersChild.getParameterMap());
-				break;
-			case XmlConstants.XML_HANDLER_USER_CHALLENGE:
-				getContainerModel().setUserChallengeHandlerParameterMap(parametersChild.getParameterMap());
-				break;
-			case XmlConstants.XML_HANDLER_SSO:
-				getContainerModel().setSsoHandlerParameterMap(parametersChild.getParameterMap());
-				break;
-			case XmlConstants.XML_HANDLER_PRIVILEGE:
-				getContainerModel().setPrivilegeHandlerParameterMap(parametersChild.getParameterMap());
-				break;
+			case XML_CONTAINER -> getContainerModel().setParameterMap(parametersChild.getParameterMap());
+			case XML_HANDLER_ENCRYPTION ->
+					getContainerModel().setEncryptionHandlerParameterMap(parametersChild.getParameterMap());
+			case XML_HANDLER_PASSWORD_STRENGTH ->
+					getContainerModel().setPasswordStrengthHandlerParameterMap(parametersChild.getParameterMap());
+			case XML_HANDLER_PERSISTENCE ->
+					getContainerModel().setPersistenceHandlerParameterMap(parametersChild.getParameterMap());
+			case XML_HANDLER_USER_CHALLENGE ->
+					getContainerModel().setUserChallengeHandlerParameterMap(parametersChild.getParameterMap());
+			case XML_HANDLER_SSO -> getContainerModel().setSsoHandlerParameterMap(parametersChild.getParameterMap());
+			case XML_HANDLER_PRIVILEGE ->
+					getContainerModel().setPrivilegeHandlerParameterMap(parametersChild.getParameterMap());
+			default -> throw new IllegalStateException("Unexpected value: " + this.currentElement);
 			}
 		}
 	}
 
 	static class ParametersParser extends ElementParserAdapter {
 
-//	      <Parameter name="autoPersistOnPasswordChange" value="true" />
+		//	      <Parameter name="autoPersistOnPasswordChange" value="true" />
 
 		private final Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
-			if (qName.equals(XmlConstants.XML_PARAMETER)) {
-				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
-				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE).trim();
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
+			if (qName.equals(XML_PARAMETER)) {
+				String key = attributes.getValue(XML_ATTR_NAME).trim();
+				String value = attributes.getValue(XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
 			}
 		}
@@ -196,14 +172,13 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 	class PoliciesParser extends ElementParserAdapter {
 
-//	    <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
+		//	    <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
-			if (qName.equals(XmlConstants.XML_POLICY)) {
-				String policyName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
-				String policyClassName = attributes.getValue(XmlConstants.XML_ATTR_CLASS).trim();
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
+			if (qName.equals(XML_POLICY)) {
+				String policyName = attributes.getValue(XML_ATTR_NAME).trim();
+				String policyClassName = attributes.getValue(XML_ATTR_CLASS).trim();
 
 				getContainerModel().addPolicy(policyName, policyClassName);
 			}

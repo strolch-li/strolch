@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class MethodArgumentDeclaration extends AbstractObjectExpression {
 
-	private List<ParameterReference> parameterReferences = new ArrayList<>();
+	private final List<ParameterReference> parameterReferences = new ArrayList<>();
 
 	@Override
 	public Class<?> getType(Map<String, Object> inputObjects, Map<String, Object> queryParameter) {

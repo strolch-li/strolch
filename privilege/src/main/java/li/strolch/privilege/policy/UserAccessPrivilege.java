@@ -65,9 +65,9 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 			return true;
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
-		if (!(object instanceof Tuple)) {
+		if (!(object instanceof Tuple tuple)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
+					.getString("Privilege.illegalArgument.nontuple");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -76,13 +76,8 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 		if (privilege.isAllAllowed())
 			return true;
 
-		Tuple tuple = (Tuple) object;
-
 		switch (privilegeName) {
-		case PrivilegeHandler.PRIVILEGE_GET_USER:
-		case PrivilegeHandler.PRIVILEGE_ADD_USER:
-		case PrivilegeHandler.PRIVILEGE_REMOVE_USER:
-		case PrivilegeHandler.PRIVILEGE_MODIFY_USER: {
+		case PrivilegeHandler.PRIVILEGE_GET_USER, PrivilegeHandler.PRIVILEGE_ADD_USER, PrivilegeHandler.PRIVILEGE_REMOVE_USER, PrivilegeHandler.PRIVILEGE_MODIFY_USER -> {
 			User oldUser = tuple.getFirst();
 			User newUser = tuple.getSecond();
 
@@ -90,12 +85,11 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newUser);
 
 			String privilegeValue = newUser.getUsername();
-			DBC.INTERIM
-					.assertEquals("oldUser and newUser names must be the same", oldUser.getUsername(), privilegeValue);
+			DBC.INTERIM.assertEquals("oldUser and newUser names must be the same", oldUser.getUsername(),
+					privilegeValue);
 			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
-
-		case PrivilegeHandler.PRIVILEGE_SET_USER_STATE: {
+		case PrivilegeHandler.PRIVILEGE_SET_USER_STATE -> {
 			User oldUser = tuple.getFirst();
 			User newUser = tuple.getSecond();
 
@@ -105,9 +99,7 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 			String privilegeValue = newUser.getUserState().name();
 			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
-
-		case PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE:
-		case PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD: {
+		case PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE, PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD -> {
 			User oldUser = tuple.getFirst();
 			User newUser = tuple.getSecond();
 
@@ -122,9 +114,7 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 
 			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 		}
-
-		case PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER:
-		case PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER: {
+		case PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER -> {
 			User user = tuple.getFirst();
 			String roleName = tuple.getSecond();
 
@@ -133,11 +123,11 @@ public class UserAccessPrivilege implements PrivilegePolicy {
 
 			return checkByAllowDenyValues(ctx, privilege, restrictable, roleName, assertHasPrivilege);
 		}
-
-		default:
-			String msg = PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+		default -> {
+			String msg = PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege");
 			msg = MessageFormat.format(msg, privilegeName, this.getClass().getName());
 			throw new PrivilegeException(msg);
+		}
 		}
 	}
 }

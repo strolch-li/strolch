@@ -90,22 +90,22 @@ public final class Certificate implements Serializable {
 
 		// validate arguments are not null
 		if (StringHelper.isEmpty(sessionId)) {
-			throw new PrivilegeException("sessionId is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("sessionId is null!");
 		}
 		if (StringHelper.isEmpty(username)) {
-			throw new PrivilegeException("username is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("username is null!");
 		}
 		if (StringHelper.isEmpty(authToken)) {
-			throw new PrivilegeException("authToken is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("authToken is null!");
 		}
 		if (userState == null) {
-			throw new PrivilegeException("userState is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("userState is null!");
 		}
 		if (usage == null) {
-			throw new PrivilegeException("usage is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("usage is null!");
 		}
 		if (source == null) {
-			throw new PrivilegeException("source is null!"); //$NON-NLS-1$
+			throw new PrivilegeException("source is null!");
 		}
 
 		this.usage = usage;
@@ -308,9 +308,8 @@ public final class Certificate implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof Certificate))
+		if (!(obj instanceof Certificate other))
 			return false;
-		Certificate other = (Certificate) obj;
 		if (this.authToken == null) {
 			if (other.authToken != null)
 				return false;
@@ -322,10 +321,8 @@ public final class Certificate implements Serializable {
 		} else if (!this.sessionId.equals(other.sessionId))
 			return false;
 		if (this.username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!this.username.equals(other.username))
-			return false;
-		return true;
+			return other.username == null;
+		} else
+			return this.username.equals(other.username);
 	}
 }

@@ -6,7 +6,7 @@ import li.strolch.utils.ObjectHelper;
  * Implements the contains predicate, delegating to {@link ObjectHelper#isIn(Object, Object, boolean)}
  */
 public class CollectionContainsPredicate extends AbstractSearchPredicate {
-	private boolean ignoreCase;
+	private final boolean ignoreCase;
 
 	public CollectionContainsPredicate(Object right, boolean ignoreCase) {
 		super(right);

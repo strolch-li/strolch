@@ -11,9 +11,9 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.utils.collections.MapOfLists;
 
 public class ObserverEvent {
-	public MapOfLists<String, StrolchRootElement> added = new MapOfLists<>();
-	public MapOfLists<String, StrolchRootElement> updated = new MapOfLists<>();
-	public MapOfLists<String, StrolchRootElement> removed = new MapOfLists<>();
+	public final MapOfLists<String, StrolchRootElement> added = new MapOfLists<>();
+	public final MapOfLists<String, StrolchRootElement> updated = new MapOfLists<>();
+	public final MapOfLists<String, StrolchRootElement> removed = new MapOfLists<>();
 
 	@Override
 	public String toString() {
@@ -30,13 +30,12 @@ public class ObserverEvent {
 	}
 
 	private static String collectSizeByType(Map.Entry<String, List<StrolchRootElement>> entry) {
-		String sizeByType = entry.getValue()
+		return entry.getValue()
 				.stream()
 				.collect(groupingBy(StrolchElement::getType))
 				.entrySet()
 				.stream()
 				.map(e -> e.getKey() + "=" + e.getValue().size())
 				.collect(joining(","));
-		return sizeByType;
 	}
 }

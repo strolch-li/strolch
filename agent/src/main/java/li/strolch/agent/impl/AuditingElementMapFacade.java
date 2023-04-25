@@ -32,8 +32,8 @@ import li.strolch.utils.dbc.DBC;
 
 /**
  * <p>
- * This {@link AuditTrail} facade registers all actions performed i.e. it registers which {@link StrolchRootElement
- * StrolchRootElements} are retrieved, created, updated and deleted.
+ * This {@link AuditTrail} facade registers all actions performed i.e. it registers which
+ * {@link StrolchRootElement StrolchRootElements} are retrieved, created, updated and deleted.
  * </p>
  *
  * <p>
@@ -49,7 +49,7 @@ import li.strolch.utils.dbc.DBC;
  */
 public abstract class AuditingElementMapFacade<T extends StrolchRootElement> implements ElementMap<T> {
 
-	protected ElementMap<T> elementMap;
+	protected final ElementMap<T> elementMap;
 	private final boolean readOnly;
 
 	protected Set<T> read;
@@ -59,10 +59,10 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	protected long deletedAll;
 	protected Map<String, Long> deletedAllByType;
 
-	protected boolean observeAccessReads;
+	protected final boolean observeAccessReads;
 
 	public AuditingElementMapFacade(ElementMap<T> elementMap, boolean readOnly, boolean observeAccessReads) {
-		DBC.PRE.assertNotNull("ElementMap must be set!", elementMap); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("ElementMap must be set!", elementMap);
 		this.elementMap = elementMap;
 		this.readOnly = readOnly;
 		this.observeAccessReads = observeAccessReads;
@@ -380,7 +380,7 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 		Long byType = this.deletedAllByType.get(type);
 		if (byType == null)
 			byType = 0L;
-		byType = byType + removed;
+		byType += removed;
 		this.deletedAllByType.put(type, byType);
 
 		return removed;

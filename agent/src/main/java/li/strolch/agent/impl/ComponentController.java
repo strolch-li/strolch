@@ -25,13 +25,13 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 
 public class ComponentController {
 
-	private StrolchComponent component;
-	private Set<ComponentController> upstreamDependencies;
-	private Set<ComponentController> downstreamDependencies;
+	private final StrolchComponent component;
+	private final Set<ComponentController> upstreamDependencies;
+	private final Set<ComponentController> downstreamDependencies;
 
 	public ComponentController(StrolchComponent component) {
 		if (component == null)
-			throw new IllegalArgumentException("Component may not be null!"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Component may not be null!");
 		this.component = component;
 		this.upstreamDependencies = new HashSet<>();
 		this.downstreamDependencies = new HashSet<>();
@@ -68,7 +68,7 @@ public class ComponentController {
 	public void addUpstreamDependency(ComponentController controller) {
 
 		if (equals(controller)) {
-			String msg = "{0} can not depend on itself!"; //$NON-NLS-1$
+			String msg = "{0} can not depend on itself!";
 			msg = MessageFormat.format(msg, controller);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -97,7 +97,7 @@ public class ComponentController {
 	private void validateNoCyclicDependency(ComponentController controller) {
 
 		if (controller.hasTransitiveUpstreamDependency(this)) {
-			String msg = "{0} has transitive upstream dependeny to {1}!"; //$NON-NLS-1$
+			String msg = "{0} has transitive upstream dependeny to {1}!";
 			msg = MessageFormat.format(msg, this, controller);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -139,13 +139,8 @@ public class ComponentController {
 		return false;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("ComponentController [component=");
-		builder.append(this.component.getName());
-		builder.append("]");
-		return builder.toString();
+		return "ComponentController [component=" + this.component.getName() + "]";
 	}
 }

@@ -11,7 +11,7 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 
-	protected XMLStreamWriter writer;
+	protected final XMLStreamWriter writer;
 
 	public AuditToSaxWriterVisitor(XMLStreamWriter writer) {
 		this.writer = writer;
@@ -24,7 +24,7 @@ public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 			writeElement(audit);
 			this.writer.flush();
 		} catch (XMLStreamException e) {
-			String msg = "Failed to write Audit {0} due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to write Audit {0} due to {1}";
 			msg = MessageFormat.format(msg, audit.getId(), e.getMessage());
 			throw new StrolchException(msg, e);
 		}

@@ -56,15 +56,10 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 
 	private void setInterpretationAndUom(StrolchRootElement element, Parameter<?> relationP) {
 		switch (element.getObjectType()) {
-		case Tags.RESOURCE:
-			relationP.setInterpretation(INTERPRETATION_RESOURCE_REF);
-			break;
-		case Tags.ORDER:
-			relationP.setInterpretation(INTERPRETATION_ORDER_REF);
-			break;
-		case Tags.ACTIVITY:
-			relationP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
-			break;
+		case Tags.RESOURCE -> relationP.setInterpretation(INTERPRETATION_RESOURCE_REF);
+		case Tags.ORDER -> relationP.setInterpretation(INTERPRETATION_ORDER_REF);
+		case Tags.ACTIVITY -> relationP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
+		default -> throw new IllegalStateException("Unexpected value: " + element.getObjectType());
 		}
 
 		relationP.setUom(element.getType());
@@ -75,8 +70,8 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 
 		// validate we have same objects
 		List<String> objectTypes = elements.stream().map(StrolchRootElement::getObjectType).distinct()
-				.collect(Collectors.toList());
-		List<String> types = elements.stream().map(StrolchRootElement::getType).distinct().collect(Collectors.toList());
+				.toList();
+		List<String> types = elements.stream().map(StrolchRootElement::getType).distinct().toList();
 		if (objectTypes.size() != 1)
 			throw new IllegalStateException(
 					"Only allow to have one type of object: " + elements.stream().map(StrolchElement::getId)
@@ -92,15 +87,10 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 			relationsP = new StringListParameter(param, name, emptyList());
 
 			switch (objectTypes.get(0)) {
-			case Tags.RESOURCE:
-				relationsP.setInterpretation(INTERPRETATION_RESOURCE_REF);
-				break;
-			case Tags.ORDER:
-				relationsP.setInterpretation(INTERPRETATION_ORDER_REF);
-				break;
-			case Tags.ACTIVITY:
-				relationsP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
-				break;
+			case Tags.RESOURCE -> relationsP.setInterpretation(INTERPRETATION_RESOURCE_REF);
+			case Tags.ORDER -> relationsP.setInterpretation(INTERPRETATION_ORDER_REF);
+			case Tags.ACTIVITY -> relationsP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
+			default -> throw new IllegalStateException("Unexpected value: " + objectTypes.get(0));
 			}
 
 			relationsP.setUom(types.get(0));

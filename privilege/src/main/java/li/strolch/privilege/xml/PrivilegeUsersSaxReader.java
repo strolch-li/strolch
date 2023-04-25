@@ -40,16 +40,18 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private final List<User> users;
+	private final Map<String, User> users;
+	private final boolean caseInsensitiveUsername;
 
-	public PrivilegeUsersSaxReader() {
-		this.users = new ArrayList<>();
+	public PrivilegeUsersSaxReader(boolean caseInsensitiveUsername) {
+		this.caseInsensitiveUsername = caseInsensitiveUsername;
+		this.users = new HashMap<>();
 	}
 
 	/**
 	 * @return the users
 	 */
-	public List<User> getUsers() {
+	public Map<String, User> getUsers() {
 		return this.users;
 	}
 
@@ -88,25 +90,25 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			this.buildersStack.peek().notifyChild(elementParser);
 	}
 
-//	<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
-//	  <Firstname>Application</Firstname>
-//	  <Lastname>Administrator</Lastname>
-//	  <State>ENABLED</State>
-//	  <Locale>en-GB</Locale>
-//	  <Roles>
-//	    <Role>PrivilegeAdmin</Role>
-//	    <Role>AppUser</Role>
-//	  </Roles>
-//	  <Properties>
-//	    <Property name="organization" value="eitchnet.ch" />
-//	    <Property name="organizationalUnit" value="Development" />
-//	  </Properties>
-//    <History>
-//      <FirstLogin>2021-02-19T15:32:09.592+01:00</FirstLogin>
-//      <LastLogin>2021-02-19T15:32:09.592+01:00</LastLogin>
-//      <LastPasswordChange>2021-02-19T15:32:09.592+01:00</LastPasswordChange>
-//    </History>
-//	</User>
+	//	<User userId="1" username="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+	//	  <Firstname>Application</Firstname>
+	//	  <Lastname>Administrator</Lastname>
+	//	  <State>ENABLED</State>
+	//	  <Locale>en-GB</Locale>
+	//	  <Roles>
+	//	    <Role>PrivilegeAdmin</Role>
+	//	    <Role>AppUser</Role>
+	//	  </Roles>
+	//	  <Properties>
+	//	    <Property name="organization" value="eitchnet.ch" />
+	//	    <Property name="organizationalUnit" value="Development" />
+	//	  </Properties>
+	//    <History>
+	//      <FirstLogin>2021-02-19T15:32:09.592+01:00</FirstLogin>
+	//      <LastLogin>2021-02-19T15:32:09.592+01:00</LastLogin>
+	//      <LastPasswordChange>2021-02-19T15:32:09.592+01:00</LastPasswordChange>
+	//    </History>
+	//	</User>
 
 	public class UserParser extends ElementParserAdapter {
 
@@ -123,7 +125,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		String lastname;
 		UserState userState;
 		Locale locale;
-		Set<String> userRoles;
+		final Set<String> userRoles;
 		Map<String, String> parameters;
 		UserHistory history;
 		boolean passwordChangeRequested;
@@ -133,8 +135,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 			this.text = new StringBuilder();
 
@@ -189,82 +190,45 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		}
 
 		@Override
-		public void characters(char[] ch, int start, int length) throws SAXException {
+		public void characters(char[] ch, int start, int length) {
 			this.text.append(ch, start, length);
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String qName) throws SAXException {
+		public void endElement(String uri, String localName, String qName) {
 
 			switch (qName) {
-			case XML_FIRSTNAME:
-
-				this.firstName = this.text.toString().trim();
-				break;
-
-			case XML_LASTNAME:
-
-				this.lastname = this.text.toString().trim();
-				break;
-
-			case XML_STATE:
-
-				this.userState = UserState.valueOf(this.text.toString().trim());
-				break;
-
-			case XML_LOCALE:
-
-				this.locale = Locale.forLanguageTag(this.text.toString().trim());
-				break;
-
-			case XML_PASSWORD_CHANGE_REQUESTED:
-
-				this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
-				break;
-
-			case XML_FIRST_LOGIN:
-
-				this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				break;
-
-			case XML_LAST_LOGIN:
-
-				this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				break;
-
-			case XML_LAST_PASSWORD_CHANGE:
-
-				this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
-				break;
-
-			case XML_ROLE:
-
-				this.userRoles.add(this.text.toString().trim());
-				break;
-
-			case XML_USER:
-
+			case XML_FIRSTNAME -> this.firstName = this.text.toString().trim();
+			case XML_LASTNAME -> this.lastname = this.text.toString().trim();
+			case XML_STATE -> this.userState = UserState.valueOf(this.text.toString().trim());
+			case XML_LOCALE -> this.locale = Locale.forLanguageTag(this.text.toString().trim());
+			case XML_PASSWORD_CHANGE_REQUESTED ->
+					this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
+			case XML_FIRST_LOGIN -> this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+			case XML_LAST_LOGIN -> this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+			case XML_LAST_PASSWORD_CHANGE ->
+					this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
+			case XML_ROLE -> this.userRoles.add(this.text.toString().trim());
+			case XML_USER -> {
 				if (this.history == null)
 					this.history = new UserHistory();
 
 				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
 						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
 						this.locale, this.parameters, this.passwordChangeRequested, this.history);
-				logger.info(MessageFormat.format("New User: {0}", user)); //$NON-NLS-1$
 
-				getUsers().add(user);
-				break;
-
-			default:
-
+				logger.info(MessageFormat.format("New User: {0}", user));
+				String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
+				users.put(username, user);
+			}
+			default -> {
 				if (!(qName.equals(XML_ROLES) //
 						|| qName.equals(XML_PARAMETER) //
 						|| qName.equals(XML_HISTORY) //
 						|| qName.equals(XML_PARAMETERS))) {
 					throw new IllegalArgumentException("Unhandled tag " + qName);
 				}
-
-				break;
+			}
 			}
 		}
 
@@ -280,22 +244,16 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 		// <Property name="organizationalUnit" value="Development" />
 
-		public Map<String, String> parameterMap = new HashMap<>();
+		public final Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-			switch (qName) {
-			case XML_PROPERTY:
-
+			if (qName.equals(XML_PROPERTY)) {
 				String key = attributes.getValue(XML_ATTR_NAME).trim();
 				String value = attributes.getValue(XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
-				break;
-
-			default:
-
+			} else {
 				if (!qName.equals(XML_PROPERTIES)) {
 					throw new IllegalArgumentException("Unhandled tag " + qName);
 				}

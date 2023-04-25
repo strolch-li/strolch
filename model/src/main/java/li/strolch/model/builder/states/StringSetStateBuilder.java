@@ -15,7 +15,7 @@ public class StringSetStateBuilder extends TimedStateBuilder<StringSetTimedState
 	@Override
 	public StringSetTimedState build() {
 		StringSetTimedState state = new StringSetTimedState();
-		build(state);
+		applyTimedState(state);
 		state.getTimeEvolution().setValueAt(0L, new StringSetValue(emptySet()));
 		return state;
 	}

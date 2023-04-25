@@ -188,7 +188,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 */
 	protected void validateValue(T value) throws StrolchException {
 		if (value == null) {
-			String msg = "Can not set null value on Parameter {0}"; //$NON-NLS-1$
+			String msg = "Can not set null value on Parameter {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}
@@ -209,22 +209,10 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 		clone.index = this.index;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-
-		StringBuilder builder = new StringBuilder();
-
-		builder.append(getClass().getSimpleName());
-		builder.append(" [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", value=");
-		builder.append(getValueAsString());
-		builder.append("]");
-
-		return builder.toString();
+		return getClass().getSimpleName() + " [id=" + this.id + ", name=" + this.name + ", value=" + getValueAsString()
+				+ "]";
 	}
 
 	/**

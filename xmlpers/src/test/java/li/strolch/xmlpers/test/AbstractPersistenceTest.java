@@ -15,14 +15,12 @@
  */
 package li.strolch.xmlpers.test;
 
-import static li.strolch.utils.helper.SystemHelper.isLinux;
 import static li.strolch.utils.helper.SystemHelper.isWindows;
 
 import java.io.File;
 import java.util.Properties;
 
 import li.strolch.utils.helper.FileHelper;
-import li.strolch.utils.helper.SystemHelper;
 import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.PersistenceConstants;
 import li.strolch.xmlpers.api.PersistenceManager;
@@ -41,7 +39,6 @@ public abstract class AbstractPersistenceTest {
 
 	protected PersistenceManager persistenceManager;
 
-	@SuppressWarnings("nls")
 	protected static void cleanPath(String path) {
 
 		File file = new File(path).getAbsoluteFile();
@@ -74,7 +71,7 @@ public abstract class AbstractPersistenceTest {
 	}
 
 	protected void setup(Properties properties) {
-		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true"); //$NON-NLS-1$
+		properties.setProperty(PersistenceConstants.PROP_VERBOSE, "true");
 		this.persistenceManager = PersistenceManagerLoader.load(properties);
 		this.persistenceManager.getCtxFactory()
 				.registerPersistenceContextFactory(MyModel.class, TestConstants.TYPE_RES, new MyModelContextFactory());

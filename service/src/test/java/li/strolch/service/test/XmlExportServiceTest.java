@@ -19,7 +19,6 @@ import static li.strolch.model.StrolchModelConstants.TEMPLATE;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.FilenameFilter;
 
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.*;
@@ -35,8 +34,8 @@ import org.junit.Test;
  */
 public class XmlExportServiceTest {
 
-	private static final String RUNTIME_PATH = "target/transienttest/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/transienttest"; //$NON-NLS-1$
+	private static final String RUNTIME_PATH = "target/transienttest/";
+	private static final String CONFIG_SRC = "src/test/resources/transienttest";
 	protected static RuntimeMock runtimeMock;
 	private static Certificate certificate;
 
@@ -111,12 +110,7 @@ public class XmlExportServiceTest {
 
 	private void assertNumberOfFilesCreated(final String modelFileName, int nrOfExpectedFiles) {
 		File dataPath = new File(RUNTIME_PATH, "data");
-		String[] list = dataPath.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.startsWith(modelFileName);
-			}
-		});
+		String[] list = dataPath.list((dir, name) -> name.startsWith(modelFileName));
 		assertEquals(nrOfExpectedFiles, list.length);
 	}
 }

@@ -22,9 +22,9 @@ import java.util.Map;
 
 public class RuntimeConfiguration extends AbstractionConfiguration {
 
-	public static final String PROP_LOCALE = "locale"; //$NON-NLS-1$
-	public static final String RUNTIME = "Runtime"; //$NON-NLS-1$
-	public static final String PROP_TIMEZONE = "timezone"; //$NON-NLS-1$
+	public static final String PROP_LOCALE = "locale";
+	public static final String RUNTIME = "Runtime";
+	public static final String PROP_TIMEZONE = "timezone";
 
 	private final String applicationName;
 	private final String environment;
@@ -32,7 +32,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	private final File dataPath;
 	private final File tempPath;
 
-	private Locale locale;
+	private final Locale locale;
 
 	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
 			File configPathF, File dataPathF, File tempPathF) {
@@ -40,21 +40,21 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 		// config path: readable directory
 		if (!configPathF.isDirectory() || !configPathF.canRead()) {
-			String msg = "Config path is not readable at {0}"; //$NON-NLS-1$
+			String msg = "Config path is not readable at {0}";
 			msg = MessageFormat.format(msg, configPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 
 		// data path: writable directory
 		if (!dataPathF.isDirectory() || !dataPathF.canRead() || !dataPathF.canWrite()) {
-			String msg = "Data path is not a directory or readable or writeable at {0}"; //$NON-NLS-1$
+			String msg = "Data path is not a directory or readable or writeable at {0}";
 			msg = MessageFormat.format(msg, dataPathF);
 			throw new StrolchConfigurationException(msg);
 		}
 
 		// tmp path: writable directory
 		if (!tempPathF.isDirectory() || !tempPathF.canRead() || !tempPathF.canWrite()) {
-			String msg = "Temp path is not a directory or readable or writeable at {0}"; //$NON-NLS-1$
+			String msg = "Temp path is not a directory or readable or writeable at {0}";
 			msg = MessageFormat.format(msg, tempPathF);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -112,7 +112,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public File getConfigFile(String context, String fileName, boolean checkExists) {
 		File configFile = new File(getConfigPath(), fileName);
 		if (checkExists && (!configFile.isFile() || !configFile.canRead())) {
-			String msg = "[{0}] requires config file which does not exist with name: {1}"; //$NON-NLS-1$
+			String msg = "[{0}] requires config file which does not exist with name: {1}";
 			msg = MessageFormat.format(msg, getName(), context, fileName);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -134,7 +134,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public File getDataFile(String context, String fileName, boolean checkExists) {
 		File dataFile = new File(getDataPath(), fileName);
 		if (checkExists && (!dataFile.isFile() || !dataFile.canRead())) {
-			String msg = "[{0}] requires data file which does not exist with name: {1}"; //$NON-NLS-1$
+			String msg = "[{0}] requires data file which does not exist with name: {1}";
 			msg = MessageFormat.format(msg, getName(), context, fileName);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -156,7 +156,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public File getDataDir(String context, String dirName, boolean checkExists) {
 		File dataDir = new File(getDataPath(), dirName);
 		if (checkExists && (!dataDir.isDirectory() || !dataDir.canRead())) {
-			String msg = "[{0}] requires data directory which does not exist with name: {1}"; //$NON-NLS-1$
+			String msg = "[{0}] requires data directory which does not exist with name: {1}";
 			msg = MessageFormat.format(msg, getName(), context, dirName);
 			throw new StrolchConfigurationException(msg);
 		}

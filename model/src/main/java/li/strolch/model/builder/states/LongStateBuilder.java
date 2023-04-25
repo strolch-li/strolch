@@ -13,7 +13,7 @@ public class LongStateBuilder extends TimedStateBuilder<LongTimedState> {
 	@Override
 	public LongTimedState build() {
 		LongTimedState state = new LongTimedState();
-		build(state);
+		applyTimedState(state);
 		state.getTimeEvolution().setValueAt(0L, new LongValue(0L));
 		return state;
 	}

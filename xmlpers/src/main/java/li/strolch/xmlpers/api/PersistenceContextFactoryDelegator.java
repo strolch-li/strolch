@@ -24,8 +24,8 @@ import java.util.Map;
  */
 public class PersistenceContextFactoryDelegator {
 
-	private Map<String, PersistenceContextFactory<?>> contextFactoryCacheByType;
-	private Map<Class<?>, PersistenceContextFactory<?>> contextFactoryCacheByClass;
+	private final Map<String, PersistenceContextFactory<?>> contextFactoryCacheByType;
+	private final Map<Class<?>, PersistenceContextFactory<?>> contextFactoryCacheByClass;
 
 	public PersistenceContextFactoryDelegator() {
 		this.contextFactoryCacheByType = new HashMap<>();
@@ -47,7 +47,7 @@ public class PersistenceContextFactoryDelegator {
 		if (ctxFactory != null)
 			return ctxFactory;
 
-		String msg = "No context factory is registered for {0}"; //$NON-NLS-1$
+		String msg = "No context factory is registered for {0}";
 		msg = MessageFormat.format(msg, classType);
 		throw new IllegalArgumentException(msg);
 	}
@@ -60,7 +60,7 @@ public class PersistenceContextFactoryDelegator {
 		if (ctxFactory != null)
 			return ctxFactory;
 
-		String msg = "No context factory is registered for type {0}"; //$NON-NLS-1$
+		String msg = "No context factory is registered for type {0}";
 		msg = MessageFormat.format(msg, type);
 		throw new IllegalArgumentException(msg);
 	}

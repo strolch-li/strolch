@@ -36,7 +36,7 @@ public class PrivilegeAddUserService extends AbstractService<PrivilegeUserArgume
 	}
 
 	@Override
-	protected PrivilegeUserResult internalDoService(PrivilegeUserArgument arg) throws Exception {
+	protected PrivilegeUserResult internalDoService(PrivilegeUserArgument arg) {
 
 		PrivilegeAddUserCommand cmd;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_ADD_USER)) {

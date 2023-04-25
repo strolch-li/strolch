@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import li.strolch.utils.dbc.DBC;
@@ -38,7 +37,7 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 	public static final String KEY = "Key";
 	public static final String CLASS = "Class";
 
-	private PolicyModel policyModel;
+	private final PolicyModel policyModel;
 	private PolicyType policyType;
 
 	public StrolchPolicyFileParser() {
@@ -46,45 +45,32 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 	}
 
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName) {
-		case POLICY_TYPE:
-
+		case POLICY_TYPE -> {
 			String type = attributes.getValue(TYPE);
 			String api = attributes.getValue(API);
-
 			DBC.PRE.assertNotEmpty(TYPE + " not defined on a " + POLICY_TYPE, type);
 			DBC.PRE.assertNotEmpty(API + " not defined on a " + POLICY_TYPE, api);
-
 			this.policyType = new PolicyType(type, api);
 			this.policyModel.getPolicyTypes().put(type, policyType);
-
-			break;
-
-		case POLICY:
-
+		}
+		case POLICY -> {
 			String key = attributes.getValue(KEY);
 			String clazz = attributes.getValue(CLASS);
-
 			DBC.PRE.assertNotEmpty(KEY + " not defined on a " + POLICY_TYPE, key);
 			DBC.PRE.assertNotEmpty(CLASS + " not defined on a " + POLICY_TYPE, clazz);
-
 			this.policyType.getPolicyByKeyMap().put(key, clazz);
-
-			break;
-		default:
-			break;
+		}
+		default -> {
+		}
 		}
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
-		switch (qName) {
-		case POLICY_TYPE:
+	public void endElement(String uri, String localName, String qName) {
+		if (qName.equals(POLICY_TYPE)) {
 			this.policyType = null;
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -92,8 +78,8 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 		return this.policyModel;
 	}
 
-	public class PolicyModel {
-		private Map<String, PolicyType> policyTypes;
+	public static class PolicyModel {
+		private final Map<String, PolicyType> policyTypes;
 
 		public PolicyModel() {
 			this.policyTypes = new HashMap<>();
@@ -104,10 +90,10 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 		}
 	}
 
-	public class PolicyType {
-		private String type;
-		private String api;
-		private Map<String, String> policyByKeyMap;
+	public static class PolicyType {
+		private final String type;
+		private final String api;
+		private final Map<String, String> policyByKeyMap;
 
 		public PolicyType(String type, String api) {
 			super();

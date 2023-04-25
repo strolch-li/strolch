@@ -16,7 +16,6 @@
 package li.strolch.persistence.xml;
 
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
-import static li.strolch.db.DbConstants.PROP_DB_IGNORE_REALM;
 import static li.strolch.db.DbConstants.PROP_USE_ENV;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
@@ -54,9 +53,9 @@ import li.strolch.xmlpers.api.*;
 public class XmlPersistenceHandler extends StrolchComponent implements PersistenceHandler {
 
 	public static final String PROP_DB_STORE_PATH = "dbStorePath";
-	public static final String PROP_DB_IGNORE_REALM = "ignoreRealm"; //$NON-NLS-1$
+	public static final String PROP_DB_IGNORE_REALM = "ignoreRealm";
 	public static final String PROP_ALLOW_DATA_INIT_ON_EMPTY_DB = "allowDataInitOnEmptyDb";
-	public static final String PROP_VERBOSE = "verbose"; //$NON-NLS-1$
+	public static final String PROP_VERBOSE = "verbose";
 
 	private Map<String, PersistenceStore> persistenceStoreMap;
 
@@ -199,7 +198,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		super.start();
 	}
 
-	class PersistenceStore {
+	static class PersistenceStore {
 		PersistenceManager persistenceManager;
 		File dbStorePathF;
 	}

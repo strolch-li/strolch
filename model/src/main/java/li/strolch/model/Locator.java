@@ -44,7 +44,7 @@ public class Locator {
 	/**
 	 * The separator used when formatting a {@link Locator} object ot a string
 	 */
-	public static final String PATH_SEPARATOR = "/"; //$NON-NLS-1$
+	public static final String PATH_SEPARATOR = "/";
 
 	/**
 	 * {@link List} of path elements, with the first being the top level or root element
@@ -66,9 +66,9 @@ public class Locator {
 	private Locator(List<String> pathElements) throws StrolchException {
 		if (pathElements == null) {
 			throw new StrolchException(
-					"The path elements may not be null and must contain at least 1 item"); //$NON-NLS-1$
+					"The path elements may not be null and must contain at least 1 item");
 		}
-		this.pathElements = Collections.unmodifiableList(new ArrayList<>(pathElements));
+		this.pathElements = List.copyOf(pathElements);
 	}
 
 	/**
@@ -121,8 +121,7 @@ public class Locator {
 	 * 		the additional element
 	 */
 	private Locator(List<String> path, String element) {
-		List<String> fullPath = new ArrayList<>();
-		fullPath.addAll(path);
+		List<String> fullPath = new ArrayList<>(path);
 		fullPath.add(element);
 		this.pathElements = Collections.unmodifiableList(fullPath);
 	}
@@ -204,8 +203,8 @@ public class Locator {
 	}
 
 	/**
-	 * Parses the given path to a {@link List} of path elements by splitting the string with the {@link
-	 * #PATH_SEPARATOR}
+	 * Parses the given path to a {@link List} of path elements by splitting the string with the
+	 * {@link #PATH_SEPARATOR}
 	 *
 	 * @param path
 	 * 		the path to parse
@@ -217,7 +216,7 @@ public class Locator {
 	 */
 	private List<String> parsePath(String path) throws StrolchException {
 		if (StringHelper.isEmpty(path)) {
-			throw new StrolchException("A path may not be empty!"); //$NON-NLS-1$
+			throw new StrolchException("A path may not be empty!");
 		}
 		String[] elements = path.split(Locator.PATH_SEPARATOR);
 		return Arrays.asList(elements);
@@ -253,6 +252,7 @@ public class Locator {
 	 * Returns true if the given locator's path elements is the beginning of this locator's path elements
 	 *
 	 * @param locator
+	 * 		the locator to check
 	 *
 	 * @return true if the given locator's path elements is the beginning of this locator's path elements
 	 */
@@ -267,6 +267,7 @@ public class Locator {
 	 * they are the same, i.e. must be an actual child
 	 *
 	 * @param locator
+	 * 		the locator to check
 	 *
 	 * @return true if the given locator's path elements is the beginning of this locator's path elements, but not if
 	 * they are the same, i.e. must be an actual child
@@ -281,7 +282,7 @@ public class Locator {
 	public int hashCode() {
 		if (this.hashcode == null) {
 			final int prime = 31;
-			this.hashcode = prime * 1 + ((this.pathElements == null) ? 0 : this.pathElements.hashCode());
+			this.hashcode = prime + ((this.pathElements == null) ? 0 : this.pathElements.hashCode());
 		}
 
 		return this.hashcode;
@@ -300,13 +301,9 @@ public class Locator {
 		}
 		Locator other = (Locator) obj;
 		if (this.pathElements == null) {
-			if (other.pathElements != null) {
-				return false;
-			}
-		} else if (!this.pathElements.equals(other.pathElements)) {
-			return false;
-		}
-		return true;
+			return other.pathElements == null;
+		} else
+			return this.pathElements.equals(other.pathElements);
 	}
 
 	/**
@@ -358,8 +355,8 @@ public class Locator {
 	}
 
 	/**
-	 * {@link LocatorBuilder} is used to build {@link Locator}s where a deep hierarchy is to be created. The {@link
-	 * #append(String)} method returns itself for chain building
+	 * {@link LocatorBuilder} is used to build {@link Locator}s where a deep hierarchy is to be created. The
+	 * {@link #append(String)} method returns itself for chain building
 	 *
 	 * @author Robert von Burg <eitch@eitchnet.ch>
 	 */
@@ -383,9 +380,7 @@ public class Locator {
 		 * @return this instance for chaining
 		 */
 		public LocatorBuilder append(String... path) {
-			for (String element : path) {
-				this.pathElements.add(element);
-			}
+			this.pathElements.addAll(Arrays.asList(path));
 			return this;
 		}
 
@@ -419,7 +414,7 @@ public class Locator {
 		 */
 		public Locator build() {
 			if (this.pathElements.isEmpty()) {
-				throw new StrolchException("The path elements must contain at least 1 item"); //$NON-NLS-1$
+				throw new StrolchException("The path elements must contain at least 1 item");
 			}
 			return new Locator(this.pathElements);
 		}

@@ -55,7 +55,7 @@ public class OperationsLogTest extends AbstractRealmServiceTest<ServiceArgument,
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			new LogMessagesTestRunner(getContainer(), arg.realm).runLogMessagesTest();
 

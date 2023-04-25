@@ -72,14 +72,9 @@ public class LongValue implements IValue<Long>, Serializable {
 		return this.value.toString();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("LongValue [value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		return "LongValue [value=" + this.value + "]";
 	}
 
 	@Override

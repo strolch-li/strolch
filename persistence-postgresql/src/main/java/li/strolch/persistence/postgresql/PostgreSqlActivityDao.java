@@ -26,7 +26,6 @@ import java.util.Calendar;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import li.strolch.model.Tags;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.json.ActivityFromJsonVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
@@ -52,11 +51,6 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 	public PostgreSqlActivityDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
 		super(dataType, connection, txResult, versioningEnabled);
-	}
-
-	@Override
-	protected String getClassName() {
-		return Tags.ACTIVITY;
 	}
 
 	@Override

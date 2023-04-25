@@ -15,7 +15,6 @@
  */
 package li.strolch.rest.filters;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 
 import jakarta.annotation.Priority;
@@ -69,8 +68,7 @@ public class AccessControlResponseFilter implements ContainerResponseFilter {
 	}
 
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
 		if (!corsEnabled)
 			return;

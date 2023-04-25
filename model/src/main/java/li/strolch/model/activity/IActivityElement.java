@@ -18,7 +18,6 @@ package li.strolch.model.activity;
 import java.util.function.Predicate;
 
 import li.strolch.exception.StrolchModelException;
-import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.*;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;

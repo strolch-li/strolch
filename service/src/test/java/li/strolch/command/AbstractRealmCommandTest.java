@@ -123,9 +123,9 @@ public abstract class AbstractRealmCommandTest {
 		doCommand(REALM_CACHED);
 	}
 
-	private class FailCommandFacade extends Command {
+	private static class FailCommandFacade extends Command {
 
-		private Command command;
+		private final Command command;
 
 		/**
 		 *

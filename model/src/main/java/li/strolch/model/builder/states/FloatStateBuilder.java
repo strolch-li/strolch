@@ -13,7 +13,7 @@ public class FloatStateBuilder extends TimedStateBuilder<FloatTimedState> {
 	@Override
 	public FloatTimedState build() {
 		FloatTimedState state = new FloatTimedState();
-		build(state);
+		applyTimedState(state);
 		state.getTimeEvolution().setValueAt(0L, new FloatValue(0.0D));
 		return state;
 	}

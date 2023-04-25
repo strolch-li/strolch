@@ -68,21 +68,15 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 		Object object = restrictable.getPrivilegeValue();
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
-		if (!(object instanceof Tuple)) {
+		if (!(object instanceof Tuple tuple)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
-					"Privilege.illegalArgument.nontuple"); //$NON-NLS-1$
+					"Privilege.illegalArgument.nontuple");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
 
-		Tuple tuple = (Tuple) object;
-
 		switch (privilegeName) {
-		case PrivilegeHandler.PRIVILEGE_GET_USER:
-		case PrivilegeHandler.PRIVILEGE_ADD_USER:
-		case PrivilegeHandler.PRIVILEGE_MODIFY_USER:
-		case PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD:
-		case PrivilegeHandler.PRIVILEGE_REMOVE_USER: {
+		case PrivilegeHandler.PRIVILEGE_GET_USER, PrivilegeHandler.PRIVILEGE_ADD_USER, PrivilegeHandler.PRIVILEGE_MODIFY_USER, PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD, PrivilegeHandler.PRIVILEGE_REMOVE_USER -> {
 
 			if (isStrolchAdminAndIgnoreOrganisation(ctx))
 				break;
@@ -101,10 +95,8 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			if (!assertUserInSameOrganisation(ctx, newUser, assertHasPrivilege))
 				return false;
 
-			break;
 		}
-		case PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER:
-		case PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER: {
+		case PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER -> {
 
 			if (isStrolchAdminAndIgnoreOrganisation(ctx))
 				break;
@@ -114,14 +106,13 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 			if (!assertUserInSameOrganisation(ctx, user, assertHasPrivilege))
 				return false;
 
-			break;
 		}
-
-		default:
+		default -> {
 			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
-					"Privilege.userAccessPrivilege.unknownPrivilege"); //$NON-NLS-1$
+					"Privilege.userAccessPrivilege.unknownPrivilege");
 			msg = MessageFormat.format(msg, privilegeName);
 			throw new PrivilegeException(msg);
+		}
 		}
 
 		// now delegate the rest of the validation to the super class

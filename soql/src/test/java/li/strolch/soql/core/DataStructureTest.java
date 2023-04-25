@@ -1,5 +1,7 @@
 package li.strolch.soql.core;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,7 +28,7 @@ public class DataStructureTest extends BaseTest {
 	public void buildProduct() {
 
 		// it's ugly indexing stuff, so here we go
-		final Object[] keys = structure.keySet().toArray(); // the nicknames of the entities
+		final String[] keys = structure.keySet().toArray(new String[0]); // the nicknames of the entities
 		final int numberOfKeys = keys.length;
 
 		// get an overview of how many elements we have to take into account
@@ -53,6 +55,7 @@ public class DataStructureTest extends BaseTest {
 				row.add(element);
 			}
 		}
-	}
 
+		assertEquals(72, cartesianProduct.size());
+	}
 }

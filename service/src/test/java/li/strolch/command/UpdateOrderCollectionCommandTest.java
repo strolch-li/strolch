@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -36,7 +35,7 @@ public class UpdateOrderCollectionCommandTest extends AbstractRealmCommandTest {
 	private List<Order> orders;
 
 	@Before
-	public void before() throws Exception {
+	public void before() {
 		this.orders = new ArrayList<>();
 		// we create elements with the same id as already exists!
 		this.orders.add(ModelGenerator.createOrder("@1", "Modified Test Order", "TestType"));

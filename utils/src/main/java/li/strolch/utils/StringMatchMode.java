@@ -38,7 +38,7 @@ public enum StringMatchMode {
 	 * @param caseSensitive
 	 * 		true if should be a case insensitive match
 	 */
-	private StringMatchMode(boolean equals, boolean caseSensitive) {
+	StringMatchMode(boolean equals, boolean caseSensitive) {
 		this.equals = equals;
 		this.caseSensitve = caseSensitive;
 	}
@@ -69,13 +69,13 @@ public enum StringMatchMode {
 	 * @return if <code>value2</code> matches <code>value1</code> according to the current settings
 	 */
 	public boolean matches(String value1, String value2) {
-		DBC.PRE.assertNotNull("value1 must be set!", value1); //$NON-NLS-1$
-		DBC.PRE.assertNotNull("value2 must be set!", value2); //$NON-NLS-1$
+		DBC.PRE.assertNotNull("value1 must be set!", value1);
+		DBC.PRE.assertNotNull("value2 must be set!", value2);
 		if (!isEquals() && !isCaseSensitve())
 			return value1.toLowerCase().contains(value2.toLowerCase());
 
 		if (!isCaseSensitve())
-			return value1.toLowerCase().equals(value2.toLowerCase());
+			return value1.equalsIgnoreCase(value2);
 
 		if (!isEquals())
 			return value1.contains(value2);

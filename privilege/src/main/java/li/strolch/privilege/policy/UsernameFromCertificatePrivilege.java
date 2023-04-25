@@ -64,9 +64,9 @@ public class UsernameFromCertificatePrivilege implements PrivilegePolicy {
 		Object object = restrictable.getPrivilegeValue();
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
-		if (!(object instanceof Certificate)) {
+		if (!(object instanceof Certificate cert)) {
 			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.noncertificate"); //$NON-NLS-1$
+					.getString("Privilege.illegalArgument.noncertificate");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -75,7 +75,6 @@ public class UsernameFromCertificatePrivilege implements PrivilegePolicy {
 		if (privilege.isAllAllowed())
 			return true;
 
-		Certificate cert = (Certificate) object;
 		String privilegeValue = cert.getUsername();
 		return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 	}

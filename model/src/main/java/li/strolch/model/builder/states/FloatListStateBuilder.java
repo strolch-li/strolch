@@ -13,7 +13,7 @@ public class FloatListStateBuilder extends TimedStateBuilder<FloatListTimedState
 	@Override
 	public FloatListTimedState build() {
 		FloatListTimedState state = new FloatListTimedState();
-		build(state);
+		applyTimedState(state);
 		state.getTimeEvolution().setValueAt(0L, new FloatListValue());
 		return state;
 	}

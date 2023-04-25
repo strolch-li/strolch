@@ -53,8 +53,7 @@ public class AesCryptoHelper {
 			outputStream.write(initVector);
 			outputStream.flush();
 
-			CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, cipher);
-			return cipherOutputStream;
+			return new CipherOutputStream(outputStream, cipher);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -81,14 +80,14 @@ public class AesCryptoHelper {
 
 			// read the initialization vector from the normal input stream
 			byte[] initVector = new byte[16];
-			inputStream.read(initVector);
+			if (inputStream.read(initVector) == -1)
+				throw new IllegalStateException("Failed to read init vector!");
 
 			// init cipher
 			Cipher cipher = Cipher.getInstance(CIPHER);
 			cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(initVector));
 
-			CipherInputStream cipherInputStream = new CipherInputStream(inputStream, cipher);
-			return cipherInputStream;
+			return new CipherInputStream(inputStream, cipher);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -198,7 +197,6 @@ public class AesCryptoHelper {
 		}
 
 		logger.info("Decrypted file " + encryptedFileS + " to " + decryptedFileS);
-
 	}
 
 	public static void decrypt(char[] password, byte[] salt, InputStream fis, OutputStream fos) {
@@ -221,7 +219,8 @@ public class AesCryptoHelper {
 
 			// read the initialization vector
 			byte[] initVector = new byte[16];
-			fis.read(initVector);
+			if (fis.read(initVector) == -1)
+				throw new IllegalStateException("Failed to read init vector!");
 
 			// init cipher
 			Cipher cipher = Cipher.getInstance(CIPHER);
@@ -248,10 +247,6 @@ public class AesCryptoHelper {
 
 	public static byte[] encrypt(char[] password, byte[] salt, String clearText) {
 		return encrypt(password, salt, clearText.getBytes());
-	}
-
-	public static byte[] encrypt(SecretKey secret, byte[] salt, String clearText) {
-		return encrypt(secret, clearText.getBytes());
 	}
 
 	public static byte[] encrypt(char[] password, byte[] salt, byte[] clearTextBytes) {
@@ -322,8 +317,7 @@ public class AesCryptoHelper {
 			Cipher cipher = Cipher.getInstance(CIPHER);
 			cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(initVector));
 
-			byte[] decryptedBytes = cipher.doFinal(encryptedBytes, 16, encryptedBytes.length - 16);
-			return decryptedBytes;
+			return cipher.doFinal(encryptedBytes, 16, encryptedBytes.length - 16);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -335,9 +329,8 @@ public class AesCryptoHelper {
 			SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 			KeySpec keySpec = new PBEKeySpec(password, salt, 65536, 256);
 			SecretKey secretKey = factory.generateSecret(keySpec);
-			SecretKey secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
 
-			return secret;
+			return new SecretKeySpec(secretKey.getEncoded(), "AES");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

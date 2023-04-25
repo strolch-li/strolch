@@ -27,7 +27,6 @@ import java.util.Calendar;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.model.Resource;
-import li.strolch.model.Tags;
 import li.strolch.model.json.ResourceFromJsonVisitor;
 import li.strolch.model.xml.SimpleStrolchElementListener;
 import li.strolch.model.xml.XmlModelSaxReader;
@@ -52,11 +51,6 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	protected PostgreSqlResourceDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
 		super(dataType, connection, txResult, versioningEnabled);
-	}
-
-	@Override
-	protected String getClassName() {
-		return Tags.RESOURCE;
 	}
 
 	@Override

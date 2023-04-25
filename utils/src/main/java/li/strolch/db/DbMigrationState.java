@@ -22,5 +22,5 @@ public enum DbMigrationState {
 	NOTHING,
 	CREATED,
 	MIGRATED,
-	DROPPED_CREATED;
+	DROPPED_CREATED
 }

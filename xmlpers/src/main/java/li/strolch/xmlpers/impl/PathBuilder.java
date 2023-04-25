@@ -28,7 +28,7 @@ public class PathBuilder {
 
 	private static final Logger logger = LoggerFactory.getLogger(PathBuilder.class);
 
-	public static final String FILE_EXT = ".xml"; //$NON-NLS-1$
+	public static final String FILE_EXT = ".xml";
 	public static final int EXT_LENGTH = PathBuilder.FILE_EXT.length();
 
 	private final File basePath;

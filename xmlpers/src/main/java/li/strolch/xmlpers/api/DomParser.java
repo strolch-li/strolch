@@ -19,11 +19,11 @@ import org.w3c.dom.Document;
 
 public interface DomParser<T> {
 
-	public T getObject();
+	T getObject();
 
-	public void setObject(T object);
+	void setObject(T object);
 
-	public Document toDom();
+	Document toDom();
 
-	public void fromDom(Document document);
+	void fromDom(Document document);
 }

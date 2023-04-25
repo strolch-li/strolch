@@ -34,7 +34,7 @@ public interface PolicyDefVisitor {
 	 * @throws ClassNotFoundException
 	 * 		if the class referenced by this {@link PolicyDef} does not exist
 	 */
-	public <T> Class<T> visit(JavaPolicyDef javaPolicyDef) throws ClassNotFoundException;
+	<T> Class<T> visit(JavaPolicyDef javaPolicyDef) throws ClassNotFoundException;
 
 	/**
 	 * This method resolves a Policy by further indirection. I.e. the {@link PolicyDef#getValue()} is a key to the
@@ -46,8 +46,6 @@ public interface PolicyDefVisitor {
 	 *
 	 * @return an instance of the policy resolved by the key {@link PolicyDef#getValue()}
 	 *
-	 * @throws ClassNotFoundException
-	 * 		if the class referenced by this {@link PolicyDef} does not exist
 	 */
-	public <T> Class<T> visit(KeyPolicyDef keyPolicyDef) throws ClassNotFoundException;
+	<T> Class<T> visit(KeyPolicyDef keyPolicyDef);
 }

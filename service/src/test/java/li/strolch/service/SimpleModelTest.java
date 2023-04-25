@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -24,8 +23,8 @@ import org.junit.Test;
 
 public class SimpleModelTest {
 
-	private static final String RUNTIME_PATH = "target/SimpleModelTest/"; //$NON-NLS-1$
-	private static final String CONFIG_SRC = "src/test/resources/transienttest"; //$NON-NLS-1$
+	private static final String RUNTIME_PATH = "target/SimpleModelTest/";
+	private static final String CONFIG_SRC = "src/test/resources/transienttest";
 
 	private static RuntimeMock runtimeMock;
 	private static Certificate certificate;
@@ -162,7 +161,7 @@ public class SimpleModelTest {
 
 			// get products
 			List<Resource> products = articles.stream().map(a -> tx.getResourceByRelation(a, "product", true))
-					.distinct().collect(Collectors.toList());
+					.distinct().toList();
 			assertEquals(1, products.size());
 
 			// search for all orders in state PLANNED and with customer

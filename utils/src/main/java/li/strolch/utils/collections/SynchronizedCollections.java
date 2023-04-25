@@ -2,6 +2,7 @@ package li.strolch.utils.collections;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.*;
@@ -10,15 +11,15 @@ import java.util.stream.Stream;
 public class SynchronizedCollections {
 
 	public static <T, U> MapOfLists<T, U> synchronizedMapOfLists(MapOfLists<T, U> mapOfLists) {
-		return new SynchronizedMapOfLists<T, U>(mapOfLists);
+		return new SynchronizedMapOfLists<>(mapOfLists);
 	}
 
 	public static <T, U> MapOfSets<T, U> synchronizedMapOfSets(MapOfSets<T, U> mapOfSets) {
-		return new SynchronizedMapOfSets<T, U>(mapOfSets);
+		return new SynchronizedMapOfSets<>(mapOfSets);
 	}
 
 	public static <T, U, V> MapOfMaps<T, U, V> synchronizedMapOfMaps(MapOfMaps<T, U, V> mapOfMaps) {
-		return new SynchronizedMapOfMaps<T, U, V>(mapOfMaps);
+		return new SynchronizedMapOfMaps<>(mapOfMaps);
 	}
 
 	private static class SynchronizedMapOfLists<T, U> extends MapOfLists<T, U> {
@@ -169,6 +170,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.m.equals(o);
 			}
@@ -351,6 +354,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.m.equals(o);
 			}
@@ -513,6 +518,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.m.equals(o);
 			}
@@ -527,6 +534,7 @@ public class SynchronizedCollections {
 	}
 
 	private static class SynchronizedCollection<E> implements Collection<E>, Serializable {
+		@Serial
 		private static final long serialVersionUID = 0L;
 
 		final Collection<E> c;
@@ -662,6 +670,7 @@ public class SynchronizedCollections {
 			return c.parallelStream();
 		}
 
+		@Serial
 		private void writeObject(ObjectOutputStream s) throws IOException {
 			synchronized (this.mutex) {
 				s.defaultWriteObject();
@@ -672,6 +681,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return this.c.equals(o);
 			}
@@ -698,6 +709,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return list.equals(o);
 			}
@@ -795,22 +808,6 @@ public class SynchronizedCollections {
 
 		SynchronizedSet(Set<E> s, Object mutex) {
 			super(s, mutex);
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			synchronized (this.mutex) {
-				return c.equals(o);
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			synchronized (this.mutex) {
-				return c.hashCode();
-			}
 		}
 	}
 
@@ -961,6 +958,8 @@ public class SynchronizedCollections {
 		public boolean equals(Object o) {
 			if (this == o)
 				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			synchronized (this.mutex) {
 				return m.equals(o);
 			}
@@ -1055,6 +1054,7 @@ public class SynchronizedCollections {
 			}
 		}
 
+		@Serial
 		private void writeObject(ObjectOutputStream s) throws IOException {
 			synchronized (this.mutex) {
 				s.defaultWriteObject();

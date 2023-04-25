@@ -22,7 +22,7 @@ public class SetActionToStoppedService extends AbstractService<LocatorArgument, 
 	}
 
 	@Override
-	protected ServiceResult internalDoService(LocatorArgument arg) throws Exception {
+	protected ServiceResult internalDoService(LocatorArgument arg) {
 
 		ExecutionHandler executionHandler = getComponent(ExecutionHandler.class);
 		String realm = getArgOrUserRealm(arg);

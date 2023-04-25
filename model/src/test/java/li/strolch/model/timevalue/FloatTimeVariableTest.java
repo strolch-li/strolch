@@ -49,7 +49,7 @@ public class FloatTimeVariableTest {
 	public void init() {
 		this.timeVariable = new TimeVariable<>();
 		for (long i = 0; i < MAX; i += STEP) {
-			this.timeVariable.setValueAt(Long.valueOf(i), new FloatValue(i));
+			this.timeVariable.setValueAt(i, new FloatValue(i));
 		}
 	}
 
@@ -66,7 +66,7 @@ public class FloatTimeVariableTest {
 	public void testGetFutureValues() {
 		Collection<ITimeValue<FloatValue>> futureValues = this.timeVariable.getFutureValues(PICK);
 		Long expectedTime = PICK;
-		Double expectedValue = PICK.doubleValue();
+		double expectedValue = PICK.doubleValue();
 		for (ITimeValue<FloatValue> value : futureValues) {
 			assertEquals(expectedTime, value.getTime());
 			assertTrue(value.getValue().matches(new FloatValue(expectedValue)));
@@ -82,7 +82,7 @@ public class FloatTimeVariableTest {
 	public void testGetPastValues() {
 		Collection<ITimeValue<FloatValue>> pastValues = this.timeVariable.getPastValues(MAX);
 		Long expectedTime = 0L;
-		Double expectedValue = expectedTime.doubleValue();
+		double expectedValue = expectedTime.doubleValue();
 		for (ITimeValue<FloatValue> value : pastValues) {
 			assertEquals(expectedTime, value.getTime());
 			assertTrue(value.getValue().matches(new FloatValue(expectedValue)));
@@ -132,7 +132,7 @@ public class FloatTimeVariableTest {
 		assertNotNull(actual);
 
 		IValue<Double> expectedValue = new FloatValue(STEP.doubleValue());
-		assertEquals(true, actual.getValue().matches(expectedValue));
+		assertTrue(actual.getValue().matches(expectedValue));
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class FloatTimeVariableTest {
 	public void testCompact() {
 
 		this.timeVariable = new TimeVariable<>();
-		for (Long i = 0L; i < MAX; i += STEP) {
+		for (long i = 0L; i < MAX; i += STEP) {
 			this.timeVariable.setValueAt(i, new FloatValue(STEP.doubleValue()));
 		}
 		// call

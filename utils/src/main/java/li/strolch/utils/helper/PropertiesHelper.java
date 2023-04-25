@@ -46,7 +46,7 @@ public class PropertiesHelper {
 			throws RuntimeException {
 		String property = properties.getProperty(key, def);
 		if (property == null) {
-			String msg = "[{0}] Property {1} is not set, and no default was given!"; //$NON-NLS-1$
+			String msg = "[{0}] Property {1} is not set, and no default was given!";
 			msg = MessageFormat.format(msg, context, key);
 			throw new RuntimeException(msg);
 		}

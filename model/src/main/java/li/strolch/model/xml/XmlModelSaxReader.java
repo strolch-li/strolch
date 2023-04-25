@@ -51,8 +51,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(XmlModelSaxReader.class);
 
-	protected StrolchElementListener listener;
-	protected ModelStatistics statistics;
+	protected final StrolchElementListener listener;
+	protected final ModelStatistics statistics;
 
 	private GroupedParameterizedElement parameterizedElement;
 	private TextParameter textParam;
@@ -322,20 +322,19 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 
 		default:
-			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
 	@Override
-	public void characters(char[] ch, int start, int length) throws SAXException {
+	public void characters(char[] ch, int start, int length) {
 		if (this.textBuffer != null) {
 			this.textBuffer.append(ch, start, length);
 		}
 	}
 
 	@Override
-	public void endElement(String uri, String localName, String qName) throws SAXException {
+	public void endElement(String uri, String localName, String qName) {
 
 		switch (qName) {
 		case RESOURCE:
@@ -369,6 +368,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		case ACTION:
 
+			if (this.activityStack.isEmpty())
+				throw new IllegalStateException("Missing parent for action");
 			this.activityStack.peek().addElement((Action) parameterizedElement);
 			this.parameterizedElement = this.activityStack.peek();
 
@@ -425,8 +426,7 @@ public class XmlModelSaxReader extends DefaultHandler {
 			break;
 
 		default:
-			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName)); //$NON-NLS-1$
+			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 }

@@ -155,16 +155,14 @@ public class ObjectHelper {
 							return false;
 					}
 
-					return true;
-
 				} else {
 					for (String s : rightArr) {
 						if (!leftString.contains(s))
 							return false;
 					}
 
-					return true;
 				}
+				return true;
 			}
 
 			if (right.getClass().isEnum())

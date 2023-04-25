@@ -37,9 +37,9 @@ public class ActivityModelTestRunner {
 	private static final String NAME = "Test Activity";
 	private static final String TYPE = "Produce";
 
-	private RuntimeMock runtimeMock;
-	private String realmName;
-	private Certificate certificate;
+	private final RuntimeMock runtimeMock;
+	private final String realmName;
+	private final Certificate certificate;
 
 	public ActivityModelTestRunner(RuntimeMock runtimeMock, String realmName) {
 		this.runtimeMock = runtimeMock;
@@ -53,7 +53,7 @@ public class ActivityModelTestRunner {
 
 		// create
 		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType",
-				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newActivity);
@@ -72,11 +72,11 @@ public class ActivityModelTestRunner {
 
 		// create three activities
 		Activity activity1 = createActivity("myTestActivity1", "Test Name", "QTestType1",
-				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
 		Activity activity2 = createActivity("myTestActivity2", "Test Name", "QTestType2",
-				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
 		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3",
-				TimeOrdering.SERIES); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(activity1);
@@ -164,7 +164,7 @@ public class ActivityModelTestRunner {
 
 		// create 15 activities
 		List<Activity> activities = new ArrayList<>();
-		activities.addAll(createActivities(activities.size(), 5, "@", "My Activity", "MyType1", TimeOrdering.SERIES));
+		activities.addAll(createActivities(0, 5, "@", "My Activity", "MyType1", TimeOrdering.SERIES));
 		activities
 				.addAll(createActivities(activities.size(), 5, "@", "Other Activity", "MyType2", TimeOrdering.SERIES));
 		activities.addAll(createActivities(activities.size(), 5, "@", "Further Activity", "MyType3",

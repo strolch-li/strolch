@@ -29,8 +29,8 @@ import org.junit.BeforeClass;
 
 public class XmlCachedDaoTest extends AbstractModelTest {
 
-	public static final String RUNTIME_PATH = "target/cachedStrolchRuntime/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/cachedStrolchRuntime/";
+	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime";
 
 	protected static RuntimeMock runtimeMock;
 

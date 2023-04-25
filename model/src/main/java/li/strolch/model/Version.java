@@ -242,23 +242,10 @@ public class Version {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Version [version=");
-		builder.append(this.version);
-		builder.append(", locator=");
-		builder.append(this.locator);
-		builder.append(", createdBy=");
-		builder.append(this.createdBy);
-		builder.append(", updatedBy=");
-		builder.append(this.updatedBy);
-		builder.append(", created=");
-		builder.append(ISO8601FormatFactory.getInstance().formatDate(this.created));
-		builder.append(", updated=");
-		builder.append(ISO8601FormatFactory.getInstance().formatDate(this.updated));
-		builder.append(", deleted=");
-		builder.append(this.deleted);
-		builder.append("]");
-		return builder.toString();
+		return "Version [version=" + this.version + ", locator=" + this.locator + ", createdBy=" + this.createdBy
+				+ ", updatedBy=" + this.updatedBy + ", created=" + ISO8601FormatFactory.getInstance()
+				.formatDate(this.created) + ", updated=" + ISO8601FormatFactory.getInstance()
+				.formatDate(this.updated) + ", deleted=" + this.deleted + "]";
 	}
 
 	/**
@@ -369,8 +356,6 @@ public class Version {
 				return false;
 		} else if (!this.locator.equals(other.locator))
 			return false;
-		if (this.version != other.version)
-			return false;
-		return true;
+		return this.version == other.version;
 	}
 }

@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class RuntimeMock {
 
 	private static final Logger logger = LoggerFactory.getLogger(RuntimeMock.class);
-	private static final String TARGET = "target"; //$NON-NLS-1$
+	private static final String TARGET = "target";
 
 	private ComponentContainer container;
 	private StrolchAgent agent;
@@ -96,7 +96,7 @@ public class RuntimeMock {
 	public RuntimeMock mockRuntime(File targetPathF, File srcPathF) {
 
 		if (!targetPathF.getParentFile().getName().equals(TARGET)) {
-			String msg = "Mocking path must be in a maven target: {0}"; //$NON-NLS-1$
+			String msg = "Mocking path must be in a maven target: {0}";
 			msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
@@ -104,28 +104,28 @@ public class RuntimeMock {
 		File configSrc = new File(srcPathF, StrolchBootstrapper.PATH_CONFIG);
 
 		if (!configSrc.isDirectory() || !configSrc.canRead()) {
-			String msg = "Could not find config source in: {0}"; //$NON-NLS-1$
+			String msg = "Could not find config source in: {0}";
 			msg = MessageFormat.format(msg, configSrc.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 
 		if (targetPathF.exists()) {
-			logger.info("Deleting all files in " + targetPathF.getAbsolutePath()); //$NON-NLS-1$
+			logger.info("Deleting all files in " + targetPathF.getAbsolutePath());
 			if (!FileHelper.deleteFile(targetPathF, true)) {
-				String msg = "Failed to delete {0}"; //$NON-NLS-1$
+				String msg = "Failed to delete {0}";
 				msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 				throw new RuntimeException(msg);
 			}
 		}
 
 		if (!targetPathF.mkdirs()) {
-			String msg = "Failed to create {0}"; //$NON-NLS-1$
+			String msg = "Failed to create {0}";
 			msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 
 		logger.info(
-				MessageFormat.format("Mocking runtime from {0} to {1}", srcPathF.getAbsolutePath(), //$NON-NLS-1$
+				MessageFormat.format("Mocking runtime from {0} to {1}", srcPathF.getAbsolutePath(),
 						targetPathF.getAbsolutePath()));
 
 		// setup the container
@@ -146,7 +146,7 @@ public class RuntimeMock {
 			this.container = this.agent.getContainer();
 
 		} catch (Exception e) {
-			logger.error("Failed to start mocked container due to: " + e.getMessage(), e); //$NON-NLS-1$
+			logger.error("Failed to start mocked container due to: " + e.getMessage(), e);
 			destroyRuntime();
 			throw e;
 		}
@@ -160,13 +160,13 @@ public class RuntimeMock {
 		try {
 			this.agent.stop();
 		} catch (Exception e) {
-			logger.info("Failed to stop container: " + e.getMessage()); //$NON-NLS-1$
+			logger.info("Failed to stop container: " + e.getMessage());
 		}
 
 		try {
 			this.agent.destroy();
 		} catch (Exception e) {
-			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
+			logger.info("Failed to destroy container: " + e.getMessage());
 		}
 	}
 
@@ -180,8 +180,7 @@ public class RuntimeMock {
 
 	public <T extends ServiceArgument, U extends ServiceResult> U doService(Certificate certificate,
 			Service<T, U> service, T argument) {
-		U result = getServiceHandler().doService(certificate, service, argument);
-		return result;
+		return getServiceHandler().doService(certificate, service, argument);
 	}
 
 	public <T extends ServiceArgument, U extends ServiceResult> U doServiceAssertResult(Certificate certificate,

@@ -43,9 +43,9 @@ import org.junit.Test;
  */
 public class ObserverUpdateTest {
 
-	private static final String TEST = "test"; //$NON-NLS-1$
-	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime"; //$NON-NLS-1$
+	private static final String TEST = "test";
+	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/";
+	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime";
 
 	protected static RuntimeMock runtimeMock;
 
@@ -70,7 +70,7 @@ public class ObserverUpdateTest {
 
 	public static final class ElementAddedObserver implements Observer {
 
-		Map<String, ModificationResult> results = new HashMap<>();
+		final Map<String, ModificationResult> results = new HashMap<>();
 
 		private ModificationResult getModificationResult(String key) {
 			ModificationResult result = this.results.get(key);

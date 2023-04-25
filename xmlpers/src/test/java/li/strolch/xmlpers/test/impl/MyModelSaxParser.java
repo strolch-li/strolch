@@ -22,7 +22,6 @@ import li.strolch.xmlpers.api.SaxParser;
 import li.strolch.xmlpers.test.model.MyModel;
 import li.strolch.xmlpers.test.model.MyParameter;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
@@ -44,7 +43,6 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 		return this;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public void write(XMLStreamWriter writer) throws XMLStreamException {
 
@@ -63,28 +61,24 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 		writer.writeEndElement();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
-	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-		case "Resource":
+		case "Resource" -> {
 			String id = attributes.getValue("id");
 			String name = attributes.getValue("name");
 			String type = attributes.getValue("type");
-			MyModel resource = new MyModel(id, name, type);
-			this.resource = resource;
-			break;
-		case "Parameter":
-			id = attributes.getValue("id");
-			name = attributes.getValue("name");
-			type = attributes.getValue("type");
+			this.resource = new MyModel(id, name, type);
+		}
+		case "Parameter" -> {
+			String id = attributes.getValue("id");
+			String name = attributes.getValue("name");
+			String type = attributes.getValue("type");
 			String value = attributes.getValue("value");
-			MyParameter param = new MyParameter(id, name, type, value);
-			this.resource.addParameter(param);
-			break;
-		default:
-			throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
+			this.resource.addParameter(new MyParameter(id, name, type, value));
+		}
+		default -> throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
 		}
 	}
 }

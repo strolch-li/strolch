@@ -35,5 +35,5 @@ public enum Operation {
 	/**
 	 * REMOVE The operation associated when an object was removed
 	 */
-	REMOVE;
+	REMOVE
 }

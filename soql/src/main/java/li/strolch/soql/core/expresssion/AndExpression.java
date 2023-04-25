@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class AndExpression extends AbstractBooleanExpression {
 
-	private List<ExpressionTerm> expressionTerms = new ArrayList<>();
+	private final List<ExpressionTerm> expressionTerms = new ArrayList<>();
 
 	public void addExpressionTerm(ExpressionTerm e) {
 		expressionTerms.add(e);

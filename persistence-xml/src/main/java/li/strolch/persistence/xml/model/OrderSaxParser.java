@@ -15,7 +15,6 @@
  */
 package li.strolch.persistence.xml.model;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import li.strolch.model.Order;
@@ -68,7 +67,7 @@ public class OrderSaxParser implements SaxParser<Order> {
 	}
 
 	@Override
-	public void write(XMLStreamWriter xmlWriter) throws XMLStreamException {
+	public void write(XMLStreamWriter xmlWriter) {
 		this.order.accept(new StrolchElementToSaxWriterVisitor(xmlWriter));
 	}
 }

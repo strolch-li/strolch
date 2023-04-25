@@ -74,7 +74,7 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String id = "flushSuccessfully";
 			Resource resource = ModelGenerator.createResource(id, id, id);
@@ -124,7 +124,7 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String id = "flushSuccessfully";
 			Resource resource = ModelGenerator.createResource(id, id, id);
@@ -174,7 +174,7 @@ public class FlushTxTest extends AbstractRealmServiceTest<ServiceArgument, Servi
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String id = "flushSuccessfully2";
 			Resource resource = ModelGenerator.createResource(id, id, id);

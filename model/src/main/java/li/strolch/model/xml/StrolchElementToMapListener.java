@@ -10,9 +10,9 @@ import li.strolch.utils.collections.MapOfMaps;
 
 public class StrolchElementToMapListener implements StrolchElementListener {
 
-	private MapOfMaps<String, String, Resource> resourceMap = new MapOfMaps<>();
-	private MapOfMaps<String, String, Order> orderMap = new MapOfMaps<>();
-	private MapOfMaps<String, String, Activity> activityMap = new MapOfMaps<>();
+	private final MapOfMaps<String, String, Resource> resourceMap = new MapOfMaps<>();
+	private final MapOfMaps<String, String, Order> orderMap = new MapOfMaps<>();
+	private final MapOfMaps<String, String, Activity> activityMap = new MapOfMaps<>();
 
 	public MapOfMaps<String, String, Resource> getResourceMap() {
 		return this.resourceMap;

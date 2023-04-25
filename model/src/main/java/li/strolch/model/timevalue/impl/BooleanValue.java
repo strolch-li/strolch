@@ -72,14 +72,9 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 		return this.value.toString();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("BooleanValue [value=");
-		sb.append(this.value);
-		sb.append("]");
-		return sb.toString();
+		return "BooleanValue [value=" + this.value + "]";
 	}
 
 	@Override

@@ -28,7 +28,7 @@ import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.PersistenceConstants;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
-import li.strolch.xmlpers.objref.LockableObject;
+import li.strolch.utils.concurrent.LockableObject;
 import li.strolch.xmlpers.test.model.MyModel;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,7 +39,7 @@ import org.junit.Test;
  */
 public class LockingTest extends AbstractPersistenceTest {
 
-	private static final String BASE_PATH = "target/db/LockingTest/"; //$NON-NLS-1$
+	private static final String BASE_PATH = "target/db/LockingTest/";
 
 	private long waitForWorkersTime;
 	private boolean run;
@@ -66,18 +66,18 @@ public class LockingTest extends AbstractPersistenceTest {
 
 		List<CreateResourceWorker> workers = new ArrayList<>(5);
 
-		String resoureId = "worker"; //$NON-NLS-1$
+		String resoureId = "worker";
 		for (int i = 0; i < 5; i++) {
-			String workerName = resoureId + "_" + i; //$NON-NLS-1$
+			String workerName = resoureId + "_" + i;
 			CreateResourceWorker worker = new CreateResourceWorker(workerName, workerName);
 			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
+			logger.info("Setup thread " + worker.getName());
 		}
 
 		int nrOfSuccess = runWorkers(workers);
 
-		assertEquals("Only one thread should be able to perform the TX!", 5, nrOfSuccess); //$NON-NLS-1$
+		assertEquals("Only one thread should be able to perform the TX!", 5, nrOfSuccess);
 	}
 
 	@Test
@@ -85,18 +85,18 @@ public class LockingTest extends AbstractPersistenceTest {
 
 		List<CreateResourceWorker> workers = new ArrayList<>(5);
 
-		String resourceId = "createWorkerRes"; //$NON-NLS-1$
+		String resourceId = "createWorkerRes";
 		for (int i = 0; i < 5; i++) {
-			String workerName = resourceId + "_" + i; //$NON-NLS-1$
+			String workerName = resourceId + "_" + i;
 			CreateResourceWorker worker = new CreateResourceWorker(workerName, resourceId);
 			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
+			logger.info("Setup thread " + worker.getName());
 		}
 
 		int nrOfSuccess = runWorkers(workers);
 
-		assertEquals("Only one thread should be able to perform the TX!", 1, nrOfSuccess); //$NON-NLS-1$
+		assertEquals("Only one thread should be able to perform the TX!", 1, nrOfSuccess);
 	}
 
 	@Test
@@ -104,13 +104,13 @@ public class LockingTest extends AbstractPersistenceTest {
 
 		// prepare workers
 		List<UpdateResourceWorker> workers = new ArrayList<>(5);
-		String resourceId = "updatWorkerRes"; //$NON-NLS-1$
+		String resourceId = "updatWorkerRes";
 		for (int i = 0; i < 5; i++) {
-			String workerName = resourceId + "_" + i; //$NON-NLS-1$
+			String workerName = resourceId + "_" + i;
 			UpdateResourceWorker worker = new UpdateResourceWorker(workerName, resourceId);
 			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread " + worker.getName()); //$NON-NLS-1$
+			logger.info("Setup thread " + worker.getName());
 		}
 
 		int nrOfSuccess;
@@ -124,7 +124,7 @@ public class LockingTest extends AbstractPersistenceTest {
 			nrOfSuccess = runWorkers(workers);
 		}
 
-		assertEquals("Only one thread should be able to perform the TX!", 0, nrOfSuccess); //$NON-NLS-1$
+		assertEquals("Only one thread should be able to perform the TX!", 0, nrOfSuccess);
 	}
 
 	private int runWorkers(List<? extends AbstractWorker> workers) throws InterruptedException {
@@ -159,7 +159,7 @@ public class LockingTest extends AbstractPersistenceTest {
 	public abstract class AbstractWorker extends Thread {
 
 		protected boolean success;
-		protected String resourceId;
+		protected final String resourceId;
 
 		public AbstractWorker(String name, String resourceId) {
 			super(name);
@@ -169,7 +169,7 @@ public class LockingTest extends AbstractPersistenceTest {
 		@Override
 		public void run() {
 
-			logger.info("Waiting for ok to work..."); //$NON-NLS-1$
+			logger.info("Waiting for ok to work...");
 			while (!isRun()) {
 				try {
 					Thread.sleep(10L);
@@ -178,13 +178,13 @@ public class LockingTest extends AbstractPersistenceTest {
 				}
 			}
 
-			logger.info("Starting work..."); //$NON-NLS-1$
+			logger.info("Starting work...");
 			try (PersistenceTransaction tx = LockingTest.this.persistenceManager.openTx()) {
 				doWork(tx);
 			}
 
 			this.success = true;
-			logger.info("Work completed."); //$NON-NLS-1$
+			logger.info("Work completed.");
 		}
 
 		protected abstract void doWork(PersistenceTransaction tx);

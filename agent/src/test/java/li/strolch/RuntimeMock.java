@@ -47,12 +47,12 @@ import li.strolch.utils.helper.StringHelper;
 public class RuntimeMock implements AutoCloseable {
 
 	private static final Logger logger = LoggerFactory.getLogger(RuntimeMock.class);
-	private static final String TARGET = "target"; //$NON-NLS-1$
+	private static final String TARGET = "target";
 
 	private ComponentContainer container;
 	private StrolchAgent agent;
-	private File targetPathF;
-	private File srcPathF;
+	private final File targetPathF;
+	private final File srcPathF;
 
 	public RuntimeMock(String targetPath, String srcPath) {
 		this.targetPathF = new File(targetPath);
@@ -82,7 +82,7 @@ public class RuntimeMock implements AutoCloseable {
 	public RuntimeMock mockRuntime() {
 
 		if (!this.targetPathF.getParentFile().getName().equals(TARGET)) {
-			String msg = "Mocking path must be in a maven target: {0}"; //$NON-NLS-1$
+			String msg = "Mocking path must be in a maven target: {0}";
 			msg = MessageFormat.format(msg, this.targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
@@ -90,33 +90,33 @@ public class RuntimeMock implements AutoCloseable {
 		File configSrc = new File(this.srcPathF, StrolchBootstrapper.PATH_CONFIG);
 
 		if (!configSrc.isDirectory() || !configSrc.canRead()) {
-			String msg = "Could not find config source in: {0}"; //$NON-NLS-1$
+			String msg = "Could not find config source in: {0}";
 			msg = MessageFormat.format(msg, configSrc.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 
 		if (this.targetPathF.exists()) {
-			logger.info("Deleting all files in " + this.targetPathF.getAbsolutePath()); //$NON-NLS-1$
+			logger.info("Deleting all files in " + this.targetPathF.getAbsolutePath());
 			if (!FileHelper.deleteFile(this.targetPathF, true)) {
-				String msg = "Failed to delete {0}"; //$NON-NLS-1$
+				String msg = "Failed to delete {0}";
 				msg = MessageFormat.format(msg, this.targetPathF.getAbsolutePath());
 				throw new RuntimeException(msg);
 			}
 		}
 
 		if (!this.targetPathF.mkdirs()) {
-			String msg = "Failed to create {0}"; //$NON-NLS-1$
+			String msg = "Failed to create {0}";
 			msg = MessageFormat.format(msg, this.targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
 
 		logger.info(
-				MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(), //$NON-NLS-1$
+				MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(),
 						this.targetPathF.getAbsolutePath()));
 
 		// setup the container
-		this.agent = new StrolchBootstrapper(getAppVersion())
-				.setupByCopyingRoot("dev", this.srcPathF, this.targetPathF);
+		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", this.srcPathF,
+				this.targetPathF);
 
 		return this;
 	}
@@ -133,7 +133,7 @@ public class RuntimeMock implements AutoCloseable {
 			this.container = this.agent.getContainer();
 
 		} catch (Exception e) {
-			logger.error("Failed to start mocked container due to: " + e.getMessage(), e); //$NON-NLS-1$
+			logger.error("Failed to start mocked container due to: " + e.getMessage(), e);
 			destroyRuntime();
 			throw e;
 		}
@@ -149,13 +149,13 @@ public class RuntimeMock implements AutoCloseable {
 		try {
 			this.agent.stop();
 		} catch (Exception e) {
-			logger.info("Failed to stop container: " + e.getMessage()); //$NON-NLS-1$
+			logger.info("Failed to stop container: " + e.getMessage());
 		}
 
 		try {
 			this.agent.destroy();
 		} catch (Exception e) {
-			logger.info("Failed to destroy container: " + e.getMessage()); //$NON-NLS-1$
+			logger.info("Failed to destroy container: " + e.getMessage());
 		}
 
 		return this;
@@ -196,12 +196,11 @@ public class RuntimeMock implements AutoCloseable {
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to read " + StrolchAgent.AGENT_VERSION_PROPERTIES, e);
 		}
-		StrolchVersion version = new StrolchVersion(properties);
-		return version;
+		return new StrolchVersion(properties);
 	}
 
 	public interface StrolchRunnable {
 
-		public void run(StrolchAgent agent) throws Exception;
+		void run(StrolchAgent agent) throws Exception;
 	}
 }

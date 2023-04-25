@@ -2,10 +2,9 @@ package li.strolch.utils;
 
 import static java.util.concurrent.Executors.*;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,12 +17,12 @@ public class ExecutorPool {
 
 	private static final Logger logger = LoggerFactory.getLogger(ExecutorPool.class);
 
-	private Map<String, ExecutorService> executors;
-	private Map<String, ScheduledExecutorService> scheduledExecutors;
+	private final Map<String, ExecutorService> executors;
+	private final Map<String, ScheduledExecutorService> scheduledExecutors;
 
 	public ExecutorPool() {
-		this.executors = Collections.synchronizedMap(new HashMap<>());
-		this.scheduledExecutors = Collections.synchronizedMap(new HashMap<>());
+		this.executors = new ConcurrentHashMap<>();
+		this.scheduledExecutors = new ConcurrentHashMap<>();
 	}
 
 	public ExecutorService getExecutor(String poolName) {
@@ -43,21 +42,12 @@ public class ExecutorPool {
 	}
 
 	public void destroy() {
-
-		for (String poolName : this.executors.keySet()) {
-			logger.info("Shutting down executor pool " + poolName);
-			ExecutorService executor = this.executors.get(poolName);
-			shutdownExecutor(poolName, executor);
-		}
-
-		for (String poolName : this.scheduledExecutors.keySet()) {
-			logger.info("Shutting down scheduled executor pool " + poolName);
-			ExecutorService executor = this.scheduledExecutors.get(poolName);
-			shutdownExecutor(poolName, executor);
-		}
+		this.executors.forEach(this::shutdownExecutor);
+		this.scheduledExecutors.forEach(this::shutdownExecutor);
 	}
 
 	private void shutdownExecutor(String name, ExecutorService executor) {
+		logger.info("Shutting down executor pool " + name);
 		try {
 			List<Runnable> tasks = executor.shutdownNow();
 			if (!tasks.isEmpty()) {

@@ -48,7 +48,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Void> {
 
-	protected ContentHandler contentHandler;
+	protected final ContentHandler contentHandler;
 
 	public StrolchElementToSaxVisitor(ContentHandler contentHandler) {
 		this.contentHandler = contentHandler;
@@ -61,7 +61,7 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 			toSax(activity);
 
 		} catch (Exception e) {
-			String msg = "Failed to transform Activity {0} to XML due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to transform Activity {0} to XML due to {1}";
 			msg = MessageFormat.format(msg, activity.getLocator(), e.getMessage());
 			throw new RuntimeException(msg, e);
 		}
@@ -76,7 +76,7 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 			toSax(order);
 
 		} catch (SAXException e) {
-			String msg = "Failed to transform Order {0} to XML due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to transform Order {0} to XML due to {1}";
 			msg = MessageFormat.format(msg, order.getLocator(), e.getMessage());
 			throw new RuntimeException(msg, e);
 		}
@@ -91,7 +91,7 @@ public class StrolchElementToSaxVisitor implements StrolchRootElementVisitor<Voi
 			toSax(resource);
 
 		} catch (Exception e) {
-			String msg = "Failed to transform Resource {0} to XML due to {1}"; //$NON-NLS-1$
+			String msg = "Failed to transform Resource {0} to XML due to {1}";
 			msg = MessageFormat.format(msg, resource.getLocator(), e.getMessage());
 			throw new RuntimeException(msg, e);
 		}

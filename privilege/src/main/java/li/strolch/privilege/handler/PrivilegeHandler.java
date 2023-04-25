@@ -167,37 +167,42 @@ public interface PrivilegeHandler {
 	/**
 	 * configuration parameter to define a secret_key
 	 */
-	String PARAM_SECRET_KEY = "secretKey"; //$NON-NLS-1$
+	String PARAM_SECRET_KEY = "secretKey";
 
 	/**
 	 * configuration parameter to define if session refreshing is allowed
 	 */
-	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh"; //$NON-NLS-1$
+	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh";
+
+	/**
+	 * configuration parameter to define if a session's source change is disallowed
+	 */
+	String PARAM_DISALLOW_SOURCE_CHANGE = "disallowSourceChange";
 
 	/**
 	 * configuration parameter to define if username is case insensitive
 	 */
-	String PARAM_CASE_INSENSITIVE_USERNAME = "caseInsensitiveUsername"; //$NON-NLS-1$
+	String PARAM_CASE_INSENSITIVE_USERNAME = "caseInsensitiveUsername";
 
 	/**
 	 * configuration parameter to define a secret salt
 	 */
-	String PARAM_SECRET_SALT = "secretSalt"; //$NON-NLS-1$
+	String PARAM_SECRET_SALT = "secretSalt";
 
 	/**
 	 * configuration parameter to define automatic persisting on password change
 	 */
-	String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData"; //$NON-NLS-1$
+	String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData";
 
 	/**
 	 * configuration parameter to define if sessions should be persisted
 	 */
-	String PARAM_PERSIST_SESSIONS = "persistSessions"; //$NON-NLS-1$
+	String PARAM_PERSIST_SESSIONS = "persistSessions";
 
 	/**
 	 * configuration parameter to define where sessions are to be persisted
 	 */
-	String PARAM_PERSIST_SESSIONS_PATH = "persistSessionsPath"; //$NON-NLS-1$
+	String PARAM_PERSIST_SESSIONS_PATH = "persistSessionsPath";
 
 	/**
 	 * configuration parameter to define {@link PrivilegeConflictResolution}
@@ -817,6 +822,16 @@ public interface PrivilegeHandler {
 	 * @see li.strolch.privilege.handler.PasswordStrengthHandler#validateStrength(char[])
 	 */
 	void validatePassword(Locale locale, char[] password) throws PasswordStrengthException;
+
+	/**
+	 * Starts the privilege handler, starting any threads and services which might be needed
+	 */
+	void start();
+
+	/**
+	 * Stops the privilege handler, starting any threads and services which might be needed
+	 */
+	void stop();
 
 	/**
 	 * <p>

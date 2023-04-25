@@ -31,10 +31,10 @@ public class GreetingService extends AbstractService<GreetingArgument, GreetingR
 	protected GreetingResult internalDoService(GreetingArgument argument) {
 
 		if (StringHelper.isEmpty(argument.name))
-			throw new IllegalArgumentException("The name must always be set!"); //$NON-NLS-1$
+			throw new IllegalArgumentException("The name must always be set!");
 
 		GreetingResult greetingResult = new GreetingResult();
-		String greeting = MessageFormat.format("Hello {0}. Nice to meet you!", argument.name); //$NON-NLS-1$
+		String greeting = MessageFormat.format("Hello {0}. Nice to meet you!", argument.name);
 		greetingResult.setGreeting(greeting);
 		return greetingResult;
 	}

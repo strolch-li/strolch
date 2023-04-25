@@ -1,10 +1,11 @@
 package li.strolch.privilege.model.internal;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 import li.strolch.utils.iso8601.ISO8601;
 
-public class UserHistory {
+public class UserHistory implements Serializable {
 
 	private ZonedDateTime firstLogin;
 	private ZonedDateTime lastLogin;

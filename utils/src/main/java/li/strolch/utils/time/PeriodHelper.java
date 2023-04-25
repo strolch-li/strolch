@@ -42,9 +42,9 @@ public class PeriodHelper {
 	/**
 	 * Shifts the given date by the given period duration. This method doesn't accept a mixture of period and duration,
 	 * one or the other must be zero. Durations may only contain hours and minutes. Periods must only have one part set,
-	 * i.e. either year, month or day. Months are handles special in that the shifting is delegated to {@link
-	 * #shiftMonths(ZonedDateTime, long)}. Furthermore, this method also specially handles weeks, i.e. if shifting is by
-	 * multiple of 7, then this is handled as shifting by weeks
+	 * i.e. either year, month or day. Months are handles special in that the shifting is delegated to
+	 * {@link #shiftMonths(ZonedDateTime, long)}. Furthermore, this method also specially handles weeks, i.e. if
+	 * shifting is by multiple of 7, then this is handled as shifting by weeks
 	 *
 	 * @param date
 	 * 		the date to shift
@@ -130,8 +130,8 @@ public class PeriodHelper {
 
 	/**
 	 * This special function allows us to shift a date by a multiple of the given {@link PeriodDuration} so that is
-	 * before the given end date. It does multiple tries end get as close as possible, due to the inexactness of 30
-	 * days being one month, and 365 days being one year.
+	 * before the given end date. It does multiple tries end get as close as possible, due to the inexactness of 30 days
+	 * being one month, and 365 days being one year.
 	 *
 	 * @param dateWithTime
 	 * 		the start date to shift before the end date
@@ -241,7 +241,7 @@ public class PeriodHelper {
 
 			ZonedDateTime result = dateNoTime.plusDays(shiftDays);
 			while (result.isAfter(end)) {
-				shiftDays =- (long) daysInPeriod;
+				shiftDays = -(long) daysInPeriod;
 				result = dateNoTime.plusDays(shiftDays);
 			}
 			return result.toLocalDate().atTime(localTime).atZone(ZoneId.systemDefault());
@@ -259,6 +259,7 @@ public class PeriodHelper {
 		if (shiftHours < 24)
 			return dateWithTime;
 
-		return dateWithTime.plusDays((shiftHours / 24) - 1);
+		long shiftDays = (shiftHours / 24) - 1;
+		return dateWithTime.plusDays(shiftDays);
 	}
 }

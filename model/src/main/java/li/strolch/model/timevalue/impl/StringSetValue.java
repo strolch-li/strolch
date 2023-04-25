@@ -129,14 +129,9 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("StringSetValue [aStrings=");
-		sb.append(getValueAsString());
-		sb.append("]");
-		return sb.toString();
+		return "StringSetValue [aStrings=" + getValueAsString() + "]";
 	}
 
 	@Override

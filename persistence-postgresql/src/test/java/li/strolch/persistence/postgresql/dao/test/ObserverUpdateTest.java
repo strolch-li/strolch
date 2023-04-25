@@ -49,9 +49,9 @@ import org.junit.Test;
  */
 public class ObserverUpdateTest {
 
-	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/"; //$NON-NLS-1$
-	public static final String DB_STORE_PATH_DIR = "dbStore"; //$NON-NLS-1$
-	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime"; //$NON-NLS-1$
+	public static final String RUNTIME_PATH = "target/observerUpdateStrolchRuntime/";
+	public static final String DB_STORE_PATH_DIR = "dbStore";
+	public static final String CONFIG_SRC = "src/test/resources/cachedRuntime";
 
 	protected static RuntimeMock runtimeMock;
 
@@ -80,9 +80,9 @@ public class ObserverUpdateTest {
 			runtimeMock.destroyRuntime();
 	}
 
-	public final class ElementAddedObserver implements Observer {
+	public static final class ElementAddedObserver implements Observer {
 
-		Map<String, ModificationResult> results = new HashMap<>();
+		final Map<String, ModificationResult> results = new HashMap<>();
 
 		private ModificationResult getModificationResult(String key) {
 			ModificationResult result = this.results.get(key);
@@ -120,20 +120,20 @@ public class ObserverUpdateTest {
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
 		Certificate certificate = privilegeHandler
-				.authenticate("test", "test".toCharArray()); //$NON-NLS-1$ //$NON-NLS-2$
+				.authenticate("test", "test".toCharArray()); //$NON-NLS-2$
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(),
-				State.CREATED); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) { //$NON-NLS-1$
+				State.CREATED);//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
 			tx.add(newOrder);
 			tx.commitOnClose();
 		}
 
 		// create resource
 		Resource newResource = createResource("MyTestResource", "Test Name",
-				"TestType"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) { //$NON-NLS-1$
+				"TestType");//$NON-NLS-2$ //$NON-NLS-3$
+		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
 			tx.add(newResource);
 			tx.commitOnClose();
 		}

@@ -249,7 +249,7 @@ public class Controller {
 	 * @param actionLoc
 	 * 		the {@link Locator} of the {@link Action} to set to executed
 	 */
-	public void toExecuted(StrolchTransaction tx, Locator actionLoc) throws Exception {
+	public void toExecuted(StrolchTransaction tx, Locator actionLoc) {
 		if (invalidActionContext(tx, actionLoc))
 			return;
 
@@ -319,7 +319,7 @@ public class Controller {
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
-				internalToStopped(tx, action);
+				toStopped(tx, action);
 
 				tx.commitOnClose();
 			}
@@ -336,15 +336,15 @@ public class Controller {
 	 * @param actionLoc
 	 * 		the {@link Locator} of the {@link Action} to set to stopped
 	 */
-	public void toStopped(StrolchTransaction tx, Locator actionLoc) throws Exception {
+	public void toStopped(StrolchTransaction tx, Locator actionLoc) {
 		lockWithRetries(tx);
 		if (!refreshActivity(tx))
 			throw new IllegalStateException("Activity " + actionLoc.trim(3) + " does not exist anymore!");
 		Action action = this.activity.getElementByLocator(actionLoc);
-		internalToStopped(tx, action);
+		toStopped(tx, action);
 	}
 
-	protected void internalToStopped(StrolchTransaction tx, Action action) {
+	public void toStopped(StrolchTransaction tx, Action action) {
 		SetActionToStoppedCommand command = new SetActionToStoppedCommand(tx);
 		command.setExecutionPolicy(refreshExecutionPolicy(tx, action));
 		command.setAction(action);
@@ -382,7 +382,7 @@ public class Controller {
 	 * @param actionLoc
 	 * 		the {@link Locator} of the {@link Action} to set to error
 	 */
-	public void toError(StrolchTransaction tx, Locator actionLoc) throws Exception {
+	public void toError(StrolchTransaction tx, Locator actionLoc) {
 		if (invalidActionContext(tx, actionLoc))
 			return;
 
@@ -430,7 +430,7 @@ public class Controller {
 	 * @param actionLoc
 	 * 		the {@link Locator} of the {@link Action} to set to error
 	 */
-	public void toWarning(StrolchTransaction tx, Locator actionLoc) throws Exception {
+	public void toWarning(StrolchTransaction tx, Locator actionLoc) {
 		if (invalidActionContext(tx, actionLoc))
 			return;
 

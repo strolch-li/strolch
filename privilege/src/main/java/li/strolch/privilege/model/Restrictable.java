@@ -34,12 +34,12 @@ public interface Restrictable {
 	 *
 	 * @return the name of the {@link IPrivilege} which is to be used to validate privileges against
 	 */
-	public String getPrivilegeName();
+	String getPrivilegeName();
 
 	/**
 	 * Returns the value which defines or describes what privilege is to be granted
 	 *
 	 * @return the value which defines or describes what privilege is to be granted
 	 */
-	public Object getPrivilegeValue();
+	Object getPrivilegeValue();
 }

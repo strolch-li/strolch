@@ -15,6 +15,6 @@ public class IntegerListParamBuilder<T extends ParameterBagContainerBuilder<T>>
 
 	@Override
 	public IntegerListParameter build() {
-		return build(new IntegerListParameter());
+		return applyParameter(new IntegerListParameter());
 	}
 }

@@ -12,7 +12,7 @@ import li.strolch.xmlpers.objref.SubTypeRef;
 
 public class XmlLogMessageDao implements LogMessageDao {
 
-	private PersistenceTransaction tx;
+	private final PersistenceTransaction tx;
 
 	public XmlLogMessageDao(StrolchTransaction tx) {
 		XmlStrolchTransaction strolchTx = (XmlStrolchTransaction) tx;

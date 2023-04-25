@@ -47,7 +47,7 @@ public class Book {
 	 */
 	public Book(Long id) {
 		if (id == null)
-			throw new IllegalArgumentException("Id may not be null!"); //$NON-NLS-1$
+			throw new IllegalArgumentException("Id may not be null!");
 		this.id = id;
 	}
 

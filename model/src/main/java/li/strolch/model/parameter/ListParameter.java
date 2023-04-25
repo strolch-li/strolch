@@ -26,8 +26,8 @@ import java.util.stream.Stream;
  */
 public interface ListParameter<E> extends Parameter<List<E>> {
 
-	String VALUE_SEPARATOR1 = ";"; //$NON-NLS-1$
-	String VALUE_SEPARATOR2 = ","; //$NON-NLS-1$
+	String VALUE_SEPARATOR1 = ";";
+	String VALUE_SEPARATOR2 = ",";
 
 	/**
 	 * Returns the value at the given index of this {@link ListParameter}'s value

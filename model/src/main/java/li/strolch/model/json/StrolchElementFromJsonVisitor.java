@@ -70,7 +70,7 @@ public class StrolchElementFromJsonVisitor {
 			String date = jsonObject.get(Json.DATE).getAsString();
 			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(date));
 		} else {
-			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(StringHelper.DASH)); //$NON-NLS-1$
+			order.setDate(ISO8601FormatFactory.getInstance().getDateFormat().parse(StringHelper.DASH));
 		}
 
 		if (jsonObject.has(Json.STATE)) {
@@ -113,7 +113,7 @@ public class StrolchElementFromJsonVisitor {
 			if (resource.hasTimedState(stateId)) {
 				timedState = resource.getTimedState(stateId);
 				if (valueType != timedState.getValueType()) {
-					String msg = "Existing TimedState {0} has change of type to {1}"; //$NON-NLS-1$
+					String msg = "Existing TimedState {0} has change of type to {1}";
 					msg = MessageFormat.format(msg, stateId, timedState.getValueType());
 					throw new StrolchException(msg);
 				}
@@ -126,7 +126,7 @@ public class StrolchElementFromJsonVisitor {
 
 			// consistency of JSON key and object.id
 			if (!stateId.equals(timedState.getId())) {
-				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!"; //$NON-NLS-1$
+				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!";
 				msg = MessageFormat.format(msg, timeStateJ);
 				throw new StrolchException(msg);
 			}
@@ -142,7 +142,7 @@ public class StrolchElementFromJsonVisitor {
 				timedState.setHidden(timeStateJ.get(Json.HIDDEN).getAsBoolean());
 
 			if (!this.overwriteExisting && resource.hasTimedState(stateId)) {
-				String msg = "Not overwriting elements, and TimedState {0} already exists!"; //$NON-NLS-1$
+				String msg = "Not overwriting elements, and TimedState {0} already exists!";
 				msg = MessageFormat.format(msg, stateId);
 				throw new StrolchException(msg);
 			}
@@ -232,7 +232,7 @@ public class StrolchElementFromJsonVisitor {
 				}
 			}
 			default -> {
-				String msg = "Check the values of the jsonObject: {0} unknown object Type {1} !"; //$NON-NLS-1$
+				String msg = "Check the values of the jsonObject: {0} unknown object Type {1} !";
 				msg = MessageFormat.format(msg, elementJsonObject, objectType);
 				throw new StrolchException(msg);
 			}
@@ -245,7 +245,7 @@ public class StrolchElementFromJsonVisitor {
 			strolchElement.setId(jsonObject.get(Json.ID).getAsString());
 			strolchElement.setName(jsonObject.get(Json.NAME).getAsString());
 		} else {
-			String msg = "Check the values of the jsonObject: {0} either id or name attribute is null!"; //$NON-NLS-1$
+			String msg = "Check the values of the jsonObject: {0} either id or name attribute is null!";
 			msg = MessageFormat.format(msg, jsonObject);
 			throw new StrolchException(msg);
 		}
@@ -257,7 +257,7 @@ public class StrolchElementFromJsonVisitor {
 		if (jsonObject.has(Json.TYPE)) {
 			groupedParameterizedElement.setType(jsonObject.get(Json.TYPE).getAsString());
 		} else {
-			String msg = "Check the values of the jsonObject: {0} type attribute is null!"; //$NON-NLS-1$
+			String msg = "Check the values of the jsonObject: {0} type attribute is null!";
 			msg = MessageFormat.format(msg, jsonObject);
 			throw new StrolchException(msg);
 		}
@@ -273,7 +273,7 @@ public class StrolchElementFromJsonVisitor {
 			String bagId = entry.getKey();
 			JsonElement jsonElement = entry.getValue();
 			if (!jsonElement.isJsonObject()) {
-				String msg = "Check the values of the jsonElement: {0} it is not a JsonObject!"; //$NON-NLS-1$
+				String msg = "Check the values of the jsonElement: {0} it is not a JsonObject!";
 				msg = MessageFormat.format(msg, bagId);
 				throw new StrolchException(msg);
 			}
@@ -288,13 +288,13 @@ public class StrolchElementFromJsonVisitor {
 
 			fillElement(bagJsonObject, bag);
 			if (!bagId.equals(bag.getId())) {
-				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!"; //$NON-NLS-1$
+				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!";
 				msg = MessageFormat.format(msg, bagId);
 				throw new StrolchException(msg);
 			}
 
 			if (!this.overwriteExisting && groupedParameterizedElement.hasParameterBag(bagId)) {
-				String msg = "Not overwriting elements, and ParameterBag {0} already exists!"; //$NON-NLS-1$
+				String msg = "Not overwriting elements, and ParameterBag {0} already exists!";
 				msg = MessageFormat.format(msg, bagId);
 				throw new StrolchException(msg);
 			}
@@ -310,7 +310,7 @@ public class StrolchElementFromJsonVisitor {
 		if (jsonObject.has(Json.TYPE)) {
 			parameterizedElement.setType(jsonObject.get(Json.TYPE).getAsString());
 		} else {
-			String msg = "Check the values of the jsonObject: {0} type attribute is null!"; //$NON-NLS-1$
+			String msg = "Check the values of the jsonObject: {0} type attribute is null!";
 			msg = MessageFormat.format(msg, jsonObject);
 			throw new StrolchException(msg);
 		}
@@ -325,7 +325,7 @@ public class StrolchElementFromJsonVisitor {
 			String paramId = entry.getKey();
 			JsonElement jsonElement = entry.getValue();
 			if (!jsonElement.isJsonObject()) {
-				String msg = "Check the values of the jsonElement: {0} it is not a JsonObject!"; //$NON-NLS-1$
+				String msg = "Check the values of the jsonElement: {0} it is not a JsonObject!";
 				msg = MessageFormat.format(msg, jsonElement);
 				throw new StrolchException(msg);
 			}
@@ -339,7 +339,7 @@ public class StrolchElementFromJsonVisitor {
 			if (parameterizedElement.hasParameter(paramId)) {
 				parameter = parameterizedElement.getParameter(paramId);
 				if (paramValueType != parameter.getValueType()) {
-					String msg = "Existing Parameter {0} has change of type to {1}"; //$NON-NLS-1$
+					String msg = "Existing Parameter {0} has change of type to {1}";
 					msg = MessageFormat.format(msg, paramId, parameter.getValueType());
 					throw new StrolchException(msg);
 				}
@@ -349,13 +349,13 @@ public class StrolchElementFromJsonVisitor {
 
 			fillElement(paramJsonObject, parameter);
 			if (!paramId.equals(parameter.getId())) {
-				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!"; //$NON-NLS-1$
+				String msg = "Check the values of the jsonElement: {0} JsonObject key not same as object.id!";
 				msg = MessageFormat.format(msg, jsonElement);
 				throw new StrolchException(msg);
 			}
 
 			if (!this.overwriteExisting && parameterizedElement.hasParameter(paramId)) {
-				String msg = "Not overwriting elements, and Parameter {0} already exists!"; //$NON-NLS-1$
+				String msg = "Not overwriting elements, and Parameter {0} already exists!";
 				msg = MessageFormat.format(msg, paramId);
 				throw new StrolchException(msg);
 			}
@@ -421,7 +421,7 @@ public class StrolchElementFromJsonVisitor {
 				action.addChange(valueChange);
 
 			} catch (Exception e1) {
-				String msg = "Check the values of the jsonElement: {0} Fields invalid!"; //$NON-NLS-1$
+				String msg = "Check the values of the jsonElement: {0} Fields invalid!";
 				msg = MessageFormat.format(msg, e);
 				throw new StrolchException(msg, e1);
 			}

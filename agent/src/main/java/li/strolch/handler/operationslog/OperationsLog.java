@@ -9,10 +9,7 @@ import static li.strolch.model.log.LogMessageState.Information;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import li.strolch.agent.api.ComponentContainer;
@@ -47,8 +44,8 @@ public class OperationsLog extends StrolchComponent {
 		this.maxMessages = configuration.getInt("maxMessages", 10000);
 
 		this.queue = new LinkedBlockingQueue<>();
-		this.logMessagesByRealmAndId = new HashMap<>();
-		this.logMessagesByLocator = new HashMap<>();
+		this.logMessagesByRealmAndId = new ConcurrentHashMap<>();
+		this.logMessagesByLocator = new ConcurrentHashMap<>();
 
 		this.executorService = getSingleThreadExecutor("OperationsLog");
 
@@ -90,11 +87,13 @@ public class OperationsLog extends StrolchComponent {
 
 				poll.run();
 
-			} catch (Exception e) {
-				if (e instanceof InterruptedException && !this.run)
+			} catch (InterruptedException e) {
+				if (!this.run)
 					logger.warn("Interrupted!");
 				else
 					logger.error("Failed to perform a task", e);
+			} catch (Exception e) {
+				logger.error("Failed to perform a task", e);
 			}
 		}
 	}
@@ -314,7 +313,7 @@ public class OperationsLog extends StrolchComponent {
 		});
 	}
 
-	public synchronized Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
+	public Optional<Set<LogMessage>> getMessagesFor(String realm, Locator locator) {
 		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessages = this.logMessagesByLocator.get(realm);
 		if (logMessages == null)
 			return Optional.empty();
@@ -324,7 +323,7 @@ public class OperationsLog extends StrolchComponent {
 		return Optional.of(new HashSet<>(result));
 	}
 
-	public synchronized List<LogMessage> getMessages(String realm) {
+	public List<LogMessage> getMessages(String realm) {
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.get(realm);
 		if (logMessages == null)
 			return emptyList();
@@ -355,6 +354,6 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	private interface LogTask {
-		void run() throws Exception;
+		void run();
 	}
 }

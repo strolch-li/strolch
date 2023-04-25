@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PrivilegeMessages {
-	private static final String BUNDLE_NAME = "PrivilegeMessages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "PrivilegeMessages";
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 

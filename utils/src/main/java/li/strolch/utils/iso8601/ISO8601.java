@@ -202,34 +202,4 @@ public class ISO8601 implements DateFormat {
 			default -> throw new IllegalArgumentException("Unsupported precision " + precision);
 		};
 	}
-
-	public static void main(String[] args) {
-		System.out.println(toString(parseToZdt("-")));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44+02:00")));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44+02:00", SECOND_OF_MINUTE)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44+02:00", MILLI_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44+02:00", MICRO_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44+02:00", NANO_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.234+02:00")));
-		// illegal: System.out.println(toString(parseToZdt("2020-06-08T18:44:44.234+02:00", SECOND_OF_MINUTE)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.234+02:00", MILLI_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.234+02:00", MICRO_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.234+02:00", NANO_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.888234+02:00")));
-		// illegal: System.out.println(toString(parseToZdt("2020-06-08T18:44:44.888234+02:00", SECOND_OF_MINUTE)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.888234+02:00", MILLI_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.888234+02:00", MICRO_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.888234+02:00", NANO_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.280888234+02:00")));
-		// illegal: System.out.println(toString(parseToZdt("2020-06-08T18:44:44.280888234+02:00", SECOND_OF_MINUTE)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.280888234+02:00", MILLI_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.280888234+02:00", MICRO_OF_SECOND)));
-		System.out.println(toString(parseToZdt("2020-06-08T18:44:44.280888234+02:00", NANO_OF_SECOND)));
-		System.out.println(toString(ZonedDateTime.now()));
-		System.out.println(toString(ZonedDateTime.now(), SECOND_OF_MINUTE));
-		System.out.println(toString(ZonedDateTime.now(), MILLI_OF_SECOND));
-		System.out.println(toString(ZonedDateTime.now(), MICRO_OF_SECOND));
-		System.out.println(toString(ZonedDateTime.now(), NANO_OF_SECOND));
-		System.out.println(toString(LocalDateTime.now()));
-	}
 }

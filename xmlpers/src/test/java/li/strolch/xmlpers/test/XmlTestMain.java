@@ -44,22 +44,18 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-@SuppressWarnings("nls")
 public class XmlTestMain {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlTestMain.class);
 
-	private static MyModel res;
-
 	public static void main(String[] args) throws Exception {
 
-		res = ModelBuilder.createResource();
+		MyModel res = ModelBuilder.createResource();
 
 		logger.info("Writing Res:\n" + res);
 
@@ -73,9 +69,6 @@ public class XmlTestMain {
 		logger.info("Parsed Resources:\n" + resoures);
 	}
 
-	/**
-	 * @return
-	 */
 	private static List<MyModel> readDom() throws Exception {
 
 		File file = new File("target/res_dom.xml");
@@ -127,9 +120,6 @@ public class XmlTestMain {
 		}
 	}
 
-	/**
-	 * @return
-	 */
 	private static List<MyModel> readSax() throws Exception {
 
 		final List<MyModel> resources = new ArrayList<>();
@@ -138,8 +128,7 @@ public class XmlTestMain {
 		DefaultHandler xmlHandler = new DefaultHandler() {
 
 			@Override
-			public void startElement(String uri, String localName, String qName, Attributes attributes)
-					throws SAXException {
+			public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 				switch (qName) {
 				case "Resource":
@@ -270,23 +259,12 @@ public class XmlTestMain {
 				writer.writeAttribute("value", param.getValue());
 			}
 
-			//writer.writeEmptyElement("data");
-			//writer.writeAttribute("name", "value");
-			////writer.writeEndElement();
-			//writer.writeEmptyElement("stuff");
-			//writer.writeAttribute("attr", "attrVal");
-
 			writer.writeEndElement();
 			writer.writeEndDocument();
 
 			writer.flush();
 			writer.close();
 			logger.info("Wrote SAX to " + file.getAbsolutePath());
-
-			//Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			//Result outputTarget = new StaxR;
-			//Source xmlSource;
-			//transformer.transform(xmlSource, outputTarget);
 		}
 	}
 }

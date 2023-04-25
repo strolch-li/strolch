@@ -37,7 +37,7 @@ public class ActionBuilder extends PolicyContainerBuilder<ActionBuilder> impleme
 		Action action = new Action(getId(), getName(), getType());
 		action.setResourceId(this.resourceId);
 		action.setResourceType(this.resourceType);
-		build((PolicyContainer) action);
+		applyPolicyContainer(action);
 		return action;
 	}
 }

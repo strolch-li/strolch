@@ -4,6 +4,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -17,11 +18,7 @@ public class AesCryptoHelperTest {
 	private static final byte[] salt;
 
 	static {
-		try {
-			salt = "E68761B3-4E8E-4122-9B12-8B89E0AEB233".getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
+		salt = "E68761B3-4E8E-4122-9B12-8B89E0AEB233".getBytes(StandardCharsets.UTF_8);
 	}
 
 	@Test

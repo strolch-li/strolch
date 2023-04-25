@@ -32,8 +32,8 @@ import li.strolch.utils.helper.StringHelper;
 public class ComponentDependencyAnalyzer {
 
 	private static final Logger logger = LoggerFactory.getLogger(ComponentDependencyAnalyzer.class);
-	private StrolchConfiguration strolchConfiguration;
-	private Map<String, ComponentController> controllerMap;
+	private final StrolchConfiguration strolchConfiguration;
+	private final Map<String, ComponentController> controllerMap;
 
 	public ComponentDependencyAnalyzer(StrolchConfiguration strolchConfiguration,
 			Map<String, ComponentController> controllerMap) {
@@ -146,7 +146,7 @@ public class ComponentDependencyAnalyzer {
 			for (String dependencyName : dependencies) {
 				ComponentController dependency = this.controllerMap.get(dependencyName);
 				if (dependency == null) {
-					String msg = "Component {0} is missing required dependency {1}"; //$NON-NLS-1$
+					String msg = "Component {0} is missing required dependency {1}";
 					msg = MessageFormat.format(msg, name, dependencyName);
 					throw new StrolchConfigurationException(msg);
 				}
@@ -162,9 +162,9 @@ public class ComponentDependencyAnalyzer {
 	 */
 	private void logDependencies(int depth, Set<ComponentController> components) {
 		if (depth == 1) {
-			logger.info("Dependency tree:"); //$NON-NLS-1$
+			logger.info("Dependency tree:");
 		}
-		String inset = StringHelper.normalizeLength("", depth * 2, false, ' '); //$NON-NLS-1$
+		String inset = StringHelper.normalizeLength("", depth * 2, false, ' ');
 		for (ComponentController controller : components) {
 			logger.info(inset + controller.getComponent().getName() + ": "
 					+ controller.getComponent().getClass().getName());

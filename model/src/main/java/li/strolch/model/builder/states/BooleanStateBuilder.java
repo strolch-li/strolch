@@ -13,7 +13,7 @@ public class BooleanStateBuilder extends TimedStateBuilder<BooleanTimedState> {
 	@Override
 	public BooleanTimedState build() {
 		BooleanTimedState state = new BooleanTimedState();
-		build(state);
+		applyTimedState(state);
 		state.getTimeEvolution().setValueAt(0L, new BooleanValue(false));
 		return state;
 	}

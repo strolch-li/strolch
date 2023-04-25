@@ -112,8 +112,6 @@ public class XmlTest {
 		assertEquals(4, containerModel.getPolicies().size());
 		assertEquals(3, containerModel.getEncryptionHandlerParameterMap().size());
 		assertEquals(3, containerModel.getPersistenceHandlerParameterMap().size());
-
-		// TODO extend assertions to actual model
 	}
 
 	@Test
@@ -150,11 +148,11 @@ public class XmlTest {
 	@Test
 	public void canReadUsers() {
 
-		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader();
+		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true);
 		File xmlFile = new File(SRC_TEST + "PrivilegeUsers.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
-		List<User> users = xmlHandler.getUsers();
+		Map<String, User> users = xmlHandler.getUsers();
 		assertNotNull(users);
 
 		assertEquals(4, users.size());
@@ -201,7 +199,7 @@ public class XmlTest {
 		File xmlFile = new File(SRC_TEST + "PrivilegeRoles.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
-		List<Role> roles = xmlHandler.getRoles();
+		Map<String, Role> roles = xmlHandler.getRoles();
 		assertNotNull(roles);
 
 		assertEquals(6, roles.size());
@@ -227,8 +225,8 @@ public class XmlTest {
 		assertEquals(0, privilegeAddRole.getAllowList().size());
 		assertEquals(0, privilegeAddRole.getDenyList().size());
 
-		IPrivilege privilegeRemRoleFromUser = privilegeAdmin
-				.getPrivilege(PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER);
+		IPrivilege privilegeRemRoleFromUser = privilegeAdmin.getPrivilege(
+				PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER);
 		assertTrue(privilegeRemRoleFromUser.isAllAllowed());
 		assertEquals(0, privilegeRemRoleFromUser.getAllowList().size());
 		assertEquals(0, privilegeRemRoleFromUser.getDenyList().size());
@@ -254,16 +252,16 @@ public class XmlTest {
 				containsInAnyOrder("li.strolch.privilege.handler.SystemAction",
 						"li.strolch.privilege.test.model.TestSystemRestrictable"));
 
-		IPrivilege testSystemUserAction = systemAdminPrivileges
-				.getPrivilege("li.strolch.privilege.handler.SystemAction");
+		IPrivilege testSystemUserAction = systemAdminPrivileges.getPrivilege(
+				"li.strolch.privilege.handler.SystemAction");
 		assertEquals("li.strolch.privilege.handler.SystemAction", testSystemUserAction.getName());
 		assertEquals("DefaultPrivilege", testSystemUserAction.getPolicy());
 		assertFalse(testSystemUserAction.isAllAllowed());
 		assertEquals(1, testSystemUserAction.getAllowList().size());
 		assertEquals(1, testSystemUserAction.getDenyList().size());
 
-		IPrivilege testSystemRestrictable = systemAdminPrivileges
-				.getPrivilege("li.strolch.privilege.test.model.TestSystemRestrictable");
+		IPrivilege testSystemRestrictable = systemAdminPrivileges.getPrivilege(
+				"li.strolch.privilege.test.model.TestSystemRestrictable");
 		assertEquals("li.strolch.privilege.test.model.TestSystemRestrictable", testSystemRestrictable.getName());
 		assertEquals("DefaultPrivilege", testSystemRestrictable.getPolicy());
 		assertTrue(testSystemRestrictable.isAllAllowed());
@@ -287,22 +285,14 @@ public class XmlTest {
 		MatcherAssert.assertThat(testSystemUserAction2.getDenyList(), containsInAnyOrder("goodbye"));
 	}
 
-	private User findUser(String username, List<User> users) {
-		for (User user : users) {
-			if (user.getUsername().equals(username))
-				return user;
-		}
-
-		throw new RuntimeException("No user exists with username " + username);
+	private User findUser(String username, Map<String, User> users) {
+		return Optional.ofNullable(users.get(username))
+				.orElseThrow(() -> new IllegalStateException("User " + username + " does not exist!"));
 	}
 
-	private Role findRole(String name, List<Role> roles) {
-		for (Role role : roles) {
-			if (role.getName().equals(name))
-				return role;
-		}
-
-		throw new RuntimeException("No role exists with name " + name);
+	private Role findRole(String name, Map<String, Role> roles) {
+		return Optional.ofNullable(roles.get(name))
+				.orElseThrow(() -> new IllegalStateException("Role " + name + " does not exist!"));
 	}
 
 	@Test
@@ -337,16 +327,22 @@ public class XmlTest {
 		PrivilegeUsersDomWriter configSaxWriter = new PrivilegeUsersDomWriter(users, modelFile);
 		configSaxWriter.write();
 
-		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader();
+		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true);
 		XmlHelper.parseDocument(modelFile, xmlHandler);
 
-		List<User> parsedUsers = xmlHandler.getUsers();
+		Map<String, User> parsedUsers = xmlHandler.getUsers();
 		assertNotNull(parsedUsers);
 		assertEquals(2, parsedUsers.size());
 
-		User parsedUser1 = parsedUsers.stream().filter(u -> u.getUsername().equals("user1")).findAny()
+		User parsedUser1 = parsedUsers.values()
+				.stream()
+				.filter(u -> u.getUsername().equals("user1"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("user1 missing!"));
-		User parsedUser2 = parsedUsers.stream().filter(u -> u.getUsername().equals("user2")).findAny()
+		User parsedUser2 = parsedUsers.values()
+				.stream()
+				.filter(u -> u.getUsername().equals("user2"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("user2 missing!"));
 
 		assertEquals(user1.getFirstname(), parsedUser1.getFirstname());
@@ -397,14 +393,20 @@ public class XmlTest {
 		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader();
 		XmlHelper.parseDocument(modelFile, xmlHandler);
 
-		List<Role> parsedRoles = xmlHandler.getRoles();
+		Map<String, Role> parsedRoles = xmlHandler.getRoles();
 		assertNotNull(parsedRoles);
 		assertEquals(2, parsedRoles.size());
 
 		assertEquals(2, parsedRoles.size());
-		Role parsedRole1 = parsedRoles.stream().filter(r -> r.getName().equals("role1")).findAny()
+		Role parsedRole1 = parsedRoles.values()
+				.stream()
+				.filter(r -> r.getName().equals("role1"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("role1 missing!"));
-		Role parsedRole2 = parsedRoles.stream().filter(r -> r.getName().equals("role2")).findAny()
+		Role parsedRole2 = parsedRoles.values()
+				.stream()
+				.filter(r -> r.getName().equals("role2"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("role2 missing!"));
 
 		Set<String> privilegeNames = role1.getPrivilegeNames();

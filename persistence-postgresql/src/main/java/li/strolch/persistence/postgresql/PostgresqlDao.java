@@ -66,10 +66,10 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	private static final String queryAllByTypeAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
 
 	protected final DataType dataType;
-	protected Connection connection;
+	protected final Connection connection;
 	protected final TransactionResult txResult;
 	protected final boolean versioningEnabled;
-	protected List<DaoCommand> commands;
+	protected final List<DaoCommand> commands;
 
 	public PostgresqlDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
@@ -88,8 +88,6 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	public DataType getDataType() {
 		return this.dataType;
 	}
-
-	protected abstract String getClassName();
 
 	protected abstract String getTableName();
 
@@ -490,7 +488,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	protected void internalRemove(T element) {
 
 		// first find out how many there are
-		long count = 0;
+		long count;
 		String sql = MessageFormat.format(querySizeOfElementSqlS, getTableName());
 		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
 			statement.setString(1, element.getType());

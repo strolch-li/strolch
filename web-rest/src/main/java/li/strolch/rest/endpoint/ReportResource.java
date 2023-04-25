@@ -14,13 +14,13 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -75,13 +75,19 @@ public class ReportResource {
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext())) {
 
-			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat().withoutVersion()
-					.withoutObjectType().withoutPolicies().withoutStateVariables()
-					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING, BAG_ADDITIONAL_TYPE).ignoreBagByType(TYPE_FILTER)
+			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat()
+					.withoutVersion()
+					.withoutObjectType()
+					.withoutPolicies()
+					.withoutStateVariables()
+					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING, BAG_ADDITIONAL_TYPE)
+					.ignoreBagByType(TYPE_FILTER)
 					.resourceHook((reportRes, reportJ) -> reportJ.addProperty(PARAM_DATE_RANGE,
 							reportRes.hasParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL)));
-			JsonArray result = new ReportSearch(tx).search(tx).orderByName(false)
-					.map(resource -> resource.accept(visitor)).asStream()
+			JsonArray result = new ReportSearch(tx).search(tx)
+					.orderByName(false)
+					.map(resource -> resource.accept(visitor))
+					.asStream()
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			return ResponseUtil.toResponse(DATA, result);
@@ -419,7 +425,8 @@ public class ReportResource {
 		// send
 		String fileName = id + "_" + System.currentTimeMillis() + ".csv";
 		return Response.ok(out, TEXT_CSV_TYPE)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	private StreamingOutput getOut(Certificate cert, String realm, String reportId, JsonObject localeJ,
@@ -464,7 +471,7 @@ public class ReportResource {
 
 				// get report content and add to the buffer
 				try (CSVPrinter csvP = new CSVPrinter(new OutputStreamWriter(out),
-						CSVFormat.DEFAULT.withHeader(headers).withDelimiter(';'))) {
+						CSVFormat.DEFAULT.builder().setHeader(headers).setDelimiter(';').build())) {
 
 					if (report.isParallel())
 						report.doReport().forEachOrdered(row -> writeCsv(csvP, row));
@@ -492,12 +499,13 @@ public class ReportResource {
 		// go through all filters and add to the map of sets
 		for (JsonElement elem : filters.getAsJsonArray()) {
 			if (!elem.isJsonObject()) {
-				logger.warn("There are wrong formatted filters:\n" + elem.toString());
+				logger.warn("There are wrong formatted filters:\n" + elem);
 				continue;
 			}
 
 			JsonObject filter = elem.getAsJsonObject();
-			filter.get(PARAM_FACET_FILTERS).getAsJsonArray()
+			filter.get(PARAM_FACET_FILTERS)
+					.getAsJsonArray()
 					.forEach(f -> result.addElement(filter.get(PARAM_FACET_TYPE).getAsString(), f.getAsString()));
 		}
 

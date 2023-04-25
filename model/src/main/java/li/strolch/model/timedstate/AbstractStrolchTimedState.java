@@ -217,21 +217,10 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		this.state.getTimeEvolution().clear();
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 
-		StringBuilder builder = new StringBuilder();
-
-		builder.append(getClass().getSimpleName());
-		builder.append(" [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", valueNow=");
-		builder.append(this.state.getStateAt(System.currentTimeMillis()));
-		builder.append("]");
-
-		return builder.toString();
+		return getClass().getSimpleName() + " [id=" + this.id + ", name=" + this.name + ", valueNow="
+				+ this.state.getStateAt(System.currentTimeMillis()) + "]";
 	}
 }

@@ -83,7 +83,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String id = "flushSuccessfully";
 			Resource resource = ModelGenerator.createResource(id, id, id);
@@ -127,7 +127,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String id = "flushSuccessfully";
 			Resource resource = ModelGenerator.createResource(id, id, id);
@@ -171,7 +171,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			try (StrolchTransaction tx = openTx(arg.realm)) {
 				Resource yellowBall = tx.getResourceBy("Ball", "yellow");
@@ -198,7 +198,7 @@ public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceRes
 		}
 
 		@Override
-		protected ServiceResult internalDoService(ServiceArgument arg) throws Exception {
+		protected ServiceResult internalDoService(ServiceArgument arg) {
 
 			String id = StrolchAgent.getUniqueId();
 			Resource resource = ModelGenerator.createResource(id, id, id);

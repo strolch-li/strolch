@@ -33,7 +33,7 @@ import org.junit.Test;
  */
 public class PolicyHandlerTest {
 
-	public static final String PATH_EMPTY_RUNTIME = "target/PolicyHandlerTest/"; //$NON-NLS-1$
+	public static final String PATH_EMPTY_RUNTIME = "target/PolicyHandlerTest/";
 
 	@Test
 	public void shouldInstantiatePolicies() throws Exception {

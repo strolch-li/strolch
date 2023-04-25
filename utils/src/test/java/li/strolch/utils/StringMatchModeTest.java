@@ -50,7 +50,6 @@ public class StringMatchModeTest {
 	/**
 	 * Test method for {@link li.strolch.utils.StringMatchMode#matches(java.lang.String, java.lang.String)}.
 	 */
-	@SuppressWarnings("nls")
 	@Test
 	public void testMatches() {
 		assertTrue(StringMatchMode.CONTAINS_CASE_INSENSITIVE.matches("hello", "el"));

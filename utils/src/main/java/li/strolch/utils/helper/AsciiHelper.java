@@ -212,7 +212,6 @@ public class AsciiHelper {
 	 *
 	 * @return String
 	 */
-	@SuppressWarnings("nls")
 	public static String getAsciiText(char c) {
 		// else if(c == ) { return "";}
 		if (c == NUL) {
@@ -283,7 +282,9 @@ public class AsciiHelper {
 			return "SP";
 		} else if (c == DEL) {
 			return "DEL";
-		} else if ((c) > 32 && (c) < 127) {
+		}
+		// all following chars will be above 32
+		else if (c < 127) {
 			return String.valueOf(c);
 		} else {
 			return "(null:" + (byte) c + ")";

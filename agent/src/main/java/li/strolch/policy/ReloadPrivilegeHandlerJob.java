@@ -12,7 +12,7 @@ public class ReloadPrivilegeHandlerJob extends StrolchJob {
 	}
 
 	@Override
-	protected void execute(PrivilegeContext ctx) throws Exception {
+	protected void execute(PrivilegeContext ctx) {
 		getContainer().getPrivilegeHandler().reloadConfiguration();
 	}
 }

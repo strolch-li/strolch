@@ -11,6 +11,7 @@ import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -167,11 +168,12 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 			}
 			logger.info("User " + this.certificate.getUsername() + " authenticated on WebSocket with remote IP "
 					+ this.remoteIp);
+		} catch (StrolchNotAuthenticatedException e) {
+			logger.error("Failed to authenticate user " + username + ": " + e.getMessage());
+			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
+			return;
 		} catch (Exception e) {
-			if (e instanceof StrolchNotAuthenticatedException)
-				logger.error("Failed to authenticate user " + username + ": " + e.getMessage());
-			else
-				logger.error("Failed to authenticate user " + username, e);
+			logger.error("Failed to authenticate user " + username, e);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}

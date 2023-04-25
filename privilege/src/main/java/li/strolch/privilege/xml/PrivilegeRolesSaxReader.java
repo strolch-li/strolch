@@ -38,13 +38,13 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private final List<Role> roles;
+	private final Map<String, Role> roles;
 
 	public PrivilegeRolesSaxReader() {
-		this.roles = new ArrayList<>();
+		this.roles = new HashMap<>();
 	}
 
-	public List<Role> getRoles() {
+	public Map<String, Role> getRoles() {
 		return this.roles;
 	}
 
@@ -84,19 +84,19 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.buildersStack.peek().notifyChild(elementParser);
 	}
 
-//	<Role name="AppUser">
-//	  <Privilege name="li.strolch.privilege.test.model.TestRestrictable">
-//	    <AllAllowed>true</AllAllowed>
-//	  </Privilege>
-//	</Role>
-//	<Role name="system_admin_privileges">
-//	  <Privilege name="li.strolch.privilege.test.model.TestSystemUserAction">
-//	    <AllAllowed>true</AllAllowed>
-//	  </Privilege>
-//	  <Privilege name="li.strolch.privilege.test.model.TestSystemRestrictable">
-//	    <AllAllowed>true</AllAllowed>
-//	  </Privilege>
-//	</Role>
+	//	<Role name="AppUser">
+	//	  <Privilege name="li.strolch.privilege.test.model.TestRestrictable">
+	//	    <AllAllowed>true</AllAllowed>
+	//	  </Privilege>
+	//	</Role>
+	//	<Role name="system_admin_privileges">
+	//	  <Privilege name="li.strolch.privilege.test.model.TestSystemUserAction">
+	//	    <AllAllowed>true</AllAllowed>
+	//	  </Privilege>
+	//	  <Privilege name="li.strolch.privilege.test.model.TestSystemRestrictable">
+	//	    <AllAllowed>true</AllAllowed>
+	//	  </Privilege>
+	//	</Role>
 
 	public class RoleParser extends ElementParserAdapter {
 
@@ -129,78 +129,76 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 		}
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 			this.text = new StringBuilder();
 
-			if (qName.equals(XmlConstants.XML_ROLE)) {
+			switch (qName) {
+			case XmlConstants.XML_ROLE:
 				this.roleName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
-			} else if (qName.equals(XmlConstants.XML_PRIVILEGE)) {
+				break;
+			case XmlConstants.XML_PRIVILEGE:
 				this.privilegeName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
 				this.privilegePolicy = attributes.getValue(XmlConstants.XML_ATTR_POLICY).trim();
-			} else if (qName.equals(XmlConstants.XML_ALLOW) || qName.equals(XmlConstants.XML_DENY) || qName
-					.equals(XmlConstants.XML_ALL_ALLOWED)) {
+				break;
+			case XmlConstants.XML_ALLOW:
+			case XmlConstants.XML_DENY:
+			case XmlConstants.XML_ALL_ALLOWED:
 				// no-op
-			} else {
+				break;
+			default:
 				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}
 
 		@Override
-		public void characters(char[] ch, int start, int length) throws SAXException {
+		public void characters(char[] ch, int start, int length) {
 			if (this.text != null)
 				this.text.append(ch, start, length);
 		}
 
 		@Override
-		public void endElement(String uri, String localName, String qName) throws SAXException {
+		public void endElement(String uri, String localName, String qName) {
 
-			if (qName.equals(XmlConstants.XML_ALL_ALLOWED)) {
-				this.allAllowed = StringHelper.parseBoolean(this.text.toString().trim());
-			} else if (qName.equals(XmlConstants.XML_ALLOW)) {
-				this.allowList.add(this.text.toString().trim());
-			} else if (qName.equals(XmlConstants.XML_DENY)) {
-				this.denyList.add(this.text.toString().trim());
-			} else if (qName.equals(XmlConstants.XML_PRIVILEGE)) {
-
+			switch (qName) {
+			case XmlConstants.XML_ALL_ALLOWED ->
+					this.allAllowed = StringHelper.parseBoolean(this.text.toString().trim());
+			case XmlConstants.XML_ALLOW -> this.allowList.add(this.text.toString().trim());
+			case XmlConstants.XML_DENY -> this.denyList.add(this.text.toString().trim());
+			case XmlConstants.XML_PRIVILEGE -> {
 				IPrivilege privilege = new PrivilegeImpl(this.privilegeName, this.privilegePolicy, this.allAllowed,
 						this.denyList, this.allowList);
 				this.privileges.put(this.privilegeName, privilege);
-
 				this.privilegeName = null;
 				this.privilegePolicy = null;
 				this.allAllowed = false;
 				this.denyList = new HashSet<>();
 				this.allowList = new HashSet<>();
-
-			} else if (qName.equals(XmlConstants.XML_ROLE)) {
-
+			}
+			case XmlConstants.XML_ROLE -> {
 				Role role = new Role(this.roleName, this.privileges);
-
-				getRoles().add(role);
-				logger.info(MessageFormat.format("New Role: {0}", role)); //$NON-NLS-1$
+				roles.put(role.getName(), role);
+				logger.info(MessageFormat.format("New Role: {0}", role));
 				init();
+			}
+			default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
 		}
 	}
 
 	static class PropertyParser extends ElementParserAdapter {
 
-//	      <Property name="organizationalUnit" value="Development" />
+		//	      <Property name="organizationalUnit" value="Development" />
 
-		public Map<String, String> parameterMap = new HashMap<>();
+		public final Map<String, String> parameterMap = new HashMap<>();
 
 		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes)
-				throws SAXException {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			if (qName.equals(XmlConstants.XML_PROPERTY)) {
 				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
 				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
-			} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
-				// NO-OP
-			} else {
+			} else if (!qName.equals(XmlConstants.XML_PROPERTIES)) {
 				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}

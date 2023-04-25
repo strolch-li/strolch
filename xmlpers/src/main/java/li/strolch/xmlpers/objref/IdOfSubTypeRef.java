@@ -16,7 +16,6 @@
 package li.strolch.xmlpers.objref;
 
 import java.text.MessageFormat;
-import java.util.Objects;
 
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceContextFactory;
@@ -67,13 +66,13 @@ public class IdOfSubTypeRef extends ObjectRef {
 
 	@Override
 	public ObjectRef getChildIdRef(PersistenceTransaction tx, String id) {
-		String msg = MessageFormat.format("Already a leaf: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("Already a leaf: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
 	@Override
 	public ObjectRef getChildTypeRef(PersistenceTransaction tx, String type) {
-		String msg = MessageFormat.format("Already a leaf: {0}", getName()); //$NON-NLS-1$
+		String msg = MessageFormat.format("Already a leaf: {0}", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 
@@ -82,20 +81,5 @@ public class IdOfSubTypeRef extends ObjectRef {
 		PersistenceContextFactoryDelegator ctxFactoryDelegator = tx.getManager().getCtxFactory();
 		PersistenceContextFactory<T> persistenceContextFactory = ctxFactoryDelegator.getCtxFactory(getType());
 		return persistenceContextFactory.createCtx(this);
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		ObjectRef objectRef = (ObjectRef) o;
-		return Objects.equals(this.name, objectRef.name);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.name);
 	}
 }

@@ -13,7 +13,7 @@ import li.strolch.policy.StrolchPolicy;
  */
 public class ConfirmationPolicy extends StrolchPolicy {
 
-	public static PolicyDef DEFAULT_CONFIRMATION = PolicyDef.valueOf(ConfirmationPolicy.class.getSimpleName(),
+	public static final PolicyDef DEFAULT_CONFIRMATION = PolicyDef.valueOf(ConfirmationPolicy.class.getSimpleName(),
 			"key:DefaultConfirmation");
 
 	public ConfirmationPolicy(StrolchTransaction tx) {
@@ -73,6 +73,9 @@ public class ConfirmationPolicy extends StrolchPolicy {
 		case STOPPED -> toStopped(action);
 		case EXECUTED -> toExecuted(action);
 		case CLOSED -> toClosed(action);
+		case EXECUTABLE -> {
+			// do nothing
+		}
 		}
 	}
 }

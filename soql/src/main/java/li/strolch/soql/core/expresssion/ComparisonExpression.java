@@ -18,37 +18,21 @@ import li.strolch.soql.core.SOQLEvaluationException;
 public class ComparisonExpression extends AbstractBooleanExpression {
 
 	private String operator;
-	private List<IObjectExpression> operands = new ArrayList<>();
+	private final List<IObjectExpression> operands = new ArrayList<>();
 
 	@Override
 	public boolean evaluate(Map<String, Object> inputObjects, Map<String, Object> queryParameter) {
 
-		boolean result;
-
-		switch (operator) {
-		case "=":
-			result = evaluateEquals(inputObjects, queryParameter);
-			break;
-		case "<>":
-			result = !evaluateEquals(inputObjects, queryParameter);
-			break;
-		case ">":
-			result = evaluateMore(inputObjects, queryParameter);
-			break;
-		case "<":
-			result = evaluateLess(inputObjects, queryParameter);
-			break;
-		case ">=":
-			result = !evaluateLess(inputObjects, queryParameter);
-			break;
-		case "<=":
-			result = !evaluateMore(inputObjects, queryParameter);
-			break;
-		default:
-			throw new SOQLEvaluationException("Comparison with operator " + operator + " is not supported yet.");
-		}
-
-		return result;
+		return switch (operator) {
+			case "=" -> evaluateEquals(inputObjects, queryParameter);
+			case "<>" -> !evaluateEquals(inputObjects, queryParameter);
+			case ">" -> evaluateMore(inputObjects, queryParameter);
+			case "<" -> evaluateLess(inputObjects, queryParameter);
+			case ">=" -> !evaluateLess(inputObjects, queryParameter);
+			case "<=" -> !evaluateMore(inputObjects, queryParameter);
+			default -> throw new SOQLEvaluationException(
+					"Comparison with operator " + operator + " is not supported yet.");
+		};
 	}
 
 	/**

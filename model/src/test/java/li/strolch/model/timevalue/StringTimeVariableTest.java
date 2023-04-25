@@ -50,16 +50,16 @@ public class StringTimeVariableTest {
 
 	private TimeVariable<IValue<Set<AString>>> timeVariable;
 
-	private Map<Long, StringSetValue> testSets = new HashMap<>();
+	private final Map<Long, StringSetValue> testSets = new HashMap<>();
 
 	@Before
 	public void init() {
 		this.timeVariable = new TimeVariable<>();
-		for (Long i = 0L; i < MAX; i += STEP) {
+		for (long i = 0L; i < MAX; i += STEP) {
 			Set<AString> testSet = new HashSet<>();
 			StringSetValue testValue = new StringSetValue(testSet);
 			this.testSets.put(i, testValue);
-			testSet.add(new AString("string " + i)); //$NON-NLS-1$
+			testSet.add(new AString("string " + i));
 			this.timeVariable.setValueAt(i, new StringSetValue(testSet));
 		}
 	}
@@ -96,7 +96,7 @@ public class StringTimeVariableTest {
 	public void testApplyChange() {
 
 		Set<AString> testSet = new HashSet<>();
-		testSet.add(new AString("Martin")); //$NON-NLS-1$
+		testSet.add(new AString("Martin"));
 		StringSetValue testValue = new StringSetValue(testSet);
 
 		this.timeVariable = new TimeVariable<>();
@@ -109,7 +109,7 @@ public class StringTimeVariableTest {
 		// check the future values
 		Collection<ITimeValue<IValue<Set<AString>>>> futureValues = this.timeVariable.getFutureValues(0L);
 		for (ITimeValue<IValue<Set<AString>>> iTimeValue : futureValues) {
-			logger.info("++ " + iTimeValue); //$NON-NLS-1$
+			logger.info("++ " + iTimeValue);
 		}
 
 		assertEquals(1, futureValues.size()); // a empty one is left
@@ -119,11 +119,11 @@ public class StringTimeVariableTest {
 	public void testCompact() {
 
 		this.timeVariable = new TimeVariable<>();
-		for (Long i = 0L; i < MAX; i += STEP) {
+		for (long i = 0L; i < MAX; i += STEP) {
 			Set<AString> testSet = new HashSet<>();
 			StringSetValue testValue = new StringSetValue(testSet);
 			this.testSets.put(i, testValue);
-			testSet.add(new AString("same string")); //$NON-NLS-1$
+			testSet.add(new AString("same string"));
 			this.timeVariable.setValueAt(i, new StringSetValue(testSet));
 		}
 

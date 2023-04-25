@@ -50,27 +50,10 @@ public class AddOrUpdateStrolchRootElementsService
 			for (StrolchRootElement rootElement : arg.rootElements) {
 
 				switch (rootElement.getObjectType()) {
-				case Tags.RESOURCE:
-					if (tx.hasResource(rootElement.getType(), rootElement.getId())) {
-						tx.update((Resource) rootElement);
-					} else {
-						tx.add((Resource) rootElement);
-					}
-					break;
-				case Tags.ORDER:
-					if (tx.hasOrder(rootElement.getType(), rootElement.getId())) {
-						tx.update((Order) rootElement);
-					} else {
-						tx.add((Order) rootElement);
-					}
-					break;
-				case Tags.ACTIVITY:
-					if (tx.hasActivity(rootElement.getType(), rootElement.getId())) {
-						tx.update((Activity) rootElement);
-					} else {
-						tx.add((Activity) rootElement);
-					}
-					break;
+				case Tags.RESOURCE -> tx.addOrUpdate((Resource) rootElement);
+				case Tags.ORDER -> tx.addOrUpdate((Order) rootElement);
+				case Tags.ACTIVITY -> tx.addOrUpdate((Activity) rootElement);
+				default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
 				}
 			}
 

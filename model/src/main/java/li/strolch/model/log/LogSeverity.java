@@ -5,5 +5,5 @@ public enum LogSeverity {
 	Notification,
 	Warning,
 	Error,
-	Exception;
+	Exception
 }

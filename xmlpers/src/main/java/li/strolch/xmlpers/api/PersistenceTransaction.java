@@ -15,7 +15,7 @@
  */
 package li.strolch.xmlpers.api;
 
-import li.strolch.xmlpers.objref.LockableObject;
+import li.strolch.utils.concurrent.LockableObject;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -27,7 +27,7 @@ public interface PersistenceTransaction extends AutoCloseable {
 	 *
 	 * @return true if the TX already has a {@link TransactionResult}
 	 */
-	public boolean hasTransactionResult();
+	boolean hasTransactionResult();
 
 	/**
 	 * Returns the {@link TransactionResult} for this transaction
@@ -37,32 +37,32 @@ public interface PersistenceTransaction extends AutoCloseable {
 	 * @throws IllegalStateException
 	 * 		if the transaction has not yet been closed
 	 */
-	public TransactionResult getTransactionResult() throws IllegalStateException;
+	TransactionResult getTransactionResult() throws IllegalStateException;
 
 	/**
 	 * @throws IllegalStateException
 	 * 		if a result is already set
 	 */
-	public void setTransactionResult(TransactionResult txResult) throws IllegalStateException;
+	void setTransactionResult(TransactionResult txResult) throws IllegalStateException;
 
-	public void setCloseStrategy(TransactionCloseStrategy closeStrategy);
+	void setCloseStrategy(TransactionCloseStrategy closeStrategy);
 
-	public void autoCloseableCommit();
+	void autoCloseableCommit();
 
-	public void autoCloseableRollback();
+	void autoCloseableRollback();
 
 	@Override
-	public void close() throws XmlPersistenceException;
+	void close() throws XmlPersistenceException;
 
-	public boolean isOpen();
+	boolean isOpen();
 
-	public ObjectDao getObjectDao();
+	ObjectDao getObjectDao();
 
-	public MetadataDao getMetadataDao();
+	MetadataDao getMetadataDao();
 
-	public FileDao getFileDao();
+	FileDao getFileDao();
 
-	public PersistenceManager getManager();
+	PersistenceManager getManager();
 
 	void lock(LockableObject lockableObject);
 }

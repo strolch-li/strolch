@@ -15,8 +15,6 @@
  */
 package li.strolch.rest.filters;
 
-import java.io.IOException;
-
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
@@ -33,11 +31,10 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class CharsetResponseFilter implements ContainerResponseFilter {
 
-	private static final String UTF_8 = "utf-8"; //$NON-NLS-1$
+	private static final String UTF_8 = "utf-8";
 
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException {
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
 		MediaType contentType = responseContext.getMediaType();
 		if (contentType != null) {

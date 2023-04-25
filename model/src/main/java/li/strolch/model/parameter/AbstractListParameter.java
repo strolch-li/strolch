@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.joining;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -51,7 +52,7 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	 */
 	protected void validateValue(List<E> values) throws StrolchException {
 		if (values == null) {
-			String msg = "Can not set null value on Parameter {0}"; //$NON-NLS-1$
+			String msg = "Can not set null value on Parameter {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}
@@ -70,7 +71,7 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	 */
 	protected void validateValue(Collection<E> values) throws StrolchException {
 		if (values == null) {
-			String msg = "Can not set null value on Parameter {0}"; //$NON-NLS-1$
+			String msg = "Can not set null value on Parameter {0}";
 			msg = MessageFormat.format(msg, getLocator());
 			throw new StrolchException(msg);
 		}
@@ -209,6 +210,6 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 
 	@Override
 	public boolean containsAll(List<E> values) {
-		return this.value.containsAll(values);
+		return new HashSet<>(this.value).containsAll(values);
 	}
 }

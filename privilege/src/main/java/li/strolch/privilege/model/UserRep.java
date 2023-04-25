@@ -82,9 +82,7 @@ public class UserRep implements Serializable {
 
 		if (propertyMap != null) {
 			this.properties = new HashMap<>();
-			propertyMap.forEach((key, value) -> {
-				this.properties.put(key.trim(), value.trim());
-			});
+			propertyMap.forEach((key, value) -> this.properties.put(key.trim(), value.trim()));
 		}
 
 		this.history = history;
@@ -104,29 +102,29 @@ public class UserRep implements Serializable {
 	public void validate() {
 
 		if (StringHelper.isEmpty(this.userId))
-			throw new PrivilegeException("userId is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("userId is null or empty");
 
 		if (StringHelper.isEmpty(this.username))
-			throw new PrivilegeException("username is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("username is null or empty");
 
 		// username must be at least 2 characters in length
 		if (this.username.length() < 2) {
 			String msg = MessageFormat
-					.format("The given username ''{0}'' is shorter than 2 characters", this.username); //$NON-NLS-1$
+					.format("The given username ''{0}'' is shorter than 2 characters", this.username);
 			throw new PrivilegeException(msg);
 		}
 
 		if (this.userState == null)
-			throw new PrivilegeException("userState is null"); //$NON-NLS-1$
+			throw new PrivilegeException("userState is null");
 
 		if (StringHelper.isEmpty(this.firstname))
-			throw new PrivilegeException("firstname is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("firstname is null or empty");
 
 		if (StringHelper.isEmpty(this.lastname))
-			throw new PrivilegeException("lastname is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("lastname is null or empty");
 
 		if (this.roles == null || this.roles.isEmpty())
-			throw new PrivilegeException("roles is null or empty"); //$NON-NLS-1$
+			throw new PrivilegeException("roles is null or empty");
 	}
 
 	/**
@@ -353,26 +351,11 @@ public class UserRep implements Serializable {
 	 *
 	 * @see java.lang.Object#toString()
 	 */
-	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("UserRep [userId=");
-		builder.append(this.userId);
-		builder.append(", username=");
-		builder.append(this.username);
-		builder.append(", firstname=");
-		builder.append(this.firstname);
-		builder.append(", lastname=");
-		builder.append(this.lastname);
-		builder.append(", userState=");
-		builder.append(this.userState);
-		builder.append(", locale=");
-		builder.append(this.locale);
-		builder.append(", roles=");
-		builder.append(this.roles);
-		builder.append("]");
-		return builder.toString();
+		return "UserRep [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
+				+ ", lastname=" + this.lastname + ", userState=" + this.userState + ", locale=" + this.locale
+				+ ", roles=" + this.roles + "]";
 	}
 
 	@Override
@@ -393,15 +376,12 @@ public class UserRep implements Serializable {
 			return false;
 		UserRep other = (UserRep) obj;
 		if (this.username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!this.username.equals(other.username))
-			return false;
-		return true;
+			return other.username == null;
+		} else
+			return this.username.equals(other.username);
 	}
 
-	@Override
-	public UserRep clone() {
+	public UserRep getCopy() {
 
 		Set<String> roles = new HashSet<>(this.roles);
 		Map<String, String> propertyMap = this.properties == null ? null : new HashMap<>(this.properties);

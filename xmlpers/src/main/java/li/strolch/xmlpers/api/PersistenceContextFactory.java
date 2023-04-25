@@ -20,8 +20,8 @@ import li.strolch.xmlpers.objref.ObjectReferenceCache;
 
 public interface PersistenceContextFactory<T> {
 
-	public PersistenceContext<T> createCtx(ObjectRef objectRef);
+	PersistenceContext<T> createCtx(ObjectRef objectRef);
 
-	public PersistenceContext<T> createCtx(ObjectReferenceCache objectRefCache, T t);
+	PersistenceContext<T> createCtx(ObjectReferenceCache objectRefCache, T t);
 
 }

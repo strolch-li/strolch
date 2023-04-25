@@ -57,7 +57,7 @@ public class MetadataDao {
 		Set<String> keySet = queryTypeSet(queryPath);
 
 		if (this.verbose) {
-			String msg = "Found {0} types for {1}"; //$NON-NLS-1$
+			String msg = "Found {0} types for {1}";
 			msg = MessageFormat.format(msg, keySet.size(), parentRef.getName());
 			logger.info(msg);
 		}
@@ -79,7 +79,7 @@ public class MetadataDao {
 		Set<String> keySet = queryKeySet(queryPath, reverse, predicate);
 
 		if (this.verbose) {
-			String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
+			String msg = "Found {0} objects for {1}";
 			msg = MessageFormat.format(msg, keySet.size(), parentRef.getName());
 			logger.info(msg);
 		}
@@ -97,7 +97,7 @@ public class MetadataDao {
 		long numberOfFiles = queryTypeSize(queryPath);
 
 		if (this.verbose) {
-			String msg = "Found {0} types for {1}"; //$NON-NLS-1$
+			String msg = "Found {0} types for {1}";
 			msg = MessageFormat.format(msg, numberOfFiles, parentRef.getName());
 			logger.info(msg);
 		}
@@ -113,7 +113,7 @@ public class MetadataDao {
 		long numberOfFiles = querySize(queryPath, predicate);
 
 		if (this.verbose) {
-			String msg = "Found {0} objects for {1}"; //$NON-NLS-1$
+			String msg = "Found {0} objects for {1}";
 			msg = MessageFormat.format(msg, numberOfFiles, parentRef.getName());
 			logger.info(msg);
 		}
@@ -134,7 +134,7 @@ public class MetadataDao {
 			return Collections.emptySet();
 
 		if (!queryPath.isDirectory()) {
-			String msg = "The path is not a directory, thus can not query type set for it: {0}"; //$NON-NLS-1$
+			String msg = "The path is not a directory, thus can not query type set for it: {0}";
 			msg = MessageFormat.format(msg, queryPath.getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
@@ -167,7 +167,7 @@ public class MetadataDao {
 			return Collections.emptySet();
 
 		if (!queryPath.isDirectory()) {
-			String msg = "The path is not a directory, thus can not query key set for it: {0}"; //$NON-NLS-1$
+			String msg = "The path is not a directory, thus can not query key set for it: {0}";
 			msg = MessageFormat.format(msg, queryPath.getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
@@ -177,7 +177,7 @@ public class MetadataDao {
 
 		File[] subTypeFiles = queryPath.listFiles();
 		if (subTypeFiles == null) {
-			String msg = "The path does not exist, thus can not query key set for it: {0}"; //$NON-NLS-1$
+			String msg = "The path does not exist, thus can not query key set for it: {0}";
 			msg = MessageFormat.format(msg, queryPath.getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
@@ -210,7 +210,7 @@ public class MetadataDao {
 			return 0L;
 
 		if (!queryPath.isDirectory()) {
-			String msg = "The path is not a directory, thus can not query type size for it: {0}"; //$NON-NLS-1$
+			String msg = "The path is not a directory, thus can not query type size for it: {0}";
 			msg = MessageFormat.format(msg, queryPath.getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
@@ -241,7 +241,7 @@ public class MetadataDao {
 			return 0L;
 
 		if (!queryPath.isDirectory()) {
-			String msg = "The path is not a directory, thus can not query key size for it: {0}"; //$NON-NLS-1$
+			String msg = "The path is not a directory, thus can not query key size for it: {0}";
 			msg = MessageFormat.format(msg, queryPath.getAbsolutePath());
 			throw new IllegalArgumentException(msg);
 		}
@@ -264,14 +264,14 @@ public class MetadataDao {
 
 	private void assertNotClosed(PersistenceTransaction tx) {
 		if (!tx.isOpen()) {
-			String msg = "Transaction has been closed and thus no operation can be performed!"; //$NON-NLS-1$
+			String msg = "Transaction has been closed and thus no operation can be performed!";
 			throw new IllegalStateException(msg);
 		}
 	}
 
 	private void assertNotIdRef(ObjectRef objectRef) {
 		if (objectRef.isLeaf()) {
-			String msg = "IdRef not allowed: {0}"; //$NON-NLS-1$
+			String msg = "IdRef not allowed: {0}";
 			msg = MessageFormat.format(msg, objectRef.getName());
 			throw new IllegalArgumentException(msg);
 		}
@@ -279,7 +279,7 @@ public class MetadataDao {
 
 	private void assertNotRootRef(ObjectRef objectRef) {
 		if (objectRef.isRoot()) {
-			String msg = "RootRef not allowed: {0}"; //$NON-NLS-1$
+			String msg = "RootRef not allowed: {0}";
 			msg = MessageFormat.format(msg, objectRef.getName());
 			throw new IllegalArgumentException(msg);
 		}

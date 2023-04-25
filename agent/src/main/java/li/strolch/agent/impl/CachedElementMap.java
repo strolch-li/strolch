@@ -160,7 +160,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		long daoRemoved = getDbDao(tx).removeAll();
 
 		if (removed != daoRemoved) {
-			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!"; //$NON-NLS-1$
+			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!";
 			logger.error(MessageFormat.format(msg, removed, daoRemoved));
 		}
 
@@ -177,7 +177,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		long daoRemoved = getDbDao(tx).removeAllBy(type);
 
 		if (removed != daoRemoved) {
-			String msg = "Removed {0} elements from cached map for type {1}, but dao removed {3} elements!"; //$NON-NLS-1$
+			String msg = "Removed {0} elements from cached map for type {1}, but dao removed {3} elements!";
 			logger.error(MessageFormat.format(msg, removed, type, daoRemoved));
 		}
 
@@ -194,7 +194,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 			throws StrolchException {
 		T t = getDbDao(tx).queryBy(type, id, version);
 		if (assertExists && t == null) {
-			String msg = "The element with type \"{0}\" and id \"{1}\" and version \"{2}\" does not exist!"; //$NON-NLS-1$
+			String msg = "The element with type \"{0}\" and id \"{1}\" and version \"{2}\" does not exist!";
 			msg = MessageFormat.format(msg, type, id, version);
 			throw new StrolchException(msg);
 		}
@@ -251,7 +251,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		// make sure the given element is the latest version
 		T current = getBy(tx, type, id, true);
 		if (!current.getVersion().equals(elementVersion)) {
-			String msg = "Can not undo the version {0} as it is not the latest!"; //$NON-NLS-1$
+			String msg = "Can not undo the version {0} as it is not the latest!";
 			msg = MessageFormat.format(msg, elementVersion);
 			throw new StrolchException(msg);
 		}

@@ -30,14 +30,14 @@ public interface FormatFactory {
 	 *
 	 * @return {@link DateFormat}
 	 */
-	public DateFormat getDateFormat();
+	DateFormat getDateFormat();
 
 	/**
 	 * the date format used in xml import and export
 	 *
 	 * @return {@link DateFormat}
 	 */
-	public DateFormat getXmlDateFormat();
+	DateFormat getXmlDateFormat();
 
 	/**
 	 * Formats a date using {@link #getDateFormat()}
@@ -47,7 +47,7 @@ public interface FormatFactory {
 	 *
 	 * @return String representation of the date
 	 */
-	public String formatDate(Date date);
+	String formatDate(Date date);
 
 	/**
 	 * Formats a long as date using {@link #getDateFormat()}
@@ -57,7 +57,7 @@ public interface FormatFactory {
 	 *
 	 * @return String representation of the date
 	 */
-	public String formatDate(long date);
+	String formatDate(long date);
 
 	/**
 	 * Formats a floating point number to have the configured number of decimals
@@ -67,7 +67,7 @@ public interface FormatFactory {
 	 *
 	 * @return the floating point formatted as a string
 	 */
-	public String formatFloat(double value);
+	String formatFloat(double value);
 
 	/**
 	 * Parses a date using {@link #getDateFormat()}
@@ -77,5 +77,5 @@ public interface FormatFactory {
 	 *
 	 * @return the date
 	 */
-	public Date parseDate(String date);
+	Date parseDate(String date);
 }

@@ -68,7 +68,7 @@ public abstract class PerformanceTest {
 				PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
 		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH,
-				PostgreSqlPersistenceHandler.class, dbVersion, "drop"); //$NON-NLS-1$
+				PostgreSqlPersistenceHandler.class, dbVersion, "drop");
 		logger.info(StringHelper.NEW_LINE + sql);
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();

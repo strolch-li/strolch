@@ -7,7 +7,7 @@ import li.strolch.utils.helper.StringHelper;
 
 /**
  * This class has been adapted from org.osgi.framework.Version
- *
+ * <p>
  * Version identifier.
  *
  * <p>
@@ -62,8 +62,8 @@ public class Version implements Comparable<Version> {
 	private final int micro;
 	private final String qualifier;
 
-	private transient String versionString;
-	private boolean osgiStyle;
+	private final transient String versionString;
+	private final boolean osgiStyle;
 
 	/**
 	 * The empty version "0.0.0".
@@ -71,8 +71,8 @@ public class Version implements Comparable<Version> {
 	public static final Version emptyVersion = new Version(0, 0, 0);
 
 	/**
-	 * Creates a version identifier from the specified numerical components. This instance will have {@link
-	 * #isOsgiStyle()} return false
+	 * Creates a version identifier from the specified numerical components. This instance will have
+	 * {@link #isOsgiStyle()} return false
 	 *
 	 * <p>
 	 * The qualifier is set to the empty string.
@@ -109,7 +109,7 @@ public class Version implements Comparable<Version> {
 	 * 		If the numerical components are negative or the qualifier string is invalid.
 	 */
 	public Version(final int major, final int minor, final int micro, String qualifier) {
-		this(major, minor, micro, null, false);
+		this(major, minor, micro, qualifier, false);
 	}
 
 	/**
@@ -135,7 +135,8 @@ public class Version implements Comparable<Version> {
 		this.minor = minor;
 		this.micro = micro;
 		this.qualifier = qualifier == null ? "" : qualifier;
-		this.versionString = null;
+		this.osgiStyle = osgiStyle;
+		this.versionString = toString(this.osgiStyle);
 		validate();
 	}
 
@@ -151,11 +152,12 @@ public class Version implements Comparable<Version> {
 	 * 		If {@code version} is improperly formatted.
 	 */
 	private Version(final String version) {
-		int maj = 0;
+		int maj;
 		int min = 0;
 		int mic = 0;
 		String qual = StringHelper.EMPTY;
 
+		boolean osgiStyle = false;
 		try {
 			StringTokenizer st = new StringTokenizer(version,
 					SEPARATOR + MAVEN_QUALIFIER_SEPARATOR + OSGI_QUALIFIER_SEPARATOR, true);
@@ -172,7 +174,7 @@ public class Version implements Comparable<Version> {
 					if (st.hasMoreTokens()) { // qualifier
 
 						String qualifierSeparator = st.nextToken(); // consume delimiter
-						this.osgiStyle = qualifierSeparator.equals(OSGI_QUALIFIER_SEPARATOR);
+						osgiStyle = qualifierSeparator.equals(OSGI_QUALIFIER_SEPARATOR);
 
 						qual = st.nextToken(StringHelper.EMPTY); // remaining string
 
@@ -183,16 +185,15 @@ public class Version implements Comparable<Version> {
 				}
 			}
 		} catch (NoSuchElementException e) {
-			IllegalArgumentException iae = new IllegalArgumentException("invalid format: " + version);
-			iae.initCause(e);
-			throw iae;
+			throw new IllegalArgumentException("invalid format: " + version, e);
 		}
 
 		this.major = maj;
 		this.minor = min;
 		this.micro = mic;
 		this.qualifier = qual;
-		this.versionString = null;
+		this.osgiStyle = osgiStyle;
+		this.versionString = toString(this.osgiStyle);
 		validate();
 	}
 
@@ -372,10 +373,9 @@ public class Version implements Comparable<Version> {
 	public boolean equals(final Object object) {
 		if (object == this)
 			return true;
-		if (!(object instanceof Version))
+		if (!(object instanceof Version other))
 			return false;
 
-		Version other = (Version) object;
 		return (this.major == other.major) && (this.minor == other.minor) && (this.micro == other.micro)
 				&& this.qualifier.equals(other.qualifier);
 	}
@@ -395,10 +395,9 @@ public class Version implements Comparable<Version> {
 	public boolean equalsIgnoreQualifier(final Object object) {
 		if (object == this)
 			return true;
-		if (!(object instanceof Version))
+		if (!(object instanceof Version other))
 			return false;
 
-		Version other = (Version) object;
 		return (this.major == other.major) && (this.minor == other.minor) && (this.micro == other.micro);
 	}
 
@@ -449,15 +448,13 @@ public class Version implements Comparable<Version> {
 	 * Returns the string representation of this version identifier.
 	 *
 	 * <p>
-	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or {@code
-	 * major.minor.micro.qualifier} otherwise.
+	 * The format of the version string will be {@code major.minor.micro} if qualifier is the empty string or
+	 * {@code major.minor.micro.qualifier} otherwise.
 	 *
 	 * @return The string representation of this version identifier.
 	 */
 	@Override
 	public String toString() {
-		if (this.versionString == null)
-			this.versionString = toString(this.osgiStyle);
 		return this.versionString;
 	}
 
@@ -508,10 +505,6 @@ public class Version implements Comparable<Version> {
 	 * @return This only the major and minor version in a string
 	 */
 	public String toMajorAndMinorString() {
-		StringBuilder result = new StringBuilder(20);
-		result.append(this.major);
-		result.append(SEPARATOR);
-		result.append(this.minor);
-		return result.toString();
+		return this.major + SEPARATOR + this.minor;
 	}
 }
