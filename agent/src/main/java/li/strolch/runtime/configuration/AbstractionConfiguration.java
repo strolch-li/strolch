@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,16 +17,11 @@ package li.strolch.runtime.configuration;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.*;
 
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractionConfiguration {
 
@@ -64,14 +59,13 @@ public abstract class AbstractionConfiguration {
 		return new HashSet<>(this.configurationValues.keySet());
 	}
 
-	public String[] getStringArray(String key, String defValue) {
+	public List<String> getStringList(String key, String defValue) {
 		String value = getValue(key, defValue);
-		String[] values = value.split(",");
-		for (int i = 0; i < values.length; i++) {
-			values[i] = values[i].trim();
-		}
+		return Arrays.stream(value.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
+	}
 
-		return values;
+	public String[] getStringArray(String key, String defValue) {
+		return getStringList(key, defValue).toArray(new String[0]);
 	}
 
 	public String getString(String key, String defValue) {
