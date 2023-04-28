@@ -33,6 +33,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.impl.ComponentContainerImpl;
 import li.strolch.exception.StrolchException;
+import li.strolch.model.Locator;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.ConfigurationParser;
@@ -42,6 +43,7 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.utils.ExecutorPool;
+import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
 import li.strolch.utils.iso8601.ISO8601;
@@ -55,6 +57,9 @@ public class StrolchAgent {
 
 	public static final String AGENT_VERSION_PROPERTIES = "/agentVersion.properties";
 
+	public static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit";
+	public static final String PROP_TRY_LOCK_TIME = "tryLockTime";
+
 	private static final Logger logger = LoggerFactory.getLogger(StrolchAgent.class);
 
 	private final StrolchVersion appVersion;
@@ -63,6 +68,7 @@ public class StrolchAgent {
 	private StrolchConfiguration strolchConfiguration;
 
 	private ExecutorPool executorPool;
+	private ElementLockingHandler<Locator> lockHandler;
 
 	private JsonObject systemState;
 	private long systemStateUpdateTime;
@@ -232,6 +238,10 @@ public class StrolchAgent {
 		return this.executorPool.getScheduledExecutor(poolName);
 	}
 
+	public ElementLockingHandler<Locator> getLockHandler() {
+		return this.lockHandler;
+	}
+
 	/**
 	 * Initializes the underlying container and prepares the executor services. Before calling this method,
 	 * {@link #setup(String, File, File, File)} must have ben called
@@ -241,6 +251,11 @@ public class StrolchAgent {
 			throw new RuntimeException("Please call setup first!");
 
 		this.executorPool = new ExecutorPool();
+
+		RuntimeConfiguration configuration = this.strolchConfiguration.getRuntimeConfiguration();
+		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(PROP_TRY_LOCK_TIME_UNIT, TimeUnit.SECONDS.name()));
+		long time = configuration.getLong(PROP_TRY_LOCK_TIME, 10L);
+		this.lockHandler = new ElementLockingHandler<>(getScheduledExecutor(), timeUnit, time);
 		this.container.initialize();
 	}
 
@@ -250,6 +265,7 @@ public class StrolchAgent {
 	public void start() {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
+		this.lockHandler.start();
 		this.container.start();
 	}
 
@@ -259,6 +275,8 @@ public class StrolchAgent {
 	public void stop() {
 		if (this.container != null)
 			this.container.stop();
+		if (this.lockHandler != null)
+			this.lockHandler.stop();
 	}
 
 	/**
