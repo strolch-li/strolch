@@ -123,6 +123,9 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (t == null)
 			return null;
 
+		if (tx.isReadOnly())
+			return t;
+
 		@SuppressWarnings("unchecked")
 		T clone = (T) t.getClone(true);
 		return clone;
@@ -165,22 +168,27 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized List<T> getAllElements(StrolchTransaction tx) {
-		return this.elementMap.values().stream() //
-				.flatMap(e -> e.values().stream()) //
-				.map(t -> {
-					@SuppressWarnings("unchecked")
-					T clone = (T) t.getClone(true);
-					return clone;
-				}) //
-				.collect(Collectors.toList());
+		Stream<T> stream = this.elementMap.values().stream() //
+				.flatMap(e -> e.values().stream());
+
+		if (tx.isReadOnly())
+			return stream.collect(Collectors.toList());
+
+		return stream.map(t -> {
+			@SuppressWarnings("unchecked")
+			T clone = (T) t.getClone(true);
+			return clone;
+		}).collect(Collectors.toList());
 	}
 
 	@Override
 	public synchronized List<T> getElementsBy(StrolchTransaction tx, String type) {
-
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return new ArrayList<>(0);
+
+		if (tx.isReadOnly())
+			return new ArrayList<>(byType.values());
 
 		return byType.values().stream().map(t -> {
 			@SuppressWarnings("unchecked")
