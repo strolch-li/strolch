@@ -223,7 +223,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 		Map<String, String> properties = new HashMap<>();
 		properties.put(REALM, this.realm);
-		properties.put(ORGANISATION, join(",", organisations));
+		if (!organisations.isEmpty())
+			properties.put(ORGANISATION, join(",", organisations));
 		properties.put(LOCATION, join(",", locations));
 		properties.put(PRIMARY_LOCATION, primaryLocation);
 		properties.put(SECONDARY_LOCATIONS, join(",", secondaryLocations));

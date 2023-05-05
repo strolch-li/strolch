@@ -1,5 +1,6 @@
 package li.strolch.execution.policy;
 
+import java.util.Locale;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -112,6 +113,11 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void addMessage(LogMessage message) {
+		switch (message.getSeverity()) {
+		case Info, Notification -> logger.info(message.getMessage(Locale.getDefault()));
+		case Warning -> logger.warn(message.getMessage(Locale.getDefault()));
+		case Error, Exception -> logger.error(message.getMessage(Locale.getDefault()));
+		}
 		if (getContainer().hasComponent(OperationsLog.class)) {
 			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
 			operationsLog.addMessage(message);

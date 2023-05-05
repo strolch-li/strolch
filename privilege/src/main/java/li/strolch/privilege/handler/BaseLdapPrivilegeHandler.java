@@ -42,8 +42,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	}
 
 	@Override
-	protected User checkCredentialsAndUserState(String username, char[] password)
-			throws AccessDeniedException {
+	protected User checkCredentialsAndUserState(String username, char[] password) throws AccessDeniedException {
 
 		// first see if this is a local user
 		User internalUser = this.persistenceHandler.getUser(username);
@@ -61,7 +60,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		env.put(Context.SECURITY_PRINCIPAL, username + this.domain);
 		env.put(Context.SECURITY_CREDENTIALS, new String(password));
 
-		logger.info("User {} tries to login on ldap", username + this.domain);
+		logger.info("User {} tries to login on ldap {}", username + this.domain, this.providerUrl);
 
 		// Create the initial context
 		DirContext ctx = null;
