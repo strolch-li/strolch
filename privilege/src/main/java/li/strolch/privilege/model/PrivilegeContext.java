@@ -55,6 +55,18 @@ public class PrivilegeContext {
 		this.policies = Map.copyOf(policies);
 	}
 
+	public boolean isSystemUser() {
+		return this.userRep.isSystemUser();
+	}
+
+	public boolean isRemoteUser() {
+		return this.userRep.isRemoteUser();
+	}
+
+	public boolean isNormalEnabledUser() {
+		return this.userRep.isNormalEnabledUser();
+	}
+
 	public UserRep getUserRep() {
 		return this.userRep;
 	}
@@ -170,10 +182,8 @@ public class PrivilegeContext {
 		String privilegeName = restrictable.getPrivilegeName();
 		IPrivilege privilege = this.privileges.get(privilegeName);
 		if (privilege == null) {
-			String msg = MessageFormat
-					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
-							getUsername(), privilegeName, restrictable.getClass().getName(),
-							restrictable.getPrivilegeValue());
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege"),
+					getUsername(), privilegeName, restrictable.getClass().getName(), restrictable.getPrivilegeValue());
 			throw new AccessDeniedException(msg);
 		}
 

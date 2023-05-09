@@ -32,8 +32,8 @@ import li.strolch.utils.helper.StringHelper;
 
 /**
  * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
- * instance which is always used when performing an access and is returned when a user performs a login through {@link
- * PrivilegeHandler#authenticate(String, char[], boolean)}
+ * instance which is always used when performing an access and is returned when a user performs a login through
+ * {@link PrivilegeHandler#authenticate(String, char[], boolean)}
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -132,6 +132,18 @@ public final class Certificate implements Serializable {
 
 		this.userRoles = Collections.unmodifiableSet(userRoles);
 		this.lastAccess = ZonedDateTime.now();
+	}
+
+	public boolean isSystemUser() {
+		return this.userState.isSystem();
+	}
+
+	public boolean isisRemoteUser() {
+		return this.userState.isRemote();
+	}
+
+	public boolean isNormalEnabledUser() {
+		return this.userState.isNormalEnabledUser();
 	}
 
 	public Usage getUsage() {
