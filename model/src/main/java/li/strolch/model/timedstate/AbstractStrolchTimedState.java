@@ -196,13 +196,17 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 		return lb.build();
 	}
 
-	protected void fillClone(AbstractStrolchTimedState<T> clone) {
+	@Override
+	protected void fillClone(AbstractStrolchElement clone) {
 		super.fillClone(clone);
-		clone.hidden = this.hidden;
-		clone.index = this.index;
-		clone.interpretation = this.interpretation;
-		clone.uom = this.uom;
-		clone.state = this.state.getCopy();
+
+		@SuppressWarnings("unchecked")
+		AbstractStrolchTimedState<T> cloneT = (AbstractStrolchTimedState<T>) clone;
+		cloneT.hidden = this.hidden;
+		cloneT.index = this.index;
+		cloneT.interpretation = this.interpretation;
+		cloneT.uom = this.uom;
+		cloneT.state = this.state.getCopy();
 	}
 
 	@Override

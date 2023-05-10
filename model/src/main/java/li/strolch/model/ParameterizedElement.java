@@ -1193,12 +1193,14 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		return lb.build();
 	}
 
-	protected void fillClone(ParameterizedElement clone) {
+	@Override
+	protected void fillClone(AbstractStrolchElement clone) {
 		super.fillClone(clone);
-		clone.type = this.type;
+		ParameterizedElement clonePe = (ParameterizedElement) clone;
+		clonePe.type = this.type;
 		if (this.parameterMap != null) {
 			for (Parameter<?> param : this.parameterMap.values()) {
-				clone.addParameter(param.getClone());
+				clonePe.addParameter(param.getClone());
 			}
 		}
 	}

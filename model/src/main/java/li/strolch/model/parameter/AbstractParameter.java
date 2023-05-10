@@ -200,13 +200,15 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	 * @param clone
 	 * 		the clone to fill
 	 */
-	protected void fillClone(AbstractParameter<?> clone) {
+	@Override
+	protected void fillClone(AbstractStrolchElement clone) {
 		super.fillClone(clone);
 
-		clone.hidden = this.hidden;
-		clone.interpretation = this.interpretation;
-		clone.uom = this.uom;
-		clone.index = this.index;
+		AbstractParameter<?> cloneP = (AbstractParameter<?>) clone;
+		cloneP.hidden = this.hidden;
+		cloneP.interpretation = this.interpretation;
+		cloneP.uom = this.uom;
+		cloneP.index = this.index;
 	}
 
 	@Override

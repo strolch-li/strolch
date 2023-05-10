@@ -279,13 +279,15 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	 * @param clone
 	 * 		the clone to fill
 	 */
-	protected void fillClone(GroupedParameterizedElement clone) {
+	@Override
+	protected void fillClone(AbstractStrolchElement clone) {
 		super.fillClone(clone);
-		clone.type = this.type;
+		GroupedParameterizedElement cloneGpe = (GroupedParameterizedElement) clone;
+		cloneGpe.type = this.type;
 
 		if (this.parameterBagMap != null) {
 			for (ParameterBag bag : this.parameterBagMap.values())
-				clone.addParameterBag(bag.getClone());
+				cloneGpe.addParameterBag(bag.getClone());
 		}
 	}
 
