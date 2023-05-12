@@ -31,5 +31,8 @@
     <option name="VARIABLE_ANNOTATION_WRAP" value="1" />
     <option name="ENUM_CONSTANTS_WRAP" value="2" />
     <option name="SOFT_MARGINS" value="120" />
+    <indentOptions>
+      <option name="USE_TAB_CHARACTER" value="true" />
+    </indentOptions>
   </codeStyleSettings>
 </code_scheme>
