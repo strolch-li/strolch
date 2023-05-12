@@ -1,9 +1,10 @@
 package li.strolch.utils;
 
-import javax.mail.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.*;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A simple helper class to send e-mails. Uses javax.mail and is built as a singleton, so configuration has to be done
  * only once.
- *
+ * <p>
  * The {@link Properties} required are as follows:
  * <ul>
  * <li><code>fromAddr</code> and <code>fromName</code> - defines the address from which the e-mail comes from</li>
@@ -42,8 +43,7 @@ public class SmtpMailer {
 	 * Initializes the SMTP Mailer with the given properties.
 	 * </p>
 	 *
-	 * @param properties
-	 * 		the properties to be used to initialize the mailer
+	 * @param properties the properties to be used to initialize the mailer
 	 */
 	public static void init(Properties properties) {
 		try {
@@ -74,13 +74,10 @@ public class SmtpMailer {
 	/**
 	 * private constructor, use the {@link #init(Properties)}-method
 	 *
-	 * @param properties
-	 * 		the properties to initialize the mailer
+	 * @param properties the properties to initialize the mailer
 	 *
-	 * @throws UnsupportedEncodingException
-	 * 		if something goes wrong parsing the from or override addresses
-	 * @throws AddressException
-	 * 		if something goes wrong parsing the from or override addresses
+	 * @throws UnsupportedEncodingException if something goes wrong parsing the from or override addresses
+	 * @throws AddressException             if something goes wrong parsing the from or override addresses
 	 */
 	private SmtpMailer(Properties properties) throws UnsupportedEncodingException, AddressException {
 
@@ -127,12 +124,9 @@ public class SmtpMailer {
 	/**
 	 * Sends an e-mail to given recipient (unless override address defined).
 	 *
-	 * @param subject
-	 * 		the subject of the e-mail
-	 * @param text
-	 * 		the test of the e-mail
-	 * @param recipients
-	 * 		the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
+	 * @param subject    the subject of the e-mail
+	 * @param text       the test of the e-mail
+	 * @param recipients the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
 	 */
 	public void sendMail(String subject, String text, String recipients) {
 
@@ -149,8 +143,8 @@ public class SmtpMailer {
 				// override, with no white list, so send to override
 				text = "Override recipient. Original recipients: " + recipients + ".\n\n" + text;
 				send(subject, text, this.overrideRecipients);
-				logger.info(MessageFormat
-						.format("Sent E-mail to override recipient {0}: {1}", Arrays.stream(this.overrideRecipients) //
+				logger.info(MessageFormat.format("Sent E-mail to override recipient {0}: {1}",
+						Arrays.stream(this.overrideRecipients) //
 								.map(Object::toString) //
 								.collect(Collectors.joining(",")), subject));
 
@@ -189,15 +183,15 @@ public class SmtpMailer {
 			}
 
 		} catch (MessagingException e) {
-			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nRecipients: " + recipients
-					+ "\n\nBody:\n" + text);
+			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nRecipients: " + recipients +
+					"\n\nBody:\n" + text);
 			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
 		}
 	}
 
 	private void send(String subject, String text, InternetAddress[] recipients) throws MessagingException {
 
-		Session session = Session.getInstance(this.props, new javax.mail.Authenticator() {
+		Session session = Session.getInstance(this.props, new jakarta.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(SmtpMailer.this.username, SmtpMailer.this.password);
 			}

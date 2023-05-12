@@ -47,21 +47,22 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendMailAsync(String subject, String text, String recipients) {
-		getExecutorService("Mail").submit(() -> {
-			try {
-				sendMail(subject, text, recipients);
-			} catch (Exception e) {
-				logger.error("Failed to send mail \"" + subject + "\" to " + recipients, e);
+		getExecutorService("Mail").submit(() -> doSendMail(subject, text, recipients));
+	}
 
-				if (hasComponent(OperationsLog.class)) {
-					LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(),
-							LogSeverity.Exception, LogMessageState.Information,
-							ResourceBundle.getBundle("strolch-service"), "mail.failedToSend").withException(e)
-							.value("reason", e).value("host", this.host).value("subject", subject)
-							.value("recipients", recipients);
-					getComponent(OperationsLog.class).addMessage(message);
-				}
+	private void doSendMail(String subject, String text, String recipients) {
+		try {
+			SmtpMailer.getInstance().sendMail(subject, text, recipients);
+		} catch (Exception e) {
+			logger.error("Failed to send mail \"" + subject + "\" to " + recipients, e);
+
+			if (hasComponent(OperationsLog.class)) {
+				LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,
+						LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+						"mail.failedToSend").withException(e).value("reason", e).value("host", this.host)
+						.value("subject", subject).value("recipients", recipients);
+				getComponent(OperationsLog.class).addMessage(message);
 			}
-		});
+		}
 	}
 }
