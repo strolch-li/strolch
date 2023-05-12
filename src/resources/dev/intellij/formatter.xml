@@ -35,4 +35,8 @@
       <option name="USE_TAB_CHARACTER" value="true" />
     </indentOptions>
   </codeStyleSettings>
+  <codeStyleSettings language="XML">
+    <option name="RIGHT_MARGIN" value="160" />
+    <option name="SOFT_MARGINS" value="160" />
+  </codeStyleSettings>
 </code_scheme>
