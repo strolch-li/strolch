@@ -33,62 +33,68 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class StrolchPolicy {
 
-	protected static final Logger logger = LoggerFactory.getLogger(StrolchPolicy.class);
+    protected static final Logger logger = LoggerFactory.getLogger(StrolchPolicy.class);
 
-	private final ComponentContainer container;
-	private final StrolchTransaction tx;
+    private final ComponentContainer container;
+    private final StrolchTransaction tx;
 
-	/**
-	 * Instantiate a new {@link StrolchPolicy}
-	 *
-	 * @param tx
-	 * 		the transaction for this policy
-	 */
-	public StrolchPolicy(StrolchTransaction tx) {
-		this.container = tx.getContainer();
-		this.tx = tx;
-	}
+    /**
+     * Instantiate a new {@link StrolchPolicy}
+     *
+     * @param tx the transaction for this policy
+     */
+    public StrolchPolicy(StrolchTransaction tx) {
+        this.container = tx.getContainer();
+        this.tx = tx;
+    }
 
-	/**
-	 * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
-	 * runtime
-	 *
-	 * @param clazz
-	 * 		the type of component to be returned
-	 *
-	 * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
-	 *
-	 * @throws IllegalArgumentException
-	 * 		if the component with the given class does not exist
-	 */
-	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
-		return this.container.getComponent(clazz);
-	}
 
-	/**
-	 * @return the container
-	 */
-	protected ComponentContainer getContainer() {
-		return this.container;
-	}
+    /**
+     * Returns true if the given component is registered on th container
+     *
+     * @param clazz the type of component to check for
+     * @return true if the component is available
+     */
+    public boolean hasComponent(Class<?> clazz) {
+        return this.container.hasComponent(clazz);
+    }
 
-	/**
-	 * Returns the {@link StrolchTransaction} bound to this {@link Command}'s runtime
-	 *
-	 * @return the {@link StrolchTransaction} bound to this {@link Command}'s runtime
-	 */
-	protected StrolchTransaction tx() {
-		return this.tx;
-	}
+    /**
+     * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
+     * runtime
+     *
+     * @param clazz the type of component to be returned
+     * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
+     * @throws IllegalArgumentException if the component with the given class does not exist
+     */
+    protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
+        return this.container.getComponent(clazz);
+    }
 
-	protected Order getOrder(IActivityElement element) {
-		return tx().getOrderByRelation(element.getRootElement(), PARAM_ORDER, true);
-	}
+    /**
+     * @return the container
+     */
+    protected ComponentContainer getContainer() {
+        return this.container;
+    }
 
-	/**
-	 * @see Command#undo()
-	 */
-	public void undo() {
-		// empty implementation
-	}
+    /**
+     * Returns the {@link StrolchTransaction} bound to this {@link Command}'s runtime
+     *
+     * @return the {@link StrolchTransaction} bound to this {@link Command}'s runtime
+     */
+    protected StrolchTransaction tx() {
+        return this.tx;
+    }
+
+    protected Order getOrder(IActivityElement element) {
+        return tx().getOrderByRelation(element.getRootElement(), PARAM_ORDER, true);
+    }
+
+    /**
+     * @see Command#undo()
+     */
+    public void undo() {
+        // empty implementation
+    }
 }
