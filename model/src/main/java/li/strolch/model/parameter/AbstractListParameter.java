@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import li.strolch.exception.StrolchException;
@@ -171,6 +172,12 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	public boolean removeValue(E value) {
 		assertNotReadonly();
 		return this.value.remove(value);
+	}
+
+	@Override
+	public boolean removeValueIf(Predicate<E> predicate) {
+		assertNotReadonly();
+		return this.value.removeIf(predicate);
 	}
 
 	@Override
