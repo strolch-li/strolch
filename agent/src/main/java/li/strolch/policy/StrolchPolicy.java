@@ -18,6 +18,7 @@ package li.strolch.policy;
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.model.Order;
 import li.strolch.model.activity.IActivityElement;
@@ -33,68 +34,83 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class StrolchPolicy {
 
-    protected static final Logger logger = LoggerFactory.getLogger(StrolchPolicy.class);
+	protected static final Logger logger = LoggerFactory.getLogger(StrolchPolicy.class);
 
-    private final ComponentContainer container;
-    private final StrolchTransaction tx;
+	private final StrolchAgent agent;
+	private final ComponentContainer container;
+	private final StrolchTransaction tx;
 
-    /**
-     * Instantiate a new {@link StrolchPolicy}
-     *
-     * @param tx the transaction for this policy
-     */
-    public StrolchPolicy(StrolchTransaction tx) {
-        this.container = tx.getContainer();
-        this.tx = tx;
-    }
+	/**
+	 * Instantiate a new {@link StrolchPolicy}
+	 *
+	 * @param tx
+	 * 		the transaction for this policy
+	 */
+	public StrolchPolicy(StrolchTransaction tx) {
+		this.agent = tx.getAgent();
+		this.container = tx.getContainer();
+		this.tx = tx;
+	}
 
+	/**
+	 * Returns true if the given component is registered on th container
+	 *
+	 * @param clazz
+	 * 		the type of component to check for
+	 *
+	 * @return true if the component is available
+	 */
+	public boolean hasComponent(Class<?> clazz) {
+		return this.container.hasComponent(clazz);
+	}
 
-    /**
-     * Returns true if the given component is registered on th container
-     *
-     * @param clazz the type of component to check for
-     * @return true if the component is available
-     */
-    public boolean hasComponent(Class<?> clazz) {
-        return this.container.hasComponent(clazz);
-    }
+	/**
+	 * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
+	 * runtime
+	 *
+	 * @param clazz
+	 * 		the type of component to be returned
+	 *
+	 * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
+	 *
+	 * @throws IllegalArgumentException
+	 * 		if the component with the given class does not exist
+	 */
+	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
+		return this.container.getComponent(clazz);
+	}
 
-    /**
-     * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
-     * runtime
-     *
-     * @param clazz the type of component to be returned
-     * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
-     * @throws IllegalArgumentException if the component with the given class does not exist
-     */
-    protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
-        return this.container.getComponent(clazz);
-    }
+	/**
+	 * @return the container
+	 */
+	protected ComponentContainer getContainer() {
+		return this.container;
+	}
 
-    /**
-     * @return the container
-     */
-    protected ComponentContainer getContainer() {
-        return this.container;
-    }
+	/**
+	 * @return the container
+	 */
+	protected StrolchAgent getAgent() {
+		return this.agent;
+	}
 
-    /**
-     * Returns the {@link StrolchTransaction} bound to this {@link Command}'s runtime
-     *
-     * @return the {@link StrolchTransaction} bound to this {@link Command}'s runtime
-     */
-    protected StrolchTransaction tx() {
-        return this.tx;
-    }
+	/**
+	 * Returns the {@link StrolchTransaction} bound to this {@link Command}'s runtime
+	 *
+	 * @return the {@link StrolchTransaction} bound to this {@link Command}'s runtime
+	 */
+	protected StrolchTransaction tx() {
+		return this.tx;
+	}
 
-    protected Order getOrder(IActivityElement element) {
-        return tx().getOrderByRelation(element.getRootElement(), PARAM_ORDER, true);
-    }
+	protected Order getOrder(IActivityElement element) {
+		return tx().getOrderByRelation(element.getRootElement(), PARAM_ORDER, true);
+	}
 
-    /**
-     * @see Command#undo()
-     */
-    public void undo() {
-        // empty implementation
-    }
+	/**
+	 * @see Command#undo()
+	 */
+	public void undo() {
+		// empty implementation
+	}
 }
