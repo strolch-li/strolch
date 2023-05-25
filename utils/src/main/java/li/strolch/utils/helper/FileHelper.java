@@ -50,12 +50,21 @@ public class FileHelper {
 	 * <p>Generates a path to the given temporary path to write a file separated in sub folders by day using current
 	 * date without any options enabled</p>
 	 *
-	 * @param tempPath
-	 * 		the directory to which to write the file
-	 * @param prefix
-	 * 		the prefix of the file name
-	 * @param suffix
-	 * 		the prefix of the file name
+	 * @param tempPath the directory to which to write the file
+	 *
+	 * @return the temporary file
+	 */
+	public static File getTempFile(File tempPath) {
+		return getTempFile(tempPath, "", "", emptySet());
+	}
+
+	/**
+	 * <p>Generates a path to the given temporary path to write a file separated in sub folders by day using current
+	 * date without any options enabled</p>
+	 *
+	 * @param tempPath the directory to which to write the file
+	 * @param prefix   the prefix of the file name
+	 * @param suffix   the prefix of the file name
 	 *
 	 * @return the temporary file
 	 */
@@ -75,14 +84,10 @@ public class FileHelper {
 	 *     <li>{@link TempFileOptions#WITH_HOURS}</li>
 	 * </ul>
 	 *
-	 * @param tempPath
-	 * 		the directory to which to write the file
-	 * @param prefix
-	 * 		the prefix of the file name
-	 * @param suffix
-	 * 		the prefix of the file name
-	 * @param options
-	 * 		the option bits
+	 * @param tempPath the directory to which to write the file
+	 * @param prefix   the prefix of the file name
+	 * @param suffix   the prefix of the file name
+	 * @param options  the option bits
 	 *
 	 * @return the temporary file
 	 */
@@ -130,8 +135,7 @@ public class FileHelper {
 	 * Reads the contents of a {@link InputStream} into a string. Note, no encoding is checked. It is expected to be
 	 * UTF-8
 	 *
-	 * @param stream
-	 * 		the stream to read
+	 * @param stream the stream to read
 	 *
 	 * @return the contents of a file as a string
 	 */
@@ -157,24 +161,20 @@ public class FileHelper {
 	/**
 	 * Deletes files recursively. No question asked, but logging is done in case of problems
 	 *
-	 * @param file
-	 * 		the file to delete
-	 * @param log
-	 * 		true to enable logging
+	 * @param file the file to delete
+	 * @param log  true to enable logging
 	 *
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
 	public static boolean deleteFile(File file, boolean log) {
-		return FileHelper.deleteFiles(new File[] { file }, log);
+		return FileHelper.deleteFiles(new File[]{file}, log);
 	}
 
 	/**
 	 * Deletes files recursively. No question asked, but logging is done in case of problems
 	 *
-	 * @param files
-	 * 		the files to delete
-	 * @param log
-	 * 		true to enable logging
+	 * @param files the files to delete
+	 * @param log   true to enable logging
 	 *
 	 * @return true if all went well, and false if it did not work. The log will contain the problems encountered
 	 */
@@ -220,12 +220,9 @@ public class FileHelper {
 	 * Copy a given list of {@link File Files}. Recursively copies the files and directories to the destination.
 	 * </p>
 	 *
-	 * @param srcFiles
-	 * 		The source files to copy
-	 * @param dstDirectory
-	 * 		The destination where to copy the files
-	 * @param checksum
-	 * 		if true, then a MD5 checksum is made to validate copying
+	 * @param srcFiles     The source files to copy
+	 * @param dstDirectory The destination where to copy the files
+	 * @param checksum     if true, then a MD5 checksum is made to validate copying
 	 *
 	 * @return <b>true</b> if and only if the copying succeeded; <b>false</b> otherwise
 	 */
@@ -262,19 +259,16 @@ public class FileHelper {
 	 * Copy a {@link File} The renameTo method does not allow action across NFS mounted filesystems this method is the
 	 * workaround
 	 *
-	 * @param fromFile
-	 * 		The existing File
-	 * @param toFile
-	 * 		The new File
-	 * @param checksum
-	 * 		if true, then a MD5 checksum is made to validate copying
+	 * @param fromFile The existing File
+	 * @param toFile   The new File
+	 * @param checksum if true, then a MD5 checksum is made to validate copying
 	 *
 	 * @return <b>true</b> if and only if the renaming succeeded; <b>false</b> otherwise
 	 */
 	public static boolean copy(File fromFile, File toFile, boolean checksum) {
 
 		try (BufferedInputStream inBuffer = new BufferedInputStream(Files.newInputStream(fromFile.toPath()));
-				BufferedOutputStream outBuffer = new BufferedOutputStream(Files.newOutputStream(toFile.toPath()))) {
+			 BufferedOutputStream outBuffer = new BufferedOutputStream(Files.newOutputStream(toFile.toPath()))) {
 
 			int theByte;
 
@@ -322,10 +316,8 @@ public class FileHelper {
 	 * Move a File The renameTo method does not allow action across NFS mounted filesystems this method is the
 	 * workaround
 	 *
-	 * @param fromFile
-	 * 		The existing File
-	 * @param toFile
-	 * 		The new File
+	 * @param fromFile The existing File
+	 * @param toFile   The new File
 	 *
 	 * @return <b>true</b> if and only if the renaming succeeded; <b>false</b> otherwise
 	 */
@@ -350,8 +342,7 @@ public class FileHelper {
 	 * Returns the size of the file in a human-readable form. Everything smaller than 1024 bytes is returned as x bytes,
 	 * next is KB, then MB and then GB
 	 *
-	 * @param file
-	 * 		the file for which the humanized size is to be returned
+	 * @param file the file for which the humanized size is to be returned
 	 *
 	 * @return the humanized form of the files size
 	 */
@@ -363,8 +354,7 @@ public class FileHelper {
 	 * Returns the size of the file in a human-readable form. Everything smaller than 1024 bytes is returned as x bytes,
 	 * next is KB, then MB and then GB
 	 *
-	 * @param fileSize
-	 * 		the size of a file for which the humanized size is to be returned
+	 * @param fileSize the size of a file for which the humanized size is to be returned
 	 *
 	 * @return the humanized form of the files size
 	 */
@@ -376,8 +366,7 @@ public class FileHelper {
 	 * Creates the MD5 hash of the given file, returning the hash as a byte array. Use
 	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 *
-	 * @param file
-	 * 		the file to hash
+	 * @param file the file to hash
 	 *
 	 * @return the hash as a byte array
 	 */
@@ -389,8 +378,7 @@ public class FileHelper {
 	 * Creates the SHA256 hash of the given file, returning the hash as a byte array. Use
 	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 *
-	 * @param file
-	 * 		the file to hash
+	 * @param file the file to hash
 	 *
 	 * @return the hash as a byte array
 	 */
@@ -402,10 +390,8 @@ public class FileHelper {
 	 * Creates the hash of the given file with the given algorithm, returning the hash as a byte array. Use
 	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 *
-	 * @param file
-	 * 		the file to hash
-	 * @param algorithm
-	 * 		the hashing algorithm to use
+	 * @param file      the file to hash
+	 * @param algorithm the hashing algorithm to use
 	 *
 	 * @return the hash as a byte array
 	 */
