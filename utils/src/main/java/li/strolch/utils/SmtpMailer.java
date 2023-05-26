@@ -130,13 +130,13 @@ public class SmtpMailer {
 	 * @param recipients the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
 	 */
 	public void sendMail(String subject, String text, String recipients, String attachment, String fileName,
-						 String type) {
+			String type) {
 		try {
 			InternetAddress[] recipientAddresses = evaluateRecipients(subject, recipients);
 			Message message = buildMessage(subject, recipientAddresses);
 
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
-			messageBodyPart.setContent(text, "text/html; charset=utf-8");
+			messageBodyPart.setText(text);
 
 			MimeBodyPart attachmentPart = new MimeBodyPart();
 			attachmentPart.setContent(attachment, type);
