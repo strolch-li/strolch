@@ -19,6 +19,7 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class RuntimeConfiguration extends AbstractionConfiguration {
 
@@ -33,9 +34,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	private final File tempPath;
 
 	private final Locale locale;
+	private final Set<SupportedLanguage> supportedLanguages;
 
 	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
-			File configPathF, File dataPathF, File tempPathF) {
+			File configPathF, File dataPathF, File tempPathF, Set<SupportedLanguage> supportedLanguages) {
 		super(RUNTIME, configurationValues);
 
 		// config path: readable directory
@@ -67,6 +69,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		this.tempPath = tempPathF;
 
 		this.locale = new Locale(getString(PROP_LOCALE, Locale.getDefault().toLanguageTag()));
+		this.supportedLanguages = supportedLanguages;
 	}
 
 	public String getApplicationName() {
@@ -93,6 +96,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		return this.locale;
 	}
 
+	public Set<SupportedLanguage> getSupportedLanguages() {
+		return this.supportedLanguages;
+	}
+
 	public String getTimezone() {
 		return getString(RuntimeConfiguration.PROP_TIMEZONE, System.getProperty("user.timezone"));
 	}
@@ -100,12 +107,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	/**
 	 * Returns the file in the config directory of the root of the application
 	 *
-	 * @param context
-	 * 		short name to define who requires this file for error handling
-	 * @param fileName
-	 * 		the relative name of the config file to return
-	 * @param checkExists
-	 * 		if true, then an exception is thrown, using the context as info, if the config file does not exist
+	 * @param context     short name to define who requires this file for error handling
+	 * @param fileName    the relative name of the config file to return
+	 * @param checkExists if true, then an exception is thrown, using the context as info, if the config file does not
+	 *                    exist
 	 *
 	 * @return the file in the config directory of the root of the application
 	 */
@@ -122,12 +127,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	/**
 	 * Returns the file in the data directory of the root of the application
 	 *
-	 * @param context
-	 * 		short name to define who requires this file for error handling
-	 * @param fileName
-	 * 		the relative name of the data file to return
-	 * @param checkExists
-	 * 		if true, then an exception is thrown, using the context as info, if the data file does not exist
+	 * @param context     short name to define who requires this file for error handling
+	 * @param fileName    the relative name of the data file to return
+	 * @param checkExists if true, then an exception is thrown, using the context as info, if the data file does not
+	 *                    exist
 	 *
 	 * @return the file in the data directory of the root of the application
 	 */
@@ -144,12 +147,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	/**
 	 * Returns the directory in the data directory of the root of the application
 	 *
-	 * @param context
-	 * 		short name to define who requires this directory for error handling
-	 * @param dirName
-	 * 		the relative name of the data directory to return
-	 * @param checkExists
-	 * 		if true, then an exception is thrown, using the context as info, if the data directory does not exist
+	 * @param context     short name to define who requires this directory for error handling
+	 * @param dirName     the relative name of the data directory to return
+	 * @param checkExists if true, then an exception is thrown, using the context as info, if the data directory does
+	 *                    not exist
 	 *
 	 * @return the directory in the data directory of the root of the application
 	 */

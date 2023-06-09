@@ -43,6 +43,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(VersionQuery.class);
 		restfulClasses.add(ModelQuery.class);
 		restfulClasses.add(EnumQuery.class);
+		restfulClasses.add(Languages.class);
 		restfulClasses.add(OperationsLogResource.class);
 
 		// privilege
