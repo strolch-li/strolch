@@ -31,8 +31,8 @@ public class Languages {
 					.getStrolchConfiguration().getRuntimeConfiguration().getSupportedLanguages();
 			JsonArray result = supportedLanguages.stream().map(language -> {
 				JsonObject jsonObject = new JsonObject();
-				jsonObject.addProperty(Tags.Json.LOCALE, language.getLocale());
-				jsonObject.addProperty(Tags.Json.NAME, language.getName());
+				jsonObject.addProperty(Tags.Json.LOCALE, language.locale());
+				jsonObject.addProperty(Tags.Json.NAME, language.name());
 				return jsonObject;
 			}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
