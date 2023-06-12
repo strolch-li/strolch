@@ -45,6 +45,7 @@ import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.AesCryptoHelper;
+import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
@@ -235,9 +236,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = validate(certificate);
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_GET_CERTIFICATES));
 
-		return this.privilegeContextMap.values()
-				.stream()
-				.map(PrivilegeContext::getCertificate)
+		return this.privilegeContextMap.values().stream().map(PrivilegeContext::getCertificate)
 				.collect(Collectors.toList());
 	}
 
@@ -330,9 +329,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// properties
 			propertySelected = isSelectedByProperty(selPropertyMap, user.getProperties());
 
-			boolean selected =
-					userIdSelected && usernameSelected && firstNameSelected && lastNameSelected && userStateSelected
-							&& localeSelected && roleSelected && propertySelected;
+			boolean selected = userIdSelected && usernameSelected && firstNameSelected && lastNameSelected &&
+					userStateSelected && localeSelected && roleSelected && propertySelected;
 
 			if (selected)
 				result.add(user.asUserRep());
@@ -346,10 +344,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * null or empty, then true is returned. If a key/value pair from the selectionMap is not in the properties, then
 	 * false is returned
 	 *
-	 * @param selectionMap
-	 * 		the map defining the expected properties
-	 * @param properties
-	 * 		the properties which must be a sub set of selectionMap to have this method return true
+	 * @param selectionMap the map defining the expected properties
+	 * @param properties   the properties which must be a sub set of selectionMap to have this method return true
 	 *
 	 * @return If the selectionMap is null or empty, then true is returned. If a key/value pair from the selectionMap is
 	 * not in the properties, then false is returned
@@ -376,10 +372,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * Checks if the given roles contains the given selectionRoles, if this is the case, or selectionRoles is null or
 	 * empty, then true is returned, otherwise false
 	 *
-	 * @param selectionRoles
-	 * 		the required roles
-	 * @param roles
-	 * 		the roles to check if they contain the selectionRoles
+	 * @param selectionRoles the required roles
+	 * @param roles          the roles to check if they contain the selectionRoles
 	 *
 	 * @return Checks if the given roles contains the given selectionRoles, if this is the case, or selectionRoles is
 	 * null or empty, then true is returned, otherwise false
@@ -656,8 +650,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeModelException(format("User {0} does not exist!", userRep.getUsername()));
 
 		// if nothing to do, then stop
-		if (isEmpty(userRep.getFirstname()) && isEmpty(userRep.getLastname()) && userRep.getLocale() == null && (
-				userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
+		if (isEmpty(userRep.getFirstname()) && isEmpty(userRep.getLastname()) && userRep.getLocale() == null &&
+				(userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
 			throw new PrivilegeModelException(
 					format("All updateable fields are empty for update of user {0}", userRep.getUsername()));
 		}
@@ -934,6 +928,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	private void internalSetUserPassword(Certificate certificate, String username, char[] password) {
+
+		// we don't want the user to worry about whitespace
+		username = trimOrEmpty(username);
+
 		try {
 
 			// validate user actually has this type of privilege
@@ -1274,8 +1272,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Replaces any existing {@link PrivilegeContext} for the given user by updating with the new user object
 	 *
-	 * @param newUser
-	 * 		the new user to update with
+	 * @param newUser the new user to update with
 	 */
 	private void updateExistingSessionsForUser(User newUser) {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
@@ -1293,8 +1290,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Replaces any existing {@link PrivilegeContext} for users with the given role
 	 *
-	 * @param role
-	 * 		the role to update with
+	 * @param role the role to update with
 	 */
 	private void updateExistingSessionsWithNewRole(Role role) {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
@@ -1381,8 +1377,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.privilegeContextMap.put(sessionId, privilegeContext);
 
 		if (!source.equals("unknown") && !source.equals(userChallenge.getSource())) {
-			logger.warn("Challenge request and response source's are different: request: " + userChallenge.getSource()
-					+ " to " + source);
+			logger.warn("Challenge request and response source's are different: request: " + userChallenge.getSource() +
+					" to " + source);
 		}
 
 		persistSessions();
@@ -1406,9 +1402,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
+		// we don't want the user to worry about whitespace
+		username = trimOrEmpty(username);
+
 		try {
 			// username must be at least 2 characters in length
-			if (username == null || username.length() < 2) {
+			if (username.length() < 2) {
 				String msg = format("The given username ''{0}'' is shorter than 2 characters", username);
 				throw new InvalidCredentialsException(msg);
 			}
@@ -1606,12 +1605,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				() -> this.lockingHandler.lockedExecute("persist-sessions", () -> {
 
 					List<Certificate> sessions = new ArrayList<>(this.privilegeContextMap.values()).stream()
-							.map(PrivilegeContext::getCertificate)
-							.filter(c -> !c.getUserState().isSystem())
+							.map(PrivilegeContext::getCertificate).filter(c -> !c.getUserState().isSystem())
 							.collect(Collectors.toList());
 
 					try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
-							OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
+						 OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
 
 						CertificateStubsDomWriter writer = new CertificateStubsDomWriter(sessions, outputStream);
 						writer.write();
@@ -1620,8 +1618,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					} catch (Exception e) {
 						logger.error("Failed to persist sessions!", e);
 						if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
-							logger.error("Failed to delete sessions file after failing to write to it, at "
-									+ this.persistSessionsPath.getAbsolutePath());
+							logger.error("Failed to delete sessions file after failing to write to it, at " +
+									this.persistSessionsPath.getAbsolutePath());
 						}
 					}
 				}), 1, TimeUnit.SECONDS);
@@ -1646,7 +1644,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		List<CertificateStub> certificateStubs;
 		try (InputStream fin = Files.newInputStream(this.persistSessionsPath.toPath());
-				InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey, fin)) {
+			 InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey, fin)) {
 
 			CertificateStubsSaxReader reader = new CertificateStubsSaxReader(inputStream);
 			certificateStubs = reader.read();
@@ -1705,17 +1703,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Checks the credentials and validates that the user may log in.
 	 *
-	 * @param username
-	 * 		the username of the {@link User} to check against
-	 * @param password
-	 * 		the password of this user
+	 * @param username the username of the {@link User} to check against
+	 * @param password the password of this user
 	 *
 	 * @return the {@link User} if the credentials are valid and the user may login
 	 *
-	 * @throws AccessDeniedException
-	 * 		if anything is wrong with the credentials or the user state
-	 * @throws InvalidCredentialsException
-	 * 		if the given credentials are invalid, the user does not exist, or has no password set
+	 * @throws AccessDeniedException       if anything is wrong with the credentials or the user state
+	 * @throws InvalidCredentialsException if the given credentials are invalid, the user does not exist, or has no
+	 *                                     password set
 	 */
 	protected User checkCredentialsAndUserState(String username, char[] password)
 			throws InvalidCredentialsException, AccessDeniedException {
@@ -1768,8 +1763,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new InvalidCredentialsException(format("Password is incorrect for {0}", username));
 
 		// see if we need to update the hash
-		if (user.getHashAlgorithm() == null || user.getHashIterations() != this.encryptionHandler.getIterations()
-				|| user.getHashKeyLength() != this.encryptionHandler.getKeyLength()) {
+		if (user.getHashAlgorithm() == null || user.getHashIterations() != this.encryptionHandler.getIterations() ||
+				user.getHashKeyLength() != this.encryptionHandler.getKeyLength()) {
 
 			logger.warn("Updating user " + username + " due to change in hashing algorithm properties ");
 
@@ -1803,10 +1798,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Builds a {@link PrivilegeContext} for the given {@link User} and its {@link Certificate}
 	 *
-	 * @param certificate
-	 * 		the certificate for which to build the {@link PrivilegeContext}
-	 * @param user
-	 * 		the user for which to build the {@link PrivilegeContext}
+	 * @param certificate the certificate for which to build the {@link PrivilegeContext}
+	 * @param user        the user for which to build the {@link PrivilegeContext}
 	 *
 	 * @return the {@link PrivilegeContext}
 	 */
@@ -2042,23 +2035,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * {@link PrivilegeHandler} might need. This method may only be called once and this must be enforced by the
 	 * concrete implementation
 	 *
-	 * @param parameterMap
-	 * 		a map containing configuration properties
-	 * @param encryptionHandler
-	 * 		the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
-	 * @param passwordStrengthHandler
-	 * 		the {@link PasswordStrengthHandler} instance for this {@link PrivilegeHandler}
-	 * @param persistenceHandler
-	 * 		the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
-	 * @param userChallengeHandler
-	 * 		the handler to challenge a user's actions e.g. password change or authentication
-	 * @param ssoHandler
-	 * 		the {@link SingleSignOnHandler}
-	 * @param policyMap
-	 * 		map of {@link PrivilegePolicy} classes
+	 * @param parameterMap            a map containing configuration properties
+	 * @param encryptionHandler       the {@link EncryptionHandler} instance for this {@link PrivilegeHandler}
+	 * @param passwordStrengthHandler the {@link PasswordStrengthHandler} instance for this {@link PrivilegeHandler}
+	 * @param persistenceHandler      the {@link PersistenceHandler} instance for this {@link PrivilegeHandler}
+	 * @param userChallengeHandler    the handler to challenge a user's actions e.g. password change or authentication
+	 * @param ssoHandler              the {@link SingleSignOnHandler}
+	 * @param policyMap               map of {@link PrivilegePolicy} classes
 	 *
-	 * @throws PrivilegeException
-	 * 		if this method is called multiple times or an initialization exception occurs
+	 * @throws PrivilegeException if this method is called multiple times or an initialization exception occurs
 	 */
 	public void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
 			EncryptionHandler encryptionHandler, PasswordStrengthHandler passwordStrengthHandler,
@@ -2138,7 +2123,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			if (persistSessionsPath.exists() && (!persistSessionsPath.isFile() || !persistSessionsPath.canWrite())) {
-				String msg = "Path for param {0} is invalid as file exists but is not a file or not writeable. Value: {1}";
+				String msg
+						= "Path for param {0} is invalid as file exists but is not a file or not writeable. Value: {1}";
 				msg = format(msg, PARAM_PERSIST_SESSIONS_PATH, persistSessionsPath.getAbsolutePath());
 				throw new PrivilegeModelException(msg);
 			}
@@ -2278,8 +2264,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Validates that the policies which are not null on the privileges of the role exist
 	 *
-	 * @param role
-	 * 		the role for which the policies are to be checked
+	 * @param role the role for which the policies are to be checked
 	 */
 	private void validatePolicies(Role role) {
 		for (String privilegeName : role.getPrivilegeNames()) {
@@ -2297,8 +2282,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * Passwords should not be kept as strings, as string are immutable, this method thus clears the char array so that
 	 * the password is not in memory anymore
 	 *
-	 * @param password
-	 * 		the char array containing the passwort which is to be set to zeroes
+	 * @param password the char array containing the passwort which is to be set to zeroes
 	 */
 	private void clearPassword(char[] password) {
 		if (password != null)
@@ -2367,8 +2351,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * Returns the {@link Certificate} for the given system username. If it does not yet exist, then it is created by
 	 * authenticating the system user
 	 *
-	 * @param systemUsername
-	 * 		the name of the system user
+	 * @param systemUsername the name of the system user
 	 *
 	 * @return the {@link Certificate} for this system user
 	 */
@@ -2433,13 +2416,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * {@link PrivilegePolicy} object
 	 * </p>
 	 *
-	 * @param policyName
-	 * 		the class name of the {@link PrivilegePolicy} object to return
+	 * @param policyName the class name of the {@link PrivilegePolicy} object to return
 	 *
 	 * @return the {@link PrivilegePolicy} object
 	 *
-	 * @throws PrivilegeException
-	 * 		if the {@link PrivilegePolicy} object for the given policy name could not be instantiated
+	 * @throws PrivilegeException if the {@link PrivilegePolicy} object for the given policy name could not be
+	 *                            instantiated
 	 */
 	private PrivilegePolicy getPolicy(String policyName) {
 
