@@ -85,7 +85,8 @@
         <hikaricp.version>5.0.1</hikaricp.version>
         <postgresql.version>42.5.1</postgresql.version>
         <antlr.version>4.9.3</antlr.version>
-        <javaxmail.version>1.6.2</javaxmail.version>
+        <jakarta-mail.version>2.1.0</jakarta-mail.version>
+        <angus-mail.version>2.0.1</angus-mail.version>
         <csv.version>1.9.0</csv.version>
         <cron.version>1.6.2</cron.version>
 
@@ -274,14 +275,14 @@
 
             <!-- Mail -->
             <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>javax.mail-api</artifactId>
-                <version>${javaxmail.version}</version>
+                <groupId>jakarta.mail</groupId>
+                <artifactId>jakarta.mail-api</artifactId>
+                <version>${jakarta-mail.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.mail</groupId>
-                <artifactId>javax.mail</artifactId>
-                <version>${javaxmail.version}</version>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>${angus-mail.version}</version>
             </dependency>
 
             <!-- REST using Apache Jersey -->

@@ -36,7 +36,10 @@ public class PeriodDurationFormatter {
 
 		u = (int) periodDuration.get(ChronoUnit.DAYS);
 		if (u > 0) {
-			sb.append(u).append(" ").append(i18n(locale, "days"));
+			if (u % 7 == 0)
+				sb.append(u / 7).append(" ").append(i18n(locale, "weeks"));
+			else
+				sb.append(u).append(" ").append(i18n(locale, "days"));
 			periodDuration = periodDuration.minus(Period.ofDays(u));
 
 			if (periodDuration.isZero())

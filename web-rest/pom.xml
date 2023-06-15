@@ -52,11 +52,6 @@
             <artifactId>soql</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
-        </dependency>
-
         <!-- Json -->
         <dependency>
             <groupId>com.google.code.gson</groupId>

@@ -29,6 +29,7 @@ public class ConfigurationTags {
 	public static final String STROLCH_CONFIGURATION_ENV = "StrolchConfiguration/env";
 
 	public static final String APPLICATION_NAME = "applicationName";
+	public static final String LANGUAGE = "language";
 	public static final String ID = "id";
 	public static final String DEPENDS = "depends";
 	public static final String IMPL = "impl";

@@ -1,26 +1,25 @@
 package li.strolch.utils;
 
-import javax.mail.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
+
+import static java.text.MessageFormat.format;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+
 /**
- * A simple helper class to send e-mails. Uses javax.mail and is built as a singleton, so configuration has to be done
+ * A simple helper class to send e-mails. Uses jakarta.mail and is built as a singleton, so configuration has to be done
  * only once.
- *
+ * <p>
  * The {@link Properties} required are as follows:
  * <ul>
  * <li><code>fromAddr</code> and <code>fromName</code> - defines the address from which the e-mail comes from</li>
  * <li><code>overrideRecipients</code> - if defined, overrides any recipients - useful for testng purposes</li>
- * <li><code>recipientWhitelist</code> - if defined allows those e-mail addresses to not be overridden</li>
  * <li>username - the username to authenticate at the SMTP Server</li>
  * <li>password - the password to authenticate at the SMTP Server</li>
  * <li>auth - boolean to define if auth is to be done</li>
@@ -42,8 +41,7 @@ public class SmtpMailer {
 	 * Initializes the SMTP Mailer with the given properties.
 	 * </p>
 	 *
-	 * @param properties
-	 * 		the properties to be used to initialize the mailer
+	 * @param properties the properties to be used to initialize the mailer
 	 */
 	public static void init(Properties properties) {
 		try {
@@ -66,7 +64,6 @@ public class SmtpMailer {
 
 	private final InternetAddress from;
 	private final InternetAddress[] overrideRecipients;
-	private final Set<InternetAddress> recipientWhitelist;
 	private final String username;
 	private final String password;
 	private final Properties props;
@@ -74,13 +71,10 @@ public class SmtpMailer {
 	/**
 	 * private constructor, use the {@link #init(Properties)}-method
 	 *
-	 * @param properties
-	 * 		the properties to initialize the mailer
+	 * @param properties the properties to initialize the mailer
 	 *
-	 * @throws UnsupportedEncodingException
-	 * 		if something goes wrong parsing the from or override addresses
-	 * @throws AddressException
-	 * 		if something goes wrong parsing the from or override addresses
+	 * @throws UnsupportedEncodingException if something goes wrong parsing the from or override addresses
+	 * @throws AddressException             if something goes wrong parsing the from or override addresses
 	 */
 	private SmtpMailer(Properties properties) throws UnsupportedEncodingException, AddressException {
 
@@ -95,17 +89,6 @@ public class SmtpMailer {
 			this.overrideRecipients = InternetAddress.parse(addr);
 		}
 
-		if (!properties.containsKey("recipientWhitelist")) {
-			this.recipientWhitelist = null;
-		} else {
-			String whiteListProp = properties.getProperty("recipientWhitelist");
-			this.recipientWhitelist = Arrays.stream(whiteListProp.split(",")) //
-					.map(String::trim) //
-					.map(s -> Arrays.asList(parseAddress(s))) //
-					.flatMap(List::stream) //
-					.collect(Collectors.toSet());
-		}
-
 		this.username = properties.getProperty("username", null);
 		this.password = properties.getProperty("password", null);
 
@@ -116,6 +99,81 @@ public class SmtpMailer {
 		this.props.put("mail.smtp.port", properties.getProperty("port", null));
 	}
 
+	/**
+	 * Sends an e-mail to the given recipients (unless override address defined).
+	 *
+	 * @param subject    the subject of the e-mail
+	 * @param text       the test of the e-mail
+	 * @param recipients the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
+	 */
+	public void sendMail(String subject, String text, String recipients) {
+		try {
+			InternetAddress[] recipientAddresses = evaluateRecipients(subject, recipients);
+			Message message = buildMessage(subject, recipientAddresses);
+			message.setText(text);
+
+			Transport.send(message);
+			logger.info(format("Sent E-mail with subject {0} to {1}", subject, addressesToString(recipientAddresses)));
+
+		} catch (MessagingException e) {
+			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nRecipients: " + recipients +
+					"\n\nBody:\n" + text);
+			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Sends an e-mail with an attachment to the given recipients (unless override address defined).
+	 *
+	 * @param subject    the subject of the e-mail
+	 * @param text       the test of the e-mail
+	 * @param recipients the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
+	 */
+	public void sendMail(String subject, String text, String recipients, String attachment, String fileName,
+			String type) {
+		try {
+			InternetAddress[] recipientAddresses = evaluateRecipients(subject, recipients);
+			Message message = buildMessage(subject, recipientAddresses);
+
+			MimeBodyPart messageBodyPart = new MimeBodyPart();
+			messageBodyPart.setText(text);
+
+			MimeBodyPart attachmentPart = new MimeBodyPart();
+			attachmentPart.setContent(attachment, type);
+			attachmentPart.setFileName(fileName);
+
+			Multipart multipart = new MimeMultipart();
+			multipart.addBodyPart(messageBodyPart);
+			multipart.addBodyPart(attachmentPart);
+
+			message.setContent(multipart);
+
+			Transport.send(message);
+		} catch (MessagingException e) {
+			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nAttachment: " + fileName +
+					"\nRecipients: " + recipients + "\n\nBody:\n" + text);
+			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
+		}
+	}
+
+	private Message buildMessage(String subject, InternetAddress[] recipients) throws MessagingException {
+		Session session = Session.getInstance(this.props, getAuthenticator());
+
+		Message message = new MimeMessage(session);
+		message.setFrom(this.from);
+		message.addRecipients(Message.RecipientType.TO, recipients);
+		message.setSubject(subject);
+		return message;
+	}
+
+	private Authenticator getAuthenticator() {
+		return new Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(SmtpMailer.this.username, SmtpMailer.this.password);
+			}
+		};
+	}
+
 	private InternetAddress[] parseAddress(String s) {
 		try {
 			return InternetAddress.parse(s);
@@ -124,91 +182,23 @@ public class SmtpMailer {
 		}
 	}
 
-	/**
-	 * Sends an e-mail to given recipient (unless override address defined).
-	 *
-	 * @param subject
-	 * 		the subject of the e-mail
-	 * @param text
-	 * 		the test of the e-mail
-	 * @param recipients
-	 * 		the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
-	 */
-	public void sendMail(String subject, String text, String recipients) {
-
-		try {
-
-			if (this.overrideRecipients == null) {
-
-				// no override, just send
-				send(subject, text, parseAddress(recipients));
-				logger.info(MessageFormat.format("Sent E-mail to {0}: {1}", recipients, subject));
-
-			} else if (this.recipientWhitelist == null) {
-
-				// override, with no white list, so send to override
-				text = "Override recipient. Original recipients: " + recipients + ".\n\n" + text;
-				send(subject, text, this.overrideRecipients);
-				logger.info(MessageFormat
-						.format("Sent E-mail to override recipient {0}: {1}", Arrays.stream(this.overrideRecipients) //
-								.map(Object::toString) //
-								.collect(Collectors.joining(",")), subject));
-
-			} else {
-
-				// override with whitelist, so we have to perhaps send to override and white list
-
-				Set<InternetAddress> allowList = new HashSet<>();
-				boolean needsOverrides = false;
-
-				for (InternetAddress recipient : parseAddress(recipients)) {
-					if (this.recipientWhitelist.contains(recipient))
-						allowList.add(recipient);
-					else
-						needsOverrides = true;
-				}
-
-				if (!allowList.isEmpty()) {
-					InternetAddress[] arr = new InternetAddress[allowList.size()];
-					allowList.toArray(arr);
-					send(subject, text, arr);
-					logger.info(
-							MessageFormat.format("Sent E-mail to white list recipient {0}: {1}", recipients, subject));
-				}
-
-				if (needsOverrides) {
-
-					// override, with no white list, so send to override
-					text = "Override recipient. Original recipients: " + recipients + ".\n\n" + text;
-					send(subject, text, this.overrideRecipients);
-					logger.info(MessageFormat.format("Sent E-mail to override recipient {0}: {1}",
-							Arrays.stream(this.overrideRecipients) //
-									.map(Object::toString) //
-									.collect(Collectors.joining(",")), subject));
-				}
-			}
-
-		} catch (MessagingException e) {
-			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nRecipients: " + recipients
-					+ "\n\nBody:\n" + text);
-			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
+	private InternetAddress[] evaluateRecipients(String subject, String recipients) {
+		InternetAddress[] recipientAddresses;
+		if (this.overrideRecipients == null) {
+			recipientAddresses = parseAddress(recipients);
+			logger.info(
+					format("Sending e-mail with subject {0} to {1}", subject, addressesToString(recipientAddresses)));
+		} else {
+			recipientAddresses = this.overrideRecipients;
+			logger.info(format("Sending e-mail with subject {0} to override recipient {1}", subject,
+					addressesToString(recipientAddresses)));
 		}
+		return recipientAddresses;
 	}
 
-	private void send(String subject, String text, InternetAddress[] recipients) throws MessagingException {
-
-		Session session = Session.getInstance(this.props, new javax.mail.Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(SmtpMailer.this.username, SmtpMailer.this.password);
-			}
-		});
-
-		Message message = new MimeMessage(session);
-		message.setFrom(this.from);
-		message.addRecipients(Message.RecipientType.TO, recipients);
-		message.setSubject(subject);
-		message.setText(text);
-
-		Transport.send(message);
+	private String addressesToString(InternetAddress[] recipientAddresses) {
+		return stream(recipientAddresses) //
+				.map(Object::toString) //
+				.collect(joining(","));
 	}
 }

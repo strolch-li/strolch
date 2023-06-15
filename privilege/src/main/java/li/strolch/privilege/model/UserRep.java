@@ -88,9 +88,6 @@ public class UserRep implements Serializable {
 		this.history = history;
 	}
 
-	/**
-	 *
-	 */
 	@SuppressWarnings("unused")
 	private UserRep() {
 		// No arg constructor for JAXB
@@ -109,8 +106,7 @@ public class UserRep implements Serializable {
 
 		// username must be at least 2 characters in length
 		if (this.username.length() < 2) {
-			String msg = MessageFormat
-					.format("The given username ''{0}'' is shorter than 2 characters", this.username);
+			String msg = MessageFormat.format("The given username ''{0}'' is shorter than 2 characters", this.username);
 			throw new PrivilegeException(msg);
 		}
 
@@ -125,6 +121,18 @@ public class UserRep implements Serializable {
 
 		if (this.roles == null || this.roles.isEmpty())
 			throw new PrivilegeException("roles is null or empty");
+	}
+
+	public boolean isSystemUser() {
+		return this.userState.isSystem();
+	}
+
+	public boolean isRemoteUser() {
+		return this.userState.isRemote();
+	}
+
+	public boolean isNormalEnabledUser() {
+		return this.userState.isNormalEnabledUser();
 	}
 
 	/**

@@ -17,6 +17,7 @@ package li.strolch.model.parameter;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -95,6 +96,16 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	 * @return true if the value was removed, false if it did not exist
 	 */
 	boolean removeValue(E value);
+
+	/**
+	 * Removes all values from the {@link List} of values if the predicate passes
+	 *
+	 * @param predicate
+	 * 		the predicate to evaluate if the value should be removed
+	 *
+	 * @return true if any values were removed
+	 */
+	boolean removeValueIf(Predicate<E> predicate);
 
 	/**
 	 * Clears the list of values, i.e the list of values is empty after this call

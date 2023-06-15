@@ -18,6 +18,7 @@ package li.strolch.policy;
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.model.Order;
 import li.strolch.model.activity.IActivityElement;
@@ -35,6 +36,7 @@ public abstract class StrolchPolicy {
 
 	protected static final Logger logger = LoggerFactory.getLogger(StrolchPolicy.class);
 
+	private final StrolchAgent agent;
 	private final ComponentContainer container;
 	private final StrolchTransaction tx;
 
@@ -45,8 +47,21 @@ public abstract class StrolchPolicy {
 	 * 		the transaction for this policy
 	 */
 	public StrolchPolicy(StrolchTransaction tx) {
+		this.agent = tx.getAgent();
 		this.container = tx.getContainer();
 		this.tx = tx;
+	}
+
+	/**
+	 * Returns true if the given component is registered on th container
+	 *
+	 * @param clazz
+	 * 		the type of component to check for
+	 *
+	 * @return true if the component is available
+	 */
+	public boolean hasComponent(Class<?> clazz) {
+		return this.container.hasComponent(clazz);
 	}
 
 	/**
@@ -70,6 +85,13 @@ public abstract class StrolchPolicy {
 	 */
 	protected ComponentContainer getContainer() {
 		return this.container;
+	}
+
+	/**
+	 * @return the container
+	 */
+	protected StrolchAgent getAgent() {
+		return this.agent;
 	}
 
 	/**

@@ -464,6 +464,25 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 		return period.isZero() && duration.isZero();
 	}
 
+	/**
+	 * Checks if all parts of this amount are zero except days, which must be a multiple of 7
+	 *
+	 * @return true if only the days are set, and are a multiple of 7
+	 */
+	public boolean isWeeks() {
+		return duration.isZero() && period.getYears() == 0 && period.getMonths() == 0 && period.getDays() % 7 == 0;
+	}
+
+	/**
+	 * Returns the number of weeks defined by the days which are a multiple of 7, i.e. if the days value is 14, then it
+	 * returns 2 for the weeks.
+	 *
+	 * @return the number of weeks represented by the days
+	 */
+	public int getWeeks() {
+		return period.getDays() / 7;
+	}
+
 	//-----------------------------------------------------------------------
 
 	/**
@@ -707,8 +726,11 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 			return duration.toString();
 		}
 		if (duration.isZero()) {
+			if (isWeeks())
+				return "P" + getWeeks() + "W";
 			return period.toString();
 		}
+
 		return period + duration.toString().substring(1);
 	}
 

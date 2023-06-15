@@ -64,4 +64,8 @@ public enum UserState {
 	public boolean isRemote() {
 		return this == UserState.REMOTE;
 	}
+
+	public boolean isNormalEnabledUser() {
+		return this == UserState.ENABLED;
+	}
 }

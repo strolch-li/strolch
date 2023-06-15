@@ -15,16 +15,6 @@
  */
 package li.strolch.model.xml;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.Map.Entry;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
@@ -40,6 +30,18 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.iso8601.ISO8601;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingInt;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -98,8 +100,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeElement(Resource resource) throws XMLStreamException {
-		boolean empty = !resource.hasVersion() && !resource.hasParameterBags() && !resource.hasTimedStates()
-				&& !resource.hasPolicyDefs();
+		boolean empty = !resource.hasVersion() && !resource.hasParameterBags() && !resource.hasTimedStates() &&
+				!resource.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.RESOURCE, empty, resource);
 
@@ -140,8 +142,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeElement(Activity activity) throws XMLStreamException {
-		boolean empty = !activity.hasVersion() && !activity.hasParameterBags() && !activity.hasElements()
-				&& !activity.hasPolicyDefs();
+		boolean empty = !activity.hasVersion() && !activity.hasParameterBags() && !activity.hasElements() &&
+				!activity.hasPolicyDefs();
 
 		writeStartStrolchElement(Tags.ACTIVITY, empty, activity);
 		this.writer.writeAttribute(Tags.TIME_ORDERING, activity.getTimeOrdering().getName());
@@ -220,7 +222,9 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 			return;
 
 		this.writer.writeStartElement(Tags.POLICIES);
-		for (String type : policyDefs.getPolicyTypes()) {
+		List<String> policyTypes = new ArrayList<>(policyDefs.getPolicyTypes());
+		policyTypes.sort(String::compareTo);
+		for (String type : policyTypes) {
 			PolicyDef policyDef = policyDefs.getPolicyDef(type);
 
 			this.writer.writeEmptyElement(Tags.POLICY);
@@ -232,6 +236,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 
 	protected void writeTimedStates(Resource resource) throws XMLStreamException {
 		List<StrolchTimedState<? extends IValue<?>>> timedStates = resource.getTimedStates();
+		timedStates.sort(comparing(StrolchTimedState::getId));
 		for (StrolchTimedState<? extends IValue<?>> timedState : timedStates) {
 			ITimeVariable<? extends IValue<?>> timeEvolution = timedState.getTimeEvolution();
 			SortedSet<? extends ITimeValue<? extends IValue<?>>> values = timeEvolution.getValues();
@@ -271,7 +276,8 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	}
 
 	protected void writeParameterBags(GroupedParameterizedElement element) throws XMLStreamException {
-		Set<String> bagKeySet = new TreeSet<>(element.getParameterBagKeySet());
+		Set<String> bagKeySet = new TreeSet<>(String::compareTo);
+		bagKeySet.addAll(element.getParameterBagKeySet());
 		for (String bagKey : bagKeySet) {
 			ParameterBag parameterBag = element.getParameterBag(bagKey);
 			boolean isEmpty = !parameterBag.hasParameters();
@@ -286,7 +292,7 @@ public class StrolchElementToSaxWriterVisitor implements StrolchRootElementVisit
 	protected void writeParameters(ParameterizedElement element) throws XMLStreamException {
 
 		List<Parameter<?>> parameters = new ArrayList<>(element.getParameters());
-		parameters.sort(Comparator.comparingInt(Parameter::getIndex));
+		parameters.sort(comparingInt(Parameter::getIndex));
 		for (Parameter<?> parameter : parameters) {
 			boolean isTextParam = parameter.getValueType() == StrolchValueType.TEXT;
 			writeStartStrolchElement(Tags.PARAMETER, !isTextParam, parameter);

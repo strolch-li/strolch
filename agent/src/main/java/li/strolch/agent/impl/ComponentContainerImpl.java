@@ -15,17 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.model.Tags.AGENT;
-import static li.strolch.runtime.StrolchConstants.*;
-import static li.strolch.runtime.configuration.RuntimeConfiguration.PROP_TIMEZONE;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
-import java.util.*;
-
 import li.strolch.agent.api.*;
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.OperationsLog;
@@ -43,6 +32,18 @@ import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.utils.helper.SystemHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
+import java.util.*;
+
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.*;
+import static li.strolch.runtime.configuration.RuntimeConfiguration.PROP_TIMEZONE;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 public class ComponentContainerImpl implements ComponentContainer {
 
@@ -193,7 +194,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 				 IllegalArgumentException | InvocationTargetException e) {
 
 			String msg = "Could not load class for component {0} due to: {1}";
-			msg = MessageFormat.format(msg, componentName, e.getMessage());
+			msg = MessageFormat.format(msg, componentName, getRootCauseMessage(e));
 			throw new StrolchConfigurationException(msg, e);
 		}
 	}

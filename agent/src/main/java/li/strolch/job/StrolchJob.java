@@ -1,21 +1,5 @@
 package li.strolch.job;
 
-import static java.time.ZoneId.systemDefault;
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static li.strolch.model.Tags.AGENT;
-import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ResourceBundle;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.JsonObject;
 import fc.cron.CronExpression;
 import li.strolch.agent.api.ComponentContainer;
@@ -24,6 +8,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
+import li.strolch.model.Resource;
 import li.strolch.model.Tags;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
@@ -39,6 +24,23 @@ import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.time.PeriodDuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
+
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.*;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * A StrolchJob is a simple job which performs an action. A StrolchJob can be scheduled so that it executes
@@ -157,13 +159,10 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param runnable the runnable to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if the agent can not perform the action
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the agent can not perform the action
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getContainer().getPrivilegeHandler().runAsAgent(runnable);
@@ -173,13 +172,11 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
 	 * {@link IllegalArgumentException} is thrown
 	 *
-	 * @param clazz
-	 * 		the type of component to return
+	 * @param clazz the type of component to return
 	 *
 	 * @return the component with the given name
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the component does not exist
+	 * @throws IllegalArgumentException if the component does not exist
 	 */
 	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
 		return getContainer().getComponent(clazz);
@@ -188,8 +185,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	/**
 	 * Returns true if the given component is registered on this container
 	 *
-	 * @param clazz
-	 * 		the type of component to check for
+	 * @param clazz the type of component to check for
 	 *
 	 * @return true if the component is available
 	 */
@@ -200,8 +196,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	/**
 	 * Opens a {@link StrolchTransaction} for the default realm and certificate
 	 *
-	 * @param cert
-	 * 		the certificate authorizing the transaction
+	 * @param cert the certificate authorizing the transaction
 	 *
 	 * @return the newly created transaction
 	 */
@@ -214,8 +209,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	/**
 	 * Opens a {@link StrolchTransaction} for the default realm and certificate
 	 *
-	 * @param cert
-	 * 		the certificate authorizing the transaction
+	 * @param cert the certificate authorizing the transaction
 	 *
 	 * @return the newly created transaction
 	 */
@@ -330,13 +324,13 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				try {
 					executionTime = this.cronExpression.nextTimeAfter(this.cronStartDate);
 				} catch (IllegalArgumentException e) {
-					logger.error("Can not schedule " + getName() + " after start date " + this.cronStartDate
-							+ " as no next time exists for cron expression " + this.cron);
+					logger.error("Can not schedule " + getName() + " after start date " + this.cronStartDate +
+							" as no next time exists for cron expression " + this.cron);
 					return this;
 				}
 
-				logger.info("First execution of " + getName() + " will be at " + executionTime.format(
-						ISO_OFFSET_DATE_TIME));
+				logger.info("First execution of " + getName() + " will be at " +
+						executionTime.format(ISO_OFFSET_DATE_TIME));
 
 				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
 				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
@@ -344,9 +338,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			} else {
 
 				long millis = this.initialDelayTimeUnit.toMillis(this.initialDelay);
-				logger.info("First execution of " + getName() + " will be at " + ZonedDateTime.now()
-						.plus(millis, ChronoUnit.MILLIS)
-						.format(ISO_OFFSET_DATE_TIME));
+				logger.info("First execution of " + getName() + " will be at " +
+						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME));
 
 				this.future = getScheduledExecutor().schedule(this, this.initialDelay, this.initialDelayTimeUnit);
 			}
@@ -358,8 +351,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				try {
 					executionTime = this.cronExpression.nextTimeAfter(this.lastExecution);
 				} catch (IllegalArgumentException e) {
-					logger.error("Can not schedule " + getName() + " after start date " + this.lastExecution
-							+ " as no next time exists for cron expression " + this.cron);
+					logger.error("Can not schedule " + getName() + " after start date " + this.lastExecution +
+							" as no next time exists for cron expression " + this.cron);
 					return this;
 				}
 
@@ -372,9 +365,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			} else {
 
 				long millis = this.delayTimeUnit.toMillis(this.delay);
-				logger.info("Next execution of " + getName() + " will be at " + ZonedDateTime.now()
-						.plus(millis, ChronoUnit.MILLIS)
-						.format(ISO_OFFSET_DATE_TIME));
+				logger.info("Next execution of " + getName() + " will be at " +
+						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME));
 
 				this.future = getScheduledExecutor().schedule(this, this.delay, this.delayTimeUnit);
 			}
@@ -428,8 +420,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		} else {
 
 			long delay = this.future.getDelay(TimeUnit.MILLISECONDS);
-			String nextExecution = ZonedDateTime.now()
-					.plus(delay, ChronoUnit.MILLIS)
+			String nextExecution = ZonedDateTime.now().plus(delay, ChronoUnit.MILLIS)
 					.format(ISO_OFFSET_DATE_TIME.withZone(systemDefault()));
 			jsonObject.addProperty("nextExecution", nextExecution);
 		}
@@ -449,11 +440,31 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		if (this.mode == JobMode.Manual)
 			schedule = this.mode.name();
 		else if (isEmpty(this.cron))
-			schedule = this.mode.name() + " Delay: " + this.initialDelay + " " + this.initialDelayTimeUnit + ", "
-					+ this.delay + " " + this.delayTimeUnit;
+			schedule = this.mode.name() + " Delay: " + this.initialDelay + " " + this.initialDelayTimeUnit + ", " +
+					this.delay + " " + this.delayTimeUnit;
 		else
 			schedule = this.mode.name() + " " + this.cron;
 
 		return "Job " + this.id + " / " + this.name + " @ " + schedule;
+	}
+
+	public String getJobStringParam(StrolchTransaction tx, String paramName) {
+		if (getConfigureMethod().isProgrammatic())
+			return "";
+		Resource job = tx.getResourceBy(TYPE_STROLCH_JOB, getId(), true);
+		return job.getString(paramName);
+	}
+
+	public List<String> getJobRelationIds(StrolchTransaction tx, String paramName) {
+		return streamJobRelationIds(tx, paramName).toList();
+	}
+
+	public Stream<String> streamJobRelationIds(StrolchTransaction tx, String paramName) {
+		if (getConfigureMethod().isProgrammatic())
+			return Stream.empty();
+		Resource job = tx.getResourceBy(TYPE_STROLCH_JOB, getId(), true);
+		if (job.hasRelation(paramName))
+			return job.streamRelationIds(paramName);
+		return Stream.empty();
 	}
 }

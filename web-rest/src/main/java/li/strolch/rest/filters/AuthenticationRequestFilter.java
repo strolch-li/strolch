@@ -85,14 +85,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		paths.add("strolch/authentication");
 		paths.add("strolch/authentication/sso");
 		paths.add("strolch/version");
+		paths.add("strolch/languages");
 		return paths;
 	}
 
 	/**
 	 * Validates if the path for the given request is for an unsecured path, i.e. no authorization is required
 	 *
-	 * @param requestContext
-	 * 		the request context
+	 * @param requestContext the request context
 	 *
 	 * @return true if the request context is for an unsecured path, false if not, meaning authorization must be
 	 * validated
@@ -115,8 +115,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	@Override
 	public void filter(ContainerRequestContext requestContext) {
 		String remoteIp = getRemoteIp(this.request);
-		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " + requestContext.getUriInfo()
-				.getRequestUri());
+		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " +
+				requestContext.getUriInfo().getRequestUri());
 
 		try {
 
@@ -128,22 +128,19 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("User is not authenticated!")
-					.build());
+			requestContext.abortWith(
+					Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("User is not authenticated!").build());
 		} catch (StrolchAccessDeniedException e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("User is not authorized!")
-					.build());
+			requestContext.abortWith(
+					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("User is not authorized!").build());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("User cannot access the resource.")
-					.build());
+			requestContext.abortWith(
+					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("User cannot access the resource.").build());
 		}
 	}
 
@@ -182,10 +179,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	 * Sub classes should override this method and first call super. If the return value is non-null, then further
 	 * validation can be performed
 	 *
-	 * @param requestContext
-	 * 		the request context for the secured path
-	 * @param remoteIp
-	 * 		the remote IP
+	 * @param requestContext the request context for the secured path
+	 * @param remoteIp       the remote IP
 	 *
 	 * @return the certificate for the validated session, or null, of the request is aborted to no missing or invalid
 	 * authorization token
@@ -216,10 +211,9 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		if (isEmpty(sessionId)) {
 			logger.error(
 					"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("Missing Authorization!")
-					.build());
+			requestContext.abortWith(
+					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("Missing Authorization!").build());
 			return null;
 		}
 
@@ -231,10 +225,9 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		if (!getRestful().isBasicAuthEnabled()) {
 			logger.error("Basic Auth is not available for URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("Basic Auth not available")
-					.build());
+			requestContext.abortWith(
+					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("Basic Auth not available").build());
 			return null;
 		}
 
@@ -242,10 +235,9 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		basicAuth = new String(Base64.getDecoder().decode(basicAuth.getBytes()), StandardCharsets.UTF_8);
 		String[] parts = basicAuth.split(":");
 		if (parts.length != 2) {
-			requestContext.abortWith(Response.status(Response.Status.BAD_REQUEST)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-					.entity("Invalid Basic Authorization!")
-					.build());
+			requestContext.abortWith(
+					Response.status(Response.Status.BAD_REQUEST).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+							.entity("Invalid Basic Authorization!").build());
 			return null;
 		}
 
@@ -266,12 +258,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
-			if (!requestContext.getUriInfo()
-					.getMatchedURIs()
+			if (!requestContext.getUriInfo().getMatchedURIs()
 					.contains("strolch/privilege/users/" + certificate.getUsername() + "/password")) {
 				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-						.entity("Can only set password!")
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Can only set password!")
 						.build());
 				return null;
 			}

@@ -11,6 +11,7 @@ include:
   - name: SystemOutErr
   - name: UnnecessarySemicolon
   - name: AssignmentToStaticFieldFromInstanceMethod
+  - name: ClassCanBeRecord
 exclude:
   - name: All
     paths:
