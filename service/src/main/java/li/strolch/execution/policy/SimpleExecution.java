@@ -39,8 +39,8 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	protected void startWarningTask(PeriodDuration duration, Action action, Supplier<LogMessage> handler) {
 		if (this.warningTask != null) {
-			logger.warn("There is already a warning task registered, for action " + action.getLocator()
-					+ ". Cancelling and creating a new task...");
+			logger.warn("There is already a warning task registered, for action " + action.getLocator() +
+					". Cancelling and creating a new task...");
 			this.warningTask.cancel(true);
 			this.warningTask = null;
 		}
@@ -68,10 +68,7 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	@Override
 	public void toExecution(Action action) {
-		setActionState(action, State.EXECUTION);
-
-		FloatValue value = new FloatValue(1.0D);
-		action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
+		setActionStateWithValueChange(action, State.EXECUTION, 1.0D);
 	}
 
 	@Override
@@ -83,40 +80,33 @@ public class SimpleExecution extends ExecutionPolicy {
 	public void toExecuted(Action action) {
 		cancelWarningTask();
 		stop();
-
-		setActionState(action, State.EXECUTED);
-
-		FloatValue value = new FloatValue(0.0D);
-		action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
+		setActionStateWithValueChange(action, State.EXECUTED, 0.0D);
 	}
 
 	@Override
 	public void toStopped(Action action) {
 		cancelWarningTask();
 		stop();
-
-		setActionState(action, State.STOPPED);
-
-		FloatValue value = new FloatValue(0.0D);
-		action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
+		setActionStateWithValueChange(action, State.STOPPED, 0.0D);
 	}
 
 	@Override
 	public void toError(Action action) {
 		cancelWarningTask();
 		stop();
+		setActionStateWithValueChange(action, State.ERROR, 0.0D);
+	}
 
-		setActionState(action, State.ERROR);
-
-		FloatValue value = new FloatValue(0.0D);
-		action.addChange(new ValueChange<>(System.currentTimeMillis(), value, ""));
+	protected void setActionStateWithValueChange(Action action, State execution, double value) {
+		setActionState(action, execution);
+		action.addChange(new ValueChange<>(System.currentTimeMillis(), new FloatValue(value), ""));
 	}
 
 	protected void addMessage(LogMessage message) {
 		switch (message.getSeverity()) {
-		case Info, Notification -> logger.info(message.getMessage(Locale.getDefault()));
-		case Warning -> logger.warn(message.getMessage(Locale.getDefault()));
-		case Error, Exception -> logger.error(message.getMessage(Locale.getDefault()));
+			case Info, Notification -> logger.info(message.getMessage(Locale.getDefault()));
+			case Warning -> logger.warn(message.getMessage(Locale.getDefault()));
+			case Error, Exception -> logger.error(message.getMessage(Locale.getDefault()));
 		}
 		if (getContainer().hasComponent(OperationsLog.class)) {
 			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
