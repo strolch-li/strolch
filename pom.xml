@@ -97,7 +97,7 @@
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
         <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
         <jakarta.websocket.version>2.1.0</jakarta.websocket.version>
-        <jersey.version>3.1.0</jersey.version>
+        <jersey.version>3.1.2</jersey.version>
 
         <camel.version>3.19.0</camel.version>
         <hapi.version>2.3</hapi.version>
