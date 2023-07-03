@@ -29,18 +29,20 @@ public class MathHelper {
 	public static final double PRECISION = 1.0E08;
 	public static final int PRECISION_DIGITS = 3;
 
+	public static boolean isEqualPrecision(double d1, double d2, double precision) {
+		return Double.compare(d1, d2) == 0 || Math.abs(d1 - d2) <= (1.0d / precision);
+	}
+
 	/**
 	 * Check if the two values are equal with respect to the precision
 	 *
-	 * @param firstValue
-	 * 		the first value to compare
-	 * @param secondValue
-	 * 		the second value to compare to
+	 * @param firstValue  the first value to compare
+	 * @param secondValue the second value to compare to
 	 *
 	 * @return boolean True, if the two values are equal under the set precision. Fales, otherwise.
 	 */
 	public static boolean isEqualPrecision(double firstValue, double secondValue) {
-		return (java.lang.Math.abs(firstValue - secondValue) < (1.0d / PRECISION));
+		return (java.lang.Math.abs(firstValue - secondValue) <= (1.0d / PRECISION));
 	}
 
 	/**
@@ -49,10 +51,8 @@ public class MathHelper {
 	 * the values are equal under the precision. Thus, it's efficient whenever the value is expected to be smaller than
 	 * the bound.
 	 *
-	 * @param value
-	 * 		The value to check
-	 * @param bound
-	 * 		The bound given
+	 * @param value The value to check
+	 * @param bound The bound given
 	 *
 	 * @return true, if value < bound under the given precision. False, otherwise.
 	 */
@@ -65,10 +65,8 @@ public class MathHelper {
 	 * the given bound. <p> Note: This implementation tests if value > bound and, if it is so, if equality does NOT
 	 * hold. Thus, it is efficient whenever the value is not expected to be greater than the bound.
 	 *
-	 * @param value
-	 * 		The value to check
-	 * @param bound
-	 * 		The bound given.
+	 * @param value The value to check
+	 * @param bound The bound given.
 	 *
 	 * @return true, if value > bound and the values do not test equal under precision. False, otherwise.
 	 */
@@ -80,14 +78,13 @@ public class MathHelper {
 	 * <p> Rounds the given double value to the number of decimals </p>
 	 *
 	 * <p> <b>Warning:</b> Do not use the returned value for further calculations. Always finish calculates and use one
-	 * of the following methods: </p> <ul> <li>{@link #isEqualPrecision(double, double)},</li> <li>{@link
-	 * #isGreaterPrecision(double, double)} or</li> <li>{@link #isSmallerEqualPrecision(double, double)}</li> </ul> to
-	 * test on equality or greater than/ smaller than
+	 * of the following methods: </p> <ul> <li>{@link #isEqualPrecision(double, double)},</li>
+	 * <li>{@link #isGreaterPrecision(double, double)} or</li>
+	 * <li>{@link #isSmallerEqualPrecision(double, double)}</li>
+	 * </ul> to test on equality or greater than/ smaller than
 	 *
-	 * @param value
-	 * 		the double value to round
-	 * @param decimals
-	 * 		number of decimals
+	 * @param value    the double value to round
+	 * @param decimals number of decimals
 	 *
 	 * @return the rounded number
 	 */
@@ -139,8 +136,7 @@ public class MathHelper {
 	/**
 	 * Formatting a double to a string, without scientific notation
 	 *
-	 * @param d
-	 * 		the double to format
+	 * @param d the double to format
 	 *
 	 * @return the formatted string
 	 */
