@@ -2,6 +2,10 @@
 
 [![Contributors](https://img.shields.io/github/contributors/strolch-li/strolch)](https://github.com/strolch-li/strolch/graphs/contributors)
 [![License](https://img.shields.io/github/license/strolch-li/strolch)](https://github.com/strolch-li/strolch/blob/master/LICENSE)
+[![Commit Activity](https://img.shields.io/github/commit-activity/y/strolch-li/strolch/develop?style=flat-square)](https://github.com/strolch-li/strolch/commits/develop)
+[![Forks](https://img.shields.io/github/forks/strolch-li/strolch?style=flat-square "Forks")](https://github.com/strolch-li/strolch/network/members)
+[![Stars](https://img.shields.io/github/stars/strolch-li/strolch?style=flat-square "Stars")](https://github.com/strolch-li/strolch/stargazers)
+[![Issues](https://img.shields.io/github/issues/strolch-li/strolch?style=flat-square "Issues")](https://github.com/strolch-li/strolch/issues)
 [![Build Status](https://ci.atexxi.ch/buildStatus/icon?job=strolch)](https://ci.atexxi.ch/job/strolch/)
 [![Qodana](https://github.com/strolch-li/strolch/actions/workflows/code_quality.yml/badge.svg)](https://github.com/strolch-li/strolch/actions/workflows/code_quality.yml)
 
