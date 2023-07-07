@@ -1,35 +1,15 @@
 package li.strolch.rest.endpoint;
 
-import static java.util.Comparator.comparing;
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.report.ReportConstants.*;
-import static li.strolch.rest.RestfulStrolchComponent.getInstance;
-import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
-import static li.strolch.rest.StrolchRestfulConstants.*;
-import static li.strolch.utils.helper.StringHelper.*;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.file.Files;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
@@ -55,6 +35,26 @@ import org.apache.commons.csv.CSVPrinter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Comparator.comparing;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.report.ReportConstants.*;
+import static li.strolch.rest.RestfulStrolchComponent.getInstance;
+import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
+import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.utils.helper.StringHelper.*;
+import static li.strolch.utils.iso8601.ISO8601.MAX_LOCAL_TIME;
+
 @Path("strolch/reports")
 public class ReportResource {
 
@@ -75,19 +75,13 @@ public class ReportResource {
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext())) {
 
-			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat()
-					.withoutVersion()
-					.withoutObjectType()
-					.withoutPolicies()
-					.withoutStateVariables()
-					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING, BAG_ADDITIONAL_TYPE)
-					.ignoreBagByType(TYPE_FILTER)
+			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat().withoutVersion()
+					.withoutObjectType().withoutPolicies().withoutStateVariables()
+					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING, BAG_ADDITIONAL_TYPE).ignoreBagByType(TYPE_FILTER)
 					.resourceHook((reportRes, reportJ) -> reportJ.addProperty(PARAM_DATE_RANGE,
 							reportRes.hasParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL)));
-			JsonArray result = new ReportSearch(tx).search(tx)
-					.orderByName(false)
-					.map(resource -> resource.accept(visitor))
-					.asStream()
+			JsonArray result = new ReportSearch(tx).search(tx).orderByName(false)
+					.map(resource -> resource.accept(visitor)).asStream()
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			return ResponseUtil.toResponse(DATA, result);
@@ -119,7 +113,7 @@ public class ReportResource {
 
 		JsonObject result = new JsonObject();
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-				Report report = new Report(tx, id)) {
+			 Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
@@ -186,7 +180,7 @@ public class ReportResource {
 		long start = System.nanoTime();
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-				Report report = new Report(tx, id)) {
+			 Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
@@ -204,8 +198,8 @@ public class ReportResource {
 			int maxFacetValues;
 			int reportMaxFacetValues = report.getReportResource().getInteger(PARAM_MAX_FACET_VALUES);
 			if (reportMaxFacetValues != 0 && reportMaxFacetValues != limit) {
-				logger.warn("Report " + report.getReportResource().getId() + " has " + PARAM_MAX_FACET_VALUES
-						+ " defined as " + reportMaxFacetValues + ". Ignoring requested limit " + limit);
+				logger.warn("Report " + report.getReportResource().getId() + " has " + PARAM_MAX_FACET_VALUES +
+						" defined as " + reportMaxFacetValues + ". Ignoring requested limit " + limit);
 				maxFacetValues = reportMaxFacetValues;
 			} else {
 				maxFacetValues = limit;
@@ -250,16 +244,14 @@ public class ReportResource {
 		int limit = jsonObject.get(LIMIT) != null ? jsonObject.get(LIMIT).getAsInt() : 50;
 
 		MapOfSets<String, String> filters = jsonObject.get(PARAM_FILTER) != null ?
-				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) :
-				new MapOfSets<>();
+				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) : new MapOfSets<>();
 
 		// get date range if defined
-		JsonObject rangeJ =
-				jsonObject.get(PARAM_DATE_RANGE) != null ? jsonObject.getAsJsonObject(PARAM_DATE_RANGE) : null;
+		JsonObject rangeJ = jsonObject.get(PARAM_DATE_RANGE) != null ? jsonObject.getAsJsonObject(PARAM_DATE_RANGE) :
+				null;
 
 		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
-				rangeJ.get(PARAM_FROM).getAsString() :
-				null;
+				rangeJ.get(PARAM_FROM).getAsString() : null;
 		ZonedDateTime from;
 		try {
 			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
@@ -269,11 +261,10 @@ public class ReportResource {
 		}
 
 		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
-				rangeJ.get(PARAM_TO).getAsString() :
-				null;
+				rangeJ.get(PARAM_TO).getAsString() : null;
 		ZonedDateTime to;
 		try {
-			to = (toS != null) ? ISO8601.parseToZdt(toS).with(LocalTime.MAX) : null;
+			to = (toS != null) ? ISO8601.parseToZdt(toS).with(MAX_LOCAL_TIME) : null;
 		} catch (Exception e) {
 			logger.error("Could not parse 'to' date, setting it to null.", e);
 			to = null;
@@ -291,7 +282,7 @@ public class ReportResource {
 		long start = System.nanoTime();
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-				Report report = new Report(tx, id)) {
+			 Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
@@ -380,17 +371,14 @@ public class ReportResource {
 		JsonObject jsonObject = StringHelper.isEmpty(data) ? null : JsonParser.parseString(data).getAsJsonObject();
 
 		MapOfSets<String, String> filters = jsonObject != null && jsonObject.get(PARAM_FILTER) != null ?
-				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) :
-				new MapOfSets<>();
+				getFiltersFromJson(jsonObject.get(PARAM_FILTER).getAsJsonArray()) : new MapOfSets<>();
 
 		// get date range if defined
 		JsonObject rangeJ = jsonObject != null && jsonObject.get(PARAM_DATE_RANGE) != null ?
-				jsonObject.getAsJsonObject(PARAM_DATE_RANGE) :
-				null;
+				jsonObject.getAsJsonObject(PARAM_DATE_RANGE) : null;
 
 		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
-				rangeJ.get(PARAM_FROM).getAsString() :
-				null;
+				rangeJ.get(PARAM_FROM).getAsString() : null;
 		ZonedDateTime from;
 		try {
 			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
@@ -400,11 +388,10 @@ public class ReportResource {
 		}
 
 		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
-				rangeJ.get(PARAM_TO).getAsString() :
-				null;
+				rangeJ.get(PARAM_TO).getAsString() : null;
 		ZonedDateTime to;
 		try {
-			to = (toS != null) ? ISO8601.parseToZdt(toS).with(LocalTime.MAX) : null;
+			to = (toS != null) ? ISO8601.parseToZdt(toS).with(MAX_LOCAL_TIME) : null;
 		} catch (Exception e) {
 			logger.error("Could not parse 'to' date, setting it to null.", e);
 			to = null;
@@ -425,8 +412,7 @@ public class ReportResource {
 		// send
 		String fileName = id + "_" + System.currentTimeMillis() + ".csv";
 		return Response.ok(out, TEXT_CSV_TYPE)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-				.build();
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
 	}
 
 	private StreamingOutput getOut(Certificate cert, String realm, String reportId, JsonObject localeJ,
@@ -435,7 +421,7 @@ public class ReportResource {
 		return out -> {
 
 			try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-					Report report = new Report(tx, reportId)) {
+				 Report report = new Report(tx, reportId)) {
 
 				tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), reportId));
 
@@ -504,8 +490,7 @@ public class ReportResource {
 			}
 
 			JsonObject filter = elem.getAsJsonObject();
-			filter.get(PARAM_FACET_FILTERS)
-					.getAsJsonArray()
+			filter.get(PARAM_FACET_FILTERS).getAsJsonArray()
 					.forEach(f -> result.addElement(filter.get(PARAM_FACET_TYPE).getAsString(), f.getAsString()));
 		}
 
