@@ -15,8 +15,9 @@
  */
 package li.strolch.utils.iso8601;
 
-import static java.time.ZoneId.systemDefault;
-import static java.time.temporal.ChronoField.*;
+import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -26,9 +27,8 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-import li.strolch.utils.helper.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.time.ZoneId.systemDefault;
+import static java.time.temporal.ChronoField.*;
 
 /**
  * @author Martin Smock &lt;smock.martin@gmail.com&gt;
@@ -42,11 +42,9 @@ public class ISO8601 implements DateFormat {
 	public static final LocalTime MAX_LOCAL_TIME = LocalTime.MAX.truncatedTo(ChronoUnit.MILLIS);
 	public static final ZonedDateTime YEAR_3000 = LocalDate.of(3000, 1, 1).atStartOfDay(systemDefault());
 
-	public static final ZonedDateTime EMPTY_VALUE_ZONED_DATE = ZonedDateTime.ofInstant(EMPTY_VALUE.toInstant(),
-			systemDefault());
+	public static final ZonedDateTime EMPTY_VALUE_ZONED_DATE = ZonedDateTime.ofInstant(Instant.EPOCH, systemDefault());
 
-	public static final LocalDateTime EMPTY_VALUE_LOCAL_DATE = LocalDateTime.ofInstant(EMPTY_VALUE.toInstant(),
-			systemDefault());
+	public static final LocalDateTime EMPTY_VALUE_LOCAL_DATE = LocalDateTime.ofInstant(Instant.EPOCH, systemDefault());
 
 	private static final DateTimeFormatter _LOCAL_DATE_TIME_SECONDS;
 
