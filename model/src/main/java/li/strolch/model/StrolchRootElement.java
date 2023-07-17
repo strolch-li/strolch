@@ -107,15 +107,6 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	void setRelations(String param, List<? extends StrolchRootElement> elements);
 
 	/**
-	 * Set a relation to the given element by using the type of the given element as the parameter ID, but lower-casing
-	 * the first letter. Should the {@link StringListParameter} not exist, then it will be created
-	 *
-	 * @param element
-	 * 		the element for which to set the relation to
-	 */
-	void addRelation(StrolchRootElement element);
-
-	/**
 	 * Adds a relation to the given element by using the given parameter ID. Should the {@link StringListParameter} not
 	 * exist, then it will be created
 	 *

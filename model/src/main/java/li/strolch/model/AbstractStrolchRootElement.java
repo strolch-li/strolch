@@ -37,11 +37,6 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 	}
 
 	@Override
-	public void addRelation(StrolchRootElement element) {
-		addRelation(buildParamId(element.getType()), element);
-	}
-
-	@Override
 	public void addRelation(String param, StrolchRootElement element) {
 		StringListParameter relationsP = relationsBag().getParameter(param);
 		if (relationsP == null) {
