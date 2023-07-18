@@ -3,6 +3,7 @@ package li.strolch.model;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +49,7 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 	}
 
 	@Override
-	public void setRelations(String param, List<? extends StrolchRootElement> elements) {
+	public void setRelations(String param, Collection<? extends StrolchRootElement> elements) {
 
 		// validate we have same objects
 		List<String> objectTypes = elements.stream().map(StrolchRootElement::getObjectType).distinct().toList();

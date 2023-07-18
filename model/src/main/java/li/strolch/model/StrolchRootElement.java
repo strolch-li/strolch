@@ -17,6 +17,7 @@ package li.strolch.model;
 
 import static li.strolch.model.StrolchModelConstants.*;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -104,7 +105,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * @param elements
 	 * 		the elements for which to set the relations to
 	 */
-	void setRelations(String param, List<? extends StrolchRootElement> elements);
+	void setRelations(String param, Collection<? extends StrolchRootElement> elements);
 
 	/**
 	 * Adds a relation to the given element by using the given parameter ID. Should the {@link StringListParameter} not
