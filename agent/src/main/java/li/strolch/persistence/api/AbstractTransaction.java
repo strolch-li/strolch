@@ -1539,10 +1539,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			writeChanges();
 
 			long auditTrailDuration = writeAuditTrail();
-			long updateObserversDuration = updateObservers();
-
-			// commit and close the connection
 			commit();
+			long updateObserversDuration = updateObservers();
 
 			handleCommit(start, auditTrailDuration, updateObserversDuration);
 
