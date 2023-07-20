@@ -15,19 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.model.Tags.AGENT;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfLists;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-
 import li.strolch.agent.api.*;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -38,6 +25,19 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.utils.collections.MapOfLists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfLists;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 /**
  * A simple {@link ObserverHandler} which keeps a reference to all registered {@link Observer Observers} and notifies
@@ -80,8 +80,22 @@ public class DefaultObserverHandler implements ObserverHandler {
 
 	@Override
 	public void notify(ObserverEvent event) {
+		assertReadOnly(event);
 		if (!(event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty()))
 			this.eventQueue.addLast(event);
+	}
+
+	private static void assertReadOnly(ObserverEvent event) {
+		event.added.values().forEach(DefaultObserverHandler::assertReadOnly);
+		event.updated.values().forEach(DefaultObserverHandler::assertReadOnly);
+		event.removed.values().forEach(DefaultObserverHandler::assertReadOnly);
+	}
+
+	private static void assertReadOnly(StrolchRootElement element) {
+		if (!element.isReadOnly())
+			throw new IllegalStateException(
+					"Only allow to update elements which are read-only. Element " + element.getLocator() +
+							" is not read-only!");
 	}
 
 	protected void doUpdates() {
