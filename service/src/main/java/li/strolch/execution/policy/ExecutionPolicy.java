@@ -1,13 +1,5 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
-
-import java.time.Duration;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
@@ -28,6 +20,14 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+
+import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 /**
  * <p>
@@ -408,10 +408,6 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected void delayToExecutedBy(long delay, TimeUnit delayUnit) {
 		long delayMs = delayUnit.toMillis(delay);
-		if (delayMs < 20) {
-			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
-			delayMs = 20;
-		}
 		logger.info("Delaying toExecuted of " + this.actionLoc + " by " + formatMillisecondsDuration(delayMs));
 		getDelayedExecutionTimer().execute(this.realm, getContainer(), this.actionLoc, delayMs);
 	}
