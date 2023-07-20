@@ -53,8 +53,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * Set the type of this {@link StrolchRootElement}. Not that this method should only be called for new elements, not
 	 * if this element has already been persisted!
 	 *
-	 * @param type
-	 * 		the new type
+	 * @param type the new type
 	 */
 	void setType(String type);
 
@@ -77,11 +76,9 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * Sets the version of this object
 	 * </p>
 	 *
-	 * @param version
-	 * 		the version to set
+	 * @param version the version to set
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the given version's locator is not equal to the current element's locator
+	 * @throws IllegalArgumentException if the given version's locator is not equal to the current element's locator
 	 */
 	void setVersion(Version version) throws IllegalArgumentException;
 
@@ -89,10 +86,8 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * Set a relation to the given element by using the given param. Should the {@link StringParameter} not exist, then
 	 * it will be created
 	 *
-	 * @param param
-	 * 		the parameter ID on which to set the relations
-	 * @param element
-	 * 		the element for which to set the relation to
+	 * @param param   the parameter ID on which to set the relations
+	 * @param element the element for which to set the relation to
 	 */
 	void setRelation(String param, StrolchRootElement element);
 
@@ -100,10 +95,8 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * Set relations to the given elements by using the given param. Should the parameter not exist, then it will be
 	 * created
 	 *
-	 * @param param
-	 * 		the parameter ID on which to set the relations
-	 * @param elements
-	 * 		the elements for which to set the relations to
+	 * @param param    the parameter ID on which to set the relations
+	 * @param elements the elements for which to set the relations to
 	 */
 	void setRelations(String param, Collection<? extends StrolchRootElement> elements);
 
@@ -111,14 +104,31 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * Adds a relation to the given element by using the given parameter ID. Should the {@link StringListParameter} not
 	 * exist, then it will be created
 	 *
-	 * @param param
-	 * 		the parameter ID on which to set the relations
-	 * @param element
-	 * 		the element for which to set the relation to
+	 * @param param   the parameter ID on which to set the relations
+	 * @param element the element for which to set the relation to
 	 */
 	void addRelation(String param, StrolchRootElement element);
 
+	/**
+	 * Returns this element if it is not readonly, otherwise returns a clone
+	 *
+	 * @return this element if it is not readonly, otherwise returns a clone
+	 */
 	StrolchRootElement ensureModifiable();
+
+	/**
+	 * Returns this element if it is readonly, otherwise returns a clone, which is read-only
+	 *
+	 * @return this element if it is readonly, otherwise returns a clone, which is read-only
+	 */
+	StrolchRootElement ensureReadOnly();
+
+	/**
+	 * Makes this instance read-only, returning this for chaining
+	 *
+	 * @return this
+	 */
+	StrolchRootElement readOnly();
 
 	/**
 	 * Return a clone of this {@link StrolchElement}
@@ -138,8 +148,7 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	/**
 	 * Visitor pattern accept method. Takes a {@link StrolchRootElementVisitor} to visit this element
 	 *
-	 * @param visitor
-	 * 		the visitor
+	 * @param visitor the visitor
 	 *
 	 * @return the result of the visitation
 	 */
@@ -251,17 +260,12 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	 * Set or add a parameter to this element from a {@link JsonObject} to the {@link ParameterBag} with the id
 	 * {StrolchModelConstants#BAG_PARAMETERS}
 	 *
-	 * @param jsonObject
-	 * 		the object from which to get the value
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param paramName
-	 * 		the name of the parameter, if the parameter is to be created
-	 * @param type
-	 * 		the type of Parameter to create
-	 * @param ignoreOnEmpty
-	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
-	 * 		is cleared if the json field is missing or null
+	 * @param jsonObject    the object from which to get the value
+	 * @param paramId       the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName     the name of the parameter, if the parameter is to be created
+	 * @param type          the type of Parameter to create
+	 * @param ignoreOnEmpty if true, and the json object is missing the field, then the parameter is not changed,
+	 *                      otherwise the parameter is cleared if the json field is missing or null
 	 */
 	default void setOrAddParamFromFlatJson(JsonObject jsonObject, String paramId, String paramName,
 			StrolchValueType type, boolean ignoreOnEmpty) {
@@ -272,23 +276,15 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	/**
 	 * Set or add a parameter to this element from a {@link JsonObject}
 	 *
-	 * @param jsonObject
-	 * 		the object from which to get the value
-	 * @param bagId
-	 * 		the bag ID on which to set the value
-	 * @param bagName
-	 * 		the name of the bag, if the bag is to be created
-	 * @param bagType
-	 * 		the type of the bag, if the bag is to be created
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param paramName
-	 * 		the name of the parameter, if the parameter is to be created
-	 * @param type
-	 * 		the type of Parameter to create
-	 * @param ignoreOnEmpty
-	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
-	 * 		is cleared if the json field is missing or null
+	 * @param jsonObject    the object from which to get the value
+	 * @param bagId         the bag ID on which to set the value
+	 * @param bagName       the name of the bag, if the bag is to be created
+	 * @param bagType       the type of the bag, if the bag is to be created
+	 * @param paramId       the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName     the name of the parameter, if the parameter is to be created
+	 * @param type          the type of Parameter to create
+	 * @param ignoreOnEmpty if true, and the json object is missing the field, then the parameter is not changed,
+	 *                      otherwise the parameter is cleared if the json field is missing or null
 	 */
 	default void setOrAddParamFromFlatJson(JsonObject jsonObject, String bagId, String bagName, String bagType,
 			String paramId, String paramName, StrolchValueType type, boolean ignoreOnEmpty) {
@@ -299,27 +295,17 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	/**
 	 * Set or add a parameter to this element from a {@link JsonObject}
 	 *
-	 * @param jsonObject
-	 * 		the object from which to get the value
-	 * @param bagId
-	 * 		the bag ID on which to set the value
-	 * @param bagName
-	 * 		the name of the bag, if the bag is to be created
-	 * @param bagType
-	 * 		the type of the bag, if the bag is to be created
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param paramName
-	 * 		the name of the parameter, if the parameter is to be created
-	 * @param interpretation
-	 * 		the interpretation
-	 * @param uom
-	 * 		the uom
-	 * @param type
-	 * 		the type of Parameter to create
-	 * @param ignoreOnEmpty
-	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
-	 * 		is cleared if the json field is missing or null
+	 * @param jsonObject     the object from which to get the value
+	 * @param bagId          the bag ID on which to set the value
+	 * @param bagName        the name of the bag, if the bag is to be created
+	 * @param bagType        the type of the bag, if the bag is to be created
+	 * @param paramId        the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName      the name of the parameter, if the parameter is to be created
+	 * @param interpretation the interpretation
+	 * @param uom            the uom
+	 * @param type           the type of Parameter to create
+	 * @param ignoreOnEmpty  if true, and the json object is missing the field, then the parameter is not changed,
+	 *                       otherwise the parameter is cleared if the json field is missing or null
 	 */
 	default void setOrAddParamFromFlatJson(JsonObject jsonObject, String bagId, String bagName, String bagType,
 			String paramId, String paramName, String interpretation, String uom, StrolchValueType type,
@@ -340,23 +326,15 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	/**
 	 * Set or add a parameter to this element with the given value
 	 *
-	 * @param bagId
-	 * 		the bag ID on which to set the value
-	 * @param bagName
-	 * 		the name of the bag, if the bag is to be created
-	 * @param bagType
-	 * 		the type of the bag, if the bag is to be created
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param paramName
-	 * 		the name of the parameter, if the parameter is to be created
-	 * @param type
-	 * 		the type of Parameter to create
-	 * @param value
-	 * 		the value to set
-	 * @param ignoreOnEmpty
-	 * 		if true, and the value is null, then the parameter is not changed, otherwise the parameter is cleared if the
-	 * 		value is null
+	 * @param bagId         the bag ID on which to set the value
+	 * @param bagName       the name of the bag, if the bag is to be created
+	 * @param bagType       the type of the bag, if the bag is to be created
+	 * @param paramId       the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName     the name of the parameter, if the parameter is to be created
+	 * @param type          the type of Parameter to create
+	 * @param value         the value to set
+	 * @param ignoreOnEmpty if true, and the value is null, then the parameter is not changed, otherwise the parameter
+	 *                      is cleared if the value is null
 	 */
 	default void setOrAddParam(String bagId, String bagName, String bagType, String paramId, String paramName,
 			StrolchValueType type, Object value, boolean ignoreOnEmpty) {
@@ -367,27 +345,17 @@ public interface StrolchRootElement extends StrolchElement, PolicyContainer, Par
 	/**
 	 * Set or add a parameter to this element with the given value
 	 *
-	 * @param bagId
-	 * 		the bag ID on which to set the value
-	 * @param bagName
-	 * 		the name of the bag, if the bag is to be created
-	 * @param bagType
-	 * 		the type of the bag, if the bag is to be created
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param paramName
-	 * 		the name of the parameter, if the parameter is to be created
-	 * @param interpretation
-	 * 		the interpretation
-	 * @param uom
-	 * 		the uom
-	 * @param type
-	 * 		the type of Parameter to create
-	 * @param value
-	 * 		the value to set
-	 * @param ignoreOnEmpty
-	 * 		if true, and the value is null, then the parameter is not changed, otherwise the parameter is cleared if the
-	 * 		value is null
+	 * @param bagId          the bag ID on which to set the value
+	 * @param bagName        the name of the bag, if the bag is to be created
+	 * @param bagType        the type of the bag, if the bag is to be created
+	 * @param paramId        the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName      the name of the parameter, if the parameter is to be created
+	 * @param interpretation the interpretation
+	 * @param uom            the uom
+	 * @param type           the type of Parameter to create
+	 * @param value          the value to set
+	 * @param ignoreOnEmpty  if true, and the value is null, then the parameter is not changed, otherwise the parameter
+	 *                       is cleared if the value is null
 	 */
 	default void setOrAddParam(String bagId, String bagName, String bagType, String paramId, String paramName,
 			String interpretation, String uom, StrolchValueType type, Object value, boolean ignoreOnEmpty) {

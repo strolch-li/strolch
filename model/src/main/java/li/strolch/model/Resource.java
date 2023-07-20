@@ -15,12 +15,6 @@
  */
 package li.strolch.model;
 
-import static java.util.stream.Collectors.toList;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Stream;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
@@ -32,6 +26,12 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -53,12 +53,9 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param type
-	 * 		the type
+	 * @param id   the id
+	 * @param name the name
+	 * @param type the type
 	 */
 	public Resource(String id, String name, String type) {
 		super(id, name, type);
@@ -123,8 +120,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 			return null;
 		}
 
-		@SuppressWarnings("unchecked")
-		T timedState = (T) this.timedStateMap.get(id);
+		@SuppressWarnings("unchecked") T timedState = (T) this.timedStateMap.get(id);
 		if (timedState == null && assertExists) {
 			String msg = "The TimedState {0} does not exist";
 			throw new StrolchModelException(MessageFormat.format(msg, getLocator().append(Tags.STATE, id)));
@@ -133,7 +129,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		return timedState;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public <T extends StrolchTimedState> T removeTimedState(String id) {
 		assertNotReadonly();
 		if (this.timedStateMap == null) {
@@ -171,8 +167,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	/**
 	 * Returns a {@link Stream} of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the timed states are to be returned
+	 * @param interpretation the interpretation for which the timed states are to be returned
 	 *
 	 * @return the timed states with the given interpretation
 	 */
@@ -186,10 +181,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	/**
 	 * Returns a {@link Stream} of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the timed states are to be returned
-	 * @param uom
-	 * 		the uom for which the timed states are to be returned
+	 * @param interpretation the interpretation for which the timed states are to be returned
+	 * @param uom            the uom for which the timed states are to be returned
 	 *
 	 * @return the timed states with the given interpretation
 	 */
@@ -198,16 +191,14 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		if (this.timedStateMap == null || this.timedStateMap.isEmpty())
 			return Stream.empty();
 
-		return this.timedStateMap.values()
-				.stream()
+		return this.timedStateMap.values().stream()
 				.filter(s -> s.getInterpretation().equals(interpretation) && s.getUom().equals(uom));
 	}
 
 	/**
 	 * Returns a list of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the timed states are to be returned
+	 * @param interpretation the interpretation for which the timed states are to be returned
 	 *
 	 * @return the timed states with the given interpretation
 	 */
@@ -218,10 +209,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	/**
 	 * Returns a list of all the {@link StrolchTimedState StrolchTimedStates} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the timed states are to be returned
-	 * @param uom
-	 * 		the uom for which the timed states are to be returned
+	 * @param interpretation the interpretation for which the timed states are to be returned
+	 * @param uom            the uom for which the timed states are to be returned
 	 *
 	 * @return the timed states with the given interpretation
 	 */
@@ -346,6 +335,19 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	}
 
 	@Override
+	public Resource ensureReadOnly() {
+		if (isReadOnly())
+			return this;
+		return getClone(true).readOnly();
+	}
+
+	@Override
+	public Resource readOnly() {
+		setReadOnly();
+		return this;
+	}
+
+	@Override
 	public void fillLocator(LocatorBuilder lb) {
 		lb.append(Tags.RESOURCE).append(getType()).append(getId());
 	}
@@ -409,10 +411,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	/**
 	 * Creates a {@link Locator} for resources of the given type and id
 	 *
-	 * @param type
-	 * 		the type of resource
-	 * @param id
-	 * 		the id of the resource
+	 * @param type the type of resource
+	 * @param id   the id of the resource
 	 *
 	 * @return the locator
 	 */
@@ -423,10 +423,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 	/**
 	 * Parses the given XML and returns the resource with the given ID
 	 *
-	 * @param xml
-	 * 		the xml to parse
-	 * @param id
-	 * 		the id of the resource to return from the parsed elements
+	 * @param xml the xml to parse
+	 * @param id  the id of the resource to return from the parsed elements
 	 *
 	 * @return the resource, or null if it does not exist
 	 */

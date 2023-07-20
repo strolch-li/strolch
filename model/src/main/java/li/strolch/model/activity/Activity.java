@@ -15,19 +15,6 @@
  */
 package li.strolch.model.activity;
 
-import static java.util.stream.Collectors.toList;
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
-import static li.strolch.utils.collections.CollectionsHelper.singletonCollector;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
 import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -40,6 +27,19 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.utils.collections.CollectionsHelper.singletonCollector;
 
 /**
  * Parameterized object grouping a collection of {@link Activity} and {@link Action} objects defining the process to be
@@ -68,12 +68,9 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param type
-	 * 		the type
+	 * @param id   the id
+	 * @param name the name
+	 * @param type the type
 	 */
 	public Activity(String id, String name, String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
@@ -154,8 +151,7 @@ public class Activity extends AbstractStrolchRootElement
 	 * Returns true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
 	 * i.e. {@link Action} or {@link Activity}
 	 *
-	 * @param id
-	 * 		the id of the element to check for
+	 * @param id the id of the element to check for
 	 *
 	 * @return true if this {@link Activity} contains a child with the given id. The element instance type is ignored,
 	 * i.e. {@link Action} or {@link Activity}
@@ -167,8 +163,7 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements}
 	 *
-	 * @param activityElement
-	 * 		the element to add
+	 * @param activityElement the element to add
 	 */
 	public void addElement(IActivityElement activityElement) {
 		assertCanAdd(activityElement);
@@ -179,10 +174,8 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} before the given element
 	 *
-	 * @param elementId
-	 * 		the id of the element before which to add the other element
-	 * @param elementToAdd
-	 * 		the element to add
+	 * @param elementId    the id of the element before which to add the other element
+	 * @param elementToAdd the element to add
 	 */
 	public void addElementBefore(String elementId, IActivityElement elementToAdd) {
 		IActivityElement element = getElement(elementId);
@@ -192,10 +185,8 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} before the given element
 	 *
-	 * @param element
-	 * 		the element before which to add the other element
-	 * @param elementToAdd
-	 * 		the element to add
+	 * @param element      the element before which to add the other element
+	 * @param elementToAdd the element to add
 	 */
 	public void addElementBefore(IActivityElement element, IActivityElement elementToAdd) {
 		assertCanAdd(elementToAdd);
@@ -224,10 +215,8 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} after the given element
 	 *
-	 * @param elementId
-	 * 		the id of the element after which to add the other element
-	 * @param elementToAdd
-	 * 		the element to add
+	 * @param elementId    the id of the element after which to add the other element
+	 * @param elementToAdd the element to add
 	 */
 	public void addElementAfter(String elementId, IActivityElement elementToAdd) {
 		IActivityElement element = getElement(elementId);
@@ -237,10 +226,8 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * add an activity element to the {@code LinkedHashMap} of {@code IActivityElements} after the given element
 	 *
-	 * @param element
-	 * 		the element after which to add the other element
-	 * @param elementToAdd
-	 * 		the element to add
+	 * @param element      the element after which to add the other element
+	 * @param elementToAdd the element to add
 	 */
 	public void addElementAfter(IActivityElement element, IActivityElement elementToAdd) {
 		assertCanAdd(elementToAdd);
@@ -283,8 +270,7 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Removes the element with the given id and returns it, if it exists
 	 *
-	 * @param id
-	 * 		the id of the element to remove
+	 * @param id the id of the element to remove
 	 *
 	 * @return the removed element, or null if it does not exist
 	 */
@@ -300,8 +286,7 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Returns the {@link Action} with the given ID which is a direct child of this {@link Activity}
 	 *
-	 * @param id
-	 * 		the id of the {@link Action} to return
+	 * @param id the id of the {@link Action} to return
 	 *
 	 * @return the {@link Action} with the given ID
 	 */
@@ -312,8 +297,7 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Returns the {@link Activity} with the given ID which is a direct child of this {@link Activity}
 	 *
-	 * @param id
-	 * 		the id of the {@link Activity} to return
+	 * @param id the id of the {@link Activity} to return
 	 *
 	 * @return the {@link Activity} with the given ID
 	 */
@@ -324,16 +308,14 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * get {@code IActivityElement} by id
 	 *
-	 * @param id
-	 * 		the id of the {@code IActivityElement}
+	 * @param id the id of the {@code IActivityElement}
 	 *
 	 * @return IActivityElement
 	 */
 	public <T extends IActivityElement> T getElement(String id) {
 		if (this.elements == null)
 			throw new IllegalArgumentException("Element " + id + " does not exist on " + getLocator());
-		@SuppressWarnings("unchecked")
-		T t = (T) this.elements.get(id);
+		@SuppressWarnings("unchecked") T t = (T) this.elements.get(id);
 		if (t == null)
 			throw new IllegalArgumentException("Element " + id + " does not exist on " + getLocator());
 		return t;
@@ -513,8 +495,8 @@ public class Activity extends AbstractStrolchRootElement
 
 	public <T extends IActivityElement> T findElement(Predicate<IActivityElement> predicate,
 			Supplier<String> msgSupplier) {
-		@SuppressWarnings("unchecked")
-		T t = (T) streamElements().filter(predicate).collect(singletonCollector(msgSupplier));
+		@SuppressWarnings("unchecked") T t = (T) streamElements().filter(predicate)
+				.collect(singletonCollector(msgSupplier));
 		return t;
 	}
 
@@ -546,8 +528,7 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Returns all the actions in the entire hierarchy with the given state
 	 *
-	 * @param state
-	 * 		the state of the action to return
+	 * @param state the state of the action to return
 	 *
 	 * @return the list of actions with the given state
 	 */
@@ -558,8 +539,7 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Returns all the actions in the entire hierarchy with the given type
 	 *
-	 * @param type
-	 * 		the type of action to return
+	 * @param type the type of action to return
 	 *
 	 * @return the list of actions with the given type
 	 */
@@ -585,8 +565,7 @@ public class Activity extends AbstractStrolchRootElement
 				throw new StrolchElementNotFoundException(locator + " does not exist!");
 		}
 
-		@SuppressWarnings("unchecked")
-		T t = (T) element;
+		@SuppressWarnings("unchecked") T t = (T) element;
 		return t;
 	}
 
@@ -767,6 +746,19 @@ public class Activity extends AbstractStrolchRootElement
 	}
 
 	@Override
+	public Activity ensureReadOnly() {
+		if (isReadOnly())
+			return this;
+		return getClone(true).readOnly();
+	}
+
+	@Override
+	public Activity readOnly() {
+		setReadOnly();
+		return this;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -903,10 +895,8 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Creates a {@link Locator} for activities of the given type and id
 	 *
-	 * @param type
-	 * 		the type of activity
-	 * @param id
-	 * 		the id of the activity
+	 * @param type the type of activity
+	 * @param id   the id of the activity
 	 *
 	 * @return the locator
 	 */
@@ -917,10 +907,8 @@ public class Activity extends AbstractStrolchRootElement
 	/**
 	 * Parses the given XML and returns the activity with the given ID
 	 *
-	 * @param xml
-	 * 		the xml to parse
-	 * @param id
-	 * 		the id of the activity to return from the parsed elements
+	 * @param xml the xml to parse
+	 * @param id  the id of the activity to return from the parsed elements
 	 *
 	 * @return the activity, or null if it does not exist
 	 */

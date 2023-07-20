@@ -15,11 +15,6 @@
  */
 package li.strolch.model;
 
-import java.text.MessageFormat;
-import java.time.*;
-import java.util.Date;
-import java.util.Objects;
-
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.policy.PolicyDef;
@@ -28,6 +23,11 @@ import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
+
+import java.text.MessageFormat;
+import java.time.*;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * The Order is an object used in the EDF to transfer data from one range to another. Orders are not to be thought of as
@@ -57,12 +57,9 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param type
-	 * 		the type
+	 * @param id   the id
+	 * @param name the name
+	 * @param type the type
 	 */
 	public Order(String id, String name, String type) {
 		super(id, name, type);
@@ -74,16 +71,11 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	/**
 	 * Extended Constructor for date and {@link State}
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param type
-	 * 		the type
-	 * @param date
-	 * 		the date
-	 * @param state
-	 * 		the state
+	 * @param id    the id
+	 * @param name  the name
+	 * @param type  the type
+	 * @param date  the date
+	 * @param state the state
 	 */
 	public Order(String id, String name, String type, Date date, State state) {
 		super(id, name, type);
@@ -259,6 +251,19 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
+	public Order ensureReadOnly() {
+		if (isReadOnly())
+			return this;
+		return getClone(true).readOnly();
+	}
+
+	@Override
+	public Order readOnly() {
+		setReadOnly();
+		return this;
+	}
+
+	@Override
 	protected void fillLocator(LocatorBuilder lb) {
 		lb.append(Tags.ORDER).append(getType()).append(getId());
 	}
@@ -311,8 +316,8 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	@Override
 	public String toString() {
 
-		return "Order [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", state=" + this.state
-				+ ", date=" + ISO8601.toString(this.date) + ", version=" + this.version + "]";
+		return "Order [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", state=" + this.state +
+				", date=" + ISO8601.toString(this.date) + ", version=" + this.version + "]";
 	}
 
 	@Override
@@ -323,10 +328,8 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	/**
 	 * Creates a {@link Locator} for orders of the given type and id
 	 *
-	 * @param type
-	 * 		the type of order
-	 * @param id
-	 * 		the id of the order
+	 * @param type the type of order
+	 * @param id   the id of the order
 	 *
 	 * @return the locator
 	 */
@@ -337,10 +340,8 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	/**
 	 * Parses the given XML and returns the order with the given ID
 	 *
-	 * @param xml
-	 * 		the xml to parse
-	 * @param id
-	 * 		the id of the order to return from the parsed elements
+	 * @param xml the xml to parse
+	 * @param id  the id of the order to return from the parsed elements
 	 *
 	 * @return the order, or null if it does not exist
 	 */
