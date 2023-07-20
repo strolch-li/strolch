@@ -1,17 +1,5 @@
 package li.strolch.persistence.api;
 
-import static li.strolch.agent.api.StrolchAgent.getUniqueId;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.model.Tags.*;
-import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
-import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
 import li.strolch.agent.api.*;
 import li.strolch.agent.impl.*;
 import li.strolch.exception.StrolchException;
@@ -48,6 +36,18 @@ import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.objectfilter.ObjectFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
+
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.model.Tags.*;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -632,8 +632,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				break;
 			if (!parents.add(parent))
 				throw new IllegalStateException(
-						"circular dependencies from " + element.getLocator() + " to " + parent.getLocator()
-								+ " on relations parameter " + parentParamKey);
+						"circular dependencies from " + element.getLocator() + " to " + parent.getLocator() +
+								" on relations parameter " + parentParamKey);
 
 			t = parent.getParameter(bagKey, paramKey);
 		}
@@ -1375,11 +1375,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedR.size() == 1) {
 			RemoveResourceCommand cmd = new RemoveResourceCommand(this);
 			cmd.setResource(changedR.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedR.size() > 1) {
 			RemoveResourcesCommand cmd = new RemoveResourcesCommand(this);
 			cmd.setResources(changedR);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// updated
@@ -1387,11 +1387,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedR.size() == 1) {
 			UpdateResourceCommand cmd = new UpdateResourceCommand(this);
 			cmd.setResource(changedR.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedR.size() > 1) {
 			UpdateResourcesCommand cmd = new UpdateResourcesCommand(this);
 			cmd.setResources(changedR);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// added
@@ -1399,11 +1399,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedR.size() == 1) {
 			AddResourceCommand cmd = new AddResourceCommand(this);
 			cmd.setResource(changedR.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedR.size() > 1) {
 			AddResourcesCommand cmd = new AddResourcesCommand(this);
 			cmd.setResources(changedR);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		/*
@@ -1414,11 +1414,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedO.size() == 1) {
 			RemoveOrderCommand cmd = new RemoveOrderCommand(this);
 			cmd.setOrder(changedO.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedO.size() > 1) {
 			RemoveOrdersCommand cmd = new RemoveOrdersCommand(this);
 			cmd.setOrders(changedO);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// updated
@@ -1426,11 +1426,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedO.size() == 1) {
 			UpdateOrderCommand cmd = new UpdateOrderCommand(this);
 			cmd.setOrder(changedO.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedO.size() > 1) {
 			UpdateOrdersCommand cmd = new UpdateOrdersCommand(this);
 			cmd.setOrders(changedO);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// added
@@ -1438,11 +1438,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedO.size() == 1) {
 			AddOrderCommand cmd = new AddOrderCommand(this);
 			cmd.setOrder(changedO.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedO.size() > 1) {
 			AddOrdersCommand cmd = new AddOrdersCommand(this);
 			cmd.setOrders(changedO);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		/*
@@ -1453,11 +1453,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedA.size() == 1) {
 			RemoveActivityCommand cmd = new RemoveActivityCommand(this);
 			cmd.setActivity(changedA.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedA.size() > 1) {
 			RemoveActivitiesCommand cmd = new RemoveActivitiesCommand(this);
 			cmd.setActivities(changedA);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// updated
@@ -1465,11 +1465,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedA.size() == 1) {
 			UpdateActivityCommand cmd = new UpdateActivityCommand(this);
 			cmd.setActivity(changedA.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedA.size() > 1) {
 			UpdateActivitiesCommand cmd = new UpdateActivitiesCommand(this);
 			cmd.setActivities(changedA);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// added
@@ -1477,11 +1477,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedA.size() == 1) {
 			AddActivityCommand cmd = new AddActivityCommand(this);
 			cmd.setActivity(changedA.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedA.size() > 1) {
 			AddActivitiesCommand cmd = new AddActivitiesCommand(this);
 			cmd.setActivities(changedA);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// clear, so that we don't do it twice in case of a flush()
