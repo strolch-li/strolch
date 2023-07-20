@@ -24,8 +24,7 @@ public abstract class BasePlanningAndExecutionCommand extends Command {
 	}
 
 	protected Resource getResource(Action action) {
-		Locator resourceLocator = action.getResourceLocator();
-		return tx().getResourceBy(resourceLocator.get(1), resourceLocator.get(2), true);
+		return tx().getResourceFor(action, true);
 	}
 
 	protected static void updateOrderState(StrolchTransaction tx, Activity rootElement, State currentState,
