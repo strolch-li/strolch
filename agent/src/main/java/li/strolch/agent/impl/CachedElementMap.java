@@ -227,8 +227,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		T versionT = getBy(tx, type, id, version, true);
 
 		// create the new version
-		@SuppressWarnings("unchecked")
-		T clone = (T) versionT.getClone();
+		@SuppressWarnings("unchecked") T clone = (T) versionT.getClone();
 		clone.setVersion(current.getVersion());
 
 		// save the new version
@@ -239,7 +238,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 	}
 
 	@Override
-	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
+	public T undoVersion(StrolchTransaction tx, T element) throws StrolchException {
 		if (!this.realm.isVersioningEnabled())
 			throw new StrolchPersistenceException("Can not undo a version if versioning is not enabled!");
 
@@ -259,10 +258,12 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		if (elementVersion.isFirstVersion()) {
 			super.remove(tx, element);
 			getDbDao(tx).remove(element);
+			return null;
 		} else {
 			T previous = getBy(tx, type, id, elementVersion.getPreviousVersion(), true);
 			super.internalUpdate(tx, previous);
 			getDbDao(tx).removeVersion(current);
+			return previous;
 		}
 	}
 

@@ -416,7 +416,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	}
 
 	@Override
-	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
+	public T undoVersion(StrolchTransaction tx, T element) throws StrolchException {
 		throw new IllegalStateException("Transient mode does not support versioning");
 	}
 
