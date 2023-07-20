@@ -123,7 +123,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (t == null)
 			return null;
 
-		if (tx.isReadOnly())
+		if (tx.isReadOnly() && !type.equals(TEMPLATE))
 			return t;
 
 		@SuppressWarnings("unchecked")
@@ -187,7 +187,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (byType == null)
 			return new ArrayList<>(0);
 
-		if (tx.isReadOnly())
+		if (tx.isReadOnly() && !type.equals(TEMPLATE))
 			return new ArrayList<>(byType.values());
 
 		return byType.values().stream().map(t -> {
