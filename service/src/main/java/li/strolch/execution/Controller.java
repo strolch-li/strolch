@@ -128,7 +128,7 @@ public class Controller {
 			return false;
 		}
 
-		this.activity = activity;
+		this.activity = activity.ensureModifiable();
 		return true;
 	}
 
