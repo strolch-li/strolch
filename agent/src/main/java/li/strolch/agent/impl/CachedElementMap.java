@@ -99,7 +99,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		updateVersion(tx, element, false);
 
 		// first perform cached change
-		super.internalUpdate(tx, element);
+		super.internalUpdate(element);
 
 		// last is to perform DB changes
 		getDbDao(tx).update(element);
@@ -111,7 +111,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		// first perform cached change
 		for (T t : elements) {
 			updateVersion(tx, t, false);
-			internalUpdate(tx, t);
+			internalUpdate(t);
 		}
 
 		// last is to perform DB changes
@@ -261,7 +261,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 			return null;
 		} else {
 			T previous = getBy(tx, type, id, elementVersion.getPreviousVersion(), true);
-			super.internalUpdate(tx, previous);
+			super.internalUpdate(previous);
 			getDbDao(tx).removeVersion(current);
 			return previous;
 		}
