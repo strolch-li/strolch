@@ -1,5 +1,6 @@
 package li.strolch.execution.command;
 
+import static li.strolch.model.State.EXECUTION;
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ATOMIC_PARALLEL_EXECUTION;
 
 import java.util.Iterator;
@@ -72,7 +73,7 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 
 	private void executeAction(Action action) {
 		State currentState = action.getState();
-		if (currentState.compareTo(State.EXECUTED) >= 0)
+		if (currentState.compareTo(State.EXECUTED) >= 0 || currentState == EXECUTION)
 			return;
 		if (currentState == State.CREATED || currentState == State.PLANNING)
 			throw new IllegalStateException("Action " + action.getLocator() + " is in illegal state " + currentState);
