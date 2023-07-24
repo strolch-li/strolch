@@ -152,7 +152,14 @@ public class Controller {
 				if (!refreshActivity(tx))
 					return false;
 
+				// perform the first execution
 				boolean trigger = internalExecute(tx);
+
+				// then we trigger execution for the same activity if the controller says it is needed
+				if (trigger) {
+					logger.info("Triggering additional execution of controller " + this + " after execution.");
+					triggerExecute(tx);
+				}
 
 				if (tx.needsCommit())
 					tx.commitOnClose();
