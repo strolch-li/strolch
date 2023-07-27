@@ -151,6 +151,8 @@ public class Tags {
 		public static final String USERNAME = "username";
 		public static final String PASSWORD = "password";
 		public static final String ELEMENTS = "elements";
+		public static final String PROPERTIES = "properties";
+		public static final String DEPENDENCIES = "dependencies";
 		public static final String NR_OF_ELEMENTS = "nrOfElements";
 		public static final String ELEMENT_MAPS = "elementMaps";
 		public static final String TYPES = "types";

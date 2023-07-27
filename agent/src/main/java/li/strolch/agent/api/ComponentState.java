@@ -32,27 +32,31 @@ public enum ComponentState {
 			return this;
 
 		switch (this) {
-		case UNDEFINED -> {
-			if (newState != ComponentState.SETUP && newState != STOPPED)
-				throw getIllegalStateEx(newState, componentName);
-		}
-		case SETUP -> {
-			if (newState != ComponentState.INITIALIZED && newState != STOPPED && newState != DESTROYED)
-				throw getIllegalStateEx(newState, componentName);
-		}
-		case INITIALIZED -> {
-			if (newState != ComponentState.STARTED && newState != STOPPED && newState != DESTROYED)
-				throw getIllegalStateEx(newState, componentName);
-		}
-		case STARTED -> {
-			if (newState != ComponentState.STOPPED)
-				throw getIllegalStateEx(newState, componentName);
-		}
-		case STOPPED -> {
-			if (newState != ComponentState.STARTED && newState != ComponentState.DESTROYED)
-				throw getIllegalStateEx(newState, componentName);
-		}
-		default -> throw getIllegalStateEx(newState, componentName);
+			case UNDEFINED -> {
+				if (newState != ComponentState.SETUP && newState != STOPPED)
+					throw getIllegalStateEx(newState, componentName);
+			}
+			case SETUP -> {
+				if (newState != ComponentState.INITIALIZED && newState != STOPPED && newState != DESTROYED)
+					throw getIllegalStateEx(newState, componentName);
+			}
+			case INITIALIZED -> {
+				if (newState != ComponentState.STARTED && newState != STOPPED && newState != DESTROYED)
+					throw getIllegalStateEx(newState, componentName);
+			}
+			case STARTED -> {
+				if (newState != ComponentState.STOPPED)
+					throw getIllegalStateEx(newState, componentName);
+			}
+			case STOPPED -> {
+				if (newState != ComponentState.STARTED && newState != ComponentState.DESTROYED)
+					throw getIllegalStateEx(newState, componentName);
+			}
+			case DESTROYED -> {
+				if (newState != ComponentState.SETUP)
+					throw getIllegalStateEx(newState, componentName);
+			}
+			default -> throw getIllegalStateEx(newState, componentName);
 		}
 
 		return newState;

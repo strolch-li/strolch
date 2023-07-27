@@ -15,9 +15,6 @@
  */
 package li.strolch.rest;
 
-import java.text.MessageFormat;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -30,6 +27,9 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -223,16 +223,20 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	}
 
 	public StrolchAgent getAgent() {
-		return super.getContainer().getAgent();
+		return super.getAgent();
 	}
 
 	public PrivilegeHandler getPrivilegeHandler() {
-		return super.getContainer().getAgent().getContainer().getPrivilegeHandler();
+		return getAgent().getPrivilegeHandler();
 	}
 
 	@Override
 	public <T> T getComponent(Class<T> clazz) {
-		return getContainer().getComponent(clazz);
+		return getAgent().getComponent(clazz);
+	}
+
+	public <T extends StrolchComponent> T getComponentByName(String name) {
+		return getAgent().getComponentByName(name);
 	}
 
 	public StrolchSessionHandler getSessionHandler() {
