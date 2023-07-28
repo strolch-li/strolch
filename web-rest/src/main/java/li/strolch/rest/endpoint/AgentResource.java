@@ -8,22 +8,18 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import li.strolch.agent.api.ComponentState;
+import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
-import li.strolch.runtime.configuration.ConfigurationParser;
-import li.strolch.runtime.configuration.ConfigurationTags;
-import li.strolch.runtime.configuration.RuntimeConfiguration;
-import li.strolch.runtime.configuration.StrolchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.List;
-import java.util.Map;
 
+import static li.strolch.model.Tags.Json.COMPONENTS;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
@@ -57,31 +53,16 @@ public class AgentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getComponents(@Context HttpServletRequest request) {
 		validateCertificate(request);
-		List<StrolchComponent> components = RestfulStrolchComponent.getInstance().getAgent()
-				.getComponentsOrderedByRoot();
+		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
+		List<StrolchComponent> components = agent.getComponentsOrderedByRoot();
 
-		JsonArray resultJ = new JsonArray();
+		JsonObject resultJ = new JsonObject();
+		resultJ.add(Tags.Json.AGENT, agent.toJson());
+		JsonArray componentsJ = new JsonArray();
 		for (StrolchComponent component : components) {
-			JsonObject componentJ = new JsonObject();
-			componentJ.addProperty(Tags.Json.NAME, component.getName());
-			componentJ.addProperty(ConfigurationTags.API, component.getConfiguration().getApi());
-			componentJ.addProperty(ConfigurationTags.IMPL, component.getConfiguration().getImpl());
-			componentJ.addProperty(Tags.Json.STATE, component.getState().name());
-
-			JsonArray propertiesJ = new JsonArray();
-			Map<String, String> properties = component.getConfiguration().getAsMap();
-			for (String key : properties.keySet()) {
-				JsonObject propertyJ = new JsonObject();
-				propertyJ.addProperty(Tags.Json.KEY, key);
-				propertyJ.addProperty(Tags.Json.VALUE, properties.get(key));
-				propertiesJ.add(propertyJ);
-			}
-			componentJ.add(Tags.Json.PROPERTIES, propertiesJ);
-			componentJ.add(Tags.Json.DEPENDENCIES, component.getConfiguration().getDependencies().stream()
-					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
-
-			resultJ.add(componentJ);
+			componentsJ.add(component.toJson());
 		}
+		resultJ.add(COMPONENTS, componentsJ);
 
 		return ResponseUtil.toResponse(DATA, resultJ);
 	}
