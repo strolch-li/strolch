@@ -38,7 +38,6 @@ public class SmtpMailHandler extends MailHandler {
 		this.host = configuration.getString("host", null);
 		// mark certain properties as secret
 		configuration.getSecret("password");
-		configuration.getSecret("password");
 		SmtpMailer.init(configuration.getAsProperties());
 		super.initialize(configuration);
 	}
