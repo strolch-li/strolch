@@ -91,11 +91,10 @@ public class Inspector {
 
 	private static final Logger logger = LoggerFactory.getLogger(Inspector.class);
 
-	private static Certificate getCertificate(HttpServletRequest request) {
+	private static Certificate validateCertificate(HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		RestfulStrolchComponent rest = RestfulStrolchComponent.getInstance();
-		if (!cert.hasRole(ROLE_STROLCH_ADMIN))
-			rest.validate(cert).validateAction(Inspector.class.getSimpleName(), getCallerMethodNoClass(2));
+		rest.validate(cert).validateAction(Inspector.class.getSimpleName(), getCallerMethodNoClass(2));
 		return cert;
 	}
 
@@ -106,7 +105,7 @@ public class Inspector {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAgentOverview(@Context HttpServletRequest request) {
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		JsonObject agentOverview = new JsonObject();
 		JsonArray realmsArr = new JsonArray();
@@ -138,7 +137,7 @@ public class Inspector {
 	@Path("{realm}")
 	public Response getRealmOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		JsonObject realmDetailJ = new JsonObject();
 		JsonArray elementMapsArr = new JsonArray();
@@ -191,7 +190,7 @@ public class Inspector {
 	@Path("{realm}/xml")
 	public Response exportRealmToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -220,7 +219,7 @@ public class Inspector {
 	@Path("{realm}/resources")
 	public Response getResourcesOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		JsonObject mapOverview = new JsonObject();
 
@@ -253,7 +252,7 @@ public class Inspector {
 	@Path("{realm}/orders")
 	public Response getOrdersOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		JsonObject mapOverview = new JsonObject();
 
@@ -286,7 +285,7 @@ public class Inspector {
 	@Path("{realm}/activities")
 	public Response getActivitiesOverview(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		JsonObject mapOverview = new JsonObject();
 
@@ -319,7 +318,7 @@ public class Inspector {
 	@Path("{realm}/resources/xml")
 	public Response exportResourcesToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -346,7 +345,7 @@ public class Inspector {
 	@Path("{realm}/orders/xml")
 	public Response exportOrdersToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -373,7 +372,7 @@ public class Inspector {
 	@Path("{realm}/activities/xml")
 	public Response exportActivitiesToXml(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		StreamingOutput streamingOutput = stream -> {
 			try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -403,7 +402,7 @@ public class Inspector {
 			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		// parse the query string
 		ResourceSearch search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
@@ -448,7 +447,7 @@ public class Inspector {
 			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		// parse the query string
 		OrderSearch search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
@@ -495,7 +494,7 @@ public class Inspector {
 			@QueryParam("overview") Boolean overview) {
 
 		queryData.initializeUnsetFields();
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		// parse the query string
 		ActivitySearch search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
@@ -540,7 +539,7 @@ public class Inspector {
 	public Response exportResourcesOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
 			@PathParam("type") String type, @Context HttpServletRequest request) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		queryData.initializeUnsetFields();
 
@@ -573,7 +572,7 @@ public class Inspector {
 	public Response exportOrdersOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
 			@PathParam("type") String type, @Context HttpServletRequest request) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		queryData.initializeUnsetFields();
 
@@ -606,7 +605,7 @@ public class Inspector {
 	public Response exportActivitiesOfTypeToXml(@BeanParam QueryData queryData, @PathParam("realm") String realm,
 			@PathParam("type") String type, @Context HttpServletRequest request) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		queryData.initializeUnsetFields();
 
@@ -639,7 +638,7 @@ public class Inspector {
 	public Response getResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -663,7 +662,7 @@ public class Inspector {
 	public Response getResourceAsXml(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -683,7 +682,7 @@ public class Inspector {
 	public Response getOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -706,7 +705,7 @@ public class Inspector {
 	public Response getOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -726,7 +725,7 @@ public class Inspector {
 	public Response getActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -749,7 +748,7 @@ public class Inspector {
 	public Response getActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -770,7 +769,7 @@ public class Inspector {
 	public Response updateResourceAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Resource resource = parseResourceFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
@@ -797,7 +796,7 @@ public class Inspector {
 	public Response updateResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateResourceService svc = new UpdateResourceService();
@@ -848,7 +847,7 @@ public class Inspector {
 	public Response updateOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Order order = parseOrderFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
@@ -875,7 +874,7 @@ public class Inspector {
 	public Response updateOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateOrderService svc = new UpdateOrderService();
@@ -926,7 +925,7 @@ public class Inspector {
 	public Response updateActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Activity activity = parseActivityFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
@@ -953,7 +952,7 @@ public class Inspector {
 	public Response updateActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		UpdateActivityService svc = new UpdateActivityService();
@@ -1012,7 +1011,7 @@ public class Inspector {
 			@QueryParam("updateActivities") boolean updateActivities, //
 			String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		File tempFile = null;
 		try {
@@ -1066,7 +1065,7 @@ public class Inspector {
 	public Response addResourceAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Resource resource = parseResourceFromXml(null, data);
 
@@ -1091,7 +1090,7 @@ public class Inspector {
 	public Response addResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		// parse from complete JSON
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -1120,7 +1119,7 @@ public class Inspector {
 	public Response addResourceAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		Resource resource = parseNewResourceFromJson(cert, realm, type, data, flat);
@@ -1148,7 +1147,7 @@ public class Inspector {
 	@Path("{realm}/orders")
 	public Response addOrderAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Order order = parseOrderFromXml(null, data);
 
@@ -1172,7 +1171,7 @@ public class Inspector {
 	@Path("{realm}/orders")
 	public Response addOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		// parse from complete JSON
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -1201,7 +1200,7 @@ public class Inspector {
 	public Response addOrderAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		Order order = parseNewOrderFromJson(cert, realm, type, data, flat);
@@ -1230,7 +1229,7 @@ public class Inspector {
 	public Response addActivityAsXml(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		Activity activity = parseActivityFromXml(null, data);
 
@@ -1255,7 +1254,7 @@ public class Inspector {
 	public Response addActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		// parse from complete JSON
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -1284,7 +1283,7 @@ public class Inspector {
 	public Response addActivityAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 		boolean flat = Boolean.parseBoolean(flatS);
 
 		Activity activity = parseNewActivityFromJson(cert, realm, type, data, flat);
@@ -1311,7 +1310,7 @@ public class Inspector {
 	public Response removeResourcesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("ids") String ids) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		RemoveResourcesService svc = new RemoveResourcesService();
 		LocatorListArgument arg = svc.getArgumentInstance();
@@ -1332,7 +1331,7 @@ public class Inspector {
 	public Response removeOrdersByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("ids") String ids) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		RemoveOrdersService svc = new RemoveOrdersService();
 		LocatorListArgument arg = svc.getArgumentInstance();
@@ -1353,7 +1352,7 @@ public class Inspector {
 	public Response removeActivitiesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("ids") String ids) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		RemoveActivitiesService svc = new RemoveActivitiesService();
 		LocatorListArgument arg = svc.getArgumentInstance();
@@ -1375,7 +1374,7 @@ public class Inspector {
 	public Response removeResource(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		RemoveResourceService svc = new RemoveResourceService();
 		LocatorArgument arg = svc.getArgumentInstance();
@@ -1392,7 +1391,7 @@ public class Inspector {
 	public Response removeOrder(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		RemoveOrderService svc = new RemoveOrderService();
 		LocatorArgument arg = svc.getArgumentInstance();
@@ -1409,7 +1408,7 @@ public class Inspector {
 	public Response removeActivity(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
-		Certificate cert = getCertificate(request);
+		Certificate cert = validateCertificate(request);
 
 		RemoveActivityService svc = new RemoveActivityService();
 		LocatorArgument arg = svc.getArgumentInstance();
