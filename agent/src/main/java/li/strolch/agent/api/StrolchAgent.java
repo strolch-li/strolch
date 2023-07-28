@@ -485,4 +485,17 @@ public class StrolchAgent {
 		//		this.strolchConfiguration = new StrolchConfiguration(newStrolchConfig.getRuntimeConfiguration(),
 		//				configurationsByComponent);
 	}
+
+	public JsonObject toJson() {
+		JsonObject agentJ = getStrolchConfiguration().getRuntimeConfiguration().toJson();
+
+		JsonArray componentsJ = new JsonArray();
+		List<StrolchComponent> components = getComponentsOrderedByRoot();
+		for (StrolchComponent component : components) {
+			componentsJ.add(component.toJson());
+		}
+		agentJ.add(COMPONENTS, componentsJ);
+
+		return agentJ;
+	}
 }

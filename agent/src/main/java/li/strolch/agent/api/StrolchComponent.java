@@ -126,6 +126,17 @@ public class StrolchComponent {
 	}
 
 	/**
+	 * Returns a JSON representation of this component's configuration and state
+	 *
+	 * @return a JSON representation of this component
+	 */
+	public JsonObject toJson() {
+		JsonObject componentJ = this.configuration.toJson();
+		componentJ.addProperty(Tags.Json.STATE, this.state.name());
+		return componentJ;
+	}
+
+	/**
 	 * Return the {@link ExecutorService} instantiated for this agent
 	 *
 	 * @return the {@link ExecutorService} instantiated for this agent

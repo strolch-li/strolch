@@ -239,4 +239,41 @@ public abstract class AbstractionConfiguration {
 			throw new StrolchConfigurationException(msg);
 		}
 	}
+
+	public JsonObject toJson() {
+		JsonObject componentJ = new JsonObject();
+		componentJ.addProperty(Tags.Json.NAME, this.name);
+
+		Map<String, JsonObject> propertiesMap = new HashMap<>();
+
+		for (String key : this.configurationValues.keySet()) {
+			JsonObject propertyJ = new JsonObject();
+			propertyJ.addProperty(Tags.Json.KEY, key);
+			propertyJ.addProperty(Tags.Json.VALUE, this.configurationValues.get(key));
+			propertyJ.addProperty(Tags.Json.UNUSED, true);
+			propertiesMap.put(key, propertyJ);
+		}
+
+		for (String key : this.defaultValues.keySet()) {
+			JsonObject propertyJ = propertiesMap.computeIfAbsent(key, s -> {
+				JsonObject p = new JsonObject();
+				p.addProperty(Tags.Json.KEY, key);
+				return p;
+			});
+
+			propertyJ.addProperty(Tags.Json.UNUSED, false);
+			propertyJ.addProperty(Tags.Json.DEFAULT_VALUE, this.defaultValues.get(key));
+			String type = this.valueTypes.get(key);
+			if (type.equals(SECRET))
+				propertyJ.addProperty(Tags.Json.VALUE, "***");
+			propertyJ.addProperty(Tags.Json.TYPE, type);
+		}
+
+		JsonArray propertiesJ = propertiesMap.values().stream()
+				.sorted(comparing(e -> e.get(Tags.Json.KEY).getAsString()))
+				.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+		componentJ.add(Tags.Json.PROPERTIES, propertiesJ);
+
+		return componentJ;
+	}
 }
