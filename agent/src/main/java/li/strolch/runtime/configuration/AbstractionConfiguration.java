@@ -249,7 +249,12 @@ public abstract class AbstractionConfiguration {
 		for (String key : this.configurationValues.keySet()) {
 			JsonObject propertyJ = new JsonObject();
 			propertyJ.addProperty(Tags.Json.KEY, key);
-			propertyJ.addProperty(Tags.Json.VALUE, this.configurationValues.get(key));
+
+			if (this.valueTypes.containsKey(key) && this.valueTypes.get(key).equals(SECRET))
+				propertyJ.addProperty(Tags.Json.VALUE, "***");
+			else
+				propertyJ.addProperty(Tags.Json.VALUE, this.configurationValues.get(key));
+
 			propertyJ.addProperty(Tags.Json.UNUSED, true);
 			propertiesMap.put(key, propertyJ);
 		}
@@ -263,10 +268,7 @@ public abstract class AbstractionConfiguration {
 
 			propertyJ.addProperty(Tags.Json.UNUSED, false);
 			propertyJ.addProperty(Tags.Json.DEFAULT_VALUE, this.defaultValues.get(key));
-			String type = this.valueTypes.get(key);
-			if (type.equals(SECRET))
-				propertyJ.addProperty(Tags.Json.VALUE, "***");
-			propertyJ.addProperty(Tags.Json.TYPE, type);
+			propertyJ.addProperty(Tags.Json.TYPE, this.valueTypes.get(key));
 		}
 
 		JsonArray propertiesJ = propertiesMap.values().stream()
