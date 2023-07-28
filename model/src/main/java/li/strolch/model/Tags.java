@@ -119,9 +119,12 @@ public class Tags {
 		public static final String VALUE_CHANGES = "valueChanges";
 		public static final String STATE_ID = "stateId";
 		public static final String VALUE = "value";
+		public static final String DEFAULT_VALUE = "defaultValue";
 		public static final String TIME = "time";
 		public static final String COMMAND = "command";
 		public static final String DATA = "data";
+		public static final String AGENT = "agent";
+		public static final String COMPONENTS = "components";
 
 		public static final String POLICIES = "policies";
 
@@ -135,6 +138,7 @@ public class Tags {
 		public static final String LOCATOR = "locator";
 		public static final String SEVERITY = "severity";
 		public static final String KEY = "key";
+		public static final String UNUSED = "unused";
 		public static final String BUNDLE = "bundle";
 		public static final String MESSAGE = "message";
 		public static final String MESSAGES = "messages";
@@ -168,6 +172,7 @@ public class Tags {
 		public static final String EXECUTION_POLICY = "executionPolicy";
 
 		public static final String APP_VERSION = "appVersion";
+		public static final String APPLICATION_NAME = "applicationName";
 		public static final String SYSTEM_STATE = "systemState";
 		public static final String AGENT_VERSION = "agentVersion";
 		public static final String COMPONENT_VERSIONS = "componentVersions";
@@ -212,6 +217,10 @@ public class Tags {
 		public static final String USED_SPACE = "usedSpace";
 		public static final String FREE_SPACE = "freeSpace";
 		public static final String TOTAL_SPACE = "totalSpace";
+		public static final String CONFIG_PATH = "configPath";
+		public static final String DATA_PATH = "dataPath";
+		public static final String TEMP_PATH = "tempPath";
+		public static final String SUPPORTED_LANGUAGES = "supportedLanguages";
 	}
 
 	public static class Audit {
