@@ -250,7 +250,10 @@ public abstract class AbstractionConfiguration {
 			JsonObject propertyJ = new JsonObject();
 			propertyJ.addProperty(Tags.Json.KEY, key);
 
-			if (this.valueTypes.containsKey(key) && this.valueTypes.get(key).equals(SECRET))
+			String type = this.valueTypes.get(key);
+			if (type != null)
+				propertyJ.addProperty(Tags.Json.TYPE, this.valueTypes.get(key));
+			if (type != null && type.equals(SECRET))
 				propertyJ.addProperty(Tags.Json.VALUE, "***");
 			else
 				propertyJ.addProperty(Tags.Json.VALUE, this.configurationValues.get(key));
