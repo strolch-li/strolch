@@ -42,7 +42,7 @@ public abstract class AbstractionConfiguration {
 
 	public AbstractionConfiguration(String name, Map<String, String> configurationValues) {
 		this.name = name;
-		this.configurationValues = new HashMap<>(configurationValues);
+		this.configurationValues = configurationValues == null ? new HashMap<>() : new HashMap<>(configurationValues);
 		this.defaultValues = new HashMap<>();
 		this.valueTypes = new HashMap<>();
 	}
