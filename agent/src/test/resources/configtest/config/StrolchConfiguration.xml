@@ -3,9 +3,6 @@
 	<env id="global">
 		<Runtime>
 			<applicationName>StrolchRuntimeTest</applicationName>
-			<Properties>
-				<verbose>true</verbose>
-			</Properties>
 		</Runtime>
 		<Component>
 			<name>PersistenceHandler</name>
