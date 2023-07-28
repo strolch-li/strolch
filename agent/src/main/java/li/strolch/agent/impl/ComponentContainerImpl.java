@@ -29,6 +29,7 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.SystemHelper;
 import org.slf4j.Logger;
@@ -51,7 +52,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerImpl.class);
 
 	private final StrolchAgent agent;
-	private Map<Class<?>, StrolchComponent> componentsByType;
+	private MapOfLists<Class<?>, StrolchComponent> componentsByType;
 	private Map<String, StrolchComponent> componentsByName;
 	private Map<String, ComponentController> controllerMap;
 	private ComponentDependencyAnalyzer dependencyAnalyzer;
@@ -87,26 +88,33 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	@Override
 	public boolean hasComponent(Class<?> clazz) {
-		return this.componentsByType != null && this.componentsByType.containsKey(clazz);
+		return this.componentsByType != null && this.componentsByType.containsList(clazz);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
-		T component = (T) this.componentsByType.get(clazz);
-		if (component == null) {
-			String msg = "The component does not exist for class {0}";
+		List<StrolchComponent> components = this.componentsByType.getList(clazz);
+		if (components == null || components.isEmpty()) {
+			String msg = "No component exists for class {0}";
 			msg = MessageFormat.format(msg, clazz.getName());
 			throw new IllegalArgumentException(msg);
 		}
-		return component;
+		if (components.size() > 1) {
+			String msg
+					= "Component clazz {0} is ambiguous as there are {1} components registered with this type! Get the component by name.";
+			msg = MessageFormat.format(msg, clazz.getName());
+			throw new IllegalArgumentException(msg);
+		}
+
+		return (T) components.get(0);
 	}
 
 	@Override
 	public <T extends StrolchComponent> T getComponentByName(String name) throws IllegalArgumentException {
 		@SuppressWarnings("unchecked") T component = (T) this.componentsByName.get(name);
 		if (component == null) {
-			String msg = "The component {0} does not exist!";
+			String msg = "The component with name {0} does not exist!";
 			msg = MessageFormat.format(msg, name);
 			throw new IllegalArgumentException(msg);
 		}
@@ -187,7 +195,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
-	private StrolchComponent setupComponent(Map<Class<?>, StrolchComponent> componentMap,
+	private StrolchComponent setupComponent(MapOfLists<Class<?>, StrolchComponent> componentMap,
 			Map<String, ComponentController> controllerMap, ComponentConfiguration componentConfiguration) {
 
 		String componentName = componentConfiguration.getName();
@@ -227,11 +235,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 			strolchComponent.setup(componentConfiguration);
 
-			StrolchComponent existing = componentMap.put(apiClass, strolchComponent);
-			if (existing != null)
-				throw new IllegalStateException(
-						"Overwrote component " + existing.getName() + " with " + strolchComponent.getName() +
-								" as they share the same API Class!");
+			componentMap.addElement(apiClass, strolchComponent);
 			controllerMap.put(componentName, new ComponentController(strolchComponent));
 
 			return strolchComponent;
@@ -268,7 +272,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 				System.getProperty("user.timezone")));
 
 		// set up the container itself
-		Map<Class<?>, StrolchComponent> componentMap = new HashMap<>();
+		MapOfLists<Class<?>, StrolchComponent> componentMap = new MapOfLists<>();
 		Map<String, StrolchComponent> componentsByName = new HashMap<>();
 		Map<String, ComponentController> controllerMap = new HashMap<>();
 		Set<String> componentNames = strolchConfiguration.getComponentNames();
