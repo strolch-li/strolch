@@ -37,8 +37,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	private final File dataPath;
 	private final File tempPath;
 
-	private final Locale locale;
-	private final Set<SupportedLanguage> supportedLanguages;
+	private Locale locale;
+	private Set<SupportedLanguage> supportedLanguages;
 
 	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
 			File configPathF, File dataPathF, File tempPathF, Set<SupportedLanguage> supportedLanguages) {
@@ -100,8 +100,16 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		return this.locale;
 	}
 
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+	}
+
 	public Set<SupportedLanguage> getSupportedLanguages() {
 		return this.supportedLanguages;
+	}
+
+	public void setSupportedLanguages(Set<SupportedLanguage> supportedLanguages) {
+		this.supportedLanguages = supportedLanguages;
 	}
 
 	public String getTimezone() {

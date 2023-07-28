@@ -42,7 +42,7 @@ public abstract class AbstractionConfiguration {
 
 	public AbstractionConfiguration(String name, Map<String, String> configurationValues) {
 		this.name = name;
-		this.configurationValues = configurationValues;
+		this.configurationValues = new HashMap<>(configurationValues);
 		this.defaultValues = new HashMap<>();
 		this.valueTypes = new HashMap<>();
 	}
@@ -61,6 +61,11 @@ public abstract class AbstractionConfiguration {
 
 	public Map<String, String> getAsMap() {
 		return new HashMap<>(this.configurationValues);
+	}
+
+	public void updateProperties(Map<String, String> properties) {
+		this.configurationValues.clear();
+		this.configurationValues.putAll(properties);
 	}
 
 	public boolean hasProperty(String key) {

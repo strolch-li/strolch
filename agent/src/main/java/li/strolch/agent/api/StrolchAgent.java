@@ -41,7 +41,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.*;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -471,19 +474,20 @@ public class StrolchAgent {
 		File configPathF = runtimeConfig.getConfigPath();
 		File dataPathF = runtimeConfig.getDataPath();
 		File tempPathF = runtimeConfig.getTempPath();
-		StrolchConfiguration newStrolchConfig = parseConfiguration(runtimeConfig.getEnvironment(), configPathF,
+		StrolchConfiguration newConfig = parseConfiguration(runtimeConfig.getEnvironment(), configPathF,
 				dataPathF, tempPathF);
 
-		Map<String, ComponentConfiguration> configurationsByComponent = new HashMap<>();
 		for (String name : this.container.getComponentNames()) {
+			ComponentConfiguration newComponentConfig = newConfig.getComponentConfiguration(name);
 			StrolchComponent existingComponent = this.container.getComponentByName(name);
-			Map<String, String> existingComponentConfig = existingComponent.getConfiguration().getAsMap();
-			ComponentConfiguration newComponentConfig = newStrolchConfig.getComponentConfiguration(name);
-			//existingComponent.getConfiguration().updateProperties(newComponentConfig.getAsMap());
+			ComponentConfiguration existingComponentConfiguration = existingComponent.getConfiguration();
+			existingComponentConfiguration.updateProperties(newComponentConfig.getAsMap());
 		}
 
-		//		this.strolchConfiguration = new StrolchConfiguration(newStrolchConfig.getRuntimeConfiguration(),
-		//				configurationsByComponent);
+		RuntimeConfiguration newRuntimeConfiguration = newConfig.getRuntimeConfiguration();
+		runtimeConfig.updateProperties(newRuntimeConfiguration.getAsMap());
+		runtimeConfig.setLocale(newRuntimeConfiguration.getLocale());
+		runtimeConfig.setSupportedLanguages(newRuntimeConfiguration.getSupportedLanguages());
 	}
 
 	public JsonObject toJson() {
