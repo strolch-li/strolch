@@ -407,17 +407,19 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	}
 
 	@Override
-	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
+	public T undoVersion(StrolchTransaction tx, T element) throws StrolchException {
 		assertNotReadOnly();
-		this.elementMap.undoVersion(tx, element);
+		T previous = this.elementMap.undoVersion(tx, element);
 		if (element.getVersion().isFirstVersion()) {
 			if (this.deleted == null)
 				this.deleted = new HashSet<>();
 			this.deleted.add(element);
+			return null;
 		} else {
 			if (this.updated == null)
 				this.updated = new HashSet<>();
-			this.updated.add(element);
+			this.updated.add(previous);
+			return previous;
 		}
 	}
 }

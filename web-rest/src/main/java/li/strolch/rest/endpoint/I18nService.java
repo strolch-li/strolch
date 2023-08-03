@@ -26,7 +26,7 @@ import li.strolch.rest.helper.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("i18n")
+@Path("strolch/i18n")
 public class I18nService {
 
 	private static final Logger logger = LoggerFactory.getLogger(I18nService.class);

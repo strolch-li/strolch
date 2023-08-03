@@ -36,6 +36,8 @@ public class SmtpMailHandler extends MailHandler {
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 		this.realm = configuration.getString("realm", getContainer().getRealmNames().iterator().next());
 		this.host = configuration.getString("host", null);
+		// mark certain properties as secret
+		configuration.getSecret("password");
 		SmtpMailer.init(configuration.getAsProperties());
 		super.initialize(configuration);
 	}

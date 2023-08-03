@@ -15,11 +15,6 @@
  */
 package li.strolch.testbase.runtime;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.*;
-
-import java.util.*;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.AbstractStrolchElement;
@@ -29,6 +24,11 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+
+import java.util.*;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("nls")
 public class ActivityModelTestRunner {
@@ -158,6 +158,30 @@ public class ActivityModelTestRunner {
 			Activity activity = tx.getActivityBy(TYPE, ID);
 			assertNull("Should not read Activity with id " + ID, activity);
 		}
+
+		// create with same ID, but different types
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Activity act = createActivity("non-unique-id", "NonUnique1", "NonUnique1", TimeOrdering.SERIES);
+			tx.add(act);
+			tx.commitOnClose();
+		}
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Activity act = createActivity("non-unique-id", "NonUnique2", "NonUnique2", TimeOrdering.SERIES);
+			tx.add(act);
+			tx.commitOnClose();
+		}
+
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Activity act1 = tx.getActivityBy("NonUnique1", "non-unique-id");
+			Activity act2 = tx.getActivityBy("NonUnique2", "non-unique-id");
+			assertNotNull(act1);
+			assertNotNull(act2);
+			assertEquals("NonUnique1", act1.getName());
+			assertEquals("NonUnique2", act2.getName());
+		}
 	}
 
 	public void runBulkOperationTests() {
@@ -165,10 +189,10 @@ public class ActivityModelTestRunner {
 		// create 15 activities
 		List<Activity> activities = new ArrayList<>();
 		activities.addAll(createActivities(0, 5, "@", "My Activity", "MyType1", TimeOrdering.SERIES));
-		activities
-				.addAll(createActivities(activities.size(), 5, "@", "Other Activity", "MyType2", TimeOrdering.SERIES));
-		activities.addAll(createActivities(activities.size(), 5, "@", "Further Activity", "MyType3",
-				TimeOrdering.SERIES));
+		activities.addAll(
+				createActivities(activities.size(), 5, "@", "Other Activity", "MyType2", TimeOrdering.SERIES));
+		activities.addAll(
+				createActivities(activities.size(), 5, "@", "Further Activity", "MyType3", TimeOrdering.SERIES));
 
 		// sort them so we know which activity our objects are
 		Comparator<Activity> comparator = Comparator.comparing(AbstractStrolchElement::getId);

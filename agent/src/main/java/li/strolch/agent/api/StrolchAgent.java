@@ -15,20 +15,6 @@
  */
 package li.strolch.agent.api;
 
-import static li.strolch.model.Tags.Json.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.management.*;
-import java.text.MessageFormat;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.impl.ComponentContainerImpl;
@@ -36,7 +22,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.Locator;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.runtime.configuration.ConfigurationParser;
+import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
@@ -49,6 +35,22 @@ import li.strolch.utils.helper.SystemHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.management.*;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static li.strolch.model.Tags.Json.*;
+import static li.strolch.runtime.configuration.ConfigurationParser.parseConfiguration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -109,6 +111,20 @@ public class StrolchAgent {
 	 */
 	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
+	}
+
+	/**
+	 * @see ComponentContainer#getComponentByName(String)
+	 */
+	public <T extends StrolchComponent> T getComponentByName(String name) {
+		return getContainer().getComponentByName(name);
+	}
+
+	/**
+	 * @see ComponentContainer#getComponentsOrderedByRoot()
+	 */
+	public List<StrolchComponent> getComponentsOrderedByRoot() {
+		return this.container.getComponentsOrderedByRoot();
 	}
 
 	public PrivilegeHandler getPrivilegeHandler() throws IllegalArgumentException {
@@ -301,14 +317,10 @@ public class StrolchAgent {
 	 * Sets up the agent by parsing the configuration file and initializes the given environment
 	 * </p>
 	 *
-	 * @param environment
-	 * 		the current environment
-	 * @param configPathF
-	 * 		the path to the config directory
-	 * @param dataPathF
-	 * 		the path to the data directory
-	 * @param tempPathF
-	 * 		the path to the temp directory
+	 * @param environment the current environment
+	 * @param configPathF the path to the config directory
+	 * @param dataPathF   the path to the data directory
+	 * @param tempPathF   the path to the temp directory
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
@@ -319,8 +331,7 @@ public class StrolchAgent {
 		logger.info(" - Temp: " + tempPathF.getAbsolutePath());
 		logger.info(" - user.dir: " + SystemHelper.getUserDir());
 
-		this.strolchConfiguration = ConfigurationParser.parseConfiguration(environment, configPathF, dataPathF,
-				tempPathF);
+		this.strolchConfiguration = parseConfiguration(environment, configPathF, dataPathF, tempPathF);
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
 		container.setup(this.strolchConfiguration);
@@ -400,9 +411,8 @@ public class StrolchAgent {
 
 	public JsonObject getSystemState(long updateInterval, TimeUnit updateIntervalUnit) {
 
-		if (this.systemState == null
-				|| System.currentTimeMillis() - this.systemStateUpdateTime > updateIntervalUnit.toMillis(
-				updateInterval)) {
+		if (this.systemState == null ||
+				System.currentTimeMillis() - this.systemStateUpdateTime > updateIntervalUnit.toMillis(updateInterval)) {
 			this.systemState = new JsonObject();
 
 			JsonObject osJ = new JsonObject();
@@ -457,5 +467,39 @@ public class StrolchAgent {
 		}
 
 		return this.systemState;
+	}
+
+	public void reloadStrolchConfiguration() {
+		RuntimeConfiguration runtimeConfig = this.strolchConfiguration.getRuntimeConfiguration();
+		File configPathF = runtimeConfig.getConfigPath();
+		File dataPathF = runtimeConfig.getDataPath();
+		File tempPathF = runtimeConfig.getTempPath();
+		StrolchConfiguration newConfig = parseConfiguration(runtimeConfig.getEnvironment(), configPathF,
+				dataPathF, tempPathF);
+
+		for (String name : this.container.getComponentNames()) {
+			ComponentConfiguration newComponentConfig = newConfig.getComponentConfiguration(name);
+			StrolchComponent existingComponent = this.container.getComponentByName(name);
+			ComponentConfiguration existingComponentConfiguration = existingComponent.getConfiguration();
+			existingComponentConfiguration.updateProperties(newComponentConfig.getAsMap());
+		}
+
+		RuntimeConfiguration newRuntimeConfiguration = newConfig.getRuntimeConfiguration();
+		runtimeConfig.updateProperties(newRuntimeConfiguration.getAsMap());
+		runtimeConfig.setLocale(newRuntimeConfiguration.getLocale());
+		runtimeConfig.setSupportedLanguages(newRuntimeConfiguration.getSupportedLanguages());
+	}
+
+	public JsonObject toJson() {
+		JsonObject agentJ = getStrolchConfiguration().getRuntimeConfiguration().toJson();
+
+		JsonArray componentsJ = new JsonArray();
+		List<StrolchComponent> components = getComponentsOrderedByRoot();
+		for (StrolchComponent component : components) {
+			componentsJ.add(component.toJson());
+		}
+		agentJ.add(COMPONENTS, componentsJ);
+
+		return agentJ;
 	}
 }

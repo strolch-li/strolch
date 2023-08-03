@@ -15,13 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.model.StrolchModelConstants.TEMPLATE;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import li.strolch.agent.api.ElementMap;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchElementNotFoundException;
@@ -35,6 +28,13 @@ import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static li.strolch.model.StrolchModelConstants.TEMPLATE;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -94,8 +94,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (t == null)
 			return null;
 
-		@SuppressWarnings("unchecked")
-		T clone = (T) t.getClone();
+		@SuppressWarnings("unchecked") T clone = (T) t.getClone();
 		clone.setId(StrolchAgent.getUniqueId());
 		clone.setType(type);
 		return clone;
@@ -123,11 +122,10 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (t == null)
 			return null;
 
-		if (tx.isReadOnly())
+		if (tx.isReadOnly() && !type.equals(TEMPLATE))
 			return t;
 
-		@SuppressWarnings("unchecked")
-		T clone = (T) t.getClone(true);
+		@SuppressWarnings("unchecked") T clone = (T) t.getClone(true);
 		return clone;
 	}
 
@@ -175,8 +173,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 			return stream.collect(Collectors.toList());
 
 		return stream.map(t -> {
-			@SuppressWarnings("unchecked")
-			T clone = (T) t.getClone(true);
+			@SuppressWarnings("unchecked") T clone = (T) t.getClone(true);
 			return clone;
 		}).collect(Collectors.toList());
 	}
@@ -187,12 +184,11 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (byType == null)
 			return new ArrayList<>(0);
 
-		if (tx.isReadOnly())
+		if (tx.isReadOnly() && !type.equals(TEMPLATE))
 			return new ArrayList<>(byType.values());
 
 		return byType.values().stream().map(t -> {
-			@SuppressWarnings("unchecked")
-			T clone = (T) t.getClone(true);
+			@SuppressWarnings("unchecked") T clone = (T) t.getClone(true);
 			return clone;
 		}).collect(Collectors.toList());
 	}
@@ -252,8 +248,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	 * Special method used when starting the container to cache the values. Not to be used anywhere else but from the
 	 * {@link CachedRealm}
 	 *
-	 * @param elements
-	 * 		the elements to insert
+	 * @param elements the elements to insert
 	 */
 	synchronized void insertAll(List<T> elements) {
 		elements.forEach(this::internalInsert);
@@ -264,8 +259,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		// assert no object already exists with this id
 		if (byType.containsKey(element.getId())) {
-			String msg = "An element already exists with the id \"{0}\". Elements of the same class must always have a unique id, regardless of their type!";
-			msg = MessageFormat.format(msg, element.getId());
+			String msg = "An element already exists with the id {0} and type {1}";
+			msg = MessageFormat.format(msg, element.getId(), element.getType());
 			throw new StrolchPersistenceException(msg);
 		}
 
@@ -300,20 +295,22 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	public synchronized void update(StrolchTransaction tx, T element) {
 		element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
 		Version.updateVersionFor(element, 0, tx.getUsername(), false);
-		internalUpdate(tx, element);
+		internalUpdate(element);
 	}
 
-	protected void internalUpdate(StrolchTransaction tx, T element) {
+	protected void internalUpdate(T element) {
 		Map<String, T> byType = this.elementMap.get(element.getType());
 		if (byType == null) {
-			String msg = "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!";
+			String msg
+					= "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!";
 			msg = MessageFormat.format(msg, element.getType(), element.getId());
 			throw new StrolchPersistenceException(msg);
 		}
 
 		// assert object already exists with this id
 		if (!byType.containsKey(element.getId())) {
-			String msg = "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!";
+			String msg
+					= "The element does not yet exist with the type \"{0}\" and id \"{1}\". Use add() for new objects!";
 			msg = MessageFormat.format(msg, element.getType(), element.getId());
 			throw new StrolchPersistenceException(msg);
 		}
@@ -329,7 +326,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		for (T element : elements) {
 			element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
 			Version.updateVersionFor(element, 0, tx.getUsername(), false);
-			internalUpdate(tx, element);
+			internalUpdate(element);
 		}
 	}
 
@@ -416,7 +413,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	}
 
 	@Override
-	public void undoVersion(StrolchTransaction tx, T element) throws StrolchException {
+	public T undoVersion(StrolchTransaction tx, T element) throws StrolchException {
 		throw new IllegalStateException("Transient mode does not support versioning");
 	}
 

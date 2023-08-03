@@ -15,12 +15,6 @@
  */
 package li.strolch.testbase.runtime;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.*;
-
-import java.time.LocalDate;
-import java.util.*;
-
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Order;
@@ -32,6 +26,12 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.collections.DateRange;
+
+import java.time.LocalDate;
+import java.util.*;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("nls")
 public class OrderModelTestRunner {
@@ -149,7 +149,7 @@ public class OrderModelTestRunner {
 			assertEquals("Expect 1 Orders from _20190501 inc to _2020 inc", 1, size);
 
 			DateRange dateRange = new DateRange().from(_2017, true).to(_20190401, true);
-			String[] types = { "QTestType1", "QTestType2", "QTestType3" };
+			String[] types = {"QTestType1", "QTestType2", "QTestType3"};
 
 			size = dao.querySize(dateRange, types);
 			assertEquals("Expect 2 Orders from _2017 inc to _20190401 inc by types", 2, size);
@@ -222,6 +222,30 @@ public class OrderModelTestRunner {
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
 			Order order = tx.getOrderBy(TYPE, ID);
 			assertNull("Should not read Order with id " + ID, order);
+		}
+
+		// create with same ID, but different types
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Order order = createOrder("non-unique-id", "NonUnique1", "NonUnique1");
+			tx.add(order);
+			tx.commitOnClose();
+		}
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Order order = createOrder("non-unique-id", "NonUnique2", "NonUnique2");
+			tx.add(order);
+			tx.commitOnClose();
+		}
+
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Order order1 = tx.getOrderBy("NonUnique1", "non-unique-id");
+			Order order2 = tx.getOrderBy("NonUnique2", "non-unique-id");
+			assertNotNull(order1);
+			assertNotNull(order2);
+			assertEquals("NonUnique1", order1.getName());
+			assertEquals("NonUnique2", order2.getName());
 		}
 	}
 

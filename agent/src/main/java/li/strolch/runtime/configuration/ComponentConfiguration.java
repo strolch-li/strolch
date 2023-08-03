@@ -15,6 +15,10 @@
  */
 package li.strolch.runtime.configuration;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
+
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
@@ -74,11 +78,22 @@ public class ComponentConfiguration extends AbstractionConfiguration {
 			return getDataDir(key, defValue, true);
 
 		if (!pathF.exists() || !pathF.isDirectory() || (writeable ? !pathF.canWrite() : !pathF.canRead()))
-			throw new IllegalStateException("The path " + path + " for key " + key + " is not a directory or " + (
-					writeable ?
-							"writeable" :
-							"readable") + "!");
+			throw new IllegalStateException("The path " + path + " for key " + key + " is not a directory or " +
+					(writeable ? "writeable" : "readable") + "!");
 
 		return pathF;
+	}
+
+	@Override
+	public JsonObject toJson() {
+		JsonObject componentJ = super.toJson();
+
+		componentJ.addProperty(ConfigurationTags.API, this.api);
+		componentJ.addProperty(ConfigurationTags.IMPL, this.impl);
+
+		componentJ.add(Tags.Json.DEPENDENCIES,
+				this.dependencies.stream().collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
+
+		return componentJ;
 	}
 }

@@ -15,24 +15,36 @@
  */
 package li.strolch.runtime.configuration;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import li.strolch.model.StrolchValueType;
+import li.strolch.model.Tags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.*;
 
-import li.strolch.utils.helper.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Comparator.comparing;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 public abstract class AbstractionConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractionConfiguration.class);
+	public static final String SECRET = "Secret";
 
 	private final String name;
 	private final Map<String, String> configurationValues;
+	private final Map<String, String> defaultValues;
+	private final Map<String, String> valueTypes;
 
 	public AbstractionConfiguration(String name, Map<String, String> configurationValues) {
 		this.name = name;
-		this.configurationValues = configurationValues;
+		this.configurationValues = configurationValues == null ? new HashMap<>() : new HashMap<>(configurationValues);
+		this.defaultValues = new HashMap<>();
+		this.valueTypes = new HashMap<>();
 	}
 
 	public String getName() {
@@ -51,6 +63,11 @@ public abstract class AbstractionConfiguration {
 		return new HashMap<>(this.configurationValues);
 	}
 
+	public void updateProperties(Map<String, String> properties) {
+		this.configurationValues.clear();
+		this.configurationValues.putAll(properties);
+	}
+
 	public boolean hasProperty(String key) {
 		return this.configurationValues.containsKey(key);
 	}
@@ -60,6 +77,9 @@ public abstract class AbstractionConfiguration {
 	}
 
 	public List<String> getStringList(String key, String defValue) {
+		this.defaultValues.put(key, defValue);
+		this.valueTypes.put(key, StrolchValueType.STRING_LIST.getType());
+
 		String value = getValue(key, defValue);
 		return Arrays.stream(value.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
 	}
@@ -69,69 +89,82 @@ public abstract class AbstractionConfiguration {
 	}
 
 	public String getString(String key, String defValue) {
+		this.defaultValues.put(key, defValue);
+		this.valueTypes.put(key, StrolchValueType.STRING.getType());
+
 		return getValue(key, defValue);
 	}
 
+	public String getSecret(String key) {
+		this.valueTypes.put(key, SECRET);
+		return getValue(key, null, true);
+	}
+
 	public boolean getBoolean(String key, Boolean defValue) {
+		if (defValue != null)
+			this.defaultValues.put(key, String.valueOf(defValue));
+		this.valueTypes.put(key, StrolchValueType.BOOLEAN.getType());
+
 		String value = this.configurationValues.get(key);
-		if (StringHelper.isNotEmpty(value)) {
-			if (value.equalsIgnoreCase("true"))
-				return true;
-			else if (value.equalsIgnoreCase("false"))
-				return false;
+		if (isEmpty(value))
+			return handleDefaultNonSecret(key, defValue);
 
-			String msg = "Component {0} has non-boolean configuration value for {1} = {2}!";
-			msg = MessageFormat.format(msg, this.name, key, value);
-			throw new StrolchConfigurationException(msg);
-		}
+		if (value.equalsIgnoreCase("true"))
+			return true;
+		if (value.equalsIgnoreCase("false"))
+			return false;
 
-		assertDefValueExist(key, defValue);
-		logDefValueUse(key, defValue);
-		return defValue;
+		String msg = "Component {0} has non-boolean configuration value for {1} = {2}!";
+		msg = MessageFormat.format(msg, this.name, key, value);
+		throw new StrolchConfigurationException(msg);
 	}
 
 	public int getInt(String key, Integer defValue) {
+		if (defValue != null)
+			this.defaultValues.put(key, String.valueOf(defValue));
+		this.valueTypes.put(key, StrolchValueType.INTEGER.getType());
+
 		String value = this.configurationValues.get(key);
-		if (StringHelper.isNotEmpty(value)) {
+		if (isEmpty(value))
+			return handleDefaultNonSecret(key, defValue);
 
-			try {
-				return Integer.decode(value);
-			} catch (NumberFormatException e) {
-				String msg = "Component {0} has non-integer configuration value for {1} = {2}!";
-				msg = MessageFormat.format(msg, this.name, key, value);
-				throw new StrolchConfigurationException(msg);
-			}
+		try {
+			return Integer.decode(value);
+		} catch (NumberFormatException e) {
+			String msg = "Component {0} has non-integer configuration value for {1} = {2}!";
+			msg = MessageFormat.format(msg, this.name, key, value);
+			throw new StrolchConfigurationException(msg);
 		}
-
-		assertDefValueExist(key, defValue);
-		logDefValueUse(key, defValue);
-		return defValue;
 	}
 
 	public long getLong(String key, Long defValue) {
+		if (defValue != null)
+			this.defaultValues.put(key, String.valueOf(defValue));
+		this.valueTypes.put(key, StrolchValueType.LONG.getType());
+
 		String value = this.configurationValues.get(key);
-		if (StringHelper.isNotEmpty(value)) {
+		if (isEmpty(value))
+			return handleDefaultNonSecret(key, defValue);
 
-			try {
-				return Long.parseLong(value);
-			} catch (NumberFormatException e) {
-				String msg = "Component {0} has non-long configuration value for {1} = {2}!";
-				msg = MessageFormat.format(msg, this.name, key, value);
-				throw new StrolchConfigurationException(msg);
-			}
+		try {
+			return Long.parseLong(value);
+		} catch (NumberFormatException e) {
+			String msg = "Component {0} has non-long configuration value for {1} = {2}!";
+			msg = MessageFormat.format(msg, this.name, key, value);
+			throw new StrolchConfigurationException(msg);
 		}
-
-		assertDefValueExist(key, defValue);
-		logDefValueUse(key, defValue);
-		return defValue;
 	}
 
 	public File getConfigFile(String key, String defValue, RuntimeConfiguration configuration) {
+		this.defaultValues.put(key, defValue);
+		this.valueTypes.put(key, File.class.getSimpleName());
+
 		String value = getValue(key, defValue);
 
 		File configFile = new File(configuration.getConfigPath(), value);
 		if (!configFile.isFile() || !configFile.canRead()) {
-			String msg = "Component {0} requires configuration file for configuration property ''{1}'' which does not exist with value: {2}";
+			String msg
+					= "Component {0} requires configuration file for configuration property ''{1}'' which does not exist with value: {2}";
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -139,11 +172,15 @@ public abstract class AbstractionConfiguration {
 	}
 
 	public File getDataDir(String key, String defValue, RuntimeConfiguration configuration, boolean checkExists) {
+		this.defaultValues.put(key, defValue);
+		this.valueTypes.put(key, Path.class.getSimpleName());
+
 		String value = getValue(key, defValue);
 
 		File dataDir = new File(configuration.getDataPath(), value);
 		if (checkExists && !dataDir.isDirectory() || !dataDir.canRead()) {
-			String msg = "Component {0} requires data directory for configuration property ''{1}'' which does not exist with value: {2}";
+			String msg
+					= "Component {0} requires data directory for configuration property ''{1}'' which does not exist with value: {2}";
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -151,11 +188,15 @@ public abstract class AbstractionConfiguration {
 	}
 
 	public File getDataFile(String key, String defValue, RuntimeConfiguration configuration, boolean checkExists) {
+		this.defaultValues.put(key, defValue);
+		this.valueTypes.put(key, File.class.getSimpleName());
+
 		String value = getValue(key, defValue);
 
 		File dataFile = new File(configuration.getDataPath(), value);
 		if (checkExists && !dataFile.isFile() || !dataFile.canRead()) {
-			String msg = "Component {0} requires data file for configuration property ''{1}'' which does not exist with value: {2}";
+			String msg
+					= "Component {0} requires data file for configuration property ''{1}'' which does not exist with value: {2}";
 			msg = MessageFormat.format(msg, this.name, key, value);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -163,18 +204,36 @@ public abstract class AbstractionConfiguration {
 	}
 
 	private String getValue(String key, String defValue) {
+		return getValue(key, defValue, false);
+	}
+
+	private String getValue(String key, String defValue, boolean isSecret) {
 		String value = this.configurationValues.get(key);
-		if (StringHelper.isEmpty(value)) {
+		if (isEmpty(value)) {
 			assertDefValueExist(key, defValue);
-			logDefValueUse(key, defValue);
+			logDefValueUse(key, defValue, isSecret);
 			value = defValue;
 		}
 		return value;
 	}
 
-	private void logDefValueUse(String key, Object defValue) {
+	private <T> T handleDefaultNonSecret(String key, T defValue) {
+		if (defValue == null)
+			throw new IllegalStateException(MessageFormat.format(
+					"No configuration value configured for {0} and no default value provided for component {1}", key,
+					this.name));
+
+		assertDefValueExist(key, defValue);
+		logDefValueUse(key, defValue, false);
+		return defValue;
+	}
+
+	private void logDefValueUse(String key, Object defValue, boolean isSecret) {
 		String msg = "{0}: Using default for key {1}={2}";
-		msg = MessageFormat.format(msg, this.name, key, defValue);
+		if (isSecret)
+			msg = MessageFormat.format(msg, this.name, "***", "***");
+		else
+			msg = MessageFormat.format(msg, this.name, key, defValue);
 		logger.info(msg);
 	}
 
@@ -184,5 +243,47 @@ public abstract class AbstractionConfiguration {
 			msg = MessageFormat.format(msg, this.name, key);
 			throw new StrolchConfigurationException(msg);
 		}
+	}
+
+	public JsonObject toJson() {
+		JsonObject componentJ = new JsonObject();
+		componentJ.addProperty(Tags.Json.NAME, this.name);
+
+		Map<String, JsonObject> propertiesMap = new HashMap<>();
+
+		for (String key : this.configurationValues.keySet()) {
+			JsonObject propertyJ = new JsonObject();
+			propertyJ.addProperty(Tags.Json.KEY, key);
+
+			String type = this.valueTypes.get(key);
+			if (type != null)
+				propertyJ.addProperty(Tags.Json.TYPE, this.valueTypes.get(key));
+			if (type != null && type.equals(SECRET))
+				propertyJ.addProperty(Tags.Json.VALUE, "***");
+			else
+				propertyJ.addProperty(Tags.Json.VALUE, this.configurationValues.get(key));
+
+			propertyJ.addProperty(Tags.Json.UNUSED, true);
+			propertiesMap.put(key, propertyJ);
+		}
+
+		for (String key : this.defaultValues.keySet()) {
+			JsonObject propertyJ = propertiesMap.computeIfAbsent(key, s -> {
+				JsonObject p = new JsonObject();
+				p.addProperty(Tags.Json.KEY, key);
+				return p;
+			});
+
+			propertyJ.addProperty(Tags.Json.UNUSED, false);
+			propertyJ.addProperty(Tags.Json.DEFAULT_VALUE, this.defaultValues.get(key));
+			propertyJ.addProperty(Tags.Json.TYPE, this.valueTypes.get(key));
+		}
+
+		JsonArray propertiesJ = propertiesMap.values().stream()
+				.sorted(comparing(e -> e.get(Tags.Json.KEY).getAsString()))
+				.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+		componentJ.add(Tags.Json.PROPERTIES, propertiesJ);
+
+		return componentJ;
 	}
 }

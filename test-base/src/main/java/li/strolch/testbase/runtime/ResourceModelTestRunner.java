@@ -148,6 +148,31 @@ public class ResourceModelTestRunner {
 			Resource resource = tx.getResourceBy(TYPE, ID);
 			assertNull("Should not read Resource with id " + ID, resource);
 		}
+
+
+		// create with same ID, but different types
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Resource res = createResource("non-unique-id", "NonUnique1", "NonUnique1");
+			tx.add(res);
+			tx.commitOnClose();
+		}
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Resource res = createResource("non-unique-id", "NonUnique2", "NonUnique2");
+			tx.add(res);
+			tx.commitOnClose();
+		}
+
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Resource res1 = tx.getResourceBy("NonUnique1", "non-unique-id");
+			Resource res2 = tx.getResourceBy("NonUnique2", "non-unique-id");
+			assertNotNull(res1);
+			assertNotNull(res2);
+			assertEquals("NonUnique1", res1.getName());
+			assertEquals("NonUnique2", res2.getName());
+		}
 	}
 
 	public void runBulkOperationTests() {

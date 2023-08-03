@@ -29,6 +29,8 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import li.strolch.utils.collections.MapOfLists;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.SystemHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,12 +52,14 @@ public class ComponentContainerImpl implements ComponentContainer {
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerImpl.class);
 
 	private final StrolchAgent agent;
-	private Map<Class<?>, StrolchComponent> componentMap;
+	private MapOfLists<Class<?>, StrolchComponent> componentsByType;
+	private Map<String, StrolchComponent> componentsByName;
 	private Map<String, ComponentController> controllerMap;
 	private ComponentDependencyAnalyzer dependencyAnalyzer;
 	private ComponentState state;
 
 	private ComponentContainerStateHandler containerStateHandler;
+	private StrolchConfiguration strolchConfiguration;
 
 	public ComponentContainerImpl(StrolchAgent agent) {
 		this.agent = agent;
@@ -74,24 +78,72 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 	@Override
 	public Set<Class<?>> getComponentTypes() {
-		return this.componentMap.keySet();
+		return this.componentsByType.keySet();
+	}
+
+	@Override
+	public Set<String> getComponentNames() {
+		return this.componentsByName.keySet();
 	}
 
 	@Override
 	public boolean hasComponent(Class<?> clazz) {
-		return this.componentMap != null && this.componentMap.containsKey(clazz);
+		return this.componentsByType != null && this.componentsByType.containsList(clazz);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
-		T component = (T) this.componentMap.get(clazz);
-		if (component == null) {
-			String msg = "The component does not exist for class {0}";
+		List<StrolchComponent> components = this.componentsByType.getList(clazz);
+		if (components == null || components.isEmpty()) {
+			String msg = "No component exists for class {0}";
 			msg = MessageFormat.format(msg, clazz.getName());
 			throw new IllegalArgumentException(msg);
 		}
+		if (components.size() > 1) {
+			String msg
+					= "Component clazz {0} is ambiguous as there are {1} components registered with this type! Get the component by name.";
+			msg = MessageFormat.format(msg, clazz.getName());
+			throw new IllegalArgumentException(msg);
+		}
+
+		return (T) components.get(0);
+	}
+
+	@Override
+	public <T extends StrolchComponent> T getComponentByName(String name) throws IllegalArgumentException {
+		@SuppressWarnings("unchecked") T component = (T) this.componentsByName.get(name);
+		if (component == null) {
+			String msg = "The component with name {0} does not exist!";
+			msg = MessageFormat.format(msg, name);
+			throw new IllegalArgumentException(msg);
+		}
 		return component;
+	}
+
+	@Override
+	public List<StrolchComponent> getComponentsOrderedByRoot() {
+		DBC.PRE.assertNotNull("Not yet started!", this.dependencyAnalyzer);
+		List<StrolchComponent> result = new ArrayList<>();
+		List<StrolchComponent> components = new ArrayList<>(this.componentsByType.values());
+		components.sort(Comparator.comparing(StrolchComponent::getName));
+
+		while (!components.isEmpty()) {
+			for (Iterator<StrolchComponent> iterator = components.iterator(); iterator.hasNext(); ) {
+				StrolchComponent component = iterator.next();
+				ComponentConfiguration configuration = strolchConfiguration.getComponentConfiguration(
+						component.getName());
+				Set<String> dependencies = configuration.getDependencies();
+				if (!dependencies.isEmpty() &&
+						dependencies.stream().map(this.componentsByName::get).noneMatch(result::contains))
+					continue;
+
+				result.add(component);
+				iterator.remove();
+			}
+		}
+
+		return result;
 	}
 
 	@Override
@@ -117,7 +169,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 			if (getRealmNames().contains(DEFAULT_REALM)) {
 				realmName = DEFAULT_REALM;
 			} else {
-				String msg = "The User {0} is missing the property {1} and the Realm {2} can not be used as it does not exist!";
+				String msg
+						= "The User {0} is missing the property {1} and the Realm {2} can not be used as it does not exist!";
 				throw new StrolchException(
 						MessageFormat.format(msg, certificate.getUsername(), PROP_REALM, DEFAULT_REALM));
 			}
@@ -126,7 +179,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		try {
 			return getComponent(RealmHandler.class).getRealm(realmName);
 		} catch (StrolchException e) {
-			String msg = "The User {0} has property {1} with value={2}, but the Realm does not eixst, or is not accessible by this user!";
+			String msg
+					= "The User {0} has property {1} with value={2}, but the Realm does not eixst, or is not accessible by this user!";
 			throw new StrolchException(MessageFormat.format(msg, certificate.getUsername(), PROP_REALM, realmName), e);
 		}
 	}
@@ -141,14 +195,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 		return getPrivilegeHandler().runAsAgentWithResult(runnable);
 	}
 
-	private void setupComponent(Map<Class<?>, StrolchComponent> componentMap,
+	private StrolchComponent setupComponent(MapOfLists<Class<?>, StrolchComponent> componentMap,
 			Map<String, ComponentController> controllerMap, ComponentConfiguration componentConfiguration) {
 
 		String componentName = componentConfiguration.getName();
 		if (isEmpty(componentName))
-			throw new IllegalStateException(
-					"name missing for a component in env " + componentConfiguration.getRuntimeConfiguration()
-							.getEnvironment());
+			throw new IllegalStateException("name missing for a component in env " +
+					componentConfiguration.getRuntimeConfiguration().getEnvironment());
 
 		try {
 			String api = componentConfiguration.getApi();
@@ -163,7 +216,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 			Class<?> implClass = Class.forName(impl);
 
 			if (!apiClass.isAssignableFrom(implClass)) {
-				String msg = "Component {0} has invalid configuration: Impl class {1} is not assignable to Api class {2}";
+				String msg
+						= "Component {0} has invalid configuration: Impl class {1} is not assignable to Api class {2}";
 				msg = MessageFormat.format(msg, componentName, impl, api);
 				throw new StrolchConfigurationException(msg);
 			}
@@ -174,20 +228,23 @@ public class ComponentContainerImpl implements ComponentContainer {
 				throw new StrolchConfigurationException(msg);
 			}
 
-			@SuppressWarnings("unchecked")
-			Class<StrolchComponent> strolchComponentClass = (Class<StrolchComponent>) implClass;
+			@SuppressWarnings("unchecked") Class<StrolchComponent> strolchComponentClass
+					= (Class<StrolchComponent>) implClass;
 			Constructor<StrolchComponent> constructor = strolchComponentClass.getConstructor(ComponentContainer.class,
 					String.class);
 			StrolchComponent strolchComponent = constructor.newInstance(this, componentName);
 			strolchComponent.setup(componentConfiguration);
 
-			componentMap.put(apiClass, strolchComponent);
+			componentMap.addElement(apiClass, strolchComponent);
 			controllerMap.put(componentName, new ComponentController(strolchComponent));
+
+			return strolchComponent;
 
 		} catch (NoSuchMethodException e) {
 
-			String msg = "Could not load class for component {0} due to missing constructor with signature (ComponentContainer.class, String.class)";
-			msg = MessageFormat.format(msg, componentName, e.getMessage());
+			String msg
+					= "Could not load class for component {0} due to missing constructor with signature (ComponentContainer.class, String.class)";
+			msg = MessageFormat.format(msg, componentName);
 			throw new StrolchConfigurationException(msg, e);
 
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException |
@@ -200,6 +257,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	public void setup(StrolchConfiguration strolchConfiguration) {
+		this.strolchConfiguration = strolchConfiguration;
 		this.state.validateStateChange(ComponentState.SETUP, "agent");
 
 		long start = System.nanoTime();
@@ -214,7 +272,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 				System.getProperty("user.timezone")));
 
 		// set up the container itself
-		Map<Class<?>, StrolchComponent> componentMap = new HashMap<>();
+		MapOfLists<Class<?>, StrolchComponent> componentMap = new MapOfLists<>();
+		Map<String, StrolchComponent> componentsByName = new HashMap<>();
 		Map<String, ComponentController> controllerMap = new HashMap<>();
 		Set<String> componentNames = strolchConfiguration.getComponentNames();
 		for (String componentName : componentNames) {
@@ -222,7 +281,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 					componentName);
 
 			// setup each component
-			setupComponent(componentMap, controllerMap, componentConfiguration);
+			StrolchComponent component = setupComponent(componentMap, controllerMap, componentConfiguration);
+			componentsByName.put(component.getName(), component);
 		}
 
 		// then analyze dependencies
@@ -230,7 +290,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.dependencyAnalyzer.setupDependencies();
 
 		// now save references
-		this.componentMap = componentMap;
+		this.componentsByType = componentMap;
+		this.componentsByName = componentsByName;
 		this.controllerMap = controllerMap;
 
 		// and configure the state handler
@@ -240,7 +301,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long took = System.nanoTime() - start;
 		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}";
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentMap.size(),
+		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentsByType.size(),
 				formatNanoDuration(took)));
 	}
 
@@ -306,7 +367,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 			}
 		}
 
-		msg = "{0}:{1} All {2} Strolch Components started for version {3}. Took {4}. Strolch is now ready to be used. Have fun =))";
+		msg
+				= "{0}:{1} All {2} Strolch Components started for version {3}. Took {4}. Strolch is now ready to be used. Have fun =))";
 		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
 				getAgent().getVersion().getAppVersion().getArtifactVersion(), tookS));
 	}
@@ -369,13 +431,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
 					formatNanoDuration(took)));
 			this.controllerMap.clear();
-			this.componentMap.clear();
+			this.componentsByType.clear();
 		}
 
 		this.state = ComponentState.DESTROYED;
 
 		this.controllerMap = null;
-		this.componentMap = null;
+		this.componentsByType = null;
 	}
 
 	private String getApplicationName() {
@@ -387,8 +449,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	private String getTimezone() {
-		return getAgent().getStrolchConfiguration()
-				.getRuntimeConfiguration()
+		return getAgent().getStrolchConfiguration().getRuntimeConfiguration()
 				.getString(PROP_TIMEZONE, System.getProperty("user.timezone"));
 	}
 }

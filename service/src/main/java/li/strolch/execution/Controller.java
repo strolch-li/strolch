@@ -1,12 +1,5 @@
 package li.strolch.execution;
 
-import static java.util.Collections.synchronizedMap;
-import static li.strolch.execution.EventBasedExecutionHandler.PROP_LOCK_RETRIES;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchLockException;
@@ -25,6 +18,13 @@ import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Collections.synchronizedMap;
+import static li.strolch.execution.EventBasedExecutionHandler.PROP_LOCK_RETRIES;
 
 public class Controller {
 
@@ -128,7 +128,7 @@ public class Controller {
 			return false;
 		}
 
-		this.activity = activity;
+		this.activity = activity.ensureModifiable();
 		return true;
 	}
 
@@ -152,7 +152,14 @@ public class Controller {
 				if (!refreshActivity(tx))
 					return false;
 
+				// perform the first execution
 				boolean trigger = internalExecute(tx);
+
+				// then we trigger execution for the same activity if the controller says it is needed
+				if (trigger) {
+					logger.info("Triggering additional execution of controller " + this + " after execution.");
+					triggerExecute(tx);
+				}
 
 				if (tx.needsCommit())
 					tx.commitOnClose();
@@ -165,8 +172,7 @@ public class Controller {
 	/**
 	 * Executes the activity in the given TX. Keeps executing till no {@link Action} was set to {@link State#EXECUTED}
 	 *
-	 * @param tx
-	 * 		the TX
+	 * @param tx the TX
 	 */
 	public void execute(StrolchTransaction tx) {
 		lockWithRetries(tx);
@@ -185,8 +191,7 @@ public class Controller {
 	/**
 	 * Executes the activity in the given TX by calling the {@link PlanAndExecuteActivityCommand}
 	 *
-	 * @param tx
-	 * 		the TX
+	 * @param tx the TX
 	 *
 	 * @return true if execute should be called again, i.e. the
 	 * {@link PlanAndExecuteActivityCommand#needsRetriggerOfExecution()} returns true and the activity isn't complete
@@ -220,8 +225,7 @@ public class Controller {
 	 * Completes the execution of the given {@link Action} with the given {@link Locator}, executing next
 	 * {@link Action Actions} if possible
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to executed
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to executed
 	 */
 	public void toExecuted(Locator actionLoc) throws Exception {
 		runAsAgent(ctx -> {
@@ -244,10 +248,8 @@ public class Controller {
 	/**
 	 * Completes the execution of the given {@link Action}. No further processing is done.
 	 *
-	 * @param tx
-	 * 		the TX
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to executed
+	 * @param tx        the TX
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to executed
 	 */
 	public void toExecuted(StrolchTransaction tx, Locator actionLoc) {
 		if (invalidActionContext(tx, actionLoc))
@@ -271,10 +273,8 @@ public class Controller {
 	 * {@link #toExecuted(StrolchTransaction, Locator)}. This method expects the associated {@link Activity} to already
 	 * be locked, and validated that this action is in execution</p>
 	 *
-	 * @param tx
-	 * 		the TX
-	 * @param action
-	 * 		the Action to set to executed
+	 * @param tx     the TX
+	 * @param action the Action to set to executed
 	 */
 	public void setToExecuted(StrolchTransaction tx, Action action) {
 
@@ -295,8 +295,7 @@ public class Controller {
 	 * {@link State#EXECUTION}. Thus the execution thread stays with this activity, keeping resources bound to it, till
 	 * we can wait and allow other activities to execute</p>
 	 *
-	 * @param tx
-	 * 		the TX
+	 * @param tx the TX
 	 */
 	protected void triggerExecute(StrolchTransaction tx) {
 		boolean trigger;
@@ -308,8 +307,7 @@ public class Controller {
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#STOPPED}
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to stopped
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to stopped
 	 */
 	public void toStopped(Locator actionLoc) throws Exception {
 		runAsAgent(ctx -> {
@@ -331,10 +329,8 @@ public class Controller {
 	/**
 	 * Sets the state of the {@link Action} to {@link State#STOPPED}
 	 *
-	 * @param tx
-	 * 		the TX
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to stopped
+	 * @param tx        the TX
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to stopped
 	 */
 	public void toStopped(StrolchTransaction tx, Locator actionLoc) {
 		lockWithRetries(tx);
@@ -355,8 +351,7 @@ public class Controller {
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#ERROR}
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to executed
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to executed
 	 */
 	public void toError(Locator actionLoc) throws Exception {
 		runAsAgent(ctx -> {
@@ -377,10 +372,8 @@ public class Controller {
 	/**
 	 * Sets the state of the {@link Action} to {@link State#ERROR}
 	 *
-	 * @param tx
-	 * 		the TX
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to error
+	 * @param tx        the TX
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to error
 	 */
 	public void toError(StrolchTransaction tx, Locator actionLoc) {
 		if (invalidActionContext(tx, actionLoc))
@@ -401,8 +394,7 @@ public class Controller {
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#WARNING}
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to warning
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to warning
 	 */
 	public void toWarning(Locator actionLoc) throws Exception {
 		runAsAgent(ctx -> {
@@ -425,10 +417,8 @@ public class Controller {
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#WARNING}
 	 *
-	 * @param tx
-	 * 		the TX
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action} to set to error
+	 * @param tx        the TX
+	 * @param actionLoc the {@link Locator} of the {@link Action} to set to error
 	 */
 	public void toWarning(StrolchTransaction tx, Locator actionLoc) {
 		if (invalidActionContext(tx, actionLoc))
@@ -460,8 +450,8 @@ public class Controller {
 			} catch (StrolchLockException e) {
 				tries++;
 				if (tries >= this.lockRetries) {
-					logger.error("Failed to lock " + this.locator + ". Max retries " + tries
-							+ " reached, throwing exception!");
+					logger.error("Failed to lock " + this.locator + ". Max retries " + tries +
+							" reached, throwing exception!");
 					throw e;
 				}
 
@@ -478,7 +468,7 @@ public class Controller {
 			return;
 
 		ObserverEvent observerEvent = new ObserverEvent();
-		observerEvent.updated.addElement(Tags.CONTROLLER, this.activity);
+		observerEvent.updated.addElement(Tags.CONTROLLER, this.activity.ensureReadOnly());
 		realm.getObserverHandler().notify(observerEvent);
 	}
 

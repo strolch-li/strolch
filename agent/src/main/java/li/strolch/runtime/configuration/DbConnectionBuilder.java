@@ -80,7 +80,7 @@ public abstract class DbConnectionBuilder {
 
 			String dbUrl = getConfigString(dbUrlKey, dbUseEnv);
 			String username = getConfigString(dbUsernameKey, dbUseEnv);
-			String password = getConfigString(dbPasswordKey, dbUseEnv);
+			String password = getConfigString(dbPasswordKey, dbUseEnv, true);
 
 			if (this.configuration.getBoolean(PROP_DB_ALLOW_HOST_OVERRIDE_ENV, false) //
 					&& System.getProperties().containsKey(PROP_DB_HOST_OVERRIDE)) {
@@ -89,8 +89,7 @@ public abstract class DbConnectionBuilder {
 
 			// find any pool configuration values
 			Map<String, String> properties = dbUseEnv ? System.getenv() : this.configuration.getAsMap();
-			String dbPoolPrefix = dbUseEnv ?
-					PROP_DB_POOL_PREFIX.replace(DOT, UNDERLINE).toUpperCase() :
+			String dbPoolPrefix = dbUseEnv ? PROP_DB_POOL_PREFIX.replace(DOT, UNDERLINE).toUpperCase() :
 					PROP_DB_POOL_PREFIX;
 			Properties props = new Properties();
 			for (String key : properties.keySet()) {
@@ -128,8 +127,15 @@ public abstract class DbConnectionBuilder {
 	}
 
 	private String getConfigString(String dbKey, boolean useEnv) {
-		if (!useEnv)
+		return getConfigString(dbKey, useEnv, false);
+	}
+
+	private String getConfigString(String dbKey, boolean useEnv, boolean isSecret) {
+		if (!useEnv) {
+			if (isSecret)
+				return this.configuration.getSecret(dbKey);
 			return this.configuration.getString(dbKey, null);
+		}
 
 		String value = System.getenv(dbKey);
 		if (isEmpty(value))

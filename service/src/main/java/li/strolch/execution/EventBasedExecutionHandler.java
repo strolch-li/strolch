@@ -83,7 +83,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public Controller getController(Activity activity) {
-		return getController(getDefaultRealm(), activity);
+		return getController(getDefaultRealm(), activity.getLocator());
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	protected Controller newController(String realm, Activity activity) {
-		return new Controller(realm, this, activity);
+		return new Controller(realm, this, activity.ensureModifiable());
 	}
 
 	@Override
@@ -535,7 +535,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 
 		ObserverEvent observerEvent = new ObserverEvent();
-		observerEvent.added.addElement(Tags.CONTROLLER, controller.getActivity());
+		observerEvent.added.addElement(Tags.CONTROLLER, controller.getActivity().ensureReadOnly());
 		realm.getObserverHandler().notify(observerEvent);
 	}
 
@@ -545,7 +545,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 
 		ObserverEvent observerEvent = new ObserverEvent();
-		observerEvent.removed.addElement(Tags.CONTROLLER, controller.getActivity());
+		observerEvent.removed.addElement(Tags.CONTROLLER, controller.getActivity().ensureReadOnly());
 		realm.getObserverHandler().notify(observerEvent);
 	}
 
@@ -556,7 +556,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 		ObserverEvent observerEvent = new ObserverEvent();
 		for (Controller controller : removed.values()) {
-			observerEvent.removed.addElement(Tags.CONTROLLER, controller.getActivity());
+			observerEvent.removed.addElement(Tags.CONTROLLER, controller.getActivity().ensureReadOnly());
 		}
 		realm.getObserverHandler().notify(observerEvent);
 	}

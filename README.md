@@ -8,6 +8,7 @@
 [![Issues](https://img.shields.io/github/issues/strolch-li/strolch?style=flat-square "Issues")](https://github.com/strolch-li/strolch/issues)
 [![Build Status](https://ci.atexxi.ch/buildStatus/icon?job=strolch)](https://ci.atexxi.ch/job/strolch/)
 [![Qodana](https://github.com/strolch-li/strolch/actions/workflows/code_quality.yml/badge.svg)](https://github.com/strolch-li/strolch/actions/workflows/code_quality.yml)
+[![Project Map](https://sourcespy.com/shield.svg)](https://sourcespy.com/github/strolchlistrolch/)
 
 The main repository which contains all of Strolch.
 

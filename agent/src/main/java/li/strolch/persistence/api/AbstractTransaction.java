@@ -1,17 +1,5 @@
 package li.strolch.persistence.api;
 
-import static li.strolch.agent.api.StrolchAgent.getUniqueId;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.model.Tags.*;
-import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
-import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
 import li.strolch.agent.api.*;
 import li.strolch.agent.impl.*;
 import li.strolch.exception.StrolchException;
@@ -48,6 +36,18 @@ import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.objectfilter.ObjectFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
+
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.model.Tags.*;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -309,10 +309,10 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.lockedElements.add(locator);
 
 		switch (element.getObjectType()) {
-		case RESOURCE -> this.resourceCache.addElement(element.getType(), element.getId(), (Resource) element);
-		case ORDER -> this.orderCache.addElement(element.getType(), element.getId(), (Order) element);
-		case ACTIVITY -> this.activityCache.addElement(element.getType(), element.getId(), (Activity) element);
-		default -> throw new IllegalStateException("Unexpected object type " + element.getObjectType());
+			case RESOURCE -> this.resourceCache.addElement(element.getType(), element.getId(), (Resource) element);
+			case ORDER -> this.orderCache.addElement(element.getType(), element.getId(), (Order) element);
+			case ACTIVITY -> this.activityCache.addElement(element.getType(), element.getId(), (Activity) element);
+			default -> throw new IllegalStateException("Unexpected object type " + element.getObjectType());
 		}
 	}
 
@@ -333,8 +333,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			default -> throw new IllegalStateException("Unexpected object type " + locator.get(0));
 		};
 
-		@SuppressWarnings("unchecked")
-		T t = (T) freshCopy;
+		@SuppressWarnings("unchecked") T t = (T) freshCopy;
 		return t;
 	}
 
@@ -505,7 +504,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		// Order/<type>/<id>/Bag/<id>/<param_id>
 
 		if (locator.getSize() < 3) {
-			String msg = "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}";
+			String msg
+					= "The locator is invalid as it does not have at least three path elements (e.g. Resource/MyType/@id): {0}";
 			msg = MessageFormat.format(msg, locator.toString());
 			throw new StrolchModelException(msg);
 		}
@@ -632,8 +632,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				break;
 			if (!parents.add(parent))
 				throw new IllegalStateException(
-						"circular dependencies from " + element.getLocator() + " to " + parent.getLocator()
-								+ " on relations parameter " + parentParamKey);
+						"circular dependencies from " + element.getLocator() + " to " + parent.getLocator() +
+								" on relations parameter " + parentParamKey);
 
 			t = parent.getParameter(bagKey, paramKey);
 		}
@@ -1107,19 +1107,19 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (locator.getSize() != 3)
 			throw new IllegalStateException("Locator is invalid for cache removal: " + locator);
 		switch (locator.get(0)) {
-		case RESOURCE -> {
-			if (this.resourceCache != null)
-				this.resourceCache.removeElement(locator.get(1), locator.get(2));
-		}
-		case ORDER -> {
-			if (this.orderCache != null)
-				this.orderCache.removeElement(locator.get(1), locator.get(2));
-		}
-		case ACTIVITY -> {
-			if (this.activityCache != null)
-				this.activityCache.removeElement(locator.get(1), locator.get(2));
-		}
-		default -> throw new IllegalStateException("Unexpected object type " + locator.get(0));
+			case RESOURCE -> {
+				if (this.resourceCache != null)
+					this.resourceCache.removeElement(locator.get(1), locator.get(2));
+			}
+			case ORDER -> {
+				if (this.orderCache != null)
+					this.orderCache.removeElement(locator.get(1), locator.get(2));
+			}
+			case ACTIVITY -> {
+				if (this.activityCache != null)
+					this.activityCache.removeElement(locator.get(1), locator.get(2));
+			}
+			default -> throw new IllegalStateException("Unexpected object type " + locator.get(0));
 		}
 
 		this.objectFilter.removeObjectCache(locator.get(0), locator);
@@ -1375,11 +1375,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedR.size() == 1) {
 			RemoveResourceCommand cmd = new RemoveResourceCommand(this);
 			cmd.setResource(changedR.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedR.size() > 1) {
 			RemoveResourcesCommand cmd = new RemoveResourcesCommand(this);
 			cmd.setResources(changedR);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// updated
@@ -1387,11 +1387,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedR.size() == 1) {
 			UpdateResourceCommand cmd = new UpdateResourceCommand(this);
 			cmd.setResource(changedR.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedR.size() > 1) {
 			UpdateResourcesCommand cmd = new UpdateResourcesCommand(this);
 			cmd.setResources(changedR);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// added
@@ -1399,11 +1399,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedR.size() == 1) {
 			AddResourceCommand cmd = new AddResourceCommand(this);
 			cmd.setResource(changedR.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedR.size() > 1) {
 			AddResourcesCommand cmd = new AddResourcesCommand(this);
 			cmd.setResources(changedR);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		/*
@@ -1414,11 +1414,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedO.size() == 1) {
 			RemoveOrderCommand cmd = new RemoveOrderCommand(this);
 			cmd.setOrder(changedO.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedO.size() > 1) {
 			RemoveOrdersCommand cmd = new RemoveOrdersCommand(this);
 			cmd.setOrders(changedO);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// updated
@@ -1426,11 +1426,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedO.size() == 1) {
 			UpdateOrderCommand cmd = new UpdateOrderCommand(this);
 			cmd.setOrder(changedO.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedO.size() > 1) {
 			UpdateOrdersCommand cmd = new UpdateOrdersCommand(this);
 			cmd.setOrders(changedO);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// added
@@ -1438,11 +1438,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedO.size() == 1) {
 			AddOrderCommand cmd = new AddOrderCommand(this);
 			cmd.setOrder(changedO.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedO.size() > 1) {
 			AddOrdersCommand cmd = new AddOrdersCommand(this);
 			cmd.setOrders(changedO);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		/*
@@ -1453,11 +1453,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedA.size() == 1) {
 			RemoveActivityCommand cmd = new RemoveActivityCommand(this);
 			cmd.setActivity(changedA.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedA.size() > 1) {
 			RemoveActivitiesCommand cmd = new RemoveActivitiesCommand(this);
 			cmd.setActivities(changedA);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// updated
@@ -1465,11 +1465,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedA.size() == 1) {
 			UpdateActivityCommand cmd = new UpdateActivityCommand(this);
 			cmd.setActivity(changedA.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedA.size() > 1) {
 			UpdateActivitiesCommand cmd = new UpdateActivitiesCommand(this);
 			cmd.setActivities(changedA);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// added
@@ -1477,11 +1477,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (changedA.size() == 1) {
 			AddActivityCommand cmd = new AddActivityCommand(this);
 			cmd.setActivity(changedA.get(0));
-			addCommand(cmd);
+			add(cmd);
 		} else if (changedA.size() > 1) {
 			AddActivitiesCommand cmd = new AddActivitiesCommand(this);
 			cmd.setActivities(changedA);
-			addCommand(cmd);
+			add(cmd);
 		}
 
 		// clear, so that we don't do it twice in case of a flush()
@@ -1537,15 +1537,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			}
 
 			writeChanges();
-
 			long auditTrailDuration = writeAuditTrail();
+			commit();
 			long updateObserversDuration = updateObservers();
 
-			// commit and close the connection
-			commit();
-
 			handleCommit(start, auditTrailDuration, updateObserversDuration);
-
 			this.txResult.setState(TransactionState.COMMITTED);
 
 		} catch (Exception e) {
@@ -1605,13 +1601,15 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			if (this.closeStrategy != TransactionCloseStrategy.READ_ONLY) {
 				if (!this.commands.isEmpty()) {
 					autoCloseableRollback();
-					String msg = "There are commands registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
+					String msg
+							= "There are commands registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
 					throw new IllegalStateException(msg);
 				}
 
 				if (!this.objectFilter.isEmpty()) {
 					autoCloseableRollback();
-					String msg = "There are modified objects registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
+					String msg
+							= "There are modified objects registered on a read-only transaction. Changing to rollback! Did you forget to commit?";
 					throw new IllegalStateException(msg);
 				}
 			}
@@ -1830,7 +1828,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				event.updated.addList(Tags.RESOURCE, new ArrayList<>(updated));
 			Set<Resource> deleted = this.resourceMap.getDeleted();
 			if (!deleted.isEmpty())
-				event.removed.addList(Tags.RESOURCE, new ArrayList<>(deleted));
+				event.removed.addList(Tags.RESOURCE,
+						deleted.stream().map(e -> (StrolchRootElement) e.ensureReadOnly()).toList());
 		}
 
 		if (this.orderMap != null) {
@@ -1842,7 +1841,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				event.updated.addList(Tags.ORDER, new ArrayList<>(updated));
 			Set<Order> deleted = this.orderMap.getDeleted();
 			if (!deleted.isEmpty())
-				event.removed.addList(Tags.ORDER, new ArrayList<>(deleted));
+				event.removed.addList(Tags.ORDER,
+						deleted.stream().map(e -> (StrolchRootElement) e.ensureReadOnly()).toList());
 		}
 
 		if (this.activityMap != null) {
@@ -1854,7 +1854,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				event.updated.addList(Tags.ACTIVITY, new ArrayList<>(updated));
 			Set<Activity> deleted = this.activityMap.getDeleted();
 			if (!deleted.isEmpty())
-				event.removed.addList(Tags.ACTIVITY, new ArrayList<>(deleted));
+				event.removed.addList(Tags.ACTIVITY,
+						deleted.stream().map(e -> (StrolchRootElement) e.ensureReadOnly()).toList());
 		}
 
 		if (!(event.added.isEmpty() && event.updated.isEmpty() && event.removed.isEmpty())) {
@@ -1943,11 +1944,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
 		audit.setUsername(this.certificate.getUsername());
-		audit.setFirstname(this.certificate.getFirstname() == null ?
-				this.certificate.getUsername() :
+		audit.setFirstname(this.certificate.getFirstname() == null ? this.certificate.getUsername() :
 				this.certificate.getFirstname());
-		audit.setLastname(this.certificate.getLastname() == null ?
-				this.certificate.getUsername() :
+		audit.setLastname(this.certificate.getLastname() == null ? this.certificate.getUsername() :
 				this.certificate.getLastname());
 		audit.setDate(new Date());
 

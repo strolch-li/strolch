@@ -15,6 +15,10 @@
  */
 package li.strolch.runtime.configuration;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Locale;
@@ -33,8 +37,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	private final File dataPath;
 	private final File tempPath;
 
-	private final Locale locale;
-	private final Set<SupportedLanguage> supportedLanguages;
+	private Locale locale;
+	private Set<SupportedLanguage> supportedLanguages;
 
 	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
 			File configPathF, File dataPathF, File tempPathF, Set<SupportedLanguage> supportedLanguages) {
@@ -68,7 +72,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		this.dataPath = dataPathF;
 		this.tempPath = tempPathF;
 
-		this.locale = new Locale(getString(PROP_LOCALE, Locale.getDefault().toLanguageTag()));
+		this.locale = Locale.forLanguageTag(getString(PROP_LOCALE, Locale.getDefault().toLanguageTag()));
 		this.supportedLanguages = supportedLanguages;
 	}
 
@@ -96,8 +100,16 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		return this.locale;
 	}
 
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+	}
+
 	public Set<SupportedLanguage> getSupportedLanguages() {
 		return this.supportedLanguages;
+	}
+
+	public void setSupportedLanguages(Set<SupportedLanguage> supportedLanguages) {
+		this.supportedLanguages = supportedLanguages;
 	}
 
 	public String getTimezone() {
@@ -117,7 +129,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public File getConfigFile(String context, String fileName, boolean checkExists) {
 		File configFile = new File(getConfigPath(), fileName);
 		if (checkExists && (!configFile.isFile() || !configFile.canRead())) {
-			String msg = "[{0}] requires config file which does not exist with name: {1}";
+			String msg = "[{0}] requires config file from component {1} which does not exist with name: {2}";
 			msg = MessageFormat.format(msg, getName(), context, fileName);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -137,7 +149,7 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public File getDataFile(String context, String fileName, boolean checkExists) {
 		File dataFile = new File(getDataPath(), fileName);
 		if (checkExists && (!dataFile.isFile() || !dataFile.canRead())) {
-			String msg = "[{0}] requires data file which does not exist with name: {1}";
+			String msg = "[{0}] requires data file from component {1} which does not exist with name: {2}";
 			msg = MessageFormat.format(msg, getName(), context, fileName);
 			throw new StrolchConfigurationException(msg);
 		}
@@ -157,10 +169,26 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public File getDataDir(String context, String dirName, boolean checkExists) {
 		File dataDir = new File(getDataPath(), dirName);
 		if (checkExists && (!dataDir.isDirectory() || !dataDir.canRead())) {
-			String msg = "[{0}] requires data directory which does not exist with name: {1}";
+			String msg = "[{0}] requires data directory from component {1} which does not exist with name: {2}";
 			msg = MessageFormat.format(msg, getName(), context, dirName);
 			throw new StrolchConfigurationException(msg);
 		}
 		return dataDir;
+	}
+
+	@Override
+	public JsonObject toJson() {
+		JsonObject runtimeJ = super.toJson();
+
+		runtimeJ.addProperty(Tags.Json.APPLICATION_NAME, applicationName);
+		runtimeJ.addProperty(Tags.Json.ENVIRONMENT, environment);
+		runtimeJ.addProperty(Tags.Json.CONFIG_PATH, configPath.getAbsolutePath());
+		runtimeJ.addProperty(Tags.Json.DATA_PATH, dataPath.getAbsolutePath());
+		runtimeJ.addProperty(Tags.Json.TEMP_PATH, tempPath.getAbsolutePath());
+		runtimeJ.addProperty(Tags.Json.LOCALE, locale.toLanguageTag());
+		runtimeJ.add(Tags.Json.SUPPORTED_LANGUAGES, supportedLanguages.stream().map(SupportedLanguage::name)
+				.collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
+
+		return runtimeJ;
 	}
 }

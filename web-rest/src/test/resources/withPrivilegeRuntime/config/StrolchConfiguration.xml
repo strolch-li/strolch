@@ -3,9 +3,6 @@
 	<env id="dev">
 		<Runtime>
 			<applicationName>StrolchPersistenceTest</applicationName>
-			<Properties>
-				<verbose>true</verbose>
-			</Properties>
 		</Runtime>
 		<Component>
 			<name>PrivilegeHandler</name>
