@@ -1,10 +1,5 @@
 package li.strolch.execution.policy;
 
-import java.util.Locale;
-import java.util.concurrent.ScheduledFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.State;
@@ -16,6 +11,11 @@ import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.utils.time.PeriodDuration;
+
+import java.util.Locale;
+import java.util.concurrent.ScheduledFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * <p>
@@ -72,8 +72,33 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	@Override
+	public void toStopped(Action action) {
+		cancelWarningTask();
+		stop();
+		setActionStateWithValueChange(action, State.STOPPED, 0.0D);
+	}
+
+	protected void toWarning(Action action, LogMessage message) {
+		addMessage(message);
+		toWarning(action);
+	}
+
+	@Override
 	public void toWarning(Action action) {
+		cancelWarningTask();
 		setActionState(action, State.WARNING);
+	}
+
+	protected void toWarning(LogMessage message) {
+		cancelWarningTask();
+		addMessage(message);
+		getExecutionHandler().toWarning(this.realm, message.getLocator());
+	}
+
+	protected void toExecuted() throws Exception {
+		cancelWarningTask();
+		stop();
+		getExecutionHandler().toExecuted(this.realm, this.actionLoc);
 	}
 
 	@Override
@@ -83,11 +108,10 @@ public class SimpleExecution extends ExecutionPolicy {
 		setActionStateWithValueChange(action, State.EXECUTED, 0.0D);
 	}
 
-	@Override
-	public void toStopped(Action action) {
-		cancelWarningTask();
-		stop();
-		setActionStateWithValueChange(action, State.STOPPED, 0.0D);
+	protected void toError(Action action, LogMessage message) {
+		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
+		addMessage(message);
+		toError(action);
 	}
 
 	@Override
@@ -95,6 +119,14 @@ public class SimpleExecution extends ExecutionPolicy {
 		cancelWarningTask();
 		stop();
 		setActionStateWithValueChange(action, State.ERROR, 0.0D);
+	}
+
+	protected void toError(LogMessage message) {
+		cancelWarningTask();
+		stop();
+		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
+		addMessage(message);
+		getExecutionHandler().toError(this.realm, message.getLocator());
 	}
 
 	protected void setActionStateWithValueChange(Action action, State execution, double value) {
@@ -112,26 +144,6 @@ public class SimpleExecution extends ExecutionPolicy {
 			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
 			operationsLog.addMessage(message);
 		}
-	}
-
-	protected void toExecuted() throws Exception {
-		cancelWarningTask();
-		stop();
-		getExecutionHandler().toExecuted(this.realm, this.actionLoc);
-	}
-
-	protected void toError(LogMessage message) {
-		cancelWarningTask();
-		stop();
-		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
-		addMessage(message);
-		getExecutionHandler().toError(this.realm, message.getLocator());
-	}
-
-	protected void toWarning(LogMessage message) {
-		cancelWarningTask();
-		addMessage(message);
-		getExecutionHandler().toWarning(this.realm, message.getLocator());
 	}
 
 	protected StrolchTransaction openLocalTx(PrivilegeContext ctx, boolean readOnly) throws StrolchException {
