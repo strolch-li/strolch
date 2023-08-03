@@ -71,10 +71,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 *
 	 * <p><b>Note:</b> This is used as execution policies can have a longer lifecycle than its transaction.</p>
 	 *
-	 * @param tx
-	 * 		the update TX
-	 * @param controller
-	 * 		the controller
+	 * @param tx         the update TX
+	 * @param controller the controller
 	 */
 	public void refreshController(StrolchTransaction tx, Controller controller) {
 		this.tx = tx;
@@ -141,6 +139,15 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Returns true if the current TX is still open
+	 *
+	 * @return true if the current TX is still open
+	 */
+	protected boolean isTxOpen() {
+		return this.tx.isOpen() && !tx.isClosing();
+	}
+
+	/**
 	 * <p>
 	 * Evaluates if the given {@link Action} is executable i.e. any state has the expected values so that the given
 	 * {@link Action} can have its execution be started.
@@ -151,8 +158,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * define a required state which is to be met for execution of the given {@link Action}.
 	 * </p>
 	 *
-	 * @param action
-	 * 		the {@link Action} to check if it can be executed
+	 * @param action the {@link Action} to check if it can be executed
 	 *
 	 * @return true if the action can be executed, false if not, i.e. the current state disallows the action to be
 	 * executed
@@ -166,8 +172,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Performs any initialization of this {@link ExecutionPolicy} for the given action, this method stores the
 	 * {@link Locator} of the action and its type
 	 *
-	 * @param action
-	 * 		the action for which to initialize
+	 * @param action the action for which to initialize
 	 */
 	public void initialize(Action action) {
 		this.actionType = action.getType();
@@ -178,16 +183,14 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	/**
 	 * Starts the execution of the given {@link Action}, i.e. sets the state to {@link State#EXECUTION}
 	 *
-	 * @param action
-	 * 		the action to start execution for
+	 * @param action the action to start execution for
 	 */
 	public abstract void toExecution(Action action);
 
 	/**
 	 * Completes execution of the given {@link Action}, i.e. sets the state to {@link State#EXECUTED}
 	 *
-	 * @param action
-	 * 		the action to set to executed
+	 * @param action the action to set to executed
 	 */
 	public abstract void toExecuted(Action action);
 
@@ -195,8 +198,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Stops the execution of this {@link Action} without completing its execution, i.e. sets the state to
 	 * {@link State#STOPPED}
 	 *
-	 * @param action
-	 * 		the action to stop execution for
+	 * @param action the action to stop execution for
 	 */
 	public abstract void toStopped(Action action);
 
@@ -204,8 +206,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Sets this {@link Action} which should be in execution to an error state, i.e. sets the state to
 	 * {@link State#ERROR}
 	 *
-	 * @param action
-	 * 		the action to set to error state
+	 * @param action the action to set to error state
 	 */
 	public abstract void toError(Action action);
 
@@ -213,8 +214,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Sets this {@link Action} which should be in execution to a warning state, i.e. sets the state to
 	 * {@link State#WARNING}
 	 *
-	 * @param action
-	 * 		the action to set to warning state
+	 * @param action the action to set to warning state
 	 */
 	public abstract void toWarning(Action action);
 
@@ -242,10 +242,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Updates the state of the given {@link Action} to the given {@link State} and updates the {@link Activity} for
 	 * persisting on the TX
 	 *
-	 * @param action
-	 * 		the action to change
-	 * @param state
-	 * 		the new state to set
+	 * @param action the action to change
+	 * @param state  the new state to set
 	 */
 	protected void setActionState(Action action, State state) {
 
@@ -275,10 +273,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	/**
 	 * Delays the given {@link Runnable} by the given {@link Duration}
 	 *
-	 * @param duration
-	 * 		the duration to delay
-	 * @param runnable
-	 * 		the action to delay
+	 * @param duration the duration to delay
+	 * @param runnable the action to delay
 	 */
 	public void delay(Duration duration, Runnable runnable) {
 		long delayMs = duration.toMillis();
@@ -315,10 +311,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	/**
 	 * Delays the given {@link Runnable} by the given delay value
 	 *
-	 * @param delay
-	 * 		the delay time
-	 * @param delayUnit
-	 * 		the UOM of the delay time
+	 * @param delay     the delay time
+	 * @param delayUnit the UOM of the delay time
 	 */
 	protected void delayRandom(long delay, TimeUnit delayUnit, Runnable runnable) {
 		long delayMs = delayUnit.toMillis(delay);
@@ -401,10 +395,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	/**
 	 * Async method to delay setting the {@link Action} to executed by the given delay value
 	 *
-	 * @param delay
-	 * 		the delay time
-	 * @param delayUnit
-	 * 		the UOM of the delay time
+	 * @param delay     the delay time
+	 * @param delayUnit the UOM of the delay time
 	 */
 	protected void delayToExecutedBy(long delay, TimeUnit delayUnit) {
 		long delayMs = delayUnit.toMillis(delay);
@@ -425,15 +417,12 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * {@link ComponentContainer#getRealm(Certificate)}. This transaction should be used in a try-with-resource clause
 	 * so it is properly closed.
 	 *
-	 * @param ctx
-	 * 		the privilege context
-	 * @param readOnly
-	 * 		true if this is a read-only TX
+	 * @param ctx      the privilege context
+	 * @param readOnly true if this is a read-only TX
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(PrivilegeContext ctx, boolean readOnly) throws StrolchException {
 		if (this.tx.isOpen())
@@ -446,13 +435,10 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param runnable the runnable to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if the agent is missing the privilege
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the agent is missing the privilege
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getContainer().getPrivilegeHandler().runAs(SYSTEM_USER_AGENT, runnable);
@@ -462,15 +448,12 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Performs the given {@link PrivilegedRunnableWithResult} as the system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param runnable the runnable to perform
 	 *
 	 * @return the result of the operation
 	 *
-	 * @throws PrivilegeException
-	 * 		if the agent is missing the privilege
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the agent is missing the privilege
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable)
 			throws PrivilegeException, Exception {
