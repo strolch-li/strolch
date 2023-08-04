@@ -149,6 +149,8 @@ public class SmtpMailer {
 			message.setContent(multipart);
 
 			Transport.send(message);
+			logger.info(format("Sent E-mail with subject {0} to {1} and attachment {2}", subject,
+					addressesToString(recipientAddresses), fileName));
 		} catch (MessagingException e) {
 			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nAttachment: " + fileName +
 					"\nRecipients: " + recipients + "\n\nBody:\n" + text);

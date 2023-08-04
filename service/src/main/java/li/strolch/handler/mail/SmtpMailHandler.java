@@ -49,7 +49,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendMail(String subject, String text, String recipients, String attachment, String fileName,
-						 String type) {
+			String type) {
 		SmtpMailer.getInstance().sendMail(subject, text, recipients, attachment, fileName, type);
 	}
 
@@ -60,14 +60,14 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendMailAsync(String subject, String text, String recipients, String attachment, String fileName,
-							  String type) {
+			String type) {
 		getExecutorService("Mail").submit(() -> doSendMail(subject, text, recipients, attachment, fileName, type));
 	}
 
 	private void doSendMail(String subject, String text, String recipients) {
 		try {
 			SmtpMailer.getInstance().sendMail(subject, text, recipients);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error("Failed to send mail \"" + subject + "\" to " + recipients, e);
 
 			if (hasComponent(OperationsLog.class)) {
@@ -81,10 +81,10 @@ public class SmtpMailHandler extends MailHandler {
 	}
 
 	private void doSendMail(String subject, String text, String recipients, String attachment, String fileName,
-							String type) {
+			String type) {
 		try {
 			SmtpMailer.getInstance().sendMail(subject, text, recipients, attachment, fileName, type);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error("Failed to send mail \"" + subject + "\" to " + recipients + " with attachment " + fileName,
 					e);
 
