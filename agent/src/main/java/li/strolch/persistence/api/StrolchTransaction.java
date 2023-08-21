@@ -42,6 +42,7 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
+import li.strolch.utils.objectfilter.ObjectFilterStatistics;
 
 /**
  * <p>
@@ -1891,4 +1892,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * 		if the session for this TX does not have any of the given roles
 	 */
 	void assertHasAnyRole(String... roleNames) throws AccessDeniedException;
+
+	/**
+	 * Returns the statistics of this TX, i.e. the number of elements added, updated and removed in this TX
+	 */
+	ObjectFilterStatistics getStatistics();
 }

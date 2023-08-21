@@ -34,6 +34,7 @@ import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.objectfilter.ObjectFilter;
+import li.strolch.utils.objectfilter.ObjectFilterStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private final TransactionResult txResult;
 
 	private final ObjectFilter objectFilter;
+	private ObjectFilterStatistics objectFilterStatistics;
 	private final MapOfMaps<String, String, Resource> resourceCache;
 	private final MapOfMaps<String, String, Order> orderCache;
 	private final MapOfMaps<String, String, Activity> activityCache;
@@ -283,6 +285,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public boolean needsCommit() {
 		return (!this.objectFilter.isEmpty()) || !this.commands.isEmpty() || !this.flushedCommands.isEmpty();
+	}
+
+	@Override
+	public ObjectFilterStatistics getStatistics() {
+		if (this.objectFilterStatistics == null)
+			return this.objectFilter.toStatistics();
+		return this.objectFilterStatistics;
 	}
 
 	@Override
@@ -1482,6 +1491,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			AddActivitiesCommand cmd = new AddActivitiesCommand(this);
 			cmd.setActivities(changedA);
 			add(cmd);
+		}
+
+		if (this.objectFilterStatistics == null) {
+			this.objectFilterStatistics = this.objectFilter.toStatistics();
+		} else {
+			ObjectFilterStatistics statistics = this.objectFilter.toStatistics();
+			this.objectFilterStatistics = this.objectFilterStatistics.merge(statistics);
 		}
 
 		// clear, so that we don't do it twice in case of a flush()
