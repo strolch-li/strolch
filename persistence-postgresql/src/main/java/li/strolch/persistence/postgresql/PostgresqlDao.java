@@ -44,7 +44,7 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 	private static final String updateLatestSqlS = "update {0} set latest = true where type = ? and id = ? and version = ?";
 
-	private static final String deleteElementSqlS = "delete from {0} where id = ?";
+	private static final String deleteElementSqlS = "delete from {0} where type = ? and id = ?";
 	private static final String deleteVersionSqlS = "delete from {0} where type = ? and id = ? and version = ? and latest = true";
 	private static final String deleteAllSqlS = "delete from {0}";
 	private static final String deleteAllByTypeSqlS = "delete from {0} where type = ?";
@@ -511,7 +511,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 		sql = MessageFormat.format(deleteElementSqlS, getTableName());
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
-			preparedStatement.setString(1, element.getId());
+			preparedStatement.setString(1, element.getType());
+			preparedStatement.setString(2, element.getId());
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != count) {
