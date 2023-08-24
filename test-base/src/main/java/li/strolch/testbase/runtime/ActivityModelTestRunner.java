@@ -173,6 +173,7 @@ public class ActivityModelTestRunner {
 			tx.commitOnClose();
 		}
 
+		// update elements
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Activity act1 = tx.getActivityBy("NonUnique1", "non-unique-id");
@@ -181,6 +182,36 @@ public class ActivityModelTestRunner {
 			assertNotNull(act2);
 			assertEquals("NonUnique1", act1.getName());
 			assertEquals("NonUnique2", act2.getName());
+
+			act1.setName("New Name 1!");
+			act2.setName("New Name 2!");
+			tx.update(act1);
+			tx.update(act2);
+			tx.commitOnClose();
+		}
+
+		// remove elements
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Activity act1 = tx.getActivityBy("NonUnique1", "non-unique-id");
+			Activity act2 = tx.getActivityBy("NonUnique2", "non-unique-id");
+			assertNotNull(act1);
+			assertNotNull(act2);
+			assertEquals("New Name 1!", act1.getName());
+			assertEquals("New Name 2!", act2.getName());
+
+			tx.remove(act1);
+			tx.remove(act2);
+			tx.commitOnClose();
+		}
+
+		// validate doesn't exist anymore
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Activity act1 = tx.getActivityBy("NonUnique1", "non-unique-id");
+			Activity act2 = tx.getActivityBy("NonUnique2", "non-unique-id");
+			assertNull(act1);
+			assertNull(act2);
 		}
 	}
 

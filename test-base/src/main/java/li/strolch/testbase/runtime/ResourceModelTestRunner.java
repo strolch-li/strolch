@@ -22,6 +22,7 @@ import java.util.*;
 
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.impl.DataStoreMode;
+import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.parameter.StringParameter;
@@ -164,6 +165,7 @@ public class ResourceModelTestRunner {
 			tx.commitOnClose();
 		}
 
+		// update elements
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Resource res1 = tx.getResourceBy("NonUnique1", "non-unique-id");
@@ -172,6 +174,36 @@ public class ResourceModelTestRunner {
 			assertNotNull(res2);
 			assertEquals("NonUnique1", res1.getName());
 			assertEquals("NonUnique2", res2.getName());
+
+			res1.setName("New Name 1!");
+			res2.setName("New Name 2!");
+			tx.update(res1);
+			tx.update(res2);
+			tx.commitOnClose();
+		}
+
+		// remove elements
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Resource res1 = tx.getResourceBy("NonUnique1", "non-unique-id");
+			Resource res2 = tx.getResourceBy("NonUnique2", "non-unique-id");
+			assertNotNull(res1);
+			assertNotNull(res2);
+			assertEquals("New Name 1!", res1.getName());
+			assertEquals("New Name 2!", res2.getName());
+
+			tx.remove(res1);
+			tx.remove(res2);
+			tx.commitOnClose();
+		}
+
+		// validate doesn't exist anymore
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Resource res1 = tx.getResourceBy("NonUnique1", "non-unique-id");
+			Resource res2 = tx.getResourceBy("NonUnique2", "non-unique-id");
+			assertNull(res1);
+			assertNull(res2);
 		}
 	}
 

@@ -238,6 +238,7 @@ public class OrderModelTestRunner {
 			tx.commitOnClose();
 		}
 
+		// update elements
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Order order1 = tx.getOrderBy("NonUnique1", "non-unique-id");
@@ -246,6 +247,36 @@ public class OrderModelTestRunner {
 			assertNotNull(order2);
 			assertEquals("NonUnique1", order1.getName());
 			assertEquals("NonUnique2", order2.getName());
+
+			order1.setName("New Name 1!");
+			order2.setName("New Name 2!");
+			tx.update(order1);
+			tx.update(order2);
+			tx.commitOnClose();
+		}
+
+		// remove elements
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Order order1 = tx.getOrderBy("NonUnique1", "non-unique-id");
+			Order order2 = tx.getOrderBy("NonUnique2", "non-unique-id");
+			assertNotNull(order1);
+			assertNotNull(order2);
+			assertEquals("New Name 1!", order1.getName());
+			assertEquals("New Name 2!", order2.getName());
+
+			tx.remove(order1);
+			tx.remove(order2);
+			tx.commitOnClose();
+		}
+
+		// validate doesn't exist anymore
+		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+				.openTx(this.certificate, "test", false)) {
+			Order order1 = tx.getOrderBy("NonUnique1", "non-unique-id");
+			Order order2 = tx.getOrderBy("NonUnique2", "non-unique-id");
+			assertNull(order1);
+			assertNull(order2);
 		}
 	}
 
