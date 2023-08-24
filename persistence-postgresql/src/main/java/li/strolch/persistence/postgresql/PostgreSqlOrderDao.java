@@ -60,10 +60,10 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asxml = ? where id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, date = ?, asjson = ? where id = ? and version = ?";
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, date = ?, asxml = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, date = ?, asjson = ? where type = ? and id = ? and version = ?";
 
-	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
+	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
 
 	public PostgreSqlOrderDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
@@ -86,7 +86,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 					MessageFormat.format("Failed to extract Order from sqlxml value for {0} / {1}", id, type), e);
 		}
 
-		if (listener.getOrders().size() == 0)
+		if (listener.getOrders().isEmpty())
 			throw new StrolchPersistenceException(
 					MessageFormat.format("No Orders parsed from sqlxml value for {0} / {1}", id, type));
 		if (listener.getOrders().size() > 1)
@@ -157,8 +157,9 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
-			preparedStatement.setString(1, order.getId());
-			preparedStatement.setInt(2, order.getVersion().getPreviousVersion());
+			preparedStatement.setString(1, order.getType());
+			preparedStatement.setString(2, order.getId());
+			preparedStatement.setInt(3, order.getVersion().getPreviousVersion());
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
@@ -214,13 +215,13 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 			// attributes
 			preparedStatement.setString(6, order.getName());
-			preparedStatement.setString(7, order.getType());
-			preparedStatement.setString(8, order.getState().name());
-			preparedStatement.setTimestamp(9, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
+			preparedStatement.setString(7, order.getState().name());
+			preparedStatement.setTimestamp(8, new Timestamp(order.getDate().getTime()), Calendar.getInstance());
 
-			SQLXML sqlxml = writeObject(preparedStatement, order, 10);
+			SQLXML sqlxml = writeObject(preparedStatement, order, 9);
 
 			// primary key
+			preparedStatement.setString(10, order.getType());
 			preparedStatement.setString(11, order.getId());
 			preparedStatement.setInt(12, order.getVersion().getVersion());
 

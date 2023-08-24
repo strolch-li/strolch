@@ -43,10 +43,10 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
 	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asxml = ? where id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, state = ?::order_state, asjson = ? where id = ? and version = ?";
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, asxml = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, asjson = ? where type = ? and id = ? and version = ?";
 
-	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
+	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
 
 	public PostgreSqlActivityDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
@@ -69,7 +69,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 					MessageFormat.format("Failed to extract Activity from sqlxml value for {0} / {1}", id, type), e);
 		}
 
-		if (listener.getActivities().size() == 0)
+		if (listener.getActivities().isEmpty())
 			throw new StrolchPersistenceException(
 					MessageFormat.format("No Activity parsed from sqlxml value for {0} / {1}", id, type));
 		if (listener.getActivities().size() > 1)
@@ -140,8 +140,9 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
-			preparedStatement.setString(1, activity.getId());
-			preparedStatement.setInt(2, activity.getVersion().getPreviousVersion());
+			preparedStatement.setString(1, activity.getType());
+			preparedStatement.setString(2, activity.getId());
+			preparedStatement.setInt(3, activity.getVersion().getPreviousVersion());
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
@@ -196,12 +197,12 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 			// attributes
 			preparedStatement.setString(6, activity.getName());
-			preparedStatement.setString(7, activity.getType());
-			preparedStatement.setString(8, activity.getState().name());
+			preparedStatement.setString(7, activity.getState().name());
 
-			SQLXML sqlxml = writeObject(preparedStatement, activity, 9);
+			SQLXML sqlxml = writeObject(preparedStatement, activity, 8);
 
 			// primary key
+			preparedStatement.setString(9, activity.getType());
 			preparedStatement.setString(10, activity.getId());
 			preparedStatement.setInt(11, activity.getVersion().getVersion());
 

@@ -43,10 +43,10 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asxml = ? where id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, type = ?, asjson = ? where id = ? and version = ?";
+	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, asxml = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, asjson = ? where type = ? and id = ? and version = ?";
 
-	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE id = ? AND version = ?";
+	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
 
 	protected PostgreSqlResourceDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
@@ -69,7 +69,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 					MessageFormat.format("Failed to extract Resource from sqlxml value for {0} / {1}", id, type), e);
 		}
 
-		if (listener.getResources().size() == 0)
+		if (listener.getResources().isEmpty())
 			throw new StrolchPersistenceException(
 					MessageFormat.format("No Resource parsed from sqlxml value for {0} / {1}", id, type));
 		if (listener.getResources().size() > 1)
@@ -139,8 +139,9 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 		try (PreparedStatement preparedStatement = this.connection.prepareStatement(sql)) {
 
 			// primary key
-			preparedStatement.setString(1, resource.getId());
-			preparedStatement.setInt(2, resource.getVersion().getPreviousVersion());
+			preparedStatement.setString(1, resource.getType());
+			preparedStatement.setString(2, resource.getId());
+			preparedStatement.setInt(3, resource.getVersion().getPreviousVersion());
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
@@ -196,11 +197,11 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 			// attributes
 			preparedStatement.setString(6, resource.getName());
-			preparedStatement.setString(7, resource.getType());
 
-			SQLXML sqlxml = writeObject(preparedStatement, resource, 8);
+			SQLXML sqlxml = writeObject(preparedStatement, resource, 7);
 
 			// primary key
+			preparedStatement.setString(8, resource.getType());
 			preparedStatement.setString(9, resource.getId());
 			preparedStatement.setInt(10, resource.getVersion().getVersion());
 
