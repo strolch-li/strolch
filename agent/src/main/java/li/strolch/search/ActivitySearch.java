@@ -4,6 +4,7 @@ import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER
 
 import li.strolch.model.Order;
 import li.strolch.model.activity.Activity;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * Performs a search for {@link Activity} elements
@@ -39,5 +40,10 @@ public class ActivitySearch extends StrolchSearch<Activity> {
 	public ActivitySearch internal() {
 		super.internal();
 		return this;
+	}
+
+	@Override
+	public ActivitySearchResult search(StrolchTransaction tx) {
+		return new ActivitySearchResult(prepareSearch(tx));
 	}
 }

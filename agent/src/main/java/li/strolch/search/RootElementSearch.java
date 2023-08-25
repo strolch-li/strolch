@@ -6,6 +6,7 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * Performs a search for any kind of root element, allowing to mix {@link Resource}, {@link Order} and {@link Activity}
@@ -32,5 +33,10 @@ public class RootElementSearch extends StrolchSearch<StrolchRootElement> {
 		};
 
 		return this;
+	}
+
+	@Override
+	public RootElementSearchResult<StrolchRootElement> search(StrolchTransaction tx) {
+		return new RootElementSearchResult<>(prepareSearch(tx));
 	}
 }

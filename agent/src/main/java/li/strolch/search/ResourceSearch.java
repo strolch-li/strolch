@@ -1,6 +1,7 @@
 package li.strolch.search;
 
 import li.strolch.model.Resource;
+import li.strolch.persistence.api.StrolchTransaction;
 
 /**
  * Performs a search for {@link Resource} elements
@@ -30,5 +31,10 @@ public class ResourceSearch extends StrolchSearch<Resource> {
 	public ResourceSearch internal() {
 		super.internal();
 		return this;
+	}
+
+	@Override
+	public ResourceSearchResult search(StrolchTransaction tx) {
+		return new ResourceSearchResult(prepareSearch(tx));
 	}
 }

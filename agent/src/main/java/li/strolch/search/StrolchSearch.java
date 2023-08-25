@@ -43,8 +43,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	/**
 	 * Used to configure the navigator, i.e. which <code>type</code> of root elements are to be queried
 	 *
-	 * @param types
-	 * 		the types of elements to search
+	 * @param types the types of elements to search
 	 *
 	 * @return this for chaining
 	 */
@@ -60,8 +59,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	/**
 	 * Adds  the given {@link SearchExpression} to the current search
 	 *
-	 * @param expression
-	 * 		the {@link SearchExpression} to add to this search
+	 * @param expression the {@link SearchExpression} to add to this search
 	 *
 	 * @return this for chaining
 	 */
@@ -87,12 +85,13 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	/**
 	 * Performs the actual search, by first validating the privilege context
 	 *
-	 * @param tx
-	 * 		the TX on which to perform the search
+	 * @param tx the TX on which to perform the search
 	 *
 	 * @return the search result
 	 */
-	public RootElementSearchResult<T> search(StrolchTransaction tx) {
+	public abstract RootElementSearchResult<T> search(StrolchTransaction tx);
+
+	protected Stream<T> prepareSearch(StrolchTransaction tx) {
 		try {
 			tx.getPrivilegeContext().validateAction(this);
 		} catch (AccessDeniedException e) {
@@ -101,8 +100,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 
 			if (tx.getContainer().hasComponent(OperationsLog.class)) {
 				String realmName = tx.getRealmName();
-				String searchName = this.privilegeValue.equals(INTERNAL) ?
-						(getClass().getName() + " (INTERNAL)") :
+				String searchName = this.privilegeValue.equals(INTERNAL) ? (getClass().getName() + " (INTERNAL)") :
 						this.privilegeValue;
 				LogMessage logMessage = new LogMessage(realmName, username,
 						Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), getPrivilegeName(), searchName),
@@ -114,8 +112,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 				operationsLog.addMessage(logMessage);
 			}
 
-			String searchName = this.privilegeValue.equals(INTERNAL) ?
-					(getClass().getSimpleName() + " (INTERNAL)") :
+			String searchName = this.privilegeValue.equals(INTERNAL) ? (getClass().getSimpleName() + " (INTERNAL)") :
 					getClass().getSimpleName();
 			I18nMessage i18n = new I18nMessage(
 					ResourceBundle.getBundle("strolch-agent", tx.getCertificate().getLocale()),
@@ -134,8 +131,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 
 		if (this.expression != null)
 			stream = stream.filter(e -> this.expression.matches(e));
-
-		return new RootElementSearchResult<>(stream);
+		return stream;
 	}
 
 	/**

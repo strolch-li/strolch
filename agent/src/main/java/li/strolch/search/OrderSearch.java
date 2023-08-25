@@ -1,12 +1,13 @@
 package li.strolch.search;
 
-import static java.util.stream.Collectors.toList;
+import li.strolch.model.Order;
+import li.strolch.model.State;
+import li.strolch.persistence.api.StrolchTransaction;
 
 import java.util.Arrays;
 import java.util.List;
 
-import li.strolch.model.Order;
-import li.strolch.model.State;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Performs a search of {@link Order} elements
@@ -60,5 +61,10 @@ public class OrderSearch extends StrolchSearch<Order> {
 	public OrderSearch internal() {
 		super.internal();
 		return this;
+	}
+
+	@Override
+	public OrderSearchResult search(StrolchTransaction tx) {
+		return new OrderSearchResult(prepareSearch(tx));
 	}
 }
