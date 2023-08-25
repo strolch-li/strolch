@@ -3,6 +3,8 @@ package li.strolch.search;
 import li.strolch.search.predicates.*;
 import li.strolch.utils.collections.DateRange;
 
+import java.time.ZonedDateTime;
+
 /**
  * Implements predicates to be used as static imports when writing searches
  */
@@ -66,5 +68,13 @@ public class PredicatesSupport {
 
 	public static SearchPredicate inRange(DateRange range) {
 		return new InRangePredicate(range);
+	}
+
+	public static SearchPredicate isBefore(ZonedDateTime dateTime, boolean inclusive) {
+		return new IsBeforePredicate(dateTime, inclusive);
+	}
+
+	public static SearchPredicate isAfter(ZonedDateTime dateTime, boolean inclusive) {
+		return new IsAfterPredicate(dateTime, inclusive);
 	}
 }

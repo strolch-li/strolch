@@ -3,6 +3,8 @@ package li.strolch.search;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.utils.collections.DateRange;
 
+import java.time.ZonedDateTime;
+
 /**
  * An interface to add search expressions to easily discover the possible search expressions
  */
@@ -72,5 +74,13 @@ public interface ExpressionBuilder {
 
 	default <T extends StrolchRootElement> SearchExpression<T> inRange(DateRange range) {
 		return element -> PredicatesSupport.inRange(range).matches(extract(element));
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> isBefore(ZonedDateTime date, boolean inclusive) {
+		return element -> PredicatesSupport.isBefore(date, inclusive).matches(extract(element));
+	}
+
+	default <T extends StrolchRootElement> SearchExpression<T> isAfter(ZonedDateTime date, boolean inclusive) {
+		return element -> PredicatesSupport.isAfter(date, inclusive).matches(extract(element));
 	}
 }

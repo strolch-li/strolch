@@ -1,20 +1,7 @@
 package li.strolch.search;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static li.strolch.agent.api.StrolchAgent.getUniqueId;
-import static li.strolch.model.ModelGenerator.*;
-import static li.strolch.search.ExpressionsSupport.*;
-import static li.strolch.search.PredicatesSupport.*;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.google.gson.JsonObject;
 import li.strolch.RuntimeMock;
-import li.strolch.agent.ParallelTests;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -27,6 +14,7 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.collections.DateRange;
+import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -34,12 +22,28 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static java.time.ZoneId.systemDefault;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
+import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.search.ExpressionsSupport.*;
+import static li.strolch.search.PredicatesSupport.*;
+import static org.junit.Assert.assertEquals;
+
 public class StrolchSearchTest {
 
 	public static final Logger logger = LoggerFactory.getLogger(StrolchSearchTest.class);
 
 	private static final String TARGET_PATH = "target/" + StrolchSearchTest.class.getSimpleName();
 	private static final String SOURCE_PATH = "src/test/resources/transienttest";
+	public static final String SORTING_TYPE = "SortingType";
 
 	private static RuntimeMock runtimeMock;
 	private static Certificate cert;
@@ -51,7 +55,7 @@ public class StrolchSearchTest {
 		cert = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, false)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, false)) {
 
 			{
 				Resource ball = createResource("the-id", "Yellow Ball", "Ball");
@@ -83,15 +87,15 @@ public class StrolchSearchTest {
 
 			String id;
 			id = "ggg";
-			tx.add(createOrder(id, id.toUpperCase(), "SortingType"));
+			tx.add(createOrder(id, id.toUpperCase(), SORTING_TYPE));
 			id = "ccc";
-			tx.add(createOrder(id, id.toUpperCase(), "SortingType"));
+			tx.add(createOrder(id, id.toUpperCase(), SORTING_TYPE));
 			id = "aaa";
-			tx.add(createOrder(id, id.toUpperCase(), "SortingType"));
+			tx.add(createOrder(id, id.toUpperCase(), SORTING_TYPE));
 			id = "bbb";
-			tx.add(createOrder(id, id.toUpperCase(), "SortingType"));
+			tx.add(createOrder(id, id.toUpperCase(), SORTING_TYPE));
 			id = "ddd";
-			tx.add(createOrder(id, id.toUpperCase(), "SortingType"));
+			tx.add(createOrder(id, id.toUpperCase(), SORTING_TYPE));
 
 			tx.commitOnClose();
 		}
@@ -112,7 +116,7 @@ public class StrolchSearchTest {
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow")
 					// do search, returns SearchResult
@@ -133,11 +137,11 @@ public class StrolchSearchTest {
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
-			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow")
-					.where(element -> element.hasTimedState(STATE_FLOAT_ID)).search(tx)
-					.map(a -> a.accept(toJsonVisitor)).toList();
+			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow").where(
+							element -> element.hasTimedState(STATE_FLOAT_ID)).search(tx).map(a -> a.accept(toJsonVisitor))
+					.toList();
 
 			assertEquals(2, result.size());
 		}
@@ -150,7 +154,7 @@ public class StrolchSearchTest {
 
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			List<JsonObject> result = new NewBallSearch().id("the-id").status("bla").color("yellow")
 
@@ -168,7 +172,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchResources3() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			assertEquals(4,
 					new ResourceSearch().types().where(param(BAG_ID, PARAM_STRING_ID, contains("rol"))).search(tx)
@@ -182,7 +186,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchResources4() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			assertEquals(8, new ResourceSearch().types().search(tx).toList().size());
 		}
@@ -191,7 +195,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchResources5() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			assertEquals(2, new ResourceSearch().types("sdf", "Ball").search(tx).toList().size());
 			assertEquals(2, new ResourceSearch().types("Ball", "sdf").search(tx).toList().size());
@@ -202,7 +206,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchResources6() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			assertEquals(1, new ResourceSearch().types("TestType") //
 					.where(relationName(tx, "other").isEqualTo("Yellow")) //
@@ -220,19 +224,19 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchOrders() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			List<Order> result = new OrderSearch() {
 				@Override
 				public void define() {
 
-					DateRange dateRange = new DateRange()
-							.from(ISO8601FormatFactory.getInstance().parseDate("2012-01-01T00:00:00.000+01:00"), true)
-							.to(ISO8601FormatFactory.getInstance().parseDate("2013-01-01T00:00:00.000+01:00"), true);
+					DateRange dateRange = new DateRange().from(ISO8601.parseToZdt("2012-01-01T00:00:00.000+01:00"),
+							true).to(ISO8601.parseToZdt("2013-01-01T00:00:00.000+01:00"), true);
 
-					types().where(date(isEqualTo(new Date(1384929777699L))).or(state(isEqualTo(State.CREATED))
-							.and(param(BAG_ID, PARAM_STRING_ID, isEqualTo("Strolch")))
-							.and(param(BAG_ID, PARAM_DATE_ID, inRange(dateRange)))));
+					types().where(date().isEqualTo(Instant.ofEpochMilli(1384929777699L).atZone(systemDefault()))
+							.or(state().isEqualTo(State.CREATED)
+									.and(param(BAG_ID, PARAM_STRING_ID).isEqualTo("Strolch"))
+									.and(param(BAG_ID, PARAM_DATE_ID).inRange(dateRange))));
 				}
 			}.search(tx).toList();
 
@@ -243,12 +247,12 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchOrders1() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			StrolchSearch<Order> search = new OrderSearch() {
 				@Override
 				public void define() {
-					types("SortingType").where(state(isEqualTo(State.CREATED)));
+					types(SORTING_TYPE).where(state(isEqualTo(State.CREATED)));
 				}
 			};
 
@@ -267,19 +271,40 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchOrders2() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
-			assertEquals(5, new OrderSearch().types("sdf", "SortingType").search(tx).toList().size());
-			assertEquals(5, new OrderSearch().types("SortingType", "sdf").search(tx).toList().size());
-			assertEquals(5, new OrderSearch().types("4gdf", "SortingType", "sdf").search(tx).toList().size());
+			assertEquals(5, new OrderSearch().types("sdf", SORTING_TYPE).search(tx).toList().size());
+			assertEquals(5, new OrderSearch().types(SORTING_TYPE, "sdf").search(tx).toList().size());
+			assertEquals(5, new OrderSearch().types("4gdf", SORTING_TYPE, "sdf").search(tx).toList().size());
 			assertEquals(7, new OrderSearch().types().search(tx).toList().size());
+		}
+	}
+
+	@Test
+	public void shouldSearchOrders3() {
+		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
+
+			ZonedDateTime dateTime = ISO8601.parseToZdt("2013-11-20T07:42:57.699+01:00");
+			assertEquals(0,
+					new OrderSearch().types("TestType").where(date().isBefore(dateTime, false)).search(tx).toList()
+							.size());
+			assertEquals(1,
+					new OrderSearch().types("TestType").where(date().isBefore(dateTime, true)).search(tx).toList()
+							.size());
+			assertEquals(0,
+					new OrderSearch().types("TestType").where(date().isAfter(dateTime, false)).search(tx).toList()
+							.size());
+			assertEquals(1,
+					new OrderSearch().types("TestType").where(date().isAfter(dateTime, true)).search(tx).toList()
+							.size());
 		}
 	}
 
 	@Test
 	public void shouldSearchActivities() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			Map<String, State> states = new ActivitySearch() {
 				@Override
@@ -295,7 +320,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchActivities1() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			Map<String, State> states = new ActivitySearch()
 
@@ -310,7 +335,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchActivities2() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			assertEquals(2, new ActivitySearch().types("sdf", "ActivityType").search(tx).toList().size());
 			assertEquals(2, new ActivitySearch().types("ActivityType", "sdf").search(tx).toList().size());
@@ -322,7 +347,7 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchActivities3() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			assertEquals(1, new ActivitySearch().types("sdf", "ActivityType")
 					.where(element -> element.getActionsByType("Use").size() == 4).search(tx).toList().size());
@@ -332,10 +357,10 @@ public class StrolchSearchTest {
 	@Test
 	public void shouldSearchRootElements() {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
-		try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, true)) {
+		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			assertEquals(9,
-					new RootElementSearch().types("SortingType", "Ball", "ActivityType").search(tx).toList().size());
+					new RootElementSearch().types(SORTING_TYPE, "Ball", "ActivityType").search(tx).toList().size());
 			assertEquals(17, new RootElementSearch().types().search(tx).toList().size());
 			assertEquals(2, new RootElementSearch().types("ActivityType").search(tx).toList().size());
 		}
@@ -380,8 +405,8 @@ public class StrolchSearchTest {
 		public void define() {
 			types("Ball").where(id(isEqualTo(this.id)).or( //
 
-					param("parameters", "status", isEqualTo(this.status))
-							.and(not(param("parameters", "color", isEqualTo(this.color))))
+					param("parameters", "status", isEqualTo(this.status)).and(
+									not(param("parameters", "color", isEqualTo(this.color))))
 
 							.and(param("parameters", "state", isEqualTo(State.EXECUTION)))
 							.and(param("parameters", "state", isEqualToIgnoreCase(State.EXECUTION)))
@@ -401,9 +426,9 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_STRING_ID, isIn("Strolch", "sdf")))
 							.and(param(BAG_ID, PARAM_STRING_ID, isInIgnoreCase("strolch")))
 							.and(param(BAG_ID, PARAM_STRING_ID, isInIgnoreCase("strolch", "dfgdfg")))
-							.and(param(BAG_ID, PARAM_STRING_ID, contains(new String[] { "Str", "rol" })))
+							.and(param(BAG_ID, PARAM_STRING_ID, contains(new String[]{"Str", "rol"})))
 							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase("ROL")))
-							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase(new String[] { "STR", "ROL" })))
+							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase(new String[]{"STR", "ROL"})))
 							.and(param(BAG_ID, PARAM_STRING_ID, startsWith("Str")))
 							.and(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("str")))
 							.and(param(BAG_ID, PARAM_STRING_ID, endsWith("lch")))
@@ -433,9 +458,9 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_LIST_LONG_ID, isEqualTo(asList(7L, 12L, 17L))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isEqualTo(asList("Hello", "World"))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isEqualToIgnoreCase(asList("hello", "world"))))
-							.and(param(BAG_ID, PARAM_LIST_STRING_ID, contains(new String[] { "Hel", "wor" })))
-							.and(param(BAG_ID, PARAM_LIST_STRING_ID, containsIgnoreCase(new String[] { "Hel", "wor" })))
-							.and(param(BAG_ID, PARAM_LIST_STRING_ID, containsIgnoreCase(new String[] { "hel" })))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, contains(new String[]{"Hel", "wor"})))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, containsIgnoreCase(new String[]{"Hel", "wor"})))
+							.and(param(BAG_ID, PARAM_LIST_STRING_ID, containsIgnoreCase(new String[]{"hel"})))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Hello", "World"))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Hello", "World", "Extra"))))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, isIn(asList("Extra", "Sauce")).not()))
