@@ -84,6 +84,22 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 		setDate(date);
 	}
 
+	/**
+	 * Extended Constructor for date and {@link State}
+	 *
+	 * @param id    the id
+	 * @param name  the name
+	 * @param type  the type
+	 * @param date  the date
+	 * @param state the state
+	 */
+	public Order(String id, String name, String type, ZonedDateTime date, State state) {
+		super(id, name, type);
+
+		setState(state);
+		setDate(date);
+	}
+
 	@Override
 	public void setId(String id) {
 		this.locator = null;
