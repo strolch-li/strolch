@@ -89,11 +89,11 @@ public class VersionQueryResult {
 		jsonObject.add(APP_VERSION, this.appVersion.toJson(isAdminRequest));
 		jsonObject.add(AGENT_VERSION, this.agentVersion.toJson(isAdminRequest));
 
-		if (isAdminRequest) {
-			JsonArray componentVersionsJ = new JsonArray();
-			this.componentVersions.forEach(c -> componentVersionsJ.add(c.toJson(true)));
-			jsonObject.add(COMPONENT_VERSIONS, componentVersionsJ);
+		JsonArray componentVersionsJ = new JsonArray();
+		this.componentVersions.forEach(c -> componentVersionsJ.add(c.toJson(isAdminRequest)));
+		jsonObject.add(COMPONENT_VERSIONS, componentVersionsJ);
 
+		if (isAdminRequest) {
 			if (this.errors != null) {
 				JsonArray errorsJ = new JsonArray();
 				this.errors.forEach(errorsJ::add);

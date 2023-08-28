@@ -29,6 +29,7 @@ import jakarta.ws.rs.core.Response;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.VersionQueryResult;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -46,22 +47,23 @@ public class VersionQuery {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
 
+		VersionQueryResult versionQuery = agent.getVersion();
 		if (cert == null) {
 			JsonObject jsonObject = new JsonObject();
 
-			JsonObject agentVersion = agent.getVersion().getAgentVersion().toJson(false);
+			JsonObject agentVersion = versionQuery.getAgentVersion().toJson(false);
 			jsonObject.add(AGENT_VERSION, agentVersion);
 
 			if (RestfulStrolchComponent.getInstance().isHideVersionFromUnauthorizedClients()) {
 				jsonObject.add(APP_VERSION, new JsonObject());
 			} else {
-				jsonObject.add(APP_VERSION, agent.getVersion().getAppVersion().toJson(false));
+				jsonObject.add(APP_VERSION, versionQuery.getAppVersion().toJson(false));
 			}
 
 			return Response.ok(jsonObject.toString(), MediaType.APPLICATION_JSON).build();
 		}
 
 		boolean isStrolchAdmin = cert.hasRole(ROLE_STROLCH_ADMIN);
-		return Response.ok(agent.getVersion().toJson(isStrolchAdmin).toString(), MediaType.APPLICATION_JSON).build();
+		return Response.ok(versionQuery.toJson(isStrolchAdmin).toString(), MediaType.APPLICATION_JSON).build();
 	}
 }
