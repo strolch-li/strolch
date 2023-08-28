@@ -50,8 +50,8 @@ public class AgentVersion extends StrolchVersion {
 	}
 
 	@Override
-	public JsonObject toJson() {
-		JsonObject jsonObject = super.toJson();
+	public JsonObject toJson(boolean isAdminRequest) {
+		JsonObject jsonObject = super.toJson(isAdminRequest);
 
 		jsonObject.addProperty(AGENT_NAME, this.agentName);
 		jsonObject.addProperty(ENVIRONMENT, this.environment);
@@ -63,10 +63,10 @@ public class AgentVersion extends StrolchVersion {
 
 	@Override
 	public String toString() {
-		return "AgentVersion{agentName='" + this.agentName + "' , environment='" + this.environment + "' , locale='"
-				+ this.locale + "' , timezone='" + this.timezone + "' , groupId='" + getGroupId() + "' , artifactId='"
-				+ getArtifactId() + "' , artifactVersion='" + getArtifactVersion() + "' , scmRevision='"
-				+ getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='" + getBuildTimestamp()
-				+ "' }";
+		return "AgentVersion{agentName='" + this.agentName + "' , environment='" + this.environment + "' , locale='" +
+				this.locale + "' , timezone='" + this.timezone + "' , groupId='" + getGroupId() + "' , artifactId='" +
+				getArtifactId() + "' , artifactVersion='" + getArtifactVersion() + "' , scmRevision='" +
+				getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='" + getBuildTimestamp() +
+				"' }";
 	}
 }

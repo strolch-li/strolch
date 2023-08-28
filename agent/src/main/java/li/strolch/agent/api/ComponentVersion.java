@@ -42,8 +42,8 @@ public class ComponentVersion extends StrolchVersion {
 	}
 
 	@Override
-	public JsonObject toJson() {
-		JsonObject jsonObject = super.toJson();
+	public JsonObject toJson(boolean isAdminRequest) {
+		JsonObject jsonObject = super.toJson(isAdminRequest);
 
 		jsonObject.addProperty(COMPONENT_NAME, this.componentName);
 
@@ -52,9 +52,9 @@ public class ComponentVersion extends StrolchVersion {
 
 	@Override
 	public String toString() {
-		return "ComponentVersion{componentName='" + this.componentName + "' , groupId='" + getGroupId()
-				+ "' , artifactId='" + getArtifactId() + "' , artifactVersion='" + getArtifactVersion()
-				+ "' , scmRevision='" + getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='"
-				+ getBuildTimestamp() + "' }";
+		return "ComponentVersion{componentName='" + this.componentName + "' , groupId='" + getGroupId() +
+				"' , artifactId='" + getArtifactId() + "' , artifactVersion='" + getArtifactVersion() +
+				"' , scmRevision='" + getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='" +
+				getBuildTimestamp() + "' }";
 	}
 }

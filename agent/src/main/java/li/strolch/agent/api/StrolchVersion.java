@@ -90,23 +90,25 @@ public class StrolchVersion {
 		this.buildTimestamp = buildTimestamp;
 	}
 
-	public JsonObject toJson() {
+	public JsonObject toJson(boolean isAdminRequest) {
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty(GROUP_ID, this.groupId);
 		jsonObject.addProperty(ARTIFACT_ID, this.artifactId);
 		jsonObject.addProperty(ARTIFACT_VERSION, this.artifactVersion);
-		jsonObject.addProperty(SCM_REVISION, this.scmRevision);
-		jsonObject.addProperty(SCM_BRANCH, this.scmBranch);
-		jsonObject.addProperty(BUILD_TIMESTAMP, this.buildTimestamp);
+		if (isAdminRequest) {
+			jsonObject.addProperty(SCM_REVISION, this.scmRevision);
+			jsonObject.addProperty(SCM_BRANCH, this.scmBranch);
+			jsonObject.addProperty(BUILD_TIMESTAMP, this.buildTimestamp);
+		}
 
 		return jsonObject;
 	}
 
 	@Override
 	public String toString() {
-		return "StrolchVersion{groupId='" + groupId + "' , artifactId='" + artifactId + "', artifactVersion='"
-				+ artifactVersion + "' , scmRevision='" + scmRevision + "' , scmBranch='" + scmBranch
-				+ "' , buildTimestamp='" + buildTimestamp + "' }";
+		return "StrolchVersion{groupId='" + groupId + "' , artifactId='" + artifactId + "', artifactVersion='" +
+				artifactVersion + "' , scmRevision='" + scmRevision + "' , scmBranch='" + scmBranch +
+				"' , buildTimestamp='" + buildTimestamp + "' }";
 	}
 }

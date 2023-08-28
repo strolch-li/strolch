@@ -15,13 +15,13 @@
  */
 package li.strolch.agent.api;
 
-import static li.strolch.model.Tags.Json.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import static li.strolch.model.Tags.Json.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -83,20 +83,22 @@ public class VersionQueryResult {
 		return this.errors != null && !this.errors.isEmpty();
 	}
 
-	public JsonObject toJson() {
+	public JsonObject toJson(boolean isAdminRequest) {
 		JsonObject jsonObject = new JsonObject();
 
-		jsonObject.add(APP_VERSION, this.appVersion.toJson());
-		jsonObject.add(AGENT_VERSION, this.agentVersion.toJson());
+		jsonObject.add(APP_VERSION, this.appVersion.toJson(isAdminRequest));
+		jsonObject.add(AGENT_VERSION, this.agentVersion.toJson(isAdminRequest));
 
-		JsonArray componentVersionsJ = new JsonArray();
-		this.componentVersions.forEach(c -> componentVersionsJ.add(c.toJson()));
-		jsonObject.add(COMPONENT_VERSIONS, componentVersionsJ);
+		if (isAdminRequest) {
+			JsonArray componentVersionsJ = new JsonArray();
+			this.componentVersions.forEach(c -> componentVersionsJ.add(c.toJson(true)));
+			jsonObject.add(COMPONENT_VERSIONS, componentVersionsJ);
 
-		if (this.errors != null) {
-			JsonArray errorsJ = new JsonArray();
-			this.errors.forEach(errorsJ::add);
-			jsonObject.add(ERRORS, errorsJ);
+			if (this.errors != null) {
+				JsonArray errorsJ = new JsonArray();
+				this.errors.forEach(errorsJ::add);
+				jsonObject.add(ERRORS, errorsJ);
+			}
 		}
 
 		return jsonObject;

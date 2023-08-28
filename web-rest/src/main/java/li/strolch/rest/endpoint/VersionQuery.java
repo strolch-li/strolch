@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.endpoint;
 
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.model.Tags.Json.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import jakarta.ws.rs.core.Response;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.model.StrolchModelConstants;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -44,29 +46,22 @@ public class VersionQuery {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
 
-		if (cert == null && RestfulStrolchComponent.getInstance().isHideVersionFromUnauthorizedClients()) {
-
-			JsonObject agentVersion = new JsonObject();
-			agentVersion.addProperty(AGENT_NAME, agent.getApplicationName());
-			agentVersion.addProperty(ENVIRONMENT, agent.getEnvironment());
-			agentVersion.addProperty(LOCALE, agent.getLocale().toLanguageTag());
-			agentVersion.addProperty(TIMEZONE, agent.getTimezone());
-
-			JsonArray componentVersionsJ = new JsonArray();
-			agent.getVersion().getComponentVersions().forEach(c -> {
-				JsonObject componentVersionJ = new JsonObject();
-				componentVersionJ.addProperty(COMPONENT_NAME, c.getComponentName());
-				componentVersionsJ.add(componentVersionJ);
-			});
-
+		if (cert == null) {
 			JsonObject jsonObject = new JsonObject();
+
+			JsonObject agentVersion = agent.getVersion().getAgentVersion().toJson(false);
 			jsonObject.add(AGENT_VERSION, agentVersion);
-			jsonObject.add(APP_VERSION, new JsonObject());
-			jsonObject.add(COMPONENT_VERSIONS, componentVersionsJ);
+
+			if (RestfulStrolchComponent.getInstance().isHideVersionFromUnauthorizedClients()) {
+				jsonObject.add(APP_VERSION, new JsonObject());
+			} else {
+				jsonObject.add(APP_VERSION, agent.getVersion().getAppVersion().toJson(false));
+			}
 
 			return Response.ok(jsonObject.toString(), MediaType.APPLICATION_JSON).build();
 		}
 
-		return Response.ok(agent.getVersion().toJson().toString(), MediaType.APPLICATION_JSON).build();
+		boolean isStrolchAdmin = cert.hasRole(ROLE_STROLCH_ADMIN);
+		return Response.ok(agent.getVersion().toJson(isStrolchAdmin).toString(), MediaType.APPLICATION_JSON).build();
 	}
 }
