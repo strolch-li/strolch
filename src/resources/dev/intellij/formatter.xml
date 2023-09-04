@@ -1,5 +1,9 @@
 <code_scheme name="strolch" version="173">
-  <option name="ENABLE_SECOND_REFORMAT" value="true" />
+  <JSCodeStyleSettings version="0">
+    <option name="FORCE_SEMICOLON_STYLE" value="true" />
+    <option name="FORCE_QUOTE_STYlE" value="true" />
+    <option name="ENFORCE_TRAILING_COMMA" value="Remove" />
+  </JSCodeStyleSettings>
   <JavaCodeStyleSettings>
     <option name="ANNOTATION_PARAMETER_WRAP" value="1" />
     <option name="JD_ADD_BLANK_AFTER_PARM_COMMENTS" value="true" />
