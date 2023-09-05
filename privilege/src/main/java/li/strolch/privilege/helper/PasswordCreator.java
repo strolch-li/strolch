@@ -15,8 +15,9 @@
  */
 package li.strolch.privilege.helper;
 
-import static li.strolch.privilege.base.PrivilegeConstants.*;
-import static li.strolch.privilege.helper.CryptHelper.buildPasswordString;
+import li.strolch.privilege.handler.DefaultEncryptionHandler;
+import li.strolch.privilege.model.internal.PasswordCrypt;
+import li.strolch.utils.helper.StringHelper;
 
 import javax.crypto.SecretKeyFactory;
 import java.io.BufferedReader;
@@ -24,8 +25,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import li.strolch.privilege.handler.DefaultEncryptionHandler;
-import li.strolch.utils.helper.StringHelper;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.privilege.model.internal.PasswordCrypt.buildPasswordString;
 
 /**
  * <p>
@@ -37,11 +38,9 @@ import li.strolch.utils.helper.StringHelper;
 public class PasswordCreator {
 
 	/**
-	 * @param args
-	 * 		the args from the command line, NOT USED
+	 * @param args the args from the command line, NOT USED
 	 *
-	 * @throws Exception
-	 * 		thrown if anything goes wrong
+	 * @throws Exception thrown if anything goes wrong
 	 */
 	public static void main(String[] args) throws Exception {
 
@@ -136,18 +135,16 @@ public class PasswordCreator {
 			}
 			byte[] salt = saltS.getBytes();
 
-			byte[] passwordHash = encryptionHandler.hashPassword(password, salt);
-			String passwordHashS = StringHelper.toHexString(passwordHash);
+			PasswordCrypt passwordCrypt = encryptionHandler.hashPassword(password, salt);
+			String passwordHashS = StringHelper.toHexString(passwordCrypt.getPassword());
 			System.out.println("Hash is: " + passwordHashS);
 			System.out.println("Salt is: " + saltS);
 			System.out.println();
 
 			System.out.println(
-					XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.XML_ATTR_SALT + "=\""
-							+ saltS + "\"");
-			System.out.println(
-					XmlConstants.XML_ATTR_PASSWORD + "=\"" + buildPasswordString(hashAlgorithm, iterations, keyLength,
-							salt, passwordHash) + "\"");
+					XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.XML_ATTR_SALT +
+							"=\"" + saltS + "\"");
+			System.out.println(XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordCrypt.buildPasswordString() + "\"");
 			System.out.println();
 		}
 	}

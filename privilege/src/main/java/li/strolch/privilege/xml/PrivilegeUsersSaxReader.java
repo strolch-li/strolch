@@ -21,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.utils.helper.StringHelper;
@@ -116,11 +117,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 		String userId;
 		String username;
-		byte[] password;
-		byte[] salt;
-		String hashAlgorithm;
-		int hashIterations = -1;
-		int hashKeyLength = -1;
+		PasswordCrypt passwordCrypt;
 		String firstName;
 		String lastname;
 		UserState userState;
@@ -145,47 +142,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 				String password = attributes.getValue(XML_ATTR_PASSWORD);
 				String salt = attributes.getValue(XML_ATTR_SALT);
-				parsePassword(password, salt);
+				this.passwordCrypt = PasswordCrypt.parse(password, salt);
 			} else if (qName.equals(XML_HISTORY)) {
 				this.history = new UserHistory();
-			}
-		}
-
-		private void parsePassword(String passwordS, String salt) {
-
-			if (StringHelper.isNotEmpty(salt))
-				this.salt = StringHelper.fromHexString(salt.trim());
-
-			if (StringHelper.isEmpty(passwordS))
-				return;
-
-			passwordS = passwordS.trim();
-
-			if (!passwordS.startsWith("$")) {
-				this.password = StringHelper.fromHexString(passwordS);
-			} else {
-
-				String[] parts = passwordS.split("\\$");
-				if (parts.length != 4) {
-					logger.error("Illegal password " + passwordS + ": Starts with $, but does not have 3 parts!");
-				} else {
-
-					String hashAlgorithm = parts[1];
-					String[] hashParts = hashAlgorithm.split(",");
-
-					if (hashParts.length != 3) {
-						logger.error("Illegal password " + passwordS
-								+ ": hashAlgorithm part does not have 3 parts separated by comma!");
-					} else {
-
-						this.hashAlgorithm = hashParts[0];
-						this.hashIterations = Integer.parseInt(hashParts[1]);
-						this.hashKeyLength = Integer.parseInt(hashParts[2]);
-
-						this.salt = StringHelper.fromHexString(parts[2]);
-						this.password = StringHelper.fromHexString(parts[3]);
-					}
-				}
 			}
 		}
 
@@ -198,37 +157,37 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		public void endElement(String uri, String localName, String qName) {
 
 			switch (qName) {
-			case XML_FIRSTNAME -> this.firstName = this.text.toString().trim();
-			case XML_LASTNAME -> this.lastname = this.text.toString().trim();
-			case XML_STATE -> this.userState = UserState.valueOf(this.text.toString().trim());
-			case XML_LOCALE -> this.locale = Locale.forLanguageTag(this.text.toString().trim());
-			case XML_PASSWORD_CHANGE_REQUESTED ->
-					this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
-			case XML_FIRST_LOGIN -> this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-			case XML_LAST_LOGIN -> this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-			case XML_LAST_PASSWORD_CHANGE ->
-					this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
-			case XML_ROLE -> this.userRoles.add(this.text.toString().trim());
-			case XML_USER -> {
-				if (this.history == null)
-					this.history = new UserHistory();
+				case XML_FIRSTNAME -> this.firstName = this.text.toString().trim();
+				case XML_LASTNAME -> this.lastname = this.text.toString().trim();
+				case XML_STATE -> this.userState = UserState.valueOf(this.text.toString().trim());
+				case XML_LOCALE -> this.locale = Locale.forLanguageTag(this.text.toString().trim());
+				case XML_PASSWORD_CHANGE_REQUESTED ->
+						this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
+				case XML_FIRST_LOGIN -> this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+				case XML_LAST_LOGIN -> this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
+				case XML_LAST_PASSWORD_CHANGE ->
+						this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
+				case XML_ROLE -> this.userRoles.add(this.text.toString().trim());
+				case XML_USER -> {
+					if (this.history == null)
+						this.history = new UserHistory();
 
-				User user = new User(this.userId, this.username, this.password, this.salt, this.hashAlgorithm,
-						hashIterations, hashKeyLength, this.firstName, this.lastname, this.userState, this.userRoles,
-						this.locale, this.parameters, this.passwordChangeRequested, this.history);
+					User user = new User(this.userId, this.username, this.passwordCrypt, this.firstName, this.lastname,
+							this.userState, this.userRoles, this.locale, this.parameters, this.passwordChangeRequested,
+							this.history);
 
-				logger.info(MessageFormat.format("New User: {0}", user));
-				String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
-				users.put(username, user);
-			}
-			default -> {
-				if (!(qName.equals(XML_ROLES) //
-						|| qName.equals(XML_PARAMETER) //
-						|| qName.equals(XML_HISTORY) //
-						|| qName.equals(XML_PARAMETERS))) {
-					throw new IllegalArgumentException("Unhandled tag " + qName);
+					logger.info(MessageFormat.format("New User: {0}", user));
+					String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
+					users.put(username, user);
 				}
-			}
+				default -> {
+					if (!(qName.equals(XML_ROLES) //
+								  || qName.equals(XML_PARAMETER) //
+								  || qName.equals(XML_HISTORY) //
+								  || qName.equals(XML_PARAMETERS))) {
+						throw new IllegalArgumentException("Unhandled tag " + qName);
+					}
+				}
 			}
 		}
 

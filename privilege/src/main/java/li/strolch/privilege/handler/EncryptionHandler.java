@@ -15,9 +15,9 @@
  */
 package li.strolch.privilege.handler;
 
-import java.util.Map;
+import li.strolch.privilege.model.internal.PasswordCrypt;
 
-import li.strolch.privilege.helper.Crypt;
+import java.util.Map;
 
 /**
  * The {@link EncryptionHandler} exposes API which is used to handle encrypting of strings, or returning secure tokens
@@ -26,13 +26,6 @@ import li.strolch.privilege.helper.Crypt;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface EncryptionHandler {
-
-	/**
-	 * Returns a new crypt instance
-	 *
-	 * @return a new crypt instance
-	 */
-	Crypt newCryptInstance();
 
 	/**
 	 * Returns the configured algorithm
@@ -72,49 +65,43 @@ public interface EncryptionHandler {
 	/**
 	 * Hashes the given password configured algorithm
 	 *
-	 * @param password
-	 * 		the password
+	 * @param password the password
 	 *
-	 * @return the hashed password
+	 * @return the {@link PasswordCrypt}
 	 */
-	byte[] hashPasswordWithoutSalt(final char[] password);
+	PasswordCrypt hashPasswordWithoutSalt(final char[] password);
 
 	/**
 	 * Hashes the given password with the given salt with the configured algorithm
 	 *
-	 * @param password
-	 * 		the password
-	 * @param salt
-	 * 		the salt
+	 * @param password the password
+	 * @param salt     the salt
 	 *
-	 * @return the hashed password
+	 * @return the {@link PasswordCrypt}
 	 */
-	byte[] hashPassword(final char[] password, final byte[] salt);
+	PasswordCrypt hashPassword(final char[] password, final byte[] salt);
 
 	/**
 	 * Hashes the given password with the given salt and algorithm properties
 	 *
-	 * @param password
-	 * 		the password
-	 * @param salt
-	 * 		the salt
-	 * @param algorithm
-	 * 		the algorithm
-	 * @param iterations
-	 * 		the iterations
-	 * @param keyLength
-	 * 		the keyLength
+	 * @param password   the password
+	 * @param salt       the salt
+	 * @param algorithm  the algorithm
+	 * @param iterations the iterations
+	 * @param keyLength  the keyLength
 	 *
-	 * @return the hashed password
+	 * @return the {@link PasswordCrypt}
 	 */
-	byte[] hashPassword(final char[] password, final byte[] salt, String algorithm, int iterations, int keyLength);
+	PasswordCrypt hashPassword(final char[] password, final byte[] salt, String algorithm, int iterations,
+			int keyLength);
+
+	boolean isPasswordCryptOutdated(PasswordCrypt userPasswordCrypt);
 
 	/**
 	 * Initialize the concrete {@link EncryptionHandler}. The passed parameter map contains any configuration the
 	 * concrete {@link EncryptionHandler} might need
 	 *
-	 * @param parameterMap
-	 * 		a map containing configuration properties
+	 * @param parameterMap a map containing configuration properties
 	 */
 	void initialize(Map<String, String> parameterMap);
 

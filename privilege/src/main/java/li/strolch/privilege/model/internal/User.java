@@ -15,15 +15,15 @@
  */
 package li.strolch.privilege.model.internal;
 
-import static li.strolch.privilege.base.PrivilegeConstants.*;
-
-import java.util.*;
-
 import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.utils.helper.StringHelper;
+
+import java.util.*;
+
+import static li.strolch.privilege.base.PrivilegeConstants.*;
 
 /**
  * This class defines the actual login information for a given user which can be granted privileges. Every user is
@@ -41,11 +41,7 @@ public final class User {
 	private final String userId;
 
 	private final String username;
-	private final byte[] password;
-	private final byte[] salt;
-	private final String hashAlgorithm;
-	private final int hashIterations;
-	private final int hashKeyLength;
+	private final PasswordCrypt passwordCrypt;
 
 	private final String firstname;
 	private final String lastname;
@@ -62,36 +58,19 @@ public final class User {
 	/**
 	 * Default constructor
 	 *
-	 * @param userId
-	 * 		the user's id
-	 * @param username
-	 * 		the user's login name
-	 * @param password
-	 * 		the user's password (hashed)
-	 * @param salt
-	 * 		the password salt
-	 * @param hashAlgorithm
-	 * 		the algorithm for the hash
-	 * @param hashIterations
-	 * 		the nr of iterations for hashing
-	 * @param hashKeyLength
-	 * 		the hash key length
-	 * @param firstname
-	 * 		the user's first name
-	 * @param lastname
-	 * 		the user's lastname
-	 * @param userState
-	 * 		the user's {@link UserState}
-	 * @param roles
-	 * 		the set of {@link Role}s assigned to this user
-	 * @param locale
-	 * 		the user's {@link Locale}
-	 * @param propertyMap
-	 * 		a {@link Map} containing string value pairs of properties for this user
+	 * @param userId        the user's id
+	 * @param username      the user's login name
+	 * @param passwordCrypt the {@link PasswordCrypt} containing user's password information
+	 * @param firstname     the user's first name
+	 * @param lastname      the user's lastname
+	 * @param userState     the user's {@link UserState}
+	 * @param roles         the set of {@link Role}s assigned to this user
+	 * @param locale        the user's {@link Locale}
+	 * @param propertyMap   a {@link Map} containing string value pairs of properties for this user
 	 */
-	public User(String userId, String username, byte[] password, byte[] salt, String hashAlgorithm, int hashIterations,
-			int hashKeyLength, String firstname, String lastname, UserState userState, Set<String> roles, Locale locale,
-			Map<String, String> propertyMap, boolean passwordChangeRequested, UserHistory history) {
+	public User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
+			UserState userState, Set<String> roles, Locale locale, Map<String, String> propertyMap,
+			boolean passwordChangeRequested, UserHistory history) {
 
 		if (StringHelper.isEmpty(userId))
 			throw new PrivilegeException("No UserId defined!");
@@ -109,7 +88,7 @@ public final class User {
 		if (history == null)
 			throw new PrivilegeException("History must not be null!");
 
-		// password, salt and hash* may be null, meaning not able to login
+		// passwordCrypt may be null, meaning not able to login
 		// roles may be null, meaning not able to login and must be added later
 		// locale may be null, meaning use system default
 		// properties may be null, meaning no properties
@@ -117,12 +96,7 @@ public final class User {
 		this.userId = userId;
 
 		this.username = username;
-		this.password = password;
-		this.salt = salt;
-
-		this.hashAlgorithm = hashAlgorithm;
-		this.hashIterations = hashIterations;
-		this.hashKeyLength = hashKeyLength;
+		this.passwordCrypt = passwordCrypt;
 
 		this.userState = userState;
 
@@ -163,48 +137,12 @@ public final class User {
 	}
 
 	/**
-	 * Returns the hashed password for this {@link User}
+	 * Returns the {@link PasswordCrypt} for this user, null if not password set
 	 *
-	 * @return the hashed password for this {@link User}
+	 * @return the {@link PasswordCrypt} for this user, null if not password set
 	 */
-	public byte[] getPassword() {
-		return this.password;
-	}
-
-	/**
-	 * Return the salt for this {@link User}
-	 *
-	 * @return the salt for this {@link User}
-	 */
-	public byte[] getSalt() {
-		return this.salt;
-	}
-
-	/**
-	 * Return the hash algorithm
-	 *
-	 * @return the hash algorithm
-	 */
-	public String getHashAlgorithm() {
-		return this.hashAlgorithm;
-	}
-
-	/**
-	 * Return the hashIterations
-	 *
-	 * @return hashIterations
-	 */
-	public int getHashIterations() {
-		return this.hashIterations;
-	}
-
-	/**
-	 * Return the hashKeyLength
-	 *
-	 * @return hashKeyLength
-	 */
-	public int getHashKeyLength() {
-		return this.hashKeyLength;
+	public PasswordCrypt getPasswordCrypt() {
+		return this.passwordCrypt;
 	}
 
 	/**
@@ -238,8 +176,7 @@ public final class User {
 	/**
 	 * Returns true if this user has the specified role
 	 *
-	 * @param role
-	 * 		the name of the {@link Role} to check for
+	 * @param role the name of the {@link Role} to check for
 	 *
 	 * @return true if the this user has the specified role
 	 */
@@ -279,8 +216,7 @@ public final class User {
 	/**
 	 * Returns the property with the given key
 	 *
-	 * @param key
-	 * 		the key for which the property is to be returned
+	 * @param key the key for which the property is to be returned
 	 *
 	 * @return the property with the given key, or null if the property is not defined
 	 */
@@ -357,9 +293,9 @@ public final class User {
 	 */
 	@Override
 	public String toString() {
-		return "User [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname
-				+ ", lastname=" + this.lastname + ", locale=" + this.locale + ", userState=" + this.userState
-				+ ", roles=" + this.roles + "]";
+		return "User [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname +
+				", lastname=" + this.lastname + ", locale=" + this.locale + ", userState=" + this.userState +
+				", roles=" + this.roles + "]";
 	}
 
 	@Override

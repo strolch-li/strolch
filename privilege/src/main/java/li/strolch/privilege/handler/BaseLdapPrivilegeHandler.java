@@ -73,8 +73,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			//Specify the search scope
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-			String searchFilter =
-					"(&(objectCategory=person)(objectClass=user)(userPrincipalName=" + username + this.domain + "))";
+			String searchFilter = "(&(objectCategory=person)(objectClass=user)(userPrincipalName=" + username +
+					this.domain + "))";
 
 			// Search for objects using the filter
 			NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase, searchFilter, searchCtls);
@@ -86,8 +86,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 				answer = ctx.search(this.searchBase, searchFilter, searchCtls);
 
 				if (!answer.hasMore())
-					throw new AccessDeniedException("Could not login with user: " + username + this.domain
-							+ " on Ldap: no LDAP Data, for either userPrincipalName or sAMAccountName");
+					throw new AccessDeniedException("Could not login with user: " + username + this.domain +
+							" on Ldap: no LDAP Data, for either userPrincipalName or sAMAccountName");
 			}
 
 			SearchResult searchResult = answer.next();
@@ -139,8 +139,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		Map<String, String> properties = buildProperties(username, attrs, ldapGroups, strolchRoles);
 
-		return new User(username, username, null, null, null, -1, -1, firstName, lastName, UserState.REMOTE,
-				strolchRoles, locale, properties, false, new UserHistory());
+		return new User(username, username, null, firstName, lastName, UserState.REMOTE, strolchRoles, locale,
+				properties, false, new UserHistory());
 	}
 
 	protected abstract Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
