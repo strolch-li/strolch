@@ -15,15 +15,6 @@
  */
 package li.strolch.privilege.test;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.*;
-
 import li.strolch.privilege.handler.DefaultEncryptionHandler;
 import li.strolch.privilege.handler.MailUserChallengeHandler;
 import li.strolch.privilege.handler.PrivilegeHandler;
@@ -41,6 +32,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -166,8 +166,8 @@ public class XmlTest {
 		assertEquals("1", admin.getUserId());
 		assertEquals("admin", admin.getUsername());
 		assertEquals("cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344",
-				StringHelper.toHexString(admin.getPassword()));
-		assertEquals("61646d696e", StringHelper.toHexString(admin.getSalt()));
+				StringHelper.toHexString(admin.getPasswordCrypt().getPassword()));
+		assertEquals("61646d696e", StringHelper.toHexString(admin.getPasswordCrypt().getSalt()));
 		assertEquals("Application", admin.getFirstname());
 		assertEquals("Administrator", admin.getLastname());
 		assertEquals(UserState.ENABLED, admin.getUserState());
@@ -182,8 +182,7 @@ public class XmlTest {
 		User systemAdmin = findUser("system_admin", users);
 		assertEquals("2", systemAdmin.getUserId());
 		assertEquals("system_admin", systemAdmin.getUsername());
-		assertNull(systemAdmin.getPassword());
-		assertNull(systemAdmin.getSalt());
+		assertNull(systemAdmin.getPasswordCrypt());
 		assertEquals("System User", systemAdmin.getFirstname());
 		assertEquals("Administrator", systemAdmin.getLastname());
 		assertEquals(UserState.SYSTEM, systemAdmin.getUserState());
@@ -308,8 +307,9 @@ public class XmlTest {
 		userRoles.add("role1");
 		UserHistory history = new UserHistory();
 		history.setFirstLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()));
-		User user1 = new User("1", "user1", "blabla".getBytes(), "blabla".getBytes(), "PBKDF2WithHmacSHA512", 10000,
-				256, "Bob", "White", UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap, false, history);
+		User user1 = new User("1", "user1",
+				new PasswordCrypt("blabla".getBytes(), "blabla".getBytes(), "PBKDF2WithHmacSHA512", 10000, 256), "Bob",
+				"White", UserState.DISABLED, userRoles, Locale.ENGLISH, propertyMap, false, history);
 		users.add(user1);
 
 		propertyMap = new HashMap<>();
@@ -319,8 +319,8 @@ public class XmlTest {
 		history = new UserHistory();
 		history.setFirstLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()));
 		history.setLastLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 5, 2, 3, 4, 5), ZoneId.systemDefault()));
-		User user2 = new User("2", "user2", "haha".getBytes(), "haha".getBytes(), null, -1, -1, "Leonard", "Sheldon",
-				UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap, false, history);
+		User user2 = new User("2", "user2", new PasswordCrypt("haha".getBytes(), "haha".getBytes(), null, -1, -1),
+				"Leonard", "Sheldon", UserState.ENABLED, userRoles, Locale.ENGLISH, propertyMap, false, history);
 		users.add(user2);
 
 		File modelFile = new File(TARGET_TEST + "PrivilegeUsersTest.xml");
@@ -334,22 +334,16 @@ public class XmlTest {
 		assertNotNull(parsedUsers);
 		assertEquals(2, parsedUsers.size());
 
-		User parsedUser1 = parsedUsers.values()
-				.stream()
-				.filter(u -> u.getUsername().equals("user1"))
-				.findAny()
+		User parsedUser1 = parsedUsers.values().stream().filter(u -> u.getUsername().equals("user1")).findAny()
 				.orElseThrow(() -> new RuntimeException("user1 missing!"));
-		User parsedUser2 = parsedUsers.values()
-				.stream()
-				.filter(u -> u.getUsername().equals("user2"))
-				.findAny()
+		User parsedUser2 = parsedUsers.values().stream().filter(u -> u.getUsername().equals("user2")).findAny()
 				.orElseThrow(() -> new RuntimeException("user2 missing!"));
 
 		assertEquals(user1.getFirstname(), parsedUser1.getFirstname());
 		assertEquals(user1.getLastname(), parsedUser1.getLastname());
 		assertEquals(user1.getLocale(), parsedUser1.getLocale());
-		assertArrayEquals(user1.getPassword(), parsedUser1.getPassword());
-		assertArrayEquals(user1.getSalt(), parsedUser1.getSalt());
+		assertArrayEquals(user1.getPasswordCrypt().getPassword(), parsedUser1.getPasswordCrypt().getPassword());
+		assertArrayEquals(user1.getPasswordCrypt().getSalt(), parsedUser1.getPasswordCrypt().getSalt());
 		assertEquals(user1.getProperties(), parsedUser1.getProperties());
 		assertEquals(user1.getUserId(), parsedUser1.getUserId());
 		assertEquals(user1.getUserState(), parsedUser1.getUserState());
@@ -358,8 +352,8 @@ public class XmlTest {
 		assertEquals(user2.getFirstname(), parsedUser2.getFirstname());
 		assertEquals(user2.getLastname(), parsedUser2.getLastname());
 		assertEquals(user2.getLocale(), parsedUser2.getLocale());
-		assertArrayEquals(user2.getPassword(), parsedUser2.getPassword());
-		assertArrayEquals(user2.getSalt(), parsedUser2.getSalt());
+		assertArrayEquals(user2.getPasswordCrypt().getPassword(), parsedUser2.getPasswordCrypt().getPassword());
+		assertArrayEquals(user2.getPasswordCrypt().getSalt(), parsedUser2.getPasswordCrypt().getSalt());
 		assertEquals(user2.getProperties(), parsedUser2.getProperties());
 		assertEquals(user2.getUserId(), parsedUser2.getUserId());
 		assertEquals(user2.getUserState(), parsedUser2.getUserState());
@@ -398,15 +392,9 @@ public class XmlTest {
 		assertEquals(2, parsedRoles.size());
 
 		assertEquals(2, parsedRoles.size());
-		Role parsedRole1 = parsedRoles.values()
-				.stream()
-				.filter(r -> r.getName().equals("role1"))
-				.findAny()
+		Role parsedRole1 = parsedRoles.values().stream().filter(r -> r.getName().equals("role1")).findAny()
 				.orElseThrow(() -> new RuntimeException("role1 missing!"));
-		Role parsedRole2 = parsedRoles.values()
-				.stream()
-				.filter(r -> r.getName().equals("role2"))
-				.findAny()
+		Role parsedRole2 = parsedRoles.values().stream().filter(r -> r.getName().equals("role2")).findAny()
 				.orElseThrow(() -> new RuntimeException("role2 missing!"));
 
 		Set<String> privilegeNames = role1.getPrivilegeNames();
