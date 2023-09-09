@@ -1722,7 +1722,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		PasswordCrypt userPasswordCrypt = user.getPasswordCrypt();
-		if (userPasswordCrypt.getPassword() == null)
+		if (userPasswordCrypt == null || userPasswordCrypt.getPassword() == null)
 			throw new InvalidCredentialsException(format("User {0} has no password and may not login!", username));
 
 		// we only work with hashed passwords

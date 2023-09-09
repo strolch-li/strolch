@@ -149,6 +149,9 @@ public class PrivilegeUsersDomWriter {
 
 	private void writePassword(User user, Element userElement) {
 		PasswordCrypt passwordCrypt = user.getPasswordCrypt();
+		if (passwordCrypt == null)
+			return;
+
 		String passwordString = passwordCrypt.buildPasswordString();
 		if (passwordString != null) {
 			userElement.setAttribute(XML_ATTR_PASSWORD, passwordString);
