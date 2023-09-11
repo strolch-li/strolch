@@ -1,10 +1,5 @@
 package li.strolch.privilege.model.internal;
 
-import li.strolch.privilege.helper.XmlConstants;
-import li.strolch.utils.helper.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static li.strolch.utils.helper.StringHelper.*;
 
 public class PasswordCrypt {
@@ -14,8 +9,6 @@ public class PasswordCrypt {
 	private final String hashAlgorithm;
 	private final int hashIterations;
 	private final int hashKeyLength;
-
-	private static final Logger logger = LoggerFactory.getLogger(PasswordCrypt.class);
 
 	public PasswordCrypt(byte[] password, byte[] salt) {
 		this.password = password;
