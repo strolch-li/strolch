@@ -21,7 +21,6 @@
             <Properties>
                 <dataStoreMode>CACHED</dataStoreMode>
                 <enableAuditTrail>true</enableAuditTrail>
-                <enableObserverUpdates>true</enableObserverUpdates>
                 <dataStoreFile>DefaultRealm.xml</dataStoreFile>
             </Properties>
         </Component>

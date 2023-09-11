@@ -21,7 +21,6 @@
 			<Properties>
 				<dataStoreMode>CACHED</dataStoreMode>
 				<enableAuditTrail>true</enableAuditTrail>
-				<enableObserverUpdates>true</enableObserverUpdates>
 				<enableVersioning>true</enableVersioning>
 				<dataStoreFile>StrolchModel.xml</dataStoreFile>
 			</Properties>
