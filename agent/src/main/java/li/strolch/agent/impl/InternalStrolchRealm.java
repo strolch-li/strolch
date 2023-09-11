@@ -89,7 +89,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 		// observer updates
 		String updateObserversKey = makeRealmKey(getRealm(), PROP_ENABLE_OBSERVER_UPDATES);
-		this.updateObservers = configuration.getBoolean(updateObserversKey, false);
+		this.updateObservers = configuration.getBoolean(updateObserversKey, true);
 		if (this.updateObservers) {
 			this.observerHandler = new DefaultObserverHandler(container.getAgent(), this);
 		}
