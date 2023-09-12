@@ -147,6 +147,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private ElementLockingHandler<String> lockingHandler;
 	private ScheduledExecutorService executorService;
 	private Future<?> persistSessionsTask;
+	private Future<?> persistModelTask;
 
 	@Override
 	public SingleSignOnHandler getSsoHandler() {
@@ -395,10 +396,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			prvCtx.assertHasPrivilege(PRIVILEGE_ADD_USER);
 
 			// make sure userId is not set
-			if (isNotEmpty(userRepParam.getUserId())) {
-				String msg = "UserId can not be set when adding a new user!";
-				throw new PrivilegeModelException(format(msg, userRepParam.getUsername()));
-			}
+			if (isNotEmpty(userRepParam.getUserId()))
+				throw new PrivilegeModelException("UserId can not be set when adding a new user!");
 
 			UserRep userRep = userRepParam.getCopy();
 
@@ -443,6 +442,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// delegate to persistence handler
 			this.persistenceHandler.addUser(newUser);
+			persistModelAsync();
 
 			logger.info("Created new user " + newUser.getUsername());
 
@@ -527,6 +527,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate to persistence handler
 		toCreate.forEach(user -> this.persistenceHandler.addUser(user));
 		toUpdate.forEach(user -> this.persistenceHandler.replaceUser(user));
+		persistModelAsync();
 
 		logger.info("Created " + toCreate.size() + " users");
 		logger.info("Updated " + toUpdate.size() + " users");
@@ -590,6 +591,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// delegate to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
+			persistModelAsync();
 
 			logger.info("Replaced user " + newUser.getUsername());
 
@@ -686,6 +688,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+		persistModelAsync();
 
 		logger.info("Updated user " + newUser.getUsername());
 
@@ -719,6 +722,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// delegate user removal to persistence handler
 		invalidSessionsFor(existingUser);
 		this.persistenceHandler.removeUser(username);
+		persistModelAsync();
 
 		logger.info("Removed user " + username);
 
@@ -772,6 +776,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+		persistModelAsync();
 
 		logger.info("Added role " + roleName + " to " + newUser.getUsername());
 
@@ -819,6 +824,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+		persistModelAsync();
 
 		logger.info("Removed role " + roleName + " from " + newUser.getUsername());
 
@@ -858,11 +864,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
-
-		// perform automatic persisting, if enabled
-		if (this.autoPersistOnUserChangesData) {
-			this.persistenceHandler.persist();
-		}
+		persistModelAsync();
 
 		logger.info("Set locale to " + locale + " for " + newUser.getUsername());
 
@@ -896,11 +898,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
-
-		// perform automatic persisting, if enabled
-		if (this.autoPersistOnUserChangesData) {
-			this.persistenceHandler.persist();
-		}
+		persistModelAsync();
 
 		logger.info("Requiring user " + newUser.getUsername() + " to change their password on next login.");
 	}
@@ -956,15 +954,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
+			persistModelAsync();
 
-			// perform automatic persisting, if enabled
-			if (this.autoPersistOnUserChangesData) {
-				this.persistenceHandler.persist();
-			}
-
-			if (certificate.getUsage() == Usage.SET_PASSWORD) {
+			if (certificate.getUsage() == Usage.SET_PASSWORD)
 				invalidate(certificate);
-			}
 
 			if (password == null)
 				logger.info("Cleared password for " + newUser.getUsername());
@@ -1004,6 +997,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
+		persistModelAsync();
 
 		logger.info("Set state of user " + newUser.getUsername() + " to " + state);
 
@@ -1042,6 +1036,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.addRole(newRole);
+		persistModelAsync();
 
 		logger.info("Added new role " + newRole.getName());
 
@@ -1084,6 +1079,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
+		persistModelAsync();
 
 		logger.info("Replaced role " + newRole.getName());
 
@@ -1127,6 +1123,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate role removal to persistence handler
 		this.persistenceHandler.removeRole(roleName);
+		persistModelAsync();
 
 		logger.info("Removed role " + roleName);
 
@@ -1189,6 +1186,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate role replacement to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
+		persistModelAsync();
 
 		logger.info("Added/replaced privilege " + privilegeRep.getName() + " to " + roleName);
 
@@ -1239,6 +1237,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceRole(newRole);
+		persistModelAsync();
 
 		logger.info("Removed privilege " + privilegeName + " from " + roleName);
 
@@ -1264,6 +1263,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 			}
 		}
+
+		persistSessionsAsync();
 	}
 
 	/**
@@ -1286,6 +1287,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				this.privilegeContextMap.put(cert.getSessionId(), privilegeContext);
 			}
 		}
+
+		persistSessionsAsync();
 	}
 
 	private void invalidSessionsFor(User user) {
@@ -1360,7 +1363,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					" to " + source);
 		}
 
-		persistSessions();
+		persistSessionsAsync();
 
 		logger.info(format("Challenge validated for user {0} with usage {1}", username, usage));
 		return certificate;
@@ -1418,15 +1421,14 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 			this.privilegeContextMap.put(sessionId, privilegeContext);
 
-			persistSessions();
+			persistSessionsAsync();
 
 			// save last login
 			if (user.getHistory().isFirstLoginEmpty())
 				user.getHistory().setFirstLogin(ZonedDateTime.now());
 			user.getHistory().setLastLogin(ZonedDateTime.now());
 			this.persistenceHandler.replaceUser(user);
-			if (this.autoPersistOnUserChangesData)
-				this.persistenceHandler.persist();
+			persistModelAsync();
 
 			// log
 			logger.info(format("User {0} authenticated: {1}", username, certificate));
@@ -1478,9 +1480,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			user.getHistory().setFirstLogin(internalUser.getHistory().getFirstLogin());
 			this.persistenceHandler.replaceUser(user);
 		}
-
-		if (this.autoPersistOnUserChangesData)
-			this.persistenceHandler.persist();
+		persistModelAsync();
 
 		// get 2 auth tokens
 		String authToken = this.encryptionHandler.nextToken();
@@ -1495,7 +1495,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext privilegeContext = buildPrivilegeContext(certificate, user);
 		this.privilegeContextMap.put(sessionId, privilegeContext);
 
-		persistSessions();
+		persistSessionsAsync();
 
 		// log
 		logger.info(format("User {0} authenticated: {1}", user.getUsername(), certificate));
@@ -1546,8 +1546,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// invalidate the previous session
 			invalidate(certificate);
 
-			persistSessions();
-
 			// log
 			logger.info(format("User {0} refreshed session: {1}", user.getUsername(), refreshedCert));
 
@@ -1573,7 +1571,24 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getLocale(), userRoles, new HashMap<>(user.getProperties()));
 	}
 
-	private boolean persistSessions() {
+	private synchronized void persistModelAsync() {
+		if (!this.autoPersistOnUserChangesData)
+			return;
+
+		// async execution, max. once per second
+		if (this.persistModelTask != null)
+			this.persistModelTask.cancel(true);
+		this.persistModelTask = this.executorService.schedule(
+				() -> this.lockingHandler.lockedExecute("persist-model", () -> {
+					try {
+						this.persistenceHandler.persist();
+					} catch (Exception e) {
+						logger.error("Failed to persist model!", e);
+					}
+				}), 1, TimeUnit.SECONDS);
+	}
+
+	private synchronized boolean persistSessionsAsync() {
 		if (!this.persistSessions)
 			return false;
 
@@ -1759,8 +1774,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					user.isPasswordChangeRequested(), user.getHistory().getClone());
 
 			// delegate user replacement to persistence handler
-			this.persistenceHandler.replaceUser(newUser);
 			this.persistenceHandler.replaceUser(user);
+			persistModelAsync();
 
 			logger.info("Updated password for " + user.getUsername());
 		}
@@ -1854,7 +1869,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// persist sessions
 		if (privilegeContext != null)
-			persistSessions();
+			persistSessionsAsync();
 
 		// return true if object was really removed
 		boolean loggedOut = privilegeContext != null;
@@ -1970,6 +1985,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = validate(certificate);
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_PERSIST));
 
+		// persist non async
 		return this.persistenceHandler.persist();
 	}
 
@@ -1980,7 +1996,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = validate(certificate);
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_PERSIST_SESSIONS));
 
-		return persistSessions();
+		return persistSessionsAsync();
 	}
 
 	@Override

@@ -15,17 +15,6 @@
  */
 package li.strolch.privilege.handler;
 
-import static java.text.MessageFormat.format;
-import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
-import static li.strolch.privilege.helper.XmlConstants.*;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.Role;
@@ -34,10 +23,21 @@ import li.strolch.privilege.xml.PrivilegeRolesDomWriter;
 import li.strolch.privilege.xml.PrivilegeRolesSaxReader;
 import li.strolch.privilege.xml.PrivilegeUsersDomWriter;
 import li.strolch.privilege.xml.PrivilegeUsersSaxReader;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static java.text.MessageFormat.format;
+import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
+import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * {@link PersistenceHandler} implementation which reads the configuration from XML files. These configuration is passed
@@ -167,39 +167,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			throw new PrivilegeException(msg);
 		}
 
-		// get users file name
-		String usersFileName = this.parameterMap.get(XML_PARAM_USERS_FILE);
-		if (StringHelper.isEmpty(usersFileName)) {
-			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!";
-			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE);
-			throw new PrivilegeException(msg);
-		}
+		// get users file path
+		File usersPath = getFile(basePath, XML_PARAM_USERS_FILE);
 
-		// get roles file name
-		String rolesFileName = this.parameterMap.get(XML_PARAM_ROLES_FILE);
-		if (StringHelper.isEmpty(rolesFileName)) {
-			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!";
-			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE);
-			throw new PrivilegeException(msg);
-		}
-
-		// validate users file exists
-		String usersPathS = basePath + "/" + usersFileName;
-		File usersPath = new File(usersPathS);
-		if (!usersPath.exists()) {
-			String msg = "[{0}] Defined parameter {1} is invalid as users file does not exist at path {2}";
-			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE, usersPath.getAbsolutePath());
-			throw new PrivilegeException(msg);
-		}
-
-		// validate roles file exists
-		String rolesPathS = basePath + "/" + rolesFileName;
-		File rolesPath = new File(rolesPathS);
-		if (!rolesPath.exists()) {
-			String msg = "[{0}] Defined parameter {1} is invalid as roles file does not exist at path {2}";
-			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE, rolesPath.getAbsolutePath());
-			throw new PrivilegeException(msg);
-		}
+		// get roles file path
+		File rolesPath = getFile(basePath, XML_PARAM_ROLES_FILE);
 
 		// save path to model
 		this.usersPath = usersPath;
@@ -209,6 +181,25 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		if (reload())
 			logger.info("Privilege Data loaded.");
+	}
+
+	private File getFile(String basePath, String param) {
+		String fileName = this.parameterMap.get(param);
+		if (isEmpty(fileName)) {
+			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!";
+			msg = format(msg, PersistenceHandler.class.getName(), param);
+			throw new PrivilegeException(msg);
+		}
+
+		String path = basePath + "/" + fileName;
+		File file = new File(path);
+		if (!file.exists()) {
+			String msg = "[{0}] Defined parameter {1} is invalid as file does not exist at path {2}";
+			msg = format(msg, PersistenceHandler.class.getName(), param, file.getAbsolutePath());
+			throw new PrivilegeException(msg);
+		}
+
+		return file;
 	}
 
 	/**
