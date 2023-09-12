@@ -1754,19 +1754,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			PasswordCrypt newPasswordCrypt = this.encryptionHandler.hashPassword(password, salt);
 
 			// create new user
-			User newUser = new User(user.getUserId(), user.getUsername(), newPasswordCrypt, user.getFirstname(),
+			user = new User(user.getUserId(), user.getUsername(), newPasswordCrypt, user.getFirstname(),
 					user.getLastname(), user.getUserState(), user.getRoles(), user.getLocale(), user.getProperties(),
 					user.isPasswordChangeRequested(), user.getHistory().getClone());
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
+			this.persistenceHandler.replaceUser(user);
 
-			// perform automatic persisting, if enabled
-			if (this.autoPersistOnUserChangesData) {
-				this.persistenceHandler.persist();
-			}
-
-			logger.info("Updated password for " + newUser.getUsername());
+			logger.info("Updated password for " + user.getUsername());
 		}
 
 		return user;
