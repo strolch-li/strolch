@@ -32,8 +32,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
-import static java.lang.Boolean.*;
+import static java.lang.Boolean.parseBoolean;
 import static java.text.MessageFormat.format;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
 import static li.strolch.privilege.helper.XmlConstants.*;
@@ -259,28 +260,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 */
 	@Override
 	public boolean persist() {
-
 		long start = System.nanoTime();
-
-		// get users file name
-		String usersFileName = this.parameterMap.get(XML_PARAM_USERS_FILE);
-		if (usersFileName == null || usersFileName.isEmpty()) {
-			String msg = "[{0}] Defined parameter {1} is invalid";
-			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_USERS_FILE);
-			throw new PrivilegeException(msg);
-		}
-
-		// get roles file name
-		String rolesFileName = this.parameterMap.get(XML_PARAM_ROLES_FILE);
-		if (rolesFileName == null || rolesFileName.isEmpty()) {
-			String msg = "[{0}] Defined parameter {1} is invalid";
-			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_ROLES_FILE);
-			throw new PrivilegeException(msg);
-		}
-
 		boolean saved = false;
 
-		// get users file
+		// write users file
 		if (this.userMapDirty) {
 			// delegate writing
 			PrivilegeUsersDomWriter modelWriter = new PrivilegeUsersDomWriter(getAllUsers(), this.usersPath);
@@ -290,7 +273,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			saved = true;
 		}
 
-		// get roles file
+		// write roles file
 		if (this.roleMapDirty) {
 			// delegate writing
 			PrivilegeRolesDomWriter modelWriter = new PrivilegeRolesDomWriter(getAllRoles(), this.rolesPath);
