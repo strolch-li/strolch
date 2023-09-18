@@ -2133,7 +2133,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	private void handleConflictResolutionParam(Map<String, String> parameterMap) {
 		String privilegeConflictResolutionS = parameterMap.get(PARAM_PRIVILEGE_CONFLICT_RESOLUTION);
 		if (privilegeConflictResolutionS == null) {
-			this.privilegeConflictResolution = PrivilegeConflictResolution.STRICT;
+			this.privilegeConflictResolution = PrivilegeConflictResolution.MERGE;
 			String msg = "No {0} parameter defined. Using {1}";
 			msg = format(msg, PARAM_PRIVILEGE_CONFLICT_RESOLUTION, this.privilegeConflictResolution);
 			logger.info(msg);
