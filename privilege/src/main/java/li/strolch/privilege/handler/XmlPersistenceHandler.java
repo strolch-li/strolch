@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.Boolean.*;
 import static java.text.MessageFormat.format;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_CASE_INSENSITIVE_USERNAME;
 import static li.strolch.privilege.helper.XmlConstants.*;
@@ -177,7 +178,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.usersPath = usersPath;
 		this.rolesPath = rolesPath;
 
-		this.caseInsensitiveUsername = Boolean.parseBoolean(this.parameterMap.get(PARAM_CASE_INSENSITIVE_USERNAME));
+		this.caseInsensitiveUsername = !this.parameterMap.containsKey(PARAM_CASE_INSENSITIVE_USERNAME) ||
+				parseBoolean(this.parameterMap.get(PARAM_CASE_INSENSITIVE_USERNAME));
 
 		if (reload())
 			logger.info("Privilege Data loaded.");
