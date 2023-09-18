@@ -283,7 +283,9 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			saved = true;
 		}
 
-		logger.info("Persist took " + (formatNanoDuration(System.nanoTime() - start)));
+		long tookNanos = System.nanoTime() - start;
+		if (TimeUnit.NANOSECONDS.toMillis(tookNanos) > 100)
+			logger.warn("Persist took " + (formatNanoDuration(tookNanos)));
 		return saved;
 	}
 }
