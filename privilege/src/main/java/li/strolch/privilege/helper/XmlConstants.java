@@ -309,9 +309,19 @@ public class XmlConstants {
 	public static final String XML_PARAM_USERS_FILE = "usersXmlFile";
 
 	/**
+	 * XML_PARAM_USERS_FILE_DEF = "PrivilegeUsers.xml" :
+	 */
+	public static final String XML_PARAM_USERS_FILE_DEF = "PrivilegeUsers.xml";
+
+	/**
 	 * XML_PARAM_ROLES_FILE = "rolesXmlFile" :
 	 */
 	public static final String XML_PARAM_ROLES_FILE = "rolesXmlFile";
+
+	/**
+	 * XML_PARAM_ROLES_FILE_DEF = "PrivilegeRoles.xml" :
+	 */
+	public static final String XML_PARAM_ROLES_FILE_DEF = "PrivilegeRoles.xml";
 
 	/**
 	 * XML_PARAM_BASE_PATH = "basePath" :

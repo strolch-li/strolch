@@ -169,10 +169,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// get users file path
-		File usersPath = getFile(basePath, XML_PARAM_USERS_FILE);
+		File usersPath = getFile(basePath, XML_PARAM_USERS_FILE, XML_PARAM_USERS_FILE_DEF);
 
 		// get roles file path
-		File rolesPath = getFile(basePath, XML_PARAM_ROLES_FILE);
+		File rolesPath = getFile(basePath, XML_PARAM_ROLES_FILE, XML_PARAM_ROLES_FILE_DEF);
 
 		// save path to model
 		this.usersPath = usersPath;
@@ -185,12 +185,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			logger.info("Privilege Data loaded.");
 	}
 
-	private File getFile(String basePath, String param) {
+	private File getFile(String basePath, String param, String defaultValue) {
 		String fileName = this.parameterMap.get(param);
 		if (isEmpty(fileName)) {
-			String msg = "[{0}] Defined parameter {1} is not valid as it is empty!";
-			msg = format(msg, PersistenceHandler.class.getName(), param);
-			throw new PrivilegeException(msg);
+			fileName = defaultValue;
+			String msg = "[{0}] Parameter {1} is not defined, using default {2}!";
+			msg = format(msg, PersistenceHandler.class.getName(), param, defaultValue);
+			logger.warn(msg);
 		}
 
 		String path = basePath + "/" + fileName;
