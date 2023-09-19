@@ -157,7 +157,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		synchronized (this.controllers) {
 			Map<Locator, Controller> map = this.controllers.getMap(realm);
 			if (map == null) {
-				logger.error("No controllers for realm " + realm);
+				logger.info("No controllers for realm " + realm);
 				return;
 			}
 
