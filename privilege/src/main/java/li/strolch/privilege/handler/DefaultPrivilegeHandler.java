@@ -19,9 +19,9 @@ import li.strolch.privilege.base.*;
 import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.*;
 import li.strolch.privilege.policy.PrivilegePolicy;
-import li.strolch.privilege.xml.CertificateStubsDomWriter;
 import li.strolch.privilege.xml.CertificateStubsSaxReader;
 import li.strolch.privilege.xml.CertificateStubsSaxReader.CertificateStub;
+import li.strolch.privilege.xml.CertificateStubsSaxWriter;
 import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
 
 import javax.crypto.SecretKey;
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -46,6 +48,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
+import static java.util.Comparator.comparing;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.*;
 
@@ -336,6 +339,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				result.add(user.asUserRep());
 		}
 
+		result.sort(comparing(UserRep::getUsername));
 		return result;
 	}
 
@@ -1571,7 +1575,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				user.getLocale(), userRoles, new HashMap<>(user.getProperties()));
 	}
 
-	private synchronized void persistModelAsync() {
+	protected synchronized void persistModelAsync() {
 		if (!this.autoPersistOnUserChangesData)
 			return;
 
@@ -1605,7 +1609,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 					try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
 						 OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
 
-						CertificateStubsDomWriter writer = new CertificateStubsDomWriter(sessions, outputStream);
+						CertificateStubsSaxWriter writer = new CertificateStubsSaxWriter(sessions, outputStream);
 						writer.write();
 						outputStream.flush();
 
@@ -1986,7 +1990,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_PERSIST));
 
 		// persist non async
-		return this.persistenceHandler.persist();
+		try {
+			return this.persistenceHandler.persist();
+		} catch (XMLStreamException | IOException e) {
+			throw new IllegalStateException("Failed to persist model", e);
+		}
 	}
 
 	@Override

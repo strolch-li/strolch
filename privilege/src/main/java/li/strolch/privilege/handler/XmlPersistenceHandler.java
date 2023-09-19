@@ -19,15 +19,17 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.xml.PrivilegeRolesDomWriter;
 import li.strolch.privilege.xml.PrivilegeRolesSaxReader;
-import li.strolch.privilege.xml.PrivilegeUsersDomWriter;
+import li.strolch.privilege.xml.PrivilegeRolesSaxWriter;
 import li.strolch.privilege.xml.PrivilegeUsersSaxReader;
+import li.strolch.privilege.xml.PrivilegeUsersSaxWriter;
 import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -259,14 +261,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * Writes the model to the XML files. Where the files are written to was defined in the {@link #initialize(Map)}
 	 */
 	@Override
-	public boolean persist() {
+	public boolean persist() throws XMLStreamException, IOException {
 		long start = System.nanoTime();
 		boolean saved = false;
 
 		// write users file
 		if (this.userMapDirty) {
 			// delegate writing
-			PrivilegeUsersDomWriter modelWriter = new PrivilegeUsersDomWriter(getAllUsers(), this.usersPath);
+			PrivilegeUsersSaxWriter modelWriter = new PrivilegeUsersSaxWriter(getAllUsers(), this.usersPath);
 			modelWriter.write();
 
 			this.userMapDirty = false;
@@ -276,7 +278,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// write roles file
 		if (this.roleMapDirty) {
 			// delegate writing
-			PrivilegeRolesDomWriter modelWriter = new PrivilegeRolesDomWriter(getAllRoles(), this.rolesPath);
+			PrivilegeRolesSaxWriter modelWriter = new PrivilegeRolesSaxWriter(getAllRoles(), this.rolesPath);
 			modelWriter.write();
 
 			this.roleMapDirty = false;

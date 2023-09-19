@@ -15,10 +15,6 @@
  */
 package li.strolch.privilege.xml;
 
-import java.text.MessageFormat;
-import java.util.*;
-
-import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.internal.PrivilegeImpl;
 import li.strolch.privilege.model.internal.Role;
@@ -28,6 +24,11 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.text.MessageFormat;
+import java.util.*;
+
+import static li.strolch.privilege.helper.XmlConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -51,9 +52,13 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (qName.equals(XmlConstants.XML_ROLE)) {
+		if (qName.equals(XML_ROLE)) {
+			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(RoleParser.class)))
+				throw new IllegalArgumentException("Previous Role not closed!");
 			this.buildersStack.push(new RoleParser());
-		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
+		} else if (qName.equals(XML_PROPERTIES)) {
+			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
+				throw new IllegalArgumentException("Previous Properties not closed!");
 			this.buildersStack.push(new PropertyParser());
 		}
 
@@ -74,9 +79,9 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(XmlConstants.XML_ROLE)) {
+		if (qName.equals(XML_ROLE)) {
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(XmlConstants.XML_PROPERTIES)) {
+		} else if (qName.equals(XML_PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -134,20 +139,15 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.text = new StringBuilder();
 
 			switch (qName) {
-			case XmlConstants.XML_ROLE:
-				this.roleName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
-				break;
-			case XmlConstants.XML_PRIVILEGE:
-				this.privilegeName = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
-				this.privilegePolicy = attributes.getValue(XmlConstants.XML_ATTR_POLICY).trim();
-				break;
-			case XmlConstants.XML_ALLOW:
-			case XmlConstants.XML_DENY:
-			case XmlConstants.XML_ALL_ALLOWED:
+				case XML_ROLE -> this.roleName = attributes.getValue(XML_ATTR_NAME).trim();
+				case XML_PRIVILEGE -> {
+					this.privilegeName = attributes.getValue(XML_ATTR_NAME).trim();
+					this.privilegePolicy = attributes.getValue(XML_ATTR_POLICY).trim();
+				}
+				case XML_ALLOW, XML_DENY, XML_ALL_ALLOWED -> {
+				}
 				// no-op
-				break;
-			default:
-				throw new IllegalArgumentException("Unhandled tag " + qName);
+				default -> throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}
 
@@ -159,30 +159,32 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 		@Override
 		public void endElement(String uri, String localName, String qName) {
-
 			switch (qName) {
-			case XmlConstants.XML_ALL_ALLOWED ->
-					this.allAllowed = StringHelper.parseBoolean(this.text.toString().trim());
-			case XmlConstants.XML_ALLOW -> this.allowList.add(this.text.toString().trim());
-			case XmlConstants.XML_DENY -> this.denyList.add(this.text.toString().trim());
-			case XmlConstants.XML_PRIVILEGE -> {
-				IPrivilege privilege = new PrivilegeImpl(this.privilegeName, this.privilegePolicy, this.allAllowed,
-						this.denyList, this.allowList);
-				this.privileges.put(this.privilegeName, privilege);
-				this.privilegeName = null;
-				this.privilegePolicy = null;
-				this.allAllowed = false;
-				this.denyList = new HashSet<>();
-				this.allowList = new HashSet<>();
+				case XML_ALL_ALLOWED -> this.allAllowed = StringHelper.parseBoolean(getText());
+				case XML_ALLOW -> this.allowList.add(getText());
+				case XML_DENY -> this.denyList.add(getText());
+				case XML_PRIVILEGE -> {
+					IPrivilege privilege = new PrivilegeImpl(this.privilegeName, this.privilegePolicy, this.allAllowed,
+							this.denyList, this.allowList);
+					this.privileges.put(this.privilegeName, privilege);
+					this.privilegeName = null;
+					this.privilegePolicy = null;
+					this.allAllowed = false;
+					this.denyList = new HashSet<>();
+					this.allowList = new HashSet<>();
+				}
+				case XML_ROLE -> {
+					Role role = new Role(this.roleName, this.privileges);
+					roles.put(role.getName(), role);
+					logger.info(MessageFormat.format("New Role: {0}", role));
+					init();
+				}
+				default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
-			case XmlConstants.XML_ROLE -> {
-				Role role = new Role(this.roleName, this.privileges);
-				roles.put(role.getName(), role);
-				logger.info(MessageFormat.format("New Role: {0}", role));
-				init();
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + qName);
-			}
+		}
+
+		private String getText() {
+			return this.text.toString().trim();
 		}
 	}
 
@@ -194,11 +196,11 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-			if (qName.equals(XmlConstants.XML_PROPERTY)) {
-				String key = attributes.getValue(XmlConstants.XML_ATTR_NAME).trim();
-				String value = attributes.getValue(XmlConstants.XML_ATTR_VALUE).trim();
+			if (qName.equals(XML_PROPERTY)) {
+				String key = attributes.getValue(XML_ATTR_NAME).trim();
+				String value = attributes.getValue(XML_ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
-			} else if (!qName.equals(XmlConstants.XML_PROPERTIES)) {
+			} else if (!qName.equals(XML_PROPERTIES)) {
 				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}

@@ -104,7 +104,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 				this.persistenceHandler.replaceUser(user);
 
 			if (this.autoPersistOnUserChangesData)
-				this.persistenceHandler.persist();
+				persistModelAsync();
 
 			return user;
 

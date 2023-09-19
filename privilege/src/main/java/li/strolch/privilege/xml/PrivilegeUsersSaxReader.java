@@ -15,22 +15,21 @@
  */
 package li.strolch.privilege.xml;
 
-import static li.strolch.privilege.helper.XmlConstants.*;
-
-import java.text.MessageFormat;
-import java.util.*;
-
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.text.MessageFormat;
+import java.util.*;
+
+import static li.strolch.privilege.helper.XmlConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -59,8 +58,12 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (qName.equals(XML_USER)) {
+			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(UserParser.class)))
+				throw new IllegalArgumentException("Previous User not closed!");
 			this.buildersStack.push(new UserParser());
 		} else if (qName.equals(XML_PROPERTIES)) {
+			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
+				throw new IllegalArgumentException("Previous Properties not closed!");
 			this.buildersStack.push(new PropertyParser());
 		}
 
@@ -157,17 +160,15 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		public void endElement(String uri, String localName, String qName) {
 
 			switch (qName) {
-				case XML_FIRSTNAME -> this.firstName = this.text.toString().trim();
-				case XML_LASTNAME -> this.lastname = this.text.toString().trim();
-				case XML_STATE -> this.userState = UserState.valueOf(this.text.toString().trim());
-				case XML_LOCALE -> this.locale = Locale.forLanguageTag(this.text.toString().trim());
-				case XML_PASSWORD_CHANGE_REQUESTED ->
-						this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
-				case XML_FIRST_LOGIN -> this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				case XML_LAST_LOGIN -> this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				case XML_LAST_PASSWORD_CHANGE ->
-						this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
-				case XML_ROLE -> this.userRoles.add(this.text.toString().trim());
+				case XML_FIRSTNAME -> this.firstName = getText();
+				case XML_LASTNAME -> this.lastname = getText();
+				case XML_STATE -> this.userState = UserState.valueOf(getText());
+				case XML_LOCALE -> this.locale = Locale.forLanguageTag(getText());
+				case XML_PASSWORD_CHANGE_REQUESTED -> this.passwordChangeRequested = Boolean.parseBoolean(getText());
+				case XML_FIRST_LOGIN -> this.history.setFirstLogin(ISO8601.parseToZdt(getText()));
+				case XML_LAST_LOGIN -> this.history.setLastLogin(ISO8601.parseToZdt(getText()));
+				case XML_LAST_PASSWORD_CHANGE -> this.history.setLastPasswordChange(ISO8601.parseToZdt(getText()));
+				case XML_ROLE -> this.userRoles.add(getText());
 				case XML_USER -> {
 					if (this.history == null)
 						this.history = new UserHistory();
@@ -189,6 +190,10 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 					}
 				}
 			}
+		}
+
+		private String getText() {
+			return this.text.toString().trim();
 		}
 
 		@Override

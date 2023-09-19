@@ -15,10 +15,7 @@
  */
 package li.strolch.privilege.test;
 
-import li.strolch.privilege.handler.DefaultEncryptionHandler;
-import li.strolch.privilege.handler.MailUserChallengeHandler;
-import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.handler.XmlPersistenceHandler;
+import li.strolch.privilege.handler.*;
 import li.strolch.privilege.model.IPrivilege;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.*;
@@ -33,7 +30,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -115,7 +115,7 @@ public class XmlTest {
 	}
 
 	@Test
-	public void canWriteConfig() {
+	public void canWriteConfig() throws XMLStreamException, IOException {
 
 		Map<String, String> parameterMap = new HashMap<>();
 		Map<String, String> encryptionHandlerParameterMap = new HashMap<>();
@@ -128,6 +128,7 @@ public class XmlTest {
 
 		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
 		containerModel.setParameterMap(parameterMap);
+		containerModel.setPrivilegeHandlerClassName(DefaultPrivilegeHandler.class.getName());
 		containerModel.setEncryptionHandlerClassName(DefaultEncryptionHandler.class.getName());
 		containerModel.setEncryptionHandlerParameterMap(encryptionHandlerParameterMap);
 		containerModel.setPersistenceHandlerClassName(XmlPersistenceHandler.class.getName());
@@ -138,11 +139,38 @@ public class XmlTest {
 		containerModel.addPolicy("DefaultPrivilege", "li.strolch.privilege.policy.DefaultPrivilege");
 
 		File configFile = new File(TARGET_TEST + "PrivilegeTest.xml");
-		PrivilegeConfigDomWriter configSaxWriter = new PrivilegeConfigDomWriter(containerModel, configFile);
+		PrivilegeConfigSaxWriter configSaxWriter = new PrivilegeConfigSaxWriter(containerModel, configFile);
 		configSaxWriter.write();
 
-		String fileHash = StringHelper.toHexString(FileHelper.hashFileSha256(configFile));
-		assertEquals("dcb6b3ed7198e0a7c88bf5c61c0bd6f0d684415f2a2f29429879edc6bc795f06", fileHash);
+		String expected = """
+				<?xml version="1.0" encoding="UTF-8"?>
+				<Privilege>
+				    <Container>
+				        <Parameters>
+				            <Parameter name="autoPersistOnPasswordChange" value="true"/>
+				        </Parameters>
+				        <PrivilegeHandler class="li.strolch.privilege.handler.DefaultPrivilegeHandler"/>
+				        <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
+				            <Parameters>
+				                <Parameter name="hashAlgorithm" value="SHA-256"/>
+				            </Parameters>
+				        </EncryptionHandler>
+				        <PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
+				            <Parameters>
+				                <Parameter name="basePath" value="target/test/"/>
+				                <Parameter name="modelXmlFile" value="PrivilegeModel.xml"/>
+				            </Parameters>
+				        </PersistenceHandler>
+				        <UserChallengeHandler class="li.strolch.privilege.handler.MailUserChallengeHandler"/>
+				        <SsoHandler class="li.strolch.privilege.test.model.DummySsoHandler"/>
+				    </Container>
+				    <Policies>
+				        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege"/>
+				    </Policies>
+				</Privilege>
+								""";
+
+		assertEquals(expected, Files.readString(configFile.toPath()));
 	}
 
 	@Test
@@ -295,7 +323,7 @@ public class XmlTest {
 	}
 
 	@Test
-	public void canWriteUsers() {
+	public void canWriteUsers() throws XMLStreamException, IOException {
 
 		Map<String, String> propertyMap;
 		Set<String> userRoles;
@@ -324,7 +352,7 @@ public class XmlTest {
 		users.add(user2);
 
 		File modelFile = new File(TARGET_TEST + "PrivilegeUsersTest.xml");
-		PrivilegeUsersDomWriter configSaxWriter = new PrivilegeUsersDomWriter(users, modelFile);
+		PrivilegeUsersSaxWriter configSaxWriter = new PrivilegeUsersSaxWriter(users, modelFile);
 		configSaxWriter.write();
 
 		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true);
@@ -361,7 +389,7 @@ public class XmlTest {
 	}
 
 	@Test
-	public void canWriteRoles() {
+	public void canWriteRoles() throws XMLStreamException, IOException {
 
 		Map<String, IPrivilege> privilegeMap;
 		List<Role> roles = new ArrayList<>();
@@ -381,8 +409,8 @@ public class XmlTest {
 		roles.add(role2);
 
 		File modelFile = new File(TARGET_TEST + "PrivilegeRolesTest.xml");
-		PrivilegeRolesDomWriter configSaxWriter = new PrivilegeRolesDomWriter(roles, modelFile);
-		configSaxWriter.write();
+		PrivilegeRolesSaxWriter writer = new PrivilegeRolesSaxWriter(roles, modelFile);
+		writer.write();
 
 		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader();
 		XmlHelper.parseDocument(modelFile, xmlHandler);

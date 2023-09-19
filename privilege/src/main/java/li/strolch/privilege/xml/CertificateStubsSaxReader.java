@@ -15,16 +15,6 @@
  */
 package li.strolch.privilege.xml;
 
-import static li.strolch.privilege.handler.DefaultPrivilegeHandler.SOURCE_UNKNOWN;
-import static li.strolch.privilege.helper.XmlConstants.*;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.io.InputStream;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Usage;
 import li.strolch.utils.dbc.DBC;
@@ -32,6 +22,16 @@ import li.strolch.utils.helper.XmlHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.InputStream;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import static li.strolch.privilege.handler.DefaultPrivilegeHandler.SOURCE_UNKNOWN;
+import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -55,33 +55,27 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-		case XML_ROOT_CERTIFICATES:
-			break;
-		case XML_CERTIFICATE:
-
-			CertificateStub stub = new CertificateStub();
-			stub.usage = Usage.valueOf(attributes.getValue(XML_ATTR_USAGE).trim());
-			stub.sessionId = attributes.getValue(XML_ATTR_SESSION_ID).trim();
-			stub.username = attributes.getValue(XML_ATTR_USERNAME).trim();
-			stub.authToken = attributes.getValue(XML_ATTR_AUTH_TOKEN).trim();
-			stub.source = attributes.getValue(XML_ATTR_SOURCE).trim();
-			stub.locale = Locale.forLanguageTag(attributes.getValue(XML_ATTR_LOCALE).trim());
-			stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME).trim());
-			stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS).trim());
-			stub.keepAlive = Boolean.parseBoolean(attributes.getValue(XML_ATTR_KEEP_ALIVE).trim());
-
-			DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
-			DBC.INTERIM.assertNotEmpty("username missing on sessions data!", stub.username);
-			DBC.INTERIM.assertNotEmpty("authToken missing on sessions data!", stub.authToken);
-
-			if (isEmpty(stub.source))
-				stub.source = SOURCE_UNKNOWN;
-
-			this.stubs.add(stub);
-			break;
-
-		default:
-			throw new PrivilegeException("Unhandled tag " + qName);
+			case XML_ROOT_CERTIFICATES -> {
+			}
+			case XML_CERTIFICATE -> {
+				CertificateStub stub = new CertificateStub();
+				stub.usage = Usage.valueOf(attributes.getValue(XML_ATTR_USAGE).trim());
+				stub.sessionId = attributes.getValue(XML_ATTR_SESSION_ID).trim();
+				stub.username = attributes.getValue(XML_ATTR_USERNAME).trim();
+				stub.authToken = attributes.getValue(XML_ATTR_AUTH_TOKEN).trim();
+				stub.source = attributes.getValue(XML_ATTR_SOURCE).trim();
+				stub.locale = Locale.forLanguageTag(attributes.getValue(XML_ATTR_LOCALE).trim());
+				stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME).trim());
+				stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS).trim());
+				stub.keepAlive = Boolean.parseBoolean(attributes.getValue(XML_ATTR_KEEP_ALIVE).trim());
+				DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
+				DBC.INTERIM.assertNotEmpty("username missing on sessions data!", stub.username);
+				DBC.INTERIM.assertNotEmpty("authToken missing on sessions data!", stub.authToken);
+				if (isEmpty(stub.source))
+					stub.source = SOURCE_UNKNOWN;
+				this.stubs.add(stub);
+			}
+			default -> throw new PrivilegeException("Unhandled tag " + qName);
 		}
 	}
 

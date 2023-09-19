@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.handler;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
+
+import javax.xml.stream.XMLStreamException;
 
 /**
  * <p>
@@ -131,7 +134,7 @@ public interface PersistenceHandler {
 	 *
 	 * @return true if changes were persisted successfully, false if nothing needed to be persisted
 	 */
-	boolean persist();
+	boolean persist() throws XMLStreamException, IOException;
 
 	/**
 	 * Informs this {@link PersistenceHandler} to reload the data from the backend

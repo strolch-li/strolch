@@ -15,18 +15,17 @@
  */
 package li.strolch.privilege.xml;
 
-import static li.strolch.privilege.helper.XmlConstants.*;
+import li.strolch.privilege.model.internal.PrivilegeContainerModel;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-import li.strolch.privilege.helper.XmlConstants;
-import li.strolch.privilege.model.internal.PrivilegeContainerModel;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import static li.strolch.privilege.helper.XmlConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -48,12 +47,12 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
 		switch (qName) {
-		case XML_CONTAINER -> this.buildersStack.push(new ContainerParser());
-		case XML_PARAMETERS -> this.buildersStack.push(new ParametersParser());
-		case XML_POLICIES -> this.buildersStack.push(new PoliciesParser());
-		default -> {
-			// nothing to do, probably handle on stack
-		}
+			case XML_CONTAINER -> this.buildersStack.push(new ContainerParser());
+			case XML_PARAMETERS -> this.buildersStack.push(new ParametersParser());
+			case XML_POLICIES -> this.buildersStack.push(new PoliciesParser());
+			default -> {
+				// nothing to do, probably handle on stack
+			}
 		}
 
 		if (!this.buildersStack.isEmpty())
@@ -89,38 +88,38 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 			switch (qName) {
-			case XML_CONTAINER -> this.currentElement = qName;
-			case XML_HANDLER_ENCRYPTION -> {
-				this.currentElement = qName;
-				String className = attributes.getValue(XML_ATTR_CLASS).trim();
-				getContainerModel().setEncryptionHandlerClassName(className);
-			}
-			case XML_HANDLER_PASSWORD_STRENGTH -> {
-				this.currentElement = qName;
-				String className = attributes.getValue(XML_ATTR_CLASS).trim();
-				getContainerModel().setPasswordStrengthHandlerClassName(className);
-			}
-			case XML_HANDLER_PERSISTENCE -> {
-				this.currentElement = qName;
-				String className = attributes.getValue(XML_ATTR_CLASS).trim();
-				getContainerModel().setPersistenceHandlerClassName(className);
-			}
-			case XML_HANDLER_USER_CHALLENGE -> {
-				this.currentElement = qName;
-				String className = attributes.getValue(XML_ATTR_CLASS).trim();
-				getContainerModel().setUserChallengeHandlerClassName(className);
-			}
-			case XML_HANDLER_SSO -> {
-				this.currentElement = qName;
-				String className = attributes.getValue(XML_ATTR_CLASS).trim();
-				getContainerModel().setSsoHandlerClassName(className);
-			}
-			case XML_HANDLER_PRIVILEGE -> {
-				this.currentElement = qName;
-				String className = attributes.getValue(XML_ATTR_CLASS).trim();
-				getContainerModel().setPrivilegeHandlerClassName(className);
-			}
-			default -> throw new IllegalStateException("Unexpected value: " + qName);
+				case XML_CONTAINER -> this.currentElement = qName;
+				case XML_HANDLER_PRIVILEGE -> {
+					this.currentElement = qName;
+					String className = attributes.getValue(XML_ATTR_CLASS).trim();
+					getContainerModel().setPrivilegeHandlerClassName(className);
+				}
+				case XML_HANDLER_ENCRYPTION -> {
+					this.currentElement = qName;
+					String className = attributes.getValue(XML_ATTR_CLASS).trim();
+					getContainerModel().setEncryptionHandlerClassName(className);
+				}
+				case XML_HANDLER_PASSWORD_STRENGTH -> {
+					this.currentElement = qName;
+					String className = attributes.getValue(XML_ATTR_CLASS).trim();
+					getContainerModel().setPasswordStrengthHandlerClassName(className);
+				}
+				case XML_HANDLER_PERSISTENCE -> {
+					this.currentElement = qName;
+					String className = attributes.getValue(XML_ATTR_CLASS).trim();
+					getContainerModel().setPersistenceHandlerClassName(className);
+				}
+				case XML_HANDLER_USER_CHALLENGE -> {
+					this.currentElement = qName;
+					String className = attributes.getValue(XML_ATTR_CLASS).trim();
+					getContainerModel().setUserChallengeHandlerClassName(className);
+				}
+				case XML_HANDLER_SSO -> {
+					this.currentElement = qName;
+					String className = attributes.getValue(XML_ATTR_CLASS).trim();
+					getContainerModel().setSsoHandlerClassName(className);
+				}
+				default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
 		}
 
@@ -129,20 +128,17 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 			if (!(child instanceof ParametersParser parametersChild))
 				return;
 
+			final Map<String, String> params = parametersChild.getParameterMap();
 			switch (this.currentElement) {
-			case XML_CONTAINER -> getContainerModel().setParameterMap(parametersChild.getParameterMap());
-			case XML_HANDLER_ENCRYPTION ->
-					getContainerModel().setEncryptionHandlerParameterMap(parametersChild.getParameterMap());
-			case XML_HANDLER_PASSWORD_STRENGTH ->
-					getContainerModel().setPasswordStrengthHandlerParameterMap(parametersChild.getParameterMap());
-			case XML_HANDLER_PERSISTENCE ->
-					getContainerModel().setPersistenceHandlerParameterMap(parametersChild.getParameterMap());
-			case XML_HANDLER_USER_CHALLENGE ->
-					getContainerModel().setUserChallengeHandlerParameterMap(parametersChild.getParameterMap());
-			case XML_HANDLER_SSO -> getContainerModel().setSsoHandlerParameterMap(parametersChild.getParameterMap());
-			case XML_HANDLER_PRIVILEGE ->
-					getContainerModel().setPrivilegeHandlerParameterMap(parametersChild.getParameterMap());
-			default -> throw new IllegalStateException("Unexpected value: " + this.currentElement);
+				case XML_CONTAINER -> getContainerModel().setParameterMap(params);
+				case XML_HANDLER_PRIVILEGE -> getContainerModel().setPrivilegeHandlerParameterMap(params);
+				case XML_HANDLER_ENCRYPTION -> getContainerModel().setEncryptionHandlerParameterMap(params);
+				case XML_HANDLER_PASSWORD_STRENGTH ->
+						getContainerModel().setPasswordStrengthHandlerParameterMap(params);
+				case XML_HANDLER_PERSISTENCE -> getContainerModel().setPersistenceHandlerParameterMap(params);
+				case XML_HANDLER_USER_CHALLENGE -> getContainerModel().setUserChallengeHandlerParameterMap(params);
+				case XML_HANDLER_SSO -> getContainerModel().setSsoHandlerParameterMap(params);
+				default -> throw new IllegalStateException("Unexpected value: " + this.currentElement);
 			}
 		}
 	}
