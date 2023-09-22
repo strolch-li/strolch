@@ -39,8 +39,7 @@ public class SimpleLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		this.realm = parameterMap.getOrDefault(REALM, "");
 
 		this.defaultLocale = parameterMap.containsKey("defaultLocale") ?
-				Locale.forLanguageTag(parameterMap.get("defaultLocale")) :
-				Locale.getDefault();
+				Locale.forLanguageTag(parameterMap.get("defaultLocale")) : Locale.getDefault();
 
 		this.adminUsers = parameterMap.get("adminUsers");
 		this.rolesForLdapGroups = getLdapGroupToRolesMappingFromConfig(parameterMap);

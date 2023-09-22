@@ -16,9 +16,9 @@ public class MailUserChallengeHandler extends UserChallengeHandler {
 
 		String subject = "Mail TAN";
 
-		String text = "Hello " + user.getFirstname() + " " + user.getLastname() + "\n\n"
-				+ "You have requested an action which requires you to respond to a challenge.\n\n"
-				+ "Please use the following code to response to the challenge:\n\n" + challenge;
+		String text = "Hello " + user.getFirstname() + " " + user.getLastname() + "\n\n" +
+				"You have requested an action which requires you to respond to a challenge.\n\n" +
+				"Please use the following code to response to the challenge:\n\n" + challenge;
 		String recipient = user.getEmail();
 		if (StringHelper.isEmpty(recipient)) {
 			String msg = "User {0} has no property {1}, so can not initiate challenge!";

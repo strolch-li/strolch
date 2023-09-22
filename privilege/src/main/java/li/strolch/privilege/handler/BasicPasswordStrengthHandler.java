@@ -37,8 +37,8 @@ public class BasicPasswordStrengthHandler implements PasswordStrengthHandler {
 		String description;
 
 		if (this.maxLength < 100)
-			description = MessageFormat
-					.format(getString(locale, "Privilege.passwordLengthBetween"), this.minLength, this.maxLength);
+			description = MessageFormat.format(getString(locale, "Privilege.passwordLengthBetween"), this.minLength,
+					this.maxLength);
 		else
 			description = MessageFormat.format(getString(locale, "Privilege.passwordLengthAtLeast"), this.minLength);
 
