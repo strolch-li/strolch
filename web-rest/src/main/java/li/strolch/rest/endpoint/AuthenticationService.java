@@ -37,7 +37,7 @@ import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -401,7 +401,7 @@ public class AuthenticationService {
 			loginResult.add("privileges", privArr);
 
 			for (String name : privilegeContext.getPrivilegeNames()) {
-				IPrivilege privilege = privilegeContext.getPrivilege(name);
+				Privilege privilege = privilegeContext.getPrivilege(name);
 
 				JsonObject privObj = new JsonObject();
 				privArr.add(privObj);

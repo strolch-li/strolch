@@ -16,12 +16,14 @@
 package li.strolch.privilege.model.internal;
 
 import li.strolch.privilege.base.PrivilegeConstants;
-import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
-import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.dbc.DBC;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 
@@ -34,59 +36,36 @@ import static li.strolch.privilege.base.PrivilegeConstants.*;
  * that
  * </p>
  *
+ * @param userId        the user's id
+ * @param username      the user's login name
+ * @param passwordCrypt the {@link PasswordCrypt} containing user's password information
+ * @param firstname     the user's first name
+ * @param lastname      the user's lastname
+ * @param userState     the user's {@link UserState}
+ * @param groups        the set of {@link Group}s assigned to this user
+ * @param roles         the set of {@link Role}s assigned to this user
+ * @param locale        the user's {@link Locale}
+ * @param propertyMap   a {@link Map} containing string value pairs of properties for this user
+ *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public final class User {
+public record User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
+				   UserState userState, Set<String> groups, Set<String> roles, Locale locale,
+				   Map<String, String> propertyMap, boolean passwordChangeRequested, UserHistory history) {
 
-	private final String userId;
-
-	private final String username;
-	private final PasswordCrypt passwordCrypt;
-
-	private final String firstname;
-	private final String lastname;
-
-	private final Set<String> roles;
-
-	private final UserState userState;
-	private final Map<String, String> propertyMap;
-	private final Locale locale;
-
-	private final boolean passwordChangeRequested;
-	private final UserHistory history;
-
-	/**
-	 * Default constructor
-	 *
-	 * @param userId        the user's id
-	 * @param username      the user's login name
-	 * @param passwordCrypt the {@link PasswordCrypt} containing user's password information
-	 * @param firstname     the user's first name
-	 * @param lastname      the user's lastname
-	 * @param userState     the user's {@link UserState}
-	 * @param roles         the set of {@link Role}s assigned to this user
-	 * @param locale        the user's {@link Locale}
-	 * @param propertyMap   a {@link Map} containing string value pairs of properties for this user
-	 */
 	public User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
-			UserState userState, Set<String> roles, Locale locale, Map<String, String> propertyMap,
+			UserState userState, Set<String> groups, Set<String> roles, Locale locale, Map<String, String> propertyMap,
 			boolean passwordChangeRequested, UserHistory history) {
 
-		if (StringHelper.isEmpty(userId))
-			throw new PrivilegeException("No UserId defined!");
-		if (userState == null)
-			throw new PrivilegeException("No userState defined!");
-		if (StringHelper.isEmpty(username))
-			throw new PrivilegeException("No username defined!");
-		if (userState != UserState.SYSTEM) {
-			if (StringHelper.isEmpty(lastname))
-				throw new PrivilegeException("No lastname defined!");
-			if (StringHelper.isEmpty(firstname))
-				throw new PrivilegeException("No firstname defined!");
-		}
+		DBC.PRE.assertNotEmpty("userId must not be empty", userId);
+		DBC.PRE.assertNotEmpty("username must not be empty", username);
+		DBC.PRE.assertNotNull("userState must not be null", userState);
+		DBC.PRE.assertNotNull("history must not be null", history);
 
-		if (history == null)
-			throw new PrivilegeException("History must not be null!");
+		if (userState != UserState.SYSTEM) {
+			DBC.PRE.assertNotEmpty("lastname must not be empty when not system user!", username);
+			DBC.PRE.assertNotEmpty("firstname must not be empty when not system user!", firstname);
+		}
 
 		// passwordCrypt may be null, meaning not able to login
 		// roles may be null, meaning not able to login and must be added later
@@ -103,35 +82,19 @@ public final class User {
 		this.firstname = firstname;
 		this.lastname = lastname;
 
-		if (roles == null)
-			this.roles = Collections.emptySet();
-		else
-			this.roles = Set.copyOf(roles);
-
-		if (locale == null)
-			this.locale = Locale.getDefault();
-		else
-			this.locale = locale;
-
-		if (propertyMap == null)
-			this.propertyMap = Collections.emptyMap();
-		else
-			this.propertyMap = Map.copyOf(propertyMap);
+		this.groups = groups == null ? Set.of() : Set.copyOf(groups);
+		this.roles = roles == null ? Set.of() : Set.copyOf(roles);
+		this.locale = locale == null ? Locale.getDefault() : locale;
+		this.propertyMap = propertyMap == null ? Map.of() : Map.copyOf(propertyMap);
 
 		this.passwordChangeRequested = passwordChangeRequested;
 		this.history = history;
 	}
 
-	/**
-	 * @return the userId
-	 */
 	public String getUserId() {
 		return this.userId;
 	}
 
-	/**
-	 * @return the username
-	 */
 	public String getUsername() {
 		return this.username;
 	}
@@ -145,48 +108,34 @@ public final class User {
 		return this.passwordCrypt;
 	}
 
-	/**
-	 * @return the first name
-	 */
 	public String getFirstname() {
 		return this.firstname;
 	}
 
-	/**
-	 * @return the last name
-	 */
 	public String getLastname() {
 		return this.lastname;
 	}
 
-	/**
-	 * @return the userState
-	 */
 	public UserState getUserState() {
 		return this.userState;
 	}
 
-	/**
-	 * @return the roles
-	 */
+	public Set<String> getGroups() {
+		return this.groups;
+	}
+
 	public Set<String> getRoles() {
 		return this.roles;
 	}
 
-	/**
-	 * Returns true if this user has the specified role
-	 *
-	 * @param role the name of the {@link Role} to check for
-	 *
-	 * @return true if the this user has the specified role
-	 */
+	public boolean hasGroup(String group) {
+		return this.groups.contains(group);
+	}
+
 	public boolean hasRole(String role) {
 		return this.roles.contains(role);
 	}
 
-	/**
-	 * @return the locale
-	 */
 	public Locale getLocale() {
 		return this.locale;
 	}
@@ -195,11 +144,6 @@ public final class User {
 		return this.passwordChangeRequested;
 	}
 
-	/**
-	 * Returns the History object
-	 *
-	 * @return the History object
-	 */
 	public UserHistory getHistory() {
 		return this.history;
 	}
@@ -282,8 +226,8 @@ public final class User {
 	 * @return a {@link UserRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public UserRep asUserRep() {
-		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState,
-				new HashSet<>(this.roles), this.locale, new HashMap<>(this.propertyMap), this.history.getClone());
+		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, this.groups,
+				this.roles, this.locale, new HashMap<>(this.propertyMap), this.history);
 	}
 
 	/**
@@ -315,9 +259,13 @@ public final class User {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (this.userId == null) {
+		if (this.userId == null)
 			return other.userId == null;
-		} else
-			return this.userId.equals(other.userId);
+		return this.userId.equals(other.userId);
+	}
+
+	public User withHistory(UserHistory history) {
+		return new User(this.userId, this.username, this.passwordCrypt, this.firstname, this.lastname, this.userState,
+				this.groups, this.roles, this.locale, this.propertyMap, this.passwordChangeRequested, history);
 	}
 }

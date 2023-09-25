@@ -15,12 +15,7 @@
  */
 package li.strolch.privilege.xml;
 
-import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.Group;
-import li.strolch.privilege.model.internal.PasswordCrypt;
-import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.model.internal.UserHistory;
-import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -35,33 +30,31 @@ import static li.strolch.privilege.helper.XmlConstants.*;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeUsersSaxReader extends DefaultHandler {
+public class PrivilegeGroupsSaxReader extends DefaultHandler {
 
-	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersSaxReader.class);
+	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeGroupsSaxReader.class);
 
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private final Map<String, User> users;
-	private final boolean caseInsensitiveUsername;
+	private final Map<String, Group> groups;
 
-	public PrivilegeUsersSaxReader(boolean caseInsensitiveUsername) {
-		this.caseInsensitiveUsername = caseInsensitiveUsername;
-		this.users = new HashMap<>();
+	public PrivilegeGroupsSaxReader() {
+		this.groups = new HashMap<>();
 	}
 
 	/**
 	 * @return the users
 	 */
-	public Map<String, User> getUsers() {
-		return this.users;
+	public Map<String, Group> getGroups() {
+		return this.groups;
 	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equals(USER)) {
-			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(UserParser.class)))
-				throw new IllegalArgumentException("Previous User not closed!");
-			this.buildersStack.push(new UserParser());
+		if (qName.equals(GROUP)) {
+			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(GroupParser.class)))
+				throw new IllegalArgumentException("Previous Group not closed!");
+			this.buildersStack.push(new GroupParser());
 		} else if (qName.equals(PROPERTIES)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
 				throw new IllegalArgumentException("Previous Properties not closed!");
@@ -85,7 +78,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(USER)) {
+		if (qName.equals(GROUP)) {
 			elementParser = this.buildersStack.pop();
 		} else if (qName.equals(PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
@@ -115,26 +108,17 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 	//    </History>
 	//	</User>
 
-	public class UserParser extends ElementParserAdapter {
+	public class GroupParser extends ElementParserAdapter {
 
 		StringBuilder text;
 
-		String userId;
-		String username;
-		PasswordCrypt passwordCrypt;
-		String firstName;
-		String lastname;
-		UserState userState;
-		Locale locale;
-		final Set<String> groups;
-		final Set<String> userRoles;
+		String name;
+		final Set<String> roles;
 		Map<String, String> parameters;
-		UserHistory history;
-		boolean passwordChangeRequested;
 
-		public UserParser() {
-			this.groups = new HashSet<>();
-			this.userRoles = new HashSet<>();
+		public GroupParser() {
+			this.roles = new HashSet<>();
+			this.parameters = new HashMap<>();
 		}
 
 		@Override
@@ -142,15 +126,8 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			if (qName.equals(USER)) {
-				this.userId = attributes.getValue(ATTR_USER_ID).trim();
-				this.username = attributes.getValue(ATTR_USERNAME).trim();
-
-				String password = attributes.getValue(ATTR_PASSWORD);
-				String salt = attributes.getValue(ATTR_SALT);
-				this.passwordCrypt = PasswordCrypt.parse(password, salt);
-			} else if (qName.equals(HISTORY)) {
-				this.history = UserHistory.EMPTY;
+			if (qName.equals(GROUP)) {
+				this.name = attributes.getValue(ATTR_NAME).trim();
 			}
 		}
 
@@ -163,34 +140,18 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		public void endElement(String uri, String localName, String qName) {
 
 			switch (qName) {
-				case FIRSTNAME -> this.firstName = getText();
-				case LASTNAME -> this.lastname = getText();
-				case STATE -> this.userState = UserState.valueOf(getText());
-				case LOCALE -> this.locale = Locale.forLanguageTag(getText());
-				case PASSWORD_CHANGE_REQUESTED -> this.passwordChangeRequested = Boolean.parseBoolean(getText());
-				case FIRST_LOGIN -> this.history = this.history.withFirstLogin(ISO8601.parseToZdt(getText()));
-				case LAST_LOGIN -> this.history = this.history.withLastLogin(ISO8601.parseToZdt(getText()));
-				case LAST_PASSWORD_CHANGE ->
-						this.history = this.history.withLastPasswordChange(ISO8601.parseToZdt(getText()));
-				case GROUP -> this.groups.add(getText());
-				case ROLE -> this.userRoles.add(getText());
-				case USER -> {
-					if (this.history == null)
-						this.history = UserHistory.EMPTY;
+				case ROLE -> this.roles.add(getText());
+				case GROUP -> {
 
-					User user = new User(this.userId, this.username, this.passwordCrypt, this.firstName, this.lastname,
-							this.userState, this.groups, this.userRoles, this.locale, this.parameters,
-							this.passwordChangeRequested, this.history);
+					Group group = new Group(this.name, this.roles, this.parameters);
 
-					logger.info(MessageFormat.format("New User: {0}", user));
-					String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
-					users.put(username, user);
+					logger.info(MessageFormat.format("New Group: {0}", group));
+					groups.put(this.name, group);
 				}
 				default -> {
-					if (!(qName.equals(ROLES) //
-								  || qName.equals(GROUPS) //
+					if (!(qName.equals(GROUPS) //
+								  || qName.equals(ROLES) //
 								  || qName.equals(PARAMETER) //
-								  || qName.equals(HISTORY) //
 								  || qName.equals(PARAMETERS))) {
 						throw new IllegalArgumentException("Unhandled tag " + qName);
 					}
@@ -209,4 +170,5 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			}
 		}
 	}
+
 }

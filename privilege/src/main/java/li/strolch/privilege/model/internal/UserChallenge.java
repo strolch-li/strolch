@@ -1,10 +1,11 @@
 package li.strolch.privilege.model.internal;
 
+import li.strolch.privilege.model.Usage;
+import li.strolch.utils.dbc.DBC;
+
 import java.time.LocalDateTime;
 
-import li.strolch.privilege.model.Usage;
-
-public class UserChallenge {
+public final class UserChallenge {
 	private final User user;
 	private final String challenge;
 	private final String source;
@@ -13,6 +14,10 @@ public class UserChallenge {
 	private boolean fulfilled;
 
 	public UserChallenge(Usage usage, User user, String challenge, String source) {
+		DBC.PRE.assertNotNull("usage may not be null", usage);
+		DBC.PRE.assertNotNull("user may not be null", user);
+		DBC.PRE.assertNotNull("challenge may not be empty", challenge);
+		DBC.PRE.assertNotNull("source may not be empty", source);
 		this.usage = usage;
 		this.user = user;
 		this.challenge = challenge;

@@ -16,8 +16,7 @@
 package li.strolch.privilege.xml;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
-import li.strolch.privilege.model.Privilege;
-import li.strolch.privilege.model.internal.Role;
+import li.strolch.privilege.model.internal.Group;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
@@ -25,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static li.strolch.privilege.helper.XmlConstants.*;
@@ -33,13 +33,13 @@ import static li.strolch.privilege.helper.XmlHelper.*;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeRolesSaxWriter {
+public class PrivilegeGroupsSaxWriter {
 
-	private final List<Role> roles;
+	private final List<Group> groups;
 	private final File modelFile;
 
-	public PrivilegeRolesSaxWriter(List<Role> roles, File modelFile) {
-		this.roles = roles;
+	public PrivilegeGroupsSaxWriter(List<Group> groups, File modelFile) {
+		this.groups = groups;
 		this.modelFile = modelFile;
 	}
 
@@ -48,32 +48,28 @@ public class PrivilegeRolesSaxWriter {
 		try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.modelFile), StandardCharsets.UTF_8)) {
 
 			IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
-			xmlWriter.writeStartElement(ROLES);
+			xmlWriter.writeStartElement(GROUPS);
 
-			List<Role> roles = new ArrayList<>(this.roles);
-			roles.sort(comparing(r -> r.getName().toLowerCase(Locale.ROOT)));
-			for (Role role : roles) {
+			List<Group> groups = new ArrayList<>(this.groups);
+			groups.sort(comparing(g -> g.name().toLowerCase(Locale.ROOT)));
+			for (Group group : this.groups) {
 
-				// start the role element
-				xmlWriter.writeStartElement(ROLE);
-				xmlWriter.writeAttribute(ATTR_NAME, role.getName());
+				// start the user element
+				xmlWriter.writeStartElement(GROUP);
 
-				List<String> privilegeNames = new ArrayList<>(role.getPrivilegeNames());
-				privilegeNames.sort(null);
-				for (String privilegeName : privilegeNames) {
-					Privilege privilege = role.getPrivilege(privilegeName);
+				xmlWriter.writeAttribute(ATTR_NAME, group.name());
 
-					xmlWriter.writeStartElement(PRIVILEGE);
-					xmlWriter.writeAttribute(ATTR_NAME, privilege.getName());
-					xmlWriter.writeAttribute(ATTR_POLICY, privilege.getPolicy());
-
-					if (privilege.isAllAllowed())
-						writeStringElement(xmlWriter, ALL_ALLOWED, "true");
-					writeStringList(xmlWriter, DENY, privilege.getDenyList());
-					writeStringList(xmlWriter, ALLOW, privilege.getAllowList());
-
+				// add all the role elements
+				if (!group.roles().isEmpty()) {
+					xmlWriter.writeStartElement(ROLES);
+					writeStringList(xmlWriter, ROLE, group.roles());
 					xmlWriter.writeEndElement();
 				}
+
+				// add the parameters
+				Map<String, String> properties = group.getProperties();
+				if (!properties.isEmpty())
+					writeStringMapElement(xmlWriter, properties, PROPERTIES, PROPERTY);
 
 				xmlWriter.writeEndElement();
 			}

@@ -15,8 +15,7 @@
  */
 package li.strolch.privilege.xml;
 
-import li.strolch.privilege.model.IPrivilege;
-import li.strolch.privilege.model.internal.PrivilegeImpl;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
@@ -52,11 +51,11 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (qName.equals(XML_ROLE)) {
+		if (qName.equals(ROLE)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(RoleParser.class)))
 				throw new IllegalArgumentException("Previous Role not closed!");
 			this.buildersStack.push(new RoleParser());
-		} else if (qName.equals(XML_PROPERTIES)) {
+		} else if (qName.equals(PROPERTIES)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
 				throw new IllegalArgumentException("Previous Properties not closed!");
 			this.buildersStack.push(new PropertyParser());
@@ -79,9 +78,9 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(XML_ROLE)) {
+		if (qName.equals(ROLE)) {
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(XML_PROPERTIES)) {
+		} else if (qName.equals(PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -114,7 +113,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 		private Set<String> denyList;
 		private Set<String> allowList;
 
-		private Map<String, IPrivilege> privileges;
+		private Map<String, Privilege> privileges;
 
 		public RoleParser() {
 			init();
@@ -139,12 +138,12 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.text = new StringBuilder();
 
 			switch (qName) {
-				case XML_ROLE -> this.roleName = attributes.getValue(XML_ATTR_NAME).trim();
-				case XML_PRIVILEGE -> {
-					this.privilegeName = attributes.getValue(XML_ATTR_NAME).trim();
-					this.privilegePolicy = attributes.getValue(XML_ATTR_POLICY).trim();
+				case ROLE -> this.roleName = attributes.getValue(ATTR_NAME).trim();
+				case PRIVILEGE -> {
+					this.privilegeName = attributes.getValue(ATTR_NAME).trim();
+					this.privilegePolicy = attributes.getValue(ATTR_POLICY).trim();
 				}
-				case XML_ALLOW, XML_DENY, XML_ALL_ALLOWED -> {
+				case ALLOW, DENY, ALL_ALLOWED -> {
 				}
 				// no-op
 				default -> throw new IllegalArgumentException("Unhandled tag " + qName);
@@ -160,11 +159,11 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) {
 			switch (qName) {
-				case XML_ALL_ALLOWED -> this.allAllowed = StringHelper.parseBoolean(getText());
-				case XML_ALLOW -> this.allowList.add(getText());
-				case XML_DENY -> this.denyList.add(getText());
-				case XML_PRIVILEGE -> {
-					IPrivilege privilege = new PrivilegeImpl(this.privilegeName, this.privilegePolicy, this.allAllowed,
+				case ALL_ALLOWED -> this.allAllowed = StringHelper.parseBoolean(getText());
+				case ALLOW -> this.allowList.add(getText());
+				case DENY -> this.denyList.add(getText());
+				case PRIVILEGE -> {
+					Privilege privilege = new Privilege(this.privilegeName, this.privilegePolicy, this.allAllowed,
 							this.denyList, this.allowList);
 					this.privileges.put(this.privilegeName, privilege);
 					this.privilegeName = null;
@@ -173,7 +172,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 					this.denyList = new HashSet<>();
 					this.allowList = new HashSet<>();
 				}
-				case XML_ROLE -> {
+				case ROLE -> {
 					Role role = new Role(this.roleName, this.privileges);
 					roles.put(role.getName(), role);
 					logger.info(MessageFormat.format("New Role: {0}", role));
@@ -196,11 +195,11 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-			if (qName.equals(XML_PROPERTY)) {
-				String key = attributes.getValue(XML_ATTR_NAME).trim();
-				String value = attributes.getValue(XML_ATTR_VALUE).trim();
+			if (qName.equals(PROPERTY)) {
+				String key = attributes.getValue(ATTR_NAME).trim();
+				String value = attributes.getValue(ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
-			} else if (!qName.equals(XML_PROPERTIES)) {
+			} else if (!qName.equals(PROPERTIES)) {
 				throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}

@@ -55,19 +55,19 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-			case XML_ROOT_CERTIFICATES -> {
+			case ROOT_CERTIFICATES -> {
 			}
-			case XML_CERTIFICATE -> {
+			case CERTIFICATE -> {
 				CertificateStub stub = new CertificateStub();
-				stub.usage = Usage.valueOf(attributes.getValue(XML_ATTR_USAGE).trim());
-				stub.sessionId = attributes.getValue(XML_ATTR_SESSION_ID).trim();
-				stub.username = attributes.getValue(XML_ATTR_USERNAME).trim();
-				stub.authToken = attributes.getValue(XML_ATTR_AUTH_TOKEN).trim();
-				stub.source = attributes.getValue(XML_ATTR_SOURCE).trim();
-				stub.locale = Locale.forLanguageTag(attributes.getValue(XML_ATTR_LOCALE).trim());
-				stub.loginTime = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LOGIN_TIME).trim());
-				stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(XML_ATTR_LAST_ACCESS).trim());
-				stub.keepAlive = Boolean.parseBoolean(attributes.getValue(XML_ATTR_KEEP_ALIVE).trim());
+				stub.usage = Usage.valueOf(attributes.getValue(ATTR_USAGE).trim());
+				stub.sessionId = attributes.getValue(ATTR_SESSION_ID).trim();
+				stub.username = attributes.getValue(ATTR_USERNAME).trim();
+				stub.authToken = attributes.getValue(ATTR_AUTH_TOKEN).trim();
+				stub.source = attributes.getValue(ATTR_SOURCE).trim();
+				stub.locale = Locale.forLanguageTag(attributes.getValue(ATTR_LOCALE).trim());
+				stub.loginTime = ISO8601.parseToZdt(attributes.getValue(ATTR_LOGIN_TIME).trim());
+				stub.lastAccess = ISO8601.parseToZdt(attributes.getValue(ATTR_LAST_ACCESS).trim());
+				stub.keepAlive = Boolean.parseBoolean(attributes.getValue(ATTR_KEEP_ALIVE).trim());
 				DBC.INTERIM.assertNotEmpty("sessionId missing on sessions data!", stub.sessionId);
 				DBC.INTERIM.assertNotEmpty("username missing on sessions data!", stub.username);
 				DBC.INTERIM.assertNotEmpty("authToken missing on sessions data!", stub.authToken);

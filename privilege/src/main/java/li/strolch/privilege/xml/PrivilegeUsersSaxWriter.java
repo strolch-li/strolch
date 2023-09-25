@@ -47,8 +47,6 @@ public class PrivilegeUsersSaxWriter {
 	public PrivilegeUsersSaxWriter(List<User> users, File modelFile) {
 		this.users = users;
 		this.modelFile = modelFile;
-
-		this.users.sort(comparing(User::getUsername));
 	}
 
 	public void write() throws IOException, XMLStreamException {
@@ -56,62 +54,68 @@ public class PrivilegeUsersSaxWriter {
 		try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.modelFile), StandardCharsets.UTF_8)) {
 
 			IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
-			xmlWriter.writeStartElement(XML_USERS);
+			xmlWriter.writeStartElement(USERS);
 
 			List<User> users = new ArrayList<>(this.users);
 			users.sort(comparing(u -> u.getUsername().toLowerCase(Locale.ROOT)));
 			for (User user : this.users) {
 
 				// start the user element
-				xmlWriter.writeStartElement(XML_USER);
+				xmlWriter.writeStartElement(USER);
 
-				xmlWriter.writeAttribute(XML_ATTR_USER_ID, user.getUserId());
-				xmlWriter.writeAttribute(XML_ATTR_USERNAME, user.getUsername());
+				xmlWriter.writeAttribute(ATTR_USER_ID, user.getUserId());
+				xmlWriter.writeAttribute(ATTR_USERNAME, user.getUsername());
 				writePassword(user, xmlWriter);
 
 				// add first name element
 				if (isNotEmpty(user.getFirstname()))
-					writeStringElement(xmlWriter, XML_FIRSTNAME, user.getFirstname());
+					writeStringElement(xmlWriter, FIRSTNAME, user.getFirstname());
 
 				// add last name element
 				if (isNotEmpty(user.getLastname()))
-					writeStringElement(xmlWriter, XML_LASTNAME, user.getLastname());
+					writeStringElement(xmlWriter, LASTNAME, user.getLastname());
 
 				// add state element
-				writeStringElement(xmlWriter, XML_STATE, user.getUserState().toString());
+				writeStringElement(xmlWriter, STATE, user.getUserState().toString());
 
 				// add locale element
-				writeStringElement(xmlWriter, XML_LOCALE, user.getLocale().toLanguageTag());
+				writeStringElement(xmlWriter, LOCALE, user.getLocale().toLanguageTag());
 
 				// add password change requested element
 				if (user.isPasswordChangeRequested())
-					writeStringElement(xmlWriter, XML_PASSWORD_CHANGE_REQUESTED, "true");
+					writeStringElement(xmlWriter, PASSWORD_CHANGE_REQUESTED, "true");
+
+				// add all the group elements
+				if (!user.getGroups().isEmpty()) {
+					xmlWriter.writeStartElement(GROUPS);
+					writeStringList(xmlWriter, GROUP, user.getGroups());
+					xmlWriter.writeEndElement();
+				}
 
 				// add all the role elements
 				if (!user.getRoles().isEmpty()) {
-					xmlWriter.writeStartElement(XML_ROLES);
-					writeStringList(xmlWriter, XML_ROLE, user.getRoles());
+					xmlWriter.writeStartElement(ROLES);
+					writeStringList(xmlWriter, ROLE, user.getRoles());
 					xmlWriter.writeEndElement();
 				}
 
 				// add the parameters
 				Map<String, String> properties = user.getProperties();
-				if (!properties.isEmpty()) {
-					writeStringMapElement(xmlWriter, properties, XML_PROPERTIES, XML_PROPERTY);
-				}
+				if (!properties.isEmpty())
+					writeStringMapElement(xmlWriter, properties, PROPERTIES, PROPERTY);
 
 				if (!user.isHistoryEmpty()) {
 					UserHistory history = user.getHistory();
-					xmlWriter.writeStartElement(XML_HISTORY);
+					xmlWriter.writeStartElement(HISTORY);
 
 					if (!history.isFirstLoginEmpty())
-						writeStringElement(xmlWriter, XML_FIRST_LOGIN, ISO8601.toString(history.getFirstLogin()));
+						writeStringElement(xmlWriter, FIRST_LOGIN, ISO8601.toString(history.getFirstLogin()));
 
 					if (!history.isLastLoginEmpty())
-						writeStringElement(xmlWriter, XML_LAST_LOGIN, ISO8601.toString(history.getLastLogin()));
+						writeStringElement(xmlWriter, LAST_LOGIN, ISO8601.toString(history.getLastLogin()));
 
 					if (!history.isLastPasswordChangeEmpty())
-						writeStringElement(xmlWriter, XML_LAST_PASSWORD_CHANGE,
+						writeStringElement(xmlWriter, LAST_PASSWORD_CHANGE,
 								ISO8601.toString(history.getLastPasswordChange()));
 
 					xmlWriter.writeEndElement();
@@ -133,12 +137,12 @@ public class PrivilegeUsersSaxWriter {
 
 		String passwordString = passwordCrypt.buildPasswordString();
 		if (passwordString != null) {
-			xmlStreamWriter.writeAttribute(XML_ATTR_PASSWORD, passwordString);
+			xmlStreamWriter.writeAttribute(ATTR_PASSWORD, passwordString);
 		} else {
-			if (passwordCrypt.getPassword() != null)
-				xmlStreamWriter.writeAttribute(XML_ATTR_PASSWORD, toHexString(passwordCrypt.getPassword()));
-			if (passwordCrypt.getSalt() != null)
-				xmlStreamWriter.writeAttribute(XML_ATTR_SALT, toHexString(passwordCrypt.getSalt()));
+			if (passwordCrypt.password() != null)
+				xmlStreamWriter.writeAttribute(ATTR_PASSWORD, toHexString(passwordCrypt.password()));
+			if (passwordCrypt.salt() != null)
+				xmlStreamWriter.writeAttribute(ATTR_SALT, toHexString(passwordCrypt.salt()));
 		}
 	}
 }

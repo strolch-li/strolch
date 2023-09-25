@@ -502,7 +502,7 @@ public interface PrivilegeHandler {
 	 * @param roleName
 	 * 		the roleName of the {@link Role} to which the privilege should be added
 	 * @param privilegeRep
-	 * 		the representation of the {@link IPrivilege} which should be added or replaced on the {@link Role}
+	 * 		the representation of the {@link Privilege} which should be added or replaced on the {@link Role}
 	 *
 	 * @throws AccessDeniedException
 	 * 		if the user for this certificate may not perform the action

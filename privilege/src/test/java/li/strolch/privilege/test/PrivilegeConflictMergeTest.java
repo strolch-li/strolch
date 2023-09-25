@@ -15,13 +15,15 @@
  */
 package li.strolch.privilege.test;
 
-import static org.junit.Assert.*;
-
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -32,7 +34,7 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	public static void init() {
 		removeConfigs(PrivilegeConflictMergeTest.class.getSimpleName());
 		prepareConfigs(PrivilegeConflictMergeTest.class.getSimpleName(), "PrivilegeConfigMerge.xml",
-				"PrivilegeUsersMerge.xml", "PrivilegeRolesMerge.xml");
+				"PrivilegeUsersMerge.xml", "PrivilegeGroupsMerge.xml", "PrivilegeRolesMerge.xml");
 	}
 
 	@AfterClass
@@ -49,7 +51,16 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	public void shouldMergePrivileges1() {
 		try {
 			login("userA", "admin".toCharArray());
-			IPrivilege privilege = this.ctx.getPrivilege("Foo");
+			assertEquals(Set.of(), this.ctx.getUserRep().getGroups());
+			assertFalse(this.ctx.hasGroup("GroupA1"));
+			assertFalse(this.ctx.hasGroup("GroupA2"));
+			assertEquals(Set.of("RoleA1", "RoleA2"), this.ctx.getUserRep().getRoles());
+			assertTrue(this.ctx.hasRole("RoleA1"));
+			assertTrue(this.ctx.hasRole("RoleA2"));
+			assertFalse(this.ctx.hasRole("RoleB2"));
+			assertNull(this.ctx.getUserRep().getLocation());
+			assertEquals(Set.of(), this.ctx.getUserRep().getPropertyKeySet());
+			Privilege privilege = this.ctx.getPrivilege("Foo");
 			assertTrue(privilege.isAllAllowed());
 			assertTrue(privilege.getAllowList().isEmpty());
 			assertTrue(privilege.getDenyList().isEmpty());
@@ -63,10 +74,68 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	public void shouldMergePrivileges2() {
 		try {
 			login("userB", "admin".toCharArray());
-			IPrivilege privilege = this.ctx.getPrivilege("Bar");
+			assertEquals(Set.of(), this.ctx.getUserRep().getGroups());
+			assertFalse(this.ctx.hasGroup("GroupB1"));
+			assertFalse(this.ctx.hasGroup("GroupB2"));
+			assertEquals(Set.of("RoleB1", "RoleB2"), this.ctx.getUserRep().getRoles());
+			assertTrue(this.ctx.hasRole("RoleB1"));
+			assertTrue(this.ctx.hasRole("RoleB2"));
+			assertFalse(this.ctx.hasRole("RoleA2"));
+			assertNull(this.ctx.getUserRep().getLocation());
+			assertEquals(Set.of(), this.ctx.getUserRep().getPropertyKeySet());
+			Privilege privilege = this.ctx.getPrivilege("Bar");
 			assertFalse(privilege.isAllAllowed());
 			assertEquals(2, privilege.getAllowList().size());
 			assertEquals(2, privilege.getDenyList().size());
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldMergePrivileges3() {
+		try {
+			login("userC", "admin".toCharArray());
+			assertEquals(Set.of("GroupA1", "GroupA2"), this.ctx.getUserRep().getGroups());
+			assertTrue(this.ctx.hasGroup("GroupA1"));
+			assertTrue(this.ctx.hasGroup("GroupA2"));
+			assertFalse(this.ctx.hasGroup("GroupB2"));
+			assertEquals(Set.of("RoleA1", "RoleA2"), this.ctx.getUserRep().getRoles());
+			assertTrue(this.ctx.hasRole("RoleA1"));
+			assertTrue(this.ctx.hasRole("RoleA2"));
+			assertFalse(this.ctx.hasRole("RoleB2"));
+			assertEquals("LocationA2", this.ctx.getUserRep().getLocation());
+			assertEquals(Set.of("location"), this.ctx.getUserRep().getPropertyKeySet());
+			Privilege privilege = this.ctx.getPrivilege("Foo");
+			assertTrue(privilege.isAllAllowed());
+			assertTrue(privilege.getAllowList().isEmpty());
+			assertTrue(privilege.getDenyList().isEmpty());
+
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldMergePrivileges4() {
+		try {
+			login("userD", "admin".toCharArray());
+			assertEquals(Set.of("GroupB1", "GroupB2"), this.ctx.getUserRep().getGroups());
+			assertTrue(this.ctx.hasGroup("GroupB1"));
+			assertTrue(this.ctx.hasGroup("GroupB2"));
+			assertFalse(this.ctx.hasGroup("GroupA2"));
+			assertEquals(Set.of("RoleB1", "RoleB2"), this.ctx.getUserRep().getRoles());
+			assertTrue(this.ctx.hasRole("RoleB1"));
+			assertTrue(this.ctx.hasRole("RoleB2"));
+			assertFalse(this.ctx.hasRole("RoleA2"));
+			assertEquals("LocationB2", this.ctx.getUserRep().getLocation());
+			assertEquals(Set.of("location"), this.ctx.getUserRep().getPropertyKeySet());
+			Privilege privilege = this.ctx.getPrivilege("Bar");
+			assertFalse(privilege.isAllAllowed());
+			assertEquals(2, privilege.getAllowList().size());
+			assertEquals(2, privilege.getDenyList().size());
+			assertEquals(Set.of("allow1", "allow2"), privilege.getAllowList());
+			assertEquals(Set.of("deny1", "deny2"), privilege.getDenyList());
 		} finally {
 			logout();
 		}

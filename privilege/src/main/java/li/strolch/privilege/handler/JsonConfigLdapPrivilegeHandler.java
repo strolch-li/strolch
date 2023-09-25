@@ -1,10 +1,11 @@
 package li.strolch.privilege.handler;
 
-import static java.lang.String.join;
-import static java.util.stream.Collectors.toSet;
-import static li.strolch.privilege.base.PrivilegeConstants.*;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import li.strolch.privilege.helper.LdapHelper;
+import li.strolch.privilege.policy.PrivilegePolicy;
+import li.strolch.utils.dbc.DBC;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -13,12 +14,11 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import li.strolch.privilege.helper.LdapHelper;
-import li.strolch.privilege.policy.PrivilegePolicy;
-import li.strolch.utils.dbc.DBC;
+import static java.lang.String.join;
+import static java.util.stream.Collectors.toSet;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
@@ -148,16 +148,24 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	}
 
 	@Override
+	protected Set<String> mapToStrolchGroups(String username, Set<String> ldapGroups) {
+		return mapLdapGroupToStrolch(ldapGroups, GROUPS);
+	}
+
+	@Override
 	protected Set<String> mapToStrolchRoles(String username, Set<String> ldapGroups) {
+		return mapLdapGroupToStrolch(ldapGroups, ROLES);
+	}
 
-		Set<String> strolchRoles = new HashSet<>();
-
+	private Set<String> mapLdapGroupToStrolch(Set<String> ldapGroups, String type) {
+		Set<String> mappedValues = new HashSet<>();
 		for (String relevantLdapGroup : ldapGroups) {
 			JsonObject mappingJ = this.ldapGroupConfigs.get(relevantLdapGroup).getAsJsonObject();
-			mappingJ.get(ROLES).getAsJsonArray().forEach(e -> strolchRoles.add(e.getAsString()));
+			if (mappingJ.has(type))
+				mappingJ.get(type).getAsJsonArray().forEach(e -> mappedValues.add(e.getAsString()));
 		}
 
-		return strolchRoles;
+		return mappedValues;
 	}
 
 	@Override

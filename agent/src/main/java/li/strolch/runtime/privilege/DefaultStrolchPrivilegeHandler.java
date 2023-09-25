@@ -19,7 +19,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
-import static li.strolch.privilege.helper.XmlConstants.XML_PARAM_BASE_PATH;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 import java.io.File;
@@ -126,7 +126,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			if (containerModel.getPersistenceHandlerClassName().equals(XmlPersistenceHandler.class.getName())) {
 				Map<String, String> xmlParams = containerModel.getPersistenceHandlerParameterMap();
 				File configPath = runtimeConfig.getConfigPath();
-				xmlParams.put(XML_PARAM_BASE_PATH, configPath.getPath());
+				xmlParams.put(PARAM_BASE_PATH, configPath.getPath());
 			}
 
 			return new PrivilegeInitializer(getScheduledExecutor(getName())).initializeFromXml(containerModel);

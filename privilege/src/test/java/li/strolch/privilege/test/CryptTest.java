@@ -20,9 +20,9 @@ public class CryptTest {
 	@BeforeClass
 	public static void beforeClass() {
 		Map<String, String> parameterMap = new HashMap<>();
-		parameterMap.put(XML_PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
-		parameterMap.put(XML_PARAM_HASH_ITERATIONS, "" + DEFAULT_SMALL_ITERATIONS);
-		parameterMap.put(XML_PARAM_HASH_KEY_LENGTH, "" + DEFAULT_KEY_LENGTH);
+		parameterMap.put(PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
+		parameterMap.put(PARAM_HASH_ITERATIONS, "" + DEFAULT_SMALL_ITERATIONS);
+		parameterMap.put(PARAM_HASH_KEY_LENGTH, "" + DEFAULT_KEY_LENGTH);
 
 		encryptionHandler = new DefaultEncryptionHandler();
 		encryptionHandler.initialize(parameterMap);
@@ -41,7 +41,7 @@ public class CryptTest {
 		PasswordCrypt passwordCrypt = encryptionHandler.hashPassword(password, salt, "PBKDF2WithHmacSHA512", 100000,
 				256);
 
-		assertArrayEquals(passwordCrypt.getPassword(), parsedCryptHash.getPassword());
+		assertArrayEquals(passwordCrypt.password(), parsedCryptHash.password());
 	}
 
 	@Test
@@ -53,9 +53,9 @@ public class CryptTest {
 		assertNotNull(parsedCryptHash);
 
 		char[] password = "admin".toCharArray();
-		PasswordCrypt passwordCrypt = encryptionHandler.hashPassword(password, parsedCryptHash.getSalt(),
+		PasswordCrypt passwordCrypt = encryptionHandler.hashPassword(password, parsedCryptHash.salt(),
 				"PBKDF2WithHmacSHA512", 100000, 256);
 
-		assertArrayEquals(passwordCrypt.getPassword(), parsedCryptHash.getPassword());
+		assertArrayEquals(passwordCrypt.password(), parsedCryptHash.password());
 	}
 }

@@ -15,14 +15,16 @@
  */
 package li.strolch.privilege.model.internal;
 
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.model.Privilege;
+import li.strolch.privilege.model.PrivilegeRep;
+import li.strolch.privilege.model.RoleRep;
+import li.strolch.utils.dbc.DBC;
+
 import java.util.*;
 import java.util.Map.Entry;
 
-import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.model.IPrivilege;
-import li.strolch.privilege.model.PrivilegeRep;
-import li.strolch.privilege.model.RoleRep;
-import li.strolch.utils.helper.StringHelper;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * <p>
@@ -37,57 +39,34 @@ import li.strolch.utils.helper.StringHelper;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public final class Role {
+public record Role(String name, Map<String, Privilege> privilegeMap) {
 
-	private final String name;
-	private final Map<String, IPrivilege> privilegeMap;
-
-	/**
-	 * Default constructor
-	 *
-	 * @param name
-	 * 		the name of the role
-	 * @param privilegeMap
-	 * 		a map of {@link IPrivilege}s granted to this role
-	 */
-	public Role(String name, Map<String, IPrivilege> privilegeMap) {
-
-		if (StringHelper.isEmpty(name)) {
-			throw new PrivilegeException("No name defined!");
-		}
-		if (privilegeMap == null) {
-			throw new PrivilegeException("No privileges defined!");
-		}
-
+	public Role(String name, Map<String, Privilege> privilegeMap) {
+		DBC.PRE.assertNotEmpty("name must not be empty", name);
+		DBC.PRE.assertNotNull("privilegeMap must not be null", privilegeMap);
 		this.name = name;
-		this.privilegeMap = Collections.unmodifiableMap(privilegeMap);
+		this.privilegeMap = Map.copyOf(privilegeMap);
 	}
 
 	/**
 	 * Construct {@link Role} from its representation {@link RoleRep}
 	 *
-	 * @param roleRep
-	 * 		the representation from which to create the {@link Role}
+	 * @param roleRep the representation from which to create the {@link Role}
 	 */
-	public Role(RoleRep roleRep) {
-
+	public static Role of(RoleRep roleRep) {
 		String name = roleRep.getName();
-		if (StringHelper.isEmpty(name)) {
+		if (isEmpty(name))
 			throw new PrivilegeException("No name defined!");
-		}
-
-		if (roleRep.getPrivileges() == null) {
+		if (roleRep.getPrivileges() == null)
 			throw new PrivilegeException("Privileges may not be null!");
-		}
 
 		// build privileges from rep
-		Map<String, IPrivilege> privilegeMap = new HashMap<>(roleRep.getPrivileges().size());
+		Map<String, Privilege> privilegeMap = new HashMap<>(roleRep.getPrivileges().size());
 		for (PrivilegeRep privilege : roleRep.getPrivileges()) {
-			privilegeMap.put(privilege.getName(), new PrivilegeImpl(privilege));
+			privilegeMap.put(privilege.getName(), Privilege.of(privilege));
 		}
 
-		this.name = name;
-		this.privilegeMap = Collections.unmodifiableMap(privilegeMap);
+		return new Role(name, privilegeMap);
 	}
 
 	/**
@@ -98,30 +77,29 @@ public final class Role {
 	}
 
 	/**
-	 * Returns the {@link Set} of names for the currently stored {@link IPrivilege Privileges}
+	 * Returns the {@link Set} of names for the currently stored {@link Privilege Privileges}
 	 *
-	 * @return the {@link Set} of names for the currently stored {@link IPrivilege Privileges}
+	 * @return the {@link Set} of names for the currently stored {@link Privilege Privileges}
 	 */
 	public Set<String> getPrivilegeNames() {
 		return this.privilegeMap.keySet();
 	}
 
 	/**
-	 * Returns the {@link IPrivilege} for the given name, null if it does not exist
+	 * Returns the {@link Privilege} for the given name, null if it does not exist
 	 *
-	 * @return the {@link IPrivilege} for the given name, null if it does not exist
+	 * @return the {@link Privilege} for the given name, null if it does not exist
 	 */
-	public IPrivilege getPrivilege(String name) {
+	public Privilege getPrivilege(String name) {
 		return this.privilegeMap.get(name);
 	}
 
 	/**
-	 * Determines if this {@link Role} has the {@link IPrivilege} with the given name
+	 * Determines if this {@link Role} has the {@link Privilege} with the given name
 	 *
-	 * @param name
-	 * 		the name of the {@link IPrivilege}
+	 * @param name the name of the {@link Privilege}
 	 *
-	 * @return true if this {@link Role} has the {@link IPrivilege} with the given name
+	 * @return true if this {@link Role} has the {@link Privilege} with the given name
 	 */
 	public boolean hasPrivilege(String name) {
 		return this.privilegeMap.containsKey(name);
@@ -132,7 +110,7 @@ public final class Role {
 	 */
 	public RoleRep asRoleRep() {
 		List<PrivilegeRep> privileges = new ArrayList<>();
-		for (Entry<String, IPrivilege> entry : this.privilegeMap.entrySet()) {
+		for (Entry<String, Privilege> entry : this.privilegeMap.entrySet()) {
 			privileges.add(entry.getValue().asPrivilegeRep());
 		}
 		return new RoleRep(this.name, privileges);

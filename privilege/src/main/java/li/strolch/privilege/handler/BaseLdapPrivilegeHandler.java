@@ -1,5 +1,13 @@
 package li.strolch.privilege.handler;
 
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.internal.User;
+import li.strolch.privilege.model.internal.UserHistory;
+import li.strolch.privilege.policy.PrivilegePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -9,14 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
-
-import li.strolch.privilege.base.AccessDeniedException;
-import li.strolch.privilege.model.UserState;
-import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.model.internal.UserHistory;
-import li.strolch.privilege.policy.PrivilegePolicy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
@@ -135,12 +135,13 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		Set<String> ldapGroups = getLdapGroups(username, attrs);
 		logger.info("User " + username + " is member of the following LDAP groups: ");
 		ldapGroups.forEach(s -> logger.info("- " + s));
+		Set<String> strolchGroups = mapToStrolchGroups(username, ldapGroups);
 		Set<String> strolchRoles = mapToStrolchRoles(username, ldapGroups);
 
 		Map<String, String> properties = buildProperties(username, attrs, ldapGroups, strolchRoles);
 
-		return new User(username, username, null, firstName, lastName, UserState.REMOTE, strolchRoles, locale,
-				properties, false, new UserHistory());
+		return new User(username, username, null, firstName, lastName, UserState.REMOTE, strolchGroups, strolchRoles,
+				locale, properties, false, UserHistory.EMPTY);
 	}
 
 	protected abstract Map<String, String> buildProperties(String username, Attributes attrs, Set<String> ldapGroups,
@@ -167,6 +168,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	protected abstract Locale getLocale(Attributes attrs);
 
 	protected abstract Set<String> getLdapGroups(String username, Attributes attrs) throws NamingException;
+
+	protected abstract Set<String> mapToStrolchGroups(String username, Set<String> ldapGroups);
 
 	protected abstract Set<String> mapToStrolchRoles(String username, Set<String> ldapGroups);
 }

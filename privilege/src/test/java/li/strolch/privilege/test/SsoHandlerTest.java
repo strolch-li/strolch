@@ -17,7 +17,7 @@ public class SsoHandlerTest extends AbstractPrivilegeTest {
 	public static void init() {
 		removeConfigs(SsoHandlerTest.class.getSimpleName());
 		prepareConfigs(SsoHandlerTest.class.getSimpleName(), "PrivilegeConfig.xml", "PrivilegeUsers.xml",
-				"PrivilegeRoles.xml");
+				"PrivilegeGroups.xml", "PrivilegeRoles.xml");
 	}
 
 	@AfterClass
@@ -39,6 +39,7 @@ public class SsoHandlerTest extends AbstractPrivilegeTest {
 			data.put("username", "admin");
 			data.put("firstName", "Admin");
 			data.put("lastName", "Istrator");
+			data.put("groups", "AppUserLocationA");
 			data.put("roles", "PrivilegeAdmin, AppUser");
 
 			// auth

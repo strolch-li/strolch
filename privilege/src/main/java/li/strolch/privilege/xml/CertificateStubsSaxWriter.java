@@ -50,41 +50,41 @@ public class CertificateStubsSaxWriter {
 		Writer ioWriter = new OutputStreamWriter(this.outputStream, StandardCharsets.UTF_8);
 
 		IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
-		xmlWriter.writeStartElement(XML_ROOT_CERTIFICATES);
+		xmlWriter.writeStartElement(ROOT_CERTIFICATES);
 
 		List<Certificate> certificates = new ArrayList<>(this.certificates);
 		certificates.sort(comparing(Certificate::getSessionId));
 		for (Certificate cert : certificates) {
 
 			// create the certificate element
-			xmlWriter.writeStartElement(XML_CERTIFICATE);
+			xmlWriter.writeStartElement(CERTIFICATE);
 
 			// sessionId;
-			xmlWriter.writeAttribute(XML_ATTR_SESSION_ID, cert.getSessionId());
+			xmlWriter.writeAttribute(ATTR_SESSION_ID, cert.getSessionId());
 
 			// usage;
-			xmlWriter.writeAttribute(XML_ATTR_USAGE, cert.getUsage().name());
+			xmlWriter.writeAttribute(ATTR_USAGE, cert.getUsage().name());
 
 			// username;
-			xmlWriter.writeAttribute(XML_ATTR_USERNAME, cert.getUsername());
+			xmlWriter.writeAttribute(ATTR_USERNAME, cert.getUsername());
 
 			// authToken;
-			xmlWriter.writeAttribute(XML_ATTR_AUTH_TOKEN, cert.getAuthToken());
+			xmlWriter.writeAttribute(ATTR_AUTH_TOKEN, cert.getAuthToken());
 
 			// source;
-			xmlWriter.writeAttribute(XML_ATTR_SOURCE, cert.getSource());
+			xmlWriter.writeAttribute(ATTR_SOURCE, cert.getSource());
 
 			// locale;
-			xmlWriter.writeAttribute(XML_ATTR_LOCALE, cert.getLocale().toLanguageTag());
+			xmlWriter.writeAttribute(ATTR_LOCALE, cert.getLocale().toLanguageTag());
 
 			// loginTime;
-			xmlWriter.writeAttribute(XML_ATTR_LOGIN_TIME, ISO8601.toString(cert.getLoginTime()));
+			xmlWriter.writeAttribute(ATTR_LOGIN_TIME, ISO8601.toString(cert.getLoginTime()));
 
 			// lastAccess;
-			xmlWriter.writeAttribute(XML_ATTR_LAST_ACCESS, ISO8601.toString(cert.getLastAccess()));
+			xmlWriter.writeAttribute(ATTR_LAST_ACCESS, ISO8601.toString(cert.getLastAccess()));
 
 			// keepAlive;
-			xmlWriter.writeAttribute(XML_ATTR_KEEP_ALIVE, String.valueOf(cert.isKeepAlive()));
+			xmlWriter.writeAttribute(ATTR_KEEP_ALIVE, String.valueOf(cert.isKeepAlive()));
 		}
 
 		// and now end

@@ -15,12 +15,6 @@
  */
 package li.strolch.privilege.test;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
-
-import java.text.MessageFormat;
-import java.util.*;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.base.PrivilegeException;
@@ -41,9 +35,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
+import java.util.*;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.*;
+
 /**
  * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum.br />
- *
+ * <p>
  * TODO add more tests, especially with deny and allow lists
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -77,12 +77,12 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	public static void init() {
 		removeConfigs(PrivilegeTest.class.getSimpleName());
 		prepareConfigs(PrivilegeTest.class.getSimpleName(), "PrivilegeConfig.xml", "PrivilegeUsers.xml",
-				"PrivilegeRoles.xml");
+				"PrivilegeGroups.xml", "PrivilegeRoles.xml");
 	}
 
 	@AfterClass
 	public static void destroy() {
-		removeConfigs(PrivilegeTest.class.getSimpleName());
+		//removeConfigs(PrivilegeTest.class.getSimpleName());
 	}
 
 	@Before
@@ -209,7 +209,9 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			}
 		});
 		MatcherAssert.assertThat(exception.getMessage(), containsString(
-				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction with value li.strolch.privilege.test.model.TestSystemUserActionDeny needed for Restrictable li.strolch.privilege.test.model.TestSystemUserActionDeny"));
+				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction with value " +
+						"li.strolch.privilege.test.model.TestSystemUserActionDeny needed for Restrictable " +
+						"li.strolch.privilege.test.model.TestSystemUserActionDeny"));
 	}
 
 	/**
@@ -252,7 +254,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			assertNotEquals("Admin", user.getLastname());
 
 			// let's add a new user bob
-			UserRep userRep = new UserRep(null, ADMIN, "The", "Admin", null, null, null, null, null);
+			UserRep userRep = new UserRep(null, ADMIN, "The", "Admin", null, null, null, null, null, null);
 			this.privilegeHandler.updateUser(certificate, userRep);
 
 			user = this.privilegeHandler.getUser(certificate, ADMIN);
@@ -273,7 +275,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 				Certificate certificate = this.ctx.getCertificate();
 
 				// let's add a new user bob
-				UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null, null);
+				UserRep userRep = new UserRep(null, BOB, null, null, null, null, null, null, null, null);
 				this.privilegeHandler.updateUser(certificate, userRep);
 			} finally {
 				logout();
@@ -291,7 +293,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 				Certificate certificate = this.ctx.getCertificate();
 
 				// let's add a new user bob
-				UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null, null);
+				UserRep userRep = new UserRep(null, ADMIN, null, null, null, null, null, null, null, null);
 				this.privilegeHandler.updateUser(certificate, userRep);
 			} finally {
 				logout();
@@ -308,7 +310,24 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			Certificate certificate = this.ctx.getCertificate();
 
-			UserRep selectorRep = new UserRep(null, ADMIN, null, null, null, null, null, null, null);
+			UserRep selectorRep = new UserRep(null, ADMIN, null, null, null, null, null, null, null, null);
+			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
+			assertEquals(1, users.size());
+			assertEquals(ADMIN, users.get(0).getUsername());
+
+		} finally {
+			logout();
+		}
+	}
+
+	@Test
+	public void shouldQueryUsersByGroups() {
+		try {
+			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
+
+			Certificate certificate = this.ctx.getCertificate();
+
+			UserRep selectorRep = new UserRep(null, null, null, null, null, Set.of("GroupA"), null, null, null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
@@ -325,8 +344,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 			Certificate certificate = this.ctx.getCertificate();
 
-			UserRep selectorRep = new UserRep(null, null, null, null, null,
-					new HashSet<>(Collections.singletonList("PrivilegeAdmin")), null, null, null);
+			UserRep selectorRep = new UserRep(null, null, null, null, null, null, Set.of("PrivilegeAdmin"), null, null,
+					null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(2, users.size());
 			assertEquals(ADMIN, users.get(0).getUsername());
@@ -344,7 +363,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			Certificate certificate = this.ctx.getCertificate();
 
 			UserRep selectorRep = new UserRep(null, null, null, null, null,
-					new HashSet<>(Collections.singletonList(ROLE_TEMP)), null, null, null);
+					new HashSet<>(Collections.singletonList(ROLE_TEMP)), null, null, null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(0, users.size());
 
@@ -593,7 +612,10 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			this.ctx.validateAction(restrictable);
 			fail("Should fail as bob does not have role app");
 		} catch (AccessDeniedException e) {
-			String msg = "User bob does not have the privilege li.strolch.privilege.test.model.TestRestrictable needed for Restrictable li.strolch.privilege.test.model.TestRestrictable and value li.strolch.privilege.test.model.TestRestrictable";
+			String msg =
+					"User bob does not have the privilege li.strolch.privilege.test.model.TestRestrictable needed for " +
+							"Restrictable li.strolch.privilege.test.model.TestRestrictable and value " +
+							"li.strolch.privilege.test.model.TestRestrictable";
 			assertEquals(msg, e.getLocalizedMessage());
 		} finally {
 			logout();
@@ -656,7 +678,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// let's add a new user ted
 			HashSet<String> roles = new HashSet<>();
 			roles.add(ROLE_USER);
-			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, roles, null, new HashMap<>(), null);
+			userRep = new UserRep(null, TED, "Ted", "Newman", UserState.ENABLED, Set.of(), roles, null, new HashMap<>(),
+					null);
 			Certificate certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + TED);
@@ -688,14 +711,14 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// auth as Bob
 			login(BOB, ArraysHelper.copyOf(PASS_BOB));
 			// let's add a new user Ted
-			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, new HashSet<>(), null,
+			userRep = new UserRep("1", TED, "Ted", "And then Some", UserState.NEW, Set.of(), Set.of(), null,
 					new HashMap<>(), null);
 			certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
 		} catch (PrivilegeException e) {
-			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"),
-					BOB, PrivilegeHandler.PRIVILEGE_ADD_USER);
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), BOB,
+					PrivilegeHandler.PRIVILEGE_ADD_USER);
 			assertEquals(msg, e.getMessage());
 		} finally {
 			logout();
@@ -768,8 +791,8 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
 			// let's add a new user bob
-			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW,
-					new HashSet<>(Collections.singletonList(ROLE_MY)), null, new HashMap<>(), null);
+			UserRep userRep = new UserRep(null, BOB, "Bob", "Newman", UserState.NEW, Set.of(), Set.of(ROLE_MY), null,
+					new HashMap<>(), null);
 			Certificate certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			logger.info("Added user " + BOB);

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Groups>
+    <Group name="GroupA1">
+        <Roles>
+            <Role>RoleA1</Role>
+        </Roles>
+        <Properties>
+            <Property name="location" value="LocationA1"/>
+        </Properties>
+    </Group>
+    <Group name="GroupA2">
+        <Roles>
+            <Role>RoleA2</Role>
+        </Roles>
+        <Properties>
+            <Property name="location" value="LocationA2"/>
+        </Properties>
+    </Group>
+
+    <Group name="GroupB1">
+        <Roles>
+            <Role>RoleB1</Role>
+        </Roles>
+        <Properties>
+            <Property name="location" value="LocationB1"/>
+        </Properties>
+    </Group>
+
+    <Group name="GroupB2">
+        <Roles>
+            <Role>RoleB2</Role>
+        </Roles>
+        <Properties>
+            <Property name="location" value="LocationB2"/>
+        </Properties>
+    </Group>
+</Groups>

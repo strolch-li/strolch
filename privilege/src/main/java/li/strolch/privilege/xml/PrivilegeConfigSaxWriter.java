@@ -46,41 +46,41 @@ public class PrivilegeConfigSaxWriter {
 		try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.configFile), StandardCharsets.UTF_8)) {
 
 			IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
-			xmlWriter.writeStartElement(XML_ROOT_PRIVILEGE);
+			xmlWriter.writeStartElement(ROOT_PRIVILEGE);
 
 			// write container element
-			xmlWriter.writeStartElement(XML_CONTAINER);
-			writeStringMapElement(xmlWriter, this.containerModel.getParameterMap(), XML_PARAMETERS, XML_PARAMETER);
+			xmlWriter.writeStartElement(CONTAINER);
+			writeStringMapElement(xmlWriter, this.containerModel.getParameterMap(), PARAMETERS, PARAMETER);
 
 			{
 				// write PrivilegeHandler
 				if (this.containerModel.getPrivilegeHandlerClassName() != null)
-					writeHandler(xmlWriter, XML_HANDLER_PRIVILEGE, this.containerModel.getPrivilegeHandlerClassName(),
+					writeHandler(xmlWriter, HANDLER_PRIVILEGE, this.containerModel.getPrivilegeHandlerClassName(),
 							this.containerModel.getPrivilegeHandlerParameterMap());
 
 				// write EncryptionHandler
-				writeHandler(xmlWriter, XML_HANDLER_ENCRYPTION, this.containerModel.getEncryptionHandlerClassName(),
+				writeHandler(xmlWriter, HANDLER_ENCRYPTION, this.containerModel.getEncryptionHandlerClassName(),
 						this.containerModel.getEncryptionHandlerParameterMap());
 
 				// write PersistenceHandler
-				writeHandler(xmlWriter, XML_HANDLER_PERSISTENCE, this.containerModel.getPersistenceHandlerClassName(),
+				writeHandler(xmlWriter, HANDLER_PERSISTENCE, this.containerModel.getPersistenceHandlerClassName(),
 						this.containerModel.getPersistenceHandlerParameterMap());
 
 				// write PasswordStrengthHandler
 				if (this.containerModel.getPasswordStrengthHandlerClassName() != null)
-					writeHandler(xmlWriter, XML_HANDLER_PASSWORD_STRENGTH,
+					writeHandler(xmlWriter, HANDLER_PASSWORD_STRENGTH,
 							this.containerModel.getPasswordStrengthHandlerClassName(),
 							this.containerModel.getPasswordStrengthHandlerParameterMap());
 
 				// write UserChallengeHandler
 				if (this.containerModel.getUserChallengeHandlerClassName() != null)
-					writeHandler(xmlWriter, XML_HANDLER_USER_CHALLENGE,
+					writeHandler(xmlWriter, HANDLER_USER_CHALLENGE,
 							this.containerModel.getUserChallengeHandlerClassName(),
 							this.containerModel.getUserChallengeHandlerParameterMap());
 
 				// write SingleSignOnHandler
 				if (this.containerModel.getSsoHandlerClassName() != null)
-					writeHandler(xmlWriter, XML_HANDLER_SSO, this.containerModel.getSsoHandlerClassName(),
+					writeHandler(xmlWriter, HANDLER_SSO, this.containerModel.getSsoHandlerClassName(),
 							this.containerModel.getSsoHandlerParameterMap());
 			}
 
@@ -89,7 +89,7 @@ public class PrivilegeConfigSaxWriter {
 			// Policies
 			Map<String, String> policies = new HashMap<>();
 			this.containerModel.getPolicies().forEach((key, value) -> policies.put(key, value.getName()));
-			writeStringMapElement(xmlWriter, policies, XML_POLICIES, XML_POLICY, XML_ATTR_CLASS);
+			writeStringMapElement(xmlWriter, policies, POLICIES, POLICY, ATTR_CLASS);
 
 			// and now end
 			xmlWriter.writeEndDocument();
@@ -103,9 +103,9 @@ public class PrivilegeConfigSaxWriter {
 			xmlWriter.writeEmptyElement(handleName);
 		else
 			xmlWriter.writeStartElement(handleName);
-		xmlWriter.writeAttribute(XML_ATTR_CLASS, className);
+		xmlWriter.writeAttribute(ATTR_CLASS, className);
 
-		writeStringMapElement(xmlWriter, parameters, XML_PARAMETERS, XML_PARAMETER);
+		writeStringMapElement(xmlWriter, parameters, PARAMETERS, PARAMETER);
 
 		if (!parameters.isEmpty())
 			xmlWriter.writeEndElement();

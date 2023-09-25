@@ -18,7 +18,7 @@ public class XmlHelper {
 
 	public static void writeStringMapElement(XMLStreamWriter xmlWriter, Map<String, String> parameterMap,
 			String elementName, String valueElementName) throws XMLStreamException {
-		writeStringMapElement(xmlWriter, parameterMap, elementName, valueElementName, XML_ATTR_VALUE);
+		writeStringMapElement(xmlWriter, parameterMap, elementName, valueElementName, ATTR_VALUE);
 	}
 
 	public static void writeStringMapElement(XMLStreamWriter xmlWriter, Map<String, String> parameterMap,
@@ -32,7 +32,7 @@ public class XmlHelper {
 		propertyKeys.sort(null);
 		for (String propertyKey : propertyKeys) {
 			xmlWriter.writeEmptyElement(valueElementName);
-			xmlWriter.writeAttribute(XML_ATTR_NAME, propertyKey);
+			xmlWriter.writeAttribute(ATTR_NAME, propertyKey);
 			xmlWriter.writeAttribute(valueAttrName, parameterMap.get(propertyKey));
 		}
 

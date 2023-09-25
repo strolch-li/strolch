@@ -33,7 +33,7 @@ import li.strolch.job.StrolchJob;
 import li.strolch.job.StrolchJobsHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -76,7 +76,7 @@ public class StrolchJobsResource {
 						if (ctx.hasRole(ROLE_STROLCH_ADMIN))
 							return true;
 
-						IPrivilege privilege = ctx.getPrivilege(StrolchJob.class.getName());
+						Privilege privilege = ctx.getPrivilege(StrolchJob.class.getName());
 						return privilege.isAllAllowed() || privilege.getAllowList().contains(job.getClass().getName());
 					}) //
 					.sorted(comparing(StrolchJob::getName)) //

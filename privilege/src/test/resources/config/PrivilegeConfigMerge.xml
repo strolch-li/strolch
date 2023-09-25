@@ -27,6 +27,7 @@
             <Parameters>
                 <Parameter name="basePath" value="target/${target}"/>
                 <Parameter name="usersXmlFile" value="PrivilegeUsersMerge.xml"/>
+                <Parameter name="groupsXmlFile" value="PrivilegeGroupsMerge.xml"/>
                 <Parameter name="rolesXmlFile" value="PrivilegeRolesMerge.xml"/>
             </Parameters>
         </PersistenceHandler>

@@ -17,12 +17,10 @@ package li.strolch.privilege.handler;
 
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
+import li.strolch.privilege.model.internal.Group;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.xml.PrivilegeRolesSaxReader;
-import li.strolch.privilege.xml.PrivilegeRolesSaxWriter;
-import li.strolch.privilege.xml.PrivilegeUsersSaxReader;
-import li.strolch.privilege.xml.PrivilegeUsersSaxWriter;
+import li.strolch.privilege.xml.*;
 import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,20 +52,24 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	protected static final Logger logger = LoggerFactory.getLogger(XmlPersistenceHandler.class);
 
 	private final Map<String, User> userMap;
+	private final Map<String, Group> groupMap;
 	private final Map<String, Role> roleMap;
 
 	private boolean userMapDirty;
+	private boolean groupMapDirty;
 	private boolean roleMapDirty;
 
 	private Map<String, String> parameterMap;
 
 	private File usersPath;
+	private File groupsPath;
 	private File rolesPath;
 
 	private boolean caseInsensitiveUsername;
 
 	public XmlPersistenceHandler() {
 		this.roleMap = new ConcurrentHashMap<>();
+		this.groupMap = new ConcurrentHashMap<>();
 		this.userMap = new ConcurrentHashMap<>();
 	}
 
@@ -84,6 +86,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
+	public List<Group> getAllGroups() {
+		synchronized (this.groupMap) {
+			return new LinkedList<>(this.groupMap.values());
+		}
+	}
+
+	@Override
 	public List<Role> getAllRoles() {
 		synchronized (this.roleMap) {
 			return new LinkedList<>(this.roleMap.values());
@@ -96,6 +105,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
+	public Group getGroup(String groupName) {
+		return this.groupMap.get(groupName);
+	}
+
+	@Override
 	public Role getRole(String roleName) {
 		return this.roleMap.get(roleName);
 	}
@@ -105,6 +119,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		User user = this.userMap.remove(this.caseInsensitiveUsername ? username.toLowerCase() : username);
 		this.userMapDirty = user != null;
 		return user;
+	}
+
+	@Override
+	public Group removeGroup(String groupName) {
+		Group group = this.groupMap.remove(groupName);
+		this.groupMapDirty = group != null;
+		return group;
 	}
 
 	@Override
@@ -134,6 +155,23 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
+	public void addGroup(Group group) {
+		if (this.groupMap.containsKey(group.name()))
+			throw new IllegalStateException(format("The group {0} already exists!", group.name()));
+		this.groupMap.put(group.name(), group);
+		this.groupMapDirty = true;
+	}
+
+	@Override
+	public void replaceGroup(Group group) {
+		if (!this.groupMap.containsKey(group.name()))
+			throw new IllegalStateException(
+					format("The group {0} can not be replaced as it does not exist!", group.name()));
+		this.groupMap.put(group.name(), group);
+		this.groupMapDirty = true;
+	}
+
+	@Override
 	public void addRole(Role role) {
 		if (this.roleMap.containsKey(role.getName()))
 			throw new IllegalStateException(format("The role {0} already exists!", role.getName()));
@@ -153,9 +191,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	/**
 	 * Initializes this {@link XmlPersistenceHandler} by reading the following parameters:
 	 * <ul>
-	 * <li>{@link XmlConstants#XML_PARAM_BASE_PATH}</li>
-	 * <li>{@link XmlConstants#XML_PARAM_USERS_FILE}</li>
-	 * <li>{@link XmlConstants#XML_PARAM_ROLES_FILE}</li>
+	 * <li>{@link XmlConstants#PARAM_BASE_PATH}</li>
+	 * <li>{@link XmlConstants#PARAM_USERS_FILE}</li>
+	 * <li>{@link XmlConstants#PARAM_GROUPS_FILE}</li>
+	 * <li>{@link XmlConstants#PARAM_ROLES_FILE}</li>
 	 * </ul>
 	 */
 	@Override
@@ -163,22 +202,21 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.parameterMap = Map.copyOf(paramsMap);
 
 		// get and validate base bath
-		String basePath = this.parameterMap.get(XML_PARAM_BASE_PATH);
+		String basePath = this.parameterMap.get(PARAM_BASE_PATH);
 		File basePathF = new File(basePath);
 		if (!basePathF.exists() && !basePathF.isDirectory()) {
 			String msg = "[{0}] Defined parameter {1} does not point to a valid path at {2}";
-			msg = format(msg, PersistenceHandler.class.getName(), XML_PARAM_BASE_PATH, basePathF.getAbsolutePath());
+			msg = format(msg, PersistenceHandler.class.getName(), PARAM_BASE_PATH, basePathF.getAbsolutePath());
 			throw new PrivilegeException(msg);
 		}
 
-		// get users file path
-		File usersPath = getFile(basePath, XML_PARAM_USERS_FILE, XML_PARAM_USERS_FILE_DEF);
-
-		// get roles file path
-		File rolesPath = getFile(basePath, XML_PARAM_ROLES_FILE, XML_PARAM_ROLES_FILE_DEF);
+		File usersPath = getFile(basePath, PARAM_USERS_FILE, PARAM_USERS_FILE_DEF, true);
+		File groupsPath = getFile(basePath, PARAM_GROUPS_FILE, PARAM_GROUPS_FILE_DEF, false);
+		File rolesPath = getFile(basePath, PARAM_ROLES_FILE, PARAM_ROLES_FILE_DEF, true);
 
 		// save path to model
 		this.usersPath = usersPath;
+		this.groupsPath = groupsPath;
 		this.rolesPath = rolesPath;
 
 		this.caseInsensitiveUsername = !this.parameterMap.containsKey(PARAM_CASE_INSENSITIVE_USERNAME) ||
@@ -188,7 +226,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			logger.info("Privilege Data loaded.");
 	}
 
-	private File getFile(String basePath, String param, String defaultValue) {
+	private File getFile(String basePath, String param, String defaultValue, boolean required) {
 		String fileName = this.parameterMap.get(param);
 		if (isEmpty(fileName)) {
 			fileName = defaultValue;
@@ -199,7 +237,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		String path = basePath + "/" + fileName;
 		File file = new File(path);
-		if (!file.exists()) {
+		if (required && !file.exists()) {
 			String msg = "[{0}] Defined parameter {1} is invalid as file does not exist at path {2}";
 			msg = format(msg, PersistenceHandler.class.getName(), param, file.getAbsolutePath());
 			throw new PrivilegeException(msg);
@@ -221,6 +259,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader(this.caseInsensitiveUsername);
 		XmlHelper.parseDocument(this.usersPath, usersXmlHandler);
 
+		PrivilegeGroupsSaxReader groupsXmlHandler = new PrivilegeGroupsSaxReader();
+		if (this.groupsPath.exists())
+			XmlHelper.parseDocument(this.groupsPath, groupsXmlHandler);
+
 		PrivilegeRolesSaxReader rolesXmlHandler = new PrivilegeRolesSaxReader();
 		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler);
 
@@ -230,6 +272,12 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			this.roleMap.putAll(rolesXmlHandler.getRoles());
 		}
 
+		// GROUPS
+		synchronized (this.groupMap) {
+			this.groupMap.clear();
+			this.groupMap.putAll(groupsXmlHandler.getGroups());
+		}
+
 		// USERS
 		synchronized (this.userMap) {
 			this.userMap.clear();
@@ -237,19 +285,38 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		this.userMapDirty = false;
+		this.groupMapDirty = false;
 		this.roleMapDirty = false;
 
 		logger.info(format("Read {0} Users", this.userMap.size()));
+		logger.info(format("Read {0} Groups", this.groupMap.size()));
 		logger.info(format("Read {0} Roles", this.roleMap.size()));
 
-		// validate referenced roles exist
+		// validate referenced elements exist
 		for (User user : this.userMap.values()) {
 			for (String roleName : user.getRoles()) {
-
 				// validate that role exists
 				if (getRole(roleName) == null) {
 					logger.error(
 							format("Role {0} does not exist referenced by user {1}", roleName, user.getUsername()));
+				}
+			}
+
+			for (String groupName : user.getGroups()) {
+				// validate that group exists
+				if (getGroup(groupName) == null) {
+					logger.error(
+							format("Group {0} does not exist referenced by user {1}", groupName, user.getUsername()));
+				}
+			}
+		}
+
+		// validate referenced roles exist on groups
+		for (Group group : this.groupMap.values()) {
+			for (String roleName : group.roles()) {
+				// validate that role exists
+				if (getRole(roleName) == null) {
+					logger.error(format("Role {0} does not exist referenced by group {1}", roleName, group.name()));
 				}
 			}
 		}
@@ -267,20 +334,21 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		// write users file
 		if (this.userMapDirty) {
-			// delegate writing
-			PrivilegeUsersSaxWriter modelWriter = new PrivilegeUsersSaxWriter(getAllUsers(), this.usersPath);
-			modelWriter.write();
-
+			new PrivilegeUsersSaxWriter(getAllUsers(), this.usersPath).write();
 			this.userMapDirty = false;
+			saved = true;
+		}
+
+		// write groups file
+		if (this.groupMapDirty) {
+			new PrivilegeGroupsSaxWriter(getAllGroups(), this.groupsPath).write();
+			this.groupMapDirty = false;
 			saved = true;
 		}
 
 		// write roles file
 		if (this.roleMapDirty) {
-			// delegate writing
-			PrivilegeRolesSaxWriter modelWriter = new PrivilegeRolesSaxWriter(getAllRoles(), this.rolesPath);
-			modelWriter.write();
-
+			new PrivilegeRolesSaxWriter(getAllRoles(), this.rolesPath).write();
 			this.roleMapDirty = false;
 			saved = true;
 		}

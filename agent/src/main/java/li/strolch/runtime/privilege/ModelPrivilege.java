@@ -9,7 +9,7 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.Role;
@@ -20,10 +20,10 @@ public class ModelPrivilege implements PrivilegePolicy {
 	/**
 	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege
 	 *
-	 * @see li.strolch.privilege.policy.PrivilegePolicy#validateAction(PrivilegeContext, IPrivilege, Restrictable)
+	 * @see li.strolch.privilege.policy.PrivilegePolicy#validateAction(PrivilegeContext, Privilege, Restrictable)
 	 */
 	@Override
-	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+	public void validateAction(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable)
 			throws AccessDeniedException {
 		validateAction(ctx, privilege, restrictable, true);
 	}
@@ -31,15 +31,15 @@ public class ModelPrivilege implements PrivilegePolicy {
 	/**
 	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege
 	 *
-	 * @see li.strolch.privilege.policy.PrivilegePolicy#validateAction(PrivilegeContext, IPrivilege, Restrictable)
+	 * @see li.strolch.privilege.policy.PrivilegePolicy#validateAction(PrivilegeContext, Privilege, Restrictable)
 	 */
 	@Override
-	public boolean hasPrivilege(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+	public boolean hasPrivilege(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable)
 			throws PrivilegeException {
 		return validateAction(ctx, privilege, restrictable, false);
 	}
 
-	protected boolean validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+	protected boolean validateAction(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable,
 			boolean assertHasPrivilege) throws AccessDeniedException {
 
 		preValidate(privilege, restrictable);
