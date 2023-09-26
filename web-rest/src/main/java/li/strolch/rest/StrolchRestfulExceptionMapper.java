@@ -43,13 +43,13 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 		if (ex instanceof NotFoundException)
 			return ResponseUtil.toResponse(Status.NOT_FOUND, ex);
 
-		if (ex instanceof StrolchAccessDeniedException e)
-			return ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
-
 		if (ex instanceof StrolchNotAuthenticatedException e) {
 			logger.error("User tried to access resource, but was not authenticated: " + ex.getMessage());
 			return Response.status(Status.UNAUTHORIZED).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
 		}
+
+		if (ex instanceof StrolchAccessDeniedException e)
+			return ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
 
 		return ResponseUtil.toResponse(ex);
 	}
