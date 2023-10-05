@@ -292,7 +292,7 @@ public class XmlTest {
 		// PrivilegeAdmin
 		Role privilegeAdmin = findRole("PrivilegeAdmin", roles);
 		assertEquals("PrivilegeAdmin", privilegeAdmin.getName());
-		assertEquals(18, privilegeAdmin.getPrivilegeNames().size());
+		assertEquals(16, privilegeAdmin.getPrivilegeNames().size());
 		Privilege privilegeAction = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_ACTION);
 		assertFalse(privilegeAction.isAllAllowed());
 		assertEquals(5, privilegeAction.getAllowList().size());
@@ -304,11 +304,10 @@ public class XmlTest {
 		assertEquals(0, privilegeAddRole.getAllowList().size());
 		assertEquals(0, privilegeAddRole.getDenyList().size());
 
-		Privilege privilegeRemRoleFromUser = privilegeAdmin.getPrivilege(
-				PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER);
-		assertTrue(privilegeRemRoleFromUser.isAllAllowed());
-		assertEquals(0, privilegeRemRoleFromUser.getAllowList().size());
-		assertEquals(0, privilegeRemRoleFromUser.getDenyList().size());
+		Privilege privilegeRemRole = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_REMOVE_ROLE);
+		assertTrue(privilegeRemRole.isAllAllowed());
+		assertEquals(0, privilegeRemRole.getAllowList().size());
+		assertEquals(0, privilegeRemRole.getDenyList().size());
 
 		// AppUser
 		Role appUser = findRole("AppUser", roles);
