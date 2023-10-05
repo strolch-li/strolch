@@ -42,7 +42,8 @@
 			<api>li.strolch.runtime.sessions.StrolchSessionHandler</api>
 			<impl>li.strolch.runtime.sessions.DefaultStrolchSessionHandler</impl>
 			<Properties>
-				<session.ttl.minutes>1</session.ttl.minutes>
+				<session.ttl.minutes>1440</session.ttl.minutes>
+				<session.maxKeepAlive.minutes>10080</session.maxKeepAlive.minutes>
 			</Properties>
 		</Component>
 		<Component>
