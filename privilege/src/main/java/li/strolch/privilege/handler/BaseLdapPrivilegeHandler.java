@@ -40,12 +40,21 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 				userChallengeHandler, ssoHandler, policyMap);
 
 		this.providerUrl = parameterMap.get("providerUrl");
+		logger.info("providerUrl: " + this.providerUrl);
 		this.searchBase = parameterMap.get("searchBase");
+		logger.info("searchBase: " + this.searchBase);
 		this.additionalFilter = trimOrEmpty(parameterMap.get("additionalFilter"));
+		if (isNotEmpty(this.additionalFilter))
+			logger.info("additionalFilter: " + this.additionalFilter);
 		this.domain = parameterMap.get("domain");
-		if (isNotEmpty(this.domain) && this.domain.startsWith("@")) {
-			logger.warn("Remove the @ symbol from the domain property! Added automatically.");
-			this.domain = this.domain.substring(1);
+		if (isNotEmpty(this.domain)) {
+			if (this.domain.startsWith("@")) {
+				logger.warn(
+						"Remove the @ symbol from the domain property! Will be added automatically where required.");
+				this.domain = this.domain.substring(1);
+			}
+
+			logger.info("domain: " + this.domain);
 		}
 	}
 
@@ -70,7 +79,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		env.put(Context.SECURITY_PRINCIPAL, userPrincipalName);
 		env.put(Context.SECURITY_CREDENTIALS, new String(password));
 
-		logger.info("User {} tries to login on ldap {}", username + this.domain, this.providerUrl);
+		logger.info("User {} tries to login on ldap {}", username, this.providerUrl);
 
 		// Create the initial context
 		DirContext ctx = null;
@@ -105,7 +114,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			SearchResult searchResult = answer.next();
 			if (answer.hasMore())
 				throw new AccessDeniedException(
-						"Could not login with user: " + username + this.domain + " on Ldap: Multiple LDAP Data");
+						"Could not login with user: " + username + " on Ldap: Multiple LDAP Data");
 
 			User user = buildUserFromSearchResult(username, searchResult);
 
