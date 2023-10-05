@@ -15,19 +15,6 @@
  */
 package li.strolch.runtime.sessions;
 
-import static java.util.function.Function.identity;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INVALIDATE_SESSION;
-
-import java.text.MessageFormat;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchNotAuthenticatedException;
@@ -43,6 +30,19 @@ import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static java.util.function.Function.identity;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INVALIDATE_SESSION;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -50,12 +50,10 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	public static final String PARAM_SESSION_TTL_MINUTES = "session.ttl.minutes";
 	public static final String PARAM_SESSION_MAX_KEEP_ALIVE_MINUTES = "session.maxKeepAlive.minutes";
-	public static final String PARAM_SESSION_RELOAD_SESSIONS = "session.reload";
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultStrolchSessionHandler.class);
 	private PrivilegeHandler privilegeHandler;
 	private final Map<String, Certificate> certificateMap;
-	private boolean reloadSessions;
 	private int sessionTtlMinutes;
 	private int maxKeepAliveMinutes;
 
@@ -73,6 +71,29 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	@Override
+	public void refreshSessions() {
+		Map<String, Certificate> certificates;
+		try {
+			certificates = runAsAgentWithResult(ctx -> {
+				Certificate cert = ctx.getCertificate();
+				return this.privilegeHandler.getPrivilegeHandler().getCertificates(cert).stream()
+						.filter(c -> !c.getUserState().isSystem())
+						.collect(Collectors.toMap(Certificate::getAuthToken, identity()));
+			});
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to refresh sessions!", e);
+		}
+
+		synchronized (this.certificateMap) {
+			this.certificateMap.clear();
+			this.certificateMap.putAll(certificates);
+		}
+		checkSessionsForTimeout();
+		logger.info("Restored " + certificates.size() + " sessions of which " +
+				(certificates.size() - this.certificateMap.size()) + " had timed out and were removed.");
+	}
+
+	@Override
 	public int getSessionMaxKeepAliveMinutes() {
 		return this.maxKeepAliveMinutes;
 	}
@@ -87,30 +108,14 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		this.sessionTtlMinutes = configuration.getInt(PARAM_SESSION_TTL_MINUTES, 30);
 		this.maxKeepAliveMinutes = configuration.getInt(PARAM_SESSION_MAX_KEEP_ALIVE_MINUTES,
 				Math.max(this.sessionTtlMinutes, 30));
-		this.reloadSessions = configuration.getBoolean(PARAM_SESSION_RELOAD_SESSIONS, false);
 		super.initialize(configuration);
 	}
 
 	@Override
 	public void start() throws Exception {
 		this.privilegeHandler = getContainer().getComponent(PrivilegeHandler.class);
-		this.certificateMap.clear();
 
-		if (this.reloadSessions) {
-			Map<String, Certificate> certificates = runAsAgentWithResult(ctx -> {
-				Certificate cert = ctx.getCertificate();
-				return this.privilegeHandler.getPrivilegeHandler()
-						.getCertificates(cert)
-						.stream()
-						.filter(c -> !c.getUserState().isSystem())
-						.collect(Collectors.toMap(Certificate::getAuthToken, identity()));
-			});
-			this.certificateMap.putAll(certificates);
-
-			checkSessionsForTimeout();
-			logger.info("Restored " + certificates.size() + " sessions of which " + (certificates.size()
-					- this.certificateMap.size()) + " had timed out and were removed.");
-		}
+		refreshSessions();
 
 		this.validateSessionsTask = getScheduledExecutor("SessionHandler").scheduleWithFixedDelay(
 				this::checkSessionsForTimeout, 5, 1, TimeUnit.MINUTES);
@@ -123,27 +128,6 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		if (this.validateSessionsTask != null)
 			this.validateSessionsTask.cancel(true);
-
-		if (this.reloadSessions) {
-
-			if (this.privilegeHandler != null)
-				persistSessions();
-
-		} else {
-			Map<String, Certificate> certificateMap;
-			synchronized (this.certificateMap) {
-				certificateMap = new HashMap<>(this.certificateMap);
-				this.certificateMap.clear();
-			}
-			for (Certificate certificate : certificateMap.values()) {
-				try {
-					this.privilegeHandler.invalidate(certificate);
-				} catch (Exception e) {
-					logger.error("Failed to invalidate certificate " + certificate, e);
-				}
-			}
-
-		}
 
 		this.privilegeHandler = null;
 		super.stop();

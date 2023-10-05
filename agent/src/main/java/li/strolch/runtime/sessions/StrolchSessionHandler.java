@@ -34,6 +34,11 @@ import li.strolch.privilege.model.Usage;
 public interface StrolchSessionHandler {
 
 	/**
+	 * Refreshes the sessions from the {@link li.strolch.runtime.privilege.PrivilegeHandler}
+	 */
+	void refreshSessions();
+
+	/**
 	 * Returns the time to live for a session in minutes
 	 *
 	 * @return the time to live for a session in minutes
