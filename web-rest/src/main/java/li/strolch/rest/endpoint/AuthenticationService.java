@@ -41,7 +41,7 @@ import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.rest.StrolchSessionHandler;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.helper.ExceptionHelper;

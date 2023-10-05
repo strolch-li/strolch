@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest.model;
+package li.strolch.runtime.sessions;
 
 import java.time.ZonedDateTime;
 import java.util.Locale;

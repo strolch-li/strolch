@@ -7,6 +7,7 @@ import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
@@ -36,6 +37,8 @@ public class PrivilegeRemoveUserCommand extends Command {
 		privilegeHandler.removeUser(tx().getCertificate(), this.username);
 		if (privilegeHandler.isPersistOnUserDataChanged())
 			privilegeHandler.persist(tx().getCertificate());
+
+		getComponent(StrolchSessionHandler.class).invalidate(tx().getCertificate());
 
 		Audit audit = tx().auditFrom(AccessType.DELETE, PRIVILEGE, USER, this.username);
 		tx().getAuditTrail().add(tx(), audit);

@@ -33,7 +33,7 @@ import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.StrolchSessionHandler;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.SearchResult;
 import li.strolch.search.ValueSearch;

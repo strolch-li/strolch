@@ -25,6 +25,7 @@ import li.strolch.rest.filters.AccessControlResponseFilter;
 import li.strolch.rest.filters.HttpCacheResponseFilter;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.utils.dbc.DBC;
 

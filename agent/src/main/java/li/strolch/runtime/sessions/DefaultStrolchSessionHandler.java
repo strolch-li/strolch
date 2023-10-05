@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest;
+package li.strolch.runtime.sessions;
 
 import static java.util.function.Function.identity;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
@@ -21,7 +21,6 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIV
 
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -38,7 +37,6 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.privilege.model.Usage;
-import li.strolch.rest.model.UserSession;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
@@ -321,8 +319,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 	}
 
 	private void checkSessionsForTimeout() {
-		ZonedDateTime maxKeepAliveTime = ZonedDateTime.now().minus(this.maxKeepAliveMinutes, ChronoUnit.MINUTES);
-		ZonedDateTime timeOutTime = ZonedDateTime.now().minus(this.sessionTtlMinutes, ChronoUnit.MINUTES);
+		ZonedDateTime maxKeepAliveTime = ZonedDateTime.now().minusMinutes(this.maxKeepAliveMinutes);
+		ZonedDateTime timeOutTime = ZonedDateTime.now().minusMinutes(this.sessionTtlMinutes);
 
 		Map<String, Certificate> certificateMap = getCertificateMapCopy();
 		for (Certificate certificate : certificateMap.values()) {
