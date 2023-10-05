@@ -10,7 +10,6 @@ import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.collections.Tuple;
-import li.strolch.utils.helper.StringHelper;
 
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
@@ -19,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
+import static li.strolch.utils.helper.StringHelper.*;
 
 public class PrivilegeCrudHandler {
 
@@ -146,16 +146,16 @@ public class PrivilegeCrudHandler {
 			boolean propertySelected;
 
 			// userId
-			userIdSelected = StringHelper.isEmpty(selUserId) || selUserId.equals(user.getUserId());
+			userIdSelected = isEmpty(selUserId) || selUserId.equals(user.getUserId());
 
 			// username
-			usernameSelected = StringHelper.isEmpty(selUsername) || selUsername.equals(user.getUsername());
+			usernameSelected = isEmpty(selUsername) || selUsername.equals(user.getUsername());
 
 			// firstname
-			firstNameSelected = StringHelper.isEmpty(selFirstName) || selFirstName.equals(user.getFirstname());
+			firstNameSelected = isEmpty(selFirstName) || selFirstName.equals(user.getFirstname());
 
 			// lastname
-			lastNameSelected = StringHelper.isEmpty(selLastName) || selLastName.equals(user.getLastname());
+			lastNameSelected = isEmpty(selLastName) || selLastName.equals(user.getLastname());
 
 			// user state
 			userStateSelected = selUserState == null || selUserState.equals(user.getUserState());
@@ -248,13 +248,13 @@ public class PrivilegeCrudHandler {
 			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_USER);
 
 			// make sure userId is not set
-			if (StringHelper.isNotEmpty(userRepParam.getUserId()))
+			if (isNotEmpty(userRepParam.getUserId()))
 				throw new PrivilegeModelException("UserId can not be set when adding a new user!");
 
 			UserRep userRep = userRepParam.getCopy();
 
 			// set userId
-			userRep.setUserId(StringHelper.getUniqueId());
+			userRep.setUserId(getUniqueId());
 
 			// first validate user
 			userRep.validate();
@@ -327,11 +327,11 @@ public class PrivilegeCrudHandler {
 				// add user
 
 				// make sure userId is not set
-				if (StringHelper.isNotEmpty(userRep.getUserId()))
+				if (isNotEmpty(userRep.getUserId()))
 					throw new PrivilegeModelException("UserId can not be set when adding a new user!");
 
 				// set userId
-				userRep.setUserId(StringHelper.getUniqueId());
+				userRep.setUserId(getUniqueId());
 
 				// first validate user
 				userRep.validate();
@@ -383,80 +383,15 @@ public class PrivilegeCrudHandler {
 		DefaultPrivilegeHandler.logger.info("Updated " + toUpdate.size() + " users");
 	}
 
-	public UserRep replaceUser(Certificate certificate, UserRep userRep, char[] password) throws PrivilegeException {
-		try {
-
-			// validate user actually has this type of privilege
-			PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
-			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER);
-
-			// first validate user
-			userRep.validate();
-
-			validateGroupsExist(userRep);
-			validateRolesExist(userRep);
-
-			// validate user exists
-			User existingUser = this.persistenceHandler.getUser(userRep.getUsername());
-			if (existingUser == null) {
-				String msg = "User {0} can not be replaced as it does not exist!";
-				throw new PrivilegeModelException(MessageFormat.format(msg, userRep.getUsername()));
-			}
-
-			// validate same userId
-			if (!existingUser.getUserId().equals(userRep.getUserId())) {
-				String msg = "UserId of existing user {0} does not match userRep {1}";
-				msg = MessageFormat.format(msg, existingUser.getUserId(), userRep.getUserId());
-				throw new PrivilegeModelException(MessageFormat.format(msg, userRep.getUsername()));
-			}
-
-			UserHistory history = existingUser.getHistory();
-			PasswordCrypt passwordCrypt = null;
-			if (password != null) {
-
-				// validate password meets basic requirements
-				privilegeHandler.validatePassword(certificate.getLocale(), password);
-
-				// get new salt for user
-				byte[] salt = privilegeHandler.getEncryptionHandler().nextSalt();
-
-				// hash password
-				passwordCrypt = privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
-
-				history = history.withLastPasswordChange(ZonedDateTime.now());
-			}
-
-			User newUser = createUser(userRep, history, passwordCrypt, existingUser.isPasswordChangeRequested());
-
-			// detect privilege conflicts
-			assertNoPrivilegeConflict(newUser);
-
-			// validate this user may modify this user
-			prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER,
-					new Tuple(existingUser, newUser)));
-
-			// delegate to persistence handler
-			this.persistenceHandler.replaceUser(newUser);
-			this.privilegeHandler.persistModelAsync();
-
-			DefaultPrivilegeHandler.logger.info("Replaced user " + newUser.getUsername());
-
-			return newUser.asUserRep();
-
-		} finally {
-			clearPassword(password);
-		}
-	}
-
 	private void assertNoPrivilegeConflict(User user) {
-		if (this.privilegeConflictResolution.isStrict()) {
-			Map<String, String> privilegeNames = new HashMap<>();
-			List<String> conflicts = detectPrivilegeConflicts(privilegeNames, user);
-			if (!conflicts.isEmpty()) {
-				String msg = String.join("\n", conflicts);
-				throw new PrivilegeModelException(msg);
-			}
-		}
+		if (!this.privilegeConflictResolution.isStrict())
+			return;
+		Map<String, String> privilegeNames = new HashMap<>();
+		List<String> conflicts = detectPrivilegeConflicts(privilegeNames, user);
+		if (conflicts.isEmpty())
+			return;
+		String msg = String.join("\n", conflicts);
+		throw new PrivilegeModelException(msg);
 	}
 
 	private void assertNoPrivilegeConflict(Role role) {
@@ -507,7 +442,7 @@ public class PrivilegeCrudHandler {
 	private void validateGroupsExist(UserRep userRep) {
 		for (String group : userRep.getGroups()) {
 			if (this.persistenceHandler.getGroup(group) == null) {
-				String msg = "Can not add user {0} as group {1} does not exist!";
+				String msg = "Can not add/update user {0} as group {1} does not exist!";
 				msg = MessageFormat.format(msg, userRep.getUsername(), group);
 				throw new PrivilegeModelException(msg);
 			}
@@ -517,7 +452,7 @@ public class PrivilegeCrudHandler {
 	private void validateRolesExist(UserRep userRep) {
 		for (String role : userRep.getRoles()) {
 			if (this.persistenceHandler.getRole(role) == null) {
-				String msg = "Can not add user {0} as role {1} does not exist!";
+				String msg = "Can not add/update user {0} as role {1} does not exist!";
 				msg = MessageFormat.format(msg, userRep.getUsername(), role);
 				throw new PrivilegeModelException(msg);
 			}
@@ -539,72 +474,71 @@ public class PrivilegeCrudHandler {
 				passwordChangeRequested, history);
 	}
 
-	public UserRep updateUser(Certificate certificate, UserRep userRep) throws PrivilegeException {
+	public UserRep updateUser(Certificate certificate, UserRep userRep, char[] password) throws PrivilegeException {
+		try {
 
-		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER);
+			// validate user actually has this type of privilege
+			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER);
 
-		// get existing user
-		User existingUser = this.persistenceHandler.getUser(userRep.getUsername());
-		if (existingUser == null)
-			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", userRep.getUsername()));
+			// first validate user
+			userRep.validate();
 
-		// if nothing to do, then stop
-		if (StringHelper.isEmpty(userRep.getFirstname()) && StringHelper.isEmpty(userRep.getLastname()) &&
-				userRep.getLocale() == null && (userRep.getProperties() == null || userRep.getProperties().isEmpty())) {
-			throw new PrivilegeModelException(
-					MessageFormat.format("All updateable fields are empty for update of user {0}",
-							userRep.getUsername()));
+			validateGroupsExist(userRep);
+			validateRolesExist(userRep);
+
+			// validate user exists
+			User existingUser = this.persistenceHandler.getUser(userRep.getUsername());
+			if (existingUser == null) {
+				String msg = "User {0} does not exist!";
+				throw new PrivilegeModelException(MessageFormat.format(msg, userRep.getUsername()));
+			}
+
+			// validate same userId
+			if (!existingUser.getUserId().equals(userRep.getUserId())) {
+				String msg = "UserId of existing user {0} does not match userRep {1}";
+				msg = MessageFormat.format(msg, existingUser.getUserId(), userRep.getUserId());
+				throw new PrivilegeModelException(MessageFormat.format(msg, userRep.getUsername()));
+			}
+
+			UserHistory history = existingUser.getHistory();
+			PasswordCrypt passwordCrypt;
+			if (password == null) {
+				passwordCrypt = existingUser.getPasswordCrypt();
+			} else {
+
+				// validate password meets basic requirements
+				privilegeHandler.validatePassword(certificate.getLocale(), password);
+
+				// get new salt for user
+				byte[] salt = privilegeHandler.getEncryptionHandler().nextSalt();
+
+				// hash password
+				passwordCrypt = privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
+
+				history = history.withLastPasswordChange(ZonedDateTime.now());
+			}
+
+			User newUser = createUser(userRep, history, passwordCrypt, existingUser.isPasswordChangeRequested());
+
+			// detect privilege conflicts
+			assertNoPrivilegeConflict(newUser);
+
+			// validate this user may modify this user
+			prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER,
+					new Tuple(existingUser, newUser)));
+
+			// delegate to persistence handler
+			this.persistenceHandler.replaceUser(newUser);
+			this.privilegeHandler.persistModelAsync();
+
+			DefaultPrivilegeHandler.logger.info("Replaced user " + newUser.getUsername());
+
+			return newUser.asUserRep();
+
+		} finally {
+			clearPassword(password);
 		}
-
-		String userId = existingUser.getUserId();
-		String username = existingUser.getUsername();
-		PasswordCrypt passwordCrypt = existingUser.getPasswordCrypt();
-		String firstName = existingUser.getFirstname();
-		String lastName = existingUser.getLastname();
-		UserState userState = existingUser.getUserState();
-		Set<String> groups = existingUser.getGroups();
-		Set<String> roles = existingUser.getRoles();
-		Locale locale = existingUser.getLocale();
-		Map<String, String> propertyMap = existingUser.getProperties();
-
-		// get updated fields
-		if (StringHelper.isNotEmpty(userRep.getFirstname()))
-			firstName = userRep.getFirstname();
-		if (StringHelper.isNotEmpty(userRep.getLastname()))
-			lastName = userRep.getLastname();
-		if (userRep.getProperties() != null && !userRep.getProperties().isEmpty())
-			propertyMap = userRep.getProperties();
-
-		if (userRep.getLocale() != null)
-			locale = userRep.getLocale();
-		if (userRep.getUserState() != null)
-			userState = userRep.getUserState();
-		if (userRep.getRoles() != null && !userRep.getRoles().equals(roles))
-			roles = userRep.getRoles();
-
-		// create new user
-		User newUser = new User(userId, username, passwordCrypt, firstName, lastName, userState, groups, roles, locale,
-				propertyMap, existingUser.isPasswordChangeRequested(), existingUser.getHistory());
-
-		// detect privilege conflicts
-		assertNoPrivilegeConflict(newUser);
-
-		// validate this user may modify this user
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER,
-				new Tuple(existingUser, newUser)));
-
-		// delegate to persistence handler
-		this.persistenceHandler.replaceUser(newUser);
-		this.privilegeHandler.persistModelAsync();
-
-		DefaultPrivilegeHandler.logger.info("Updated user " + newUser.getUsername());
-
-		// update any existing sessions for this user
-		this.privilegeHandler.updateExistingSessionsForUser(newUser);
-
-		return newUser.asUserRep();
 	}
 
 	public UserRep removeUser(Certificate certificate, String username) {
@@ -632,100 +566,6 @@ public class PrivilegeCrudHandler {
 		DefaultPrivilegeHandler.logger.info("Removed user " + username);
 
 		return existingUser.asUserRep();
-	}
-
-	public UserRep addRoleToUser(Certificate certificate, String username, String roleName) {
-
-		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER);
-
-		// get user
-		User existingUser = this.persistenceHandler.getUser(username);
-		if (existingUser == null)
-			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username));
-
-		// validate that this user may add this role to this user
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER,
-				new Tuple(existingUser, roleName)));
-
-		// check that user not already has role
-		Set<String> currentRoles = existingUser.getRoles();
-		if (currentRoles.contains(roleName)) {
-			String msg = MessageFormat.format("User {0} already has role {1}", username, roleName);
-			throw new PrivilegeModelException(msg);
-		}
-
-		// validate that the role exists
-		if (this.persistenceHandler.getRole(roleName) == null) {
-			String msg = MessageFormat.format("Role {0} does not exist!", roleName);
-			throw new PrivilegeModelException(msg);
-		}
-
-		// create new user
-		Set<String> newRoles = new HashSet<>(currentRoles);
-		newRoles.add(roleName);
-
-		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPasswordCrypt(),
-				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
-				existingUser.getGroups(), newRoles, existingUser.getLocale(), existingUser.getProperties(),
-				existingUser.isPasswordChangeRequested(), existingUser.getHistory());
-
-		// detect privilege conflicts
-		assertNoPrivilegeConflict(newUser);
-
-		// delegate user replacement to persistence handler
-		this.persistenceHandler.replaceUser(newUser);
-		this.privilegeHandler.persistModelAsync();
-
-		DefaultPrivilegeHandler.logger.info("Added role " + roleName + " to " + newUser.getUsername());
-
-		// update any existing sessions for this user
-		this.privilegeHandler.updateExistingSessionsForUser(newUser);
-
-		return newUser.asUserRep();
-	}
-
-	public UserRep removeRoleFromUser(Certificate certificate, String username, String roleName) {
-
-		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER);
-
-		// get User
-		User existingUser = this.persistenceHandler.getUser(username);
-		if (existingUser == null)
-			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username));
-
-		// validate that this user may remove this role from this user
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER,
-				new Tuple(existingUser, roleName)));
-
-		// ignore if user does not have role
-		Set<String> currentRoles = existingUser.getRoles();
-		if (!currentRoles.contains(roleName)) {
-			String msg = MessageFormat.format("User {0} does not have role {1}", existingUser.getUsername(), roleName);
-			throw new PrivilegeModelException(msg);
-		}
-
-		// create new user
-		Set<String> newRoles = new HashSet<>(currentRoles);
-		newRoles.remove(roleName);
-		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPasswordCrypt(),
-				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
-				existingUser.getGroups(), newRoles, existingUser.getLocale(), existingUser.getProperties(),
-				existingUser.isPasswordChangeRequested(), existingUser.getHistory());
-
-		// delegate user replacement to persistence handler
-		this.persistenceHandler.replaceUser(newUser);
-		this.privilegeHandler.persistModelAsync();
-
-		DefaultPrivilegeHandler.logger.info("Removed role " + roleName + " from " + newUser.getUsername());
-
-		// update any existing sessions for this user
-		this.privilegeHandler.updateExistingSessionsForUser(newUser);
-
-		return newUser.asUserRep();
 	}
 
 	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
@@ -792,7 +632,7 @@ public class PrivilegeCrudHandler {
 	public void setUserPassword(Certificate certificate, String username, char[] password) {
 
 		// we don't want the user to worry about whitespace
-		username = StringHelper.trimOrEmpty(username);
+		username = trimOrEmpty(username);
 
 		try {
 
@@ -992,112 +832,6 @@ public class PrivilegeCrudHandler {
 		DefaultPrivilegeHandler.logger.info("Removed role " + roleName);
 
 		return existingRole.asRoleRep();
-	}
-
-	public RoleRep addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
-
-		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_ROLE);
-
-		// validate PrivilegeRep
-		privilegeRep.validate();
-
-		// get role
-		Role existingRole = this.persistenceHandler.getRole(roleName);
-		if (existingRole == null) {
-			String msg = MessageFormat.format("Role {0} does not exist!", roleName);
-			throw new PrivilegeModelException(msg);
-		}
-
-		// validate that policy exists if needed
-		String policy = privilegeRep.getPolicy();
-		if (policy != null && !this.policyMap.containsKey(policy)) {
-			String msg = "Policy {0} for Privilege {1} does not exist";
-			msg = MessageFormat.format(msg, policy, privilegeRep.getName());
-			throw new PrivilegeModelException(msg);
-		}
-
-		// create new role with the additional privilege
-		Privilege newPrivilege = Privilege.of(privilegeRep);
-
-		// copy existing privileges
-		Set<String> existingPrivilegeNames = existingRole.getPrivilegeNames();
-		Map<String, Privilege> privilegeMap = new HashMap<>(existingPrivilegeNames.size() + 1);
-		for (String name : existingPrivilegeNames) {
-			Privilege privilege = existingRole.getPrivilege(name);
-			privilegeMap.put(name, privilege);
-		}
-
-		// add new one
-		privilegeMap.put(newPrivilege.getName(), newPrivilege);
-
-		// create new role
-		Role newRole = new Role(existingRole.getName(), privilegeMap);
-
-		// detect privilege conflicts
-		assertNoPrivilegeConflict(newRole);
-
-		// validate that this user may modify this role
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_ROLE,
-				new Tuple(existingRole, newRole)));
-
-		// delegate role replacement to persistence handler
-		this.persistenceHandler.replaceRole(newRole);
-		this.privilegeHandler.persistModelAsync();
-
-		DefaultPrivilegeHandler.logger.info("Added/replaced privilege " + privilegeRep.getName() + " to " + roleName);
-
-		// update any existing certificates with new role
-		this.privilegeHandler.updateExistingSessionsWithNewRole(newRole);
-
-		return newRole.asRoleRep();
-	}
-
-	public RoleRep removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
-
-		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_ROLE);
-
-		// get role
-		Role existingRole = this.persistenceHandler.getRole(roleName);
-		if (existingRole == null) {
-			throw new PrivilegeModelException(MessageFormat.format("Role {0} does not exist!", roleName));
-		}
-
-		// ignore if role does not have privilege
-		if (!existingRole.hasPrivilege(privilegeName)) {
-			String msg = MessageFormat.format("Role {0} does not have Privilege {1}", roleName, privilegeName);
-			throw new PrivilegeModelException(msg);
-		}
-
-		// create new set of privileges with out the to removed privilege
-		Set<String> privilegeNames = existingRole.getPrivilegeNames();
-		Map<String, Privilege> newPrivileges = new HashMap<>(privilegeNames.size() - 1);
-		for (String name : privilegeNames) {
-			Privilege privilege = existingRole.getPrivilege(name);
-			if (!privilege.getName().equals(privilegeName))
-				newPrivileges.put(privilege.getName(), privilege);
-		}
-
-		// create new role
-		Role newRole = new Role(existingRole.getName(), newPrivileges);
-
-		// validate that this user may modify this role
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_ROLE,
-				new Tuple(existingRole, newRole)));
-
-		// delegate user replacement to persistence handler
-		this.persistenceHandler.replaceRole(newRole);
-		this.privilegeHandler.persistModelAsync();
-
-		DefaultPrivilegeHandler.logger.info("Removed privilege " + privilegeName + " from " + roleName);
-
-		// update any existing certificates with new role
-		this.privilegeHandler.updateExistingSessionsWithNewRole(newRole);
-
-		return newRole.asRoleRep();
 	}
 
 	/**

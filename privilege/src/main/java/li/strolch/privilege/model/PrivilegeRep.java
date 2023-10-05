@@ -22,7 +22,6 @@ import li.strolch.privilege.policy.PrivilegePolicy;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
@@ -42,6 +41,8 @@ public class PrivilegeRep {
 	private Set<String> denyList;
 	private Set<String> allowList;
 
+	private boolean readOnly;
+
 	/**
 	 * Default constructor
 	 *
@@ -57,8 +58,26 @@ public class PrivilegeRep {
 		this.name = trimOrEmpty(name);
 		this.policy = trimOrEmpty(policy);
 		this.allAllowed = allAllowed;
-		this.denyList = denyList == null ? Set.of() : Set.copyOf(denyList);
-		this.allowList = allowList == null ? Set.of() : Set.copyOf(allowList);
+		setDenyList(denyList == null ? Set.of() : denyList);
+		setAllowList(allowList == null ? Set.of() : allowList);
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public PrivilegeRep readOnly() {
+		if (this.readOnly)
+			return this;
+		this.readOnly = true;
+		this.denyList = Set.copyOf(this.denyList);
+		this.allowList = Set.copyOf(this.allowList);
+		return this;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readOnly)
+			throw new IllegalStateException("Privilege is currently readOnly, to modify get a copy!");
 	}
 
 	/**
@@ -86,6 +105,7 @@ public class PrivilegeRep {
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		assertNotReadonly();
 		this.name = trimOrEmpty(name);
 	}
 
@@ -100,6 +120,7 @@ public class PrivilegeRep {
 	 * @param policy the policy to set
 	 */
 	public void setPolicy(String policy) {
+		assertNotReadonly();
 		this.policy = trimOrEmpty(policy);
 	}
 
@@ -114,6 +135,7 @@ public class PrivilegeRep {
 	 * @param allAllowed the allAllowed to set
 	 */
 	public void setAllAllowed(boolean allAllowed) {
+		assertNotReadonly();
 		this.allAllowed = allAllowed;
 	}
 
@@ -128,7 +150,8 @@ public class PrivilegeRep {
 	 * @param denyList the denyList to set
 	 */
 	public void setDenyList(Set<String> denyList) {
-		this.denyList = denyList.stream().map(String::trim).collect(Collectors.toSet());
+		assertNotReadonly();
+		this.denyList = denyList.stream().map(String::trim).collect(HashSet::new, HashSet::add, HashSet::addAll);
 	}
 
 	/**
@@ -142,7 +165,8 @@ public class PrivilegeRep {
 	 * @param allowList the allowList to set
 	 */
 	public void setAllowList(Set<String> allowList) {
-		this.allowList = allowList.stream().map(String::trim).collect(Collectors.toSet());
+		assertNotReadonly();
+		this.allowList = allowList.stream().map(String::trim).collect(HashSet::new, HashSet::add, HashSet::addAll);
 	}
 
 	/**
@@ -176,6 +200,10 @@ public class PrivilegeRep {
 		if (this.name == null)
 			return other.name == null;
 		return this.name.equals(other.name);
+	}
+
+	public PrivilegeRep getCopy() {
+		return new PrivilegeRep(this.name, this.policy, this.allAllowed, this.denyList, this.allowList);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

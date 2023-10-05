@@ -240,33 +240,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
-	public UserRep replaceUser(Certificate certificate, UserRep userRep, char[] password) throws PrivilegeException {
+	public UserRep updateUser(Certificate certificate, UserRep userRep, char[] password) throws PrivilegeException {
 		return this.lockingHandler.lockedExecuteWithResult(userRep.getUsername(),
-				() -> crudHandler.replaceUser(certificate, userRep, password));
-	}
-
-	@Override
-	public UserRep updateUser(Certificate certificate, UserRep userRep) throws PrivilegeException {
-		return this.lockingHandler.lockedExecuteWithResult(userRep.getUsername(),
-				() -> crudHandler.updateUser(certificate, userRep));
+				() -> crudHandler.updateUser(certificate, userRep, password));
 	}
 
 	@Override
 	public UserRep removeUser(Certificate certificate, String username) {
 		return this.lockingHandler.lockedExecuteWithResult(username,
 				() -> crudHandler.removeUser(certificate, username));
-	}
-
-	@Override
-	public UserRep addRoleToUser(Certificate certificate, String username, String roleName) {
-		return this.lockingHandler.lockedExecuteWithResult(username,
-				() -> crudHandler.addRoleToUser(certificate, username, roleName));
-	}
-
-	@Override
-	public UserRep removeRoleFromUser(Certificate certificate, String username, String roleName) {
-		return this.lockingHandler.lockedExecuteWithResult(username,
-				() -> crudHandler.removeRoleFromUser(certificate, username, roleName));
 	}
 
 	@Override
@@ -307,18 +289,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	public RoleRep removeRole(Certificate certificate, String roleName) {
 		return this.lockingHandler.lockedExecuteWithResult(roleName,
 				() -> crudHandler.removeRole(certificate, roleName));
-	}
-
-	@Override
-	public RoleRep addOrReplacePrivilegeOnRole(Certificate certificate, String roleName, PrivilegeRep privilegeRep) {
-		return this.lockingHandler.lockedExecuteWithResult(roleName,
-				() -> crudHandler.addOrReplacePrivilegeOnRole(certificate, roleName, privilegeRep));
-	}
-
-	@Override
-	public RoleRep removePrivilegeFromRole(Certificate certificate, String roleName, String privilegeName) {
-		return this.lockingHandler.lockedExecuteWithResult(roleName,
-				() -> crudHandler.removePrivilegeFromRole(certificate, roleName, privilegeName));
 	}
 
 	void invalidSessionsFor(User user) {

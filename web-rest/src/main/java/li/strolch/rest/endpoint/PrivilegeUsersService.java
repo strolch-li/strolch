@@ -15,19 +15,6 @@
  */
 package li.strolch.rest.endpoint;
 
-import static jakarta.ws.rs.core.Response.Status.NOT_ACCEPTABLE;
-import static java.util.Comparator.comparing;
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
-import static li.strolch.rest.helper.ResponseUtil.toResponse;
-import static li.strolch.rest.helper.RestfulHelper.toJson;
-import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
-import java.util.Locale;
-
 import com.google.gson.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -50,13 +37,25 @@ import li.strolch.rest.StrolchSessionHandler;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.SearchResult;
 import li.strolch.search.ValueSearch;
-import li.strolch.service.JsonServiceArgument;
 import li.strolch.service.StringMapArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.privilege.users.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
+
+import static jakarta.ws.rs.core.Response.Status.NOT_ACCEPTABLE;
+import static java.util.Comparator.comparing;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
+import static li.strolch.rest.helper.ResponseUtil.toResponse;
+import static li.strolch.rest.helper.RestfulHelper.toJson;
+import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -192,60 +191,6 @@ public class PrivilegeUsersService {
 	}
 
 	@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/roles")
-	public Response updateRolesOnUser(@PathParam("username") String username, String data,
-			@Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
-		PrivilegeUpdateUserRolesService svc = new PrivilegeUpdateUserRolesService();
-		JsonServiceArgument arg = svc.getArgumentInstance();
-		arg.objectId = username;
-		arg.jsonElement = JsonParser.parseString(data);
-
-		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
-	}
-
-	@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/roles/{rolename}")
-	public Response addRoleToUser(@PathParam("username") String username, @PathParam("rolename") String rolename,
-			@Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
-		PrivilegeAddRoleToUserService svc = new PrivilegeAddRoleToUserService();
-		PrivilegeRoleUserNamesArgument arg = new PrivilegeRoleUserNamesArgument();
-		arg.username = username;
-		arg.rolename = rolename;
-
-		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
-	}
-
-	@DELETE
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/roles/{rolename}")
-	public Response removeRoleFromUser(@PathParam("username") String username, @PathParam("rolename") String rolename,
-			@Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
-		PrivilegeRemoveRoleFromUserService svc = new PrivilegeRemoveRoleFromUserService();
-		PrivilegeRoleUserNamesArgument arg = new PrivilegeRoleUserNamesArgument();
-		arg.username = username;
-		arg.rolename = rolename;
-
-		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
-	}
-
-	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}/state/{state}")
 	public Response setUserState(@PathParam("username") String username, @PathParam("state") String state,
@@ -279,7 +224,7 @@ public class PrivilegeUsersService {
 
 		Locale locale;
 		try {
-			locale = new Locale(localeS);
+			locale = Locale.forLanguageTag(localeS);
 		} catch (Exception e) {
 			String msg = MessageFormat.format("Locale {0} is not valid!", localeS);
 			return toResponse(msg);

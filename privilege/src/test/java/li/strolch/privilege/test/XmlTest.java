@@ -254,7 +254,7 @@ public class XmlTest {
 		Map<String, Group> groups = xmlHandler.getGroups();
 		assertNotNull(groups);
 
-		assertEquals(1, groups.size());
+		assertEquals(2, groups.size());
 
 		// group AppUserLocationA
 		Group group = groups.get("AppUserLocationA");
@@ -263,6 +263,12 @@ public class XmlTest {
 		Map<String, String> properties = group.getProperties();
 		assertEquals(new HashSet<>(List.of("location")), properties.keySet());
 		assertEquals("LocationA", properties.get("location"));
+
+		group = groups.get("GroupA");
+		assertEquals("GroupA", group.name());
+		properties = group.getProperties();
+		assertTrue(properties.isEmpty());
+		assertTrue(group.roles().isEmpty());
 	}
 
 	@Test

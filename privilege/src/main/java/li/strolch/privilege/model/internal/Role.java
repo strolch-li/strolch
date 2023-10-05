@@ -21,8 +21,9 @@ import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.utils.dbc.DBC;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -62,9 +63,7 @@ public record Role(String name, Map<String, Privilege> privilegeMap) {
 
 		// build privileges from rep
 		Map<String, Privilege> privilegeMap = new HashMap<>(roleRep.getPrivileges().size());
-		for (PrivilegeRep privilege : roleRep.getPrivileges()) {
-			privilegeMap.put(privilege.getName(), Privilege.of(privilege));
-		}
+		roleRep.getPrivileges().values().forEach(p -> privilegeMap.put(p.getName(), Privilege.of(p)));
 
 		return new Role(name, privilegeMap);
 	}
@@ -109,10 +108,8 @@ public record Role(String name, Map<String, Privilege> privilegeMap) {
 	 * @return a {@link RoleRep} which is a representation of this object used to serialize and view on clients
 	 */
 	public RoleRep asRoleRep() {
-		List<PrivilegeRep> privileges = new ArrayList<>();
-		for (Entry<String, Privilege> entry : this.privilegeMap.entrySet()) {
-			privileges.add(entry.getValue().asPrivilegeRep());
-		}
+		Map<String, PrivilegeRep> privileges = new HashMap<>();
+		this.privilegeMap.values().forEach(p -> privileges.put(p.getName(), p.asPrivilegeRep()));
 		return new RoleRep(this.name, privileges);
 	}
 

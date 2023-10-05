@@ -20,7 +20,8 @@ import li.strolch.privilege.model.internal.Role;
 import li.strolch.utils.dbc.DBC;
 
 import java.text.MessageFormat;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
@@ -35,7 +36,9 @@ import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 public class RoleRep {
 
 	private String name;
-	private List<PrivilegeRep> privileges;
+	private Map<String, PrivilegeRep> privileges;
+
+	private boolean readOnly;
 
 	/**
 	 * Default constructor
@@ -43,9 +46,26 @@ public class RoleRep {
 	 * @param name       the name of this role
 	 * @param privileges the list of privileges granted to this role
 	 */
-	public RoleRep(String name, List<PrivilegeRep> privileges) {
+	public RoleRep(String name, Map<String, PrivilegeRep> privileges) {
 		this.name = trimOrEmpty(name);
-		this.privileges = privileges == null ? List.of() : List.copyOf(privileges);
+		setPrivileges(privileges == null ? Map.of() : privileges);
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public RoleRep readOnly() {
+		if (this.readOnly)
+			return this;
+		this.readOnly = true;
+		this.privileges = Map.copyOf(this.privileges);
+		return this;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readOnly)
+			throw new IllegalStateException("Role is currently readOnly, to modify get a copy!");
 	}
 
 	/**
@@ -55,7 +75,7 @@ public class RoleRep {
 		if (isEmpty(this.name))
 			throw new PrivilegeException("name is null");
 
-		for (PrivilegeRep privilege : this.privileges) {
+		for (PrivilegeRep privilege : this.privileges.values()) {
 			try {
 				privilege.validate();
 			} catch (Exception e) {
@@ -77,26 +97,26 @@ public class RoleRep {
 	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		assertNotReadonly();
 		this.name = trimOrEmpty(name);
 	}
 
-	/**
-	 * Returns the privileges assigned to this Role as a list
-	 *
-	 * @return the privileges assigned to this Role as a list
-	 */
-	public List<PrivilegeRep> getPrivileges() {
+	public Map<String, PrivilegeRep> getPrivileges() {
+		if (this.privileges == null)
+			return null;
 		return this.privileges;
 	}
 
-	/**
-	 * Sets the privileges on this from a list
-	 *
-	 * @param privileges the list of privileges to assign to this role
-	 */
-	public void setPrivileges(List<PrivilegeRep> privileges) {
+	public void setPrivileges(Map<String, PrivilegeRep> privileges) {
+		assertNotReadonly();
 		DBC.PRE.assertNotNull("privileges must not be null!", privileges);
-		this.privileges = List.copyOf(privileges);
+		this.privileges = new HashMap<>(privileges);
+	}
+
+	public void addPrivilege(PrivilegeRep privilegeRep) {
+		DBC.PRE.assertFalse(() -> "Privilege " + privilegeRep.getName() + " already on role " + this.name,
+				privileges.containsKey(privilegeRep.getName()));
+		this.privileges.put(privilegeRep.getName(), privilegeRep);
 	}
 
 	/**
@@ -129,6 +149,10 @@ public class RoleRep {
 		if (this.name == null)
 			return other.name == null;
 		return this.name.equals(other.name);
+	}
+
+	public RoleRep getCopy() {
+		return new RoleRep(this.name, this.privileges);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

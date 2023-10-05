@@ -32,11 +32,12 @@ public class PrivilegeElementFromJsonVisitor {
 
 		String name = nameE == null ? null : nameE.getAsString().trim();
 
-		List<PrivilegeRep> privileges = new ArrayList<>();
+		Map<String, PrivilegeRep> privileges = new HashMap<>();
 		if (privilegesE != null) {
 			JsonArray privilegesArr = privilegesE.getAsJsonArray();
 			for (JsonElement privilegeE : privilegesArr) {
-				privileges.add(privilegeRepFromJson(privilegeE.getAsJsonObject()));
+				PrivilegeRep privilegeRep = privilegeRepFromJson(privilegeE.getAsJsonObject());
+				privileges.put(privilegeRep.getName(), privilegeRep);
 			}
 		}
 

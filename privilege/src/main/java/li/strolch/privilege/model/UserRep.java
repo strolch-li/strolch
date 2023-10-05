@@ -25,7 +25,6 @@ import li.strolch.utils.dbc.DBC;
 import java.text.MessageFormat;
 import java.util.*;
 
-import static java.util.stream.Collectors.toSet;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
@@ -74,15 +73,11 @@ public class UserRep {
 		this.firstname = trimOrEmpty(firstname);
 		this.lastname = trimOrEmpty(lastname);
 		this.userState = userState;
-		this.groups = groups == null ? null : groups.stream().map(String::trim).collect(toSet());
-		this.roles = roles == null ? null : roles.stream().map(String::trim).collect(toSet());
 		this.locale = locale;
-
-		this.properties = new HashMap<>();
-		if (propertyMap != null)
-			propertyMap.forEach((key, value) -> this.properties.put(key.trim(), value.trim()));
-
-		this.history = history;
+		setGroups(groups == null ? Set.of() : groups);
+		setRoles(roles == null ? Set.of() : roles);
+		setProperties(properties == null ? Map.of() : properties);
+		this.history = history == null ? UserHistory.EMPTY : history;
 	}
 
 	@SuppressWarnings("unused")
@@ -129,7 +124,8 @@ public class UserRep {
 	}
 
 	public UserRep readOnly() {
-		assertNotReadonly();
+		if (this.readOnly)
+			return this;
 		this.readOnly = true;
 		this.groups = Set.copyOf(this.groups);
 		this.roles = Set.copyOf(this.roles);
@@ -232,17 +228,17 @@ public class UserRep {
 	}
 
 	public Set<String> getGroups() {
-		return groups;
+		return this.groups;
 	}
 
 	public void setGroups(Set<String> groups) {
 		DBC.PRE.assertNotNull("groups must not be null!", groups);
 		assertNotReadonly();
-		this.groups = groups.stream().map(String::trim).collect(toSet());
+		this.groups = groups.stream().map(String::trim).collect(HashSet::new, HashSet::add, HashSet::addAll);
 	}
 
 	public boolean hasGroup(String group) {
-		return this.groups != null && this.groups.contains(group);
+		return this.groups.contains(group);
 	}
 
 	/**
@@ -258,11 +254,16 @@ public class UserRep {
 	public void setRoles(Set<String> roles) {
 		DBC.PRE.assertNotNull("roles must not be null!", roles);
 		assertNotReadonly();
-		this.roles = roles.stream().map(String::trim).collect(toSet());
+		this.roles = roles.stream().map(String::trim).collect(HashSet::new, HashSet::add, HashSet::addAll);
+	}
+
+	public void addRole(String role) {
+		assertNotReadonly();
+		this.roles.add(role);
 	}
 
 	public boolean hasRole(String role) {
-		return this.roles != null && this.roles.contains(role);
+		return this.roles.contains(role);
 	}
 
 	/**
@@ -286,8 +287,6 @@ public class UserRep {
 	 * @return the user history
 	 */
 	public UserHistory getHistory() {
-		if (this.history == null)
-			return UserHistory.EMPTY;
 		return this.history;
 	}
 
@@ -329,7 +328,8 @@ public class UserRep {
 	public void setProperties(Map<String, String> properties) {
 		DBC.PRE.assertNotNull("properties must not be null!", properties);
 		assertNotReadonly();
-		this.properties = properties;
+		this.properties = new HashMap<>();
+		properties.forEach((key, value) -> this.properties.put(key.trim(), value.trim()));
 	}
 
 	/**
@@ -338,9 +338,7 @@ public class UserRep {
 	 * @return the {@link Set} of keys of all properties
 	 */
 	public Set<String> getPropertyKeySet() {
-		if (this.readOnly)
-			return this.properties.keySet();
-		return new HashSet<>(this.properties.keySet());
+		return this.properties.keySet();
 	}
 
 	/**
@@ -349,9 +347,7 @@ public class UserRep {
 	 * @return the map of properties
 	 */
 	public Map<String, String> getProperties() {
-		if (this.readOnly)
-			return this.properties;
-		return new HashMap<>(this.properties);
+		return this.properties;
 	}
 
 	/**
@@ -417,13 +413,8 @@ public class UserRep {
 	}
 
 	public UserRep getCopy() {
-
-		Set<String> groups = this.groups == null ? null : new HashSet<>(this.groups);
-		Set<String> roles = this.roles == null ? null : new HashSet<>(this.roles);
-		Map<String, String> propertyMap = new HashMap<>(this.properties);
-
-		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, groups, roles,
-				this.locale, propertyMap, this.history == null ? UserHistory.EMPTY : this.history);
+		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, this.groups,
+				this.roles, this.locale, this.properties, this.history);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
