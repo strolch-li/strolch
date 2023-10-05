@@ -18,12 +18,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
+
 public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(BaseLdapPrivilegeHandler.class);
 
 	private String providerUrl;
 	private String searchBase;
+	private String additionalFilter;
 	private String domain;
 
 	@Override
@@ -37,8 +41,12 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		this.providerUrl = parameterMap.get("providerUrl");
 		this.searchBase = parameterMap.get("searchBase");
+		this.additionalFilter = trimOrEmpty(parameterMap.get("additionalFilter"));
 		this.domain = parameterMap.get("domain");
-
+		if (isNotEmpty(this.domain) && this.domain.startsWith("@")) {
+			logger.warn("Remove the @ symbol from the domain property! Added automatically.");
+			this.domain = this.domain.substring(1);
+		}
 	}
 
 	@Override
@@ -49,6 +57,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		if (internalUser != null && internalUser.getUserState() != UserState.REMOTE)
 			return super.checkCredentialsAndUserState(username, password);
 
+		String userPrincipalName = username + "@" + this.domain;
+
 		// Set up the environment for creating the initial context
 		Hashtable<String, String> env = new Hashtable<>();
 
@@ -57,7 +67,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		// Authenticate 
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, username + this.domain);
+		env.put(Context.SECURITY_PRINCIPAL, userPrincipalName);
 		env.put(Context.SECURITY_CREDENTIALS, new String(password));
 
 		logger.info("User {} tries to login on ldap {}", username + this.domain, this.providerUrl);
@@ -73,21 +83,23 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			//Specify the search scope
 			searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-			String searchFilter = "(&(objectCategory=person)(objectClass=user)(userPrincipalName=" + username +
-					this.domain + "))";
+			String searchFilter = "(&(objectCategory=person)(objectClass=user)(sAMAccountName=%s)%s)".formatted(
+					username, this.additionalFilter);
 
 			// Search for objects using the filter
 			NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase, searchFilter, searchCtls);
 
 			if (!answer.hasMore()) {
 
-				logger.warn("No LDAP data retrieved using userPrincipalName, trying with sAMAccountName...");
-				searchFilter = "(&(objectCategory=person)(objectClass=user)(sAMAccountName=" + username + "))";
+				logger.warn("No LDAP data retrieved using sAMAccountName, trying with userPrincipalName...");
+				searchFilter = "(&(objectCategory=person)(objectClass=user)(userPrincipalName=%s)%s)".formatted(
+						userPrincipalName, this.additionalFilter);
 				answer = ctx.search(this.searchBase, searchFilter, searchCtls);
 
 				if (!answer.hasMore())
-					throw new AccessDeniedException("Could not login with user: " + username + this.domain +
-							" on Ldap: no LDAP Data, for either userPrincipalName or sAMAccountName");
+					throw new AccessDeniedException("Could not login user: " + username +
+							" on Ldap: no LDAP Data, for either sAMAccountName or userPrincipalName searches. Domain used is " +
+							this.domain);
 			}
 
 			SearchResult searchResult = answer.next();
