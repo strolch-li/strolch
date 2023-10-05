@@ -38,7 +38,7 @@ public class PrivilegeRemoveUserCommand extends Command {
 		if (privilegeHandler.isPersistOnUserDataChanged())
 			privilegeHandler.persist(tx().getCertificate());
 
-		getComponent(StrolchSessionHandler.class).invalidate(tx().getCertificate());
+		getComponent(StrolchSessionHandler.class).refreshSessions();
 
 		Audit audit = tx().auditFrom(AccessType.DELETE, PRIVILEGE, USER, this.username);
 		tx().getAuditTrail().add(tx(), audit);
