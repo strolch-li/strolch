@@ -38,7 +38,7 @@ public class PrivilegeCrudHandler {
 	public RoleRep getRole(Certificate certificate, String roleName) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_ROLE);
 
 		Role role = this.persistenceHandler.getRole(roleName);
@@ -54,7 +54,7 @@ public class PrivilegeCrudHandler {
 	public UserRep getUser(Certificate certificate, String username) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_USER);
 
 		User user = this.persistenceHandler.getUser(username);
@@ -69,7 +69,7 @@ public class PrivilegeCrudHandler {
 	public Map<String, String> getPolicyDefs(Certificate certificate) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_ACTION,
 				DefaultPrivilegeHandler.PRIVILEGE_ACTION_GET_POLICIES));
 
@@ -83,7 +83,7 @@ public class PrivilegeCrudHandler {
 	public List<RoleRep> getRoles(Certificate certificate) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_ROLE);
 
 		Stream<Role> rolesStream = this.persistenceHandler.getAllRoles().stream();
@@ -98,7 +98,7 @@ public class PrivilegeCrudHandler {
 	public List<UserRep> getUsers(Certificate certificate) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_USER);
 
 		Stream<User> usersStream = this.persistenceHandler.getAllUsers().stream();
@@ -113,7 +113,7 @@ public class PrivilegeCrudHandler {
 	public List<UserRep> queryUsers(Certificate certificate, UserRep selectorRep) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_USER);
 
 		String selUserId = selectorRep.getUserId();
@@ -244,7 +244,7 @@ public class PrivilegeCrudHandler {
 		try {
 
 			// validate user actually has this type of privilege
-			PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_USER);
 
 			// make sure userId is not set
@@ -273,13 +273,13 @@ public class PrivilegeCrudHandler {
 			if (password != null) {
 
 				// validate password meets basic requirements
-				privilegeHandler.validatePassword(certificate.getLocale(), password);
+				this.privilegeHandler.validatePassword(certificate.getLocale(), password);
 
 				// get new salt for user
-				byte[] salt = privilegeHandler.getEncryptionHandler().nextSalt();
+				byte[] salt = this.privilegeHandler.getEncryptionHandler().nextSalt();
 
 				// hash password
-				passwordCrypt = privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
+				passwordCrypt = this.privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
 
 				history = history.withLastPasswordChange(ZonedDateTime.now());
 			}
@@ -310,7 +310,7 @@ public class PrivilegeCrudHandler {
 	public void addOrUpdateUsers(Certificate certificate, List<UserRep> userReps) throws PrivilegeException {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_USER);
 
 		List<User> toCreate = new ArrayList<>();
@@ -508,13 +508,13 @@ public class PrivilegeCrudHandler {
 			} else {
 
 				// validate password meets basic requirements
-				privilegeHandler.validatePassword(certificate.getLocale(), password);
+				this.privilegeHandler.validatePassword(certificate.getLocale(), password);
 
 				// get new salt for user
-				byte[] salt = privilegeHandler.getEncryptionHandler().nextSalt();
+				byte[] salt = this.privilegeHandler.getEncryptionHandler().nextSalt();
 
 				// hash password
-				passwordCrypt = privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
+				passwordCrypt = this.privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
 
 				history = history.withLastPasswordChange(ZonedDateTime.now());
 			}
@@ -544,7 +544,7 @@ public class PrivilegeCrudHandler {
 	public UserRep removeUser(Certificate certificate, String username) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_USER);
 
 		// validate user exists
@@ -559,7 +559,7 @@ public class PrivilegeCrudHandler {
 				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_USER, new Tuple(null, existingUser)));
 
 		// delegate user removal to persistence handler
-		privilegeHandler.invalidSessionsFor(existingUser);
+		this.privilegeHandler.invalidSessionsFor(existingUser);
 		this.persistenceHandler.removeUser(username);
 		this.privilegeHandler.persistModelAsync();
 
@@ -571,7 +571,7 @@ public class PrivilegeCrudHandler {
 	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_LOCALE);
 
 		// get User
@@ -603,7 +603,7 @@ public class PrivilegeCrudHandler {
 	public void requirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_REQUIRE_PASSWORD_CHANGE);
 
 		// get User
@@ -637,7 +637,7 @@ public class PrivilegeCrudHandler {
 		try {
 
 			// validate user actually has this type of privilege
-			PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD);
 
 			// get User
@@ -651,13 +651,13 @@ public class PrivilegeCrudHandler {
 			if (password != null) {
 
 				// validate password meets basic requirements
-				privilegeHandler.validatePassword(certificate.getLocale(), password);
+				this.privilegeHandler.validatePassword(certificate.getLocale(), password);
 
 				// get new salt for user
-				byte[] salt = privilegeHandler.getEncryptionHandler().nextSalt();
+				byte[] salt = this.privilegeHandler.getEncryptionHandler().nextSalt();
 
 				// hash password
-				passwordCrypt = privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
+				passwordCrypt = this.privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
 
 				history = history.withLastPasswordChange(ZonedDateTime.now());
 			}
@@ -680,7 +680,7 @@ public class PrivilegeCrudHandler {
 			this.privilegeHandler.persistModelAsync();
 
 			if (certificate.getUsage() == Usage.SET_PASSWORD)
-				privilegeHandler.invalidate(certificate);
+				this.privilegeHandler.invalidate(certificate);
 
 			if (password == null)
 				DefaultPrivilegeHandler.logger.info("Cleared password for " + newUser.getUsername());
@@ -695,7 +695,7 @@ public class PrivilegeCrudHandler {
 	public UserRep setUserState(Certificate certificate, String username, UserState state) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_STATE);
 
 		// get User
@@ -725,7 +725,7 @@ public class PrivilegeCrudHandler {
 	public RoleRep addRole(Certificate certificate, RoleRep roleRep) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_ROLE);
 
 		// first validate role
@@ -759,7 +759,7 @@ public class PrivilegeCrudHandler {
 	public RoleRep replaceRole(Certificate certificate, RoleRep roleRep) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_ROLE);
 
 		// first validate role
@@ -800,13 +800,13 @@ public class PrivilegeCrudHandler {
 	public RoleRep removeRole(Certificate certificate, String roleName) {
 
 		// validate user actually has this type of privilege
-		PrivilegeContext prvCtx = privilegeHandler.validate(certificate);
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_ROLE);
 
 		// validate no user is using this role
 		Set<String> roles = new HashSet<>(Collections.singletonList(roleName));
 		UserRep selector = new UserRep(null, null, null, null, null, null, roles, null, null, null);
-		List<UserRep> usersWithRole = privilegeHandler.queryUsers(certificate, selector);
+		List<UserRep> usersWithRole = this.privilegeHandler.queryUsers(certificate, selector);
 		if (!usersWithRole.isEmpty()) {
 			String usersS = usersWithRole.stream().map(UserRep::getUsername).collect(Collectors.joining(", "));
 			String msg = "The role {0} can not be removed as the following {1} user have the role assigned: {2}";
