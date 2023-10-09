@@ -36,7 +36,7 @@ public class NetworkHelper {
 	public static String formatMacAddress(byte[] bytes) {
 		StringBuilder sb = new StringBuilder(17);
 		for (byte b : bytes) {
-			if (sb.length() > 0)
+			if (!sb.isEmpty())
 				sb.append(':');
 			sb.append(String.format("%02x", b));
 		}
