@@ -129,9 +129,11 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 			return user;
 
+		} catch (AccessDeniedException e) {
+			throw e;
 		} catch (Exception e) {
-			logger.error("Could not login with user: " + username + this.domain + " on Ldap", e);
-			throw new AccessDeniedException("Could not login with user: " + username + this.domain + " on Ldap", e);
+			logger.error("Could not login with user: " + username + " on Ldap", e);
+			throw new AccessDeniedException("Could not login with user: " + username + " on Ldap", e);
 		} finally {
 			if (ctx != null) {
 				try {
