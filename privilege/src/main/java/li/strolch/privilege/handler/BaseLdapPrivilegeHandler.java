@@ -142,7 +142,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		// the first search is using sAMAccountName
 		NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase,
-				LDAP_FILTER_TEMPLATE.formatted(username, SAM_ACCOUNT_NAME, this.additionalFilter), searchControls);
+				LDAP_FILTER_TEMPLATE.formatted(SAM_ACCOUNT_NAME, username, this.additionalFilter), searchControls);
 
 		SearchResult searchResult = null;
 		while (searchResult == null) {
