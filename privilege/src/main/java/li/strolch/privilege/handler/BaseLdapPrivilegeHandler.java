@@ -20,11 +20,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static li.strolch.utils.helper.StringHelper.*;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(BaseLdapPrivilegeHandler.class);
+	public static final String LDAP_FILTER_TEMPLATE = "(&(objectCategory=person)(objectClass=user)(%s=%s)%s)";
+	public static final String SAM_ACCOUNT_NAME = "sAMAccountName";
+	public static final String USER_PRINCIPAL_NAME = "userPrincipalName";
 
 	private String providerUrl;
 	private String searchBase;
@@ -46,18 +49,19 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		this.searchBase = parameterMap.get("searchBase");
 		logger.info("searchBase: " + this.searchBase);
 		this.additionalFilter = trimOrEmpty(parameterMap.get("additionalFilter"));
-		if (isNotEmpty(this.additionalFilter))
+		if (!this.additionalFilter.isEmpty())
 			logger.info("additionalFilter: " + this.additionalFilter);
-		this.domain = parameterMap.get("domain");
-		if (isNotEmpty(this.domain)) {
+		this.domain = trimOrEmpty(parameterMap.get("domain"));
+		if (!this.domain.isEmpty()) {
 			if (this.domain.startsWith("@")) {
 				logger.warn(
 						"Remove the @ symbol from the domain property! Will be added automatically where required.");
 				this.domain = this.domain.substring(1);
 			}
+			this.domainPrefix = this.domain + '\\';
 
 			logger.info("domain: " + this.domain);
-			this.domainPrefix = this.domain + "\\";
+			logger.info("domain prefix: " + this.domainPrefix);
 		}
 	}
 
@@ -70,7 +74,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			return super.checkCredentialsAndUserState(username, password);
 
 		String userPrincipalName;
-		if (isEmpty(this.domain)) {
+		if (this.domain.isEmpty()) {
 			userPrincipalName = username;
 		} else {
 			if (!this.domainPrefix.isEmpty() && username.startsWith(this.domainPrefix)) {
@@ -80,65 +84,13 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			userPrincipalName = username + "@" + this.domain;
 		}
 
-		// Set up the environment for creating the initial context
-		Hashtable<String, String> env = new Hashtable<>();
-
-		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, this.providerUrl);
-
-		// Authenticate 
-		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, userPrincipalName);
-		env.put(Context.SECURITY_CREDENTIALS, new String(password));
-		env.put(Context.REFERRAL, "ignore");
-
 		logger.info("User {} tries to login on ldap {}", username, this.providerUrl);
 
 		// Create the initial context
 		DirContext ctx = null;
 		try {
-			ctx = new InitialDirContext(env);
-
-			//Create the search controls        
-			SearchControls searchControls = new SearchControls();
-
-			//Specify the search scope
-			searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-			String searchFilter = "(&(objectCategory=person)(objectClass=user)(sAMAccountName=%s)%s)".formatted(
-					username, this.additionalFilter);
-
-			// Search for objects using the filter
-			NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase, searchFilter, searchControls);
-
-			SearchResult searchResult = null;
-			while (searchResult == null) {
-				try {
-					if (!answer.hasMore()) {
-
-						logger.warn("No LDAP data retrieved using sAMAccountName, trying with userPrincipalName...");
-						searchFilter = "(&(objectCategory=person)(objectClass=user)(userPrincipalName=%s)%s)".formatted(
-								userPrincipalName, this.additionalFilter);
-						answer = ctx.search(this.searchBase, searchFilter, searchControls);
-
-						if (!answer.hasMore())
-							throw new AccessDeniedException("Could not login user: " + username +
-									" on Ldap: no LDAP Data, for either sAMAccountName or userPrincipalName searches. Domain used is " +
-									this.domain);
-					}
-
-					searchResult = answer.next();
-					if (answer.hasMore())
-						throw new AccessDeniedException(
-								"Could not login with user: " + username + " on Ldap: Multiple LDAP Data");
-				} catch (PartialResultException e) {
-					if (ExceptionHelper.getExceptionMessage(e).contains("Unprocessed Continuation Reference(s)"))
-						logger.warn("Ignoring partial result exception, as we are not following referrals!");
-					else
-						throw e;
-				}
-			}
-
+			ctx = new InitialDirContext(buildLdapEnv(password, userPrincipalName));
+			SearchResult searchResult = searchLdap(username, ctx, userPrincipalName);
 			User user = buildUserFromSearchResult(username, searchResult);
 
 			// persist this user
@@ -168,6 +120,65 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		}
 	}
 
+	private Hashtable<String, String> buildLdapEnv(char[] password, String userPrincipalName) {
+
+		// Set up the environment for creating the initial context
+		Hashtable<String, String> env = new Hashtable<>();
+
+		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		env.put(Context.PROVIDER_URL, this.providerUrl);
+
+		// Authenticate
+		env.put(Context.SECURITY_AUTHENTICATION, "simple");
+		env.put(Context.SECURITY_PRINCIPAL, userPrincipalName);
+		env.put(Context.SECURITY_CREDENTIALS, new String(password));
+		env.put(Context.REFERRAL, "ignore");
+		return env;
+	}
+
+	private SearchResult searchLdap(String username, DirContext ctx, String userPrincipalName) throws NamingException {
+		SearchControls searchControls = new SearchControls();
+		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+		// the first search is using sAMAccountName
+		NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase,
+				LDAP_FILTER_TEMPLATE.formatted(username, SAM_ACCOUNT_NAME, this.additionalFilter), searchControls);
+
+		SearchResult searchResult = null;
+		while (searchResult == null) {
+			try {
+
+				// and if we don't find anything, then we search with userPrincipalName
+				if (!answer.hasMore()) {
+
+					logger.warn("No LDAP data retrieved using " + SAM_ACCOUNT_NAME + ", trying with " +
+							USER_PRINCIPAL_NAME + "...");
+					answer = ctx.search(this.searchBase,
+							LDAP_FILTER_TEMPLATE.formatted(USER_PRINCIPAL_NAME, userPrincipalName,
+									this.additionalFilter), searchControls);
+
+					if (!answer.hasMore())
+						throw new AccessDeniedException("Could not login user: " + username +
+								" on Ldap: no LDAP Data, for either sAMAccountName or userPrincipalName searches. Domain used is " +
+								this.domain);
+				}
+
+				searchResult = answer.next();
+				if (answer.hasMore())
+					throw new AccessDeniedException(
+							"Could not login with user: " + username + " on Ldap: Multiple LDAP Data");
+
+			} catch (PartialResultException e) {
+				if (ExceptionHelper.getExceptionMessage(e).contains("Unprocessed Continuation Reference(s)"))
+					logger.warn("Ignoring partial result exception, as we are not following referrals!");
+				else
+					throw e;
+			}
+		}
+
+		return searchResult;
+	}
+
 	protected User buildUserFromSearchResult(String username, SearchResult sr) throws Exception {
 		Attributes attrs = sr.getAttributes();
 
@@ -194,7 +205,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			Set<String> strolchRoles) throws Exception;
 
 	protected String validateLdapUsername(String username, Attributes attrs) throws NamingException {
-		Attribute sAMAccountName = attrs.get("sAMAccountName");
+		Attribute sAMAccountName = attrs.get(SAM_ACCOUNT_NAME);
 		if (sAMAccountName == null || !username.equalsIgnoreCase(sAMAccountName.get().toString()))
 			throw new AccessDeniedException(
 					"Could not login with user: " + username + this.domain + " on Ldap: Wrong LDAP Data");
