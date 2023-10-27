@@ -213,10 +213,10 @@ public enum State {
 	}
 
 	/**
-	 * @return true if {@link #PLANNED} or {@link #EXECUTION} or {@link #WARNING} or {@link #ERROR}
+	 * @return true if {@link #PLANNED} or {@link #EXECUTION} or {@link #WARNING} or {@link #ERROR} or {@link #STOPPED}
 	 */
 	public boolean canSetToError() {
-		return this == PLANNED || this == EXECUTION || this == WARNING || this == ERROR;
+		return this == PLANNED || this == EXECUTION || this == WARNING || this == ERROR || this == STOPPED;
 	}
 
 	/**
@@ -282,8 +282,8 @@ public enum State {
 		// execution
 		if (states.contains(EXECUTABLE) || states.contains(EXECUTION))
 			return EXECUTION;
-		if (states.contains(EXECUTED) && (states.contains(CREATED) || states.contains(PLANNING) || states.contains(
-				PLANNED)))
+		if (states.contains(EXECUTED) &&
+				(states.contains(CREATED) || states.contains(PLANNING) || states.contains(PLANNED)))
 			return EXECUTION;
 
 		// executed
