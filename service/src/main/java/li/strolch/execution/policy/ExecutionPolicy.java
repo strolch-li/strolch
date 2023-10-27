@@ -20,6 +20,7 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import li.strolch.utils.time.PeriodDuration;
 
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
@@ -246,6 +247,9 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * @param state  the new state to set
 	 */
 	protected void setActionState(Action action, State state) {
+		if (action.getState().inClosedPhase())
+			throw new IllegalStateException("Action " + action.getLocator() + " has state " + action.getState() +
+					" and can not be changed to " + state);
 
 		action.setState(state);
 
@@ -268,6 +272,17 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected DurationParameter findActionDuration(Action action) {
 		return action.findObjectivesParam(PARAM_DURATION, true);
+	}
+
+	/**
+	 * Delays the given {@link Runnable} by the given {@link PeriodDuration}
+	 *
+	 * @param duration the duration to delay
+	 * @param runnable the action to delay
+	 */
+	public void delay(PeriodDuration duration, Runnable runnable) {
+		long delayMs = duration.toMillis();
+		getDelayedExecutionTimer().delay(delayMs, runnable);
 	}
 
 	/**
