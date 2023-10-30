@@ -740,6 +740,8 @@ public class Activity extends AbstractStrolchRootElement
 
 	@Override
 	public Activity ensureModifiable() {
+		if (!this.isRootElement())
+			throw new IllegalStateException("Only call this method on the root element!");
 		if (isReadOnly())
 			return getClone(true);
 		return this;
