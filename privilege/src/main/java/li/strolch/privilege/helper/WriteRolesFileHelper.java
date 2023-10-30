@@ -1,18 +1,20 @@
 package li.strolch.privilege.helper;
 
+import li.strolch.privilege.model.internal.Role;
+import li.strolch.privilege.xml.PrivilegeRolesSaxReader;
+import li.strolch.privilege.xml.PrivilegeRolesSaxWriter;
+import li.strolch.utils.helper.XmlHelper;
+
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import li.strolch.privilege.model.internal.Role;
-import li.strolch.privilege.xml.PrivilegeRolesDomWriter;
-import li.strolch.privilege.xml.PrivilegeRolesSaxReader;
-import li.strolch.utils.helper.XmlHelper;
-
 public class WriteRolesFileHelper {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws XMLStreamException, IOException {
 
 		if (args.length != 2)
 			throw new IllegalStateException("Usage: <src> <dst>");
@@ -31,7 +33,7 @@ public class WriteRolesFileHelper {
 		Map<String, Role> rolesMap = xmlHandler.getRoles();
 		List<Role> roles = new ArrayList<>(rolesMap.values());
 
-		PrivilegeRolesDomWriter configSaxWriter = new PrivilegeRolesDomWriter(roles, dst);
+		PrivilegeRolesSaxWriter configSaxWriter = new PrivilegeRolesSaxWriter(roles, dst);
 		configSaxWriter.write();
 	}
 }

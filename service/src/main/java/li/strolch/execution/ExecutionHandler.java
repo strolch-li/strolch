@@ -219,7 +219,7 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * @throws IllegalStateException
 	 * 		if the default realm is not set!
 	 */
-	public abstract void addForExecution(Activity activity);
+	public abstract Controller addForExecution(Activity activity);
 
 	/**
 	 * Registers the given {@link Activity} for execution. Execution is started when the concrete implementation deems
@@ -230,7 +230,7 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * @param activity
 	 * 		the {@link Activity}
 	 */
-	public abstract void addForExecution(String realm, Activity activity);
+	public abstract Controller addForExecution(String realm, Activity activity);
 
 	/**
 	 * Registers the given {@link Activity} for execution on the default realm, and submits it for execution immediately

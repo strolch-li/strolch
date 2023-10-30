@@ -15,16 +15,16 @@
  */
 package li.strolch.privilege.model;
 
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
-
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.internal.Role;
-import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
  * To keep certain details of the {@link Role} itself hidden from remote clients and make sure instances are only edited
@@ -33,40 +33,55 @@ import li.strolch.utils.helper.StringHelper;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RoleRep implements Serializable {
+public class RoleRep {
 
 	private String name;
-	private List<PrivilegeRep> privileges;
+	private Map<String, PrivilegeRep> privileges;
+
+	private boolean readOnly;
 
 	/**
 	 * Default constructor
 	 *
-	 * @param name
-	 * 		the name of this role
-	 * @param privileges
-	 * 		the list of privileges granted to this role
+	 * @param name       the name of this role
+	 * @param privileges the list of privileges granted to this role
 	 */
-	public RoleRep(String name, List<PrivilegeRep> privileges) {
+	public RoleRep(String name, Map<String, PrivilegeRep> privileges) {
 		this.name = trimOrEmpty(name);
-		this.privileges = privileges;
+		setPrivileges(privileges == null ? Map.of() : privileges);
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public RoleRep readOnly() {
+		if (this.readOnly)
+			return this;
+		this.readOnly = true;
+		this.privileges = Map.copyOf(this.privileges);
+		return this;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readOnly)
+			throw new IllegalStateException("Role is currently readOnly, to modify get a copy!");
 	}
 
 	/**
 	 * validates that all required fields are set
 	 */
 	public void validate() {
-		if (StringHelper.isEmpty(this.name))
+		if (isEmpty(this.name))
 			throw new PrivilegeException("name is null");
 
-		if (this.privileges != null && !this.privileges.isEmpty()) {
-			for (PrivilegeRep privilege : this.privileges) {
-				try {
-					privilege.validate();
-				} catch (Exception e) {
-					String msg = "Privilege {0} is invalid on role {1}";
-					msg = MessageFormat.format(msg, privilege.getName(), this.name);
-					throw new PrivilegeException(msg, e);
-				}
+		for (PrivilegeRep privilege : this.privileges.values()) {
+			try {
+				privilege.validate();
+			} catch (Exception e) {
+				String msg = "Privilege {0} is invalid on role {1}";
+				msg = MessageFormat.format(msg, privilege.getName(), this.name);
+				throw new PrivilegeException(msg, e);
 			}
 		}
 	}
@@ -79,30 +94,29 @@ public class RoleRep implements Serializable {
 	}
 
 	/**
-	 * @param name
-	 * 		the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		assertNotReadonly();
 		this.name = trimOrEmpty(name);
 	}
 
-	/**
-	 * Returns the privileges assigned to this Role as a list
-	 *
-	 * @return the privileges assigned to this Role as a list
-	 */
-	public List<PrivilegeRep> getPrivileges() {
-		return this.privileges == null ? new ArrayList<>() : this.privileges;
+	public Map<String, PrivilegeRep> getPrivileges() {
+		if (this.privileges == null)
+			return null;
+		return this.privileges;
 	}
 
-	/**
-	 * Sets the privileges on this from a list
-	 *
-	 * @param privileges
-	 * 		the list of privileges to assign to this role
-	 */
-	public void setPrivileges(List<PrivilegeRep> privileges) {
-		this.privileges = privileges;
+	public void setPrivileges(Map<String, PrivilegeRep> privileges) {
+		assertNotReadonly();
+		DBC.PRE.assertNotNull("privileges must not be null!", privileges);
+		this.privileges = new HashMap<>(privileges);
+	}
+
+	public void addPrivilege(PrivilegeRep privilegeRep) {
+		DBC.PRE.assertFalse(() -> "Privilege " + privilegeRep.getName() + " already on role " + this.name,
+				privileges.containsKey(privilegeRep.getName()));
+		this.privileges.put(privilegeRep.getName(), privilegeRep);
 	}
 
 	/**
@@ -112,8 +126,7 @@ public class RoleRep implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "RoleRep [name=" + this.name + ", privilegeMap=" + (this.privileges == null ? "null" : this.privileges)
-				+ "]";
+		return "RoleRep [name=" + this.name + ", privilegeMap=" + this.privileges + "]";
 	}
 
 	@Override
@@ -133,10 +146,13 @@ public class RoleRep implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		RoleRep other = (RoleRep) obj;
-		if (this.name == null) {
+		if (this.name == null)
 			return other.name == null;
-		} else
-			return this.name.equals(other.name);
+		return this.name.equals(other.name);
+	}
+
+	public RoleRep getCopy() {
+		return new RoleRep(this.name, this.privileges);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

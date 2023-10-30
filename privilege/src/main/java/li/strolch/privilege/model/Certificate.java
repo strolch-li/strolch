@@ -15,20 +15,18 @@
  */
 package li.strolch.privilege.model;
 
-import static li.strolch.privilege.base.PrivilegeConstants.*;
+import li.strolch.privilege.base.PrivilegeConstants;
+import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.internal.User;
+import li.strolch.utils.dbc.DBC;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import li.strolch.privilege.base.PrivilegeConstants;
-import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.model.internal.User;
-import li.strolch.utils.helper.StringHelper;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * The {@link Certificate} is the object a client keeps when accessing a Privilege enabled system. This object is the
@@ -37,7 +35,7 @@ import li.strolch.utils.helper.StringHelper;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public final class Certificate implements Serializable {
+public final class Certificate {
 
 	private final Usage usage;
 	private final String sessionId;
@@ -50,6 +48,7 @@ public final class Certificate implements Serializable {
 	private final ZonedDateTime loginTime;
 	private final boolean keepAlive;
 
+	private final Set<String> userGroups;
 	private final Set<String> userRoles;
 	private final Map<String, String> propertyMap;
 
@@ -64,49 +63,28 @@ public final class Certificate implements Serializable {
 	 * by the {@link PrivilegeHandler}
 	 * </p>
 	 *
-	 * @param usage
-	 * 		the usage allowed for this certificate
-	 * @param sessionId
-	 * 		the users session id
-	 * @param username
-	 * 		the users login name
-	 * @param firstName
-	 * 		the users first name
-	 * @param lastName
-	 * 		the users last name
-	 * @param authToken
-	 * 		the authentication token defining the users unique session and is a private field of this certificate.
-	 * @param locale
-	 * 		the users {@link Locale}
-	 * @param userRoles
-	 * 		the user's roles
-	 * @param propertyMap
-	 * 		a {@link Map} containing string value pairs of properties for the logged in user. These properties can be
-	 * 		edited and can be used for the user to change settings of this session
+	 * @param usage       the usage allowed for this certificate
+	 * @param sessionId   the users session id
+	 * @param username    the users login name
+	 * @param firstName   the users first name
+	 * @param lastName    the users last name
+	 * @param authToken   the authentication token defining the users unique session and is a private field of this
+	 *                    certificate.
+	 * @param locale      the users {@link Locale}
+	 * @param userRoles   the user's roles
+	 * @param propertyMap a {@link Map} containing string value pairs of properties for the logged in user. These
+	 *                    properties can be edited and can be used for the user to change settings of this session
 	 */
 	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
 			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
-			Locale locale, Set<String> userRoles, Map<String, String> propertyMap) {
+			Locale locale, Set<String> userGroups, Set<String> userRoles, Map<String, String> propertyMap) {
 
-		// validate arguments are not null
-		if (StringHelper.isEmpty(sessionId)) {
-			throw new PrivilegeException("sessionId is null!");
-		}
-		if (StringHelper.isEmpty(username)) {
-			throw new PrivilegeException("username is null!");
-		}
-		if (StringHelper.isEmpty(authToken)) {
-			throw new PrivilegeException("authToken is null!");
-		}
-		if (userState == null) {
-			throw new PrivilegeException("userState is null!");
-		}
-		if (usage == null) {
-			throw new PrivilegeException("usage is null!");
-		}
-		if (source == null) {
-			throw new PrivilegeException("source is null!");
-		}
+		DBC.PRE.assertNotEmpty("sessionId must not be empty", sessionId);
+		DBC.PRE.assertNotEmpty("username must not be empty", username);
+		DBC.PRE.assertNotEmpty("authToken must not be empty", authToken);
+		DBC.PRE.assertNotNull("userState must not be empty", userState);
+		DBC.PRE.assertNotNull("usage must not be empty", usage);
+		DBC.PRE.assertNotNull("source must not be null", source);
 
 		this.usage = usage;
 		this.sessionId = sessionId;
@@ -126,11 +104,12 @@ public final class Certificate implements Serializable {
 			this.locale = locale;
 
 		if (propertyMap == null)
-			this.propertyMap = Collections.emptyMap();
+			this.propertyMap = Map.of();
 		else
-			this.propertyMap = Collections.unmodifiableMap(propertyMap);
+			this.propertyMap = Map.copyOf(propertyMap);
 
-		this.userRoles = Collections.unmodifiableSet(userRoles);
+		this.userGroups = Set.copyOf(userGroups);
+		this.userRoles = Set.copyOf(userRoles);
 		this.lastAccess = ZonedDateTime.now();
 	}
 
@@ -150,15 +129,29 @@ public final class Certificate implements Serializable {
 		return this.usage;
 	}
 
+	public Set<String> getUserGroups() {
+		return this.userGroups;
+	}
+
 	public Set<String> getUserRoles() {
 		return this.userRoles;
 	}
 
 	/**
+	 * Returns true if the user of this certificate has the given group
+	 *
+	 * @param group the group to check for
+	 *
+	 * @return true if the user of this certificate has the given group
+	 */
+	public boolean hasGroup(String group) {
+		return this.userGroups.contains(group);
+	}
+
+	/**
 	 * Returns true if the user of this certificate has the given role
 	 *
-	 * @param role
-	 * 		the role to check for
+	 * @param role the role to check for
 	 *
 	 * @return true if the user of this certificate has the given role
 	 */
@@ -178,8 +171,7 @@ public final class Certificate implements Serializable {
 	/**
 	 * Returns the property with the given key
 	 *
-	 * @param key
-	 * 		the key for which the property is to be returned
+	 * @param key the key for which the property is to be returned
 	 *
 	 * @return the value of the property with the given key, or null if it does not exist
 	 */
@@ -283,12 +275,12 @@ public final class Certificate implements Serializable {
 		builder.append(", username=");
 		builder.append(this.username);
 
-		if (StringHelper.isNotEmpty(this.firstname)) {
+		if (isNotEmpty(this.firstname)) {
 			builder.append(", firstname=");
 			builder.append(this.firstname);
 		}
 
-		if (StringHelper.isNotEmpty(this.lastname)) {
+		if (isNotEmpty(this.lastname)) {
 			builder.append(", lastname=");
 			builder.append(this.lastname);
 		}

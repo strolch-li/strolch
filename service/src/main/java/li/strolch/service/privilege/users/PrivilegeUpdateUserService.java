@@ -49,7 +49,7 @@ public class PrivilegeUpdateUserService extends AbstractService<PrivilegeUserArg
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_MODIFY_USER)) {
 			tx.setSuppressAudits(true);
 
-			user = privilegeHandler.updateUser(getCertificate(), arg.user);
+			user = privilegeHandler.updateUser(getCertificate(), arg.user, null);
 			if (privilegeHandler.isPersistOnUserDataChanged())
 				privilegeHandler.persist(getCertificate());
 

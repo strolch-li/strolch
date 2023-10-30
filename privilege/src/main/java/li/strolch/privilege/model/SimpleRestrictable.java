@@ -26,10 +26,8 @@ public class SimpleRestrictable implements Restrictable {
 	private final Object value;
 
 	/**
-	 * @param name
-	 * 		the name of the privilege
-	 * @param value
-	 * 		the value allowed on the privilege
+	 * @param name  the name of the privilege
+	 * @param value the value allowed on the privilege
 	 */
 	public SimpleRestrictable(String name, Object value) {
 		DBC.PRE.assertNotEmpty("name must not be empty", name);

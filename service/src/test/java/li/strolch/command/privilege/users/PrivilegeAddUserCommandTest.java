@@ -15,17 +15,17 @@
  */
 package li.strolch.command.privilege.users;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.*;
-
 import li.strolch.command.AbstractRealmCommandTest;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.service.api.Command;
 import li.strolch.service.privilege.users.PrivilegeAddUserCommand;
+
+import java.util.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -40,12 +40,14 @@ public class PrivilegeAddUserCommandTest extends AbstractRealmCommandTest {
 	@Override
 	protected Command getCommandInstance(StrolchTransaction tx) {
 
+		Set<String> groups = new HashSet<>();
+		groups.add("AppGroups");
 		Set<String> roles = new HashSet<>();
 		roles.add("AppUser");
 		Map<String, String> propertyMap = new HashMap<>();
 
-		UserRep user = new UserRep(null, "dude", "Jeff", "Lebowski", UserState.ENABLED, roles, Locale.getDefault(),
-				propertyMap, null);
+		UserRep user = new UserRep(null, "dude", "Jeff", "Lebowski", UserState.ENABLED, groups, roles,
+				Locale.getDefault(), propertyMap, null);
 
 		PrivilegeAddUserCommand command = new PrivilegeAddUserCommand(tx);
 		command.setUserIn(user);

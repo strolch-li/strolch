@@ -20,8 +20,12 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import li.strolch.utils.time.PeriodDuration;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -53,6 +57,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	protected Locator resourceLoc;
 	protected Locator actionLoc;
 
+	protected List<ScheduledFuture<?>> futures;
+
 	/**
 	 * The TX for this execution policy. The TX needs to be updated when this execution policy has a longer life time
 	 * than the actual TX
@@ -63,6 +69,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 		super(tx);
 		this.tx = tx;
 		this.realm = tx.getRealmName();
+		this.futures = new ArrayList<>();
 	}
 
 	/**
@@ -225,6 +232,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	public void stop() {
 		this.stopped = true;
 		try {
+			this.futures.forEach(future -> future.cancel(false));
 			handleStopped();
 		} catch (Exception e) {
 			logger.error("Stopping failed for " + this.actionLoc, e);
@@ -246,6 +254,9 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * @param state  the new state to set
 	 */
 	protected void setActionState(Action action, State state) {
+		if (action.getState().inClosedPhase())
+			throw new IllegalStateException("Action " + action.getLocator() + " has state " + action.getState() +
+					" and can not be changed to " + state);
 
 		action.setState(state);
 
@@ -271,6 +282,17 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Delays the given {@link Runnable} by the given {@link PeriodDuration}
+	 *
+	 * @param duration the duration to delay
+	 * @param runnable the action to delay
+	 */
+	public void delay(PeriodDuration duration, Runnable runnable) {
+		long delayMs = duration.toMillis();
+		this.futures.add(getDelayedExecutionTimer().delay(delayMs, runnable));
+	}
+
+	/**
 	 * Delays the given {@link Runnable} by the given {@link Duration}
 	 *
 	 * @param duration the duration to delay
@@ -278,7 +300,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	public void delay(Duration duration, Runnable runnable) {
 		long delayMs = duration.toMillis();
-		getDelayedExecutionTimer().delay(delayMs, runnable);
+		this.futures.add(getDelayedExecutionTimer().delay(delayMs, runnable));
 	}
 
 	/**
@@ -321,7 +343,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 			delayMs = 20;
 		}
 		logger.info("Delaying runnable " + runnable + " by " + formatMillisecondsDuration(delayMs));
-		getDelayedExecutionTimer().delay(delayMs, runnable);
+		this.futures.add(getDelayedExecutionTimer().delay(delayMs, runnable));
 	}
 
 	/**

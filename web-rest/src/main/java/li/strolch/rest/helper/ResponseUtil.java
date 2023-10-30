@@ -1,21 +1,14 @@
 package li.strolch.rest.helper;
 
-import static li.strolch.rest.StrolchRestfulConstants.*;
-import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
-import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
-
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import li.strolch.exception.StrolchElementNotFoundException;
+import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
@@ -26,6 +19,14 @@ import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.helper.StringHelper;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 
 /**
  * Created by eitch on 29.08.16.
@@ -155,17 +156,17 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(Throwable t) {
-		if (t instanceof AccessDeniedException) {
-			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
-		} else if (t instanceof StrolchElementNotFoundException) {
-			return ResponseUtil.toResponse(Status.NOT_FOUND, t);
-		} else if (t instanceof PrivilegeModelException) {
-			return ResponseUtil.toResponse(Status.INTERNAL_SERVER_ERROR, t);
-		} else if (t instanceof PrivilegeException) {
+		if (t instanceof StrolchNotAuthenticatedException)
 			return ResponseUtil.toResponse(Status.UNAUTHORIZED, t);
-		} else {
-			return toResponse(Status.INTERNAL_SERVER_ERROR, t);
-		}
+		if (t instanceof AccessDeniedException)
+			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
+		if (t instanceof StrolchElementNotFoundException)
+			return ResponseUtil.toResponse(Status.NOT_FOUND, t);
+		if (t instanceof PrivilegeModelException)
+			return ResponseUtil.toResponse(Status.INTERNAL_SERVER_ERROR, t);
+		if (t instanceof PrivilegeException)
+			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
+		return toResponse(Status.INTERNAL_SERVER_ERROR, t);
 	}
 
 	public static Response toResponse(Status status, String msg) {
@@ -183,8 +184,8 @@ public class ResponseUtil {
 			response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 		} else {
 			Throwable rootCause = getRootCause(t);
-			if (rootCause instanceof StrolchUserMessageException ex
-					&& ((StrolchUserMessageException) rootCause).hasI18n()) {
+			if (rootCause instanceof StrolchUserMessageException ex &&
+					((StrolchUserMessageException) rootCause).hasI18n()) {
 				response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 			}
 		}

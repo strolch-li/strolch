@@ -2,61 +2,32 @@
 <Roles>
 
     <Role name="PrivilegeAdmin">
-        <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
-            <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserService</Allow>
-            <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserRolesService</Allow>
-            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserPasswordService</Allow>
-            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserLocaleService</Allow>
-            <Allow>li.strolch.service.privilege.users.PrivilegeRemoveUserService</Allow>
-            <Allow>li.strolch.service.privilege.users.PrivilegeRemoveRoleFromUserService</Allow>
-            <Allow>li.strolch.service.privilege.users.PrivilegeAddUserService</Allow>
-            <Allow>li.strolch.service.privilege.users.PrivilegeAddRoleToUserService</Allow>
-            <Allow>li.strolch.service.privilege.roles.PrivilegeUpdateRoleService</Allow>
-            <Allow>li.strolch.service.privilege.roles.PrivilegeRemoveRoleService</Allow>
-            <Allow>li.strolch.service.privilege.roles.PrivilegeRemovePrivilegeFromRoleService</Allow>
-            <Allow>li.strolch.service.privilege.roles.PrivilegeAddRoleService</Allow>
-            <Allow>li.strolch.service.privilege.roles.PrivilegeAddOrReplacePrivilegeOnRoleService</Allow>
-        </Privilege>
-        <Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege">
-            <AllAllowed>true</AllAllowed>
-        </Privilege>
-        <Privilege name="PrivilegeRemoveUser" policy="UserAccessPrivilege">
+        <Privilege name="GetSession" policy="UserSessionAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="InvalidateSession" policy="UserSessionAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
-            <AllAllowed>true</AllAllowed>
-        </Privilege>
-        <Privilege name="RequirePasswordChange" policy="UserAccessPrivilege">
-            <AllAllowed>true</AllAllowed>
-        </Privilege>
-        <Privilege name="PrivilegeSetUserLocale" policy="UserAccessPrivilege">
-            <AllAllowed>true</AllAllowed>
-        </Privilege>
         <Privilege name="PrivilegeAction" policy="DefaultPrivilege">
-            <Allow>Reload</Allow>
+            <Allow>GetCertificates</Allow>
             <Allow>GetPolicies</Allow>
             <Allow>Persist</Allow>
-            <Allow>GetCertificates</Allow>
             <Allow>PersistSessions</Allow>
+            <Allow>Reload</Allow>
         </Privilege>
-        <Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
+        <Privilege name="PrivilegeAddRole" policy="RoleAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeSetUserState" policy="UserAccessPrivilege">
-            <Deny>SYSTEM</Deny>
-            <Allow>DISABLED</Allow>
-            <Allow>ENABLED</Allow>
-        </Privilege>
-        <Privilege name="PrivilegeAddRoleToUser" policy="UserAccessPrivilege">
+        <Privilege name="PrivilegeAddUser" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="PrivilegeGetRole" policy="RoleAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="GetSession" policy="UserSessionAccessPrivilege">
+        <Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="PrivilegeModifyRole" policy="RoleAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="PrivilegeModifyUser" policy="UserAccessPrivilege">
@@ -65,14 +36,34 @@
         <Privilege name="PrivilegeRemoveRole" policy="RoleAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeRemoveRoleFromUser" policy="UserAccessPrivilege">
+        <Privilege name="PrivilegeRemoveUser" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeModifyRole" policy="RoleAccessPrivilege">
+        <Privilege name="PrivilegeSetUserLocale" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeAddRole" policy="RoleAccessPrivilege">
+        <Privilege name="PrivilegeSetUserPassword" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="PrivilegeSetUserState" policy="UserAccessPrivilege">
+            <Deny>SYSTEM</Deny>
+            <Allow>DISABLED</Allow>
+            <Allow>ENABLED</Allow>
+        </Privilege>
+        <Privilege name="RequirePasswordChange" policy="UserAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
+            <Allow>li.strolch.service.privilege.roles.PrivilegeAddRoleService</Allow>
+            <Allow>li.strolch.service.privilege.roles.PrivilegeRemoveRoleService</Allow>
+            <Allow>li.strolch.service.privilege.roles.PrivilegeUpdateRoleService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeAddUserService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeRemoveUserService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserLocaleService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserPasswordService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeSetUserStateService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserRolesService</Allow>
+            <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserService</Allow>
         </Privilege>
     </Role>
 

@@ -44,7 +44,7 @@ import static li.strolch.privilege.helper.XmlConstants.*;
  * <p>
  * Required parameters:
  * <ul>
- * <li>{@link XmlConstants#XML_PARAM_HASH_ALGORITHM}</li>
+ * <li>{@link XmlConstants#PARAM_HASH_ALGORITHM}</li>
  * </ul>
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -121,7 +121,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		try {
 
 			MessageDigest digest = MessageDigest.getInstance(this.nonSaltAlgorithm);
-			return new PasswordCrypt(digest.digest(new String(password).getBytes()), null);
+			return PasswordCrypt.of(digest.digest(new String(password).getBytes()), null);
 
 		} catch (NoSuchAlgorithmException e) {
 			throw new PrivilegeException(MessageFormat.format("Algorithm {0} was not found!", nonSaltAlgorithm),
@@ -151,9 +151,8 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 	@Override
 	public boolean isPasswordCryptOutdated(PasswordCrypt passwordCrypt) {
-		return passwordCrypt.getSalt() == null || passwordCrypt.getHashAlgorithm() == null ||
-				passwordCrypt.getHashIterations() != this.iterations ||
-				passwordCrypt.getHashKeyLength() != this.keyLength;
+		return passwordCrypt.salt() == null || passwordCrypt.hashAlgorithm() == null ||
+				passwordCrypt.hashIterations() != this.iterations || passwordCrypt.hashKeyLength() != this.keyLength;
 	}
 
 	@Override
@@ -163,13 +162,13 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		this.secureRandom = new SecureRandom();
 
 		// get hash algorithm parameters
-		this.algorithm = parameterMap.getOrDefault(XML_PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
-		this.nonSaltAlgorithm = parameterMap.getOrDefault(XML_PARAM_HASH_ALGORITHM_NON_SALT,
+		this.algorithm = parameterMap.getOrDefault(PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
+		this.nonSaltAlgorithm = parameterMap.getOrDefault(PARAM_HASH_ALGORITHM_NON_SALT,
 				DEFAULT_ALGORITHM_NON_SALT);
 		this.iterations = Integer.parseInt(
-				parameterMap.getOrDefault(XML_PARAM_HASH_ITERATIONS, valueOf(DEFAULT_ITERATIONS)));
+				parameterMap.getOrDefault(PARAM_HASH_ITERATIONS, valueOf(DEFAULT_ITERATIONS)));
 		this.keyLength = Integer.parseInt(
-				parameterMap.getOrDefault(XML_PARAM_HASH_KEY_LENGTH, valueOf(DEFAULT_KEY_LENGTH)));
+				parameterMap.getOrDefault(PARAM_HASH_KEY_LENGTH, valueOf(DEFAULT_KEY_LENGTH)));
 
 		// test non-salt hash algorithm
 		try {
@@ -178,7 +177,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 					MessageFormat.format("Using non-salt hashing algorithm {0}", this.nonSaltAlgorithm));
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
-			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XML_PARAM_HASH_ALGORITHM_NON_SALT,
+			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), PARAM_HASH_ALGORITHM_NON_SALT,
 					e.getLocalizedMessage());
 			throw new PrivilegeException(msg, e);
 		}
@@ -189,7 +188,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 			DefaultEncryptionHandler.logger.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm));
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
-			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), XML_PARAM_HASH_ALGORITHM,
+			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), PARAM_HASH_ALGORITHM,
 					e.getLocalizedMessage());
 			throw new PrivilegeException(msg, e);
 		}

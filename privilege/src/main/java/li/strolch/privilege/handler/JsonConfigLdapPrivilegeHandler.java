@@ -1,10 +1,11 @@
 package li.strolch.privilege.handler;
 
-import static java.lang.String.join;
-import static java.util.stream.Collectors.toSet;
-import static li.strolch.privilege.base.PrivilegeConstants.*;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import li.strolch.privilege.helper.LdapHelper;
+import li.strolch.privilege.policy.PrivilegePolicy;
+import li.strolch.utils.dbc.DBC;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -13,12 +14,11 @@ import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import li.strolch.privilege.helper.LdapHelper;
-import li.strolch.privilege.policy.PrivilegePolicy;
-import li.strolch.utils.dbc.DBC;
+import static java.lang.String.join;
+import static java.util.stream.Collectors.toSet;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
@@ -42,15 +42,14 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		DBC.PRE.assertNotEmpty("realm must be set!", realm);
 
 		this.defaultLocale = parameterMap.containsKey("defaultLocale") ?
-				Locale.forLanguageTag(parameterMap.get("defaultLocale")) :
-				Locale.getDefault();
+				Locale.forLanguageTag(parameterMap.get("defaultLocale")) : Locale.getDefault();
 
 		String configFileS = parameterMap.get("configFile");
 		DBC.PRE.assertNotEmpty("configFile param must be set!", configFileS);
 		File configFile = new File(configFileS);
 		if (!configFile.exists() || !configFile.isFile() || !configFile.canRead())
-			throw new IllegalStateException("configFile does not exist, is not a file, or can not be read at path "
-					+ configFile.getAbsolutePath());
+			throw new IllegalStateException("configFile does not exist, is not a file, or can not be read at path " +
+					configFile.getAbsolutePath());
 
 		// parse the configuration file
 		JsonObject configJ;
@@ -82,14 +81,14 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		// validate the configuration
 		for (String name : this.ldapGroupNames) {
 			JsonObject config = ldapGroupConfigs.get(name).getAsJsonObject();
-			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray()
-					|| config.get(LOCATION).getAsJsonArray().size() == 0)
-				throw new IllegalStateException("LDAP Group " + name
-						+ " is missing a location attribute, or it is not an array or the array is empty");
-			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray()
-					|| config.get(LOCATION).getAsJsonArray().size() == 0)
-				throw new IllegalStateException("LDAP Group " + name
-						+ " is missing a roles attribute, or it is not an array or the array is empty");
+			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray() ||
+					config.get(LOCATION).getAsJsonArray().isEmpty())
+				throw new IllegalStateException("LDAP Group " + name +
+						" is missing a location attribute, or it is not an array or the array is empty");
+			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray() ||
+					config.get(LOCATION).getAsJsonArray().isEmpty())
+				throw new IllegalStateException("LDAP Group " + name +
+						" is missing a roles attribute, or it is not an array or the array is empty");
 		}
 
 		this.userLdapGroupOverrides = new HashMap<>();
@@ -133,33 +132,40 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 			logger.info("Overriding LDAP group for user " + username + " to " + overrideGroup);
 		}
 
-		Set<String> relevantLdapGroups = ldapGroups.stream()
-				.filter(s -> this.ldapGroupNames.contains(s))
+		Set<String> relevantLdapGroups = ldapGroups.stream().filter(s -> this.ldapGroupNames.contains(s))
 				.collect(toSet());
 		if (relevantLdapGroups.isEmpty())
-			throw new IllegalStateException("User " + username
-					+ " can not login, as none of their LDAP Groups have mappings to Strolch Roles!");
+			throw new IllegalStateException("User " + username +
+					" can not login, as none of their LDAP Groups have mappings to Strolch Roles!");
 
 		if (relevantLdapGroups.size() > 1) {
 			logger.warn(
-					"User " + username + " has multiple relevant LDAP Groups which will lead to undefined behaviour: "
-							+ join(",", relevantLdapGroups));
+					"User " + username + " has multiple relevant LDAP Groups which will lead to undefined behaviour: " +
+							join(",", relevantLdapGroups));
 		}
 
 		return relevantLdapGroups;
 	}
 
 	@Override
+	protected Set<String> mapToStrolchGroups(String username, Set<String> ldapGroups) {
+		return mapLdapGroupToStrolch(ldapGroups, GROUPS);
+	}
+
+	@Override
 	protected Set<String> mapToStrolchRoles(String username, Set<String> ldapGroups) {
+		return mapLdapGroupToStrolch(ldapGroups, ROLES);
+	}
 
-		Set<String> strolchRoles = new HashSet<>();
-
+	private Set<String> mapLdapGroupToStrolch(Set<String> ldapGroups, String type) {
+		Set<String> mappedValues = new HashSet<>();
 		for (String relevantLdapGroup : ldapGroups) {
 			JsonObject mappingJ = this.ldapGroupConfigs.get(relevantLdapGroup).getAsJsonObject();
-			mappingJ.get(ROLES).getAsJsonArray().forEach(e -> strolchRoles.add(e.getAsString()));
+			if (mappingJ.has(type))
+				mappingJ.get(type).getAsJsonArray().forEach(e -> mappedValues.add(e.getAsString()));
 		}
 
-		return strolchRoles;
+		return mappedValues;
 	}
 
 	@Override
@@ -194,9 +200,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 				} else {
 					String location = primaryLocationJ.getAsString();
 					if (!secondaryLocations.contains(location)) {
-						logger.warn(
-								"Primary location already set by previous LDAP Group config for LDAP Group " + ldapGroup
-										+ ", adding to secondary locations.");
+						logger.warn("Primary location already set by previous LDAP Group config for LDAP Group " +
+								ldapGroup + ", adding to secondary locations.");
 						secondaryLocations.add(location);
 					}
 				}
@@ -210,9 +215,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 					else
 						secondaryLocationsJ.getAsJsonArray().forEach(s -> secondaryLocations.add(s.getAsString()));
 				} else {
-					logger.warn(
-							"Secondary locations already set by previous LDAP Group config for LDAP Group " + ldapGroup
-									+ ", adding additional");
+					logger.warn("Secondary locations already set by previous LDAP Group config for LDAP Group " +
+							ldapGroup + ", adding additional");
 					if (secondaryLocationsJ.isJsonPrimitive())
 						secondaryLocations.add(secondaryLocationsJ.getAsString());
 					else

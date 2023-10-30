@@ -17,7 +17,6 @@ package li.strolch.privilege.xml;
 
 import org.xml.sax.Attributes;
 
-// TODO write JavaDoc...
 public interface ElementParser {
 
 	void startElement(String uri, String localName, String qName, Attributes attributes);

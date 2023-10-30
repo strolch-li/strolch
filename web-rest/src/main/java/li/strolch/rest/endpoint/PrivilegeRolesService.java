@@ -15,29 +15,27 @@
  */
 package li.strolch.rest.endpoint;
 
-import static java.util.Comparator.comparing;
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_ROLE;
-
+import com.google.gson.JsonArray;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import com.google.gson.JsonArray;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.json.PrivilegeElementFromJsonVisitor;
 import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.privilege.roles.*;
+
+import static java.util.Comparator.comparing;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_ROLE;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -147,50 +145,11 @@ public class PrivilegeRolesService {
 		return handleServiceResult(svcResult);
 	}
 
-	@PUT
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{roleName}/privileges")
-	public Response addOrReplacePrivilegeOnRole(@Context HttpServletRequest request,
-			@PathParam("roleName") String roleName, String data) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		PrivilegeRep privilegeRep = new PrivilegeElementFromJsonVisitor().privilegeRepFromJson(data);
-
-		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
-		PrivilegeAddOrReplacePrivilegeOnRoleService svc = new PrivilegeAddOrReplacePrivilegeOnRoleService();
-		PrivilegeAddOrReplacePrivilegeOnRoleArgument arg = new PrivilegeAddOrReplacePrivilegeOnRoleArgument();
-		arg.roleName = roleName;
-		arg.privilegeRep = privilegeRep;
-
-		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
-	}
-
-	@DELETE
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{roleName}/privileges/{privilege}")
-	public Response removePrivilegeFromRole(@Context HttpServletRequest request, @PathParam("roleName") String roleName,
-			@PathParam("privilege") String privilege) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-
-		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
-		PrivilegeRemovePrivilegeFromRoleService svc = new PrivilegeRemovePrivilegeFromRoleService();
-		PrivilegeRemovePrivilegeFromRoleArgument arg = new PrivilegeRemovePrivilegeFromRoleArgument();
-		arg.roleName = roleName;
-		arg.privilegeName = privilege;
-
-		PrivilegeRoleResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
-	}
-
 	private Response handleServiceResult(PrivilegeRoleResult svcResult) {
 		if (svcResult.isOk()) {
 			RoleRep roleRep = svcResult.getRole();
-			return Response
-					.ok(roleRep.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
-					.build();
+			return Response.ok(roleRep.accept(new PrivilegeElementToJsonVisitor()).toString(),
+					MediaType.APPLICATION_JSON).build();
 		}
 		return ResponseUtil.toResponse(svcResult);
 	}

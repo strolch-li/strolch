@@ -15,8 +15,6 @@
  */
 package li.strolch.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -26,6 +24,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 /**
  * Interface for all Strolch policies, which are instantiated by the {@link PolicyHandler}
@@ -101,6 +101,14 @@ public abstract class StrolchPolicy {
 	 */
 	protected StrolchTransaction tx() {
 		return this.tx;
+	}
+
+	/**
+	 * Returns true if this TX is still open, or committing, and thus can still be used
+	 * @return true if this TX is still open, or committing, and thus can still be used
+	 */
+	protected boolean isTxOpen() {
+		return this.tx.isOpen() || this.tx.isCommitting();
 	}
 
 	protected Order getOrder(IActivityElement element) {

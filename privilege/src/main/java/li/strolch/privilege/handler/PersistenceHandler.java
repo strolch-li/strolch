@@ -15,14 +15,17 @@
  */
 package li.strolch.privilege.handler;
 
-import java.util.List;
-import java.util.Map;
-
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.Restrictable;
+import li.strolch.privilege.model.internal.Group;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -33,7 +36,7 @@ import li.strolch.privilege.policy.PrivilegePolicy;
  * <p>
  * The {@link PersistenceHandler} also serves the special {@link PrivilegePolicy} objects. These policies are special
  * objects which implement an algorithm to define if an action is allowed on a {@link Restrictable} by a {@link Role}
- * and {@link IPrivilege}
+ * and {@link Privilege}
  * </p>
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -48,6 +51,13 @@ public interface PersistenceHandler {
 	List<User> getAllUsers();
 
 	/**
+	 * Returns all currently known {@link Group}s
+	 *
+	 * @return all currently known {@link Group}s
+	 */
+	List<Group> getAllGroups();
+
+	/**
 	 * Returns all currently known {@link Role}s
 	 *
 	 * @return all currently known {@link Role}s
@@ -57,18 +67,25 @@ public interface PersistenceHandler {
 	/**
 	 * Returns a {@link User} object from the underlying database
 	 *
-	 * @param username
-	 * 		the name/id of the {@link User} object to return
+	 * @param username the name/id of the {@link User} object to return
 	 *
 	 * @return the {@link User} object, or null if it was not found
 	 */
 	User getUser(String username);
 
 	/**
+	 * Returns a {@link Group} object from the underlying database
+	 *
+	 * @param groupName the name/id of the {@link Group} object to return
+	 *
+	 * @return the {@link Group} object, or null if it was not found
+	 */
+	Group getGroup(String groupName);
+
+	/**
 	 * Returns a {@link Role} object from the underlying database
 	 *
-	 * @param roleName
-	 * 		the name/id of the {@link Role} object to return
+	 * @param roleName the name/id of the {@link Role} object to return
 	 *
 	 * @return the {@link Role} object, or null if it was not found
 	 */
@@ -77,18 +94,25 @@ public interface PersistenceHandler {
 	/**
 	 * Removes a {@link User} with the given name and returns the removed object if it existed
 	 *
-	 * @param username
-	 * 		the name of the {@link User} to remove
+	 * @param username the name of the {@link User} to remove
 	 *
 	 * @return the {@link User} removed, or null if it did not exist
 	 */
 	User removeUser(String username);
 
 	/**
+	 * Removes a {@link Group} with the given name and returns the removed object if it existed
+	 *
+	 * @param groupName the name of the {@link Group} to remove
+	 *
+	 * @return the {@link Group} removed, or null if it did not exist
+	 */
+	Group removeGroup(String groupName);
+
+	/**
 	 * Removes a {@link Role} with the given name and returns the removed object if it existed
 	 *
-	 * @param roleName
-	 * 		the name of the {@link Role} to remove
+	 * @param roleName the name of the {@link Role} to remove
 	 *
 	 * @return the {@link Role} removed, or null if it did not exist
 	 */
@@ -97,41 +121,51 @@ public interface PersistenceHandler {
 	/**
 	 * Adds a {@link User} object to the underlying database
 	 *
-	 * @param user
-	 * 		the {@link User} object to add
+	 * @param user the {@link User} object to add
 	 */
 	void addUser(User user);
 
 	/**
 	 * Replaces the existing {@link User} object in the underlying database
 	 *
-	 * @param user
-	 * 		the {@link User} object to add
+	 * @param user the {@link User} object to add
 	 */
 	void replaceUser(User user);
 
 	/**
 	 * Adds a {@link Role} object to the underlying database
 	 *
-	 * @param role
-	 * 		the {@link User} object to add
+	 * @param role the {@link Role} object to add
 	 */
 	void addRole(Role role);
 
 	/**
 	 * Replaces the {@link Role} object in the underlying database
 	 *
-	 * @param role
-	 * 		the {@link User} object to add
+	 * @param role the {@link User} object to add
 	 */
 	void replaceRole(Role role);
+
+	/**
+	 * Adds a {@link Group} object to the underlying database
+	 *
+	 * @param group the {@link Group} object to add
+	 */
+	void addGroup(Group group);
+
+	/**
+	 * Replaces the {@link Group} object in the underlying database
+	 *
+	 * @param group the {@link Group} object to add
+	 */
+	void replaceGroup(Group group);
 
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved
 	 *
 	 * @return true if changes were persisted successfully, false if nothing needed to be persisted
 	 */
-	boolean persist();
+	boolean persist() throws XMLStreamException, IOException;
 
 	/**
 	 * Informs this {@link PersistenceHandler} to reload the data from the backend
@@ -144,8 +178,7 @@ public interface PersistenceHandler {
 	 * Initialize the concrete {@link PersistenceHandler}. The passed parameter map contains any configuration the
 	 * concrete {@link PersistenceHandler} might need
 	 *
-	 * @param parameterMap
-	 * 		a map containing configuration properties
+	 * @param parameterMap a map containing configuration properties
 	 */
 	void initialize(Map<String, String> parameterMap);
 

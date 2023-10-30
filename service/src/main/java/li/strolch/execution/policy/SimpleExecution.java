@@ -92,7 +92,7 @@ public class SimpleExecution extends ExecutionPolicy {
 	protected void toWarning(LogMessage message) {
 		cancelWarningTask();
 		addMessage(message);
-		getExecutionHandler().toWarning(this.realm, message.getLocator());
+		getExecutionHandler().toWarning(this.realm, this.actionLoc);
 	}
 
 	protected void toExecuted() throws Exception {
@@ -126,7 +126,7 @@ public class SimpleExecution extends ExecutionPolicy {
 		stop();
 		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
 		addMessage(message);
-		getExecutionHandler().toError(this.realm, message.getLocator());
+		getExecutionHandler().toError(this.realm, this.actionLoc);
 	}
 
 	protected void setActionStateWithValueChange(Action action, State execution, double value) {

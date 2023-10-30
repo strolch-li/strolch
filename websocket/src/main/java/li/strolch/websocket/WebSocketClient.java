@@ -23,7 +23,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.rest.StrolchSessionHandler;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

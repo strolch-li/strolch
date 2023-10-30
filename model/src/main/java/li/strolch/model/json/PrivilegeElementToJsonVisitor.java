@@ -53,7 +53,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.addProperty("name", roleRep.getName());
 
 		JsonArray privilegesJ = new JsonArray();
-		roleRep.getPrivileges().forEach(p -> privilegesJ.add(p.accept(this)));
+		roleRep.getPrivileges().values().forEach(p -> privilegesJ.add(p.accept(this)));
 		jsonObject.add("privileges", privilegesJ);
 
 		return jsonObject;

@@ -33,6 +33,7 @@ import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import li.strolch.service.test.model.TestService;
+import li.strolch.utils.dbc.DBC;
 import org.junit.Test;
 
 /**
@@ -42,11 +43,11 @@ public class ServiceTest extends AbstractServiceTest {
 
 	@Test
 	public void shouldFailInvalidCertificate1() {
-		assertThrows(PrivilegeException.class, () -> {
+		assertThrows(DBC.DbcException.class, () -> {
 			TestService testService = new TestService();
 			getServiceHandler().doService(
 					new Certificate(null, null, null, null, null, null, null, null, ZonedDateTime.now(), false, null,
-							new HashSet<>(), null), testService);
+							new HashSet<>(), new HashSet<>(), null), testService);
 		});
 	}
 
@@ -54,7 +55,7 @@ public class ServiceTest extends AbstractServiceTest {
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", "asd",
-				ZonedDateTime.now(), false, null, new HashSet<>(), null);
+				ZonedDateTime.now(), false, null, new HashSet<>(), new HashSet<>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
 		assertThat(svcResult.getThrowable(), instanceOf(NotAuthenticatedException.class));
 	}
@@ -67,8 +68,7 @@ public class ServiceTest extends AbstractServiceTest {
 		try {
 			TestService testService = new TestService();
 			ServiceResult svcResult = getServiceHandler().doService(certificate, testService);
-			assertThat(svcResult.getMessage(),
-					containsString("User jill may not perform service TestService"));
+			assertThat(svcResult.getMessage(), containsString("User jill may not perform service TestService"));
 			assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
 		} finally {
 			runtimeMock.getPrivilegeHandler().invalidate(certificate);

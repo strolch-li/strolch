@@ -17,7 +17,7 @@ package li.strolch.privilege.policy;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.Role;
@@ -26,7 +26,7 @@ import li.strolch.privilege.model.internal.User;
 /**
  * <p>
  * {@link PrivilegePolicy} implements logic to determine if a {@link User} which has the given {@link Role} and the
- * given {@link IPrivilege} has access to the given {@link Restrictable}
+ * given {@link Privilege} has access to the given {@link Restrictable}
  * </p>
  *
  * <p>
@@ -38,29 +38,29 @@ import li.strolch.privilege.model.internal.User;
 public interface PrivilegePolicy {
 
 	/**
-	 * Checks if the given {@link Role} and the given {@link IPrivilege} has access to the given {@link Restrictable}
+	 * Checks if the given {@link Role} and the given {@link Privilege} has access to the given {@link Restrictable}
 	 *
 	 * @param context
 	 * 		the privilege context
 	 * @param privilege
-	 * 		the {@link IPrivilege} containing the permissions
+	 * 		the {@link Privilege} containing the permissions
 	 * @param restrictable
 	 * 		the {@link Restrictable} to which the user wants access
 	 *
 	 * @throws AccessDeniedException
 	 * 		if action not allowed
 	 */
-	void validateAction(PrivilegeContext context, IPrivilege privilege, Restrictable restrictable)
+	void validateAction(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
 			throws AccessDeniedException;
 
 	/**
-	 * Returns true if the given {@link Role} and the given {@link IPrivilege} has access to the given {@link
+	 * Returns true if the given {@link Role} and the given {@link Privilege} has access to the given {@link
 	 * Restrictable}
 	 *
 	 * @param context
 	 * 		the privilege context
 	 * @param privilege
-	 * 		the {@link IPrivilege} containing the permissions
+	 * 		the {@link Privilege} containing the permissions
 	 * @param restrictable
 	 * 		the {@link Restrictable} to which the user wants access
 	 *
@@ -69,6 +69,6 @@ public interface PrivilegePolicy {
 	 * @throws AccessDeniedException
 	 * 		if something goes wrong with the validate
 	 */
-	boolean hasPrivilege(PrivilegeContext context, IPrivilege privilege, Restrictable restrictable)
+	boolean hasPrivilege(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
 			throws PrivilegeException;
 }

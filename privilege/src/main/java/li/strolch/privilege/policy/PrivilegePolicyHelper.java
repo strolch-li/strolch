@@ -20,7 +20,7 @@ import java.text.MessageFormat;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.utils.helper.StringHelper;
@@ -34,7 +34,7 @@ public class PrivilegePolicyHelper {
 	 * Validates the given values and returns the privilege name
 	 *
 	 * @param privilege
-	 * 		the {@link IPrivilege}
+	 * 		the {@link Privilege}
 	 * @param restrictable
 	 * 		the {@link Restrictable}
 	 *
@@ -43,7 +43,7 @@ public class PrivilegePolicyHelper {
 	 * @throws PrivilegeException
 	 * 		if something is wrong
 	 */
-	public static String preValidate(IPrivilege privilege, Restrictable restrictable) throws PrivilegeException {
+	public static String preValidate(Privilege privilege, Restrictable restrictable) throws PrivilegeException {
 		if (privilege == null)
 			throw new PrivilegeException(PrivilegeMessages.getString("Privilege.privilegeNull"));
 		if (restrictable == null)
@@ -88,7 +88,7 @@ public class PrivilegePolicyHelper {
 	 * @throws AccessDeniedException
 	 * 		if access is denied
 	 */
-	public static boolean checkByAllowDenyValues(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+	public static boolean checkByAllowDenyValues(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable,
 			String privilegeValue, boolean assertHasPrivilege) throws AccessDeniedException {
 
 		// first check values not allowed
@@ -102,7 +102,7 @@ public class PrivilegePolicyHelper {
 		return handleAccessDenied(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
 	}
 
-	private static boolean handleAccessDenied(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+	private static boolean handleAccessDenied(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable,
 			String privilegeValue, boolean assertHasPrivilege) {
 
 		if (assertHasPrivilege) {

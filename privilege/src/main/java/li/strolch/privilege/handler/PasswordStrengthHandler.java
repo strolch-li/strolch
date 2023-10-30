@@ -12,8 +12,7 @@ public interface PasswordStrengthHandler {
 	 * Initialize the concrete {@link PasswordStrengthHandler}. The passed parameter map contains any configuration the
 	 * concrete {@link PasswordStrengthHandler} might need
 	 *
-	 * @param parameterMap
-	 * 		a map containing configuration properties
+	 * @param parameterMap a map containing configuration properties
 	 */
 	void initialize(Map<String, String> parameterMap);
 
@@ -21,16 +20,16 @@ public interface PasswordStrengthHandler {
 	 * Returns a description what a password must contain in order to be regarded as strong for this concrete
 	 * implementation
 	 *
+	 * @param locale the locale in which to return the description
+	 *
 	 * @return a description of a strong password
-	 * @param locale
 	 */
 	String getDescription(Locale locale);
 
 	/**
 	 * Performs the validation of the given password
 	 *
-	 * @param password
-	 * 		the password to validate
+	 * @param password the password to validate
 	 *
 	 * @return true if the password meets the criteria for a strong password
 	 */

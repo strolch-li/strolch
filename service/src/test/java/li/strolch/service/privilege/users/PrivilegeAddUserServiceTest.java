@@ -43,12 +43,14 @@ public class PrivilegeAddUserServiceTest extends AbstractRealmServiceTest<Privil
 
 	@Override
 	protected PrivilegeUserArgument getArgInstance() {
+		Set<String> groups = new HashSet<>();
+		groups.add("AppGroups");
 		Set<String> roles = new HashSet<>();
 		roles.add("AppUser");
 		Map<String, String> propertyMap = new HashMap<>();
 
 		PrivilegeUserArgument arg = new PrivilegeUserArgument();
-		arg.user = new UserRep(null, "dude", "Jeff", "Lebowski", UserState.ENABLED, roles, Locale.getDefault(),
+		arg.user = new UserRep(null, "dude", "Jeff", "Lebowski", UserState.ENABLED, groups, roles, Locale.getDefault(),
 				propertyMap, null);
 
 		return arg;

@@ -15,22 +15,22 @@
  */
 package li.strolch.privilege.xml;
 
-import static li.strolch.privilege.helper.XmlConstants.*;
-
-import java.text.MessageFormat;
-import java.util.*;
-
 import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.internal.Group;
 import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.text.MessageFormat;
+import java.util.*;
+
+import static li.strolch.privilege.helper.XmlConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -58,9 +58,13 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equals(XML_USER)) {
+		if (qName.equals(USER)) {
+			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(UserParser.class)))
+				throw new IllegalArgumentException("Previous User not closed!");
 			this.buildersStack.push(new UserParser());
-		} else if (qName.equals(XML_PROPERTIES)) {
+		} else if (qName.equals(PROPERTIES)) {
+			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
+				throw new IllegalArgumentException("Previous Properties not closed!");
 			this.buildersStack.push(new PropertyParser());
 		}
 
@@ -81,9 +85,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(XML_USER)) {
+		if (qName.equals(USER)) {
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(XML_PROPERTIES)) {
+		} else if (qName.equals(PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -122,12 +126,14 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		String lastname;
 		UserState userState;
 		Locale locale;
+		final Set<String> groups;
 		final Set<String> userRoles;
 		Map<String, String> parameters;
 		UserHistory history;
 		boolean passwordChangeRequested;
 
 		public UserParser() {
+			this.groups = new HashSet<>();
 			this.userRoles = new HashSet<>();
 		}
 
@@ -136,15 +142,15 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			if (qName.equals(XML_USER)) {
-				this.userId = attributes.getValue(XML_ATTR_USER_ID).trim();
-				this.username = attributes.getValue(XML_ATTR_USERNAME).trim();
+			if (qName.equals(USER)) {
+				this.userId = attributes.getValue(ATTR_USER_ID).trim();
+				this.username = attributes.getValue(ATTR_USERNAME).trim();
 
-				String password = attributes.getValue(XML_ATTR_PASSWORD);
-				String salt = attributes.getValue(XML_ATTR_SALT);
+				String password = attributes.getValue(ATTR_PASSWORD);
+				String salt = attributes.getValue(ATTR_SALT);
 				this.passwordCrypt = PasswordCrypt.parse(password, salt);
-			} else if (qName.equals(XML_HISTORY)) {
-				this.history = new UserHistory();
+			} else if (qName.equals(HISTORY)) {
+				this.history = UserHistory.EMPTY;
 			}
 		}
 
@@ -157,38 +163,43 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		public void endElement(String uri, String localName, String qName) {
 
 			switch (qName) {
-				case XML_FIRSTNAME -> this.firstName = this.text.toString().trim();
-				case XML_LASTNAME -> this.lastname = this.text.toString().trim();
-				case XML_STATE -> this.userState = UserState.valueOf(this.text.toString().trim());
-				case XML_LOCALE -> this.locale = Locale.forLanguageTag(this.text.toString().trim());
-				case XML_PASSWORD_CHANGE_REQUESTED ->
-						this.passwordChangeRequested = Boolean.parseBoolean(this.text.toString().trim());
-				case XML_FIRST_LOGIN -> this.history.setFirstLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				case XML_LAST_LOGIN -> this.history.setLastLogin(ISO8601.parseToZdt(this.text.toString().trim()));
-				case XML_LAST_PASSWORD_CHANGE ->
-						this.history.setLastPasswordChange(ISO8601.parseToZdt(this.text.toString().trim()));
-				case XML_ROLE -> this.userRoles.add(this.text.toString().trim());
-				case XML_USER -> {
+				case FIRSTNAME -> this.firstName = getText();
+				case LASTNAME -> this.lastname = getText();
+				case STATE -> this.userState = UserState.valueOf(getText());
+				case LOCALE -> this.locale = Locale.forLanguageTag(getText());
+				case PASSWORD_CHANGE_REQUESTED -> this.passwordChangeRequested = Boolean.parseBoolean(getText());
+				case FIRST_LOGIN -> this.history = this.history.withFirstLogin(ISO8601.parseToZdt(getText()));
+				case LAST_LOGIN -> this.history = this.history.withLastLogin(ISO8601.parseToZdt(getText()));
+				case LAST_PASSWORD_CHANGE ->
+						this.history = this.history.withLastPasswordChange(ISO8601.parseToZdt(getText()));
+				case GROUP -> this.groups.add(getText());
+				case ROLE -> this.userRoles.add(getText());
+				case USER -> {
 					if (this.history == null)
-						this.history = new UserHistory();
+						this.history = UserHistory.EMPTY;
 
 					User user = new User(this.userId, this.username, this.passwordCrypt, this.firstName, this.lastname,
-							this.userState, this.userRoles, this.locale, this.parameters, this.passwordChangeRequested,
-							this.history);
+							this.userState, this.groups, this.userRoles, this.locale, this.parameters,
+							this.passwordChangeRequested, this.history);
 
 					logger.info(MessageFormat.format("New User: {0}", user));
 					String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
 					users.put(username, user);
 				}
 				default -> {
-					if (!(qName.equals(XML_ROLES) //
-								  || qName.equals(XML_PARAMETER) //
-								  || qName.equals(XML_HISTORY) //
-								  || qName.equals(XML_PARAMETERS))) {
+					if (!(qName.equals(ROLES) //
+								  || qName.equals(GROUPS) //
+								  || qName.equals(PARAMETER) //
+								  || qName.equals(HISTORY) //
+								  || qName.equals(PARAMETERS))) {
 						throw new IllegalArgumentException("Unhandled tag " + qName);
 					}
 				}
 			}
+		}
+
+		private String getText() {
+			return this.text.toString().trim();
 		}
 
 		@Override
@@ -196,31 +207,6 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			if (child instanceof PropertyParser) {
 				this.parameters = ((PropertyParser) child).parameterMap;
 			}
-		}
-	}
-
-	static class PropertyParser extends ElementParserAdapter {
-
-		// <Property name="organizationalUnit" value="Development" />
-
-		public final Map<String, String> parameterMap = new HashMap<>();
-
-		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-
-			if (qName.equals(XML_PROPERTY)) {
-				String key = attributes.getValue(XML_ATTR_NAME).trim();
-				String value = attributes.getValue(XML_ATTR_VALUE).trim();
-				this.parameterMap.put(key, value);
-			} else {
-				if (!qName.equals(XML_PROPERTIES)) {
-					throw new IllegalArgumentException("Unhandled tag " + qName);
-				}
-			}
-		}
-
-		public Map<String, String> getParameterMap() {
-			return this.parameterMap;
 		}
 	}
 }

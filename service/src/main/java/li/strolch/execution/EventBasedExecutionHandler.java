@@ -1,15 +1,5 @@
 package li.strolch.execution;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.StrolchRealm;
@@ -27,6 +17,16 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.utils.collections.MapOfMaps;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
 
 /**
  * The event based execution handler waits for events in that the {@link ExecutionPolicy} implementations must call the
@@ -51,12 +51,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public boolean isControlling(Activity activity) {
-		return this.controllers.containsElement(getDefaultRealm(), activity.getLocator());
+		return this.controllers.containsElement(getDefaultRealm(), activity.getRootElement().getLocator());
 	}
 
 	@Override
 	public boolean isControlling(String realm, Activity activity) {
-		return this.controllers.containsElement(realm, activity.getLocator());
+		return this.controllers.containsElement(realm, activity.getRootElement().getLocator());
 	}
 
 	@Override
@@ -83,12 +83,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public Controller getController(Activity activity) {
-		return getController(getDefaultRealm(), activity.getLocator());
+		return getController(getDefaultRealm(), activity.getRootElement().getLocator());
 	}
 
 	@Override
 	public Controller getController(String realm, Activity activity) {
-		return this.controllers.getElement(realm, activity.getLocator());
+		return this.controllers.getElement(realm, activity.getRootElement().getLocator());
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		synchronized (this.controllers) {
 			Map<Locator, Controller> map = this.controllers.getMap(realm);
 			if (map == null) {
-				logger.error("No controllers for realm " + realm);
+				logger.info("No controllers for realm " + realm);
 				return;
 			}
 
@@ -171,26 +171,28 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	@Override
-	public void addForExecution(Activity activity) {
-		addForExecution(getDefaultRealm(), activity);
+	public Controller addForExecution(Activity activity) {
+		return addForExecution(getDefaultRealm(), activity);
 	}
 
 	@Override
-	public void addForExecution(String realm, Activity activity) {
+	public Controller addForExecution(String realm, Activity activity) {
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.HaltNew)
 			throw new IllegalStateException(
 					"ExecutionHandler state is " + state + ", can not add activities for execution!");
 
-		if (this.controllers.containsElement(realm, activity.getLocator()))
-			throw new IllegalStateException(activity.getLocator() + " is already registered for execution!");
+		Locator locator = activity.getRootElement().getLocator();
+		if (this.controllers.containsElement(realm, locator))
+			throw new IllegalStateException(locator + " is already registered for execution!");
 
-		logger.info("Added " + activity.getLocator() + " @ " + realm);
+		logger.info("Added " + locator + " @ " + realm);
 		Controller controller = newController(realm, activity);
-		this.controllers.addElement(realm, activity.getLocator(), controller);
+		this.controllers.addElement(realm, locator, controller);
 		notifyObserverAdd(controller);
 
 		triggerExecution(realm);
+		return controller;
 	}
 
 	@Override
@@ -205,10 +207,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			throw new IllegalStateException(
 					"ExecutionHandler state is " + state + ", can not add activities for execution!");
 
-		Controller controller = this.controllers.getElement(realm, activity.getLocator());
+		Locator locator = activity.getRootElement().getLocator();
+		Controller controller = this.controllers.getElement(realm, locator);
 		if (controller == null) {
 			controller = newController(realm, activity);
-			this.controllers.addElement(realm, activity.getLocator(), controller);
+			this.controllers.addElement(realm, locator, controller);
 			notifyObserverAdd(controller);
 		}
 
@@ -296,7 +299,8 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (activity.isReadOnly())
 					activity = activity.getClone(true);
 
-				logger.info("Restarting Execution of " + activity.getLocator() + " on realm " + realmName);
+				Locator locator = activity.getRootElement().getLocator();
+				logger.info("Restarting Execution of " + locator + " on realm " + realmName);
 
 				// in execution actions need to be in state STOPPED to restart
 				activity.findActionsDeep(a -> a.getState().inExecutionPhase()).forEach(a -> {
@@ -309,7 +313,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				// register for execution
 				Controller controller = newController(realmName, activity);
-				this.controllers.addElement(realmName, activity.getLocator(), controller);
+				this.controllers.addElement(realmName, locator, controller);
 			});
 
 			// commit changes to state

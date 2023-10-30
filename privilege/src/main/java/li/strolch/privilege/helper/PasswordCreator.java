@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static li.strolch.privilege.base.PrivilegeConstants.*;
-import static li.strolch.privilege.model.internal.PasswordCrypt.buildPasswordString;
 
 /**
  * <p>
@@ -111,9 +110,9 @@ public class PasswordCreator {
 			}
 
 			Map<String, String> parameterMap = new HashMap<>();
-			parameterMap.put(XmlConstants.XML_PARAM_HASH_ALGORITHM, hashAlgorithm);
-			parameterMap.put(XmlConstants.XML_PARAM_HASH_ITERATIONS, String.valueOf(iterations));
-			parameterMap.put(XmlConstants.XML_PARAM_HASH_KEY_LENGTH, String.valueOf(keyLength));
+			parameterMap.put(XmlConstants.PARAM_HASH_ALGORITHM, hashAlgorithm);
+			parameterMap.put(XmlConstants.PARAM_HASH_ITERATIONS, String.valueOf(iterations));
+			parameterMap.put(XmlConstants.PARAM_HASH_KEY_LENGTH, String.valueOf(keyLength));
 
 			DefaultEncryptionHandler encryptionHandler = new DefaultEncryptionHandler();
 			encryptionHandler.initialize(parameterMap);
@@ -136,15 +135,15 @@ public class PasswordCreator {
 			byte[] salt = saltS.getBytes();
 
 			PasswordCrypt passwordCrypt = encryptionHandler.hashPassword(password, salt);
-			String passwordHashS = StringHelper.toHexString(passwordCrypt.getPassword());
+			String passwordHashS = StringHelper.toHexString(passwordCrypt.password());
 			System.out.println("Hash is: " + passwordHashS);
 			System.out.println("Salt is: " + saltS);
 			System.out.println();
 
 			System.out.println(
-					XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.XML_ATTR_SALT +
-							"=\"" + saltS + "\"");
-			System.out.println(XmlConstants.XML_ATTR_PASSWORD + "=\"" + passwordCrypt.buildPasswordString() + "\"");
+					XmlConstants.ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.ATTR_SALT + "=\"" +
+							saltS + "\"");
+			System.out.println(XmlConstants.ATTR_PASSWORD + "=\"" + passwordCrypt.buildPasswordString() + "\"");
 			System.out.println();
 		}
 	}

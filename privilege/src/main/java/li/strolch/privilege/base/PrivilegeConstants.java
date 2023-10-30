@@ -14,6 +14,7 @@ public class PrivilegeConstants {
 	public static final String PRIMARY_LOCATION = "primaryLocation";
 	public static final String SECONDARY_LOCATIONS = "secondaryLocations";
 	public static final String ROLES = "roles";
+	public static final String GROUPS = "groups";
 	public static final String EMAIL = "email";
 
 	public static final String ROLE_STROLCH_ADMIN = "StrolchAdmin";

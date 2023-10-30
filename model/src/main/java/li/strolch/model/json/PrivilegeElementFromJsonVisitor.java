@@ -1,7 +1,5 @@
 package li.strolch.model.json;
 
-import java.util.*;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,6 +8,8 @@ import li.strolch.privilege.model.PrivilegeRep;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
+
+import java.util.*;
 
 public class PrivilegeElementFromJsonVisitor {
 
@@ -32,11 +32,12 @@ public class PrivilegeElementFromJsonVisitor {
 
 		String name = nameE == null ? null : nameE.getAsString().trim();
 
-		List<PrivilegeRep> privileges = new ArrayList<>();
+		Map<String, PrivilegeRep> privileges = new HashMap<>();
 		if (privilegesE != null) {
 			JsonArray privilegesArr = privilegesE.getAsJsonArray();
 			for (JsonElement privilegeE : privilegesArr) {
-				privileges.add(privilegeRepFromJson(privilegeE.getAsJsonObject()));
+				PrivilegeRep privilegeRep = privilegeRepFromJson(privilegeE.getAsJsonObject());
+				privileges.put(privilegeRep.getName(), privilegeRep);
 			}
 		}
 
@@ -82,6 +83,7 @@ public class PrivilegeElementFromJsonVisitor {
 		JsonElement lastNameE = jsonObject.get("lastname");
 		JsonElement userStateE = jsonObject.get("userState");
 		JsonElement localeE = jsonObject.get("locale");
+		JsonElement groupsE = jsonObject.get("groups");
 		JsonElement rolesE = jsonObject.get("roles");
 		JsonElement propertiesE = jsonObject.get("properties");
 
@@ -90,16 +92,11 @@ public class PrivilegeElementFromJsonVisitor {
 		String firstname = firstNameE == null ? null : firstNameE.getAsString().trim();
 		String lastname = lastNameE == null ? null : lastNameE.getAsString().trim();
 		UserState userState = userStateE == null ? null : UserState.valueOf(userStateE.getAsString().trim());
-		Locale locale = localeE == null ? null : new Locale(localeE.getAsString().trim());
+		Locale locale = localeE == null ? null : Locale.forLanguageTag(localeE.getAsString().trim());
 
-		Set<String> roles = null;
-		if (rolesE != null) {
-			roles = new HashSet<>();
-			JsonArray rolesArr = rolesE.getAsJsonArray();
-			for (JsonElement role : rolesArr) {
-				roles.add(role.getAsString().trim());
-			}
-		}
+		Set<String> groups = jsonArrayToSet(groupsE);
+
+		Set<String> roles = jsonArrayToSet(rolesE);
 
 		Map<String, String> properties = null;
 		if (propertiesE != null) {
@@ -111,6 +108,19 @@ public class PrivilegeElementFromJsonVisitor {
 			}
 		}
 
-		return new UserRep(userId, username, firstname, lastname, userState, roles, locale, properties, null);
+		return new UserRep(userId, username, firstname, lastname, userState, groups, roles, locale, properties, null);
+	}
+
+	private Set<String> jsonArrayToSet(JsonElement array) {
+		if (array == null)
+			return Set.of();
+
+		Set<String> result = new HashSet<>();
+		JsonArray rolesArr = array.getAsJsonArray();
+		for (JsonElement role : rolesArr) {
+			result.add(role.getAsString().trim());
+		}
+
+		return result;
 	}
 }

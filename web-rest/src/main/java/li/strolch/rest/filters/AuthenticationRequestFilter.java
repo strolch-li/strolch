@@ -15,17 +15,22 @@
  */
 package li.strolch.rest.filters;
 
-import static li.strolch.rest.StrolchRestfulConstants.*;
-import static li.strolch.utils.helper.StringHelper.*;
-
 import jakarta.annotation.Priority;
 import jakarta.servlet.http.HttpServletRequest;
-
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.ext.Provider;
+import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.exception.StrolchNotAuthenticatedException;
+import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.Usage;
+import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -33,15 +38,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.exception.StrolchAccessDeniedException;
-import li.strolch.exception.StrolchNotAuthenticatedException;
-import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.Usage;
-import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.StrolchSessionHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.utils.helper.StringHelper.*;
 
 /**
  * This authentication request filter secures any requests to a Strolch server, by verifying that the request contains
@@ -212,7 +210,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			logger.error(
 					"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
 			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 							.entity("Missing Authorization!").build());
 			return null;
 		}

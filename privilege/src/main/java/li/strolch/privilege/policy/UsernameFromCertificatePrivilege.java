@@ -24,7 +24,7 @@ import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
 import li.strolch.privilege.model.Certificate;
-import li.strolch.privilege.model.IPrivilege;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 
@@ -44,18 +44,18 @@ import li.strolch.privilege.model.Restrictable;
 public class UsernameFromCertificatePrivilege implements PrivilegePolicy {
 
 	@Override
-	public void validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+	public void validateAction(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable)
 			throws AccessDeniedException {
 		validateAction(ctx, privilege, restrictable, true);
 	}
 
 	@Override
-	public boolean hasPrivilege(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable)
+	public boolean hasPrivilege(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable)
 			throws PrivilegeException {
 		return validateAction(ctx, privilege, restrictable, false);
 	}
 
-	protected boolean validateAction(PrivilegeContext ctx, IPrivilege privilege, Restrictable restrictable,
+	protected boolean validateAction(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable,
 			boolean assertHasPrivilege) throws AccessDeniedException {
 
 		preValidate(privilege, restrictable);

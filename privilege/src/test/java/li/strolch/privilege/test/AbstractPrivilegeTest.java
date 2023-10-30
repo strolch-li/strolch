@@ -1,12 +1,5 @@
 package li.strolch.privilege.test;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.helper.PrivilegeInitializer;
@@ -17,6 +10,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+import static org.junit.Assert.assertNotNull;
 
 public class AbstractPrivilegeTest {
 
@@ -57,13 +57,14 @@ public class AbstractPrivilegeTest {
 		}
 	}
 
-	protected static void prepareConfigs(String dst, String configFilename, String usersFilename,
+	protected static void prepareConfigs(String dst, String configFilename, String usersFilename, String groupsFilename,
 			String rolesFilename) {
 		try {
 			File configPath = new File("src/test/resources/config");
 
 			File privilegeConfigFile = new File(configPath, configFilename);
 			File privilegeUsersFile = new File(configPath, usersFilename);
+			File privilegeGroupsFile = new File(configPath, groupsFilename);
 			File privilegeRolesFile = new File(configPath, rolesFilename);
 
 			File targetPath = new File("target/" + dst);
@@ -72,6 +73,7 @@ public class AbstractPrivilegeTest {
 
 			File dstConfig = new File(targetPath, configFilename);
 			File dstUsers = new File(targetPath, usersFilename);
+			File dstGroups = new File(targetPath, groupsFilename);
 			File dstRoles = new File(targetPath, rolesFilename);
 
 			// write config
@@ -81,6 +83,7 @@ public class AbstractPrivilegeTest {
 
 			// copy model
 			Files.copy(privilegeUsersFile.toPath(), dstUsers.toPath());
+			Files.copy(privilegeGroupsFile.toPath(), dstGroups.toPath());
 			Files.copy(privilegeRolesFile.toPath(), dstRoles.toPath());
 
 		} catch (Exception e) {

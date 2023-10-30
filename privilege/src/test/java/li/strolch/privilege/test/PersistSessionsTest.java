@@ -16,7 +16,7 @@ public class PersistSessionsTest extends AbstractPrivilegeTest {
 	public static void init() {
 		removeConfigs(PersistSessionsTest.class.getSimpleName());
 		prepareConfigs(PersistSessionsTest.class.getSimpleName(), "PrivilegeConfig.xml", "PrivilegeUsers.xml",
-				"PrivilegeRoles.xml");
+				"PrivilegeGroups.xml", "PrivilegeRoles.xml");
 	}
 
 	@AfterClass

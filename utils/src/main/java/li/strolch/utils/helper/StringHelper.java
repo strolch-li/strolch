@@ -85,23 +85,16 @@ public class StringHelper {
 	}
 
 	public static String toPrettyHexString(byte[] raw, int srcPos, int length) {
-		byte[] hex = new byte[3 * length + (length / 8)];
-		int index = srcPos;
-
-		for (int i = srcPos; i < length; i++) {
-			byte b = raw[i];
-			int v = b & 0xFF;
-			hex[index++] = HEX_CHAR_TABLE[v >>> 4];
-			hex[index++] = HEX_CHAR_TABLE[v & 0xF];
-			hex[index++] = ' ';
-
-			if ((i + 1) % 8 == 0) {
-				hex[index++] = ' ';
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < length; i++) {
+			sb.append(String.format("%02x", raw[i + srcPos]));
+			sb.append(' ');
+			if ((i + srcPos) % 8 == 0) {
+				sb.append(' ');
 			}
 		}
 
-		return new String(hex, StandardCharsets.US_ASCII);
-
+		return sb.toString();
 	}
 
 	public static byte[] fromPrettyHexString(String prettyHex) {

@@ -15,12 +15,21 @@
  */
 package li.strolch.utils.helper;
 
-import static li.strolch.utils.helper.FileHelper.getTempFile;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import li.strolch.utils.RemoveCRFilterWriter;
+import li.strolch.utils.exceptions.XmlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import javax.xml.parsers.*;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -33,16 +42,7 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Set;
 
-import li.strolch.utils.RemoveCRFilterWriter;
-import li.strolch.utils.exceptions.XmlException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import static li.strolch.utils.helper.FileHelper.getTempFile;
 
 /**
  * Helper class for performing XML based tasks
@@ -71,8 +71,7 @@ public class XmlHelper {
 	/**
 	 * Parses an XML file on the file system and returns the resulting {@link Document} object
 	 *
-	 * @param xmlFile
-	 * 		the {@link File} which has the path to the XML file to read
+	 * @param xmlFile the {@link File} which has the path to the XML file to read
 	 */
 	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler) {
 
@@ -92,8 +91,7 @@ public class XmlHelper {
 	/**
 	 * Parses an XML file on the file system and returns the resulting {@link Document} object
 	 *
-	 * @param xmlFileInputStream
-	 * 		the XML {@link InputStream} which is to be parsed
+	 * @param xmlFileInputStream the XML {@link InputStream} which is to be parsed
 	 */
 	public static void parseDocument(InputStream xmlFileInputStream, DefaultHandler xmlHandler) {
 
@@ -116,8 +114,7 @@ public class XmlHelper {
 	/**
 	 * Parses an XML file on the file system and returns the resulting {@link Document} object
 	 *
-	 * @param xmlInputSource
-	 * 		the XML {@link InputSource} which is to be parsed
+	 * @param xmlInputSource the XML {@link InputSource} which is to be parsed
 	 */
 	public static void parseDocument(InputSource xmlInputSource, DefaultHandler xmlHandler) {
 		parseDocument(xmlInputSource, xmlHandler, false);
@@ -126,10 +123,8 @@ public class XmlHelper {
 	/**
 	 * Parses an XML file on the file system and returns the resulting {@link Document} object
 	 *
-	 * @param xmlInputSource
-	 * 		the XML {@link InputSource} which is to be parsed
-	 * @param nsAware
-	 * 		if true, then calls {@link SAXParserFactory#setNamespaceAware(boolean)}
+	 * @param xmlInputSource the XML {@link InputSource} which is to be parsed
+	 * @param nsAware        if true, then calls {@link SAXParserFactory#setNamespaceAware(boolean)}
 	 */
 	public static void parseDocument(InputSource xmlInputSource, DefaultHandler xmlHandler, boolean nsAware) {
 
@@ -156,12 +151,9 @@ public class XmlHelper {
 	 *
 	 * <p><b>Note:</b> The passed class must have the {@link XmlRootElement} annotation!</p>
 	 *
-	 * @param file
-	 * 		the file to parse
-	 * @param clazz
-	 * 		the class for the returning object type
-	 * @param <T>
-	 * 		the type of object to return
+	 * @param file  the file to parse
+	 * @param clazz the class for the returning object type
+	 * @param <T>   the type of object to return
 	 *
 	 * @return the parsed object
 	 */
@@ -171,8 +163,7 @@ public class XmlHelper {
 			JAXBContext jaxbContext = JAXBContext.newInstance(clazz);
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-			@SuppressWarnings("unchecked")
-			T o = (T) unmarshaller.unmarshal(fin);
+			@SuppressWarnings("unchecked") T o = (T) unmarshaller.unmarshal(fin);
 
 			return o;
 
@@ -185,13 +176,11 @@ public class XmlHelper {
 	/**
 	 * Writes an {@link Element} to an XML file on the file system
 	 *
-	 * @param rootElement
-	 * 		the {@link Element} to write to the file system
-	 * @param file
-	 * 		the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param rootElement the {@link Element} to write to the file system
+	 * @param file        the {@link File} describing the path on the file system where the XML file should be written
+	 *                    to
 	 *
-	 * @throws RuntimeException
-	 * 		if something went wrong while creating the XML configuration, or writing the element
+	 * @throws RuntimeException if something went wrong while creating the XML configuration, or writing the element
 	 */
 	public static void writeElement(Element rootElement, File file) throws RuntimeException {
 		Document document = createDocument();
@@ -202,13 +191,10 @@ public class XmlHelper {
 	/**
 	 * Writes a {@link Document} to an XML file on the file system
 	 *
-	 * @param document
-	 * 		the {@link Document} to write to the file system
-	 * @param file
-	 * 		the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param document the {@link Document} to write to the file system
+	 * @param file     the {@link File} describing the path on the file system where the XML file should be written to
 	 *
-	 * @throws RuntimeException
-	 * 		if something went wrong while creating the XML configuration, or writing the element
+	 * @throws RuntimeException if something went wrong while creating the XML configuration, or writing the element
 	 */
 	public static void writeDocument(Document document, File file) throws RuntimeException {
 		writeDocument(document, file, DEFAULT_ENCODING);
@@ -217,15 +203,11 @@ public class XmlHelper {
 	/**
 	 * Writes a {@link Document} to an XML file on the file system
 	 *
-	 * @param document
-	 * 		the {@link Document} to write to the file system
-	 * @param file
-	 * 		the {@link File} describing the path on the file system where the XML file should be written to
-	 * @param encoding
-	 * 		encoding to use to write the file
+	 * @param document the {@link Document} to write to the file system
+	 * @param file     the {@link File} describing the path on the file system where the XML file should be written to
+	 * @param encoding encoding to use to write the file
 	 *
-	 * @throws RuntimeException
-	 * 		if something went wrong while creating the XML configuration, or writing the element
+	 * @throws RuntimeException if something went wrong while creating the XML configuration, or writing the element
 	 */
 	public static void writeDocument(Document document, File file, String encoding) throws RuntimeException {
 		try (FileOutputStream out = new FileOutputStream(file)) {
@@ -239,13 +221,10 @@ public class XmlHelper {
 	/**
 	 * Writes a {@link Document} to an XML file on the file system
 	 *
-	 * @param document
-	 * 		the {@link Document} to write to the file system
-	 * @param out
-	 * 		stream to write document to
+	 * @param document the {@link Document} to write to the file system
+	 * @param out      stream to write document to
 	 *
-	 * @throws RuntimeException
-	 * 		if something went wrong while creating the XML configuration, or writing the element
+	 * @throws RuntimeException if something went wrong while creating the XML configuration, or writing the element
 	 */
 	public static void writeDocument(Document document, OutputStream out) throws RuntimeException {
 		writeDocument(document, new StreamResult(new RemoveCRFilterWriter(new OutputStreamWriter(out))),
@@ -255,11 +234,9 @@ public class XmlHelper {
 	/**
 	 * Writes a {@link Document} to an XML file on the file system
 	 *
-	 * @param document
-	 * 		the {@link Document} to write to the file system
+	 * @param document the {@link Document} to write to the file system
 	 *
-	 * @throws RuntimeException
-	 * 		if something went wrong while creating the XML configuration, or writing the element
+	 * @throws RuntimeException if something went wrong while creating the XML configuration, or writing the element
 	 */
 	public static String writeToString(Document document) throws RuntimeException {
 		try {
@@ -275,15 +252,11 @@ public class XmlHelper {
 	/**
 	 * Writes a {@link Document} to an XML file on the file system
 	 *
-	 * @param document
-	 * 		the {@link Document} to write to the file system
-	 * @param streamResult
-	 * 		the destination
-	 * @param encoding
-	 * 		encoding to use to write the file
+	 * @param document     the {@link Document} to write to the file system
+	 * @param streamResult the destination
+	 * @param encoding     encoding to use to write the file
 	 *
-	 * @throws RuntimeException
-	 * 		if something went wrong while creating the XML configuration, or writing the element
+	 * @throws RuntimeException if something went wrong while creating the XML configuration, or writing the element
 	 */
 	public static void writeDocument(Document document, StreamResult streamResult, String encoding)
 			throws RuntimeException {
@@ -307,8 +280,7 @@ public class XmlHelper {
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.ENCODING, docEncoding);
-			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount",
-					"2"); //$NON-NLS-2$
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2"); //$NON-NLS-2$
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
@@ -330,8 +302,7 @@ public class XmlHelper {
 	 *
 	 * @return a new document instance
 	 *
-	 * @throws RuntimeException
-	 * 		if something went wrong while creating the XML configuration
+	 * @throws RuntimeException if something went wrong while creating the XML configuration
 	 */
 	public static Document createDocument() throws RuntimeException {
 		try {
@@ -354,13 +325,10 @@ public class XmlHelper {
 	/**
 	 * Marshalls the given element annotated with xml annotations to the given destination file
 	 *
-	 * @param dstFile
-	 * 		the destination to marshall the object
-	 * @param object
-	 * 		the object to marshall
+	 * @param dstFile the destination to marshall the object
+	 * @param object  the object to marshall
 	 *
-	 * @throws Exception
-	 * 		if the marshalling fails for any reason
+	 * @throws Exception if the marshalling fails for any reason
 	 */
 	public static void marshall(File dstFile, Object object) throws Exception {
 

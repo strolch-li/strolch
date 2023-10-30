@@ -15,27 +15,25 @@
  */
 package li.strolch.privilege.model;
 
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
-
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.policy.PrivilegePolicy;
-import li.strolch.utils.helper.StringHelper;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
- * To keep certain details of the {@link IPrivilege} itself hidden from remote clients and make sure instances are only
+ * To keep certain details of the {@link Privilege} itself hidden from remote clients and make sure instances are only
  * edited by users with the correct privilege, this representational version is allowed to be viewed by remote clients
- * and simply wraps all public data from the {@link IPrivilege}
+ * and simply wraps all public data from the {@link Privilege}
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeRep implements Serializable {
+public class PrivilegeRep {
 
 	private String name;
 	private String policy;
@@ -43,48 +41,57 @@ public class PrivilegeRep implements Serializable {
 	private Set<String> denyList;
 	private Set<String> allowList;
 
+	private boolean readOnly;
+
 	/**
 	 * Default constructor
 	 *
-	 * @param name
-	 * 		the name of this privilege, which is unique to all privileges known in the {@link PrivilegeHandler}
-	 * @param policy
-	 * 		the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
-	 * @param allAllowed
-	 * 		a boolean defining if a {@link Role} with this {@link IPrivilege} has unrestricted access to a {@link
-	 *        Restrictable}
-	 * @param denyList
-	 * 		a list of deny rules for this {@link IPrivilege}
-	 * @param allowList
-	 * 		a list of allow rules for this {@link IPrivilege}
+	 * @param name       the name of this privilege, which is unique to all privileges known in the
+	 *                   {@link PrivilegeHandler}
+	 * @param policy     the {@link PrivilegePolicy} configured to evaluate if the privilege is granted
+	 * @param allAllowed a boolean defining if a {@link Role} with this {@link Privilege} has unrestricted access to a
+	 *                   {@link Restrictable}
+	 * @param denyList   a list of deny rules for this {@link Privilege}
+	 * @param allowList  a list of allow rules for this {@link Privilege}
 	 */
 	public PrivilegeRep(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 		this.name = trimOrEmpty(name);
 		this.policy = trimOrEmpty(policy);
 		this.allAllowed = allAllowed;
-		this.denyList = denyList;
-		this.allowList = allowList;
+		setDenyList(denyList == null ? Set.of() : denyList);
+		setAllowList(allowList == null ? Set.of() : allowList);
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public PrivilegeRep readOnly() {
+		if (this.readOnly)
+			return this;
+		this.readOnly = true;
+		this.denyList = Set.copyOf(this.denyList);
+		this.allowList = Set.copyOf(this.allowList);
+		return this;
+	}
+
+	protected void assertNotReadonly() {
+		if (this.readOnly)
+			throw new IllegalStateException("Privilege is currently readOnly, to modify get a copy!");
 	}
 
 	/**
 	 * Validates that all required fields are set
 	 */
 	public void validate() {
-
-		if (StringHelper.isEmpty(this.name)) {
+		if (isEmpty(this.name))
 			throw new PrivilegeException("No name defined!");
-		}
-
-		if (StringHelper.isEmpty(this.policy)) {
-			throw new PrivilegeException("policy is null!");
-		}
-
-		if (this.denyList == null) {
+		if (isEmpty(this.policy))
+			throw new PrivilegeException("No policy defined!");
+		if (this.denyList == null)
 			throw new PrivilegeException("denyList is null");
-		}
-		if (this.allowList == null) {
+		if (this.allowList == null)
 			throw new PrivilegeException("allowList is null");
-		}
 	}
 
 	/**
@@ -95,10 +102,10 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param name
-	 * 		the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
+		assertNotReadonly();
 		this.name = trimOrEmpty(name);
 	}
 
@@ -110,10 +117,10 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param policy
-	 * 		the policy to set
+	 * @param policy the policy to set
 	 */
 	public void setPolicy(String policy) {
+		assertNotReadonly();
 		this.policy = trimOrEmpty(policy);
 	}
 
@@ -125,10 +132,10 @@ public class PrivilegeRep implements Serializable {
 	}
 
 	/**
-	 * @param allAllowed
-	 * 		the allAllowed to set
+	 * @param allAllowed the allAllowed to set
 	 */
 	public void setAllAllowed(boolean allAllowed) {
+		assertNotReadonly();
 		this.allAllowed = allAllowed;
 	}
 
@@ -136,30 +143,30 @@ public class PrivilegeRep implements Serializable {
 	 * @return the denyList
 	 */
 	public Set<String> getDenyList() {
-		return this.denyList == null ? new HashSet<>() : this.denyList;
+		return this.denyList;
 	}
 
 	/**
-	 * @param denyList
-	 * 		the denyList to set
+	 * @param denyList the denyList to set
 	 */
 	public void setDenyList(Set<String> denyList) {
-		this.denyList = denyList.stream().map(String::trim).collect(Collectors.toSet());
+		assertNotReadonly();
+		this.denyList = denyList.stream().map(String::trim).collect(HashSet::new, HashSet::add, HashSet::addAll);
 	}
 
 	/**
 	 * @return the allowList
 	 */
 	public Set<String> getAllowList() {
-		return this.allowList == null ? new HashSet<>() : this.allowList;
+		return this.allowList;
 	}
 
 	/**
-	 * @param allowList
-	 * 		the allowList to set
+	 * @param allowList the allowList to set
 	 */
 	public void setAllowList(Set<String> allowList) {
-		this.allowList = allowList.stream().map(String::trim).collect(Collectors.toSet());
+		assertNotReadonly();
+		this.allowList = allowList.stream().map(String::trim).collect(HashSet::new, HashSet::add, HashSet::addAll);
 	}
 
 	/**
@@ -169,11 +176,8 @@ public class PrivilegeRep implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "PrivilegeRep [name=" + this.name + ", policy=" + this.policy + ", allAllowed=" + this.allAllowed
-				+ ", denyList=" + (this.denyList == null ? "null" : this.denyList.size()) + ", allowList=" + (
-				this.allowList == null ?
-						"null" :
-						this.allowList.size()) + "]";
+		return "PrivilegeRep [name=" + this.name + ", policy=" + this.policy + ", allAllowed=" + this.allAllowed +
+				", denyList=" + this.denyList.size() + ", allowList=" + this.allowList.size() + "]";
 	}
 
 	@Override
@@ -193,10 +197,13 @@ public class PrivilegeRep implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PrivilegeRep other = (PrivilegeRep) obj;
-		if (this.name == null) {
+		if (this.name == null)
 			return other.name == null;
-		} else
-			return this.name.equals(other.name);
+		return this.name.equals(other.name);
+	}
+
+	public PrivilegeRep getCopy() {
+		return new PrivilegeRep(this.name, this.policy, this.allAllowed, this.denyList, this.allowList);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

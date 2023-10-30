@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.rest;
+package li.strolch.runtime.sessions;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +24,6 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Usage;
-import li.strolch.rest.model.UserSession;
 
 /**
  * The {@link StrolchSessionHandler} implements session management. It authenticates, validates and invalidates session
@@ -33,6 +32,11 @@ import li.strolch.rest.model.UserSession;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface StrolchSessionHandler {
+
+	/**
+	 * Refreshes the sessions from the {@link li.strolch.runtime.privilege.PrivilegeHandler}
+	 */
+	void refreshSessions();
 
 	/**
 	 * Returns the time to live for a session in minutes
