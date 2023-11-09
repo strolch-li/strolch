@@ -96,7 +96,7 @@ public class GenericReport extends ReportPolicy {
 
 		this.parallel = this.reportRes.getBoolean(PARAM_PARALLEL);
 		this.descending = this.reportRes.getBoolean(PARAM_DESCENDING);
-		this.allowMissingColumns = this.reportRes.getBoolean(PARAM_ALLOW_MISSING_COLUMNS);
+		this.allowMissingColumns = !this.reportRes.hasParameter(PARAM_ALLOW_MISSING_COLUMNS) || this.reportRes.getBoolean(PARAM_ALLOW_MISSING_COLUMNS);
 		this.filterMissingValuesAsTrue = this.reportRes.getBoolean(PARAM_FILTER_MISSING_VALUES_AS_TRUE);
 		this.dateRangeSelP = this.reportRes.getParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL);
 
@@ -583,6 +583,7 @@ public class GenericReport extends ReportPolicy {
 				.sorted(comparing(StringParameter::getIndex)) //
 				.map(StringParameter::getUom) //
 				.collect(toList());
+		criteria.addAll(this.directCriteria);
 
 		int maxRowsForFacetGeneration = this.reportRes.getInteger(PARAM_MAX_ROWS_FOR_FACET_GENERATION);
 
