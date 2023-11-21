@@ -75,6 +75,7 @@ import static li.strolch.rest.StrolchRestfulConstants.MSG;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.rest.helper.ResponseUtil.toResponse;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_INSPECTOR;
 import static li.strolch.search.SearchBuilder.orderBy;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
@@ -93,7 +94,7 @@ public class InspectorResource {
 	private static Certificate validateCertificate(HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		RestfulStrolchComponent rest = RestfulStrolchComponent.getInstance();
-		rest.validate(cert).validateAction(InspectorResource.class.getSimpleName(), getCallerMethodNoClass(2));
+		rest.validate(cert).validateAction(PRIVILEGE_INSPECTOR, getCallerMethodNoClass(2));
 		return cert;
 	}
 

@@ -87,6 +87,8 @@ public class StrolchConstants extends StrolchModelConstants {
 		public static final String PRIVILEGE_SET_USER_STATE = PrivilegeHandler.PRIVILEGE_SET_USER_STATE;
 		public static final String PRIVILEGE_SET_USER_PASSWORD = PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD;
 
+		public static final String PRIVILEGE_INSPECTOR = "Inspector";
+
 		public static final String PRIVILEGE_INVALIDATE_SESSION = "InvalidateSession";
 		public static final String PRIVILEGE_GET_SESSION = "GetSession";
 
