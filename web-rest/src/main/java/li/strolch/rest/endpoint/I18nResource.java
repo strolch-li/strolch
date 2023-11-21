@@ -27,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("strolch/i18n")
-public class I18nService {
+public class I18nResource {
 
-	private static final Logger logger = LoggerFactory.getLogger(I18nService.class);
+	private static final Logger logger = LoggerFactory.getLogger(I18nResource.class);
 
 	@GET
 	@Path("data")

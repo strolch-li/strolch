@@ -47,9 +47,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("strolch/sessions")
-public class UserSessionsService {
+public class UserSessionsResource {
 
-	private static final Logger logger = LoggerFactory.getLogger(UserSessionsService.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserSessionsResource.class);
 
 	private static String getContext() {
 		StackTraceElement element = new Throwable().getStackTrace()[1];

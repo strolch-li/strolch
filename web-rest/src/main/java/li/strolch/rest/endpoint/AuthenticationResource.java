@@ -53,9 +53,9 @@ import org.slf4j.LoggerFactory;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/authentication")
-public class AuthenticationService {
+public class AuthenticationResource {
 
-	private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+	private static final Logger logger = LoggerFactory.getLogger(AuthenticationResource.class);
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)

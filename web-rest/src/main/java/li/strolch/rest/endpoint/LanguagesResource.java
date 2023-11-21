@@ -18,9 +18,9 @@ import java.util.Set;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 
 @Path("strolch/languages")
-public class Languages {
+public class LanguagesResource {
 
-	private static final Logger logger = LoggerFactory.getLogger(Languages.class);
+	private static final Logger logger = LoggerFactory.getLogger(LanguagesResource.class);
 
 	@GET
 	@Path("supported")

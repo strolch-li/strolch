@@ -32,7 +32,7 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import li.strolch.rest.StrolchRestfulClasses;
-import li.strolch.rest.endpoint.Inspector;
+import li.strolch.rest.endpoint.InspectorResource;
 import li.strolch.rest.filters.AuthenticationRequestFilter;
 import li.strolch.testbase.runtime.RuntimeMock;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -171,7 +171,7 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 						try {
 							this.server = GrizzlyWebContainerFactory.create(baseUri,
 									Collections.singletonMap("jersey.config.server.provider.packages",
-											Inspector.class.getPackage().getName() + ";"
+											InspectorResource.class.getPackage().getName() + ";"
 													+ AuthenticationRequestFilter.class.getPackage().getName()));
 						} catch (ProcessingException | IOException e) {
 							throw new TestContainerException(e);

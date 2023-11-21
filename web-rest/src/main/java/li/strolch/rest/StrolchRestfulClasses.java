@@ -34,25 +34,25 @@ public class StrolchRestfulClasses {
 
 		Set<Class<?>> restfulClasses = new HashSet<>();
 
-		restfulClasses.add(AuthenticationService.class);
+		restfulClasses.add(AuthenticationResource.class);
 		restfulClasses.add(StrolchJobsResource.class);
 		restfulClasses.add(ReportResource.class);
 		restfulClasses.add(ControlResource.class);
-		restfulClasses.add(Inspector.class);
-		restfulClasses.add(I18nService.class);
-		restfulClasses.add(VersionQuery.class);
-		restfulClasses.add(ModelQuery.class);
-		restfulClasses.add(EnumQuery.class);
-		restfulClasses.add(Languages.class);
+		restfulClasses.add(InspectorResource.class);
+		restfulClasses.add(I18nResource.class);
+		restfulClasses.add(VersionResource.class);
+		restfulClasses.add(ModelResource.class);
+		restfulClasses.add(EnumResource.class);
+		restfulClasses.add(LanguagesResource.class);
 		restfulClasses.add(OperationsLogResource.class);
 		restfulClasses.add(AgentResource.class);
 
 		// privilege
-		restfulClasses.add(PrivilegeUsersService.class);
-		restfulClasses.add(PrivilegeRolesService.class);
-		restfulClasses.add(PrivilegePoliciesService.class);
-		restfulClasses.add(UserSessionsService.class);
-		restfulClasses.add(AuditsService.class);
+		restfulClasses.add(PrivilegeUsersResource.class);
+		restfulClasses.add(PrivilegeRolesResource.class);
+		restfulClasses.add(PrivilegePoliciesResource.class);
+		restfulClasses.add(UserSessionsResource.class);
+		restfulClasses.add(AuditsResource.class);
 
 		Set<Class<?>> providerClasses = new HashSet<>();
 		providerClasses.add(StrolchRestfulExceptionMapper.class);

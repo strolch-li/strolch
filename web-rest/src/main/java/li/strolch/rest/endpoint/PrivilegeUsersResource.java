@@ -61,9 +61,9 @@ import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/users")
-public class PrivilegeUsersService {
+public class PrivilegeUsersResource {
 
-	private static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersService.class);
+	private static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersResource.class);
 
 	private PrivilegeHandler getPrivilegeHandler() {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();

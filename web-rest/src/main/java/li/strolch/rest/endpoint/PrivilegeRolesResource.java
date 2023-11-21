@@ -41,7 +41,7 @@ import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_ROLE;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/roles")
-public class PrivilegeRolesService {
+public class PrivilegeRolesResource {
 
 	private PrivilegeHandler getPrivilegeHandler() {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();

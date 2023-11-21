@@ -20,7 +20,7 @@ import li.strolch.soql.core.QueryRequest;
 import li.strolch.soql.core.QueryResponse;
 
 @Path("strolch/model")
-public class ModelQuery {
+public class ModelResource {
 
 	private static String getContext() {
 		StackTraceElement element = new Throwable().getStackTrace()[2];

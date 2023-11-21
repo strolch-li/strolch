@@ -31,7 +31,7 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 
 @Path("strolch/audits")
-public class AuditsService {
+public class AuditsResource {
 
 	private static String getContext() {
 		StackTraceElement element = new Throwable().getStackTrace()[1];

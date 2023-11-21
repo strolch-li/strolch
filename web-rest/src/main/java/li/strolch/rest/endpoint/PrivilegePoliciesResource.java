@@ -40,7 +40,7 @@ import li.strolch.rest.StrolchRestfulConstants;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/policies")
-public class PrivilegePoliciesService {
+public class PrivilegePoliciesResource {
 
 	// private static final Logger logger = LoggerFactory.getLogger(PrivilegePoliciesService.class);
 

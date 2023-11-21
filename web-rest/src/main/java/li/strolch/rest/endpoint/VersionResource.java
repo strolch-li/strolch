@@ -26,11 +26,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.VersionQueryResult;
-import li.strolch.model.StrolchModelConstants;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -39,7 +37,7 @@ import li.strolch.rest.StrolchRestfulConstants;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/version")
-public class VersionQuery {
+public class VersionResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

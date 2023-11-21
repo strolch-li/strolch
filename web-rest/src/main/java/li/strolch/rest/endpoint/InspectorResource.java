@@ -71,7 +71,6 @@ import java.util.Set;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.sort;
-import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.rest.helper.ResponseUtil.toResponse;
@@ -87,14 +86,14 @@ import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/inspector")
-public class Inspector {
+public class InspectorResource {
 
-	private static final Logger logger = LoggerFactory.getLogger(Inspector.class);
+	private static final Logger logger = LoggerFactory.getLogger(InspectorResource.class);
 
 	private static Certificate validateCertificate(HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		RestfulStrolchComponent rest = RestfulStrolchComponent.getInstance();
-		rest.validate(cert).validateAction(Inspector.class.getSimpleName(), getCallerMethodNoClass(2));
+		rest.validate(cert).validateAction(InspectorResource.class.getSimpleName(), getCallerMethodNoClass(2));
 		return cert;
 	}
 
