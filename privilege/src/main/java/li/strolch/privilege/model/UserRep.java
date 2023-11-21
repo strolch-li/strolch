@@ -63,10 +63,10 @@ public class UserRep {
 	 * @param groups      the set of {@link li.strolch.privilege.model.internal.Group}s assigned to this user
 	 * @param roles       the set of {@link Role}s assigned to this user
 	 * @param locale      the user's {@link Locale}
-	 * @param propertyMap a {@link Map} containing string value pairs of properties for this user
+	 * @param properties a {@link Map} containing string value pairs of properties for this user
 	 */
 	public UserRep(String userId, String username, String firstname, String lastname, UserState userState,
-			Set<String> groups, Set<String> roles, Locale locale, Map<String, String> propertyMap,
+			Set<String> groups, Set<String> roles, Locale locale, Map<String, String> properties,
 			UserHistory history) {
 		this.userId = trimOrEmpty(userId);
 		this.username = trimOrEmpty(username);
