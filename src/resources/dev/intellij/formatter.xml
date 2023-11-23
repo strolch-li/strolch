@@ -1,4 +1,4 @@
-<code_scheme name="strolch" version="173">
+<code_scheme name="strolch copy" version="173">
   <JavaCodeStyleSettings>
     <option name="ANNOTATION_PARAMETER_WRAP" value="1" />
     <option name="JD_ADD_BLANK_AFTER_PARM_COMMENTS" value="true" />
@@ -24,7 +24,9 @@
     <option name="THROWS_KEYWORD_WRAP" value="1" />
     <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
     <option name="WRAP_FIRST_METHOD_IN_CALL_CHAIN" value="true" />
-    <option name="BINARY_OPERATION_WRAP" value="1" />
+    <option name="PARENTHESES_EXPRESSION_LPAREN_WRAP" value="true" />
+    <option name="BINARY_OPERATION_WRAP" value="5" />
+    <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
     <option name="TERNARY_OPERATION_WRAP" value="1" />
     <option name="FOR_STATEMENT_WRAP" value="1" />
     <option name="ARRAY_INITIALIZER_WRAP" value="1" />
