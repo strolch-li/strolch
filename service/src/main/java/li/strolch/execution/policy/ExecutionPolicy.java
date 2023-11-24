@@ -97,6 +97,13 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	}
 
 	/**
+	 * Returns the type of activity for which this {@link ExecutionPolicy} is being executed
+	 */
+	public String getActivityType() {
+		return this.actionLoc.get(1);
+	}
+
+	/**
 	 * Returns the type of the {@link Resource} for this action. Can only be called after {@link #initialize(Action)}
 	 * was called.
 	 */
@@ -255,8 +262,12 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected void setActionState(Action action, State state) {
 		if (action.getState().inClosedPhase())
-			throw new IllegalStateException("Action " + action.getLocator() + " has state " + action.getState() +
-					" and can not be changed to " + state);
+			throw new IllegalStateException("Action " +
+					action.getLocator() +
+					" has state " +
+					action.getState() +
+					" and can not be changed to " +
+					state);
 
 		action.setState(state);
 
