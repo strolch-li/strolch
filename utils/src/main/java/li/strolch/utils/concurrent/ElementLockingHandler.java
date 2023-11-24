@@ -1,5 +1,12 @@
 package li.strolch.utils.concurrent;
 
+import li.strolch.utils.CheckedRunnable;
+import li.strolch.utils.CheckedSupplier;
+import li.strolch.utils.collections.TypedTuple;
+import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,13 +15,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-
-import li.strolch.utils.CheckedRunnable;
-import li.strolch.utils.CheckedSupplier;
-import li.strolch.utils.collections.TypedTuple;
-import li.strolch.utils.dbc.DBC;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ElementLockingHandler<T> {
 	private static final Logger logger = LoggerFactory.getLogger(ElementLockingHandler.class);
@@ -42,10 +42,8 @@ public class ElementLockingHandler<T> {
 	 * Note that only {@link #lock(Object)} and {@link #unlock(Object)} are called, if the element was locked
 	 * previously, then the lock counter is only reduced to the value prior to the call
 	 *
-	 * @param element
-	 * 		the element to lock
-	 * @param action
-	 * 		the action to perform
+	 * @param element the element to lock
+	 * @param action  the action to perform
 	 */
 	public void lockedExecute(T element, CheckedRunnable action) {
 		lock(element);
@@ -68,10 +66,8 @@ public class ElementLockingHandler<T> {
 	 * Note that only {@link #lock(Object)} and {@link #unlock(Object)} are called, if the element was locked
 	 * previously, then the lock counter is only reduced to the value prior to the call
 	 *
-	 * @param element
-	 * 		the element to lock
-	 * @param action
-	 * 		the action to perform
+	 * @param element the element to lock
+	 * @param action  the action to perform
 	 *
 	 * @return the result of the action
 	 */
@@ -79,9 +75,6 @@ public class ElementLockingHandler<T> {
 		lock(element);
 		try {
 			return action.get();
-		} catch (RuntimeException e) {
-			logger.error("Failed to execute action " + action + " for locked element " + element, e);
-			throw e;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to execute action " + action + " for locked element " + element, e);
 		} finally {
@@ -93,11 +86,9 @@ public class ElementLockingHandler<T> {
 	 * Locks the given element by creating a {@link ReentrantLock} on it. If the lock is already held by the calling
 	 * thread, then the lock count is increased
 	 *
-	 * @param element
-	 * 		the element for which a {@link ReentrantLock} is to be created and/or locked
+	 * @param element the element for which a {@link ReentrantLock} is to be created and/or locked
 	 *
-	 * @throws ElementLockingException
-	 * 		if the lock could not be acquired
+	 * @throws ElementLockingException if the lock could not be acquired
 	 */
 	public void lock(T element) throws ElementLockingException {
 		DBC.PRE.assertNotNull("element may not be null!", element);
@@ -115,11 +106,9 @@ public class ElementLockingHandler<T> {
 	 * If the lock must be completely released, then use {@link #releaseLock(T)}
 	 * </p>
 	 *
-	 * @param element
-	 * 		the element for which the current/last {@link ReentrantLock} is to be unlocked
+	 * @param element the element for which the current/last {@link ReentrantLock} is to be unlocked
 	 *
-	 * @throws ElementLockingException
-	 * 		if unlocking failed
+	 * @throws ElementLockingException if unlocking failed
 	 */
 	public void unlock(T element) throws ElementLockingException {
 		DBC.PRE.assertNotNull("element may not be null!", element);
@@ -136,11 +125,9 @@ public class ElementLockingHandler<T> {
 	 * Releases the lock on the given element, by unlocking all locks, i.e. after this method is called, no lock will be
 	 * held anymore by the current thread
 	 *
-	 * @param element
-	 * 		the element for which the {@link ReentrantLock} is to be released
+	 * @param element the element for which the {@link ReentrantLock} is to be released
 	 *
-	 * @throws ElementLockingException
-	 * 		if the lock could not be released
+	 * @throws ElementLockingException if the lock could not be released
 	 */
 	public void releaseLock(T element) throws ElementLockingException {
 		DBC.PRE.assertNotNull("element may not be null!", element);
