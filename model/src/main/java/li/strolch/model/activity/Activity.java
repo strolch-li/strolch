@@ -892,6 +892,7 @@ public class Activity extends AbstractStrolchRootElement
 	public void setParent(Activity activity) {
 		assertNotReadonly();
 		this.parent = activity;
+		this.locator = null;
 	}
 
 	/**

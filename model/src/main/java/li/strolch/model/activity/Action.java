@@ -391,6 +391,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	public void setParent(Activity activity) {
 		assertNotReadonly();
 		this.parent = activity;
+		this.locator = null;
 	}
 
 	@Override
