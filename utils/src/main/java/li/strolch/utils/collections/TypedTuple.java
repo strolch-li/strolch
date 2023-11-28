@@ -15,13 +15,13 @@
  */
 package li.strolch.utils.collections;
 
+import java.util.Objects;
+
 /**
  * Simple wrapper for two elements
  *
- * @param <T>
- * 		first object
- * @param <U>
- * 		second object
+ * @param <T> first object
+ * @param <U> second object
  *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
@@ -65,5 +65,20 @@ public class TypedTuple<T, U> {
 
 	public boolean hasBoth() {
 		return this.hasFirst() & this.hasSecond();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		TypedTuple<?, ?> that = (TypedTuple<?, ?>) o;
+		return Objects.equals(first, that.first) && Objects.equals(second, that.second);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(first, second);
 	}
 }
