@@ -1,12 +1,5 @@
 package li.strolch.report;
 
-import static li.strolch.report.ReportConstants.TYPE_REPORT;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
@@ -16,8 +9,20 @@ import li.strolch.policy.PolicyHandler;
 import li.strolch.report.policy.ReportPolicy;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static li.strolch.report.ReportConstants.TYPE_REPORT;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 public class Report implements AutoCloseable {
+
+	private static final Logger logger = LoggerFactory.getLogger(Report.class);
 
 	private final ReportPolicy reportPolicy;
 
@@ -26,9 +31,12 @@ public class Report implements AutoCloseable {
 		Resource reportRes = tx.getResourceBy(TYPE_REPORT, reportId, true);
 		PolicyDef reportPolicyDef = reportRes.getPolicyDef(ReportPolicy.class.getSimpleName());
 
+		long start = System.currentTimeMillis();
 		PolicyHandler policyHandler = tx.getContainer().getComponent(PolicyHandler.class);
 		this.reportPolicy = policyHandler.getPolicy(reportPolicyDef, tx);
 		this.reportPolicy.initialize(reportId);
+		long took = System.currentTimeMillis() - start;
+		logger.info("Initializing report " + reportId + " took " + formatMillisecondsDuration(took));
 	}
 
 	public ReportPolicy getReportPolicy() {
