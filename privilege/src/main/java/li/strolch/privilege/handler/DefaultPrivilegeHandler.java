@@ -25,6 +25,7 @@ import li.strolch.privilege.xml.CertificateStubsSaxWriter;
 import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.AesCryptoHelper;
+import li.strolch.utils.helper.AesCryptoHelper.SecretKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
@@ -135,7 +136,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	/**
 	 * Secret key
 	 */
-	protected SecretKey secretKey;
+	protected SecretKeys secretKey;
 
 	/**
 	 * flag if session refreshing is allowed
