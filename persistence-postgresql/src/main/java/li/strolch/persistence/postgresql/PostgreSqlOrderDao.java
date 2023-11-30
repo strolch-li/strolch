@@ -15,17 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.*;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.model.Order;
@@ -39,31 +28,54 @@ import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
+
 @SuppressWarnings("nls")
 public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao {
 
 	public static final String ORDERS = "orders";
 
 	private static final String querySizeDrSqlS = "select count(*) from {0} where latest = true {1}";
-	private static final String querySizeOfTypeDrSqlS = "select count(*) from {0} where type = ANY(?) and latest = true {1}";
+	private static final String querySizeOfTypeDrSqlS
+			= "select count(*) from {0} where type = ANY(?) and latest = true {1}";
 
 	private static final String queryAllDrAsXmlSqlS = "select id, type, asxml from {0} where latest = true {1}";
-	private static final String queryAllDrAsXmlLimitSqlS = "select id, type, asxml from {0} where latest = true {1} order by date {2} limit {3} offset {4}";
+	private static final String queryAllDrAsXmlLimitSqlS
+			= "select id, type, asxml from {0} where latest = true {1} order by date {2} limit {3} offset {4}";
 	private static final String queryAllDrAsJsonSqlS = "select id, type, asjson from {0} where latest = true {1}";
-	private static final String queryAllDrAsJsonLimitSqlS = "select id, type, asjson from {0} where latest = true {1} order by date {2} limit {3} offset {4}";
+	private static final String queryAllDrAsJsonLimitSqlS
+			= "select id, type, asjson from {0} where latest = true {1} order by date {2} limit {3} offset {4}";
 
-	private static final String queryAllByTypeDrAsXmlSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true {1}";
-	private static final String queryAllByTypeDrAsXmlLimitSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true {1} order by date {2} limit {3,number,#} offset {4,number,#}";
-	private static final String queryAllByTypeDrAsJsonSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true {1}";
-	private static final String queryAllByTypeDrAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true {1} order by date {2} limit {3,number,#} offset {4,number,#}";
+	private static final String queryAllByTypeDrAsXmlSqlS
+			= "select id, type, asxml from {0} where type = ANY(?) and latest = true {1}";
+	private static final String queryAllByTypeDrAsXmlLimitSqlS
+			= "select id, type, asxml from {0} where type = ANY(?) and latest = true {1} order by date {2} limit {3,number,#} offset {4,number,#}";
+	private static final String queryAllByTypeDrAsJsonSqlS
+			= "select id, type, asjson from {0} where type = ANY(?) and latest = true {1}";
+	private static final String queryAllByTypeDrAsJsonLimitSqlS
+			= "select id, type, asjson from {0} where type = ANY(?) and latest = true {1} order by date {2} limit {3,number,#} offset {4,number,#}";
 
-	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
-	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
+	private static final String insertAsXmlSqlS
+			= "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
+	private static final String insertAsJsonSqlS
+			= "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, date, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, date = ?, asxml = ? where type = ? and id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, date = ?, asjson = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsXmlSqlS
+			= "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, date = ?, asxml = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsJsonSqlS
+			= "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, date = ?, asjson = ? where type = ? and id = ? and version = ?";
 
-	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
+	private static final String updateLatestSqlS
+			= "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
 
 	public PostgreSqlOrderDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
@@ -79,8 +91,7 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 	protected Order parseFromXml(String id, String type, SQLXML sqlxml) {
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		try (InputStream binaryStream = sqlxml.getBinaryStream()) {
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(binaryStream, new XmlModelSaxReader(listener));
+			getSaxParser().parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
 			throw new StrolchPersistenceException(
 					MessageFormat.format("Failed to extract Order from sqlxml value for {0} / {1}", id, type), e);
@@ -115,10 +126,10 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			// version
 			preparedStatement.setInt(2, order.getVersion().getVersion());
 			preparedStatement.setString(3, order.getVersion().getCreatedBy());
-			preparedStatement
-					.setTimestamp(4, new Timestamp(order.getVersion().getCreated().getTime()), Calendar.getInstance());
-			preparedStatement
-					.setTimestamp(5, new Timestamp(order.getVersion().getUpdated().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(4, new Timestamp(order.getVersion().getCreated().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setTimestamp(5, new Timestamp(order.getVersion().getUpdated().getTime()),
+					Calendar.getInstance());
 			preparedStatement.setBoolean(6, order.getVersion().isDeleted());
 
 			preparedStatement.setBoolean(7, !order.getVersion().isDeleted());
@@ -144,8 +155,9 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to insert Order {0} due to {1}", order.getVersion(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to insert Order {0} due to {1}", order.getVersion(),
+							e.getLocalizedMessage()), e);
 		}
 
 		if (order.getVersion().isFirstVersion()) {
@@ -163,15 +175,16 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
-				String msg = "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
+				String msg
+						= "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
 				msg = MessageFormat.format(msg, order.getId(), order.getVersion().getPreviousVersion(), modCount);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update previous version of Order {0} due to {1}", order.getVersion(),
-							e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update previous version of Order {0} due to {1}",
+							order.getVersion(), e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -186,15 +199,15 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 		// make sure is first version when versioning is not enabled
 		if (!order.getVersion().isFirstVersion()) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
-							order.getVersion()));
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
+					order.getVersion()));
 		}
 
 		// and also not marked as deleted!
 		if (order.getVersion().isDeleted()) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
 							order.getVersion()));
 		}
 
@@ -205,10 +218,10 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 
 			// version
 			preparedStatement.setString(1, order.getVersion().getCreatedBy());
-			preparedStatement
-					.setTimestamp(2, new Timestamp(order.getVersion().getCreated().getTime()), Calendar.getInstance());
-			preparedStatement
-					.setTimestamp(3, new Timestamp(order.getVersion().getUpdated().getTime()), Calendar.getInstance());
+			preparedStatement.setTimestamp(2, new Timestamp(order.getVersion().getCreated().getTime()),
+					Calendar.getInstance());
+			preparedStatement.setTimestamp(3, new Timestamp(order.getVersion().getUpdated().getTime()),
+					Calendar.getInstance());
 			preparedStatement.setBoolean(4, order.getVersion().isDeleted());
 
 			preparedStatement.setBoolean(5, !order.getVersion().isDeleted());
@@ -228,7 +241,8 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
-					String msg = "Expected to update 1 element with id {0} and version {1} but SQL statement modified {2} elements!";
+					String msg
+							= "Expected to update 1 element with id {0} and version {1} but SQL statement modified {2} elements!";
 					msg = MessageFormat.format(msg, order.getId(), order.getVersion().getVersion(), modCount);
 					throw new StrolchPersistenceException(msg);
 				}
@@ -238,8 +252,9 @@ public class PostgreSqlOrderDao extends PostgresqlDao<Order> implements OrderDao
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update Order {0} due to {1}", order.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update Order {0} due to {1}", order.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 	}
 

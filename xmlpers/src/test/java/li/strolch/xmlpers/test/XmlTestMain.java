@@ -15,23 +15,6 @@
  */
 package li.strolch.xmlpers.test;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
-
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.utils.exceptions.XmlException;
 import li.strolch.utils.helper.XmlHelper;
@@ -45,6 +28,22 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static li.strolch.utils.helper.XmlHelper.getDocumentBuilder;
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -72,9 +71,7 @@ public class XmlTestMain {
 	private static List<MyModel> readDom() throws Exception {
 
 		File file = new File("target/res_dom.xml");
-		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-		Document document = docBuilder.parse(file);
+		Document document = getDocumentBuilder().parse(file);
 		Element rootElement = document.getDocumentElement();
 
 		List<MyModel> resources = new ArrayList<>();
@@ -131,34 +128,32 @@ public class XmlTestMain {
 			public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 				switch (qName) {
-				case "Resource":
-					MyModel res = new MyModel();
-					res.setId(attributes.getValue("id"));
-					res.setName(attributes.getValue("name"));
-					res.setType(attributes.getValue("type"));
-					currentRes[0] = res;
-					resources.add(res);
-					break;
-				case "Parameter":
-					MyParameter param = new MyParameter();
-					param.setId(attributes.getValue("id"));
-					param.setName(attributes.getValue("name"));
-					param.setType(attributes.getValue("type"));
-					param.setValue(attributes.getValue("value"));
-					currentRes[0].addParameter(param);
-					break;
-				case "model":
-					break;
-				default:
-					throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
+					case "Resource":
+						MyModel res = new MyModel();
+						res.setId(attributes.getValue("id"));
+						res.setName(attributes.getValue("name"));
+						res.setType(attributes.getValue("type"));
+						currentRes[0] = res;
+						resources.add(res);
+						break;
+					case "Parameter":
+						MyParameter param = new MyParameter();
+						param.setId(attributes.getValue("id"));
+						param.setName(attributes.getValue("name"));
+						param.setType(attributes.getValue("type"));
+						param.setValue(attributes.getValue("value"));
+						currentRes[0].addParameter(param);
+						break;
+					case "model":
+						break;
+					default:
+						throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
 				}
 			}
 		};
 
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
 		File file = new File("target/res_sax.xml");
-		sp.parse(file, xmlHandler);
+		getSaxParser().parse(file, xmlHandler);
 
 		logger.info("SAX parsed file " + file.getAbsolutePath());
 
@@ -167,9 +162,7 @@ public class XmlTestMain {
 
 	private static void writeDom(MyModel res) throws Exception {
 
-		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-		Document doc = docBuilder.newDocument();
+		Document doc = getDocumentBuilder().newDocument();
 
 		Element resElement = doc.createElement("Resource");
 		resElement.setAttribute("id", res.getId());

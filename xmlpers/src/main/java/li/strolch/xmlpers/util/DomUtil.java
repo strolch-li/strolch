@@ -15,12 +15,13 @@
  */
 package li.strolch.xmlpers.util;
 
+import li.strolch.xmlpers.api.XmlPersistenceException;
+
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.text.MessageFormat;
 
-import li.strolch.xmlpers.api.XmlPersistenceException;
+import static li.strolch.utils.helper.XmlHelper.getDocumentBuilder;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -29,8 +30,7 @@ public class DomUtil {
 
 	public static DocumentBuilder createDocumentBuilder() {
 		try {
-			DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-			return dbfac.newDocumentBuilder();
+			return getDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			String msg = "No Xml Parser could be loaded: {0}";
 			msg = MessageFormat.format(msg, e.getMessage());

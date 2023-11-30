@@ -1,5 +1,13 @@
 package li.strolch.utils.helper;
 
+import li.strolch.utils.dbc.DBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
@@ -22,13 +30,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
-import li.strolch.utils.dbc.DBC;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import static li.strolch.utils.helper.XmlHelper.getDocumentBuilderFactory;
 
 public class XmlDomSigner {
 
@@ -230,7 +232,7 @@ public class XmlDomSigner {
 
 		Document doc;
 		try {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilderFactory dbf = getDocumentBuilderFactory();
 			dbf.setNamespaceAware(true);
 			doc = dbf.newDocumentBuilder().parse(in);
 		} catch (Exception e) {

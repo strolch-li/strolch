@@ -15,10 +15,16 @@
  */
 package li.strolch.model.activity;
 
-import static org.junit.Assert.*;
+import li.strolch.exception.StrolchException;
+import li.strolch.model.ModelGenerator;
+import li.strolch.model.State;
+import li.strolch.model.xml.StrolchElementToDomVisitor;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -31,15 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.ModelGenerator;
-import li.strolch.model.State;
-import li.strolch.model.xml.StrolchElementToDomVisitor;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static li.strolch.utils.helper.XmlHelper.getDocumentBuilder;
+import static org.junit.Assert.*;
 
 public class ActivityTest {
 
@@ -342,9 +341,7 @@ public class ActivityTest {
 	// @Test
 	public void showToDOM() throws ParserConfigurationException, TransformerException {
 
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		Document document = db.newDocument();
+		Document document = getDocumentBuilder().newDocument();
 		Element dom = new StrolchElementToDomVisitor().toDom(this.activity);
 		document.appendChild(dom);
 

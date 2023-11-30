@@ -1,11 +1,14 @@
 package li.strolch.model.xml;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
-import static li.strolch.model.StrolchModelConstants.DEFAULT_XML_VERSION;
+import javanet.staxutils.IndentingXMLStreamWriter;
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
+import li.strolch.model.activity.Activity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -19,14 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javanet.staxutils.IndentingXMLStreamWriter;
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
-import li.strolch.model.activity.Activity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+import static li.strolch.model.StrolchModelConstants.DEFAULT_XML_VERSION;
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 public class StrolchXmlHelper {
 
@@ -69,8 +68,7 @@ public class StrolchXmlHelper {
 	private static SimpleStrolchElementListener parse(String xml) {
 		try {
 			SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
-			SAXParser sp = SAXParserFactory.newInstance().newSAXParser();
-			sp.parse(new ByteArrayInputStream(xml.getBytes(UTF_8)), new XmlModelSaxReader(elementListener));
+			getSaxParser().parse(new ByteArrayInputStream(xml.getBytes(UTF_8)), new XmlModelSaxReader(elementListener));
 			return elementListener;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to parse XML", e);

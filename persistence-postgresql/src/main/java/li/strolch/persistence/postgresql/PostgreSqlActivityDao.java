@@ -15,15 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.*;
-import java.text.MessageFormat;
-import java.util.Calendar;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.model.activity.Activity;
@@ -35,18 +26,32 @@ import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
+import java.text.MessageFormat;
+import java.util.Calendar;
+
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
+
 @SuppressWarnings("nls")
 public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements ActivityDao {
 
 	public static final String ACTIVITIES = "activities";
 
-	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
-	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
+	private static final String insertAsXmlSqlS
+			= "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
+	private static final String insertAsJsonSqlS
+			= "insert into {0} (id, version, created_by, created_at, updated_at, deleted, latest, name, type, state, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::order_state, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, asxml = ? where type = ? and id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, asjson = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsXmlSqlS
+			= "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, asxml = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsJsonSqlS
+			= "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, state = ?::order_state, asjson = ? where type = ? and id = ? and version = ?";
 
-	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
+	private static final String updateLatestSqlS
+			= "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
 
 	public PostgreSqlActivityDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
@@ -62,8 +67,7 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 	protected Activity parseFromXml(String id, String type, SQLXML sqlxml) {
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		try (InputStream binaryStream = sqlxml.getBinaryStream()) {
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(binaryStream, new XmlModelSaxReader(listener));
+			getSaxParser().parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
 			throw new StrolchPersistenceException(
 					MessageFormat.format("Failed to extract Activity from sqlxml value for {0} / {1}", id, type), e);
@@ -126,9 +130,9 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to insert Activity {0} due to {1}", activity.getLocator(), e.getLocalizedMessage()),
-					e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to insert Activity {0} due to {1}", activity.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 
 		if (activity.getVersion().isFirstVersion()) {
@@ -146,15 +150,16 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
-				String msg = "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
+				String msg
+						= "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
 				msg = MessageFormat.format(msg, activity.getId(), activity.getVersion().getPreviousVersion(), modCount);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update previous version of Activity {0} due to {1}", activity.getVersion(),
-							e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update previous version of Activity {0} due to {1}",
+							activity.getVersion(), e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -169,15 +174,15 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 
 		// make sure is first version when versioning is not enabled
 		if (!activity.getVersion().isFirstVersion()) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
-							activity.getVersion()));
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
+					activity.getVersion()));
 		}
 
 		// and also not marked as deleted!
 		if (activity.getVersion().isDeleted()) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
 							activity.getVersion()));
 		}
 
@@ -219,9 +224,9 @@ public class PostgreSqlActivityDao extends PostgresqlDao<Activity> implements Ac
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update Activity {0} due to {1}", activity.getLocator(), e.getLocalizedMessage()),
-					e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update Activity {0} due to {1}", activity.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 	}
 }

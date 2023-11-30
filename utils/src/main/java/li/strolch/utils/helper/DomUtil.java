@@ -16,9 +16,10 @@
 package li.strolch.utils.helper;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.text.MessageFormat;
+
+import static li.strolch.utils.helper.XmlHelper.getDocumentBuilder;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -27,8 +28,7 @@ public class DomUtil {
 
 	public static DocumentBuilder createDocumentBuilder() {
 		try {
-			DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-			return dbfac.newDocumentBuilder();
+			return getDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			String msg = "No Xml Parser could be loaded: {0}";
 			msg = MessageFormat.format(msg, e.getMessage());

@@ -15,18 +15,18 @@
  */
 package li.strolch.model.xml;
 
-import static li.strolch.utils.helper.StringHelper.*;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.File;
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -61,7 +61,8 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 			File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
 			if (!includeFile.exists() || !includeFile.canRead()) {
-				String msg = "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}";
+				String msg
+						= "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}";
 				msg = MessageFormat.format(msg, this.modelFile.getAbsolutePath(), includeFileS);
 				throw new IllegalArgumentException(msg);
 			}
@@ -78,10 +79,7 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 			long startNanos = System.nanoTime();
 			this.statistics.startTime = LocalDateTime.now();
 
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-
-			sp.parse(this.modelFile, this);
+			getSaxParser().parse(this.modelFile, this);
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;

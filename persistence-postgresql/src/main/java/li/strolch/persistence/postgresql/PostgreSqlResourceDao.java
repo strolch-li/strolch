@@ -15,15 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.*;
-import java.text.MessageFormat;
-import java.util.Calendar;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.model.Resource;
@@ -35,18 +26,32 @@ import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.TransactionResult;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
+import java.text.MessageFormat;
+import java.util.Calendar;
+
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
+
 @SuppressWarnings("nls")
 public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements ResourceDao {
 
 	public static final String RESOURCES = "resources";
 
-	private static final String insertAsXmlSqlS = "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String insertAsJsonSqlS = "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertAsXmlSqlS
+			= "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asxml) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertAsJsonSqlS
+			= "insert into {0} (id, version, created_by, updated_at, created_at, deleted, latest, name, type, asjson) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String updateAsXmlSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, asxml = ? where type = ? and id = ? and version = ?";
-	private static final String updateAsJsonSqlS = "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, asjson = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsXmlSqlS
+			= "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, asxml = ? where type = ? and id = ? and version = ?";
+	private static final String updateAsJsonSqlS
+			= "update {0} set created_by = ?, created_at = ?, updated_at = ?, deleted = ?, latest = ?, name = ?, asjson = ? where type = ? and id = ? and version = ?";
 
-	private static final String updateLatestSqlS = "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
+	private static final String updateLatestSqlS
+			= "update {0} SET latest = false WHERE type = ? and id = ? AND version = ?";
 
 	protected PostgreSqlResourceDao(DataType dataType, Connection connection, TransactionResult txResult,
 			boolean versioningEnabled) {
@@ -62,8 +67,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 	protected Resource parseFromXml(String id, String type, SQLXML sqlxml) {
 		SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
 		try (InputStream binaryStream = sqlxml.getBinaryStream()) {
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(binaryStream, new XmlModelSaxReader(listener));
+			getSaxParser().parse(binaryStream, new XmlModelSaxReader(listener));
 		} catch (SQLException | IOException | SAXException | ParserConfigurationException e) {
 			throw new StrolchPersistenceException(
 					MessageFormat.format("Failed to extract Resource from sqlxml value for {0} / {1}", id, type), e);
@@ -125,9 +129,9 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to insert Resource {0} due to {1}", resource.getLocator(), e.getLocalizedMessage()),
-					e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to insert Resource {0} due to {1}", resource.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 
 		if (resource.getVersion().isFirstVersion()) {
@@ -145,15 +149,16 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
-				String msg = "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
+				String msg
+						= "Expected to update 1 previous element with id {0} and version {1} but SQL statement modified {2} elements!";
 				msg = MessageFormat.format(msg, resource.getId(), resource.getVersion().getPreviousVersion(), modCount);
 				throw new StrolchPersistenceException(msg);
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to insert Resource {0} due to {1}", resource.getLocator(), e.getLocalizedMessage()),
-					e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to insert Resource {0} due to {1}", resource.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -168,15 +173,15 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 
 		// make sure is first version when versioning is not enabled
 		if (!resource.getVersion().isFirstVersion()) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
-							resource.getVersion()));
+			throw new StrolchPersistenceException(MessageFormat.format(
+					"Versioning is not enabled, so version must always be 0 to perform an update, but it is {0}",
+					resource.getVersion()));
 		}
 
 		// and also not marked as deleted!
 		if (resource.getVersion().isDeleted()) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Versioning is not enabled, so version can not be marked as deleted for {0}",
 							resource.getVersion()));
 		}
 
@@ -208,7 +213,8 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			try {
 				int modCount = preparedStatement.executeUpdate();
 				if (modCount != 1) {
-					String msg = "Expected to update 1 element with id {0} and version {1} but SQL statement modified {2} elements!";
+					String msg
+							= "Expected to update 1 element with id {0} and version {1} but SQL statement modified {2} elements!";
 					msg = MessageFormat.format(msg, resource.getId(), resource.getVersion().getVersion(), modCount);
 					throw new StrolchPersistenceException(msg);
 				}
@@ -218,9 +224,9 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			}
 
 		} catch (SQLException | SAXException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update Resource {0} due to {1}", resource.getLocator(), e.getLocalizedMessage()),
-					e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update Resource {0} due to {1}", resource.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 	}
 }

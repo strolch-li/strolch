@@ -28,6 +28,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.*;
@@ -94,14 +96,9 @@ public class XmlHelper {
 	 * @param xmlFileInputStream the XML {@link InputStream} which is to be parsed
 	 */
 	public static void parseDocument(InputStream xmlFileInputStream, DefaultHandler xmlHandler) {
-
 		try {
-
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-
-			SAXParser sp = spf.newSAXParser();
+			SAXParser sp = getSaxParser();
 			sp.parse(xmlFileInputStream, xmlHandler);
-
 		} catch (ParserConfigurationException e) {
 			throw new XmlException("Failed to initialize a SAX Parser: " + e.getMessage(), e);
 		} catch (SAXException e) {
@@ -109,6 +106,29 @@ public class XmlHelper {
 		} catch (IOException e) {
 			throw new XmlException("The XML stream not be read: " + e.getMessage(), e);
 		}
+	}
+
+	public static SAXParser getSaxParser() throws SAXException, ParserConfigurationException {
+		SAXParserFactory factory = getSaxParserFactory();
+		return factory.newSAXParser();
+	}
+
+	public static SAXParserFactory getSaxParserFactory()
+			throws ParserConfigurationException, SAXNotRecognizedException, SAXNotSupportedException {
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		return factory;
+	}
+
+	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+		DocumentBuilderFactory dbf = getDocumentBuilderFactory();
+		return dbf.newDocumentBuilder();
+	}
+
+	public static DocumentBuilderFactory getDocumentBuilderFactory() throws ParserConfigurationException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		return factory;
 	}
 
 	/**
@@ -130,7 +150,7 @@ public class XmlHelper {
 
 		try {
 
-			SAXParserFactory spf = SAXParserFactory.newInstance();
+			SAXParserFactory spf = getSaxParserFactory();
 			if (nsAware)
 				spf.setNamespaceAware(true);
 
@@ -306,12 +326,7 @@ public class XmlHelper {
 	 */
 	public static Document createDocument() throws RuntimeException {
 		try {
-
-			DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-
-			return docBuilder.newDocument();
-
+			return getDocumentBuilder().newDocument();
 		} catch (DOMException | ParserConfigurationException e) {
 			throw new XmlException("Failed to create Document: " + e.getLocalizedMessage(), e);
 		}
@@ -333,18 +348,12 @@ public class XmlHelper {
 	public static void marshall(File dstFile, Object object) throws Exception {
 
 		try (FileOutputStream out = new FileOutputStream(dstFile)) {
-
 			JAXBContext jc = JAXBContext.newInstance(object.getClass());
-
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document document = db.newDocument();
-
+			Document document = getDocumentBuilder().newDocument();
 			Marshaller marshaller = jc.createMarshaller();
 			marshaller.marshal(object, document);
 
 			writeDocument(document, out);
-
 			out.flush();
 		}
 

@@ -15,11 +15,14 @@
  */
 package li.strolch.model.xml;
 
-import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
+import li.strolch.utils.helper.StringHelper;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,12 +30,8 @@ import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
-import li.strolch.utils.helper.StringHelper;
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -85,10 +84,7 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 			long startNanos = System.nanoTime();
 			this.statistics.startTime = LocalDateTime.now();
 
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-
-			sp.parse(this.source, this);
+			getSaxParser().parse(this.source, this);
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;

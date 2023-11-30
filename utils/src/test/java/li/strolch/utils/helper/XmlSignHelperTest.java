@@ -1,6 +1,10 @@
 package li.strolch.utils.helper;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.parsers.DocumentBuilder;
@@ -11,11 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import static li.strolch.utils.helper.XmlHelper.getDocumentBuilderFactory;
+import static org.junit.Assert.assertEquals;
 
 public class XmlSignHelperTest {
 
@@ -124,10 +125,10 @@ public class XmlSignHelperTest {
 		issueInstant.add(Calendar.SECOND, 10);
 		String notOnOrAfterS = simpleDf.format(issueInstant.getTime());
 
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
 		DocumentBuilder docBuilder;
 		try {
+			DocumentBuilderFactory dbf = getDocumentBuilderFactory();
+			dbf.setNamespaceAware(true);
 			docBuilder = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException("Failed to configure document builder!", e);
@@ -168,10 +169,10 @@ public class XmlSignHelperTest {
 		issueInstant.add(Calendar.SECOND, 10);
 		String notOnOrAfterS = simpleDf.format(issueInstant.getTime());
 
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
 		DocumentBuilder docBuilder;
 		try {
+			DocumentBuilderFactory dbf = getDocumentBuilderFactory();
+			dbf.setNamespaceAware(true);
 			docBuilder = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException("Failed to configure document builder!", e);

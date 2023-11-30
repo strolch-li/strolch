@@ -15,20 +15,6 @@
  */
 package li.strolch.xmlpers.api;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.text.MessageFormat;
-
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.utils.exceptions.XmlException;
 import li.strolch.utils.helper.StringHelper;
@@ -39,6 +25,21 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.text.MessageFormat;
+
+import static li.strolch.utils.helper.XmlHelper.PROP_LINE_SEPARATOR;
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 public class FileIo {
 
@@ -103,12 +104,9 @@ public class FileIo {
 
 		try {
 
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-
 			SaxParser<T> saxParser = ctx.getParserFactor().getSaxParser();
 			DefaultHandler defaultHandler = saxParser.getDefaultHandler();
-			sp.parse(this.path, defaultHandler);
+			getSaxParser().parse(this.path, defaultHandler);
 
 			if (logger.isDebugEnabled()) {
 				String msg = "SAX parsed file {0}";
@@ -127,7 +125,7 @@ public class FileIo {
 
 	public <T> void writeDom(PersistenceContext<T> ctx) {
 
-		String lineSep = System.getProperty(XmlHelper.PROP_LINE_SEPARATOR);
+		String lineSep = System.getProperty(PROP_LINE_SEPARATOR);
 
 		try {
 
@@ -142,7 +140,7 @@ public class FileIo {
 
 			if (!lineSep.equals(StringHelper.NEW_LINE)) {
 				logger.info("Overriding line separator to \\n");
-				System.setProperty(XmlHelper.PROP_LINE_SEPARATOR, StringHelper.NEW_LINE);
+				System.setProperty(PROP_LINE_SEPARATOR, StringHelper.NEW_LINE);
 			}
 
 			// Set up a transformer
@@ -176,7 +174,7 @@ public class FileIo {
 			throw new XmlException(msg, e);
 
 		} finally {
-			System.setProperty(XmlHelper.PROP_LINE_SEPARATOR, lineSep);
+			System.setProperty(PROP_LINE_SEPARATOR, lineSep);
 		}
 	}
 

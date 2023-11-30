@@ -1,19 +1,5 @@
 package li.strolch.model.activity;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.assertEquals;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.StringWriter;
-
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.model.timevalue.impl.ValueChange;
@@ -24,6 +10,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.StringWriter;
+
+import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.utils.helper.XmlHelper.getDocumentBuilder;
+import static org.junit.Assert.assertEquals;
 
 public class ActionTest {
 
@@ -76,8 +75,7 @@ public class ActionTest {
 	// @Test
 	public void showToDOM() throws ParserConfigurationException, TransformerException {
 
-		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document document = db.newDocument();
+		Document document = getDocumentBuilder().newDocument();
 		Element dom = new StrolchElementToDomVisitor().toDom(this.action);
 		document.appendChild(dom);
 

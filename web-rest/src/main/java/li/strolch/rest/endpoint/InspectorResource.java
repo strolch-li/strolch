@@ -57,8 +57,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
@@ -79,6 +77,7 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIV
 import static li.strolch.search.SearchBuilder.orderBy;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
+import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 /**
  * The RESTful inspector for Strolch. It allows to inspect the realms, and their respective elements. Supporting
@@ -210,8 +209,10 @@ public class InspectorResource {
 		};
 
 		String fileName = "strolch_export_" + realm + "_" + System.currentTimeMillis() + ".xml";
-		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -336,8 +337,10 @@ public class InspectorResource {
 		};
 
 		String fileName = "strolch_export_resources_" + realm + "_" + System.currentTimeMillis() + ".xml";
-		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -363,8 +366,10 @@ public class InspectorResource {
 		};
 
 		String fileName = "strolch_export_orders_" + realm + "_" + System.currentTimeMillis() + ".xml";
-		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -390,8 +395,10 @@ public class InspectorResource {
 		};
 
 		String fileName = "strolch_export_activities_" + realm + "_" + System.currentTimeMillis() + ".xml";
-		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -562,8 +569,10 @@ public class InspectorResource {
 		};
 
 		String fileName = "strolch_export_resources_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
-		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -595,8 +604,10 @@ public class InspectorResource {
 		};
 
 		String fileName = "strolch_export_orders_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
-		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -628,8 +639,10 @@ public class InspectorResource {
 		};
 
 		String fileName = "strolch_export_activities_" + type + "_" + realm + "_" + System.currentTimeMillis() + ".xml";
-		return Response.ok(streamingOutput, MediaType.APPLICATION_XML)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(streamingOutput, MediaType.APPLICATION_XML)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	@GET
@@ -1423,15 +1436,16 @@ public class InspectorResource {
 		Resource resource;
 		try {
 			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+			getSaxParser().parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
-			if (listener.getResources().size() == 0)
-				throw new StrolchPersistenceException("No Resource parsed from xml value" +
-						(StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+			if (listener.getResources().isEmpty())
+				throw new StrolchPersistenceException(
+						"No Resource parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
+																	   ""));
 			if (listener.getResources().size() > 1)
-				throw new StrolchPersistenceException("Multiple Resources parsed from xml value" +
-						(StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"Multiple Resources parsed from xml value" + (StringHelper.isNotEmpty(type) ?
+																			  " for type " + type : ""));
 
 			resource = listener.getResources().get(0);
 			resource.setVersion(null);
@@ -1439,8 +1453,9 @@ public class InspectorResource {
 			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, resource.getType());
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException("Failed to extract Resource from xml value" +
-					(StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+			throw new StrolchPersistenceException(
+					"Failed to extract Resource from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
+																		   ""), e);
 		}
 		return resource;
 	}
@@ -1449,15 +1464,15 @@ public class InspectorResource {
 		Order order;
 		try {
 			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+			getSaxParser().parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
-			if (listener.getOrders().size() == 0)
+			if (listener.getOrders().isEmpty())
 				throw new StrolchPersistenceException(
 						"No Order parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 			if (listener.getOrders().size() > 1)
-				throw new StrolchPersistenceException("Multiple Orders parsed from xml value" +
-						(StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"Multiple Orders parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
+																		   ""));
 
 			order = listener.getOrders().get(0);
 			order.setVersion(null);
@@ -1465,8 +1480,9 @@ public class InspectorResource {
 			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, order.getType());
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException("Failed to extract Order from xml value" +
-					(StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+			throw new StrolchPersistenceException(
+					"Failed to extract Order from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
+																		""), e);
 		}
 		return order;
 	}
@@ -1475,15 +1491,16 @@ public class InspectorResource {
 		Activity activity;
 		try {
 			SimpleStrolchElementListener listener = new SimpleStrolchElementListener();
-			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-			parser.parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
+			getSaxParser().parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
-			if (listener.getActivities().size() == 0)
-				throw new StrolchPersistenceException("No Activity parsed from xml value" +
-						(StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+			if (listener.getActivities().isEmpty())
+				throw new StrolchPersistenceException(
+						"No Activity parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
+																	   ""));
 			if (listener.getActivities().size() > 1)
-				throw new StrolchPersistenceException("Multiple Activities parsed from xml value" +
-						(StringHelper.isNotEmpty(type) ? " for type " + type : ""));
+				throw new StrolchPersistenceException(
+						"Multiple Activities parsed from xml value" + (StringHelper.isNotEmpty(type) ?
+																			   " for type " + type : ""));
 
 			activity = listener.getActivities().get(0);
 			activity.setVersion(null);
@@ -1491,8 +1508,9 @@ public class InspectorResource {
 			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, activity.getType());
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException("Failed to extract Activity from xml value" +
-					(StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
+			throw new StrolchPersistenceException(
+					"Failed to extract Activity from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
+																		   ""), e);
 		}
 		return activity;
 	}
