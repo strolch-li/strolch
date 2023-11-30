@@ -28,7 +28,7 @@ public class AesCryptoHelper {
 	private static final int AES_KEY_LENGTH_BITS = 128;
 	private static final int IV_LENGTH_BYTES = 16;
 	private static final int PBE_ITERATION_COUNT = 10000;
-	private static final String PBE_ALGORITHM = "PBKDF2WithHmacSHA1";
+	private static final String PBE_ALGORITHM = "PBKDF2WithHmacSHA256";
 
 	private static final String HMAC_ALGORITHM = "HmacSHA256";
 	private static final int HMAC_KEY_LENGTH_BITS = 256;
