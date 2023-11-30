@@ -1,6 +1,7 @@
 package li.strolch.privilege.handler;
 
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
@@ -9,10 +10,7 @@ import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.Context;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.PartialResultException;
+import javax.naming.*;
 import javax.naming.directory.*;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -109,6 +107,9 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		} catch (AccessDeniedException e) {
 			throw e;
+		} catch (AuthenticationException e) {
+			logger.error("Could not login with user: " + safeUsername + " on Ldap", e);
+			throw new InvalidCredentialsException("Could not login with user: " + safeUsername + " on Ldap", e);
 		} catch (Exception e) {
 			logger.error("Could not login with user: " + safeUsername + " on Ldap", e);
 			throw new AccessDeniedException("Could not login with user: " + safeUsername + " on Ldap", e);
