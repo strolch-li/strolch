@@ -86,6 +86,7 @@ public class AgentResource {
 				case STARTED -> component.start();
 				case STOPPED -> component.stop();
 				case DESTROYED -> component.destroy();
+				default -> throw new IllegalStateException("Unhandled state " + state);
 			}
 		} catch (Exception e) {
 			logger.error("Failed to change state of component " + name + " to state " + state, e);
