@@ -15,19 +15,10 @@
  */
 package li.strolch.rest.endpoint;
 
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION;
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION_EXPIRATION_DATE;
-import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
-
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -41,13 +32,25 @@ import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import li.strolch.utils.helper.ExceptionHelper;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Base64;
+import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION;
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION_EXPIRATION_DATE;
+import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -61,11 +64,9 @@ public class AuthenticationResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticate(@Context HttpServletRequest request, @Context HttpHeaders headers, String data) {
-
 		JsonObject login = JsonParser.parseString(data).getAsJsonObject();
 
 		try {
-
 			if (!login.has("username") || login.get("username").getAsString().length() < 2) {
 				logger.error("Authentication failed: Username was not given or is too short!");
 				JsonObject loginResult = new JsonObject();
@@ -103,29 +104,8 @@ public class AuthenticationResource {
 
 			return getAuthenticationResponse(request, certificate, source, true);
 
-		} catch (InvalidCredentialsException e) {
-			logger.error("Authentication failed due to: " + e.getMessage());
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid");
-			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
-		} catch (AccessDeniedException e) {
-			logger.error("Authentication failed due to: " + e.getMessage());
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg",
-					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
-			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
-		} catch (StrolchException | PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg",
-					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
-			return Response.status(Status.FORBIDDEN).entity(loginResult.toString()).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			String msg = e.getMessage();
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
-			return Response.serverError().entity(loginResult.toString()).build();
+			return handleAuthenticationException(e);
 		}
 	}
 
@@ -133,38 +113,13 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("sso")
 	public Response authenticateSingleSignOn(@Context HttpServletRequest request, @Context HttpHeaders headers) {
-
 		try {
-
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
 			Certificate certificate = sessionHandler.authenticateSingleSignOn(request.getUserPrincipal(), source);
-
 			return getAuthenticationResponse(request, certificate, source, true);
-
-		} catch (InvalidCredentialsException e) {
-			logger.error("Authentication failed due to: " + e.getMessage());
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", "Could not log in as the given credentials are invalid");
-			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
-		} catch (AccessDeniedException e) {
-			logger.error("Authentication failed due to: " + e.getMessage());
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg",
-					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
-			return Response.status(Status.UNAUTHORIZED).entity(loginResult.toString()).build();
-		} catch (StrolchException | PrivilegeException e) {
-			logger.error(e.getMessage(), e);
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg",
-					MessageFormat.format("Could not log in due to: {0}", e.getMessage())); //$NON-NLS-2$
-			return Response.status(Status.FORBIDDEN).entity(loginResult.toString()).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			String msg = e.getMessage();
-			JsonObject loginResult = new JsonObject();
-			loginResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
-			return Response.serverError().entity(loginResult.toString()).build();
+			return handleAuthenticationException(e);
 		}
 	}
 
@@ -177,7 +132,6 @@ public class AuthenticationResource {
 		JsonObject logoutResult = new JsonObject();
 
 		try {
-
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
 			Certificate certificate = sessionHandler.validate(authToken, source);
@@ -189,16 +143,8 @@ public class AuthenticationResource {
 					MessageFormat.format("{0} has been logged out.", certificate.getUsername()));
 			return Response.ok().entity(logoutResult.toString()).build();
 
-		} catch (StrolchException | PrivilegeException e) {
-			logger.error("Failed to invalidate session due to: " + e.getMessage());
-			logoutResult.addProperty("msg",
-					MessageFormat.format("Could not logout due to: {0}", e.getMessage())); //$NON-NLS-2$
-			return Response.status(Status.UNAUTHORIZED).entity(logoutResult.toString()).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			String msg = e.getMessage();
-			logoutResult.addProperty("msg", MessageFormat.format("{0}: {1}", e.getClass().getName(), msg));
-			return Response.serverError().entity(logoutResult.toString()).build();
+			return handleSessionException("Failed to invalidate session", e);
 		}
 	}
 
@@ -207,29 +153,53 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	public Response validateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
-
 		try {
-
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
 			sessionHandler.validate(authToken, source);
-
 			return Response.ok().build();
-
-		} catch (StrolchException | PrivilegeException e) {
-			logger.error("Session validation failed: " + e.getMessage());
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", MessageFormat.format("Session invalid: {0}", e.getMessage()));
-			String json = new Gson().toJson(root);
-			return Response.status(Status.UNAUTHORIZED).entity(json).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			String msg = e.getMessage();
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", MessageFormat.format("Session invalid: {0}: {1}", e.getClass().getName(), msg));
-			String json = new Gson().toJson(root);
-			return Response.serverError().entity(json).build();
+			return handleSessionException("Session validation failed", e);
 		}
+	}
+
+	private static Response handleAuthenticationException(Exception e) {
+		logger.error(e.getMessage(), e);
+		Status status;
+		Throwable rootCause = getRootCause(e);
+		String msg = MessageFormat.format("Could not log in due to: {0}", rootCause);
+		switch (rootCause) {
+			case InvalidCredentialsException ignored -> {
+				status = Status.UNAUTHORIZED;
+				msg = "Could not log in as the given credentials are invalid";
+			}
+			case AccessDeniedException ignored -> status = Status.UNAUTHORIZED;
+			case StrolchException ignored -> status = Status.FORBIDDEN;
+			case PrivilegeException ignored -> status = Status.FORBIDDEN;
+			default -> status = Status.INTERNAL_SERVER_ERROR;
+		}
+
+		JsonObject loginResult = new JsonObject();
+		loginResult.addProperty("msg", msg);
+		return Response.status(status).entity(loginResult.toString()).build();
+	}
+
+	private static Response handleSessionException(String context, Exception e) {
+		logger.error(e.getMessage(), e);
+		Throwable rootCause = getRootCause(e);
+		Status status;
+		String msg = MessageFormat.format("{0}: {1}", context, rootCause);
+		switch (rootCause) {
+			case InvalidCredentialsException ignored -> status = Status.UNAUTHORIZED;
+			case AccessDeniedException ignored -> status = Status.UNAUTHORIZED;
+			case StrolchException ignored -> status = Status.FORBIDDEN;
+			case PrivilegeException ignored -> status = Status.FORBIDDEN;
+			case null, default -> status = Status.INTERNAL_SERVER_ERROR;
+		}
+
+		JsonObject resultJ = new JsonObject();
+		resultJ.addProperty("msg", msg);
+		return Response.status(status).entity(resultJ.toString()).build();
 	}
 
 	@GET
@@ -237,28 +207,13 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	public Response getValidatedSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
-
 		try {
-
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
 			Certificate certificate = sessionHandler.validate(authToken, source);
-
 			return getAuthenticationResponse(request, certificate, source, false);
-
-		} catch (StrolchException | PrivilegeException e) {
-			logger.error("Session validation failed: " + e.getMessage());
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", MessageFormat.format("Session invalid: {0}", e.getMessage()));
-			String json = new Gson().toJson(root);
-			return Response.status(Status.UNAUTHORIZED).entity(json).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			String msg = e.getMessage();
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", MessageFormat.format("Session invalid: {0}: {1}", e.getClass().getName(), msg));
-			String json = new Gson().toJson(root);
-			return Response.serverError().entity(json).build();
+			return handleSessionException("Session validation failed", e);
 		}
 	}
 
@@ -267,30 +222,14 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	public Response refreshSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
-
 		try {
-
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
 			Certificate certificate = sessionHandler.validate(authToken, source);
-
 			Certificate refreshedCert = sessionHandler.refreshSession(certificate, source);
-
 			return getAuthenticationResponse(request, refreshedCert, source, true);
-
-		} catch (StrolchException | PrivilegeException e) {
-			logger.error("Session validation failed: " + e.getMessage());
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", MessageFormat.format("Session invalid: {0}", e.getMessage()));
-			String json = new Gson().toJson(root);
-			return Response.status(Status.UNAUTHORIZED).entity(json).build();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			String msg = e.getMessage();
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", MessageFormat.format("Session invalid: {0}: {1}", e.getClass().getName(), msg));
-			String json = new Gson().toJson(root);
-			return Response.serverError().entity(json).build();
+			return handleSessionException("Session validation failed", e);
 		}
 	}
 
@@ -298,7 +237,6 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("challenge")
 	public Response initiateChallenge(@Context HttpServletRequest request, String data) {
-
 		try {
 			JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
 			String username = jsonObject.get("username").getAsString();
@@ -307,15 +245,9 @@ public class AuthenticationResource {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
 			sessionHandler.initiateChallengeFor(Usage.byValue(usage), username, source);
-
 			return ResponseUtil.toResponse();
-
-		} catch (PrivilegeException e) {
-			logger.error("Challenge initialization failed: " + e.getMessage());
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", ExceptionHelper.getExceptionMessage(e));
-			String json = new Gson().toJson(root);
-			return Response.status(Status.UNAUTHORIZED).entity(json).build();
+		} catch (Exception e) {
+			return handleSessionException("Challenge initialization failed", e);
 		}
 	}
 
@@ -323,7 +255,6 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("challenge")
 	public Response validateChallenge(@Context HttpServletRequest request, String data) {
-
 		try {
 
 			JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -344,12 +275,8 @@ public class AuthenticationResource {
 
 			return setCookiesAndReturnResponse(request, restComponent, cookieMaxAge, expirationDate, result, authToken);
 
-		} catch (PrivilegeException e) {
-			logger.error("Challenge validation failed: " + e.getMessage());
-			JsonObject root = new JsonObject();
-			root.addProperty("msg", ExceptionHelper.getExceptionMessage(e));
-			String json = new Gson().toJson(root);
-			return Response.status(Status.UNAUTHORIZED).entity(json).build();
+		} catch (Exception e) {
+			return handleSessionException("Challenge validation failed", e);
 		}
 	}
 
@@ -431,7 +358,8 @@ public class AuthenticationResource {
 			JsonObject loginResult, String authToken) {
 		boolean secureCookie = restComponent.isSecureCookie();
 		if (secureCookie && !request.getScheme().equals("https")) {
-			String msg = "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
+			String msg
+					= "Authorization cookie is secure, but connection is not secure! Cookie won't be passed to client!";
 			logger.error(msg);
 		}
 
