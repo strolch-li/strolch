@@ -6,6 +6,7 @@ import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.helper.ExceptionHelper;
+import org.owasp.esapi.reference.DefaultEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,31 +68,34 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	@Override
 	protected User checkCredentialsAndUserState(String username, char[] password) throws AccessDeniedException {
+		// escape the user provider username
+		org.owasp.esapi.Encoder encoder = DefaultEncoder.getInstance();
+		String safeUsername = encoder.encodeForLDAP(username);
 
 		// first see if this is a local user
-		User internalUser = this.persistenceHandler.getUser(username);
+		User internalUser = this.persistenceHandler.getUser(safeUsername);
 		if (internalUser != null && internalUser.getUserState() != UserState.REMOTE)
-			return super.checkCredentialsAndUserState(username, password);
+			return super.checkCredentialsAndUserState(safeUsername, password);
 
 		String userPrincipalName;
 		if (this.domain.isEmpty()) {
-			userPrincipalName = username;
+			userPrincipalName = safeUsername;
 		} else {
 			if (!this.domainPrefix.isEmpty() && username.startsWith(this.domainPrefix)) {
 				logger.warn("Trimming domain from given username, to first search in sAMAccountName");
-				username = username.substring(this.domainPrefix.length());
+				safeUsername = encoder.encodeForLDAP(username.substring(this.domainPrefix.length()));
 			}
-			userPrincipalName = username + "@" + this.domain;
+			userPrincipalName = safeUsername + "@" + this.domain;
 		}
 
-		logger.info("User {} tries to login on ldap {}", username, this.providerUrl);
+		logger.info("User {} tries to login on ldap {}", safeUsername, this.providerUrl);
 
 		// Create the initial context
 		DirContext ctx = null;
 		try {
 			ctx = new InitialDirContext(buildLdapEnv(password, userPrincipalName));
-			SearchResult searchResult = searchLdap(username, ctx, userPrincipalName);
-			User user = buildUserFromSearchResult(username, searchResult);
+			SearchResult searchResult = searchLdap(safeUsername, ctx, userPrincipalName);
+			User user = buildUserFromSearchResult(safeUsername, searchResult);
 
 			// persist this user
 			if (internalUser == null)
@@ -107,8 +111,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		} catch (AccessDeniedException e) {
 			throw e;
 		} catch (Exception e) {
-			logger.error("Could not login with user: " + username + " on Ldap", e);
-			throw new AccessDeniedException("Could not login with user: " + username + " on Ldap", e);
+			logger.error("Could not login with user: " + safeUsername + " on Ldap", e);
+			throw new AccessDeniedException("Could not login with user: " + safeUsername + " on Ldap", e);
 		} finally {
 			if (ctx != null) {
 				try {
@@ -136,13 +140,14 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		return env;
 	}
 
-	private SearchResult searchLdap(String username, DirContext ctx, String userPrincipalName) throws NamingException {
+	private SearchResult searchLdap(String safeUsername, DirContext ctx, String userPrincipalName)
+			throws NamingException {
 		SearchControls searchControls = new SearchControls();
 		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
 		// the first search is using sAMAccountName
 		NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase,
-				LDAP_FILTER_TEMPLATE.formatted(SAM_ACCOUNT_NAME, username, this.additionalFilter), searchControls);
+				LDAP_FILTER_TEMPLATE.formatted(SAM_ACCOUNT_NAME, safeUsername, this.additionalFilter), searchControls);
 
 		SearchResult searchResult = null;
 		while (searchResult == null) {
@@ -151,22 +156,26 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 				// and if we don't find anything, then we search with userPrincipalName
 				if (!answer.hasMore()) {
 
-					logger.warn("No LDAP data retrieved using " + SAM_ACCOUNT_NAME + ", trying with " +
-							USER_PRINCIPAL_NAME + "...");
+					logger.warn("No LDAP data retrieved using "
+							+ SAM_ACCOUNT_NAME
+							+ ", trying with "
+							+ USER_PRINCIPAL_NAME
+							+ "...");
 					answer = ctx.search(this.searchBase,
 							LDAP_FILTER_TEMPLATE.formatted(USER_PRINCIPAL_NAME, userPrincipalName,
 									this.additionalFilter), searchControls);
 
 					if (!answer.hasMore())
-						throw new AccessDeniedException("Could not login user: " + username +
-								" on Ldap: no LDAP Data, for either sAMAccountName or userPrincipalName searches. Domain used is " +
-								this.domain);
+						throw new AccessDeniedException("Could not login user: "
+								+ safeUsername
+								+ " on Ldap: no LDAP Data, for either sAMAccountName or userPrincipalName searches. Domain used is "
+								+ this.domain);
 				}
 
 				searchResult = answer.next();
 				if (answer.hasMore())
 					throw new AccessDeniedException(
-							"Could not login with user: " + username + " on Ldap: Multiple LDAP Data");
+							"Could not login with user: " + safeUsername + " on Ldap: Multiple LDAP Data");
 
 			} catch (PartialResultException e) {
 				if (ExceptionHelper.getExceptionMessage(e).contains("Unprocessed Continuation Reference(s)"))

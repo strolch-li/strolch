@@ -89,6 +89,7 @@
         <angus-mail.version>2.0.1</angus-mail.version>
         <csv.version>1.9.0</csv.version>
         <cron.version>1.6.2</cron.version>
+        <owasp-encoder-esapi.version>1.2.3</owasp-encoder-esapi.version>
 
         <jakarta.xml.bind-api.version>4.0.0</jakarta.xml.bind-api.version>
         <jakarta.annotation.version>2.1.1</jakarta.annotation.version>
@@ -251,6 +252,62 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-csv</artifactId>
                 <version>${csv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.owasp.encoder</groupId>
+                <artifactId>encoder-esapi</artifactId>
+                <version>${owasp-encoder-esapi.version}</version>
+                <!-- we basically exclude all its dependencies, as the code we need has no transitive dependencies -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>xom</groupId>
+                        <artifactId>xom</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-beanutils</groupId>
+                        <artifactId>commons-beanutils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-configuration</groupId>
+                        <artifactId>commons-configuration</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-lang</groupId>
+                        <artifactId>commons-lang</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-fileupload</groupId>
+                        <artifactId>commons-fileupload</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-collections4</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache-extras.beanshell</groupId>
+                        <artifactId>bsh</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.owasp.antisamy</groupId>
+                        <artifactId>antisamy</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-io</groupId>
+                        <artifactId>commons-io</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-annotations</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Database -->

@@ -44,6 +44,10 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder-esapi</artifactId>
+        </dependency>
 
         <!-- test -->
         <dependency>
