@@ -6,7 +6,6 @@ import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.helper.ExceptionHelper;
-import org.owasp.esapi.reference.DefaultEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 
+import static li.strolch.utils.LdapHelper.encodeForLDAP;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
@@ -69,8 +69,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	@Override
 	protected User checkCredentialsAndUserState(String username, char[] password) throws AccessDeniedException {
 		// escape the user provider username
-		org.owasp.esapi.Encoder encoder = DefaultEncoder.getInstance();
-		String safeUsername = encoder.encodeForLDAP(username);
+		String safeUsername = encodeForLDAP(username, true);
 
 		// first see if this is a local user
 		User internalUser = this.persistenceHandler.getUser(safeUsername);
@@ -83,7 +82,7 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		} else {
 			if (!this.domainPrefix.isEmpty() && username.startsWith(this.domainPrefix)) {
 				logger.warn("Trimming domain from given username, to first search in sAMAccountName");
-				safeUsername = encoder.encodeForLDAP(username.substring(this.domainPrefix.length()));
+				safeUsername = encodeForLDAP(username.substring(this.domainPrefix.length()), true);
 			}
 			userPrincipalName = safeUsername + "@" + this.domain;
 		}
