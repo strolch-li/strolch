@@ -51,6 +51,7 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION_EXPIRATION_DATE;
 import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
+import static li.strolch.utils.helper.ExceptionHelper.hasCause;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -165,18 +166,25 @@ public class AuthenticationResource {
 
 	private static Response handleAuthenticationException(Exception e) {
 		logger.error(e.getMessage(), e);
-		Status status;
 		Throwable rootCause = getRootCause(e);
 		String msg = MessageFormat.format("Could not log in due to: {0}", rootCause);
-		switch (rootCause) {
-			case InvalidCredentialsException ignored -> {
-				status = Status.UNAUTHORIZED;
-				msg = "Could not log in as the given credentials are invalid";
-			}
-			case AccessDeniedException ignored -> status = Status.UNAUTHORIZED;
-			case StrolchException ignored -> status = Status.FORBIDDEN;
-			case PrivilegeException ignored -> status = Status.FORBIDDEN;
-			default -> status = Status.INTERNAL_SERVER_ERROR;
+		if (hasCause(e, InvalidCredentialsException.class))
+			msg = "Could not log in as the given credentials are invalid";
+		return evaluateResponseByCause(e, msg);
+	}
+
+	private static Response evaluateResponseByCause(Exception e, String msg) {
+		Status status;
+		if (hasCause(e, InvalidCredentialsException.class)) {
+			status = Status.UNAUTHORIZED;
+		} else if (hasCause(e, AccessDeniedException.class)) {
+			status = Status.UNAUTHORIZED;
+		} else if (hasCause(e, StrolchException.class)) {
+			status = Status.FORBIDDEN;
+		} else if (hasCause(e, PrivilegeException.class)) {
+			status = Status.FORBIDDEN;
+		} else {
+			status = Status.INTERNAL_SERVER_ERROR;
 		}
 
 		JsonObject loginResult = new JsonObject();
@@ -187,19 +195,8 @@ public class AuthenticationResource {
 	private static Response handleSessionException(String context, Exception e) {
 		logger.error(e.getMessage(), e);
 		Throwable rootCause = getRootCause(e);
-		Status status;
 		String msg = MessageFormat.format("{0}: {1}", context, rootCause);
-		switch (rootCause) {
-			case InvalidCredentialsException ignored -> status = Status.UNAUTHORIZED;
-			case AccessDeniedException ignored -> status = Status.UNAUTHORIZED;
-			case StrolchException ignored -> status = Status.FORBIDDEN;
-			case PrivilegeException ignored -> status = Status.FORBIDDEN;
-			case null, default -> status = Status.INTERNAL_SERVER_ERROR;
-		}
-
-		JsonObject resultJ = new JsonObject();
-		resultJ.addProperty("msg", msg);
-		return Response.status(status).entity(resultJ.toString()).build();
+		return evaluateResponseByCause(e, msg);
 	}
 
 	@GET
