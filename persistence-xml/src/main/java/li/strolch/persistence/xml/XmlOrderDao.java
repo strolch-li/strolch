@@ -91,7 +91,7 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 			return this.tx.getMetadataDao().querySize(subTypeRef, getDateRangePredicate(dateRange));
 		}
 
-		int size = 0;
+		long size = 0;
 		for (String type : types) {
 			SubTypeRef subTypeRef = getTypeRef(type);
 			size += this.tx.getMetadataDao().querySize(subTypeRef, getDateRangePredicate(dateRange));
