@@ -15,10 +15,9 @@
  */
 package li.strolch.utils.helper;
 
-import static java.util.Collections.emptySet;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-import static li.strolch.utils.helper.StringHelper.normalizeLength;
-import static li.strolch.utils.helper.TempFileOptions.*;
+import li.strolch.utils.DataUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -30,9 +29,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
-import li.strolch.utils.DataUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Collections.emptySet;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.normalizeLength;
+import static li.strolch.utils.helper.TempFileOptions.*;
 
 /**
  * Helper class for dealing with files
@@ -279,12 +279,12 @@ public class FileHelper {
 			outBuffer.flush();
 
 			if (checksum) {
-				String fromFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(fromFile));
-				String toFileMD5 = StringHelper.toHexString(FileHelper.hashFileMd5(toFile));
-				if (!fromFileMD5.equals(toFileMD5)) {
+				String fromFileSha256 = StringHelper.toHexString(FileHelper.hashFileSha256(fromFile));
+				String toFileSha256 = StringHelper.toHexString(FileHelper.hashFileSha256(toFile));
+				if (!fromFileSha256.equals(toFileSha256)) {
 					FileHelper.logger.error(
-							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", fromFileMD5,
-									toFileMD5));
+							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", fromFileSha256,
+									toFileSha256));
 					if (!toFile.delete())
 						throw new IllegalStateException("Failed to delete file " + toFile);
 
@@ -360,18 +360,6 @@ public class FileHelper {
 	 */
 	public static String humanizeFileSize(long fileSize) {
 		return DataUnit.Bytes.humanizeBytesValue(fileSize);
-	}
-
-	/**
-	 * Creates the MD5 hash of the given file, returning the hash as a byte array. Use
-	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
-	 *
-	 * @param file the file to hash
-	 *
-	 * @return the hash as a byte array
-	 */
-	public static byte[] hashFileMd5(File file) {
-		return FileHelper.hashFile(file, "MD5");
 	}
 
 	/**
