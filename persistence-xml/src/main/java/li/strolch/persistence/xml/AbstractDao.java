@@ -69,7 +69,7 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 			return this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
 		}
 
-		int size = 0;
+		long size = 0;
 		for (String type : types) {
 			SubTypeRef subTypeRef = getTypeRef(type);
 			size += this.tx.getMetadataDao().querySize(subTypeRef, file -> true);
