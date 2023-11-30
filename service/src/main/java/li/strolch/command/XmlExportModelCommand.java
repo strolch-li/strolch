@@ -65,10 +65,10 @@ public class XmlExportModelCommand extends Command {
 	// output
 	private ModelStatistics statistics;
 
-	private int elementsToWrite;
-	private int nrOfResourcesToExport;
-	private int nrOfOrdersToExport;
-	private int nrOfActivitiesToExport;
+	private long elementsToWrite;
+	private long nrOfResourcesToExport;
+	private long nrOfOrdersToExport;
+	private long nrOfActivitiesToExport;
 
 	private long nextLogTime;
 
