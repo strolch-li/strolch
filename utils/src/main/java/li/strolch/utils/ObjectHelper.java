@@ -94,8 +94,7 @@ public class ObjectHelper {
 			return ((String) left).compareToIgnoreCase((String) right);
 
 		if (left instanceof Comparable) {
-			@SuppressWarnings("unchecked")
-			Comparable<Object> comparable = (Comparable<Object>) left;
+			@SuppressWarnings("unchecked") Comparable<Object> comparable = (Comparable<Object>) left;
 
 			return comparable.compareTo(right);
 		}
@@ -151,18 +150,18 @@ public class ObjectHelper {
 				if (ignoreCase) {
 					leftString = leftString.toLowerCase();
 					for (String s : rightArr) {
-						if (!leftString.contains(s.toLowerCase()))
-							return false;
+						if (leftString.contains(s.toLowerCase()))
+							return true;
 					}
 
 				} else {
 					for (String s : rightArr) {
-						if (!leftString.contains(s))
-							return false;
+						if (leftString.contains(s))
+							return true;
 					}
 
 				}
-				return true;
+				return false;
 			}
 
 			if (right.getClass().isEnum())
