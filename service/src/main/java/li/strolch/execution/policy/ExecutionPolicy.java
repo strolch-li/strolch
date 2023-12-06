@@ -250,7 +250,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 * Performs tasked required when this execution policy is stopped
 	 */
 	protected void handleStopped() {
-		getDelayedExecutionTimer().cancel(this.actionLoc);
+		if (this.actionLoc != null)
+			getDelayedExecutionTimer().cancel(this.actionLoc);
 	}
 
 	/**
@@ -262,12 +263,12 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected void setActionState(Action action, State state) {
 		if (action.getState().inClosedPhase())
-			throw new IllegalStateException("Action " +
-					action.getLocator() +
-					" has state " +
-					action.getState() +
-					" and can not be changed to " +
-					state);
+			throw new IllegalStateException("Action "
+					+ action.getLocator()
+					+ " has state "
+					+ action.getState()
+					+ " and can not be changed to "
+					+ state);
 
 		action.setState(state);
 
