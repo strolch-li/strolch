@@ -61,7 +61,8 @@ public class InMemoryStrolchDao<T extends StrolchRootElement> implements Strolch
 	public List<T> queryAll(String... types) throws StrolchPersistenceException {
 		List<T> values = new ArrayList<>();
 		for (String type : types) {
-			values.addAll(this.elements.getList(type));
+			if (this.elements.containsList(type))
+				values.addAll(this.elements.getList(type));
 		}
 		return values;
 	}
