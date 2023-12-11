@@ -47,7 +47,11 @@ public class PredicatesSupport {
 	}
 
 	public static SearchPredicate contains(Object right) {
-		return new ContainsPredicate(right, false);
+		return new ContainsPredicate(right, false, false);
+	}
+
+	public static SearchPredicate containsMatchAny(Object right) {
+		return new ContainsPredicate(right, false, true);
 	}
 
 	public static SearchPredicate collectionContains(Object right) {
@@ -55,7 +59,11 @@ public class PredicatesSupport {
 	}
 
 	public static SearchPredicate containsIgnoreCase(Object right) {
-		return new ContainsPredicate(right, true);
+		return new ContainsPredicate(right, true, false);
+	}
+
+	public static SearchPredicate containsIgnoreCaseMatchAny(Object right) {
+		return new ContainsPredicate(right, true, true);
 	}
 
 	public static SearchPredicate isIn(Object right) {
