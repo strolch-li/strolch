@@ -104,6 +104,10 @@ public class ObjectHelper {
 	}
 
 	public static boolean contains(Object left, Object right, boolean ignoreCase) {
+		return contains(left, right, ignoreCase, true);
+	}
+
+	public static boolean contains(Object left, Object right, boolean ignoreCase, boolean matchAll) {
 		if (left == null && right == null)
 			return true;
 		if (left == null)
@@ -116,7 +120,7 @@ public class ObjectHelper {
 			if (right instanceof Collection<?> rightCollection) {
 				for (Object l : leftCollection) {
 					for (Object r : rightCollection) {
-						if (contains(l, r, ignoreCase))
+						if (contains(l, r, ignoreCase, matchAll))
 							return true;
 					}
 				}
@@ -127,7 +131,7 @@ public class ObjectHelper {
 			if (right instanceof String[] rightArr) {
 				for (Object l : leftCollection) {
 					for (Object r : rightArr) {
-						if (contains(l, r, ignoreCase))
+						if (contains(l, r, ignoreCase, matchAll))
 							return true;
 					}
 				}
@@ -136,7 +140,7 @@ public class ObjectHelper {
 			}
 
 			for (Object l : leftCollection) {
-				if (contains(l, right, ignoreCase))
+				if (contains(l, right, ignoreCase, matchAll))
 					return true;
 			}
 
@@ -150,18 +154,22 @@ public class ObjectHelper {
 				if (ignoreCase) {
 					leftString = leftString.toLowerCase();
 					for (String s : rightArr) {
-						if (leftString.contains(s.toLowerCase()))
+						if (!matchAll && leftString.contains(s.toLowerCase()))
 							return true;
+						else if (matchAll && !leftString.contains(s.toLowerCase()))
+							return false;
 					}
 
 				} else {
 					for (String s : rightArr) {
-						if (leftString.contains(s))
+						if (!matchAll && leftString.contains(s))
 							return true;
+						else if (matchAll && !leftString.contains(s))
+							return false;
 					}
-
 				}
-				return false;
+
+				return matchAll;
 			}
 
 			if (right.getClass().isEnum())
