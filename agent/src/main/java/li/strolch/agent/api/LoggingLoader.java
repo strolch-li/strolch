@@ -2,6 +2,7 @@ package li.strolch.agent.api;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.util.ContextInitializer;
+import ch.qos.logback.classic.util.DefaultJoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class LoggingLoader {
 						logConfigFile);
 				try {
 					loggerContext.reset();
-					new ContextInitializer(loggerContext).configureByResource(logConfigFile.toURI().toURL());
+					new DefaultJoranConfigurator().configureByResource(logConfigFile.toURI().toURL());
 					logger.info("Reloaded logger configuration from " + logConfigFile.getAbsolutePath());
 					lastConfigFile = logConfigFile;
 				} catch (MalformedURLException | JoranException e) {
@@ -69,6 +70,7 @@ public class LoggingLoader {
 				} catch (JoranException e) {
 					logger.error("Failed to do logging auto configuration", e);
 					System.out.println("Failed to do logging auto configuration");
+					//noinspection CallToPrintStackTrace
 					e.printStackTrace();
 				}
 			}
