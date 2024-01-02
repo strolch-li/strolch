@@ -766,7 +766,7 @@
             </build>
         </profile>
         <profile>
-            <id>deploy-maven</id>
+            <id>deploy-releases</id>
             <build>
                 <plugins>
                     <plugin>
