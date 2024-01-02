@@ -688,8 +688,8 @@
 
     <distributionManagement>
         <repository>
-            <id>oss.sonatype.org</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>repo.strolch.li</id>
+            <url>https://repo.strolch.li/repository/strolch-releases/</url>
         </repository>
         <snapshotRepository>
             <id>repo.strolch.li</id>
