@@ -693,7 +693,7 @@
         </repository>
         <snapshotRepository>
             <id>repo.strolch.li</id>
-            <url>https://repo.strolch.li/repository/maven-snapshots/</url>
+            <url>https://repo.strolch.li/repository/strolch-snapshots/</url>
         </snapshotRepository>
         <site>
             <id>localhost</id>
