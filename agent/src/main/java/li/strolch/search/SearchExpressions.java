@@ -1,16 +1,16 @@
 package li.strolch.search;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
 
 /**
  * Declares specific search expressions, i.e. extracting the relevant data for a where clause
@@ -75,6 +75,10 @@ public interface SearchExpressions {
 
 	default ExpressionBuilder param(String paramId) {
 		return ExpressionsSupport.param(BAG_PARAMETERS, paramId);
+	}
+
+	default <T extends StrolchRootElement> ExpressionBuilder extract(Function<T, Object> extractor) {
+		return ExpressionsSupport.extract(extractor);
 	}
 
 	default ExpressionBuilder relation(String paramId) {

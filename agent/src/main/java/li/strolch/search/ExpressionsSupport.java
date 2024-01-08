@@ -1,16 +1,16 @@
 package li.strolch.search;
 
-import static li.strolch.model.StrolchModelConstants.*;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import li.strolch.model.*;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static li.strolch.model.StrolchModelConstants.*;
 
 /**
  * Implements search expressions to be statically imported when writing searches
@@ -145,6 +145,13 @@ public class ExpressionsSupport {
 				Parameter<?> param = bag.getParameter(paramId);
 				return param == null ? null : param.getValue();
 			}
+		};
+	}
+
+	public static <T extends StrolchRootElement> ExpressionBuilder extract(Function<T, Object> extractor) {
+		return element -> {
+			@SuppressWarnings("unchecked") T e = (T) element;
+			return extractor.apply(e);
 		};
 	}
 
