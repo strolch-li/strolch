@@ -232,7 +232,7 @@ public class ObjectHelper {
 
 				return false;
 
-			} else if (left instanceof String[] leftArr) {
+			} else if (left instanceof Object[] leftArr) {
 				for (Object r : collectionRight) {
 					for (Object l : leftArr) {
 						if (equals(r, l, ignoreCase))
@@ -265,7 +265,7 @@ public class ObjectHelper {
 
 				return false;
 
-			} else if (left instanceof String[] leftArr) {
+			} else if (left instanceof Object[] leftArr) {
 
 				for (Object o : arrayRight) {
 					for (Object l : leftArr) {
