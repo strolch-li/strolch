@@ -507,7 +507,7 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("World")))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("World1")).not())
 
-							.and(paramOnBagType("Owner", "name").isIn("Felix", "Jill"))
+							.and(paramOnBagType("Owner", "name").isInArray("Felix", "Jill"))
 
 							.and(paramNull(BAG_ID, "non-existant"))
 					//
