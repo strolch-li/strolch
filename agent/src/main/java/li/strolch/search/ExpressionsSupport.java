@@ -7,6 +7,7 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -145,6 +146,19 @@ public class ExpressionsSupport {
 				Parameter<?> param = bag.getParameter(paramId);
 				return param == null ? null : param.getValue();
 			}
+		};
+	}
+
+	public static <T extends StrolchRootElement> ExpressionBuilder paramOnBagType(String bagType, String paramId) {
+		return element -> {
+			List<Object> result = element
+					.streamOfParameterBagsByType(bagType)
+					.filter(b -> b.isParamSet(paramId))
+					.map(b -> b.getParameter(paramId, true).getValue())
+					.toList();
+			if (result.size() == 1)
+				return result.getFirst();
+			return result.toArray();
 		};
 	}
 

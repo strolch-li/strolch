@@ -110,6 +110,10 @@ public interface SearchExpressions {
 		return ExpressionsSupport.paramNull(bagId, paramId);
 	}
 
+	default ExpressionBuilder paramOnBagType(String bagType, String paramId) {
+		return ExpressionsSupport.paramOnBagType(bagType, paramId);
+	}
+
 	default ExpressionBuilder relationName(StrolchTransaction tx, String paramId) {
 		return ExpressionsSupport.relationName(tx, paramId);
 	}

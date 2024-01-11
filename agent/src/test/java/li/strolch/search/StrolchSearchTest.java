@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,11 @@ public class StrolchSearchTest {
 				bag.addParameter(new StringParameter("status", "Status", "bla"));
 				bag.addParameter(new StringParameter("color", "Color", "yellow"));
 
+				ball.addParameterBag(new ParameterBag("owner1", "Owner", "Owner"));
+				ball.setString("owner1", "name", "Felix");
+				ball.addParameterBag(new ParameterBag("owner2", "Owner", "Owner"));
+				ball.setString("owner2", "name", "Fox");
+
 				tx.add(ball);
 			}
 
@@ -81,6 +87,11 @@ public class StrolchSearchTest {
 				bag.addParameter(new StringParameter("state", "State", State.EXECUTION.name()));
 				bag.addParameter(new StringListParameter("stateList", "Status",
 						asList(State.EXECUTION.name(), State.EXECUTED.name())));
+
+				ball.addParameterBag(new ParameterBag("owner1", "Owner", "Owner"));
+				ball.setString("owner1", "name", "Jill");
+				ball.addParameterBag(new ParameterBag("owner2", "Owner", "Owner"));
+				ball.setString("owner2", "name", "Jane");
 
 				tx.add(ball);
 			}
@@ -139,8 +150,10 @@ public class StrolchSearchTest {
 
 		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
-			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow").where(
-							element -> element.hasTimedState(STATE_FLOAT_ID)).search(tx).map(a -> a.accept(toJsonVisitor))
+			List<JsonObject> result = new BallSearch("the-id", "STATUS", "yellow")
+					.where(element -> element.hasTimedState(STATE_FLOAT_ID))
+					.search(tx)
+					.map(a -> a.accept(toJsonVisitor))
 					.toList();
 
 			assertEquals(2, result.size());
@@ -174,12 +187,18 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
-			assertEquals(4,
-					new ResourceSearch().types().where(param(BAG_ID, PARAM_STRING_ID, contains("rol"))).search(tx)
-							.toList().size());
-			assertEquals(4,
-					new ResourceSearch().types().where(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("STR")))
-							.search(tx).toList().size());
+			assertEquals(4, new ResourceSearch()
+					.types()
+					.where(param(BAG_ID, PARAM_STRING_ID, contains("rol")))
+					.search(tx)
+					.toList()
+					.size());
+			assertEquals(4, new ResourceSearch()
+					.types()
+					.where(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("STR")))
+					.search(tx)
+					.toList()
+					.size());
 		}
 	}
 
@@ -230,11 +249,14 @@ public class StrolchSearchTest {
 				@Override
 				public void define() {
 
-					DateRange dateRange = new DateRange().from(ISO8601.parseToZdt("2012-01-01T00:00:00.000+01:00"),
-							true).to(ISO8601.parseToZdt("2013-01-01T00:00:00.000+01:00"), true);
+					DateRange dateRange = new DateRange()
+							.from(ISO8601.parseToZdt("2012-01-01T00:00:00.000+01:00"), true)
+							.to(ISO8601.parseToZdt("2013-01-01T00:00:00.000+01:00"), true);
 
-					types().where(date().isEqualTo(Instant.ofEpochMilli(1384929777699L).atZone(systemDefault()))
-							.or(state().isEqualTo(State.CREATED)
+					types().where(date()
+							.isEqualTo(Instant.ofEpochMilli(1384929777699L).atZone(systemDefault()))
+							.or(state()
+									.isEqualTo(State.CREATED)
 									.and(param(BAG_ID, PARAM_STRING_ID).isEqualTo("Strolch"))
 									.and(param(BAG_ID, PARAM_DATE_ID).inRange(dateRange))));
 				}
@@ -286,18 +308,30 @@ public class StrolchSearchTest {
 		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
 			ZonedDateTime dateTime = ISO8601.parseToZdt("2013-11-20T07:42:57.699+01:00");
-			assertEquals(0,
-					new OrderSearch().types("TestType").where(date().isBefore(dateTime, false)).search(tx).toList()
-							.size());
-			assertEquals(1,
-					new OrderSearch().types("TestType").where(date().isBefore(dateTime, true)).search(tx).toList()
-							.size());
-			assertEquals(0,
-					new OrderSearch().types("TestType").where(date().isAfter(dateTime, false)).search(tx).toList()
-							.size());
-			assertEquals(1,
-					new OrderSearch().types("TestType").where(date().isAfter(dateTime, true)).search(tx).toList()
-							.size());
+			assertEquals(0, new OrderSearch()
+					.types("TestType")
+					.where(date().isBefore(dateTime, false))
+					.search(tx)
+					.toList()
+					.size());
+			assertEquals(1, new OrderSearch()
+					.types("TestType")
+					.where(date().isBefore(dateTime, true))
+					.search(tx)
+					.toList()
+					.size());
+			assertEquals(0, new OrderSearch()
+					.types("TestType")
+					.where(date().isAfter(dateTime, false))
+					.search(tx)
+					.toList()
+					.size());
+			assertEquals(1, new OrderSearch()
+					.types("TestType")
+					.where(date().isAfter(dateTime, true))
+					.search(tx)
+					.toList()
+					.size());
 		}
 	}
 
@@ -349,8 +383,12 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
-			assertEquals(1, new ActivitySearch().types("sdf", "ActivityType")
-					.where(element -> element.getActionsByType("Use").size() == 4).search(tx).toList().size());
+			assertEquals(1, new ActivitySearch()
+					.types("sdf", "ActivityType")
+					.where(element -> element.getActionsByType("Use").size() == 4)
+					.search(tx)
+					.toList()
+					.size());
 		}
 	}
 
@@ -405,8 +443,8 @@ public class StrolchSearchTest {
 		public void define() {
 			types("Ball").where(id(isEqualTo(this.id)).or( //
 
-					param("parameters", "status", isEqualTo(this.status)).and(
-									not(param("parameters", "color", isEqualTo(this.color))))
+					param("parameters", "status", isEqualTo(this.status))
+							.and(not(param("parameters", "color", isEqualTo(this.color))))
 
 							.and(param("parameters", "state", isEqualTo(State.EXECUTION)))
 							.and(param("parameters", "state", isEqualToIgnoreCase(State.EXECUTION)))
@@ -468,6 +506,8 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("Hello1")).not())
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("World")))
 							.and(param(BAG_ID, PARAM_LIST_STRING_ID, listContains("World1")).not())
+
+							.and(paramOnBagType("Owner", "name").isIn("Felix", "Jill"))
 
 							.and(paramNull(BAG_ID, "non-existant"))
 					//
