@@ -232,7 +232,7 @@ public class ObjectHelper {
 
 				return false;
 
-			} else if (left instanceof String[] leftArr) {
+			} else if (left instanceof Object[] leftArr) {
 				for (Object r : collectionRight) {
 					for (Object l : leftArr) {
 						if (equals(r, l, ignoreCase))
@@ -252,10 +252,35 @@ public class ObjectHelper {
 			}
 		}
 
-		if (right instanceof Object[] arr) {
-			for (Object o : arr) {
-				if (equals(left, o, ignoreCase))
-					return true;
+		if (right instanceof Object[] arrayRight) {
+
+			if (left instanceof Collection<?> collectionLeft) {
+
+				for (Object o : arrayRight) {
+					for (Object l : collectionLeft) {
+						if (equals(l, o, ignoreCase))
+							return true;
+					}
+				}
+
+				return false;
+
+			} else if (left instanceof Object[] leftArr) {
+
+				for (Object o : arrayRight) {
+					for (Object l : leftArr) {
+						if (equals(l, o, ignoreCase))
+							return true;
+					}
+				}
+
+				return false;
+
+			} else {
+				for (Object o : arrayRight) {
+					if (equals(left, o, ignoreCase))
+						return true;
+				}
 			}
 
 			return false;

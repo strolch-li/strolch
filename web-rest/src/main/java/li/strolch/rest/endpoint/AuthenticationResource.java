@@ -24,8 +24,10 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.core.Response.Status;
 import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
+import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Privilege;
@@ -193,7 +195,10 @@ public class AuthenticationResource {
 	}
 
 	private static Response handleSessionException(String context, Exception e) {
-		logger.error(e.getMessage(), e);
+		if (e instanceof StrolchNotAuthenticatedException || e instanceof NotAuthenticatedException)
+			logger.error("Session exception: " + e.getMessage());
+		else
+			logger.error(e.getMessage(), e);
 		Throwable rootCause = getRootCause(e);
 		String msg = MessageFormat.format("{0}: {1}", context, rootCause);
 		return evaluateResponseByCause(e, msg);
