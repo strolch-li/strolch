@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static java.text.MessageFormat.format;
 import static java.util.Collections.synchronizedMap;
 import static li.strolch.execution.EventBasedExecutionHandler.PROP_LOCK_RETRIES;
 
@@ -95,7 +96,9 @@ public class Controller {
 	public ExecutionPolicy refreshExecutionPolicy(StrolchTransaction tx, Action action) {
 		ExecutionPolicy executionPolicy = this.inExecution.computeIfAbsent(action.getLocator(), e -> {
 			Resource resource = tx.readLock(tx.getResourceFor(action, true));
-			return tx.getPolicy(resource, ExecutionPolicy.class);
+			ExecutionPolicy policy = tx.getPolicy(resource, ExecutionPolicy.class);
+			policy.initialize(action);
+			return policy;
 		});
 
 		// always update the TX and controller
@@ -403,6 +406,8 @@ public class Controller {
 					return;
 
 				Action action = this.activity.getElementByLocator(actionLoc);
+				if (action.getState().isExecuted())
+					return;
 
 				// set this action to warning
 				internalToWarning(tx, action);
@@ -425,6 +430,9 @@ public class Controller {
 			return;
 
 		Action action = this.activity.getElementByLocator(actionLoc);
+		if (action.getState().isExecuted())
+			return;
+
 		internalToWarning(tx, action);
 	}
 
@@ -450,8 +458,9 @@ public class Controller {
 			} catch (StrolchLockException e) {
 				tries++;
 				if (tries >= this.lockRetries) {
-					logger.error("Failed to lock " + this.locator + ". Max retries " + tries +
-							" reached, throwing exception!");
+					logger.error(
+							format("Failed to lock {0}. Max retries {1} reached, throwing exception!", this.locator,
+									tries));
 					throw e;
 				}
 
