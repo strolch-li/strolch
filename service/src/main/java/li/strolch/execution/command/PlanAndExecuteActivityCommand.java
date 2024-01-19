@@ -97,7 +97,6 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 				executionPolicy = getExecutionPolicy(action);
 			}
 
-			executionPolicy.initialize(action);
 			if (!executionPolicy.isExecutable(action)) {
 				logger.info("Action " + action.getLocator() + " is not yet executable.");
 				return;
@@ -195,16 +194,7 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 			}
 
 			// stop execution if at least one action is not executable from this entire tree
-			boolean anyActionNotExecutable = activity.streamActionsDeep().anyMatch(a -> {
-				if (!a.getState().canSetToExecution())
-					return false;
-				ExecutionPolicy executionPolicy = getExecutionPolicy(a);
-				executionPolicy.initialize(a);
-				boolean executable = executionPolicy.isExecutable(a);
-				if (!executable)
-					logger.info("Action " + a.getLocator() + " is not executable yet!");
-				return !executable;
-			});
+			boolean anyActionNotExecutable = activity.streamActionsDeep().anyMatch(this::isActionExecutable);
 			if (anyActionNotExecutable)
 				return;
 		}
@@ -218,5 +208,14 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 			// in parallel, we execute all the actions in the activity
 			element.accept(this);
 		}
+	}
+
+	private boolean isActionExecutable(Action action) {
+		if (!action.getState().canSetToExecution())
+			return false;
+		boolean executable = getExecutionPolicy(action).isExecutable(action);
+		if (!executable)
+			logger.info("Action " + action.getLocator() + " is not yet executable!");
+		return !executable;
 	}
 }
