@@ -16,15 +16,6 @@
 
 package li.strolch.model.activity;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
-
-import java.text.MessageFormat;
-import java.util.*;
-
 import li.strolch.exception.StrolchModelException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.*;
@@ -36,6 +27,15 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.*;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
  * An {@link Action} represents a single step within an {@link Activity}, that is, one that is not further decomposed
@@ -107,8 +107,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @param resourceId
-	 * 		the id of the {@link Resource} the {@link Action} acts on
+	 * @param resourceId the id of the {@link Resource} the {@link Action} acts on
 	 */
 	public void setResourceId(String resourceId) {
 		assertNotReadonly();
@@ -124,8 +123,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @param state
-	 * 		the target {@code State} of the a {@code Action}
+	 * @param state the target {@code State} of the a {@code Action}
 	 */
 	public void setState(State state) {
 		assertNotReadonly();
@@ -140,8 +138,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @param resourceType
-	 * 		the resource type
+	 * @param resourceType the resource type
 	 */
 	public void setResourceType(String resourceType) {
 		assertNotReadonly();
@@ -151,8 +148,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	/**
 	 * Sets the resource type and id from the given {@link Resource}
 	 *
-	 * @param resource
-	 * 		the resource from which to get the type and id
+	 * @param resource the resource from which to get the type and id
 	 */
 	public void setResource(Resource resource) {
 		assertNotReadonly();
@@ -182,8 +178,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	 *
 	 * @return the {@link Locator} for the {@link Resource} for this action
 	 *
-	 * @throws IllegalStateException
-	 * 		if the resource is not defined
+	 * @throws IllegalStateException if the resource is not defined
 	 */
 	public Locator getResourceLocator() {
 		if (!isResourceDefined())
@@ -201,8 +196,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 	}
 
 	/**
-	 * @param change
-	 *        {@code IValueChange} to be applied to the {@code Resource}
+	 * @param change {@code IValueChange} to be applied to the {@code Resource}
 	 *
 	 * @return <tt>true</tt> (as specified by {@link Collection#add})
 	 */
@@ -383,8 +377,7 @@ public class Action extends GroupedParameterizedElement implements IActivityElem
 
 	@Override
 	public String toString() {
-		return "Action [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", resourceId="
-				+ this.resourceId + ", state=" + this.state + "]";
+		return getLocator() + ", resourceId: " + this.resourceId + ", state=" + this.state;
 	}
 
 	@Override

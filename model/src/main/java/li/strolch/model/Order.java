@@ -22,7 +22,6 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601;
 
 import java.text.MessageFormat;
 import java.time.*;
@@ -331,9 +330,7 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	@Override
 	public String toString() {
-
-		return "Order [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", state=" + this.state +
-				", date=" + ISO8601.toString(this.date) + ", version=" + this.version + "]";
+		return getLocator() + ", Version: " + this.version.getVersion();
 	}
 
 	@Override

@@ -495,7 +495,8 @@ public class Activity extends AbstractStrolchRootElement
 
 	public <T extends IActivityElement> T findElement(Predicate<IActivityElement> predicate,
 			Supplier<String> msgSupplier) {
-		@SuppressWarnings("unchecked") T t = (T) streamElements().filter(predicate)
+		@SuppressWarnings("unchecked") T t = (T) streamElements()
+				.filter(predicate)
 				.collect(singletonCollector(msgSupplier));
 		return t;
 	}
@@ -778,12 +779,7 @@ public class Activity extends AbstractStrolchRootElement
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("Activity [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", type=");
-		builder.append(this.type);
+		builder.append(getLocator());
 		builder.append(", state=");
 		builder.append(getState());
 		builder.append(", start=");
@@ -792,9 +788,8 @@ public class Activity extends AbstractStrolchRootElement
 		builder.append(getEnd());
 		if (isRootElement()) {
 			builder.append(", version=");
-			builder.append(this.version);
+			builder.append(this.version.getVersion());
 		}
-		builder.append("]");
 		return builder.toString();
 	}
 

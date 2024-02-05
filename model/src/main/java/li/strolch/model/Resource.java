@@ -191,7 +191,9 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 		if (this.timedStateMap == null || this.timedStateMap.isEmpty())
 			return Stream.empty();
 
-		return this.timedStateMap.values().stream()
+		return this.timedStateMap
+				.values()
+				.stream()
 				.filter(s -> s.getInterpretation().equals(interpretation) && s.getUom().equals(uom));
 	}
 
@@ -399,8 +401,7 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public String toString() {
-
-		return "Resource [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", version=" + this.version;
+		return getLocator() + ", Version: " + this.version.getVersion();
 	}
 
 	@Override
