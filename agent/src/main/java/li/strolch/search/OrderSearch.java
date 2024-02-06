@@ -6,6 +6,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -23,7 +24,11 @@ public class OrderSearch extends StrolchSearch<Order> {
 
 	@Override
 	public OrderSearch types(String... types) {
-		this.navigator = tx -> tx.streamOrders(types);
+		this.navigator = tx -> {
+			Stream<Order> cachedStream = tx.streamCachedOrders(types);
+			Stream<Order> stream = tx.streamOrders(types).filter(e -> !tx.isOrderCached(e.getType(), e.getId()));
+			return Stream.concat(cachedStream, stream);
+		};
 		return this;
 	}
 

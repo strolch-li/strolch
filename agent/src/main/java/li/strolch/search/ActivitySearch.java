@@ -1,10 +1,12 @@
 package li.strolch.search;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
-
 import li.strolch.model.Order;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.stream.Stream;
+
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 /**
  * Performs a search for {@link Activity} elements
@@ -20,7 +22,13 @@ public class ActivitySearch extends StrolchSearch<Activity> {
 
 	@Override
 	public ActivitySearch types(String... types) {
-		this.navigator = tx -> tx.streamActivities(types);
+		this.navigator = tx -> {
+			Stream<Activity> cachedStream = tx.streamCachedActivities(types);
+			Stream<Activity> stream = tx
+					.streamActivities(types)
+					.filter(e -> !tx.isActivityCached(e.getType(), e.getId()));
+			return Stream.concat(cachedStream, stream);
+		};
 		return this;
 	}
 
