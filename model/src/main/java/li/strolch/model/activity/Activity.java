@@ -786,7 +786,7 @@ public class Activity extends AbstractStrolchRootElement
 		builder.append(getStart());
 		builder.append(", end=");
 		builder.append(getEnd());
-		if (isRootElement()) {
+		if (isRootElement() && this.version != null) {
 			builder.append(", version=");
 			builder.append(this.version.getVersion());
 		}

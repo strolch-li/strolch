@@ -401,6 +401,8 @@ public class Resource extends AbstractStrolchRootElement implements StrolchRootE
 
 	@Override
 	public String toString() {
+		if (this.version == null)
+			return getLocator().toString();
 		return getLocator() + ", Version: " + this.version.getVersion();
 	}
 

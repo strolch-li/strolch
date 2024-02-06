@@ -330,6 +330,8 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 
 	@Override
 	public String toString() {
+		if (this.version == null)
+			return getLocator().toString();
 		return getLocator() + ", Version: " + this.version.getVersion();
 	}
 
