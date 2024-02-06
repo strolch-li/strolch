@@ -1572,6 +1572,21 @@ public interface StrolchTransaction extends AutoCloseable {
 	void removeFromCache(Locator locator);
 
 	/**
+	 * Returns true if the given resource is currently cached
+	 */
+	boolean isResourceCached(String type, String id);
+
+	/**
+	 * Returns true if the given order is currently cached
+	 */
+	boolean isOrderCached(String type, String id);
+
+	/**
+	 * Returns true if the given activity is currently cached
+	 */
+	boolean isActivityCached(String type, String id);
+
+	/**
 	 * Returns the cached resource with the given type and id, or null if not yet fetched
 	 *
 	 * @param type
@@ -1606,6 +1621,21 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the cached element, or null if not yet fetched
 	 */
 	Activity getCachedActivity(String type, String id);
+
+	/**
+	 * Returns a stream of resources in the cache
+	 */
+	Stream<Resource> streamCachedResources(String... types);
+
+	/**
+	 * Returns a stream of orders in the cache
+	 */
+	Stream<Order> streamCachedOrders(String... types);
+
+	/**
+	 * Returns a stream of activities in the cache
+	 */
+	Stream<Activity> streamCachedActivities(String... types);
 
 	/**
 	 * Returns true if the @{@link Resource} exists with the given type and ID
