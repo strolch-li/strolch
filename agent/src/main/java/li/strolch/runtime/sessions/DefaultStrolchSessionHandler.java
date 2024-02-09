@@ -302,7 +302,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		return certificate;
 	}
 
-	private void checkSessionsForTimeout() {
+	protected void checkSessionsForTimeout() {
 		ZonedDateTime maxKeepAliveTime = ZonedDateTime.now().minusMinutes(this.maxKeepAliveMinutes);
 		ZonedDateTime timeOutTime = ZonedDateTime.now().minusMinutes(this.sessionTtlMinutes);
 
@@ -326,7 +326,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		}
 	}
 
-	private void sessionTimeout(Certificate certificate) {
+	protected void sessionTimeout(Certificate certificate) {
 		DBC.PRE.assertNotNull("Certificate must be given!", certificate);
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
