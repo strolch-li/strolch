@@ -388,6 +388,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>strolch-${artifactId}</finalName>
 
         <pluginManagement>
             <plugins>
