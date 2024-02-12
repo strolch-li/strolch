@@ -48,6 +48,8 @@ public class StrolchRestfulConstants {
 	public static final String PARAM_TO = "to";
 	public static final String PARAM_FILTER = "filter";
 	public static final String PARAM_QUERY = "query";
+	public static final String PARAM_TITLE = "title";
+	public static final String PARAM_TEXT = "text";
 
 	public static final MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
 	public static final String TEXT_CSV = "text/csv";

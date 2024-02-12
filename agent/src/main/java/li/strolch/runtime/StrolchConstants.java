@@ -96,5 +96,6 @@ public class StrolchConstants extends StrolchModelConstants {
 		public static final String PRIVILEGE_UPDATE_PREFIX = "Update";
 		public static final String PRIVILEGE_REMOVE_PREFIX = "Remove";
 		public static final String PRIVILEGE_GET_PREFIX = "Get";
+		public static final String PRIVILEGE_GET_NOTIFICATIONS = "GetNotifications";
 	}
 }

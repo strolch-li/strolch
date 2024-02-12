@@ -72,6 +72,7 @@ public class StrolchModelConstants {
 
 	public static final String BAG_RELATIONS = "relations";
 	public static final String BAG_PARAMETERS = "parameters";
+	public static final String BAG_VISIBILITY = "visibility";
 	public static final String TYPE_PARAMETERS = "Parameters";
 	public static final String TYPE_VERSION = "Version";
 	public static final String TYPE_MEMORY = "Memory";
@@ -82,6 +83,8 @@ public class StrolchModelConstants {
 	public static final String TYPE_CONFIGURATION = "Configuration";
 	public static final String TYPE_OBJECTIVES = "Objectives";
 	public static final String TYPE_METRIC = "Metric";
+	public static final String TYPE_NOTIFICATION = "Notification";
+	public static final String TYPE_TEXT = "Text";
 
 	public static final String RES_CONFIGURATION = "configuration";
 
@@ -99,6 +102,11 @@ public class StrolchModelConstants {
 	public static final String PARAM_START_DATE = "startDate";
 	public static final String PARAM_MODE = "mode";
 	public static final String PARAM_GROUP = "group";
+	public static final String PARAM_VISIBLE_FROM = "visibleFrom";
+	public static final String PARAM_VISIBLE_TO = "visibleTo";
+	public static final String PARAM_FOR_ALL = "forAll";
+	public static final String PARAM_ROLES = "roles";
+	public static final String PARAM_GROUPS = "groups";
 
 	public static class PolicyConstants {
 		public static final String POLICY_DEFAULT = "Default";
