@@ -82,6 +82,7 @@ public class FileHelper {
 	 *     <li>{@link TempFileOptions#SEPARATE_DATE_SEGMENTS}</li>
 	 *     <li>{@link TempFileOptions#SEPARATE_HOURS}</li>
 	 *     <li>{@link TempFileOptions#WITH_HOURS}</li>
+	 *     <li>{@link TempFileOptions#MILLIS_FIRST}</li>
 	 * </ul>
 	 *
 	 * @param tempPath the directory to which to write the file
@@ -92,8 +93,14 @@ public class FileHelper {
 	 * @return the temporary file
 	 */
 	public static File getTempFile(File tempPath, String prefix, String suffix, Set<TempFileOptions> options) {
+		return getTempFile(tempPath, prefix, suffix, options, LocalDateTime.now(), System.currentTimeMillis());
+	}
 
-		LocalDateTime dateTime = LocalDateTime.now();
+	static File getTempFile(File tempPath, String prefix, String suffix, Set<TempFileOptions> options,
+			LocalDateTime dateTime, long timestamp) {
+		prefix = StringHelper.trimOrEmpty(prefix);
+		suffix = StringHelper.trimOrEmpty(suffix);
+
 		LocalDate localDate = dateTime.toLocalDate();
 
 		boolean separateDateSegments = options.contains(SEPARATE_DATE_SEGMENTS);
@@ -113,21 +120,22 @@ public class FileHelper {
 			throw new IllegalStateException("Failed to create path " + path.getAbsolutePath());
 
 		boolean appendMillis = options.contains(APPEND_MILLIS);
-		if (appendMillis)
-			prefix = (isEmpty(prefix) ? "" : prefix + "_");
-		else
-			prefix = (isEmpty(prefix) ? "" : prefix);
+		boolean millisFirst = appendMillis && options.contains(MILLIS_FIRST);
+		if (appendMillis) {
+			if (isEmpty(prefix)) {
+				prefix = String.valueOf(timestamp);
+			} else {
+				if (millisFirst)
+					prefix = timestamp + "_" + prefix;
+				else
+					prefix = prefix + "_" + timestamp;
+			}
 
-		suffix = (isEmpty(suffix) ? "" : suffix);
-		if (!suffix.startsWith(".") && appendMillis)
-			suffix = "_" + suffix;
+			if (!suffix.startsWith("."))
+				prefix = prefix + "_";
+		}
 
-		String fileName;
-		if (appendMillis)
-			fileName = prefix + System.currentTimeMillis() + suffix;
-		else
-			fileName = prefix + suffix;
-
+		String fileName = prefix + suffix;
 		return new File(path, fileName);
 	}
 
