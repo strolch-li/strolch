@@ -46,6 +46,7 @@ import static java.util.Optional.ofNullable;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.privilege.base.PrivilegeConstants.REALM;
 import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_NOTIFICATIONS;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
@@ -61,7 +62,7 @@ public class NotificationResource {
 	private StrolchTransaction openTx(Certificate certificate) {
 		String realm = certificate.getRealm();
 		if (StringHelper.isEmpty(realm))
-			realm = REALM;
+			realm = DEFAULT_REALM;
 		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getCallerMethod());
 	}
 
@@ -100,8 +101,10 @@ public class NotificationResource {
 
 			notificationJ.addProperty(PARAM_TITLE, textBag.getString(PARAM_TITLE));
 			notificationJ.addProperty(PARAM_TEXT, textBag.getString(PARAM_TEXT));
-			notificationJ.addProperty(PARAM_VISIBLE_FROM, ISO8601.toString(textBag.getDate(PARAM_VISIBLE_FROM)));
-			notificationJ.addProperty(PARAM_VISIBLE_TO, ISO8601.toString(textBag.getDate(PARAM_VISIBLE_TO)));
+			notificationJ.addProperty(PARAM_VISIBLE_FROM,
+					ISO8601.toString(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_FROM)));
+			notificationJ.addProperty(PARAM_VISIBLE_TO,
+					ISO8601.toString(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_TO)));
 
 			return notificationJ;
 		};
