@@ -1,18 +1,19 @@
 package li.strolch.model.builder;
 
-import static java.util.Collections.emptyList;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
-import static li.strolch.model.builder.BuilderHelper.buildParamId;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.model.ParameterBag;
 import li.strolch.model.ParameterBagContainer;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Collections.emptyList;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.model.builder.BuilderHelper.buildParamId;
+import static li.strolch.model.builder.BuilderHelper.buildParamName;
 
 public abstract class ParameterBagContainerBuilder<T extends ParameterBagContainerBuilder<T>> {
 
@@ -23,6 +24,10 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 	private final Map<String, BagBuilder<T>> parametersBags;
 	private final Map<String, String[]> singleRelations;
 	private final Map<String, String[]> multiRelations;
+
+	public ParameterBagContainerBuilder(String id, String type) {
+		this(id, buildParamName(id), type);
+	}
 
 	public ParameterBagContainerBuilder(String id, String name, String type) {
 		this.id = id;
@@ -58,9 +63,12 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		return bag(BAG_RELATIONS, TYPE_RELATIONS, TYPE_RELATIONS);
 	}
 
+	public BagBuilder<T> bag(String id, String type) {
+		return bag(id, buildParamName(id), type);
+	}
+
 	public BagBuilder<T> bag(String id, String name, String type) {
-		@SuppressWarnings("unchecked")
-		BagBuilder<T> bagBuilder = new BagBuilder<>((T) this, id, name, type);
+		@SuppressWarnings("unchecked") BagBuilder<T> bagBuilder = new BagBuilder<>((T) this, id, name, type);
 		if (this.parametersBags.put(id, bagBuilder) != null)
 			throw new IllegalArgumentException("Bag builder for " + id + " already exists!");
 		return bagBuilder;
@@ -70,11 +78,14 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		return resourceRelation(buildParamId(type), type, type);
 	}
 
+	public T resourceRelation(String paramId, String type) {
+		return resourceRelation(paramId, buildParamName(paramId), type);
+	}
+
 	public T resourceRelation(String paramId, String paramName, String type) {
 		assertNotMapped(paramId);
-		this.singleRelations.put(paramId, new String[] { paramName, type, Tags.RESOURCE });
-		@SuppressWarnings("unchecked")
-		T t = (T) this;
+		this.singleRelations.put(paramId, new String[]{paramName, type, Tags.RESOURCE});
+		@SuppressWarnings("unchecked") T t = (T) this;
 		return t;
 	}
 
@@ -82,11 +93,14 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		return resourceRelations(buildParamId(type), type + "s", type);
 	}
 
+	public T resourceRelations(String paramId, String type) {
+		return resourceRelations(paramId, buildParamName(paramId), type);
+	}
+
 	public T resourceRelations(String paramId, String paramName, String type) {
 		assertNotMapped(paramId);
-		this.multiRelations.put(paramId, new String[] { paramName, type, Tags.RESOURCE });
-		@SuppressWarnings("unchecked")
-		T t = (T) this;
+		this.multiRelations.put(paramId, new String[]{paramName, type, Tags.RESOURCE});
+		@SuppressWarnings("unchecked") T t = (T) this;
 		return t;
 	}
 
@@ -94,11 +108,14 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		return orderRelation(buildParamId(type), type, type);
 	}
 
+	public T orderRelation(String paramId, String type) {
+		return orderRelation(paramId, buildParamName(paramId), type);
+	}
+
 	public T orderRelation(String paramId, String paramName, String type) {
 		assertNotMapped(paramId);
-		this.singleRelations.put(paramId, new String[] { paramName, type, Tags.ORDER });
-		@SuppressWarnings("unchecked")
-		T t = (T) this;
+		this.singleRelations.put(paramId, new String[]{paramName, type, Tags.ORDER});
+		@SuppressWarnings("unchecked") T t = (T) this;
 		return t;
 	}
 
@@ -106,11 +123,14 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		return orderRelations(buildParamId(type), type + "s", type);
 	}
 
+	public T orderRelations(String paramId, String type) {
+		return orderRelations(paramId, buildParamName(paramId), type);
+	}
+
 	public T orderRelations(String paramId, String paramName, String type) {
 		assertNotMapped(paramId);
-		this.multiRelations.put(paramId, new String[] { paramName, type, Tags.ORDER });
-		@SuppressWarnings("unchecked")
-		T t = (T) this;
+		this.multiRelations.put(paramId, new String[]{paramName, type, Tags.ORDER});
+		@SuppressWarnings("unchecked") T t = (T) this;
 		return t;
 	}
 
@@ -118,11 +138,14 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		return activityRelation(buildParamId(type), type, type);
 	}
 
+	public T activityRelation(String paramId, String type) {
+		return activityRelation(paramId, buildParamName(paramId), type);
+	}
+
 	public T activityRelation(String paramId, String paramName, String type) {
 		assertNotMapped(paramId);
-		this.singleRelations.put(paramId, new String[] { paramName, type, Tags.ACTIVITY });
-		@SuppressWarnings("unchecked")
-		T t = (T) this;
+		this.singleRelations.put(paramId, new String[]{paramName, type, Tags.ACTIVITY});
+		@SuppressWarnings("unchecked") T t = (T) this;
 		return t;
 	}
 
@@ -130,11 +153,14 @@ public abstract class ParameterBagContainerBuilder<T extends ParameterBagContain
 		return activityRelations(buildParamId(type), type + "s", type);
 	}
 
+	public T activityRelations(String paramId, String type) {
+		return activityRelations(paramId, buildParamName(paramId), type);
+	}
+
 	public T activityRelations(String paramId, String paramName, String type) {
 		assertNotMapped(paramId);
-		this.multiRelations.put(paramId, new String[] { paramName, type, Tags.ACTIVITY });
-		@SuppressWarnings("unchecked")
-		T t = (T) this;
+		this.multiRelations.put(paramId, new String[]{paramName, type, Tags.ACTIVITY});
+		@SuppressWarnings("unchecked") T t = (T) this;
 		return t;
 	}
 

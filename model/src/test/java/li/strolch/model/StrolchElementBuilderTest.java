@@ -33,7 +33,7 @@ public class StrolchElementBuilderTest {
 				 */
 
 				// person
-				.resource("Person Template", "Person") //
+				.resourceTemplate("Person Template", "Person") //
 				.defaultBag() //
 				.date("birthdate", "Birthdate").value(ZonedDateTime.now()).end() //
 				.string("case", "Case").interpretation("Case").uom("Simple").end() //
@@ -47,7 +47,7 @@ public class StrolchElementBuilderTest {
 				.endResource() //
 
 				// cars
-				.resource("Car Template", "Car") //
+				.resourceTemplate("Car Template", "Car") //
 				.defaultBag() //
 				.string("color", "Color").value("white").end() //
 				.endBag() //
@@ -56,7 +56,7 @@ public class StrolchElementBuilderTest {
 				.endResource() //
 
 				// machines
-				.resource("Machine Template", "Machine") //
+				.resourceTemplate("Machine Template", "Machine") //
 				.defaultBag() //
 				.string("color", "Color").end() //
 				.endBag() //
@@ -68,7 +68,7 @@ public class StrolchElementBuilderTest {
 				 */
 
 				// orders
-				.order("Order Template", "Order") //
+				.orderTemplate("Order Template", "Order") //
 				.defaultBag() //
 				.string("description", "Description").end() //
 				.endBag() //
@@ -83,7 +83,7 @@ public class StrolchElementBuilderTest {
 				 */
 
 				// ToStock
-				.activity("ToStock Template", "ToStock", TimeOrdering.SERIES) //
+				.activityTemplate("ToStock Template", "ToStock", TimeOrdering.SERIES) //
 				.defaultBag() //
 				.string("description", "Description").end() //
 				.endBag() //
@@ -211,7 +211,7 @@ public class StrolchElementBuilderTest {
 
 		Resource car1 = new StrolchElementBuilder() //
 
-				.resource("Car Template", "Car") //
+				.resourceTemplate("Car Template", "Car") //
 				.defaultBag() //
 				.string("color", "Color").value("white").end() //
 				.endBag() //

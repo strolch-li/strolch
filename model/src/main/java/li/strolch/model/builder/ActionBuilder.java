@@ -4,6 +4,8 @@ import li.strolch.model.PolicyContainer;
 import li.strolch.model.activity.Action;
 import li.strolch.utils.dbc.DBC;
 
+import static li.strolch.model.builder.BuilderHelper.buildParamName;
+
 public class ActionBuilder extends PolicyContainerBuilder<ActionBuilder> implements ActivityElementBuilder {
 
 	private final ActivityBuilder builder;
@@ -11,9 +13,17 @@ public class ActionBuilder extends PolicyContainerBuilder<ActionBuilder> impleme
 	private String resourceId;
 	private String resourceType;
 
+	public ActionBuilder(String id, String type) {
+		this(id, buildParamName(id), type);
+	}
+
 	public ActionBuilder(String id, String name, String type) {
 		super(id, name, type);
 		this.builder = null;
+	}
+
+	public ActionBuilder(ActivityBuilder builder, String id, String type) {
+		this(builder, id, buildParamName(id), type);
 	}
 
 	public ActionBuilder(ActivityBuilder builder, String id, String name, String type) {

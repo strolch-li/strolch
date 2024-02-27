@@ -84,6 +84,7 @@ public class StrolchModelConstants {
 	public static final String TYPE_OBJECTIVES = "Objectives";
 	public static final String TYPE_METRIC = "Metric";
 	public static final String TYPE_NOTIFICATION = "Notification";
+	public static final String TYPE_VISIBILITY = "Visibility";
 	public static final String TYPE_TEXT = "Text";
 
 	public static final String RES_CONFIGURATION = "configuration";
@@ -106,6 +107,7 @@ public class StrolchModelConstants {
 	public static final String PARAM_VISIBLE_TO = "visibleTo";
 	public static final String PARAM_FOR_ALL = "forAll";
 	public static final String PARAM_ROLES = "roles";
+	public static final String PARAM_LOCATIONS = "locations";
 	public static final String PARAM_GROUPS = "groups";
 
 	public static class PolicyConstants {

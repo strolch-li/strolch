@@ -27,19 +27,19 @@ public class StrolchElementBuilder {
 		this.activityBuilders = new HashMap<>();
 	}
 
-	public ResourceBuilder resource(String name, String type) {
+	public ResourceBuilder resourceTemplate(String name, String type) {
 		ResourceBuilder builder = new ResourceBuilder(this, type, name, TEMPLATE);
 		this.resourceBuilders.put(type, builder);
 		return builder;
 	}
 
-	public OrderBuilder order(String name, String type) {
+	public OrderBuilder orderTemplate(String name, String type) {
 		OrderBuilder builder = new OrderBuilder(this, type, name, TEMPLATE);
 		this.orderBuilders.put(type, builder);
 		return builder;
 	}
 
-	public ActivityBuilder activity(String name, String type, TimeOrdering timeOrdering) {
+	public ActivityBuilder activityTemplate(String name, String type, TimeOrdering timeOrdering) {
 		ActivityBuilder builder = new ActivityBuilder(this, type, name, TEMPLATE, timeOrdering);
 		this.activityBuilders.put(type, builder);
 		return builder;
@@ -62,7 +62,7 @@ public class StrolchElementBuilder {
 
 	public List<StrolchRootElement> buildTemplates() {
 		return concat(concat(this.resourceBuilders.values().stream(), //
-				this.orderBuilders.values().stream()), //
+						this.orderBuilders.values().stream()), //
 				this.activityBuilders.values().stream()) //
 				.map(RootElementBuilder::build).collect(toList());
 	}
@@ -71,24 +71,24 @@ public class StrolchElementBuilder {
 		ResourceBuilder builder = this.resourceBuilders.get(type);
 		if (builder == null)
 			throw new IllegalArgumentException("No resource template defined for type " + type);
-		return updateFields(type, newName, builder.build());
+		return setInitialFields(type, newName, builder.build());
 	}
 
 	public Order newOrder(String type, String newName) {
 		OrderBuilder builder = this.orderBuilders.get(type);
 		if (builder == null)
 			throw new IllegalArgumentException("No resource template defined for type " + type);
-		return updateFields(type, newName, builder.build());
+		return setInitialFields(type, newName, builder.build());
 	}
 
 	public Activity newActivity(String type, String newName) {
 		ActivityBuilder builder = this.activityBuilders.get(type);
 		if (builder == null)
 			throw new IllegalArgumentException("No resource template defined for type " + type);
-		return updateFields(type, newName, builder.build());
+		return setInitialFields(type, newName, builder.build());
 	}
 
-	private <T extends StrolchRootElement> T updateFields(String type, String newName, T element) {
+	private <T extends StrolchRootElement> T setInitialFields(String type, String newName, T element) {
 		element.setId(StringHelper.getUniqueId());
 		element.setName(newName);
 		element.setType(type);

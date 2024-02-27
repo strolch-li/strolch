@@ -7,6 +7,8 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.utils.dbc.DBC;
 
+import static li.strolch.model.builder.BuilderHelper.*;
+
 public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> implements ActivityElementBuilder {
 
 	private final StrolchElementBuilder builder;
@@ -15,12 +17,20 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 
 	private final List<ActivityElementBuilder> builders;
 
+	public ActivityBuilder(String id, String type, TimeOrdering timeOrdering) {
+		this(id, buildParamName(id), type, timeOrdering);
+	}
+
 	public ActivityBuilder(String id, String name, String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
 		this.builder = null;
 		this.parentBuilder = null;
 		this.timeOrdering = timeOrdering;
 		this.builders = new ArrayList<>();
+	}
+
+	public ActivityBuilder(StrolchElementBuilder builder, String id, String type, TimeOrdering timeOrdering) {
+		this(builder, id, buildParamName(id), type, timeOrdering);
 	}
 
 	public ActivityBuilder(StrolchElementBuilder builder, String id, String name, String type,
@@ -32,6 +42,11 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 		this.builders = new ArrayList<>();
 	}
 
+	public ActivityBuilder(StrolchElementBuilder builder, ActivityBuilder parentBuilder, String id, String type,
+			TimeOrdering timeOrdering) {
+		this(builder, parentBuilder, id, buildParamName(id), type, timeOrdering);
+	}
+
 	public ActivityBuilder(StrolchElementBuilder builder, ActivityBuilder parentBuilder, String id, String name,
 			String type, TimeOrdering timeOrdering) {
 		super(id, name, type);
@@ -41,10 +56,18 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 		this.builders = new ArrayList<>();
 	}
 
+	public ActivityBuilder subActivity(String id, String type, TimeOrdering timeOrdering) {
+		return subActivity(id, buildParamName(id), type, timeOrdering);
+	}
+
 	public ActivityBuilder subActivity(String id, String name, String type, TimeOrdering timeOrdering) {
 		ActivityBuilder builder = new ActivityBuilder(this.builder, this, id, name, type, timeOrdering);
 		this.builders.add(builder);
 		return builder;
+	}
+
+	public ActionBuilder action(String id, String type) {
+		return action(id, buildParamName(id), type);
 	}
 
 	public ActionBuilder action(String id, String name, String type) {
