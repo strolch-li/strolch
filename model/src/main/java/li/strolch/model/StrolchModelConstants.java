@@ -105,9 +105,12 @@ public class StrolchModelConstants {
 	public static final String PARAM_GROUP = "group";
 	public static final String PARAM_VISIBLE_FROM = "visibleFrom";
 	public static final String PARAM_VISIBLE_TO = "visibleTo";
+	public static final String PARAM_TITLE = "title";
+	public static final String PARAM_TEXT = "text";
 	public static final String PARAM_FOR_ALL = "forAll";
 	public static final String PARAM_ROLES = "roles";
 	public static final String PARAM_LOCATIONS = "locations";
+	public static final String PARAM_LANGUAGES = "languages";
 	public static final String PARAM_GROUPS = "groups";
 
 	public static class PolicyConstants {
