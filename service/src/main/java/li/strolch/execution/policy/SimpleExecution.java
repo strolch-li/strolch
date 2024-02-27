@@ -10,11 +10,12 @@ import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.utils.CheckedBiConsumer;
 import li.strolch.utils.time.PeriodDuration;
 
 import java.util.Locale;
 import java.util.concurrent.ScheduledFuture;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -39,8 +40,9 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	protected void startWarningTask(PeriodDuration duration, Action action, Supplier<LogMessage> handler) {
 		if (this.warningTask != null) {
-			logger.warn("There is already a warning task registered, for action " + action.getLocator() +
-					". Cancelling and creating a new task...");
+			logger.warn("There is already a warning task registered, for action "
+					+ action.getLocator()
+					+ ". Cancelling and creating a new task...");
 			this.warningTask.cancel(true);
 			this.warningTask = null;
 		}
@@ -150,18 +152,18 @@ public class SimpleExecution extends ExecutionPolicy {
 		return getContainer().getRealm(ctx.getCertificate()).openTx(ctx.getCertificate(), getClass(), readOnly);
 	}
 
-	protected void runWithFreshActionReadonly(BiConsumer<StrolchTransaction, Action> consumer,
-			Supplier<String> failMsgSupplier) {
-		runWithFreshAction(true, consumer, failMsgSupplier);
+	protected void runWithFreshActionReadonly(CheckedBiConsumer<StrolchTransaction, Action> consumer,
+			Consumer<Throwable> failHandler) {
+		runWithFreshAction(true, consumer, failHandler);
 	}
 
-	protected void runWithFreshActionWritable(BiConsumer<StrolchTransaction, Action> consumer,
-			Supplier<String> failMsgSupplier) {
-		runWithFreshAction(false, consumer, failMsgSupplier);
+	protected void runWithFreshActionWritable(CheckedBiConsumer<StrolchTransaction, Action> consumer,
+			Consumer<Throwable> failHandler) {
+		runWithFreshAction(false, consumer, failHandler);
 	}
 
-	private void runWithFreshAction(boolean readOnly, BiConsumer<StrolchTransaction, Action> consumer,
-			Supplier<String> failMsgSupplier) {
+	private void runWithFreshAction(boolean readOnly, CheckedBiConsumer<StrolchTransaction, Action> consumer,
+			Consumer<Throwable> failHandler) {
 		try {
 			runAsAgent(ctx -> {
 				try (StrolchTransaction tx = openLocalTx(ctx, readOnly)) {
@@ -174,7 +176,7 @@ public class SimpleExecution extends ExecutionPolicy {
 				}
 			});
 		} catch (Exception e) {
-			logger.error(failMsgSupplier.get(), e);
+			failHandler.accept(e);
 		}
 	}
 }
