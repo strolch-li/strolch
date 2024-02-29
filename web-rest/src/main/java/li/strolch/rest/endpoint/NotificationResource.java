@@ -118,7 +118,11 @@ public class NotificationResource {
 	public Response getAllNotifications(@Context HttpServletRequest request) {
 		Certificate cert = validateCertificate(request, PRIVILEGE_GET_NOTIFICATIONS_ALL);
 		try (StrolchTransaction tx = openTx(cert)) {
-			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flatBags();
+			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor()
+					.withoutPolicies()
+					.withoutVersion()
+					.withoutStateVariables()
+					.flatBagsByType(TYPE_TEXT, TYPE_VISIBILITY);
 			return toResponse(DATA, tx.streamResources(TYPE_NOTIFICATION).map(a -> a.accept(visitor)).toList());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
