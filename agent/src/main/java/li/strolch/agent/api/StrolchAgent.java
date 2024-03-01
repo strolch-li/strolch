@@ -81,20 +81,14 @@ public class StrolchAgent {
 		this.appVersion = appVersion;
 	}
 
-	/**
-	 * Return the {@link StrolchConfiguration}
-	 *
-	 * @return the {@link StrolchConfiguration}
-	 */
 	public StrolchConfiguration getStrolchConfiguration() {
 		return this.strolchConfiguration;
 	}
 
-	/**
-	 * Return the container
-	 *
-	 * @return the container
-	 */
+	public RuntimeConfiguration getRuntimeConfiguration() {
+		return this.strolchConfiguration.getRuntimeConfiguration();
+	}
+
 	public ComponentContainer getContainer() {
 		return this.container;
 	}
@@ -411,8 +405,9 @@ public class StrolchAgent {
 
 	public JsonObject getSystemState(long updateInterval, TimeUnit updateIntervalUnit) {
 
-		if (this.systemState == null ||
-				System.currentTimeMillis() - this.systemStateUpdateTime > updateIntervalUnit.toMillis(updateInterval)) {
+		if (this.systemState == null
+				|| System.currentTimeMillis() - this.systemStateUpdateTime > updateIntervalUnit.toMillis(
+				updateInterval)) {
 			this.systemState = new JsonObject();
 
 			JsonObject osJ = new JsonObject();
@@ -474,8 +469,8 @@ public class StrolchAgent {
 		File configPathF = runtimeConfig.getConfigPath();
 		File dataPathF = runtimeConfig.getDataPath();
 		File tempPathF = runtimeConfig.getTempPath();
-		StrolchConfiguration newConfig = parseConfiguration(runtimeConfig.getEnvironment(), configPathF,
-				dataPathF, tempPathF);
+		StrolchConfiguration newConfig = parseConfiguration(runtimeConfig.getEnvironment(), configPathF, dataPathF,
+				tempPathF);
 
 		for (String name : this.container.getComponentNames()) {
 			ComponentConfiguration newComponentConfig = newConfig.getComponentConfiguration(name);
