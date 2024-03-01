@@ -18,6 +18,7 @@ public abstract class NotificationsPolicy extends StrolchPolicy {
 	}
 
 	public abstract List<Resource> findUserNotifications();
+	public abstract boolean canView(Resource notification);
 
 	public static NotificationsPolicy getDefaultPolicy(StrolchTransaction tx) {
 		PolicyDef defaultDef = getKeyPolicy(NotificationsPolicy.class, POLICY_DEFAULT);

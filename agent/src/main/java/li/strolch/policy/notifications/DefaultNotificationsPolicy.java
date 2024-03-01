@@ -20,12 +20,15 @@ public class DefaultNotificationsPolicy extends NotificationsPolicy {
 		return tx().streamResources(StrolchModelConstants.TYPE_NOTIFICATION).filter(this::isForUser).toList();
 	}
 
+	@Override
+	public boolean canView(Resource notification) {
+		return isForAll(notification) || isForRole(notification) || isForGroup(notification);
+	}
+
 	protected boolean isForUser(Resource notification) {
 		if (!isActive(notification))
 			return false;
-		if (isForAll(notification))
-			return true;
-		return isForRole(notification) || isForGroup(notification);
+		return isForAll(notification) || isForRole(notification) || isForGroup(notification);
 	}
 
 	protected boolean isActive(Resource notification) {

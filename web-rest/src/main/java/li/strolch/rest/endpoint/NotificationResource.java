@@ -15,6 +15,7 @@
  */
 package li.strolch.rest.endpoint;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 import static li.strolch.model.StrolchModelConstants.*;
@@ -122,12 +124,27 @@ public class NotificationResource {
 					.withoutPolicies()
 					.withoutVersion()
 					.withoutStateVariables()
-					.flatBagsByType(TYPE_TEXT, TYPE_VISIBILITY);
+					.flatBagsByType(TYPE_TEXT, TYPE_VISIBILITY)
+					.resourceHook((notification, notificationJ) -> addLocationNames(notification, notificationJ, tx));
 			return toResponse(DATA, tx.streamResources(TYPE_NOTIFICATION).map(a -> a.accept(visitor)).toList());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return toResponse(e);
 		}
+	}
+
+	private static void addLocationNames(Resource notification, JsonObject notificationJ, StrolchTransaction tx) {
+		if (!notification.hasParameter(BAG_VISIBILITY, PARAM_LOCATIONS))
+			return;
+		JsonArray locationNamesJ = notification
+				.getStringList(BAG_VISIBILITY, PARAM_LOCATIONS)
+				.stream()
+				.map(locationId -> {
+					Resource location = tx.getResourceBy(TYPE_LOCATION, locationId);
+					return location == null ? locationId : location.getName();
+				})
+				.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+		notificationJ.get(BAG_VISIBILITY).getAsJsonObject().add(PARAM_LOCATION_NAMES, locationNamesJ);
 	}
 
 	private static Function<Resource, JsonObject> notificationToJson(StrolchAgent agent, Certificate cert) {

@@ -86,6 +86,7 @@ public class StrolchModelConstants {
 	public static final String TYPE_NOTIFICATION = "Notification";
 	public static final String TYPE_VISIBILITY = "Visibility";
 	public static final String TYPE_TEXT = "Text";
+	public static final String TYPE_LOCATION = "Location";
 
 	public static final String RES_CONFIGURATION = "configuration";
 
@@ -110,6 +111,7 @@ public class StrolchModelConstants {
 	public static final String PARAM_FOR_ALL = "forAll";
 	public static final String PARAM_ROLES = "roles";
 	public static final String PARAM_LOCATIONS = "locations";
+	public static final String PARAM_LOCATION_NAMES = "locationNames";
 	public static final String PARAM_LANGUAGES = "languages";
 	public static final String PARAM_GROUPS = "groups";
 
