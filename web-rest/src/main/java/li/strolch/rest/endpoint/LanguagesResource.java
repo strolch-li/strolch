@@ -13,8 +13,10 @@ import li.strolch.runtime.configuration.SupportedLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.Set;
 
+import static java.util.Comparator.*;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 
 @Path("strolch/languages")
@@ -27,14 +29,20 @@ public class LanguagesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSupportedLanguages() {
 		try {
-			Set<SupportedLanguage> supportedLanguages = RestfulStrolchComponent.getInstance().getAgent()
-					.getStrolchConfiguration().getRuntimeConfiguration().getSupportedLanguages();
-			JsonArray result = supportedLanguages.stream().map(language -> {
-				JsonObject jsonObject = new JsonObject();
-				jsonObject.addProperty(Tags.Json.LOCALE, language.locale());
-				jsonObject.addProperty(Tags.Json.NAME, language.name());
-				return jsonObject;
-			}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+			JsonArray result = RestfulStrolchComponent
+					.getInstance()
+					.getAgent()
+					.getRuntimeConfiguration()
+					.getSupportedLanguages()
+					.stream()
+					.sorted(comparing(SupportedLanguage::name))
+					.map(language -> {
+						JsonObject jsonObject = new JsonObject();
+						jsonObject.addProperty(Tags.Json.LOCALE, language.locale());
+						jsonObject.addProperty(Tags.Json.NAME, language.name());
+						return jsonObject;
+					})
+					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			return Response.ok().entity(result.toString()).build();
 		} catch (Exception e) {
