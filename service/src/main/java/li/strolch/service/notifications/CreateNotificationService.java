@@ -5,18 +5,23 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.builder.ResourceBuilder;
-import li.strolch.model.json.FromFlatJsonVisitor;
+import li.strolch.persistence.api.Operation;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.runtime.configuration.SupportedLanguage;
 import li.strolch.service.JsonServiceArgument;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
+import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.dbc.DBC;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.privilege.handler.DefaultPrivilegeHandler.PRIVILEGE_GET_ROLE;
+import static li.strolch.utils.iso8601.ISO8601.parseToZdt;
 
 public class CreateNotificationService extends AbstractService<JsonServiceArgument, ServiceResult> {
 	@Override
@@ -35,9 +40,9 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 		DBC.PRE.assertNotNull("JsonElement must be a JsonObject", arg.jsonElement.isJsonObject());
 
 		JsonObject jsonObject = arg.jsonElement.getAsJsonObject();
-		Resource notification = buildNotification(jsonObject, getSupportedLanguages(getAgent()));
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+			Resource notification = buildNotification(tx, jsonObject, getSupportedLanguages(getAgent()));
 			tx.add(notification);
 			tx.commitOnClose();
 		}
@@ -45,22 +50,41 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 		return ServiceResult.success();
 	}
 
-	protected static Resource buildNotification(JsonObject jsonObject, Set<String> supportedLanguages) {
-		DBC.PRE.assertTrue("JsonObject must have languages!", jsonObject.has(PARAM_LANGUAGES));
-		JsonObject languagesJ = jsonObject.get(PARAM_LANGUAGES).getAsJsonObject();
-		DBC.PRE.assertNotEmpty("JsonObject must have at least one languages!", languagesJ.keySet());
-
-		FromFlatJsonVisitor visitor = new FromFlatJsonVisitor(jsonObject);
-		visitor.optionalParameter(PARAM_ROLES);
-		visitor.optionalParameter(PARAM_LOCATIONS);
-		visitor.optionalParameter(PARAM_FOR_ALL);
+	protected static Resource buildNotification(StrolchTransaction tx, JsonObject jsonObject,
+			Set<String> supportedLanguages) {
 		Resource notification = newNotification();
-		notification.accept(visitor);
+		PrivilegeContext ctx = tx.getPrivilegeContext();
 
-		for (String language : languagesJ.keySet()) {
-			if (!supportedLanguages.contains(language))
-				throw new IllegalArgumentException("The agent doesn't support language " + language);
-			JsonObject languageJ = languagesJ.get(language).getAsJsonObject();
+		JsonObject visibilityJ = jsonObject.get(BAG_VISIBILITY).getAsJsonObject();
+		ParameterBag visibility = notification.getParameterBag(BAG_VISIBILITY);
+
+		visibility.setBoolean(PARAM_FOR_ALL,
+				visibilityJ.has(PARAM_FOR_ALL) && visibilityJ.get(PARAM_FOR_ALL).getAsBoolean());
+		if (visibilityJ.has(PARAM_VISIBLE_FROM))
+			visibility.setDate(PARAM_VISIBLE_FROM, parseToZdt(visibilityJ.get(PARAM_VISIBLE_FROM).getAsString()));
+		if (visibilityJ.has(PARAM_VISIBLE_TO))
+			visibility.setDate(PARAM_VISIBLE_TO, parseToZdt(visibilityJ.get(PARAM_VISIBLE_TO).getAsString()));
+
+		if (visibilityJ.has(PARAM_ROLES)) {
+			String rolesJ = visibilityJ.get(PARAM_ROLES).getAsString();
+			visibility.getStringListP(PARAM_ROLES).setValueFromString(rolesJ);
+			for (String role : visibility.getStringList(PARAM_ROLES)) {
+				ctx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role)));
+			}
+		}
+
+		if (visibilityJ.has(PARAM_LOCATIONS)) {
+			String locationsJ = visibilityJ.get(PARAM_LOCATIONS).getAsString();
+			visibility.getStringListP(PARAM_LOCATIONS).setValueFromString(locationsJ);
+			for (String locationId : visibility.getStringList(PARAM_LOCATIONS)) {
+				tx.assertHasPrivilege(Operation.GET, tx.getResourceBy(TYPE_LOCATION, locationId, true));
+			}
+		}
+
+		for (String language : supportedLanguages) {
+			if (!jsonObject.has(language))
+				continue;
+			JsonObject languageJ = jsonObject.get(language).getAsJsonObject();
 			String title = languageJ.get(PARAM_TITLE).getAsString();
 			String text = languageJ.get(PARAM_TEXT).getAsString();
 

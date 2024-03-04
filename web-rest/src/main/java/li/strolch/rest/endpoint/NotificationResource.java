@@ -122,7 +122,6 @@ public class NotificationResource {
 		try (StrolchTransaction tx = openTx(cert)) {
 			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor()
 					.withoutPolicies()
-					.withoutVersion()
 					.withoutStateVariables()
 					.flatBagsByType(TYPE_TEXT, TYPE_VISIBILITY)
 					.resourceHook((notification, notificationJ) -> addLocationNames(notification, notificationJ, tx));

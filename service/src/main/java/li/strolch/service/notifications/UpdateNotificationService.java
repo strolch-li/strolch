@@ -33,10 +33,11 @@ public class UpdateNotificationService extends AbstractService<JsonServiceArgume
 		DBC.PRE.assertEquals("arg ID and jsonObject ID must be the same", arg.objectId,
 				jsonObject.get(Tags.Json.ID).getAsString());
 
-		Resource notification = buildNotification(jsonObject, getSupportedLanguages(getAgent()));
-		notification.setId(arg.objectId);
-
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
+
+			Resource notification = buildNotification(tx, jsonObject, getSupportedLanguages(getAgent()));
+			notification.setId(arg.objectId);
+
 			tx.update(notification);
 			tx.commitOnClose();
 		}
