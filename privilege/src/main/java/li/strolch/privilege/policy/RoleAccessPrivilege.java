@@ -15,11 +15,6 @@
  */
 package li.strolch.privilege.policy;
 
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
-
-import java.text.MessageFormat;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.PrivilegeHandler;
@@ -30,6 +25,11 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
 
 /**
  * This {@link PrivilegePolicy} expects a {@link Tuple} as {@link Restrictable#getPrivilegeValue()}. The Tuple must
@@ -67,8 +67,8 @@ public class RoleAccessPrivilege implements PrivilegePolicy {
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Tuple tuple)) {
-			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nontuple");
+			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
+					"Privilege.illegalArgument.nontuple");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}
@@ -78,32 +78,30 @@ public class RoleAccessPrivilege implements PrivilegePolicy {
 			return true;
 
 		// get role name as privilege value
-		Role oldRole = tuple.getFirst();
-		Role newRole = tuple.getSecond();
+		String oldRole = tuple.getFirst() instanceof Role r ? r.getName() : tuple.getFirst();
+		String newRole = tuple.getSecond() instanceof Role r ? r.getName() : tuple.getSecond();
 
 		switch (privilegeName) {
-		case PrivilegeHandler.PRIVILEGE_GET_ROLE, PrivilegeHandler.PRIVILEGE_ADD_ROLE, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE -> {
-			DBC.INTERIM.assertNull("For " + privilegeName + " first must be null!", oldRole);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newRole);
+			case PrivilegeHandler.PRIVILEGE_GET_ROLE, PrivilegeHandler.PRIVILEGE_ADD_ROLE, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE -> {
+				DBC.INTERIM.assertNull("For " + privilegeName + " first must be null!", oldRole);
+				DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newRole);
 
-			String privilegeValue = newRole.getName();
-			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
-		}
-		case PrivilegeHandler.PRIVILEGE_MODIFY_ROLE -> {
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldRole);
-			DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newRole);
+				return checkByAllowDenyValues(ctx, privilege, restrictable, newRole, assertHasPrivilege);
+			}
+			case PrivilegeHandler.PRIVILEGE_MODIFY_ROLE -> {
+				DBC.INTERIM.assertNotNull("For " + privilegeName + " first must not be null!", oldRole);
+				DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newRole);
 
-			String privilegeValue = newRole.getName();
-			DBC.INTERIM.assertEquals("oldRole and newRole names must be the same", oldRole.getName(), privilegeValue);
+				DBC.INTERIM.assertEquals("oldRole and newRole names must be the same", oldRole, newRole);
 
-			return checkByAllowDenyValues(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
-		}
-		default -> {
-			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
-					"Privilege.roleAccessPrivilege.unknownPrivilege");
-			msg = MessageFormat.format(msg, privilegeName);
-			throw new PrivilegeException(msg);
-		}
+				return checkByAllowDenyValues(ctx, privilege, restrictable, newRole, assertHasPrivilege);
+			}
+			default -> {
+				String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
+						"Privilege.roleAccessPrivilege.unknownPrivilege");
+				msg = MessageFormat.format(msg, privilegeName);
+				throw new PrivilegeException(msg);
+			}
 		}
 	}
 }
