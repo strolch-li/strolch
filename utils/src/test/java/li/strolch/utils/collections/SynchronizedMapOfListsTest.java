@@ -97,7 +97,7 @@ public class SynchronizedMapOfListsTest {
 		Future<Boolean> task5 = this.executorService.submit(iterateTask);
 
 		run.set(true);
-		Thread.sleep(20L);
+		Thread.sleep(100L);
 		run.set(false);
 
 		Boolean result0 = task0.get();
