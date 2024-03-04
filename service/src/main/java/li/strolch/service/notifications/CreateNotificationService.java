@@ -96,7 +96,7 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 		return notification;
 	}
 
-	protected static Set<String> getSupportedLanguages(StrolchAgent agent) {
+	public static Set<String> getSupportedLanguages(StrolchAgent agent) {
 		return agent
 				.getStrolchConfiguration()
 				.getRuntimeConfiguration()
@@ -106,7 +106,7 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 				.collect(Collectors.toSet());
 	}
 
-	protected static Resource newNotification() {
+	public static Resource newNotification() {
 		ResourceBuilder notificationBuilder = new ResourceBuilder(TYPE_NOTIFICATION, TYPE_NOTIFICATION)
 
 				.bag(BAG_VISIBILITY, TYPE_VISIBILITY)
