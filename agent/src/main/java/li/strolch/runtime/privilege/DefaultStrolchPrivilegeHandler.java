@@ -15,19 +15,6 @@
  */
 package li.strolch.runtime.privilege;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
-import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
-import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
-
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.text.MessageFormat;
-import java.util.Map;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
@@ -47,6 +34,21 @@ import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.utils.helper.XmlHelper;
+
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.text.MessageFormat;
+import java.util.Map;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static li.strolch.persistence.api.TransactionThreadLocal.getTx;
+import static li.strolch.persistence.api.TransactionThreadLocal.hasTx;
+import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
+import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
 
@@ -89,8 +91,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	/**
 	 * Initializes the {@link DefaultPrivilegeHandler} from the configuration file
 	 *
-	 * @param privilegeXmlFile
-	 * 		a {@link File} reference to the XML file containing the configuration for Privilege
+	 * @param privilegeXmlFile a {@link File} reference to the XML file containing the configuration for Privilege
 	 *
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
 	 * {@link PersistenceHandler} are set and initialized as well
@@ -185,11 +186,15 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 
 	private void writeAudit(Certificate certificate, String login, AccessType accessType, String username) {
 		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = realm.openTx(certificate, login, false).silentThreshold(1, NANOSECONDS)) {
+		try (StrolchTransaction tx = hasTx() ? getTx() : openTx(certificate, login, realm)) {
 			tx.setSuppressAudits(true);
 			Audit audit = tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username);
 			tx.getAuditTrail().add(tx, audit);
 		}
+	}
+
+	private static StrolchTransaction openTx(Certificate certificate, String login, StrolchRealm realm) {
+		return realm.openTx(certificate, login, false).silentThreshold(1, NANOSECONDS);
 	}
 
 	@Override
