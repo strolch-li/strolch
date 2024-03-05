@@ -1167,14 +1167,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public Stream<Resource> streamCachedResources(String... types) {
 		if (types.length == 0)
-			return this.resourceCache.streamValues();
+			return this.resourceCache.values().stream();
 		if (types.length == 1) {
 			String type = types[0];
 			if (!this.resourceCache.containsMap(type))
 				return Stream.empty();
-			return this.resourceCache.getMap(type).values().stream();
+			return new ArrayList<>(this.resourceCache.getMap(type).values()).stream();
 		}
-		return this.resourceCache.streamValues().filter(element -> {
+		return this.resourceCache.values().stream().filter(element -> {
 			String resType = element.getType();
 			for (String type : types) {
 				if (resType.equals(type))
@@ -1187,14 +1187,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public Stream<Order> streamCachedOrders(String... types) {
 		if (types.length == 0)
-			return this.orderCache.streamValues();
+			return this.orderCache.values().stream();
 		if (types.length == 1) {
 			String type = types[0];
 			if (!this.orderCache.containsMap(type))
 				return Stream.empty();
-			return this.orderCache.getMap(type).values().stream();
+			return new ArrayList<>(this.orderCache.getMap(type).values()).stream();
 		}
-		return this.orderCache.streamValues().filter(element -> {
+		return this.orderCache.values().stream().filter(element -> {
 			String resType = element.getType();
 			for (String type : types) {
 				if (resType.equals(type))
@@ -1207,14 +1207,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public Stream<Activity> streamCachedActivities(String... types) {
 		if (types.length == 0)
-			return this.activityCache.streamValues();
+			return this.activityCache.values().stream();
 		if (types.length == 1) {
 			String type = types[0];
 			if (!this.activityCache.containsMap(type))
 				return Stream.empty();
-			return this.activityCache.getMap(type).values().stream();
+			return new ArrayList<>(this.activityCache.getMap(type).values()).stream();
 		}
-		return this.activityCache.streamValues().filter(element -> {
+		return this.activityCache.values().stream().filter(element -> {
 			String resType = element.getType();
 			for (String type : types) {
 				if (resType.equals(type))
