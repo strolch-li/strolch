@@ -548,35 +548,35 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// async execution, max. once per second
 		if (this.persistSessionsTask != null)
 			this.persistSessionsTask.cancel(true);
-		this.persistSessionsTask = this.executorService.schedule(() -> {
-
-			// get sessions reference
-			AtomicReference<List<Certificate>> sessions = new AtomicReference<>();
-			this.lockingHandler.lockedExecute("persist-sessions", () -> sessions.set(
-					new ArrayList<>(this.privilegeContextMap.values())
-							.stream()
-							.map(PrivilegeContext::getCertificate)
-							.filter(c -> !c.getUserState().isSystem())
-							.collect(toList())));
-
-			// write the sessions
-			try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
-				 OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
-
-				CertificateStubsSaxWriter writer = new CertificateStubsSaxWriter(sessions.get(), outputStream);
-				writer.write();
-				outputStream.flush();
-
-			} catch (Exception e) {
-				logger.error("Failed to persist sessions!", e);
-				if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
-					logger.error("Failed to delete sessions file after failing to write to it, at "
-							+ this.persistSessionsPath.getAbsolutePath());
-				}
-			}
-		}, 1, TimeUnit.SECONDS);
-
+		this.persistSessionsTask = this.executorService.schedule(this::internalPersistSessions, 1, TimeUnit.SECONDS);
 		return true;
+	}
+
+	private void internalPersistSessions() {
+		// get sessions reference
+		AtomicReference<List<Certificate>> sessions = new AtomicReference<>();
+		this.lockingHandler.lockedExecute("persist-sessions", () -> sessions.set(
+				new ArrayList<>(this.privilegeContextMap.values())
+						.stream()
+						.map(PrivilegeContext::getCertificate)
+						.filter(c -> !c.getUserState().isSystem())
+						.collect(toList())));
+
+		// write the sessions
+		try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
+			 OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
+
+			CertificateStubsSaxWriter writer = new CertificateStubsSaxWriter(sessions.get(), outputStream);
+			writer.write();
+			outputStream.flush();
+
+		} catch (Exception e) {
+			logger.error("Failed to persist sessions!", e);
+			if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
+				logger.error("Failed to delete sessions file after failing to write to it, at "
+						+ this.persistSessionsPath.getAbsolutePath());
+			}
+		}
 	}
 
 	private void loadSessions() {
