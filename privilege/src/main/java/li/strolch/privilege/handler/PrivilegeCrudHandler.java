@@ -172,8 +172,15 @@ public class PrivilegeCrudHandler {
 			// properties
 			propertySelected = isSelectedByProperty(selPropertyMap, user.getProperties());
 
-			boolean selected = userIdSelected && usernameSelected && firstNameSelected && lastNameSelected &&
-					userStateSelected && localeSelected && groupSelected && roleSelected && propertySelected;
+			boolean selected = userIdSelected
+					&& usernameSelected
+					&& firstNameSelected
+					&& lastNameSelected
+					&& userStateSelected
+					&& localeSelected
+					&& groupSelected
+					&& roleSelected
+					&& propertySelected;
 
 			if (selected)
 				result.add(user.asUserRep());
@@ -376,7 +383,10 @@ public class PrivilegeCrudHandler {
 
 		// delegate to persistence handler
 		toCreate.forEach(this.persistenceHandler::addUser);
-		toUpdate.forEach(this.persistenceHandler::replaceUser);
+		for (User user : toUpdate) {
+			this.persistenceHandler.replaceUser(user);
+			this.privilegeHandler.updateExistingSessionsForUser(user, false);
+		}
 		this.privilegeHandler.persistModelAsync();
 
 		DefaultPrivilegeHandler.logger.info("Created " + toCreate.size() + " users");
@@ -530,7 +540,7 @@ public class PrivilegeCrudHandler {
 
 			// delegate to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
-			this.privilegeHandler.persistModelAsync();
+			this.privilegeHandler.updateExistingSessionsForUser(newUser, true);
 
 			DefaultPrivilegeHandler.logger.info("Replaced user " + newUser.getUsername());
 
@@ -559,9 +569,8 @@ public class PrivilegeCrudHandler {
 				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_USER, new Tuple(null, existingUser)));
 
 		// delegate user removal to persistence handler
-		this.privilegeHandler.invalidSessionsFor(existingUser);
+		this.privilegeHandler.invalidateSessionsFor(existingUser);
 		this.persistenceHandler.removeUser(username);
-		this.privilegeHandler.persistModelAsync();
 
 		DefaultPrivilegeHandler.logger.info("Removed user " + username);
 
@@ -715,7 +724,7 @@ public class PrivilegeCrudHandler {
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
-		this.privilegeHandler.persistModelAsync();
+		this.privilegeHandler.invalidateSessionsFor(newUser);
 
 		DefaultPrivilegeHandler.logger.info("Set state of user " + newUser.getUsername() + " to " + state);
 
@@ -789,10 +798,10 @@ public class PrivilegeCrudHandler {
 		this.persistenceHandler.replaceRole(newRole);
 		this.privilegeHandler.persistModelAsync();
 
-		DefaultPrivilegeHandler.logger.info("Replaced role " + newRole.getName());
-
 		// update any existing certificates with new role
 		this.privilegeHandler.updateExistingSessionsWithNewRole(newRole);
+
+		DefaultPrivilegeHandler.logger.info("Replaced role " + newRole.getName());
 
 		return newRole.asRoleRep();
 	}

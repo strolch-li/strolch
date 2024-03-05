@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
 
-import javax.crypto.SecretKey;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
@@ -292,14 +291,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				() -> crudHandler.removeRole(certificate, roleName));
 	}
 
-	void invalidSessionsFor(User user) {
-		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
-		for (PrivilegeContext ctx : contexts) {
-			if (ctx.getUserRep().getUsername().equals(user.getUsername()))
-				invalidate(ctx.getCertificate());
-		}
-	}
-
 	@Override
 	public void initiateChallengeFor(Usage usage, String username) {
 		initiateChallengeFor(usage, username, SOURCE_UNKNOWN);
@@ -355,8 +346,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				false).getCertificate();
 
 		if (!source.equals("unknown") && !source.equals(userChallenge.getSource())) {
-			logger.warn("Challenge request and response source's are different: request: " + userChallenge.getSource() +
-					" to " + source);
+			logger.warn(format("Challenge request and response source''s are different: request: {0} to {1}",
+					userChallenge.getSource(), source));
 		}
 
 		persistSessionsAsync();
@@ -444,9 +435,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @return a stream of role names
 	 */
 	public static Stream<String> streamAllRolesForUser(PersistenceHandler persistenceHandler, User user) {
-		return Stream.concat(user.getRoles().stream(),
-				user.groups().stream().map(persistenceHandler::getGroup).filter(Objects::nonNull)
-						.flatMap(g -> g.roles().stream()));
+		return Stream.concat(user.getRoles().stream(), user
+				.groups()
+				.stream()
+				.map(persistenceHandler::getGroup)
+				.filter(Objects::nonNull)
+				.flatMap(g -> g.roles().stream()));
 	}
 
 	@Override
@@ -559,8 +553,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			// get sessions reference
 			AtomicReference<List<Certificate>> sessions = new AtomicReference<>();
 			this.lockingHandler.lockedExecute("persist-sessions", () -> sessions.set(
-					new ArrayList<>(this.privilegeContextMap.values()).stream().map(PrivilegeContext::getCertificate)
-							.filter(c -> !c.getUserState().isSystem()).collect(toList())));
+					new ArrayList<>(this.privilegeContextMap.values())
+							.stream()
+							.map(PrivilegeContext::getCertificate)
+							.filter(c -> !c.getUserState().isSystem())
+							.collect(toList())));
 
 			// write the sessions
 			try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
@@ -573,8 +570,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			} catch (Exception e) {
 				logger.error("Failed to persist sessions!", e);
 				if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
-					logger.error("Failed to delete sessions file after failing to write to it, at " +
-							this.persistSessionsPath.getAbsolutePath());
+					logger.error("Failed to delete sessions file after failing to write to it, at "
+							+ this.persistSessionsPath.getAbsolutePath());
 				}
 			}
 		}, 1, TimeUnit.SECONDS);
@@ -694,8 +691,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PasswordCrypt requestPasswordCrypt;
 		if (userPasswordCrypt.salt() == null) {
 			requestPasswordCrypt = this.encryptionHandler.hashPasswordWithoutSalt(password);
-		} else if (userPasswordCrypt.hashAlgorithm() == null || userPasswordCrypt.hashIterations() == -1 ||
-				userPasswordCrypt.hashKeyLength() == -1) {
+		} else if (userPasswordCrypt.hashAlgorithm() == null
+				|| userPasswordCrypt.hashIterations() == -1
+				|| userPasswordCrypt.hashKeyLength() == -1) {
 			requestPasswordCrypt = this.encryptionHandler.hashPassword(password, userPasswordCrypt.salt());
 		} else {
 			requestPasswordCrypt = this.encryptionHandler.hashPassword(password, userPasswordCrypt.salt(),
@@ -1076,11 +1074,26 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	/**
+	 * Invalidates all the sessions for the given user and persists the sessions async
+	 *
+	 * @param user the user for which to invalidate the sessions
+	 */
+	void invalidateSessionsFor(User user) {
+		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
+		for (PrivilegeContext ctx : contexts) {
+			if (ctx.getUserRep().getUsername().equals(user.getUsername()))
+				invalidate(ctx.getCertificate());
+		}
+
+		persistSessionsAsync();
+	}
+
+	/**
 	 * Replaces any existing {@link PrivilegeContext} for the given user by updating with the new user object
 	 *
 	 * @param newUser the new user to update with
 	 */
-	void updateExistingSessionsForUser(User newUser) {
+	void updateExistingSessionsForUser(User newUser, boolean persistSessions) {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
 		for (PrivilegeContext ctx : contexts) {
 			if (!ctx.getUserRep().getUsername().equals(newUser.getUsername()))
@@ -1088,7 +1101,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			replacePrivilegeContextForCert(newUser, ctx.getCertificate());
 		}
 
-		persistSessionsAsync();
+		if (persistSessions)
+			persistSessionsAsync();
 	}
 
 	/**
