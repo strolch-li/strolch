@@ -75,7 +75,7 @@ public class NotificationResource {
 		String realm = certificate.getRealm();
 		if (StringHelper.isEmpty(realm))
 			realm = DEFAULT_REALM;
-		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getCallerMethod());
+		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getCallerMethod(2));
 	}
 
 	private static Certificate validateCertificate(HttpServletRequest request, String privilege) {
