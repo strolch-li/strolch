@@ -44,11 +44,11 @@ public class DefaultNotificationsPolicy extends NotificationsPolicy {
 
 	protected boolean isForRole(Resource notification) {
 		List<String> roles = notification.getStringList(BAG_VISIBILITY, PARAM_ROLES);
-		return roles.isEmpty() || roles.stream().anyMatch(r -> tx().getCertificate().hasRole(r));
+		return roles.stream().anyMatch(r -> tx().getCertificate().hasRole(r));
 	}
 
 	protected boolean isForGroup(Resource notification) {
 		List<String> groups = notification.getStringList(BAG_VISIBILITY, PARAM_GROUPS);
-		return groups.isEmpty() || groups.stream().anyMatch(r -> tx().getCertificate().hasGroup(r));
+		return groups.stream().anyMatch(r -> tx().getCertificate().hasGroup(r));
 	}
 }
