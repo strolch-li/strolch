@@ -30,6 +30,8 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 
+import static li.strolch.agent.impl.DefaultRealmHandler.*;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -87,7 +89,7 @@ public class TransientRealm extends InternalStrolchRealm {
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
 
-		String key = StrolchConstants.makeRealmKey(getRealm(), DefaultRealmHandler.PREFIX_DATA_STORE_FILE);
+		String key = StrolchConstants.makeRealmKey(getRealm(), PREFIX_DATA_STORE_FILE);
 		if (!configuration.hasProperty(key)) {
 			String msg = "There is no data store file for realm {0}. Set a property with key {1}";
 			msg = MessageFormat.format(msg, getRealm(), key);

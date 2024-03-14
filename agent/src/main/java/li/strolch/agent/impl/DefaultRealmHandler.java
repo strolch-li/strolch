@@ -31,6 +31,8 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.dbc.DBC;
 
+import static li.strolch.runtime.StrolchConstants.*;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -70,9 +72,9 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	@Override
 	public void setup(ComponentConfiguration configuration) {
 		this.realms = new HashMap<>(1);
-		String[] realms = configuration.getStringArray(PROP_REALMS, StrolchConstants.DEFAULT_REALM);
+		String[] realms = configuration.getStringArray(PROP_REALMS, DEFAULT_REALM);
 		for (String realmName : realms) {
-			String dataStoreModeKey = StrolchConstants.makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
+			String dataStoreModeKey = makeRealmKey(realmName, PREFIX_DATA_STORE_MODE);
 			String realmMode = configuration.getString(dataStoreModeKey, null);
 			InternalStrolchRealm realm = buildRealm(realmName, realmMode);
 			this.realms.put(realmName, realm);
