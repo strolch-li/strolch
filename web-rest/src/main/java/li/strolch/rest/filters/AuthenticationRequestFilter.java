@@ -28,6 +28,7 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.runtime.sessions.StrolchSessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,9 +113,10 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) {
-		String remoteIp = getRemoteIp(this.request);
-		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " +
-				requestContext.getUriInfo().getRequestUri());
+		String remoteIp = RestfulHelper.getRemoteIp(this.request);
+		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " + requestContext
+				.getUriInfo()
+				.getRequestUri());
 
 		try {
 
@@ -126,19 +128,25 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(
-					Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("User is not authenticated!").build());
+			requestContext.abortWith(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("User is not authenticated!")
+					.build());
 		} catch (StrolchAccessDeniedException e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("User is not authorized!").build());
+			requestContext.abortWith(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("User is not authorized!")
+					.build());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("User cannot access the resource.").build());
+			requestContext.abortWith(Response
+					.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("User cannot access the resource.")
+					.build());
 		}
 	}
 
@@ -209,9 +217,11 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		if (isEmpty(sessionId)) {
 			logger.error(
 					"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(
-					Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("Missing Authorization!").build());
+			requestContext.abortWith(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("Missing Authorization!")
+					.build());
 			return null;
 		}
 
@@ -223,9 +233,11 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		if (!getRestful().isBasicAuthEnabled()) {
 			logger.error("Basic Auth is not available for URL " + requestContext.getUriInfo().getPath());
-			requestContext.abortWith(
-					Response.status(Response.Status.FORBIDDEN).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("Basic Auth not available").build());
+			requestContext.abortWith(Response
+					.status(Response.Status.FORBIDDEN)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("Basic Auth not available")
+					.build());
 			return null;
 		}
 
@@ -233,9 +245,11 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		basicAuth = new String(Base64.getDecoder().decode(basicAuth.getBytes()), StandardCharsets.UTF_8);
 		String[] parts = basicAuth.split(":");
 		if (parts.length != 2) {
-			requestContext.abortWith(
-					Response.status(Response.Status.BAD_REQUEST).header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-							.entity("Invalid Basic Authorization!").build());
+			requestContext.abortWith(Response
+					.status(Response.Status.BAD_REQUEST)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("Invalid Basic Authorization!")
+					.build());
 			return null;
 		}
 
@@ -256,10 +270,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
-			if (!requestContext.getUriInfo().getMatchedURIs()
+			if (!requestContext
+					.getUriInfo()
+					.getMatchedURIs()
 					.contains("strolch/privilege/users/" + certificate.getUsername() + "/password")) {
-				requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN).entity("Can only set password!")
+				requestContext.abortWith(Response
+						.status(Response.Status.FORBIDDEN)
+						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.entity("Can only set password!")
 						.build());
 				return null;
 			}
@@ -268,28 +286,5 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
 		return certificate;
-	}
-
-	public static String getRemoteIp(HttpServletRequest request) {
-		if (request == null) {
-			logger.error("HttpServletRequest NOT AVAILABLE! Probably running in TEST!");
-			return "(null)";
-		}
-
-		String remoteHost = request.getRemoteHost();
-		String remoteAddr = request.getRemoteAddr();
-
-		StringBuilder sb = new StringBuilder();
-		if (remoteHost.equals(remoteAddr))
-			sb.append(remoteAddr);
-		else {
-			sb.append(remoteHost).append(": (").append(remoteAddr).append(")");
-		}
-
-		String xForwardedFor = request.getHeader("X-Forwarded-For");
-		if (isNotEmpty(xForwardedFor))
-			sb.append(" (fwd)=> ").append(xForwardedFor);
-
-		return sb.toString();
 	}
 }

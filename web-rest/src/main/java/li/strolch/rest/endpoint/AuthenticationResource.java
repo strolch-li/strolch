@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit;
 
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION_EXPIRATION_DATE;
-import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
+import static li.strolch.rest.helper.RestfulHelper.getRemoteIp;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.ExceptionHelper.hasCause;
 

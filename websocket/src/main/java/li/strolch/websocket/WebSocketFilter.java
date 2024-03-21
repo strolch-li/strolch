@@ -1,6 +1,6 @@
 package li.strolch.websocket;
 
-import static li.strolch.rest.filters.AuthenticationRequestFilter.getRemoteIp;
+import static li.strolch.rest.helper.RestfulHelper.getRemoteIp;
 
 import jakarta.servlet.annotation.WebFilter;
 

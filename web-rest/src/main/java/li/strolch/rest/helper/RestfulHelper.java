@@ -15,17 +15,10 @@
  */
 package li.strolch.rest.helper;
 
-import static java.util.stream.Collectors.toList;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.core.HttpHeaders;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.HttpHeaders;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.privilege.model.Certificate;
@@ -36,16 +29,28 @@ import li.strolch.search.SearchResult;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class RestfulHelper {
 
+	private static final Logger logger = LoggerFactory.getLogger(RestfulHelper.class);
+
 	public static Locale getLocale(HttpHeaders headers) {
 		if (headers == null || StringHelper.isEmpty(headers.getHeaderString(HttpHeaders.ACCEPT_LANGUAGE)))
 			return null;
-		return headers.getAcceptableLanguages().get(0);
+		return headers.getAcceptableLanguages().getFirst();
 	}
 
 	public static Certificate getCert(HttpServletRequest request) {
@@ -104,5 +109,28 @@ public class RestfulHelper {
 		}
 		root.add("data", data);
 		return root;
+	}
+
+	public static String getRemoteIp(HttpServletRequest request) {
+		if (request == null) {
+			logger.error("HttpServletRequest NOT AVAILABLE! Probably running in TEST!");
+			return "(null)";
+		}
+
+		String remoteHost = request.getRemoteHost();
+		String remoteAddr = request.getRemoteAddr();
+
+		StringBuilder sb = new StringBuilder();
+		if (remoteHost.equals(remoteAddr))
+			sb.append(remoteAddr);
+		else {
+			sb.append(remoteHost).append(": (").append(remoteAddr).append(")");
+		}
+
+		String xForwardedFor = request.getHeader("X-Forwarded-For");
+		if (isNotEmpty(xForwardedFor))
+			sb.append(" (fwd)=> ").append(xForwardedFor);
+
+		return sb.toString();
 	}
 }
