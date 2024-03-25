@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import li.strolch.exception.StrolchElementNotFoundException;
+import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
@@ -139,34 +140,24 @@ public class ResponseUtil {
 		if (svcResult.isOk())
 			return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
 
-		Status status;
-		if (t instanceof AccessDeniedException) {
-			status = Status.FORBIDDEN;
-		} else if (t instanceof PrivilegeModelException) {
-			status = Status.INTERNAL_SERVER_ERROR;
-		} else if (t instanceof PrivilegeException) {
-			status = Status.UNAUTHORIZED;
-		} else if (t instanceof StrolchElementNotFoundException) {
-			status = Status.NOT_FOUND;
-		} else {
-			status = Status.INTERNAL_SERVER_ERROR;
-		}
+		Status status = switch (t) {
+			case AccessDeniedException ignored -> Status.FORBIDDEN;
+			case PrivilegeException ignored -> Status.UNAUTHORIZED;
+			case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
+			case null, default -> Status.INTERNAL_SERVER_ERROR;
+		};
 
 		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
 
 	public static Response toResponse(Throwable t) {
-		if (t instanceof StrolchNotAuthenticatedException)
-			return ResponseUtil.toResponse(Status.UNAUTHORIZED, t);
-		if (t instanceof AccessDeniedException)
-			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
-		if (t instanceof StrolchElementNotFoundException)
-			return ResponseUtil.toResponse(Status.NOT_FOUND, t);
-		if (t instanceof PrivilegeModelException)
-			return ResponseUtil.toResponse(Status.INTERNAL_SERVER_ERROR, t);
-		if (t instanceof PrivilegeException)
-			return ResponseUtil.toResponse(Status.FORBIDDEN, t);
-		return toResponse(Status.INTERNAL_SERVER_ERROR, t);
+		return switch (t) {
+			case StrolchNotAuthenticatedException ignored -> toResponse(Status.UNAUTHORIZED, t);
+			case AccessDeniedException ignored -> toResponse(Status.FORBIDDEN, t);
+			case StrolchElementNotFoundException ignored -> toResponse(Status.NOT_FOUND, t);
+			case PrivilegeException ignored -> toResponse(Status.FORBIDDEN, t);
+			case null, default -> toResponse(Status.INTERNAL_SERVER_ERROR, t);
+		};
 	}
 
 	public static Response toResponse(Status status, String msg) {
@@ -180,13 +171,13 @@ public class ResponseUtil {
 	public static Response toResponse(Status status, Throwable t) {
 		JsonObject response = new JsonObject();
 
-		if (t instanceof StrolchUserMessageException ex && ((StrolchUserMessageException) t).hasI18n()) {
-			response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
-		} else {
-			Throwable rootCause = getRootCause(t);
-			if (rootCause instanceof StrolchUserMessageException ex &&
-					((StrolchUserMessageException) rootCause).hasI18n()) {
-				response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
+		switch (t) {
+			case StrolchException ex when ex.hasI18n() ->
+					response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
+			case null, default -> {
+				Throwable rootCause = getRootCause(t);
+				if (rootCause instanceof StrolchUserMessageException ex && ex.hasI18n())
+					response.add("i18n", ex.getI18n().accept(new I18nMessageToJsonVisitor()));
 			}
 		}
 

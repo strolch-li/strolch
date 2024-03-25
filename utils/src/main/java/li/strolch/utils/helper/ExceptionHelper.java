@@ -40,7 +40,8 @@ public class ExceptionHelper {
 
 	public static String getCallerMethod(int depth) {
 		return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE) //
-				.walk(frames -> frames.map((StackWalker.StackFrame sf) -> sf.getClassName() + "." + sf.getMethodName())
+				.walk(frames -> frames
+						.map((StackWalker.StackFrame sf) -> sf.getClassName() + "." + sf.getMethodName())
 						.skip(depth)
 						.findFirst()).orElse("UnknownClass.unknownMethod!");
 	}
@@ -61,8 +62,7 @@ public class ExceptionHelper {
 	 * in such a case
 	 * </p>
 	 *
-	 * @param t
-	 * 		the {@link Throwable}
+	 * @param t the {@link Throwable}
 	 *
 	 * @return the exception as string
 	 */
@@ -80,11 +80,9 @@ public class ExceptionHelper {
 	 * in such a case
 	 * </p>
 	 *
-	 * @param t
-	 * 		the {@link Throwable}
-	 * @param withClassName
-	 * 		if true, then exception class name is prepended to the exception message, if the exception message is null,
-	 * 		then this param is ignored
+	 * @param t             the {@link Throwable}
+	 * @param withClassName if true, then exception class name is prepended to the exception message, if the exception
+	 *                      message is null, then this param is ignored
 	 *
 	 * @return the exception as string
 	 */
@@ -104,8 +102,7 @@ public class ExceptionHelper {
 	 * in such a case
 	 * </p>
 	 *
-	 * @param t
-	 * 		the {@link Throwable}
+	 * @param t the {@link Throwable}
 	 *
 	 * @return the exception as string
 	 */
@@ -123,15 +120,15 @@ public class ExceptionHelper {
 	 * in such a case
 	 * </p>
 	 *
-	 * @param t
-	 * 		the {@link Throwable}
-	 * @param withClassName
-	 * 		if true, then exception class name is prepended to the exception message, if the exception message is null,
-	 * 		then this param is ignored
+	 * @param t             the {@link Throwable}
+	 * @param withClassName if true, then exception class name is prepended to the exception message, if the exception
+	 *                      message is null, then this param is ignored
 	 *
 	 * @return the exception as string
 	 */
 	public static String getExceptionMessageWithCauses(Throwable t, boolean withClassName) {
+		if (t == null)
+			return "(null)";
 		if (t.getCause() == null)
 			return getExceptionMessage(t, withClassName);
 
@@ -142,13 +139,12 @@ public class ExceptionHelper {
 	/**
 	 * Formats the given {@link Throwable}'s stack trace to a string
 	 *
-	 * @param t
-	 * 		the throwable for which the stack trace is to be formatted to string
+	 * @param t the throwable for which the stack trace is to be formatted to string
 	 *
 	 * @return a string representation of the given {@link Throwable}'s stack trace
 	 */
 	public static String formatException(Throwable t) {
-		String ls = System.getProperty(PROP_LINE_SEPARATOR);
+		String ls = System.lineSeparator();
 		if (!ls.equals(UNIX_LINE_SEP))
 			System.setProperty(PROP_LINE_SEPARATOR, UNIX_LINE_SEP);
 		try {
@@ -165,8 +161,7 @@ public class ExceptionHelper {
 	/**
 	 * Formats the given {@link Throwable}'s message including causes to a string
 	 *
-	 * @param t
-	 * 		the throwable for which the messages are to be formatted to a string
+	 * @param t the throwable for which the messages are to be formatted to a string
 	 *
 	 * @return a string representation of the given {@link Throwable}'s messages including causes
 	 */
@@ -177,11 +172,9 @@ public class ExceptionHelper {
 	/**
 	 * Formats the given {@link Throwable}'s message including causes to a string
 	 *
-	 * @param t
-	 * 		the throwable for which the messages are to be formatted to a string
-	 * @param withClassName
-	 * 		if true, then exception class name is prepended to the exception message, if the exception message is null, *
-	 * 		then this param is ignored
+	 * @param t             the throwable for which the messages are to be formatted to a string
+	 * @param withClassName if true, then exception class name is prepended to the exception message, if the exception
+	 *                      message is null, * then this param is ignored
 	 *
 	 * @return a string representation of the given {@link Throwable}'s messages including causes
 	 */
@@ -196,8 +189,7 @@ public class ExceptionHelper {
 	/**
 	 * Returns the root cause for the given {@link Throwable}
 	 *
-	 * @param throwable
-	 * 		the {@link Throwable} for which to get the root cause
+	 * @param throwable the {@link Throwable} for which to get the root cause
 	 *
 	 * @return the root cause of the given {@link Throwable}
 	 */
@@ -213,8 +205,7 @@ public class ExceptionHelper {
 	/**
 	 * Returns {@link #getExceptionMessage(Throwable, boolean)} for the root cause of the given {@link Throwable}
 	 *
-	 * @param throwable
-	 * 		the throwable for which to get the message of the root cause
+	 * @param throwable the throwable for which to get the message of the root cause
 	 *
 	 * @return {@link #getExceptionMessage(Throwable, boolean)} for the root cause of the given {@link Throwable}
 	 */
@@ -225,8 +216,7 @@ public class ExceptionHelper {
 	/**
 	 * Walks the causes for the given {@link Throwable} and sees if the given cause exists
 	 *
-	 * @param throwable
-	 * 		the {@link Throwable} for which to find the given cause type
+	 * @param throwable the {@link Throwable} for which to find the given cause type
 	 *
 	 * @return true if the cause was found, false if not
 	 */
