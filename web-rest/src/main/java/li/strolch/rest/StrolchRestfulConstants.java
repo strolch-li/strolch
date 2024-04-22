@@ -27,6 +27,8 @@ public class StrolchRestfulConstants {
 	public static final String STROLCH_CERTIFICATE = "strolch.certificate";
 	public static final String STROLCH_REQUEST_SOURCE= "strolch.requestSource";
 	public static final String STROLCH_AUTHORIZATION = "strolch.authorization";
+	public static final String STROLCH_REMOTE_IP = "strolch.remote.ip";
+	public static final String STROLCH_REQUEST_URL = "strolch.request.location";
 	public static final String STROLCH_AUTHORIZATION_EXPIRATION_DATE = "strolch.authorization.expirationDate";
 
 	public static final String MSG = "msg";

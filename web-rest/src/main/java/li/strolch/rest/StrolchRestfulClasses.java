@@ -56,6 +56,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(AuditsResource.class);
 
 		Set<Class<?>> providerClasses = new HashSet<>();
+		providerClasses.add(LogRequestFilter.class);
 		providerClasses.add(StrolchRestfulExceptionMapper.class);
 		providerClasses.add(AccessControlResponseFilter.class);
 		providerClasses.add(AuthenticationRequestFilter.class);

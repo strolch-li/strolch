@@ -16,11 +16,13 @@
 package li.strolch.rest.filters;
 
 import jakarta.annotation.Priority;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
@@ -28,7 +30,6 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.helper.RestfulHelper;
 import li.strolch.runtime.sessions.StrolchSessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,9 +60,6 @@ import static li.strolch.utils.helper.StringHelper.*;
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationRequestFilter.class);
-
-	@Context
-	private HttpServletRequest request;
 
 	private Set<String> unsecuredPaths;
 
@@ -113,10 +111,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) {
-		String remoteIp = RestfulHelper.getRemoteIp(this.request);
-		logger.info("Remote IP: " + remoteIp + ": " + requestContext.getMethod() + " " + requestContext
-				.getUriInfo()
-				.getRequestUri());
+
+		String remoteIp = (String) requestContext.getProperty(STROLCH_REMOTE_IP);
 
 		try {
 

@@ -21,14 +21,13 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-
-import java.text.MessageFormat;
-
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.rest.helper.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {
@@ -40,17 +39,14 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 
 		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex);
 
-		if (ex instanceof NotFoundException)
-			return ResponseUtil.toResponse(Status.NOT_FOUND, ex);
-
-		if (ex instanceof StrolchNotAuthenticatedException e) {
-			logger.error("User tried to access resource, but was not authenticated: " + ex.getMessage());
-			return Response.status(Status.UNAUTHORIZED).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
-		}
-
-		if (ex instanceof StrolchAccessDeniedException e)
-			return ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
-
-		return ResponseUtil.toResponse(ex);
+		return switch (ex) {
+			case NotFoundException ignored -> ResponseUtil.toResponse(Status.NOT_FOUND, ex);
+			case StrolchAccessDeniedException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
+			case StrolchNotAuthenticatedException e -> {
+				logger.error("User tried to access resource, but was not authenticated: {}", ex.getMessage());
+				yield Response.status(Status.UNAUTHORIZED).entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+			}
+			default -> ResponseUtil.toResponse(ex);
+		};
 	}
 }
