@@ -204,14 +204,15 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	@Override
 	public void start() throws Exception {
-		DBC.PRE.assertNull("Instance is already set! This component is a singleton resource!", instance);
-		instance = this;
+		if (instance == null)
+			instance = this;
+		else if (instance != this)
+			throw new IllegalStateException("Instance is already set! This component is a singleton resource!");
 		super.start();
 	}
 
 	@Override
 	public void stop() throws Exception {
-		instance = null;
 		super.stop();
 	}
 

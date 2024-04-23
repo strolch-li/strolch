@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REMOTE_IP;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_URL;
+import static li.strolch.rest.helper.ServletRequestHelper.logRequest;
 
 @PreMatching
 public class LogRequestFilter implements ContainerRequestFilter {
@@ -31,5 +32,7 @@ public class LogRequestFilter implements ContainerRequestFilter {
 		this.request.setAttribute(STROLCH_REMOTE_IP, remoteIp);
 		this.request.setAttribute(STROLCH_REQUEST_URL,
 				requestContext.getMethod() + " " + requestContext.getUriInfo().getRequestUri());
+
+		logRequest(this.request);
 	}
 }
