@@ -53,6 +53,17 @@ public class ExceptionHelper {
 	}
 
 	/**
+	 * Returns the message of the root cause of the given exception
+	 *
+	 * @param e the exception for which to get the root cause
+	 *
+	 * @return the message of the root cause of the given exception
+	 */
+	public static String getRootCauseExceptionMessage(Throwable e) {
+		return getExceptionMessage(getRootCause(e), false);
+	}
+
+	/**
 	 * <p>
 	 * Returns a message for the given {@link Throwable}
 	 * </p>
