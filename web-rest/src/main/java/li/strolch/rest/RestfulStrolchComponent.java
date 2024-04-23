@@ -204,10 +204,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	@Override
 	public void start() throws Exception {
-		if (instance == null)
-			instance = this;
-		else if (instance != this)
-			throw new IllegalStateException("Instance is already set! This component is a singleton resource!");
+		instance = this;
 		super.start();
 	}
 
