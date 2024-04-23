@@ -6,6 +6,7 @@ import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
 import li.strolch.runtime.sessions.StrolchSessionHandler;
+import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ public class BasicAuth {
 
 	private static final Logger logger = LoggerFactory.getLogger(BasicAuth.class);
 
-	private StrolchSessionHandler sessionHandler;
+	private final StrolchSessionHandler sessionHandler;
 
 	public BasicAuth(StrolchSessionHandler sessionHandler) {
 		this.sessionHandler = sessionHandler;
@@ -46,6 +47,16 @@ public class BasicAuth {
 			throw new BasicAuthFailure(Response.Status.UNAUTHORIZED, "User is not authorized!", e);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+
+			Throwable rootCause = ExceptionHelper.getRootCause(e);
+			if (rootCause instanceof StrolchNotAuthenticatedException) {
+				logger.error(e.getMessage());
+				throw new BasicAuthFailure(Response.Status.UNAUTHORIZED, "Not authenticated!", e);
+			} else if (rootCause instanceof StrolchAccessDeniedException) {
+				logger.error(e.getMessage());
+				throw new BasicAuthFailure(Response.Status.UNAUTHORIZED, "User is not authorized!", e);
+			}
+
 			throw new BasicAuthFailure(Response.Status.INTERNAL_SERVER_ERROR, "Internal error", e);
 		}
 	}
