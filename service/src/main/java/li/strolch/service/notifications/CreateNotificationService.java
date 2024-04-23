@@ -58,6 +58,8 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 		JsonObject visibilityJ = jsonObject.get(BAG_VISIBILITY).getAsJsonObject();
 		ParameterBag visibility = notification.getParameterBag(BAG_VISIBILITY);
 
+		visibility.setBoolean(PARAM_ENABLED,
+				visibilityJ.has(PARAM_ENABLED) && visibilityJ.get(PARAM_ENABLED).getAsBoolean());
 		visibility.setBoolean(PARAM_FOR_ALL,
 				visibilityJ.has(PARAM_FOR_ALL) && visibilityJ.get(PARAM_FOR_ALL).getAsBoolean());
 		if (visibilityJ.has(PARAM_VISIBLE_FROM))
@@ -110,6 +112,8 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 		ResourceBuilder notificationBuilder = new ResourceBuilder(TYPE_NOTIFICATION, TYPE_NOTIFICATION)
 
 				.bag(BAG_VISIBILITY, TYPE_VISIBILITY)
+
+				.booleanB(PARAM_ENABLED).end()
 
 				.date(PARAM_VISIBLE_FROM).end()
 

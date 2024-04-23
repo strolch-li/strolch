@@ -28,7 +28,8 @@ public class DefaultNotificationsPolicy extends NotificationsPolicy {
 	protected boolean isForUser(Resource notification) {
 		if (!isActive(notification))
 			return false;
-		return isForAll(notification) || isForRole(notification) || isForGroup(notification);
+		return isEnabled(notification) && (
+				isForAll(notification) || isForRole(notification) || isForGroup(notification));
 	}
 
 	protected boolean isActive(Resource notification) {
@@ -36,6 +37,10 @@ public class DefaultNotificationsPolicy extends NotificationsPolicy {
 				.from(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_FROM), true)
 				.to(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_TO), true)
 				.contains(ZonedDateTime.now());
+	}
+
+	protected boolean isEnabled(Resource notification) {
+		return notification.getBoolean(BAG_VISIBILITY, PARAM_ENABLED);
 	}
 
 	protected boolean isForAll(Resource notification) {

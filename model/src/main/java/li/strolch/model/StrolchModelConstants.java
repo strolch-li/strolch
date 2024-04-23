@@ -104,6 +104,7 @@ public class StrolchModelConstants {
 	public static final String PARAM_START_DATE = "startDate";
 	public static final String PARAM_MODE = "mode";
 	public static final String PARAM_GROUP = "group";
+	public static final String PARAM_ENABLED = "enabled";
 	public static final String PARAM_VISIBLE_FROM = "visibleFrom";
 	public static final String PARAM_VISIBLE_TO = "visibleTo";
 	public static final String PARAM_TITLE = "title";

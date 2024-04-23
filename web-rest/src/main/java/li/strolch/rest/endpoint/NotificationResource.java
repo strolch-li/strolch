@@ -163,6 +163,7 @@ public class NotificationResource {
 					ISO8601.toString(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_FROM)));
 			notificationJ.addProperty(PARAM_VISIBLE_TO,
 					ISO8601.toString(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_TO)));
+			notificationJ.addProperty(PARAM_ENABLED, notification.getBoolean(BAG_VISIBILITY, PARAM_ENABLED));
 
 			return notificationJ;
 		};
