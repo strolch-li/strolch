@@ -104,8 +104,8 @@ public class I18nMessage {
 
 		} catch (MissingResourceException e) {
 			if (!missingKeysMap.containsSet(baseName + "_" + locale.toLanguageTag())) {
-				logger.error("Failed to find resource bundle " + baseName + " " + locale.toLanguageTag()
-						+ ", returning current bundle " + this.bundle.getLocale().toLanguageTag());
+				logger.error("Failed to find resource bundle {} {}, returning current bundle {}", baseName,
+						locale.toLanguageTag(), this.bundle.getLocale().toLanguageTag());
 				missingKeysMap.addSet(baseName + "_" + locale.toLanguageTag(), emptySet());
 			}
 			return this.bundle;
@@ -123,10 +123,10 @@ public class I18nMessage {
 			if (isEmpty(this.bundleName))
 				return getMessage();
 			if (!missingKeysMap.containsSet(this.bundleName + "_" + locale.toLanguageTag())) {
-				logger.warn("No bundle found for " + this.bundleName + " " + locale + ". Available are: ");
+				logger.warn("No bundle found for {} {}. Available are: ", this.bundleName, locale);
 				getBundleMap().forEach((s, map) -> {
-					logger.info("  " + s);
-					map.forEach((l, resourceBundle) -> logger.info("  " + l + ": " + map.keySet()));
+					logger.info("  {}", s);
+					map.forEach((l, resourceBundle) -> logger.info("  {}: {}", l, map.keySet()));
 				});
 				missingKeysMap.addSet(this.bundleName + "_" + locale.toLanguageTag(), emptySet());
 			}
@@ -192,7 +192,7 @@ public class I18nMessage {
 			String languageTag = bundle.getLocale().toLanguageTag();
 			String bundleKey = baseName + "_" + languageTag;
 			if (!missingKeysMap.containsElement(bundleKey, this.key)) {
-				logger.error("Key " + this.key + " is missing in bundle " + baseName + " for locale " + languageTag);
+				logger.error("Key {} is missing in bundle {} for locale {}", this.key, baseName, languageTag);
 				missingKeysMap.addElement(bundleKey, this.key);
 			}
 
@@ -265,14 +265,14 @@ public class I18nMessage {
 		try {
 			CodeSource src = I18nMessage.class.getProtectionDomain().getCodeSource();
 			if (src == null) {
-				logger.error(
-						"Failed to find CodeSource for ProtectionDomain " + I18nMessage.class.getProtectionDomain());
+				logger.error("Failed to find CodeSource for ProtectionDomain {}",
+						I18nMessage.class.getProtectionDomain());
 				return;
 			}
 
 			File jarLocationF = new File(src.getLocation().toURI());
 			if (!(jarLocationF.exists() && jarLocationF.getParentFile().isDirectory())) {
-				logger.info("Found JAR repository at " + jarLocationF.getParentFile());
+				logger.info("Found JAR repository at {}", jarLocationF.getParentFile());
 				return;
 			}
 
@@ -292,16 +292,10 @@ public class I18nMessage {
 						JarEntry je = entries.nextElement();
 
 						String entryName = je.getName();
-
-						if (entryName.startsWith("META-INF") //
-								|| entryName.equals("ENV.properties") //
-								|| entryName.equals("agentVersion.properties") //
-								|| entryName.equals("appVersion.properties") //
-								|| entryName.equals("componentVersion.properties") //
-								|| entryName.equals("strolch_db_version.properties"))
+						if (!entryName.endsWith(".properties"))
 							continue;
 
-						if (!entryName.endsWith(".properties"))
+						if (shouldIgnorePropertyFile(entryName))
 							continue;
 
 						TypedTuple<String, Locale> tuple = parsePropertyName(entryName);
@@ -316,23 +310,21 @@ public class I18nMessage {
 						bundleMap.addElement(bundle.getBaseBundleName(), bundle.getLocale(), bundle);
 
 						String propertyName = entryName.replace('/', '.');
-						logger.info(
-								"    Loaded bundle " + bundle.getBaseBundleName() + " " + bundle.getLocale() + " from "
-										+ propertyName + " from JAR " + file.getName());
+						logger.info("    Loaded bundle {} {} from {} from JAR {}", bundle.getBaseBundleName(),
+								bundle.getLocale(), propertyName, file.getName());
 					}
 				}
 			}
 
 			File classesD = new File(jarD.getParentFile(), "classes");
 			if (classesD.isDirectory()) {
-				File[] propertyFiles = classesD.listFiles(
-						(dir, name) -> name.endsWith(".properties") && !(name.equals("appVersion.properties")
-								|| name.equals("ENV.properties")));
+				File[] propertyFiles = classesD.listFiles((dir, name) -> name.endsWith(".properties") && !(
+						name.equals("appVersion.properties") || name.equals("ENV.properties")));
 				if (propertyFiles != null) {
 					for (File propertyFile : propertyFiles) {
 
-						logger.info("  Found property file " + propertyFile.getName() + " in classes "
-								+ classesD.getAbsolutePath());
+						logger.info("  Found property file {} in classes {}", propertyFile.getName(),
+								classesD.getAbsolutePath());
 
 						TypedTuple<String, Locale> tuple = parsePropertyName(propertyFile.getName());
 						if (tuple == null)
@@ -346,8 +338,8 @@ public class I18nMessage {
 						}
 
 						bundleMap.addElement(bundle.getBaseBundleName(), bundle.getLocale(), bundle);
-						logger.info("    Loaded bundle " + bundle.getBaseBundleName() + " " + bundle.getLocale()
-								+ " from file " + propertyFile.getName());
+						logger.info("    Loaded bundle {} {} from file {}", bundle.getBaseBundleName(),
+								bundle.getLocale(), propertyFile.getName());
 					}
 				}
 			}
@@ -378,17 +370,17 @@ public class I18nMessage {
 				int languageI = Arrays.binarySearch(Locale.getISOLanguages(), language);
 				int countryI = Arrays.binarySearch(Locale.getISOCountries(), country);
 				if (languageI >= 0 && countryI >= 0)
-					locale = new Locale(language, country);
+					locale = Locale.of(language, country);
 				else {
-					logger.warn("Ignoring bad bundle locale for " + entryName);
+					logger.warn("Ignoring malformed bad bundle locale for {}", entryName);
 					return null;
 				}
 			} else {
 				int languageI = Arrays.binarySearch(Locale.getISOLanguages(), localeS);
 				if (languageI >= 0)
-					locale = new Locale(localeS);
+					locale = Locale.forLanguageTag(localeS);
 				else {
-					logger.warn("Ignoring bad bundle locale for " + entryName);
+					logger.warn("Ignoring bad bundle locale for {}", entryName);
 					return null;
 				}
 			}
@@ -401,6 +393,7 @@ public class I18nMessage {
 	}
 
 	private static class CustomControl extends ResourceBundle.Control {
+
 		private final InputStream stream;
 
 		public CustomControl(InputStream stream) {
@@ -414,65 +407,76 @@ public class I18nMessage {
 		}
 	}
 
+	private static boolean shouldIgnorePropertyFile(String name) {
+		return name.startsWith("META-INF")
+				|| name.equals("ENV.properties")
+				|| name.equals("agentVersion.properties")
+				|| name.equals("appVersion.properties")
+				|| name.equals("componentVersion.properties")
+				|| name.contains("_db_version");
+	}
+
 	private static boolean shouldIgnoreFile(File file) {
-		return file.getName().contains("aopalliance") //
-				|| file.getName().contains("activation") //
-				|| file.getName().contains("antlr") //
-				|| file.getName().contains("assertj-core") //
-				|| file.getName().startsWith("com.sun") //
-				|| file.getName().startsWith("commonj.") //
-				|| file.getName().startsWith("commons-") //
-				|| file.getName().startsWith("jackson-") //
-				|| file.getName().startsWith("hapi-") //
-				|| file.getName().startsWith("jaxb-") //
-				|| file.getName().startsWith("org.hl7.") //
-				|| file.getName().startsWith("listenablefuture-") //
-				|| file.getName().startsWith("j2objc-annotations") //
-				|| file.getName().startsWith("failureaccess-") //
-				|| file.getName().startsWith("error_prone_") //
-				|| file.getName().startsWith("guava-") //
-				|| file.getName().startsWith("org.eclipse") //
-				|| file.getName().startsWith("javax") //
-				|| file.getName().startsWith("jaxws") //
-				|| file.getName().startsWith("jaxrs") //
-				|| file.getName().startsWith("jaxb") //
-				|| file.getName().contains("jsr305") //
-				|| file.getName().contains("c3p0") //
-				|| file.getName().contains("camel") //
-				|| file.getName().contains("checker-qual") //
-				|| file.getName().contains("cron") //
-				|| file.getName().contains("FastInfoset") //
-				|| file.getName().contains("gmbal") //
-				|| file.getName().contains("grizzly") //
-				|| file.getName().contains("gson") //
-				|| file.getName().contains("ha-api") //
-				|| file.getName().contains("HikariCP") //
-				|| file.getName().contains("hk2") //
-				|| file.getName().contains("icu4j") //
-				|| file.getName().contains("jakarta") //
-				|| file.getName().contains("javassist") //
-				|| file.getName().contains("jersey") //
-				|| file.getName().contains("joda-time") //
-				|| file.getName().contains("logback") //
-				|| file.getName().contains("management-api") //
-				|| file.getName().contains("mchange-commons-java") //
-				|| file.getName().contains("mimepull") //
-				|| file.getName().contains("org.abego.treelayout") //
-				|| file.getName().contains("osgi") //
-				|| file.getName().contains("pfl-basic") //
-				|| file.getName().contains("pfl-tf") //
-				|| file.getName().contains("policy-2.7.10") //
-				|| file.getName().contains("postgresql") //
-				|| file.getName().contains("quartz") //
-				|| file.getName().contains("saaj-impl") //
-				|| file.getName().contains("sax") //
-				|| file.getName().contains("slf4j") //
-				|| file.getName().contains("ST4") //
-				|| file.getName().contains("stax-ex") //
-				|| file.getName().contains("stax2-api") //
-				|| file.getName().contains("streambuffer") //
-				|| file.getName().contains("tyrus") //
-				|| file.getName().contains("validation-api") //
-				|| file.getName().contains("yasson");
+		String name = file.getName();
+		return name.contains("aopalliance")
+				|| name.contains("activation")
+				|| name.contains("antlr")
+				|| name.contains("assertj-core")
+				|| name.startsWith("com.sun")
+				|| name.startsWith("commonj.")
+				|| name.startsWith("commons-")
+				|| name.startsWith("jackson-")
+				|| name.startsWith("hapi-")
+				|| name.startsWith("jaxb-")
+				|| name.startsWith("org.hl7.")
+				|| name.startsWith("org.glassfish.")
+				|| name.startsWith("listenablefuture-")
+				|| name.startsWith("j2objc-annotations")
+				|| name.startsWith("failureaccess-")
+				|| name.startsWith("error_prone_")
+				|| name.startsWith("guava-")
+				|| name.startsWith("org.eclipse")
+				|| name.startsWith("javax")
+				|| name.startsWith("jaxws")
+				|| name.startsWith("jaxrs")
+				|| name.startsWith("jaxb")
+				|| name.contains("jsr305")
+				|| name.contains("c3p0")
+				|| name.contains("camel")
+				|| name.contains("checker-qual")
+				|| name.contains("cron")
+				|| name.contains("FastInfoset")
+				|| name.contains("gmbal")
+				|| name.contains("grizzly")
+				|| name.contains("gson")
+				|| name.contains("ha-api")
+				|| name.contains("HikariCP")
+				|| name.contains("hk2")
+				|| name.contains("icu4j")
+				|| name.contains("jakarta")
+				|| name.contains("javassist")
+				|| name.contains("jersey")
+				|| name.contains("joda-time")
+				|| name.contains("logback")
+				|| name.contains("management-api")
+				|| name.contains("mchange-commons-java")
+				|| name.contains("mimepull")
+				|| name.contains("org.abego.treelayout")
+				|| name.contains("osgi")
+				|| name.contains("pfl-basic")
+				|| name.contains("pfl-tf")
+				|| name.contains("policy-2.7.10")
+				|| name.contains("postgresql")
+				|| name.contains("quartz")
+				|| name.contains("saaj-impl")
+				|| name.contains("sax")
+				|| name.contains("slf4j")
+				|| name.contains("ST4")
+				|| name.contains("stax-ex")
+				|| name.contains("stax2-api")
+				|| name.contains("streambuffer")
+				|| name.contains("tyrus")
+				|| name.contains("validation-api")
+				|| name.contains("yasson");
 	}
 }
