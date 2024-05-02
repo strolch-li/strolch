@@ -1,10 +1,5 @@
 package li.strolch.report.policy;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
@@ -13,6 +8,11 @@ import li.strolch.policy.StrolchPolicy;
 import li.strolch.report.ReportElement;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfSets;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public abstract class ReportPolicy extends StrolchPolicy {
 
@@ -48,9 +48,9 @@ public abstract class ReportPolicy extends StrolchPolicy {
 
 	public abstract Stream<ReportElement> doReportWithPage(int offset, int limit);
 
-	public abstract MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit);
+	public abstract MapOfSets<String, JsonObject> generateFilterCriteria(int limit);
 
-	public abstract Stream<StrolchRootElement> generateFilterCriteria(String type);
+	public abstract Stream<JsonObject> generateFilterCriteria(String type, int limit, String query);
 
 	public abstract long getCounter();
 

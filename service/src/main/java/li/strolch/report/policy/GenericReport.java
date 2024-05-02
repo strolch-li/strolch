@@ -1,17 +1,5 @@
 package li.strolch.report.policy;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.toList;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.report.ReportConstants.*;
-import static li.strolch.utils.helper.StringHelper.EMPTY;
-
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.*;
 import li.strolch.model.parameter.AbstractParameter;
@@ -32,6 +20,20 @@ import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.collections.TypedTuple;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
+
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
+
+import static java.text.MessageFormat.format;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.toList;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.report.ReportConstants.*;
+import static li.strolch.utils.ObjectHelper.*;
+import static li.strolch.utils.helper.StringHelper.EMPTY;
 
 /**
  * A Generic Report defines a report as is described at <a href="https://strolch.li/documentation-reports.html">Strolch
@@ -88,9 +90,11 @@ public class GenericReport extends ReportPolicy {
 
 		this.columnsBag = this.reportRes.getParameterBag(BAG_COLUMNS, true);
 
-		this.columnIds = this.columnsBag.getParameters().stream() //
-				.sorted(comparingInt(Parameter::getIndex)) //
-				.map(StrolchElement::getId) //
+		this.columnIds = this.columnsBag
+				.getParameters()
+				.stream()
+				.sorted(comparingInt(Parameter::getIndex))
+				.map(StrolchElement::getId)
 				.collect(toList());
 
 		this.parallel = this.reportRes.getBoolean(PARAM_PARALLEL);
@@ -167,36 +171,21 @@ public class GenericReport extends ReportPolicy {
 		List<ParameterBag> filterBags = this.reportRes.getParameterBagsByType(TYPE_FILTER);
 		for (ParameterBag filterBag : filterBags) {
 
-			if (filterBag.hasParameter(PARAM_FIELD_REF) && (filterBag.hasParameter(PARAM_FIELD_REF1)
-																	|| filterBag.hasParameter(PARAM_FIELD_REF2))) {
-				throw new IllegalArgumentException("Filter "
-						+ filterBag.getLocator()
-						+ " can not have combination of "
-						+ PARAM_FIELD_REF
-						+ " and any of "
-						+ PARAM_FIELD_REF1
-						+ ", "
-						+ PARAM_FIELD_REF2);
+			if (filterBag.hasParameter(PARAM_FIELD_REF) && (
+					filterBag.hasParameter(PARAM_FIELD_REF1) || filterBag.hasParameter(PARAM_FIELD_REF2))) {
+				throw new IllegalArgumentException(
+						format("Filter {0} can not have combination of {1} and any of {2}, {3}", filterBag.getLocator(),
+								PARAM_FIELD_REF, PARAM_FIELD_REF1, PARAM_FIELD_REF2));
 			} else if ((filterBag.hasParameter(PARAM_FIELD_REF1) && !filterBag.hasParameter(PARAM_FIELD_REF2))
 					|| (!filterBag.hasParameter(PARAM_FIELD_REF1) && filterBag.hasParameter(PARAM_FIELD_REF2))) {
-				throw new IllegalArgumentException("Filter "
-						+ filterBag.getLocator()
-						+ " must have both "
-						+ PARAM_FIELD_REF1
-						+ " and "
-						+ PARAM_FIELD_REF2);
-			} else if (!filterBag.hasParameter(PARAM_FIELD_REF) && (!filterBag.hasParameter(PARAM_FIELD_REF1)
-																			|| !filterBag.hasParameter(
-					PARAM_FIELD_REF2))) {
-				throw new IllegalArgumentException("Filter "
-						+ filterBag.getLocator()
-						+ " is missing the "
-						+ PARAM_FIELD_REF
-						+ " or "
-						+ PARAM_FIELD_REF1
-						+ ", "
-						+ PARAM_FIELD_REF2
-						+ " combination!");
+				throw new IllegalArgumentException(
+						format("Filter {0} must have both {1} and {2}", filterBag.getLocator(), PARAM_FIELD_REF1,
+								PARAM_FIELD_REF2));
+			} else if (!filterBag.hasParameter(PARAM_FIELD_REF) && (
+					!filterBag.hasParameter(PARAM_FIELD_REF1) || !filterBag.hasParameter(PARAM_FIELD_REF2))) {
+				throw new IllegalArgumentException(
+						format("Filter {0} is missing the {1} or {2}, {3} combination!", filterBag.getLocator(),
+								PARAM_FIELD_REF, PARAM_FIELD_REF1, PARAM_FIELD_REF2));
 			}
 
 			// prepare filter function policy
@@ -379,7 +368,7 @@ public class GenericReport extends ReportPolicy {
 		Stream<Map<String, StrolchRootElement>> stream;
 
 		// query the main objects and return a stream
-		stream = queryRows() //
+		stream = queryRows()
 
 				// transform each element into a map of Type,Value pairs
 				.map(this::evaluateRow);
@@ -458,10 +447,9 @@ public class GenericReport extends ReportPolicy {
 		StringParameter joinParamP = additionalTypeBag.getStringP(PARAM_JOIN_PARAM);
 		String[] locatorParts = joinParamP.getValue().split(Locator.PATH_SEPARATOR);
 		if (locatorParts.length != 3)
-			throw new IllegalStateException("Parameter reference ("
-					+ joinParamP.getValue()
-					+ ") is invalid as it does not have 3 parts for "
-					+ joinParamP.getLocator());
+			throw new IllegalStateException(
+					format("Parameter reference ({0}) is invalid as it does not have 3 parts for {1}",
+							joinParamP.getValue(), joinParamP.getLocator()));
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
 
@@ -476,19 +464,15 @@ public class GenericReport extends ReportPolicy {
 
 			StrolchRootElement joinElement = row.get(joinWithP.getUom());
 			if (joinElement == null)
-				throw new IllegalStateException("Additional join type "
-						+ joinWithP.getUom()
-						+ " is not available on row for "
-						+ joinWithP.getLocator());
+				throw new IllegalStateException(
+						format("Additional join type {0} is not available on row for {1}", joinWithP.getUom(),
+								joinWithP.getLocator()));
 
 			Optional<Parameter<?>> refP = lookupParameter(joinWithP, joinElement, false);
 			if (refP.isEmpty()) {
-				throw new IllegalStateException("Parameter reference ("
-						+ joinWithP.getValue()
-						+ ") for "
-						+ joinWithP.getLocator()
-						+ " not found on "
-						+ joinElement.getLocator());
+				throw new IllegalStateException(
+						format("Parameter reference ({0}) for {1} not found on {2}", joinWithP.getValue(),
+								joinWithP.getLocator(), joinElement.getLocator()));
 			}
 
 			StringParameter joinP = (StringParameter) refP.get();
@@ -520,14 +504,12 @@ public class GenericReport extends ReportPolicy {
 	protected String formatColumn(Map<String, StrolchRootElement> row, String columnId) {
 		StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
 		Object value = evaluateColumnValue(columnDefP, row, false);
-		if (value instanceof ZonedDateTime) {
-			return ISO8601.toString((ZonedDateTime) value);
-		} else if (value instanceof Date) {
-			return ISO8601.toString((Date) value);
-		} else if (value instanceof Parameter) {
-			return formatColumn((Parameter<?>) value);
-		} else
-			return value.toString();
+		return switch (value) {
+			case ZonedDateTime zonedDateTime -> ISO8601.toString(zonedDateTime);
+			case Date date -> ISO8601.toString(date);
+			case Parameter<?> parameter -> formatColumn(parameter);
+			default -> value.toString();
+		};
 	}
 
 	protected String formatColumn(Parameter<?> param) {
@@ -570,76 +552,29 @@ public class GenericReport extends ReportPolicy {
 	 * @return the filter criteria as a map of sets
 	 */
 	@Override
-	public MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit) {
+	public MapOfSets<String, JsonObject> generateFilterCriteria(int limit) {
+		int maxFacetValues = getMaxFacetValues(limit);
 
-		if (limit <= 0 || limit >= MAX_FACET_VALUE_LIMIT) {
-			logger.warn("Overriding invalid limit " + limit + " with " + MAX_FACET_VALUE_LIMIT);
-			limit = 100;
-		}
-
-		int maxFacetValues;
-		int reportMaxFacetValues = this.reportRes.getInteger(PARAM_MAX_FACET_VALUES);
-		if (reportMaxFacetValues != 0 && reportMaxFacetValues != limit) {
-			logger.warn("Report "
-					+ this.reportRes.getId()
-					+ " has "
-					+ PARAM_MAX_FACET_VALUES
-					+ " defined as "
-					+ reportMaxFacetValues
-					+ ". Ignoring requested limit "
-					+ limit);
-			maxFacetValues = reportMaxFacetValues;
-		} else {
-			maxFacetValues = limit;
-		}
-
-		MapOfSets<String, StrolchRootElement> result = new MapOfSets<>(true);
+		MapOfSets<String, JsonObject> result = new MapOfSets<>(true);
 
 		// we need the list of possible element types, which designate the criteria
-		List<String> criteria = this.filterCriteriaParams.values().stream() //
-				.filter(p -> {
-					if (p.getUom().equals(UOM_NONE))
-						throw new IllegalStateException(
-								"Join UOM " + p.getUom() + " invalid: " + p.getId() + " for " + p.getLocator());
-					if (p.getId().equals(PARAM_OBJECT_TYPE))
-						return filterCriteriaAllowed(p.getUom());
-					return filterCriteriaAllowed(p.getId());
-				}) //
-				.sorted(comparing(StringParameter::getIndex)) //
-				.map(StringParameter::getUom) //
-				.collect(toList());
+		List<String> criteria = this.filterCriteriaParams.values().stream().filter(p -> {
+			if (p.getUom().equals(UOM_NONE))
+				throw new IllegalStateException(
+						format("Join UOM {0} invalid: {1} for {2}", p.getUom(), p.getId(), p.getLocator()));
+			if (p.getId().equals(PARAM_OBJECT_TYPE))
+				return filterCriteriaAllowed(p.getUom());
+			return filterCriteriaAllowed(p.getId());
+		}).sorted(comparing(StringParameter::getIndex)).map(StringParameter::getUom).collect(toList());
 		criteria.addAll(this.directCriteria);
 
 		int maxRowsForFacetGeneration = this.reportRes.getInteger(PARAM_MAX_ROWS_FOR_FACET_GENERATION);
 
 		if (!this.directCriteria.isEmpty()) {
 			criteria.forEach(type -> {
-				if (!this.directCriteria.contains(type))
-					return;
-				StringParameter filterCriteriaP = this.filterCriteriaParams.get(type);
-				if (filterCriteriaP == null) {
-					logger.warn("Filter criteria not found for " + type);
-					return;
-				}
-				Stream<? extends StrolchRootElement> stream = switch (filterCriteriaP.getInterpretation()) {
-					case INTERPRETATION_RESOURCE_REF -> tx().streamResources(filterCriteriaP.getUom());
-					case INTERPRETATION_ORDER_REF -> tx().streamOrders(filterCriteriaP.getUom());
-					case INTERPRETATION_ACTIVITY_REF -> tx().streamActivities(filterCriteriaP.getUom());
-					default -> throw new IllegalArgumentException("Unhandled filter criteria interpretation "
-							+ filterCriteriaP.getInterpretation()
-							+ " for "
-							+ filterCriteriaP.getLocator());
-				};
-
-				stream = stream.map(this::mapFilterCriteria).filter(this::filterDirectCriteria);
-
-				if (hasOrdering())
-					stream = stream.sorted(this::sortDirectCriteria);
-
-				if (maxFacetValues > 0)
-					stream = stream.limit(maxFacetValues);
-
-				stream.forEachOrdered(e -> result.addElement(e.getType(), e));
+				if (this.directCriteria.contains(type))
+					prepareStreamForDirectCriteria(type, maxFacetValues).forEachOrdered(
+							e -> result.addElement(e.getType(), mapCriteriaToJson(e)));
 			});
 
 			criteria.removeAll(this.directCriteria);
@@ -656,7 +591,7 @@ public class GenericReport extends ReportPolicy {
 
 			for (String criterion : criteria) {
 				if (row.containsKey(criterion) && result.size(criterion) < maxFacetValues)
-					result.addElement(criterion, row.get(criterion));
+					result.addElement(criterion, mapCriteriaToJson(row.get(criterion)));
 			}
 
 			// stop if we have enough data
@@ -671,13 +606,80 @@ public class GenericReport extends ReportPolicy {
 		return result;
 	}
 
-	protected StrolchRootElement mapFilterCriteria(StrolchRootElement element) {
-		return element;
+	@Override
+	public Stream<JsonObject> generateFilterCriteria(String type, int limit, String query) {
+		int maxFacetValues = getMaxFacetValues(limit);
+
+		Stream<StrolchRootElement> stream;
+		if (this.directCriteria.contains(type)) {
+			stream = prepareStreamForDirectCriteria(type, 0).map(e -> (StrolchRootElement) e);
+		} else {
+			stream = buildStream().filter(row -> row.containsKey(type)).map(row -> row.get(type)).distinct();
+		}
+
+		Stream<JsonObject> resultStream = filterAndMapFilterCriteria(stream, query);
+		if (maxFacetValues != 0)
+			resultStream = resultStream.limit(maxFacetValues);
+		return resultStream;
 	}
 
-	@Override
-	public Stream<StrolchRootElement> generateFilterCriteria(String type) {
-		return buildStream().filter(row -> row.containsKey(type)).map(row -> row.get(type)).distinct();
+	protected Stream<JsonObject> filterAndMapFilterCriteria(Stream<StrolchRootElement> stream, String query) {
+		Stream<JsonObject> resultStream = stream.map(this::mapCriteriaToJson);
+		String[] queryParts = query == null || query.isEmpty() ? null : query.split(" ");
+		if (queryParts != null)
+			resultStream = resultStream.filter(f -> contains(f.get(Tags.Json.NAME).getAsString(), queryParts, true));
+		return resultStream;
+	}
+
+	protected JsonObject mapCriteriaToJson(StrolchRootElement criterion) {
+		JsonObject result = new JsonObject();
+		result.addProperty(Tags.Json.ID, criterion.getId());
+		result.addProperty(Tags.Json.NAME, criterion.getName());
+		return result;
+	}
+
+	protected Stream<? extends StrolchRootElement> prepareStreamForDirectCriteria(String type, int maxFacetValues) {
+		StringParameter filterCriteriaP = this.filterCriteriaParams.get(type);
+		if (filterCriteriaP == null) {
+			logger.warn("Filter criteria not found for {}", type);
+			return Stream.empty();
+		}
+
+		Stream<? extends StrolchRootElement> stream = switch (filterCriteriaP.getInterpretation()) {
+			case INTERPRETATION_RESOURCE_REF -> tx().streamResources(filterCriteriaP.getUom());
+			case INTERPRETATION_ORDER_REF -> tx().streamOrders(filterCriteriaP.getUom());
+			case INTERPRETATION_ACTIVITY_REF -> tx().streamActivities(filterCriteriaP.getUom());
+			default -> throw new IllegalArgumentException(
+					format("Unhandled filter criteria interpretation {0} for {1}", filterCriteriaP.getInterpretation(),
+							filterCriteriaP.getLocator()));
+		};
+
+		stream = stream.filter(this::filterDirectCriteria);
+
+		if (hasOrdering())
+			stream = stream.sorted(this::sortDirectCriteria);
+
+		if (maxFacetValues > 0)
+			stream = stream.limit(maxFacetValues);
+		return stream;
+	}
+
+	private int getMaxFacetValues(int limit) {
+		if (limit <= 0 || limit >= MAX_FACET_VALUE_LIMIT) {
+			logger.warn("Overriding invalid limit {} with " + MAX_FACET_VALUE_LIMIT, limit);
+			limit = 100;
+		}
+
+		int maxFacetValues;
+		int reportMaxFacetValues = this.reportRes.getInteger(PARAM_MAX_FACET_VALUES);
+		if (reportMaxFacetValues != 0 && reportMaxFacetValues != limit) {
+			logger.warn("Report {} has " + PARAM_MAX_FACET_VALUES + " defined as {}. Ignoring requested limit {}",
+					this.reportRes.getId(), reportMaxFacetValues, limit);
+			maxFacetValues = reportMaxFacetValues;
+		} else {
+			maxFacetValues = limit;
+		}
+		return maxFacetValues;
 	}
 
 	/**
@@ -705,31 +707,9 @@ public class GenericReport extends ReportPolicy {
 
 			int sortVal;
 			if (fieldRefP.getValue().startsWith("$")) {
-				Object columnValue1 = evaluateColumnValue(fieldRefP, Map.of(column1.getType(), column1), false);
-				Object columnValue2 = evaluateColumnValue(fieldRefP, Map.of(column2.getType(), column2), false);
-
-				if (this.descending) {
-					sortVal = ObjectHelper.compare(columnValue2, columnValue1, true);
-				} else {
-					sortVal = ObjectHelper.compare(columnValue1, columnValue2, true);
-				}
-
+				sortVal = compareFieldRef(fieldRefP, column1, column2);
 			} else {
-				Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1, false);
-				Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2, false);
-
-				if (param1.isEmpty() && param2.isEmpty())
-					continue;
-
-				if (param1.isPresent() && param2.isEmpty())
-					return 1;
-				else if (param1.isEmpty())
-					return -1;
-
-				if (this.descending)
-					sortVal = param2.get().compareTo(param1.get());
-				else
-					sortVal = param1.get().compareTo(param2.get());
+				sortVal = compareParamFieldRefP(fieldRefP, column1, column2);
 			}
 
 			if (sortVal != 0)
@@ -765,31 +745,9 @@ public class GenericReport extends ReportPolicy {
 
 			int sortVal;
 			if (fieldRefP.getValue().startsWith("$")) {
-				Object columnValue1 = evaluateColumnValue(fieldRefP, row1, false);
-				Object columnValue2 = evaluateColumnValue(fieldRefP, row2, false);
-
-				if (this.descending) {
-					sortVal = ObjectHelper.compare(columnValue2, columnValue1, true);
-				} else {
-					sortVal = ObjectHelper.compare(columnValue1, columnValue2, true);
-				}
-
+				sortVal = compareFieldRef(fieldRefP, row1, row2);
 			} else {
-				Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1, false);
-				Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2, false);
-
-				if (param1.isEmpty() && param2.isEmpty())
-					continue;
-
-				if (param1.isPresent() && param2.isEmpty())
-					return 1;
-				else if (param1.isEmpty())
-					return -1;
-
-				if (this.descending)
-					sortVal = param2.get().compareTo(param1.get());
-				else
-					sortVal = param1.get().compareTo(param2.get());
+				sortVal = compareParamFieldRefP(fieldRefP, column1, column2);
 			}
 
 			if (sortVal != 0)
@@ -799,6 +757,41 @@ public class GenericReport extends ReportPolicy {
 		return 0;
 	}
 
+	private int compareFieldRef(StringParameter fieldRefP, Map<String, StrolchRootElement> row1,
+			Map<String, StrolchRootElement> row2) {
+		Object columnValue1 = evaluateColumnValue(fieldRefP, row1, false);
+		Object columnValue2 = evaluateColumnValue(fieldRefP, row2, false);
+		if (this.descending)
+			return compare(columnValue2, columnValue1, true);
+		return compare(columnValue1, columnValue2, true);
+	}
+
+	private int compareFieldRef(StringParameter fieldRefP, StrolchRootElement column1, StrolchRootElement column2) {
+		Object columnValue1 = evaluateColumnValue(fieldRefP, Map.of(column1.getType(), column1), false);
+		Object columnValue2 = evaluateColumnValue(fieldRefP, Map.of(column2.getType(), column2), false);
+		if (this.descending)
+			return compare(columnValue2, columnValue1, true);
+		return compare(columnValue1, columnValue2, true);
+	}
+
+	private int compareParamFieldRefP(StringParameter fieldRefP, StrolchRootElement column1,
+			StrolchRootElement column2) {
+		Optional<Parameter<?>> param1 = lookupParameter(fieldRefP, column1, false);
+		Optional<Parameter<?>> param2 = lookupParameter(fieldRefP, column2, false);
+
+		if (param1.isEmpty() && param2.isEmpty())
+			return 0;
+
+		if (param1.isPresent() && param2.isEmpty())
+			return 1;
+		else if (param1.isEmpty())
+			return -1;
+
+		if (this.descending)
+			return param2.get().compareTo(param1.get());
+		return param1.get().compareTo(param2.get());
+	}
+
 	/**
 	 * Returns true if a filter is defined, i.e. {@link ParameterBag ParameterBags} of type
 	 * {@link ReportConstants#TYPE_FILTER}, a date range
@@ -806,8 +799,8 @@ public class GenericReport extends ReportPolicy {
 	 * @return true if a filter is defined
 	 */
 	protected boolean hasFilter() {
-		return !this.filtersByPolicy.isEmpty() || this.dateRange != null || (this.filtersById != null
-																					 && !this.filtersById.isEmpty());
+		return !this.filtersByPolicy.isEmpty() || this.dateRange != null || (
+				this.filtersById != null && !this.filtersById.isEmpty());
 	}
 
 	protected boolean filterDirectCriteria(StrolchRootElement element) {
@@ -893,7 +886,7 @@ public class GenericReport extends ReportPolicy {
 				Optional<Parameter<?>> param = lookupParameter(this.dateRangeSelP, element, false);
 				if (param.isEmpty() || param.get().getValueType() != StrolchValueType.DATE)
 					throw new IllegalStateException(
-							"Date Range selector is invalid, as referenced parameter is not a Date but " + (
+							format("Date Range selector is invalid, as referenced parameter is not a Date but {0}",
 									param.isPresent() ? param.get().getValueType() : "null"));
 
 				date = ((DateParameter) param.get()).getValueZdt();
@@ -961,8 +954,8 @@ public class GenericReport extends ReportPolicy {
 			else
 				columnValue = parameter;
 		} else {
-			columnValue = lookupParameter(columnDefP, column, allowNull) //
-					.orElseGet(() -> allowNull ? null : new StringParameter(columnDefP.getValue(), columnDef, ""));
+			columnValue = lookupParameter(columnDefP, column, allowNull).orElseGet(
+					() -> allowNull ? null : new StringParameter(columnDefP.getValue(), columnDef, ""));
 		}
 
 		return columnValue;
@@ -982,20 +975,18 @@ public class GenericReport extends ReportPolicy {
 
 		String[] searchParts = columnDef.split(SEARCH_SEPARATOR);
 		if (searchParts.length != 3)
-			throw new IllegalStateException("Parameter search reference ("
-					+ columnDef
-					+ ") is invalid as it does not have 3 parts for "
-					+ columnDefP.getLocator());
+			throw new IllegalStateException(
+					format("Parameter search reference ({0}) is invalid as it does not have 3 parts for {1}", columnDef,
+							columnDefP.getLocator()));
 
 		String parentParamId = searchParts[1];
 		String paramRef = searchParts[2];
 
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
 		if (locatorParts.length != 3)
-			throw new IllegalStateException("Parameter search reference ("
-					+ paramRef
-					+ ") is invalid as it does not have 3 parts for "
-					+ columnDefP.getLocator());
+			throw new IllegalStateException(
+					format("Parameter search reference ({0}) is invalid as it does not have 3 parts for {1}", paramRef,
+							columnDefP.getLocator()));
 
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
@@ -1018,22 +1009,18 @@ public class GenericReport extends ReportPolicy {
 
 		String[] locatorParts = paramRef.split(Locator.PATH_SEPARATOR);
 		if (locatorParts.length != 3)
-			throw new IllegalStateException("Parameter reference ("
-					+ paramRef
-					+ ") is invalid as it does not have 3 parts for "
-					+ paramRefP.getLocator());
+			throw new IllegalStateException(
+					format("Parameter reference ({0}) is invalid as it does not have 3 parts for {1}", paramRef,
+							paramRefP.getLocator()));
 
 		String bagKey = locatorParts[1];
 		String paramKey = locatorParts[2];
 
 		Parameter<?> param = element.getParameter(bagKey, paramKey);
 		if (!overrideAllowMissingColumns && !this.allowMissingColumns && param == null)
-			throw new IllegalStateException("Parameter reference ("
-					+ paramRef
-					+ ") for "
-					+ paramRefP.getLocator()
-					+ " not found on "
-					+ element.getLocator());
+			throw new IllegalStateException(
+					format("Parameter reference ({0}) for {1} not found on {2}", paramRef, paramRefP.getLocator(),
+							element.getLocator()));
 
 		return Optional.ofNullable(param);
 	}
@@ -1058,15 +1045,17 @@ public class GenericReport extends ReportPolicy {
 	}
 
 	protected boolean hasJoinOnType(String type) {
-		return (this.reportRes.hasParameterBag(BAG_JOINS) //
-						&& this.reportRes.getParameterBag(BAG_JOINS).hasParameter(type)) //
-				|| (this.reportRes.hasParameterBag(BAG_ADDITIONAL_TYPE) //
-							&& this.reportRes
-				.getParameterBag(BAG_ADDITIONAL_TYPE)
-				.getString(PARAM_OBJECT_TYPE)
-				.equals(type)) //
-				|| (this.reportRes.hasParameterBag(BAG_ADDITIONAL_JOINS) //
-							&& this.reportRes.getParameterBag(BAG_ADDITIONAL_JOINS).hasParameter(type));
+		return (
+				this.reportRes.hasParameterBag(BAG_JOINS) && this.reportRes
+						.getParameterBag(BAG_JOINS)
+						.hasParameter(type)) || (
+				this.reportRes.hasParameterBag(BAG_ADDITIONAL_TYPE) && this.reportRes
+						.getParameterBag(BAG_ADDITIONAL_TYPE)
+						.getString(PARAM_OBJECT_TYPE)
+						.equals(type)) || (
+				this.reportRes.hasParameterBag(BAG_ADDITIONAL_JOINS) && this.reportRes
+						.getParameterBag(BAG_ADDITIONAL_JOINS)
+						.hasParameter(type));
 	}
 
 	protected Stream<? extends StrolchRootElement> getStreamFor(StringParameter objectTypeP) {
@@ -1146,38 +1135,7 @@ public class GenericReport extends ReportPolicy {
 				return null;
 		}
 
-		ParameterBag relationsBag = dependency.getParameterBag(BAG_RELATIONS);
-		if (relationsBag == null)
-			throw new IllegalStateException("Invalid join definition value: "
-					+ joinP.getValue()
-					+ " on: "
-					+ joinP.getLocator()
-					+ " as "
-					+ dependency.getLocator()
-					+ " has no ParameterBag "
-					+ BAG_RELATIONS);
-
-		List<Parameter<?>> relationParams = relationsBag
-				.getParametersByInterpretationAndUom(interpretation, joinType)
-				.stream()
-				.filter(p -> p.getValueType() == StrolchValueType.STRING)
-				.toList();
-
-		if (relationParams.isEmpty())
-			throw new IllegalStateException("Found no relation parameters with UOM "
-					+ joinType
-					+ " of type "
-					+ StrolchValueType.STRING.getType()
-					+ " on dependency "
-					+ dependency.getLocator());
-		if (relationParams.size() > 1)
-			throw new IllegalStateException("Found multiple possible relation parameters for UOM "
-					+ joinType
-					+ " on dependency "
-					+ dependency.getLocator());
-
-		Parameter<?> relationParam = relationParams.get(0);
-		StringParameter relationP = (StringParameter) relationParam;
+		StringParameter relationP = getJoinRelationParam(dependency, joinP, joinType, interpretation);
 		if (relationP.getValue().isEmpty() && optional)
 			return null;
 
@@ -1188,5 +1146,34 @@ public class GenericReport extends ReportPolicy {
 
 		refs.put(joinType, joinElem);
 		return joinElem;
+	}
+
+	private static StringParameter getJoinRelationParam(StrolchRootElement dependency, StringParameter joinP,
+			String joinType, String interpretation) {
+
+		ParameterBag relationsBag = dependency.getParameterBag(BAG_RELATIONS);
+		if (relationsBag == null)
+			throw new IllegalStateException(
+					format("Invalid join definition value: {0} on: {1} as {2} has no ParameterBag {3}",
+							joinP.getValue(), joinP.getLocator(), dependency.getLocator(), BAG_RELATIONS));
+
+		List<Parameter<?>> relationParams = relationsBag
+				.getParametersByInterpretationAndUom(interpretation, joinType)
+				.stream()
+				.filter(p -> p.getValueType() == StrolchValueType.STRING)
+				.toList();
+
+		if (relationParams.isEmpty())
+			throw new IllegalStateException(
+					format("Found no relation parameters with UOM {0} of type {1} on dependency {2}", joinType,
+							StrolchValueType.STRING.getType(), dependency.getLocator()));
+		if (relationParams.size() > 1)
+			throw new IllegalStateException("Found multiple possible relation parameters for UOM "
+					+ joinType
+					+ " on dependency "
+					+ dependency.getLocator());
+
+		Parameter<?> relationParam = relationParams.getFirst();
+		return (StringParameter) relationParam;
 	}
 }
