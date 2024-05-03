@@ -41,6 +41,13 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	E getValue(int index);
 
 	/**
+	 * Returns the first item of this {@link ListParameter}'s value
+	 *
+	 * @return the value at the given index
+	 */
+	E getFirstValue();
+
+	/**
 	 * Returns a {@link Stream} for the values of this list
 	 *
 	 * @return a stream for the values
