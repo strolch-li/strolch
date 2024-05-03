@@ -225,6 +225,19 @@ public class ExceptionHelper {
 	}
 
 	/**
+	 * Returns {@link #getExceptionMessage(Throwable, boolean)} for the root cause of the given {@link Throwable}
+	 *
+	 * @param throwable     the throwable for which to get the message of the root cause
+	 * @param withClassName if true, then exception class name is prepended to the exception message, if the exception
+	 *                      message is null, then this param is ignored
+	 *
+	 * @return {@link #getExceptionMessage(Throwable, boolean)} for the root cause of the given {@link Throwable}
+	 */
+	public static String getRootCauseMessage(Throwable throwable, boolean withClassName) {
+		return getExceptionMessage(getRootCause(throwable), withClassName);
+	}
+
+	/**
 	 * Walks the causes for the given {@link Throwable} and sees if the given cause exists
 	 *
 	 * @param throwable the {@link Throwable} for which to find the given cause type
