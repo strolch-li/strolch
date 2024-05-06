@@ -91,12 +91,12 @@ public class Report implements AutoCloseable {
 		return this.reportPolicy.doReportWithPage(offset, limit);
 	}
 
-	public MapOfSets<String, StrolchRootElement> generateFilterCriteria(int limit) {
+	public MapOfSets<String, JsonObject> generateFilterCriteria(int limit) {
 		return this.reportPolicy.generateFilterCriteria(limit);
 	}
 
-	public Stream<StrolchRootElement> generateFilterCriteria(String type) {
-		return this.reportPolicy.generateFilterCriteria(type);
+	public Stream<JsonObject> generateFilterCriteria(String type, int limit, String query) {
+		return this.reportPolicy.generateFilterCriteria(type,limit, query);
 	}
 
 	public long getCounter() {

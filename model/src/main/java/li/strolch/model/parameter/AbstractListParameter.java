@@ -27,10 +27,8 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
+	 * @param id   the id
+	 * @param name the name
 	 */
 	AbstractListParameter(String id, String name) {
 		super(id, name);
@@ -45,11 +43,9 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	/**
 	 * Validates that the value is legal. This is the case when it is not null in this implementation
 	 *
-	 * @param values
-	 * 		the values to check for this parameter instance
+	 * @param values the values to check for this parameter instance
 	 *
-	 * @throws StrolchException
-	 * 		if the value is null
+	 * @throws StrolchException if the value is null
 	 */
 	protected void validateValue(List<E> values) throws StrolchException {
 		if (values == null) {
@@ -64,11 +60,9 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	/**
 	 * Validates that the value is legal. This is the case when it is not null in this implementation
 	 *
-	 * @param values
-	 * 		the values to check for this parameter instance
+	 * @param values the values to check for this parameter instance
 	 *
-	 * @throws StrolchException
-	 * 		if the value is null
+	 * @throws StrolchException if the value is null
 	 */
 	protected void validateValue(Collection<E> values) throws StrolchException {
 		if (values == null) {
@@ -84,6 +78,8 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 	public String getValueAsString() {
 		if (this.value.isEmpty())
 			return StringHelper.EMPTY;
+		if (this.value.size() == 1)
+			return elementToString(this.value.getFirst());
 		return this.value.stream().map(this::elementToString).collect(joining(", "));
 	}
 
@@ -98,6 +94,13 @@ public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>
 		if (this.value.isEmpty() || this.value.size() < index)
 			throw new IllegalStateException("No value at index " + index + " for " + getLocator());
 		return this.value.get(index);
+	}
+
+	@Override
+	public E getFirstValue() {
+		if (this.value.isEmpty())
+			throw new IllegalStateException("No value at index 0 for " + getLocator());
+		return this.value.getFirst();
 	}
 
 	@Override

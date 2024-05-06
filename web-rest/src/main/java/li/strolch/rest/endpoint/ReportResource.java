@@ -75,13 +75,21 @@ public class ReportResource {
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext())) {
 
-			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat().withoutVersion()
-					.withoutObjectType().withoutPolicies().withoutStateVariables()
-					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING, BAG_ADDITIONAL_TYPE).ignoreBagByType(TYPE_FILTER)
+			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor()
+					.flat()
+					.withoutVersion()
+					.withoutObjectType()
+					.withoutPolicies()
+					.withoutStateVariables()
+					.ignoreBags(BAG_JOINS, BAG_COLUMNS, BAG_ORDERING, BAG_ADDITIONAL_TYPE)
+					.ignoreBagByType(TYPE_FILTER)
 					.resourceHook((reportRes, reportJ) -> reportJ.addProperty(PARAM_DATE_RANGE,
 							reportRes.hasParameter(BAG_PARAMETERS, PARAM_DATE_RANGE_SEL)));
-			JsonArray result = new ReportSearch(tx).search(tx).orderByName(false)
-					.map(resource -> resource.accept(visitor)).asStream()
+			JsonArray result = new ReportSearch(tx)
+					.search(tx)
+					.orderByName(false)
+					.map(resource -> resource.accept(visitor))
+					.asStream()
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			return ResponseUtil.toResponse(DATA, result);
@@ -103,7 +111,8 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser
+					.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
@@ -124,21 +133,19 @@ public class ReportResource {
 			JsonArray facetsJ = new JsonArray();
 			JsonObject finalLocaleJ = localeJ;
 
-			MapOfSets<String, StrolchRootElement> criteria = report.generateFilterCriteria(limit);
+			MapOfSets<String, JsonObject> criteria = report.generateFilterCriteria(limit);
 
 			criteria.keySet().stream().sorted(comparing(type -> {
 				JsonElement translatedJ = finalLocaleJ == null ? null : finalLocaleJ.get(type);
 				return translatedJ == null ? type : translatedJ.getAsString();
 			})).forEach(type -> {
-				Set<StrolchRootElement> elements = criteria.getSet(type);
+				Set<JsonObject> elements = criteria.getSet(type);
 				JsonObject filter = new JsonObject();
 				filter.addProperty(Tags.Json.TYPE, type);
-				filter.add(Tags.Json.VALUES, elements.stream().sorted(comparing(StrolchElement::getName)).map(f -> {
-					JsonObject o = new JsonObject();
-					o.addProperty(Tags.Json.ID, f.getId());
-					o.addProperty(Tags.Json.NAME, f.getName());
-					return o;
-				}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
+				filter.add(Tags.Json.VALUES, elements
+						.stream()
+						.sorted(comparing(e -> e.get(Tags.Json.NAME).getAsString()))
+						.collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
 				facetsJ.add(filter);
 			});
 
@@ -148,7 +155,7 @@ public class ReportResource {
 			result.addProperty(PARAM_DURATION, duration);
 			result.addProperty(PARAM_PARALLEL, report.isParallel());
 
-			logger.info("Facet Generation for " + id + " took: " + duration);
+			logger.info("Facet Generation for {} took: {}", id, duration);
 			return ResponseUtil.toResponse(DATA, result);
 		}
 	}
@@ -171,7 +178,8 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser
+					.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
@@ -189,37 +197,13 @@ public class ReportResource {
 				report.getReportPolicy().setI18nData(localeJ);
 
 			// get filter criteria
-			Stream<StrolchRootElement> criteria = report.generateFilterCriteria(type);
-			if (query != null && !query.isEmpty()) {
-				String[] parts = query.split(" ");
-				criteria = criteria.filter(f -> ObjectHelper.contains(f.getName(), parts, true));
-			}
-
-			int maxFacetValues;
-			int reportMaxFacetValues = report.getReportResource().getInteger(PARAM_MAX_FACET_VALUES);
-			if (reportMaxFacetValues != 0 && reportMaxFacetValues != limit) {
-				logger.warn("Report " + report.getReportResource().getId() + " has " + PARAM_MAX_FACET_VALUES +
-						" defined as " + reportMaxFacetValues + ". Ignoring requested limit " + limit);
-				maxFacetValues = reportMaxFacetValues;
-			} else {
-				maxFacetValues = limit;
-			}
-
-			criteria = criteria.sorted(comparing(StrolchElement::getName));
-
-			if (maxFacetValues != 0)
-				criteria = criteria.limit(maxFacetValues);
-
-			// add the data finally
-			JsonArray array = criteria.map(f -> {
-				JsonObject o = new JsonObject();
-				o.addProperty(Tags.Json.ID, f.getId());
-				o.addProperty(Tags.Json.NAME, f.getName());
-				return o;
-			}).collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+			JsonArray array = report
+					.generateFilterCriteria(type, limit, query)
+					.sorted(comparing(e -> e.get(Tags.Json.NAME).getAsString()))
+					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			String duration = formatNanoDuration(System.nanoTime() - start);
-			logger.info("Facet Generation for " + id + "." + type + " took: " + duration);
+			logger.info("Facet Generation for {}.{} took: {}", id, type, duration);
 			return ResponseUtil.toResponse(DATA, array);
 		}
 	}
@@ -273,7 +257,8 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser
+					.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
@@ -349,7 +334,7 @@ public class ReportResource {
 			finalResult.addProperty(PARAM_DURATION, duration);
 			finalResult.addProperty(PARAM_PARALLEL, report.isParallel());
 
-			logger.info(id + " Report took: " + duration);
+			logger.info("{} Report took: {}", id, duration);
 			return ResponseUtil.toResponse(DATA, finalResult);
 		}
 	}
@@ -400,7 +385,8 @@ public class ReportResource {
 		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
 		JsonObject localeJ = null;
 		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser.parseString(new String(Files.readAllBytes(localesF.toPath())))
+			JsonObject localesJ = JsonParser
+					.parseString(new String(Files.readAllBytes(localesF.toPath())))
 					.getAsJsonObject();
 			if (localesJ.has(cert.getLocale().toLanguageTag()))
 				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
@@ -411,8 +397,10 @@ public class ReportResource {
 
 		// send
 		String fileName = id + "_" + System.currentTimeMillis() + ".csv";
-		return Response.ok(out, TEXT_CSV_TYPE)
-				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"").build();
+		return Response
+				.ok(out, TEXT_CSV_TYPE)
+				.header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+				.build();
 	}
 
 	private StreamingOutput getOut(Certificate cert, String realm, String reportId, JsonObject localeJ,
@@ -485,12 +473,14 @@ public class ReportResource {
 		// go through all filters and add to the map of sets
 		for (JsonElement elem : filters.getAsJsonArray()) {
 			if (!elem.isJsonObject()) {
-				logger.warn("There are wrong formatted filters:\n" + elem);
+				logger.warn("There are wrong formatted filters:\n{}", elem);
 				continue;
 			}
 
 			JsonObject filter = elem.getAsJsonObject();
-			filter.get(PARAM_FACET_FILTERS).getAsJsonArray()
+			filter
+					.get(PARAM_FACET_FILTERS)
+					.getAsJsonArray()
 					.forEach(f -> result.addElement(filter.get(PARAM_FACET_TYPE).getAsString(), f.getAsString()));
 		}
 

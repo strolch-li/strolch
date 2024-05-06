@@ -1,18 +1,7 @@
 package li.strolch.report;
 
-import static java.util.stream.Collectors.toSet;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.*;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.google.gson.JsonObject;
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
@@ -22,6 +11,16 @@ import org.hamcrest.MatcherAssert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.*;
 
 public class GenericReportTest {
 
@@ -48,49 +47,49 @@ public class GenericReportTest {
 	public void shouldGenerateJsonReport() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
 			report.doReportAsJson() //
 					.forEach(e -> {
 
 						switch (e.get("slot").getAsString()) {
-						case "Slot 1" -> {
-							assertEquals("Product 01", e.get("product").getAsString());
-							assertEquals("20.0", e.get("quantity").getAsString());
-							assertEquals("40.0", e.get("maxQuantity").getAsString());
-							assertEquals("4.0", e.get("minQuantity").getAsString());
-							assertEquals("Section 001", e.get("section").getAsString());
-							assertEquals("Storage 01", e.get("storage").getAsString());
-							assertEquals("Location 01", e.get("location").getAsString());
-						}
-						case "Slot 2" -> {
-							assertEquals("Product 02", e.get("product").getAsString());
-							assertEquals("18.0", e.get("quantity").getAsString());
-							assertEquals("20.0", e.get("maxQuantity").getAsString());
-							assertEquals("4.0", e.get("minQuantity").getAsString());
-							assertEquals("Section 001", e.get("section").getAsString());
-							assertEquals("Storage 01", e.get("storage").getAsString());
-							assertEquals("Location 01", e.get("location").getAsString());
-						}
-						case "Slot 3" -> {
-							assertEquals("Product 01", e.get("product").getAsString());
-							assertEquals("11.0", e.get("quantity").getAsString());
-							assertEquals("40.0", e.get("maxQuantity").getAsString());
-							assertEquals("6.0", e.get("minQuantity").getAsString());
-							assertEquals("Section 002", e.get("section").getAsString());
-							assertEquals("Storage 02", e.get("storage").getAsString());
-							assertEquals("Location 02", e.get("location").getAsString());
-						}
-						case "Slot 4" -> {
-							assertEquals("Product 02", e.get("product").getAsString());
-							assertEquals("16.0", e.get("quantity").getAsString());
-							assertEquals("20.0", e.get("maxQuantity").getAsString());
-							assertEquals("6.0", e.get("minQuantity").getAsString());
-							assertEquals("Section 002", e.get("section").getAsString());
-							assertEquals("Storage 02", e.get("storage").getAsString());
-							assertEquals("Location 02", e.get("location").getAsString());
-						}
-						default -> fail("Unhandled result element: \n" + e);
+							case "Slot 1" -> {
+								assertEquals("Product 01", e.get("product").getAsString());
+								assertEquals("20.0", e.get("quantity").getAsString());
+								assertEquals("40.0", e.get("maxQuantity").getAsString());
+								assertEquals("4.0", e.get("minQuantity").getAsString());
+								assertEquals("Section 001", e.get("section").getAsString());
+								assertEquals("Storage 01", e.get("storage").getAsString());
+								assertEquals("Location 01", e.get("location").getAsString());
+							}
+							case "Slot 2" -> {
+								assertEquals("Product 02", e.get("product").getAsString());
+								assertEquals("18.0", e.get("quantity").getAsString());
+								assertEquals("20.0", e.get("maxQuantity").getAsString());
+								assertEquals("4.0", e.get("minQuantity").getAsString());
+								assertEquals("Section 001", e.get("section").getAsString());
+								assertEquals("Storage 01", e.get("storage").getAsString());
+								assertEquals("Location 01", e.get("location").getAsString());
+							}
+							case "Slot 3" -> {
+								assertEquals("Product 01", e.get("product").getAsString());
+								assertEquals("11.0", e.get("quantity").getAsString());
+								assertEquals("40.0", e.get("maxQuantity").getAsString());
+								assertEquals("6.0", e.get("minQuantity").getAsString());
+								assertEquals("Section 002", e.get("section").getAsString());
+								assertEquals("Storage 02", e.get("storage").getAsString());
+								assertEquals("Location 02", e.get("location").getAsString());
+							}
+							case "Slot 4" -> {
+								assertEquals("Product 02", e.get("product").getAsString());
+								assertEquals("16.0", e.get("quantity").getAsString());
+								assertEquals("20.0", e.get("maxQuantity").getAsString());
+								assertEquals("6.0", e.get("minQuantity").getAsString());
+								assertEquals("Section 002", e.get("section").getAsString());
+								assertEquals("Storage 02", e.get("storage").getAsString());
+								assertEquals("Location 02", e.get("location").getAsString());
+							}
+							default -> fail("Unhandled result element: \n" + e);
 						}
 					});
 		}
@@ -100,7 +99,7 @@ public class GenericReportTest {
 	public void shouldFilterReport1() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
 			report.filter("Product", "product01") //
 					.doReportAsJson() //
@@ -108,12 +107,12 @@ public class GenericReportTest {
 
 						String slotName = e.get("slot").getAsString();
 						switch (slotName) {
-						case "Slot 1":
-						case "Slot 3":
-							break;
-						default:
-							fail("Unexpected slot name " + slotName + ", should have been filtered!");
-							break;
+							case "Slot 1":
+							case "Slot 3":
+								break;
+							default:
+								fail("Unexpected slot name " + slotName + ", should have been filtered!");
+								break;
 						}
 					});
 		}
@@ -123,7 +122,7 @@ public class GenericReportTest {
 	public void shouldFilterReport2() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
 			report.filter("Product", "product01") //
 					.filter("Location", "location02") //
@@ -144,7 +143,7 @@ public class GenericReportTest {
 		Date from = new Date(LocalDate.of(2016, 1, 1).toEpochDay() * 86400000);
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
 			Date to = new Date(LocalDate.of(2017, 1, 1).toEpochDay() * 86400000);
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
@@ -158,7 +157,7 @@ public class GenericReportTest {
 		}
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
 			Date to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
@@ -185,7 +184,10 @@ public class GenericReportTest {
 				Date to = new Date(LocalDate.of(2017, 1, 1).toEpochDay() * 86400000);
 				DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
-				List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+				List<JsonObject> result = report
+						.filter("Product", "product01")
+						.dateRange(dateRange)
+						.doReportAsJson()
 						.toList();
 				assertTrue(result.isEmpty());
 			}
@@ -196,7 +198,10 @@ public class GenericReportTest {
 				Date to = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
 				DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
-				List<JsonObject> result = report.filter("Product", "product01").dateRange(dateRange).doReportAsJson()
+				List<JsonObject> result = report
+						.filter("Product", "product01")
+						.dateRange(dateRange)
+						.doReportAsJson()
 						.toList();
 				assertEquals(2, result.size());
 			}
@@ -207,8 +212,11 @@ public class GenericReportTest {
 				Date to = new Date(LocalDate.of(2017, 3, 2).toEpochDay() * 86400000);
 				DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
-				List<JsonObject> result = report.filter("Product", "product01", "product02").dateRange(dateRange)
-						.doReportAsJson().toList();
+				List<JsonObject> result = report
+						.filter("Product", "product01", "product02")
+						.dateRange(dateRange)
+						.doReportAsJson()
+						.toList();
 				assertEquals(4, result.size());
 			}
 		}
@@ -218,21 +226,27 @@ public class GenericReportTest {
 	public void shouldCreateFilterCriteria() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
-			MapOfSets<String, StrolchRootElement> filterCriteria = report.generateFilterCriteria(1000);
+			MapOfSets<String, JsonObject> filterCriteria = report.generateFilterCriteria(1000);
 
 			assertFalse(filterCriteria.containsSet("Location"));
 			assertFalse(filterCriteria.containsSet("Slot"));
-			MatcherAssert
-					.assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(toSet()),
-							containsInAnyOrder("product01", "product02"));
-			MatcherAssert
-					.assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(toSet()),
-							containsInAnyOrder("storage01", "storage02"));
-			MatcherAssert
-					.assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(toSet()),
-							containsInAnyOrder("section001", "section002"));
+			MatcherAssert.assertThat(filterCriteria
+					.getSet("Product")
+					.stream()
+					.map(e -> e.get(Tags.Json.ID).getAsString())
+					.collect(toSet()), containsInAnyOrder("product01", "product02"));
+			MatcherAssert.assertThat(filterCriteria
+					.getSet("Storage")
+					.stream()
+					.map(e -> e.get(Tags.Json.ID).getAsString())
+					.collect(toSet()), containsInAnyOrder("storage01", "storage02"));
+			MatcherAssert.assertThat(filterCriteria
+					.getSet("Section")
+					.stream()
+					.map(e -> e.get(Tags.Json.ID).getAsString())
+					.collect(toSet()), containsInAnyOrder("section001", "section002"));
 		}
 	}
 
@@ -240,9 +254,10 @@ public class GenericReportTest {
 	public void shouldCreateFilterCriteriaFiltered1() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
-			MapOfSets<String, StrolchRootElement> filterCriteria = report.filter("Product", "product01")
+			MapOfSets<String, JsonObject> filterCriteria = report
+					.filter("Product", "product01")
 					.generateFilterCriteria(1000);
 
 			// assert sequence of filter criteria is correct
@@ -254,15 +269,21 @@ public class GenericReportTest {
 
 			assertFalse(filterCriteria.containsSet("Location"));
 			assertFalse(filterCriteria.containsSet("Slot"));
-			MatcherAssert
-					.assertThat(filterCriteria.getSet("Product").stream().map(StrolchElement::getId).collect(toSet()),
-							containsInAnyOrder("product01"));
-			MatcherAssert
-					.assertThat(filterCriteria.getSet("Storage").stream().map(StrolchElement::getId).collect(toSet()),
-							containsInAnyOrder("storage01", "storage02"));
-			MatcherAssert
-					.assertThat(filterCriteria.getSet("Section").stream().map(StrolchElement::getId).collect(toSet()),
-							containsInAnyOrder("section001", "section002"));
+			MatcherAssert.assertThat(filterCriteria
+					.getSet("Product")
+					.stream()
+					.map(e -> e.get(Tags.Json.ID).getAsString())
+					.collect(toSet()), containsInAnyOrder("product01"));
+			MatcherAssert.assertThat(filterCriteria
+					.getSet("Storage")
+					.stream()
+					.map(e -> e.get(Tags.Json.ID).getAsString())
+					.collect(toSet()), containsInAnyOrder("storage01", "storage02"));
+			MatcherAssert.assertThat(filterCriteria
+					.getSet("Section")
+					.stream()
+					.map(e -> e.get(Tags.Json.ID).getAsString())
+					.collect(toSet()), containsInAnyOrder("section001", "section002"));
 		}
 	}
 
@@ -270,13 +291,13 @@ public class GenericReportTest {
 	public void shouldCreateFilterCriteriaFiltered2() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "stockReport")) {
+			 Report report = new Report(tx, "stockReport")) {
 
 			Date from = new Date(LocalDate.of(2017, 3, 1).toEpochDay() * 86400000);
 			Date to = new Date(LocalDate.of(2017, 3, 5).toEpochDay() * 86400000);
 			DateRange dateRange = new DateRange().from(from, true).to(to, false);
 
-			MapOfSets<String, StrolchRootElement> filterCriteria = report //
+			MapOfSets<String, JsonObject> filterCriteria = report //
 					.dateRange(dateRange) //
 					.filter("Product", "product01") //
 					.generateFilterCriteria(1000);
@@ -289,26 +310,26 @@ public class GenericReportTest {
 	public void shouldDoAdditionalJoin() {
 
 		try (StrolchTransaction tx = runtimeMock.openUserTx(certificate, true);
-				Report report = new Report(tx, "slotsByOrderUsageReport")) {
+			 Report report = new Report(tx, "slotsByOrderUsageReport")) {
 
 			AtomicInteger slotsFound = new AtomicInteger();
 			report.doReportAsJson().forEach(e -> {
 
 				switch (e.get("slot").getAsString()) {
-				case "Slot 1", "Slot 3" -> {
-					assertEquals("Harry", e.get("firstName").getAsString());
-					assertEquals("Barns", e.get("lastName").getAsString());
-					slotsFound.getAndIncrement();
-				}
-				case "Slot 2", "Slot 4", "Slot 5" -> {
-					assertEquals("Geoffrey", e.get("firstName").getAsString());
-					assertEquals("Bobcat", e.get("lastName").getAsString());
-					slotsFound.getAndIncrement();
-				}
-				case "Slot 6" -> {
-					assertEquals("", e.get("firstName").getAsString());
-					slotsFound.getAndIncrement();
-				}
+					case "Slot 1", "Slot 3" -> {
+						assertEquals("Harry", e.get("firstName").getAsString());
+						assertEquals("Barns", e.get("lastName").getAsString());
+						slotsFound.getAndIncrement();
+					}
+					case "Slot 2", "Slot 4", "Slot 5" -> {
+						assertEquals("Geoffrey", e.get("firstName").getAsString());
+						assertEquals("Bobcat", e.get("lastName").getAsString());
+						slotsFound.getAndIncrement();
+					}
+					case "Slot 6" -> {
+						assertEquals("", e.get("firstName").getAsString());
+						slotsFound.getAndIncrement();
+					}
 				}
 			});
 
