@@ -116,7 +116,10 @@ public class InMemoryStrolchDao<T extends StrolchRootElement> implements Strolch
 
 	@Override
 	public T queryBy(String type, String id, int version) throws StrolchPersistenceException {
-		throw new UnsupportedOperationException("Versioning is not supported!");
+		List<T> list = this.elements.getList(type);
+		if (list == null || list.isEmpty())
+			return null;
+		return list.stream().filter(e -> e.getId().equals(id)).findFirst().orElse(null);
 	}
 
 	@Override
@@ -126,7 +129,7 @@ public class InMemoryStrolchDao<T extends StrolchRootElement> implements Strolch
 
 	@Override
 	public int queryLatestVersionFor(String type, String id) throws StrolchPersistenceException {
-		throw new UnsupportedOperationException("Versioning is not supported!");
+		return 0;
 	}
 
 	@Override
