@@ -16,6 +16,7 @@
 package li.strolch.service.api;
 
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.utils.helper.ExceptionHelper.*;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
@@ -39,6 +40,7 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +57,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Called by the {@link ServiceHandler} to set the {@link PrivilegeContext} before this service is performed
 	 *
-	 * @param privilegeContext
-	 * 		the privilegeContext to set
+	 * @param privilegeContext the privilegeContext to set
 	 */
 	public final void setPrivilegeContext(PrivilegeContext privilegeContext) {
 		DBC.PRE.assertNull("PrivilegeContext is already set!", this.privilegeContext);
@@ -85,8 +86,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Called by the {@link ServiceHandler} to set a reference to the {@link ComponentContainer} to be used during
 	 * service execution
 	 *
-	 * @param container
-	 * 		the container to set
+	 * @param container the container to set
 	 */
 	public final void setContainer(ComponentContainer container) {
 		this.container = container;
@@ -123,13 +123,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an
 	 * {@link IllegalArgumentException} is thrown
 	 *
-	 * @param clazz
-	 * 		the type of component to return
+	 * @param clazz the type of component to return
 	 *
 	 * @return the component with the given name
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the component does not exist
+	 * @throws IllegalArgumentException if the component does not exist
 	 */
 	protected final <V> V getComponent(Class<V> clazz) {
 		return this.container.getComponent(clazz);
@@ -138,8 +136,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Returns true if the given component is registered on the {@link ComponentContainer}
 	 *
-	 * @param clazz
-	 * 		the type of component to check for
+	 * @param clazz the type of component to check for
 	 *
 	 * @return true if the component is available
 	 */
@@ -160,13 +157,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Returns the {@link StrolchRealm} with the given name. If the realm does not exist, then a
 	 * {@link StrolchException} is thrown
 	 *
-	 * @param realm
-	 * 		the name of the {@link StrolchRealm} to return
+	 * @param realm the name of the {@link StrolchRealm} to return
 	 *
 	 * @return the {@link StrolchRealm} with the given name
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected final StrolchRealm getRealm(String realm) throws StrolchException {
 		return this.container.getRealm(realm);
@@ -205,13 +200,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Opens a {@link StrolchTransaction} for the given realm, the action for the TX is this implementation's class
 	 * name. This transaction should be used in a try-with-resource clause so it is properly closed
 	 *
-	 * @param realm
-	 * 		the name of the realm to return
+	 * @param realm the name of the realm to return
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm) throws StrolchException {
 		return getRealm(realm).openTx(getCertificate(), getClass(), false);
@@ -221,15 +214,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Opens a {@link StrolchTransaction} for the given realm, the action for the TX is this implementation's class
 	 * name. This transaction should be used in a try-with-resource clause so it is properly closed
 	 *
-	 * @param realm
-	 * 		the name of the realm to return
-	 * @param readOnly
-	 * 		true if this TX is so be read-only
+	 * @param realm    the name of the realm to return
+	 * @param readOnly true if this TX is so be read-only
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm, boolean readOnly) throws StrolchException {
 		return getRealm(realm).openTx(getCertificate(), getClass(), readOnly);
@@ -240,13 +230,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
 	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 *
-	 * @param arg
-	 * 		the {@link ServiceArgument}
+	 * @param arg the {@link ServiceArgument}
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg) throws StrolchException {
 		return openTx(getArgOrUserRealm(arg));
@@ -257,15 +245,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
 	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 *
-	 * @param arg
-	 * 		the {@link ServiceArgument}
-	 * @param readOnly
-	 * 		flag to denote if this TX should be read only
+	 * @param arg      the {@link ServiceArgument}
+	 * @param readOnly flag to denote if this TX should be read only
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, boolean readOnly) throws StrolchException {
 		return openTx(getArgOrUserRealm(arg), readOnly);
@@ -276,15 +261,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
 	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 *
-	 * @param arg
-	 * 		the {@link ServiceArgument}
-	 * @param action
-	 * 		the action to use for the opened TX
+	 * @param arg    the {@link ServiceArgument}
+	 * @param action the action to use for the opened TX
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, String action) throws StrolchException {
 		return openTx(getArgOrUserRealm(arg), action);
@@ -295,17 +277,13 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * realm from the user certificate is used. The action for the TX is this implementation's class name. This
 	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 *
-	 * @param arg
-	 * 		the {@link ServiceArgument}
-	 * @param action
-	 * 		the action to use for the opened TX
-	 * @param readOnly
-	 * 		flag to denote if this TX should be read only
+	 * @param arg      the {@link ServiceArgument}
+	 * @param action   the action to use for the opened TX
+	 * @param readOnly flag to denote if this TX should be read only
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openArgOrUserTx(ServiceArgument arg, String action, boolean readOnly)
 			throws StrolchException {
@@ -316,17 +294,13 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Opens a {@link StrolchTransaction} for the given realm. This transaction should be used in a try-with-resource
 	 * clause so it is properly closed
 	 *
-	 * @param realm
-	 * 		the name of the realm
-	 * @param action
-	 * 		the action to use for the opened TX
-	 * @param readOnly
-	 * 		flag to denote if this TX should be read only
+	 * @param realm    the name of the realm
+	 * @param action   the action to use for the opened TX
+	 * @param readOnly flag to denote if this TX should be read only
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm, String action, boolean readOnly) throws StrolchException {
 		return getRealm(realm).openTx(getCertificate(), action, readOnly);
@@ -336,15 +310,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Opens a {@link StrolchTransaction} for the given realm. This transaction should be used in a try-with-resource
 	 * clause so it is properly closed
 	 *
-	 * @param realm
-	 * 		the name of the realm
-	 * @param action
-	 * 		the action to use for the opened TX
+	 * @param realm  the name of the realm
+	 * @param action the action to use for the opened TX
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openTx(String realm, String action) throws StrolchException {
 		return getRealm(realm).openTx(getCertificate(), action, false);
@@ -357,8 +328,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx() throws StrolchException {
 		return getRealm().openTx(getCertificate(), getClass(), false);
@@ -369,13 +339,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * {@link ComponentContainer#getRealm(Certificate)}, the action for the TX is this implementation's class name. This
 	 * transaction should be used in a try-with-resource clause so it is properly closed
 	 *
-	 * @param readOnly
-	 * 		flag to denote if this TX should be read only
+	 * @param readOnly flag to denote if this TX should be read only
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx(boolean readOnly) throws StrolchException {
 		return getRealm().openTx(getCertificate(), getClass(), readOnly);
@@ -386,13 +354,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * {@link ComponentContainer#getRealm(Certificate)}. This transaction should be used in a try-with-resource clause
 	 * so it is properly closed
 	 *
-	 * @param action
-	 * 		the action to use for the opened TX
+	 * @param action the action to use for the opened TX
 	 *
 	 * @return the open {@link StrolchTransaction}
 	 *
-	 * @throws StrolchException
-	 * 		if the {@link StrolchRealm} does not exist with the given name
+	 * @throws StrolchException if the {@link StrolchRealm} does not exist with the given name
 	 */
 	protected StrolchTransaction openUserTx(String action) throws StrolchException {
 		return getRealm().openTx(getCertificate(), action, false);
@@ -401,15 +367,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link SystemAction} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param action
-	 * 		the action to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param action   the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if the user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAs(String username, SystemAction action) throws PrivilegeException, Exception {
 		getPrivilegeHandler().runAs(username, action);
@@ -418,17 +380,13 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link SystemAction} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param action
-	 * 		the action to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param action   the action to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if the user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <V> V runWithResult(String username, SystemActionWithResult<V> action)
 			throws PrivilegeException, Exception {
@@ -438,15 +396,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param runnable the runnable to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if the user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getPrivilegeHandler().runAs(username, runnable);
@@ -455,17 +409,13 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link PrivilegedRunnableWithResult} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param runnable the runnable to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if the user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <V> V runWithResult(String username, PrivilegedRunnableWithResult<V> runnable)
 			throws PrivilegeException, Exception {
@@ -475,13 +425,10 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param action
-	 * 		the action to perform
+	 * @param action the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if the agent user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(SystemAction action) throws PrivilegeException, Exception {
 		getPrivilegeHandler().runAsAgent(action);
@@ -490,15 +437,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param action
-	 * 		the action to perform
+	 * @param action the action to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if the agent user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <V> V runAsAgentWithResult(SystemActionWithResult<V> action) throws PrivilegeException, Exception {
 		return getPrivilegeHandler().runAsAgentWithResult(action);
@@ -508,13 +452,10 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the action to perform
+	 * @param runnable the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if the agent user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		getPrivilegeHandler().runAsAgent(runnable);
@@ -524,15 +465,12 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the action to perform
+	 * @param runnable the action to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if the agent user does not exist, or is not a system user
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if the agent user does not exist, or is not a system user
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <V> V runAsAgentWithResult(PrivilegedRunnableWithResult<V> runnable)
 			throws PrivilegeException, Exception {
@@ -578,7 +516,7 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 			return result;
 		} catch (Exception e) {
 			U result = getResultInstance();
-			result.setMessage(e.getMessage());
+			result.setMessage(getExceptionMessageWithCauses(e, false));
 
 			Throwable rootCause = getRootCause(e);
 			if (rootCause instanceof StrolchUserMessageException) {
@@ -622,13 +560,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 * Internal method to perform the {@link Service}. The implementor does not need to handle exceptions as this is
 	 * done in the {@link #doService(ServiceArgument)} which calls this method
 	 *
-	 * @param arg
-	 * 		the {@link ServiceArgument} containing the arguments to perform the concrete service
+	 * @param arg the {@link ServiceArgument} containing the arguments to perform the concrete service
 	 *
 	 * @return a {@link ServiceResult} which denotes the execution state of this {@link Service}
 	 *
-	 * @throws Exception
-	 * 		if something went wrong. The caller will catch and handle the {@link ServiceResult}
+	 * @throws Exception if something went wrong. The caller will catch and handle the {@link ServiceResult}
 	 */
 	protected abstract U internalDoService(T arg) throws Exception;
 
