@@ -31,11 +31,17 @@ import li.strolch.privilege.model.RoleRep;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.search.StrolchValueSearch;
+import li.strolch.search.ValueSearch;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.privilege.roles.*;
+import li.strolch.utils.helper.StringHelper;
 
 import static java.util.Comparator.comparing;
+import static java.util.stream.Stream.concat;
+import static java.util.stream.Stream.of;
 import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_ROLE;
+import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -55,7 +61,7 @@ public class PrivilegeRolesResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRoles(@Context HttpServletRequest request) {
+	public Response getRoles(@Context HttpServletRequest request, @QueryParam("query") String query) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
@@ -63,11 +69,23 @@ public class PrivilegeRolesResource {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_ROLE);
 
 			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
-			JsonArray rolesJ = privilegeHandler.getRoles(cert).stream() //
-					.sorted(comparing(roleRep -> roleRep.getName().toLowerCase())) //
-					.collect(JsonArray::new, //
-							(array, role) -> array.add(role.accept(visitor)), //
-							JsonArray::addAll);
+			ValueSearch<RoleRep> search = new StrolchValueSearch<>();
+			if (StringHelper.isNotEmpty(query)) {
+				String[] parts = query.split(" ");
+				search = search.where(containsIgnoreCase(RoleRep::getName, parts).or(containsIgnoreCase(r -> r
+						.getPrivileges()
+						.values()
+						.stream()
+						.flatMap(f -> concat(concat(of(f.getName()), f.getAllowList().stream()),
+								f.getDenyList().stream()))
+						.toList(), parts)));
+			}
+
+			JsonArray rolesJ = search
+					.search(privilegeHandler.getRoles(cert))
+					.asStream()
+					.sorted(comparing(roleRep -> roleRep.getName().toLowerCase()))
+					.collect(JsonArray::new, (array, role) -> array.add(role.accept(visitor)), JsonArray::addAll);
 
 			return Response.ok(rolesJ.toString(), MediaType.APPLICATION_JSON).build();
 		}
@@ -84,7 +102,8 @@ public class PrivilegeRolesResource {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_ROLE);
 
 			RoleRep role = privilegeHandler.getRole(cert, roleName);
-			return Response.ok(role.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
+			return Response
+					.ok(role.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
 					.build();
 		}
 	}
@@ -148,8 +167,9 @@ public class PrivilegeRolesResource {
 	private Response handleServiceResult(PrivilegeRoleResult svcResult) {
 		if (svcResult.isOk()) {
 			RoleRep roleRep = svcResult.getRole();
-			return Response.ok(roleRep.accept(new PrivilegeElementToJsonVisitor()).toString(),
-					MediaType.APPLICATION_JSON).build();
+			return Response
+					.ok(roleRep.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
+					.build();
 		}
 		return ResponseUtil.toResponse(svcResult);
 	}
