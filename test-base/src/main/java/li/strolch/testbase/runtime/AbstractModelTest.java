@@ -129,4 +129,10 @@ public abstract class AbstractModelTest {
 		VersioningTestRunner testRunner = new VersioningTestRunner(getRuntimeMock());
 		testRunner.runTestsForVersioning();
 	}
+
+	@Test
+	public void shouldTestDataArchive() throws Exception {
+		DataArchiveTestRunner testRunner = new DataArchiveTestRunner(getRuntimeMock(), this.realmName);
+		testRunner.runTestsForDataArchive();
+	}
 }

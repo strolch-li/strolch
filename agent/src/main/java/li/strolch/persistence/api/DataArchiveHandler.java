@@ -18,21 +18,23 @@ package li.strolch.persistence.api;
 import java.sql.Connection;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface DataArchiveHandler {
 
-	void run(StrolchTransaction tx, BiConsumer<Connection, TransactionResult> runnable);
+	void run(StrolchTransaction tx, Consumer<ArchiveTransaction> runnable);
 
-	<T> T runWithResult(StrolchTransaction tx, BiFunction<Connection, TransactionResult, T> runnable);
+	<T> T runWithResult(StrolchTransaction tx, Function<ArchiveTransaction, T> runnable);
 
-	Connection getConnection(StrolchTransaction tx);
+	ArchiveTransaction openArchiveTx(StrolchTransaction tx);
 
-	OrderDao getOrderDao(Connection connection, TransactionResult txResult);
+	OrderDao getOrderDao(ArchiveTransaction archiveTx);
 
-	ResourceDao getResourceDao(Connection connection, TransactionResult txResult);
+	ResourceDao getResourceDao(ArchiveTransaction archiveTx);
 
-	ActivityDao getActivityDao(Connection connection, TransactionResult txResult);
+	ActivityDao getActivityDao(ArchiveTransaction archiveTx);
 }

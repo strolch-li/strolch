@@ -15,8 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.sql.Connection;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.*;
@@ -24,22 +22,29 @@ import li.strolch.privilege.model.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+
 public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	private static final Logger logger = LoggerFactory.getLogger(PostgreSqlStrolchTransaction.class);
 	private final PostgreSqlPersistenceHandler persistenceHandler;
+	private final Connection connection;
 
 	private PostgreSqlOrderDao orderDao;
 	private PostgreSqlResourceDao resourceDao;
 	private PostgreSqlActivityDao activityDao;
 	private PostgreSqlLogMessageDao logMessageDao;
 	private AuditDao auditDao;
-	private Connection connection;
 
 	public PostgreSqlStrolchTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate,
-			String action, boolean readOnly, PostgreSqlPersistenceHandler persistenceHandler) {
+			String action, boolean readOnly, PostgreSqlPersistenceHandler persistenceHandler, Connection connection) {
 		super(container, realm, certificate, action, readOnly);
 		this.persistenceHandler = persistenceHandler;
+		this.connection = connection;
+	}
+
+	private DataType getDataType() {
+		return this.persistenceHandler.getDataType();
 	}
 
 	@Override
@@ -65,7 +70,7 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 				try {
 					this.connection.close();
 				} catch (Exception e) {
-					logger.error("Failed to close connection due to " + e.getMessage(), e);
+					logger.error("Failed to close connection due to {}", e.getMessage(), e);
 				}
 			}
 		}
@@ -81,22 +86,22 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 
 	OrderDao getOrderDao() {
 		if (this.orderDao == null)
-			this.orderDao = new PostgreSqlOrderDao(this.persistenceHandler.getDataType(), getConnection(),
-					getTxResult(), isVersioningEnabled());
+			this.orderDao = new PostgreSqlOrderDao(getDataType(), this.connection, getTxResult(),
+					isVersioningEnabled());
 		return this.orderDao;
 	}
 
 	ResourceDao getResourceDao() {
 		if (this.resourceDao == null)
-			this.resourceDao = new PostgreSqlResourceDao(this.persistenceHandler.getDataType(), getConnection(),
-					getTxResult(), isVersioningEnabled());
+			this.resourceDao = new PostgreSqlResourceDao(getDataType(), this.connection, getTxResult(),
+					isVersioningEnabled());
 		return this.resourceDao;
 	}
 
 	ActivityDao getActivityDao() {
 		if (this.activityDao == null)
-			this.activityDao = new PostgreSqlActivityDao(this.persistenceHandler.getDataType(), getConnection(),
-					getTxResult(), isVersioningEnabled());
+			this.activityDao = new PostgreSqlActivityDao(getDataType(), this.connection, getTxResult(),
+					isVersioningEnabled());
 		return this.activityDao;
 	}
 
@@ -113,8 +118,6 @@ public class PostgreSqlStrolchTransaction extends AbstractTransaction {
 	}
 
 	Connection getConnection() {
-		if (this.connection == null)
-			this.connection = this.persistenceHandler.getConnection(getRealm().getRealm());
 		return this.connection;
 	}
 

@@ -1,6 +1,11 @@
 package li.strolch.persistence.postgresql;
 
-import static li.strolch.utils.helper.StringHelper.commaSeparated;
+import li.strolch.model.Locator;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
+import li.strolch.persistence.api.LogMessageDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,12 +16,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
-import li.strolch.model.Locator;
-import li.strolch.persistence.api.LogMessageDao;
-import li.strolch.persistence.api.StrolchPersistenceException;
+import static li.strolch.utils.helper.StringHelper.commaSeparated;
 
 public class PostgreSqlLogMessageDao implements LogMessageDao {
 
@@ -32,18 +32,21 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	private static final String STACK_TRACE = "stacktrace";
 	private static final String STATE = "state";
 
-	private static final String FIELDS = commaSeparated(ID, REALM, DATE_TIME, USERNAME, SEVERITY, STATE, LOCATOR, BUNDLE, KEY,
-			MESSAGE, STACK_TRACE);
+	private static final String FIELDS = commaSeparated(ID, REALM, DATE_TIME, USERNAME, SEVERITY, STATE, LOCATOR,
+			BUNDLE, KEY, MESSAGE, STACK_TRACE);
 
-	private static final String queryByRealmMaxSql =
-			"select " + FIELDS + " from operations_log where realm = ? order by id desc limit ?";
+	private static final String queryByRealmMaxSql = "select "
+			+ FIELDS
+			+ " from operations_log where realm = ? order by id desc limit ?";
 	private static final String queryValuesSql = "select key, value from operations_log_values where id = ?";
 
-	private static final String insertLogMessageSql = "insert into operations_log (" + FIELDS
+	private static final String insertLogMessageSql = "insert into operations_log ("
+			+ FIELDS
 			+ ") values (?, ?, ?, ?, ?::log_severity_type, ?::log_state_type, ?, ?, ?, ?, ?)";
 	private static final String insertValuesSql = "insert into operations_log_values (id, key, value) values (?, ?, ?)";
 
-	private static final String updateLogMessageStateSql = "update operations_log set state = ?::log_state_type where id = ?";
+	private static final String updateLogMessageStateSql
+			= "update operations_log set state = ?::log_state_type where id = ?";
 
 	private static final String removeSql = "delete from operations_log where id = ?";
 	private static final String removeValuesSql = "delete from operations_log_values where id = ?";
@@ -58,7 +61,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	public List<LogMessage> queryLatest(String realm, int maxNr) {
 
 		try (PreparedStatement queryMsgStatement = this.tx.getConnection().prepareStatement(queryByRealmMaxSql);
-				PreparedStatement queryValuesStatement = this.tx.getConnection().prepareStatement(queryValuesSql)) {
+			 PreparedStatement queryValuesStatement = this.tx.getConnection().prepareStatement(queryValuesSql)) {
 
 			queryMsgStatement.setString(1, realm);
 			queryMsgStatement.setInt(2, maxNr);
@@ -87,15 +90,15 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	@Override
 	public void save(LogMessage logMessage) {
 		try (PreparedStatement insertStatement = this.tx.getConnection().prepareStatement(insertLogMessageSql);
-				PreparedStatement valuesStatement = this.tx.getConnection().prepareStatement(insertValuesSql)) {
+			 PreparedStatement valuesStatement = this.tx.getConnection().prepareStatement(insertValuesSql)) {
 
 			// insert log message
 			setLogMessageFields(logMessage, insertStatement);
 			int count = insertStatement.executeUpdate();
 			if (count != 1) {
-				throw new StrolchPersistenceException(MessageFormat
-						.format("Expected to insert 1 log_message record, but inserted {0} for LogMessage {1}", count,
-								logMessage.getId()));
+				throw new StrolchPersistenceException(MessageFormat.format(
+						"Expected to insert 1 log_message record, but inserted {0} for LogMessage {1}", count,
+						logMessage.getId()));
 			}
 
 			int nrOfInserts = setValues(logMessage, valuesStatement);
@@ -126,8 +129,8 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update LogMessage state {0} due to {1}", logMessage.getId(),
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update LogMessage state {0} due to {1}", logMessage.getId(),
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -148,8 +151,8 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			ps.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to update states for {0} LogMessages due to {1}", logMessages.size(),
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to update states for {0} LogMessages due to {1}", logMessages.size(),
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -157,20 +160,21 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	@Override
 	public void remove(LogMessage logMessage) {
 		try (PreparedStatement removeStatement = this.tx.getConnection().prepareStatement(removeSql);
-				PreparedStatement removeValuesStatement = this.tx.getConnection().prepareStatement(removeValuesSql)) {
+			 PreparedStatement removeValuesStatement = this.tx.getConnection().prepareStatement(removeValuesSql)) {
 
 			remove(removeStatement, removeValuesStatement, logMessage);
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {1}",
-					logMessage.getId(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove {0} due to {1}", logMessage.getId(),
+							e.getLocalizedMessage()), e);
 		}
 	}
 
 	@Override
 	public void removeAll(List<LogMessage> logMessages) {
 		try (PreparedStatement removeStatement = this.tx.getConnection().prepareStatement(removeSql);
-				PreparedStatement removeValuesStatement = this.tx.getConnection().prepareStatement(removeValuesSql)) {
+			 PreparedStatement removeValuesStatement = this.tx.getConnection().prepareStatement(removeValuesSql)) {
 
 			int nrOfRemoves = 0;
 			int[] nrOfValueRemoves = new int[logMessages.size()];
@@ -194,7 +198,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			for (int count : countAll) {
 				if (count != 1) {
 					String msg = "Expected to delete 1 LogMessages per delete statement but deleted {0} elements!";
-					msg = MessageFormat.format(msg, nrOfRemoves, count);
+					msg = MessageFormat.format(msg, count);
 					throw new StrolchPersistenceException(msg);
 				}
 			}
@@ -242,16 +246,16 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 	private void validateValuesStatement(LogMessage logMessage, int nrOfInserts, int[] ints) {
 		if (ints.length != nrOfInserts) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Expected to insert {0} value record, but inserted {1} for LogMessage {2}", nrOfInserts,
-							ints.length, logMessage.getId()));
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Expected to insert {0} value record, but inserted {1} for LogMessage {2}",
+							nrOfInserts, ints.length, logMessage.getId()));
 		}
 
 		for (int i = 0; i < ints.length; i++) {
 			if (ints[i] != 1) {
-				throw new StrolchPersistenceException(MessageFormat
-						.format("Expected to insert 1 record per value, but inserted {0} for value at index {1} for LogMessage {2}",
-								ints[i], i, logMessage.getId()));
+				throw new StrolchPersistenceException(MessageFormat.format(
+						"Expected to insert 1 record per value, but inserted {0} for value at index {1} for LogMessage {2}",
+						ints[i], i, logMessage.getId()));
 			}
 		}
 	}

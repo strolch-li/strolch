@@ -15,14 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import static li.strolch.db.DbConstants.*;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.text.MessageFormat;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -36,6 +28,14 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import org.postgresql.Driver;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.text.MessageFormat;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static li.strolch.db.DbConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -65,16 +65,15 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	}
 
 	@Override
-	public void initialize(ComponentConfiguration componentConfiguration) throws Exception {
+	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		if (!Driver.isRegistered())
 			Driver.register();
 
-		DbConnectionBuilder connectionBuilder = new PostgreSqlDbConnectionBuilder(getContainer(),
-				componentConfiguration);
+		DbConnectionBuilder connectionBuilder = new PostgreSqlDbConnectionBuilder(getContainer(), configuration);
 		this.dsMap = connectionBuilder.build();
-		this.dataType = DataType.valueOf(componentConfiguration.getString(PROP_DATA_TYPE, DATA_TYPE_XML).toLowerCase());
-		super.initialize(componentConfiguration);
+		this.dataType = DataType.valueOf(configuration.getString(PROP_DATA_TYPE, DATA_TYPE_XML).toLowerCase());
+		super.initialize(configuration);
 	}
 
 	@Override
@@ -109,8 +108,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 			logger.info("Data Initialization not enabled as 'allowDataInitOnSchemaCreate' is false!");
 		} else {
 			Map<String, DbMigrationState> dbMigrationStates = schemaVersionCheck.getDbMigrationStates();
-			String msg = "Data Initialization is enabled, checking for {0} realms if DB initialization is required...";
-			logger.info(MessageFormat.format(msg, dbMigrationStates.size()));
+			logger.info("Data Initialization is enabled, checking for {} realms if DB initialization is required...",
+					dbMigrationStates.size());
 			PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler();
 			StrolchAgent agent = getContainer().getAgent();
 			PostgreSqlSchemaInitializer schemaInitializer = new PostgreSqlSchemaInitializer(agent, this,
@@ -138,14 +137,14 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action, boolean readOnly) {
-		return new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, this);
+		Connection connection = getConnection(realm.getRealm());
+		return new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, this, connection);
 	}
 
 	public Connection getConnection(String realm) {
 		DataSource ds = this.dsMap.get(realm);
 		if (ds == null) {
-			String msg = MessageFormat.format("There is no DataSource registered for the realm {0}",
-					realm);
+			String msg = MessageFormat.format("There is no DataSource registered for the realm {0}", realm);
 			throw new StrolchPersistenceException(msg);
 		}
 

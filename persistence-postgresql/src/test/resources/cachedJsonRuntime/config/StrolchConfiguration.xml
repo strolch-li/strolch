@@ -42,6 +42,12 @@
 			</Properties>
 		</Component>
 		<Component>
+			<name>DataArchiveHandler</name>
+			<api>li.strolch.persistence.api.DataArchiveHandler</api>
+			<impl>li.strolch.persistence.postgresql.PostgreSqlDataArchiveHandler</impl>
+			<depends>PersistenceHandler</depends>
+		</Component>
+		<Component>
 			<name>OperationsLog</name>
 			<api>li.strolch.handler.operationslog.OperationsLog</api>
 			<impl>li.strolch.handler.operationslog.OperationsLog</impl>

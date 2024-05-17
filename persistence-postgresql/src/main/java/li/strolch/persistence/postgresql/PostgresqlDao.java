@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Version;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.persistence.api.StrolchDao;

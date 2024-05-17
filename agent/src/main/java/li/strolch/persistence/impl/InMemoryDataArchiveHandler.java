@@ -1,12 +1,11 @@
 package li.strolch.persistence.impl;
 
-import java.sql.Connection;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.persistence.api.*;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class InMemoryDataArchiveHandler extends StrolchComponent implements DataArchiveHandler {
 
@@ -15,32 +14,40 @@ public class InMemoryDataArchiveHandler extends StrolchComponent implements Data
 	}
 
 	@Override
-	public void run(StrolchTransaction tx, BiConsumer<Connection, TransactionResult> runnable) {
-		runnable.accept(null, null);
+	public void run(StrolchTransaction tx, Consumer<ArchiveTransaction> runnable) {
+		try (ArchiveTransaction archiveTx = openArchiveTx(tx)) {
+			runnable.accept(archiveTx);
+		} catch (Exception e) {
+			throw new StrolchPersistenceException("InMemory archive action failed", e);
+		}
 	}
 
 	@Override
-	public <T> T runWithResult(StrolchTransaction tx, BiFunction<Connection, TransactionResult, T> runnable) {
-		return runnable.apply(null, null);
+	public <T> T runWithResult(StrolchTransaction tx, Function<ArchiveTransaction, T> runnable) {
+		try (ArchiveTransaction archiveTx = openArchiveTx(tx)) {
+			return runnable.apply(archiveTx);
+		} catch (Exception e) {
+			throw new StrolchPersistenceException("InMemory archive action failed", e);
+		}
 	}
 
 	@Override
-	public Connection getConnection(StrolchTransaction tx) {
-		return null;
+	public ArchiveTransaction openArchiveTx(StrolchTransaction tx) {
+		return new InMemoryArchiveTransaction(tx, this);
 	}
 
 	@Override
-	public OrderDao getOrderDao(Connection connection, TransactionResult txResult) {
+	public OrderDao getOrderDao(ArchiveTransaction archiveTx) {
 		return new InMemoryOrderDao();
 	}
 
 	@Override
-	public ResourceDao getResourceDao(Connection connection, TransactionResult txResult) {
+	public ResourceDao getResourceDao(ArchiveTransaction archiveTx) {
 		return new InMemoryResourceDao();
 	}
 
 	@Override
-	public ActivityDao getActivityDao(Connection connection, TransactionResult txResult) {
+	public ActivityDao getActivityDao(ArchiveTransaction archiveTx) {
 		return new InMemoryActivityDao();
 	}
 }

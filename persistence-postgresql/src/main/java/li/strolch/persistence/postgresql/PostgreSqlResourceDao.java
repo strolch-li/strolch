@@ -80,7 +80,7 @@ public class PostgreSqlResourceDao extends PostgresqlDao<Resource> implements Re
 			throw new StrolchPersistenceException(
 					MessageFormat.format("Multiple Resources parsed from sqlxml value for {0} / {1}", id, type));
 
-		return listener.getResources().get(0);
+		return listener.getResources().getFirst();
 	}
 
 	@Override
