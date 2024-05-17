@@ -82,7 +82,7 @@ public class PrivilegeContextBuilder {
 		for (String groupName : this.userGroups) {
 			Group group = this.persistenceHandler.getGroup(groupName);
 			if (group == null) {
-				logger.error("Group " + groupName + " does not exist!");
+				logger.error("Group {} does not exist!", groupName);
 				continue;
 			}
 			Map<String, String> groupProperties = group.getProperties();
@@ -100,7 +100,7 @@ public class PrivilegeContextBuilder {
 		for (String roleName : roles) {
 			Role role = this.persistenceHandler.getRole(roleName);
 			if (role == null) {
-				logger.error("Role " + roleName + " does not exist for user " + userName);
+				logger.error("Role {} does not exist for user {}", roleName, userName);
 			} else {
 				addPrivilegesForRole(userName, role, privileges, policies);
 			}

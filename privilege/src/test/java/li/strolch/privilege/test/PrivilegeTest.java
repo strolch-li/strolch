@@ -214,9 +214,9 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			}
 		});
 		MatcherAssert.assertThat(exception.getMessage(), containsString(
-				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction with value " +
-						"li.strolch.privilege.test.model.TestSystemUserActionDeny needed for Restrictable " +
-						"li.strolch.privilege.test.model.TestSystemUserActionDeny"));
+				"User system_admin2 does not have the privilege li.strolch.privilege.handler.SystemAction with value "
+						+ "li.strolch.privilege.test.model.TestSystemUserActionDeny needed for Restrictable "
+						+ "li.strolch.privilege.test.model.TestSystemUserActionDeny"));
 	}
 
 	/**
@@ -305,7 +305,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			UserRep selectorRep = new UserRep(null, ADMIN, null, null, null, null, null, null, null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
-			assertEquals(ADMIN, users.get(0).getUsername());
+			assertEquals(ADMIN, users.getFirst().getUsername());
 
 		} finally {
 			logout();
@@ -322,7 +322,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			UserRep selectorRep = new UserRep(null, null, null, null, null, Set.of("GroupA"), null, null, null, null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(1, users.size());
-			assertEquals(ADMIN, users.get(0).getUsername());
+			assertEquals(ADMIN, users.getFirst().getUsername());
 
 		} finally {
 			logout();
@@ -340,7 +340,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 					null);
 			List<UserRep> users = this.privilegeHandler.queryUsers(certificate, selectorRep);
 			assertEquals(2, users.size());
-			assertEquals(ADMIN, users.get(0).getUsername());
+			assertEquals(ADMIN, users.getFirst().getUsername());
 
 		} finally {
 			logout();
@@ -370,10 +370,10 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			try {
 				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 				Certificate certificate = this.ctx.getCertificate();
-				PrivilegeRep privilegeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_ACTION, "DefaultPrivilege",
-						true, Set.of(), Set.of());
+				Privilege privilege = new Privilege(PrivilegeHandler.PRIVILEGE_ACTION, "DefaultPrivilege", true,
+						Set.of(), Set.of());
 				RoleRep role = this.privilegeHandler.getRole(certificate, ROLE_APP_USER);
-				role.addPrivilege(privilegeRep);
+				role.addPrivilege(privilege);
 				this.privilegeHandler.replaceRole(certificate, role);
 			} finally {
 				logout();
@@ -406,8 +406,13 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	@Test
 	public void shouldSetPasswordWithChallenge() {
 		this.privilegeHandler.initiateChallengeFor(Usage.SET_PASSWORD, ADMIN);
-		UserChallenge userChallenge = TestUserChallengeHandler.getInstance().getChallenges().values().stream()
-				.filter(u -> u.getUser().getUsername().equals(ADMIN)).findFirst()
+		UserChallenge userChallenge = TestUserChallengeHandler
+				.getInstance()
+				.getChallenges()
+				.values()
+				.stream()
+				.filter(u -> u.getUser().getUsername().equals(ADMIN))
+				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("Missing admin user!"));
 		Certificate certificate = this.privilegeHandler.validateChallenge(ADMIN, userChallenge.getChallenge());
 		this.privilegeHandler.setUserPassword(certificate, ADMIN, ArraysHelper.copyOf(PASS_TED));
@@ -563,14 +568,14 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// add role user
 			login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
-			PrivilegeRep passwordRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD,
-					PRIVILEGE_USER_ACCESS, false, Set.of(), Set.of());
-			PrivilegeRep localeRep = new PrivilegeRep(PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE, PRIVILEGE_USER_ACCESS,
+			Privilege password = new Privilege(PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD, PRIVILEGE_USER_ACCESS,
 					false, Set.of(), Set.of());
+			Privilege locale = new Privilege(PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE, PRIVILEGE_USER_ACCESS, false,
+					Set.of(), Set.of());
 
-			Map<String, PrivilegeRep> privileges = new HashMap<>();
-			privileges.put(passwordRep.getName(), passwordRep);
-			privileges.put(localeRep.getName(), localeRep);
+			Map<String, Privilege> privileges = new HashMap<>();
+			privileges.put(password.getName(), password);
+			privileges.put(locale.getName(), locale);
 			RoleRep roleRep = new RoleRep(ROLE_CHANGE_PW, privileges);
 
 			Certificate certificate = this.ctx.getCertificate();
@@ -626,9 +631,9 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			fail("Should fail as bob does not have role app");
 		} catch (AccessDeniedException e) {
 			String msg =
-					"User bob does not have the privilege li.strolch.privilege.test.model.TestRestrictable needed for " +
-							"Restrictable li.strolch.privilege.test.model.TestRestrictable and value " +
-							"li.strolch.privilege.test.model.TestRestrictable";
+					"User bob does not have the privilege li.strolch.privilege.test.model.TestRestrictable needed for "
+							+ "Restrictable li.strolch.privilege.test.model.TestRestrictable and value "
+							+ "li.strolch.privilege.test.model.TestRestrictable";
 			assertEquals(msg, e.getLocalizedMessage());
 		} finally {
 			logout();

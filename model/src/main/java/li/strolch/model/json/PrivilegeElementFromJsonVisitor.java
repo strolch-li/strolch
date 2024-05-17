@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import li.strolch.privilege.model.PrivilegeRep;
+import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.RoleRep;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
@@ -21,8 +21,8 @@ public class PrivilegeElementFromJsonVisitor {
 		return roleRepFromJson(JsonParser.parseString(string).getAsJsonObject());
 	}
 
-	public PrivilegeRep privilegeRepFromJson(String string) {
-		return privilegeRepFromJson(JsonParser.parseString(string).getAsJsonObject());
+	public Privilege privilegeFromJson(String string) {
+		return privilegeFromJson(JsonParser.parseString(string).getAsJsonObject());
 	}
 
 	public RoleRep roleRepFromJson(JsonObject jsonObject) {
@@ -32,11 +32,11 @@ public class PrivilegeElementFromJsonVisitor {
 
 		String name = nameE == null ? null : nameE.getAsString().trim();
 
-		Map<String, PrivilegeRep> privileges = new HashMap<>();
+		Map<String, Privilege> privileges = new HashMap<>();
 		if (privilegesE != null) {
 			JsonArray privilegesArr = privilegesE.getAsJsonArray();
 			for (JsonElement privilegeE : privilegesArr) {
-				PrivilegeRep privilegeRep = privilegeRepFromJson(privilegeE.getAsJsonObject());
+				Privilege privilegeRep = privilegeFromJson(privilegeE.getAsJsonObject());
 				privileges.put(privilegeRep.getName(), privilegeRep);
 			}
 		}
@@ -44,7 +44,7 @@ public class PrivilegeElementFromJsonVisitor {
 		return new RoleRep(name, privileges);
 	}
 
-	public PrivilegeRep privilegeRepFromJson(JsonObject privilegeJ) {
+	public Privilege privilegeFromJson(JsonObject privilegeJ) {
 
 		JsonElement privilegeNameE = privilegeJ.get("name");
 		JsonElement policyE = privilegeJ.get("policy");
@@ -72,7 +72,7 @@ public class PrivilegeElementFromJsonVisitor {
 			}
 		}
 
-		return new PrivilegeRep(privilegeName, policy, allAllowed, denyList, allowList);
+		return new Privilege(privilegeName, policy, allAllowed, denyList, allowList);
 	}
 
 	public UserRep userRepFromJson(JsonObject jsonObject) {

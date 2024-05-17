@@ -19,7 +19,6 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.utils.dbc.DBC;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 public class RoleRep {
 
 	private String name;
-	private Map<String, PrivilegeRep> privileges;
+	private Map<String, Privilege> privileges;
 
 	private boolean readOnly;
 
@@ -46,7 +45,7 @@ public class RoleRep {
 	 * @param name       the name of this role
 	 * @param privileges the list of privileges granted to this role
 	 */
-	public RoleRep(String name, Map<String, PrivilegeRep> privileges) {
+	public RoleRep(String name, Map<String, Privilege> privileges) {
 		this.name = trimOrEmpty(name);
 		setPrivileges(privileges == null ? Map.of() : privileges);
 	}
@@ -74,16 +73,6 @@ public class RoleRep {
 	public void validate() {
 		if (isEmpty(this.name))
 			throw new PrivilegeException("name is null");
-
-		for (PrivilegeRep privilege : this.privileges.values()) {
-			try {
-				privilege.validate();
-			} catch (Exception e) {
-				String msg = "Privilege {0} is invalid on role {1}";
-				msg = MessageFormat.format(msg, privilege.getName(), this.name);
-				throw new PrivilegeException(msg, e);
-			}
-		}
 	}
 
 	/**
@@ -101,22 +90,22 @@ public class RoleRep {
 		this.name = trimOrEmpty(name);
 	}
 
-	public Map<String, PrivilegeRep> getPrivileges() {
+	public Map<String, Privilege> getPrivileges() {
 		if (this.privileges == null)
 			return null;
 		return this.privileges;
 	}
 
-	public void setPrivileges(Map<String, PrivilegeRep> privileges) {
+	public void setPrivileges(Map<String, Privilege> privileges) {
 		assertNotReadonly();
 		DBC.PRE.assertNotNull("privileges must not be null!", privileges);
 		this.privileges = new HashMap<>(privileges);
 	}
 
-	public void addPrivilege(PrivilegeRep privilegeRep) {
-		DBC.PRE.assertFalse(() -> "Privilege " + privilegeRep.getName() + " already on role " + this.name,
-				privileges.containsKey(privilegeRep.getName()));
-		this.privileges.put(privilegeRep.getName(), privilegeRep);
+	public void addPrivilege(Privilege privilege) {
+		DBC.PRE.assertFalse(() -> "Privilege " + privilege.getName() + " already on role " + this.name,
+				privileges.containsKey(privilege.getName()));
+		this.privileges.put(privilege.getName(), privilege);
 	}
 
 	/**

@@ -20,7 +20,6 @@ import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.dbc.DBC;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -55,14 +54,6 @@ public record Privilege(String name, String policy, boolean allAllowed, Set<Stri
 		this.policy = policy;
 		this.denyList = Set.copyOf(denyList);
 		this.allowList = Set.copyOf(allowList);
-	}
-
-	/**
-	 * @return a {@link PrivilegeRep} which is a representation of this object used to serialize and view on clients
-	 */
-	public PrivilegeRep asPrivilegeRep() {
-		return new PrivilegeRep(this.name, this.policy, this.allAllowed, new HashSet<>(this.denyList),
-				new HashSet<>(this.allowList));
 	}
 
 	public String getName() {
@@ -128,13 +119,7 @@ public record Privilege(String name, String policy, boolean allAllowed, Set<Stri
 		return this.name.equals(other.name);
 	}
 
-	/**
-	 * Constructs a {@link Privilege} from the {@link PrivilegeRep}
-	 *
-	 * @param privilegeRep the {@link PrivilegeRep} from which to create the {@link Privilege}
-	 */
-	public static Privilege of(PrivilegeRep privilegeRep) {
-		return new Privilege(privilegeRep.getName(), privilegeRep.getPolicy(), privilegeRep.isAllAllowed(),
-				privilegeRep.getDenyList(), privilegeRep.getAllowList());
+	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
+		return visitor.visitPrivilegeRep(this);
 	}
 }
