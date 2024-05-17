@@ -72,9 +72,22 @@ public class PrivilegeContextBuilder {
 		return new PrivilegeContext(userRep, certificate, privileges, policies);
 	}
 
+	public UserPrivileges buildUserPrivilege(UserRep userRep) {
+		this.userRoles = streamAllRolesForUser(this.persistenceHandler, userRep)
+				.sorted()
+				.collect(toCollection(TreeSet::new));
+
+		// cache the privileges and policies for this user by role
+		Map<String, Privilege> privileges = new HashMap<>();
+		addPrivilegesForRoles(this.userRoles, userRep.getUsername(), privileges, new HashMap<>());
+
+		return new UserPrivileges(userRep, List.copyOf(privileges.values()));
+	}
+
 	private void prepare(User user) {
 		this.userGroups = user.getGroups().stream().sorted().collect(toCollection(TreeSet::new));
-		this.userRoles = streamAllRolesForUser(this.persistenceHandler, user).sorted()
+		this.userRoles = streamAllRolesForUser(this.persistenceHandler, user)
+				.sorted()
 				.collect(toCollection(TreeSet::new));
 		this.userProperties = new HashMap<>(user.getProperties());
 

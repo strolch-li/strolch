@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
+import static li.strolch.privilege.handler.DefaultPrivilegeHandler.*;
 import static li.strolch.utils.helper.StringHelper.*;
 
 public class PrivilegeCrudHandler {
@@ -39,14 +40,13 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_ROLE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_ROLE);
 
 		Role role = this.persistenceHandler.getRole(roleName);
 		if (role == null)
 			return null;
 
-		prvCtx.validateAction(
-				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_GET_ROLE, new Tuple(null, role)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role)));
 
 		return role.asRoleRep();
 	}
@@ -55,14 +55,13 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_USER);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER);
 
 		User user = this.persistenceHandler.getUser(username);
 		if (user == null)
 			return null;
 
-		prvCtx.validateAction(
-				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_GET_USER, new Tuple(null, user)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user)));
 		return user.asUserRep();
 	}
 
@@ -70,8 +69,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_ACTION,
-				DefaultPrivilegeHandler.PRIVILEGE_ACTION_GET_POLICIES));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ACTION, PRIVILEGE_ACTION_GET_POLICIES));
 
 		Map<String, String> policyDef = new HashMap<>(this.policyMap.size());
 		for (Map.Entry<String, Class<PrivilegePolicy>> entry : this.policyMap.entrySet()) {
@@ -84,13 +82,13 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_ROLE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_ROLE);
 
 		Stream<Role> rolesStream = this.persistenceHandler.getAllRoles().stream();
 
 		// validate access to each role
-		rolesStream = rolesStream.filter(role -> prvCtx.hasPrivilege(
-				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_GET_ROLE, new Tuple(null, role))));
+		rolesStream = rolesStream.filter(
+				role -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role))));
 
 		return rolesStream.map(Role::asRoleRep).collect(Collectors.toList());
 	}
@@ -99,13 +97,13 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_USER);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER);
 
 		Stream<User> usersStream = this.persistenceHandler.getAllUsers().stream();
 
 		// validate access to each user
-		usersStream = usersStream.filter(user -> prvCtx.hasPrivilege(
-				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_GET_USER, new Tuple(null, user))));
+		usersStream = usersStream.filter(
+				user -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user))));
 
 		return usersStream.map(User::asUserRep).collect(Collectors.toList());
 	}
@@ -114,7 +112,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_GET_USER);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER);
 
 		String selUserId = selectorRep.getUserId();
 		String selUsername = selectorRep.getUsername();
@@ -130,8 +128,7 @@ public class PrivilegeCrudHandler {
 		List<User> allUsers = this.persistenceHandler.getAllUsers();
 		for (User user : allUsers) {
 
-			if (!prvCtx.hasPrivilege(
-					new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_GET_USER, new Tuple(null, user))))
+			if (!prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user))))
 				continue;
 
 			// selections
@@ -252,7 +249,7 @@ public class PrivilegeCrudHandler {
 
 			// validate user actually has this type of privilege
 			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_USER);
+			prvCtx.assertHasPrivilege(PRIVILEGE_ADD_USER);
 
 			// make sure userId is not set
 			if (isNotEmpty(userRepParam.getUserId()))
@@ -298,14 +295,13 @@ public class PrivilegeCrudHandler {
 			assertNoPrivilegeConflict(newUser);
 
 			// validate this user may create such a user
-			prvCtx.validateAction(
-					new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_ADD_USER, new Tuple(null, newUser)));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_USER, new Tuple(null, newUser)));
 
 			// delegate to persistence handler
 			this.persistenceHandler.addUser(newUser);
 			this.privilegeHandler.persistModelAsync();
 
-			DefaultPrivilegeHandler.logger.info("Created new user " + newUser.getUsername());
+			logger.info("Created new user {}", newUser.getUsername());
 
 			return newUser.asUserRep();
 
@@ -318,7 +314,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_USER);
+		prvCtx.assertHasPrivilege(PRIVILEGE_ADD_USER);
 
 		List<User> toCreate = new ArrayList<>();
 		List<User> toUpdate = new ArrayList<>();
@@ -353,11 +349,10 @@ public class PrivilegeCrudHandler {
 				assertNoPrivilegeConflict(user);
 
 				// validate this user may create such a user
-				prvCtx.validateAction(
-						new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_ADD_USER, new Tuple(null, user)));
+				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_USER, new Tuple(null, user)));
 
 				toCreate.add(user);
-				DefaultPrivilegeHandler.logger.info("Creating new user " + user.getUsername());
+				logger.info("Creating new user {}", user.getUsername());
 
 			} else {
 
@@ -373,11 +368,10 @@ public class PrivilegeCrudHandler {
 				assertNoPrivilegeConflict(user);
 
 				// validate this user may modify this user
-				prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER,
-						new Tuple(existingUser, user)));
+				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, user)));
 
 				toUpdate.add(user);
-				DefaultPrivilegeHandler.logger.info("Updating existing user " + user.getUsername());
+				logger.info("Updating existing user {}", user.getUsername());
 			}
 		}
 
@@ -389,8 +383,8 @@ public class PrivilegeCrudHandler {
 		}
 		this.privilegeHandler.persistModelAsync();
 
-		DefaultPrivilegeHandler.logger.info("Created " + toCreate.size() + " users");
-		DefaultPrivilegeHandler.logger.info("Updated " + toUpdate.size() + " users");
+		logger.info("Created {} users", toCreate.size());
+		logger.info("Updated {} users", toUpdate.size());
 	}
 
 	private void assertNoPrivilegeConflict(User user) {
@@ -489,7 +483,7 @@ public class PrivilegeCrudHandler {
 
 			// validate user actually has this type of privilege
 			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER);
+			prvCtx.assertHasPrivilege(PRIVILEGE_MODIFY_USER);
 
 			// first validate user
 			userRep.validate();
@@ -535,14 +529,13 @@ public class PrivilegeCrudHandler {
 			assertNoPrivilegeConflict(newUser);
 
 			// validate this user may modify this user
-			prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_USER,
-					new Tuple(existingUser, newUser)));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_USER, new Tuple(existingUser, newUser)));
 
 			// delegate to persistence handler
 			this.persistenceHandler.replaceUser(newUser);
 			this.privilegeHandler.updateExistingSessionsForUser(newUser, true);
 
-			DefaultPrivilegeHandler.logger.info("Replaced user " + newUser.getUsername());
+			logger.info("Replaced user {}", newUser.getUsername());
 
 			return newUser.asUserRep();
 
@@ -555,7 +548,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_USER);
+		prvCtx.assertHasPrivilege(PRIVILEGE_REMOVE_USER);
 
 		// validate user exists
 		User existingUser = this.persistenceHandler.getUser(username);
@@ -565,14 +558,13 @@ public class PrivilegeCrudHandler {
 		}
 
 		// validate this user may remove this user
-		prvCtx.validateAction(
-				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_USER, new Tuple(null, existingUser)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_REMOVE_USER, new Tuple(null, existingUser)));
 
 		// delegate user removal to persistence handler
 		this.privilegeHandler.invalidateSessionsFor(existingUser);
 		this.persistenceHandler.removeUser(username);
 
-		DefaultPrivilegeHandler.logger.info("Removed user " + username);
+		logger.info("Removed user {}", username);
 
 		return existingUser.asUserRep();
 	}
@@ -581,7 +573,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_LOCALE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_LOCALE);
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
@@ -596,15 +588,14 @@ public class PrivilegeCrudHandler {
 
 		// if the user is not setting their own locale, then make sure this user may set this user's locale
 		if (!certificate.getUsername().equals(username)) {
-			prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_LOCALE,
-					new Tuple(existingUser, newUser)));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_LOCALE, new Tuple(existingUser, newUser)));
 		}
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 		this.privilegeHandler.persistModelAsync();
 
-		DefaultPrivilegeHandler.logger.info("Set locale to " + locale + " for " + newUser.getUsername());
+		logger.info("Set locale to {} for {}", locale, newUser.getUsername());
 
 		return newUser.asUserRep();
 	}
@@ -613,7 +604,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_REQUIRE_PASSWORD_CHANGE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_REQUIRE_PASSWORD_CHANGE);
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
@@ -634,8 +625,7 @@ public class PrivilegeCrudHandler {
 		this.persistenceHandler.replaceUser(newUser);
 		this.privilegeHandler.persistModelAsync();
 
-		DefaultPrivilegeHandler.logger.info(
-				"Requiring user " + newUser.getUsername() + " to change their password on next login.");
+		logger.info("Requiring user {} to change their password on next login.", newUser.getUsername());
 	}
 
 	public void setUserPassword(Certificate certificate, String username, char[] password) {
@@ -647,7 +637,7 @@ public class PrivilegeCrudHandler {
 
 			// validate user actually has this type of privilege
 			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-			prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD);
+			prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_PASSWORD);
 
 			// get User
 			User existingUser = this.persistenceHandler.getUser(username);
@@ -680,8 +670,7 @@ public class PrivilegeCrudHandler {
 			if (!certificate.getUsername().equals(username)) {
 				// check that the user may change their own password
 				Tuple value = new Tuple(existingUser, newUser);
-				prvCtx.validateAction(
-						new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD, value));
+				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, value));
 			}
 
 			// delegate user replacement to persistence handler
@@ -692,9 +681,9 @@ public class PrivilegeCrudHandler {
 				this.privilegeHandler.invalidate(certificate);
 
 			if (password == null)
-				DefaultPrivilegeHandler.logger.info("Cleared password for " + newUser.getUsername());
+				logger.info("Cleared password for {}", newUser.getUsername());
 			else
-				DefaultPrivilegeHandler.logger.info("Updated password for " + newUser.getUsername());
+				logger.info("Updated password for {}", newUser.getUsername());
 
 		} finally {
 			clearPassword(password);
@@ -705,7 +694,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_STATE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_STATE);
 
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
@@ -719,14 +708,13 @@ public class PrivilegeCrudHandler {
 				existingUser.isPasswordChangeRequested(), existingUser.getHistory());
 
 		// validate that this user may modify this user's state
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_SET_USER_STATE,
-				new Tuple(existingUser, newUser)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_STATE, new Tuple(existingUser, newUser)));
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 		this.privilegeHandler.invalidateSessionsFor(newUser);
 
-		DefaultPrivilegeHandler.logger.info("Set state of user " + newUser.getUsername() + " to " + state);
+		logger.info("Set state of user {} to {}", newUser.getUsername(), state);
 
 		return newUser.asUserRep();
 	}
@@ -735,7 +723,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_ADD_ROLE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_ADD_ROLE);
 
 		// first validate role
 		roleRep.validate();
@@ -750,8 +738,7 @@ public class PrivilegeCrudHandler {
 		Role newRole = Role.of(roleRep);
 
 		// validate that this user may add this new role
-		prvCtx.validateAction(
-				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_ADD_ROLE, new Tuple(null, newRole)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_ROLE, new Tuple(null, newRole)));
 
 		// validate policy if not null
 		validatePolicies(newRole);
@@ -760,7 +747,7 @@ public class PrivilegeCrudHandler {
 		this.persistenceHandler.addRole(newRole);
 		this.privilegeHandler.persistModelAsync();
 
-		DefaultPrivilegeHandler.logger.info("Added new role " + newRole.getName());
+		logger.info("Added new role {}", newRole.getName());
 
 		return newRole.asRoleRep();
 	}
@@ -769,7 +756,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_ROLE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_MODIFY_ROLE);
 
 		// first validate role
 		roleRep.validate();
@@ -788,8 +775,7 @@ public class PrivilegeCrudHandler {
 		assertNoPrivilegeConflict(newRole);
 
 		// validate that this user may modify this role
-		prvCtx.validateAction(new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_MODIFY_ROLE,
-				new Tuple(existingRole, newRole)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_ROLE, new Tuple(existingRole, newRole)));
 
 		// validate policy if not null
 		validatePolicies(newRole);
@@ -801,7 +787,7 @@ public class PrivilegeCrudHandler {
 		// update any existing certificates with new role
 		this.privilegeHandler.updateExistingSessionsWithNewRole(newRole);
 
-		DefaultPrivilegeHandler.logger.info("Replaced role " + newRole.getName());
+		logger.info("Replaced role {}", newRole.getName());
 
 		return newRole.asRoleRep();
 	}
@@ -810,7 +796,7 @@ public class PrivilegeCrudHandler {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		prvCtx.assertHasPrivilege(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_ROLE);
+		prvCtx.assertHasPrivilege(PRIVILEGE_REMOVE_ROLE);
 
 		// validate no user is using this role
 		Set<String> roles = new HashSet<>(Collections.singletonList(roleName));
@@ -831,14 +817,13 @@ public class PrivilegeCrudHandler {
 		}
 
 		// validate that this user may remove this role
-		prvCtx.validateAction(
-				new SimpleRestrictable(DefaultPrivilegeHandler.PRIVILEGE_REMOVE_ROLE, new Tuple(null, existingRole)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_REMOVE_ROLE, new Tuple(null, existingRole)));
 
 		// delegate role removal to persistence handler
 		this.persistenceHandler.removeRole(roleName);
 		this.privilegeHandler.persistModelAsync();
 
-		DefaultPrivilegeHandler.logger.info("Removed role " + roleName);
+		logger.info("Removed role {}", roleName);
 
 		return existingRole.asRoleRep();
 	}

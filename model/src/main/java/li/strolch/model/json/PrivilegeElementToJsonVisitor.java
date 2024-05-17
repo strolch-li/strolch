@@ -3,10 +3,7 @@ package li.strolch.model.json;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import li.strolch.privilege.model.Privilege;
-import li.strolch.privilege.model.PrivilegeElementVisitor;
-import li.strolch.privilege.model.RoleRep;
-import li.strolch.privilege.model.UserRep;
+import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.utils.iso8601.ISO8601;
 
@@ -74,6 +71,17 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		JsonArray allowListJ = new JsonArray();
 		privilegeRep.getAllowList().forEach(allowListJ::add);
 		jsonObject.add("allowList", allowListJ);
+
+		return jsonObject;
+	}
+
+	@Override
+	public JsonObject visitUserPrivileges(UserPrivileges userPrivileges) {
+		JsonObject jsonObject = userPrivileges.userRep().accept(this);
+
+		JsonArray privilegesJ = new JsonArray();
+		userPrivileges.privileges().forEach(privilege -> privilegesJ.add(privilege.accept(this)));
+		jsonObject.add("privileges", privilegesJ);
 
 		return jsonObject;
 	}

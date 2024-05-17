@@ -29,30 +29,30 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PasswordStrengthException;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.UserPrivileges;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.rest.model.QueryData;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.search.SearchResult;
 import li.strolch.search.ValueSearch;
 import li.strolch.service.StringMapArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.privilege.users.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 
 import static jakarta.ws.rs.core.Response.Status.NOT_ACCEPTABLE;
+import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER_PRIVILEGES;
 import static li.strolch.rest.helper.ResponseUtil.toResponse;
 import static li.strolch.rest.helper.RestfulHelper.toJson;
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
@@ -62,8 +62,6 @@ import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
  */
 @Path("strolch/privilege/users")
 public class PrivilegeUsersResource {
-
-	private static final Logger logger = LoggerFactory.getLogger(PrivilegeUsersResource.class);
 
 	private PrivilegeHandler getPrivilegeHandler() {
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
@@ -86,13 +84,10 @@ public class PrivilegeUsersResource {
 
 			String query = queryData.getQuery();
 			List<UserRep> users = privilegeHandler.getUsers(cert);
-			SearchResult<UserRep> result = buildSimpleValueSearch(new ValueSearch<UserRep>(), query, Arrays.asList( //
-					UserRep::getUsername, //
-					UserRep::getFirstname,  //
-					UserRep::getLastname,  //
-					userRep -> userRep.getUserState().name(),  //
-					UserRep::getRoles)) //
-					.search(users) //
+			SearchResult<UserRep> result = buildSimpleValueSearch(new ValueSearch<UserRep>(), query,
+					asList(UserRep::getUsername, UserRep::getFirstname, UserRep::getLastname,
+							userRep -> userRep.getUserState().name(), UserRep::getRoles))
+					.search(users)
 					.orderBy(comparing(r -> r.getUsername().toLowerCase()));
 
 			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
@@ -116,11 +111,11 @@ public class PrivilegeUsersResource {
 			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 
 			UserRep queryRep = new PrivilegeElementFromJsonVisitor().userRepFromJson(query);
-			JsonArray usersArr = privilegeHandler.queryUsers(cert, queryRep).stream() //
-					.sorted(comparing(r -> r.getUsername().toLowerCase())) //
-					.collect(JsonArray::new, //
-							(array, user) -> array.add(user.accept(visitor)), //
-							JsonArray::addAll);
+			JsonArray usersArr = privilegeHandler
+					.queryUsers(cert, queryRep)
+					.stream()
+					.sorted(comparing(r -> r.getUsername().toLowerCase()))
+					.collect(JsonArray::new, (array, user) -> array.add(user.accept(visitor)), JsonArray::addAll);
 
 			return Response.ok(usersArr.toString(), MediaType.APPLICATION_JSON).build();
 		}
@@ -137,8 +132,24 @@ public class PrivilegeUsersResource {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER);
 
 			UserRep user = privilegeHandler.getUser(cert, username);
-			return Response.ok(user.accept(new PrivilegeElementToJsonVisitor()).toString(), MediaType.APPLICATION_JSON)
-					.build();
+			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+			return Response.ok(user.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
+		}
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{username}/privileges")
+	public Response getUserPrivileges(@PathParam("username") String username, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
+
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER_PRIVILEGES);
+
+			UserPrivileges userPrivileges = privilegeHandler.getUserPrivileges(cert, username);
+			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+			return Response.ok(userPrivileges.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
 		}
 	}
 
@@ -185,6 +196,8 @@ public class PrivilegeUsersResource {
 		PrivilegeUpdateUserService svc = new PrivilegeUpdateUserService();
 		PrivilegeUserArgument arg = new PrivilegeUserArgument();
 		arg.user = new PrivilegeElementFromJsonVisitor().userRepFromJson(updatedFields);
+		if (!username.equals(arg.user.getUsername()))
+			throw new IllegalArgumentException("Username mismatch");
 
 		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
 		return handleServiceResult(svcResult);
@@ -307,11 +320,10 @@ public class PrivilegeUsersResource {
 	}
 
 	private Response handleServiceResult(PrivilegeUserResult svcResult) {
-		if (svcResult.isOk()) {
-			UserRep userRep = svcResult.getUser();
-			return Response.ok(userRep.accept(new PrivilegeElementToJsonVisitor()).toString(),
-					MediaType.APPLICATION_JSON).build();
-		}
-		return toResponse(svcResult);
+		if (svcResult.isNok())
+			return toResponse(svcResult);
+		UserRep userRep = svcResult.getUser();
+		PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+		return Response.ok(userRep.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
 	}
 }

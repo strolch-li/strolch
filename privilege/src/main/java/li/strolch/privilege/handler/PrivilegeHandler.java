@@ -102,6 +102,11 @@ public interface PrivilegeHandler {
 	///
 
 	/**
+	 * For Privilege "PrivilegeGetUserPrivileges" value required to get privileges for a user
+	 */
+	String PRIVILEGE_GET_USER_PRIVILEGES = "PrivilegeGetUserPrivileges";
+
+	/**
 	 * Privilege "PrivilegeGetUser" which is used to validate that a user can get a specific user
 	 */
 	String PRIVILEGE_GET_USER = "PrivilegeGetUser";
@@ -218,6 +223,19 @@ public interface PrivilegeHandler {
 	 * @return the {@link UserRep} for the given username, or null if it was not found
 	 */
 	UserRep getUser(Certificate certificate, String username);
+
+	/**
+	 * Returns a {@link UserPrivileges} for the given username. This object contains all the privileges the user has
+	 * assigned by its roles and groups
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param username    the name of the {@link UserRep} to return
+	 *
+	 * @return the {@link UserPrivileges} for the given username
+	 *
+	 * @throws PrivilegeException if the certificate may not access the user, or the request user does not exist
+	 */
+	UserPrivileges getUserPrivileges(Certificate certificate, String username);
 
 	/**
 	 * Returns a {@link RoleRep} for the given roleName

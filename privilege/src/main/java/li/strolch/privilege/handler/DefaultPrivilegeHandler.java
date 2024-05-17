@@ -198,6 +198,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public UserPrivileges getUserPrivileges(Certificate certificate, String username) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER_PRIVILEGES);
+
+		UserRep userRep = crudHandler.getUser(certificate, username);
+		return new PrivilegeContextBuilder(this).buildUserPrivilege(userRep);
+	}
+
+	@Override
 	public Map<String, String> getPolicyDefs(Certificate certificate) {
 		return crudHandler.getPolicyDefs(certificate);
 	}
@@ -435,12 +446,27 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * @return a stream of role names
 	 */
 	public static Stream<String> streamAllRolesForUser(PersistenceHandler persistenceHandler, User user) {
-		return Stream.concat(user.getRoles().stream(), user
-				.groups()
+		return Stream.concat(user.getRoles().stream(), streamAllRolesForGroups(persistenceHandler, user.groups()));
+	}
+
+	/**
+	 * Returns a {@link Stream} of all roles of the given user. This includes the roles referenced by the user's groups
+	 *
+	 * @param userRep the user for which to stream the roles
+	 *
+	 * @return a stream of role names
+	 */
+	public static Stream<String> streamAllRolesForUser(PersistenceHandler persistenceHandler, UserRep userRep) {
+		return Stream.concat(userRep.getRoles().stream(),
+				streamAllRolesForGroups(persistenceHandler, userRep.getGroups()));
+	}
+
+	private static Stream<String> streamAllRolesForGroups(PersistenceHandler persistenceHandler, Set<String> groups) {
+		return groups
 				.stream()
 				.map(persistenceHandler::getGroup)
 				.filter(Objects::nonNull)
-				.flatMap(g -> g.roles().stream()));
+				.flatMap(g -> g.roles().stream());
 	}
 
 	@Override
@@ -573,8 +599,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		} catch (Exception e) {
 			logger.error("Failed to persist sessions!", e);
 			if (this.persistSessionsPath.exists() && !this.persistSessionsPath.delete()) {
-				logger.error("Failed to delete sessions file after failing to write to it, at "
-						+ this.persistSessionsPath.getAbsolutePath());
+				logger.error("Failed to delete sessions file after failing to write to it, at {}",
+						this.persistSessionsPath.getAbsolutePath());
 			}
 		}
 	}
@@ -603,11 +629,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		} catch (Exception e) {
 			if (getRootCause(e) instanceof SAXParseException)
-				logger.error("Failed to load sessions: " + getRootCause(e).getMessage());
+				logger.error("Failed to load sessions: {}", getRootCause(e).getMessage());
 			else
 				logger.error("Failed to load sessions!", e);
 			if (!this.persistSessionsPath.delete())
-				logger.error("Failed to delete session file at " + this.persistSessionsPath.getAbsolutePath());
+				logger.error("Failed to delete session file at {}", this.persistSessionsPath.getAbsolutePath());
 			return;
 		}
 
@@ -620,17 +646,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			String username = stub.getUsername();
 			User user = this.persistenceHandler.getUser(username);
 			if (user == null) {
-				logger.error("Ignoring session data for missing user " + username);
+				logger.error("Ignoring session data for missing user {}", username);
 				continue;
 			}
 
 			if (user.getUserState() == UserState.DISABLED || user.getUserState() == UserState.EXPIRED) {
-				logger.error("Ignoring session data for disabled/expired user " + username);
+				logger.error("Ignoring session data for disabled/expired user {}", username);
 				continue;
 			}
 
 			if (streamAllRolesForUser(this.persistenceHandler, user).findAny().isEmpty()) {
-				logger.error("Ignoring session data for user " + username + " which has no roles or groups defined!");
+				logger.error("Ignoring session data for user {} which has no roles or groups defined!", username);
 				continue;
 			}
 
@@ -638,7 +664,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			buildPrivilegeContext(user, stub);
 		}
 
-		logger.info("Loaded " + this.privilegeContextMap.size() + " sessions.");
+		logger.info("Loaded {} sessions.", this.privilegeContextMap.size());
 	}
 
 	/**
@@ -708,7 +734,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// see if we need to update the hash
 		if (this.encryptionHandler.isPasswordCryptOutdated(userPasswordCrypt)) {
 
-			logger.warn("Updating user " + username + " due to change in hashing algorithm properties ");
+			logger.warn("Updating user {} due to change in hashing algorithm properties ", username);
 
 			// get new salt for user
 			byte[] salt = this.encryptionHandler.nextSalt();
@@ -725,7 +751,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.persistenceHandler.replaceUser(user);
 			persistModelAsync();
 
-			logger.info("Updated password for " + user.getUsername());
+			logger.info("Updated password for {}", user.getUsername());
 		}
 
 		return user;
@@ -1027,7 +1053,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeModelException(msg);
 			}
 		}
-		logger.info("Privilege conflict resolution set to " + this.privilegeConflictResolution);
+		logger.info("Privilege conflict resolution set to {}", this.privilegeConflictResolution);
 	}
 
 	private void handleSecretParams(Map<String, String> parameterMap) {
