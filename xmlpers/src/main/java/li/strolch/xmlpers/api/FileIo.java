@@ -81,13 +81,13 @@ public class FileIo {
 			}
 
 			if (logger.isDebugEnabled())
-				logger.info(MessageFormat.format("Wrote SAX to {0}", this.tmpPath.getAbsolutePath()));
+				logger.info("Wrote SAX to {}", this.tmpPath.getAbsolutePath());
 			moveTmpFileToPath(ctx.getLastModified());
 
 		} catch (FactoryConfigurationError | XMLStreamException | IOException e) {
 			if (this.tmpPath.exists()) {
 				if (!this.tmpPath.delete())
-					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
+					logger.error("Failed to delete existing temp file {}", this.tmpPath.getAbsolutePath());
 			}
 			String msg = "Writing to file {0} failed due to internal error: {1}";
 			msg = MessageFormat.format(msg, this.path.getAbsolutePath(), e.getMessage());
@@ -95,8 +95,7 @@ public class FileIo {
 		}
 
 		if (logger.isDebugEnabled()) {
-			String msg = "Wrote SAX to {0}";
-			logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
+			logger.info("Wrote SAX to {}", this.path.getAbsolutePath());
 		}
 	}
 
@@ -109,8 +108,7 @@ public class FileIo {
 			getSaxParser().parse(this.path, defaultHandler);
 
 			if (logger.isDebugEnabled()) {
-				String msg = "SAX parsed file {0}";
-				logger.info(MessageFormat.format(msg, this.path.getAbsolutePath()));
+				logger.info("SAX parsed file {}", this.path.getAbsolutePath());
 			}
 
 			ctx.setObject(saxParser.getObject());
@@ -125,7 +123,7 @@ public class FileIo {
 
 	public <T> void writeDom(PersistenceContext<T> ctx) {
 
-		String lineSep = System.getProperty(PROP_LINE_SEPARATOR);
+		String lineSep = System.lineSeparator();
 
 		try {
 
@@ -161,13 +159,13 @@ public class FileIo {
 			}
 
 			if (logger.isDebugEnabled())
-				logger.info(MessageFormat.format("Wrote DOM to {0}", this.tmpPath.getAbsolutePath()));
+				logger.info("Wrote DOM to {}", this.tmpPath.getAbsolutePath());
 			moveTmpFileToPath(ctx.getLastModified());
 
 		} catch (IOException | TransformerFactoryConfigurationError | TransformerException e) {
 			if (this.tmpPath.exists()) {
 				if (!this.tmpPath.delete())
-					logger.error("Failed to delete existing temp file " + this.tmpPath.getAbsolutePath());
+					logger.error("Failed to delete existing temp file {}", this.tmpPath.getAbsolutePath());
 			}
 			String msg = "Writing to file {0} failed due to internal error: {1}";
 			msg = MessageFormat.format(msg, this.tmpPath.getAbsolutePath(), e.getMessage());
@@ -188,7 +186,7 @@ public class FileIo {
 
 		if (lastModified != -1L) {
 			if (!this.path.setLastModified(lastModified))
-				logger.error("Failed to set last modified of path " + this.path.getAbsolutePath());
+				logger.error("Failed to set last modified of path {}", this.path.getAbsolutePath());
 		}
 	}
 
@@ -202,9 +200,7 @@ public class FileIo {
 			domParser.fromDom(document);
 
 			if (logger.isDebugEnabled()) {
-				String msg = "DOM parsed file {0}";
-				msg = MessageFormat.format(msg, this.path.getAbsolutePath());
-				logger.info(msg);
+				logger.info("DOM parsed file {}", this.path.getAbsolutePath());
 			}
 
 			ctx.setObject(domParser.getObject());

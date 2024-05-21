@@ -30,9 +30,6 @@ public enum TransactionCloseStrategy {
 		}
 	};
 
-	/**
-	 * @param tx
-	 */
 	public void close(PersistenceTransaction tx) {
 		throw new UnsupportedOperationException("Override in enum!");
 	}

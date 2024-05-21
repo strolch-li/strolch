@@ -69,7 +69,7 @@ public class DefaultPersistenceManager implements PersistenceManager {
 		if (!basePathF.canWrite())
 			throw new XmlPersistenceException(MessageFormat.format("The database store path is not writeable at {0}",
 					basePathF.getAbsolutePath()));
-		logger.info(MessageFormat.format("Using base path {0}", basePathF));
+		logger.info("Using base path {}", basePathF);
 
 		this.verbose = verbose;
 		this.allowOverwriteOnCreate = allowOverwriteOnCreate;

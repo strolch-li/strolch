@@ -15,15 +15,6 @@
  */
 package li.strolch.persistence.xml;
 
-import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
-import static li.strolch.db.DbConstants.PROP_USE_ENV;
-import static li.strolch.runtime.StrolchConstants.makeRealmKey;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.*;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchComponent;
@@ -46,6 +37,14 @@ import li.strolch.runtime.configuration.StrolchConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.xmlpers.api.*;
+
+import java.io.File;
+import java.util.*;
+
+import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
+import static li.strolch.db.DbConstants.PROP_USE_ENV;
+import static li.strolch.runtime.StrolchConstants.makeRealmKey;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -91,7 +90,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 			String dbIgnoreRealmKey = makeRealmKey(realmName, PROP_DB_IGNORE_REALM, false);
 			boolean dbIgnoreRealm = configuration.getBoolean(dbIgnoreRealmKey, false);
 			if (dbIgnoreRealm) {
-				logger.info("Ignoring any DB configuration for Realm " + realmName);
+				logger.info("Ignoring any DB configuration for Realm {}", realmName);
 				continue;
 			}
 
@@ -168,7 +167,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 			if (files == null)
 				throw new IllegalStateException(persistenceStore.dbStorePathF.getAbsolutePath() + " does not exist!");
 			if (files.length == 0 && allowDataInitOnEmptyDb) {
-				logger.info("Initializing realm " + realmName + " as DB is empty.");
+				logger.info("Initializing realm {} as DB is empty.", realmName);
 
 				StrolchConfiguration strolchConfiguration = getContainer().getAgent().getStrolchConfiguration();
 				ComponentConfiguration realmConfiguration = strolchConfiguration.getComponentConfiguration(
@@ -189,8 +188,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 						statistics = handler.getStatistics();
 						tx.commitOnClose();
 					}
-					logger.info(
-							MessageFormat.format("Realm {0} initialization statistics: {1}", realmName, statistics));
+					logger.info("Realm {} initialization statistics: {}", realmName, statistics);
 				});
 			}
 		}

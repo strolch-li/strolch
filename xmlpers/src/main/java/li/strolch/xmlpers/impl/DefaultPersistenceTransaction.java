@@ -15,16 +15,16 @@
  */
 package li.strolch.xmlpers.impl;
 
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-
-import java.text.MessageFormat;
-import java.util.*;
-
+import li.strolch.utils.concurrent.LockableObject;
 import li.strolch.utils.objectfilter.ObjectFilter;
 import li.strolch.xmlpers.api.*;
-import li.strolch.utils.concurrent.LockableObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+
+import static java.text.MessageFormat.format;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -163,11 +163,10 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 					logger.info("No objects removed in this tx.");
 			} else {
 				if (this.verbose)
-					logger.info(removed.size() + " objects removed in this tx.");
+					logger.info("{} objects removed in this tx.", removed.size());
 
 				for (Object object : removed) {
-					@SuppressWarnings("unchecked")
-					PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
+					@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
 					this.fileDao.performDelete(ctx);
 				}
 			}
@@ -178,11 +177,10 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 					logger.info("No objects updated in this tx.");
 			} else {
 				if (this.verbose)
-					logger.info(updated.size() + " objects updated in this tx.");
+					logger.info("{} objects updated in this tx.", updated.size());
 
 				for (Object object : updated) {
-					@SuppressWarnings("unchecked")
-					PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
+					@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
 					this.fileDao.performUpdate(ctx);
 				}
 			}
@@ -193,11 +191,10 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 					logger.info("No objects added in this tx.");
 			} else {
 				if (this.verbose)
-					logger.info(added.size() + " objects added in this tx.");
+					logger.info("{} objects added in this tx.", added.size());
 
 				for (Object object : added) {
-					@SuppressWarnings("unchecked")
-					PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
+					@SuppressWarnings("unchecked") PersistenceContext<Object> ctx = (PersistenceContext<Object>) object;
 					this.fileDao.performCreate(ctx);
 				}
 			}
@@ -223,8 +220,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 		try {
 
 			if (this.verbose) {
-				String msg = "Committing {0} operations in TX...";//$NON-NLS-1$
-				logger.info(MessageFormat.format(msg, this.objectFilter.sizeCache()));
+				logger.info("Committing {} operations in TX...", this.objectFilter.sizeCache());
 			}
 
 			internalCommit();
@@ -238,9 +234,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 				long txDuration = end - this.startTime;
 				long closeDuration = end - start;
 
-				String sb = "TX has failed after " + formatNanoDuration(txDuration) + " with close operation taking "
-						+ formatNanoDuration(closeDuration);
-				logger.error(sb);
+				logger.error("TX has failed after {} with close operation taking {}", formatNanoDuration(txDuration),
+						formatNanoDuration(closeDuration));
 
 				throw e;
 			}
@@ -262,9 +257,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 		if (this.txResult == null) {
 
-			String sb = "TX was completed after " + formatNanoDuration(txDuration) + " with close operation taking "
-					+ formatNanoDuration(closeDuration);
-			logger.info(sb);
+			logger.info("TX was completed after {} with close operation taking {}", formatNanoDuration(txDuration),
+					formatNanoDuration(closeDuration));
 
 		} else {
 
@@ -274,9 +268,9 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 			if (this.txResult.getState() == TransactionState.FAILED) {
 				String msg = "Failed to commit TX due to underlying exception: {0}";
-				String causeMsg =
-						this.txResult.getFailCause() == null ? null : this.txResult.getFailCause().getMessage();
-				msg = MessageFormat.format(msg, causeMsg);
+				String causeMsg = this.txResult.getFailCause() == null ? null :
+						this.txResult.getFailCause().getMessage();
+				msg = format(msg, causeMsg);
 				throw new XmlPersistenceException(msg, this.txResult.getFailCause());
 			}
 		}

@@ -21,8 +21,6 @@ public class RefNameCreator {
 
 	protected static final String SLASH = "/";
 
-	// FIXME validate each name part that it is a valid literal for file names...
-
 	public static String createRootName() {
 		return SLASH;
 	}

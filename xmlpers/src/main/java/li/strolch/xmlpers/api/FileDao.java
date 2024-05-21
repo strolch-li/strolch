@@ -151,8 +151,7 @@ public class FileDao {
 
 		// log
 		if (this.verbose) {
-			String msg = "Deleted empty directory for {0} at {1}";
-			logger.info(MessageFormat.format(msg, objectRef.getName(), directoryPath));
+			logger.info("Deleted empty directory for {} at {}", objectRef.getName(), directoryPath);
 		}
 
 		// recursively delete
@@ -162,9 +161,8 @@ public class FileDao {
 
 	private void logPath(IoOperation operation, File path, ObjectRef objectRef) {
 		if (this.verbose) {
-			String msg = "Path for operation {0} for {1} is at {2}";
-			msg = MessageFormat.format(msg, operation, objectRef.getName(), path.getAbsolutePath());
-			logger.info(msg);
+			logger.info("Path for operation {} for {} is at {}", operation, objectRef.getName(),
+					path.getAbsolutePath());
 		}
 	}
 

@@ -16,8 +16,8 @@
 package li.strolch.xmlpers.api;
 
 public enum TransactionState {
-	OPEN, // 
-	COMMITTED, // 
-	ROLLED_BACK, //
+	OPEN,
+	COMMITTED,
+	ROLLED_BACK,
 	FAILED
 }

@@ -15,18 +15,14 @@
  */
 package li.strolch.xmlpers.impl;
 
-import java.io.File;
-
 import li.strolch.xmlpers.objref.ObjectRef;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class PathBuilder {
-
-	private static final Logger logger = LoggerFactory.getLogger(PathBuilder.class);
 
 	public static final String FILE_EXT = ".xml";
 	public static final int EXT_LENGTH = PathBuilder.FILE_EXT.length();
@@ -48,7 +44,6 @@ public class PathBuilder {
 	public File getPath(ObjectRef objectRef) {
 		if (objectRef.isLeaf())
 			return new File(this.basePath, getFilename(objectRef.getName()));
-		else
-			return new File(this.basePath, objectRef.getName());
+		return new File(this.basePath, objectRef.getName());
 	}
 }
