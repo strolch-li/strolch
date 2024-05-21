@@ -31,6 +31,10 @@ public abstract class AbstractModelTest {
 
 	protected String realmName = StrolchConstants.DEFAULT_REALM;
 
+	protected boolean hasDataArchive() {
+		return true;
+	}
+
 	@Test
 	public void shouldStartContainer() {
 		PrivilegeHandler privilegeHandler = getRuntimeMock().getContainer().getPrivilegeHandler();
@@ -132,6 +136,7 @@ public abstract class AbstractModelTest {
 
 	@Test
 	public void shouldTestDataArchive() throws Exception {
+		org.junit.Assume.assumeTrue("Only run if DataArchive is available", hasDataArchive());
 		DataArchiveTestRunner testRunner = new DataArchiveTestRunner(getRuntimeMock(), this.realmName);
 		testRunner.runTestsForDataArchive();
 	}

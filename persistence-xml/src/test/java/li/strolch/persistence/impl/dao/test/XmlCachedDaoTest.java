@@ -50,7 +50,8 @@ public class XmlCachedDaoTest extends AbstractModelTest {
 
 		// check that the data was initialized
 		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = runtimeMock
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", true)) {
 			assertTrue("Model was not properly initialized!", tx.hasResource("Template", "TestType"));
 			assertTrue("Model was not properly initialized!", tx.hasOrder("Template", "MyTestOrder"));
@@ -60,5 +61,10 @@ public class XmlCachedDaoTest extends AbstractModelTest {
 	@AfterClass
 	public static void afterClass() {
 		runtimeMock.destroyRuntime();
+	}
+
+	@Override
+	protected boolean hasDataArchive() {
+		return false;
 	}
 }
