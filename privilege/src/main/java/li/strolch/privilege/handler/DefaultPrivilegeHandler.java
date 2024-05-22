@@ -303,6 +303,29 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public List<Group> getGroups(Certificate certificate) {
+		return crudHandler.getGroups(certificate);
+	}
+
+	@Override
+	public Group addGroup(Certificate certificate, Group group) {
+		return this.lockingHandler.lockedExecuteWithResult(group.name(),
+				() -> crudHandler.addGroup(certificate, group));
+	}
+
+	@Override
+	public Group replaceGroup(Certificate certificate, Group group) {
+		return this.lockingHandler.lockedExecuteWithResult(group.name(),
+				() -> crudHandler.replaceGroup(certificate, group));
+	}
+
+	@Override
+	public Group removeGroup(Certificate certificate, String groupName) {
+		return this.lockingHandler.lockedExecuteWithResult(groupName,
+				() -> crudHandler.removeGroup(certificate, groupName));
+	}
+
+	@Override
 	public void initiateChallengeFor(Usage usage, String username) {
 		initiateChallengeFor(usage, username, SOURCE_UNKNOWN);
 	}
@@ -1140,6 +1163,25 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
 		for (PrivilegeContext ctx : contexts) {
 			if (!ctx.getUserRep().hasRole(role.getName()))
+				continue;
+			User user = this.persistenceHandler.getUser(ctx.getUsername());
+			if (user == null)
+				continue;
+			replacePrivilegeContextForCert(user, ctx.getCertificate());
+		}
+
+		persistSessionsAsync();
+	}
+
+	/**
+	 * Replaces any existing {@link PrivilegeContext} for users with the given group
+	 *
+	 * @param group the group to update with
+	 */
+	void updateExistingSessionsWithNewGroup(Group group) {
+		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
+		for (PrivilegeContext ctx : contexts) {
+			if (!ctx.getUserRep().hasGroup(group.name()))
 				continue;
 			User user = this.persistenceHandler.getUser(ctx.getUsername());
 			if (user == null)

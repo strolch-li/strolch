@@ -15,7 +15,10 @@
  */
 package li.strolch.privilege.handler;
 
-import li.strolch.privilege.base.*;
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.NotAuthenticatedException;
+import li.strolch.privilege.base.PasswordStrengthException;
+import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
@@ -37,7 +40,7 @@ public interface PrivilegeHandler {
 	///
 
 	/**
-	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g. s
+	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g.
 	 * {@link #PRIVILEGE_ACTION_PERSIST} and {@link #PRIVILEGE_ACTION_GET_POLICIES}
 	 */
 	String PRIVILEGE_ACTION = "PrivilegeAction";
@@ -67,151 +70,43 @@ public interface PrivilegeHandler {
 	String PRIVILEGE_ACTION_GET_POLICIES = "GetPolicies";
 
 	/**
-	 * For Privilege "PrivilegeAction" value required to get a certificate if not <code>allAllowed</code>
-	 */
-	String PRIVILEGE_ACTION_GET_CERTIFICATE = "GetCertificate";
-
-	/**
 	 * For Privilege "PrivilegeAction" value required to get all certificates if not <code>allAllowed</code>
 	 */
 	String PRIVILEGE_ACTION_GET_CERTIFICATES = "GetCertificates";
 
 	///
 
-	/**
-	 * Privilege "PrivilegeGetRole" which is used to validate that a user can get a specific role
-	 */
 	String PRIVILEGE_GET_ROLE = "PrivilegeGetRole";
-
-	/**
-	 * Privilege "PrivilegeAddRole" which is used to validate that a user can add a specific role
-	 */
 	String PRIVILEGE_ADD_ROLE = "PrivilegeAddRole";
-
-	/**
-	 * Privilege "PrivilegeRemoveRole" which is used to validate that a user can remove a specific role
-	 */
 	String PRIVILEGE_REMOVE_ROLE = "PrivilegeRemoveRole";
-
-	/**
-	 * Privilege "PrivilegeModifyRole" which is used to validate that a user can modify a specific role. <b>Note:</b>
-	 * This includes modifying of the privileges on the role
-	 */
 	String PRIVILEGE_MODIFY_ROLE = "PrivilegeModifyRole";
+	String PRIVILEGE_GET_GROUP = "PrivilegeGetGroup";
+	String PRIVILEGE_ADD_GROUP = "PrivilegeAddGroup";
+	String PRIVILEGE_REMOVE_GROUP = "PrivilegeRemoveGroup";
+	String PRIVILEGE_MODIFY_GROUP = "PrivilegeModifyGroup";
 
 	///
 
-	/**
-	 * For Privilege "PrivilegeGetUserPrivileges" value required to get privileges for a user
-	 */
-	String PRIVILEGE_GET_USER_PRIVILEGES = "PrivilegeGetUserPrivileges";
-
-	/**
-	 * Privilege "PrivilegeGetUser" which is used to validate that a user can get a specific user
-	 */
 	String PRIVILEGE_GET_USER = "PrivilegeGetUser";
-
-	/**
-	 * Privilege "PrivilegeAddUser" which is used to validate that a user can add a specific user
-	 */
+	String PRIVILEGE_GET_USER_PRIVILEGES = "PrivilegeGetUserPrivileges";
 	String PRIVILEGE_ADD_USER = "PrivilegeAddUser";
-
-	/**
-	 * Privilege "PrivilegeRemoveUser" which is used to validate that a user can remove a specific user
-	 */
 	String PRIVILEGE_REMOVE_USER = "PrivilegeRemoveUser";
-
-	/**
-	 * Privilege "PrivilegeModifyUser" which is used to validate that a user can modify a specific user
-	 */
 	String PRIVILEGE_MODIFY_USER = "PrivilegeModifyUser";
-
-	/**
-	 * Privilege "PRIVILEGE_MODIFY_USER_ROLES" which is used to validate that a user may modify the roles of a user
-	 * user
-	 */
-	String PRIVILEGE_MODIFY_USER_ROLES = "PrivilegeModifyUserRoles";
-
-	/**
-	 * Privilege "PrivilegeAddRoleToUser" which is used to validate that a user can add a specific role to a specific
-	 * user
-	 */
-	String PRIVILEGE_ADD_ROLE_TO_USER = "PrivilegeAddRoleToUser";
-
-	/**
-	 * Privilege "PrivilegeRemoveRoleFromUser" which is used to validate that a user can remove a specific role from a
-	 * specific user
-	 */
-	String PRIVILEGE_REMOVE_ROLE_FROM_USER = "PrivilegeRemoveRoleFromUser";
-
-	/**
-	 * Privilege "PRIVILEGE_SET_USER_LOCALE" which is used to validate that a user can set the locale of a user, or
-	 * their own
-	 */
 	String PRIVILEGE_SET_USER_LOCALE = "PrivilegeSetUserLocale";
-
-	/**
-	 * Privilege "PRIVILEGE_SET_USER_STATE" which is used to validate that a user can set the state of a user
-	 */
 	String PRIVILEGE_SET_USER_STATE = "PrivilegeSetUserState";
-
-	/**
-	 * Privilege "PRIVILEGE_SET_USER_PASSWORD" which is used to validate that a user can set the password of a user, or
-	 * their own
-	 */
 	String PRIVILEGE_SET_USER_PASSWORD = "PrivilegeSetUserPassword";
-
-	/**
-	 * Privilege "PRIVILEGE_SET_USER_PASSWORD" which is used to validate that a user can set the password of a user, or
-	 * their own
-	 */
 	String PRIVILEGE_REQUIRE_PASSWORD_CHANGE = "RequirePasswordChange";
 
 	///
 
-	/**
-	 * configuration parameter to define a secret_key
-	 */
 	String PARAM_SECRET_KEY = "secretKey";
-
-	/**
-	 * configuration parameter to define if session refreshing is allowed
-	 */
 	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh";
-
-	/**
-	 * configuration parameter to define if a session's source change is disallowed
-	 */
 	String PARAM_DISALLOW_SOURCE_CHANGE = "disallowSourceChange";
-
-	/**
-	 * configuration parameter to define if username is case insensitive
-	 */
 	String PARAM_CASE_INSENSITIVE_USERNAME = "caseInsensitiveUsername";
-
-	/**
-	 * configuration parameter to define a secret salt
-	 */
 	String PARAM_SECRET_SALT = "secretSalt";
-
-	/**
-	 * configuration parameter to define automatic persisting on password change
-	 */
 	String PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA = "autoPersistOnUserChangesData";
-
-	/**
-	 * configuration parameter to define if sessions should be persisted
-	 */
 	String PARAM_PERSIST_SESSIONS = "persistSessions";
-
-	/**
-	 * configuration parameter to define where sessions are to be persisted
-	 */
 	String PARAM_PERSIST_SESSIONS_PATH = "persistSessionsPath";
-
-	/**
-	 * configuration parameter to define {@link PrivilegeConflictResolution}
-	 */
 	String PARAM_PRIVILEGE_CONFLICT_RESOLUTION = "privilegeConflictResolution";
 
 	/**
@@ -275,6 +170,15 @@ public interface PrivilegeHandler {
 	List<RoleRep> getRoles(Certificate certificate);
 
 	/**
+	 * Returns all {@link Group Groups}
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 *
+	 * @return the list of {@link Group Groups}
+	 */
+	List<Group> getGroups(Certificate certificate);
+
+	/**
 	 * Returns all {@link UserRep UserReps}
 	 *
 	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
@@ -320,6 +224,20 @@ public interface PrivilegeHandler {
 	 *                               user
 	 */
 	RoleRep removeRole(Certificate certificate, String roleName) throws PrivilegeException;
+
+	/**
+	 * Removes the group with the given groupName
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param groupName   the groupName of the group to remove
+	 *
+	 * @return the {@link Group} of the group removed, or null if the group did not exist
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate or the group is still in use by a
+	 *                               user
+	 */
+	Group removeGroup(Certificate certificate, String groupName) throws PrivilegeException;
 
 	/**
 	 * <p>
@@ -393,6 +311,17 @@ public interface PrivilegeHandler {
 	RoleRep addRole(Certificate certificate, RoleRep roleRep) throws PrivilegeException;
 
 	/**
+	 * Adds a new {@link Group}
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param group       the {@link Group} to add
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate or if the group already exists
+	 */
+	Group addGroup(Certificate certificate, Group group) throws PrivilegeException;
+
+	/**
 	 * Replaces the existing role with the information from this {@link RoleRep}
 	 *
 	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
@@ -402,6 +331,17 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException    if there is anything wrong with this certificate or if the role does not exist
 	 */
 	RoleRep replaceRole(Certificate certificate, RoleRep roleRep) throws PrivilegeException;
+
+	/**
+	 * Replaces the existing group with the given {@link Group}
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param group       the group to replace the existing group with
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate or if the group does not exist
+	 */
+	Group replaceGroup(Certificate certificate, Group group) throws PrivilegeException;
 
 	/**
 	 * <p>

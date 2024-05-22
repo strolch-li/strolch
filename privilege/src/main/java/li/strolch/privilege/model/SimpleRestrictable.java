@@ -45,4 +45,8 @@ public class SimpleRestrictable implements Restrictable {
 	public Object getPrivilegeValue() {
 		return this.value;
 	}
+
+	public static SimpleRestrictable restrictableOf(String name, Object value) {
+		return new SimpleRestrictable(name, value);
+	}
 }

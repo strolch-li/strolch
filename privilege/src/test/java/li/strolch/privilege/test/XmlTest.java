@@ -16,6 +16,7 @@
 package li.strolch.privilege.test;
 
 import li.strolch.privilege.handler.*;
+import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.*;

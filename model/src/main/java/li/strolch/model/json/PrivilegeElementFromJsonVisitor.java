@@ -4,10 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import li.strolch.privilege.model.Privilege;
-import li.strolch.privilege.model.RoleRep;
-import li.strolch.privilege.model.UserRep;
-import li.strolch.privilege.model.UserState;
+import li.strolch.privilege.model.*;
 
 import java.util.*;
 
@@ -44,6 +41,18 @@ public class PrivilegeElementFromJsonVisitor {
 		return new RoleRep(name, privileges);
 	}
 
+	public Group groupFromJson(JsonObject jsonObject) {
+		JsonElement nameE = jsonObject.get("name");
+		String name = nameE == null ? null : nameE.getAsString().trim();
+		JsonElement rolesE = jsonObject.get("roles");
+		JsonElement propertiesE = jsonObject.get("properties");
+
+		Set<String> roles = jsonArrayToSet(rolesE);
+		Map<String, String> properties = parseProperties(propertiesE);
+
+		return new Group(name, roles, properties);
+	}
+
 	public Privilege privilegeFromJson(JsonObject privilegeJ) {
 
 		JsonElement privilegeNameE = privilegeJ.get("name");
@@ -56,22 +65,8 @@ public class PrivilegeElementFromJsonVisitor {
 		String policy = policyE == null ? null : policyE.getAsString().trim();
 		boolean allAllowed = allAllowedE != null && allAllowedE.getAsBoolean();
 
-		Set<String> denyList = new HashSet<>();
-		if (denyListE != null) {
-			JsonArray denyListArr = denyListE.getAsJsonArray();
-			for (JsonElement denyValueE : denyListArr) {
-				denyList.add(denyValueE.getAsString().trim());
-			}
-		}
-
-		Set<String> allowList = new HashSet<>();
-		if (allowListE != null) {
-			JsonArray allowListArr = allowListE.getAsJsonArray();
-			for (JsonElement allowValueE : allowListArr) {
-				allowList.add(allowValueE.getAsString().trim());
-			}
-		}
-
+		Set<String> denyList = parseToSet(denyListE);
+		Set<String> allowList = parseToSet(allowListE);
 		return new Privilege(privilegeName, policy, allAllowed, denyList, allowList);
 	}
 
@@ -95,20 +90,36 @@ public class PrivilegeElementFromJsonVisitor {
 		Locale locale = localeE == null ? null : Locale.forLanguageTag(localeE.getAsString().trim());
 
 		Set<String> groups = jsonArrayToSet(groupsE);
-
 		Set<String> roles = jsonArrayToSet(rolesE);
+		Map<String, String> properties = parseProperties(propertiesE);
+		return new UserRep(userId, username, firstname, lastname, userState, groups, roles, locale, properties, null);
+	}
 
-		Map<String, String> properties = null;
-		if (propertiesE != null) {
-			properties = new HashMap<>();
-			JsonArray propertiesArr = propertiesE.getAsJsonArray();
-			for (JsonElement propertyE : propertiesArr) {
-				JsonObject property = propertyE.getAsJsonObject();
-				properties.put(property.get("key").getAsString().trim(), property.get("value").getAsString().trim());
-			}
+	private static Map<String, String> parseProperties(JsonElement propertiesE) {
+		if (propertiesE == null)
+			return null;
+
+		Map<String, String> properties = new HashMap<>();
+		JsonArray propertiesArr = propertiesE.getAsJsonArray();
+		for (JsonElement propertyE : propertiesArr) {
+			JsonObject property = propertyE.getAsJsonObject();
+			properties.put(property.get("key").getAsString().trim(), property.get("value").getAsString().trim());
 		}
 
-		return new UserRep(userId, username, firstname, lastname, userState, groups, roles, locale, properties, null);
+		return properties;
+	}
+
+	private static Set<String> parseToSet(JsonElement allowListE) {
+		Set<String> allowList = new HashSet<>();
+		if (allowListE == null)
+			return allowList;
+
+		JsonArray allowListArr = allowListE.getAsJsonArray();
+		for (JsonElement allowValueE : allowListArr) {
+			allowList.add(allowValueE.getAsString().trim());
+		}
+
+		return allowList;
 	}
 
 	private Set<String> jsonArrayToSet(JsonElement array) {

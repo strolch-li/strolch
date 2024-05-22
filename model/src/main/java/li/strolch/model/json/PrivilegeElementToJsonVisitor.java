@@ -7,6 +7,8 @@ import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.utils.iso8601.ISO8601;
 
+import java.util.Map;
+
 public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<JsonObject> {
 
 	@Override
@@ -24,14 +26,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.add("roles", rolesArr);
 		userRep.getRoles().stream().sorted(String::compareToIgnoreCase).map(JsonPrimitive::new).forEach(rolesArr::add);
 
-		JsonArray propsArr = new JsonArray();
-		jsonObject.add("properties", propsArr);
-		userRep.getPropertyKeySet().stream().sorted(String::compareToIgnoreCase).forEach(propKey -> {
-			JsonObject propObj = new JsonObject();
-			propObj.addProperty("key", propKey);
-			propObj.addProperty("value", userRep.getProperty(propKey));
-			propsArr.add(propObj);
-		});
+		addProperties(userRep.getProperties(), jsonObject);
 
 		JsonObject historyJ = new JsonObject();
 		jsonObject.add("history", historyJ);
@@ -54,6 +49,32 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.add("privileges", privilegesJ);
 
 		return jsonObject;
+	}
+
+	@Override
+	public JsonObject visitGroup(Group group) {
+		JsonObject jsonObject = new JsonObject();
+
+		jsonObject.addProperty("name", group.name());
+
+		JsonArray rolesJ = new JsonArray();
+		group.roles().forEach(rolesJ::add);
+		jsonObject.add("roles", rolesJ);
+
+		addProperties(group.getProperties(), jsonObject);
+
+		return jsonObject;
+	}
+
+	private static void addProperties(Map<String, String> properties, JsonObject jsonObject) {
+		JsonArray propsArr = new JsonArray();
+		jsonObject.add("properties", propsArr);
+		properties.keySet().stream().sorted(String::compareToIgnoreCase).forEach(propKey -> {
+			JsonObject propObj = new JsonObject();
+			propObj.addProperty("key", propKey);
+			propObj.addProperty("value", properties.get(propKey));
+			propsArr.add(propObj);
+		});
 	}
 
 	@Override

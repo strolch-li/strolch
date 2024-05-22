@@ -17,7 +17,7 @@ package li.strolch.privilege.handler;
 
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.Restrictable;
-import li.strolch.privilege.model.internal.Group;
+import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;

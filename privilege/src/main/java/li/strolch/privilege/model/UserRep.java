@@ -60,7 +60,7 @@ public class UserRep {
 	 * @param firstname   the user's first name
 	 * @param lastname    the user's last name
 	 * @param userState   the user's {@link UserState}
-	 * @param groups      the set of {@link li.strolch.privilege.model.internal.Group}s assigned to this user
+	 * @param groups      the set of {@link Group}s assigned to this user
 	 * @param roles       the set of {@link Role}s assigned to this user
 	 * @param locale      the user's {@link Locale}
 	 * @param properties a {@link Map} containing string value pairs of properties for this user

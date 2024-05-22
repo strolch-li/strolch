@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.privilege.roles;
+package li.strolch.service.privilege.groups;
 
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
+import li.strolch.model.json.PrivilegeElementFromJsonVisitor;
+import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.model.RoleRep;
+import li.strolch.privilege.model.Group;
+import li.strolch.service.JsonServiceArgument;
+import li.strolch.service.JsonServiceResult;
 import li.strolch.service.api.AbstractService;
 
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
@@ -27,35 +31,36 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeAddRoleService extends AbstractService<PrivilegeRoleArgument, PrivilegeRoleResult> {
+public class PrivilegeAddGroupService extends AbstractService<JsonServiceArgument, JsonServiceResult> {
 
 	@Override
-	protected PrivilegeRoleResult getResultInstance() {
-		return new PrivilegeRoleResult();
+	protected JsonServiceResult getResultInstance() {
+		return new JsonServiceResult();
 	}
 
 	@Override
-	public PrivilegeRoleArgument getArgumentInstance() {
-		return new PrivilegeRoleArgument();
+	public JsonServiceArgument getArgumentInstance() {
+		return new JsonServiceArgument();
 	}
 
 	@Override
-	protected PrivilegeRoleResult internalDoService(PrivilegeRoleArgument arg) {
+	protected JsonServiceResult internalDoService(JsonServiceArgument arg) {
+		Group newGroup = new PrivilegeElementFromJsonVisitor().groupFromJson(arg.jsonElement.getAsJsonObject());
 
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
-		RoleRep role;
-		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_ADD_ROLE)) {
+		Group group;
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_ADD_GROUP)) {
 			tx.setSuppressAudits(true);
 
-			role = privilegeHandler.addRole(getCertificate(), arg.role);
+			group = privilegeHandler.addGroup(getCertificate(), newGroup);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, ROLE, role.getName());
+			Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, GROUP, newGroup.name());
 			tx.getAuditTrail().add(tx, audit);
 		}
 
-		return new PrivilegeRoleResult(role);
+		return new JsonServiceResult(group.accept(new PrivilegeElementToJsonVisitor()));
 	}
 }

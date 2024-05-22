@@ -16,7 +16,7 @@
 package li.strolch.privilege.xml;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
-import li.strolch.privilege.model.internal.Group;
+import li.strolch.privilege.model.Group;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;

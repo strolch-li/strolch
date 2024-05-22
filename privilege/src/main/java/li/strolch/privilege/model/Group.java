@@ -1,6 +1,8 @@
-package li.strolch.privilege.model.internal;
+package li.strolch.privilege.model;
 
 import li.strolch.privilege.base.PrivilegeConstants;
+import li.strolch.privilege.model.internal.Role;
+import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.dbc.DBC;
 
 import java.util.Map;
@@ -88,5 +90,9 @@ public record Group(String name, Set<String> roles, Map<String, String> property
 	 */
 	public String getLocation() {
 		return getProperty(LOCATION);
+	}
+
+	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
+		return visitor.visitGroup(this);
 	}
 }

@@ -14,11 +14,13 @@ import li.strolch.utils.collections.Tuple;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static li.strolch.privilege.handler.DefaultPrivilegeHandler.*;
+import static li.strolch.privilege.model.SimpleRestrictable.restrictableOf;
 import static li.strolch.utils.helper.StringHelper.*;
 
 public class PrivilegeCrudHandler {
@@ -84,13 +86,24 @@ public class PrivilegeCrudHandler {
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(PRIVILEGE_GET_ROLE);
 
-		Stream<Role> rolesStream = this.persistenceHandler.getAllRoles().stream();
-
 		// validate access to each role
-		rolesStream = rolesStream.filter(
-				role -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_ROLE, new Tuple(null, role))));
+		Stream<Role> roles = this.persistenceHandler.getAllRoles().stream();
+		roles = roles.filter(r -> prvCtx.hasPrivilege(restrictableOf(PRIVILEGE_GET_ROLE, new Tuple(null, r))));
 
-		return rolesStream.map(Role::asRoleRep).collect(Collectors.toList());
+		return roles.map(Role::asRoleRep).collect(toList());
+	}
+
+	public List<Group> getGroups(Certificate certificate) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_GROUP);
+
+		// validate access to each group
+		Stream<Group> groups = this.persistenceHandler.getAllGroups().stream();
+		groups = groups.filter(g -> prvCtx.hasPrivilege(restrictableOf(PRIVILEGE_GET_GROUP, new Tuple(null, g))));
+
+		return groups.collect(toList());
 	}
 
 	public List<UserRep> getUsers(Certificate certificate) {
@@ -99,13 +112,11 @@ public class PrivilegeCrudHandler {
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER);
 
-		Stream<User> usersStream = this.persistenceHandler.getAllUsers().stream();
-
 		// validate access to each user
-		usersStream = usersStream.filter(
-				user -> prvCtx.hasPrivilege(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user))));
+		Stream<User> users = this.persistenceHandler.getAllUsers().stream();
+		users = users.filter(u -> prvCtx.hasPrivilege(restrictableOf(PRIVILEGE_GET_USER, new Tuple(null, u))));
 
-		return usersStream.map(User::asUserRep).collect(Collectors.toList());
+		return users.map(User::asUserRep).collect(toList());
 	}
 
 	public List<UserRep> queryUsers(Certificate certificate, UserRep selectorRep) {
@@ -799,11 +810,11 @@ public class PrivilegeCrudHandler {
 		prvCtx.assertHasPrivilege(PRIVILEGE_REMOVE_ROLE);
 
 		// validate no user is using this role
-		Set<String> roles = new HashSet<>(Collections.singletonList(roleName));
+		Set<String> roles = Set.of(roleName);
 		UserRep selector = new UserRep(null, null, null, null, null, null, roles, null, null, null);
 		List<UserRep> usersWithRole = this.privilegeHandler.queryUsers(certificate, selector);
 		if (!usersWithRole.isEmpty()) {
-			String usersS = usersWithRole.stream().map(UserRep::getUsername).collect(Collectors.joining(", "));
+			String usersS = usersWithRole.stream().map(UserRep::getUsername).collect(joining(", "));
 			String msg = "The role {0} can not be removed as the following {1} user have the role assigned: {2}";
 			msg = MessageFormat.format(msg, roleName, usersWithRole.size(), usersS);
 			throw new PrivilegeModelException(msg);
@@ -824,8 +835,92 @@ public class PrivilegeCrudHandler {
 		this.privilegeHandler.persistModelAsync();
 
 		logger.info("Removed role {}", roleName);
-
 		return existingRole.asRoleRep();
+	}
+
+	public Group addGroup(Certificate certificate, Group group) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_ADD_GROUP);
+
+		// validate group does not exist
+		if (this.persistenceHandler.getGroup(group.name()) != null) {
+			String msg = MessageFormat.format("Can not add group {0} as it already exists!", group.name());
+			throw new PrivilegeModelException(msg);
+		}
+
+		// validate that this user may add this new group
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_GROUP, new Tuple(null, group)));
+
+		// delegate to persistence handler
+		this.persistenceHandler.addGroup(group);
+		this.privilegeHandler.persistModelAsync();
+
+		logger.info("Added new group {}", group.name());
+		return group;
+	}
+
+	public Group replaceGroup(Certificate certificate, Group group) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_MODIFY_GROUP);
+
+		// validate group does exist
+		Group existingGroup = this.persistenceHandler.getGroup(group.name());
+		if (existingGroup == null) {
+			String msg = MessageFormat.format("Can not replace group {0} as it does not exist!", group.name());
+			throw new PrivilegeModelException(msg);
+		}
+
+		// validate that this user may modify this group
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_GROUP, new Tuple(existingGroup, group)));
+
+		// delegate to persistence handler
+		this.persistenceHandler.replaceGroup(group);
+		this.privilegeHandler.persistModelAsync();
+
+		// update any existing certificates with new group
+		this.privilegeHandler.updateExistingSessionsWithNewGroup(group);
+
+		logger.info("Replaced group {}", group.name());
+		return group;
+	}
+
+	public Group removeGroup(Certificate certificate, String groupName) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_REMOVE_GROUP);
+
+		// validate no user is using this group
+		Set<String> groups = Set.of(groupName);
+		UserRep selector = new UserRep(null, null, null, null, null, groups, null, null, null, null);
+		List<UserRep> usersWithGroup = this.privilegeHandler.queryUsers(certificate, selector);
+		if (!usersWithGroup.isEmpty()) {
+			String usersS = usersWithGroup.stream().map(UserRep::getUsername).collect(joining(", "));
+			String msg = "The group {0} can not be removed as the following {1} user have the group assigned: {2}";
+			msg = MessageFormat.format(msg, groupName, usersWithGroup.size(), usersS);
+			throw new PrivilegeModelException(msg);
+		}
+
+		// validate group exists
+		Group existingGroup = this.persistenceHandler.getGroup(groupName);
+		if (existingGroup == null) {
+			String msg = "Can not remove group {0} because group does not exist!";
+			throw new PrivilegeModelException(MessageFormat.format(msg, groupName));
+		}
+
+		// validate that this user may remove this group
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_REMOVE_GROUP, new Tuple(null, existingGroup)));
+
+		// delegate group removal to persistence handler
+		this.persistenceHandler.removeGroup(groupName);
+		this.privilegeHandler.persistModelAsync();
+
+		logger.info("Removed group {}", groupName);
+		return existingGroup;
 	}
 
 	/**

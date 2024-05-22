@@ -4,7 +4,7 @@ import li.strolch.privilege.base.PrivilegeConflictResolution;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.*;
-import li.strolch.privilege.model.internal.Group;
+import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;

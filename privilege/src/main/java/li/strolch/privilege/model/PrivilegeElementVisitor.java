@@ -6,6 +6,8 @@ public interface PrivilegeElementVisitor<T> {
 
 	T visitRoleRep(RoleRep roleRep);
 
+	T visitGroup(Group group);
+
 	T visitPrivilegeRep(Privilege privilege);
 
 	T visitUserPrivileges(UserPrivileges userPrivileges);

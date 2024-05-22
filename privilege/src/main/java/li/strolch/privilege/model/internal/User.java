@@ -16,6 +16,7 @@
 package li.strolch.privilege.model.internal;
 
 import li.strolch.privilege.base.PrivilegeConstants;
+import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.utils.dbc.DBC;

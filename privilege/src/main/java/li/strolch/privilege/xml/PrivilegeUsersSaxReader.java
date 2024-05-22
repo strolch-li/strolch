@@ -16,7 +16,6 @@
 package li.strolch.privilege.xml;
 
 import li.strolch.privilege.model.UserState;
-import li.strolch.privilege.model.internal.Group;
 import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;

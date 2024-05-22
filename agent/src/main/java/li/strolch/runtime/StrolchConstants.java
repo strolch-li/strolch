@@ -70,6 +70,7 @@ public class StrolchConstants extends StrolchModelConstants {
 		public static final String LOGOUT = "Logout";
 		public static final String SESSION_TIME_OUT = "SessionTimeout";
 		public static final String ROLE = "Role";
+		public static final String GROUP = "Group";
 		public static final String USER = "User";
 
 		public static final String PRIVILEGE_GET_ROLE = PrivilegeHandler.PRIVILEGE_GET_ROLE;
@@ -77,12 +78,15 @@ public class StrolchConstants extends StrolchModelConstants {
 		public static final String PRIVILEGE_REMOVE_ROLE = PrivilegeHandler.PRIVILEGE_REMOVE_ROLE;
 		public static final String PRIVILEGE_MODIFY_ROLE = PrivilegeHandler.PRIVILEGE_MODIFY_ROLE;
 
+		public static final String PRIVILEGE_GET_GROUP = PrivilegeHandler.PRIVILEGE_GET_GROUP;
+		public static final String PRIVILEGE_ADD_GROUP = PrivilegeHandler.PRIVILEGE_ADD_GROUP;
+		public static final String PRIVILEGE_REMOVE_GROUP = PrivilegeHandler.PRIVILEGE_REMOVE_GROUP;
+		public static final String PRIVILEGE_MODIFY_GROUP = PrivilegeHandler.PRIVILEGE_MODIFY_GROUP;
+
 		public static final String PRIVILEGE_GET_USER = PrivilegeHandler.PRIVILEGE_GET_USER;
 		public static final String PRIVILEGE_ADD_USER = PrivilegeHandler.PRIVILEGE_ADD_USER;
 		public static final String PRIVILEGE_REMOVE_USER = PrivilegeHandler.PRIVILEGE_REMOVE_USER;
 		public static final String PRIVILEGE_MODIFY_USER = PrivilegeHandler.PRIVILEGE_MODIFY_USER;
-		public static final String PRIVILEGE_ADD_ROLE_TO_USER = PrivilegeHandler.PRIVILEGE_ADD_ROLE_TO_USER;
-		public static final String PRIVILEGE_REMOVE_ROLE_FROM_USER = PrivilegeHandler.PRIVILEGE_REMOVE_ROLE_FROM_USER;
 		public static final String PRIVILEGE_SET_USER_LOCALE = PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE;
 		public static final String PRIVILEGE_SET_USER_STATE = PrivilegeHandler.PRIVILEGE_SET_USER_STATE;
 		public static final String PRIVILEGE_SET_USER_PASSWORD = PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD;
