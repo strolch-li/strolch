@@ -240,7 +240,7 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	public String toString() {
 		return "User [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname +
 				", lastname=" + this.lastname + ", locale=" + this.locale + ", userState=" + this.userState +
-				", roles=" + this.roles + "]";
+				", roles=" + this.roles + ", groups=" + this.groups + "]";
 	}
 
 	@Override

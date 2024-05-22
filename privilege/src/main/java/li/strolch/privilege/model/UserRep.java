@@ -386,7 +386,7 @@ public class UserRep {
 	public String toString() {
 		return "UserRep [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname +
 				", lastname=" + this.lastname + ", userState=" + this.userState + ", locale=" + this.locale +
-				", roles=" + this.roles + "]";
+				", roles=" + this.roles + ", groups=" + this.groups + "]";
 	}
 
 	@Override

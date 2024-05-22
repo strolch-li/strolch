@@ -92,6 +92,11 @@ public record Group(String name, Set<String> roles, Map<String, String> property
 		return getProperty(LOCATION);
 	}
 
+	@Override
+	public String toString() {
+		return "Group [" + "name='" + name + '\'' + ", roles=" + roles + ']';
+	}
+
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
 		return visitor.visitGroup(this);
 	}
