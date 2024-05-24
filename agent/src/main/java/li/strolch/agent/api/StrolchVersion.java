@@ -15,11 +15,12 @@
  */
 package li.strolch.agent.api;
 
-import static li.strolch.model.Tags.Json.*;
+import com.google.gson.JsonObject;
 
 import java.util.Properties;
 
-import com.google.gson.JsonObject;
+import static java.text.MessageFormat.format;
+import static li.strolch.model.Tags.Json.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -90,12 +91,15 @@ public class StrolchVersion {
 		this.buildTimestamp = buildTimestamp;
 	}
 
-	public JsonObject toJson(boolean isAdminRequest) {
+	public JsonObject toJson(boolean isAdminRequest, boolean withVersion) {
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty(GROUP_ID, this.groupId);
 		jsonObject.addProperty(ARTIFACT_ID, this.artifactId);
-		jsonObject.addProperty(ARTIFACT_VERSION, this.artifactVersion);
+
+		if (withVersion)
+			jsonObject.addProperty(ARTIFACT_VERSION, this.artifactVersion);
+
 		if (isAdminRequest) {
 			jsonObject.addProperty(SCM_REVISION, this.scmRevision);
 			jsonObject.addProperty(SCM_BRANCH, this.scmBranch);
@@ -107,8 +111,8 @@ public class StrolchVersion {
 
 	@Override
 	public String toString() {
-		return "StrolchVersion{groupId='" + groupId + "' , artifactId='" + artifactId + "', artifactVersion='" +
-				artifactVersion + "' , scmRevision='" + scmRevision + "' , scmBranch='" + scmBranch +
-				"' , buildTimestamp='" + buildTimestamp + "' }";
+		return format(
+				"StrolchVersion'{'groupId=''{0}'' , artifactId=''{1}'', artifactVersion=''{2}'' , scmRevision=''{3}'' , scmBranch=''{4}'' , buildTimestamp=''{5}'' '}'",
+				groupId, artifactId, artifactVersion, scmRevision, scmBranch, buildTimestamp);
 	}
 }

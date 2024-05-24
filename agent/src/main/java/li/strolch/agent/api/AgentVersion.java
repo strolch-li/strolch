@@ -15,12 +15,13 @@
  */
 package li.strolch.agent.api;
 
-import static li.strolch.model.Tags.Json.*;
+import com.google.gson.JsonObject;
 
 import java.util.Locale;
 import java.util.Properties;
 
-import com.google.gson.JsonObject;
+import static java.text.MessageFormat.format;
+import static li.strolch.model.Tags.Json.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -50,8 +51,8 @@ public class AgentVersion extends StrolchVersion {
 	}
 
 	@Override
-	public JsonObject toJson(boolean isAdminRequest) {
-		JsonObject jsonObject = super.toJson(isAdminRequest);
+	public JsonObject toJson(boolean isAdminRequest, boolean withVersion) {
+		JsonObject jsonObject = super.toJson(isAdminRequest, withVersion);
 
 		jsonObject.addProperty(AGENT_NAME, this.agentName);
 		jsonObject.addProperty(ENVIRONMENT, this.environment);
@@ -63,10 +64,9 @@ public class AgentVersion extends StrolchVersion {
 
 	@Override
 	public String toString() {
-		return "AgentVersion{agentName='" + this.agentName + "' , environment='" + this.environment + "' , locale='" +
-				this.locale + "' , timezone='" + this.timezone + "' , groupId='" + getGroupId() + "' , artifactId='" +
-				getArtifactId() + "' , artifactVersion='" + getArtifactVersion() + "' , scmRevision='" +
-				getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='" + getBuildTimestamp() +
-				"' }";
+		return format(
+				"AgentVersion'{'agentName=''{0}'' , environment=''{1}'' , locale=''{2}'' , timezone=''{3}'' , groupId=''{4}'' , artifactId=''{5}'' , artifactVersion=''{6}'' , scmRevision=''{7}'' , scmBranch=''{8}'' , buildTimestamp=''{9}'' '}'",
+				this.agentName, this.environment, this.locale, this.timezone, getGroupId(), getArtifactId(),
+				getArtifactVersion(), getScmRevision(), getScmBranch(), getBuildTimestamp());
 	}
 }

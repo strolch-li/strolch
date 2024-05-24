@@ -49,14 +49,9 @@ public class VersionResource {
 		if (cert == null) {
 			JsonObject jsonObject = new JsonObject();
 
-			JsonObject agentVersion = versionQuery.getAgentVersion().toJson(false);
-			jsonObject.add(AGENT_VERSION, agentVersion);
-
-			if (RestfulStrolchComponent.getInstance().isHideVersionFromUnauthorizedClients()) {
-				jsonObject.add(APP_VERSION, new JsonObject());
-			} else {
-				jsonObject.add(APP_VERSION, versionQuery.getAppVersion().toJson(false));
-			}
+			boolean hideVersion = RestfulStrolchComponent.getInstance().isHideVersionFromUnauthorizedClients();
+			jsonObject.add(AGENT_VERSION, versionQuery.getAgentVersion().toJson(false, !hideVersion));
+			jsonObject.add(APP_VERSION, versionQuery.getAppVersion().toJson(false, !hideVersion));
 
 			return Response.ok(jsonObject.toString(), MediaType.APPLICATION_JSON).build();
 		}
