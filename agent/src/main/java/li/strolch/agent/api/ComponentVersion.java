@@ -15,8 +15,10 @@
  */
 package li.strolch.agent.api;
 
+import static java.text.MessageFormat.*;
 import static li.strolch.model.Tags.Json.*;
 
+import java.text.MessageFormat;
 import java.util.Properties;
 
 import com.google.gson.JsonObject;
@@ -42,19 +44,17 @@ public class ComponentVersion extends StrolchVersion {
 	}
 
 	@Override
-	public JsonObject toJson(boolean isAdminRequest) {
-		JsonObject jsonObject = super.toJson(isAdminRequest);
-
+	public JsonObject toJson(boolean isAdminRequest, boolean withVersion) {
+		JsonObject jsonObject = super.toJson(isAdminRequest, withVersion);
 		jsonObject.addProperty(COMPONENT_NAME, this.componentName);
-
 		return jsonObject;
 	}
 
 	@Override
 	public String toString() {
-		return "ComponentVersion{componentName='" + this.componentName + "' , groupId='" + getGroupId() +
-				"' , artifactId='" + getArtifactId() + "' , artifactVersion='" + getArtifactVersion() +
-				"' , scmRevision='" + getScmRevision() + "' , scmBranch='" + getScmBranch() + "' , buildTimestamp='" +
-				getBuildTimestamp() + "' }";
+		return format(
+				"ComponentVersion'{'componentName=''{0}'' , groupId=''{1}'' , artifactId=''{2}'' , artifactVersion=''{3}'' , scmRevision=''{4}'' , scmBranch=''{5}'' , buildTimestamp=''{6}'' '}'",
+				this.componentName, getGroupId(), getArtifactId(), getArtifactVersion(), getScmRevision(),
+				getScmBranch(), getBuildTimestamp());
 	}
 }

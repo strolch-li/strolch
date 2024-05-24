@@ -57,6 +57,6 @@ public class VersionResource {
 		}
 
 		boolean isStrolchAdmin = cert.hasRole(ROLE_STROLCH_ADMIN);
-		return Response.ok(versionQuery.toJson(isStrolchAdmin).toString(), MediaType.APPLICATION_JSON).build();
+		return Response.ok(versionQuery.toJson(isStrolchAdmin, true).toString(), MediaType.APPLICATION_JSON).build();
 	}
 }

@@ -83,14 +83,14 @@ public class VersionQueryResult {
 		return this.errors != null && !this.errors.isEmpty();
 	}
 
-	public JsonObject toJson(boolean isAdminRequest) {
+	public JsonObject toJson(boolean isAdminRequest, boolean withVersion) {
 		JsonObject jsonObject = new JsonObject();
 
-		jsonObject.add(APP_VERSION, this.appVersion.toJson(isAdminRequest));
-		jsonObject.add(AGENT_VERSION, this.agentVersion.toJson(isAdminRequest));
+		jsonObject.add(APP_VERSION, this.appVersion.toJson(isAdminRequest, withVersion));
+		jsonObject.add(AGENT_VERSION, this.agentVersion.toJson(isAdminRequest, withVersion));
 
 		JsonArray componentVersionsJ = new JsonArray();
-		this.componentVersions.forEach(c -> componentVersionsJ.add(c.toJson(isAdminRequest)));
+		this.componentVersions.forEach(c -> componentVersionsJ.add(c.toJson(isAdminRequest, withVersion)));
 		jsonObject.add(COMPONENT_VERSIONS, componentVersionsJ);
 
 		if (isAdminRequest) {
