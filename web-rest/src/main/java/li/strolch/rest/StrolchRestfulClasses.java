@@ -50,6 +50,7 @@ public class StrolchRestfulClasses {
 
 		// privilege
 		restfulClasses.add(PrivilegeUsersResource.class);
+		restfulClasses.add(PrivilegeGroupsResource.class);
 		restfulClasses.add(PrivilegeRolesResource.class);
 		restfulClasses.add(PrivilegePoliciesResource.class);
 		restfulClasses.add(UserSessionsResource.class);

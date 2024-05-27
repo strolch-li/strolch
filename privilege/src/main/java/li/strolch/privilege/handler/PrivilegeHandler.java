@@ -143,6 +143,16 @@ public interface PrivilegeHandler {
 	RoleRep getRole(Certificate certificate, String roleName);
 
 	/**
+	 * Returns {@link Group} with the given name
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param groupName   the name of the group to return
+	 *
+	 * @return the {@link Group}
+	 */
+	Group getGroup(Certificate certificate, String groupName);
+
+	/**
 	 * Returns the map of {@link PrivilegePolicy} definitions
 	 *
 	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action

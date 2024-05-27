@@ -1,6 +1,7 @@
 package li.strolch.privilege.model;
 
 import li.strolch.privilege.base.PrivilegeConstants;
+import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.dbc.DBC;
@@ -99,5 +100,13 @@ public record Group(String name, Set<String> roles, Map<String, String> property
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
 		return visitor.visitGroup(this);
+	}
+
+	/**
+	 * Asserts that the group has at lease one role assigned
+	 */
+	public void validate() {
+		if (this.roles.isEmpty())
+			throw new PrivilegeException("Group must have at least one role assigned!");
 	}
 }

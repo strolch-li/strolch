@@ -53,6 +53,21 @@ public class PrivilegeCrudHandler {
 		return role.asRoleRep();
 	}
 
+	public Group getGroup(Certificate certificate, String groupName) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_GROUP);
+
+		Group group = this.persistenceHandler.getGroup(groupName);
+		if (group == null)
+			return null;
+
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_GROUP, new Tuple(null, group)));
+
+		return group;
+	}
+
 	public UserRep getUser(Certificate certificate, String username) {
 
 		// validate user actually has this type of privilege
@@ -275,7 +290,7 @@ public class PrivilegeCrudHandler {
 			userRep.validate();
 
 			validateGroupsExist(userRep);
-			validateRolesExist(userRep);
+			validateRolesExist("user", userRep.getUsername(), userRep.getRoles());
 
 			// validate user does not already exist
 			if (this.persistenceHandler.getUser(userRep.getUsername()) != null) {
@@ -351,7 +366,7 @@ public class PrivilegeCrudHandler {
 				userRep.validate();
 
 				validateGroupsExist(userRep);
-				validateRolesExist(userRep);
+				validateRolesExist("user", userRep.getUsername(), userRep.getRoles());
 
 				// create new user
 				user = createUser(userRep, UserHistory.EMPTY, null, false);
@@ -464,11 +479,11 @@ public class PrivilegeCrudHandler {
 		}
 	}
 
-	private void validateRolesExist(UserRep userRep) {
-		for (String role : userRep.getRoles()) {
+	private void validateRolesExist(String clazz, String name, Collection<String> roles) {
+		for (String role : roles) {
 			if (this.persistenceHandler.getRole(role) == null) {
-				String msg = "Can not add/update user {0} as role {1} does not exist!";
-				msg = MessageFormat.format(msg, userRep.getUsername(), role);
+				String msg = "Can not add/update {0} {1} as role {2} does not exist!";
+				msg = MessageFormat.format(msg, clazz, name, role);
 				throw new PrivilegeModelException(msg);
 			}
 		}
@@ -500,7 +515,7 @@ public class PrivilegeCrudHandler {
 			userRep.validate();
 
 			validateGroupsExist(userRep);
-			validateRolesExist(userRep);
+			validateRolesExist("user", userRep.getUsername(), userRep.getRoles());
 
 			// validate user exists
 			User existingUser = this.persistenceHandler.getUser(userRep.getUsername());
@@ -850,6 +865,10 @@ public class PrivilegeCrudHandler {
 			throw new PrivilegeModelException(msg);
 		}
 
+		// validations
+		group.validate();
+		validateRolesExist("group", group.name(), group.roles());
+
 		// validate that this user may add this new group
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_ADD_GROUP, new Tuple(null, group)));
 
@@ -873,6 +892,10 @@ public class PrivilegeCrudHandler {
 			String msg = MessageFormat.format("Can not replace group {0} as it does not exist!", group.name());
 			throw new PrivilegeModelException(msg);
 		}
+
+		// validations
+		group.validate();
+		validateRolesExist("group", group.name(), group.roles());
 
 		// validate that this user may modify this group
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_MODIFY_GROUP, new Tuple(existingGroup, group)));

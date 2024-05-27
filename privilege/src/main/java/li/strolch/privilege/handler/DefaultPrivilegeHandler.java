@@ -193,6 +193,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	@Override
+	public Group getGroup(Certificate certificate, String groupName) {
+		return this.crudHandler.getGroup(certificate, groupName);
+	}
+
+	@Override
 	public UserRep getUser(Certificate certificate, String username) {
 		return crudHandler.getUser(certificate, username);
 	}

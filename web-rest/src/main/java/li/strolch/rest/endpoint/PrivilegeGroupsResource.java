@@ -30,7 +30,6 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.search.StrolchValueSearch;
 import li.strolch.search.ValueSearch;
 import li.strolch.service.JsonServiceArgument;
@@ -44,6 +43,8 @@ import li.strolch.utils.helper.StringHelper;
 
 import static java.util.Comparator.comparing;
 import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_GROUP;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
+import static li.strolch.rest.helper.ResponseUtil.toResponse;
 import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
 
 /**
@@ -89,6 +90,22 @@ public class PrivilegeGroupsResource {
 		}
 	}
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{group}")
+	public Response getGroup(@PathParam("group") String groupName, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
+
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER);
+
+			Group group = privilegeHandler.getGroup(cert, groupName);
+			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+			return Response.ok(group.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
+		}
+	}
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -101,7 +118,7 @@ public class PrivilegeGroupsResource {
 		arg.jsonElement = JsonParser.parseString(data).getAsJsonObject();
 
 		JsonServiceResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
+		return toResponse(svcResult);
 	}
 
 	@PUT
@@ -118,7 +135,7 @@ public class PrivilegeGroupsResource {
 		arg.jsonElement = JsonParser.parseString(data).getAsJsonObject();
 
 		JsonServiceResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
+		return toResponse(svcResult);
 	}
 
 	@DELETE
@@ -134,12 +151,6 @@ public class PrivilegeGroupsResource {
 		arg.value = group;
 
 		JsonServiceResult svcResult = svcHandler.doService(cert, svc, arg);
-		return handleServiceResult(svcResult);
-	}
-
-	private Response handleServiceResult(JsonServiceResult svcResult) {
-		if (svcResult.isOk())
-			return Response.ok(svcResult.getResult().getAsString(), MediaType.APPLICATION_JSON).build();
-		return ResponseUtil.toResponse(svcResult);
+		return toResponse(svcResult);
 	}
 }

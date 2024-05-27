@@ -7,7 +7,11 @@ import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.utils.iso8601.ISO8601;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+
+import static java.util.Comparator.comparing;
 
 public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<JsonObject> {
 
@@ -22,18 +26,9 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.addProperty("userState", userRep.getUserState().name());
 		jsonObject.addProperty("locale", userRep.getLocale().toLanguageTag());
 
-		JsonArray rolesArr = new JsonArray();
-		jsonObject.add("roles", rolesArr);
-		userRep.getRoles().stream().sorted(String::compareToIgnoreCase).map(JsonPrimitive::new).forEach(rolesArr::add);
-
+		addRoles(jsonObject, userRep.getRoles());
 		addProperties(userRep.getProperties(), jsonObject);
-
-		JsonObject historyJ = new JsonObject();
-		jsonObject.add("history", historyJ);
-		UserHistory history = userRep.getHistory();
-		historyJ.addProperty("firstLogin", ISO8601.toString(history.getFirstLogin()));
-		historyJ.addProperty("lastLogin", ISO8601.toString(history.getLastLogin()));
-		historyJ.addProperty("lastPasswordChange", ISO8601.toString(history.getLastPasswordChange()));
+		addHistory(userRep, jsonObject);
 
 		return jsonObject;
 	}
@@ -43,10 +38,16 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		JsonObject jsonObject = new JsonObject();
 
 		jsonObject.addProperty("name", roleRep.getName());
+		addPrivileges(roleRep.getPrivileges().values(), jsonObject);
 
-		JsonArray privilegesJ = new JsonArray();
-		roleRep.getPrivileges().values().forEach(p -> privilegesJ.add(p.accept(this)));
-		jsonObject.add("privileges", privilegesJ);
+		return jsonObject;
+	}
+
+	@Override
+	public JsonObject visitUserPrivileges(UserPrivileges userPrivileges) {
+		JsonObject jsonObject = userPrivileges.userRep().accept(this);
+
+		addPrivileges(userPrivileges.privileges(), jsonObject);
 
 		return jsonObject;
 	}
@@ -54,16 +55,56 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	@Override
 	public JsonObject visitGroup(Group group) {
 		JsonObject jsonObject = new JsonObject();
-
 		jsonObject.addProperty("name", group.name());
 
-		JsonArray rolesJ = new JsonArray();
-		group.roles().forEach(rolesJ::add);
-		jsonObject.add("roles", rolesJ);
-
+		addRoles(jsonObject, group.roles());
 		addProperties(group.getProperties(), jsonObject);
 
 		return jsonObject;
+	}
+
+	@Override
+	public JsonObject visitPrivilegeRep(Privilege privilegeRep) {
+		JsonObject jsonObject = new JsonObject();
+
+		jsonObject.addProperty("name", privilegeRep.getName());
+		jsonObject.addProperty("policy", privilegeRep.getPolicy());
+		jsonObject.addProperty("allAllowed", privilegeRep.isAllAllowed());
+
+		addList(privilegeRep.getDenyList(), jsonObject, "denyList");
+		addList(privilegeRep.getAllowList(), jsonObject, "allowList");
+
+		return jsonObject;
+	}
+
+	private void addPrivileges(Collection<Privilege> privileges, JsonObject jsonObject) {
+		JsonArray privilegesJ = new JsonArray();
+		privileges
+				.stream()
+				.sorted(comparing(p -> p.name().toLowerCase()))
+				.forEach(p -> privilegesJ.add(p.accept(this)));
+		jsonObject.add("privileges", privilegesJ);
+	}
+
+	private static void addList(Set<String> privilegeRep, JsonObject jsonObject, String listName) {
+		JsonArray listJ = new JsonArray();
+		privilegeRep.stream().sorted(String::compareToIgnoreCase).forEach(listJ::add);
+		jsonObject.add(listName, listJ);
+	}
+
+	private static void addRoles(JsonObject jsonObject, Set<String> userRep) {
+		JsonArray rolesArr = new JsonArray();
+		jsonObject.add("roles", rolesArr);
+		userRep.stream().sorted(String::compareToIgnoreCase).map(JsonPrimitive::new).forEach(rolesArr::add);
+	}
+
+	private static void addHistory(UserRep userRep, JsonObject jsonObject) {
+		JsonObject historyJ = new JsonObject();
+		jsonObject.add("history", historyJ);
+		UserHistory history = userRep.getHistory();
+		historyJ.addProperty("firstLogin", ISO8601.toString(history.getFirstLogin()));
+		historyJ.addProperty("lastLogin", ISO8601.toString(history.getLastLogin()));
+		historyJ.addProperty("lastPasswordChange", ISO8601.toString(history.getLastPasswordChange()));
 	}
 
 	private static void addProperties(Map<String, String> properties, JsonObject jsonObject) {
@@ -75,35 +116,5 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 			propObj.addProperty("value", properties.get(propKey));
 			propsArr.add(propObj);
 		});
-	}
-
-	@Override
-	public JsonObject visitPrivilegeRep(Privilege privilegeRep) {
-		JsonObject jsonObject = new JsonObject();
-
-		jsonObject.addProperty("name", privilegeRep.getName());
-		jsonObject.addProperty("policy", privilegeRep.getPolicy());
-		jsonObject.addProperty("allAllowed", privilegeRep.isAllAllowed());
-
-		JsonArray denyListJ = new JsonArray();
-		privilegeRep.getDenyList().forEach(denyListJ::add);
-		jsonObject.add("denyList", denyListJ);
-
-		JsonArray allowListJ = new JsonArray();
-		privilegeRep.getAllowList().forEach(allowListJ::add);
-		jsonObject.add("allowList", allowListJ);
-
-		return jsonObject;
-	}
-
-	@Override
-	public JsonObject visitUserPrivileges(UserPrivileges userPrivileges) {
-		JsonObject jsonObject = userPrivileges.userRep().accept(this);
-
-		JsonArray privilegesJ = new JsonArray();
-		userPrivileges.privileges().forEach(privilege -> privilegesJ.add(privilege.accept(this)));
-		jsonObject.add("privileges", privilegesJ);
-
-		return jsonObject;
 	}
 }
