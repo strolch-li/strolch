@@ -50,10 +50,11 @@ public class ElementLockingHandler<T> {
 		try {
 			action.run();
 		} catch (RuntimeException e) {
-			logger.error("Failed to execute action " + action + " for locked element " + element, e);
+			logger.error("Failed to execute action {} for locked element {}", action, element, e);
 			throw e;
 		} catch (Exception e) {
-			throw new IllegalStateException("Failed to execute action " + action + " for locked element " + element, e);
+			throw new ElementLockingException("Failed to execute action " + action + " for locked element " + element,
+					e);
 		} finally {
 			unlock(element);
 		}
@@ -75,8 +76,12 @@ public class ElementLockingHandler<T> {
 		lock(element);
 		try {
 			return action.get();
+		} catch (RuntimeException e) {
+			logger.error("Failed to execute action {} for locked element {}", action, element, e);
+			throw e;
 		} catch (Exception e) {
-			throw new IllegalStateException("Failed to execute action " + action + " for locked element " + element, e);
+			throw new ElementLockingException("Failed to execute action " + action + " for locked element " + element,
+					e);
 		} finally {
 			unlock(element);
 		}
@@ -197,7 +202,7 @@ public class ElementLockingHandler<T> {
 			}
 		}
 
-		logger.info("Pruned " + count + " locks.");
+		logger.info("Pruned {} locks.", count);
 	}
 
 	private TypedTuple<ElementLock, Long> newLock(T element) {
