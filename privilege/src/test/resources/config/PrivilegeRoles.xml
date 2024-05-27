@@ -24,6 +24,18 @@
         <Privilege name="PrivilegeGetRole" policy="RoleAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
+        <Privilege name="PrivilegeGetGroup" policy="RoleAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="PrivilegeAddGroup" policy="RoleAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="PrivilegeModifyGroup" policy="RoleAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
+        <Privilege name="PrivilegeRemoveGroup" policy="RoleAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
         <Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
