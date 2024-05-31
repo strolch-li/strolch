@@ -145,14 +145,13 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 
 					Group group = new Group(this.name, this.roles, this.parameters);
 
-					logger.info(MessageFormat.format("New Group: {0}", group));
+					logger.info("New Group: {}", group);
 					groups.put(this.name, group);
 				}
 				default -> {
-					if (!(qName.equals(GROUPS) //
-								  || qName.equals(ROLES) //
-								  || qName.equals(PARAMETER) //
-								  || qName.equals(PARAMETERS))) {
+					if (!(
+							qName.equals(GROUPS) || qName.equals(ROLES) || qName.equals(PARAMETER) || qName.equals(
+									PARAMETERS))) {
 						throw new IllegalArgumentException("Unhandled tag " + qName);
 					}
 				}

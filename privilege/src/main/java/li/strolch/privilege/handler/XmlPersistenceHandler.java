@@ -219,8 +219,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.groupsPath = groupsPath;
 		this.rolesPath = rolesPath;
 
-		this.caseInsensitiveUsername = !this.parameterMap.containsKey(PARAM_CASE_INSENSITIVE_USERNAME) ||
-				parseBoolean(this.parameterMap.get(PARAM_CASE_INSENSITIVE_USERNAME));
+		this.caseInsensitiveUsername = !this.parameterMap.containsKey(PARAM_CASE_INSENSITIVE_USERNAME) || parseBoolean(
+				this.parameterMap.get(PARAM_CASE_INSENSITIVE_USERNAME));
 
 		if (reload())
 			logger.info("Privilege Data loaded.");
@@ -288,26 +288,22 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.groupMapDirty = false;
 		this.roleMapDirty = false;
 
-		logger.info(format("Read {0} Users", this.userMap.size()));
-		logger.info(format("Read {0} Groups", this.groupMap.size()));
-		logger.info(format("Read {0} Roles", this.roleMap.size()));
+		logger.info("Read {} Users", this.userMap.size());
+		logger.info("Read {} Groups", this.groupMap.size());
+		logger.info("Read {} Roles", this.roleMap.size());
 
 		// validate referenced elements exist
 		for (User user : this.userMap.values()) {
 			for (String roleName : user.getRoles()) {
 				// validate that role exists
-				if (getRole(roleName) == null) {
-					logger.error(
-							format("Role {0} does not exist referenced by user {1}", roleName, user.getUsername()));
-				}
+				if (getRole(roleName) == null)
+					logger.error("Role {} does not exist referenced by user {}", roleName, user.getUsername());
 			}
 
 			for (String groupName : user.getGroups()) {
 				// validate that group exists
-				if (getGroup(groupName) == null) {
-					logger.error(
-							format("Group {0} does not exist referenced by user {1}", groupName, user.getUsername()));
-				}
+				if (getGroup(groupName) == null)
+					logger.error("Group {} does not exist referenced by user {}", groupName, user.getUsername());
 			}
 		}
 
@@ -315,9 +311,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		for (Group group : this.groupMap.values()) {
 			for (String roleName : group.roles()) {
 				// validate that role exists
-				if (getRole(roleName) == null) {
-					logger.error(format("Role {0} does not exist referenced by group {1}", roleName, group.name()));
-				}
+				if (getRole(roleName) == null)
+					logger.error("Role {} does not exist referenced by group {}", roleName, group.name());
 			}
 		}
 
@@ -355,7 +350,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 		long tookNanos = System.nanoTime() - start;
 		if (TimeUnit.NANOSECONDS.toMillis(tookNanos) > 100)
-			logger.warn("Persist took " + (formatNanoDuration(tookNanos)));
+			logger.warn("Persist took {}", formatNanoDuration(tookNanos));
 		return saved;
 	}
 }

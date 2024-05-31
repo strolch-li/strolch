@@ -29,7 +29,7 @@ import static li.strolch.privilege.i18n.PrivilegeMessages.getString;
 /**
  * <p>
  * This context gives access to a logged in user's privilege data e.g. the {@link UserRep}, {@link Certificate} and the
- * user's list of {@link PrivilegeRep}
+ * user's list of {@link Privilege}
  * </p>
  *
  * <p>

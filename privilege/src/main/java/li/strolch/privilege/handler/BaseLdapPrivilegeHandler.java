@@ -44,12 +44,12 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 				userChallengeHandler, ssoHandler, policyMap);
 
 		this.providerUrl = parameterMap.get("providerUrl");
-		logger.info("providerUrl: " + this.providerUrl);
+		logger.info("providerUrl: {}", this.providerUrl);
 		this.searchBase = parameterMap.get("searchBase");
-		logger.info("searchBase: " + this.searchBase);
+		logger.info("searchBase: {}", this.searchBase);
 		this.additionalFilter = trimOrEmpty(parameterMap.get("additionalFilter"));
 		if (!this.additionalFilter.isEmpty())
-			logger.info("additionalFilter: " + this.additionalFilter);
+			logger.info("additionalFilter: {}", this.additionalFilter);
 		this.domain = trimOrEmpty(parameterMap.get("domain"));
 		if (!this.domain.isEmpty()) {
 			if (this.domain.startsWith("@")) {
@@ -59,8 +59,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			}
 			this.domainPrefix = this.domain + '\\';
 
-			logger.info("domain: " + this.domain);
-			logger.info("domain prefix: " + this.domainPrefix);
+			logger.info("domain: {}", this.domain);
+			logger.info("domain prefix: {}", this.domainPrefix);
 		}
 	}
 
@@ -108,10 +108,10 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		} catch (AccessDeniedException e) {
 			throw e;
 		} catch (AuthenticationException e) {
-			logger.error("Could not login with user: " + safeUsername + " on Ldap", e);
+			logger.error("Could not login with user: {} on Ldap", safeUsername, e);
 			throw new InvalidCredentialsException("Could not login with user: " + safeUsername + " on Ldap", e);
 		} catch (Exception e) {
-			logger.error("Could not login with user: " + safeUsername + " on Ldap", e);
+			logger.error("Could not login with user: {} on Ldap", safeUsername, e);
 			throw new AccessDeniedException("Could not login with user: " + safeUsername + " on Ldap", e);
 		} finally {
 			if (ctx != null) {
@@ -199,8 +199,8 @@ public abstract class BaseLdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		// evaluate roles for this user
 		Set<String> ldapGroups = getLdapGroups(username, attrs);
-		logger.info("User " + username + " is member of the following LDAP groups: ");
-		ldapGroups.forEach(s -> logger.info("- " + s));
+		logger.info("User {} is member of the following LDAP groups: ", username);
+		ldapGroups.forEach(s -> logger.info("- {}", s));
 		Set<String> strolchGroups = mapToStrolchGroups(username, ldapGroups);
 		Set<String> strolchRoles = mapToStrolchRoles(username, ldapGroups);
 

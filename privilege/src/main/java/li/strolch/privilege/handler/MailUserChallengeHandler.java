@@ -1,5 +1,6 @@
 package li.strolch.privilege.handler;
 
+import static java.text.MessageFormat.format;
 import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
 
 import java.text.MessageFormat;
@@ -16,18 +17,28 @@ public class MailUserChallengeHandler extends UserChallengeHandler {
 
 		String subject = "Mail TAN";
 
-		String text = "Hello " + user.getFirstname() + " " + user.getLastname() + "\n\n" +
-				"You have requested an action which requires you to respond to a challenge.\n\n" +
-				"Please use the following code to response to the challenge:\n\n" + challenge;
+		String text = "Hello "
+				+ user.getFirstname()
+				+ " "
+				+ user.getLastname()
+				+ "\n\n"
+				+ "You have requested an action which requires you to respond to a challenge.\n\n"
+				+ "Please use the following code to response to the challenge:\n\n"
+				+ challenge;
 		String recipient = user.getEmail();
 		if (StringHelper.isEmpty(recipient)) {
-			String msg = "User {0} has no property {1}, so can not initiate challenge!";
-			logger.error(MessageFormat.format(msg, user.getUsername(), EMAIL));
+			logger.error("User {} has no property {}, so can not initiate challenge!", user.getUsername(), EMAIL);
 			return;
 		}
 
 		// send e-mail async
-		CompletableFuture.runAsync(() -> SmtpMailer.getInstance().sendMail(subject, text, recipient))
-				.whenComplete((unused, throwable) -> logger.error("Failed to send e-mail for user " + user, throwable));
+		CompletableFuture
+				.runAsync(() -> SmtpMailer.getInstance().sendMail(subject, text, recipient))
+				.whenComplete((unused, throwable) -> {
+					if (throwable == null)
+						logger.error("Sent Mail TAN e-mail for user {}", user, throwable);
+					else
+						logger.error("Failed to send e-mail for user {}", user, throwable);
+				});
 	}
 }

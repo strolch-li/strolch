@@ -26,7 +26,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.text.MessageFormat;
 import java.util.*;
 
 import static li.strolch.privilege.helper.XmlConstants.*;
@@ -181,16 +180,14 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 							this.userState, this.groups, this.userRoles, this.locale, this.parameters,
 							this.passwordChangeRequested, this.history);
 
-					logger.info(MessageFormat.format("New User: {0}", user));
+					logger.info("New User: {}", user);
 					String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
 					users.put(username, user);
 				}
 				default -> {
-					if (!(qName.equals(ROLES) //
-								  || qName.equals(GROUPS) //
-								  || qName.equals(PARAMETER) //
-								  || qName.equals(HISTORY) //
-								  || qName.equals(PARAMETERS))) {
+					if (!(
+							qName.equals(ROLES) || qName.equals(GROUPS) || qName.equals(PARAMETER) || qName.equals(
+									HISTORY) || qName.equals(PARAMETERS))) {
 						throw new IllegalArgumentException("Unhandled tag " + qName);
 					}
 				}

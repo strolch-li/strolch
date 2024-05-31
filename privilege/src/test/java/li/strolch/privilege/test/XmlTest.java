@@ -174,7 +174,7 @@ public class XmlTest {
 				        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege"/>
 				    </Policies>
 				</Privilege>
-								""";
+				""";
 
 		assertEquals(expected, Files.readString(configFile.toPath()));
 	}

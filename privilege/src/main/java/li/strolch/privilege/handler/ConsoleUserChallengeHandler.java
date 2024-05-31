@@ -6,6 +6,6 @@ public class ConsoleUserChallengeHandler extends UserChallengeHandler {
 
 	@Override
 	public void sendChallengeToUser(User user, String challenge) {
-		logger.info("Password reset challenge for " + user.getUsername() + " is: " + challenge);
+		logger.info("Password reset challenge for {} is: {}", user.getUsername(), challenge);
 	}
 }

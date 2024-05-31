@@ -24,7 +24,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.text.MessageFormat;
 import java.util.*;
 
 import static li.strolch.privilege.helper.XmlConstants.*;
@@ -175,7 +174,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 				case ROLE -> {
 					Role role = new Role(this.roleName, this.privileges);
 					roles.put(role.getName(), role);
-					logger.info(MessageFormat.format("New Role: {0}", role));
+					logger.info("New Role: {}", role);
 					init();
 				}
 				default -> throw new IllegalStateException("Unexpected value: " + qName);

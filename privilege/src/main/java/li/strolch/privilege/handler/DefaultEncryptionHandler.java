@@ -151,8 +151,10 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 	@Override
 	public boolean isPasswordCryptOutdated(PasswordCrypt passwordCrypt) {
-		return passwordCrypt.salt() == null || passwordCrypt.hashAlgorithm() == null ||
-				passwordCrypt.hashIterations() != this.iterations || passwordCrypt.hashKeyLength() != this.keyLength;
+		return passwordCrypt.salt() == null
+				|| passwordCrypt.hashAlgorithm() == null
+				|| passwordCrypt.hashIterations() != this.iterations
+				|| passwordCrypt.hashKeyLength() != this.keyLength;
 	}
 
 	@Override
@@ -163,8 +165,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 
 		// get hash algorithm parameters
 		this.algorithm = parameterMap.getOrDefault(PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
-		this.nonSaltAlgorithm = parameterMap.getOrDefault(PARAM_HASH_ALGORITHM_NON_SALT,
-				DEFAULT_ALGORITHM_NON_SALT);
+		this.nonSaltAlgorithm = parameterMap.getOrDefault(PARAM_HASH_ALGORITHM_NON_SALT, DEFAULT_ALGORITHM_NON_SALT);
 		this.iterations = Integer.parseInt(
 				parameterMap.getOrDefault(PARAM_HASH_ITERATIONS, valueOf(DEFAULT_ITERATIONS)));
 		this.keyLength = Integer.parseInt(
@@ -173,8 +174,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		// test non-salt hash algorithm
 		try {
 			hashPasswordWithoutSalt("test".toCharArray());
-			DefaultEncryptionHandler.logger.info(
-					MessageFormat.format("Using non-salt hashing algorithm {0}", this.nonSaltAlgorithm));
+			logger.info("Using non-salt hashing algorithm {}", this.nonSaltAlgorithm);
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
 			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), PARAM_HASH_ALGORITHM_NON_SALT,
@@ -185,7 +185,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		// test hash algorithm
 		try {
 			hashPassword("test".toCharArray(), "test".getBytes());
-			DefaultEncryptionHandler.logger.info(MessageFormat.format("Using hashing algorithm {0}", this.algorithm));
+			logger.info("Using hashing algorithm {}", this.algorithm);
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
 			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), PARAM_HASH_ALGORITHM,

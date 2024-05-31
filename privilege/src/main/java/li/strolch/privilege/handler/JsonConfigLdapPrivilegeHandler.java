@@ -96,7 +96,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 			JsonObject userLdapGroupOverrides = configJ.get("userLdapGroupOverrides").getAsJsonObject();
 			for (String username : userLdapGroupOverrides.keySet()) {
 				String group = userLdapGroupOverrides.get(username).getAsString();
-				logger.info("Registered LDAP group override for user " + username + " to group " + group);
+				logger.info("Registered LDAP group override for user {} to group {}", username, group);
 				this.userLdapGroupOverrides.put(username, group);
 			}
 		}
@@ -122,14 +122,14 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 	@Override
 	protected Set<String> getLdapGroups(String username, Attributes attrs) throws NamingException {
 		Set<String> ldapGroups = LdapHelper.getLdapGroups(attrs);
-		logger.info("User " + username + " has LDAP Groups: ");
-		ldapGroups.forEach(s -> logger.info("- " + s));
+		logger.info("User {} has LDAP Groups: ", username);
+		ldapGroups.forEach(s -> logger.info("- {}", s));
 
 		if (this.userLdapGroupOverrides.containsKey(username)) {
 			String overrideGroup = this.userLdapGroupOverrides.get(username);
 			ldapGroups.clear();
 			ldapGroups.add(overrideGroup);
-			logger.info("Overriding LDAP group for user " + username + " to " + overrideGroup);
+			logger.info("Overriding LDAP group for user {} to {}", username, overrideGroup);
 		}
 
 		Set<String> relevantLdapGroups = ldapGroups.stream().filter(s -> this.ldapGroupNames.contains(s))
@@ -139,9 +139,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 					" can not login, as none of their LDAP Groups have mappings to Strolch Roles!");
 
 		if (relevantLdapGroups.size() > 1) {
-			logger.warn(
-					"User " + username + " has multiple relevant LDAP Groups which will lead to undefined behaviour: " +
-							join(",", relevantLdapGroups));
+			logger.warn("User {} has multiple relevant LDAP Groups which will lead to undefined behaviour: {}",
+					username, join(",", relevantLdapGroups));
 		}
 
 		return relevantLdapGroups;
@@ -182,7 +181,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		if (isNotEmpty(department)) {
 			if (this.ldapToLocalLocationMap.containsKey(department)) {
 				String localL = this.ldapToLocalLocationMap.get(department);
-				logger.info("Using primary location " + localL + " for LDAP department " + department);
+				logger.info("Using primary location {} for LDAP department {}", localL, department);
 				primaryLocation = localL;
 			}
 		}
@@ -200,8 +199,9 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 				} else {
 					String location = primaryLocationJ.getAsString();
 					if (!secondaryLocations.contains(location)) {
-						logger.warn("Primary location already set by previous LDAP Group config for LDAP Group " +
-								ldapGroup + ", adding to secondary locations.");
+						logger.warn(
+								"Primary location already set by previous LDAP Group config for LDAP Group {}, adding to secondary locations.",
+								ldapGroup);
 						secondaryLocations.add(location);
 					}
 				}
@@ -215,8 +215,9 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 					else
 						secondaryLocationsJ.getAsJsonArray().forEach(s -> secondaryLocations.add(s.getAsString()));
 				} else {
-					logger.warn("Secondary locations already set by previous LDAP Group config for LDAP Group " +
-							ldapGroup + ", adding additional");
+					logger.warn(
+							"Secondary locations already set by previous LDAP Group config for LDAP Group {}, adding additional",
+							ldapGroup);
 					if (secondaryLocationsJ.isJsonPrimitive())
 						secondaryLocations.add(secondaryLocationsJ.getAsString());
 					else

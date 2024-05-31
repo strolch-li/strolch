@@ -63,8 +63,7 @@ public class PrivilegeInitializer {
 	/**
 	 * Initializes the {@link PrivilegeHandler} from the configuration file
 	 *
-	 * @param privilegeXmlFile
-	 * 		a {@link File} reference to the XML file containing the configuration for Privilege
+	 * @param privilegeXmlFile a {@link File} reference to the XML file containing the configuration for Privilege
 	 *
 	 * @return the initialized {@link PrivilegeHandler} where the {@link EncryptionHandler} and
 	 * {@link PersistenceHandler} are set and initialized as well
@@ -102,8 +101,7 @@ public class PrivilegeInitializer {
 	/**
 	 * Parses the privilege XML configuration from the given stream
 	 *
-	 * @param privilegeConfigInputStream
-	 * 		the XML stream containing the privilege configuration
+	 * @param privilegeConfigInputStream the XML stream containing the privilege configuration
 	 */
 	public PrivilegeContainerModel parseXmlConfiguration(InputStream privilegeConfigInputStream) {
 
@@ -207,7 +205,7 @@ public class PrivilegeInitializer {
 	private PasswordStrengthHandler initializePasswordStrengthHandler() {
 		String passwordStrengthHandlerClassName = this.containerModel.getPasswordStrengthHandlerClassName();
 		if (isEmpty(passwordStrengthHandlerClassName)) {
-			logger.info("No PasswordStrengthHandler defined, using " + SimplePasswordStrengthHandler.class.getName());
+			logger.info("No PasswordStrengthHandler defined, using {}", SimplePasswordStrengthHandler.class.getName());
 			passwordStrengthHandlerClassName = SimplePasswordStrengthHandler.class.getName();
 		}
 
