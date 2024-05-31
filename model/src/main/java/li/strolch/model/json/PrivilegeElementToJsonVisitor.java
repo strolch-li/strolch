@@ -37,19 +37,22 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	@Override
 	public JsonObject visitRoleRep(RoleRep roleRep) {
 		JsonObject jsonObject = new JsonObject();
-
 		jsonObject.addProperty("name", roleRep.getName());
 		addPrivileges(roleRep.getPrivileges().values(), jsonObject);
-
 		return jsonObject;
 	}
 
 	@Override
 	public JsonObject visitUserPrivileges(UserPrivileges userPrivileges) {
 		JsonObject jsonObject = userPrivileges.userRep().accept(this);
-
 		addPrivileges(userPrivileges.privileges(), jsonObject);
+		return jsonObject;
+	}
 
+	@Override
+	public JsonObject visitGroupPrivileges(GroupPrivileges groupPrivileges) {
+		JsonObject jsonObject = groupPrivileges.group().accept(this);
+		addPrivileges(groupPrivileges.privileges(), jsonObject);
 		return jsonObject;
 	}
 

@@ -42,6 +42,9 @@
         <Privilege name="PrivilegeGetUserPrivileges" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
+        <Privilege name="PrivilegeGetGroupPrivileges" policy="UserAccessPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
         <Privilege name="PrivilegeModifyRole" policy="RoleAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>

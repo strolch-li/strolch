@@ -210,7 +210,22 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER_PRIVILEGES);
 
 		UserRep userRep = crudHandler.getUser(certificate, username);
+		if (userRep == null)
+			throw new PrivilegeModelException(format("User {0} does not exist!", username));
 		return new PrivilegeContextBuilder(this).buildUserPrivilege(userRep);
+	}
+
+	@Override
+	public GroupPrivileges getGroupPrivileges(Certificate certificate, String groupName) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_GROUP_PRIVILEGES);
+
+		Group group = crudHandler.getGroup(certificate, groupName);
+		if (group == null)
+			throw new PrivilegeModelException(format("Group {0} does not exist!", groupName));
+		return new PrivilegeContextBuilder(this).buildGroupPrivilege(group);
 	}
 
 	@Override
@@ -345,14 +360,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
-		if (user == null) {
+		if (user == null)
 			throw new PrivilegeModelException(format("User {0} does not exist!", username));
-		}
 
 		// initiate the challenge
 		this.userChallengeHandler.initiateChallengeFor(usage, user, source);
 
-		logger.info(format("Initiated Challenge for {0} with usage {1}", username, usage));
+		logger.info("Initiated Challenge for {} with usage {}", username, usage);
 	}
 
 	@Override
@@ -385,13 +399,13 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				false).getCertificate();
 
 		if (!source.equals("unknown") && !source.equals(userChallenge.getSource())) {
-			logger.warn(format("Challenge request and response source''s are different: request: {0} to {1}",
-					userChallenge.getSource(), source));
+			logger.warn("Challenge request and response source''s are different: request: {} to {}",
+					userChallenge.getSource(), source);
 		}
 
 		persistSessionsAsync();
 
-		logger.info(format("Challenge validated for user {0} with usage {1}", username, usage));
+		logger.info("Challenge validated for user {} with usage {}", username, usage);
 		return certificate;
 	}
 
@@ -449,7 +463,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			persistModelAsync();
 
 			// log
-			logger.info(format("User {0} authenticated: {1}", username, certificate));
+			logger.info("User {} authenticated: {}", username, certificate);
 
 			// return the certificate
 			return certificate;
@@ -539,7 +553,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		persistSessionsAsync();
 
 		// log
-		logger.info(format("User {0} authenticated: {1}", user.getUsername(), certificate));
+		logger.info("User {} authenticated: {}", user.getUsername(), certificate);
 
 		return certificate;
 	}
@@ -580,7 +594,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// log
 			Certificate refreshedCertificate = refreshedContext.getCertificate();
-			logger.info(format("User {0} refreshed session: {1}", user.getUsername(), refreshedCertificate));
+			logger.info("User {} refreshed session: {}", user.getUsername(), refreshedCertificate);
 
 			// return the certificate
 			return refreshedCertificate;
@@ -798,7 +812,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// return true if object was really removed
 		boolean loggedOut = privilegeContext != null;
 		if (loggedOut)
-			logger.info(format("User {0} logged out.", certificate.getUsername()));
+			logger.info("User {} logged out.", certificate.getUsername());
 		else
 			logger.warn("User already logged out!");
 
@@ -1040,7 +1054,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			this.persistSessionsPath = getPersistSessionFile(persistSessionsPathS);
-			logger.info(format("Enabling persistence of sessions to {0}", this.persistSessionsPath.getAbsolutePath()));
+			logger.info("Enabling persistence of sessions to {}", this.persistSessionsPath.getAbsolutePath());
 		} else {
 			String msg = "Parameter {0} has illegal value {1}. Overriding with {2}";
 			msg = format(msg, PARAM_PERSIST_SESSIONS, persistSessionsS, Boolean.FALSE);

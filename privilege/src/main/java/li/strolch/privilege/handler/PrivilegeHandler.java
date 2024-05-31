@@ -89,6 +89,7 @@ public interface PrivilegeHandler {
 
 	String PRIVILEGE_GET_USER = "PrivilegeGetUser";
 	String PRIVILEGE_GET_USER_PRIVILEGES = "PrivilegeGetUserPrivileges";
+	String PRIVILEGE_GET_GROUP_PRIVILEGES = "PrivilegeGetGroupPrivileges";
 	String PRIVILEGE_ADD_USER = "PrivilegeAddUser";
 	String PRIVILEGE_REMOVE_USER = "PrivilegeRemoveUser";
 	String PRIVILEGE_MODIFY_USER = "PrivilegeModifyUser";
@@ -124,13 +125,26 @@ public interface PrivilegeHandler {
 	 * assigned by its roles and groups
 	 *
 	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
-	 * @param username    the name of the {@link UserRep} to return
+	 * @param username    the name of the user
 	 *
 	 * @return the {@link UserPrivileges} for the given username
 	 *
 	 * @throws PrivilegeException if the certificate may not access the user, or the request user does not exist
 	 */
 	UserPrivileges getUserPrivileges(Certificate certificate, String username);
+
+	/**
+	 * Returns a {@link GroupPrivileges} for the given group name. This object contains all the privileges the group has
+	 * assigned by its roles
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param group       the name of the group
+	 *
+	 * @return the {@link GroupPrivileges} for the given group name
+	 *
+	 * @throws PrivilegeException if the certificate may not access the user, or the request user does not exist
+	 */
+	GroupPrivileges getGroupPrivileges(Certificate certificate, String group);
 
 	/**
 	 * Returns a {@link RoleRep} for the given roleName

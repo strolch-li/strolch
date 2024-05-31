@@ -11,4 +11,6 @@ public interface PrivilegeElementVisitor<T> {
 	T visitPrivilegeRep(Privilege privilege);
 
 	T visitUserPrivileges(UserPrivileges userPrivileges);
+
+	T visitGroupPrivileges(GroupPrivileges groupPrivileges);
 }

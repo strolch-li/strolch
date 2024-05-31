@@ -28,6 +28,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
+import li.strolch.privilege.model.GroupPrivileges;
+import li.strolch.privilege.model.UserPrivileges;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.search.StrolchValueSearch;
@@ -42,8 +44,7 @@ import li.strolch.service.privilege.groups.PrivilegeUpdateGroupService;
 import li.strolch.utils.helper.StringHelper;
 
 import static java.util.Comparator.comparing;
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_GROUP;
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_GET_USER;
+import static li.strolch.privilege.handler.PrivilegeHandler.*;
 import static li.strolch.rest.helper.ResponseUtil.toResponse;
 import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
 
@@ -103,6 +104,22 @@ public class PrivilegeGroupsResource {
 			Group group = privilegeHandler.getGroup(cert, groupName);
 			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 			return Response.ok(group.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
+		}
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{group}/privileges")
+	public Response getGroupPrivileges(@PathParam("group") String group, @Context HttpServletRequest request) {
+		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
+
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_GROUP_PRIVILEGES);
+
+			GroupPrivileges groupPrivileges = privilegeHandler.getGroupPrivileges(cert, group);
+			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
+			return Response.ok(groupPrivileges.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
 		}
 	}
 

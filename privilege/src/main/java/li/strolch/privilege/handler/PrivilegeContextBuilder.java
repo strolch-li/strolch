@@ -4,7 +4,6 @@ import li.strolch.privilege.base.PrivilegeConflictResolution;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.*;
-import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
@@ -27,9 +26,9 @@ public class PrivilegeContextBuilder {
 	private final PrivilegeConflictResolution conflictResolution;
 	private final PersistenceHandler persistenceHandler;
 
-	private Set<String> userGroups;
-	private Set<String> userRoles;
-	private Map<String, String> userProperties;
+	private Set<String> groups;
+	private Set<String> roles;
+	private Map<String, String> properties;
 
 	public PrivilegeContextBuilder(DefaultPrivilegeHandler privilegeHandler) {
 		this.privilegeHandler = privilegeHandler;
@@ -57,42 +56,50 @@ public class PrivilegeContextBuilder {
 		Map<String, PrivilegePolicy> policies = new HashMap<>();
 
 		// cache the privileges and policies for this user by role
-		addPrivilegesForRoles(this.userRoles, user.getUsername(), privileges, policies);
+		addPrivilegesForRoles(this.roles, user.getUsername(), privileges, policies);
 
 		UserRep userRep = user.asUserRep();
-		userRep.setRoles(this.userRoles);
-		userRep.setGroups(this.userGroups);
-		userRep.setProperties(this.userProperties);
+		userRep.setRoles(this.roles);
+		userRep.setGroups(this.groups);
+		userRep.setProperties(this.properties);
 		userRep.readOnly();
 
 		Certificate certificate = new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(),
 				user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive, user.getLocale(),
-				this.userGroups, this.userRoles, this.userProperties);
+				this.groups, this.roles, this.properties);
 
 		return new PrivilegeContext(userRep, certificate, privileges, policies);
 	}
 
 	public UserPrivileges buildUserPrivilege(UserRep userRep) {
-		this.userRoles = streamAllRolesForUser(this.persistenceHandler, userRep)
+		this.roles = streamAllRolesForUser(this.persistenceHandler, userRep)
 				.sorted()
 				.collect(toCollection(TreeSet::new));
 
 		// cache the privileges and policies for this user by role
 		Map<String, Privilege> privileges = new HashMap<>();
-		addPrivilegesForRoles(this.userRoles, userRep.getUsername(), privileges, new HashMap<>());
+		addPrivilegesForRoles(this.roles, userRep.getUsername(), privileges, new HashMap<>());
 
 		return new UserPrivileges(userRep, List.copyOf(privileges.values()));
 	}
 
+	public GroupPrivileges buildGroupPrivilege(Group group) {
+		this.roles = group.roles().stream().sorted().collect(toCollection(TreeSet::new));
+
+		// cache the privileges and policies for this group by role
+		Map<String, Privilege> privileges = new HashMap<>();
+		addPrivilegesForRoles(this.roles, group.name(), privileges, new HashMap<>());
+
+		return new GroupPrivileges(group, List.copyOf(privileges.values()));
+	}
+
 	private void prepare(User user) {
-		this.userGroups = user.getGroups().stream().sorted().collect(toCollection(TreeSet::new));
-		this.userRoles = streamAllRolesForUser(this.persistenceHandler, user)
-				.sorted()
-				.collect(toCollection(TreeSet::new));
-		this.userProperties = new HashMap<>(user.getProperties());
+		this.groups = user.getGroups().stream().sorted().collect(toCollection(TreeSet::new));
+		this.roles = streamAllRolesForUser(this.persistenceHandler, user).sorted().collect(toCollection(TreeSet::new));
+		this.properties = new HashMap<>(user.getProperties());
 
 		// copy properties from groups to user properties
-		for (String groupName : this.userGroups) {
+		for (String groupName : this.groups) {
 			Group group = this.persistenceHandler.getGroup(groupName);
 			if (group == null) {
 				logger.error("Group {} does not exist!", groupName);
@@ -100,27 +107,27 @@ public class PrivilegeContextBuilder {
 			}
 			Map<String, String> groupProperties = group.getProperties();
 			for (String key : groupProperties.keySet()) {
-				String replaced = this.userProperties.put(key, groupProperties.get(key));
+				String replaced = this.properties.put(key, groupProperties.get(key));
 				if (replaced != null)
 					logger.error("Duplicate property {} for user {} from group {}", key, user.getUsername(), groupName);
 			}
 		}
 	}
 
-	private void addPrivilegesForRoles(Set<String> roles, String userName, Map<String, Privilege> privileges,
+	private void addPrivilegesForRoles(Set<String> roles, String name, Map<String, Privilege> privileges,
 			Map<String, PrivilegePolicy> policies) {
 
 		for (String roleName : roles) {
 			Role role = this.persistenceHandler.getRole(roleName);
 			if (role == null) {
-				logger.error("Role {} does not exist for user {}", roleName, userName);
+				logger.error("Role {} does not exist for user/group {}", roleName, name);
 			} else {
-				addPrivilegesForRole(userName, role, privileges, policies);
+				addPrivilegesForRole(name, role, privileges, policies);
 			}
 		}
 	}
 
-	private void addPrivilegesForRole(String userName, Role role, Map<String, Privilege> privileges,
+	private void addPrivilegesForRole(String name, Role role, Map<String, Privilege> privileges,
 			Map<String, PrivilegePolicy> policies) {
 
 		for (Privilege privilege : role.privilegeMap().values()) {
@@ -129,7 +136,7 @@ public class PrivilegeContextBuilder {
 			if (!privileges.containsKey(privilegeName)) {
 				privileges.put(privilegeName, privilege);
 			} else {
-				handleDuplicatePrivilege(userName, role, privileges, privilege, privilegeName);
+				handleDuplicatePrivilege(name, role, privileges, privilege, privilegeName);
 			}
 
 			// cache the policy for the privilege
@@ -145,19 +152,19 @@ public class PrivilegeContextBuilder {
 
 		PrivilegePolicy policy = getPolicy(policyName);
 		if (policy == null) {
-			logger.error(format("The Policy {0} does not exist for Privilege {1}", policyName, privilegeName));
+			logger.error("The Policy {} does not exist for Privilege {}", policyName, privilegeName);
 		} else {
 			policies.put(policyName, policy);
 		}
 	}
 
-	private void handleDuplicatePrivilege(String userName, Role role, Map<String, Privilege> privileges,
+	private void handleDuplicatePrivilege(String name, Role role, Map<String, Privilege> privileges,
 			Privilege additionalPrivilege, String privilegeName) {
 
 		// for strict, we have to throw an exception
 		if (this.conflictResolution.isStrict())
 			throw new PrivilegeModelException(
-					format("User " + userName + " has conflicts for privilege {0} with role {1}", privilegeName,
+					format("User/Group " + name + " has conflicts for privilege {0} with role {1}", privilegeName,
 							role.name()));
 
 		// merge privileges
@@ -197,14 +204,12 @@ public class PrivilegeContextBuilder {
 
 		// get the policies class
 		Class<PrivilegePolicy> policyClazz = this.policyMap.get(policyName);
-		if (policyClazz == null) {
+		if (policyClazz == null)
 			return null;
-		}
 
 		// instantiate the policy
 		PrivilegePolicy policy;
 		try {
-
 			policy = policyClazz.getConstructor().newInstance();
 		} catch (Exception e) {
 			String msg = "The class for the policy with the name {0} does not exist!{1}";
