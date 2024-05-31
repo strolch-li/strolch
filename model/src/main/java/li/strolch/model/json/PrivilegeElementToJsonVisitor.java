@@ -26,7 +26,8 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.addProperty("userState", userRep.getUserState().name());
 		jsonObject.addProperty("locale", userRep.getLocale().toLanguageTag());
 
-		addRoles(jsonObject, userRep.getRoles());
+		addSet(jsonObject, userRep.getGroups(), "groups");
+		addSet(jsonObject, userRep.getRoles(), "roles");
 		addProperties(userRep.getProperties(), jsonObject);
 		addHistory(userRep, jsonObject);
 
@@ -57,7 +58,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.addProperty("name", group.name());
 
-		addRoles(jsonObject, group.roles());
+		addSet(jsonObject, group.roles(), "roles");
 		addProperties(group.getProperties(), jsonObject);
 
 		return jsonObject;
@@ -71,8 +72,8 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.addProperty("policy", privilegeRep.getPolicy());
 		jsonObject.addProperty("allAllowed", privilegeRep.isAllAllowed());
 
-		addList(privilegeRep.getDenyList(), jsonObject, "denyList");
-		addList(privilegeRep.getAllowList(), jsonObject, "allowList");
+		addList(jsonObject, privilegeRep.getDenyList(), "denyList");
+		addList(jsonObject, privilegeRep.getAllowList(), "allowList");
 
 		return jsonObject;
 	}
@@ -86,16 +87,16 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.add("privileges", privilegesJ);
 	}
 
-	private static void addList(Set<String> privilegeRep, JsonObject jsonObject, String listName) {
+	private static void addList(JsonObject jsonObject, Set<String> privilegeRep, String listName) {
 		JsonArray listJ = new JsonArray();
 		privilegeRep.stream().sorted(String::compareToIgnoreCase).forEach(listJ::add);
 		jsonObject.add(listName, listJ);
 	}
 
-	private static void addRoles(JsonObject jsonObject, Set<String> userRep) {
-		JsonArray rolesArr = new JsonArray();
-		jsonObject.add("roles", rolesArr);
-		userRep.stream().sorted(String::compareToIgnoreCase).map(JsonPrimitive::new).forEach(rolesArr::add);
+	private static void addSet(JsonObject jsonObject, Set<String> values, String name) {
+		JsonArray listJ = new JsonArray();
+		jsonObject.add(name, listJ);
+		values.stream().sorted(String::compareToIgnoreCase).map(JsonPrimitive::new).forEach(listJ::add);
 	}
 
 	private static void addHistory(UserRep userRep, JsonObject jsonObject) {
