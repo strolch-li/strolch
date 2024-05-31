@@ -2,8 +2,7 @@ package li.strolch.model.json;
 
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
@@ -200,6 +199,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		for (String bagId : bagIds) {
 			this.ignoredKeys.addSet(bagId, Collections.emptySet());
 		}
+		return this;
+	}
+
+	public StrolchElementToJsonVisitor ignoreParameter(String paramId) {
+		this.ignoredKeys.addElement(BAG_PARAMETERS, paramId);
 		return this;
 	}
 
@@ -662,13 +666,17 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 				rootJ.addProperty(paramId, (Number) param.getValue());
 			} else if (this.withListParametersAsArray && type.isList()) {
 				JsonArray valuesJ = switch (type) {
-					case FLOAT_LIST -> ((FloatListParameter) param).streamValues()
+					case FLOAT_LIST -> ((FloatListParameter) param)
+							.streamValues()
 							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-					case INTEGER_LIST -> ((IntegerListParameter) param).streamValues()
+					case INTEGER_LIST -> ((IntegerListParameter) param)
+							.streamValues()
 							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-					case STRING_LIST -> ((StringListParameter) param).streamValues()
+					case STRING_LIST -> ((StringListParameter) param)
+							.streamValues()
 							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-					case LONG_LIST -> ((LongListParameter) param).streamValues()
+					case LONG_LIST -> ((LongListParameter) param)
+							.streamValues()
 							.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 					default -> throw new IllegalStateException("Unhandle list type " + type);
 				};
@@ -687,7 +695,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		JsonObject paramsJ = new JsonObject();
 		bagJ.add(PARAMETERS, paramsJ);
 
-		bag.streamOfParameters()
+		bag
+				.streamOfParameters()
 				.sorted(comparing(Parameter::getIndex))
 				.forEach(param -> paramsJ.add(param.getId(), paramToJsonFull(param)));
 
