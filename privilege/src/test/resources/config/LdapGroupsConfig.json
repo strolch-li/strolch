@@ -1,0 +1,47 @@
+{
+  "userLdapGroupOverrides": {
+    "some_user": "Administrator"
+  },
+  "locationMappings": {
+    "some_location": "LocationA"
+  },
+  "ldapGroupConfigs": {
+    "admin_group": {
+      "organisation": [
+        "OrganisationA"
+      ],
+      "primaryLocation": "LocationA",
+      "location": [
+        "LocationA",
+        "LocationB"
+      ],
+      "roles": [
+        "NotificationsAdmin",
+        "OperationsLogViewer",
+        "JobAdmin",
+        "ExecutionAdmin",
+        "LocationAdmin",
+        "StrolchAdmin",
+        "UserPrivileges",
+        "ModelAccessor",
+        "PrivilegeAdmin"
+      ]
+    },
+    "G_Esybox_Pflegefachperson": {
+      "organisation": [
+        "OrganisationA"
+      ],
+      "primaryLocation": "LocationA",
+      "location": [
+        "LocationA",
+        "LocationB"
+      ],
+      "roles": [
+        "Notifications",
+        "ModelAccessor",
+        "AppUser",
+        "UserPrivileges"
+      ]
+    }
+  }
+}
