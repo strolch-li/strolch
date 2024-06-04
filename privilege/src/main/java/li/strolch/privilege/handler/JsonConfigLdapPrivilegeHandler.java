@@ -20,12 +20,18 @@ import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toSet;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_CONFIG_FILE;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
-	public static final String PARAM_CONFIG_FILE = "configFile";
+	public static final String JSON_USER_LDAP_GROUP_OVERRIDES = "userLdapGroupOverrides";
+	public static final String JSON_LOCATION_MAPPINGS = "locationMappings";
+	public static final String LDAP_GROUP_CONFIGS = "ldapGroupConfigs";
+	public static final String LDAP_GIVEN_NAME = "givenName";
+	public static final String LDAP_SN = "sn";
+	public static final String LDAP_DEPARTMENT = "department";
 	private Locale defaultLocale;
 	private Map<String, String> ldapToLocalLocationMap;
 	private JsonObject ldapGroupConfigs;
@@ -84,19 +90,19 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		}
 
 		// validate the configuration
-		if (!configJ.has("ldapGroupConfigs") || !configJ.get("ldapGroupConfigs").isJsonObject())
+		if (!configJ.has(LDAP_GROUP_CONFIGS) || !configJ.get(LDAP_GROUP_CONFIGS).isJsonObject())
 			throw new IllegalStateException("JSON config is missing ldapGroupConfigs element!");
 
 		this.ldapToLocalLocationMap = new HashMap<>();
-		if (configJ.has("locationMappings")) {
-			JsonObject locationMappingsJ = configJ.get("locationMappings").getAsJsonObject();
+		if (configJ.has(JSON_LOCATION_MAPPINGS)) {
+			JsonObject locationMappingsJ = configJ.get(JSON_LOCATION_MAPPINGS).getAsJsonObject();
 			for (String ldapL : locationMappingsJ.keySet()) {
 				String localL = locationMappingsJ.get(ldapL).getAsString();
 				this.ldapToLocalLocationMap.put(ldapL, localL);
 			}
 		}
 
-		this.ldapGroupConfigs = configJ.get("ldapGroupConfigs").getAsJsonObject();
+		this.ldapGroupConfigs = configJ.get(LDAP_GROUP_CONFIGS).getAsJsonObject();
 		this.ldapGroupNames = ldapGroupConfigs.keySet();
 		if (this.ldapGroupNames.isEmpty())
 			throw new IllegalStateException(
@@ -122,8 +128,8 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		}
 
 		this.userLdapGroupOverrides = new HashMap<>();
-		if (configJ.has("userLdapGroupOverrides")) {
-			JsonObject userLdapGroupOverrides = configJ.get("userLdapGroupOverrides").getAsJsonObject();
+		if (configJ.has(JSON_USER_LDAP_GROUP_OVERRIDES)) {
+			JsonObject userLdapGroupOverrides = configJ.get(JSON_USER_LDAP_GROUP_OVERRIDES).getAsJsonObject();
 			for (String username : userLdapGroupOverrides.keySet()) {
 				String group = userLdapGroupOverrides.get(username).getAsString();
 				logger.info("Registered LDAP group override for user {} to group {}", username, group);
@@ -134,13 +140,13 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
 	@Override
 	protected String getFirstName(String username, Attributes attrs) throws NamingException {
-		String value = getLdapString(attrs, "givenName");
+		String value = getLdapString(attrs, LDAP_GIVEN_NAME);
 		return isEmpty(value) ? username : value;
 	}
 
 	@Override
 	protected String getLastName(String username, Attributes attrs) throws NamingException {
-		String value = getLdapString(attrs, "sn");
+		String value = getLdapString(attrs, LDAP_SN);
 		return isEmpty(value) ? username : value;
 	}
 
@@ -210,7 +216,7 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		Set<String> locations = new HashSet<>();
 
 		// first see if we can find the primaryLocation from the department attribute:
-		String department = getLdapString(attrs, "department");
+		String department = getLdapString(attrs, LDAP_DEPARTMENT);
 		if (isNotEmpty(department)) {
 			if (this.ldapToLocalLocationMap.containsKey(department)) {
 				String localL = this.ldapToLocalLocationMap.get(department);

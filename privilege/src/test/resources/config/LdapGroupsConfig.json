@@ -27,7 +27,7 @@
         "PrivilegeAdmin"
       ]
     },
-    "G_Esybox_Pflegefachperson": {
+    "app_user_group": {
       "organisation": [
         "OrganisationA"
       ],
