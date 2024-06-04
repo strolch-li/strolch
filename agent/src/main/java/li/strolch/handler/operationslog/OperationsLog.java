@@ -118,7 +118,9 @@ public class OperationsLog extends StrolchComponent {
 					// add the messages
 					messages.forEach(logMessage -> {
 						logMessages.add(logMessage);
-						logMessagesByLocator.put(logMessage.getLocator(), logMessages);
+						LinkedHashSet<LogMessage> tmp = logMessagesByLocator.computeIfAbsent(logMessage.getLocator(),
+								OperationsLog::newHashSet);
+						tmp.add(logMessage);
 					});
 				} catch (RuntimeException e) {
 					logger.error("Failed to load operations log for realm {}", realmName, e);
