@@ -3,6 +3,7 @@ package li.strolch.privilege.handler;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.LdapHelper;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.dbc.DBC;
@@ -15,13 +16,16 @@ import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static java.lang.String.join;
+import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toSet;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 
+	public static final String PARAM_CONFIG_FILE = "configFile";
 	private Locale defaultLocale;
 	private Map<String, String> ldapToLocalLocationMap;
 	private JsonObject ldapGroupConfigs;
@@ -44,12 +48,32 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		this.defaultLocale = parameterMap.containsKey("defaultLocale") ?
 				Locale.forLanguageTag(parameterMap.get("defaultLocale")) : Locale.getDefault();
 
-		String configFileS = parameterMap.get("configFile");
+		String configFileS = parameterMap.get(PARAM_CONFIG_FILE);
 		DBC.PRE.assertNotEmpty("configFile param must be set!", configFileS);
+
+		// see if we need a base path for our configuration file
 		File configFile = new File(configFileS);
+		if (!configFile.isAbsolute()) {
+			String basePath = parameterMap.get(PARAM_BASE_PATH);
+			if (isEmpty(basePath)) {
+				String msg = "[{0}] Config file parameter {1} is not absolute, and base bath {2} is not set!";
+				msg = format(msg, JsonConfigLdapPrivilegeHandler.class.getName(), PARAM_CONFIG_FILE, basePath);
+				throw new PrivilegeException(msg);
+			}
+
+			File basePathF = new File(basePath);
+			if (!basePathF.exists() && !basePathF.isDirectory()) {
+				String msg = "[{0}] Config file parameter {1} is not absolute, and base bath {2} is not a directory!";
+				msg = format(msg, JsonConfigLdapPrivilegeHandler.class.getName(), PARAM_CONFIG_FILE,
+						basePathF.getAbsolutePath());
+				throw new PrivilegeException(msg);
+			}
+
+			configFile = new File(basePath, configFile.getName());
+		}
 		if (!configFile.exists() || !configFile.isFile() || !configFile.canRead())
-			throw new IllegalStateException("configFile does not exist, is not a file, or can not be read at path " +
-					configFile.getAbsolutePath());
+			throw new IllegalStateException("configFile does not exist, is not a file, or can not be read at path "
+					+ configFile.getAbsolutePath());
 
 		// parse the configuration file
 		JsonObject configJ;
@@ -81,14 +105,20 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 		// validate the configuration
 		for (String name : this.ldapGroupNames) {
 			JsonObject config = ldapGroupConfigs.get(name).getAsJsonObject();
-			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray() ||
-					config.get(LOCATION).getAsJsonArray().isEmpty())
-				throw new IllegalStateException("LDAP Group " + name +
-						" is missing a location attribute, or it is not an array or the array is empty");
-			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray() ||
-					config.get(LOCATION).getAsJsonArray().isEmpty())
-				throw new IllegalStateException("LDAP Group " + name +
-						" is missing a roles attribute, or it is not an array or the array is empty");
+			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray() || config
+					.get(LOCATION)
+					.getAsJsonArray()
+					.isEmpty())
+				throw new IllegalStateException("LDAP Group "
+						+ name
+						+ " is missing a location attribute, or it is not an array or the array is empty");
+			if (!config.has(LOCATION) || !config.get(LOCATION).isJsonArray() || config
+					.get(LOCATION)
+					.getAsJsonArray()
+					.isEmpty())
+				throw new IllegalStateException("LDAP Group "
+						+ name
+						+ " is missing a roles attribute, or it is not an array or the array is empty");
 		}
 
 		this.userLdapGroupOverrides = new HashMap<>();
@@ -132,11 +162,14 @@ public class JsonConfigLdapPrivilegeHandler extends BaseLdapPrivilegeHandler {
 			logger.info("Overriding LDAP group for user {} to {}", username, overrideGroup);
 		}
 
-		Set<String> relevantLdapGroups = ldapGroups.stream().filter(s -> this.ldapGroupNames.contains(s))
+		Set<String> relevantLdapGroups = ldapGroups
+				.stream()
+				.filter(s -> this.ldapGroupNames.contains(s))
 				.collect(toSet());
 		if (relevantLdapGroups.isEmpty())
-			throw new IllegalStateException("User " + username +
-					" can not login, as none of their LDAP Groups have mappings to Strolch Roles!");
+			throw new IllegalStateException("User "
+					+ username
+					+ " can not login, as none of their LDAP Groups have mappings to Strolch Roles!");
 
 		if (relevantLdapGroups.size() > 1) {
 			logger.warn("User {} has multiple relevant LDAP Groups which will lead to undefined behaviour: {}",

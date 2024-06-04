@@ -100,7 +100,7 @@ public class XmlTest {
 	@Test
 	public void canReadConfig() {
 
-		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
+		PrivilegeContainerModel containerModel = new PrivilegeContainerModel(new File(SRC_TEST));
 		PrivilegeConfigSaxReader saxReader = new PrivilegeConfigSaxReader(containerModel);
 		File xmlFile = new File(SRC_TEST + "PrivilegeConfig.xml");
 		XmlHelper.parseDocument(xmlFile, saxReader);
@@ -129,10 +129,9 @@ public class XmlTest {
 
 		parameterMap.put("autoPersistOnPasswordChange", "true");
 		encryptionHandlerParameterMap.put("hashAlgorithm", "SHA-256");
-		persistenceHandlerParameterMap.put("basePath", TARGET_TEST);
 		persistenceHandlerParameterMap.put("modelXmlFile", "PrivilegeModel.xml");
 
-		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
+		PrivilegeContainerModel containerModel = new PrivilegeContainerModel(new File(TARGET_TEST));
 		containerModel.setParameterMap(parameterMap);
 		containerModel.setPrivilegeHandlerClassName(DefaultPrivilegeHandler.class.getName());
 		containerModel.setEncryptionHandlerClassName(DefaultEncryptionHandler.class.getName());
@@ -163,7 +162,6 @@ public class XmlTest {
 				        </EncryptionHandler>
 				        <PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
 				            <Parameters>
-				                <Parameter name="basePath" value="target/test/"/>
 				                <Parameter name="modelXmlFile" value="PrivilegeModel.xml"/>
 				            </Parameters>
 				        </PersistenceHandler>
@@ -293,7 +291,7 @@ public class XmlTest {
 		// PrivilegeAdmin
 		Role privilegeAdmin = findRole("PrivilegeAdmin", roles);
 		assertEquals("PrivilegeAdmin", privilegeAdmin.getName());
-		assertEquals(17, privilegeAdmin.getPrivilegeNames().size());
+		assertEquals(22, privilegeAdmin.getPrivilegeNames().size());
 		Privilege privilegeAction = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_ACTION);
 		assertFalse(privilegeAction.isAllAllowed());
 		assertEquals(5, privilegeAction.getAllowList().size());
@@ -365,12 +363,14 @@ public class XmlTest {
 	}
 
 	private User findUser(String username, Map<String, User> users) {
-		return Optional.ofNullable(users.get(username))
+		return Optional
+				.ofNullable(users.get(username))
 				.orElseThrow(() -> new IllegalStateException("User " + username + " does not exist!"));
 	}
 
 	private Role findRole(String name, Map<String, Role> roles) {
-		return Optional.ofNullable(roles.get(name))
+		return Optional
+				.ofNullable(roles.get(name))
 				.orElseThrow(() -> new IllegalStateException("Role " + name + " does not exist!"));
 	}
 
@@ -401,8 +401,8 @@ public class XmlTest {
 		groups.add("group2");
 		userRoles = new HashSet<>();
 		userRoles.add("role2");
-		history = UserHistory.EMPTY.withFirstLogin(
-						ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()))
+		history = UserHistory.EMPTY
+				.withFirstLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 2, 3, 4, 5), ZoneId.systemDefault()))
 				.withLastLogin(ZonedDateTime.of(LocalDateTime.of(2020, 1, 5, 2, 3, 4, 5), ZoneId.systemDefault()));
 		User user2 = new User("2", "user2", new PasswordCrypt("haha".getBytes(), "haha".getBytes(), null, -1, -1),
 				"Leonard", "Sheldon", UserState.ENABLED, groups, userRoles, Locale.ENGLISH, propertyMap, false,
@@ -420,9 +420,17 @@ public class XmlTest {
 		assertNotNull(parsedUsers);
 		assertEquals(2, parsedUsers.size());
 
-		User parsedUser1 = parsedUsers.values().stream().filter(u -> u.getUsername().equals("user1")).findAny()
+		User parsedUser1 = parsedUsers
+				.values()
+				.stream()
+				.filter(u -> u.getUsername().equals("user1"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("user1 missing!"));
-		User parsedUser2 = parsedUsers.values().stream().filter(u -> u.getUsername().equals("user2")).findAny()
+		User parsedUser2 = parsedUsers
+				.values()
+				.stream()
+				.filter(u -> u.getUsername().equals("user2"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("user2 missing!"));
 
 		assertEquals(user1.getFirstname(), parsedUser1.getFirstname());
@@ -513,9 +521,17 @@ public class XmlTest {
 		assertEquals(2, parsedRoles.size());
 
 		assertEquals(2, parsedRoles.size());
-		Role parsedRole1 = parsedRoles.values().stream().filter(r -> r.getName().equals("role1")).findAny()
+		Role parsedRole1 = parsedRoles
+				.values()
+				.stream()
+				.filter(r -> r.getName().equals("role1"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("role1 missing!"));
-		Role parsedRole2 = parsedRoles.values().stream().filter(r -> r.getName().equals("role2")).findAny()
+		Role parsedRole2 = parsedRoles
+				.values()
+				.stream()
+				.filter(r -> r.getName().equals("role2"))
+				.findAny()
 				.orElseThrow(() -> new RuntimeException("role2 missing!"));
 
 		Set<String> privilegeNames = role1.getPrivilegeNames();

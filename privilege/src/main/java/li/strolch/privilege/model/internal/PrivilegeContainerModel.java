@@ -15,6 +15,7 @@
  */
 package li.strolch.privilege.model.internal;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ import li.strolch.privilege.policy.PrivilegePolicy;
  */
 public class PrivilegeContainerModel {
 
+	private File basePath;
+
 	private String encryptionHandlerClassName;
 	private String passwordStrengthHandlerClassName;
 	private String persistenceHandlerClassName;
@@ -54,7 +57,8 @@ public class PrivilegeContainerModel {
 
 	private final Map<String, Class<PrivilegePolicy>> policies;
 
-	public PrivilegeContainerModel() {
+	public PrivilegeContainerModel(File basePath) {
+		this.basePath = basePath;
 		this.policies = new HashMap<>();
 		this.encryptionHandlerParameterMap = new HashMap<>();
 		this.passwordStrengthHandlerParameterMap = new HashMap<>();
@@ -62,6 +66,10 @@ public class PrivilegeContainerModel {
 		this.challengeHandlerParameterMap = new HashMap<>();
 		this.ssoHandlerParameterMap = new HashMap<>();
 		this.privilegeHandlerParameterMap = new HashMap<>();
+	}
+
+	public File getBasePath() {
+		return this.basePath;
 	}
 
 	public Map<String, String> getParameterMap() {
@@ -173,8 +181,8 @@ public class PrivilegeContainerModel {
 		try {
 
 			// load class and try to create a new instance
-			@SuppressWarnings("unchecked")
-			Class<PrivilegePolicy> clazz = (Class<PrivilegePolicy>) Class.forName(policyClassName);
+			@SuppressWarnings("unchecked") Class<PrivilegePolicy> clazz = (Class<PrivilegePolicy>) Class.forName(
+					policyClassName);
 
 			clazz.getConstructor().newInstance();
 
@@ -205,15 +213,28 @@ public class PrivilegeContainerModel {
 
 	@Override
 	public String toString() {
-		return "PrivilegeContainerModel [encryptionHandlerClassName=" + this.encryptionHandlerClassName
-				+ ", encryptionHandlerParameterMap=" + this.encryptionHandlerParameterMap.size()
-				+ ", passwordStrengthHandlerClassName=" + this.passwordStrengthHandlerClassName
-				+ ", passwordStrengthHandlerParameterMap=" + this.passwordStrengthHandlerParameterMap
-				+ ", persistenceHandlerClassName=" + this.persistenceHandlerClassName
-				+ ", persistenceHandlerParameterMap=" + this.persistenceHandlerParameterMap.size()
-				+ ", challengeHandlerParameterMap=" + this.challengeHandlerParameterMap.size()
-				+ ", ssoHandlerParameterMap=" + this.ssoHandlerParameterMap.size() + ", privilegeHandlerParameterMap="
-				+ this.privilegeHandlerParameterMap.size() + ", parameterMap=" + this.parameterMap.size()
-				+ ", policies=" + this.policies.size() + "]";
+		return "PrivilegeContainerModel [encryptionHandlerClassName="
+				+ this.encryptionHandlerClassName
+				+ ", encryptionHandlerParameterMap="
+				+ this.encryptionHandlerParameterMap.size()
+				+ ", passwordStrengthHandlerClassName="
+				+ this.passwordStrengthHandlerClassName
+				+ ", passwordStrengthHandlerParameterMap="
+				+ this.passwordStrengthHandlerParameterMap
+				+ ", persistenceHandlerClassName="
+				+ this.persistenceHandlerClassName
+				+ ", persistenceHandlerParameterMap="
+				+ this.persistenceHandlerParameterMap.size()
+				+ ", challengeHandlerParameterMap="
+				+ this.challengeHandlerParameterMap.size()
+				+ ", ssoHandlerParameterMap="
+				+ this.ssoHandlerParameterMap.size()
+				+ ", privilegeHandlerParameterMap="
+				+ this.privilegeHandlerParameterMap.size()
+				+ ", parameterMap="
+				+ this.parameterMap.size()
+				+ ", policies="
+				+ this.policies.size()
+				+ "]";
 	}
 }

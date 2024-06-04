@@ -47,7 +47,6 @@ import static li.strolch.persistence.api.TransactionThreadLocal.getTx;
 import static li.strolch.persistence.api.TransactionThreadLocal.hasTx;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
-import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
@@ -106,28 +105,22 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			throw new PrivilegeException(msg);
 		}
 
+		RuntimeConfiguration runtimeConfig = configuration.getRuntimeConfiguration();
+		File configPath = runtimeConfig.getConfigPath();
+
 		try (InputStream inputStream = Files.newInputStream(privilegeXmlFile.toPath())) {
 
 			// parse configuration file
-			PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
+			PrivilegeContainerModel containerModel = new PrivilegeContainerModel(configPath);
 			PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
 			XmlHelper.parseDocument(inputStream, xmlHandler);
 
-			Map<String, String> parameterMap = containerModel.getParameterMap();
-			RuntimeConfiguration runtimeConfig = configuration.getRuntimeConfiguration();
-
 			// set sessions data path
+			Map<String, String> parameterMap = containerModel.getParameterMap();
 			if (parseBoolean(parameterMap.get(PARAM_PERSIST_SESSIONS))) {
 				File dataPath = runtimeConfig.getTempPath();
 				String sessionsPath = new File(dataPath, "sessions.dat").getAbsolutePath();
 				parameterMap.put(PARAM_PERSIST_SESSIONS_PATH, sessionsPath);
-			}
-
-			// set base path
-			if (containerModel.getPersistenceHandlerClassName().equals(XmlPersistenceHandler.class.getName())) {
-				Map<String, String> xmlParams = containerModel.getPersistenceHandlerParameterMap();
-				File configPath = runtimeConfig.getConfigPath();
-				xmlParams.put(PARAM_BASE_PATH, configPath.getPath());
 			}
 
 			return new PrivilegeInitializer(getScheduledExecutor(getName())).initializeFromXml(containerModel);

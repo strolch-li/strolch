@@ -15,16 +15,6 @@
  */
 package li.strolch.privilege.helper;
 
-import static li.strolch.utils.helper.ClassHelper.instantiateClass;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.text.MessageFormat;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.*;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
@@ -34,6 +24,17 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.text.MessageFormat;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+
+import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
+import static li.strolch.utils.helper.ClassHelper.instantiateClass;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * This class implements the initializing of the {@link PrivilegeHandler} by loading an XML file containing the
@@ -79,7 +80,7 @@ public class PrivilegeInitializer {
 
 		// delegate using input stream
 		try (InputStream fin = Files.newInputStream(privilegeXmlFile.toPath())) {
-			this.containerModel = parseXmlConfiguration(fin);
+			this.containerModel = parseXmlConfiguration(privilegeXmlFile.getParentFile(), fin);
 		} catch (Exception e) {
 			String msg = "Failed to load configuration from {0}";
 			msg = MessageFormat.format(msg, privilegeXmlFile.getAbsolutePath());
@@ -103,10 +104,10 @@ public class PrivilegeInitializer {
 	 *
 	 * @param privilegeConfigInputStream the XML stream containing the privilege configuration
 	 */
-	public PrivilegeContainerModel parseXmlConfiguration(InputStream privilegeConfigInputStream) {
+	public PrivilegeContainerModel parseXmlConfiguration(File basePath, InputStream privilegeConfigInputStream) {
 
 		// parse configuration file
-		PrivilegeContainerModel containerModel = new PrivilegeContainerModel();
+		PrivilegeContainerModel containerModel = new PrivilegeContainerModel(basePath);
 		PrivilegeConfigSaxReader xmlHandler = new PrivilegeConfigSaxReader(containerModel);
 		XmlHelper.parseDocument(privilegeConfigInputStream, xmlHandler);
 
@@ -127,7 +128,9 @@ public class PrivilegeInitializer {
 
 	private PrivilegeHandler initializedPrivilegeHandler() {
 		DefaultPrivilegeHandler privilegeHandler;
+
 		Map<String, String> parameterMap = this.containerModel.getParameterMap();
+		parameterMap.put(PARAM_BASE_PATH, this.containerModel.getBasePath().getAbsolutePath());
 
 		if (this.containerModel.getPrivilegeHandlerClassName() == null) {
 			privilegeHandler = new DefaultPrivilegeHandler();
@@ -190,6 +193,7 @@ public class PrivilegeInitializer {
 		String persistenceHandlerClassName = this.containerModel.getPersistenceHandlerClassName();
 		PersistenceHandler persistenceHandler = instantiateClass(persistenceHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getPersistenceHandlerParameterMap();
+		parameterMap.put(PARAM_BASE_PATH, this.containerModel.getBasePath().getAbsolutePath());
 
 		try {
 			persistenceHandler.initialize(parameterMap);
