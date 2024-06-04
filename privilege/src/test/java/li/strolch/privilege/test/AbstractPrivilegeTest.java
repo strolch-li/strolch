@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 public class AbstractPrivilegeTest {
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractPrivilegeTest.class);
+	public static final String SRC_TEST_RESOURCES_CONFIG = "src/test/resources/config";
 
 	protected static ScheduledExecutorService executorService;
 	protected PrivilegeHandler privilegeHandler;
@@ -60,7 +61,7 @@ public class AbstractPrivilegeTest {
 	protected static void prepareConfigs(String dst, String configFilename, String usersFilename, String groupsFilename,
 			String rolesFilename) {
 		try {
-			File configPath = new File("src/test/resources/config");
+			File configPath = new File(SRC_TEST_RESOURCES_CONFIG);
 
 			File privilegeConfigFile = new File(configPath, configFilename);
 			File privilegeUsersFile = new File(configPath, usersFilename);

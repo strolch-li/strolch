@@ -740,7 +740,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		if (user.getUserState() == UserState.SYSTEM) {
 			String msg = "User {0} is a system user and may not login!";
 			msg = format(msg, username);
-			throw new InvalidCredentialsException(msg);
+			throw new AccessDeniedException(msg);
 		}
 
 		// validate if user is allowed to login

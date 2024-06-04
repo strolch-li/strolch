@@ -113,7 +113,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void testFailAuthenticationNOk() {
-		IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+		InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> {
 			try {
 				login(ADMIN, ArraysHelper.copyOf(PASS_BAD));
 			} finally {
@@ -126,7 +126,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void testFailAuthenticationPWNull() {
-		IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+		InvalidCredentialsException exception = assertThrows(InvalidCredentialsException.class, () -> {
 			try {
 				login(ADMIN, null);
 			} finally {
@@ -224,14 +224,14 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	 */
 	@Test
 	public void testLoginSystemUser() {
-		IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+		AccessDeniedException exception = assertThrows(AccessDeniedException.class, () -> {
 			try {
 				login(SYSTEM_USER_ADMIN, SYSTEM_USER_ADMIN.toCharArray());
 			} finally {
 				logout();
 			}
 		});
-		assertEquals(InvalidCredentialsException.class, getRootCause(exception).getClass());
+		assertEquals(AccessDeniedException.class, getRootCause(exception).getClass());
 		MatcherAssert.assertThat(getRootCauseMessage(exception),
 				containsString("User system_admin is a system user and may not login!"));
 	}
@@ -277,7 +277,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldFailUpdateInexistantUser() {
-		IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+		PrivilegeModelException exception = assertThrows(PrivilegeModelException.class, () -> {
 			try {
 				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 
@@ -366,7 +366,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldDetectPrivilegeConflict1() {
-		IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+		PrivilegeModelException exception = assertThrows(PrivilegeModelException.class, () -> {
 			try {
 				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 				Certificate certificate = this.ctx.getCertificate();
@@ -386,7 +386,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldDetectPrivilegeConflict2() {
-		IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+		PrivilegeModelException exception = assertThrows(PrivilegeModelException.class, () -> {
 			try {
 				login(ADMIN, ArraysHelper.copyOf(PASS_ADMIN));
 				Certificate certificate = this.ctx.getCertificate();
@@ -485,7 +485,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			try {
 				this.privilegeHandler.setUserState(certificate, TED, UserState.SYSTEM);
 				fail("Should not be able to set user state to SYSTEM");
-			} catch (IllegalStateException e) {
+			} catch (AccessDeniedException e) {
 				if (!(getRootCause(e) instanceof AccessDeniedException))
 					fail("Unexpected root cause " + getRootCause(e));
 			}
@@ -511,7 +511,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			try {
 				this.privilegeHandler.setUserLocale(certificate, BOB, Locale.FRENCH);
 				fail("Should not be able to set locale of other user, as missing privilege");
-			} catch (IllegalStateException e) {
+			} catch (AccessDeniedException e) {
 				if (!(getRootCause(e) instanceof AccessDeniedException))
 					fail("Unexpected root cause " + getRootCause(e));
 			}
@@ -519,7 +519,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			try {
 				this.privilegeHandler.setUserState(certificate, BOB, UserState.DISABLED);
 				fail("Should not be able to set state of other user, as missing privilege");
-			} catch (IllegalStateException e) {
+			} catch (AccessDeniedException e) {
 				if (!(getRootCause(e) instanceof AccessDeniedException))
 					fail("Unexpected root cause " + getRootCause(e));
 			}
@@ -545,7 +545,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			try {
 				this.privilegeHandler.setUserLocale(certificate, TED, Locale.FRENCH);
 				fail("Should not be able to set locale, as missing privilege");
-			} catch (IllegalStateException e) {
+			} catch (AccessDeniedException e) {
 				if (!(getRootCause(e) instanceof AccessDeniedException))
 					fail("Unexpected root cause " + getRootCause(e));
 			}
@@ -553,7 +553,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			try {
 				this.privilegeHandler.setUserState(certificate, TED, UserState.ENABLED);
 				fail("Should not be able to set state, as missing privilege");
-			} catch (IllegalStateException e) {
+			} catch (AccessDeniedException e) {
 				if (!(getRootCause(e) instanceof AccessDeniedException))
 					fail("Unexpected root cause " + getRootCause(e));
 			}
@@ -680,7 +680,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// Will fail because user ted has no password
 			login(TED, ArraysHelper.copyOf(PASS_TED));
 			fail("User Ted may not authenticate because the user has no password!");
-		} catch (IllegalStateException e) {
+		} catch (AccessDeniedException e) {
 			String msg = "User ted has no password and may not login!";
 			assertEquals(InvalidCredentialsException.class, getRootCause(e).getClass());
 			MatcherAssert.assertThat(getRootCauseMessage(e), containsString(msg));
@@ -737,7 +737,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			certificate = this.ctx.getCertificate();
 			this.privilegeHandler.addUser(certificate, userRep, null);
 			fail("User bob may not add a user as bob does not have admin rights!");
-		} catch (IllegalStateException e) {
+		} catch (AccessDeniedException e) {
 			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.noprivilege.user"), BOB,
 					PrivilegeHandler.PRIVILEGE_ADD_USER);
 			assertEquals(AccessDeniedException.class, getRootCause(e).getClass());
@@ -802,7 +802,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 			// Will fail because user bob is not yet enabled
 			this.privilegeHandler.authenticate(BOB, ArraysHelper.copyOf(PASS_BOB), false);
 			fail("User Bob may not authenticate because the user is not yet enabled!");
-		} catch (IllegalStateException e) {
+		} catch (AccessDeniedException e) {
 			String msg = "User bob does not have state ENABLED and can not login!";
 			assertEquals(AccessDeniedException.class, getRootCause(e).getClass());
 			MatcherAssert.assertThat(getRootCauseMessage(e), containsString(msg));
