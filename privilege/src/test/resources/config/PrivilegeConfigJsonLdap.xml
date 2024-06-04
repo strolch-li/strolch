@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Privilege>
+    <Container>
+        <Parameters>
+            <Parameter name="secretKey" value="5185F447-6317-4856-B40E-573919BA0A16"/>
+            <Parameter name="secretSalt" value="00F6E88C-A64F-410A-8FCF-9CD340E340F7"/>
+            <Parameter name="persistSessions" value="true"/>
+            <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
+            <Parameter name="autoPersistOnUserChangesData" value="true"/>
+            <Parameter name="privilegeConflictResolution" value="STRICT"/>
+        </Parameters>
+        <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
+            <Parameters>
+                <Parameter name="hashAlgorithm" value="PBKDF2WithHmacSHA512"/>
+                <Parameter name="hashIterations" value="10000"/>
+                <Parameter name="hashKeyLength" value="256"/>
+            </Parameters>
+        </EncryptionHandler>
+        <PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
+            <Parameters>
+                <Parameter name="basePath" value="target/${target}"/>
+                <Parameter name="usersXmlFile" value="PrivilegeUsers.xml"/>
+                <Parameter name="rolesXmlFile" value="PrivilegeRoles.xml"/>
+            </Parameters>
+        </PersistenceHandler>
+
+        <UserChallengeHandler class="li.strolch.privilege.test.model.TestUserChallengeHandler"/>
+
+        <SsoHandler class="li.strolch.privilege.test.model.DummySsoHandler"/>
+
+        <PrivilegeHandler class="li.strolch.privilege.handler.JsonConfigLdapPrivilegeHandler">
+            <Parameters>
+                <Parameter name="providerUrl" value="ldap://ldap.lan:389"/>
+                <Parameter name="searchBase" value="OU=Development,dc=Strolch,dc=li"/>
+                <Parameter name="domain" value="@strolch.li"/>
+                <Parameter name="defaultLocale" value="de"/>
+                <Parameter name="realm" value="defaultRealm"/>
+                <Parameter name="configFile" value="LdapGroupsConfig.json"/>
+            </Parameters>
+        </PrivilegeHandler>
+
+    </Container>
+    <Policies>
+        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege"/>
+        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege"/>
+        <Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege"/>
+        <Policy name="UserSessionAccessPrivilege" class="li.strolch.privilege.policy.UsernameFromCertificatePrivilege"/>
+    </Policies>
+</Privilege>
