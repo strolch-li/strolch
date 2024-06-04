@@ -1,17 +1,5 @@
 package li.strolch.handler.operationslog;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static java.util.ResourceBundle.getBundle;
-import static li.strolch.agent.api.StrolchAgent.getUniqueId;
-import static li.strolch.model.Tags.AGENT;
-import static li.strolch.model.log.LogMessageState.Information;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
@@ -22,6 +10,18 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.ResourceBundle.getBundle;
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.model.log.LogMessageState.Information;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 public class OperationsLog extends StrolchComponent {
 
@@ -102,15 +102,26 @@ public class OperationsLog extends StrolchComponent {
 		try {
 			runAsAgent(ctx -> {
 
-				logger.info("Loading OperationsLog for realm " + realmName + "...");
+				logger.info("Loading OperationsLog for realm {}...", realmName);
 
 				try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<LogMessage> messages = logMessageDao.queryLatest(realmName, this.maxMessages);
-					logger.info("Loaded " + messages.size() + " messages for OperationsLog for realm " + realmName);
-					this.logMessagesByRealmAndId.computeIfAbsent(realmName, OperationsLog::newHashSet).addAll(messages);
+					logger.info("Loaded {} messages for OperationsLog for realm {}", messages.size(), realmName);
+
+					// get collections to which to add
+					LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
+							OperationsLog::newHashSet);
+					LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesByLocator
+							= this.logMessagesByLocator.computeIfAbsent(realmName, this::newBoundedLocatorMap);
+
+					// add the messages
+					messages.forEach(logMessage -> {
+						logMessages.add(logMessage);
+						logMessagesByLocator.put(logMessage.getLocator(), logMessages);
+					});
 				} catch (RuntimeException e) {
-					logger.error("Failed to load operations log for realm " + realmName, e);
+					logger.error("Failed to load operations log for realm {}", realmName, e);
 				}
 			});
 		} catch (Exception e) {
@@ -157,8 +168,8 @@ public class OperationsLog extends StrolchComponent {
 		logMessages.add(logMessage);
 
 		// store under locator
-		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator = this.logMessagesByLocator.computeIfAbsent(
-				realmName, this::newBoundedLocatorMap);
+		LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesLocator
+				= this.logMessagesByLocator.computeIfAbsent(realmName, this::newBoundedLocatorMap);
 		LinkedHashSet<LogMessage> messages = logMessagesLocator.computeIfAbsent(logMessage.getLocator(),
 				OperationsLog::newHashSet);
 		messages.add(logMessage);
@@ -195,7 +206,8 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	private void _removeMessages(Collection<LogMessage> logMessages) {
-		Map<String, List<LogMessage>> messagesByRealm = logMessages.stream()
+		Map<String, List<LogMessage>> messagesByRealm = logMessages
+				.stream()
 				.collect(Collectors.groupingBy(LogMessage::getRealm));
 
 		messagesByRealm.forEach((realmName, messages) -> {
@@ -262,7 +274,7 @@ public class OperationsLog extends StrolchComponent {
 		if (nrOfExcessMessages > 0)
 			maxDelete += nrOfExcessMessages;
 
-		logger.info("Pruning " + maxDelete + " messages from realm " + realm + "...");
+		logger.info("Pruning {} messages from realm {}...", maxDelete, realm);
 		Iterator<LogMessage> iterator = logMessages.iterator();
 		while (maxDelete > 0 && iterator.hasNext()) {
 			LogMessage messageToRemove = iterator.next();
