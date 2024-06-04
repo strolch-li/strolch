@@ -28,7 +28,7 @@
 
         <SsoHandler class="li.strolch.privilege.test.model.DummySsoHandler"/>
 
-        <PrivilegeHandler class="li.strolch.privilege.handler.JsonConfigLdapPrivilegeHandler">
+        <PrivilegeHandler class="li.strolch.privilege.handler.LdapPrivilegeHandler">
             <Parameters>
                 <Parameter name="providerUrl" value="ldap://ldap.lan:389"/>
                 <Parameter name="searchBase" value="OU=Development,dc=Strolch,dc=li"/>

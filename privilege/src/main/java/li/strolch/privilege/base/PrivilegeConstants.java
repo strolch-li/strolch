@@ -11,6 +11,7 @@ public class PrivilegeConstants {
 	public static final String REALM = "realm";
 	public static final String ORGANISATION = "organisation";
 	public static final String LOCATION = "location";
+	public static final String LOCATIONS = "locations";
 	public static final String PRIMARY_LOCATION = "primaryLocation";
 	public static final String SECONDARY_LOCATIONS = "secondaryLocations";
 	public static final String ROLES = "roles";

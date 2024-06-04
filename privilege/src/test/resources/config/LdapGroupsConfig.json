@@ -1,11 +1,14 @@
 {
-  "userLdapGroupOverrides": {
+  "userGroupOverrides": {
     "some_user": "Administrator"
   },
   "locationMappings": {
     "some_location": "LocationA"
   },
-  "ldapGroupConfigs": {
+  "groupMappings": {
+    "some_admin_group": "GroupA"
+  },
+  "groupConfigs": {
     "admin_group": {
       "organisation": [
         "OrganisationA"

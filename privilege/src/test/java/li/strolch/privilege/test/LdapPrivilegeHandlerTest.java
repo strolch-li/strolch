@@ -9,21 +9,21 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class JsonConfigLdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
+public class LdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
 
 	@BeforeClass
 	public static void init() throws IOException {
-		removeConfigs(JsonConfigLdapPrivilegeHandlerTest.class.getSimpleName());
-		prepareConfigs(JsonConfigLdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigJsonLdap.xml",
+		removeConfigs(LdapPrivilegeHandlerTest.class.getSimpleName());
+		prepareConfigs(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigJsonLdap.xml",
 				"PrivilegeUsers.xml", "PrivilegeGroups.xml", "PrivilegeRoles.xml");
 		Files.copy(new File(SRC_TEST_RESOURCES_CONFIG, "LdapGroupsConfig.json").toPath(),
-				new File("target/" + JsonConfigLdapPrivilegeHandlerTest.class.getSimpleName(),
+				new File("target/" + LdapPrivilegeHandlerTest.class.getSimpleName(),
 						"LdapGroupsConfig.json").toPath());
 	}
 
 	@Before
 	public void setup() {
-		initialize(JsonConfigLdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigJsonLdap.xml");
+		initialize(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigJsonLdap.xml");
 	}
 
 	@Test
