@@ -14,7 +14,7 @@ public interface SingleSignOnHandler {
 	 * @param parameterMap
 	 * 		a map containing configuration properties
 	 */
-	void initialize(Map<String, String> parameterMap);
+	void initialize(PersistenceHandler persistenceHandler, Map<String, String> parameterMap);
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service.

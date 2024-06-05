@@ -1,46 +1,37 @@
 package li.strolch.privilege.handler;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
-import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.helper.LdapHelper;
-import li.strolch.privilege.model.Group;
+import li.strolch.privilege.helper.GroupsAndRoles;
+import li.strolch.privilege.helper.LdapQuery;
+import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.privilege.policy.PrivilegePolicy;
-import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import java.io.File;
-import java.io.FileReader;
+import javax.naming.AuthenticationException;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static java.text.MessageFormat.format;
-import static java.util.stream.Collectors.toSet;
-import static li.strolch.privilege.base.PrivilegeConstants.*;
-import static li.strolch.privilege.helper.LdapHelper.LDAP_DEPARTMENT;
-import static li.strolch.privilege.helper.LdapHelper.LDAP_SN;
-import static li.strolch.privilege.helper.ModelHelper.buildLocationProperties;
+import static li.strolch.privilege.base.PrivilegeConstants.REALM;
+import static li.strolch.privilege.helper.LdapQuery.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_CONFIG_FILE;
-import static li.strolch.utils.LdapHelper.encodeForLDAP;
-import static li.strolch.utils.helper.StringHelper.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(LdapPrivilegeHandler.class);
-	public static final String LDAP_FILTER_TEMPLATE = "(&(objectCategory=person)(objectClass=user)(%s=%s)%s)";
-	public static final String SAM_ACCOUNT_NAME = "sAMAccountName";
-	public static final String USER_PRINCIPAL_NAME = "userPrincipalName";
 
 	private String providerUrl;
 	private String searchBase;
@@ -48,18 +39,9 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 	private String domain;
 	private String domainPrefix;
 
-	public static final String USER_GROUP_OVERRIDES = "userGroupOverrides";
-	public static final String GROUP_MAPPINGS = "groupMappings";
-	public static final String LOCATION_MAPPINGS = "locationMappings";
-	public static final String GROUP_CONFIGS = "ldapGroupConfigs";
-	public static final String LDAP_GIVEN_NAME = "givenName";
-
 	private Locale defaultLocale;
-	private Map<String, String> ldapGroupToLocalGroupMap;
-	private Map<String, String> ldapLocationToLocalLocationMap;
-	private JsonObject groupConfigs;
-	private String realm;
-	private HashMap<String, String> userGroupOverrides;
+
+	private RemoteGroupMappingModel groupMappingModel;
 
 	@Override
 	public void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
@@ -90,124 +72,41 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			logger.info("domain prefix: {}", this.domainPrefix);
 		}
 
-		this.realm = parameterMap.get(REALM);
-		DBC.PRE.assertNotEmpty("realm must be set!", realm);
-
 		this.defaultLocale = parameterMap.containsKey("defaultLocale") ?
 				Locale.forLanguageTag(parameterMap.get("defaultLocale")) : Locale.getDefault();
 
+		String realm = parameterMap.get(REALM);
+		String basePath = parameterMap.get(PARAM_BASE_PATH);
 		String configFileS = parameterMap.get(PARAM_CONFIG_FILE);
-		DBC.PRE.assertNotEmpty("configFile param must be set!", configFileS);
-
-		// see if we need a base path for our configuration file
-		File configFile = new File(configFileS);
-		if (!configFile.isAbsolute()) {
-			String basePath = parameterMap.get(PARAM_BASE_PATH);
-			if (isEmpty(basePath)) {
-				String msg = "[{0}] Config file parameter {1} is not absolute, and base bath {2} is not set!";
-				msg = format(msg, LdapPrivilegeHandler.class.getName(), PARAM_CONFIG_FILE, basePath);
-				throw new PrivilegeException(msg);
-			}
-
-			File basePathF = new File(basePath);
-			if (!basePathF.exists() && !basePathF.isDirectory()) {
-				String msg = "[{0}] Config file parameter {1} is not absolute, and base bath {2} is not a directory!";
-				msg = format(msg, LdapPrivilegeHandler.class.getName(), PARAM_CONFIG_FILE, basePathF.getAbsolutePath());
-				throw new PrivilegeException(msg);
-			}
-
-			configFile = new File(basePath, configFile.getName());
-		}
-		if (!configFile.exists() || !configFile.isFile() || !configFile.canRead())
-			throw new IllegalStateException("configFile does not exist, is not a file, or can not be read at path "
-					+ configFile.getAbsolutePath());
-
-		// parse the configuration file
-		JsonObject configJ;
-		try (FileReader reader = new FileReader(configFile)) {
-			configJ = JsonParser.parseReader(reader).getAsJsonObject();
-		} catch (Exception e) {
-			throw new IllegalStateException("Failed to read config file " + configFile.getAbsolutePath(), e);
-		}
-
-		// validate the configuration
-		if (!configJ.has(GROUP_CONFIGS) || !configJ.get(GROUP_CONFIGS).isJsonObject())
-			throw new IllegalStateException("JSON config is missing ldapGroupConfigs element!");
-
-		this.ldapLocationToLocalLocationMap = new HashMap<>();
-		if (configJ.has(LOCATION_MAPPINGS)) {
-			JsonObject locationMappingsJ = configJ.get(LOCATION_MAPPINGS).getAsJsonObject();
-			for (String ldapLocation : locationMappingsJ.keySet()) {
-				String localLocation = locationMappingsJ.get(ldapLocation).getAsString();
-				this.ldapLocationToLocalLocationMap.put(ldapLocation, localLocation);
-			}
-		}
-		this.ldapGroupToLocalGroupMap = new HashMap<>();
-		if (configJ.has(GROUP_MAPPINGS)) {
-			JsonObject groupMappingsJ = configJ.get(GROUP_MAPPINGS).getAsJsonObject();
-			for (String ldapGroup : groupMappingsJ.keySet()) {
-				String localGroup = groupMappingsJ.get(ldapGroup).getAsString();
-				this.ldapGroupToLocalGroupMap.put(ldapGroup, localGroup);
-			}
-		}
-
-		this.groupConfigs = configJ.get(GROUP_CONFIGS).getAsJsonObject();
-
-		// validate the configuration
-		for (String name : this.groupConfigs.keySet()) {
-			JsonObject config = this.groupConfigs.get(name).getAsJsonObject();
-			JsonElement locationsJ = config.get(LOCATIONS);
-			if (locationsJ == null || !locationsJ.isJsonArray() || locationsJ.getAsJsonArray().isEmpty())
-				throw new IllegalStateException(
-						format("LDAP Group {0} is missing attribute {1}, or it is not an array or the array is empty",
-								name, LOCATIONS));
-			JsonElement rolesJ = config.get(ROLES);
-			if (rolesJ == null || !rolesJ.isJsonArray() || rolesJ.getAsJsonArray().isEmpty())
-				throw new IllegalStateException(
-						format("LDAP Group {0} is missing attribute {1}, or it is not an array or the array is empty",
-								name, ROLES));
-		}
-
-		this.userGroupOverrides = new HashMap<>();
-		if (configJ.has(USER_GROUP_OVERRIDES)) {
-			JsonObject userGroupOverrides = configJ.get(USER_GROUP_OVERRIDES).getAsJsonObject();
-			for (String username : userGroupOverrides.keySet()) {
-				String group = userGroupOverrides.get(username).getAsString();
-				logger.info("Registered user group override for user {} to group {}", username, group);
-				this.userGroupOverrides.put(username, group);
-			}
-		}
+		this.groupMappingModel = new RemoteGroupMappingModel(persistenceHandler);
+		this.groupMappingModel.loadJsonConfig(realm, basePath, configFileS);
 	}
 
 	@Override
 	protected User checkCredentialsAndUserState(String username, char[] password) throws AccessDeniedException {
-		// escape the user provider username
-		String safeUsername = encodeForLDAP(username, true);
 
 		// first see if this is a local user
-		User internalUser = this.persistenceHandler.getUser(safeUsername);
+		User internalUser = this.persistenceHandler.getUser(username);
 		if (internalUser != null && internalUser.getUserState() != UserState.REMOTE)
-			return super.checkCredentialsAndUserState(safeUsername, password);
+			return super.checkCredentialsAndUserState(username, password);
 
-		String userPrincipalName;
-		if (this.domain.isEmpty()) {
-			userPrincipalName = safeUsername;
-		} else {
-			if (!this.domainPrefix.isEmpty() && username.startsWith(this.domainPrefix)) {
-				logger.warn("Trimming domain from given username, to first search in sAMAccountName");
-				safeUsername = encodeForLDAP(username.substring(this.domainPrefix.length()), true);
-			}
-			userPrincipalName = safeUsername + "@" + this.domain;
+		logger.info("User {} tries to login on ldap {}", username, this.providerUrl);
+
+		// Perform LDAP query
+		SearchResult searchResult;
+		try (LdapQuery query = new LdapQuery(this.providerUrl, this.searchBase, this.additionalFilter, this.domain,
+				this.domainPrefix)) {
+			searchResult = query.searchLdap(username, password);
+		} catch (NamingException e) {
+			logger.error("Could not login with user: {} on Ldap", username, e);
+			throw new AccessDeniedException("Could not login with user: " + username + " on Ldap", e);
+		} finally {
+			Arrays.fill(password, '\0');
 		}
 
-		logger.info("User {} tries to login on ldap {}", safeUsername, this.providerUrl);
-
-		// Create the initial context
-		DirContext ctx = null;
+		// build user
 		try {
-			ctx = new InitialDirContext(buildLdapEnv(password, userPrincipalName));
-			SearchResult searchResult = searchLdap(safeUsername, ctx, userPrincipalName);
-			User user = buildUserFromSearchResult(safeUsername, searchResult);
+			User user = buildUserFromSearchResult(username, searchResult);
 
 			// persist this user
 			if (internalUser == null)
@@ -223,81 +122,12 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		} catch (AccessDeniedException e) {
 			throw e;
 		} catch (AuthenticationException e) {
-			logger.error("Could not login with user: {} on Ldap", safeUsername, e);
-			throw new InvalidCredentialsException("Could not login with user: " + safeUsername + " on Ldap", e);
+			logger.error("Could not login with user: {} on Ldap", username, e);
+			throw new InvalidCredentialsException("Could not login with user: " + username + " on Ldap", e);
 		} catch (Exception e) {
-			logger.error("Could not login with user: {} on Ldap", safeUsername, e);
-			throw new AccessDeniedException("Could not login with user: " + safeUsername + " on Ldap", e);
-		} finally {
-			if (ctx != null) {
-				try {
-					ctx.close();
-				} catch (NamingException e) {
-					logger.error("Failed to close DirContext", e);
-				}
-			}
+			logger.error("Could not login with user: {} on Ldap", username, e);
+			throw new AccessDeniedException("Could not login with user: " + username + " on Ldap", e);
 		}
-	}
-
-	private Hashtable<String, String> buildLdapEnv(char[] password, String userPrincipalName) {
-
-		// Set up the environment for creating the initial context
-		Hashtable<String, String> env = new Hashtable<>();
-
-		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, this.providerUrl);
-
-		// Authenticate
-		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, userPrincipalName);
-		env.put(Context.SECURITY_CREDENTIALS, new String(password));
-		env.put(Context.REFERRAL, "ignore");
-		return env;
-	}
-
-	private SearchResult searchLdap(String safeUsername, DirContext ctx, String userPrincipalName)
-			throws NamingException {
-		SearchControls searchControls = new SearchControls();
-		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-		// the first search is using sAMAccountName
-		NamingEnumeration<SearchResult> answer = ctx.search(this.searchBase,
-				LDAP_FILTER_TEMPLATE.formatted(SAM_ACCOUNT_NAME, safeUsername, this.additionalFilter), searchControls);
-
-		SearchResult searchResult = null;
-		while (searchResult == null) {
-			try {
-
-				// and if we don't find anything, then we search with userPrincipalName
-				if (!answer.hasMore()) {
-
-					logger.warn("No LDAP data retrieved using {}, trying with {}...", SAM_ACCOUNT_NAME,
-							USER_PRINCIPAL_NAME);
-					answer = ctx.search(this.searchBase,
-							LDAP_FILTER_TEMPLATE.formatted(USER_PRINCIPAL_NAME, userPrincipalName,
-									this.additionalFilter), searchControls);
-
-					if (!answer.hasMore())
-						throw new AccessDeniedException("Could not login user: "
-								+ safeUsername
-								+ " on Ldap: no LDAP Data, for either sAMAccountName or userPrincipalName searches. Domain used is "
-								+ this.domain);
-				}
-
-				searchResult = answer.next();
-				if (answer.hasMore())
-					throw new AccessDeniedException(
-							"Could not login with user: " + safeUsername + " on Ldap: Multiple LDAP Data");
-
-			} catch (PartialResultException e) {
-				if (ExceptionHelper.getExceptionMessage(e).contains("Unprocessed Continuation Reference(s)"))
-					logger.warn("Ignoring partial result exception, as we are not following referrals!");
-				else
-					throw e;
-			}
-		}
-
-		return searchResult;
 	}
 
 	protected User buildUserFromSearchResult(String username, SearchResult sr) throws Exception {
@@ -309,20 +139,28 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		String lastName = getLastName(username, attrs);
 		Locale locale = getLocale(attrs);
 
-		// evaluate roles for this user
-		Set<String> ldapGroups = getLdapGroups(username, attrs);
-		logger.info("User {} is member of the following LDAP groups: ", username);
-		ldapGroups.forEach(s -> logger.info("- {}", s));
-		GroupsAndRoles groupsAndRoles = mapToStrolchGroupsAndRoles(ldapGroups);
+		// evaluate groups and roles for this user
+		Set<String> ldapGroups = getLdapGroups(attrs);
+		GroupsAndRoles groupsAndRoles = this.groupMappingModel.mapRemoteGroupsToStrolch(username, ldapGroups);
 
-		Map<String, String> properties = buildProperties(attrs, ldapGroups);
+		if (groupsAndRoles.isEmpty()) {
+			logger.error("User {} can not login, as no group or role mappings were found.", username);
+			logger.info("User {} is member of the following LDAP groups: ", username);
+			ldapGroups.forEach(s -> logger.info("- {}", s));
+			throw new AccessDeniedException(
+					"User " + username + " can not login, as no group or role mappings were found.");
+		}
 
-		return new User(username, username, null, firstName, lastName, UserState.REMOTE, groupsAndRoles.groups,
-				groupsAndRoles.roles, locale, properties, false, UserHistory.EMPTY);
+		// first see if we can find the primaryLocation from the department attribute:
+		String department = getLdapString(attrs, LDAP_DEPARTMENT);
+		Map<String, String> properties = this.groupMappingModel.buildProperties(department, ldapGroups);
+
+		return new User(username, username, null, firstName, lastName, UserState.REMOTE, groupsAndRoles.groups(),
+				groupsAndRoles.roles(), locale, properties, false, UserHistory.EMPTY);
 	}
 
 	protected String validateLdapUsername(String username, Attributes attrs) throws NamingException {
-		Attribute sAMAccountName = attrs.get(SAM_ACCOUNT_NAME);
+		Attribute sAMAccountName = attrs.get(LDAP_SAM_ACCOUNT_NAME);
 		if (sAMAccountName == null || !username.equalsIgnoreCase(sAMAccountName.get().toString()))
 			throw new AccessDeniedException(
 					"Could not login with user: " + username + this.domain + " on Ldap: Wrong LDAP Data");
@@ -349,108 +187,26 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		return this.defaultLocale;
 	}
 
-	protected Set<String> getLdapGroups(String username, Attributes attrs) throws NamingException {
-		Set<String> ldapGroups = LdapHelper.getLdapGroups(attrs);
-		logger.info("User {} has LDAP Groups: ", username);
-		ldapGroups.forEach(s -> logger.info("- {}", s));
+	protected Set<String> getLdapGroups(Attributes attrs) throws NamingException {
+		Set<String> ldapRoles = new HashSet<>();
+		Attribute groupMembers = attrs.get(LDAP_MEMBER_OF);
+		if (groupMembers == null)
+			return ldapRoles;
 
-		if (this.userGroupOverrides.containsKey(username)) {
-			String overrideGroup = this.userGroupOverrides.get(username);
-			ldapGroups.clear();
-			ldapGroups.add(overrideGroup);
-			logger.info("Overriding LDAP group for user {} to {}", username, overrideGroup);
-		}
+		for (int i = 0; i < groupMembers.size(); i++) {
+			String memberOfLdapString = attrs.get(LDAP_MEMBER_OF).get(i).toString();
 
-		return ldapGroups;
-	}
-
-	protected GroupsAndRoles mapToStrolchGroupsAndRoles(Set<String> ldapGroups) {
-
-		// first see if we have mappings for LDAP groups to local groups
-		Set<String> mappedGroupNames = ldapGroups
-				.stream()
-				.map(lg -> this.ldapGroupToLocalGroupMap.getOrDefault(lg, lg))
-				.collect(toSet());
-
-		// now see if we have any groups with these names
-		Set<String> groups = getPersistenceHandler()
-				.getAllGroups()
-				.stream()
-				.map(Group::name)
-				.filter(mappedGroupNames::contains)
-				.collect(toSet());
-
-		// now map any LDAP groups to roles
-		Set<String> roles = new HashSet<>();
-		for (String relevantLdapGroup : ldapGroups) {
-			JsonObject mappingJ = this.groupConfigs.get(relevantLdapGroup).getAsJsonObject();
-			if (mappingJ.has(ROLES))
-				mappingJ.get(ROLES).getAsJsonArray().forEach(e -> roles.add(e.getAsString()));
-		}
-
-		return new GroupsAndRoles(groups, roles);
-	}
-
-	protected Map<String, String> buildProperties(Attributes attrs, Set<String> ldapGroups) throws NamingException {
-
-		String primaryLocation = "";
-		Set<String> secondaryLocations = new HashSet<>();
-		Set<String> organisations = new HashSet<>();
-		Set<String> locations = new HashSet<>();
-
-		// first see if we can find the primaryLocation from the department attribute:
-		String department = getLdapString(attrs, LDAP_DEPARTMENT);
-		if (isNotEmpty(department)) {
-			if (this.ldapLocationToLocalLocationMap.containsKey(department)) {
-				String localL = this.ldapLocationToLocalLocationMap.get(department);
-				logger.info("Using primary location {} for LDAP department {}", localL, department);
-				primaryLocation = localL;
-			}
-		}
-
-		for (String ldapGroup : ldapGroups) {
-			JsonObject mappingJ = this.groupConfigs.get(ldapGroup).getAsJsonObject();
-			if (mappingJ.has(ORGANISATION))
-				mappingJ.get(ORGANISATION).getAsJsonArray().forEach(e -> organisations.add(e.getAsString()));
-			mappingJ.get(LOCATION).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
-
-			JsonElement primaryLocationJ = mappingJ.get(PRIMARY_LOCATION);
-			if (primaryLocationJ != null && !primaryLocationJ.isJsonNull()) {
-				if (primaryLocation.isEmpty()) {
-					primaryLocation = primaryLocationJ.getAsString();
-				} else {
-					String location = primaryLocationJ.getAsString();
-					if (!secondaryLocations.contains(location)) {
-						logger.warn(
-								"Primary location already set by previous LDAP Group config for LDAP Group {}, adding to secondary locations.",
-								ldapGroup);
-						secondaryLocations.add(location);
-					}
-				}
-			}
-
-			JsonElement secondaryLocationsJ = mappingJ.get(SECONDARY_LOCATIONS);
-			if (secondaryLocationsJ != null && !secondaryLocationsJ.isJsonNull()) {
-				if (secondaryLocations.isEmpty()) {
-					if (secondaryLocationsJ.isJsonPrimitive())
-						secondaryLocations.add(secondaryLocationsJ.getAsString());
-					else
-						secondaryLocationsJ.getAsJsonArray().forEach(s -> secondaryLocations.add(s.getAsString()));
-				} else {
-					logger.warn(
-							"Secondary locations already set by previous LDAP Group config for LDAP Group {}, adding additional",
-							ldapGroup);
-					if (secondaryLocationsJ.isJsonPrimitive())
-						secondaryLocations.add(secondaryLocationsJ.getAsString());
-					else
-						secondaryLocationsJ.getAsJsonArray().forEach(s -> secondaryLocations.add(s.getAsString()));
+			// extract group name from ldap string -> CN=groupname,OU=company,DC=domain,DC=country
+			LdapName memberOfName = new LdapName(memberOfLdapString);
+			for (Rdn rdn : memberOfName.getRdns()) {
+				if (rdn.getType().equalsIgnoreCase(LDAP_CN)) {
+					String groupName = rdn.getValue().toString();
+					ldapRoles.add(groupName);
+					break;
 				}
 			}
 		}
 
-		return buildLocationProperties(this.realm, organisations, locations, primaryLocation, secondaryLocations);
-	}
-
-	public record GroupsAndRoles(Set<String> groups, Set<String> roles) {
+		return ldapRoles;
 	}
 }

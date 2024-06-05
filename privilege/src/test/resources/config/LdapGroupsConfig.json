@@ -14,7 +14,7 @@
         "OrganisationA"
       ],
       "primaryLocation": "LocationA",
-      "location": [
+      "locations": [
         "LocationA",
         "LocationB"
       ],
@@ -35,7 +35,7 @@
         "OrganisationA"
       ],
       "primaryLocation": "LocationA",
-      "location": [
+      "locations": [
         "LocationA",
         "LocationB"
       ],

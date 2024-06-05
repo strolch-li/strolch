@@ -14,7 +14,7 @@ public class LdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
 	@BeforeClass
 	public static void init() throws IOException {
 		removeConfigs(LdapPrivilegeHandlerTest.class.getSimpleName());
-		prepareConfigs(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigJsonLdap.xml",
+		prepareConfigs(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigLdap.xml",
 				"PrivilegeUsers.xml", "PrivilegeGroups.xml", "PrivilegeRoles.xml");
 		Files.copy(new File(SRC_TEST_RESOURCES_CONFIG, "LdapGroupsConfig.json").toPath(),
 				new File("target/" + LdapPrivilegeHandlerTest.class.getSimpleName(),
@@ -23,7 +23,7 @@ public class LdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
 
 	@Before
 	public void setup() {
-		initialize(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigJsonLdap.xml");
+		initialize(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigLdap.xml");
 	}
 
 	@Test
