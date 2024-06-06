@@ -16,9 +16,9 @@ import java.util.Hashtable;
 import static li.strolch.utils.LdapHelper.encodeForLDAP;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 
-public class LdapQuery implements AutoCloseable {
+public class WindowsLdapQuery implements AutoCloseable {
 
-	private static final Logger logger = LoggerFactory.getLogger(LdapQuery.class);
+	private static final Logger logger = LoggerFactory.getLogger(WindowsLdapQuery.class);
 
 	public static final String LDAP_FILTER_TEMPLATE = "(&(objectCategory=person)(objectClass=user)(%s=%s)%s)";
 	public static final String USER_PRINCIPAL_NAME = "userPrincipalName";
@@ -38,7 +38,7 @@ public class LdapQuery implements AutoCloseable {
 
 	private InitialDirContext context;
 
-	public LdapQuery(String providerUrl, String searchBase, String additionalFilter, String domain,
+	public WindowsLdapQuery(String providerUrl, String searchBase, String additionalFilter, String domain,
 			String domainPrefix) {
 		this.providerUrl = providerUrl;
 		this.searchBase = searchBase;

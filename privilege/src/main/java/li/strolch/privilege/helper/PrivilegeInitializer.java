@@ -163,7 +163,7 @@ public class PrivilegeInitializer {
 		Map<String, String> parameterMap = this.containerModel.getSsoHandlerParameterMap();
 
 		try {
-			ssoHandler.initialize(parameterMap);
+			ssoHandler.initialize(this.persistenceHandler, parameterMap);
 		} catch (Exception e) {
 			String msg = "SingleSignOnHandler {0} could not be initialized";
 			msg = MessageFormat.format(msg, ssoHandlerClassName);

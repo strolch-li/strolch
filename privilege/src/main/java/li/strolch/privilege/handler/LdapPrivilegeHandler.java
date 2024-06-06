@@ -3,7 +3,7 @@ package li.strolch.privilege.handler;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.helper.GroupsAndRoles;
-import li.strolch.privilege.helper.LdapQuery;
+import li.strolch.privilege.helper.WindowsLdapQuery;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static li.strolch.privilege.base.PrivilegeConstants.REALM;
-import static li.strolch.privilege.helper.LdapQuery.*;
+import static li.strolch.privilege.helper.WindowsLdapQuery.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_CONFIG_FILE;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
@@ -94,7 +94,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		// Perform LDAP query
 		SearchResult searchResult;
-		try (LdapQuery query = new LdapQuery(this.providerUrl, this.searchBase, this.additionalFilter, this.domain,
+		try (WindowsLdapQuery query = new WindowsLdapQuery(this.providerUrl, this.searchBase, this.additionalFilter, this.domain,
 				this.domainPrefix)) {
 			searchResult = query.searchLdap(username, password);
 		} catch (NamingException e) {

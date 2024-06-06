@@ -1,6 +1,7 @@
 package li.strolch.privilege.test.model;
 
 import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.PersistenceHandler;
 import li.strolch.privilege.handler.SingleSignOnHandler;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
@@ -19,7 +20,7 @@ public class DummySsoHandler implements SingleSignOnHandler {
 	}
 
 	@Override
-	public void initialize(Map<String, String> parameterMap) {
+	public void initialize(PersistenceHandler persistenceHandler, Map<String, String> parameterMap) {
 		this.parameterMap = parameterMap;
 	}
 
