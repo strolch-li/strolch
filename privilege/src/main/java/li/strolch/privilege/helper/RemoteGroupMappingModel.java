@@ -158,10 +158,10 @@ public class RemoteGroupMappingModel {
 				.filter(mappedGroupNames::contains)
 				.collect(toSet());
 
-		// now map any LDAP groups to roles
+		// now map any groups to roles
 		Set<String> roles = new HashSet<>();
-		for (String relevantLdapGroup : remoteGroups) {
-			JsonElement mappingE = this.groupConfigs.get(relevantLdapGroup);
+		for (String relevantGroup : remoteGroups) {
+			JsonElement mappingE = this.groupConfigs.get(relevantGroup);
 			if (mappingE == null)
 				continue;
 			JsonObject mappingJ = mappingE.getAsJsonObject();
@@ -186,8 +186,8 @@ public class RemoteGroupMappingModel {
 			}
 		}
 
-		for (String ldapGroup : remoteGroups) {
-			JsonElement mappingE = this.groupConfigs.get(ldapGroup);
+		for (String remoteGroup : remoteGroups) {
+			JsonElement mappingE = this.groupConfigs.get(remoteGroup);
 			if (mappingE == null)
 				continue;
 			JsonObject mappingJ = mappingE.getAsJsonObject();
@@ -204,7 +204,7 @@ public class RemoteGroupMappingModel {
 					if (!secondaryLocations.contains(location)) {
 						logger.warn(
 								"Primary location already set by previous LDAP Group config for LDAP Group {}, adding to secondary locations.",
-								ldapGroup);
+								remoteGroup);
 						secondaryLocations.add(location);
 					}
 				}
@@ -220,7 +220,7 @@ public class RemoteGroupMappingModel {
 				} else {
 					logger.warn(
 							"Secondary locations already set by previous LDAP Group config for LDAP Group {}, adding additional",
-							ldapGroup);
+							remoteGroup);
 					if (secondaryLocationsJ.isJsonPrimitive())
 						secondaryLocations.add(secondaryLocationsJ.getAsString());
 					else
