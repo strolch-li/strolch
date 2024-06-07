@@ -6,7 +6,8 @@
     "some_location": "LocationA"
   },
   "groupMappings": {
-    "some_admin_group": "GroupA"
+    "some_admin_group": "GroupA",
+    "AppUser": "GroupA"
   },
   "groupConfigs": {
     "admin_group": {

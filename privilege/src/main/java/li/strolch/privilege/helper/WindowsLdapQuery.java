@@ -1,17 +1,16 @@
 package li.strolch.privilege.helper;
 
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.handler.WindowsLdapQueryContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.PartialResultException;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
-import java.util.Hashtable;
 
 import static li.strolch.utils.LdapHelper.encodeForLDAP;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
@@ -21,58 +20,17 @@ public class WindowsLdapQuery implements AutoCloseable {
 	protected static final Logger logger = LoggerFactory.getLogger(WindowsLdapQuery.class);
 
 	public static final String LDAP_FILTER_TEMPLATE = "(&%s(%s=%s)%s)";
-	public static final String USER_PRINCIPAL_NAME = "userPrincipalName";
 
-	public static final String LDAP_SN = "sn";
-	public static final String LDAP_DEPARTMENT = "department";
-	public static final String LDAP_MEMBER_OF = "memberOf";
-	public static final String LDAP_CN = "CN";
-	public static final String LDAP_GIVEN_NAME = "givenName";
-	public static final String LDAP_SAM_ACCOUNT_NAME = "sAMAccountName";
+	protected final WindowsLdapQueryContext queryContext;
+	protected InitialDirContext directoryContext;
+	protected SearchControls searchControls;
 
-	protected final String providerUrl;
-	protected final String searchBase;
-	protected final String additionalFilter;
-	protected final String domain;
-	protected final String domainPrefix;
+	public WindowsLdapQuery(WindowsLdapQueryContext queryContext) {
+		this.queryContext = queryContext;
 
-	protected InitialDirContext context;
-
-	public WindowsLdapQuery(String providerUrl, String searchBase, String additionalFilter, String domain,
-			String domainPrefix) {
-		this.providerUrl = providerUrl;
-		this.searchBase = searchBase;
-		this.additionalFilter = additionalFilter;
-		this.domain = domain;
-		this.domainPrefix = domainPrefix;
-	}
-
-	private Hashtable<String, String> buildLdapEnv(char[] password, String userPrincipalName) {
-
-		// Set up the environment for creating the initial context
-		Hashtable<String, String> env = new Hashtable<>();
-
-		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, this.providerUrl);
-
-		// Authenticate
-		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, userPrincipalName);
-		env.put(Context.SECURITY_CREDENTIALS, new String(password));
-		env.put(Context.REFERRAL, "ignore");
-		return env;
-	}
-
-	protected String getDistinguishedName(String safeUsername) {
-		if (this.domain.isEmpty())
-			return safeUsername;
-
-		if (!this.domainPrefix.isEmpty() && safeUsername.startsWith(this.domainPrefix)) {
-			logger.warn("Trimming domain from given username, to first search in sAMAccountName");
-			safeUsername = encodeForLDAP(safeUsername.substring(this.domainPrefix.length()), true);
-		}
-
-		return safeUsername + "@" + this.domain;
+		this.searchControls = new SearchControls();
+		this.searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		this.searchControls.setReturningAttributes(new String[]{"*", "+"});
 	}
 
 	public SearchResult searchLdap(String username, char[] password) throws NamingException {
@@ -80,21 +38,22 @@ public class WindowsLdapQuery implements AutoCloseable {
 		// escape the user provider username
 		String safeUsername = encodeForLDAP(username, true);
 
-		String distinguishedName = getDistinguishedName(safeUsername);
+		String distinguishedName = this.queryContext.getDistinguishedName(safeUsername);
 		logger.info("Logging in with {}", distinguishedName);
-		this.context = new InitialDirContext(buildLdapEnv(password, distinguishedName));
+		this.directoryContext = new InitialDirContext(this.queryContext.buildLdapEnv(password, distinguishedName));
 
-		SearchControls searchControls = new SearchControls();
-		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		String additionalFilter = this.queryContext.getAdditionalFilter();
+		String searchBase = this.queryContext.getSearchBase();
+		String domain = this.queryContext.getDomain();
 
 		// the first search is using sAMAccountName
-		String objectClassFilter = getObjectClassFilter();
-		String userAttributeIdentifier1 = getUserAttributeIdentifier1();
-		String userAttributeIdentifier2 = getUserAttributeIdentifier2();
+		String objectClassFilter = this.queryContext.getObjectClassFilter();
+		String userAttributeIdentifier1 = this.queryContext.getUserAttributeIdentifier1();
+		String userAttributeIdentifier2 = this.queryContext.getUserAttributeIdentifier2();
 		String filter = LDAP_FILTER_TEMPLATE.formatted(objectClassFilter, userAttributeIdentifier1, safeUsername,
-				this.additionalFilter);
-		logger.info("Searching based on {}, with search base: {}", filter, this.searchBase);
-		NamingEnumeration<SearchResult> answer = this.context.search(this.searchBase, filter, searchControls);
+				additionalFilter);
+		logger.info("Searching based on {}, with search base: {}", filter, searchBase);
+		NamingEnumeration<SearchResult> answer = this.directoryContext.search(searchBase, filter, this.searchControls);
 
 		SearchResult searchResult = null;
 		while (searchResult == null) {
@@ -106,15 +65,15 @@ public class WindowsLdapQuery implements AutoCloseable {
 					logger.warn("No LDAP data retrieved using {}, trying with {}...", userAttributeIdentifier1,
 							userAttributeIdentifier2);
 					filter = LDAP_FILTER_TEMPLATE.formatted(objectClassFilter, userAttributeIdentifier2,
-							distinguishedName, this.additionalFilter);
-					logger.info("Searching based on {}, with search base: {}", filter, this.searchBase);
-					answer = this.context.search(this.searchBase, filter, searchControls);
+							distinguishedName, additionalFilter);
+					logger.info("Searching based on {}, with search base: {}", filter, searchBase);
+					answer = this.directoryContext.search(searchBase, filter, this.searchControls);
 
 					if (!answer.hasMore())
 						throw new AccessDeniedException("Could not login user: "
 								+ safeUsername
 								+ " on Ldap: no LDAP Data, for either sAMAccountName or userPrincipalName searches. Domain used is "
-								+ this.domain);
+								+ domain);
 				}
 
 				searchResult = answer.next();
@@ -133,23 +92,11 @@ public class WindowsLdapQuery implements AutoCloseable {
 		return searchResult;
 	}
 
-	protected String getObjectClassFilter() {
-		return "(objectCategory=person)(objectClass=user)";
-	}
-
-	protected String getUserAttributeIdentifier1() {
-		return LDAP_SAM_ACCOUNT_NAME;
-	}
-
-	protected String getUserAttributeIdentifier2() {
-		return USER_PRINCIPAL_NAME;
-	}
-
 	@Override
 	public void close() {
-		if (this.context != null) {
+		if (this.directoryContext != null) {
 			try {
-				this.context.close();
+				this.directoryContext.close();
 			} catch (NamingException e) {
 				logger.error("Failed to close context!", e);
 			}

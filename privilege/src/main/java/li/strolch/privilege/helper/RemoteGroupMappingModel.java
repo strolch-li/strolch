@@ -161,7 +161,10 @@ public class RemoteGroupMappingModel {
 		// now map any LDAP groups to roles
 		Set<String> roles = new HashSet<>();
 		for (String relevantLdapGroup : remoteGroups) {
-			JsonObject mappingJ = this.groupConfigs.get(relevantLdapGroup).getAsJsonObject();
+			JsonElement mappingE = this.groupConfigs.get(relevantLdapGroup);
+			if (mappingE == null)
+				continue;
+			JsonObject mappingJ = mappingE.getAsJsonObject();
 			if (mappingJ.has(ROLES))
 				mappingJ.get(ROLES).getAsJsonArray().forEach(e -> roles.add(e.getAsString()));
 		}
@@ -184,7 +187,10 @@ public class RemoteGroupMappingModel {
 		}
 
 		for (String ldapGroup : remoteGroups) {
-			JsonObject mappingJ = this.groupConfigs.get(ldapGroup).getAsJsonObject();
+			JsonElement mappingE = this.groupConfigs.get(ldapGroup);
+			if (mappingE == null)
+				continue;
+			JsonObject mappingJ = mappingE.getAsJsonObject();
 			if (mappingJ.has(ORGANISATION))
 				mappingJ.get(ORGANISATION).getAsJsonArray().forEach(e -> organisations.add(e.getAsString()));
 			mappingJ.get(LOCATION).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
