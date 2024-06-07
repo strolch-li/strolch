@@ -33,6 +33,7 @@ public class WindowsLdapQueryContext {
 	public static final String LDAP_GIVEN_NAME = "givenName";
 	public static final String LDAP_SAM_ACCOUNT_NAME = "sAMAccountName";
 	public static final String LDAP_USER_PRINCIPAL_NAME = "userPrincipalName";
+	public static final String PLATFORM = "platform";
 	public static final String PARAM_PROVIDER_URL = "providerUrl";
 	public static final String PARAM_SEARCH_BASE = "searchBase";
 	public static final String PARAM_ADDITIONAL_FILTER = "additionalFilter";

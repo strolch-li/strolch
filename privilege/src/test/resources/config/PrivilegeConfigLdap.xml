@@ -30,9 +30,11 @@
 
         <PrivilegeHandler class="li.strolch.privilege.handler.LdapPrivilegeHandler">
             <Parameters>
-                <Parameter name="providerUrl" value="ldap://ldap.lan:389"/>
-                <Parameter name="searchBase" value="OU=Development,dc=Strolch,dc=li"/>
-                <Parameter name="domain" value="@strolch.li"/>
+                <Parameter name="platform" value="Linux"/>
+                <Parameter name="providerUrl" value="ldap://localhost:389"/>
+                <Parameter name="searchBase" value="ou=People,dc=atexxi,dc=ch"/>
+                <Parameter name="domain" value=""/>
+                <Parameter name="additionalFilter" value="(memberOf=cn=Accounts,ou=Groups,dc=atexxi,dc=ch)"/>
                 <Parameter name="defaultLocale" value="de"/>
                 <Parameter name="realm" value="defaultRealm"/>
                 <Parameter name="configFile" value="LdapGroupsConfig.json"/>

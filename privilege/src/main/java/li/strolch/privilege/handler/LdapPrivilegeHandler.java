@@ -2,6 +2,7 @@ package li.strolch.privilege.handler;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
+import li.strolch.privilege.helper.LinuxLdapQueryContext;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.helper.WindowsLdapQuery;
 import li.strolch.privilege.model.UserState;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static li.strolch.privilege.base.PrivilegeConstants.REALM;
+import static li.strolch.privilege.handler.WindowsLdapQueryContext.PLATFORM;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_CONFIG_FILE;
 
@@ -42,7 +44,12 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		RemoteGroupMappingModel groupMappingModel = new RemoteGroupMappingModel(persistenceHandler);
 		groupMappingModel.loadJsonConfig(realm, basePath, configFileS);
 
-		this.queryContext = new WindowsLdapQueryContext(parameterMap, groupMappingModel);
+		String platform = parameterMap.get(PLATFORM);
+		this.queryContext = switch (platform) {
+			case "Linux" -> new LinuxLdapQueryContext(parameterMap, groupMappingModel);
+			case "Windows" -> new WindowsLdapQueryContext(parameterMap, groupMappingModel);
+			default -> throw new IllegalStateException("Unexpected platform: " + platform);
+		};
 	}
 
 	@Override

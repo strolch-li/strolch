@@ -258,7 +258,7 @@ public class XmlTest {
 		// group AppUserLocationA
 		Group group = groups.get("AppUserLocationA");
 		assertEquals("AppUserLocationA", group.name());
-		MatcherAssert.assertThat(group.roles(), containsInAnyOrder("AppUser", "ModelAccessor", "UserPrivileges"));
+		MatcherAssert.assertThat(group.roles(), containsInAnyOrder("AppUser", "MyRole"));
 		Map<String, String> properties = group.getProperties();
 		assertEquals(new HashSet<>(List.of("location")), properties.keySet());
 		assertEquals("LocationA", properties.get("location"));

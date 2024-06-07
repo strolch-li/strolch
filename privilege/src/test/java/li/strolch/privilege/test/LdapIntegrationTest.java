@@ -16,8 +16,7 @@ import java.util.Map;
 
 import static li.strolch.privilege.handler.WindowsLdapQueryContext.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @Ignore("This test requires a running LDAP server")
 public class LdapIntegrationTest {
@@ -62,5 +61,6 @@ public class LdapIntegrationTest {
 		assertEquals("eitch", user.getUsername());
 		assertEquals("Robert", user.getFirstname());
 		assertEquals("von Burg", user.getLastname());
+		assertNull(user.getLocation());
 	}
 }

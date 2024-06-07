@@ -4,8 +4,7 @@
     <Group name="AppUserLocationA">
         <Roles>
             <Role>AppUser</Role>
-            <Role>ModelAccessor</Role>
-            <Role>UserPrivileges</Role>
+            <Role>MyRole</Role>
         </Roles>
         <Properties>
             <Property name="location" value="LocationA"/>
