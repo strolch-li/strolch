@@ -195,7 +195,6 @@ public class WindowsLdapQueryContext {
 		env.put(Context.SECURITY_PRINCIPAL, userPrincipalName);
 		env.put(Context.SECURITY_CREDENTIALS, new String(password));
 		env.put(Context.REFERRAL, "ignore");
-		env.put(Context.REFERRAL, "ignore");
 		return env;
 	}
 

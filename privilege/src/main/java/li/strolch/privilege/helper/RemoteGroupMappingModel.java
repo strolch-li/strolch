@@ -193,7 +193,7 @@ public class RemoteGroupMappingModel {
 			JsonObject mappingJ = mappingE.getAsJsonObject();
 			if (mappingJ.has(ORGANISATION))
 				mappingJ.get(ORGANISATION).getAsJsonArray().forEach(e -> organisations.add(e.getAsString()));
-			mappingJ.get(LOCATION).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
+			mappingJ.get(LOCATIONS).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
 
 			JsonElement primaryLocationJ = mappingJ.get(PRIMARY_LOCATION);
 			if (primaryLocationJ != null && !primaryLocationJ.isJsonNull()) {
