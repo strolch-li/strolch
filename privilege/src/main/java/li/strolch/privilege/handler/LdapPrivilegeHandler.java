@@ -44,7 +44,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		RemoteGroupMappingModel groupMappingModel = new RemoteGroupMappingModel(persistenceHandler);
 		groupMappingModel.loadJsonConfig(realm, basePath, configFileS);
 
-		String platform = parameterMap.get(PLATFORM);
+		String platform = parameterMap.getOrDefault(PLATFORM, "Windows");
 		this.queryContext = switch (platform) {
 			case "Linux" -> new LinuxLdapQueryContext(parameterMap, groupMappingModel);
 			case "Windows" -> new WindowsLdapQueryContext(parameterMap, groupMappingModel);

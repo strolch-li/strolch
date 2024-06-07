@@ -84,7 +84,7 @@ public class RemoteGroupMappingModel {
 
 		// validate the configuration
 		if (!configJ.has(GROUP_CONFIGS) || !configJ.get(GROUP_CONFIGS).isJsonObject())
-			throw new IllegalStateException("JSON config is missing ldapGroupConfigs element!");
+			throw new IllegalStateException("JSON config is missing groupConfigs element!");
 
 		this.remoteLocationToLocalLocationMap = new HashMap<>();
 		if (configJ.has(LOCATION_MAPPINGS)) {
@@ -94,6 +94,7 @@ public class RemoteGroupMappingModel {
 				this.remoteLocationToLocalLocationMap.put(ldapLocation, localLocation);
 			}
 		}
+
 		this.remoteGroupToLocalGroupMap = new HashMap<>();
 		if (configJ.has(GROUP_MAPPINGS)) {
 			JsonObject groupMappingsJ = configJ.get(GROUP_MAPPINGS).getAsJsonObject();
@@ -131,7 +132,7 @@ public class RemoteGroupMappingModel {
 		}
 	}
 
-	private Set<String> getGroupOverride(String username, Set<String> remoteGroups) {
+	public Set<String> getGroupOverride(String username, Set<String> remoteGroups) {
 		if (!this.userGroupOverrides.containsKey(username))
 			return remoteGroups;
 
@@ -140,9 +141,7 @@ public class RemoteGroupMappingModel {
 		return Set.of(overrideGroup);
 	}
 
-	public GroupsAndRoles mapRemoteGroupsToStrolch(String username, Set<String> remoteGroups) {
-		if (this.userGroupOverrides.containsKey(username))
-			remoteGroups = getGroupOverride(username, remoteGroups);
+	public GroupsAndRoles mapRemoteGroupsToStrolch(Set<String> remoteGroups) {
 
 		// first see if we have mappings for LDAP groups to local groups
 		Set<String> mappedGroupNames = remoteGroups
@@ -187,9 +186,12 @@ public class RemoteGroupMappingModel {
 		}
 
 		for (String remoteGroup : remoteGroups) {
+			logger.info("Checking group config for {}", remoteGroup);
 			JsonElement mappingE = this.groupConfigs.get(remoteGroup);
-			if (mappingE == null)
+			if (mappingE == null) {
+				logger.info("No configs for {}", remoteGroup);
 				continue;
+			}
 			JsonObject mappingJ = mappingE.getAsJsonObject();
 			if (mappingJ.has(ORGANISATION))
 				mappingJ.get(ORGANISATION).getAsJsonArray().forEach(e -> organisations.add(e.getAsString()));

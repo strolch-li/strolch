@@ -209,8 +209,8 @@ public class WindowsLdapQueryContext {
 		Locale locale = getLocale(attrs);
 
 		// evaluate groups and roles for this user
-		Set<String> ldapGroups = getLdapGroups(attrs);
-		GroupsAndRoles groupsAndRoles = this.groupMappingModel.mapRemoteGroupsToStrolch(username, ldapGroups);
+		Set<String> ldapGroups = this.groupMappingModel.getGroupOverride(username, getLdapGroups(attrs));
+		GroupsAndRoles groupsAndRoles = this.groupMappingModel.mapRemoteGroupsToStrolch(ldapGroups);
 
 		if (groupsAndRoles.isEmpty()) {
 			logger.error("User {} can not login, as no group or role mappings were found.", username);
