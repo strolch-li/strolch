@@ -32,8 +32,17 @@ public class LdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
 
 	@Ignore("This test requires a running LDAP server")
 	@Test
-	public void shouldLoginEitch() {
-		Certificate cert = this.privilegeHandler.authenticate("eitch", "eitch".toCharArray(), false);
+	public void shouldLoginTest1() {
+		Certificate cert = this.privilegeHandler.authenticate("test1", "test".toCharArray(), false);
+		assertNotNull(cert);
+
+		assertEquals("LocationA", cert.getLocation());
+	}
+
+	@Ignore("This test requires a running LDAP server")
+	@Test
+	public void shouldLoginTest2() {
+		Certificate cert = this.privilegeHandler.authenticate("test2", "test".toCharArray(), false);
 		assertNotNull(cert);
 
 		assertEquals("LocationA", cert.getLocation());

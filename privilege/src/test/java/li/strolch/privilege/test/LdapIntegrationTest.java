@@ -18,7 +18,7 @@ import static li.strolch.privilege.handler.WindowsLdapQueryContext.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static org.junit.Assert.*;
 
-@Ignore("This test requires a running LDAP server")
+//@Ignore("This test requires a running LDAP server")
 public class LdapIntegrationTest {
 
 	private static LinuxLdapQueryContext queryContext;
@@ -27,9 +27,9 @@ public class LdapIntegrationTest {
 	public static void setUpBeforeClass() {
 
 		Map<String, String> parameterMap = new HashMap<>();
-		parameterMap.put(PARAM_PROVIDER_URL, "ldap://localhost:389");
-		parameterMap.put(PARAM_SEARCH_BASE, "ou=People,dc=atexxi,dc=ch");
-		parameterMap.put(PARAM_ADDITIONAL_FILTER, "(memberOf=cn=Accounts,ou=Groups,dc=atexxi,dc=ch)");
+		parameterMap.put(PARAM_PROVIDER_URL, "ldap://localhost:10389");
+		parameterMap.put(PARAM_SEARCH_BASE, "ou=People,dc=strolch,dc=li");
+		parameterMap.put(PARAM_ADDITIONAL_FILTER, "(memberOf=cn=Accounts,ou=Groups,dc=strolch,dc=li)");
 		parameterMap.put(PARAM_DOMAIN, "");
 		parameterMap.put(PARAM_DEFAULT_LOCALE, Locale.ENGLISH.toLanguageTag());
 
@@ -44,10 +44,10 @@ public class LdapIntegrationTest {
 	}
 
 	@Test
-	public void testLdap() throws Exception {
+	public void testUserTest1() throws Exception {
 
-		String username = "eitch";
-		char[] password = "eitch".toCharArray();
+		String username = "test1";
+		char[] password = "test".toCharArray();
 
 		SearchResult searchResult;
 		try (LinuxLdapQuery query = new LinuxLdapQuery(queryContext)) {
@@ -58,9 +58,30 @@ public class LdapIntegrationTest {
 		User user = queryContext.buildUserFromSearchResult(username, searchResult);
 		assertNotNull(user);
 
-		assertEquals("eitch", user.getUsername());
-		assertEquals("Robert", user.getFirstname());
-		assertEquals("von Burg", user.getLastname());
+		assertEquals("test1", user.getUsername());
+		assertEquals("Test 1", user.getFirstname());
+		assertEquals("User", user.getLastname());
+		assertNull(user.getLocation());
+	}
+
+	@Test
+	public void testUserTest2() throws Exception {
+
+		String username = "test2";
+		char[] password = "test".toCharArray();
+
+		SearchResult searchResult;
+		try (LinuxLdapQuery query = new LinuxLdapQuery(queryContext)) {
+			searchResult = query.searchLdap(username, password);
+		}
+		assertNotNull(searchResult);
+
+		User user = queryContext.buildUserFromSearchResult(username, searchResult);
+		assertNotNull(user);
+
+		assertEquals("test2", user.getUsername());
+		assertEquals("Test 2", user.getFirstname());
+		assertEquals("User", user.getLastname());
 		assertNull(user.getLocation());
 	}
 }

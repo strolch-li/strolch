@@ -1,0 +1,60 @@
+dn: ou=People,dc=strolch,dc=li
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Groups,dc=strolch,dc=li
+objectClass: organizationalUnit
+ou: Groups
+
+dn: uid=test1,ou=People,dc=strolch,dc=li
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: posixAccount
+objectClass: simpleSecurityObject
+objectClass: top
+cn: Test 1 User
+gidNumber: 1
+homeDirectory: /home/test1
+givenName: Test 1
+surname: User
+uid: test1
+uidNumber: 1
+userPassword:: e1NTSEF9RDY2RXhpQVBnaVZ3c2lob3o4NFNzSElvTVliSUQ1RTQK
+mail: test1@strolch.li
+
+dn: uid=test2,ou=People,dc=strolch,dc=li
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: posixAccount
+objectClass: simpleSecurityObject
+objectClass: top
+cn: Test 2 User
+gidNumber: 2
+homeDirectory: /home/test2
+givenName: Test 2
+surname: User
+uid: test2
+uidNumber: 2
+userPassword:: e1NTSEF9RDY2RXhpQVBnaVZ3c2lob3o4NFNzSElvTVliSUQ1RTQK
+mail: test2@strolch.li
+
+dn: cn=Accounts,ou=Groups,dc=strolch,dc=li
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: Accounts
+uniqueMember: uid=test1,ou=People,dc=strolch,dc=li
+uniqueMember: uid=test2,ou=People,dc=strolch,dc=li
+
+dn: cn=AppUser,ou=Groups,dc=strolch,dc=li
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: Accounts
+uniqueMember: uid=test1,ou=People,dc=strolch,dc=li
+
+dn: cn=AppSuperUser,ou=Groups,dc=strolch,dc=li
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: Accounts
+uniqueMember: uid=test2,ou=People,dc=strolch,dc=li

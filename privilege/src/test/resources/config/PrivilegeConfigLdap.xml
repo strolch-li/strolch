@@ -2,8 +2,8 @@
 <Privilege>
     <Container>
         <Parameters>
-            <Parameter name="secretKey" value="5185F447-6317-4856-B40E-573919BA0A16"/>
-            <Parameter name="secretSalt" value="00F6E88C-A64F-410A-8FCF-9CD340E340F7"/>
+            <Parameter name="secretKey" value="CHANGE-ME"/>
+            <Parameter name="secretSalt" value="CHANGE-ME"/>
             <Parameter name="persistSessions" value="true"/>
             <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
             <Parameter name="autoPersistOnUserChangesData" value="true"/>
@@ -31,10 +31,10 @@
         <PrivilegeHandler class="li.strolch.privilege.handler.LdapPrivilegeHandler">
             <Parameters>
                 <Parameter name="platform" value="Linux"/>
-                <Parameter name="providerUrl" value="ldap://localhost:389"/>
-                <Parameter name="searchBase" value="ou=People,dc=atexxi,dc=ch"/>
+                <Parameter name="providerUrl" value="ldap://localhost:10389"/>
+                <Parameter name="searchBase" value="ou=People,dc=strolch,dc=li"/>
                 <Parameter name="domain" value=""/>
-                <Parameter name="additionalFilter" value="(memberOf=cn=Accounts,ou=Groups,dc=atexxi,dc=ch)"/>
+                <Parameter name="additionalFilter" value="(memberOf=cn=Accounts,ou=Groups,dc=strolch,dc=li)"/>
                 <Parameter name="defaultLocale" value="de"/>
                 <Parameter name="realm" value="defaultRealm"/>
                 <Parameter name="configFile" value="LdapGroupsConfig.json"/>

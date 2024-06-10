@@ -1,0 +1,21 @@
+services:
+  ldap:
+    image: osixia/openldap:1.5.0
+    container_name: ldap
+    hostname: ldap
+    command: --copy-service --loglevel debug
+    volumes:
+      - ./ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
+    ports:
+      - "10389:389"
+    environment:
+      LDAP_READONLY_USER: false
+      LDAP_RFC2307BIS_SCHEMA: false
+      KEEP_EXISTING_CONFIG: false
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: false
+      DISABLE_CHOWN: false
+      LDAP_TLS: 'true'
+      LDAP_TLS_VERIFY_CLIENT: 'never'
+      LDAP_ADMIN_PASSWORD: 'admin'
+      LDAP_DOMAIN: strolch.li
+      LDAP_ORGANISATION: Strolch.li

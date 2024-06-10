@@ -253,7 +253,7 @@ public class XmlTest {
 		Map<String, Group> groups = xmlHandler.getGroups();
 		assertNotNull(groups);
 
-		assertEquals(2, groups.size());
+		assertEquals(3, groups.size());
 
 		// group AppUserLocationA
 		Group group = groups.get("AppUserLocationA");
