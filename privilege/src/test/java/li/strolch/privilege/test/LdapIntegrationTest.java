@@ -18,7 +18,7 @@ import static li.strolch.privilege.handler.WindowsLdapQueryContext.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static org.junit.Assert.*;
 
-//@Ignore("This test requires a running LDAP server")
+@Ignore("This test requires a running LDAP server")
 public class LdapIntegrationTest {
 
 	private static LinuxLdapQueryContext queryContext;
