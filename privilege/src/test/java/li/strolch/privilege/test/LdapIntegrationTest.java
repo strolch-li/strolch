@@ -82,6 +82,6 @@ public class LdapIntegrationTest {
 		assertEquals("test2", user.getUsername());
 		assertEquals("Test 2", user.getFirstname());
 		assertEquals("User", user.getLastname());
-		assertNull(user.getLocation());
+		assertEquals("LocationA,LocationB", user.getLocation());
 	}
 }

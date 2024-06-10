@@ -209,7 +209,7 @@ public class WindowsLdapQueryContext {
 		Locale locale = getLocale(attrs);
 
 		// evaluate groups and roles for this user
-		Set<String> ldapGroups = this.groupMappingModel.getGroupOverride(username, getLdapGroups(attrs));
+		Set<String> ldapGroups = this.groupMappingModel.getUserGroupOverride(username, getLdapGroups(attrs));
 		GroupsAndRoles groupsAndRoles = this.groupMappingModel.mapRemoteGroupsToStrolch(ldapGroups);
 
 		if (groupsAndRoles.isEmpty()) {

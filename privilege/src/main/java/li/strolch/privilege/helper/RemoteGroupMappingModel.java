@@ -114,11 +114,6 @@ public class RemoteGroupMappingModel {
 				throw new IllegalStateException(
 						format("LDAP Group {0} is missing attribute {1}, or it is not an array or the array is empty",
 								name, LOCATIONS));
-			JsonElement rolesJ = config.get(ROLES);
-			if (rolesJ == null || !rolesJ.isJsonArray() || rolesJ.getAsJsonArray().isEmpty())
-				throw new IllegalStateException(
-						format("LDAP Group {0} is missing attribute {1}, or it is not an array or the array is empty",
-								name, ROLES));
 		}
 
 		this.userGroupOverrides = new HashMap<>();
@@ -132,7 +127,7 @@ public class RemoteGroupMappingModel {
 		}
 	}
 
-	public Set<String> getGroupOverride(String username, Set<String> remoteGroups) {
+	public Set<String> getUserGroupOverride(String username, Set<String> remoteGroups) {
 		if (!this.userGroupOverrides.containsKey(username))
 			return remoteGroups;
 
@@ -155,7 +150,7 @@ public class RemoteGroupMappingModel {
 				.stream()
 				.map(Group::name)
 				.filter(mappedGroupNames::contains)
-				.collect(toSet());
+				.collect(HashSet::new, HashSet::add, HashSet::addAll);
 
 		// now map any groups to roles
 		Set<String> roles = new HashSet<>();
@@ -166,6 +161,8 @@ public class RemoteGroupMappingModel {
 			JsonObject mappingJ = mappingE.getAsJsonObject();
 			if (mappingJ.has(ROLES))
 				mappingJ.get(ROLES).getAsJsonArray().forEach(e -> roles.add(e.getAsString()));
+			if (mappingJ.has(GROUPS))
+				mappingJ.get(GROUPS).getAsJsonArray().forEach(e -> groups.add(e.getAsString()));
 		}
 
 		return new GroupsAndRoles(groups, roles);

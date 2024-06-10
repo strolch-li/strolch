@@ -10,13 +10,10 @@
             <Property name="location" value="LocationA"/>
         </Properties>
     </Group>
-    <Group name="AppSuperUserLocationA">
+    <Group name="AppSuperUser">
         <Roles>
             <Role>AppUser</Role>
             <Role>MyRole</Role>
         </Roles>
-        <Properties>
-            <Property name="location" value="LocationA"/>
-        </Properties>
     </Group>
 </Groups>

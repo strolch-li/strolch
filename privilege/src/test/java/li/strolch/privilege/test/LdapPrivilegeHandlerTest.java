@@ -1,13 +1,17 @@
 package li.strolch.privilege.test;
 
 import li.strolch.privilege.model.Certificate;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class LdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
 
@@ -45,6 +49,6 @@ public class LdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
 		Certificate cert = this.privilegeHandler.authenticate("test2", "test".toCharArray(), false);
 		assertNotNull(cert);
 
-		assertEquals("LocationA", cert.getLocation());
+		assertEquals("LocationA,LocationB", cert.getLocation());
 	}
 }

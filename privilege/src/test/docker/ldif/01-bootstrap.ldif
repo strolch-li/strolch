@@ -53,7 +53,7 @@ objectClass: top
 cn: Accounts
 uniqueMember: uid=test1,ou=People,dc=strolch,dc=li
 
-dn: cn=AppSuperUser,ou=Groups,dc=strolch,dc=li
+dn: cn=AppSuperUser_LocationA,ou=Groups,dc=strolch,dc=li
 objectClass: groupOfUniqueNames
 objectClass: top
 cn: Accounts
