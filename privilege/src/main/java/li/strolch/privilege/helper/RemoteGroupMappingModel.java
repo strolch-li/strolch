@@ -106,16 +106,6 @@ public class RemoteGroupMappingModel {
 
 		this.groupConfigs = configJ.get(GROUP_CONFIGS).getAsJsonObject();
 
-		// validate the configuration
-		for (String name : this.groupConfigs.keySet()) {
-			JsonObject config = this.groupConfigs.get(name).getAsJsonObject();
-			JsonElement locationsJ = config.get(LOCATIONS);
-			if (locationsJ == null || !locationsJ.isJsonArray() || locationsJ.getAsJsonArray().isEmpty())
-				throw new IllegalStateException(
-						format("LDAP Group {0} is missing attribute {1}, or it is not an array or the array is empty",
-								name, LOCATIONS));
-		}
-
 		this.userGroupOverrides = new HashMap<>();
 		if (configJ.has(USER_GROUP_OVERRIDES)) {
 			JsonObject userGroupOverrides = configJ.get(USER_GROUP_OVERRIDES).getAsJsonObject();
@@ -189,10 +179,12 @@ public class RemoteGroupMappingModel {
 				logger.info("No configs for {}", remoteGroup);
 				continue;
 			}
+
 			JsonObject mappingJ = mappingE.getAsJsonObject();
 			if (mappingJ.has(ORGANISATION))
 				mappingJ.get(ORGANISATION).getAsJsonArray().forEach(e -> organisations.add(e.getAsString()));
-			mappingJ.get(LOCATIONS).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
+			if (mappingJ.has(LOCATIONS))
+				mappingJ.get(LOCATIONS).getAsJsonArray().forEach(e -> locations.add(e.getAsString()));
 
 			JsonElement primaryLocationJ = mappingJ.get(PRIMARY_LOCATION);
 			if (primaryLocationJ != null && !primaryLocationJ.isJsonNull()) {
