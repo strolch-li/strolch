@@ -75,18 +75,11 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		// build user
 		try {
+
 			User user = this.queryContext.buildUserFromSearchResult(username, searchResult);
-
-			// persist this user
 			if (internalUser == null)
-				this.persistenceHandler.addUser(user);
-			else
-				this.persistenceHandler.replaceUser(user);
-
-			if (this.autoPersistOnUserChangesData)
-				persistModelAsync();
-
-			return user;
+				return user;
+			return user.withHistory(internalUser.history());
 
 		} catch (AccessDeniedException e) {
 			throw e;

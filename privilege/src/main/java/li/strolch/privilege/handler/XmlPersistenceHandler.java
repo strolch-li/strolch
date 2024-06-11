@@ -100,8 +100,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
+	public boolean hasUser(String username) {
+		return this.userMap.containsKey(evaluateUsername(username));
+	}
+
+	@Override
 	public User getUser(String username) {
-		return this.userMap.get(this.caseInsensitiveUsername ? username.toLowerCase() : username);
+		return this.userMap.get(evaluateUsername(username));
 	}
 
 	@Override
@@ -116,7 +121,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public User removeUser(String username) {
-		User user = this.userMap.remove(this.caseInsensitiveUsername ? username.toLowerCase() : username);
+		User user = this.userMap.remove(evaluateUsername(username));
 		this.userMapDirty = user != null;
 		return user;
 	}
@@ -137,7 +142,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void addUser(User user) {
-		String username = this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
+		String username = evaluateUsername(user.getUsername());
 		if (this.userMap.containsKey(username))
 			throw new IllegalStateException(format("The user {0} already exists!", user.getUsername()));
 		this.userMap.put(username, user);
@@ -146,7 +151,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public void replaceUser(User user) {
-		String username = this.caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
+		String username = evaluateUsername(user.getUsername());
 		if (!this.userMap.containsKey(username))
 			throw new IllegalStateException(
 					format("The user {0} can not be replaced as it does not exist!", user.getUsername()));
@@ -219,8 +224,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.groupsPath = groupsPath;
 		this.rolesPath = rolesPath;
 
-		this.caseInsensitiveUsername = !this.parameterMap.containsKey(PARAM_CASE_INSENSITIVE_USERNAME) || parseBoolean(
-				this.parameterMap.get(PARAM_CASE_INSENSITIVE_USERNAME));
+		this.caseInsensitiveUsername = parseBoolean(
+				this.parameterMap.getOrDefault(PARAM_CASE_INSENSITIVE_USERNAME, "true"));
 
 		if (reload())
 			logger.info("Privilege Data loaded.");
@@ -352,5 +357,9 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		if (TimeUnit.NANOSECONDS.toMillis(tookNanos) > 100)
 			logger.warn("Persist took {}", formatNanoDuration(tookNanos));
 		return saved;
+	}
+
+	protected String evaluateUsername(String username) {
+		return this.caseInsensitiveUsername ? username.toLowerCase() : username;
 	}
 }

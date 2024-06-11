@@ -74,6 +74,15 @@ public interface PersistenceHandler {
 	User getUser(String username);
 
 	/**
+	 * Returns true if the user exists with the give name, false otherwise
+	 *
+	 * @param username the name of the user to check for
+	 *
+	 * @return true if the user exists with the give name, false otherwise
+	 */
+	boolean hasUser(String username);
+
+	/**
 	 * Returns a {@link Group} object from the underlying database
 	 *
 	 * @param groupName the name/id of the {@link Group} object to return

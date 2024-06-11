@@ -455,11 +455,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			persistSessionsAsync();
 
 			// save last login
-			UserHistory history = user.getHistory();
+			UserHistory history = user.getHistory().withLastLogin(ZonedDateTime.now());
 			if (history.isFirstLoginEmpty())
 				history = history.withFirstLogin(ZonedDateTime.now());
-			history = history.withLastLogin(ZonedDateTime.now());
-			this.persistenceHandler.replaceUser(user.withHistory(history));
+
+			if (!this.persistenceHandler.hasUser(user.getUsername())) {
+				// for remote, the user won't exist, if it is the user's first login
+				this.persistenceHandler.addUser(user.withHistory(history));
+			} else {
+				// otherwise we replace the user
+				this.persistenceHandler.replaceUser(user.withHistory(history));
+			}
 			persistModelAsync();
 
 			// log
