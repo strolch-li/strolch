@@ -111,8 +111,24 @@ public class ResourceBuilder extends RootElementBuilder<ResourceBuilder> {
 	}
 
 	@Override
+	public Resource build(String id) {
+		Resource resource = new Resource(id, getName(), getType());
+		return applyBuilder(resource);
+	}
+
+	@Override
+	public Resource build(String id, String name) {
+		Resource resource = new Resource(id, name, getType());
+		return applyBuilder(resource);
+	}
+
+	@Override
 	public Resource build() {
 		Resource resource = new Resource(getId(), getName(), getType());
+		return applyBuilder(resource);
+	}
+
+	protected Resource applyBuilder(Resource resource) {
 		super.applyRootElement(resource);
 		this.timedStates.forEach(b -> resource.addTimedState(b.build()));
 		return resource;

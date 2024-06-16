@@ -5,7 +5,7 @@ import li.strolch.model.State;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
 
-import static li.strolch.model.builder.BuilderHelper.*;
+import static li.strolch.model.builder.BuilderHelper.buildParamName;
 
 public class OrderBuilder extends RootElementBuilder<OrderBuilder> {
 
@@ -35,8 +35,24 @@ public class OrderBuilder extends RootElementBuilder<OrderBuilder> {
 	}
 
 	@Override
+	public Order build(String id) {
+		Order order = new Order(id, getName(), getType());
+		return applyBuilder(order);
+	}
+
+	@Override
+	public Order build(String id, String name) {
+		Order order = new Order(id, name, getType());
+		return applyBuilder(order);
+	}
+
+	@Override
 	public Order build() {
 		Order order = new Order(getId(), getName(), getType());
+		return applyBuilder(order);
+	}
+
+	private Order applyBuilder(Order order) {
 		super.applyRootElement(order);
 		order.setDate(ISO8601.EMPTY_VALUE_ZONED_DATE);
 		order.setState(State.CREATED);

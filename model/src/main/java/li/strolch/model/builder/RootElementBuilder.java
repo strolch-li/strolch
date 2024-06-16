@@ -19,4 +19,8 @@ public abstract class RootElementBuilder<T extends ParameterBagContainerBuilder<
 	}
 
 	public abstract StrolchRootElement build();
+
+	public abstract StrolchRootElement build(String id);
+
+	public abstract StrolchRootElement build(String id, String name);
 }

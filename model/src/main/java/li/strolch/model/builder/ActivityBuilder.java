@@ -1,13 +1,13 @@
 package li.strolch.model.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.utils.dbc.DBC;
 
-import static li.strolch.model.builder.BuilderHelper.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static li.strolch.model.builder.BuilderHelper.buildParamName;
 
 public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> implements ActivityElementBuilder {
 
@@ -87,12 +87,26 @@ public class ActivityBuilder extends RootElementBuilder<ActivityBuilder> impleme
 	}
 
 	@Override
+	public Activity build(String id) {
+		Activity activity = new Activity(id, getName(), getType(), this.timeOrdering);
+		return applyBuilder(activity);
+	}
+
+	@Override
+	public Activity build(String id, String name) {
+		Activity activity = new Activity(id, name, getType(), this.timeOrdering);
+		return applyBuilder(activity);
+	}
+
+	@Override
 	public Activity build() {
 		Activity activity = new Activity(getId(), getName(), getType(), this.timeOrdering);
+		return applyBuilder(activity);
+	}
+
+	private Activity applyBuilder(Activity activity) {
 		super.applyRootElement(activity);
-
 		this.builders.forEach(b -> activity.addElement(b.build()));
-
 		return activity;
 	}
 }
