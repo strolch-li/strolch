@@ -21,31 +21,30 @@ public class LoggingLoader {
 
 		File logConfigFile = new File(configPathF, LOGBACK_XML);
 		if (!logConfigFile.exists()) {
-			logger.info(
-					"Not changing logback configuration as " + logConfigFile.getAbsolutePath() + " does not exist.");
+			logger.info("Not changing logback configuration as {} does not exist.", logConfigFile.getAbsolutePath());
 		} else {
 			if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
-				logger.error(logConfigFile.getAbsolutePath()
-						+ "  exists, but LoggerFactory is not instance of ch.qos.logback.classic.LoggerContext. Ignoring.");
+				logger.error(
+						"{}  exists, but LoggerFactory is not instance of ch.qos.logback.classic.LoggerContext. Ignoring.",
+						logConfigFile.getAbsolutePath());
 			} else {
-				logger.info(logConfigFile.getAbsolutePath()
-						+ " file exists. Reloading logging configuration from "
-						+ logConfigFile);
+				logger.info("{} file exists. Reloading logging configuration from {}", logConfigFile.getAbsolutePath(),
+						logConfigFile);
 				try {
 					loggerContext.reset();
 					DefaultJoranConfigurator configurator = new DefaultJoranConfigurator();
 					configurator.setContext(loggerContext);
 					configurator.configureByResource(logConfigFile.toURI().toURL());
-					logger.info("Reloaded logger configuration from " + logConfigFile.getAbsolutePath());
+					logger.info("Reloaded logger configuration from {}", logConfigFile.getAbsolutePath());
 					lastConfigFile = logConfigFile;
 				} catch (Exception e) {
 					try {
 						new ContextInitializer(loggerContext).autoConfig();
 					} catch (JoranException e1) {
-						logger.error("Failed to reload original config after failure to load new config from "
-								+ logConfigFile.getAbsolutePath(), e);
+						logger.error("Failed to reload original config after failure to load new config from {}",
+								logConfigFile.getAbsolutePath(), e);
 					}
-					logger.error("Failed to reload logback configuration from file " + logConfigFile, e);
+					logger.error("Failed to reload logback configuration from file {}", logConfigFile, e);
 				}
 			}
 		}
@@ -53,14 +52,13 @@ public class LoggingLoader {
 
 	public static void reloadLoggingConfiguration() {
 		if (lastConfigFile != null) {
-			logger.info("Reloading configuration from last config file " + lastConfigFile.getAbsolutePath());
+			logger.info("Reloading configuration from last config file {}", lastConfigFile.getAbsolutePath());
 			System.out.println("Reloading configuration from last config file " + lastConfigFile.getAbsolutePath());
 			reloadLogging(lastConfigFile.getParentFile());
 		} else {
 			if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
-				logger.error("LoggerFactory is not instance of "
-						+ LoggerContext.class.getName()
-						+ ". Ignoring request to reload configuration!");
+				logger.error("LoggerFactory is not instance of {}. Ignoring request to reload configuration!",
+						LoggerContext.class.getName());
 				System.out.println("LoggerFactory is not instance of "
 						+ LoggerContext.class.getName()
 						+ ". Ignoring request to reload configuration!");
@@ -85,7 +83,7 @@ public class LoggingLoader {
 		if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
 			logger.error("LoggerFactory is not instance of ch.qos.logback.classic.LoggerContext. Ignoring.");
 		} else {
-			logger.info("Resetting LoggerFactory " + loggerContext);
+			logger.info("Resetting LoggerFactory {}", loggerContext);
 			loggerContext.reset();
 		}
 	}

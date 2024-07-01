@@ -74,7 +74,7 @@ public abstract class DbConnectionBuilder {
 			String dbIgnoreRealmKey = makeRealmKey(realmName, PROP_DB_IGNORE_REALM, false);
 			boolean dbIgnoreRealm = this.configuration.getBoolean(dbIgnoreRealmKey, false);
 			if (dbIgnoreRealm) {
-				logger.info("[" + realm + "] Ignoring any DB configuration for Realm " + realmName);
+				logger.info("[{}] Ignoring any DB configuration for Realm {}", realm, realmName);
 				continue;
 			}
 
@@ -169,9 +169,9 @@ public abstract class DbConnectionBuilder {
 		if (host.equals(hostOverride))
 			return dbUrl;
 
-		logger.warn("[" + realmName + "] Replacing db host " + host + " with override " + hostOverride);
+		logger.warn("[{}] Replacing db host {} with override {}", realmName, host, hostOverride);
 		dbUrl = "jdbc:postgresql://" + hostOverride + dbName;
-		logger.warn("[" + realmName + "] DB URL is now " + dbUrl);
+		logger.warn("[{}] DB URL is now {}", realmName, dbUrl);
 		return dbUrl;
 	}
 

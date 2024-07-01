@@ -320,10 +320,10 @@ public class StrolchAgent {
 
 		String msg = "[{0}] Setting up Strolch Container using the following paths:";
 		logger.info(MessageFormat.format(msg, environment));
-		logger.info(" - Config: " + configPathF.getAbsolutePath());
-		logger.info(" - Data: " + dataPathF.getAbsolutePath());
-		logger.info(" - Temp: " + tempPathF.getAbsolutePath());
-		logger.info(" - user.dir: " + SystemHelper.getUserDir());
+		logger.info(" - Config: {}", configPathF.getAbsolutePath());
+		logger.info(" - Data: {}", dataPathF.getAbsolutePath());
+		logger.info(" - Temp: {}", tempPathF.getAbsolutePath());
+		logger.info(" - user.dir: {}", SystemHelper.getUserDir());
 
 		this.strolchConfiguration = parseConfiguration(environment, configPathF, dataPathF, tempPathF);
 

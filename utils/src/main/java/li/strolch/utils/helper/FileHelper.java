@@ -198,22 +198,22 @@ public class FileHelper {
 				boolean done = FileHelper.deleteFiles(children, log);
 				if (!done) {
 					worked = false;
-					logger.warn("Could not empty the directory: " + file.getAbsolutePath());
+					logger.warn("Could not empty the directory: {}", file.getAbsolutePath());
 				} else {
 					done = file.delete();
 					if (done) {
 						if (log)
-							logger.info("Deleted DIR  " + file.getAbsolutePath());
+							logger.info("Deleted DIR  {}", file.getAbsolutePath());
 					} else {
 						worked = false;
-						logger.warn("Could not delete the directory: " + file.getAbsolutePath());
+						logger.warn("Could not delete the directory: {}", file.getAbsolutePath());
 					}
 				}
 			} else {
 				boolean done = file.delete();
 				if (done) {
 					if (log)
-						FileHelper.logger.info("Deleted FILE " + file.getAbsolutePath());
+						FileHelper.logger.info("Deleted FILE {}", file.getAbsolutePath());
 				} else {
 					worked = false;
 					FileHelper.logger.warn(("Could not delete the file: " + file.getAbsolutePath()));
@@ -339,7 +339,7 @@ public class FileHelper {
 
 		// delete if copy was successful, otherwise move will fail
 		if (FileHelper.copy(fromFile, toFile, true)) {
-			FileHelper.logger.info("Deleting fromFile: " + fromFile.getAbsolutePath());
+			FileHelper.logger.info("Deleting fromFile: {}", fromFile.getAbsolutePath());
 			return fromFile.delete();
 		}
 

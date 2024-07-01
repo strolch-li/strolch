@@ -45,12 +45,12 @@ public class AuthenticationResponseFilter implements ContainerResponseFilter {
 			return;
 
 		if (cert.getUsage().isSingle()) {
-			logger.info("Invalidating single usage certificate for " + cert.getUsername());
+			logger.info("Invalidating single usage certificate for {}", cert.getUsername());
 			RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
 		} else if (cert.getUsage().isSetPassword()) {
 			// if not acceptable, then user can try again
 			if (responseContext.getStatusInfo().toEnum() != Response.Status.NOT_ACCEPTABLE) {
-				logger.info("Invalidating SET_PASSWORD usage certificate for " + cert.getUsername());
+				logger.info("Invalidating SET_PASSWORD usage certificate for {}", cert.getUsername());
 				RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
 			}
 		}

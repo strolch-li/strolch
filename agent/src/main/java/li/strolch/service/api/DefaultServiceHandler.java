@@ -211,11 +211,11 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			logger.warn(msg);
 
 			if (isNotEmpty(result.getMessage()) && result.getThrowable() != null) {
-				logger.warn("Reason: " + result.getMessage(), result.getThrowable());
+				logger.warn("Reason: {}", result.getMessage(), result.getThrowable());
 			} else if (isNotEmpty(result.getMessage())) {
-				logger.warn("Reason: " + result.getMessage());
+				logger.warn("Reason: {}", result.getMessage());
 			} else if (result.getThrowable() != null) {
-				logger.warn("Reason: " + result.getThrowable().getMessage(), result.getThrowable());
+				logger.warn("Reason: {}", result.getThrowable().getMessage(), result.getThrowable());
 			}
 
 		} else if (result.getState() == FAILED || result.getState() == EXCEPTION
@@ -237,9 +237,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			}
 
 			if (throwable == null)
-				logger.error("Reason: " + reason);
+				logger.error("Reason: {}", reason);
 			else
-				logger.error("Reason: " + reason, throwable);
+				logger.error("Reason: {}", reason, throwable);
 
 			if ((result.getState() == EXCEPTION || result.getState() == ACCESS_DENIED) //
 					&& getContainer().hasComponent(OperationsLog.class)) {
@@ -265,10 +265,10 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			}
 
 		} else if (result.getState() == null) {
-			logger.error("Service " + svcName + " returned a null ServiceResultState!");
+			logger.error("Service {} returned a null ServiceResultState!", svcName);
 			logger.error(msg);
 		} else {
-			logger.error("UNHANDLED SERVICE RESULT STATE: " + result.getState());
+			logger.error("UNHANDLED SERVICE RESULT STATE: {}", result.getState());
 			logger.error(msg);
 		}
 	}

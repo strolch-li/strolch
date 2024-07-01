@@ -84,12 +84,12 @@ public class CachedRealmLoader {
 		try (StrolchTransaction tx = this.realm.openTx(getCert(), "strolch_boot_" + context, false)) {
 			StrolchDao<T> dao = daoSupplier.apply(tx);
 			nrOfElements = dao.querySize();
-			logger.info("Loading " + nrOfElements + " " + context + " from DB...");
+			logger.info("Loading {} {} from DB...", nrOfElements, context);
 
 			Set<String> types = dao.queryTypes();
 			for (String type : types) {
 				long sizeOfType = dao.querySize(type);
-				logger.info("Loading " + sizeOfType + " " + context + " of type " + type + " from DB...");
+				logger.info("Loading {} {} of type {} from DB...", sizeOfType, context, type);
 
 				List<T> elements = dao.queryAll(type);
 				elementMap.insertAll(elements);
@@ -113,18 +113,18 @@ public class CachedRealmLoader {
 		CachedElementMap<T> elementMap = elementMapSupplier.get();
 
 		long nrOfElements = sizeByTypes.values().stream().mapToLong(Long::longValue).sum();
-		logger.info("Loading " + nrOfElements + " " + context + " from DB...");
+		logger.info("Loading {} {} from DB...", nrOfElements, context);
 
 		List<CompletableFuture<List<T>>> tasks = new ArrayList<>();
 		sizeByTypes.keySet().stream().sorted(Comparator.comparing(sizeByTypes::get)).forEach(type -> {
 			long size = sizeByTypes.get(type);
 			if (size < MIN_PAGE_SIZE) {
-				logger.info("Loading " + size + " " + context + " of type " + type + " from DB async in parallel...");
+				logger.info("Loading {} {} of type {} from DB async in parallel...", size, context, type);
 				tasks.add(supplyAsync(() -> loadPage(daoSupplier, type, MAX_VALUE, 0)));
 			} else {
 				long pageSize = Math.max(MIN_PAGE_SIZE, size / Runtime.getRuntime().availableProcessors());
-				logger.info("Loading " + size + " " + context + " of type " + type + " in pages of " + pageSize
-						+ " from DB async in parallel...");
+				logger.info("Loading {} {} of type {} in pages of {} from DB async in parallel...", size, context, type,
+						pageSize);
 				long position = 0;
 				while (position < size) {
 					long offset = position;

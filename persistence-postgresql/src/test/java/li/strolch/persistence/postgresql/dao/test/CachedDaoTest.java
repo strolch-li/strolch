@@ -91,7 +91,7 @@ public class CachedDaoTest extends AbstractModelTest {
 		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(scriptPrefix, PostgreSqlPersistenceHandler.class);
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
 		String sql = DbSchemaVersionCheck.getSql(scriptPrefix, PostgreSqlPersistenceHandler.class, dbVersion, "drop");
-		logger.info(StringHelper.NEW_LINE + sql);
+		logger.info(StringHelper.NEW_LINE + "{}", sql);
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();
 		}

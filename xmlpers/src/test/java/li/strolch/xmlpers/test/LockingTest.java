@@ -72,7 +72,7 @@ public class LockingTest extends AbstractPersistenceTest {
 			CreateResourceWorker worker = new CreateResourceWorker(workerName, workerName);
 			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread " + worker.getName());
+			logger.info("Setup thread {}", worker.getName());
 		}
 
 		int nrOfSuccess = runWorkers(workers);
@@ -91,7 +91,7 @@ public class LockingTest extends AbstractPersistenceTest {
 			CreateResourceWorker worker = new CreateResourceWorker(workerName, resourceId);
 			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread " + worker.getName());
+			logger.info("Setup thread {}", worker.getName());
 		}
 
 		int nrOfSuccess = runWorkers(workers);
@@ -110,7 +110,7 @@ public class LockingTest extends AbstractPersistenceTest {
 			UpdateResourceWorker worker = new UpdateResourceWorker(workerName, resourceId);
 			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread " + worker.getName());
+			logger.info("Setup thread {}", worker.getName());
 		}
 
 		int nrOfSuccess;

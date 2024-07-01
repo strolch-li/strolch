@@ -88,7 +88,7 @@ public class ObserverHandlerTests {
 			int wait = random.nextInt(MAX_WAIT_PER_UPDATE);
 			Thread.sleep(wait);
 			for (StrolchRootElement element : elements) {
-				logger.info("Added " + key + " " + element.getLocator() + " took " + wait + "ms");
+				logger.info("Added {} {} took {}ms", key, element.getLocator(), wait);
 			}
 
 			updateCount.incrementAndGet();

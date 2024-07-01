@@ -143,7 +143,7 @@ public abstract class PolicyDef {
 				return new JavaPolicyDef(type, value, true);
 
 			} catch (ClassNotFoundException e) {
-				logger.error("INVALID POLICY CONFIGURATION: Policy does not exist: " + value);
+				logger.error("INVALID POLICY CONFIGURATION: Policy does not exist: {}", value);
 				return new JavaPolicyDef(type, value, false);
 			}
 

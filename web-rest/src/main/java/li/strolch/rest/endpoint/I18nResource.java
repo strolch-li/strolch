@@ -50,7 +50,7 @@ public class I18nResource {
 			throw new IllegalStateException("Failed to read i18n file at " + i18nFile);
 		}
 
-		logger.info("Returning I18n data to user " + cert.getUsername());
+		logger.info("Returning I18n data to user {}", cert.getUsername());
 		String response = new GsonBuilder().setPrettyPrinting().create().toJson(i18nJ);
 		return Response.ok(response, MediaType.APPLICATION_JSON).build();
 	}
@@ -74,7 +74,7 @@ public class I18nResource {
 			throw new IllegalStateException("Failed to read i18n file at " + i18nFile);
 		}
 
-		logger.info("Returning I18n data to user " + cert.getUsername());
+		logger.info("Returning I18n data to user {}", cert.getUsername());
 		return ResponseUtil.toResponse(DATA, i18nJ);
 	}
 
@@ -99,7 +99,7 @@ public class I18nResource {
 		if (i18nFile.exists() && !i18nFile.renameTo(i18nBackupFile))
 			throw new IllegalStateException("Failed to create backup of i18n file to " + i18nBackupFile);
 
-		logger.info("Overwriting I18n data by user " + cert.getUsername() + " to file " + i18nFile);
+		logger.info("Overwriting I18n data by user {} to file {}", cert.getUsername(), i18nFile);
 		try (FileWriter out = new FileWriter(i18nFile)) {
 			new GsonBuilder().setPrettyPrinting().create().toJson(i18nJ, out);
 		} catch (IOException e) {

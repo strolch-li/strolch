@@ -121,8 +121,8 @@ public class ReservationExecution extends DurationExecution {
 		if (nrOfActivitiesInExecution < jobCountSemaphoreP.getValue())
 			return true;
 
-		logger.error("Action " + action.getLocator() + " is not executable as there are " + nrOfActivitiesInExecution
-				+ " activities in execution with type(s): " + jobCountSemaphoreP.getValueAsString());
+		logger.error("Action {} is not executable as there are {} activities in execution with type(s): {}",
+				action.getLocator(), nrOfActivitiesInExecution, jobCountSemaphoreP.getValueAsString());
 		return false;
 	}
 }

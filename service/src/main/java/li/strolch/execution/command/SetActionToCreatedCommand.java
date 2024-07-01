@@ -35,7 +35,7 @@ public class SetActionToCreatedCommand extends BasePlanningAndExecutionCommand {
 	@Override
 	public void doCommand() {
 		if (this.action.getState() == State.CREATED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in state CREATED! Not changing.");
+			logger.warn("Action {} is already in state CREATED! Not changing.", this.action.getLocator());
 			return;
 		}
 

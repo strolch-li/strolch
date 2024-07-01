@@ -40,24 +40,24 @@ public class SimpleExecution extends ExecutionPolicy {
 
 	protected void startWarningTask(PeriodDuration duration, Action action, Supplier<LogMessage> handler) {
 		if (this.warningTask != null) {
-			logger.warn("There is already a warning task registered, for action "
-					+ action.getLocator()
-					+ ". Cancelling and creating a new task...");
+			logger.warn(
+					"There is already a warning task registered, for action {}. Cancelling and creating a new task...",
+					action.getLocator());
 			this.warningTask.cancel(true);
 			this.warningTask = null;
 		}
 
 		this.warningTask = getDelayedExecutionTimer().delay(duration, () -> handleToWarning(handler));
-		logger.info("Registered warning task for action " + this.actionLoc);
+		logger.info("Registered warning task for action {}", this.actionLoc);
 	}
 
 	private void handleToWarning(Supplier<LogMessage> handler) {
 		try {
 			LogMessage logMessage = handler.get();
-			logger.warn("Action " + this.actionLoc + " is in warning with message: " + logMessage.getMessage());
+			logger.warn("Action {} is in warning with message: {}", this.actionLoc, logMessage.getMessage());
 			toWarning(logMessage);
 		} catch (Exception e) {
-			logger.error("Failed to perform warning task for action " + this.actionLoc, e);
+			logger.error("Failed to perform warning task for action {}", this.actionLoc, e);
 		}
 	}
 
@@ -111,7 +111,7 @@ public class SimpleExecution extends ExecutionPolicy {
 	}
 
 	protected void toError(Action action, LogMessage message) {
-		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
+		logger.error("Action {} failed because of: {}", message.getLocator(), message.formatMessage());
 		addMessage(message);
 		toError(action);
 	}
@@ -126,7 +126,7 @@ public class SimpleExecution extends ExecutionPolicy {
 	protected void toError(LogMessage message) {
 		cancelWarningTask();
 		stop();
-		logger.error("Action " + message.getLocator() + " failed because of: " + message.formatMessage());
+		logger.error("Action {} failed because of: {}", message.getLocator(), message.formatMessage());
 		addMessage(message);
 		getExecutionHandler().toError(this.realm, this.actionLoc);
 	}

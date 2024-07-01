@@ -46,7 +46,7 @@ public class LanguagesResource {
 
 			return Response.ok().entity(result.toString()).build();
 		} catch (Exception e) {
-			logger.error("Failed to get supported languages: " + e.getMessage(), e);
+			logger.error("Failed to get supported languages: {}", e.getMessage(), e);
 			return Response.serverError().entity(getRootCauseMessage(e)).build();
 		}
 	}

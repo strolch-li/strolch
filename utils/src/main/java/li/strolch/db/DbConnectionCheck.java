@@ -53,7 +53,7 @@ public class DbConnectionCheck {
 		Collection<DataSource> values = this.dsMap.values();
 		for (DataSource ds : values) {
 
-			logger.info("Checking connection " + ds);
+			logger.info("Checking connection {}", ds);
 
 			try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 

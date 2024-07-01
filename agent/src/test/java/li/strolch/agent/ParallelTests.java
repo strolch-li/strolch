@@ -97,10 +97,10 @@ public class ParallelTests {
 				try (StrolchTransaction tx = realm.openTx(cert, ParallelTests.class, false)) {
 
 					List<String> ids = tx.streamResources().map(StrolchElement::getId).collect(toList());
-					logger.info("There are " + ids.size() + " Resources!");
+					logger.info("There are {} Resources!", ids.size());
 
 					ids = tx.streamResources("SomeType", "TestType").map(StrolchElement::getId).collect(toList());
-					logger.info("There are " + ids.size() + " Resources of type SomeType");
+					logger.info("There are {} Resources of type SomeType", ids.size());
 				}
 			}
 

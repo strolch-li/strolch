@@ -169,7 +169,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 						MessageFormat.format("Resource {0} already exists and updating is disallowed!",
 								resource.getLocator()));
 			} else {
-				logger.warn("Ignoring " + resource.getLocator() + " as updating is not enabled!");
+				logger.warn("Ignoring {} as updating is not enabled!", resource.getLocator());
 			}
 		} else if (this.addResources) {
 			this.tx.add(resource);
@@ -194,7 +194,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 				throw new StrolchException(MessageFormat.format("Order {0} already exists and updating is disallowed!",
 						order.getLocator()));
 			} else {
-				logger.warn("Ignoring " + order.getLocator() + " as updating is not enabled!");
+				logger.warn("Ignoring {} as updating is not enabled!", order.getLocator());
 			}
 		} else if (this.addOrders) {
 			this.tx.add(order);
@@ -220,7 +220,7 @@ public class InMemoryElementListener implements StrolchElementListener {
 						MessageFormat.format("Activity {0} already exists and updating is disallowed!",
 								activity.getLocator()));
 			} else {
-				logger.warn("Ignoring " + activity.getLocator() + " as updating is not enabled!");
+				logger.warn("Ignoring {} as updating is not enabled!", activity.getLocator());
 			}
 		} else if (this.addActivities) {
 			this.tx.add(activity);

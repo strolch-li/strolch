@@ -60,7 +60,7 @@ public class ElementLock extends ReentrantLock {
 				for (Thread queuedThread : getQueuedThreads()) {
 					Exception e = new Exception();
 					e.setStackTrace(queuedThread.getStackTrace());
-					logger.error("\n" + queuedThread.getName(), e);
+					logger.error("\n{}", queuedThread.getName(), e);
 				}
 
 				throw new ElementLockingException(msg);

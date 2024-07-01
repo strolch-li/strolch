@@ -123,7 +123,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 			try {
 				realm.stop();
 			} catch (Exception e) {
-				logger.error("Failed to stop realm " + realm.getRealm(), e);
+				logger.error("Failed to stop realm {}", realm.getRealm(), e);
 			}
 		}
 		super.stop();

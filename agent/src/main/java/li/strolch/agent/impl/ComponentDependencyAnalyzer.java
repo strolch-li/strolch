@@ -166,8 +166,8 @@ public class ComponentDependencyAnalyzer {
 		}
 		String inset = StringHelper.normalizeLength("", depth * 2, false, ' ');
 		for (ComponentController controller : components) {
-			logger.info(inset + controller.getComponent().getName() + ": "
-					+ controller.getComponent().getClass().getName());
+			logger.info("{}{}: {}", inset, controller.getComponent().getName(),
+					controller.getComponent().getClass().getName());
 			logDependencies(depth + 1, controller.getDownstreamDependencies());
 		}
 	}

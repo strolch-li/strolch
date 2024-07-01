@@ -196,7 +196,7 @@ public class AuthenticationResource {
 
 	private static Response handleSessionException(String context, Exception e) {
 		if (e instanceof StrolchNotAuthenticatedException || e instanceof NotAuthenticatedException)
-			logger.error("Session exception: " + e.getMessage());
+			logger.error("Session exception: {}", e.getMessage());
 		else
 			logger.error(e.getMessage(), e);
 		Throwable rootCause = getRootCause(e);

@@ -35,7 +35,7 @@ public class SetActionToClosedCommand extends BasePlanningAndExecutionCommand {
 	@Override
 	public void doCommand() {
 		if (this.action.getState() == State.CLOSED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in state CLOSED! Not changing.");
+			logger.warn("Action {} is already in state CLOSED! Not changing.", this.action.getLocator());
 			return;
 		}
 

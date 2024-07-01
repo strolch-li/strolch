@@ -35,7 +35,7 @@ public class SetActionToPlannedCommand extends BasePlanningAndExecutionCommand {
 	@Override
 	public void doCommand() {
 		if (this.action.getState() == State.PLANNED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in state PLANNED! Not changing.");
+			logger.warn("Action {} is already in state PLANNED! Not changing.", this.action.getLocator());
 			return;
 		}
 

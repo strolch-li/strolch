@@ -27,7 +27,7 @@ public class SetActionToErrorCommand extends ActionExecutionCommand {
 	@Override
 	public void doCommand() {
 		if (this.action.getState() == State.ERROR) {
-			logger.warn("Action " + this.action.getLocator() + " is already in state ERROR! Not changing.");
+			logger.warn("Action {} is already in state ERROR! Not changing.", this.action.getLocator());
 			return;
 		}
 

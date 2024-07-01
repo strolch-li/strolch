@@ -30,11 +30,11 @@ public class ArchiveActivityCommand extends Command {
 
 		Activity activity = tx().getActivityBy(this.activityLoc.get(1), this.activityLoc.get(2));
 		if (activity == null) {
-			logger.error("Activity " + this.activityLoc + " does not exist anymore, can not archive!");
+			logger.error("Activity {} does not exist anymore, can not archive!", this.activityLoc);
 			return;
 		}
 
-		logger.info("Activity " + activity.getLocator() + " is in state " + activity.getState());
+		logger.info("Activity {} is in state {}", activity.getLocator(), activity.getState());
 
 		tx().getPolicy(activity, ActivityArchivalPolicy.class).archive(activity);
 	}

@@ -115,7 +115,7 @@ public class StrolchJobsResource {
 			return ResponseUtil.toResponse();
 
 		} catch (Exception e) {
-			logger.error("Failed to perform job action " + action, e);
+			logger.error("Failed to perform job action {}", action, e);
 			return ResponseUtil.toResponse(e);
 		}
 	}

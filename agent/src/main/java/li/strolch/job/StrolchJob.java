@@ -242,7 +242,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			this.lastException = null;
 		} catch (Exception e) {
 			this.lastException = e;
-			logger.error("Execution of Job " + getName() + " failed.", e);
+			logger.error("Execution of Job {} failed.", getName(), e);
 
 			if (getContainer().hasComponent(OperationsLog.class)) {
 				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
@@ -276,7 +276,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			if (this.mode == JobMode.Recurring) {
 				schedule();
 			} else {
-				logger.info("Not scheduling " + getName() + " after first execution as mode is " + this.mode);
+				logger.info("Not scheduling {} after first execution as mode is {}", getName(), this.mode);
 			}
 
 		} else {
@@ -310,7 +310,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 */
 	public StrolchJob schedule() {
 		if (this.mode == JobMode.Manual) {
-			logger.info("Not scheduling " + getName() + " as mode is " + this.mode);
+			logger.info("Not scheduling {} as mode is {}", getName(), this.mode);
 			return this;
 		}
 
@@ -324,12 +324,13 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				try {
 					executionTime = this.cronExpression.nextTimeAfter(this.cronStartDate);
 				} catch (IllegalArgumentException e) {
-					logger.error("Can not schedule " + getName() + " after start date " + this.cronStartDate +
-							" as no next time exists for cron expression " + this.cron);
+					logger.error(
+							"Can not schedule {} after start date {} as no next time exists for cron expression {}",
+							getName(), this.cronStartDate, this.cron);
 					return this;
 				}
 
-				logger.info("First execution of " + getName() + " will be at " +
+				logger.info("First execution of {} will be at {}", getName(),
 						executionTime.format(ISO_OFFSET_DATE_TIME));
 
 				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
@@ -338,7 +339,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			} else {
 
 				long millis = this.initialDelayTimeUnit.toMillis(this.initialDelay);
-				logger.info("First execution of " + getName() + " will be at " +
+				logger.info("First execution of {} will be at {}", getName(),
 						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME));
 
 				this.future = getScheduledExecutor().schedule(this, this.initialDelay, this.initialDelayTimeUnit);
@@ -351,13 +352,14 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				try {
 					executionTime = this.cronExpression.nextTimeAfter(this.lastExecution);
 				} catch (IllegalArgumentException e) {
-					logger.error("Can not schedule " + getName() + " after start date " + this.lastExecution +
-							" as no next time exists for cron expression " + this.cron);
+					logger.error(
+							"Can not schedule {} after start date {} as no next time exists for cron expression {}",
+							getName(), this.lastExecution, this.cron);
 					return this;
 				}
 
-				logger.info(
-						"Next execution of " + getName() + " will be at " + executionTime.format(ISO_OFFSET_DATE_TIME));
+				logger.info("Next execution of {} will be at {}", getName(),
+						executionTime.format(ISO_OFFSET_DATE_TIME));
 
 				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
 				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
@@ -365,7 +367,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			} else {
 
 				long millis = this.delayTimeUnit.toMillis(this.delay);
-				logger.info("Next execution of " + getName() + " will be at " +
+				logger.info("Next execution of {} will be at {}", getName(),
 						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME));
 
 				this.future = getScheduledExecutor().schedule(this, this.delay, this.delayTimeUnit);

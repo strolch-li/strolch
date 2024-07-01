@@ -114,9 +114,8 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 			long now = System.currentTimeMillis();
 			if (System.currentTimeMillis() >= nextLog) {
 				nextLog = now + resolutionMillis;
-				logger.info(
-						getCertificate().getSessionId() + ": Performing " + (nrOfTx / resolutionSeconds) + " TXs/s ("
-								+ SystemHelper.getMemorySummary() + ")");
+				logger.info("{}: Performing {} TXs/s ({})", getCertificate().getSessionId(), nrOfTx / resolutionSeconds,
+						SystemHelper.getMemorySummary());
 				nrOfTx = 0;
 			}
 		}
@@ -124,8 +123,7 @@ public class PerformanceTestService extends AbstractService<PerformanceTestArgum
 		long end = System.currentTimeMillis();
 		long took = end - start;
 		long txPerSec = allTx / (took / 1000);
-		logger.info("Took " + StringHelper.formatMillisecondsDuration(took) + " for " + allTx + " TXs with " + txPerSec
-				+ " TXs/s");
+		logger.info("Took {} for {} TXs with {} TXs/s", StringHelper.formatMillisecondsDuration(took), allTx, txPerSec);
 
 		return new PerformanceTestResult(allTx);
 	}

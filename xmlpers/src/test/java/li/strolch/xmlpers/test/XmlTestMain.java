@@ -56,16 +56,16 @@ public class XmlTestMain {
 
 		MyModel res = ModelBuilder.createResource();
 
-		logger.info("Writing Res:\n" + res);
+		logger.info("Writing Res:\n{}", res);
 
 		writeSax(res);
 		writeDom(res);
 
 		List<MyModel> resoures;
 		resoures = readDom();
-		logger.info("Parsed Resources:\n" + resoures);
+		logger.info("Parsed Resources:\n{}", resoures);
 		resoures = readSax();
-		logger.info("Parsed Resources:\n" + resoures);
+		logger.info("Parsed Resources:\n{}", resoures);
 	}
 
 	private static List<MyModel> readDom() throws Exception {
@@ -94,7 +94,7 @@ public class XmlTestMain {
 			resources.add(res);
 		}
 
-		logger.info("DOM parsed file " + file.getAbsolutePath());
+		logger.info("DOM parsed file {}", file.getAbsolutePath());
 
 		return resources;
 	}
@@ -155,7 +155,7 @@ public class XmlTestMain {
 		File file = new File("target/res_sax.xml");
 		getSaxParser().parse(file, xmlHandler);
 
-		logger.info("SAX parsed file " + file.getAbsolutePath());
+		logger.info("SAX parsed file {}", file.getAbsolutePath());
 
 		return resources;
 	}
@@ -214,7 +214,7 @@ public class XmlTestMain {
 			Source xmlSource = new DOMSource(doc);
 			transformer.transform(xmlSource, result);
 
-			logger.info("Wrote DOM to " + file.getAbsolutePath());
+			logger.info("Wrote DOM to {}", file.getAbsolutePath());
 
 		} catch (Exception e) {
 
@@ -257,7 +257,7 @@ public class XmlTestMain {
 
 			writer.flush();
 			writer.close();
-			logger.info("Wrote SAX to " + file.getAbsolutePath());
+			logger.info("Wrote SAX to {}", file.getAbsolutePath());
 		}
 	}
 }

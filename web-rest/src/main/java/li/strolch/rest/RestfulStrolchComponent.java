@@ -165,7 +165,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.corsEnabled = configuration.getBoolean(PARAM_CORS_ENABLED, Boolean.FALSE);
 		if (this.corsEnabled) {
 			this.corsOrigin = configuration.getString(PARAM_CORS_ORIGIN, null);
-			logger.info("Enabling CORS for origin: " + this.corsOrigin);
+			logger.info("Enabling CORS for origin: {}", this.corsOrigin);
 			AccessControlResponseFilter.setCorsEnabled(true);
 			AccessControlResponseFilter.setOrigin(this.corsOrigin);
 		}
@@ -196,8 +196,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.hideVersionFromUnauthorizedClients = configuration.getBoolean(PARAM_HIDE_VERSION_FROM_UNAUTHORIZED_CLIENTS,
 				false);
 
-		logger.info(
-				"Cookie max age is " + this.cookieMaxAge + "s and is " + (this.secureCookie ? "secure" : "not secure"));
+		logger.info("Cookie max age is {}s and is {}", this.cookieMaxAge, this.secureCookie ? "secure" : "not secure");
 
 		super.initialize(configuration);
 	}

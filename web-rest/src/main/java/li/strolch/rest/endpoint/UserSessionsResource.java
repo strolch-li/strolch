@@ -61,7 +61,7 @@ public class UserSessionsResource {
 	public Response querySessions(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
-		logger.info("[" + cert.getUsername() + "] Querying user sessions...");
+		logger.info("[{}] Querying user sessions...", cert.getUsername());
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
@@ -91,7 +91,7 @@ public class UserSessionsResource {
 	public Response getSession(@Context HttpServletRequest request, @PathParam("sessionId") String sessionId) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
-		logger.info("[" + cert.getUsername() + "] Returning session " + sessionId);
+		logger.info("[{}] Returning session {}", cert.getUsername(), sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
@@ -107,7 +107,7 @@ public class UserSessionsResource {
 	@Path("{sessionId}")
 	public Response invalidateSession(@Context HttpServletRequest request, @PathParam("sessionId") String sessionId) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		logger.info("[" + cert.getUsername() + "] Invalidating session " + sessionId);
+		logger.info("[{}] Invalidating session {}", cert.getUsername(), sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
@@ -124,7 +124,7 @@ public class UserSessionsResource {
 	public Response setSessionLocale(@Context HttpServletRequest request, @PathParam("sessionId") String sessionId,
 			@PathParam("locale") String localeS) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		logger.info("[" + cert.getUsername() + "] Setting locale of session " + sessionId + " to " + localeS);
+		logger.info("[{}] Setting locale of session {} to {}", cert.getUsername(), sessionId, localeS);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 		Locale locale;
 		try {

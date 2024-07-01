@@ -36,7 +36,7 @@ public class Report implements AutoCloseable {
 		this.reportPolicy = policyHandler.getPolicy(reportPolicyDef, tx);
 		this.reportPolicy.initialize(reportId);
 		long took = System.currentTimeMillis() - start;
-		logger.info("Initializing report " + reportId + " took " + formatMillisecondsDuration(took));
+		logger.info("Initializing report {} took {}", reportId, formatMillisecondsDuration(took));
 	}
 
 	public ReportPolicy getReportPolicy() {

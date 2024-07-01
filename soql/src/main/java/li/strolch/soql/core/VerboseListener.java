@@ -20,7 +20,7 @@ public class VerboseListener extends BaseErrorListener implements ANTLRErrorList
 
 		List<String> stack = ((Parser) recognizer).getRuleInvocationStack();
 		Collections.reverse(stack);
-		logger.error("rule stack: " + stack);
+		logger.error("rule stack: {}", stack);
 
 		String text = "line " + line + ":" + charPositionInLine + " at " + offendingSymbol + ": " + msg;
 		logger.error(text);

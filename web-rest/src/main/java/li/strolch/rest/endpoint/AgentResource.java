@@ -89,7 +89,7 @@ public class AgentResource {
 				default -> throw new IllegalStateException("Unhandled state " + state);
 			}
 		} catch (Exception e) {
-			logger.error("Failed to change state of component " + name + " to state " + state, e);
+			logger.error("Failed to change state of component {} to state {}", name, state, e);
 			return ResponseUtil.toResponse(e);
 		}
 

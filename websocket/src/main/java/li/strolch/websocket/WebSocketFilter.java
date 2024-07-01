@@ -22,7 +22,7 @@ public class WebSocketFilter implements Filter {
 
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String remoteIp = getRemoteIp(httpRequest);
-		logger.info("Remote IP: " + remoteIp + ": " + httpRequest.getMethod() + " " + httpRequest.getRequestURI());
+		logger.info("Remote IP: {}: {} {}", remoteIp, httpRequest.getMethod(), httpRequest.getRequestURI());
 		WebSocketRemoteIp.set(remoteIp);
 		chain.doFilter(request, response);
 	}

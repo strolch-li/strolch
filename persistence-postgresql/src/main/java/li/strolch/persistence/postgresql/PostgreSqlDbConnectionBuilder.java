@@ -58,12 +58,12 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		config.setUsername(username);
 		config.setPassword(password);
 
-		logger.info("Preparing HikariDataSource with a fail timeout of " + config.getInitializationFailTimeout()
-				+ "ms for realm " + realm + " to " + url);
+		logger.info("Preparing HikariDataSource with a fail timeout of {}ms for realm {} to {}",
+				config.getInitializationFailTimeout(), realm, url);
 		ds = new HikariDataSource(config);
 
-		logger.info("[" + realm + "] PostgreSQL Connection pool to " + url + " has a maximum pool size of "
-				+ ds.getMaximumPoolSize() + " connections");
+		logger.info("[{}] PostgreSQL Connection pool to {} has a maximum pool size of {} connections", realm, url,
+				ds.getMaximumPoolSize());
 
 		return new StrolchPostgreDataSource(ds);
 	}

@@ -242,7 +242,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 			this.futures.forEach(future -> future.cancel(false));
 			handleStopped();
 		} catch (Exception e) {
-			logger.error("Stopping failed for " + this.actionLoc, e);
+			logger.error("Stopping failed for {}", this.actionLoc, e);
 		}
 	}
 
@@ -351,10 +351,10 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	protected void delayRandom(long delay, TimeUnit delayUnit, Runnable runnable) {
 		long delayMs = delayUnit.toMillis(delay);
 		if (delayMs < 20) {
-			logger.warn("Delay time for " + this.actionLoc + " is less than 20ms, overriding!");
+			logger.warn("Delay time for {} is less than 20ms, overriding!", this.actionLoc);
 			delayMs = 20;
 		}
-		logger.info("Delaying runnable " + runnable + " by " + formatMillisecondsDuration(delayMs));
+		logger.info("Delaying runnable {} by {}", runnable, formatMillisecondsDuration(delayMs));
 		this.futures.add(getDelayedExecutionTimer().delay(delayMs, runnable));
 	}
 
@@ -434,7 +434,7 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected void delayToExecutedBy(long delay, TimeUnit delayUnit) {
 		long delayMs = delayUnit.toMillis(delay);
-		logger.info("Delaying toExecuted of " + this.actionLoc + " by " + formatMillisecondsDuration(delayMs));
+		logger.info("Delaying toExecuted of {} by {}", this.actionLoc, formatMillisecondsDuration(delayMs));
 		getDelayedExecutionTimer().execute(this.realm, getContainer(), this.actionLoc, delayMs);
 	}
 

@@ -1668,8 +1668,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				rollback();
 				handleRollback(start);
 			} catch (Exception ex) {
-				logger.error("Transaction failed due to " + e.getMessage(), e);
-				logger.error("Failed to commit transaction and then rollback due to " + ex.getMessage(), ex);
+				logger.error("Transaction failed due to {}", e.getMessage(), e);
+				logger.error("Failed to commit transaction and then rollback due to {}", ex.getMessage(), ex);
 				handleFailure(false, start, e);
 			}
 

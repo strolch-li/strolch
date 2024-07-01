@@ -96,7 +96,7 @@ public class RuntimeMock implements AutoCloseable {
 		}
 
 		if (this.targetPathF.exists()) {
-			logger.info("Deleting all files in " + this.targetPathF.getAbsolutePath());
+			logger.info("Deleting all files in {}", this.targetPathF.getAbsolutePath());
 			if (!FileHelper.deleteFile(this.targetPathF, true)) {
 				String msg = "Failed to delete {0}";
 				msg = MessageFormat.format(msg, this.targetPathF.getAbsolutePath());
@@ -133,7 +133,7 @@ public class RuntimeMock implements AutoCloseable {
 			this.container = this.agent.getContainer();
 
 		} catch (Exception e) {
-			logger.error("Failed to start mocked container due to: " + e.getMessage(), e);
+			logger.error("Failed to start mocked container due to: {}", e.getMessage(), e);
 			destroyRuntime();
 			throw e;
 		}
@@ -149,13 +149,13 @@ public class RuntimeMock implements AutoCloseable {
 		try {
 			this.agent.stop();
 		} catch (Exception e) {
-			logger.info("Failed to stop container: " + e.getMessage());
+			logger.info("Failed to stop container: {}", e.getMessage());
 		}
 
 		try {
 			this.agent.destroy();
 		} catch (Exception e) {
-			logger.info("Failed to destroy container: " + e.getMessage());
+			logger.info("Failed to destroy container: {}", e.getMessage());
 		}
 
 		return this;

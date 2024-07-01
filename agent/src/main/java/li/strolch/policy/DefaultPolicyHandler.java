@@ -243,7 +243,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 											+ " Key=" + key + " as constructor is abstract or an interface!");
 
 						// store the implementation class
-						logger.info("Loaded Policy " + type + " / " + key + " / " + className);
+						logger.info("Loaded Policy {} / {} / {}", type, key, className);
 						this.classByTypeMap.addElement(type, key, (Class<? extends StrolchPolicy>) implClass);
 
 					} catch (ClassNotFoundException e) {

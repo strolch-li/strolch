@@ -109,7 +109,7 @@ public class WebSocketObserverHandler implements Observer {
 			try {
 				this.client.sendMessage(jsonObject.toString());
 			} catch (Exception e) {
-				logger.error("Failed to send data to client " + this.client);
+				logger.error("Failed to send data to client {}", this.client);
 				this.client.close(new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, getExceptionMessage(e)));
 			}
 		});

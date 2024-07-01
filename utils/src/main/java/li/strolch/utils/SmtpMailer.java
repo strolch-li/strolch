@@ -116,8 +116,8 @@ public class SmtpMailer {
 			logger.info(format("Sent E-mail with subject {0} to {1}", subject, addressesToString(recipientAddresses)));
 
 		} catch (MessagingException e) {
-			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nRecipients: " + recipients +
-					"\n\nBody:\n" + text);
+			logger.error("Failed to send the following e-mail:\nSubject: {}\nRecipients: {}\n\nBody:\n{}", subject,
+					recipients, text);
 			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
 		}
 	}
@@ -152,8 +152,9 @@ public class SmtpMailer {
 			logger.info(format("Sent E-mail with subject {0} to {1} and attachment {2}", subject,
 					addressesToString(recipientAddresses), fileName));
 		} catch (MessagingException e) {
-			logger.error("Failed to send the following e-mail:\nSubject: " + subject + "\nAttachment: " + fileName +
-					"\nRecipients: " + recipients + "\n\nBody:\n" + text);
+			logger.error(
+					"Failed to send the following e-mail:\nSubject: {}\nAttachment: {}\nRecipients: {}\n\nBody:\n{}",
+					subject, fileName, recipients, text);
 			throw new RuntimeException("Failed to send e-mail due to " + e.getMessage(), e);
 		}
 	}

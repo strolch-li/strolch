@@ -168,7 +168,7 @@ public class DbSchemaVersionCheck {
 					currentVersion = Version.valueOf(rs.getString(2));
 			}
 		} catch (Exception e) {
-			logger.error("Failed to query version for app " + app + ": " + ExceptionHelper.formatExceptionMessage(e));
+			logger.error("Failed to query version for app {}: {}", app, ExceptionHelper.formatExceptionMessage(e));
 			return null;
 		}
 
@@ -300,7 +300,7 @@ public class DbSchemaVersionCheck {
 		try (Statement st = con.createStatement()) {
 			st.execute(sql);
 		} catch (SQLException e) {
-			logger.error("Failed to execute schema creation SQL: \n" + sql);
+			logger.error("Failed to execute schema creation SQL: \n{}", sql);
 			throw new DbException("Failed to execute schema generation SQL: " + e.getMessage(), e);
 		}
 
@@ -355,13 +355,13 @@ public class DbSchemaVersionCheck {
 			if (version.compareTo(currentVersion) <= 0)
 				continue;
 
-			logger.info("Migrating to version " + version + "...");
+			logger.info("Migrating to version {}...", version);
 
 			String sql = getSql(this.app, this.ctxClass, version, "migration");
 			try (Statement st = con.createStatement()) {
 				st.execute(sql);
 			} catch (SQLException e) {
-				logger.error("Failed to execute schema migration SQL: \n" + sql);
+				logger.error("Failed to execute schema migration SQL: \n{}", sql);
 				throw new DbException("Failed to execute schema migration SQL: " + e.getMessage(), e);
 			}
 		}
@@ -451,7 +451,7 @@ public class DbSchemaVersionCheck {
 		try (Statement st = con.createStatement()) {
 			st.execute(sql);
 		} catch (SQLException e) {
-			logger.error("Failed to execute schema drop SQL: \n" + sql);
+			logger.error("Failed to execute schema drop SQL: \n{}", sql);
 			throw new DbException("Failed to execute schema drop SQL: " + e.getMessage(), e);
 		}
 

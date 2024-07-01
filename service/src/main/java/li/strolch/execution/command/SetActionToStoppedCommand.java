@@ -27,7 +27,7 @@ public class SetActionToStoppedCommand extends ActionExecutionCommand {
 	@Override
 	public void doCommand() {
 		if (this.action.getState() == State.STOPPED) {
-			logger.warn("Action " + this.action.getLocator() + " is already in state STOPPED! Not changing.");
+			logger.warn("Action {} is already in state STOPPED! Not changing.", this.action.getLocator());
 			return;
 		}
 

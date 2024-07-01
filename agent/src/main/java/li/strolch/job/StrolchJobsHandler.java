@@ -98,15 +98,15 @@ public class StrolchJobsHandler extends StrolchComponent {
 									+ " does not exist!");
 				}
 
-				logger.error("Failed to load StrolchJob " + jobRes.getId() + " from model as class " + className
-						+ " does not exist!");
+				logger.error("Failed to load StrolchJob {} from model as class {} does not exist!", jobRes.getId(),
+						className);
 				return;
 			}
 			job.setConfigureMethod(ConfigureMethod.Model).setMode(mode);
 
 			if (mode == JobMode.Manual) {
 				jobs.add(job);
-				logger.info("Added job " + job + " from model.");
+				logger.info("Added job {} from model.", job);
 				return;
 			}
 
@@ -116,7 +116,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 				job.setCronExpression(cron, startDateP.getValueZdt());
 
 				jobs.add(job);
-				logger.info("Added job " + job + " from model.");
+				logger.info("Added job {} from model.", job);
 
 				return;
 			}
@@ -129,16 +129,15 @@ public class StrolchJobsHandler extends StrolchComponent {
 				job.setDelay(initialDelayP.getValue(), initialDelayUnit, delayP.getValue(), delayUnit);
 
 				jobs.add(job);
-				logger.info("Added job " + job + " from model.");
+				logger.info("Added job {} from model.", job);
 
 				return;
 			}
 
-			logger.error(
-					"Job " + jobRes.getId() + " is inconsistent, as either cron, or initialDelay/delay is missing!");
+			logger.error("Job {} is inconsistent, as either cron, or initialDelay/delay is missing!", jobRes.getId());
 		} catch (RuntimeException e) {
 			if (catchExceptions)
-				logger.error("Failed to load StrolchJob " + jobRes.getId() + " from model", e);
+				logger.error("Failed to load StrolchJob {} from model", jobRes.getId(), e);
 			else
 				throw new IllegalStateException("Failed to load StrolchJob " + jobRes.getId() + " from model", e);
 		}
@@ -210,8 +209,8 @@ public class StrolchJobsHandler extends StrolchComponent {
 			StrolchJob existingJob = this.jobs.get(job.getName());
 			if (existingJob.getClass().equals(job.getClass()) && existingJob.getConfigureMethod().isModel()
 					&& job.getConfigureMethod().isProgrammatic()) {
-				logger.error("Not registering job " + job.getName()
-						+ " as it is already registered by a model specific job!");
+				logger.error("Not registering job {} as it is already registered by a model specific job!",
+						job.getName());
 			} else {
 				throw new IllegalArgumentException("Job " + job.getName() + " is already registered!");
 			}

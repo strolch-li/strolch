@@ -68,7 +68,7 @@ public class SmtpMailHandler extends MailHandler {
 		try {
 			SmtpMailer.getInstance().sendMail(subject, text, recipients);
 		} catch (Throwable e) {
-			logger.error("Failed to send mail \"" + subject + "\" to " + recipients, e);
+			logger.error("Failed to send mail \"{}\" to {}", subject, recipients, e);
 
 			if (hasComponent(OperationsLog.class)) {
 				LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,
@@ -85,8 +85,7 @@ public class SmtpMailHandler extends MailHandler {
 		try {
 			SmtpMailer.getInstance().sendMail(subject, text, recipients, attachment, fileName, type);
 		} catch (Throwable e) {
-			logger.error("Failed to send mail \"" + subject + "\" to " + recipients + " with attachment " + fileName,
-					e);
+			logger.error("Failed to send mail \"{}\" to {} with attachment {}", subject, recipients, fileName, e);
 
 			if (hasComponent(OperationsLog.class)) {
 				LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,

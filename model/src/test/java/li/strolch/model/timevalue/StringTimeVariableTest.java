@@ -109,7 +109,7 @@ public class StringTimeVariableTest {
 		// check the future values
 		Collection<ITimeValue<IValue<Set<AString>>>> futureValues = this.timeVariable.getFutureValues(0L);
 		for (ITimeValue<IValue<Set<AString>>> iTimeValue : futureValues) {
-			logger.info("++ " + iTimeValue);
+			logger.info("++ {}", iTimeValue);
 		}
 
 		assertEquals(1, futureValues.size()); // a empty one is left

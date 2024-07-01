@@ -34,8 +34,9 @@ public abstract class BasePlanningAndExecutionCommand extends Command {
 
 		Order order = tx.getOrderByRelation(rootElement, PARAM_ORDER);
 		if (order == null) {
-			logger.warn("Did not find activity order by relation " + PARAM_ORDER + " for activity " + rootElement
-					.getLocator() + ", trying by Activity type and id");
+			logger.warn("Did not find activity order by relation "
+					+ PARAM_ORDER
+					+ " for activity {}, trying by Activity type and id", rootElement.getLocator());
 			order = tx.getOrderBy(rootElement.getType(), rootElement.getId());
 			if (order == null) {
 				logger.error("Could not find order by Activity type and id either, not updating order state!");

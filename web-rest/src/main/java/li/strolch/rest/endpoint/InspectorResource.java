@@ -1062,7 +1062,7 @@ public class InspectorResource {
 		} finally {
 			if (tempFile != null) {
 				if (!tempFile.delete())
-					logger.error("Failed to delete temp file " + tempFile.getAbsolutePath());
+					logger.error("Failed to delete temp file {}", tempFile.getAbsolutePath());
 			}
 		}
 	}

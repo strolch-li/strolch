@@ -79,7 +79,7 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 			throw new IllegalStateException("Action " + action.getLocator() + " is in illegal state " + currentState);
 
 		if (!currentState.canSetToExecution()) {
-			logger.warn("Action " + action.getLocator() + " can not be executed with state " + currentState);
+			logger.warn("Action {} can not be executed with state {}", action.getLocator(), currentState);
 			return;
 		}
 
@@ -98,11 +98,11 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 			}
 
 			if (!executionPolicy.isExecutable(action)) {
-				logger.info("Action " + action.getLocator() + " is not yet executable.");
+				logger.info("Action {} is not yet executable.", action.getLocator());
 				return;
 			}
 
-			logger.info("Action " + action.getLocator() + " is now being executed...");
+			logger.info("Action {} is now being executed...", action.getLocator());
 
 			executionPolicy.toExecution(action);
 			confirmationPolicy.doConfirmation(action);
@@ -111,12 +111,12 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 				this.needsRetriggerOfExecution = true;
 
 		} catch (Exception e) {
-			logger.error("Failed to set " + action.getLocator() + " to execution due to " + e.getMessage(), e);
+			logger.error("Failed to set {} to execution due to {}", action.getLocator(), e.getMessage(), e);
 
 			try {
 				executionPolicy.stop();
 			} catch (Exception ex) {
-				logger.error("Failed to stop execution policy for " + action.getLocator(), e);
+				logger.error("Failed to stop execution policy for {}", action.getLocator(), e);
 			}
 
 			action.setState(State.ERROR);
@@ -153,7 +153,7 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 
 		if (currentState != action.getState() && action.isResourceDefined())
 			getConfirmationPolicy(action).doConfirmation(action);
-		logger.info("Failed to plan action " + action.getLocator() + ", thus no execution possible");
+		logger.info("Failed to plan action {}, thus no execution possible", action.getLocator());
 		return false;
 	}
 
@@ -215,7 +215,7 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 			return false;
 		boolean executable = getExecutionPolicy(action).isExecutable(action);
 		if (!executable)
-			logger.info("Action " + action.getLocator() + " is not yet executable!");
+			logger.info("Action {} is not yet executable!", action.getLocator());
 		return !executable;
 	}
 }

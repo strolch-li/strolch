@@ -123,7 +123,7 @@ public class DefaultObserverHandler implements ObserverHandler {
 
 				long durationNanos = System.nanoTime() - start;
 				if (durationNanos >= 250000000L)
-					logger.warn("Observer update for event " + event + " took " + formatNanoDuration(durationNanos));
+					logger.warn("Observer update for event {} took {}", event, formatNanoDuration(durationNanos));
 
 			} catch (InterruptedException e) {
 				if (this.run)

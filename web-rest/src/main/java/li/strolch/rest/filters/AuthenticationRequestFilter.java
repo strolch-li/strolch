@@ -154,7 +154,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			if (sessionHandler.isSessionKnown(sessionId)) {
 				validateCertificate(requestContext, sessionId, remoteIp);
 			} else {
-				logger.error("Session " + sessionId + " by authorization header does not exist anymore, ignoring!");
+				logger.error("Session {} by authorization header does not exist anymore, ignoring!", sessionId);
 			}
 
 			return;
@@ -168,7 +168,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		if (sessionHandler.isSessionKnown(sessionId)) {
 			validateCertificate(requestContext, sessionId, remoteIp);
 		} else {
-			logger.error("Session " + sessionId + " by cookie does not exist anymore, ignoring!");
+			logger.error("Session {} by cookie does not exist anymore, ignoring!", sessionId);
 		}
 	}
 
@@ -211,8 +211,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	protected Certificate validateCookie(ContainerRequestContext requestContext, String remoteIp) {
 		String sessionId = getSessionIdFromCookie(requestContext);
 		if (isEmpty(sessionId)) {
-			logger.error(
-					"No Authorization header or cookie on request to URL " + requestContext.getUriInfo().getPath());
+			logger.error("No Authorization header or cookie on request to URL {}",
+					requestContext.getUriInfo().getPath());
 			requestContext.abortWith(Response
 					.status(Response.Status.UNAUTHORIZED)
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
@@ -228,7 +228,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			String remoteIp) {
 
 		if (!getRestful().isBasicAuthEnabled()) {
-			logger.error("Basic Auth is not available for URL " + requestContext.getUriInfo().getPath());
+			logger.error("Basic Auth is not available for URL {}", requestContext.getUriInfo().getPath());
 			requestContext.abortWith(Response
 					.status(Response.Status.FORBIDDEN)
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
@@ -249,7 +249,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			return null;
 		}
 
-		logger.info("Performing basic auth for user " + parts[0] + "...");
+		logger.info("Performing basic auth for user {}...", parts[0]);
 		StrolchSessionHandler sessionHandler = getSessionHandler();
 		Certificate certificate = sessionHandler.authenticate(parts[0], parts[1].toCharArray(), remoteIp, Usage.SINGLE,
 				false);

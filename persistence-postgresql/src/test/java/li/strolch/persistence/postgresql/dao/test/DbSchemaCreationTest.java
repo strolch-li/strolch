@@ -63,7 +63,7 @@ public class DbSchemaCreationTest {
 
 		logger.info("");
 		logger.info("===============================================");
-		logger.info("Trying to create DB schema for " + scriptPrefix);
+		logger.info("Trying to create DB schema for {}", scriptPrefix);
 		logger.info("");
 
 		String dbUrl = DB_URL;
@@ -89,7 +89,7 @@ public class DbSchemaCreationTest {
 				String versionS = name.substring((scriptPrefix + "_db_schema_").length(),
 						name.length() - "_initial.sql".length());
 				Version version = Version.valueOf(versionS);
-				logger.info("Creating Version " + version);
+				logger.info("Creating Version {}", version);
 
 				dropSchema(DbSchemaCreationTest.class.getSimpleName(), scriptPrefix, dbUrl, DB_USERNAME, DB_PASSWORD);
 

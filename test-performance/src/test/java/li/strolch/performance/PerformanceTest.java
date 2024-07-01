@@ -69,7 +69,7 @@ public abstract class PerformanceTest {
 		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
 		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH,
 				PostgreSqlPersistenceHandler.class, dbVersion, "drop");
-		logger.info(StringHelper.NEW_LINE + sql);
+		logger.info(StringHelper.NEW_LINE + "{}", sql);
 		try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
 			connection.prepareStatement(sql).execute();
 		}
@@ -111,21 +111,21 @@ public abstract class PerformanceTest {
 			commonPool.execute(task);
 		}
 
-		logger.info("Executing " + tasks.size() + " tasks...");
+		logger.info("Executing {} tasks...", tasks.size());
 
 		List<Long> results = new ArrayList<>();
 		for (ForkJoinTask<Long> task : tasks) {
 			results.add(task.join());
 		}
-		logger.info("Executed " + tasks.size() + " tasks.");
+		logger.info("Executed {} tasks.", tasks.size());
 		for (int i = 0; i < results.size(); i++) {
-			logger.info("Task " + i + " executed " + results.get(i) + " TXs");
+			logger.info("Task {} executed {} TXs", i, results.get(i));
 		}
 
 		long avg = (long) results.stream().mapToLong(l -> l).average().orElse(0.0D);
 		long took = System.currentTimeMillis() - start;
 		long txPerSec = avg / (took / 1000);
-		logger.info("Average TXs was " + avg + " with " + txPerSec + " TXs/s");
+		logger.info("Average TXs was {} with {} TXs/s", avg, txPerSec);
 	}
 
 	public class PerformanceTask extends ForkJoinTask<Long> {

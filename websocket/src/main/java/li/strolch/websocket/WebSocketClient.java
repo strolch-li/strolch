@@ -60,7 +60,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 
 		JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
 		String msgType = jsonObject.get(MSG_TYPE).getAsString();
-		logger.info("Handling message " + msgType);
+		logger.info("Handling message {}", msgType);
 
 		switch (msgType) {
 		case "Authenticate" -> handleAuthenticate(jsonObject);
@@ -72,13 +72,13 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 			assertAuthenticated(msgType);
 			handleUnregister(jsonObject);
 		}
-		default -> logger.error("Unhandled Event msgType: " + msgType);
+		default -> logger.error("Unhandled Event msgType: {}", msgType);
 		}
 	}
 
 	public void assertAuthenticated(String type) {
 		if (this.certificate == null) {
-			logger.error("Received " + type + " request, but not yet authed!");
+			logger.error("Received {} request, but not yet authed!", type);
 			close(CloseReason.CloseCodes.PROTOCOL_ERROR, "Not yet authed!");
 			return;
 		}
@@ -86,8 +86,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		try {
 			this.sessionHandler.validate(this.certificate, this.remoteIp);
 		} catch (RuntimeException e) {
-			logger.error("Received " + type + " request, but authentication is not valid anymore: "
-					+ ExceptionHelper.getExceptionMessage(e));
+			logger.error("Received {} request, but authentication is not valid anymore: {}", type,
+					ExceptionHelper.getExceptionMessage(e));
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Not yet authed!");
 		}
 	}
@@ -121,7 +121,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		}).register(objectType, type, params);
 
 		String username = this.certificate.getUsername();
-		logger.info(username + " registered for " + objectType + " " + type + " params: " + params);
+		logger.info("{} registered for {} {} params: {}", username, objectType, type, params);
 	}
 
 	protected WebSocketObserverHandler getWebSocketObserverHandler(String realm, ObserverHandler observerHandler) {
@@ -134,9 +134,8 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		String type = jsonObject.get(Tags.Json.TYPE).getAsString();
 		WebSocketObserverHandler webSocketObserverHandler = this.observerHandlersByRealm.get(realm);
 		if (webSocketObserverHandler == null) {
-			logger.error(
-					"Client " + this.session.getId() + " for " + this.certificate.getUsername() + " not registered for "
-							+ realm + " " + objectType + " " + type);
+			logger.error("Client {} for {} not registered for {} {} {}", this.session.getId(),
+					this.certificate.getUsername(), realm, objectType, type);
 		} else {
 			webSocketObserverHandler.unregister(objectType, type);
 		}
@@ -145,7 +144,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	private void handleAuthenticate(JsonObject jsonObject) {
 		if (!jsonObject.has("authToken") || jsonObject.get("authToken").isJsonNull() || !jsonObject.has("username")
 				|| jsonObject.get("username").isJsonNull()) {
-			logger.error("Received invalid authentication request: " + jsonObject);
+			logger.error("Received invalid authentication request: {}", jsonObject);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}
@@ -154,7 +153,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		String username = jsonObject.get("username").getAsString();
 
 		if (authToken.isEmpty() || username.isEmpty()) {
-			logger.error("Received invalid authentication request: " + jsonObject);
+			logger.error("Received invalid authentication request: {}", jsonObject);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}
@@ -162,18 +161,18 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		try {
 			this.certificate = this.sessionHandler.validate(authToken, this.remoteIp);
 			if (!this.certificate.getUsername().equals(username)) {
-				logger.error("Invalid authentication for " + username);
+				logger.error("Invalid authentication for {}", username);
 				close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 				return;
 			}
-			logger.info("User " + this.certificate.getUsername() + " authenticated on WebSocket with remote IP "
-					+ this.remoteIp);
+			logger.info("User {} authenticated on WebSocket with remote IP {}", this.certificate.getUsername(),
+					this.remoteIp);
 		} catch (StrolchNotAuthenticatedException e) {
-			logger.error("Failed to authenticate user " + username + ": " + e.getMessage());
+			logger.error("Failed to authenticate user {}: {}", username, e.getMessage());
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		} catch (Exception e) {
-			logger.error("Failed to authenticate user " + username, e);
+			logger.error("Failed to authenticate user {}", username, e);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");
 			return;
 		}
@@ -183,7 +182,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		try {
 			sendMessage(jsonObject.toString());
 		} catch (Exception e) {
-			logger.error("Failed to send authentication response to client " + this, e);
+			logger.error("Failed to send authentication response to client {}", this, e);
 			close(new CloseReason(CloseReason.CloseCodes.CLOSED_ABNORMALLY, getExceptionMessage(e)));
 		}
 	}
@@ -204,7 +203,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	}
 
 	public void onError(Throwable t) {
-		logger.error("Socket error: " + t.getMessage(), t);
+		logger.error("Socket error: {}", t.getMessage(), t);
 	}
 
 	public synchronized void sendMessage(String data) throws Exception {

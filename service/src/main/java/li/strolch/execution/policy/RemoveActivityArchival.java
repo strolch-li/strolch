@@ -17,6 +17,6 @@ public class RemoveActivityArchival extends ActivityArchivalPolicy {
 
 		tx().remove(activity);
 
-		logger.info("Removing " + activity.getLocator());
+		logger.info("Removing {}", activity.getLocator());
 	}
 }
