@@ -7,7 +7,6 @@ import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +14,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.text.MessageFormat.format;
 
 public class ElementLockingHandler<T> {
 	private static final Logger logger = LoggerFactory.getLogger(ElementLockingHandler.class);
@@ -49,12 +50,9 @@ public class ElementLockingHandler<T> {
 		lock(element);
 		try {
 			action.run();
-		} catch (RuntimeException e) {
-			logger.error("Failed to execute action {} for locked element {}", action, element, e);
-			throw e;
 		} catch (Exception e) {
-			throw new ElementLockingException("Failed to execute action " + action + " for locked element " + element,
-					e);
+			String msg = format("Failed to execute action {0} for locked element {1}", action, element);
+			throw new ElementLockingException(msg, e);
 		} finally {
 			unlock(element);
 		}
@@ -76,12 +74,9 @@ public class ElementLockingHandler<T> {
 		lock(element);
 		try {
 			return action.get();
-		} catch (RuntimeException e) {
-			logger.error("Failed to execute action {} for locked element {}", action, element, e);
-			throw e;
 		} catch (Exception e) {
-			throw new ElementLockingException("Failed to execute action " + action + " for locked element " + element,
-					e);
+			String msg = format("Failed to execute action {0} for locked element {1}", action, element);
+			throw new IllegalStateException(msg, e);
 		} finally {
 			unlock(element);
 		}
@@ -120,7 +115,7 @@ public class ElementLockingHandler<T> {
 		TypedTuple<ElementLock, Long> tuple = this.lockMap.get(element);
 		ElementLock elementLock = tuple.getFirst();
 		if (elementLock == null || !elementLock.isHeldByCurrentThread()) {
-			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", element));
+			logger.error(format("Trying to unlock not locked element {0}", element));
 		} else {
 			unlock(elementLock);
 		}
@@ -139,12 +134,12 @@ public class ElementLockingHandler<T> {
 		TypedTuple<ElementLock, Long> tuple = this.lockMap.get(element);
 		ElementLock elementLock = tuple.getFirst();
 		if (elementLock == null) {
-			logger.error(MessageFormat.format("Trying to unlock not locked element {0}", element));
+			logger.error(format("Trying to unlock not locked element {0}", element));
 		} else if (!elementLock.isHeldByCurrentThread()) {
 			if (elementLock.isLocked())
-				logger.error(MessageFormat.format("Lock not held by this thread for element {0}", element));
+				logger.error(format("Lock not held by this thread for element {0}", element));
 			else
-				logger.error(MessageFormat.format("Element {0} is not locked!", element));
+				logger.error(format("Element {0} is not locked!", element));
 		} else {
 			releaseLock(elementLock);
 		}
