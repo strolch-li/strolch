@@ -19,6 +19,7 @@ import li.strolch.service.JsonServiceResult;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.collections.Paging;
+import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
 
 import java.util.List;
@@ -140,7 +141,8 @@ public class ResponseUtil {
 		if (svcResult.isOk())
 			return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
 
-		Status status = switch (t) {
+		Throwable rootCause = getRootCause(t);
+		Status status = switch (rootCause) {
 			case AccessDeniedException ignored -> Status.FORBIDDEN;
 			case PrivilegeException ignored -> Status.UNAUTHORIZED;
 			case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
@@ -151,12 +153,13 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(Throwable t) {
-		return switch (t) {
-			case StrolchNotAuthenticatedException ignored -> toResponse(Status.UNAUTHORIZED, t);
-			case AccessDeniedException ignored -> toResponse(Status.FORBIDDEN, t);
-			case StrolchElementNotFoundException ignored -> toResponse(Status.NOT_FOUND, t);
-			case PrivilegeException ignored -> toResponse(Status.FORBIDDEN, t);
-			case null, default -> toResponse(Status.INTERNAL_SERVER_ERROR, t);
+		Throwable rootCause = getRootCause(t);
+		return switch (rootCause) {
+			case StrolchNotAuthenticatedException ignored -> toResponse(Status.UNAUTHORIZED, rootCause);
+			case AccessDeniedException ignored -> toResponse(Status.FORBIDDEN, rootCause);
+			case StrolchElementNotFoundException ignored -> toResponse(Status.NOT_FOUND, rootCause);
+			case PrivilegeException ignored -> toResponse(Status.FORBIDDEN, rootCause);
+			case null, default -> toResponse(Status.INTERNAL_SERVER_ERROR, rootCause);
 		};
 	}
 
