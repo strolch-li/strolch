@@ -227,7 +227,7 @@ public class ServiceResult {
 		json.addProperty(MSG, isEmpty(this.message) ? "-" : this.message);
 
 		if (this.throwable != null) {
-			json.addProperty(EXCEPTION_MSG, getExceptionMessageWithCauses(this.throwable, false));
+			json.addProperty(EXCEPTION_MSG, getRootMessage());
 			json.addProperty(THROWABLE, formatException(this.throwable));
 
 			if (this.throwable instanceof StrolchException ex && ex.hasI18n())
