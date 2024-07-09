@@ -1,8 +1,11 @@
 package li.strolch.handler.operationslog;
 
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.handler.mail.MailHandler;
 import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
@@ -10,6 +13,7 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.iso8601.ISO8601;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -25,6 +29,10 @@ import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 public class OperationsLog extends StrolchComponent {
 
+	public static final String PARAM_MAX_MESSAGES = "maxMessages";
+	public static final String PARAM_SEND_MAILS = "sendMails";
+	public static final String PARAM_SEND_MAILS_MIN_SEVERITY = "sendMailsMinSeverity";
+	public static final String PARAM_SEND_MAILS_RECIPIENTS = "sendMailsRecipients";
 	private LinkedBlockingQueue<LogTask> queue;
 
 	private Map<String, LinkedHashSet<LogMessage>> logMessagesByRealmAndId;
@@ -33,6 +41,12 @@ public class OperationsLog extends StrolchComponent {
 	private ExecutorService executorService;
 	private Future<?> handleQueueTask;
 	private boolean run;
+	private boolean sendMails;
+	private LogSeverity sendMailsMinSeverity;
+	private String sendMailsRecipients;
+
+	private Map<String, Long> sentMessageHashes;
+	private long lastSentHashesPruning;
 
 	public OperationsLog(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -41,7 +55,21 @@ public class OperationsLog extends StrolchComponent {
 	@Override
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 
-		this.maxMessages = configuration.getInt("maxMessages", 10000);
+		this.sentMessageHashes = new ConcurrentHashMap<>();
+		this.sendMails = configuration.getBoolean(PARAM_SEND_MAILS, false);
+		this.sendMailsMinSeverity = LogSeverity.valueOf(
+				configuration.getString(PARAM_SEND_MAILS_MIN_SEVERITY, LogSeverity.Exception.name()));
+		if (this.sendMails) {
+			String sendMailsRecipients = configuration.getString(PARAM_SEND_MAILS_RECIPIENTS, null);
+			try {
+				InternetAddress.parse(sendMailsRecipients);
+			} catch (AddressException e) {
+				throw new IllegalArgumentException("Failed to parse email recipients " + sendMailsRecipients, e);
+			}
+			this.sendMailsRecipients = sendMailsRecipients;
+		}
+
+		this.maxMessages = configuration.getInt(PARAM_MAX_MESSAGES, 10000);
 
 		this.queue = new LinkedBlockingQueue<>();
 		this.logMessagesByRealmAndId = new ConcurrentHashMap<>();
@@ -75,12 +103,22 @@ public class OperationsLog extends StrolchComponent {
 			this.handleQueueTask.cancel(true);
 		if (this.executorService != null)
 			this.executorService.shutdownNow();
+		this.sentMessageHashes.clear();
 		super.stop();
 	}
 
 	private void handleQueue() {
 		while (this.run) {
 			try {
+
+				// prune sent hashes
+				try {
+					pruneSentHashes();
+				} catch (Exception e) {
+					logger.error("Failed to prune hashes", e);
+				}
+
+				// now handle add tasks
 				LogTask poll = this.queue.poll(1, TimeUnit.SECONDS);
 				if (poll == null)
 					continue;
@@ -142,8 +180,12 @@ public class OperationsLog extends StrolchComponent {
 	}
 
 	public void addMessage(LogMessage logMessage) {
+		addMessage(logMessage, false);
+	}
+
+	public void addMessage(LogMessage logMessage, boolean mailError) {
 		if (this.queue != null)
-			this.queue.add(() -> _addMessage(logMessage));
+			this.queue.add(() -> _addMessage(logMessage, mailError));
 	}
 
 	public void removeMessage(LogMessage message) {
@@ -162,7 +204,7 @@ public class OperationsLog extends StrolchComponent {
 		this.queue.add(() -> _updateState(realmName, id, state));
 	}
 
-	private void _addMessage(LogMessage logMessage) {
+	private void _addMessage(LogMessage logMessage, boolean mailError) {
 		// store in global list
 		String realmName = logMessage.getRealm();
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
@@ -183,6 +225,14 @@ public class OperationsLog extends StrolchComponent {
 		StrolchRealm realm = getContainer().getRealm(realmName);
 		if (!realm.getMode().isTransient())
 			persist(realm, logMessage, messagesToRemove);
+
+		if (!mailError) {
+			try {
+				sendMessageAsMail(logMessage);
+			} catch (Exception e) {
+				logger.error("Failed to send mail for log message {}", logMessage.getLocator(), e);
+			}
+		}
 	}
 
 	private void _removeMessage(LogMessage message) {
@@ -369,5 +419,96 @@ public class OperationsLog extends StrolchComponent {
 
 	private interface LogTask {
 		void run();
+	}
+
+	private void pruneSentHashes() {
+		if (this.sentMessageHashes.isEmpty())
+			return;
+
+		long now = System.currentTimeMillis();
+		if (now - this.lastSentHashesPruning < TimeUnit.MINUTES.toMillis(10))
+			return;
+
+		Set<String> hashes = new HashSet<>(this.sentMessageHashes.keySet());
+		for (String hash : hashes) {
+			long sentTime = this.sentMessageHashes.get(hash);
+			if (now - sentTime > TimeUnit.MINUTES.toMillis(30)) {
+				this.sentMessageHashes.remove(hash);
+			}
+		}
+
+		this.lastSentHashesPruning = now;
+	}
+
+	private void sendMessageAsMail(LogMessage logMessage) {
+		if (!this.sendMails || logMessage.getSeverity().compareTo(sendMailsMinSeverity) < 0)
+			return;
+
+		if (!hasComponent(MailHandler.class))
+			return;
+		MailHandler mailHandler = getComponent(MailHandler.class);
+		if (!mailHandler.isEncryptionEnabled())
+			return;
+
+		String hash = logMessage.buildRelevantHash();
+		long now = System.currentTimeMillis();
+		if (this.sentMessageHashes.containsKey(hash)) {
+			long sentTime = this.sentMessageHashes.get(hash);
+			if (now - sentTime < TimeUnit.MINUTES.toMillis(30)) {
+				logger.warn(
+						"LogMessage {} {} has already been sent less than 30min ago as hash is already known. Ignoring.",
+						logMessage.getSeverity(), logMessage.getLocator());
+				return;
+			}
+		}
+		this.sentMessageHashes.put(hash, now);
+
+		String appName = getAgent().getApplicationName();
+		String env = getAgent().getEnvironment();
+		Locator locator = trimAgentLocator(logMessage.getLocator());
+		String subject = appName + ":" + env + " - " + logMessage.getSeverity() + " - " + locator;
+		String stackTrace = logMessage.getStackTrace();
+		String text = """
+				Dear team,
+								
+				the following message was logged:
+								
+				=====================
+				Realm: %s
+				Severity: %s
+				Locator: %s
+				Username: %s
+				Timestamp: %s
+				Message ID: %s
+								
+				Message:
+				---------------------
+				%s
+								
+				StackTrace:
+				---------------------
+				%s
+				=====================
+								
+				Kind regards
+					your server
+				""".formatted(logMessage.getRealm(), logMessage.getSeverity(), logMessage.getLocator(),
+				logMessage.getUsername(), ISO8601.toString(logMessage.getZonedDateTime()), logMessage.getId(),
+				logMessage.getMessage(Locale.ENGLISH), stackTrace == null ? "(none)" : stackTrace);
+
+		mailHandler.sendMailAsync(this.sendMailsRecipients, subject, text, false);
+	}
+
+	private static Locator trimAgentLocator(Locator tmp) {
+		if (!tmp.get(0).equals(AGENT))
+			return tmp.trim(2);
+
+		// remove package name
+		String className = tmp.get(2);
+		if (!className.contains("."))
+			return tmp.trim(3);
+
+		int startClassName = className.lastIndexOf('.') + 1;
+		return tmp.trim(2).append(className.substring(startClassName));
 	}
 }
