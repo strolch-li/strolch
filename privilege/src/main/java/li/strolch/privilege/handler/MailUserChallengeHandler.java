@@ -1,9 +1,7 @@
 package li.strolch.privilege.handler;
 
-import static java.text.MessageFormat.format;
 import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
 
-import java.text.MessageFormat;
 import java.util.concurrent.CompletableFuture;
 
 import li.strolch.privilege.model.internal.User;

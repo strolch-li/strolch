@@ -37,8 +37,8 @@ public abstract class MailHandler extends StrolchComponent {
 	 * @param fileName   the file name of the attachment
 	 * @param type       the mime type of the attachment
 	 */
-	public abstract void sendMail(String subject, String text, String recipients, String attachment, String fileName,
-								  String type);
+	public abstract void sendMailWithAttachment(String subject, String text, String recipients, String attachment,
+			String fileName, String type);
 
 	/**
 	 * Sends an e-mail to the given recipients asynchronously
@@ -61,6 +61,6 @@ public abstract class MailHandler extends StrolchComponent {
 	 * @param fileName   the file name of the attachment
 	 * @param type       the mime type of the attachment
 	 */
-	public abstract void sendMailAsync(String subject, String text, String recipients, String attachment,
-									   String fileName, String type);
+	public abstract void sendMailWithAttachmentAsync(String subject, String text, String recipients, String attachment,
+			String fileName, String type);
 }
