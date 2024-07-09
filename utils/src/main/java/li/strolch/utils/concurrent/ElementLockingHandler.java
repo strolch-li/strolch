@@ -51,8 +51,10 @@ public class ElementLockingHandler<T> {
 		try {
 			action.run();
 		} catch (Exception e) {
+			if (e instanceof RuntimeException re)
+				throw re;
 			String msg = format("Failed to execute action {0} for locked element {1}", action, element);
-			throw new ElementLockingException(msg, e);
+			throw new IllegalStateException(msg, e);
 		} finally {
 			unlock(element);
 		}
@@ -75,6 +77,8 @@ public class ElementLockingHandler<T> {
 		try {
 			return action.get();
 		} catch (Exception e) {
+			if (e instanceof RuntimeException re)
+				throw re;
 			String msg = format("Failed to execute action {0} for locked element {1}", action, element);
 			throw new IllegalStateException(msg, e);
 		} finally {
