@@ -1,17 +1,20 @@
 package li.strolch.model.log;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.ResourceBundle;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.Locator;
 import li.strolch.model.Tags.Json;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.ResourceBundle;
+
+import static li.strolch.utils.helper.StringHelper.hashSha256AsHex;
 
 public class LogMessage extends I18nMessage {
 
@@ -184,5 +187,11 @@ public class LogMessage extends I18nMessage {
 		int result = super.hashCode();
 		result = 31 * result + (id != null ? id.hashCode() : 0);
 		return result;
+	}
+
+	public String buildRelevantHash() {
+		String sb = getRealm() + getSeverity() + getLocator() + getUsername() + getMessage(Locale.ENGLISH) + (
+				this.stackTrace == null ? "(none)" : this.stackTrace);
+		return hashSha256AsHex(sb);
 	}
 }
