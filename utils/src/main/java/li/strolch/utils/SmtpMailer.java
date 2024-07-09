@@ -289,7 +289,7 @@ public class SmtpMailer {
 	}
 
 	public void sendEncryptedEmailWithAttachment(String recipients, String subject, String mailText, String secretText,
-			String pgpPrefix, String attachment, String fileName) {
+			String encryptedTextFileName, String attachment, String fileName) {
 		DBC.PRE.assertNotNull("Encrypted e-mails require a signing key!", this.signingKeyRing);
 		DBC.PRE.assertNotEmpty("Encrypted e-mails require at least one recipient key ring!", this.recipientKeyRings);
 		Session session = Session.getInstance(this.props, this.authenticator);
@@ -297,7 +297,7 @@ public class SmtpMailer {
 		MimeMessage message;
 		try {
 			message = prepareMimeMessage(recipients, subject, session);
-			Multipart multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), pgpPrefix);
+			Multipart multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), encryptedTextFileName);
 			attachEncryptedFile(attachment, fileName, multipart);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);

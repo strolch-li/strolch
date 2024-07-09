@@ -9,8 +9,10 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.SmtpMailer;
 
 import java.io.File;
+import java.text.Normalizer;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
 
 import static li.strolch.privilege.base.PrivilegeConstants.REALM;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
@@ -26,6 +28,8 @@ public class SmtpMailHandler extends MailHandler {
 	public static final String PARAM_SIGNING_KEY = "signingKey";
 	public static final String PARAM_SIGNING_KEY_PASSWORD = "signingKeyPassword";
 	public static final String PARAM_RECIPIENT_PUBLIC_KEYS = "recipientPublicKeys";
+	public static final String ENCRYPTED_MAIL_TEXT
+			= "This is an encrypted mail. Please decrypt the attached file for details.";
 
 	private String realm;
 	private String host;
@@ -90,39 +94,86 @@ public class SmtpMailHandler extends MailHandler {
 		super.initialize(configuration);
 	}
 
+	@Override
 	public boolean isSigningEnabled() {
 		return this.signingEnabled;
 	}
 
+	@Override
 	public boolean isEncryptionEnabled() {
 		return this.encryptionEnabled;
 	}
 
 	@Override
-	public void sendMail(String subject, String text, String recipients) {
-		SmtpMailer.getInstance().sendMail(subject, text, recipients);
-	}
-
-	public void sendMailWithAttachment(String subject, String text, String recipients, String attachment,
-			String fileName, String type) {
-		SmtpMailer.getInstance().sendMailWithAttachment(subject, text, recipients, attachment, fileName, type);
+	public void sendMail(String recipients, String subject, String text) {
+		sendMail(recipients, subject, text, false);
 	}
 
 	@Override
-	public void sendMailAsync(String subject, String text, String recipients) {
-		getExecutorService("Mail").submit(() -> doSendMail(recipients, subject, text));
+	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		sendMailWithAttachment(recipients, subject, text, attachment, fileName, type, false);
 	}
 
 	@Override
-	public void sendMailWithAttachmentAsync(String subject, String text, String recipients, String attachment,
-			String fileName, String type) {
-		getExecutorService("Mail").submit(
-				() -> doSendMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+	public void sendMail(String recipients, String subject, String text, boolean disableEncryption) {
+		SmtpMailer mailer = SmtpMailer.getInstance();
+		if (disableEncryption) {
+			mailer.sendMail(recipients, subject, text);
+		} else if (this.encryptionEnabled) {
+			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
+			mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
+		} else {
+			throw new IllegalStateException(
+					"Can not send mail with subject %s as encryption is not enabled, and disableEncryption=false!".formatted(
+							subject));
+		}
 	}
 
-	private void doSendMail(String recipients, String subject, String text) {
+	@Override
+	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
+			String fileName, String type, boolean disableEncryption) {
+		SmtpMailer mailer = SmtpMailer.getInstance();
+		if (disableEncryption) {
+			mailer.sendMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+		} else if (this.encryptionEnabled) {
+			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
+			mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
+					encryptedFileNameFromSubject, attachment, fileName);
+		} else {
+			throw new IllegalStateException(
+					"Can not send mail with subject %s as encryption is not enabled, and disableEncryption=false!".formatted(
+							subject));
+		}
+	}
+
+	@Override
+	public void sendMailAsync(String recipients, String subject, String text) {
+		sendMailAsync(recipients, subject, text, false);
+	}
+
+	@Override
+	public void sendMailAsync(String recipients, String subject, String text, boolean disableEncryption) {
+		getExecutorService("Mail").submit(() -> doSendMail(recipients, subject, text, disableEncryption));
+	}
+
+	@Override
+	public void sendMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		sendMailWithAttachmentAsync(recipients, subject, text, attachment, fileName, type, false);
+	}
+
+	@Override
+	public void sendMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
+			String fileName, String type, boolean disableEncryption) {
+		ExecutorService svc = getExecutorService("Mail");
+		svc.submit(() -> doSendMailWithAttachment(recipients, subject, text, attachment, fileName, type,
+				disableEncryption));
+	}
+
+	private void doSendMail(String recipients, String subject, String text, boolean disableEncryption) {
 		try {
-			SmtpMailer.getInstance().sendMail(recipients, subject, text);
+			sendMail(recipients, subject, text, disableEncryption);
 		} catch (Throwable e) {
 			logger.error("Failed to send mail \"{}\" to {}", subject, recipients, e);
 
@@ -134,15 +185,15 @@ public class SmtpMailHandler extends MailHandler {
 						.value("host", this.host)
 						.value("subject", subject)
 						.value("recipients", recipients);
-				getComponent(OperationsLog.class).addMessage(message);
+				getComponent(OperationsLog.class).addMessage(message, true);
 			}
 		}
 	}
 
 	private void doSendMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+			String fileName, String type, boolean disableEncryption) {
 		try {
-			SmtpMailer.getInstance().sendMailWithAttachment(subject, text, recipients, attachment, fileName, type);
+			sendMailWithAttachment(recipients, subject, text, attachment, fileName, type, disableEncryption);
 		} catch (Throwable e) {
 			logger.error("Failed to send mail \"{}\" to {} with attachment {}", subject, recipients, fileName, e);
 
@@ -156,8 +207,18 @@ public class SmtpMailHandler extends MailHandler {
 						.value("host", this.host)
 						.value("subject", subject)
 						.value("recipients", recipients);
-				getComponent(OperationsLog.class).addMessage(message);
+				getComponent(OperationsLog.class).addMessage(message, true);
 			}
 		}
+	}
+
+	private static String createEncryptedFileNameFromSubject(String subject) {
+		String normalized = Normalizer
+				.normalize(subject.trim(), Normalizer.Form.NFKD)
+				.replaceAll("\\p{M}", "")
+				.replaceAll(" - ", "-")
+				.replaceAll(" ", "_")
+				.replaceAll("[:/]", "-");
+		return normalized + "_" + System.currentTimeMillis() + ".txt";
 	}
 }
