@@ -360,13 +360,14 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
-				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.System,
-						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.started") //
-						.value("applicationName", applicationName) //
-						.value("environment", environment) //
-						.value("components", String.valueOf(this.controllerMap.size())) //
-						.value("took", tookS));
+				getComponent(OperationsLog.class).addMessage(
+						new LogMessage(realmName, SYSTEM_USER_AGENT, Locator.valueOf(AGENT, AGENT, "start"),
+								LogSeverity.System, LogMessageState.Information,
+								ResourceBundle.getBundle("strolch-agent"), "agent.started") //
+								.value("applicationName", applicationName) //
+								.value("environment", environment) //
+								.value("components", String.valueOf(this.controllerMap.size())) //
+								.value("took", tookS));
 			}
 		}
 
@@ -386,12 +387,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
-				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.System,
-						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
-						.value("applicationName", applicationName) //
-						.value("environment", environment) //
-						.value("components", String.valueOf(this.controllerMap.size())));
+				getComponent(OperationsLog.class).addMessage(
+						new LogMessage(realmName, SYSTEM_USER_AGENT, Locator.valueOf(AGENT, AGENT, "stop"),
+								LogSeverity.System, LogMessageState.Information,
+								ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
+								.value("applicationName", applicationName) //
+								.value("environment", environment) //
+								.value("components", String.valueOf(this.controllerMap.size())));
 			}
 		}
 

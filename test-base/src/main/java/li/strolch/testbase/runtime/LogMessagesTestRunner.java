@@ -50,8 +50,10 @@ public class LogMessagesTestRunner {
 			RuntimeException ex = new RuntimeException();
 			ResourceBundle bundle = ResourceBundle.getBundle("li-strolch-testbase");
 			LogMessage logMessage = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
-					Locator.valueOf(AGENT, "li.strolch.testbase", StrolchAgent.getUniqueId()), LogSeverity.Exception,
-					LogMessageState.Information, bundle, "test-message").withException(ex).value("reason", ex);
+					Locator.valueOf(AGENT, "li.strolch.testbase", LogMessagesTestRunner.class.getName()),
+					LogSeverity.Exception, LogMessageState.Information, bundle, "test-message")
+					.withException(ex)
+					.value("reason", ex);
 			this.operationsLog.addMessage(logMessage);
 
 			// default is async persisting...
@@ -83,14 +85,15 @@ public class LogMessagesTestRunner {
 			}
 
 			// initialize with the existing message IDs
-			List<String> ids = this.operationsLog.getMessages(this.realmName)
+			List<String> ids = this.operationsLog
+					.getMessages(this.realmName)
 					.stream()
 					.map(LogMessage::getId)
 					.collect(toList());
 
 			for (int i = 0; i < MAX_MESSAGES * 2; i++) {
 				LogMessage m = new LogMessage(this.realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "li.strolch.testbase", StrolchAgent.getUniqueId()),
+						Locator.valueOf(AGENT, "li.strolch.testbase", LogMessagesTestRunner.class.getName()),
 						LogSeverity.Exception, LogMessageState.Information, bundle, "test-message").value("reason",
 						String.valueOf(i));
 				this.operationsLog.addMessage(m);
@@ -110,7 +113,8 @@ public class LogMessagesTestRunner {
 
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-					List<String> actualIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE)
+					List<String> actualIds = logMessageDao
+							.queryLatest(this.realmName, Integer.MAX_VALUE)
 							.stream()
 							.map(LogMessage::getId)
 							.sorted()
@@ -172,7 +176,8 @@ public class LogMessagesTestRunner {
 			} else {
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-					List<String> logMessageIds = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE)
+					List<String> logMessageIds = logMessageDao
+							.queryLatest(this.realmName, Integer.MAX_VALUE)
 							.stream()
 							.map(LogMessage::getId)
 							.sorted()

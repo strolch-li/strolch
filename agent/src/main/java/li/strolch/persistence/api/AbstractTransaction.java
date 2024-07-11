@@ -1894,10 +1894,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.container.hasComponent(OperationsLog.class)) {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
-					Locator.valueOf(AGENT, "tx", this.action, getUniqueId()), LogSeverity.Exception,
-					LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
-					.withException(e)
-					.value("reason", e));
+					Locator.valueOf(AGENT, StrolchTransaction.class.getSimpleName(), this.action, getUniqueId()),
+					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+					"agent.tx.failed").withException(e).value("reason", e));
 		}
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}";

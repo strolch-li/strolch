@@ -94,8 +94,8 @@ public class DefaultObserverHandler implements ObserverHandler {
 	private static void assertReadOnly(StrolchRootElement element) {
 		if (!element.isReadOnly())
 			throw new IllegalStateException(
-					"Only allow to update elements which are read-only. Element " + element.getLocator() +
-							" is not read-only!");
+					"Only allow to update elements which are read-only. Element %s is not read-only!".formatted(
+							element.getLocator()));
 	}
 
 	protected void doUpdates() {
@@ -204,7 +204,7 @@ public class DefaultObserverHandler implements ObserverHandler {
 		if (container.hasComponent(OperationsLog.class)) {
 			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
 			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), SYSTEM_USER_AGENT,
-					Locator.valueOf(AGENT, ObserverHandler.class.getName(), type, StrolchAgent.getUniqueId()),
+					Locator.valueOf(AGENT, ObserverHandler.class.getSimpleName(), type, StrolchAgent.getUniqueId()),
 					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
 					"agent.observers.update.failed").withException(e).value("type", type).value("reason", e));
 		}

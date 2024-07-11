@@ -248,9 +248,11 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
 				String realmName = this.realmName == null ? DEFAULT_REALM : this.realmName;
 				operationsLog.addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Exception,
-						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
-						"job.failed").withException(e).value("jobName", getClass().getName()).value("reason", e));
+						Locator.valueOf(AGENT, StrolchJob.class.getSimpleName(), getName()), LogSeverity.Exception,
+						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "job.failed")
+						.withException(e)
+						.value("jobName", getClass().getName())
+						.value("reason", e));
 			}
 		} finally {
 			long took = System.currentTimeMillis() - start;
@@ -422,7 +424,9 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		} else {
 
 			long delay = this.future.getDelay(TimeUnit.MILLISECONDS);
-			String nextExecution = ZonedDateTime.now().plus(delay, ChronoUnit.MILLIS)
+			String nextExecution = ZonedDateTime
+					.now()
+					.plus(delay, ChronoUnit.MILLIS)
 					.format(ISO_OFFSET_DATE_TIME.withZone(systemDefault()));
 			jsonObject.addProperty("nextExecution", nextExecution);
 		}
@@ -442,8 +446,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		if (this.mode == JobMode.Manual)
 			schedule = this.mode.name();
 		else if (isEmpty(this.cron))
-			schedule = this.mode.name() + " Delay: " + this.initialDelay + " " + this.initialDelayTimeUnit + ", " +
-					this.delay + " " + this.delayTimeUnit;
+			schedule = "%s Delay: %d %s, %d %s".formatted(this.mode.name(), this.initialDelay,
+					this.initialDelayTimeUnit, this.delay, this.delayTimeUnit);
 		else
 			schedule = this.mode.name() + " " + this.cron;
 

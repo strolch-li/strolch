@@ -126,7 +126,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	private <T extends ServiceArgument, U extends ServiceResult> I18nMessage logAccessDenied(Certificate certificate,
 			T argument, AbstractService<T, U> service, long start, String username, PrivilegeException e) {
 		logger.error(buildFailMessage(service, start, username, e));
-		addOperationsLogMessage(certificate, argument, service, username, e, service.getClass().getName());
+		addAccessDeniedLogMessage(certificate, argument, service, username, e, service.getClass().getName());
 		I18nMessage i18n = buildAccessDeniedMessage(certificate, service, username);
 		logger.error(e.getMessage(), e);
 		return i18n;
@@ -145,7 +145,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	private static <T extends ServiceArgument, U extends ServiceResult> I18nMessage buildAccessDeniedMessage(
 			Certificate certificate, AbstractService<T, U> service, String username) {
 		return new I18nMessage(ResourceBundle.getBundle("strolch-agent", certificate.getLocale()),
-				"agent.service.failed.access.denied").value("user", username)
+				"agent.service.failed.access.denied")
+				.value("user", username)
 				.value("service", service.getClass().getSimpleName());
 	}
 
@@ -158,14 +159,15 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		return msg;
 	}
 
-	private <T extends ServiceArgument, U extends ServiceResult> void addOperationsLogMessage(Certificate certificate,
+	private <T extends ServiceArgument, U extends ServiceResult> void addAccessDeniedLogMessage(Certificate certificate,
 			T argument, AbstractService<T, U> service, String username, PrivilegeException e, String svcName) {
 		if (getContainer().hasComponent(OperationsLog.class)) {
 			String realmName = getRealmName(argument, certificate);
 			LogMessage logMessage = new LogMessage(realmName, username,
-					Locator.valueOf(AGENT, PrivilegeHandler.class.getSimpleName(), service.getPrivilegeName(), svcName),
-					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
-					"agent.service.failed.access.denied").value("user", username)
+					Locator.valueOf(AGENT, Service.class.getSimpleName(), svcName), LogSeverity.Exception,
+					LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+					"agent.service.failed.access.denied")
+					.value("user", username)
 					.value("service", svcName)
 					.withException(e);
 
@@ -176,8 +178,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 	private String getRealmName(ServiceArgument arg, Certificate certificate) {
 		if (arg == null) {
-			return isNotEmpty(certificate.getRealm()) ?
-					certificate.getRealm() :
+			return isNotEmpty(certificate.getRealm()) ? certificate.getRealm() :
 					getContainer().getRealmNames().iterator().next();
 		}
 
@@ -218,7 +219,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 				logger.warn("Reason: {}", result.getThrowable().getMessage(), result.getThrowable());
 			}
 
-		} else if (result.getState() == FAILED || result.getState() == EXCEPTION
+		} else if (result.getState() == FAILED
+				|| result.getState() == EXCEPTION
 				|| result.getState() == ACCESS_DENIED) {
 
 			msg = result.getState() + ": " + msg;
@@ -248,13 +250,16 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 				ResourceBundle bundle = ResourceBundle.getBundle("strolch-agent");
 				if (throwable == null) {
-					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
-							LogSeverity.Exception, LogMessageState.Information, bundle, "agent.service.failed").value(
-							"service", svcName).value("reason", reason);
+					logMessage = new LogMessage(realmName, username,
+							Locator.valueOf(AGENT, Service.class.getSimpleName(), svcName), LogSeverity.Exception,
+							LogMessageState.Information, bundle, "agent.service.failed")
+							.value("service", svcName)
+							.value("reason", reason);
 				} else {
-					logMessage = new LogMessage(realmName, username, Locator.valueOf(AGENT, svcName, getUniqueId()),
-							LogSeverity.Exception, LogMessageState.Information, bundle,
-							"agent.service.failed.ex").withException(throwable)
+					logMessage = new LogMessage(realmName, username,
+							Locator.valueOf(AGENT, Service.class.getSimpleName(), svcName), LogSeverity.Exception,
+							LogMessageState.Information, bundle, "agent.service.failed.ex")
+							.withException(throwable)
 							.value("service", svcName)
 							.value("reason", reason)
 							.value("exception", throwable);

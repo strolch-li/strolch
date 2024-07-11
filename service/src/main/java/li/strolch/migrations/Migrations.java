@@ -140,7 +140,7 @@ public class Migrations {
 				List<Version> list = migrationsRan.getList(realm);
 				for (Version version : list) {
 					LogMessage logMessage = new LogMessage(realm, SYSTEM_USER_AGENT,
-							locator.append(StrolchAgent.getUniqueId()), LogSeverity.System, LogMessageState.Information,
+							locator.append(Migrations.class.getName()), LogSeverity.System, LogMessageState.Information,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.migrations.version").value(
 							"version", version.toString());
 					operationsLog.addMessage(logMessage);
@@ -266,7 +266,8 @@ public class Migrations {
 	private static Map<String, SortedSet<CodeMigration>> loadCodeMigrations(Set<String> realmNames,
 			File migrationsPath) {
 
-		Map<String, SortedSet<CodeMigration>> migrationsByRealm = new HashMap<>(); //new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
+		Map<String, SortedSet<CodeMigration>> migrationsByRealm
+				= new HashMap<>(); //new TreeSet<>((o1, o2) -> o1.getVersion().compareTo(o2.getVersion()));
 
 		File codeDir = new File(migrationsPath, "code");
 		if (!codeDir.exists())
