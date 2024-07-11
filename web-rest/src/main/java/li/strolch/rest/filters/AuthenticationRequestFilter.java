@@ -27,6 +27,7 @@ import jakarta.ws.rs.ext.Provider;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.privilege.model.Usage;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -35,10 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.utils.helper.StringHelper.*;
@@ -116,11 +114,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		try {
 
+			Optional<Certificate> certificate;
 			if (isUnsecuredPath(requestContext)) {
-				setCertificateIfAvailable(requestContext, remoteIp);
+				certificate = setCertificateIfAvailable(requestContext, remoteIp);
 			} else {
-				validateSession(requestContext, remoteIp);
+				certificate = validateSession(requestContext, remoteIp);
 			}
+
+			certificate.ifPresent(CertificateThreadLocal::setCert);
 
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
@@ -146,30 +147,28 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		}
 	}
 
-	protected void setCertificateIfAvailable(ContainerRequestContext requestContext, String remoteIp) {
+	protected Optional<Certificate> setCertificateIfAvailable(ContainerRequestContext requestContext, String remoteIp) {
 		StrolchSessionHandler sessionHandler = getSessionHandler();
 
 		String sessionId = trimOrEmpty(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 		if (isNotEmpty(sessionId)) {
 			if (sessionHandler.isSessionKnown(sessionId)) {
-				validateCertificate(requestContext, sessionId, remoteIp);
+				return validateCertificate(requestContext, sessionId, remoteIp);
 			} else {
 				logger.error("Session {} by authorization header does not exist anymore, ignoring!", sessionId);
+				return Optional.empty();
 			}
-
-			return;
 		}
 
 		sessionId = getSessionIdFromCookie(requestContext);
-		if (isEmpty(sessionId)) {
-			return;
-		}
+		if (isEmpty(sessionId))
+			return Optional.empty();
 
-		if (sessionHandler.isSessionKnown(sessionId)) {
-			validateCertificate(requestContext, sessionId, remoteIp);
-		} else {
-			logger.error("Session {} by cookie does not exist anymore, ignoring!", sessionId);
-		}
+		if (sessionHandler.isSessionKnown(sessionId))
+			return validateCertificate(requestContext, sessionId, remoteIp);
+
+		logger.debug("Session {} by cookie does not exist anymore, ignoring!", sessionId);
+		return Optional.empty();
 	}
 
 	/**
@@ -187,7 +186,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	 * @return the certificate for the validated session, or null, of the request is aborted to no missing or invalid
 	 * authorization token
 	 */
-	protected Certificate validateSession(ContainerRequestContext requestContext, String remoteIp) {
+	protected Optional<Certificate> validateSession(ContainerRequestContext requestContext, String remoteIp) {
 		String authorization = trimOrEmpty(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
 		if (authorization.isEmpty())
 			return validateCookie(requestContext, remoteIp);
@@ -208,7 +207,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		return sessionId.trim();
 	}
 
-	protected Certificate validateCookie(ContainerRequestContext requestContext, String remoteIp) {
+	protected Optional<Certificate> validateCookie(ContainerRequestContext requestContext, String remoteIp) {
 		String sessionId = getSessionIdFromCookie(requestContext);
 		if (isEmpty(sessionId)) {
 			logger.error("No Authorization header or cookie on request to URL {}",
@@ -218,13 +217,13 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("Missing Authorization!")
 					.build());
-			return null;
+			return Optional.empty();
 		}
 
 		return validateCertificate(requestContext, sessionId, remoteIp);
 	}
 
-	protected Certificate authenticateBasic(ContainerRequestContext requestContext, String authorization,
+	protected Optional<Certificate> authenticateBasic(ContainerRequestContext requestContext, String authorization,
 			String remoteIp) {
 
 		if (!getRestful().isBasicAuthEnabled()) {
@@ -234,7 +233,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("Basic Auth not available")
 					.build());
-			return null;
+			return Optional.empty();
 		}
 
 		String basicAuth = authorization.substring("Basic ".length());
@@ -246,7 +245,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("Invalid Basic Authorization!")
 					.build());
-			return null;
+			return Optional.empty();
 		}
 
 		logger.info("Performing basic auth for user {}...", parts[0]);
@@ -257,12 +256,22 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
 
-		return certificate;
+		return Optional.ofNullable(certificate);
 	}
 
-	protected Certificate validateCertificate(ContainerRequestContext requestContext, String sessionId,
+	protected Optional<Certificate> validateCertificate(ContainerRequestContext requestContext, String sessionId,
 			String remoteIp) {
 		StrolchSessionHandler sessionHandler = getSessionHandler();
+		if (!sessionHandler.isSessionKnown(sessionId)) {
+			logger.debug("Ignoring unknown session!");
+			requestContext.abortWith(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("User is not authenticated!")
+					.build());
+			return Optional.empty();
+		}
+
 		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
@@ -275,12 +284,12 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
 						.entity("Can only set password!")
 						.build());
-				return null;
+				return Optional.empty();
 			}
 		}
 
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
-		return certificate;
+		return Optional.of(certificate);
 	}
 }

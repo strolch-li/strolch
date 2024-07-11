@@ -24,6 +24,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 import li.strolch.privilege.model.Certificate;
+import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.rest.RestfulStrolchComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,9 @@ public class AuthenticationResponseFilter implements ContainerResponseFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
+
+		if (CertificateThreadLocal.hasCert())
+			CertificateThreadLocal.removeCert();
 
 		Certificate cert = (Certificate) requestContext.getProperty(STROLCH_CERTIFICATE);
 		if (cert == null)
