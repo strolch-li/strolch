@@ -103,7 +103,8 @@ public class OperationsLog extends StrolchComponent {
 			this.handleQueueTask.cancel(true);
 		if (this.executorService != null)
 			this.executorService.shutdownNow();
-		this.sentMessageHashes.clear();
+		if (this.sentMessageHashes != null)
+			this.sentMessageHashes.clear();
 		super.stop();
 	}
 
