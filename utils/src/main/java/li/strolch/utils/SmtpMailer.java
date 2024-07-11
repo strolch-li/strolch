@@ -10,10 +10,8 @@ import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.DocumentSignatureType;
 import org.pgpainless.algorithm.HashAlgorithm;
 import org.pgpainless.algorithm.SymmetricKeyAlgorithm;
-import org.pgpainless.encryption_signing.EncryptionOptions;
-import org.pgpainless.encryption_signing.EncryptionStream;
-import org.pgpainless.encryption_signing.ProducerOptions;
-import org.pgpainless.encryption_signing.SigningOptions;
+import org.pgpainless.encryption_signing.*;
+import org.pgpainless.key.SubkeyIdentifier;
 import org.pgpainless.key.protection.SecretKeyRingProtector;
 import org.pgpainless.key.protection.UnlockSecretKey;
 import org.pgpainless.util.Passphrase;
@@ -27,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.text.MessageFormat.format;
@@ -216,8 +215,10 @@ public class SmtpMailer {
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
+		InternetAddress[] recipientAddresses;
 		try {
-			message = prepareMimeMessage(recipients, subject, session);
+			recipientAddresses = evaluateRecipients(subject, recipients);
+			message = prepareMimeMessage(subject, session);
 
 			if (shouldSign()) {
 				logger.info("Signing text with key {}", this.signingKeyRing.getPublicKey().getUserIDs().next());
@@ -231,7 +232,7 @@ public class SmtpMailer {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
-		send(recipients, message);
+		send(recipientAddresses, message);
 		logger.info(format("Sent {0} E-mail with subject {1} to {2}", shouldSign() ? "signed" : "unsigned", subject,
 				recipients));
 	}
@@ -245,8 +246,10 @@ public class SmtpMailer {
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
+		InternetAddress[] recipientAddresses;
 		try {
-			message = prepareMimeMessage(recipients, subject, session);
+			recipientAddresses = evaluateRecipients(subject, recipients);
+			message = prepareMimeMessage(subject, session);
 
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			messageBodyPart.setText(text);
@@ -265,7 +268,7 @@ public class SmtpMailer {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
-		send(recipients, message);
+		send(recipientAddresses, message);
 		logger.info(format("Sent {0} E-mail with subject {1} to {2} and attachment {3}",
 				shouldSign() ? "signed" : "unsigned", subject, recipients, fileName));
 	}
@@ -277,14 +280,16 @@ public class SmtpMailer {
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
+		InternetAddress[] recipientAddresses;
 		try {
-			message = prepareMimeMessage(recipients, subject, session);
+			recipientAddresses = evaluateRecipients(subject, recipients);
+			message = prepareMimeMessage(subject, session);
 			attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), encryptedTextFileName);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
-		send(recipients, message);
+		send(recipientAddresses, message);
 		logger.info(format("Sent signed and encrypted E-mail with subject {0} to {1}", subject, recipients));
 	}
 
@@ -295,41 +300,40 @@ public class SmtpMailer {
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
+		InternetAddress[] recipientAddresses;
 		try {
-			message = prepareMimeMessage(recipients, subject, session);
-			Multipart multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), encryptedTextFileName);
+			recipientAddresses = evaluateRecipients(subject, recipients);
+			message = prepareMimeMessage(subject, session);
+			Multipart multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText),
+					encryptedTextFileName);
 			attachEncryptedFile(attachment, fileName, multipart);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
-		send(recipients, message);
+		send(recipientAddresses, message);
 		logger.info(format("Sent signed and encrypted E-mail with subject {0} to {1}", subject, recipients));
 	}
 
-	private void send(String recipients, MimeMessage message) {
+	protected void send(InternetAddress[] recipients, MimeMessage message) {
 		try {
-			Transport.send(message);
+			Transport.send(message, recipients);
 		} catch (MessagingException e) {
-			throw new RuntimeException(
-					"Failed to send message to %s with recipients %s".formatted(this.props.getProperty(MAIL_SMTP_HOST),
-							recipients), e);
+			throw new RuntimeException("Failed to send message to server %s with recipients %s".formatted(
+					this.props.getProperty(MAIL_SMTP_HOST), addressesToString(recipients)), e);
 		}
 	}
 
-	private MimeMessage prepareMimeMessage(String recipients, String subject, Session session)
-			throws MessagingException {
-		InternetAddress[] recipientAddresses = evaluateRecipients(subject, recipients);
+	protected MimeMessage prepareMimeMessage(String subject, Session session) throws MessagingException {
 
 		MimeMessage message;
 		message = new MimeMessage(session);
 		message.setFrom(this.from);
-		message.setRecipients(Message.RecipientType.TO, recipientAddresses);
 		message.setSubject(subject);
 		return message;
 	}
 
-	private InternetAddress[] evaluateRecipients(String subject, String recipients) {
+	protected InternetAddress[] evaluateRecipients(String subject, String recipients) {
 		InternetAddress[] recipientAddresses;
 		if (this.overrideRecipients == null) {
 			recipientAddresses = parseAddress(recipients);
@@ -343,7 +347,7 @@ public class SmtpMailer {
 		return recipientAddresses;
 	}
 
-	private InternetAddress[] parseAddress(String s) {
+	protected InternetAddress[] parseAddress(String s) {
 		try {
 			return InternetAddress.parse(s);
 		} catch (AddressException e) {
@@ -351,13 +355,13 @@ public class SmtpMailer {
 		}
 	}
 
-	private String addressesToString(Address[] recipientAddresses) {
+	protected String addressesToString(Address[] recipientAddresses) {
 		return stream(recipientAddresses) //
 				.map(Address::toString) //
 				.collect(joining(","));
 	}
 
-	private Multipart attachEncryptedMessage(MimeMessage message, String mailText, String encryptedAndSignedMessage,
+	protected Multipart attachEncryptedMessage(MimeMessage message, String mailText, String encryptedAndSignedMessage,
 			String encryptedTextFileName) throws MessagingException {
 
 		String fileName = encryptedTextFileName + ".asc";
@@ -379,7 +383,7 @@ public class SmtpMailer {
 		return multiPart;
 	}
 
-	private void attachEncryptedFile(String attachment, String fileName, Multipart multipart)
+	protected void attachEncryptedFile(String attachment, String fileName, Multipart multipart)
 			throws MessagingException {
 		fileName = fileName + ".asc";
 
@@ -392,7 +396,7 @@ public class SmtpMailer {
 		multipart.addBodyPart(attachmentPart);
 	}
 
-	private String sign(String plainText) {
+	protected String sign(String plainText) {
 		try {
 			SigningOptions signingOptions = new SigningOptions()
 					.addDetachedSignature(
@@ -415,7 +419,7 @@ public class SmtpMailer {
 		}
 	}
 
-	private String signAndEncrypt(String plainText) {
+	protected String signAndEncrypt(String plainText) {
 		try {
 
 			ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
@@ -436,20 +440,20 @@ public class SmtpMailer {
 		}
 	}
 
-	private SigningOptions getSigningOptions() throws PGPException {
+	protected SigningOptions getSigningOptions() throws PGPException {
 		return new SigningOptions()
 				.addInlineSignature(SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(this.signingKeyPassword)),
 						this.signingKeyRing, DocumentSignatureType.BINARY_DOCUMENT)
 				.overrideHashAlgorithm(HashAlgorithm.SHA256);
 	}
 
-	private EncryptionOptions getEncryptionOptions() {
+	protected EncryptionOptions getEncryptionOptions() {
 		return new EncryptionOptions()
 				.addRecipients(this.recipientKeyRings)
 				.overrideEncryptionAlgorithm(SymmetricKeyAlgorithm.AES_256);
 	}
 
-	private static PGPSecretKeyRing getSigningKeyRing(String signingKeyFileName) {
+	protected PGPSecretKeyRing getSigningKeyRing(String signingKeyFileName) {
 		PGPSecretKeyRing signingKeyRing;
 		try {
 			signingKeyRing = PGPainless.readKeyRing().secretKeyRing(new FileInputStream(signingKeyFileName));
@@ -462,7 +466,7 @@ public class SmtpMailer {
 		return signingKeyRing;
 	}
 
-	private static PGPPublicKeyRing getRecipientKeyRing(String recipientPublicKeyFileName) {
+	protected PGPPublicKeyRing getRecipientKeyRing(String recipientPublicKeyFileName) {
 		PGPPublicKeyRing recipientKeyRing;
 		try {
 			recipientKeyRing = PGPainless.readKeyRing().publicKeyRing(new FileInputStream(recipientPublicKeyFileName));

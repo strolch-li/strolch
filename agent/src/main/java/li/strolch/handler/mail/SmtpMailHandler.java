@@ -53,7 +53,7 @@ public class SmtpMailHandler extends MailHandler {
 		// mark certain properties as secret
 		configuration.getSecret(SmtpMailer.PARAM_PASSWORD);
 
-		SmtpMailer smtpMailer = SmtpMailer.init(configuration.getAsProperties());
+		SmtpMailer smtpMailer = initializeSmtpMailer(configuration);
 
 		File configPath = configuration.getRuntimeConfiguration().getConfigPath();
 		if (!configuration.hasProperty(PARAM_SIGNING_KEY)) {
@@ -94,6 +94,10 @@ public class SmtpMailHandler extends MailHandler {
 		super.initialize(configuration);
 	}
 
+	protected SmtpMailer initializeSmtpMailer(ComponentConfiguration configuration) {
+		return SmtpMailer.init(configuration.getAsProperties());
+	}
+
 	@Override
 	public boolean isSigningEnabled() {
 		return this.signingEnabled;
@@ -117,7 +121,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendMail(String recipients, String subject, String text, boolean disableEncryption) {
-		SmtpMailer mailer = SmtpMailer.getInstance();
+		SmtpMailer mailer = getSmtpMailer();
 		if (disableEncryption) {
 			mailer.sendMail(recipients, subject, text);
 		} else if (this.encryptionEnabled) {
@@ -130,10 +134,14 @@ public class SmtpMailHandler extends MailHandler {
 		}
 	}
 
+	protected SmtpMailer getSmtpMailer() {
+		return SmtpMailer.getInstance();
+	}
+
 	@Override
 	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
 			String fileName, String type, boolean disableEncryption) {
-		SmtpMailer mailer = SmtpMailer.getInstance();
+		SmtpMailer mailer = getSmtpMailer();
 		if (disableEncryption) {
 			mailer.sendMailWithAttachment(recipients, subject, text, attachment, fileName, type);
 		} else if (this.encryptionEnabled) {
