@@ -497,4 +497,8 @@ public class StrolchAgent {
 
 		return agentJ;
 	}
+
+	public Set<String> getRealmNames() {
+		return this.container.getRealmNames();
+	}
 }
