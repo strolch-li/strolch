@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -103,11 +104,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 		if (components.size() > 1) {
 			String msg
 					= "Component clazz {0} is ambiguous as there are {1} components registered with this type! Get the component by name.";
-			msg = MessageFormat.format(msg, clazz.getName());
+			msg = MessageFormat.format(msg, clazz.getName(), components.size());
 			throw new IllegalArgumentException(msg);
 		}
 
-		return (T) components.get(0);
+		return (T) components.getFirst();
 	}
 
 	@Override
@@ -134,8 +135,10 @@ public class ComponentContainerImpl implements ComponentContainer {
 				ComponentConfiguration configuration = strolchConfiguration.getComponentConfiguration(
 						component.getName());
 				Set<String> dependencies = configuration.getDependencies();
-				if (!dependencies.isEmpty() &&
-						dependencies.stream().map(this.componentsByName::get).noneMatch(result::contains))
+				if (!dependencies.isEmpty() && dependencies
+						.stream()
+						.map(this.componentsByName::get)
+						.noneMatch(result::contains))
 					continue;
 
 				result.add(component);
@@ -200,8 +203,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		String componentName = componentConfiguration.getName();
 		if (isEmpty(componentName))
-			throw new IllegalStateException("name missing for a component in env " +
-					componentConfiguration.getRuntimeConfiguration().getEnvironment());
+			throw new IllegalStateException("name missing for a component in env " + componentConfiguration
+					.getRuntimeConfiguration()
+					.getEnvironment());
 
 		try {
 			String api = componentConfiguration.getApi();
@@ -349,16 +353,15 @@ public class ComponentContainerImpl implements ComponentContainer {
 		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",
 				getAgent().getStrolchConfiguration().getRuntimeConfiguration().getLocale().toLanguageTag(),
 				getTimezone()));
-		logger.info(
-				MessageFormat.format("file.encoding: {0} / sun.jnu.encoding {1}", System.getProperty("file.encoding"),
-						System.getProperty("sun.jnu.encoding")));
+		logger.info(MessageFormat.format("file.encoding: {0} / sun.jnu.encoding {1}",
+				Charset.defaultCharset().displayName(), System.getProperty("sun.jnu.encoding")));
 
 		String tookS = formatNanoDuration(System.nanoTime() - start);
 
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
+						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.System,
 						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.started") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
@@ -384,7 +387,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 		if (hasComponent(OperationsLog.class)) {
 			for (String realmName : getRealmNames()) {
 				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
-						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.Info,
+						Locator.valueOf(AGENT, "strolch-agent", StrolchAgent.getUniqueId()), LogSeverity.System,
 						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.stopping") //
 						.value("applicationName", applicationName) //
 						.value("environment", environment) //
@@ -449,7 +452,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	private String getTimezone() {
-		return getAgent().getStrolchConfiguration().getRuntimeConfiguration()
+		return getAgent()
+				.getStrolchConfiguration()
+				.getRuntimeConfiguration()
 				.getString(PROP_TIMEZONE, System.getProperty("user.timezone"));
 	}
 }
