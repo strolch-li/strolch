@@ -140,7 +140,7 @@ public class Migrations {
 				List<Version> list = migrationsRan.getList(realm);
 				for (Version version : list) {
 					LogMessage logMessage = new LogMessage(realm, SYSTEM_USER_AGENT,
-							locator.append(StrolchAgent.getUniqueId()), LogSeverity.Info, LogMessageState.Information,
+							locator.append(StrolchAgent.getUniqueId()), LogSeverity.System, LogMessageState.Information,
 							ResourceBundle.getBundle("strolch-service"), "execution.handler.migrations.version").value(
 							"version", version.toString());
 					operationsLog.addMessage(logMessage);
