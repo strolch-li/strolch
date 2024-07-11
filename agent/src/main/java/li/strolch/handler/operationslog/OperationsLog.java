@@ -497,7 +497,7 @@ public class OperationsLog extends StrolchComponent {
 				logMessage.getUsername(), ISO8601.toString(logMessage.getZonedDateTime()), logMessage.getId(),
 				logMessage.getMessage(Locale.ENGLISH), stackTrace == null ? "(none)" : stackTrace);
 
-		mailHandler.sendMailAsync(this.sendMailsRecipients, subject, text, false);
+		mailHandler.sendEncryptedMailAsync(this.sendMailsRecipients, subject, text);
 	}
 
 	private static Locator trimAgentLocator(Locator tmp) {
