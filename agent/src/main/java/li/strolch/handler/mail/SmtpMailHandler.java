@@ -108,116 +108,187 @@ public class SmtpMailHandler extends MailHandler {
 		return this.encryptionEnabled;
 	}
 
-	@Override
-	public void sendMail(String recipients, String subject, String text) {
-		sendMail(recipients, subject, text, false);
-	}
-
-	@Override
-	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
-		sendMailWithAttachment(recipients, subject, text, attachment, fileName, type, false);
-	}
-
-	@Override
-	public void sendMail(String recipients, String subject, String text, boolean disableEncryption) {
-		SmtpMailer mailer = getSmtpMailer();
-		if (disableEncryption) {
-			mailer.sendMail(recipients, subject, text);
-		} else if (this.encryptionEnabled) {
-			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
-			mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
-		} else {
-			throw new IllegalStateException(
-					"Can not send mail with subject %s as encryption is not enabled, and disableEncryption=false!".formatted(
-							subject));
-		}
-	}
-
 	protected SmtpMailer getSmtpMailer() {
 		return SmtpMailer.getInstance();
 	}
 
 	@Override
-	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type, boolean disableEncryption) {
+	public void sendMail(String recipients, String subject, String text) {
 		SmtpMailer mailer = getSmtpMailer();
-		if (disableEncryption) {
-			mailer.sendMailWithAttachment(recipients, subject, text, attachment, fileName, type);
-		} else if (this.encryptionEnabled) {
+		if (this.encryptionEnabled) {
 			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
-			mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
-					encryptedFileNameFromSubject, attachment, fileName);
+			mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
 		} else {
-			throw new IllegalStateException(
-					"Can not send mail with subject %s as encryption is not enabled, and disableEncryption=false!".formatted(
-							subject));
+			mailer.sendMail(recipients, subject, text);
 		}
 	}
 
 	@Override
-	public void sendMailAsync(String recipients, String subject, String text) {
-		sendMailAsync(recipients, subject, text, false);
+	public void sendUnencryptedMail(String recipients, String subject, String text) {
+		SmtpMailer mailer = getSmtpMailer();
+		mailer.sendMail(recipients, subject, text);
 	}
 
 	@Override
-	public void sendMailAsync(String recipients, String subject, String text, boolean disableEncryption) {
-		getExecutorService("Mail").submit(() -> doSendMail(recipients, subject, text, disableEncryption));
+	public void sendEncryptedMail(String recipients, String subject, String text) {
+		if (!this.encryptionEnabled)
+			throw new IllegalStateException(
+					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
+
+		SmtpMailer mailer = getSmtpMailer();
+		String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
+		mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
+	}
+
+	@Override
+	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		SmtpMailer mailer = getSmtpMailer();
+		if (this.encryptionEnabled) {
+			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
+			mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
+					encryptedFileNameFromSubject, attachment, fileName);
+		} else {
+			mailer.sendMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+		}
+	}
+
+	@Override
+	public void sendEncryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		if (!this.encryptionEnabled)
+			throw new IllegalStateException(
+					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
+
+		SmtpMailer mailer = getSmtpMailer();
+		String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
+		mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
+				encryptedFileNameFromSubject, attachment, fileName);
+	}
+
+	@Override
+	public void sendUnencryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		SmtpMailer mailer = getSmtpMailer();
+		mailer.sendMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+	}
+
+	@Override
+	public void sendMailAsync(String recipients, String subject, String text) {
+		if (this.encryptionEnabled) {
+			sendEncryptedMailAsync(recipients, subject, text);
+		} else {
+			sendUnencryptedMailAsync(recipients, subject, text);
+		}
+	}
+
+	@Override
+	public void sendEncryptedMailAsync(String recipients, String subject, String text) {
+		if (!this.encryptionEnabled)
+			throw new IllegalStateException(
+					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
+		getExecutorService("Mail").submit(() -> doSendEncryptedMail(recipients, subject, text));
+	}
+
+	@Override
+	public void sendUnencryptedMailAsync(String recipients, String subject, String text) {
+		getExecutorService("Mail").submit(() -> doSendUnencryptedMail(recipients, subject, text));
 	}
 
 	@Override
 	public void sendMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
 			String fileName, String type) {
-		sendMailWithAttachmentAsync(recipients, subject, text, attachment, fileName, type, false);
+		if (this.encryptionEnabled) {
+			getExecutorService("Mail").submit(
+					() -> doSendEncryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+		} else {
+			getExecutorService("Mail").submit(
+					() -> doSendUnencryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+		}
 	}
 
 	@Override
-	public void sendMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
-			String fileName, String type, boolean disableEncryption) {
+	public void sendEncryptedMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		if (!this.encryptionEnabled)
+			throw new IllegalStateException(
+					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 		ExecutorService svc = getExecutorService("Mail");
-		svc.submit(() -> doSendMailWithAttachment(recipients, subject, text, attachment, fileName, type,
-				disableEncryption));
+		svc.submit(() -> doSendEncryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
 	}
 
-	private void doSendMail(String recipients, String subject, String text, boolean disableEncryption) {
+	@Override
+	public void sendUnencryptedMailWithAttachmentAsync(String recipients, String subject, String text,
+			String attachment, String fileName, String type) {
+		ExecutorService svc = getExecutorService("Mail");
+		svc.submit(() -> doSendUnencryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+	}
+
+	private void doSendEncryptedMail(String recipients, String subject, String text) {
 		try {
-			sendMail(recipients, subject, text, disableEncryption);
+			sendEncryptedMail(recipients, subject, text);
 		} catch (Throwable e) {
 			logger.error("Failed to send mail \"{}\" to {}", subject, recipients, e);
-
-			if (hasComponent(OperationsLog.class)) {
-				LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,
-						LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "mail.failedToSend")
-						.withException(e)
-						.value("reason", e)
-						.value("host", this.host)
-						.value("subject", subject)
-						.value("recipients", recipients);
-				getComponent(OperationsLog.class).addMessage(message, true);
-			}
+			if (hasComponent(OperationsLog.class))
+				addFailedToSendMailLogMessage(recipients, subject, e);
 		}
 	}
 
-	private void doSendMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type, boolean disableEncryption) {
+	private void doSendUnencryptedMail(String recipients, String subject, String text) {
 		try {
-			sendMailWithAttachment(recipients, subject, text, attachment, fileName, type, disableEncryption);
+			sendUnencryptedMail(recipients, subject, text);
+		} catch (Throwable e) {
+			logger.error("Failed to send mail \"{}\" to {}", subject, recipients, e);
+			if (hasComponent(OperationsLog.class))
+				addFailedToSendMailLogMessage(recipients, subject, e);
+		}
+	}
+
+	private void doSendEncryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		try {
+			sendEncryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type);
 		} catch (Throwable e) {
 			logger.error("Failed to send mail \"{}\" to {} with attachment {}", subject, recipients, fileName, e);
-
-			if (hasComponent(OperationsLog.class)) {
-				LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,
-						LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
-						"mail.failedToSendWithAttachment")
-						.withException(e)
-						.value("reason", e)
-						.value("fileName", fileName)
-						.value("host", this.host)
-						.value("subject", subject)
-						.value("recipients", recipients);
-				getComponent(OperationsLog.class).addMessage(message, true);
-			}
+			if (hasComponent(OperationsLog.class))
+				addFailedToSendMailWithAttachmentLogMessage(recipients, subject, fileName, e);
 		}
+	}
+
+	private void doSendUnencryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
+			String fileName, String type) {
+		try {
+			sendUnencryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+		} catch (Throwable e) {
+			logger.error("Failed to send mail \"{}\" to {} with attachment {}", subject, recipients, fileName, e);
+			if (hasComponent(OperationsLog.class))
+				addFailedToSendMailWithAttachmentLogMessage(recipients, subject, fileName, e);
+		}
+	}
+
+	private void addFailedToSendMailLogMessage(String recipients, String subject, Throwable e) {
+		LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,
+				LogMessageState.Information, ResourceBundle.getBundle("strolch-service"), "mail.failedToSend")
+				.withException(e)
+				.value("reason", e)
+				.value("host", this.host)
+				.value("subject", subject)
+				.value("recipients", recipients);
+		getComponent(OperationsLog.class).addMessage(message, true);
+	}
+
+	private void addFailedToSendMailWithAttachmentLogMessage(String recipients, String subject, String fileName,
+			Throwable e) {
+		LogMessage message = new LogMessage(this.realm, SYSTEM_USER_AGENT, getLocator(), LogSeverity.Exception,
+				LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+				"mail.failedToSendWithAttachment")
+				.withException(e)
+				.value("reason", e)
+				.value("fileName", fileName)
+				.value("host", this.host)
+				.value("subject", subject)
+				.value("recipients", recipients);
+		getComponent(OperationsLog.class).addMessage(message, true);
 	}
 
 	private static String createEncryptedFileNameFromSubject(String subject) {
