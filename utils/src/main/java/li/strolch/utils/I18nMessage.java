@@ -440,6 +440,8 @@ public class I18nMessage {
 				|| name.startsWith("jaxws")
 				|| name.startsWith("jaxrs")
 				|| name.startsWith("jaxb")
+				// bouncy castle
+				|| name.contains("-jdk18on-")
 				|| name.contains("jsr305")
 				|| name.contains("c3p0")
 				|| name.contains("camel")
