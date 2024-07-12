@@ -1,11 +1,12 @@
 package li.strolch.utils;
 
-import static java.util.Collections.emptySet;
-import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
-import static li.strolch.utils.helper.ExceptionHelper.formatException;
-import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
-import static li.strolch.utils.helper.StringHelper.EMPTY;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
+import li.strolch.utils.collections.MapOfMaps;
+import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.collections.TypedTuple;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,13 +18,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import li.strolch.utils.collections.MapOfMaps;
-import li.strolch.utils.collections.MapOfSets;
-import li.strolch.utils.collections.TypedTuple;
-import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Collections.emptySet;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
+import static li.strolch.utils.helper.ExceptionHelper.formatException;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
+import static li.strolch.utils.helper.StringHelper.EMPTY;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 public class I18nMessage {
 
@@ -304,15 +304,23 @@ public class I18nMessage {
 						String baseName = tuple.getFirst();
 						Locale locale = tuple.getSecond();
 
-						ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale,
-								new CustomControl(jarFile.getInputStream(je)));
+						String propertyName = entryName.replace('/', '.');
+						ResourceBundle bundle;
+						try {
+							bundle = ResourceBundle.getBundle(baseName, locale,
+									new CustomControl(jarFile.getInputStream(je)));
+						} catch (Exception e) {
+							logger.error("Failed to load bundle {} {} from {} from JAR {}", baseName, locale,
+									propertyName, file.getName(), e);
+							continue;
+						}
 
 						bundleMap.addElement(bundle.getBaseBundleName(), bundle.getLocale(), bundle);
-
-						String propertyName = entryName.replace('/', '.');
 						logger.info("    Loaded bundle {} {} from {} from JAR {}", bundle.getBaseBundleName(),
 								bundle.getLocale(), propertyName, file.getName());
 					}
+				} catch (Exception e) {
+					logger.error("Failed to read JAR {}", file.getName(), e);
 				}
 			}
 
@@ -335,6 +343,10 @@ public class I18nMessage {
 						ResourceBundle bundle;
 						try (FileInputStream in = new FileInputStream(propertyFile)) {
 							bundle = ResourceBundle.getBundle(baseName, locale, new CustomControl(in));
+						} catch (Exception e) {
+							logger.error("Failed to load bundle {} {} from file {}", baseName, locale,
+									propertyFile.getName(), e);
+							continue;
 						}
 
 						bundleMap.addElement(bundle.getBaseBundleName(), bundle.getLocale(), bundle);
