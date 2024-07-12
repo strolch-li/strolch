@@ -141,13 +141,18 @@ public class ResponseUtil {
 		if (svcResult.isOk())
 			return Response.ok().entity(json).type(MediaType.APPLICATION_JSON).build();
 
-		Throwable rootCause = getRootCause(t);
-		Status status = switch (rootCause) {
-			case AccessDeniedException ignored -> Status.FORBIDDEN;
-			case PrivilegeException ignored -> Status.UNAUTHORIZED;
-			case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
-			case null, default -> Status.INTERNAL_SERVER_ERROR;
-		};
+		Status status;
+		if (t == null) {
+			status = Status.INTERNAL_SERVER_ERROR;
+		} else {
+			Throwable rootCause = getRootCause(t);
+			status = switch (rootCause) {
+				case AccessDeniedException ignored -> Status.FORBIDDEN;
+				case PrivilegeException ignored -> Status.UNAUTHORIZED;
+				case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
+				case null, default -> Status.INTERNAL_SERVER_ERROR;
+			};
+		}
 
 		return Response.status(status).entity(json).type(MediaType.APPLICATION_JSON).build();
 	}
