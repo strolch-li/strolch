@@ -3,15 +3,19 @@ package li.strolch.utils;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import li.strolch.utils.dbc.DBC;
-import org.bouncycastle.openpgp.*;
-import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.util.io.Streams;
 import org.pgpainless.PGPainless;
 import org.pgpainless.algorithm.DocumentSignatureType;
 import org.pgpainless.algorithm.HashAlgorithm;
 import org.pgpainless.algorithm.SymmetricKeyAlgorithm;
-import org.pgpainless.encryption_signing.*;
-import org.pgpainless.key.SubkeyIdentifier;
+import org.pgpainless.encryption_signing.EncryptionOptions;
+import org.pgpainless.encryption_signing.EncryptionStream;
+import org.pgpainless.encryption_signing.ProducerOptions;
+import org.pgpainless.encryption_signing.SigningOptions;
 import org.pgpainless.key.protection.SecretKeyRingProtector;
 import org.pgpainless.key.protection.UnlockSecretKey;
 import org.pgpainless.util.Passphrase;
@@ -25,7 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.text.MessageFormat.format;
@@ -79,12 +84,16 @@ public class SmtpMailer {
 
 	private static SmtpMailer instance;
 
+	private final ReentrantLock lock = new ReentrantLock();
+
 	/**
 	 * <p>
 	 * Initializes the SMTP Mailer with the given properties.
 	 * </p>
 	 *
 	 * @param properties the properties to be used to initialize the mailer
+	 *
+	 * @return this instance
 	 */
 	public static SmtpMailer init(Properties properties) {
 		instance = new SmtpMailer(properties);
@@ -104,7 +113,7 @@ public class SmtpMailer {
 	 * @param username    the username for connection authorization
 	 * @param password    the password for connection authorization
 	 *
-	 * @return
+	 * @return this instance
 	 */
 	public static SmtpMailer init(String fromAddress, String host, int port, boolean auth, boolean startTls,
 			String username, String password) {
@@ -398,6 +407,14 @@ public class SmtpMailer {
 
 	protected String sign(String plainText) {
 		try {
+			// locking is required, as key rings are not thread safe
+			// can be removed in a future version, when bouncy castle is thread safe
+			// https://github.com/pgpainless/pgpainless/issues/443
+			// https://github.com/bcgit/bc-java/issues/1379
+			// https://github.com/bcgit/bc-java/pull/1383
+			if (!this.lock.tryLock(10, TimeUnit.SECONDS))
+				throw new IllegalStateException("Failed to acquired lock in 10s!");
+
 			SigningOptions signingOptions = new SigningOptions()
 					.addDetachedSignature(
 							SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(this.signingKeyPassword)),
@@ -414,13 +431,24 @@ public class SmtpMailer {
 			encryptionStream.close();
 
 			return signatureResult.toString(UTF_8);
+		} catch (InterruptedException e) {
+			throw new IllegalStateException("Interrupted while waiting to lock", e);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to sign plain text!", e);
+		} finally {
+			this.lock.unlock();
 		}
 	}
 
 	protected String signAndEncrypt(String plainText) {
 		try {
+			// locking is required, as key rings are not thread safe
+			// can be removed in a future version, when bouncy castle is thread safe
+			// https://github.com/pgpainless/pgpainless/issues/443
+			// https://github.com/bcgit/bc-java/issues/1379
+			// https://github.com/bcgit/bc-java/pull/1383
+			if (!this.lock.tryLock(10, TimeUnit.SECONDS))
+				throw new IllegalStateException("Failed to acquired lock in 10s!");
 
 			ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
 			EncryptionStream encryptionStream = PGPainless
@@ -435,8 +463,12 @@ public class SmtpMailer {
 			encryptionStream.close();
 
 			return signatureResult.toString(UTF_8);
+		} catch (InterruptedException e) {
+			throw new IllegalStateException("Interrupted while waiting to lock", e);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to encrypt and sign plain text!", e);
+		} finally {
+			this.lock.unlock();
 		}
 	}
 
