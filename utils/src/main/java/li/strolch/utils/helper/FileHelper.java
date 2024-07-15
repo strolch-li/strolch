@@ -383,6 +383,17 @@ public class FileHelper {
 	}
 
 	/**
+	 * Creates the SHA256 hash of the given file, returning the hash as a HEX string.
+	 *
+	 * @param file the file to hash
+	 *
+	 * @return the hash as a HEX string
+	 */
+	public static String hashFileSha256AsHex(File file) {
+		return StringHelper.toHexString(FileHelper.hashFile(file, "SHA-256"));
+	}
+
+	/**
 	 * Creates the hash of the given file with the given algorithm, returning the hash as a byte array. Use
 	 * {@link StringHelper#toHexString(byte[])} to create a HEX string of the bytes
 	 *
