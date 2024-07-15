@@ -2,21 +2,29 @@ package li.strolch.execution.policy;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
 import li.strolch.model.parameter.DurationParameter;
 import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.utils.CheckedBiConsumer;
+import li.strolch.utils.CheckedBiFunction;
 import li.strolch.utils.time.PeriodDuration;
 
 import java.util.Locale;
+import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static li.strolch.model.Tags.AGENT;
 
 /**
  * <p>
@@ -152,31 +160,79 @@ public class SimpleExecution extends ExecutionPolicy {
 		return getContainer().getRealm(ctx.getCertificate()).openTx(ctx.getCertificate(), getClass(), readOnly);
 	}
 
+	protected void runWithFreshActionReadonly(CheckedBiConsumer<StrolchTransaction, Action> consumer) {
+		runWithFreshActionReadonly(consumer, t -> toError(newTxFailedMessage(t)));
+	}
+
 	protected void runWithFreshActionReadonly(CheckedBiConsumer<StrolchTransaction, Action> consumer,
 			Consumer<Throwable> failHandler) {
-		runWithFreshAction(true, consumer, failHandler);
+		runWithFreshAction(true, (tx, a) -> {
+			consumer.accept(tx, a);
+			return null;
+		}, failHandler);
+	}
+
+	protected Optional<Action> refreshAction() {
+		return runWithFreshActionReadonlyWithResult((tx, action) -> action, t -> toError(newTxFailedMessage(t)));
+	}
+
+	protected <T> Optional<T> runWithFreshActionReadonlyWithResult(
+			CheckedBiFunction<StrolchTransaction, Action, T> consumer) {
+		return runWithFreshActionReadonlyWithResult(consumer, t -> toError(newTxFailedMessage(t)));
+	}
+
+	protected <T> Optional<T> runWithFreshActionReadonlyWithResult(
+			CheckedBiFunction<StrolchTransaction, Action, T> consumer, Consumer<Throwable> failHandler) {
+		return runWithFreshAction(true, consumer, failHandler);
+	}
+
+	protected void runWithFreshActionWritable(CheckedBiConsumer<StrolchTransaction, Action> consumer) {
+		runWithFreshActionWritable(consumer, t -> toError(newTxFailedMessage(t)));
 	}
 
 	protected void runWithFreshActionWritable(CheckedBiConsumer<StrolchTransaction, Action> consumer,
 			Consumer<Throwable> failHandler) {
-		runWithFreshAction(false, consumer, failHandler);
+		runWithFreshAction(false, (tx, a) -> {
+			consumer.accept(tx, a);
+			return null;
+		}, failHandler);
 	}
 
-	private void runWithFreshAction(boolean readOnly, CheckedBiConsumer<StrolchTransaction, Action> consumer,
-			Consumer<Throwable> failHandler) {
+	protected <T> Optional<T> runWithFreshActionWritableWithResult(
+			CheckedBiFunction<StrolchTransaction, Action, T> consumer) {
+		return runWithFreshActionWritableWithResult(consumer, t -> toError(newTxFailedMessage(t)));
+	}
+
+	protected <T> Optional<T> runWithFreshActionWritableWithResult(
+			CheckedBiFunction<StrolchTransaction, Action, T> consumer, Consumer<Throwable> failHandler) {
+		return runWithFreshAction(false, consumer, failHandler);
+	}
+
+	private <T> Optional<T> runWithFreshAction(boolean readOnly,
+			CheckedBiFunction<StrolchTransaction, Action, T> consumer, Consumer<Throwable> failHandler) {
 		try {
-			runAsAgent(ctx -> {
+			return Optional.ofNullable(runAsAgentWithResult(ctx -> {
 				try (StrolchTransaction tx = openLocalTx(ctx, readOnly)) {
 					tx.lock(this.actionLoc.trim(3));
 					Action action = tx.findElement(this.actionLoc);
-					consumer.accept(tx, action);
+					T t = consumer.apply(tx, action);
 
 					if (!readOnly && tx.needsCommit())
 						tx.commitOnClose();
+
+					return t;
 				}
-			});
+			}));
 		} catch (Exception e) {
 			failHandler.accept(e);
+			return Optional.empty();
 		}
+	}
+
+	protected LogMessage newTxFailedMessage(Throwable t) {
+		return new LogMessage(this.realm, isTxOpen() ? tx().getUsername() : AGENT,
+				Locator.valueOf(AGENT, ExecutionPolicy.class.getSimpleName(), getClass().getName()),
+				LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
+				"agent.execution.async.failed").value("reason", t);
 	}
 }

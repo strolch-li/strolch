@@ -263,12 +263,9 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected void setActionState(Action action, State state) {
 		if (action.getState().inClosedPhase())
-			throw new IllegalStateException("Action "
-					+ action.getLocator()
-					+ " has state "
-					+ action.getState()
-					+ " and can not be changed to "
-					+ state);
+			throw new IllegalStateException(
+					"Action %s has state %s and can not be changed to %s".formatted(action.getLocator(),
+							action.getState(), state));
 
 		action.setState(state);
 
