@@ -126,7 +126,7 @@ public class Controller {
 	private boolean refreshActivity(StrolchTransaction tx) {
 		Activity activity = tx.getActivityBy(this.activityType, this.activityId, false);
 		if (activity == null) {
-			logger.error("Element " + this.locator + " does not exist anymore. Removing from execution");
+			logger.error("Element {} does not exist anymore. Removing from execution", this.locator);
 			this.executionHandler.removeFromExecution(this);
 			return false;
 		}
@@ -160,7 +160,7 @@ public class Controller {
 
 				// then we trigger execution for the same activity if the controller says it is needed
 				if (trigger) {
-					logger.info("Triggering additional execution of controller " + this + " after execution.");
+					logger.info("Triggering additional execution of controller {} after execution.", this);
 					triggerExecute(tx);
 				}
 
@@ -186,7 +186,7 @@ public class Controller {
 
 		// we trigger execution for the same activity if the controller says it is needed
 		if (trigger) {
-			logger.info("Triggering additional execution of controller " + this + " after execution.");
+			logger.info("Triggering additional execution of controller {} after execution.", this);
 			triggerExecute(tx);
 		}
 	}
@@ -203,14 +203,14 @@ public class Controller {
 	protected boolean internalExecute(StrolchTransaction tx) {
 		if (this.activity.getState().isExecuted()) {
 			this.executionHandler.removeFromExecution(this);
-			logger.info("Archiving executed activity " + this.locator + " with state " + this.activity.getState());
+			logger.info("Archiving executed activity {} with state {}", this.locator, this.activity.getState());
 			this.executionHandler.archiveActivity(this.realm, this.activity.getLocator());
 			return false;
 		}
 
 		ExecutionHandlerState state = this.executionHandler.getExecutionState(this.realm);
 		if (state == ExecutionHandlerState.Paused) {
-			logger.warn("Ignoring trigger for paused realm " + this.realm);
+			logger.warn("Ignoring trigger for paused realm {}", this.realm);
 			return false;
 		}
 
@@ -465,7 +465,7 @@ public class Controller {
 				}
 
 				logger.error("LOCK FAILURE!");
-				logger.error("Failed to lock " + this.locator + ". Trying again...");
+				logger.error("Failed to lock {}. Trying again...", this.locator);
 				logger.error("LOCK FAILURE!");
 			}
 		}

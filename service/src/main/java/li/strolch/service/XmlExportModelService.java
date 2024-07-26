@@ -75,8 +75,8 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 			}
 		}
 
-		logger.info("Exporting: " + arg);
-		logger.info("Exporting model to real path: " + modelFile.getAbsolutePath());
+		logger.info("Exporting: {}", arg);
+		logger.info("Exporting model to real path: {}", modelFile.getAbsolutePath());
 
 		XmlExportModelCommand command;
 		String realm;

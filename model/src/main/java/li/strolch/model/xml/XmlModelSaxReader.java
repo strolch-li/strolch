@@ -269,9 +269,8 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 				PolicyDef policyDef = PolicyDef.valueOf(policyType, policyValue);
 				if (policyDef instanceof JavaPolicyDef j && !j.isClassExists()) {
-					logger.error(
-							"Policy invalid for " + policyType + " = " + policyValue + ": class does not exist for "
-									+ this.parameterizedElement.getLocator());
+					logger.error("Policy invalid for {} = {}: class does not exist for {}", policyType, policyValue,
+							this.parameterizedElement.getLocator());
 				}
 
 				this.policies.addOrUpdate(policyDef);

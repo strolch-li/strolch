@@ -61,7 +61,7 @@ public class MethodExpression extends AbstractObjectExpression {
 		try {
 			result = method.invoke(object, arguments.toArray());
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			logger.error("Failed to call method " + this.methodName + " on class " + object.getClass().getName(), e);
+			logger.error("Failed to call method {} on class {}", this.methodName, object.getClass().getName(), e);
 			return null;
 		}
 

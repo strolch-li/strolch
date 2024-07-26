@@ -96,7 +96,7 @@ public class ProcessHelper {
 				sb.append("=====================================\n");
 			}
 
-			logger.info("Command ended after " + StringHelper.formatNanoDuration(System.nanoTime() - start));
+			logger.info("Command ended after {}", StringHelper.formatNanoDuration(System.nanoTime() - start));
 			return new ProcessResult(returnValue[0], sb.toString(), null);
 
 		} catch (IOException e) {
@@ -160,7 +160,7 @@ public class ProcessHelper {
 		if (processResult.returnValue == 0) {
 			logger.info("Process executed successfully");
 		} else if (processResult.returnValue == -1) {
-			logger.error("Process execution failed:\n" + processResult.processOutput);
+			logger.error("Process execution failed:\n{}", processResult.processOutput);
 			logger.error(processResult.throwable.getMessage(), processResult.throwable);
 		} else {
 			String msg = "Process execution was not successful with return value:{0}\n{1}";

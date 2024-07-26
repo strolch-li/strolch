@@ -40,8 +40,8 @@ public class SynchronizedMapOfMapsTest {
 
 			while (run.get()) {
 				mapOfMaps.forEach(
-						(s, subTypeMap) -> subTypeMap.forEach((s1, s2) -> logger.info(s + " " + s1 + " " + s2)));
-				mapOfMaps.getMap("Resource").forEach((s1, s2) -> logger.info("  " + s1 + " " + s2));
+						(s, subTypeMap) -> subTypeMap.forEach((s1, s2) -> logger.info("{} {} {}", s, s1, s2)));
+				mapOfMaps.getMap("Resource").forEach((s1, s2) -> logger.info("  {} {}", s1, s2));
 			}
 
 			return true;
@@ -69,7 +69,7 @@ public class SynchronizedMapOfMapsTest {
 					Set<String> subTypes = subTypeMap.keySet();
 					synchronized (mapOfMaps) {
 						for (String subType : subTypes) {
-							logger.info(type + " " + subType + " " + mapOfMaps.getElement(type, subType));
+							logger.info("{} {} {}", type, subType, mapOfMaps.getElement(type, subType));
 						}
 					}
 				}
@@ -77,7 +77,7 @@ public class SynchronizedMapOfMapsTest {
 				synchronized (mapOfMaps) {
 					Map<String, String> resources = mapOfMaps.getMap("Resource");
 					for (String value : resources.values()) {
-						logger.info("Resource: value: " + value);
+						logger.info("Resource: value: {}", value);
 					}
 				}
 			}

@@ -116,7 +116,7 @@ public class MigrationsTest {
 
 		@Override
 		public void migrate(ComponentContainer container, Certificate cert) {
-			logger.info("[" + this.realm + "] Running migration " + this.getVersion());
+			logger.info("[{}] Running migration {}", this.realm, this.getVersion());
 
 			try (StrolchTransaction tx = openTx(container, cert)) {
 
@@ -143,7 +143,7 @@ public class MigrationsTest {
 
 		@Override
 		public void migrate(ComponentContainer container, Certificate cert) {
-			logger.info("[" + this.realm + "] Running migration " + this.getVersion());
+			logger.info("[{}] Running migration {}", this.realm, this.getVersion());
 
 			try (StrolchTransaction tx = openTx(container, cert)) {
 
@@ -170,7 +170,7 @@ public class MigrationsTest {
 
 		@Override
 		public void migrate(ComponentContainer container, Certificate cert) {
-			logger.info("[" + this.realm + "] Running migration " + this.getVersion());
+			logger.info("[{}] Running migration {}", this.realm, this.getVersion());
 
 			try (StrolchTransaction tx = openTx(container, cert)) {
 

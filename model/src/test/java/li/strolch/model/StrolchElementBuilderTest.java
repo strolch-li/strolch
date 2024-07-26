@@ -137,7 +137,7 @@ public class StrolchElementBuilderTest {
 		MapOfMaps<String, String, StrolchRootElement> elementsByType = templates.stream().collect(MapOfMaps::new,
 				(map, element) -> map.addElement(element.getObjectType(), element.getId(), element), MapOfMaps::putAll);
 		assertEquals(5, elementsByType.size());
-		elementsByType.forEach((t, map) -> map.values().forEach(element -> logger.info("\n" + element.toXmlString())));
+		elementsByType.forEach((t, map) -> map.values().forEach(element -> logger.info("\n{}", element.toXmlString())));
 
 		Resource carT = (Resource) elementsByType.getElement(Tags.RESOURCE, "Car");
 		assertEquals(TEMPLATE, carT.getType());
@@ -222,6 +222,6 @@ public class StrolchElementBuilderTest {
 
 		car1.setString("color", "green");
 		car1.setRelationId("owner", "me!");
-		logger.info("\n" + car1.toXmlString());
+		logger.info("\n{}", car1.toXmlString());
 	}
 }

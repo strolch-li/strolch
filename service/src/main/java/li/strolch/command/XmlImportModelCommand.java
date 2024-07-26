@@ -82,7 +82,7 @@ public class XmlImportModelCommand extends Command {
 
 	@Override
 	public void undo() {
-		logger.warn("Not undoing import of file " + this.modelFile);
+		logger.warn("Not undoing import of file {}", this.modelFile);
 	}
 
 	public void setFailOnUpdate(boolean failOnUpdate) {

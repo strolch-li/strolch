@@ -1653,14 +1653,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			try {
 				undoCommands();
 			} catch (Exception ex) {
-				logger.error("Failed to commit transaction and then undo commands due to " + ex.getMessage(), ex);
+				logger.error("Failed to commit transaction and then undo commands due to {}", ex.getMessage(), ex);
 				try {
 					rollback();
 					handleRollback(start);
 				} catch (Exception exc) {
-					logger.error("Failed to roll back after failing to undo commands: " + exc.getMessage(), exc);
+					logger.error("Failed to roll back after failing to undo commands: {}", exc.getMessage(), exc);
 				}
-				logger.error("Transaction failed due to " + e.getMessage(), e);
+				logger.error("Transaction failed due to {}", e.getMessage(), e);
 				handleFailure(false, start, ex);
 			}
 

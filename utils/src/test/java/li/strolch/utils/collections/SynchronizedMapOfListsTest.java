@@ -40,8 +40,8 @@ public class SynchronizedMapOfListsTest {
 			}
 
 			while (run.get()) {
-				mapOfLists.forEach((s, list) -> list.forEach(s1 -> logger.info(s + " " + s1)));
-				mapOfLists.getList("Resource").forEach(s1 -> logger.info("  " + s1));
+				mapOfLists.forEach((s, list) -> list.forEach(s1 -> logger.info("{} {}", s, s1)));
+				mapOfLists.getList("Resource").forEach(s1 -> logger.info("  {}", s1));
 			}
 
 			return true;
@@ -67,7 +67,7 @@ public class SynchronizedMapOfListsTest {
 				for (String type : types) {
 					synchronized (mapOfLists) {
 						for (String id : mapOfLists.getList(type)) {
-							logger.info(type + " " + id);
+							logger.info("{} {}", type, id);
 						}
 					}
 				}
@@ -75,7 +75,7 @@ public class SynchronizedMapOfListsTest {
 				synchronized (mapOfLists) {
 					List<String> resources = mapOfLists.getList("Resource");
 					for (String value : resources) {
-						logger.info("Resource: value: " + value);
+						logger.info("Resource: value: {}", value);
 					}
 				}
 			}

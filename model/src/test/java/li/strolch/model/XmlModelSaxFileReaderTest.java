@@ -71,7 +71,7 @@ public class XmlModelSaxFileReaderTest {
 		assertEquals(3, activityMap.size());
 
 		ModelStatistics statistics = handler.getStatistics();
-		logger.info("Parsing took " + StringHelper.formatNanoDuration(statistics.durationNanos));
+		logger.info("Parsing took {}", StringHelper.formatNanoDuration(statistics.durationNanos));
 		assertEquals(3, statistics.nrOfOrders);
 		assertEquals(3, statistics.nrOfResources);
 		assertEquals(3, statistics.nrOfActivities);

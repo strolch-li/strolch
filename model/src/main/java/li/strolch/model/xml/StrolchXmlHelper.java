@@ -100,7 +100,7 @@ public class StrolchXmlHelper {
 			throw new RuntimeException("Failed to write elements to " + file, e);
 		}
 
-		logger.info("Wrote " + elements.size() + " elements to file " + file);
+		logger.info("Wrote {} elements to file {}", elements.size(), file);
 	}
 
 	public static void writeToFile(File file, Stream<? extends StrolchRootElement> elements) {
@@ -115,7 +115,7 @@ public class StrolchXmlHelper {
 			throw new RuntimeException("Failed to write elements to " + file, e);
 		}
 
-		logger.info("Wrote " + size + " elements to file " + file);
+		logger.info("Wrote {} elements to file {}", size, file);
 	}
 
 	public static void writeToWriter(Writer writer, Collection<? extends StrolchRootElement> elements) {

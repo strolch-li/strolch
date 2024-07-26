@@ -89,8 +89,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			this.certificateMap.putAll(certificates);
 		}
 		checkSessionsForTimeout();
-		logger.info("Restored " + certificates.size() + " sessions of which " +
-				(certificates.size() - this.certificateMap.size()) + " had timed out and were removed.");
+		logger.info("Restored {} sessions of which {} had timed out and were removed.", certificates.size(),
+				certificates.size() - this.certificateMap.size());
 	}
 
 	@Override

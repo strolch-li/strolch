@@ -101,7 +101,7 @@ public class AesCryptoHelper {
 			throw new RuntimeException("Failed to encrypt file " + clearTextFileS + " to " + encryptedFileS, e);
 		}
 
-		logger.info("Encrypted file " + clearTextFileS + " to " + encryptedFileS);
+		logger.info("Encrypted file {} to {}", clearTextFileS, encryptedFileS);
 	}
 
 	public static void encrypt(char[] password, byte[] salt, InputStream inFile, OutputStream outFile) {
@@ -156,7 +156,7 @@ public class AesCryptoHelper {
 			throw new RuntimeException("Failed to decrypt file " + decryptedFileS + " to " + decryptedFileS, e);
 		}
 
-		logger.info("Decrypted file " + encryptedFileS + " to " + decryptedFileS);
+		logger.info("Decrypted file {} to {}", encryptedFileS, decryptedFileS);
 
 	}
 

@@ -40,8 +40,8 @@ public class SynchronizedMapOfSetsTest {
 			}
 
 			while (run.get()) {
-				mapOfSets.forEach((s, list) -> list.forEach(s1 -> logger.info(s + " " + s1)));
-				mapOfSets.getSet("Resource").forEach(s1 -> logger.info("  " + s1));
+				mapOfSets.forEach((s, list) -> list.forEach(s1 -> logger.info("{} {}", s, s1)));
+				mapOfSets.getSet("Resource").forEach(s1 -> logger.info("  {}", s1));
 			}
 
 			return true;
@@ -67,7 +67,7 @@ public class SynchronizedMapOfSetsTest {
 				for (String type : types) {
 					synchronized (mapOfSets) {
 						for (String id : mapOfSets.getSet(type)) {
-							logger.info(type + " " + id);
+							logger.info("{} {}", type, id);
 						}
 					}
 				}
@@ -75,7 +75,7 @@ public class SynchronizedMapOfSetsTest {
 				synchronized (mapOfSets) {
 					Set<String> resources = mapOfSets.getSet("Resource");
 					for (String value : resources) {
-						logger.info("Resource: value: " + value);
+						logger.info("Resource: value: {}", value);
 					}
 				}
 			}

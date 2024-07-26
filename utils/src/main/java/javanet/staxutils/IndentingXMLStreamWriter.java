@@ -277,7 +277,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 				writeEndElement(); // indented
 			}
 		} catch (Exception ignorable) {
-			logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
+			logger.error("Ignoring exception {}", getExceptionMessage(ignorable, true), ignorable);
 		}
 		this.out.writeEndDocument();
 		afterEndDocument();
@@ -297,7 +297,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 					afterMarkup(); // indentation was written
 				}
 			} catch (Exception e) {
-				logger.error("Failed beforeMarkup: " + getExceptionMessage(e, true), e);
+				logger.error("Failed beforeMarkup: {}", getExceptionMessage(e, true), e);
 			}
 		}
 	}
@@ -346,7 +346,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 			try {
 				writeNewLine(this.depth - 1);
 			} catch (Exception ignorable) {
-				logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
+				logger.error("Ignoring exception {}", getExceptionMessage(ignorable, true), ignorable);
 			}
 		}
 	}
@@ -368,7 +368,7 @@ public class IndentingXMLStreamWriter extends StreamWriterDelegate implements In
 			try {
 				writeNewLine(0);
 			} catch (Exception ignorable) {
-				logger.error("Ignoring exception " + getExceptionMessage(ignorable, true), ignorable);
+				logger.error("Ignoring exception {}", getExceptionMessage(ignorable, true), ignorable);
 			}
 		}
 		this.stack[this.depth] = 0; // start fresh

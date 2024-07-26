@@ -153,16 +153,16 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	}
 
 	protected void stopControllers(String realm) {
-		logger.info("Stopping controllers for realm " + realm + "...");
+		logger.info("Stopping controllers for realm {}...", realm);
 		synchronized (this.controllers) {
 			Map<Locator, Controller> map = this.controllers.getMap(realm);
 			if (map == null) {
-				logger.info("No controllers for realm " + realm);
+				logger.info("No controllers for realm {}", realm);
 				return;
 			}
 
 			map.values().forEach(controller -> {
-				logger.info("Stopping controller " + controller);
+				logger.info("Stopping controller {}", controller);
 				controller.stopExecutions();
 			});
 
@@ -186,7 +186,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		if (this.controllers.containsElement(realm, locator))
 			throw new IllegalStateException(locator + " is already registered for execution!");
 
-		logger.info("Added " + locator + " @ " + realm);
+		logger.info("Added {} @ {}", locator, realm);
 		Controller controller = newController(realm, activity);
 		this.controllers.addElement(realm, locator, controller);
 		notifyObserverAdd(controller);
@@ -241,11 +241,10 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public void removeFromExecution(Controller controller) {
 		if (this.controllers.removeElement(controller.getRealm(), controller.getLocator()) != null) {
-			logger.info("Removed controller " + controller.getLocator() + " from execution.");
+			logger.info("Removed controller {} from execution.", controller.getLocator());
 			getExecutor().submit(() -> notifyObserverRemove(controller));
 		} else {
-			logger.error(
-					"Controller " + controller.getRealm() + " " + controller.getLocator() + " was already removed.");
+			logger.error("Controller {} {} was already removed.", controller.getRealm(), controller.getLocator());
 		}
 	}
 
@@ -300,7 +299,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					activity = activity.getClone(true);
 
 				Locator locator = activity.getRootElement().getLocator();
-				logger.info("Restarting Execution of " + locator + " on realm " + realmName);
+				logger.info("Restarting Execution of {} on realm {}", locator, realmName);
 
 				// in execution actions need to be in state STOPPED to restart
 				activity.findActionsDeep(a -> a.getState().inExecutionPhase()).forEach(a -> {
@@ -321,7 +320,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		}
 
 		// trigger execution of the registered activities
-		logger.info("Triggering execution for realm " + realmName + " after reloading activities...");
+		logger.info("Triggering execution for realm {} after reloading activities...", realmName);
 		triggerExecution(realmName);
 	}
 
@@ -338,11 +337,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	public void triggerExecution(String realm) {
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.Paused) {
-			logger.warn("Ignoring trigger for paused realm " + realm);
+			logger.warn("Ignoring trigger for paused realm {}", realm);
 			return;
 		}
 
-		logger.info("Triggering execution for all controllers on realm " + realm + "...");
+		logger.info("Triggering execution for all controllers on realm {}...", realm);
 		getExecutor().execute(() -> {
 			synchronized (this.controllers) {
 				controllerStream(realm).forEach(this::toExecution);
@@ -355,11 +354,11 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		String realm = controller.getRealm();
 		ExecutionHandlerState state = this.statesByRealm.getOrDefault(realm, ExecutionHandlerState.Running);
 		if (state == ExecutionHandlerState.Paused) {
-			logger.warn("Ignoring execution of " + controller.getLocator() + " for paused realm " + realm);
+			logger.warn("Ignoring execution of {} for paused realm {}", controller.getLocator(), realm);
 			return;
 		}
 
-		logger.info("Added toExecution task for " + controller.getLocator() + " @ " + realm);
+		logger.info("Added toExecution task for {} @ {}", controller.getLocator(), realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -367,12 +366,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				boolean trigger = controller.execute();
 
 				if (trigger) {
-					logger.info("Triggering of controllers for realm " + realm + " after executing " + controller);
+					logger.info("Triggering of controllers for realm {} after executing {}", realm, controller);
 					triggerExecution(realm);
 				}
 
 			} catch (Exception e) {
-				logger.error("Failed to set " + controller.getLocator() + " to execution", e);
+				logger.error("Failed to set {} to execution", controller.getLocator(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
@@ -391,7 +390,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toExecuted(String realm, Locator locator) {
-		logger.info("Added toExecuted task for " + locator + " @ " + realm);
+		logger.info("Added toExecuted task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -402,7 +401,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				triggerExecution(realm);
 
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to executed due to " + e.getMessage(), e);
+				logger.error("Failed to set {} to executed due to {}", locator, e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
@@ -421,7 +420,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toStopped(String realm, Locator locator) {
-		logger.warn("Added toStopped task for " + locator + " @ " + realm);
+		logger.warn("Added toStopped task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -430,7 +429,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					controller.toStopped(locator);
 
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to stopped due to " + e.getMessage(), e);
+				logger.error("Failed to set {} to stopped due to {}", locator, e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
@@ -449,7 +448,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toError(String realm, Locator locator) {
-		logger.error("Added toError task for " + locator + " @ " + realm);
+		logger.error("Added toError task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -458,7 +457,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					controller.toError(locator);
 
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to error due to " + e.getMessage(), e);
+				logger.error("Failed to set {} to error due to {}", locator, e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
@@ -477,7 +476,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toWarning(String realm, Locator locator) {
-		logger.warn("Added toWarning task for " + locator + " @ " + realm);
+		logger.warn("Added toWarning task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -486,7 +485,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					controller.toWarning(locator);
 
 			} catch (Exception e) {
-				logger.error("Failed to set " + locator + " to warning due to " + e.getMessage(), e);
+				logger.error("Failed to set {} to warning due to {}", locator, e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
@@ -505,7 +504,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void archiveActivity(String realm, Locator activityLoc) {
-		logger.info("Added archiveActivity task for " + activityLoc + " @ " + realm);
+		logger.info("Added archiveActivity task for {} @ {}", activityLoc, realm);
 		Locator trimmedLocator = trimLocator(activityLoc);
 		getExecutor().execute(() -> {
 			try {
@@ -519,7 +518,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					}
 				});
 			} catch (Exception e) {
-				logger.error("Failed to archive " + trimmedLocator + " due to " + e.getMessage(), e);
+				logger.error("Failed to archive {} due to {}", trimmedLocator, e.getMessage(), e);
 
 				if (getContainer().hasComponent(OperationsLog.class)) {
 					getComponent(OperationsLog.class).addMessage(
@@ -633,7 +632,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 						config.setString(PARAM_STATE, ExecutionHandlerState.Running);
 						tx.update(config);
 						tx.commitOnClose();
-						logger.error("Failed to read unhandled state " + currentState, e);
+						logger.error("Failed to read unhandled state {}", currentState, e);
 					}
 
 					this.statesByRealm.put(realm, state);

@@ -77,7 +77,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		this.container = container;
 
-		logger.info("Initializing Realm " + getRealm() + "...");
+		logger.info("Initializing Realm {}...", getRealm());
 
 		// audits
 		String enableAuditKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL);
@@ -107,21 +107,21 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		this.versioningEnabled = configuration.getBoolean(enableVersioningKey, false);
 
 		if (this.auditTrailEnabled)
-			logger.info("Enabling AuditTrail for realm " + getRealm());
+			logger.info("Enabling AuditTrail for realm {}", getRealm());
 		else
-			logger.info("AuditTrail not enabled for realm " + getRealm());
+			logger.info("AuditTrail not enabled for realm {}", getRealm());
 		if (this.auditTrailEnabledForRead)
-			logger.info("Enabling AuditTrail for read for realm " + getRealm());
+			logger.info("Enabling AuditTrail for read for realm {}", getRealm());
 		else
-			logger.info("AuditTrail not enabled for read for realm " + getRealm());
+			logger.info("AuditTrail not enabled for read for realm {}", getRealm());
 		if (this.updateObservers)
-			logger.info("Enabling Observer Updates for realm " + getRealm());
+			logger.info("Enabling Observer Updates for realm {}", getRealm());
 		else
-			logger.info("Observer Updates not enabled for realm " + getRealm());
+			logger.info("Observer Updates not enabled for realm {}", getRealm());
 		if (this.versioningEnabled)
-			logger.info("Enabling Versioning for realm " + getRealm());
+			logger.info("Enabling Versioning for realm {}", getRealm());
 		else
-			logger.info("Versioning not enabled for realm " + getRealm());
+			logger.info("Versioning not enabled for realm {}", getRealm());
 
 		logger.info(MessageFormat.format("Using a locking try timeout of {0}s", timeUnit.toSeconds(time)));
 	}

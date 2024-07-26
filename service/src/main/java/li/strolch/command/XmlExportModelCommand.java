@@ -145,10 +145,10 @@ public class XmlExportModelCommand extends Command {
 		}
 
 		this.elementsToWrite = this.nrOfResourcesToExport + this.nrOfOrdersToExport + this.nrOfActivitiesToExport;
-		logger.info("Exporting " + this.elementsToWrite + " Elements...");
-		logger.info("Exporting " + this.nrOfResourcesToExport + " Resources...");
-		logger.info("Exporting " + this.nrOfOrdersToExport + " Orders...");
-		logger.info("Exporting " + this.nrOfActivitiesToExport + " Activities...");
+		logger.info("Exporting {} Elements...", this.elementsToWrite);
+		logger.info("Exporting {} Resources...", this.nrOfResourcesToExport);
+		logger.info("Exporting {} Orders...", this.nrOfOrdersToExport);
+		logger.info("Exporting {} Activities...", this.nrOfActivitiesToExport);
 
 		try (OutputStream out = Files.newOutputStream(this.modelFile.toPath())) {
 			createdFiles.add(this.modelFile);
@@ -173,8 +173,8 @@ public class XmlExportModelCommand extends Command {
 
 						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
-						logger.info("Writing " + resourceMap.querySize(tx(), type) + " " + type + " Resources to path: "
-								+ typeXmlFileF.getAbsolutePath() + "...");
+						logger.info("Writing {} {} Resources to path: {}...", resourceMap.querySize(tx(), type), type,
+								typeXmlFileF.getAbsolutePath());
 						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = StrolchXmlHelper.prepareXmlStreamWriter(typeOut);
@@ -202,8 +202,8 @@ public class XmlExportModelCommand extends Command {
 
 						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
-						logger.info("Writing " + orderMap.querySize(tx(), type) + " " + type + " Orders to path: "
-								+ typeXmlFileF.getAbsolutePath() + "...");
+						logger.info("Writing {} {} Orders to path: {}...", orderMap.querySize(tx(), type), type,
+								typeXmlFileF.getAbsolutePath());
 						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = StrolchXmlHelper.prepareXmlStreamWriter(typeOut);
@@ -232,9 +232,8 @@ public class XmlExportModelCommand extends Command {
 
 						File typeXmlFileF = new File(this.modelFile.getParentFile(), typeXmlFile);
 						DBC.INTERIM.assertNotExists("The type file should not exist with name.", typeXmlFileF);
-						logger.info(
-								"Writing " + activityMap.querySize(tx(), type) + " " + type + " Activities to path: "
-										+ typeXmlFileF.getAbsolutePath() + "...");
+						logger.info("Writing {} {} Activities to path: {}...", activityMap.querySize(tx(), type), type,
+								typeXmlFileF.getAbsolutePath());
 						try (OutputStream typeOut = Files.newOutputStream(typeXmlFileF.toPath())) {
 							createdFiles.add(typeXmlFileF);
 							XMLStreamWriter typeWriter = StrolchXmlHelper.prepareXmlStreamWriter(typeOut);
@@ -267,7 +266,7 @@ public class XmlExportModelCommand extends Command {
 
 	@Override
 	public void undo() {
-		logger.warn("Not undoing export to file " + this.modelFile);
+		logger.warn("Not undoing export to file {}", this.modelFile);
 	}
 
 	private void writeOrdersByType(XMLStreamWriter writer, OrderMap orderMap, String type) {
@@ -302,7 +301,7 @@ public class XmlExportModelCommand extends Command {
 
 	private void logElementsWritten() {
 		if (this.nextLogTime < System.currentTimeMillis()) {
-			logger.info("Wrote " + this.statistics.getNrOfElements() + " of " + this.elementsToWrite + " Elements.");
+			logger.info("Wrote {} of {} Elements.", this.statistics.getNrOfElements(), this.elementsToWrite);
 			this.nextLogTime = System.currentTimeMillis() + LOG_INTERVAL;
 		}
 	}

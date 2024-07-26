@@ -73,7 +73,7 @@ public class TexHelper {
 			if (texFiles == null)
 				throw new IllegalStateException("No tex files found!");
 			Arrays.asList(texFiles).forEach(file -> {
-				logger.info("Deleting old path " + file);
+				logger.info("Deleting old path {}", file);
 				FileHelper.deleteFile(file, false);
 			});
 

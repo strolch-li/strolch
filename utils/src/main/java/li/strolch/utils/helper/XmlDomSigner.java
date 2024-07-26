@@ -158,13 +158,13 @@ public class XmlDomSigner {
 			if (!coreValidity) {
 				logger.error("Signature failed core validation");
 				boolean sv = signature.getSignatureValue().validate(valContext);
-				logger.error("signature validation status: " + sv);
+				logger.error("signature validation status: {}", sv);
 				if (!sv) {
 					// Check the validation status of each Reference.
 					Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
 					for (int j = 0; i.hasNext(); j++) {
 						boolean refValid = ((Reference) i.next()).validate(valContext);
-						logger.error("ref[" + j + "] validity status: " + refValid);
+						logger.error("ref[{}] validity status: {}", j, refValid);
 					}
 				}
 				throw new RuntimeException("Uh-oh validation, failed!");

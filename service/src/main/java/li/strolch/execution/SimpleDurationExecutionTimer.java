@@ -39,7 +39,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 		ScheduledFuture<?> future = this.simulationTasks.remove(locator);
 		if (future != null) {
 			if (!future.cancel(false)) {
-				logger.warn("Failed to cancel task " + locator);
+				logger.warn("Failed to cancel task {}", locator);
 			}
 		}
 	}
@@ -63,12 +63,12 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 	public void execute(String realm, ComponentContainer container, Locator actionLocator, long duration) {
 		synchronized (this.simulationTasks) {
 			if (this.simulationTasks.containsKey(actionLocator)) {
-				logger.warn("Ignoring duplicate timer for locator " + actionLocator);
+				logger.warn("Ignoring duplicate timer for locator {}", actionLocator);
 			} else {
 				SimulationTask task = new SimulationTask(realm, container, actionLocator);
 				ScheduledFuture<?> future = getExecutor().schedule(task, duration, TimeUnit.MILLISECONDS);
 				this.simulationTasks.put(actionLocator, future);
-				logger.info("Scheduled a delay of " + formatMillisecondsDuration(duration) + " for " + actionLocator);
+				logger.info("Scheduled a delay of {} for {}", formatMillisecondsDuration(duration), actionLocator);
 			}
 		}
 	}
@@ -82,7 +82,7 @@ public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 		this.simulationTasks.remove(locator);
 		ExecutionHandler executionHandler = container.getComponent(ExecutionHandler.class);
 
-		logger.info("Completing task " + locator);
+		logger.info("Completing task {}", locator);
 		executionHandler.toExecuted(realm, locator);
 	}
 

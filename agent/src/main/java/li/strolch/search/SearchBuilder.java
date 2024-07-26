@@ -258,7 +258,7 @@ public class SearchBuilder {
 		case Tags.Json.NAME -> {
 			return searchResult.orderByName(descending);
 		}
-		default -> logger.warn("Unhandled ordering " + orderBy);
+		default -> logger.warn("Unhandled ordering {}", orderBy);
 		}
 
 		return searchResult;
