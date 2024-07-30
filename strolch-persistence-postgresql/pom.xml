@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>li.strolch</groupId>
@@ -10,9 +9,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>websocket</artifactId>
-    <name>strolch-websocket</name>
-    <description>WebSocket API for Strolch</description>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>strolch-persistence-postgresql</artifactId>
+    <name>strolch-persistence-postgresql</name>
+    <description>PostgreSQL Persistence Implementation for Strolch</description>
     <inceptionYear>2011</inceptionYear>
 
     <distributionManagement>
@@ -37,53 +37,26 @@
         <!-- main -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>strolch-model</artifactId>
         </dependency>
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>agent</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>service</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>soql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>web-rest</artifactId>
+            <artifactId>strolch-agent</artifactId>
         </dependency>
 
-        <!-- utils -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-
-        <!-- websocket -->
-        <dependency>
-            <groupId>jakarta.websocket</groupId>
-            <artifactId>jakarta.websocket-api</artifactId>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
         </dependency>
         <dependency>
-            <groupId>jakarta.websocket</groupId>
-            <artifactId>jakarta.websocket-client-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
 
         <!-- test -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>test-base</artifactId>
+            <artifactId>strolch-test-base</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -103,7 +76,6 @@
     </dependencies>
 
     <build>
-
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -113,6 +85,7 @@
                 </excludes>
                 <includes>
                     <include>**/*.properties</include>
+                    <include>**/*.sql</include>
                 </includes>
             </resource>
             <resource>
@@ -125,10 +98,12 @@
         </resources>
 
         <plugins>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
+
         </plugins>
     </build>
 </project>

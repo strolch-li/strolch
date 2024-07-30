@@ -10,10 +10,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>test-performance</artifactId>
-    <name>strolch-test-performance</name>
-    <description>Strolch project for running performance tests</description>
-    <inceptionYear>2015</inceptionYear>
+    <artifactId>strolch-persistence-xml</artifactId>
+    <name>strolch-persistence.xml</name>
+    <description>Reference Persistence Implementation for Strolch</description>
+    <inceptionYear>2011</inceptionYear>
 
     <distributionManagement>
         <site>
@@ -21,10 +21,6 @@
             <url>file://${project.basedir}/../target/${project.artifactId}</url>
         </site>
     </distributionManagement>
-
-    <properties>
-        <perfTestDisabled>true</perfTestDisabled>
-    </properties>
 
     <dependencies>
 
@@ -38,33 +34,25 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
 
+        <!-- main -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>strolch-model</artifactId>
         </dependency>
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>agent</artifactId>
+            <artifactId>strolch-agent</artifactId>
         </dependency>
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>service</artifactId>
-        </dependency>
-
-        <!-- underlying DB -->
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>persistence-postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>persistence-xml</artifactId>
+            <artifactId>strolch-xmlpers</artifactId>
         </dependency>
 
         <!-- test -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>test-base</artifactId>
+            <artifactId>strolch-test-base</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -86,17 +74,21 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/componentVersion.properties</exclude>
+                </excludes>
                 <includes>
                     <include>**/*.properties</include>
+                    <include>**/*.sql</include>
                 </includes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/*.properties</exclude>
-                </excludes>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/componentVersion.properties</include>
+                </includes>
             </resource>
         </resources>
 
@@ -107,33 +99,6 @@
                 <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>${perfTestDisabled}</skipTests>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <configuration>
-                    <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
-
-    <profiles>
-
-        <profile>
-            <id>performanceTest</id>
-            <properties>
-                <perfTestDisabled>false</perfTestDisabled>
-            </properties>
-        </profile>
-
-    </profiles>
 </project>

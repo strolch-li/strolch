@@ -10,10 +10,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>agent</artifactId>
-    <name>strolch-agent</name>
-    <description>Strolch Agent which is the runtime for Strolch</description>
-    <inceptionYear>2011</inceptionYear>
+    <artifactId>strolch-soql</artifactId>
+    <packaging>jar</packaging>
+    <name>strolch-soql</name>
+    <inceptionYear>2012</inceptionYear>
 
     <distributionManagement>
         <site>
@@ -23,6 +23,12 @@
     </distributionManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>${antlr.version}</version>
+        </dependency>
 
         <!-- Base -->
         <dependency>
@@ -34,22 +40,24 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
 
-        <!-- main -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>strolch-utils</artifactId>
         </dependency>
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>privilege</artifactId>
+            <artifactId>strolch-privilege</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>ch.eitchnet</groupId>
-            <artifactId>cron</artifactId>
+            <groupId>li.strolch</groupId>
+            <artifactId>strolch-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>li.strolch</groupId>
+            <artifactId>strolch-agent</artifactId>
         </dependency>
 
-        <!-- test -->
+        <!-- Test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -71,7 +79,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>**/agentVersion.properties</exclude>
+                    <exclude>**/componentVersion.properties</exclude>
                 </excludes>
                 <includes>
                     <include>**/*.properties</include>
@@ -81,11 +89,10 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/agentVersion.properties</include>
+                    <include>**/componentVersion.properties</include>
                 </includes>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

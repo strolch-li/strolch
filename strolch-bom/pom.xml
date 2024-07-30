@@ -26,59 +26,59 @@
         <dependencies>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>agent</artifactId>
+                <artifactId>strolch-agent</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>model</artifactId>
+                <artifactId>strolch-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>service</artifactId>
+                <artifactId>strolch-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>persistence-postgresql</artifactId>
+                <artifactId>strolch-persistence-postgresql</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>persistence-xml</artifactId>
+                <artifactId>strolch-persistence-xml</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>privilege</artifactId>
+                <artifactId>strolch-privilege</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>web-rest</artifactId>
+                <artifactId>strolch-web-rest</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>soql</artifactId>
+                <artifactId>strolch-soql</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>utils</artifactId>
+                <artifactId>strolch-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>websocket</artifactId>
+                <artifactId>strolch-websocket</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <!-- test -->
             <dependency>
                 <groupId>li.strolch</groupId>
-                <artifactId>test-base</artifactId>
+                <artifactId>strolch-test-base</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>

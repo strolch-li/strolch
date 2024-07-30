@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>li.strolch</groupId>
@@ -9,10 +10,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>persistence-postgresql</artifactId>
-    <name>strolch-persistence-postgresql</name>
-    <description>PostgreSQL Persistence Implementation for Strolch</description>
+    <artifactId>strolch-xmlpers</artifactId>
+    <packaging>jar</packaging>
+    <name>strolch-xmlpers</name>
     <inceptionYear>2011</inceptionYear>
 
     <distributionManagement>
@@ -34,29 +34,15 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
 
-        <!-- main -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>li.strolch</groupId>
-            <artifactId>agent</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>strolch-utils</artifactId>
         </dependency>
 
         <!-- test -->
         <dependency>
             <groupId>li.strolch</groupId>
-            <artifactId>test-base</artifactId>
+            <artifactId>strolch-test-base</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -76,34 +62,11 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/componentVersion.properties</exclude>
-                </excludes>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.sql</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/componentVersion.properties</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
-
         </plugins>
     </build>
 </project>
