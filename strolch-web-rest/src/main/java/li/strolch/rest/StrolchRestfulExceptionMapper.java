@@ -28,15 +28,17 @@ import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.utils.helper.ExceptionHelper.*;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {
@@ -46,10 +48,12 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 	@Override
 	public Response toResponse(Exception ex) {
 
-		logger.error(MessageFormat.format("Handling exception {0}", ex.getClass()), ex);
+		logger.error("Handling exception {}", ex.getClass(), ex);
 
 		RestfulStrolchComponent instance = RestfulStrolchComponent.getInstance();
-		if (instance.hasComponent(OperationsLog.class)) {
+		boolean isNotAccessDeniedException = !hasCause(ex, AccessDeniedException.class) && !hasCause(ex,
+				StrolchAccessDeniedException.class);
+		if (isNotAccessDeniedException && instance.hasComponent(OperationsLog.class)) {
 			try {
 				String username = CertificateThreadLocal.hasCert() ? CertificateThreadLocal.getCert().getUsername() :
 						"anonymous";
@@ -68,6 +72,7 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 
 		return switch (ex) {
 			case NotFoundException ignored -> ResponseUtil.toResponse(Status.NOT_FOUND, ex);
+			case AccessDeniedException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.getMessage());
 			case StrolchAccessDeniedException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
 			case StrolchNotAuthenticatedException e -> {
 				logger.error("User tried to access resource, but was not authenticated: {}", ex.getMessage());

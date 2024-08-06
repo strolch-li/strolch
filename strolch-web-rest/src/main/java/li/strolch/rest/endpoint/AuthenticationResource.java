@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.core.Response.Status;
+import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.base.AccessDeniedException;
@@ -179,7 +180,7 @@ public class AuthenticationResource {
 		Status status;
 		if (hasCause(e, InvalidCredentialsException.class)) {
 			status = Status.UNAUTHORIZED;
-		} else if (hasCause(e, AccessDeniedException.class)) {
+		} else if (hasCause(e, AccessDeniedException.class) || hasCause(e, StrolchAccessDeniedException.class)) {
 			status = Status.UNAUTHORIZED;
 		} else if (hasCause(e, StrolchException.class)) {
 			status = Status.FORBIDDEN;

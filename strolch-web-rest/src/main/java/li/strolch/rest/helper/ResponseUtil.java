@@ -7,10 +7,7 @@ import com.google.gson.JsonObject;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import li.strolch.exception.StrolchElementNotFoundException;
-import li.strolch.exception.StrolchException;
-import li.strolch.exception.StrolchNotAuthenticatedException;
-import li.strolch.exception.StrolchUserMessageException;
+import li.strolch.exception.*;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
@@ -148,6 +145,7 @@ public class ResponseUtil {
 			Throwable rootCause = getRootCause(t);
 			status = switch (rootCause) {
 				case AccessDeniedException ignored -> Status.FORBIDDEN;
+				case StrolchAccessDeniedException ignored -> Status.FORBIDDEN;
 				case PrivilegeException ignored -> Status.UNAUTHORIZED;
 				case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
 				case null, default -> Status.INTERNAL_SERVER_ERROR;
@@ -162,6 +160,7 @@ public class ResponseUtil {
 		return switch (rootCause) {
 			case StrolchNotAuthenticatedException ignored -> toResponse(Status.UNAUTHORIZED, rootCause);
 			case AccessDeniedException ignored -> toResponse(Status.FORBIDDEN, rootCause);
+			case StrolchAccessDeniedException ignored -> toResponse(Status.FORBIDDEN, rootCause);
 			case StrolchElementNotFoundException ignored -> toResponse(Status.NOT_FOUND, rootCause);
 			case PrivilegeException ignored -> toResponse(Status.FORBIDDEN, rootCause);
 			case null, default -> toResponse(Status.INTERNAL_SERVER_ERROR, rootCause);
