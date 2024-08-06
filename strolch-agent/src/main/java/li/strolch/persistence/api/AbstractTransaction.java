@@ -854,7 +854,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotEmpty("refId", refId);
 		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId);
 		if (refsP == null)
-			return null;
+			return List.of();
 		return getOrdersBy(refsP);
 	}
 
@@ -970,7 +970,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotEmpty("refId", refId);
 		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId);
 		if (refsP == null)
-			return null;
+			return List.of();
 		return getResourcesBy(refsP);
 	}
 
@@ -981,7 +981,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotEmpty("refId", refId);
 		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId, assertExists);
 		if (!assertExists && refsP == null)
-			return null;
+			return List.of();
 		return getResourcesBy(refsP, assertExists);
 	}
 
@@ -1098,7 +1098,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		DBC.PRE.assertNotEmpty("refId", refId);
 		StringListParameter refsP = element.getParameter(BAG_RELATIONS, refId);
 		if (refsP == null)
-			return null;
+			return List.of();
 		return getActivitiesBy(refsP);
 	}
 
