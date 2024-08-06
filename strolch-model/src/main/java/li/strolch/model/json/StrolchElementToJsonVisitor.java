@@ -1,15 +1,5 @@
 package li.strolch.model.json;
 
-import static java.util.Arrays.asList;
-import static java.util.Comparator.comparing;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.model.Tags.Json.*;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -30,6 +20,16 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+
+import static java.util.Arrays.asList;
+import static java.util.Comparator.comparing;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.model.Tags.Json.*;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
 
@@ -514,12 +514,10 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 				JsonObject elementJ = new JsonObject();
 				elementsJ.add(elementJ);
 
-				if (activityElement instanceof Activity) {
-					toJson((Activity) activityElement, elementJ, currentDepth + 1);
-				} else if (activityElement instanceof Action) {
-					toJson((Action) activityElement, elementJ);
-				} else {
-					throw new IllegalArgumentException("Unhandled element " + activityElement.getClass());
+				switch (activityElement) {
+					case Activity activity -> toJson(activity, elementJ, currentDepth + 1);
+					case Action action -> toJson(action, elementJ);
+					default -> throw new IllegalArgumentException("Unhandled element " + activityElement.getClass());
 				}
 			}
 		}
