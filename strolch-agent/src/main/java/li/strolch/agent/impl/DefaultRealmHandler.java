@@ -42,6 +42,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead";
 	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates";
 	public static final String PROP_ENABLE_VERSIONING = "enableVersioning";
+	public static final String PROP_TX_LOGGING_THRESHOLD_MS = "txLoggingThresholdMs";
 	public static final String PREFIX_DATA_STORE_MODE = "dataStoreMode";
 	public static final String PREFIX_DATA_STORE_FILE = "dataStoreFile";
 	public static final String PROP_REALMS = "realms";

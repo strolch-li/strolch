@@ -19,6 +19,7 @@ import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.Locator;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.utils.concurrent.ElementLockingHandler;
 
 /**
  * <p>
@@ -53,30 +54,27 @@ public interface StrolchRealm {
 	/**
 	 * Locks the element with the given {@link Locator}
 	 *
-	 * @param locator
-	 * 		the locator of the element to lock
+	 * @param locator the locator of the element to lock
 	 *
-	 * @see LockHandler#lock(Locator)
+	 * @see ElementLockingHandler#lock(Object)
 	 */
 	void lock(Locator locator);
 
 	/**
 	 * Unlocks the element with the given {@link Locator} (lock might still be held, if lock counter is used)
 	 *
-	 * @param locator
-	 * 		the locator of the element to unlock
+	 * @param locator the locator of the element to unlock
 	 *
-	 * @see LockHandler#unlock(Locator)
+	 * @see ElementLockingHandler#unlock(Object)
 	 */
 	void unlock(Locator locator);
 
 	/**
 	 * Releases the lock for the given element
 	 *
-	 * @param locator
-	 * 		the locator of the element for which to release the lock
+	 * @param locator the locator of the element for which to release the lock
 	 *
-	 * @see LockHandler#releaseLock(Locator)
+	 * @see ElementLockingHandler#releaseLock(Object)
 	 */
 	void releaseLock(Locator locator);
 
@@ -90,12 +88,9 @@ public interface StrolchRealm {
 	/**
 	 * Opens a {@link StrolchTransaction} for the given certificate
 	 *
-	 * @param certificate
-	 * 		the authenticated certificate
-	 * @param clazz
-	 * 		to give the transaction an action name
-	 * @param readOnly
-	 * 		if this TX is read-only
+	 * @param certificate the authenticated certificate
+	 * @param clazz       to give the transaction an action name
+	 * @param readOnly    if this TX is read-only
 	 *
 	 * @return the newly created transaction
 	 */
@@ -104,12 +99,9 @@ public interface StrolchRealm {
 	/**
 	 * Opens a {@link StrolchTransaction} for the given certificate
 	 *
-	 * @param certificate
-	 * 		the authenticated certificate
-	 * @param action
-	 * 		to give the transaction an action name
-	 * @param readOnly
-	 * 		if this TX is read-only
+	 * @param certificate the authenticated certificate
+	 * @param action      to give the transaction an action name
+	 * @param readOnly    if this TX is read-only
 	 *
 	 * @return the newly created transaction
 	 */
@@ -144,12 +136,19 @@ public interface StrolchRealm {
 	boolean isVersioningEnabled();
 
 	/**
+	 * Returns the minimum duration of a TX to enable logging if the TX was successful. If it failed, then it will be
+	 * logged in any case.
+	 *
+	 * @return the minimum duration of a TX for it to be logged
+	 */
+	long getTxLogDurationThresholdMs();
+
+	/**
 	 * Returns the {@link ObserverHandler} if observer updates are enabled
 	 *
 	 * @return the {@link ObserverHandler} if observer updates are enabled
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if observer updates are not enabled
+	 * @throws IllegalArgumentException if observer updates are not enabled
 	 */
 	ObserverHandler getObserverHandler() throws IllegalArgumentException;
 }

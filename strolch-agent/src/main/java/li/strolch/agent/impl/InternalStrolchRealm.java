@@ -47,6 +47,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	private ObserverHandler observerHandler;
 
 	protected ComponentContainer container;
+	private long txLoggingThresholdMs;
 
 	public InternalStrolchRealm(String realm) {
 		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm);
@@ -106,6 +107,9 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		String enableVersioningKey = makeRealmKey(getRealm(), PROP_ENABLE_VERSIONING);
 		this.versioningEnabled = configuration.getBoolean(enableVersioningKey, false);
 
+		String txLoggingThresholdMsKey = makeRealmKey(getRealm(), PROP_TX_LOGGING_THRESHOLD_MS);
+		this.txLoggingThresholdMs = configuration.getLong(txLoggingThresholdMsKey, 0L);
+
 		if (this.auditTrailEnabled)
 			logger.info("Enabling AuditTrail for realm {}", getRealm());
 		else
@@ -144,6 +148,11 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	@Override
 	public boolean isVersioningEnabled() {
 		return this.versioningEnabled;
+	}
+
+	@Override
+	public long getTxLogDurationThresholdMs() {
+		return this.txLoggingThresholdMs;
 	}
 
 	@Override

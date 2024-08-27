@@ -69,6 +69,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private final MapOfMaps<String, String, Activity> activityCache;
 
 	private TransactionCloseStrategy closeStrategy;
+	private long globalSilentThreshold;
 	private long silentThreshold;
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
@@ -101,6 +102,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.realm = (InternalStrolchRealm) realm;
 		this.action = action;
 		this.certificate = certificate;
+		this.globalSilentThreshold = TimeUnit.MILLISECONDS.toNanos(realm.getTxLogDurationThresholdMs());
 
 		this.commands = new ArrayList<>();
 		this.flushedCommands = new ArrayList<>();
@@ -1763,6 +1765,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
 
+		if (this.globalSilentThreshold > 0L && txDuration < this.globalSilentThreshold)
+			return;
 		if (this.silentThreshold > 0L && txDuration < this.silentThreshold)
 			return;
 
@@ -1801,6 +1805,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.txResult.setTxDuration(txDuration);
 		this.txResult.setCloseDuration(closeDuration);
 
+		if (this.globalSilentThreshold > 0L && txDuration < this.globalSilentThreshold)
+			return;
 		if (this.silentThreshold > 0L && txDuration < this.silentThreshold)
 			return;
 
