@@ -1,26 +1,20 @@
 package li.strolch.utils;
 
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Simple {@link ThreadFactory} which allocates as a pool and has a name for each pool
  */
 public class NamedThreadPoolFactory implements ThreadFactory {
-	private final ThreadGroup group;
-	private final AtomicInteger threadNumber = new AtomicInteger(1);
-	private final String poolName;
+	private final ThreadFactory factory;
 
 	public NamedThreadPoolFactory(String poolName) {
-		this.group = Thread.currentThread().getThreadGroup();
-		this.poolName = poolName + "-";
+		this.factory = Thread.ofPlatform().name(poolName + "-", 0).factory();
 	}
 
 	@Override
 	public Thread newThread(Runnable r) {
-		Thread t = new Thread(this.group, r, this.poolName + this.threadNumber.getAndIncrement(), 0);
-		if (t.isDaemon())
-			t.setDaemon(false);
+		Thread t = this.factory.newThread(r);
 		if (t.getPriority() != Thread.NORM_PRIORITY)
 			t.setPriority(Thread.NORM_PRIORITY);
 		return t;
