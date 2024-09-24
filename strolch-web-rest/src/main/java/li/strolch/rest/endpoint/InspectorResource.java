@@ -53,6 +53,7 @@ import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import org.glassfish.grizzly.utils.StringFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -64,6 +65,7 @@ import java.io.FileWriter;
 import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
@@ -406,7 +408,7 @@ public class InspectorResource {
 	@Path("{realm}/resources/{type}")
 	public Response queryResourcesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
 			@PathParam("realm") String realm, @PathParam("type") String type,
-			@QueryParam("overview") Boolean overview) {
+			@QueryParam("overview") boolean overview) {
 
 		queryData.initializeUnsetFields();
 		Certificate cert = validateCertificate(request);
@@ -427,7 +429,7 @@ public class InspectorResource {
 
 		// build JSON response
 		ResourceVisitor<JsonObject> visitor;
-		if (overview == null || !overview) {
+		if (!overview) {
 			visitor = new StrolchRootElementToJsonVisitor().withLocator().asResourceVisitor();
 		} else {
 			visitor = e -> {
@@ -451,7 +453,7 @@ public class InspectorResource {
 	@Path("{realm}/orders/{type}")
 	public Response queryOrdersByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
 			@PathParam("realm") String realm, @PathParam("type") String type,
-			@QueryParam("overview") Boolean overview) {
+			@QueryParam("overview") boolean overview) {
 
 		queryData.initializeUnsetFields();
 		Certificate cert = validateCertificate(request);
@@ -472,7 +474,7 @@ public class InspectorResource {
 
 		// build JSON response
 		OrderVisitor<JsonObject> visitor;
-		if (overview == null || !overview) {
+		if (!overview) {
 			visitor = new StrolchRootElementToJsonVisitor().withLocator().asOrderVisitor();
 		} else {
 			visitor = e -> {
@@ -498,7 +500,7 @@ public class InspectorResource {
 	@Path("{realm}/activities/{type}")
 	public Response queryActivitiesByType(@Context HttpServletRequest request, @BeanParam QueryData queryData,
 			@PathParam("realm") String realm, @PathParam("type") String type,
-			@QueryParam("overview") Boolean overview) {
+			@QueryParam("overview") boolean overview) {
 
 		queryData.initializeUnsetFields();
 		Certificate cert = validateCertificate(request);
@@ -519,7 +521,7 @@ public class InspectorResource {
 
 		// build JSON response
 		ActivityVisitor<JsonObject> visitor;
-		if (overview == null || !overview) {
+		if (!overview) {
 			visitor = new StrolchRootElementToJsonVisitor().withLocator().asActivityVisitor();
 		} else {
 			visitor = e -> {
@@ -649,9 +651,10 @@ public class InspectorResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}/{id}")
 	public Response getResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") boolean flat) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -662,11 +665,16 @@ public class InspectorResource {
 		}
 
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
-		if (Boolean.parseBoolean(flat))
+		if (flat)
 			visitor.flat();
 
 		JsonElement jsonElement = resource.accept(visitor);
 		return Response.ok().entity(jsonElement.toString()).build();
+	}
+
+	private static String decodeId(String id) {
+		id = id.startsWith("b64_") ? new String(Base64.getDecoder().decode(id.substring(4))) : id;
+		return id;
 	}
 
 	@GET
@@ -676,6 +684,7 @@ public class InspectorResource {
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Resource resource;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -693,9 +702,10 @@ public class InspectorResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}/{id}")
 	public Response getOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") boolean flat) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -706,7 +716,7 @@ public class InspectorResource {
 		}
 
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
-		if (Boolean.parseBoolean(flat))
+		if (flat)
 			visitor.flat();
 		JsonElement jsonElement = order.accept(visitor);
 		return Response.ok().entity(jsonElement.toString()).build();
@@ -719,6 +729,7 @@ public class InspectorResource {
 			@PathParam("type") String type, @PathParam("id") String id) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Order order;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -736,9 +747,10 @@ public class InspectorResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}/{id}")
 	public Response getActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flat) {
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") boolean flat) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -749,7 +761,7 @@ public class InspectorResource {
 		}
 
 		StrolchElementToJsonVisitor visitor = new StrolchElementToJsonVisitor().withLocator().withVersion();
-		if (Boolean.parseBoolean(flat))
+		if (flat)
 			visitor.flat();
 		JsonElement jsonElement = activity.accept(visitor);
 		return Response.ok().entity(jsonElement.toString()).build();
@@ -762,6 +774,7 @@ public class InspectorResource {
 			@PathParam("type") String type, @PathParam("id") String id) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Activity activity;
 		try (StrolchTransaction tx = openTx(cert, realm)) {
@@ -783,6 +796,7 @@ public class InspectorResource {
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Resource resource = parseResourceFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, resource.getId());
@@ -807,10 +821,10 @@ public class InspectorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}/{id}")
 	public Response updateResourceAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") boolean flat, String data) {
 
 		Certificate cert = validateCertificate(request);
-		boolean flat = Boolean.parseBoolean(flatS);
+		id = decodeId(id);
 
 		UpdateResourceService svc = new UpdateResourceService();
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
@@ -861,6 +875,7 @@ public class InspectorResource {
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Order order = parseOrderFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, order.getId());
@@ -885,10 +900,10 @@ public class InspectorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}/{id}")
 	public Response updateOrderAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") boolean flat, String data) {
 
 		Certificate cert = validateCertificate(request);
-		boolean flat = Boolean.parseBoolean(flatS);
+		id = decodeId(id);
 
 		UpdateOrderService svc = new UpdateOrderService();
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
@@ -939,6 +954,7 @@ public class InspectorResource {
 			@PathParam("type") String type, @PathParam("id") String id, String data) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		Activity activity = parseActivityFromXml(type, data);
 		DBC.INTERIM.assertEquals("Posted id must be same as request!", id, activity.getId());
@@ -963,10 +979,10 @@ public class InspectorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}/{id}")
 	public Response updateActivityAsJson(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") String flatS, String data) {
+			@PathParam("type") String type, @PathParam("id") String id, @QueryParam("flat") boolean flat, String data) {
 
 		Certificate cert = validateCertificate(request);
-		boolean flat = Boolean.parseBoolean(flatS);
+		id = decodeId(id);
 
 		UpdateActivityService svc = new UpdateActivityService();
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
@@ -1060,10 +1076,9 @@ public class InspectorResource {
 			logger.error(e.getMessage(), e);
 			return toResponse(e);
 		} finally {
-			if (tempFile != null) {
-				if (!tempFile.delete())
-					logger.error("Failed to delete temp file {}", tempFile.getAbsolutePath());
-			}
+			if (tempFile != null && !tempFile.delete())
+				logger.error("Failed to delete temp file {}", tempFile.getAbsolutePath());
+
 		}
 	}
 
@@ -1130,10 +1145,9 @@ public class InspectorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}")
 	public Response addResourceAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
+			@PathParam("type") String type, @QueryParam("flat") boolean flat, String data) {
 
 		Certificate cert = validateCertificate(request);
-		boolean flat = Boolean.parseBoolean(flatS);
 
 		Resource resource = parseNewResourceFromJson(cert, realm, type, data, flat);
 
@@ -1211,10 +1225,9 @@ public class InspectorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}")
 	public Response addOrderAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
+			@PathParam("type") String type, @QueryParam("flat") boolean flat, String data) {
 
 		Certificate cert = validateCertificate(request);
-		boolean flat = Boolean.parseBoolean(flatS);
 
 		Order order = parseNewOrderFromJson(cert, realm, type, data, flat);
 
@@ -1294,10 +1307,9 @@ public class InspectorResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
 	public Response addActivityAsJsonFlat(@Context HttpServletRequest request, @PathParam("realm") String realm,
-			@PathParam("type") String type, @QueryParam("flat") String flatS, String data) {
+			@PathParam("type") String type, @QueryParam("flat") boolean flat, String data) {
 
 		Certificate cert = validateCertificate(request);
-		boolean flat = Boolean.parseBoolean(flatS);
 
 		Activity activity = parseNewActivityFromJson(cert, realm, type, data, flat);
 
@@ -1331,7 +1343,7 @@ public class InspectorResource {
 		arg.realm = realm;
 
 		for (String id : ids.split(",")) {
-			Locator locator = Resource.locatorFor(type, id.trim());
+			Locator locator = Resource.locatorFor(type, decodeId(id.trim()).trim());
 			arg.locators.add(locator);
 		}
 
@@ -1352,7 +1364,7 @@ public class InspectorResource {
 		arg.realm = realm;
 
 		for (String id : ids.split(",")) {
-			Locator locator = Order.locatorFor(type, id.trim());
+			Locator locator = Order.locatorFor(type, decodeId(id.trim()));
 			arg.locators.add(locator);
 		}
 
@@ -1373,7 +1385,7 @@ public class InspectorResource {
 		arg.realm = realm;
 
 		for (String id : ids.split(",")) {
-			Locator locator = Activity.locatorFor(type, id.trim());
+			Locator locator = Activity.locatorFor(type, decodeId(id.trim()));
 			arg.locators.add(locator);
 		}
 
@@ -1388,6 +1400,7 @@ public class InspectorResource {
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		RemoveResourceService svc = new RemoveResourceService();
 		LocatorArgument arg = svc.getArgumentInstance();
@@ -1405,6 +1418,7 @@ public class InspectorResource {
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		RemoveOrderService svc = new RemoveOrderService();
 		LocatorArgument arg = svc.getArgumentInstance();
@@ -1422,6 +1436,7 @@ public class InspectorResource {
 			@PathParam("id") String id, @Context HttpServletRequest request) {
 
 		Certificate cert = validateCertificate(request);
+		id = decodeId(id);
 
 		RemoveActivityService svc = new RemoveActivityService();
 		LocatorArgument arg = svc.getArgumentInstance();
@@ -1439,23 +1454,20 @@ public class InspectorResource {
 			getSaxParser().parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
 			if (listener.getResources().isEmpty())
-				throw new StrolchPersistenceException(
-						"No Resource parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
-																	   ""));
+				throw new StrolchPersistenceException("No Resource parsed from xml value" + (
+						StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 			if (listener.getResources().size() > 1)
-				throw new StrolchPersistenceException(
-						"Multiple Resources parsed from xml value" + (StringHelper.isNotEmpty(type) ?
-																			  " for type " + type : ""));
+				throw new StrolchPersistenceException("Multiple Resources parsed from xml value" + (
+						StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 
-			resource = listener.getResources().get(0);
+			resource = listener.getResources().getFirst();
 			resource.setVersion(null);
 
 			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, resource.getType());
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException(
-					"Failed to extract Resource from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
-																		   ""), e);
+			throw new StrolchPersistenceException("Failed to extract Resource from xml value" + (
+					StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
 		}
 		return resource;
 	}
@@ -1470,19 +1482,17 @@ public class InspectorResource {
 				throw new StrolchPersistenceException(
 						"No Order parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 			if (listener.getOrders().size() > 1)
-				throw new StrolchPersistenceException(
-						"Multiple Orders parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
-																		   ""));
+				throw new StrolchPersistenceException("Multiple Orders parsed from xml value" + (
+						StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 
-			order = listener.getOrders().get(0);
+			order = listener.getOrders().getFirst();
 			order.setVersion(null);
 
 			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, order.getType());
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException(
-					"Failed to extract Order from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
-																		""), e);
+			throw new StrolchPersistenceException("Failed to extract Order from xml value" + (
+					StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
 		}
 		return order;
 	}
@@ -1494,23 +1504,20 @@ public class InspectorResource {
 			getSaxParser().parse(new InputSource(new StringReader(data)), new XmlModelSaxReader(listener));
 
 			if (listener.getActivities().isEmpty())
-				throw new StrolchPersistenceException(
-						"No Activity parsed from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
-																	   ""));
+				throw new StrolchPersistenceException("No Activity parsed from xml value" + (
+						StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 			if (listener.getActivities().size() > 1)
-				throw new StrolchPersistenceException(
-						"Multiple Activities parsed from xml value" + (StringHelper.isNotEmpty(type) ?
-																			   " for type " + type : ""));
+				throw new StrolchPersistenceException("Multiple Activities parsed from xml value" + (
+						StringHelper.isNotEmpty(type) ? " for type " + type : ""));
 
-			activity = listener.getActivities().get(0);
+			activity = listener.getActivities().getFirst();
 			activity.setVersion(null);
 
 			DBC.INTERIM.assertEquals("Posted type must be same as request!", type, activity.getType());
 
 		} catch (Exception e) {
-			throw new StrolchPersistenceException(
-					"Failed to extract Activity from xml value" + (StringHelper.isNotEmpty(type) ? " for type " + type :
-																		   ""), e);
+			throw new StrolchPersistenceException("Failed to extract Activity from xml value" + (
+					StringHelper.isNotEmpty(type) ? " for type " + type : ""), e);
 		}
 		return activity;
 	}
