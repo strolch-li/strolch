@@ -150,7 +150,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage, keepAlive);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		logger.info("{} sessions currently active.", this.certificateMap.size());
+		if (usage.isAny())
+			logger.info("{} sessions currently active.", this.certificateMap.size());
 
 		return certificate;
 	}

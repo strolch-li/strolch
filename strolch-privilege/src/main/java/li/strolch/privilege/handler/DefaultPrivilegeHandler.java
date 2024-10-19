@@ -452,24 +452,26 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			Certificate certificate = buildPrivilegeContext(usage, user, source, ZonedDateTime.now(),
 					keepAlive).getCertificate();
 
-			persistSessionsAsync();
+			if (usage.isAny()) {
+				persistSessionsAsync();
 
-			// save last login
-			UserHistory history = user.getHistory().withLastLogin(ZonedDateTime.now());
-			if (history.isFirstLoginEmpty())
-				history = history.withFirstLogin(ZonedDateTime.now());
+				// save last login
+				UserHistory history = user.getHistory().withLastLogin(ZonedDateTime.now());
+				if (history.isFirstLoginEmpty())
+					history = history.withFirstLogin(ZonedDateTime.now());
 
-			if (!this.persistenceHandler.hasUser(user.getUsername())) {
-				// for remote, the user won't exist, if it is the user's first login
-				this.persistenceHandler.addUser(user.withHistory(history));
-			} else {
-				// otherwise we replace the user
-				this.persistenceHandler.replaceUser(user.withHistory(history));
+				if (!this.persistenceHandler.hasUser(user.getUsername())) {
+					// for remote, the user won't exist, if it is the user's first login
+					this.persistenceHandler.addUser(user.withHistory(history));
+				} else {
+					// otherwise we replace the user
+					this.persistenceHandler.replaceUser(user.withHistory(history));
+				}
+				persistModelAsync();
+
+				// log
+				logger.info("User {} authenticated: {}", username, certificate);
 			}
-			persistModelAsync();
-
-			// log
-			logger.info("User {} authenticated: {}", username, certificate);
 
 			// return the certificate
 			return certificate;
@@ -812,15 +814,17 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
 
 		// persist sessions
-		if (privilegeContext != null)
+		if (privilegeContext != null && privilegeContext.getCertificate().getUsage().isAny())
 			persistSessionsAsync();
 
 		// return true if object was really removed
 		boolean loggedOut = privilegeContext != null;
-		if (loggedOut)
-			logger.info("User {} logged out.", certificate.getUsername());
-		else
+		if (loggedOut) {
+			if (certificate.getUsage().isAny())
+				logger.info("User {} logged out.", certificate.getUsername());
+		} else {
 			logger.warn("User already logged out!");
+		}
 
 		return loggedOut;
 	}

@@ -15,19 +15,18 @@
  */
 package li.strolch.rest.filters;
 
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
-
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
-
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.rest.RestfulStrolchComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 /**
  * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
@@ -49,7 +48,7 @@ public class AuthenticationResponseFilter implements ContainerResponseFilter {
 			return;
 
 		if (cert.getUsage().isSingle()) {
-			logger.info("Invalidating single usage certificate for {}", cert.getUsername());
+			logger.debug("Invalidating single usage certificate for {}", cert.getUsername());
 			RestfulStrolchComponent.getInstance().getSessionHandler().invalidate(cert);
 		} else if (cert.getUsage().isSetPassword()) {
 			// if not acceptable, then user can try again
