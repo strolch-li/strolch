@@ -107,8 +107,9 @@ public class PrivilegeContextBuilder {
 			}
 			Map<String, String> groupProperties = group.getProperties();
 			for (String key : groupProperties.keySet()) {
-				String replaced = this.properties.put(key, groupProperties.get(key));
-				if (replaced != null)
+				String value = groupProperties.get(key);
+				String replaced = this.properties.put(key, value);
+				if (replaced != null && !replaced.equals(value))
 					logger.error("Duplicate property {} for user {} from group {}", key, user.getUsername(), groupName);
 			}
 		}
