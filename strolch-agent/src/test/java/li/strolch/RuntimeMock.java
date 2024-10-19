@@ -110,9 +110,8 @@ public class RuntimeMock implements AutoCloseable {
 			throw new RuntimeException(msg);
 		}
 
-		logger.info(
-				MessageFormat.format("Mocking runtime from {0} to {1}", this.srcPathF.getAbsolutePath(),
-						this.targetPathF.getAbsolutePath()));
+		logger.info("Mocking runtime from {} to {}", this.srcPathF.getAbsolutePath(),
+				this.targetPathF.getAbsolutePath());
 
 		// setup the container
 		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", this.srcPathF,

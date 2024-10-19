@@ -147,7 +147,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage, keepAlive);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size()));
+		logger.info("{} sessions currently active.", this.certificateMap.size());
 
 		return certificate;
 	}
@@ -157,7 +157,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size()));
+		logger.info("{} sessions currently active.", this.certificateMap.size());
 
 		return certificate;
 	}
@@ -167,7 +167,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		Certificate certificate = this.privilegeHandler.authenticateSingleSignOn(data, source);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size()));
+		logger.info("{} sessions currently active.", this.certificateMap.size());
 
 		return certificate;
 	}
@@ -178,7 +178,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		invalidate(certificate);
 		this.certificateMap.put(refreshedSession.getAuthToken(), refreshedSession);
-		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size()));
+		logger.info("{} sessions currently active.", this.certificateMap.size());
 
 		return refreshedSession;
 	}
@@ -260,7 +260,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken()));
+			logger.error("No session was registered with token {}", certificate.getAuthToken());
 
 		this.privilegeHandler.invalidate(certificate);
 	}
@@ -283,7 +283,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		Certificate certificate = this.privilegeHandler.getPrivilegeHandler().validateChallenge(username, challenge);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size()));
+		logger.info("{} sessions currently active.", this.certificateMap.size());
 
 		return certificate;
 	}
@@ -297,7 +297,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 				.validateChallenge(username, challenge, source);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		logger.info(MessageFormat.format("{0} sessions currently active.", this.certificateMap.size()));
+		logger.info("{} sessions currently active.", this.certificateMap.size());
 
 		return certificate;
 	}
@@ -331,7 +331,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error(MessageFormat.format("No session was registered with token {0}", certificate.getAuthToken()));
+			logger.error("No session was registered with token {}", certificate.getAuthToken());
 
 		this.privilegeHandler.sessionTimeout(certificate);
 	}

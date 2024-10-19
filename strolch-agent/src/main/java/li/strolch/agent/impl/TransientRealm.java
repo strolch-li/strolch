@@ -129,12 +129,10 @@ public class TransientRealm extends InternalStrolchRealm {
 		}
 
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat
-				.format("Loaded XML Model file {0} for realm {1} took {2}.", this.modelFile.getName(),
-						getRealm(), durationS));
-		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders));
-		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources));
-		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities));
+		logger.info("Loaded XML Model file {} for realm {} took {}.", this.modelFile.getName(), getRealm(), durationS);
+		logger.info("Loaded {} Orders", statistics.nrOfOrders);
+		logger.info("Loaded {} Resources", statistics.nrOfResources);
+		logger.info("Loaded {} Activities", statistics.nrOfActivities);
 	}
 
 	@Override

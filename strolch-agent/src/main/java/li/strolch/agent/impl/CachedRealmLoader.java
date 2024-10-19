@@ -48,7 +48,7 @@ public class CachedRealmLoader {
 
 	public void load(String realm) {
 		long start = System.nanoTime();
-		logger.info(MessageFormat.format("Loading Model from Database for realm {0}...", realm));
+		logger.info("Loading Model from Database for realm {}...", realm);
 
 		if (this.persistenceHandler.supportsPaging()) {
 			loadElementsPagingAsync("Resources", this.persistenceHandler::getResourceDao, this.realm::getResourceMap,
@@ -67,10 +67,10 @@ public class CachedRealmLoader {
 
 		long duration = System.nanoTime() - start;
 		String durationS = StringHelper.formatNanoDuration(duration);
-		logger.info(MessageFormat.format("Loading Model from Database for realm {0} took {1}.", realm, durationS));
-		logger.info(MessageFormat.format("Loaded {0} Orders", this.nrOfOrders));
-		logger.info(MessageFormat.format("Loaded {0} Resources", this.nrOfResources));
-		logger.info(MessageFormat.format("Loaded {0} Activities", this.nrOfActivities));
+		logger.info("Loading Model from Database for realm {} took {}.", realm, durationS);
+		logger.info("Loaded {} Orders", this.nrOfOrders);
+		logger.info("Loaded {} Resources", this.nrOfResources);
+		logger.info("Loaded {} Activities", this.nrOfActivities);
 	}
 
 	private <T extends StrolchRootElement> void loadElements(String context,
@@ -100,7 +100,7 @@ public class CachedRealmLoader {
 		}
 
 		String durationS = StringHelper.formatNanoDuration(System.nanoTime() - start);
-		logger.info(MessageFormat.format("Loading of {0} {1} took {2}.", nrOfElements, context, durationS));
+		logger.info("Loading of {} {} took {}.", nrOfElements, context, durationS);
 	}
 
 	private <T extends StrolchRootElement> void loadElementsPagingAsync(String context,
@@ -147,7 +147,7 @@ public class CachedRealmLoader {
 
 		DBC.POST.assertEquals("Expected size should be same as counter", nrOfElements, counter.get());
 		String durationS = StringHelper.formatNanoDuration(System.nanoTime() - start);
-		logger.info(MessageFormat.format("Loading of {0} {1} took {2}.", counter, context, durationS));
+		logger.info("Loading of {} {} took {}.", counter, context, durationS);
 	}
 
 	private <T extends StrolchRootElement> List<T> loadPage(Function<StrolchTransaction, StrolchDao<T>> daoSupplier,

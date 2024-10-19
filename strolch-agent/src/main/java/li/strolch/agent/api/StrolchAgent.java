@@ -333,7 +333,7 @@ public class StrolchAgent {
 		this.container = container;
 
 		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
-		logger.info(MessageFormat.format("Setup Agent {0}:{1}", config.getApplicationName(), config.getEnvironment()));
+		logger.info("Setup Agent {}:{}", config.getApplicationName(), config.getEnvironment());
 	}
 
 	protected void assertContainerStarted() {

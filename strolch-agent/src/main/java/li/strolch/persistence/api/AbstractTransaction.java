@@ -1684,7 +1684,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public void autoCloseableRollback() {
 		long start = System.nanoTime();
-		logger.warn(format("Rolling back TX for realm {0}...", getRealmName()));
+		logger.warn("Rolling back TX for realm {}...", getRealmName());
 		try {
 			this.txResult.setState(TransactionState.ROLLING_BACK);
 			undoCommands();

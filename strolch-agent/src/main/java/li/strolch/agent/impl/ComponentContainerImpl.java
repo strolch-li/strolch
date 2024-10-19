@@ -348,13 +348,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		logger.info("Garbage collecting after startup...");
 		System.gc();
-		logger.info(MessageFormat.format("System: {0}", SystemHelper.asString()));
-		logger.info(MessageFormat.format("Memory: {0}", SystemHelper.getMemorySummary()));
-		logger.info(MessageFormat.format("Using locale {0} with timezone {1}",
+		logger.info("System: {}", SystemHelper.asString());
+		logger.info("Memory: {}", SystemHelper.getMemorySummary());
+		logger.info("Using locale {} with timezone {}",
 				getAgent().getStrolchConfiguration().getRuntimeConfiguration().getLocale().toLanguageTag(),
-				getTimezone()));
-		logger.info(MessageFormat.format("file.encoding: {0} / sun.jnu.encoding {1}",
-				Charset.defaultCharset().displayName(), System.getProperty("sun.jnu.encoding")));
+				getTimezone());
+		logger.info("file.encoding: {} / sun.jnu.encoding {}", Charset.defaultCharset().displayName(),
+				System.getProperty("sun.jnu.encoding"));
 
 		String tookS = formatNanoDuration(System.nanoTime() - start);
 

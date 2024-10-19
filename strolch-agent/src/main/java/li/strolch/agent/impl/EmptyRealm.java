@@ -91,7 +91,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 	@Override
 	public void start(PrivilegeContext privilegeContext) {
 		super.start(privilegeContext);
-		logger.info(MessageFormat.format("Initialized EMPTY Realm {0}", getRealm()));
+		logger.info("Initialized EMPTY Realm {}", getRealm());
 	}
 
 	@Override

@@ -127,7 +127,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		else
 			logger.info("Versioning not enabled for realm {}", getRealm());
 
-		logger.info(MessageFormat.format("Using a locking try timeout of {0}s", timeUnit.toSeconds(time)));
+		logger.info("Using a locking try timeout of {}s", timeUnit.toSeconds(time));
 	}
 
 	@Override
