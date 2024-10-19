@@ -119,7 +119,7 @@ public class ElementLockingHandler<T> {
 		TypedTuple<ElementLock, Long> tuple = this.lockMap.get(element);
 		ElementLock elementLock = tuple.getFirst();
 		if (elementLock == null || !elementLock.isHeldByCurrentThread()) {
-			logger.error(format("Trying to unlock not locked element {0}", element));
+			logger.error("Trying to unlock not locked element {}", element);
 		} else {
 			unlock(elementLock);
 		}
@@ -138,12 +138,12 @@ public class ElementLockingHandler<T> {
 		TypedTuple<ElementLock, Long> tuple = this.lockMap.get(element);
 		ElementLock elementLock = tuple.getFirst();
 		if (elementLock == null) {
-			logger.error(format("Trying to unlock not locked element {0}", element));
+			logger.error("Trying to unlock not locked element {}", element);
 		} else if (!elementLock.isHeldByCurrentThread()) {
 			if (elementLock.isLocked())
-				logger.error(format("Lock not held by this thread for element {0}", element));
+				logger.error("Lock not held by this thread for element {}", element);
 			else
-				logger.error(format("Element {0} is not locked!", element));
+				logger.error("Element {} is not locked!", element);
 		} else {
 			releaseLock(elementLock);
 		}

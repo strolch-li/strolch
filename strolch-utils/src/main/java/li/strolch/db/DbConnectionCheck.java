@@ -59,7 +59,7 @@ public class DbConnectionCheck {
 
 				try (ResultSet rs = st.executeQuery("select version()")) {
 					if (rs.next()) {
-						logger.info(MessageFormat.format("Connected to: {0}", rs.getString(1)));
+						logger.info("Connected to: {}", rs.getString(1));
 					}
 				}
 

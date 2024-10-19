@@ -107,7 +107,7 @@ public class DbSchemaVersionCheck {
 	 */
 	public DbMigrationState checkSchemaVersion(String realm, DataSource ds) throws DbException {
 
-		logger.info(MessageFormat.format("[{0}:{1}] Checking Schema version for: {2}", this.app, realm, ds));
+		logger.info("[{}:{}] Checking Schema version for: {}", this.app, realm, ds);
 
 		Version expectedDbVersion = getExpectedDbVersion(this.app, this.ctxClass);
 
@@ -293,7 +293,7 @@ public class DbSchemaVersionCheck {
 			throw new DbException(msg);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Creating initial schema version {2}...", this.app, realm, version));
+		logger.info("[{}:{}] Creating initial schema version {}...", this.app, realm, version);
 
 		String sql = getSql(this.app, this.ctxClass, version, "initial");
 
@@ -304,8 +304,7 @@ public class DbSchemaVersionCheck {
 			throw new DbException("Failed to execute schema generation SQL: " + e.getMessage(), e);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Successfully created schema with version {2}", this.app, realm,
-				version));
+		logger.info("[{}:{}] Successfully created schema with version {}", this.app, realm, version);
 	}
 
 	/**
@@ -337,9 +336,7 @@ public class DbSchemaVersionCheck {
 					"Expected version " + expectedVersion + " is weirdly before current version" + currentVersion
 							+ " for " + this.app);
 
-		logger.info(
-				MessageFormat.format("[{0}:{1}] Migrating schema from {2} to {3}...", this.app, realm, currentVersion,
-						expectedVersion));
+		logger.info("[{}:{}] Migrating schema from {} to {}...", this.app, realm, currentVersion, expectedVersion);
 
 		// first get all possible migration scripts
 		List<Version> versions = parseMigrationVersions();
@@ -375,8 +372,7 @@ public class DbSchemaVersionCheck {
 			throw new IllegalStateException("Failed to read current version", e);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Successfully migrated schema to version {2}", this.app, realm,
-				expectedVersion));
+		logger.info("[{}:{}] Successfully migrated schema to version {}", this.app, realm, expectedVersion);
 	}
 
 	public List<Version> parseMigrationVersions() {
@@ -444,8 +440,7 @@ public class DbSchemaVersionCheck {
 			throw new DbException(msg);
 		}
 
-		logger.info(
-				MessageFormat.format("[{0}:{1}] Dropping existing schema version {2}...", this.app, realm, version));
+		logger.info("[{}:{}] Dropping existing schema version {}...", this.app, realm, version);
 
 		String sql = getSql(this.app, this.ctxClass, version, "drop");
 		try (Statement st = con.createStatement()) {
@@ -455,7 +450,6 @@ public class DbSchemaVersionCheck {
 			throw new DbException("Failed to execute schema drop SQL: " + e.getMessage(), e);
 		}
 
-		logger.info(MessageFormat.format("[{0}:{1}] Successfully dropped schema with version {2}", this.app, realm,
-				version));
+		logger.info("[{}:{}] Successfully dropped schema with version {}", this.app, realm, version);
 	}
 }

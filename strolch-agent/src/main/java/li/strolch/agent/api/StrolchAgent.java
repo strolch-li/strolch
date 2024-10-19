@@ -318,8 +318,7 @@ public class StrolchAgent {
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
-		String msg = "[{0}] Setting up Strolch Container using the following paths:";
-		logger.info(MessageFormat.format(msg, environment));
+		logger.info("[{}] Setting up Strolch Container using the following paths:", environment);
 		logger.info(" - Config: {}", configPathF.getAbsolutePath());
 		logger.info(" - Data: {}", dataPathF.getAbsolutePath());
 		logger.info(" - Temp: {}", tempPathF.getAbsolutePath());

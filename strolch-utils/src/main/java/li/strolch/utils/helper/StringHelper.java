@@ -471,8 +471,8 @@ public class StringHelper {
 
 		} else if (shorten) {
 
-			logger.warn(MessageFormat.format("Shortening length of value: {0}", value));
-			logger.warn(MessageFormat.format("Length is: {0} max: {1}", value.length(), length));
+			logger.warn("Shortening length of value: {}", value);
+			logger.warn("Length is: {} max: {}", value.length(), length);
 
 			return value.substring(0, length);
 		}
@@ -540,8 +540,7 @@ public class StringHelper {
 
 			// if no stop found, then break as another sequence should be able to start
 			if (stop == -1) {
-				logger.error(
-						MessageFormat.format("Sequence starts at offset {0} but does not end!", pos));
+				logger.error("Sequence starts at offset {} but does not end!", pos);
 				tmpValue = value;
 				break;
 			}

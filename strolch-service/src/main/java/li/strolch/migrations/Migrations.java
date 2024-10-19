@@ -90,7 +90,7 @@ public class Migrations {
 			MigrationVersion currentVersion = entry.getValue();
 
 			if (this.verbose)
-				logger.info("[" + realm + "] Performing all migrations after " + currentVersion);
+				logger.info("[{}] Performing all migrations after {}", realm, currentVersion);
 
 			Version nextPossibleCodeVersion = currentVersion.codeVersion().add(0, 0, 1);
 			Version nextPossibleDataVersion = currentVersion.dataVersion().add(0, 0, 1);
@@ -100,8 +100,7 @@ public class Migrations {
 			SortedSet<DataMigration> dataMigrations = this.dataMigrations.get(realm);
 			if (dataMigrations != null && !dataMigrations.isEmpty()) {
 				for (DataMigration migration : dataMigrations.tailSet(currentDataMigration)) {
-					String msg = "[{0}] Running data migration {1}";
-					logger.info(MessageFormat.format(msg, realm, migration.getVersion()));
+					logger.info("[{}] Running data migration {}", realm, migration.getVersion());
 					migration.migrate(container, certificate);
 					migrationsRan.addElement(realm, migration.getVersion());
 				}
@@ -110,9 +109,8 @@ public class Migrations {
 			SortedSet<CodeMigration> codeMigrations = this.codeMigrations.get(realm);
 			if (codeMigrations != null && !codeMigrations.isEmpty()) {
 				for (CodeMigration migration : codeMigrations.tailSet(currentCodeMigration)) {
-					String msg = "[{0}] Running code migration {1} {2}";
-					logger.info(
-							MessageFormat.format(msg, realm, migration.getVersion(), migration.getClass().getName()));
+					logger.info("[{}] Running code migration {} {}", realm, migration.getVersion(),
+							migration.getClass().getName());
 					migration.migrate(container, certificate);
 					migrationsRan.addElement(realm, migration.getVersion());
 				}
@@ -123,7 +121,7 @@ public class Migrations {
 			if (this.verbose)
 				logger.info("There were no migrations required!");
 		} else {
-			logger.info("Migrated " + migrationsRan.size() + " realms!");
+			logger.info("Migrated {} realms!", migrationsRan.size());
 			addOperationLogs(migrationsRan);
 		}
 
@@ -181,8 +179,7 @@ public class Migrations {
 						"Current version " + currentVersion.codeVersion() + " is not before next " + migrateVersion,
 						isLaterMigration);
 
-				String msg = "[{0}] Running code migration {1} {2}";
-				logger.info(MessageFormat.format(msg, realm, migrateVersion, migration.getClass().getName()));
+				logger.info("[{}] Running code migration {} {}", realm, migrateVersion, migration.getClass().getName());
 				migration.migrate(this.container, cert);
 				migrationsRan.addElement(realm, migration.getVersion());
 			}
@@ -192,8 +189,7 @@ public class Migrations {
 			if (this.verbose)
 				logger.info("There were no migrations required!");
 		} else {
-			logger.info(
-					"Performed " + migrationsRan.size() + " migrations on " + migrationsRan.sizeKeys() + " realms.");
+			logger.info("Performed {} migrations on {} realms.", migrationsRan.size(), migrationsRan.sizeKeys());
 			addOperationLogs(migrationsRan);
 		}
 		this.migrationsRan = migrationsRan;
@@ -207,21 +203,21 @@ public class Migrations {
 
 			SortedSet<CodeMigration> codeMigrations = allCodeMigrations.get(realm);
 			if (codeMigrations == null || codeMigrations.isEmpty()) {
-				logger.info("[" + realm + "] Found no code migrations.");
+				logger.info("[{}] Found no code migrations.", realm);
 			} else {
-				logger.info("[" + realm + "] Found " + codeMigrations.size() + " code migrations");
+				logger.info("[{}] Found {} code migrations", realm, codeMigrations.size());
 				for (CodeMigration codeMigration : codeMigrations) {
-					logger.info("[" + realm + "] " + codeMigration.getVersion().toString());
+					logger.info("[{}] {}", realm, codeMigration.getVersion().toString());
 				}
 			}
 
 			SortedSet<DataMigration> dataMigrations = allDataMigrations.get(realm);
 			if (dataMigrations == null || dataMigrations.isEmpty()) {
-				logger.info("[" + realm + "] Found no data migrations.");
+				logger.info("[{}] Found no data migrations.", realm);
 			} else {
-				logger.info("[" + realm + "] Found " + dataMigrations.size() + " data migrations");
+				logger.info("[{}] Found {} data migrations", realm, dataMigrations.size());
 				for (DataMigration dataMigration : dataMigrations) {
-					logger.info("[" + realm + "] " + dataMigration.getVersion().toString());
+					logger.info("[{}] {}", realm, dataMigration.getVersion().toString());
 				}
 			}
 		}

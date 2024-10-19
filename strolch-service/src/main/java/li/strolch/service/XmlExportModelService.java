@@ -15,9 +15,6 @@
  */
 package li.strolch.service;
 
-import java.io.File;
-import java.text.MessageFormat;
-
 import li.strolch.command.XmlExportModelCommand;
 import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -25,6 +22,9 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.dbc.DBC;
+
+import java.io.File;
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -99,11 +99,11 @@ public class XmlExportModelService extends AbstractService<XmlExportModelArgumen
 		}
 
 		ModelStatistics statistics = command.getStatistics();
-		String msg = "Wrote XML Model file {0} for realm {1}: {2} at path: {3}";
-		logger.info(MessageFormat.format(msg, modelFile.getName(), realm, statistics, modelFile.getAbsolutePath()));
-		logger.info(MessageFormat.format("Wrote {0} Orders", statistics.nrOfOrders));
-		logger.info(MessageFormat.format("Wrote {0} Resources", statistics.nrOfResources));
-		logger.info(MessageFormat.format("Wrote {0} Activities", statistics.nrOfActivities));
+		logger.info("Wrote XML Model file {} for realm {}: {} at path: {}", modelFile.getName(), realm, statistics,
+				modelFile.getAbsolutePath());
+		logger.info("Wrote {} Orders", statistics.nrOfOrders);
+		logger.info("Wrote {} Resources", statistics.nrOfResources);
+		logger.info("Wrote {} Activities", statistics.nrOfActivities);
 		return ServiceResult.success();
 	}
 }

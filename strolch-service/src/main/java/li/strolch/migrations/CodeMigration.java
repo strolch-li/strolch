@@ -37,7 +37,7 @@ public class CodeMigration extends Migration {
 
 	@Override
 	public void migrate(ComponentContainer container, Certificate certificate) {
-		logger.info("[" + this.realm + "] Running no-op migration " + this.version);
+		logger.info("[{}] Running no-op migration {}", this.realm, this.version);
 	}
 
 	@Override

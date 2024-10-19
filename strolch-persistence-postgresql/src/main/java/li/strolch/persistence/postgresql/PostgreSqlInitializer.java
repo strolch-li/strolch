@@ -60,13 +60,12 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 	protected void initSchemaFromDataStore(DbMigrationState migrationType, String realmName) {
 		boolean needsDbInit = checkNeedsDbInit(migrationType);
 		if (!needsDbInit) {
-			String msg = "Schema for realm {0} had no migration run. No need for data initialization.";
-			logger.info(MessageFormat.format(msg, realmName));
+			logger.info("Schema for realm {} had no migration run. No need for data initialization.", realmName);
 			return;
 		}
 
-		String msg = "Migration for schema for realm {0} was {1} so need to initialize the data from the databaseStore...";
-		logger.info(MessageFormat.format(msg, realmName, migrationType));
+		logger.info("Migration for schema for realm {} was {} so need to initialize the data from the databaseStore...",
+				realmName, migrationType);
 
 		ModelStatistics statistics;
 		try (StrolchTransaction tx = this.persistenceHandler.openTx(this.agent.getContainer().getRealm(realmName),
@@ -79,7 +78,7 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 			statistics = handler.getStatistics();
 			tx.commitOnClose();
 		}
-		logger.info(MessageFormat.format("Realm {0} initialization statistics: {1}", realmName, statistics));
+		logger.info("Realm {} initialization statistics: {}", realmName, statistics);
 	}
 
 	protected boolean checkNeedsDbInit(DbMigrationState migrationType) {

@@ -66,7 +66,7 @@ public abstract class PerformanceTest {
 
 		Version dbVersion = DbSchemaVersionCheck.getExpectedDbVersion(
 				PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH, PostgreSqlPersistenceHandler.class);
-		logger.info(MessageFormat.format("Dropping schema for expected version {0}", dbVersion));
+		logger.info("Dropping schema for expected version {}", dbVersion);
 		String sql = DbSchemaVersionCheck.getSql(PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH,
 				PostgreSqlPersistenceHandler.class, dbVersion, "drop");
 		logger.info(StringHelper.NEW_LINE + "{}", sql);

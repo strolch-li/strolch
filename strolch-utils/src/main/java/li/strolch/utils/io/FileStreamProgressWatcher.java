@@ -49,7 +49,7 @@ public class FileStreamProgressWatcher implements Runnable {
 			try {
 				int percentComplete = this.inputStream.getPercentComplete();
 				if (this.inputStream.isClosed()) {
-					logger.info(MessageFormat.format("Input Stream is closed at: {0}%", percentComplete));
+					logger.info("Input Stream is closed at: {}%", percentComplete);
 					run = false;
 					this.progressListener.end(percentComplete, this.inputStream.getBytesRead());
 				} else if (percentComplete < 100) {
@@ -66,7 +66,7 @@ public class FileStreamProgressWatcher implements Runnable {
 				run = false;
 				int percentComplete = this.inputStream.getPercentComplete();
 				if (percentComplete != 100)
-					logger.info(MessageFormat.format("Work stopped: {0}", e.getLocalizedMessage()));
+					logger.info("Work stopped: {}", e.getLocalizedMessage());
 				this.progressListener.end(percentComplete, this.inputStream.getBytesRead());
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);

@@ -124,9 +124,7 @@ public class RuntimeMock {
 			throw new RuntimeException(msg);
 		}
 
-		logger.info(
-				MessageFormat.format("Mocking runtime from {0} to {1}", srcPathF.getAbsolutePath(),
-						targetPathF.getAbsolutePath()));
+		logger.info("Mocking runtime from {} to {}", srcPathF.getAbsolutePath(), targetPathF.getAbsolutePath());
 
 		// setup the container
 		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", srcPathF, targetPathF);

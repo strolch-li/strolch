@@ -76,7 +76,10 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		try {
 			certificates = runAsAgentWithResult(ctx -> {
 				Certificate cert = ctx.getCertificate();
-				return this.privilegeHandler.getPrivilegeHandler().getCertificates(cert).stream()
+				return this.privilegeHandler
+						.getPrivilegeHandler()
+						.getCertificates(cert)
+						.stream()
 						.filter(c -> !c.getUserState().isSystem())
 						.collect(Collectors.toMap(Certificate::getAuthToken, identity()));
 			});
@@ -245,7 +248,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 	private void persistSessions() {
 		try {
-			runAsAgent(ctx -> this.privilegeHandler.getPrivilegeHandler()
+			runAsAgent(ctx -> this.privilegeHandler
+					.getPrivilegeHandler()
 					.persistSessions(ctx.getCertificate(), ctx.getCertificate().getSource()));
 		} catch (Exception e) {
 			logger.error("Failed to persist sessions", e);
@@ -293,7 +297,8 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		DBC.PRE.assertNotEmpty("username must be set!", username);
 		DBC.PRE.assertNotEmpty("challenge must be set", challenge);
 
-		Certificate certificate = this.privilegeHandler.getPrivilegeHandler()
+		Certificate certificate = this.privilegeHandler
+				.getPrivilegeHandler()
 				.validateChallenge(username, challenge, source);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
@@ -311,15 +316,15 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			if (certificate.isKeepAlive()) {
 
 				if (maxKeepAliveTime.isAfter(certificate.getLoginTime())) {
-					String msg = "KeepAlive for session {0} for user {1} has expired, invalidating session...";
-					logger.info(MessageFormat.format(msg, certificate.getSessionId(), certificate.getUsername()));
+					logger.info("KeepAlive for session {} for user {} has expired, invalidating session...",
+							certificate.getSessionId(), certificate.getUsername());
 					sessionTimeout(certificate);
 				}
 
 			} else {
 				if (timeOutTime.isAfter(certificate.getLastAccess())) {
-					String msg = "Session {0} for user {1} has expired, invalidating session...";
-					logger.info(MessageFormat.format(msg, certificate.getSessionId(), certificate.getUsername()));
+					logger.info("Session {} for user {} has expired, invalidating session...",
+							certificate.getSessionId(), certificate.getUsername());
 					sessionTimeout(certificate);
 				}
 			}

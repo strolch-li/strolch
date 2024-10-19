@@ -160,8 +160,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		long daoRemoved = getDbDao(tx).removeAll();
 
 		if (removed != daoRemoved) {
-			String msg = "Removed {0} elements from cached map, but dao removed {1} elements!";
-			logger.error(MessageFormat.format(msg, removed, daoRemoved));
+			logger.error("Removed {} elements from cached map, but dao removed {} elements!", removed, daoRemoved);
 		}
 
 		return removed;
@@ -177,8 +176,8 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		long daoRemoved = getDbDao(tx).removeAllBy(type);
 
 		if (removed != daoRemoved) {
-			String msg = "Removed {0} elements from cached map for type {1}, but dao removed {3} elements!";
-			logger.error(MessageFormat.format(msg, removed, type, daoRemoved));
+			logger.error("Removed {} elements from cached map for type {}, but dao removed {} elements!", removed, type,
+					daoRemoved);
 		}
 
 		return removed;

@@ -75,8 +75,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * base from which the agent is instantiated.
 	 * </p>
 	 *
-	 * @param appVersion
-	 * 		the app's version
+	 * @param appVersion the app's version
 	 */
 	public StrolchBootstrapper(StrolchVersion appVersion) {
 		DBC.PRE.assertNotNull("appVersion must be set!", appVersion);
@@ -89,8 +88,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * stream. The version is used for information on the code base from which the agent is instantiated.
 	 * </p>
 	 *
-	 * @param appClass
-	 * 		the class where the {@link #APP_VERSION_PROPERTIES} resource resides
+	 * @param appClass the class where the {@link #APP_VERSION_PROPERTIES} resource resides
 	 */
 	public StrolchBootstrapper(Class<?> appClass) {
 		DBC.PRE.assertNotNull("appClass must be set!", appClass);
@@ -171,19 +169,19 @@ public class StrolchBootstrapper extends DefaultHandler {
 				throw new StrolchConfigurationException(msg);
 			}
 		} else if (!rootDstPath.mkdir()) {
-			String msg = "[{0}] Destination root does not exist and could not be created. Either parent does not exist, or permission is denied at {1}";
+			String msg
+					= "[{0}] Destination root does not exist and could not be created. Either parent does not exist, or permission is denied at {1}";
 			msg = MessageFormat.format(msg, environment, rootDstPath.getAbsolutePath());
 			throw new StrolchConfigurationException(msg);
 		}
 
-		String msg = "[{0}] Copying source {1} to {2}";
-		logger.info(
-				MessageFormat.format(msg, environment, rootSrcPath.getAbsolutePath(), rootDstPath.getAbsolutePath()));
+		logger.info("[{}] Copying source {} to {}", environment, rootSrcPath.getAbsolutePath(),
+				rootDstPath.getAbsolutePath());
 
 		if (!FileHelper.copy(rootSrcPath.listFiles(), rootDstPath, true)) {
-			msg = "[{0}] Failed to copy source files from {1} to {2}";
-			msg = MessageFormat.format(msg, environment, rootSrcPath.getAbsolutePath(), rootDstPath.getAbsolutePath());
-			throw new RuntimeException(msg);
+			throw new RuntimeException(
+					MessageFormat.format("[{0}] Failed to copy source files from {1} to {2}", environment,
+							rootSrcPath.getAbsolutePath(), rootDstPath.getAbsolutePath()));
 		}
 
 		this.configPathF = new File(rootDstPath, PATH_CONFIG);
@@ -197,10 +195,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
 	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
 	 *
-	 * @param clazz
-	 * 		the class from which to load the resource as stream
-	 * @param bootstrapFile
-	 * 		the bootstrap file to load
+	 * @param clazz         the class from which to load the resource as stream
+	 * @param bootstrapFile the bootstrap file to load
 	 *
 	 * @return the Agent which is setup
 	 */
@@ -216,10 +212,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
 	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
 	 *
-	 * @param clazz
-	 * 		the class from which to load the resource as stream
-	 * @param bootstrapFile
-	 * 		the input stream to the bootstrap file to load
+	 * @param clazz         the class from which to load the resource as stream
+	 * @param bootstrapFile the input stream to the bootstrap file to load
 	 *
 	 * @return the Agent which is setup
 	 */
@@ -234,10 +228,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 	/**
 	 * Set up Strolch by loading the given bootstrap file for configuration
 	 *
-	 * @param environment
-	 * 		the environment to load from the boostrap file
-	 * @param bootstrapFile
-	 * 		the bootstrap file to load
+	 * @param environment   the environment to load from the boostrap file
+	 * @param bootstrapFile the bootstrap file to load
 	 *
 	 * @return the Agent which is setup
 	 */
@@ -252,10 +244,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 	/**
 	 * Set up Strolch by loading the given bootstrap file for configuration
 	 *
-	 * @param environment
-	 * 		the environment to load from the boostrap file
-	 * @param bootstrapFile
-	 * 		the input stream to the bootstrap file to load
+	 * @param environment   the environment to load from the boostrap file
+	 * @param bootstrapFile the input stream to the bootstrap file to load
 	 *
 	 * @return the Agent which is setup
 	 */
@@ -319,8 +309,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 		if (StringHelper.isEmpty(this.environmentOverride)) {
 			env = this.environment;
 		} else {
-			String msg = "[{0}] Environment override to ''{1}''";
-			logger.info(MessageFormat.format(msg, this.environment, this.environmentOverride));
+			logger.info("[{}] Environment override to ''{}''", this.environment, this.environmentOverride);
 			env = this.environmentOverride;
 		}
 
@@ -334,9 +323,10 @@ public class StrolchBootstrapper extends DefaultHandler {
 		XmlHelper.parseDocument(bootstrapFile, this);
 
 		if (!this.envFound) {
-			throw new StrolchConfigurationException(
-					"Environment " + this.environment + " not configured in bootstrap configuration "
-							+ bootstrapFile.getAbsolutePath());
+			throw new StrolchConfigurationException("Environment "
+					+ this.environment
+					+ " not configured in bootstrap configuration "
+					+ bootstrapFile.getAbsolutePath());
 		}
 
 		evaluatePaths();
@@ -348,7 +338,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 		XmlHelper.parseDocument(bootstrapStream, this);
 
 		if (!this.envFound) {
-			throw new StrolchConfigurationException("Environment " + this.environment
+			throw new StrolchConfigurationException("Environment "
+					+ this.environment
 					+ " not configured in bootstrap configuration from given stream!");
 		}
 
@@ -361,16 +352,19 @@ public class StrolchBootstrapper extends DefaultHandler {
 		if (!this.defaultAllowed) {
 			if (StringHelper.isEmpty(this.configS) || StringHelper.isEmpty(this.dataS) || StringHelper.isEmpty(
 					this.tempS)) {
-				String msg = "One element of " + Arrays.toString(new String[] { CONFIG, DATA, TEMP })
-						+ " is not set and environment " + this.environment + " does not have attribute " + DEFAULT
+				String msg = "One element of "
+						+ Arrays.toString(new String[]{CONFIG, DATA, TEMP})
+						+ " is not set and environment "
+						+ this.environment
+						+ " does not have attribute "
+						+ DEFAULT
 						+ "=\"true\". Either set the value or allow using default values!";
 				throw new StrolchConfigurationException(msg);
 			}
 		}
 
 		String root = StringHelper.isEmpty(this.rootS) ?
-				new File(System.getProperty(SYS_PROP_USER_DIR)).getAbsolutePath() :
-				this.rootS;
+				new File(System.getProperty(SYS_PROP_USER_DIR)).getAbsolutePath() : this.rootS;
 		String config = StringHelper.isEmpty(this.configS) ? PATH_CONFIG : this.configS;
 		String data = StringHelper.isEmpty(this.dataS) ? PATH_DATA : this.dataS;
 		String temp = StringHelper.isEmpty(this.tempS) ? PATH_TEMP : this.tempS;
@@ -393,35 +387,35 @@ public class StrolchBootstrapper extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-		case STROLCH_BOOTSTRAP:
-			break;
+			case STROLCH_BOOTSTRAP:
+				break;
 
-		case ENV:
-			if (attributes.getValue(ID).equals(this.environment)) {
-				this.insideEnv = true;
-				this.envFound = true;
-			} else {
-				this.insideEnv = false;
-			}
+			case ENV:
+				if (attributes.getValue(ID).equals(this.environment)) {
+					this.insideEnv = true;
+					this.envFound = true;
+				} else {
+					this.insideEnv = false;
+				}
 
-			String defaultS = attributes.getValue(DEFAULT);
-			this.defaultAllowed = defaultS != null && StringHelper.parseBoolean(defaultS);
+				String defaultS = attributes.getValue(DEFAULT);
+				this.defaultAllowed = defaultS != null && StringHelper.parseBoolean(defaultS);
 
-			break;
+				break;
 
-		case ENVIRONMENT:
-		case ROOT:
-		case CONFIG:
-		case DATA:
-		case TEMP:
+			case ENVIRONMENT:
+			case ROOT:
+			case CONFIG:
+			case DATA:
+			case TEMP:
 
-			if (this.insideEnv)
-				this.textB = new StringBuilder();
+				if (this.insideEnv)
+					this.textB = new StringBuilder();
 
-			break;
+				break;
 
-		default:
-			throw new StrolchConfigurationException("Unhandled element " + qName);
+			default:
+				throw new StrolchConfigurationException("Unhandled element " + qName);
 		}
 	}
 
@@ -429,36 +423,36 @@ public class StrolchBootstrapper extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 
 		switch (qName) {
-		case STROLCH_BOOTSTRAP:
-			break;
+			case STROLCH_BOOTSTRAP:
+				break;
 
-		case ENV:
-			this.insideEnv = false;
-			break;
+			case ENV:
+				this.insideEnv = false;
+				break;
 
-		case ENVIRONMENT:
-			if (this.insideEnv)
-				this.environmentOverride = this.textB.toString();
-			break;
-		case ROOT:
-			if (this.insideEnv)
-				this.rootS = this.textB.toString();
-			break;
-		case CONFIG:
-			if (this.insideEnv)
-				this.configS = this.textB.toString();
-			break;
-		case DATA:
-			if (this.insideEnv)
-				this.dataS = this.textB.toString();
-			break;
-		case TEMP:
-			if (this.insideEnv)
-				this.tempS = this.textB.toString();
-			break;
+			case ENVIRONMENT:
+				if (this.insideEnv)
+					this.environmentOverride = this.textB.toString();
+				break;
+			case ROOT:
+				if (this.insideEnv)
+					this.rootS = this.textB.toString();
+				break;
+			case CONFIG:
+				if (this.insideEnv)
+					this.configS = this.textB.toString();
+				break;
+			case DATA:
+				if (this.insideEnv)
+					this.dataS = this.textB.toString();
+				break;
+			case TEMP:
+				if (this.insideEnv)
+					this.tempS = this.textB.toString();
+				break;
 
-		default:
-			throw new StrolchConfigurationException("Unhandled element " + qName);
+			default:
+				throw new StrolchConfigurationException("Unhandled element " + qName);
 		}
 
 		this.textB = null;

@@ -95,11 +95,10 @@ public class XmlImportModelService extends AbstractService<XmlImportModelArgumen
 
 		ModelStatistics statistics = command.getStatistics();
 		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info(MessageFormat.format("Loading XML Model file {0} for realm {1} took {2}.", modelFile.getName(),
-				arg.realm, durationS));
-		logger.info(MessageFormat.format("Loaded {0} Orders", statistics.nrOfOrders));
-		logger.info(MessageFormat.format("Loaded {0} Resources", statistics.nrOfResources));
-		logger.info(MessageFormat.format("Loaded {0} Activities", statistics.nrOfActivities));
+		logger.info("Loading XML Model file {} for realm {} took {}.", modelFile.getName(), arg.realm, durationS);
+		logger.info("Loaded {} Orders", statistics.nrOfOrders);
+		logger.info("Loaded {} Resources", statistics.nrOfResources);
+		logger.info("Loaded {} Activities", statistics.nrOfActivities);
 
 		return new XmlImportModelResult(statistics);
 	}

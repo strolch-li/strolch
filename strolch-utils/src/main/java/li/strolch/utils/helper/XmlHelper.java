@@ -80,8 +80,7 @@ public class XmlHelper {
 		try (InputStream xmlFileInputStream = Files.newInputStream(xmlFile.toPath())) {
 
 			parseDocument(xmlFileInputStream, xmlHandler);
-			String msg = "SAX parsed file {0}";
-			logger.info(MessageFormat.format(msg, xmlFile.getAbsolutePath()));
+			logger.info("SAX parsed file {}", xmlFile.getAbsolutePath());
 
 		} catch (IOException e) {
 			String msg = "Failed to parse XML file: {0} due to: {1}";
@@ -281,7 +280,7 @@ public class XmlHelper {
 	public static void writeDocument(Document document, StreamResult streamResult, String encoding)
 			throws RuntimeException {
 
-		String lineSep = System.getProperty(PROP_LINE_SEPARATOR);
+		String lineSep = System.lineSeparator();
 		try {
 
 			String docEncoding = document.getInputEncoding();
@@ -357,6 +356,6 @@ public class XmlHelper {
 			out.flush();
 		}
 
-		logger.info("Marshalled " + object.getClass() + " to " + dstFile);
+		logger.info("Marshalled {} to {}", object.getClass(), dstFile);
 	}
 }

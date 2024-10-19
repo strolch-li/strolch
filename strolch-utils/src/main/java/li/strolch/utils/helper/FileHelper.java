@@ -216,7 +216,7 @@ public class FileHelper {
 						FileHelper.logger.info("Deleted FILE {}", file.getAbsolutePath());
 				} else {
 					worked = false;
-					FileHelper.logger.warn(("Could not delete the file: " + file.getAbsolutePath()));
+					FileHelper.logger.warn("Could not delete the file: {}", file.getAbsolutePath());
 				}
 			}
 		}
@@ -290,9 +290,8 @@ public class FileHelper {
 				String fromFileSha256 = StringHelper.toHexString(FileHelper.hashFileSha256(fromFile));
 				String toFileSha256 = StringHelper.toHexString(FileHelper.hashFileSha256(toFile));
 				if (!fromFileSha256.equals(toFileSha256)) {
-					FileHelper.logger.error(
-							MessageFormat.format("Copying failed, as MD5 sums are not equal: {0} / {1}", fromFileSha256,
-									toFileSha256));
+					FileHelper.logger.error("Copying failed, as MD5 sums are not equal: {} / {}", fromFileSha256,
+							toFileSha256);
 					if (!toFile.delete())
 						throw new IllegalStateException("Failed to delete file " + toFile);
 

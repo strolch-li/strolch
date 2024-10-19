@@ -75,7 +75,7 @@ public class AccessControlResponseFilter implements ContainerResponseFilter {
 
 		if (!logged) {
 			logged = true;
-			logger.info(MessageFormat.format("Enabling CORS for origin: {0}", origin));
+			logger.info("Enabling CORS for origin: {}", origin);
 		}
 
 		MultivaluedMap<String, Object> headers = responseContext.getHeaders();

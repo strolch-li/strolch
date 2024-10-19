@@ -242,8 +242,7 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info(format("Sent {0} E-mail with subject {1} to {2}", shouldSign() ? "signed" : "unsigned", subject,
-				recipients));
+		logger.info("Sent {} E-mail with subject {} to {}", shouldSign() ? "signed" : "unsigned", subject, recipients);
 	}
 
 	private boolean shouldSign() {
@@ -278,8 +277,8 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info(format("Sent {0} E-mail with subject {1} to {2} and attachment {3}",
-				shouldSign() ? "signed" : "unsigned", subject, recipients, fileName));
+		logger.info("Sent {} E-mail with subject {} to {} and attachment {}", shouldSign() ? "signed" : "unsigned",
+				subject, recipients, fileName);
 	}
 
 	public void sendEncryptedEmail(String recipients, String subject, String mailText, String secretText,
@@ -299,7 +298,7 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info(format("Sent signed and encrypted E-mail with subject {0} to {1}", subject, recipients));
+		logger.info("Sent signed and encrypted E-mail with subject {} to {}", subject, recipients);
 	}
 
 	public void sendEncryptedEmailWithAttachment(String recipients, String subject, String mailText, String secretText,
@@ -321,7 +320,7 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info(format("Sent signed and encrypted E-mail with subject {0} to {1}", subject, recipients));
+		logger.info("Sent signed and encrypted E-mail with subject {} to {}", subject, recipients);
 	}
 
 	protected void send(InternetAddress[] recipients, MimeMessage message) {
@@ -346,12 +345,11 @@ public class SmtpMailer {
 		InternetAddress[] recipientAddresses;
 		if (this.overrideRecipients == null) {
 			recipientAddresses = parseAddress(recipients);
-			logger.info(
-					format("Sending e-mail with subject {0} to {1}", subject, addressesToString(recipientAddresses)));
+			logger.info("Sending e-mail with subject {} to {}", subject, addressesToString(recipientAddresses));
 		} else {
 			recipientAddresses = this.overrideRecipients;
-			logger.info(format("Sending e-mail with subject {0} to override recipient {1}", subject,
-					addressesToString(recipientAddresses)));
+			logger.info("Sending e-mail with subject {} to override recipient {}", subject,
+					addressesToString(recipientAddresses));
 		}
 		return recipientAddresses;
 	}

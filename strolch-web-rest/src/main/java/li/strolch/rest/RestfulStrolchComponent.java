@@ -176,9 +176,8 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF");
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE");
 
-		String msg = "Set restLogging={0} with logEntities={1} restTracing={2} with threshold={3}";
-		logger.info(MessageFormat.format(msg, this.restLogging, this.restLoggingEntity, this.restTracing,
-				this.restTracingThreshold));
+		logger.info("Set restLogging={} with logEntities={} restTracing={} with threshold={}", this.restLogging,
+				this.restLoggingEntity, this.restTracing, this.restTracingThreshold);
 
 		// set http cache mode
 		String cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);

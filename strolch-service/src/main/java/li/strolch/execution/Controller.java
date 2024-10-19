@@ -458,9 +458,7 @@ public class Controller {
 			} catch (StrolchLockException e) {
 				tries++;
 				if (tries >= this.lockRetries) {
-					logger.error(
-							format("Failed to lock {0}. Max retries {1} reached, throwing exception!", this.locator,
-									tries));
+					logger.error("Failed to lock {}. Max retries {} reached, throwing exception!", this.locator, tries);
 					throw e;
 				}
 

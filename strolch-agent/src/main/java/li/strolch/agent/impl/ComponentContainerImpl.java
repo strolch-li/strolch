@@ -268,12 +268,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		// set the application locale
 		Locale.setDefault(strolchConfiguration.getRuntimeConfiguration().getLocale());
-		String msg = "Application {0}:{1} is using locale {2} and timezone {3}";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		System.setProperty("user.timezone", getTimezone());
-		logger.info(MessageFormat.format(msg, applicationName, environment, Locale.getDefault(),
-				System.getProperty("user.timezone")));
+		logger.info("Application {}:{} is using locale {} and timezone {}", applicationName, environment,
+				Locale.getDefault(), System.getProperty("user.timezone"));
 
 		// set up the container itself
 		MapOfLists<Class<?>, StrolchComponent> componentMap = new MapOfLists<>();
@@ -304,9 +303,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.state = ComponentState.SETUP;
 
 		long took = System.nanoTime() - start;
-		msg = "{0}:{1} Strolch Container setup with {2} components. Took {3}";
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.componentsByType.size(),
-				formatNanoDuration(took)));
+		logger.info("{}:{} Strolch Container setup with {} components. Took {}", applicationName, environment,
+				this.componentsByType.size(), formatNanoDuration(took));
 	}
 
 	public void initialize() {
@@ -315,10 +313,10 @@ public class ComponentContainerImpl implements ComponentContainer {
 		long start = System.nanoTime();
 
 		// now we can initialize the components
-		String msg = "{0}:{1} Initializing {2} Strolch Components...";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+		logger.info("{}:{} Initializing {} Strolch Components...", applicationName, environment,
+				this.controllerMap.size());
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
 		containerStateHandler.initialize(rootUpstreamComponents);
@@ -326,9 +324,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.state = ComponentState.INITIALIZED;
 
 		long took = System.nanoTime() - start;
-		msg = "{0}:{1} All {2} Strolch Components have been initialized. Took {3}";
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-				formatNanoDuration(took)));
+		logger.info("{}:{} All {} Strolch Components have been initialized. Took {}", applicationName, environment,
+				this.controllerMap.size(), formatNanoDuration(took));
 	}
 
 	public void start() {
@@ -336,10 +333,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long start = System.nanoTime();
 
-		String msg = "{0}:{1} Starting {2} Strolch Components...";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+		logger.info("{}:{} Starting {} Strolch Components...", applicationName, environment, this.controllerMap.size());
 
 		Set<ComponentController> rootUpstreamComponents = this.dependencyAnalyzer.findRootUpstreamComponents();
 		containerStateHandler.start(rootUpstreamComponents);
@@ -371,10 +367,10 @@ public class ComponentContainerImpl implements ComponentContainer {
 			}
 		}
 
-		msg
-				= "{0}:{1} All {2} Strolch Components started for version {3}. Took {4}. Strolch is now ready to be used. Have fun =))";
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-				getAgent().getVersion().getAppVersion().getArtifactVersion(), tookS));
+		logger.info(
+				"{}:{} All {} Strolch Components started for version {}. Took {}. Strolch is now ready to be used. Have fun =))",
+				applicationName, environment, this.controllerMap.size(),
+				getAgent().getVersion().getAppVersion().getArtifactVersion(), tookS);
 	}
 
 	public void stop() {
@@ -397,8 +393,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			}
 		}
 
-		String msg = "{0}:{1} Stopping {2} Strolch Components...";
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+		logger.info("{}:{} Stopping {} Strolch Components...", applicationName, environment, this.controllerMap.size());
 
 		if (this.dependencyAnalyzer == null) {
 			logger.info("Strolch was not yet setup, nothing to stop");
@@ -407,9 +402,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 			containerStateHandler.stop(rootUpstreamComponents);
 
 			long took = System.nanoTime() - start;
-			msg = "{0}:{1} All {2} Strolch Components have been stopped. Took {3}";
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-					formatNanoDuration(took)));
+			logger.info("{}:{} All {} Strolch Components have been stopped. Took {}", applicationName, environment,
+					this.controllerMap.size(), formatNanoDuration(took));
 		}
 
 		this.state = ComponentState.STOPPED;
@@ -420,10 +414,10 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		long start = System.nanoTime();
 
-		String msg = "{0}:{1} Destroying {2} Strolch Components...";
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
-		logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size()));
+		logger.info("{}:{} Destroying {} Strolch Components...", applicationName, environment,
+				this.controllerMap.size());
 
 		if (this.dependencyAnalyzer == null) {
 			logger.info("Strolch was not yet setup, nothing to destroy");
@@ -432,9 +426,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 			containerStateHandler.destroy(rootUpstreamComponents);
 
 			long took = System.nanoTime() - start;
-			msg = "{0}:{1} All {2} Strolch Components have been destroyed! Took {3}";
-			logger.info(MessageFormat.format(msg, applicationName, environment, this.controllerMap.size(),
-					formatNanoDuration(took)));
+			logger.info("{}:{} All {} Strolch Components have been destroyed! Took {}", applicationName, environment,
+					this.controllerMap.size(), formatNanoDuration(took));
 			this.controllerMap.clear();
 			this.componentsByType.clear();
 		}

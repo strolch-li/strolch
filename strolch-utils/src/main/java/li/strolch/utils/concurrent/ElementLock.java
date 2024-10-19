@@ -48,7 +48,7 @@ public class ElementLock extends ReentrantLock {
 
 				Thread owner = getOwner();
 				if (owner == null) {
-					logger.error(format("Lock {0} is currently held by unknown thread!", this.name));
+					logger.error("Lock {} is currently held by unknown thread!", this.name);
 					logger.error(toString());
 				} else {
 					Exception e = new Exception();

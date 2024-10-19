@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,8 +55,8 @@ public class ComponentContainerStateHandler {
 
 			StrolchComponent component = controller.getComponent();
 			String componentName = component.getName();
-			ComponentConfiguration componentConfiguration = this.strolchConfiguration
-					.getComponentConfiguration(componentName);
+			ComponentConfiguration componentConfiguration = this.strolchConfiguration.getComponentConfiguration(
+					componentName);
 
 			try {
 				component.initialize(componentConfiguration);
@@ -66,14 +66,13 @@ public class ComponentContainerStateHandler {
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Initialized component {0}. Took {1}";
-			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
+			logger.info("Initialized component {}. Took {}", componentName, formatNanoDuration(took));
 
 		}
 
 		// initialize direct downstream components
-		Set<ComponentController> dependencies = this.dependencyAnalyzer
-				.collectDirectDownstreamDependencies(controllers);
+		Set<ComponentController> dependencies = this.dependencyAnalyzer.collectDirectDownstreamDependencies(
+				controllers);
 		if (!dependencies.isEmpty())
 			initialize(dependencies);
 	}
@@ -96,13 +95,12 @@ public class ComponentContainerStateHandler {
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Started component {0}. Took {1}";
-			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
+			logger.info("Started component {}. Took {}", componentName, formatNanoDuration(took));
 		}
 
 		// Start direct downstream components
-		Set<ComponentController> dependencies = this.dependencyAnalyzer
-				.collectDirectDownstreamDependencies(controllers);
+		Set<ComponentController> dependencies = this.dependencyAnalyzer.collectDirectDownstreamDependencies(
+				controllers);
 		if (!dependencies.isEmpty())
 			start(dependencies);
 	}
@@ -122,13 +120,11 @@ public class ComponentContainerStateHandler {
 				component.stop();
 			} catch (Exception e) {
 				String msg = "Failed to stop component {0} due to {1}";
-				msg = MessageFormat.format(msg, componentName, e.getMessage());
-				logger.error(msg, e);
+				logger.error(MessageFormat.format(msg, componentName, e.getMessage()), e);
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Stopped component {0}. Took {1}";
-			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
+			logger.info("Stopped component {}. Took {}", componentName, formatNanoDuration(took));
 		}
 
 		// Stop direct upstream components
@@ -152,13 +148,11 @@ public class ComponentContainerStateHandler {
 				component.destroy();
 			} catch (Exception e) {
 				String msg = "Failed to destroy component {0} due to {1}";
-				msg = MessageFormat.format(msg, componentName, e.getMessage());
-				logger.error(msg, e);
+				logger.error(MessageFormat.format(msg, componentName, e.getMessage()), e);
 			}
 
 			long took = System.nanoTime() - start;
-			String msg = "Destroyed component {0}. Took {1}";
-			logger.info(MessageFormat.format(msg, componentName, formatNanoDuration(took)));
+			logger.info("Destroyed component {}. Took {}", componentName, formatNanoDuration(took));
 		}
 
 		// Destroy direct upstream components

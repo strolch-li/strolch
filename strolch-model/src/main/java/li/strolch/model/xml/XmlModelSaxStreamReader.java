@@ -17,7 +17,6 @@ package li.strolch.model.xml;
 
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
-import li.strolch.utils.helper.StringHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -31,6 +30,7 @@ import java.text.MessageFormat;
 import java.time.LocalDateTime;
 
 import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 /**
@@ -88,8 +88,7 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;
-			String msg = "SAX parsed stream took {0}";
-			logger.info(MessageFormat.format(msg, StringHelper.formatNanoDuration(this.statistics.durationNanos)));
+			logger.info("SAX parsed stream took {}", formatNanoDuration(this.statistics.durationNanos));
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 

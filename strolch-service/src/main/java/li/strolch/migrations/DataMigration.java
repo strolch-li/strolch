@@ -61,9 +61,8 @@ public class DataMigration extends Migration {
 		}
 
 		ModelStatistics statistics = command.getStatistics();
-		logger.info(
-				MessageFormat.format("[{0}] Data migration for {1} loaded {2} Resources and {3} Orders.",
-						getRealm(), getVersion(), statistics.nrOfResources, statistics.nrOfOrders));
+		logger.info("[{}] Data migration for {} loaded {} Resources and {} Orders.", getRealm(), getVersion(),
+				statistics.nrOfResources, statistics.nrOfOrders);
 	}
 
 	@Override

@@ -83,9 +83,8 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;
-			String msg = "SAX parsed model file {0} took {1}";
-			logger.info(MessageFormat.format(msg, this.modelFile.getAbsolutePath(),
-					formatNanoDuration(this.statistics.durationNanos)));
+			logger.info("SAX parsed model file {} took {}", this.modelFile.getAbsolutePath(),
+					formatNanoDuration(this.statistics.durationNanos));
 
 		} catch (Exception e) {
 

@@ -64,13 +64,12 @@ public class ProcessHelper {
 			pb.directory(workingDirectory);
 
 			long start = System.nanoTime();
-			logger.info(MessageFormat.format("Starting command (Timeout {0} {1}) {2}", timeout, unit.name(),
-					String.join(" ", commandAndArgs)));
+			logger.info("Starting command (Timeout {} {}) {}", timeout, unit.name(), String.join(" ", commandAndArgs));
 			final Process process = pb.start();
 			int[] returnValue = new int[1];
 
 			try (BufferedReader errorStream = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-					BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				 BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 
 				Thread errorIn = new Thread(() -> readStream(sb, "[ERROR] ", errorStream), "errorIn");
 				errorIn.start();
@@ -163,8 +162,8 @@ public class ProcessHelper {
 			logger.error("Process execution failed:\n{}", processResult.processOutput);
 			logger.error(processResult.throwable.getMessage(), processResult.throwable);
 		} else {
-			String msg = "Process execution was not successful with return value:{0}\n{1}";
-			logger.info(MessageFormat.format(msg, processResult.returnValue, processResult.processOutput));
+			logger.info("Process execution was not successful with return value:{}\n{}", processResult.returnValue,
+					processResult.processOutput);
 		}
 	}
 }
