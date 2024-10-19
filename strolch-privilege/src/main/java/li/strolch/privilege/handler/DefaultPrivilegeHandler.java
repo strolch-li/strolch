@@ -472,7 +472,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				// log
 				logger.info("User {} authenticated with password : {}", username, certificate);
 			} else {
-				logger.info("User {} authenticated with basic auth: {}", username, certificate);
+				logger.info("User {} authenticated with basic auth/sigle use: {}", username, certificate);
 			}
 
 			// return the certificate
