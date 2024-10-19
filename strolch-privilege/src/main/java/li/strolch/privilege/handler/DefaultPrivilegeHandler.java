@@ -635,6 +635,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				new ArrayList<>(this.privilegeContextMap.values())
 						.stream()
 						.map(PrivilegeContext::getCertificate)
+						.filter(c -> c.getUsage().isAny())
 						.filter(c -> !c.getUserState().isSystem())
 						.collect(toList())));
 
