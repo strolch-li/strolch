@@ -470,7 +470,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				persistModelAsync();
 
 				// log
-				logger.info("User {} authenticated: {}", username, certificate);
+				logger.info("User {} authenticated with password : {}", username, certificate);
+			} else {
+				logger.info("User {} authenticated with basic auth: {}", username, certificate);
 			}
 
 			// return the certificate
@@ -561,7 +563,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		persistSessionsAsync();
 
 		// log
-		logger.info("User {} authenticated: {}", user.getUsername(), certificate);
+		logger.info("User {} authenticated with single sign on: {}", user.getUsername(), certificate);
 
 		return certificate;
 	}
