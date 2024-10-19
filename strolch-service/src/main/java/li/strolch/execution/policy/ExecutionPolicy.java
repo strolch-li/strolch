@@ -431,7 +431,8 @@ public abstract class ExecutionPolicy extends StrolchPolicy {
 	 */
 	protected void delayToExecutedBy(long delay, TimeUnit delayUnit) {
 		long delayMs = delayUnit.toMillis(delay);
-		logger.info("Delaying toExecuted of {} by {}", this.actionLoc, formatMillisecondsDuration(delayMs));
+		if (logger.isTraceEnabled())
+			logger.debug("Delaying toExecuted of {} by {}", this.actionLoc, formatMillisecondsDuration(delayMs));
 		getDelayedExecutionTimer().execute(this.realm, getContainer(), this.actionLoc, delayMs);
 	}
 

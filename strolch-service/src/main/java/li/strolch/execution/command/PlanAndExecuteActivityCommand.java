@@ -102,7 +102,7 @@ public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionComma
 				return;
 			}
 
-			logger.info("Action {} is now being executed...", action.getLocator());
+			logger.debug("Action {} is now being executed...", action.getLocator());
 
 			executionPolicy.toExecution(action);
 			confirmationPolicy.doConfirmation(action);

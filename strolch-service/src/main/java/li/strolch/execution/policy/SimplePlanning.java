@@ -34,7 +34,7 @@ public class SimplePlanning extends PlanningPolicy {
 		if (action.getState().compareTo(State.PLANNED) >= 0)
 			throw new IllegalStateException("Can not plan illegal state " + action.getState());
 
-		logger.info("Planning action {}", action.getLocator());
+		logger.debug("Planning action {}", action.getLocator());
 		action.setState(State.PLANNING);
 
 		Resource resource = evaluateAndSetResource(action);

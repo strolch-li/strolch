@@ -48,6 +48,7 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	public static final String PARAM_STATE = "state";
 
 	private String defaultRealm;
+	private int lockRetriesCount;
 
 	public ExecutionHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -58,7 +59,12 @@ public abstract class ExecutionHandler extends StrolchComponent {
 		Set<String> realmNames = getAgent().getContainer().getRealmNames();
 		if (realmNames.size() == 1)
 			this.defaultRealm = realmNames.iterator().next();
+		this.lockRetriesCount = configuration.getInt(PROP_LOCK_RETRIES, 2);
 		super.initialize(configuration);
+	}
+
+	public int getLockRetriesCount() {
+		return this.lockRetriesCount;
 	}
 
 	protected String getDefaultRealm() {
@@ -89,51 +95,42 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	/**
 	 * Returns true if the given {@link Activity} is currently being controlled on the default realm
 	 *
-	 * @param activity
-	 * 		the activity to check if it is being controlled
+	 * @param activity the activity to check if it is being controlled
 	 *
 	 * @return true or false
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract boolean isControlling(Activity activity);
 
 	/**
 	 * Returns true if the given {@link Activity} is currently being controlled on the given realm
 	 *
-	 * @param realm
-	 * 		the realm
-	 * @param activity
-	 * 		the activity to check if it is being controlled
+	 * @param realm    the realm
+	 * @param activity the activity to check if it is being controlled
 	 *
 	 * @return true or false
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract boolean isControlling(String realm, Activity activity);
 
 	/**
 	 * Returns true if the given {@link Activity} is currently being controlled on the default realm
 	 *
-	 * @param locator
-	 * 		the locator of the activity to check if it is being controlled
+	 * @param locator the locator of the activity to check if it is being controlled
 	 *
 	 * @return true or false
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract boolean isControlling(Locator locator);
 
 	/**
 	 * Returns true if the given {@link Activity} is currently being controlled on the given realm
 	 *
-	 * @param realm
-	 * 		the realm
-	 * @param locator
-	 * 		the locator of the activity to check if it is being controlled
+	 * @param realm   the realm
+	 * @param locator the locator of the activity to check if it is being controlled
 	 *
 	 * @return true or false
 	 */
@@ -144,16 +141,14 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 *
 	 * @return the controllers
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract List<Controller> getControllers();
 
 	/**
 	 * Returns the controllers for the given realm
 	 *
-	 * @param realm
-	 * 		the realm for which to get the controller
+	 * @param realm the realm for which to get the controller
 	 *
 	 * @return the controllers
 	 */
@@ -162,23 +157,19 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	/**
 	 * Returns the controller for the default realm and activity, null if it does not exist
 	 *
-	 * @param activity
-	 * 		the activity for which to get the controller
+	 * @param activity the activity for which to get the controller
 	 *
 	 * @return the controller, or null if it does not exist
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract Controller getController(Activity activity);
 
 	/**
 	 * Returns the controller for the given realm and activity, null if it does not exist
 	 *
-	 * @param realm
-	 * 		the realm for which to get the controller
-	 * @param activity
-	 * 		the activity for which to get the controller
+	 * @param realm    the realm for which to get the controller
+	 * @param activity the activity for which to get the controller
 	 *
 	 * @return the controller, or null if it does not exist
 	 */
@@ -187,23 +178,19 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	/**
 	 * Returns the controller for the default realm and activity, null if it does not exist
 	 *
-	 * @param locator
-	 * 		the locator of the activity for which to get the controller
+	 * @param locator the locator of the activity for which to get the controller
 	 *
 	 * @return the controller, or null if it does not exist
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract Controller getController(Locator locator);
 
 	/**
 	 * Returns the controller for the given realm and activity, null if it does not exist
 	 *
-	 * @param realm
-	 * 		the realm for which to get the controller
-	 * @param locator
-	 * 		the locator of the activity for which to get the controller
+	 * @param realm   the realm for which to get the controller
+	 * @param locator the locator of the activity for which to get the controller
 	 *
 	 * @return the controller, or null if it does not exist
 	 */
@@ -213,11 +200,9 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Registers the given {@link Activity} for execution on the default realm. Execution is started when the concrete
 	 * implementation deems necessary
 	 *
-	 * @param activity
-	 * 		the {@link Activity}
+	 * @param activity the {@link Activity}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract Controller addForExecution(Activity activity);
 
@@ -225,10 +210,8 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Registers the given {@link Activity} for execution. Execution is started when the concrete implementation deems
 	 * necessary
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Activity} resides
-	 * @param activity
-	 * 		the {@link Activity}
+	 * @param realm    the realm where the {@link Activity} resides
+	 * @param activity the {@link Activity}
 	 */
 	public abstract Controller addForExecution(String realm, Activity activity);
 
@@ -236,11 +219,9 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Registers the given {@link Activity} for execution on the default realm, and submits it for execution immediately
 	 * in an asynchronous manner
 	 *
-	 * @param activity
-	 * 		the {@link Activity}
+	 * @param activity the {@link Activity}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void toExecution(Activity activity);
 
@@ -248,10 +229,8 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Registers the given {@link Activity} for execution, and submits it for execution immediately in an asynchronous
 	 * manner
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Activity} resides
-	 * @param activity
-	 * 		the {@link Activity}
+	 * @param realm    the realm where the {@link Activity} resides
+	 * @param activity the {@link Activity}
 	 */
 	public abstract void toExecution(String realm, Activity activity);
 
@@ -259,11 +238,9 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Triggers the execution of the given {@link Activity}'s {@link Locator} on the default realm. If the
 	 * {@link Controller} is available, then it is triggered
 	 *
-	 * @param activityLoc
-	 * 		the {@link Locator} for the activity to execute
+	 * @param activityLoc the {@link Locator} for the activity to execute
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void toExecution(Locator activityLoc);
 
@@ -271,18 +248,15 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Triggers the execution of the given {@link Activity}'s {@link Locator}. If the {@link Controller} is available,
 	 * then it is triggered
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Activity} resides
-	 * @param activityLoc
-	 * 		the {@link Locator} for the activity to execute
+	 * @param realm       the realm where the {@link Activity} resides
+	 * @param activityLoc the {@link Locator} for the activity to execute
 	 */
 	public abstract void toExecution(String realm, Locator activityLoc);
 
 	/**
 	 * Removes the given {@link Controller} from execution, so it is not executed further
 	 *
-	 * @param controller
-	 * 		the controller to remove
+	 * @param controller the controller to remove
 	 */
 	public abstract void removeFromExecution(Controller controller);
 
@@ -290,21 +264,17 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Removes the given {@link Locator} for an {@link Activity} from execution from the default realm, so it is not
 	 * executed further
 	 *
-	 * @param activityLoc
-	 * 		the {@link Locator} of the {@link Activity}
+	 * @param activityLoc the {@link Locator} of the {@link Activity}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void removeFromExecution(Locator activityLoc);
 
 	/**
 	 * Removes the given {@link Locator} for an {@link Activity} from execution, so it is not executed further
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Activity} resides
-	 * @param activityLoc
-	 * 		the {@link Locator} of the {@link Activity}
+	 * @param realm       the realm where the {@link Activity} resides
+	 * @param activityLoc the {@link Locator} of the {@link Activity}
 	 */
 	public abstract void removeFromExecution(String realm, Locator activityLoc);
 
@@ -312,53 +282,45 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Restarts all existing Activities on the given realm, which are not yet executed and already in state of
 	 * execution
 	 *
-	 * @param ctx
-	 * 		the privilege context
+	 * @param ctx the privilege context
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void reloadActivitiesInExecution(PrivilegeContext ctx);
 
 	/**
 	 * Restarts all existing Activities which are not yet executed and already in state of execution
 	 *
-	 * @param ctx
-	 * 		the privilege context
-	 * @param realm
-	 * 		the realm for which to restart activities
+	 * @param ctx   the privilege context
+	 * @param realm the realm for which to restart activities
 	 */
 	public abstract void reloadActivitiesInExecution(PrivilegeContext ctx, String realm);
 
 	/**
 	 * Removes all currently registered {@link Activity Activities} from execution from the default realm
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void clearAllCurrentExecutions();
 
 	/**
 	 * Removes all currently registered {@link Activity Activities} from execution
 	 *
-	 * @param realm
-	 * 		the realm for which to restart activities
+	 * @param realm the realm for which to restart activities
 	 */
 	public abstract void clearAllCurrentExecutions(String realm);
 
 	/**
 	 * Triggers execution for all registered activities in the default realm
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void triggerExecution();
 
 	/**
 	 * Triggers execution for all registered activities in the given realm
 	 *
-	 * @param realm
-	 * 		the realm to trigger execution for
+	 * @param realm the realm to trigger execution for
 	 */
 	public abstract void triggerExecution(String realm);
 
@@ -367,16 +329,14 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 *
 	 * @return the state of the execution handler
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract ExecutionHandlerState getExecutionState();
 
 	/**
 	 * Get the state of the execution handler for the given realm
 	 *
-	 * @param realm
-	 * 		the realm for which to get the state
+	 * @param realm the realm for which to get the state
 	 *
 	 * @return the state of the execution handler
 	 */
@@ -385,46 +345,36 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	/**
 	 * Set the state for the default realm
 	 *
-	 * @param cert
-	 * 		certificate to use
-	 * @param state
-	 * 		the state to set
+	 * @param cert  certificate to use
+	 * @param state the state to set
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void getExecutionState(Certificate cert, ExecutionHandlerState state);
 
 	/**
 	 * Set the state for the given realm
 	 *
-	 * @param cert
-	 * 		certificate to use
-	 * @param realm
-	 * 		the realm to halt execution for
-	 * @param state
-	 * 		the state to set
+	 * @param cert  certificate to use
+	 * @param realm the realm to halt execution for
+	 * @param state the state to set
 	 */
 	public abstract void getExecutionState(Certificate cert, String realm, ExecutionHandlerState state);
 
 	/**
 	 * Archives the given {@link Activity} on the default realm
 	 *
-	 * @param activityLoc
-	 * 		the {@link Locator} of the {@link Activity} to archive
+	 * @param activityLoc the {@link Locator} of the {@link Activity} to archive
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void archiveActivity(Locator activityLoc);
 
 	/**
 	 * Archives the given {@link Activity}
 	 *
-	 * @param realm
-	 * 		the realm where the activity resides
-	 * @param activityLoc
-	 * 		the {@link Locator} of the {@link Activity} to archive
+	 * @param realm       the realm where the activity resides
+	 * @param activityLoc the {@link Locator} of the {@link Activity} to archive
 	 */
 	public abstract void archiveActivity(String realm, Locator activityLoc);
 
@@ -434,8 +384,7 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 *
 	 * @return a set of locators
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract Set<Locator> getActiveActivitiesLocator();
 
@@ -443,8 +392,7 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Returns the {@link Set} of {@link Locator Locators} of {@link Activity Activities} which are registered for
 	 * execution for the given realm
 	 *
-	 * @param realm
-	 * 		the realm for which to return the registered activities
+	 * @param realm the realm for which to return the registered activities
 	 *
 	 * @return a set of locators
 	 */
@@ -467,21 +415,17 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	/**
 	 * Completes the execution of the given {@link Action} with the given {@link Locator} on the default realm
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void toExecuted(Locator actionLoc);
 
 	/**
 	 * Completes the execution of the given {@link Action} with the given {@link Locator}
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Action} resides
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param realm     the realm where the {@link Action} resides
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 */
 	public abstract void toExecuted(String realm, Locator actionLoc);
 
@@ -489,21 +433,17 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#STOPPED} on the default
 	 * realm
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void toStopped(Locator actionLoc);
 
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#STOPPED}
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Action} resides
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param realm     the realm where the {@link Action} resides
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 */
 	public abstract void toStopped(String realm, Locator actionLoc);
 
@@ -511,42 +451,34 @@ public abstract class ExecutionHandler extends StrolchComponent {
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#WARNING} on the default
 	 * realm
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void toWarning(Locator actionLoc);
 
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#WARNING}
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Action} resides
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param realm     the realm where the {@link Action} resides
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 */
 	public abstract void toWarning(String realm, Locator actionLoc);
 
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#ERROR} on the default realm
 	 *
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the default realm is not set!
+	 * @throws IllegalStateException if the default realm is not set!
 	 */
 	public abstract void toError(Locator actionLoc);
 
 	/**
 	 * Sets the state of the {@link Action} with the given {@link Locator} to {@link State#ERROR}
 	 *
-	 * @param realm
-	 * 		the realm where the {@link Action} resides
-	 * @param actionLoc
-	 * 		the {@link Locator} of the {@link Action}
+	 * @param realm     the realm where the {@link Action} resides
+	 * @param actionLoc the {@link Locator} of the {@link Action}
 	 */
 	public abstract void toError(String realm, Locator actionLoc);
 

@@ -36,6 +36,7 @@ import static li.strolch.utils.collections.SynchronizedCollections.synchronizedM
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
+	public static final String ADDED_MSG = "Added {} @ {}";
 	protected final MapOfMaps<String, Locator, Controller> controllers;
 	protected Map<String, ExecutionHandlerState> statesByRealm;
 	protected DelayedExecutionTimer delayedExecutionTimer;
@@ -211,6 +212,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 		Controller controller = this.controllers.getElement(realm, locator);
 		if (controller == null) {
 			controller = newController(realm, activity);
+			logger.info("Added {} @ {}", locator, realm);
 			this.controllers.addElement(realm, locator, controller);
 			notifyObserverAdd(controller);
 		}
@@ -312,6 +314,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 				// register for execution
 				Controller controller = newController(realmName, activity);
+				logger.info(ADDED_MSG, locator, realmName);
 				this.controllers.addElement(realmName, locator, controller);
 			});
 
@@ -341,7 +344,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
-		logger.info("Triggering execution for all controllers on realm {}...", realm);
+		logger.debug("Triggering execution for all controllers on realm {}...", realm);
 		getExecutor().execute(() -> {
 			synchronized (this.controllers) {
 				controllerStream(realm).forEach(this::toExecution);
@@ -358,7 +361,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			return;
 		}
 
-		logger.info("Added toExecution task for {} @ {}", controller.getLocator(), realm);
+		logger.debug("Added toExecution task for {} @ {}", controller.getLocator(), realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -366,7 +369,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				boolean trigger = controller.execute();
 
 				if (trigger) {
-					logger.info("Triggering of controllers for realm {} after executing {}", realm, controller);
+					logger.debug("Triggering of controllers for realm {} after executing {}", realm, controller);
 					triggerExecution(realm);
 				}
 
@@ -390,7 +393,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toExecuted(String realm, Locator locator) {
-		logger.info("Added toExecuted task for {} @ {}", locator, realm);
+		logger.debug("Added toExecuted task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -420,7 +423,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toStopped(String realm, Locator locator) {
-		logger.warn("Added toStopped task for {} @ {}", locator, realm);
+		logger.debug("Added toStopped task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -448,7 +451,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toError(String realm, Locator locator) {
-		logger.error("Added toError task for {} @ {}", locator, realm);
+		logger.debug("Added toError task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -476,7 +479,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void toWarning(String realm, Locator locator) {
-		logger.warn("Added toWarning task for {} @ {}", locator, realm);
+		logger.debug("Added toWarning task for {} @ {}", locator, realm);
 		getExecutor().execute(() -> {
 			try {
 
@@ -504,7 +507,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void archiveActivity(String realm, Locator activityLoc) {
-		logger.info("Added archiveActivity task for {} @ {}", activityLoc, realm);
+		logger.debug("Added archiveActivity task for {} @ {}", activityLoc, realm);
 		Locator trimmedLocator = trimLocator(activityLoc);
 		getExecutor().execute(() -> {
 			try {

@@ -5,6 +5,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.PreMatching;
 import jakarta.ws.rs.core.Context;
+import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.RestfulHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +27,9 @@ public class LogRequestFilter implements ContainerRequestFilter {
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 		String remoteIp = RestfulHelper.getRemoteIp(this.request);
-		logger.info("Remote IP: {}: {} {}", remoteIp, requestContext.getMethod(),
-				requestContext.getUriInfo().getRequestUri());
+		if (RestfulStrolchComponent.getInstance().isRestLogging())
+			logger.info("Remote IP: {}: {} {}", remoteIp, requestContext.getMethod(),
+					requestContext.getUriInfo().getRequestUri());
 
 		this.request.setAttribute(STROLCH_REMOTE_IP, remoteIp);
 		this.request.setAttribute(STROLCH_REQUEST_URL,

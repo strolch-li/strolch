@@ -34,8 +34,7 @@ public class ArchiveActivityCommand extends Command {
 			return;
 		}
 
-		logger.info("Activity {} is in state {}", activity.getLocator(), activity.getState());
-
+		logger.debug("Archiving activity {}", activity.getLocator());
 		tx().getPolicy(activity, ActivityArchivalPolicy.class).archive(activity);
 	}
 }

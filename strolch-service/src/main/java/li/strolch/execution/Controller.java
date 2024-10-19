@@ -53,7 +53,7 @@ public class Controller {
 		this.activityId = activity.getId();
 		this.activity = activity;
 		this.inExecution = synchronizedMap(new HashMap<>());
-		this.lockRetries = executionHandler.getConfiguration().getInt(PROP_LOCK_RETRIES, 2);
+		this.lockRetries = executionHandler.getLockRetriesCount();
 	}
 
 	public String getRealm() {
@@ -160,7 +160,7 @@ public class Controller {
 
 				// then we trigger execution for the same activity if the controller says it is needed
 				if (trigger) {
-					logger.info("Triggering additional execution of controller {} after execution.", this);
+					logger.debug("Triggering additional execution of controller {} after execution.", this);
 					triggerExecute(tx);
 				}
 
@@ -203,7 +203,7 @@ public class Controller {
 	protected boolean internalExecute(StrolchTransaction tx) {
 		if (this.activity.getState().isExecuted()) {
 			this.executionHandler.removeFromExecution(this);
-			logger.info("Archiving executed activity {} with state {}", this.locator, this.activity.getState());
+			logger.debug("Archiving executed activity {} with state {}", this.locator, this.activity.getState());
 			this.executionHandler.archiveActivity(this.realm, this.activity.getLocator());
 			return false;
 		}
