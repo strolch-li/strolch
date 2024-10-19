@@ -15,23 +15,23 @@
  */
 package li.strolch.agent.impl;
 
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.RealmHandler;
+import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.api.StrolchRealm;
+import li.strolch.exception.StrolchException;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.utils.dbc.DBC;
+
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.RealmHandler;
-import li.strolch.agent.api.StrolchComponent;
-import li.strolch.agent.api.StrolchRealm;
-import li.strolch.exception.StrolchException;
-import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.privilege.PrivilegeHandler;
-import li.strolch.utils.dbc.DBC;
-
-import static li.strolch.runtime.StrolchConstants.*;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

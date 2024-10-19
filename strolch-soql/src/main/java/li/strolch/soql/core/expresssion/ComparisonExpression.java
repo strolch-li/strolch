@@ -1,10 +1,10 @@
 package li.strolch.soql.core.expresssion;
 
+import li.strolch.soql.core.SOQLEvaluationException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import li.strolch.soql.core.SOQLEvaluationException;
 
 /**
  * Compares two or more expressions, for example 'a.name = "12345"'

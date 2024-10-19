@@ -15,12 +15,6 @@
  */
 package li.strolch.persistence.api;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
 import li.strolch.agent.api.*;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.exception.StrolchException;
@@ -43,6 +37,12 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
 import li.strolch.utils.objectfilter.ObjectFilterStatistics;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * <p>

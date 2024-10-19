@@ -15,14 +15,14 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
-
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
 
 public class CachedResourceMap extends CachedElementMap<Resource> implements ResourceMap {
 

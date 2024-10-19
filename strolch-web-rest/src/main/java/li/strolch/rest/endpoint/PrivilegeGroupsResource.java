@@ -29,7 +29,6 @@ import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.GroupPrivileges;
-import li.strolch.privilege.model.UserPrivileges;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.search.StrolchValueSearch;

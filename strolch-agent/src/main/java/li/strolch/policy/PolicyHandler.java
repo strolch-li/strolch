@@ -15,11 +15,11 @@
  */
 package li.strolch.policy;
 
-import java.util.Set;
-
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.Set;
 
 /**
  * <p>

@@ -1,7 +1,6 @@
 package li.strolch.search;
 
 import li.strolch.model.Order;
-import li.strolch.model.StrolchElement;
 
 import java.util.Comparator;
 import java.util.stream.Stream;

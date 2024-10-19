@@ -1,8 +1,8 @@
 package li.strolch.soql.core.expresssion;
 
-import java.util.Map;
-
 import li.strolch.soql.core.SOQLEvaluationException;
+
+import java.util.Map;
 
 /**
  * A reference to a query parameter

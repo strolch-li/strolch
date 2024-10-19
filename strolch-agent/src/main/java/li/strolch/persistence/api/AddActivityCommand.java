@@ -15,13 +15,13 @@
  */
 package li.strolch.persistence.api;
 
-import java.text.MessageFormat;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

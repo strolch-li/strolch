@@ -15,12 +15,12 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import li.strolch.exception.StrolchException;
+import li.strolch.model.parameter.Parameter;
 
 import java.text.MessageFormat;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.parameter.Parameter;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

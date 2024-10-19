@@ -15,12 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.agent.impl.DefaultRealmHandler.*;
-import static li.strolch.runtime.StrolchConstants.makeRealmKey;
-
-import java.text.MessageFormat;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.*;
 import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
@@ -29,6 +23,11 @@ import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
+
+import static li.strolch.agent.impl.DefaultRealmHandler.*;
+import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

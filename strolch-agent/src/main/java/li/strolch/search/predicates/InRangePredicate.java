@@ -1,11 +1,11 @@
 package li.strolch.search.predicates;
 
-import java.time.ZonedDateTime;
-import java.util.Date;
-
 import li.strolch.search.SearchPredicate;
 import li.strolch.search.ValueCoercer;
 import li.strolch.utils.collections.DateRange;
+
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * <p>Implements the date in range predicate.</p>

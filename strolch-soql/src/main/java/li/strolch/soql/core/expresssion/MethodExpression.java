@@ -1,14 +1,14 @@
 package li.strolch.soql.core.expresssion;
 
+import li.strolch.soql.core.SOQLEvaluationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import li.strolch.soql.core.SOQLEvaluationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * extract state field value by reflection

@@ -1,11 +1,11 @@
 package li.strolch.soql.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.soql.antlr4.generated.SOQLBaseListener;
 import li.strolch.soql.antlr4.generated.SOQLParser.*;
 import li.strolch.soql.core.expresssion.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author msmock

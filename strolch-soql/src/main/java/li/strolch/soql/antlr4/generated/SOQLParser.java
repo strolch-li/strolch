@@ -1,8 +1,6 @@
 // Generated from SOQL.g4 by ANTLR 4.7
 package li.strolch.soql.antlr4.generated;
 
-import java.util.List;
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATN;
 import org.antlr.v4.runtime.atn.ATNDeserializer;
@@ -12,6 +10,8 @@ import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.List;
 
 @SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class SOQLParser extends Parser {

@@ -1,9 +1,5 @@
 package li.strolch.soql.core;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.model.*;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.FloatParameter;
@@ -15,6 +11,10 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author msmock

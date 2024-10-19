@@ -15,9 +15,9 @@
  */
 package li.strolch.agent.api;
 
-import java.util.List;
-
 import li.strolch.model.StrolchRootElement;
+
+import java.util.List;
 
 public interface Observer {
 

@@ -1,11 +1,11 @@
 package li.strolch.soql.core;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.antlr.v4.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author msmock

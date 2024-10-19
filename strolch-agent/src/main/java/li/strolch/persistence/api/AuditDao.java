@@ -15,11 +15,11 @@
  */
 package li.strolch.persistence.api;
 
-import java.util.List;
-import java.util.Set;
-
 import li.strolch.model.audit.Audit;
 import li.strolch.utils.collections.DateRange;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

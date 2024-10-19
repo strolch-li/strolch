@@ -15,14 +15,14 @@
  */
 package li.strolch.runtime.query.enums;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

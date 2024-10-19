@@ -15,15 +15,15 @@
  */
 package li.strolch.runtime.sessions;
 
-import java.util.List;
-import java.util.Locale;
-
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Usage;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The {@link StrolchSessionHandler} implements session management. It authenticates, validates and invalidates session

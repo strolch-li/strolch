@@ -15,13 +15,6 @@
  */
 package li.strolch.runtime.query.enums;
 
-import static li.strolch.model.StrolchModelConstants.TYPE_ENUMERATION;
-import static li.strolch.utils.helper.StringHelper.DASH;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
-import java.text.MessageFormat;
-import java.util.*;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
@@ -32,6 +25,13 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.*;
+
+import static li.strolch.model.StrolchModelConstants.TYPE_ENUMERATION;
+import static li.strolch.utils.helper.StringHelper.DASH;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

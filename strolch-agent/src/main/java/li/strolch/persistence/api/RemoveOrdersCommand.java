@@ -15,15 +15,15 @@
  */
 package li.strolch.persistence.api;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

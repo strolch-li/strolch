@@ -15,10 +15,10 @@
  */
 package li.strolch.persistence.api;
 
+import li.strolch.model.StrolchRootElement;
+
 import java.util.List;
 import java.util.Set;
-
-import li.strolch.model.StrolchRootElement;
 
 /**
  * <p>

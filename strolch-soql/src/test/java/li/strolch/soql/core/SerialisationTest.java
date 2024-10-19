@@ -1,11 +1,11 @@
 package li.strolch.soql.core;
 
-import static org.junit.Assert.assertEquals;
+import com.google.gson.JsonObject;
+import org.junit.Test;
 
 import java.util.List;
 
-import com.google.gson.JsonObject;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author msmock

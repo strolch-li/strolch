@@ -1,6 +1,11 @@
 package li.strolch.search;
 
-import static li.strolch.utils.collections.CollectionsHelper.singletonCollector;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import li.strolch.utils.collections.MapOfLists;
+import li.strolch.utils.collections.MapOfMaps;
+import li.strolch.utils.collections.MapOfSets;
+import li.strolch.utils.collections.Paging;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -10,12 +15,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import li.strolch.utils.collections.MapOfLists;
-import li.strolch.utils.collections.MapOfMaps;
-import li.strolch.utils.collections.MapOfSets;
-import li.strolch.utils.collections.Paging;
+import static li.strolch.utils.collections.CollectionsHelper.singletonCollector;
 
 /**
  * A search result for {@link StrolchSearch}. Internally a stream is stored and this class provides methods for

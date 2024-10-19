@@ -15,12 +15,12 @@
  */
 package li.strolch.agent.api;
 
-import java.util.List;
-import java.util.Set;
-
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

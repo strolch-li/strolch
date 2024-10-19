@@ -15,15 +15,6 @@
  */
 package li.strolch.service.api;
 
-import static li.strolch.agent.api.StrolchAgent.getUniqueId;
-import static li.strolch.model.Tags.AGENT;
-import static li.strolch.service.api.ServiceResultState.*;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchAccessDeniedException;
@@ -42,6 +33,14 @@ import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.service.api.ServiceResultState.*;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

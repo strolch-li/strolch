@@ -15,14 +15,14 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.ActivityDao;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
 
 public class CachedActivityMap extends CachedElementMap<Activity> implements ActivityMap {
 

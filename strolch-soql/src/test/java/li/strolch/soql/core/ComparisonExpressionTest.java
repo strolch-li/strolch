@@ -1,15 +1,15 @@
 package li.strolch.soql.core;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.soql.core.expresssion.ComparisonExpression;
 import li.strolch.soql.core.expresssion.ParameterReference;
 import li.strolch.soql.core.expresssion.ValueDeclaration;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author msmock

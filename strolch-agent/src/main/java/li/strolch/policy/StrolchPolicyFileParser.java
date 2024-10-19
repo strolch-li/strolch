@@ -15,13 +15,12 @@
  */
 package li.strolch.policy;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import li.strolch.utils.dbc.DBC;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-import li.strolch.utils.dbc.DBC;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

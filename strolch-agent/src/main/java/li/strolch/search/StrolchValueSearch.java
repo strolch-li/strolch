@@ -1,12 +1,12 @@
 package li.strolch.search;
 
-import static li.strolch.model.StrolchModelConstants.INTERNAL;
+import li.strolch.model.StrolchModelConstants;
+import li.strolch.privilege.model.Restrictable;
 
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import li.strolch.model.StrolchModelConstants;
-import li.strolch.privilege.model.Restrictable;
+import static li.strolch.model.StrolchModelConstants.INTERNAL;
 
 public class StrolchValueSearch<T> extends ValueSearch<T> implements Restrictable {
 

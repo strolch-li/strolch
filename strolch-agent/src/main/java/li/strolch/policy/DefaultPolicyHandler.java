@@ -15,15 +15,6 @@
  */
 package li.strolch.policy;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchPolicyException;
@@ -38,6 +29,15 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
+
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>

@@ -15,10 +15,11 @@
  */
 package li.strolch.runtime.configuration;
 
-import static li.strolch.db.DbConstants.*;
-import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
-import static li.strolch.runtime.StrolchConstants.makeRealmKey;
-import static li.strolch.utils.helper.StringHelper.*;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchRealm;
+import li.strolch.persistence.api.StrolchPersistenceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -28,11 +29,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchRealm;
-import li.strolch.persistence.api.StrolchPersistenceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static li.strolch.db.DbConstants.*;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.runtime.StrolchConstants.makeRealmKey;
+import static li.strolch.utils.helper.StringHelper.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

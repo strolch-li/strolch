@@ -15,14 +15,14 @@
  */
 package li.strolch.runtime;
 
-import static li.strolch.utils.helper.StringHelper.DOT;
-import static li.strolch.utils.helper.StringHelper.UNDERLINE;
-
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.handler.PrivilegeHandler;
+
+import static li.strolch.utils.helper.StringHelper.DOT;
+import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

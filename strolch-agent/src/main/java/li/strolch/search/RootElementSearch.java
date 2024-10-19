@@ -1,12 +1,12 @@
 package li.strolch.search;
 
-import java.util.stream.Stream;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.stream.Stream;
 
 /**
  * Performs a search for any kind of root element, allowing to mix {@link Resource}, {@link Order} and {@link Activity}

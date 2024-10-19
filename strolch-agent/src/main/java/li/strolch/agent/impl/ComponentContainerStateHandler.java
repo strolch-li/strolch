@@ -15,19 +15,18 @@
  */
 package li.strolch.agent.impl;
 
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
-
-import java.text.MessageFormat;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.Set;
+
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

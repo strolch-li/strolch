@@ -1,13 +1,5 @@
 package li.strolch.search;
 
-import static li.strolch.search.ExpressionsSupport.*;
-import static li.strolch.search.PredicatesSupport.containsIgnoreCase;
-import static li.strolch.search.PredicatesSupport.isEqualTo;
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
-
-import java.util.List;
-import java.util.function.Function;
-
 import li.strolch.model.ParameterBag;
 import li.strolch.model.State;
 import li.strolch.model.StrolchRootElement;
@@ -16,6 +8,14 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.function.Function;
+
+import static li.strolch.search.ExpressionsSupport.*;
+import static li.strolch.search.PredicatesSupport.containsIgnoreCase;
+import static li.strolch.search.PredicatesSupport.isEqualTo;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
  * <p>A helper class to build search expressions on {@link StrolchRootElement}</p>

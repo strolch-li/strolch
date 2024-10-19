@@ -15,9 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
@@ -26,6 +23,9 @@ import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

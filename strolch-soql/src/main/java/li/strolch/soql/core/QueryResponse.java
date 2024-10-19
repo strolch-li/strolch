@@ -1,9 +1,9 @@
 package li.strolch.soql.core;
 
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
+
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author msmock

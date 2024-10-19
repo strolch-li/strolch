@@ -1,14 +1,14 @@
 package li.strolch.soql.core;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author msmock

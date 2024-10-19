@@ -1,9 +1,9 @@
 package li.strolch.search;
 
-import java.util.stream.Stream;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.stream.Stream;
 
 /**
  * Navigate the TX to a {@link Stream} of {@link StrolchRootElement}

@@ -1,9 +1,9 @@
 package li.strolch.search;
 
+import li.strolch.utils.collections.DateRange;
+
 import java.util.Date;
 import java.util.function.Function;
-
-import li.strolch.utils.collections.DateRange;
 
 public class ValueSearchExpressionBuilder {
 

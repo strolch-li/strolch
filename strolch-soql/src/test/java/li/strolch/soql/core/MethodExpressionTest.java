@@ -1,10 +1,5 @@
 package li.strolch.soql.core;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
@@ -15,6 +10,11 @@ import li.strolch.soql.core.expresssion.MethodArgumentDeclaration;
 import li.strolch.soql.core.expresssion.MethodExpression;
 import li.strolch.soql.core.expresssion.ParameterReference;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author msmock

@@ -15,10 +15,10 @@
  */
 package li.strolch.persistence.api;
 
-import java.util.List;
-
 import li.strolch.model.Order;
 import li.strolch.utils.collections.DateRange;
+
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

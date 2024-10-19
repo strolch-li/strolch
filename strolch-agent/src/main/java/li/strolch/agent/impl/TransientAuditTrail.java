@@ -1,12 +1,12 @@
 package li.strolch.agent.impl;
 
-import java.util.*;
-
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfMaps;
+
+import java.util.*;
 
 public class TransientAuditTrail implements AuditTrail {
 

@@ -15,21 +15,19 @@
  */
 package li.strolch.runtime.configuration;
 
-import static java.text.MessageFormat.*;
+import li.strolch.runtime.StrolchConstants;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.text.MessageFormat;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.runtime.StrolchConstants;
-import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
+import static java.text.MessageFormat.format;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

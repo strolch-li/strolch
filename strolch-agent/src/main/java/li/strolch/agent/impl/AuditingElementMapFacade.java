@@ -15,12 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-
-import java.util.*;
-import java.util.stream.Stream;
-
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ElementMap;
 import li.strolch.exception.StrolchException;
@@ -29,6 +23,12 @@ import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.*;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 
 /**
  * <p>

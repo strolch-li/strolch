@@ -1,12 +1,12 @@
 package li.strolch.soql.core;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author msmock

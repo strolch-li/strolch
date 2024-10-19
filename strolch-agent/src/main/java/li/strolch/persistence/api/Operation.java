@@ -1,11 +1,8 @@
 package li.strolch.persistence.api;
 
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_ADD_PREFIX;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_PREFIX;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_REMOVE_PREFIX;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_UPDATE_PREFIX;
-
 import li.strolch.model.StrolchRootElement;
+
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 public enum Operation {
 	GET(PRIVILEGE_GET_PREFIX), //

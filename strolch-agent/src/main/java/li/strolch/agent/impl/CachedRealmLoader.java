@@ -1,17 +1,5 @@
 package li.strolch.agent.impl;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.util.concurrent.CompletableFuture.allOf;
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchDao;
@@ -22,6 +10,17 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CachedRealmLoader {
 

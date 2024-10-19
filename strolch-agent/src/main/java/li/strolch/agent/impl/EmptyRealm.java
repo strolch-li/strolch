@@ -15,8 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import java.text.MessageFormat;
-
 import li.strolch.agent.api.*;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;

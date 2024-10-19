@@ -15,10 +15,10 @@
  */
 package li.strolch.agent.api;
 
-import java.util.Set;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.StrolchConstants;
+
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -15,12 +15,12 @@
  */
 package li.strolch.runtime.configuration;
 
-import java.io.File;
-import java.text.MessageFormat;
-
 import li.strolch.runtime.configuration.ConfigurationSaxParser.ConfigurationBuilder;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
+
+import java.io.File;
+import java.text.MessageFormat;
 
 public class ConfigurationParser {
 

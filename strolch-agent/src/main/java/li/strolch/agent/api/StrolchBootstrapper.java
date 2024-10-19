@@ -1,13 +1,5 @@
 package li.strolch.agent.api;
 
-import static java.util.Objects.requireNonNull;
-
-import java.io.File;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Properties;
-
 import li.strolch.runtime.configuration.ConfigurationParser;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.runtime.configuration.StrolchEnvironment;
@@ -19,6 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.io.File;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Properties;
+
+import static java.util.Objects.requireNonNull;
 
 public class StrolchBootstrapper extends DefaultHandler {
 

@@ -1,12 +1,12 @@
 package li.strolch.soql.core;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.google.gson.JsonArray;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.json.StrolchElementToJsonVisitor;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The query result set as List of Lists

@@ -1,7 +1,6 @@
 package li.strolch.handler.mail;
 
 import jakarta.mail.internet.InternetAddress;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 

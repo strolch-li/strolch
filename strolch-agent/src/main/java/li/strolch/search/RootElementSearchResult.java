@@ -1,10 +1,5 @@
 package li.strolch.search;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-
-import java.util.Comparator;
-import java.util.stream.Stream;
-
 import li.strolch.model.ParameterBag;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchModelConstants;
@@ -12,6 +7,11 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.Comparator;
+import java.util.stream.Stream;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
 /**
  * A search result for {@link StrolchSearch} for {@link StrolchRootElement} adding methods specific to root element

@@ -15,10 +15,6 @@
  */
 package li.strolch.agent.api;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
@@ -28,6 +24,10 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * <p>

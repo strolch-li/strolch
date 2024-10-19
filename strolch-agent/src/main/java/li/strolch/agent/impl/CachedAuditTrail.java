@@ -15,15 +15,14 @@
  */
 package li.strolch.agent.impl;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.AuditDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

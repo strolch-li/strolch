@@ -1,7 +1,5 @@
 package li.strolch.soql.core;
 
-import java.util.*;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -15,6 +13,8 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
+import java.util.*;
 
 /**
  * Main class to process a SOQL query. It performs the queries to retrieve the input objects as defined in the FROM

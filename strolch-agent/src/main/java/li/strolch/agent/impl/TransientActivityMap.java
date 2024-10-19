@@ -1,10 +1,10 @@
 package li.strolch.agent.impl;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
 
 public class TransientActivityMap extends TransientElementMap<Activity> implements ActivityMap {
 

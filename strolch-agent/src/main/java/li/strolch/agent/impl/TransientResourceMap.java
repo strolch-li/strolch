@@ -1,10 +1,10 @@
 package li.strolch.agent.impl;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
-
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.Parameter;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
 
 public class TransientResourceMap extends TransientElementMap<Resource> implements ResourceMap {
 

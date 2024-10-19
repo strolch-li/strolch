@@ -15,11 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Set;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.Order;
@@ -29,6 +24,11 @@ import li.strolch.model.xml.StrolchElementListener;
 import li.strolch.persistence.api.StrolchTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

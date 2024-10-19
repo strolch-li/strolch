@@ -1,14 +1,14 @@
 package li.strolch.agent.api;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.joining;
+import li.strolch.model.StrolchElement;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.utils.collections.MapOfLists;
 
 import java.util.List;
 import java.util.Map;
 
-import li.strolch.model.StrolchElement;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.utils.collections.MapOfLists;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
 
 public class ObserverEvent {
 	public final MapOfLists<String, StrolchRootElement> added = new MapOfLists<>();

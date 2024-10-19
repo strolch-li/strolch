@@ -15,13 +15,13 @@
  */
 package li.strolch.agent.impl;
 
-import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Set;
-
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
+
+import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ComponentController {
 

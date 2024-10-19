@@ -1,12 +1,12 @@
 package li.strolch.soql.core;
 
+import li.strolch.soql.core.expresssion.SelectClause;
+import li.strolch.soql.core.expresssion.WhereExpression;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import li.strolch.soql.core.expresssion.SelectClause;
-import li.strolch.soql.core.expresssion.WhereExpression;
 
 /**
  * @author msmock

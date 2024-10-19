@@ -1,13 +1,5 @@
 package li.strolch.search;
 
-import static li.strolch.model.StrolchModelConstants.INTERNAL;
-import static li.strolch.model.Tags.AGENT;
-import static li.strolch.utils.helper.ExceptionHelper.*;
-
-import java.util.Collection;
-import java.util.ResourceBundle;
-import java.util.stream.Stream;
-
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
@@ -19,10 +11,16 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Restrictable;
-import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.ExceptionHelper;
+
+import java.util.Collection;
+import java.util.ResourceBundle;
+import java.util.stream.Stream;
+
+import static li.strolch.model.StrolchModelConstants.INTERNAL;
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 
 /**
  * Class to perform searches on Strolch elements

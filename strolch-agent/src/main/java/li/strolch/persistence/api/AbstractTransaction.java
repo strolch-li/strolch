@@ -43,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
-import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.model.Tags.*;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;

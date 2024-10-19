@@ -15,14 +15,14 @@
  */
 package li.strolch.runtime.sessions;
 
-import java.time.ZonedDateTime;
-import java.util.Locale;
-import java.util.Set;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.iso8601.ISO8601;
+
+import java.time.ZonedDateTime;
+import java.util.Locale;
+import java.util.Set;
 
 public class UserSession {
 

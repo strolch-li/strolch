@@ -15,10 +15,10 @@
  */
 package li.strolch.runtime.query.enums;
 
-import java.util.Locale;
-
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
+
+import java.util.Locale;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

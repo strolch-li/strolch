@@ -15,9 +15,6 @@
  */
 package li.strolch.agent.impl;
 
-import java.io.File;
-import java.text.MessageFormat;
-
 import li.strolch.agent.api.*;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
@@ -30,7 +27,10 @@ import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 
-import static li.strolch.agent.impl.DefaultRealmHandler.*;
+import java.io.File;
+import java.text.MessageFormat;
+
+import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

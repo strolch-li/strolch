@@ -1,10 +1,5 @@
 package li.strolch.runtime.privilege;
 
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
-
-import java.text.MessageFormat;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
@@ -14,6 +9,11 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.policy.PrivilegePolicy;
+
+import java.text.MessageFormat;
+
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
 
 public class ModelPrivilege implements PrivilegePolicy {
 

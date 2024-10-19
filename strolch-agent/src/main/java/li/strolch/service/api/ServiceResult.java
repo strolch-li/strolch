@@ -15,20 +15,18 @@
  */
 package li.strolch.service.api;
 
-import static li.strolch.model.Tags.Json.*;
-import static li.strolch.utils.helper.ExceptionHelper.formatException;
-import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
+import com.google.gson.JsonObject;
+import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
+import li.strolch.model.i18n.I18nMessageToJsonVisitor;
+import li.strolch.utils.I18nMessage;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import com.google.gson.JsonObject;
-import li.strolch.exception.StrolchException;
-import li.strolch.exception.StrolchUserMessageException;
-import li.strolch.model.Tags;
-import li.strolch.model.i18n.I18nMessageToJsonVisitor;
-import li.strolch.utils.I18nMessage;
+import static li.strolch.model.Tags.Json.*;
+import static li.strolch.utils.helper.ExceptionHelper.formatException;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

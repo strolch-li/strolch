@@ -1,16 +1,5 @@
 package li.strolch.job;
 
-import static java.lang.String.join;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.runtime.StrolchConstants.TYPE_STROLCH_JOB;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -20,6 +9,17 @@ import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
+
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static java.lang.String.join;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.runtime.StrolchConstants.TYPE_STROLCH_JOB;
 
 /**
  * The {@link StrolchJobsHandler} registers all {@link StrolchJob StrolchJobs}

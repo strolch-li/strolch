@@ -15,13 +15,12 @@
  */
 package li.strolch.agent.api;
 
-import static java.text.MessageFormat.*;
-import static li.strolch.model.Tags.Json.*;
+import com.google.gson.JsonObject;
 
-import java.text.MessageFormat;
 import java.util.Properties;
 
-import com.google.gson.JsonObject;
+import static java.text.MessageFormat.format;
+import static li.strolch.model.Tags.Json.COMPONENT_NAME;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

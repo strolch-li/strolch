@@ -15,10 +15,10 @@
  */
 package li.strolch.agent.api;
 
-import java.util.Locale;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.utils.I18nMessage;
+
+import java.util.Locale;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
