@@ -89,11 +89,16 @@ public abstract class StrolchSearch<T extends StrolchRootElement, U extends Root
 	 *
 	 * @return the search result
 	 */
-	public abstract RootElementSearchResult<T> search(StrolchTransaction tx);
 	public final U search(StrolchTransaction tx) {
 		long start = System.nanoTime();
+		try {
 			Stream<T> stream = prepareSearch(tx);
 			return evaluateResult(stream);
+		} finally {
+			// record the event
+			long duration = System.nanoTime() - start;
+			tx.getAgent().getAgentStatistics().recordSearch(duration);
+		}
 	}
 
 	protected abstract U evaluateResult(Stream<T> stream);

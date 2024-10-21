@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@ package li.strolch.persistence.api;
 
 import li.strolch.utils.helper.StringHelper;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class TransactionResult {
 
@@ -26,7 +26,7 @@ public class TransactionResult {
 	private Exception failCause;
 
 	private final long startNanos;
-	private Date startTime;
+	private LocalDateTime startTime;
 	private long txDuration;
 	private long closeDuration;
 
@@ -35,7 +35,7 @@ public class TransactionResult {
 	private long updated;
 	private long deleted;
 
-	public TransactionResult(String realm, long startNanos, Date startDate) {
+	public TransactionResult(String realm, long startNanos, LocalDateTime startDate) {
 		this.realm = realm;
 		this.startNanos = startNanos;
 		this.startTime = startDate;
@@ -57,8 +57,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param state
-	 *            the state to set
+	 * @param state the state to set
 	 */
 	public void setState(TransactionState state) {
 		this.state = state;
@@ -72,8 +71,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param failCause
-	 *            the failCause to set
+	 * @param failCause the failCause to set
 	 */
 	public void setFailCause(Exception failCause) {
 		this.failCause = failCause;
@@ -89,15 +87,14 @@ public class TransactionResult {
 	/**
 	 * @return the startTime
 	 */
-	public Date getStartTime() {
+	public LocalDateTime getStartTime() {
 		return this.startTime;
 	}
 
 	/**
-	 * @param startTime
-	 *            the startTime to set
+	 * @param startTime the startTime to set
 	 */
-	public void setStartTime(Date startTime) {
+	public void setStartTime(LocalDateTime startTime) {
 		this.startTime = startTime;
 	}
 
@@ -109,8 +106,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param txDuration
-	 *            the txDuration to set
+	 * @param txDuration the txDuration to set
 	 */
 	public void setTxDuration(long txDuration) {
 		this.txDuration = txDuration;
@@ -124,8 +120,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param closeDuration
-	 *            the closeDuration to set
+	 * @param closeDuration the closeDuration to set
 	 */
 	public void setCloseDuration(long closeDuration) {
 		this.closeDuration = closeDuration;
@@ -139,8 +134,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param created
-	 *            the created to set
+	 * @param created the created to set
 	 */
 	public void setCreated(long created) {
 		this.created = created;
@@ -154,8 +148,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param read
-	 *            the read to set
+	 * @param read the read to set
 	 */
 	public void setRead(long read) {
 		this.read = read;
@@ -169,8 +162,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param updated
-	 *            the updated to set
+	 * @param updated the updated to set
 	 */
 	public void setUpdated(long updated) {
 		this.updated = updated;
@@ -184,8 +176,7 @@ public class TransactionResult {
 	}
 
 	/**
-	 * @param deleted
-	 *            the deleted to set
+	 * @param deleted the deleted to set
 	 */
 	public void setDeleted(long deleted) {
 		this.deleted = deleted;
@@ -215,15 +206,15 @@ public class TransactionResult {
 
 		StringBuilder sb = new StringBuilder();
 		switch (this.state) {
-		case OPEN -> sb.append("TX is still open after ");
-		case COMMITTED -> sb.append("TX was completed after ");
-		case ROLLED_BACK -> sb.append("TX was rolled back after ");
-		case FAILED -> sb.append("TX has failed after ");
-		default -> {
-			sb.append("TX is in unhandled state ");
-			sb.append(this.state);
-			sb.append(" after ");
-		}
+			case OPEN -> sb.append("TX is still open after ");
+			case COMMITTED -> sb.append("TX was completed after ");
+			case ROLLED_BACK -> sb.append("TX was rolled back after ");
+			case FAILED -> sb.append("TX has failed after ");
+			default -> {
+				sb.append("TX is in unhandled state ");
+				sb.append(this.state);
+				sb.append(" after ");
+			}
 		}
 
 		sb.append(StringHelper.formatNanoDuration(this.txDuration));

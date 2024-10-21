@@ -29,11 +29,20 @@ public class AgentResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(AgentResource.class);
 
-	private static Certificate validateCertificate(HttpServletRequest request) {
+	private static void validateCertificate(HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 		RestfulStrolchComponent rest = RestfulStrolchComponent.getInstance();
 		rest.validate(cert).validateAction(Tags.AGENT, getCallerMethodNoClass(2));
-		return cert;
+	}
+
+	@GET
+	@Path("statistics")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStatistics(@Context HttpServletRequest request) {
+		validateCertificate(request);
+		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
+		JsonObject statisticsJson = agent.getAgentStatistics().toJson();
+		return ResponseUtil.toResponse(DATA, statisticsJson);
 	}
 
 	@PUT

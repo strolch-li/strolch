@@ -38,6 +38,7 @@ import li.strolch.utils.objectfilter.ObjectFilterStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -68,7 +69,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private final MapOfMaps<String, String, Activity> activityCache;
 
 	private TransactionCloseStrategy closeStrategy;
-	private long globalSilentThreshold;
+	private final long globalSilentThreshold;
 	private long silentThreshold;
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
@@ -107,7 +108,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.flushedCommands = new ArrayList<>();
 		this.lockedElements = new HashSet<>();
 		this.closeStrategy = readOnly ? TransactionCloseStrategy.READ_ONLY : TransactionCloseStrategy.DEFAULT;
-		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), new Date());
+		this.txResult = new TransactionResult(getRealmName(), System.nanoTime(), LocalDateTime.now());
 		this.txResult.setState(TransactionState.OPEN);
 
 		this.objectFilter = new ObjectFilter();
@@ -1746,6 +1747,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		} finally {
 			releaseElementLocks();
 			TransactionThreadLocal.removeTx();
+
+			// record the event
+			getAgent().getAgentStatistics().recordTransaction(this.txResult);
 		}
 	}
 

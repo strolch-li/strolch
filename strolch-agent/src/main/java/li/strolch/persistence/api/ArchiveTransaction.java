@@ -7,6 +7,7 @@ import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
 import li.strolch.utils.collections.DateRange;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public abstract class ArchiveTransaction implements AutoCloseable {
 	protected ArchiveTransaction(StrolchTransaction tx, DataArchiveHandler archiveHandler) {
 		this.tx = tx;
 		this.archiveHandler = archiveHandler;
-		this.txResult = new TransactionResult(tx.getRealmName(), System.nanoTime(), new Date());
+		this.txResult = new TransactionResult(tx.getRealmName(), System.nanoTime(), LocalDateTime.now());
 	}
 
 	public StrolchTransaction tx() {

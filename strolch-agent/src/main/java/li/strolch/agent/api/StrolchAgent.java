@@ -77,8 +77,15 @@ public class StrolchAgent {
 
 	private VersionQueryResult versionQueryResult;
 
+	private final AgentStatistics agentStatistics;
+
 	public StrolchAgent(StrolchVersion appVersion) {
 		this.appVersion = appVersion;
+		this.agentStatistics = new AgentStatistics();
+	}
+
+	public AgentStatistics getAgentStatistics() {
+		return this.agentStatistics;
 	}
 
 	public StrolchConfiguration getStrolchConfiguration() {

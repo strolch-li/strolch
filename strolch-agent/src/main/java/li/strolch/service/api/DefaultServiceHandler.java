@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.service.api.ServiceResultState.*;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
@@ -115,8 +116,21 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		} catch (Exception e) {
 			long end = System.nanoTime();
 			String msg = "User {0}: Service failed {1} after {2} due to {3}";
+			String reason = getRootCauseMessage(e);
 			msg = MessageFormat.format(msg, username, service.getClass().getName(), formatNanoDuration(end - start),
-					e.getMessage());
+					reason);
+
+			ResourceBundle bundle = ResourceBundle.getBundle("strolch-agent");
+			LogMessage logMessage = new LogMessage(getRealmName(argument, certificate), username,
+					Locator.valueOf(AGENT, Service.class.getSimpleName(), service.getClass().getName()),
+					LogSeverity.Exception, LogMessageState.Information, bundle, "agent.service.failed.ex")
+					.value("service", service.getClass().getName())
+					.value("reason", reason)
+					.value("exception", e);
+
+			OperationsLog operationsLog = getContainer().getComponent(OperationsLog.class);
+			operationsLog.addMessage(logMessage);
+
 			logger.error(msg);
 			throw new StrolchException(msg, e);
 		}
@@ -125,7 +139,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 	private <T extends ServiceArgument, U extends ServiceResult> I18nMessage logAccessDenied(Certificate certificate,
 			T argument, AbstractService<T, U> service, long start, String username, PrivilegeException e) {
 		logger.error(buildFailMessage(service, start, username, e));
-		addAccessDeniedLogMessage(certificate, argument, service, username, e, service.getClass().getName());
+		addAccessDeniedLogMessage(certificate, argument, username, e, service.getClass().getName());
 		I18nMessage i18n = buildAccessDeniedMessage(certificate, service, username);
 		logger.error(e.getMessage(), e);
 		return i18n;
@@ -158,8 +172,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		return msg;
 	}
 
-	private <T extends ServiceArgument, U extends ServiceResult> void addAccessDeniedLogMessage(Certificate certificate,
-			T argument, AbstractService<T, U> service, String username, PrivilegeException e, String svcName) {
+	private <T extends ServiceArgument> void addAccessDeniedLogMessage(Certificate certificate, T argument,
+			String username, PrivilegeException e, String svcName) {
 		if (getContainer().hasComponent(OperationsLog.class)) {
 			String realmName = getRealmName(argument, certificate);
 			LogMessage logMessage = new LogMessage(realmName, username,
@@ -201,7 +215,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 
 		String realmName = getRealmName(arg, certificate);
 
-		msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(end - start));
+		long durationNanos = end - start;
+		msg = MessageFormat.format(msg, username, svcName, formatNanoDuration(durationNanos));
 
 		if (result.getState() == SUCCESS) {
 			logger.info(msg);
@@ -215,7 +230,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			} else if (isNotEmpty(result.getMessage())) {
 				logger.warn("Reason: {}", result.getMessage());
 			} else if (result.getThrowable() != null) {
-				logger.warn("Reason: {}", result.getThrowable().getMessage(), result.getThrowable());
+				logger.warn("Reason: {}", getRootCauseMessage(result.getThrowable()), result.getThrowable());
 			}
 
 		} else if (result.getState() == FAILED
@@ -233,7 +248,7 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			} else if (isNotEmpty(result.getMessage())) {
 				reason = result.getMessage();
 			} else if (result.getThrowable() != null) {
-				reason = result.getThrowable().getMessage();
+				reason = getRootCauseMessage(result.getThrowable());
 				throwable = result.getThrowable();
 			}
 
@@ -258,7 +273,6 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 					logMessage = new LogMessage(realmName, username,
 							Locator.valueOf(AGENT, Service.class.getSimpleName(), svcName), LogSeverity.Exception,
 							LogMessageState.Information, bundle, "agent.service.failed.ex")
-							.withException(throwable)
 							.value("service", svcName)
 							.value("reason", reason)
 							.value("exception", throwable);
@@ -275,5 +289,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 			logger.error("UNHANDLED SERVICE RESULT STATE: {}", result.getState());
 			logger.error(msg);
 		}
+
+		// record the event
+		getAgent().getAgentStatistics().recordService(durationNanos);
 	}
 }
