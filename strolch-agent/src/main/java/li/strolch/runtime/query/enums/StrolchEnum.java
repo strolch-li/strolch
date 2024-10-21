@@ -55,7 +55,7 @@ public class StrolchEnum {
 	}
 
 	public void setLocale(String locale) {
-		this.localeL = new Locale(locale);
+		this.localeL = Locale.forLanguageTag(locale);
 		this.locale = locale;
 	}
 
