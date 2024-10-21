@@ -53,10 +53,8 @@ public class Statistics {
 
 	private synchronized int getInTimeFrame(long amount, ChronoUnit unit) {
 		LocalDateTime now = LocalDateTime.now();
-		return (int) this.events
-				.stream()
-				.filter(tx -> SECONDS.between(tx.timestamp, now) < unit.getDuration().getSeconds() * amount)
-				.count();
+		long amountSeconds = unit.getDuration().getSeconds() * amount;
+		return (int) this.events.stream().filter(tx -> SECONDS.between(tx.timestamp, now) < amountSeconds).count();
 	}
 
 	public synchronized JsonObject toJson() {
@@ -85,9 +83,8 @@ public class Statistics {
 	}
 
 	private Duration getMedian(List<Duration> durations) {
-		if (durations.isEmpty()) {
+		if (durations.isEmpty())
 			return Duration.ZERO;
-		}
 		List<Duration> sorted = durations.stream().sorted().toList();
 		int middle = sorted.size() / 2;
 		if (sorted.size() % 2 == 0) {
