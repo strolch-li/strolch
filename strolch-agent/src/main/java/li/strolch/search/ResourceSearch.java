@@ -1,14 +1,13 @@
 package li.strolch.search;
 
 import li.strolch.model.Resource;
-import li.strolch.persistence.api.StrolchTransaction;
 
 import java.util.stream.Stream;
 
 /**
  * Performs a search for {@link Resource} elements
  */
-public class ResourceSearch extends StrolchSearch<Resource> {
+public class ResourceSearch extends StrolchSearch<Resource, ResourceSearchResult> {
 
 	private SearchNavigator<Resource> navigator;
 
@@ -42,7 +41,7 @@ public class ResourceSearch extends StrolchSearch<Resource> {
 	}
 
 	@Override
-	public ResourceSearchResult search(StrolchTransaction tx) {
-		return new ResourceSearchResult(prepareSearch(tx));
+	protected ResourceSearchResult evaluateResult(Stream<Resource> stream) {
+		return new ResourceSearchResult(stream);
 	}
 }

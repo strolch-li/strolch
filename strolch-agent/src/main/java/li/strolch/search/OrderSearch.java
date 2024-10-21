@@ -2,7 +2,6 @@ package li.strolch.search;
 
 import li.strolch.model.Order;
 import li.strolch.model.State;
-import li.strolch.persistence.api.StrolchTransaction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Performs a search of {@link Order} elements
  */
-public class OrderSearch extends StrolchSearch<Order> {
+public class OrderSearch extends StrolchSearch<Order, OrderSearchResult> {
 
 	private SearchNavigator<Order> navigator;
 
@@ -69,7 +68,7 @@ public class OrderSearch extends StrolchSearch<Order> {
 	}
 
 	@Override
-	public OrderSearchResult search(StrolchTransaction tx) {
-		return new OrderSearchResult(prepareSearch(tx));
+	protected OrderSearchResult evaluateResult(Stream<Order> stream) {
+		return new OrderSearchResult(stream);
 	}
 }

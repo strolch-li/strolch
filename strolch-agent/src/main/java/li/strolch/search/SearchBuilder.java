@@ -40,10 +40,8 @@ public class SearchBuilder {
 	/**
 	 * Builds an {@link OrderSearch} for the given types with the given query
 	 *
-	 * @param query
-	 * 		the query
-	 * @param types
-	 * 		the type of orders to search
+	 * @param query the query
+	 * @param types the type of orders to search
 	 *
 	 * @return the {@link OrderSearch}
 	 */
@@ -54,10 +52,8 @@ public class SearchBuilder {
 	/**
 	 * Builds an {@link ResourceSearch} for the given types with the given query
 	 *
-	 * @param query
-	 * 		the query
-	 * @param types
-	 * 		the type of resources to search
+	 * @param query the query
+	 * @param types the type of resources to search
 	 *
 	 * @return the {@link OrderSearch}
 	 */
@@ -68,10 +64,8 @@ public class SearchBuilder {
 	/**
 	 * Builds an {@link ActivitySearch} for the given types with the given query
 	 *
-	 * @param query
-	 * 		the query
-	 * @param types
-	 * 		the type of activities to search
+	 * @param query the query
+	 * @param types the type of activities to search
 	 *
 	 * @return the {@link OrderSearch}
 	 */
@@ -104,8 +98,8 @@ public class SearchBuilder {
 				if (partSearchExpression == null) {
 					partSearchExpression = ValueSearchExpressionBuilder.containsIgnoreCase(extractor, part);
 				} else {
-					partSearchExpression = partSearchExpression
-							.or(ValueSearchExpressionBuilder.containsIgnoreCase(extractor, part));
+					partSearchExpression = partSearchExpression.or(
+							ValueSearchExpressionBuilder.containsIgnoreCase(extractor, part));
 				}
 			}
 
@@ -127,7 +121,8 @@ public class SearchBuilder {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T extends StrolchRootElement, U extends StrolchSearch<T>> U buildSearch(U search, String query) {
+	private static <T extends StrolchRootElement, S extends RootElementSearchResult<T>, U extends StrolchSearch<T, S>> U buildSearch(
+			U search, String query) {
 		query = trimOrEmpty(query);
 
 		if (query.isEmpty())
@@ -227,7 +222,7 @@ public class SearchBuilder {
 
 		if (bagId.isEmpty() || paramId.isEmpty() || query.isEmpty())
 			return new String[0];
-		return new String[] { bagId, paramId, query };
+		return new String[]{bagId, paramId, query};
 	}
 
 	private static <T extends StrolchRootElement> SearchExpression<T> add(boolean and, boolean negate,
@@ -252,13 +247,13 @@ public class SearchBuilder {
 			return searchResult.orderById(descending);
 
 		switch (orderBy) {
-		case Tags.Json.ID -> {
-			return searchResult.orderById(descending);
-		}
-		case Tags.Json.NAME -> {
-			return searchResult.orderByName(descending);
-		}
-		default -> logger.warn("Unhandled ordering {}", orderBy);
+			case Tags.Json.ID -> {
+				return searchResult.orderById(descending);
+			}
+			case Tags.Json.NAME -> {
+				return searchResult.orderByName(descending);
+			}
+			default -> logger.warn("Unhandled ordering {}", orderBy);
 		}
 
 		return searchResult;

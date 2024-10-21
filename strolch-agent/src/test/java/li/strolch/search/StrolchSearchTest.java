@@ -270,7 +270,7 @@ public class StrolchSearchTest {
 		StrolchRealm realm = runtimeMock.getAgent().getContainer().getRealm(cert);
 		try (StrolchTransaction tx = realm.openTx(cert, StrolchSearchTest.class, true)) {
 
-			StrolchSearch<Order> search = new OrderSearch() {
+			OrderSearch search = new OrderSearch() {
 				@Override
 				public void define() {
 					types(SORTING_TYPE).where(state(isEqualTo(State.CREATED)));
@@ -281,11 +281,11 @@ public class StrolchSearchTest {
 
 			result = search.search(tx).orderById(true).toList();
 			assertEquals(5, result.size());
-			assertEquals("ggg", result.get(0).getId());
+			assertEquals("ggg", result.getFirst().getId());
 
 			result = search.search(tx).orderByName(false).toList();
 			assertEquals(5, result.size());
-			assertEquals("aaa", result.get(0).getId());
+			assertEquals("aaa", result.getFirst().getId());
 		}
 	}
 

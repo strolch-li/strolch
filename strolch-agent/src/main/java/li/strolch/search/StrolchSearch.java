@@ -27,7 +27,7 @@ import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
  *
  * @param <T>
  */
-public abstract class StrolchSearch<T extends StrolchRootElement>
+public abstract class StrolchSearch<T extends StrolchRootElement, U extends RootElementSearchResult<T>>
 		implements SearchExpressions, SearchPredicates, Restrictable {
 
 	private String privilegeValue;
@@ -47,7 +47,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 *
 	 * @return this for chaining
 	 */
-	public abstract StrolchSearch<T> types(String... types);
+	public abstract StrolchSearch<T, U> types(String... types);
 
 	/**
 	 * Allows to implement the search expression in one method, or to prepare a project specific search expression
@@ -63,7 +63,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 *
 	 * @return this for chaining
 	 */
-	public StrolchSearch<T> where(SearchExpression<T> expression) {
+	public StrolchSearch<T, U> where(SearchExpression<T> expression) {
 		if (this.expression == null)
 			this.expression = expression;
 		else
@@ -77,7 +77,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 *
 	 * @return this object for chaining
 	 */
-	public StrolchSearch<T> internal() {
+	public StrolchSearch<T, U> internal() {
 		this.privilegeValue = INTERNAL;
 		return this;
 	}
@@ -90,6 +90,13 @@ public abstract class StrolchSearch<T extends StrolchRootElement>
 	 * @return the search result
 	 */
 	public abstract RootElementSearchResult<T> search(StrolchTransaction tx);
+	public final U search(StrolchTransaction tx) {
+		long start = System.nanoTime();
+			Stream<T> stream = prepareSearch(tx);
+			return evaluateResult(stream);
+	}
+
+	protected abstract U evaluateResult(Stream<T> stream);
 
 	/**
 	 * Prepares the search by performing the following:

@@ -4,7 +4,6 @@ import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
-import li.strolch.persistence.api.StrolchTransaction;
 
 import java.util.stream.Stream;
 
@@ -12,7 +11,7 @@ import java.util.stream.Stream;
  * Performs a search for any kind of root element, allowing to mix {@link Resource}, {@link Order} and {@link Activity}
  * in the result
  */
-public class RootElementSearch extends StrolchSearch<StrolchRootElement> {
+public class RootElementSearch extends StrolchSearch<StrolchRootElement, RootElementSearchResult<StrolchRootElement>> {
 
 	private SearchNavigator<StrolchRootElement> navigator;
 
@@ -36,7 +35,7 @@ public class RootElementSearch extends StrolchSearch<StrolchRootElement> {
 	}
 
 	@Override
-	public RootElementSearchResult<StrolchRootElement> search(StrolchTransaction tx) {
-		return new RootElementSearchResult<>(prepareSearch(tx));
+	protected RootElementSearchResult<StrolchRootElement> evaluateResult(Stream<StrolchRootElement> stream) {
+		return new RootElementSearchResult<>(stream);
 	}
 }

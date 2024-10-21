@@ -11,7 +11,7 @@ import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER
 /**
  * Performs a search for {@link Activity} elements
  */
-public class ActivitySearch extends StrolchSearch<Activity> {
+public class ActivitySearch extends StrolchSearch<Activity, ActivitySearchResult> {
 
 	private SearchNavigator<Activity> navigator;
 
@@ -51,7 +51,7 @@ public class ActivitySearch extends StrolchSearch<Activity> {
 	}
 
 	@Override
-	public ActivitySearchResult search(StrolchTransaction tx) {
-		return new ActivitySearchResult(prepareSearch(tx));
+	protected ActivitySearchResult evaluateResult(Stream<Activity> stream) {
+		return new ActivitySearchResult(stream);
 	}
 }
