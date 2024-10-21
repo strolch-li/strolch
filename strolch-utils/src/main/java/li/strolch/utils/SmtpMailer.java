@@ -462,11 +462,13 @@ public class SmtpMailer {
 
 			return signatureResult.toString(UTF_8);
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			throw new IllegalStateException("Interrupted while waiting to lock", e);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to encrypt and sign plain text!", e);
 		} finally {
-			this.lock.unlock();
+			if (this.lock.isHeldByCurrentThread() && this.lock.isLocked())
+				this.lock.unlock();
 		}
 	}
 
