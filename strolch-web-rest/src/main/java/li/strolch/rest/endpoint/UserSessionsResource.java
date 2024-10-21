@@ -15,36 +15,36 @@
  */
 package li.strolch.rest.endpoint;
 
-import static java.util.Comparator.comparing;
-import static li.strolch.rest.helper.RestfulHelper.toJson;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
-import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
-import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.model.QueryData;
+import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.runtime.sessions.UserSession;
 import li.strolch.search.SearchResult;
 import li.strolch.search.ValueSearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import static java.util.Comparator.comparing;
+import static li.strolch.rest.helper.RestfulHelper.toJson;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_SESSION;
+import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
 @Path("strolch/sessions")
 public class UserSessionsResource {
@@ -71,13 +71,8 @@ public class UserSessionsResource {
 			List<UserSession> sessions = sessionHandler.getSessions(cert, source);
 
 			SearchResult<UserSession> result = buildSimpleValueSearch(new ValueSearch<UserSession>(), query,
-					Arrays.asList( //
-							UserSession::getUsername, //
-							UserSession::getFirstname,  //
-							UserSession::getLastname,  //
-							UserSession::getUserRoles)) //
-					.search(sessions) //
-					.orderBy(comparing(UserSession::getUsername));
+					Arrays.asList(UserSession::username, UserSession::firstName, UserSession::lastName,
+							UserSession::userRoles)).search(sessions).orderBy(comparing(UserSession::username));
 
 			JsonObject root = toJson(queryData, sessions.size(), result, UserSession::toJson);
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();

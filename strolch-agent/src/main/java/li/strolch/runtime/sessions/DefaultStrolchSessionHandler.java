@@ -351,7 +351,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		for (Certificate cert : certificateMap.values()) {
 			if (cert.getSessionId().equals(sessionId)) {
 				ctx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_SESSION, cert));
-				return new UserSession(cert);
+				return UserSession.valueOf(cert);
 			}
 		}
 
@@ -368,7 +368,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		for (Certificate cert : certificateMap.values()) {
 			try {
 				ctx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_SESSION, cert));
-				sessions.add(new UserSession(cert));
+				sessions.add(UserSession.valueOf(cert));
 			} catch (AccessDeniedException e) {
 				// no, user may not get this session
 			}

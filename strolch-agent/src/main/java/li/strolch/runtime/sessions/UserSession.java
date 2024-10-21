@@ -24,66 +24,15 @@ import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.Set;
 
-public class UserSession {
+public record UserSession(boolean keepAlive, String sessionId, ZonedDateTime loginTime, String username,
+						  String firstName, String lastName, String source, Set<String> userRoles, Locale locale,
+						  ZonedDateTime lastAccess) {
 
-	private final boolean keepAlive;
-	private final String sessionId;
-	private final ZonedDateTime loginTime;
-	private final String username;
-	private final String firstName;
-	private final String lastName;
-	private final String source;
-	private final Set<String> userRoles;
-	private final Locale locale;
-	private final ZonedDateTime lastAccess;
-
-	public UserSession(Certificate certificate) {
-		this.sessionId = certificate.getSessionId();
-		this.loginTime = certificate.getLoginTime();
-		this.username = certificate.getUsername();
-		this.firstName = certificate.getFirstname();
-		this.lastName = certificate.getLastname();
-		this.source = certificate.getSource();
-		this.userRoles = certificate.getUserRoles();
-		this.locale = certificate.getLocale();
-		this.keepAlive = certificate.isKeepAlive();
-		this.lastAccess = certificate.getLastAccess();
-	}
-
-	public Locale getLocale() {
-		return locale;
-	}
-
-	public ZonedDateTime getLastAccess() {
-		return lastAccess;
-	}
-
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	public ZonedDateTime getLoginTime() {
-		return loginTime;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public String getFirstname() {
-		return firstName;
-	}
-
-	public String getLastname() {
-		return lastName;
-	}
-
-	public String getSource() {
-		return this.source;
-	}
-
-	public Set<String> getUserRoles() {
-		return userRoles;
+	public static UserSession valueOf(Certificate certificate) {
+		return new UserSession(certificate.isKeepAlive(), certificate.getSessionId(), certificate.getLoginTime(),
+				certificate.getUsername(), certificate.getFirstname(), certificate.getLastname(),
+				certificate.getSource(), certificate.getUserRoles(), certificate.getLocale(),
+				certificate.getLastAccess());
 	}
 
 	public JsonObject toJson() {
