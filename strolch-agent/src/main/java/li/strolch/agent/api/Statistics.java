@@ -1,15 +1,13 @@
 package li.strolch.agent.api;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.time.temporal.ChronoUnit.*;
 
@@ -18,10 +16,10 @@ public class Statistics {
 	private final Queue<Statistic> events;
 
 	public Statistics() {
-		this.events = new LinkedList<>();
+		this.events = new ConcurrentLinkedQueue<>();
 	}
 
-	public void recordEvent(Duration duration) {
+	public synchronized void recordEvent(Duration duration) {
 		LocalDateTime now = LocalDateTime.now();
 		this.events.add(new Statistic(now, duration));
 		removeOldEvents(now);
@@ -53,7 +51,7 @@ public class Statistics {
 		return getInTimeFrame(1, DAYS);
 	}
 
-	private int getInTimeFrame(long amount, ChronoUnit unit) {
+	private synchronized int getInTimeFrame(long amount, ChronoUnit unit) {
 		LocalDateTime now = LocalDateTime.now();
 		return (int) this.events
 				.stream()
@@ -61,7 +59,7 @@ public class Statistics {
 				.count();
 	}
 
-	public JsonObject toJson() {
+	public synchronized JsonObject toJson() {
 		List<Duration> durations = this.events.stream().map(e -> e.duration).toList();
 
 		long count = durations.size();
