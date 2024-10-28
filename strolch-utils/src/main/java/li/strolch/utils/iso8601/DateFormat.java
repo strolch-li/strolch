@@ -27,8 +27,7 @@ public interface DateFormat {
 	/**
 	 * format a long to string
 	 *
-	 * @param timepoint
-	 * 		the timepoint
+	 * @param timepoint the timepoint
 	 *
 	 * @return the formatted string of the long value
 	 */
@@ -37,8 +36,7 @@ public interface DateFormat {
 	/**
 	 * format a Date to string
 	 *
-	 * @param date
-	 * 		the date
+	 * @param date the date
 	 *
 	 * @return the formatted string of the long value
 	 */
@@ -47,8 +45,7 @@ public interface DateFormat {
 	/**
 	 * parse a string to long
 	 *
-	 * @param s
-	 * 		the string
+	 * @param s the string
 	 *
 	 * @return the value parsed
 	 */
@@ -57,8 +54,7 @@ public interface DateFormat {
 	/**
 	 * parse a string to Date
 	 *
-	 * @param s
-	 * 		the string
+	 * @param s the string
 	 *
 	 * @return the value parsed
 	 */

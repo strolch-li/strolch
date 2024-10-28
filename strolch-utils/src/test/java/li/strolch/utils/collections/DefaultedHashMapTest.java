@@ -15,12 +15,12 @@
  */
 package li.strolch.utils.collections;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;

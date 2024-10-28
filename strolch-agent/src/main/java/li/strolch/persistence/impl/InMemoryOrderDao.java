@@ -1,14 +1,14 @@
 package li.strolch.persistence.impl;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-import java.util.Set;
-
 import li.strolch.model.Order;
 import li.strolch.persistence.api.OrderDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.utils.collections.DateRange;
+
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 public class InMemoryOrderDao implements OrderDao {
 
@@ -36,8 +36,13 @@ public class InMemoryOrderDao implements OrderDao {
 
 	@Override
 	public long querySize(DateRange dateRange, String... types) {
-		return instance.getElements().values().stream().filter(o -> isIn(o, types))
-				.filter(o -> dateRange.contains(o.getDate())).count();
+		return instance
+				.getElements()
+				.values()
+				.stream()
+				.filter(o -> isIn(o, types))
+				.filter(o -> dateRange.contains(o.getDate()))
+				.count();
 	}
 
 	private boolean isIn(Order o, String[] types) {
@@ -71,8 +76,14 @@ public class InMemoryOrderDao implements OrderDao {
 	@Override
 	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc)
 			throws StrolchPersistenceException {
-		return instance.getElements().values().stream().filter(o -> dateRange.contains(o.getDate())).skip(offset)
-				.limit(limit).collect(toList());
+		return instance
+				.getElements()
+				.values()
+				.stream()
+				.filter(o -> dateRange.contains(o.getDate()))
+				.skip(offset)
+				.limit(limit)
+				.collect(toList());
 	}
 
 	@Override
@@ -87,15 +98,27 @@ public class InMemoryOrderDao implements OrderDao {
 
 	@Override
 	public List<Order> queryAll(DateRange dateRange, String... types) throws StrolchPersistenceException {
-		return instance.getElements().values().stream().filter(o -> isIn(o, types))
-				.filter(o -> dateRange.contains(o.getDate())).collect(toList());
+		return instance
+				.getElements()
+				.values()
+				.stream()
+				.filter(o -> isIn(o, types))
+				.filter(o -> dateRange.contains(o.getDate()))
+				.collect(toList());
 	}
 
 	@Override
 	public List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc, String... types)
 			throws StrolchPersistenceException {
-		return instance.getElements().values().stream().filter(o -> isIn(o, types))
-				.filter(o -> dateRange.contains(o.getDate())).skip(offset).limit(limit).collect(toList());
+		return instance
+				.getElements()
+				.values()
+				.stream()
+				.filter(o -> isIn(o, types))
+				.filter(o -> dateRange.contains(o.getDate()))
+				.skip(offset)
+				.limit(limit)
+				.collect(toList());
 	}
 
 	@Override

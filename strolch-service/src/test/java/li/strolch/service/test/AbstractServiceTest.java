@@ -15,12 +15,12 @@
  */
 package li.strolch.service.test;
 
-import java.io.File;
-
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import java.io.File;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

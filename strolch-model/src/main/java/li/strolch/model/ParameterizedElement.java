@@ -15,19 +15,6 @@
  */
 package li.strolch.model;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static li.strolch.model.StrolchModelConstants.*;
-import static li.strolch.model.builder.BuilderHelper.buildParamName;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
@@ -37,6 +24,19 @@ import li.strolch.model.parameter.*;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.time.PeriodDuration;
+
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.model.builder.BuilderHelper.buildParamName;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -57,12 +57,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param type
-	 * 		the type
+	 * @param id   the id
+	 * @param name the name
+	 * @param type the type
 	 */
 	public ParameterizedElement(String id, String name, String type) {
 		setId(id);
@@ -78,8 +75,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the type of this {@link ParameterizedElement}
 	 *
-	 * @param type
-	 * 		the type to set
+	 * @param type the type to set
 	 */
 	public void setType(String type) {
 		assertNotReadonly();
@@ -99,8 +95,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Returns true if the parameter with the given key does not exist or the value is empty, i.e.
 	 * {@link Parameter#isEmpty()} returns true
 	 *
-	 * @param paramKey
-	 * 		the parameter to check if it is empty
+	 * @param paramKey the parameter to check if it is empty
 	 *
 	 * @return true if the parameter with the given key does not exist or the value is empty, i.e.
 	 * {@link Parameter#isEmpty()} returns true
@@ -113,8 +108,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Returns true if the parameter with the given key exists and the value is not empty, i.e.
 	 * {@link Parameter#isSet()} returns true
 	 *
-	 * @param paramKey
-	 * 		the parameter to check if it has a value
+	 * @param paramKey the parameter to check if it has a value
 	 *
 	 * @return true if the parameter with the given key exists and the value is not empty, i.e.
 	 * {@link Parameter#isSet()} returns true
@@ -126,13 +120,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link StringParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public String getString(String paramKey) throws StrolchModelException {
 		StringParameter param = getParameter(paramKey, false);
@@ -144,13 +136,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link BooleanParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public boolean getBoolean(String paramKey) throws StrolchModelException {
 		BooleanParameter param = getParameter(paramKey, false);
@@ -162,13 +152,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link IntegerParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public int getInteger(String paramKey) throws StrolchModelException {
 		IntegerParameter param = getParameter(paramKey, false);
@@ -180,13 +168,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link FloatParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public double getDouble(String paramKey) throws StrolchModelException {
 		FloatParameter param = getParameter(paramKey, false);
@@ -198,13 +184,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link LongParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public long getLong(String paramKey) throws StrolchModelException {
 		LongParameter param = getParameter(paramKey, false);
@@ -216,13 +200,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link DateParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public ZonedDateTime getDate(String paramKey) throws StrolchModelException {
 		DateParameter param = getParameter(paramKey, false);
@@ -234,13 +216,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link DateParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public LocalDateTime getLocalDate(String paramKey) throws StrolchModelException {
 		DateParameter param = getParameter(paramKey, false);
@@ -252,13 +232,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link TextParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public String getText(String paramKey) throws StrolchModelException {
 		TextParameter param = getParameter(paramKey, false);
@@ -270,13 +248,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link DurationParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public PeriodDuration getDuration(String paramKey) throws StrolchModelException {
 		DurationParameter param = getParameter(paramKey, false);
@@ -288,13 +264,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link StringListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public List<String> getStringList(String paramKey) throws StrolchModelException {
 		StringListParameter param = getParameter(paramKey, false);
@@ -306,13 +280,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns a {@link Stream} over the elements of the {@link StringListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return a stream over the values of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public Stream<String> streamStringList(String paramKey) throws StrolchModelException {
 		StringListParameter param = getParameter(paramKey, false);
@@ -324,13 +296,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link IntegerListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public List<Integer> getIntegerList(String paramKey) throws StrolchModelException {
 		IntegerListParameter param = getParameter(paramKey, false);
@@ -342,13 +312,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link FloatListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public List<Double> getDoubleList(String paramKey) throws StrolchModelException {
 		FloatListParameter param = getParameter(paramKey, false);
@@ -360,13 +328,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the value of the {@link LongListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
+	 * @param paramKey the key of the parameter for which to return the value
 	 *
 	 * @return the value of the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public List<Long> getLongList(String paramKey) throws StrolchModelException {
 		LongListParameter param = getParameter(paramKey, false);
@@ -378,13 +344,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link StringParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setString(String paramKey, String value) throws StrolchModelException {
 		StringParameter param = getParameter(paramKey, false);
@@ -397,13 +360,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given enum's name value on the {@link StringParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setString(String paramKey, Enum<?> value) throws StrolchModelException {
 		StringParameter param = getParameter(paramKey, false);
@@ -416,13 +376,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link BooleanParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setBoolean(String paramKey, boolean value) throws StrolchModelException {
 		BooleanParameter param = getParameter(paramKey, false);
@@ -435,13 +392,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link IntegerParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setInteger(String paramKey, int value) throws StrolchModelException {
 		IntegerParameter param = getParameter(paramKey, false);
@@ -454,13 +408,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link FloatParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setDouble(String paramKey, double value) throws StrolchModelException {
 		FloatParameter param = getParameter(paramKey, false);
@@ -473,13 +424,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link LongParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setLong(String paramKey, long value) throws StrolchModelException {
 		LongParameter param = getParameter(paramKey, false);
@@ -492,13 +440,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link DateParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setDate(String paramKey, ZonedDateTime value) throws StrolchModelException {
 		DateParameter param = getParameter(paramKey, false);
@@ -511,13 +456,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link DateParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setDate(String paramKey, LocalDateTime value) throws StrolchModelException {
 		DateParameter param = getParameter(paramKey, false);
@@ -530,13 +472,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link TextParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setText(String paramKey, String value) throws StrolchModelException {
 		TextParameter param = getParameter(paramKey, false);
@@ -549,13 +488,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link DurationParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setDuration(String paramKey, PeriodDuration value) throws StrolchModelException {
 		DurationParameter param = getParameter(paramKey, false);
@@ -568,13 +504,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link StringListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setStringList(String paramKey, List<String> value) throws StrolchModelException {
 		StringListParameter param = getParameter(paramKey, false);
@@ -587,13 +520,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link IntegerListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setIntegerList(String paramKey, List<Integer> value) throws StrolchModelException {
 		IntegerListParameter param = getParameter(paramKey, false);
@@ -606,13 +536,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link FloatListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setDoubleList(String paramKey, List<Double> value) throws StrolchModelException {
 		FloatListParameter param = getParameter(paramKey, false);
@@ -625,13 +552,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Sets the given value on the {@link LongListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter for which to return the value
-	 * @param value
-	 * 		the value to set on the parameter
+	 * @param paramKey the key of the parameter for which to return the value
+	 * @param value    the value to set on the parameter
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public void setLongList(String paramKey, List<Long> value) throws StrolchModelException {
 		LongListParameter param = getParameter(paramKey, false);
@@ -647,13 +571,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link StringParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public StringParameter getStringP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -662,13 +584,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link BooleanParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public BooleanParameter getBooleanP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -677,13 +597,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link IntegerParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public IntegerParameter getIntegerP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -692,13 +610,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link FloatParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public FloatParameter getDoubleP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -707,13 +623,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link LongParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public LongParameter getLongP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -722,13 +636,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link DateParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public DateParameter getDateP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -737,13 +649,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link TextParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public TextParameter getTextP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -752,13 +662,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link DurationParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public DurationParameter getDurationP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -767,13 +675,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link StringListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public StringListParameter getStringListP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -782,13 +688,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link IntegerListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public IntegerListParameter getIntegerListP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -797,13 +701,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link FloatListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public FloatListParameter getDoubleListP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -812,13 +714,11 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link LongListParameter} with the given paramKey
 	 *
-	 * @param paramKey
-	 * 		the key of the parameter
+	 * @param paramKey the key of the parameter
 	 *
 	 * @return the parameter with the given paramKey
 	 *
-	 * @throws StrolchModelException
-	 * 		if the parameter does not exist
+	 * @throws StrolchModelException if the parameter does not exist
 	 */
 	public LongListParameter getLongListP(String paramKey) throws StrolchModelException {
 		return getParameter(paramKey, true);
@@ -827,8 +727,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link Parameter} with the given id, or null if it does not exist
 	 *
-	 * @param key
-	 * 		the id of the parameter to return
+	 * @param key the id of the parameter to return
 	 *
 	 * @return the {@link Parameter} with the given id, or null if it does not exist
 	 */
@@ -839,10 +738,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns the {@link Parameter} with the given id, or null if it does not exist
 	 *
-	 * @param key
-	 * 		the id of the parameter to return
-	 * @param assertExists
-	 * 		if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
+	 * @param key          the id of the parameter to return
+	 * @param assertExists if set to true, and the parameter does not exist, a {@link StrolchModelException} is thrown
 	 *
 	 * @return the {@link Parameter} with the given id, or null if it does not exist
 	 */
@@ -870,8 +767,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Adds the given {@link Parameter} to the {@link ParameterizedElement}
 	 *
-	 * @param parameter
-	 * 		the {@link Parameter} to add
+	 * @param parameter the {@link Parameter} to add
 	 */
 	public void addParameter(Parameter<?> parameter) {
 		assertNotReadonly();
@@ -891,8 +787,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Removes the {@link Parameter} with the given key
 	 *
-	 * @param key
-	 * 		the key of the {@link Parameter} to remove
+	 * @param key the key of the {@link Parameter} to remove
 	 *
 	 * @return the removed {@link Parameter}, or null if it does not exist
 	 */
@@ -930,8 +825,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the parameters are to be returned
+	 * @param interpretation the interpretation for which the parameters are to be returned
 	 *
 	 * @return the parameters with the given interpretation
 	 */
@@ -945,10 +839,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns a {@link Stream} of all the {@link Parameter Parameters} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the parameters are to be returned
-	 * @param uom
-	 * 		the uom for which the parameters are to be returned
+	 * @param interpretation the interpretation for which the parameters are to be returned
+	 * @param uom            the uom for which the parameters are to be returned
 	 *
 	 * @return the parameters with the given interpretation
 	 */
@@ -956,7 +848,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		if (this.parameterMap == null)
 			return Stream.empty();
 
-		return this.parameterMap.values()
+		return this.parameterMap
+				.values()
 				.stream()
 				.filter(p -> p.getInterpretation().equals(interpretation) && p.getUom().equals(uom));
 	}
@@ -964,8 +857,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the parameters are to be returned
+	 * @param interpretation the interpretation for which the parameters are to be returned
 	 *
 	 * @return the parameters with the given interpretation
 	 */
@@ -976,10 +868,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns a list of all the {@link Parameter Parameters} with the given interpretation
 	 *
-	 * @param interpretation
-	 * 		the interpretation for which the parameters are to be returned
-	 * @param uom
-	 * 		the uom for which the parameters are to be returned
+	 * @param interpretation the interpretation for which the parameters are to be returned
+	 * @param uom            the uom for which the parameters are to be returned
 	 *
 	 * @return the parameters with the given interpretation
 	 */
@@ -999,8 +889,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Returns true, if the {@link Parameter} exists with the given key, false otherwise
 	 *
-	 * @param key
-	 * 		the key of the {@link Parameter} to check for
+	 * @param key the key of the {@link Parameter} to check for
 	 *
 	 * @return true, if the {@link Parameter} exists with the given key, false otherwise
 	 */
@@ -1024,17 +913,12 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Set or add a parameter to this element from a {@link JsonObject}
 	 *
-	 * @param jsonObject
-	 * 		the object from which to get the value
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param paramName
-	 * 		the name of the parameter, if the parameter is to be created
-	 * @param type
-	 * 		the type of Parameter to create
-	 * @param ignoreOnEmpty
-	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
-	 * 		is cleared if the json field is missing or null
+	 * @param jsonObject    the object from which to get the value
+	 * @param paramId       the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName     the name of the parameter, if the parameter is to be created
+	 * @param type          the type of Parameter to create
+	 * @param ignoreOnEmpty if true, and the json object is missing the field, then the parameter is not changed,
+	 *                      otherwise the parameter is cleared if the json field is missing or null
 	 */
 	public void setOrAddParamFromFlatJson(JsonObject jsonObject, String paramId, String paramName,
 			StrolchValueType type, boolean ignoreOnEmpty) {
@@ -1044,21 +928,14 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Set or add a parameter to this element from a {@link JsonObject}
 	 *
-	 * @param jsonObject
-	 * 		the object from which to get the value
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param paramName
-	 * 		the name of the parameter, if the parameter is to be created
-	 * @param interpretation
-	 * 		the interpretation
-	 * @param uom
-	 * 		the uom
-	 * @param type
-	 * 		the type of Parameter to create
-	 * @param ignoreOnEmpty
-	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
-	 * 		is cleared if the json field is missing or null
+	 * @param jsonObject     the object from which to get the value
+	 * @param paramId        the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param paramName      the name of the parameter, if the parameter is to be created
+	 * @param interpretation the interpretation
+	 * @param uom            the uom
+	 * @param type           the type of Parameter to create
+	 * @param ignoreOnEmpty  if true, and the json object is missing the field, then the parameter is not changed,
+	 *                       otherwise the parameter is cleared if the json field is missing or null
 	 */
 	public void setOrAddParamFromFlatJson(JsonObject jsonObject, String paramId, String paramName,
 			String interpretation, String uom, StrolchValueType type, boolean ignoreOnEmpty) {
@@ -1086,10 +963,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Set a parameter on this element from a {@link JsonObject}
 	 *
-	 * @param jsonObject
-	 * 		the object from which to get the value
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param jsonObject the object from which to get the value
+	 * @param paramId    the ID of the parameter on which to set the value, and also the Json reference ID
 	 */
 	public void setParamFromFlatJson(JsonObject jsonObject, String paramId) {
 		Parameter<?> param = getParameter(paramId);
@@ -1099,13 +974,10 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Set a parameter on this element from a {@link JsonObject}
 	 *
-	 * @param jsonObject
-	 * 		the object from which to get the value
-	 * @param paramId
-	 * 		the ID of the parameter on which to set the value, and also the Json reference ID
-	 * @param ignoreOnEmpty
-	 * 		if true, and the json object is missing the field, then the parameter is not changed, otherwise the parameter
-	 * 		is cleared if the json field is missing or null
+	 * @param jsonObject    the object from which to get the value
+	 * @param paramId       the ID of the parameter on which to set the value, and also the Json reference ID
+	 * @param ignoreOnEmpty if true, and the json object is missing the field, then the parameter is not changed,
+	 *                      otherwise the parameter is cleared if the json field is missing or null
 	 */
 	public void setParamFromFlatJson(JsonObject jsonObject, String paramId, boolean ignoreOnEmpty) {
 		if (!jsonObject.has(paramId) && ignoreOnEmpty)
@@ -1118,10 +990,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
 	 * element
 	 *
-	 * @param paramId
-	 * 		the parameter ID of which to copy the value
-	 * @param otherElement
-	 * 		the element from which to get the value to copy
+	 * @param paramId      the parameter ID of which to copy the value
+	 * @param otherElement the element from which to get the value to copy
 	 */
 	public void copyParameterValue(String paramId, ParameterizedElement otherElement) {
 		Parameter<?> otherParam = otherElement.getParameter(paramId);
@@ -1132,10 +1002,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
 	 * element. Copying is done from the #BAG_PARAMETERS parameter bag
 	 *
-	 * @param paramId
-	 * 		the parameter ID of which to copy the value
-	 * @param otherElement
-	 * 		the element from which to get the value to copy
+	 * @param paramId      the parameter ID of which to copy the value
+	 * @param otherElement the element from which to get the value to copy
 	 */
 	public void copyParameterValue(String paramId, GroupedParameterizedElement otherElement) {
 		copyParameterValue(BAG_PARAMETERS, paramId, otherElement);
@@ -1145,10 +1013,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Copies the value of the parameter with the given id from the given element and sets it on the parameter on this
 	 * element. Copying is done from the #BAG_RELATIONS parameter bag
 	 *
-	 * @param paramId
-	 * 		the parameter ID of which to copy the value
-	 * @param otherElement
-	 * 		the element from which to get the value to copy
+	 * @param paramId      the parameter ID of which to copy the value
+	 * @param otherElement the element from which to get the value to copy
 	 */
 	public void copyRelationId(String paramId, GroupedParameterizedElement otherElement) {
 		copyParameterValue(BAG_RELATIONS, paramId, otherElement);
@@ -1158,12 +1024,9 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Copies the value of the parameter from the {@link ParameterBag} with the given bag and param ID from the given
 	 * element and sets it on the parameter on this element
 	 *
-	 * @param bagId
-	 * 		the ID of the bag from which to get the parameter from the other element
-	 * @param paramId
-	 * 		the parameter ID of which to copy the value
-	 * @param otherElement
-	 * 		the element from which to get the value to copy
+	 * @param bagId        the ID of the bag from which to get the parameter from the other element
+	 * @param paramId      the parameter ID of which to copy the value
+	 * @param otherElement the element from which to get the value to copy
 	 */
 	public void copyParameterValue(String bagId, String paramId, GroupedParameterizedElement otherElement) {
 		Parameter<?> otherParam = otherElement.getParameter(bagId, paramId);
@@ -1178,7 +1041,8 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	 * Parameters
 	 */
 	public Map<String, Object> toObjectMap() {
-		return this.parameterMap.values()
+		return this.parameterMap
+				.values()
 				.stream()
 				.collect(toMap(StrolchElement::getId, (Function<Parameter<?>, Object>) Parameter::getValue));
 	}
@@ -1229,8 +1093,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 	/**
 	 * Set the parent for this {@link ParameterizedElement}
 	 *
-	 * @param parent
-	 * 		the parent to set
+	 * @param parent the parent to set
 	 */
 	public void setParent(GroupedParameterizedElement parent) {
 		assertNotReadonly();

@@ -1,13 +1,13 @@
 package li.strolch.model.i18n;
 
-import java.util.Properties;
-import java.util.Set;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 import li.strolch.utils.I18nMessage;
+
+import java.util.Properties;
+import java.util.Set;
 
 public class I18nMessageJsonParser {
 

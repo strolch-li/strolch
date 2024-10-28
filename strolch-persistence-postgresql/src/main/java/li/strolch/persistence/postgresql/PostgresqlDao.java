@@ -15,16 +15,7 @@
  */
 package li.strolch.persistence.postgresql;
 
-import javax.xml.transform.sax.SAXResult;
-import java.sql.*;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Version;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.xml.StrolchElementToSaxVisitor;
 import li.strolch.persistence.api.StrolchDao;
@@ -34,37 +25,58 @@ import org.postgresql.util.PGobject;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.sax.SAXResult;
+import java.sql.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public abstract class PostgresqlDao<T extends StrolchRootElement> implements StrolchDao<T> {
 
 	private static final String querySizeSqlS = "select count(*) from {0} where latest = true";
 	private static final String querySizeOfTypeSqlS = "select count(*) from {0} where type = ANY(?) and latest = true";
 	private static final String querySizeOfElementSqlS = "select count(*) from {0} where type = ? and id = ?";
 	private static final String queryTypesSqlS = "select distinct type from {0} where latest = true";
-	private static final String queryLatestVersionNumberForSqlS = "select count(*), max(version) from {0} where type = ? and id = ?";
+	private static final String queryLatestVersionNumberForSqlS
+			= "select count(*), max(version) from {0} where type = ? and id = ?";
 	private static final String queryVersionsSizeForSqlS = "select count(*) from {0} where type = ? and id = ?";
 
-	private static final String updateLatestSqlS = "update {0} set latest = true where type = ? and id = ? and version = ?";
+	private static final String updateLatestSqlS
+			= "update {0} set latest = true where type = ? and id = ? and version = ?";
 
 	private static final String deleteElementSqlS = "delete from {0} where type = ? and id = ?";
-	private static final String deleteVersionSqlS = "delete from {0} where type = ? and id = ? and version = ? and latest = true";
+	private static final String deleteVersionSqlS
+			= "delete from {0} where type = ? and id = ? and version = ? and latest = true";
 	private static final String deleteAllSqlS = "delete from {0}";
 	private static final String deleteAllByTypeSqlS = "delete from {0} where type = ?";
 
-	private static final String queryByVersionAsXmlSqlS = "select version, asxml from {0} where type = ? and id = ? and version = ?";
-	private static final String queryByVersionAsJsonSqlS = "select version, asjson from {0} where type = ? and id = ? and version = ?";
+	private static final String queryByVersionAsXmlSqlS
+			= "select version, asxml from {0} where type = ? and id = ? and version = ?";
+	private static final String queryByVersionAsJsonSqlS
+			= "select version, asjson from {0} where type = ? and id = ? and version = ?";
 
-	private static final String queryVersionsAsXmlForSqlS = "select asxml from {0} where type = ? and id = ? order by version";
-	private static final String queryVersionsAsJsonForSqlS = "select asjson from {0} where type = ? and id = ? order by version";
+	private static final String queryVersionsAsXmlForSqlS
+			= "select asxml from {0} where type = ? and id = ? order by version";
+	private static final String queryVersionsAsJsonForSqlS
+			= "select asjson from {0} where type = ? and id = ? order by version";
 
 	private static final String queryAllAsXmlSqlS = "select id, type, asxml from {0} where latest = true";
-	private static final String queryAllAsXmlLimitSqlS = "select id, type, asxml from {0} where latest = true order by id limit {1} offset {2}";
+	private static final String queryAllAsXmlLimitSqlS
+			= "select id, type, asxml from {0} where latest = true order by id limit {1} offset {2}";
 	private static final String queryAllAsJsonSqlS = "select id, type, asjson from {0} where latest = true";
-	private static final String queryAllAsJsonLimitSqlS = "select id, type, asjson from {0} where latest = true order by id limit {1} offset {2}";
+	private static final String queryAllAsJsonLimitSqlS
+			= "select id, type, asjson from {0} where latest = true order by id limit {1} offset {2}";
 
-	private static final String queryAllByTypeAsXmlSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true";
-	private static final String queryAllByTypeAsXmlLimitSqlS = "select id, type, asxml from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
-	private static final String queryAllByTypeAsJsonSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true";
-	private static final String queryAllByTypeAsJsonLimitSqlS = "select id, type, asjson from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
+	private static final String queryAllByTypeAsXmlSqlS
+			= "select id, type, asxml from {0} where type = ANY(?) and latest = true";
+	private static final String queryAllByTypeAsXmlLimitSqlS
+			= "select id, type, asxml from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
+	private static final String queryAllByTypeAsJsonSqlS
+			= "select id, type, asjson from {0} where type = ANY(?) and latest = true";
+	private static final String queryAllByTypeAsJsonLimitSqlS
+			= "select id, type, asjson from {0} where type = ANY(?) and latest = true order by id limit {1,number,#} offset {2,number,#}";
 
 	protected final DataType dataType;
 	protected final Connection connection;
@@ -501,8 +513,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to remove {0} due to {1}", element.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove {0} due to {1}", element.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 
 		if (count == 0) {
@@ -523,8 +536,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to remove {0} due to {1}", element.getLocator(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove {0} due to {1}", element.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -537,7 +551,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 			int modCount = preparedStatement.executeUpdate();
 			if (modCount != 1) {
-				String msg = "Expected to delete 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} is the latest version!";
+				String msg
+						= "Expected to delete 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} is the latest version!";
 				msg = MessageFormat.format(msg, element.getId(), modCount, element.getVersion());
 				throw new StrolchPersistenceException(msg);
 			}
@@ -552,9 +567,10 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 
 					modCount = updateStmt.executeUpdate();
 					if (modCount != 1) {
-						String msg = "Expected to update 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} with version {3} exists!";
-						msg = MessageFormat
-								.format(msg, element.getId(), modCount, element.getLocator(), previousVersion);
+						String msg
+								= "Expected to update 1 element with id {0} but SQL statement modified {1} elements! Verify that element {2} with version {3} exists!";
+						msg = MessageFormat.format(msg, element.getId(), modCount, element.getLocator(),
+								previousVersion);
 						throw new StrolchPersistenceException(msg);
 					}
 
@@ -562,9 +578,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to remove version {0} due to {1}", element.getLocator(), e.getLocalizedMessage()),
-					e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove version {0} due to {1}", element.getLocator(),
+							e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -588,8 +604,9 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 			preparedStatement.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat
-					.format("Failed to remove all elements of type {0} due to {1}", type, e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove all elements of type {0} due to {1}", type,
+							e.getLocalizedMessage()), e);
 		}
 	}
 

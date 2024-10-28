@@ -1,19 +1,19 @@
 package li.strolch.model.parameter;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.*;
-
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
-
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.utils.time.PeriodDuration;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
 public class ParameterTest {
 

@@ -1,7 +1,5 @@
 package li.strolch.execution;
 
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.execution.command.ArchiveActivityCommand;
 import li.strolch.job.JobMode;
@@ -9,6 +7,8 @@ import li.strolch.job.StrolchJob;
 import li.strolch.model.State;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.PrivilegeContext;
+
+import java.util.concurrent.TimeUnit;
 
 public class ArchiveExecutedActivitiesJob extends StrolchJob {
 

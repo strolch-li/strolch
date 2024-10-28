@@ -195,8 +195,7 @@ public class AsciiHelper {
 	/**
 	 * Returns the ASCII Text of a certain bye value
 	 *
-	 * @param b
-	 * 		the byte
+	 * @param b the byte
 	 *
 	 * @return String
 	 */
@@ -207,8 +206,7 @@ public class AsciiHelper {
 	/**
 	 * Returns the ASCII Text of a certain char value
 	 *
-	 * @param c
-	 * 		the char
+	 * @param c the char
 	 *
 	 * @return String
 	 */

@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * Expression to set a fixed value
- *
+ * <p>
  * TODO allow blancs in Strings, and support parsing to other objects like int, double, Dates, etc.
  *
  * @author msmock

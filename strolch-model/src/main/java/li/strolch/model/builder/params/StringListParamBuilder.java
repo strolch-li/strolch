@@ -1,12 +1,12 @@
 package li.strolch.model.builder.params;
 
-import static li.strolch.model.StrolchModelConstants.*;
-
-import java.util.List;
-
 import li.strolch.model.builder.BagBuilder;
 import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.StringListParameter;
+
+import java.util.List;
+
+import static li.strolch.model.StrolchModelConstants.*;
 
 public class StringListParamBuilder<T extends ParameterBagContainerBuilder<T>>
 		extends ParameterBuilder<List<String>, StringListParameter, T> {

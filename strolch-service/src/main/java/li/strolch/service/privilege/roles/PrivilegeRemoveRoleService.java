@@ -52,9 +52,8 @@ public class PrivilegeRemoveRoleService extends AbstractService<PrivilegeRoleNam
 			role = privilegeHandler.removeRole(getCertificate(), arg.roleName);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx
-					.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.ROLE,
-							role.getName());
+			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.ROLE, role.getName());
 			tx.getAuditTrail().add(tx, audit);
 		}
 

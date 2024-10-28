@@ -19,8 +19,8 @@ import li.strolch.model.timedstate.AbstractStrolchTimedState;
 import li.strolch.model.timevalue.impl.TimeVariable;
 
 /**
- * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable} or {@link
- * AbstractStrolchTimedState}.
+ * Interface for operators to be used to change the values of {@link ITimeValue} in a {@link ITimeVariable} or
+ * {@link AbstractStrolchTimedState}.
  *
  * @author Martin Smock <smock.martin@gmail.com>
  */
@@ -33,8 +33,7 @@ public interface IValueChange<T extends IValue> {
 	String getStateId();
 
 	/**
-	 * @param id
-	 * 		the id of the {@link AbstractStrolchTimedState} the change applies to
+	 * @param id the id of the {@link AbstractStrolchTimedState} the change applies to
 	 */
 	void setStateId(String id);
 

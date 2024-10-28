@@ -1,8 +1,8 @@
 package li.strolch.exception;
 
-import java.util.Locale;
-
 import li.strolch.utils.I18nMessage;
+
+import java.util.Locale;
 
 public class StrolchElementNotFoundException extends StrolchModelException {
 

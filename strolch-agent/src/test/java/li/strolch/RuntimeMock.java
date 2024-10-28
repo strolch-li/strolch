@@ -15,28 +15,23 @@
  */
 package li.strolch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.api.StrolchBootstrapper;
-import li.strolch.agent.api.StrolchRealm;
-import li.strolch.agent.api.StrolchVersion;
+import li.strolch.agent.api.*;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Basically you should use the RuntimeMock class in the testbase project, but to mitigate circular dependencies, in
@@ -175,7 +170,11 @@ public class RuntimeMock implements AutoCloseable {
 				expectedResultType, result.getClass());
 
 		if (!expectedState.equals(result.getState())) {
-			fail("Expected service result state " + expectedState + " but was " + result.getState() + ": Reason: "
+			fail("Expected service result state "
+					+ expectedState
+					+ " but was "
+					+ result.getState()
+					+ ": Reason: "
 					+ StringHelper.formatException(result.getThrowable()));
 		}
 	}

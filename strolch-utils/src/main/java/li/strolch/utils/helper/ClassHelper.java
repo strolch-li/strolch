@@ -27,15 +27,12 @@ public class ClassHelper {
 	/**
 	 * Returns an instance of the class' name given by instantiating the class through an empty arguments constructor
 	 *
-	 * @param className
-	 * 		the name of a class to instantiate through an empty arguments constructor
-	 * @param <T>
-	 * 		the type of the class to return
+	 * @param className the name of a class to instantiate through an empty arguments constructor
+	 * @param <T>       the type of the class to return
 	 *
 	 * @return the newly instantiated object from the given class name
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the class could not be instantiated
+	 * @throws IllegalArgumentException if the class could not be instantiated
 	 */
 	public static <T> T instantiateClass(String className) throws IllegalArgumentException {
 		return instantiateClass(className, new Class<?>[0], new Object[0]);
@@ -45,14 +42,10 @@ public class ClassHelper {
 	 * Returns an instance of the class' name given by instantiating the constructor using the given types and
 	 * arguments
 	 *
-	 * @param className
-	 * 		the name of a class to instantiate through an empty arguments constructor
-	 * @param types
-	 * 		the constructor types
-	 * @param args
-	 * 		the constructor arguments
-	 * @param <T>
-	 * 		the type of the class to return
+	 * @param className the name of a class to instantiate through an empty arguments constructor
+	 * @param types     the constructor types
+	 * @param args      the constructor arguments
+	 * @param <T>       the type of the class to return
 	 *
 	 * @return the newly instantiated object from the given class name
 	 *
@@ -62,8 +55,7 @@ public class ClassHelper {
 			throws IllegalArgumentException {
 		try {
 
-			@SuppressWarnings("unchecked")
-			Class<T> clazz = (Class<T>) Class.forName(className);
+			@SuppressWarnings("unchecked") Class<T> clazz = (Class<T>) Class.forName(className);
 
 			return instantiateClass(clazz, types, args);
 
@@ -76,15 +68,13 @@ public class ClassHelper {
 	/**
 	 * Instantiates an object for the given {@link Class} using an empty arguments constructor
 	 *
-	 * @param clazz
-	 * 		the {@link Class} from which a new object is to be instantiated using an empty arguments constructor
-	 * @param <T>
-	 * 		the type of the class to return
+	 * @param clazz the {@link Class} from which a new object is to be instantiated using an empty arguments
+	 *              constructor
+	 * @param <T>   the type of the class to return
 	 *
 	 * @return the newly instantiated object from the given {@link Class}
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the {@link Class} could not be instantiated
+	 * @throws IllegalArgumentException if the {@link Class} could not be instantiated
 	 */
 	public static <T> T instantiateClass(Class<T> clazz) throws IllegalArgumentException {
 		return instantiateClass(clazz, new Class<?>[0], new Object[0]);
@@ -93,19 +83,15 @@ public class ClassHelper {
 	/**
 	 * Instantiates an object for the given {@link Class} using the given constructor arguments
 	 *
-	 * @param clazz
-	 * 		the {@link Class} from which a new object is to be instantiated using an empty arguments constructor
-	 * @param types
-	 * 		the constructor types
-	 * @param args
-	 * 		the constructor arguments
-	 * @param <T>
-	 * 		the type of the class to return
+	 * @param clazz the {@link Class} from which a new object is to be instantiated using an empty arguments
+	 *              constructor
+	 * @param types the constructor types
+	 * @param args  the constructor arguments
+	 * @param <T>   the type of the class to return
 	 *
 	 * @return the newly instantiated object from the given {@link Class}
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the {@link Class} could not be instantiated
+	 * @throws IllegalArgumentException if the {@link Class} could not be instantiated
 	 */
 	public static <T> T instantiateClass(Class<T> clazz, Class<?>[] types, Object[] args)
 			throws IllegalArgumentException {
@@ -114,8 +100,7 @@ public class ClassHelper {
 			return clazz.getConstructor(types).newInstance(args);
 
 		} catch (Exception e) {
-			String msg = MessageFormat
-					.format("The class {0} could not be instantiated: ", clazz.getName());
+			String msg = MessageFormat.format("The class {0} could not be instantiated: ", clazz.getName());
 			throw new IllegalArgumentException(msg, e);
 		}
 	}
@@ -123,15 +108,12 @@ public class ClassHelper {
 	/**
 	 * Loads the {@link Class} object for the given class name
 	 *
-	 * @param className
-	 * 		the name of the {@link Class} to load and return
-	 * @param <T>
-	 * 		the type of {@link Class} to return
+	 * @param className the name of the {@link Class} to load and return
+	 * @param <T>       the type of {@link Class} to return
 	 *
 	 * @return the {@link Class} object for the given class name
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the class could not be instantiated
+	 * @throws IllegalArgumentException if the class could not be instantiated
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> loadClass(String className) throws IllegalArgumentException {

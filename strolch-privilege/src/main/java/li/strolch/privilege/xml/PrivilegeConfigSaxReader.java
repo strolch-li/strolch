@@ -133,8 +133,7 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 				case CONTAINER -> getContainerModel().setParameterMap(params);
 				case HANDLER_PRIVILEGE -> getContainerModel().setPrivilegeHandlerParameterMap(params);
 				case HANDLER_ENCRYPTION -> getContainerModel().setEncryptionHandlerParameterMap(params);
-				case HANDLER_PASSWORD_STRENGTH ->
-						getContainerModel().setPasswordStrengthHandlerParameterMap(params);
+				case HANDLER_PASSWORD_STRENGTH -> getContainerModel().setPasswordStrengthHandlerParameterMap(params);
 				case HANDLER_PERSISTENCE -> getContainerModel().setPersistenceHandlerParameterMap(params);
 				case HANDLER_USER_CHALLENGE -> getContainerModel().setUserChallengeHandlerParameterMap(params);
 				case HANDLER_SSO -> getContainerModel().setSsoHandlerParameterMap(params);

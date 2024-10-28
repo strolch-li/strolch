@@ -50,7 +50,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
-		return new TransientTransaction(this.container, this, certificate, clazz.getName(),readOnly);
+		return new TransientTransaction(this.container, this, certificate, clazz.getName(), readOnly);
 	}
 
 	@Override

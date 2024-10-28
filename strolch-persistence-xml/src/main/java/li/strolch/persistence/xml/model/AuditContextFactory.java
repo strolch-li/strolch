@@ -34,8 +34,8 @@ public class AuditContextFactory implements PersistenceContextFactory<Audit> {
 
 	@Override
 	public PersistenceContext<Audit> createCtx(ObjectReferenceCache objectRefCache, Audit audit) {
-		IdOfSubTypeRef objectRef = objectRefCache
-				.getIdOfSubTypeRef(Tags.AUDIT, audit.getElementType(), audit.getId().toString());
+		IdOfSubTypeRef objectRef = objectRefCache.getIdOfSubTypeRef(Tags.AUDIT, audit.getElementType(),
+				audit.getId().toString());
 		PersistenceContext<Audit> ctx = createCtx(objectRef);
 		ctx.setObject(audit);
 		return ctx;

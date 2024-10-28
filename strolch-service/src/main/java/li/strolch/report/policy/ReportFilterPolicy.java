@@ -1,11 +1,5 @@
 package li.strolch.report.policy;
 
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Date;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
@@ -14,6 +8,12 @@ import li.strolch.policy.StrolchPolicy;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 public abstract class ReportFilterPolicy extends StrolchPolicy {
 

@@ -17,8 +17,7 @@ public interface PolicyContainer {
 	 *
 	 * @return the reference to the {@link PolicyDefs}
 	 *
-	 * @throws StrolchPolicyException
-	 * 		if no {@link PolicyDefs} are available
+	 * @throws StrolchPolicyException if no {@link PolicyDefs} are available
 	 */
 	PolicyDefs getPolicyDefs() throws StrolchPolicyException;
 
@@ -30,8 +29,7 @@ public interface PolicyContainer {
 	/**
 	 * Returns true if this container has the {@link PolicyDef} with the given type, false if not
 	 *
-	 * @param type
-	 * 		the type of policy def to return
+	 * @param type the type of policy def to return
 	 *
 	 * @return true if this container has the {@link PolicyDef} with the given type, false if not
 	 */
@@ -40,8 +38,7 @@ public interface PolicyContainer {
 	/**
 	 * Returns true if this container has the {@link PolicyDef} with the given type, false if not
 	 *
-	 * @param clazz
-	 * 		the type of policy def to return
+	 * @param clazz the type of policy def to return
 	 *
 	 * @return true if this container has the {@link PolicyDef} with the given type, false if not
 	 */
@@ -50,8 +47,7 @@ public interface PolicyContainer {
 	/**
 	 * Returns the {@link PolicyDef} for the given type
 	 *
-	 * @param type
-	 * 		the type of policy def to return
+	 * @param type the type of policy def to return
 	 *
 	 * @return the policy def of the given type
 	 */
@@ -60,10 +56,8 @@ public interface PolicyContainer {
 	/**
 	 * Returns the {@link PolicyDef} for the given type
 	 *
-	 * @param type
-	 * 		the type of policy def to return
-	 * @param defaultDef
-	 * 		the default policy definition to return if the given type is not defined
+	 * @param type       the type of policy def to return
+	 * @param defaultDef the default policy definition to return if the given type is not defined
 	 *
 	 * @return the policy def of the given type
 	 */
@@ -72,8 +66,7 @@ public interface PolicyContainer {
 	/**
 	 * Returns the {@link PolicyDef} for the given class
 	 *
-	 * @param clazz
-	 * 		the type of policy def to return
+	 * @param clazz the type of policy def to return
 	 *
 	 * @return the policy def of the given class
 	 */
@@ -82,10 +75,8 @@ public interface PolicyContainer {
 	/**
 	 * Returns the {@link PolicyDef} for the given class
 	 *
-	 * @param clazz
-	 * 		the type of policy def to return
-	 * @param defaultDef
-	 * 		the default policy definition to return if the given type is not defined
+	 * @param clazz      the type of policy def to return
+	 * @param defaultDef the default policy definition to return if the given type is not defined
 	 *
 	 * @return the policy def of the given class
 	 */
@@ -94,16 +85,14 @@ public interface PolicyContainer {
 	/**
 	 * Set the reference to the {@link PolicyDefs}
 	 *
-	 * @param policyDefs
-	 * 		the {@link PolicyDefs} to set
+	 * @param policyDefs the {@link PolicyDefs} to set
 	 */
 	void setPolicyDefs(PolicyDefs policyDefs);
 
 	/**
 	 * Add or update the given {@link PolicyDef} to this container
 	 *
-	 * @param policyDef
-	 * 		the {@link PolicyDef} to add or update
+	 * @param policyDef the {@link PolicyDef} to add or update
 	 */
 	void addOrUpdate(PolicyDef policyDef);
 }

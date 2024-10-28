@@ -15,10 +15,9 @@
  */
 package li.strolch.model;
 
-import static java.util.Collections.emptySet;
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
+import li.strolch.exception.StrolchException;
+import li.strolch.exception.StrolchModelException;
+import li.strolch.model.parameter.Parameter;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -27,9 +26,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.exception.StrolchModelException;
-import li.strolch.model.parameter.Parameter;
+import static java.util.Collections.emptySet;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -49,12 +49,9 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param type
-	 * 		the type
+	 * @param id   the id
+	 * @param name the name
+	 * @param type the type
 	 */
 	protected GroupedParameterizedElement(String id, String name, String type) {
 		super(id, name);
@@ -69,8 +66,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	/**
 	 * Sets the type of this {@link GroupedParameterizedElement}
 	 *
-	 * @param type
-	 * 		the type to set
+	 * @param type the type to set
 	 */
 	public void setType(String type) {
 		assertNotReadonly();
@@ -276,8 +272,7 @@ public abstract class GroupedParameterizedElement extends AbstractStrolchElement
 	/**
 	 * Fills {@link GroupedParameterizedElement} properties of this clone
 	 *
-	 * @param clone
-	 * 		the clone to fill
+	 * @param clone the clone to fill
 	 */
 	@Override
 	protected void fillClone(AbstractStrolchElement clone) {

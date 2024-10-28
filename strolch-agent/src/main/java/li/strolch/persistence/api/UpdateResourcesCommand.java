@@ -15,15 +15,15 @@
  */
 package li.strolch.persistence.api;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,16 +38,14 @@ public class UpdateResourcesCommand extends Command {
 	}
 
 	/**
-	 * @param resources
-	 * 		the resources to set for updating
+	 * @param resources the resources to set for updating
 	 */
 	public void setResources(List<Resource> resources) {
 		this.resources = resources;
 	}
 
 	/**
-	 * @param resource
-	 * 		the resource to add for updating
+	 * @param resource the resource to add for updating
 	 */
 	public void addResource(Resource resource) {
 		this.resources.add(resource);

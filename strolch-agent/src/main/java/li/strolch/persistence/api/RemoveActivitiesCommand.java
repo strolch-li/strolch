@@ -15,15 +15,15 @@
  */
 package li.strolch.persistence.api;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,16 +38,14 @@ public class RemoveActivitiesCommand extends Command {
 	}
 
 	/**
-	 * @param activities
-	 * 		the activities to set for removal
+	 * @param activities the activities to set for removal
 	 */
 	public void setActivities(List<Activity> activities) {
 		this.activities = activities;
 	}
 
 	/**
-	 * @param activity
-	 * 		the activity to add for removal
+	 * @param activity the activity to add for removal
 	 */
 	public void addActivity(Activity activity) {
 		this.activities.add(activity);

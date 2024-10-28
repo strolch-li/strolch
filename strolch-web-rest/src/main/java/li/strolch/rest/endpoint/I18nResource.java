@@ -1,22 +1,13 @@
 package li.strolch.rest.endpoint;
 
-import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
-
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import li.strolch.persistence.api.Operation;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
@@ -25,6 +16,15 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.rest.StrolchRestfulConstants.DATA;
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 @Path("strolch/i18n")
 public class I18nResource {

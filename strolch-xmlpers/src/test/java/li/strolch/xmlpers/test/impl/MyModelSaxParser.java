@@ -15,14 +15,14 @@
  */
 package li.strolch.xmlpers.test.impl;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import li.strolch.xmlpers.api.SaxParser;
 import li.strolch.xmlpers.test.model.MyModel;
 import li.strolch.xmlpers.test.model.MyParameter;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 
@@ -65,20 +65,20 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-		case "Resource" -> {
-			String id = attributes.getValue("id");
-			String name = attributes.getValue("name");
-			String type = attributes.getValue("type");
-			this.resource = new MyModel(id, name, type);
-		}
-		case "Parameter" -> {
-			String id = attributes.getValue("id");
-			String name = attributes.getValue("name");
-			String type = attributes.getValue("type");
-			String value = attributes.getValue("value");
-			this.resource.addParameter(new MyParameter(id, name, type, value));
-		}
-		default -> throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
+			case "Resource" -> {
+				String id = attributes.getValue("id");
+				String name = attributes.getValue("name");
+				String type = attributes.getValue("type");
+				this.resource = new MyModel(id, name, type);
+			}
+			case "Parameter" -> {
+				String id = attributes.getValue("id");
+				String name = attributes.getValue("name");
+				String type = attributes.getValue("type");
+				String value = attributes.getValue("value");
+				this.resource.addParameter(new MyParameter(id, name, type, value));
+			}
+			default -> throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
 		}
 	}
 }

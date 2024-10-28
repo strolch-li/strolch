@@ -15,13 +15,6 @@
  */
 package li.strolch.xmlpers.test;
 
-import static li.strolch.xmlpers.test.model.ModelBuilder.*;
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.ObjectDao;
 import li.strolch.xmlpers.api.PersistenceConstants;
@@ -33,6 +26,13 @@ import li.strolch.xmlpers.test.impl.TestConstants;
 import li.strolch.xmlpers.test.model.Book;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import static li.strolch.xmlpers.test.model.ModelBuilder.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -78,7 +78,9 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
 		// read book
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			IdOfTypeRef bookRef = tx.getManager().getObjectRefCache()
+			IdOfTypeRef bookRef = tx
+					.getManager()
+					.getObjectRefCache()
 					.getIdOfTypeRef(TestConstants.TYPE_BOOK, Long.toString(BOOK_ID));
 			objectDao = tx.getObjectDao();
 			book = objectDao.queryById(bookRef);
@@ -91,7 +93,9 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
 		// read modified book
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			IdOfTypeRef bookRef = tx.getManager().getObjectRefCache()
+			IdOfTypeRef bookRef = tx
+					.getManager()
+					.getObjectRefCache()
 					.getIdOfTypeRef(TestConstants.TYPE_BOOK, Long.toString(BOOK_ID));
 			objectDao = tx.getObjectDao();
 			book = objectDao.queryById(bookRef);
@@ -106,7 +110,9 @@ public class ObjectDaoBookTest extends AbstractPersistenceTest {
 
 		// fail to read
 		try (PersistenceTransaction tx = this.persistenceManager.openTx()) {
-			IdOfTypeRef bookRef = tx.getManager().getObjectRefCache()
+			IdOfTypeRef bookRef = tx
+					.getManager()
+					.getObjectRefCache()
 					.getIdOfTypeRef(TestConstants.TYPE_BOOK, Long.toString(BOOK_ID));
 			objectDao = tx.getObjectDao();
 			book = objectDao.queryById(bookRef);

@@ -15,9 +15,7 @@
  */
 package li.strolch.rest.endpoint;
 
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION;
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION_GET_POLICIES;
-
+import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -25,9 +23,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Map;
-
-import com.google.gson.JsonObject;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
@@ -35,6 +30,11 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+
+import java.util.Map;
+
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION_GET_POLICIES;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

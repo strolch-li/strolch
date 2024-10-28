@@ -15,14 +15,6 @@
  */
 package li.strolch.performance;
 
-import static li.strolch.model.ModelGenerator.BAG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
@@ -32,6 +24,14 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.SystemHelper;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
 
 public class PerformanceTestService extends AbstractService<PerformanceTestArgument, PerformanceTestResult> {
 

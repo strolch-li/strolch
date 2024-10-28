@@ -1,9 +1,9 @@
 package li.strolch.utils;
 
-import static org.junit.Assert.*;
-
 import li.strolch.utils.helper.StringHelper;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests the {@link Version} class

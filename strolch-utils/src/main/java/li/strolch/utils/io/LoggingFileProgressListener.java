@@ -15,10 +15,10 @@
  */
 package li.strolch.utils.io;
 
-import java.text.MessageFormat;
-
 import li.strolch.utils.helper.FileHelper;
 import org.slf4j.Logger;
+
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;

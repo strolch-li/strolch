@@ -1,11 +1,11 @@
 package li.strolch.execution.command;
 
-import java.text.MessageFormat;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.State;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.text.MessageFormat;
 
 public class SetActionToErrorCommand extends ActionExecutionCommand {
 

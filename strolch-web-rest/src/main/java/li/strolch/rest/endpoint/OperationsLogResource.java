@@ -1,25 +1,13 @@
 package li.strolch.rest.endpoint;
 
-import static java.util.Comparator.comparing;
-import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogSeverity;
-import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -28,6 +16,18 @@ import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.search.ValueSearch;
 import li.strolch.utils.collections.Paging;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Comparator.comparing;
+import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 @Path("strolch/operations-log")
 public class OperationsLogResource {
@@ -69,8 +69,8 @@ public class OperationsLogResource {
 
 			ZonedDateTime from = LocalDate.parse(fromS).atStartOfDay(ZoneId.systemDefault());
 			ZonedDateTime to = LocalDate.parse(toS).plusDays(1).atStartOfDay(ZoneId.systemDefault());
-			messages = messages.filter(logMessage -> from.isBefore(logMessage.getZonedDateTime()) && to
-					.isAfter(logMessage.getZonedDateTime()));
+			messages = messages.filter(logMessage -> from.isBefore(logMessage.getZonedDateTime()) && to.isAfter(
+					logMessage.getZonedDateTime()));
 
 		} else if (isNotEmpty(fromS)) {
 

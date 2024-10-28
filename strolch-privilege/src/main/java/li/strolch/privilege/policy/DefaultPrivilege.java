@@ -15,10 +15,6 @@
  */
 package li.strolch.privilege.policy;
 
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
-
-import java.text.MessageFormat;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
@@ -26,6 +22,10 @@ import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.Role;
+
+import java.text.MessageFormat;
+
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
 
 /**
  * This is a simple implementation of {@link PrivilegePolicy} which uses the {@link Restrictable#getPrivilegeName()} to
@@ -73,8 +73,8 @@ public class DefaultPrivilege implements PrivilegePolicy {
 
 		// DefaultPrivilege policy expects the privilege value to be a string
 		if (!(object instanceof String)) {
-			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.nonstring");
+			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
+					"Privilege.illegalArgument.nonstring");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}

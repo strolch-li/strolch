@@ -78,8 +78,8 @@ public class ComponentConfiguration extends AbstractionConfiguration {
 			return getDataDir(key, defValue, true);
 
 		if (!pathF.exists() || !pathF.isDirectory() || (writeable ? !pathF.canWrite() : !pathF.canRead()))
-			throw new IllegalStateException("The path " + path + " for key " + key + " is not a directory or " +
-					(writeable ? "writeable" : "readable") + "!");
+			throw new IllegalStateException("The path " + path + " for key " + key + " is not a directory or " + (
+					writeable ? "writeable" : "readable") + "!");
 
 		return pathF;
 	}

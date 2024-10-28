@@ -15,6 +15,9 @@
  */
 package li.strolch.db;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -23,9 +26,6 @@ import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -36,8 +36,7 @@ public class DbConnectionCheck {
 	private final Map<String, DataSource> dsMap;
 
 	/**
-	 * @param dsMap
-	 * 		the data source map
+	 * @param dsMap the data source map
 	 */
 	public DbConnectionCheck(Map<String, DataSource> dsMap) {
 		this.dsMap = dsMap;
@@ -46,8 +45,7 @@ public class DbConnectionCheck {
 	/**
 	 * Checks the connectivity to each of the configured {@link DataSource}
 	 *
-	 * @throws DbException
-	 * 		if something goes wrong
+	 * @throws DbException if something goes wrong
 	 */
 	public void checkConnections() throws DbException {
 		Collection<DataSource> values = this.dsMap.values();

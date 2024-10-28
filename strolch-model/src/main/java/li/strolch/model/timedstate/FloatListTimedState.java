@@ -15,11 +15,11 @@
  */
 package li.strolch.model.timedstate;
 
-import java.util.Objects;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.impl.FloatListValue;
 import li.strolch.model.visitor.StrolchElementVisitor;
+
+import java.util.Objects;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

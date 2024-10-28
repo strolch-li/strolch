@@ -15,15 +15,15 @@
  */
 package li.strolch.privilege.model.internal;
 
+import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.policy.PrivilegePolicy;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
-import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.PrivilegeHandler;
-import li.strolch.privilege.policy.PrivilegePolicy;
 
 /**
  * This class is used during XML parsing to hold the model before it is properly validated and made accessible through

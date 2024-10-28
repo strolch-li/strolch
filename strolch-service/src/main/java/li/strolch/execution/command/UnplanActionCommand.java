@@ -15,8 +15,6 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
-
 import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -29,12 +27,14 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
 
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
+
 /**
- * Command to unplan an {@link Activity} from a {@link Resource}. This {@link Command} assumes that the {@link
- * IValueChange} objects of the action are already constructed and {@link Action#getResourceId()} is set.
+ * Command to unplan an {@link Activity} from a {@link Resource}. This {@link Command} assumes that the
+ * {@link IValueChange} objects of the action are already constructed and {@link Action#getResourceId()} is set.
  *
  * <br>
- *
+ * <p>
  * It iterates the {@link IValueChange} operators and unregisters the changes from the {@link StrolchTimedState} objects
  * on the {@link Resource}.
  *

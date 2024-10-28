@@ -32,8 +32,7 @@ import java.util.Set;
  * version is not modified, but a new version is persisted so that rollbacks can be done
  * </p>
  *
- * @param <T>
- * 		the object instance being queried from the underlying persistence layer
+ * @param <T> the object instance being queried from the underlying persistence layer
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -56,8 +55,7 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	/**
 	 * Returns the number of elements in the underlying persistence layer for the given type(s)
 	 *
-	 * @param types
-	 * 		the type(s) to query the size for
+	 * @param types the type(s) to query the size for
 	 *
 	 * @return the number of elements in the underlying persistence layer for the given type(s)
 	 */
@@ -68,8 +66,7 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 *
 	 * @return the set of types
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	Set<String> queryTypes() throws StrolchPersistenceException;
 
@@ -78,97 +75,79 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 *
 	 * @return all elements regardless of type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<T> queryAll() throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all elements regardless of type
 	 *
-	 * @param limit
-	 * 		the max amount, or @{@link Integer#MAX_VALUE} for all
-	 * @param offset
-	 * 		if max amount defined, then the offset to start from
+	 * @param limit  the max amount, or @{@link Integer#MAX_VALUE} for all
+	 * @param offset if max amount defined, then the offset to start from
 	 *
 	 * @return all elements regardless of type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<T> queryAll(long limit, long offset) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all elements of the given type
 	 *
-	 * @param types
-	 * 		the type(s) of element(s) to return
+	 * @param types the type(s) of element(s) to return
 	 *
 	 * @return all elements of the given type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<T> queryAll(String... types) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all elements of the given type
 	 *
-	 * @param limit
-	 * 		the max amount, or @{@link Integer#MAX_VALUE} for all
-	 * @param offset
-	 * 		if max amount defined, then the offset to start from
-	 * @param types
-	 * 		the type(s) of element(s) to return
+	 * @param limit  the max amount, or @{@link Integer#MAX_VALUE} for all
+	 * @param offset if max amount defined, then the offset to start from
+	 * @param types  the type(s) of element(s) to return
 	 *
 	 * @return all elements of the given type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<T> queryAll(long limit, long offset, String... types) throws StrolchPersistenceException;
 
 	/**
 	 * Persists the given element. The element must not yet exist
 	 *
-	 * @param element
-	 * 		the element to be persisted
+	 * @param element the element to be persisted
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if the element already exists
+	 * @throws StrolchPersistenceException if the element already exists
 	 */
 	void save(T element) throws StrolchPersistenceException;
 
 	/**
 	 * Persists the given list of elements. None of the elements may already exists
 	 *
-	 * @param elements
-	 * 		the list of elements to be persisted
+	 * @param elements the list of elements to be persisted
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if any of the elements already exist
+	 * @throws StrolchPersistenceException if any of the elements already exist
 	 */
 	void saveAll(List<T> elements) throws StrolchPersistenceException;
 
 	/**
 	 * Updates the given element. The element must already exist
 	 *
-	 * @param element
-	 * 		the element to be updated
+	 * @param element the element to be updated
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if the element does not exist
+	 * @throws StrolchPersistenceException if the element does not exist
 	 */
 	void update(T element) throws StrolchPersistenceException;
 
 	/**
 	 * Updates the given list of elements. Each element must already exist
 	 *
-	 * @param elements
-	 * 		the elements to be updated
+	 * @param elements the elements to be updated
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if any of the elements do not exist
+	 * @throws StrolchPersistenceException if any of the elements do not exist
 	 */
 	void updateAll(List<T> elements) throws StrolchPersistenceException;
 
@@ -182,11 +161,9 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 * use versioning!
 	 * </p>
 	 *
-	 * @param element
-	 * 		the element to be removed
+	 * @param element the element to be removed
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if the element does not exist
+	 * @throws StrolchPersistenceException if the element does not exist
 	 */
 	void remove(T element) throws StrolchPersistenceException;
 
@@ -200,11 +177,9 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 * to use versioning!
 	 * </p>
 	 *
-	 * @param elements
-	 * 		the elements to be removed
+	 * @param elements the elements to be removed
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if any of the elements do not exist
+	 * @throws StrolchPersistenceException if any of the elements do not exist
 	 */
 	void removeAll(List<T> elements) throws StrolchPersistenceException;
 
@@ -220,8 +195,7 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 *
 	 * @return the number of elements removed
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	long removeAll() throws StrolchPersistenceException;
 
@@ -235,13 +209,11 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 * type and their versions!
 	 * </p>
 	 *
-	 * @param type
-	 * 		the type of element to remove
+	 * @param type the type of element to remove
 	 *
 	 * @return the number of elements removed
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	long removeAllBy(String type) throws StrolchPersistenceException;
 
@@ -254,62 +226,49 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 * <b>Note:</b> If you want to query the latest version, then use the method with out the version parameter
 	 * </p>
 	 *
-	 * @param type
-	 * 		the type of the element to be queried
-	 * @param id
-	 * 		the id of the element to be queried
-	 * @param version
-	 * 		the version of the element to be returned
+	 * @param type    the type of the element to be queried
+	 * @param id      the id of the element to be queried
+	 * @param version the version of the element to be returned
 	 *
 	 * @return the element with the given type and ID, or null if it does not exist
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	T queryBy(String type, String id, int version) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all the versions of the element with the given type and ID
 	 *
-	 * @param type
-	 * 		the type of the element to be queried
-	 * @param id
-	 * 		the id of the element to be queried
+	 * @param type the type of the element to be queried
+	 * @param id   the id of the element to be queried
 	 *
 	 * @return all the versions of the element with the given type and ID
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<T> queryVersionsFor(String type, String id) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns the latest version of the element with the given type and ID, -1 if no version available
 	 *
-	 * @param type
-	 * 		the type of the element to be queried
-	 * @param id
-	 * 		the id of the element to be queried
+	 * @param type the type of the element to be queried
+	 * @param id   the id of the element to be queried
 	 *
 	 * @return the latest version of the element with the given type and ID, -1 if no version available
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	int queryLatestVersionFor(String type, String id) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns the number of versions for the element with the given type and ID
 	 *
-	 * @param type
-	 * 		the type of the element to be queried
-	 * @param id
-	 * 		the id of the element to be queried
+	 * @param type the type of the element to be queried
+	 * @param id   the id of the element to be queried
 	 *
 	 * @return the number of versions for the element with the given type and ID
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	long queryVersionsSizeFor(String type, String id) throws StrolchPersistenceException;
 
@@ -324,19 +283,16 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 * <b>Note:</b> This element given must be the current latest version!
 	 * </p>
 	 *
-	 * @param element
-	 * 		the latest version of the element to be removed
+	 * @param element the latest version of the element to be removed
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if the element/version does not exist
+	 * @throws StrolchPersistenceException if the element/version does not exist
 	 */
 	void removeVersion(T element) throws StrolchPersistenceException;
 
 	/**
 	 * Causes the DAO to flush any actions which have not yet been sent to the underlying persistence layer
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	default void flush() throws StrolchPersistenceException {
 		// empty implementation

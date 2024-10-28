@@ -38,16 +38,14 @@ public class RemoveResourcesCommand extends Command {
 	}
 
 	/**
-	 * @param resources
-	 * 		the resources to set for removal
+	 * @param resources the resources to set for removal
 	 */
 	public void setResources(List<Resource> resources) {
 		this.resources = resources;
 	}
 
 	/**
-	 * @param resource
-	 * 		the resource to add for removal
+	 * @param resource the resource to add for removal
 	 */
 	public void addResource(Resource resource) {
 		this.resources.add(resource);

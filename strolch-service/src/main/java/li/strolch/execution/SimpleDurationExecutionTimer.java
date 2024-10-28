@@ -1,6 +1,11 @@
 package li.strolch.execution;
 
-import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.model.Locator;
+import li.strolch.utils.time.PeriodDuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
@@ -9,12 +14,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.model.Locator;
-import li.strolch.utils.time.PeriodDuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
 public class SimpleDurationExecutionTimer implements DelayedExecutionTimer {
 

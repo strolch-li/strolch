@@ -1,15 +1,14 @@
 package li.strolch.runtime.configuration;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-
-import org.junit.Test;
-
 import li.strolch.RuntimeMock;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchBootstrapper;
 import li.strolch.utils.helper.FileHelper;
+import org.junit.Test;
+
+import java.io.File;
+
+import static org.junit.Assert.assertEquals;
 
 public class BootstrapperTest {
 
@@ -68,8 +67,8 @@ public class BootstrapperTest {
 			throw new RuntimeException("Could not delete target " + rootDstPath);
 		}
 
-		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion())
-				.setupByCopyingRoot("dev", rootSrcPath, rootDstPath);
+		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByCopyingRoot("dev", rootSrcPath,
+				rootDstPath);
 		assertEquals("dev", agent.getStrolchConfiguration().getRuntimeConfiguration().getEnvironment());
 	}
 
@@ -90,8 +89,8 @@ public class BootstrapperTest {
 		}
 
 		File bootstrapFile = new File("src/test/resources/bootstraptest/StrolchBootstrap.xml");
-		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion())
-				.setupByBootstrapFile("dev", bootstrapFile);
+		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByBootstrapFile("dev",
+				bootstrapFile);
 		assertEquals("dev", agent.getStrolchConfiguration().getRuntimeConfiguration().getEnvironment());
 		agent.destroy();
 	}
@@ -120,8 +119,8 @@ public class BootstrapperTest {
 
 		File bootstrapFile = new File("src/test/resources/bootstraptest/StrolchBootstrap.xml");
 
-		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion())
-				.setupByBootstrapFile("test.next", bootstrapFile);
+		StrolchAgent agent = new StrolchBootstrapper(RuntimeMock.getAppVersion()).setupByBootstrapFile("test.next",
+				bootstrapFile);
 		assertEquals("test", agent.getStrolchConfiguration().getRuntimeConfiguration().getEnvironment());
 		agent.destroy();
 	}

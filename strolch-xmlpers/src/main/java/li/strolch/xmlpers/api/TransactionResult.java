@@ -15,12 +15,12 @@
  */
 package li.strolch.xmlpers.api;
 
+import li.strolch.utils.helper.StringHelper;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import li.strolch.utils.helper.StringHelper;
 
 public class TransactionResult {
 
@@ -102,15 +102,15 @@ public class TransactionResult {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TX");
 		switch (this.state) {
-		case OPEN -> sb.append(" is still open after ");
-		case COMMITTED -> sb.append(" was completed after ");
-		case ROLLED_BACK -> sb.append(" was rolled back after ");
-		case FAILED -> sb.append(" has failed after ");
-		default -> {
-			sb.append(" is in unhandled state ");
-			sb.append(this.state);
-			sb.append(" after ");
-		}
+			case OPEN -> sb.append(" is still open after ");
+			case COMMITTED -> sb.append(" was completed after ");
+			case ROLLED_BACK -> sb.append(" was rolled back after ");
+			case FAILED -> sb.append(" has failed after ");
+			default -> {
+				sb.append(" is in unhandled state ");
+				sb.append(this.state);
+				sb.append(" after ");
+			}
 		}
 
 		sb.append(StringHelper.formatNanoDuration(this.txDuration));

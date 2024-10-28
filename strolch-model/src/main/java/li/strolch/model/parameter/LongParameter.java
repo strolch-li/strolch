@@ -15,11 +15,11 @@
  */
 package li.strolch.model.parameter;
 
-import java.util.Objects;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.Objects;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,12 +38,9 @@ public class LongParameter extends AbstractParameter<Long> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public LongParameter(String id, String name, Long value) {
 		super(id, name);

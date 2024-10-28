@@ -1,10 +1,10 @@
 package li.strolch.utils;
 
+import li.strolch.utils.iso8601.ISO8601;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
-
-import li.strolch.utils.iso8601.ISO8601;
 
 public class ObjectHelper {
 

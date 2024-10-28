@@ -1,12 +1,5 @@
 package li.strolch.model.json;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import li.strolch.exception.StrolchModelException;
@@ -21,14 +14,21 @@ import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.dbc.DBC;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.BAG_RELATIONS;
+
 /**
  * <p>
  * Maps a given {@link JsonObject} to a {@link StrolchRootElement}. All {@link Parameter Parameters} on the element are
  * iterated and expected to be found as a member on the {@link JsonObject}.
  * </p>
  * <p>
- * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the {@link #ignoreParameter(String,
- * String)} and {@link #ignoreBag(String)} methods
+ * To ignore {@link Parameter Parameters} or {@link ParameterBag ParameterBags} use the
+ * {@link #ignoreParameter(String, String)} and {@link #ignoreBag(String)} methods
  * </p>
  * <p>
  * {@link Parameter} can be made optional by using the {@link #optionalParameter(String, String)} method
@@ -190,7 +190,8 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 				if (!jsonElement.isJsonPrimitive()) {
 					throw new StrolchModelException(
-							"JsonElement " + paramId + " is not a json primitive but a " + jsonElement.getClass()
+							"JsonElement " + paramId + " is not a json primitive but a " + jsonElement
+									.getClass()
 									.getName() + " for " + bag.getLocator() + "/" + paramId);
 				}
 
@@ -198,9 +199,10 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 
 				String asString = jsonElement.getAsString();
 				if (asString.isEmpty() && this.nonEmptyParameters.containsElement(bagId, paramId)) {
-					throw new StrolchModelException(
-							"JsonElement " + paramId + " is required to be a non empty value for " + parameter
-									.getLocator());
+					throw new StrolchModelException("JsonElement "
+							+ paramId
+							+ " is required to be a non empty value for "
+							+ parameter.getLocator());
 				}
 
 				try {

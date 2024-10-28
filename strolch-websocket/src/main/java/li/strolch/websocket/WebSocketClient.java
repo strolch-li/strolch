@@ -1,23 +1,11 @@
 package li.strolch.websocket;
 
-import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
-import static li.strolch.model.Tags.Json.*;
-import static li.strolch.rest.StrolchRestfulConstants.MSG;
-import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
-import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
-import static li.strolch.utils.helper.StringHelper.*;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import jakarta.websocket.CloseReason;
 import jakarta.websocket.EndpointConfig;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchNotAuthenticatedException;
@@ -27,6 +15,17 @@ import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.model.Tags.Json.*;
+import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
+import static li.strolch.utils.helper.StringHelper.*;
 
 public class WebSocketClient implements MessageHandler.Whole<String> {
 
@@ -63,16 +62,16 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		logger.info("Handling message {}", msgType);
 
 		switch (msgType) {
-		case "Authenticate" -> handleAuthenticate(jsonObject);
-		case "ObserverRegister" -> {
-			assertAuthenticated(msgType);
-			handleRegister(jsonObject);
-		}
-		case "ObserverUnregister" -> {
-			assertAuthenticated(msgType);
-			handleUnregister(jsonObject);
-		}
-		default -> logger.error("Unhandled Event msgType: {}", msgType);
+			case "Authenticate" -> handleAuthenticate(jsonObject);
+			case "ObserverRegister" -> {
+				assertAuthenticated(msgType);
+				handleRegister(jsonObject);
+			}
+			case "ObserverUnregister" -> {
+				assertAuthenticated(msgType);
+				handleUnregister(jsonObject);
+			}
+			default -> logger.error("Unhandled Event msgType: {}", msgType);
 		}
 	}
 
@@ -142,7 +141,9 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 	}
 
 	private void handleAuthenticate(JsonObject jsonObject) {
-		if (!jsonObject.has("authToken") || jsonObject.get("authToken").isJsonNull() || !jsonObject.has("username")
+		if (!jsonObject.has("authToken")
+				|| jsonObject.get("authToken").isJsonNull()
+				|| !jsonObject.has("username")
 				|| jsonObject.get("username").isJsonNull()) {
 			logger.error("Received invalid authentication request: {}", jsonObject);
 			close(CloseReason.CloseCodes.UNEXPECTED_CONDITION, "Invalid authentication");

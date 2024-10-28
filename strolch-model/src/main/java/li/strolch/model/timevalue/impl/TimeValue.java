@@ -31,10 +31,8 @@ public class TimeValue<T extends IValue> implements ITimeValue<T>, Serializable 
 	protected T value;
 
 	/**
-	 * @param time
-	 * 		the time for this value
-	 * @param value
-	 * 		the actual value for this value
+	 * @param time  the time for this value
+	 * @param value the actual value for this value
 	 */
 	public TimeValue(final long time, final T value) {
 		this.time = time;

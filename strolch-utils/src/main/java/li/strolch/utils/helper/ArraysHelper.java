@@ -25,10 +25,8 @@ public class ArraysHelper {
 	/**
 	 * Returns true if the byte array contains the given byte value
 	 *
-	 * @param bytes
-	 * 		the array to search in
-	 * @param searchByte
-	 * 		the value to search for
+	 * @param bytes      the array to search in
+	 * @param searchByte the value to search for
 	 *
 	 * @return true if found, false if not
 	 */
@@ -43,8 +41,7 @@ public class ArraysHelper {
 	/**
 	 * Creates a simple copy of the given array
 	 *
-	 * @param bytes
-	 * 		the array to copy
+	 * @param bytes the array to copy
 	 *
 	 * @return the copy
 	 */
@@ -55,8 +52,7 @@ public class ArraysHelper {
 	/**
 	 * Creates a simple copy of the given array
 	 *
-	 * @param bytes
-	 * 		the array to copy
+	 * @param bytes the array to copy
 	 *
 	 * @return the copy
 	 */

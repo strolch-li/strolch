@@ -151,7 +151,8 @@ public class CachedRealmLoader {
 
 	private <T extends StrolchRootElement> List<T> loadPage(Function<StrolchTransaction, StrolchDao<T>> daoSupplier,
 			String type, long pageSize, long offset) {
-		try (StrolchTransaction tx = this.realm.openTx(getCert(), "strolch_boot", true)
+		try (StrolchTransaction tx = this.realm
+				.openTx(getCert(), "strolch_boot", true)
 				.silentThreshold(10, SECONDS)
 				.suppressUpdates()) {
 			return daoSupplier.apply(tx).queryAll(pageSize, offset, type);

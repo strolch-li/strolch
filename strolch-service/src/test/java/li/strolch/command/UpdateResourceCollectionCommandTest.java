@@ -15,17 +15,17 @@
  */
 package li.strolch.command;
 
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import org.junit.Before;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -15,10 +15,6 @@
  */
 package li.strolch.runtime.configuration;
 
-import static org.junit.Assert.*;
-
-import java.util.*;
-
 import li.strolch.agent.api.ComponentState;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.impl.ComponentContainerImpl;
@@ -30,6 +26,10 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 @SuppressWarnings("nls")
 public class ControllerDependencyTest {
@@ -378,8 +378,8 @@ public class ControllerDependencyTest {
 		controllers.add(this.conB);
 		controllers.add(this.conC);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer.collectDirectUpstreamDependencies(
+				controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
 		assertTrue(directUpstreamDependencies.contains(this.conA));
@@ -396,8 +396,8 @@ public class ControllerDependencyTest {
 		controllers.add(this.conD);
 		controllers.add(this.conC);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer.collectDirectUpstreamDependencies(
+				controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
 		assertTrue(directUpstreamDependencies.contains(this.conB));
@@ -413,8 +413,8 @@ public class ControllerDependencyTest {
 		Set<ComponentController> controllers = new HashSet<>();
 		controllers.add(this.conB);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer.collectDirectUpstreamDependencies(
+				controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
 		assertTrue(directUpstreamDependencies.contains(this.conA));
@@ -438,8 +438,8 @@ public class ControllerDependencyTest {
 		Set<ComponentController> controllers = new HashSet<>();
 		controllers.add(this.conB1);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer.collectDirectUpstreamDependencies(
+				controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
 		assertTrue(directUpstreamDependencies.contains(this.conC1));
@@ -475,8 +475,8 @@ public class ControllerDependencyTest {
 		Set<ComponentController> controllers = new HashSet<>();
 		controllers.add(this.conB1);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer.collectDirectUpstreamDependencies(
+				controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
 		assertTrue(directUpstreamDependencies.contains(this.conC1));
@@ -500,8 +500,8 @@ public class ControllerDependencyTest {
 		Set<ComponentController> controllers = new HashSet<>();
 		controllers.add(this.conB2);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer.collectDirectUpstreamDependencies(
+				controllers);
 
 		assertEquals(2, directUpstreamDependencies.size());
 		assertTrue(directUpstreamDependencies.contains(this.conA2));
@@ -518,8 +518,8 @@ public class ControllerDependencyTest {
 		Set<ComponentController> controllers = new HashSet<>();
 		controllers.add(this.conD2);
 
-		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer
-				.collectDirectUpstreamDependencies(controllers);
+		Set<ComponentController> directUpstreamDependencies = dependencyAnalyzer.collectDirectUpstreamDependencies(
+				controllers);
 
 		assertEquals(1, directUpstreamDependencies.size());
 		assertTrue(directUpstreamDependencies.contains(this.conB2));
@@ -579,8 +579,8 @@ public class ControllerDependencyTest {
 		for (ComponentController controller : this.controllerMap.values()) {
 			assertEquals(ComponentState.UNDEFINED, controller.getState());
 
-			ComponentConfiguration componentConfiguration = this.strolchConfiguration
-					.getComponentConfiguration(controller.getName());
+			ComponentConfiguration componentConfiguration = this.strolchConfiguration.getComponentConfiguration(
+					controller.getName());
 			controller.getComponent().setup(componentConfiguration);
 		}
 

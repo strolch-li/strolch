@@ -15,14 +15,14 @@
  */
 package li.strolch.command;
 
-import static org.junit.Assert.assertEquals;
-
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.UpdateOrderCommand;
 import li.strolch.service.api.Command;
 import org.junit.Before;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

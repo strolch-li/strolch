@@ -44,8 +44,7 @@ public interface PolicyHandler {
 	/**
 	 * Returns the keys defined for the given policy type
 	 *
-	 * @param type
-	 * 		the type of policy for which to return the keys
+	 * @param type the type of policy for which to return the keys
 	 *
 	 * @return the keys defined for the given policy type
 	 */
@@ -54,8 +53,7 @@ public interface PolicyHandler {
 	/**
 	 * Returns the keys defined for the given policy type
 	 *
-	 * @param type
-	 * 		the type of policy for which to return the keys
+	 * @param type the type of policy for which to return the keys
 	 *
 	 * @return the keys defined for the given policy type
 	 */
@@ -64,10 +62,8 @@ public interface PolicyHandler {
 	/**
 	 * Instantiates the actual policy by resolving the {@link PolicyDef} using a {@link PolicyDefVisitor}
 	 *
-	 * @param policyDef
-	 * 		the {@link PolicyDef} referencing a concrete policy
-	 * @param tx
-	 * 		the current transaction for which the policy is instantiated
+	 * @param policyDef the {@link PolicyDef} referencing a concrete policy
+	 * @param tx        the current transaction for which the policy is instantiated
 	 *
 	 * @return the instantiated instance of the referenced policy
 	 */
@@ -77,12 +73,9 @@ public interface PolicyHandler {
 	 * Instantiates the actual policy by resolving the {@link PolicyDef} using a {@link PolicyDefVisitor}, or if not
 	 * available, using the default policy definition
 	 *
-	 * @param policyDef
-	 * 		the {@link PolicyDef} referencing a concrete policy
-	 * @param defaultDef
-	 * 		the default {@link PolicyDef} to use if the other is not available
-	 * @param tx
-	 * 		the current transaction for which the policy is instantiated
+	 * @param policyDef  the {@link PolicyDef} referencing a concrete policy
+	 * @param defaultDef the default {@link PolicyDef} to use if the other is not available
+	 * @param tx         the current transaction for which the policy is instantiated
 	 *
 	 * @return the instantiated instance of the referenced policy
 	 */
@@ -91,8 +84,7 @@ public interface PolicyHandler {
 	/**
 	 * Returns true, if the policy definition is known
 	 *
-	 * @param policyDef
-	 * 		the policy definition to check for
+	 * @param policyDef the policy definition to check for
 	 *
 	 * @return true if the policy definition is known, false otherwise
 	 */

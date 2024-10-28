@@ -140,9 +140,14 @@ public class PasswordCreator {
 			System.out.println("Salt is: " + saltS);
 			System.out.println();
 
-			System.out.println(
-					XmlConstants.ATTR_PASSWORD + "=\"" + passwordHashS + "\" " + XmlConstants.ATTR_SALT + "=\"" +
-							saltS + "\"");
+			System.out.println(XmlConstants.ATTR_PASSWORD
+					+ "=\""
+					+ passwordHashS
+					+ "\" "
+					+ XmlConstants.ATTR_SALT
+					+ "=\""
+					+ saltS
+					+ "\"");
 			System.out.println(XmlConstants.ATTR_PASSWORD + "=\"" + passwordCrypt.buildPasswordString() + "\"");
 			System.out.println();
 		}

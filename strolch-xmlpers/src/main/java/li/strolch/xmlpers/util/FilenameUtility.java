@@ -15,10 +15,10 @@
  */
 package li.strolch.xmlpers.util;
 
-import java.text.MessageFormat;
-
 import li.strolch.xmlpers.api.XmlPersistenceException;
 import li.strolch.xmlpers.impl.PathBuilder;
+
+import java.text.MessageFormat;
 
 public class FilenameUtility {
 

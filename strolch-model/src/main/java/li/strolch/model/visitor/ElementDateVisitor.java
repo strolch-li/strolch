@@ -15,11 +15,11 @@
  */
 package li.strolch.model.visitor;
 
-import java.util.Date;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
+
+import java.util.Date;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

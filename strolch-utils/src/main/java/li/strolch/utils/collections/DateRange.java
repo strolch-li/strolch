@@ -15,14 +15,14 @@
  */
 package li.strolch.utils.collections;
 
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
-
-import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
@@ -218,10 +218,8 @@ public class DateRange {
 
 	@Override
 	public String toString() {
-		return (this.fromDate == null ? "-" : ISO8601.toString(this.fromDate)) + (this.fromInclusive ?
-				" (inc)" :
-				" (exc)") + " - " + (this.toDate == null ? "-" : ISO8601.toString(this.toDate)) + (this.toInclusive ?
-				" (inc)" :
-				" (exc)");
+		return (this.fromDate == null ? "-" : ISO8601.toString(this.fromDate)) + (
+				this.fromInclusive ? " (inc)" : " (exc)") + " - " + (
+				this.toDate == null ? "-" : ISO8601.toString(this.toDate)) + (this.toInclusive ? " (inc)" : " (exc)");
 	}
 }

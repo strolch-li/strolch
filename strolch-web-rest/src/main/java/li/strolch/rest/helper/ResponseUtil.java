@@ -11,12 +11,10 @@ import li.strolch.exception.*;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.service.JsonServiceResult;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.collections.Paging;
-import li.strolch.utils.helper.ExceptionHelper;
 import li.strolch.utils.helper.StringHelper;
 
 import java.util.List;

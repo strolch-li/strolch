@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Enumeration;
 
-import static li.strolch.utils.helper.StringHelper.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.normalizeLength;
 
 public class ServletRequestHelper {
 

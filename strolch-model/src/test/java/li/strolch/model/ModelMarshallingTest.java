@@ -1,10 +1,10 @@
 package li.strolch.model;
 
-import static org.junit.Assert.assertEquals;
-
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public abstract class ModelMarshallingTest {
 

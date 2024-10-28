@@ -15,11 +15,6 @@
  */
 package li.strolch.execution;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.assertEquals;
-
-import java.util.SortedSet;
-
 import li.strolch.execution.command.PlanActivityCommand;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.ParameterBag;
@@ -43,6 +38,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.SortedSet;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
@@ -208,12 +208,9 @@ public class PlanActivityTest {
 	 * add changes to action start and end time with a value defined in the action objective and set the stateId of the
 	 * state variable to apply the change to
 	 *
-	 * @param action
-	 * 		the action toe create changes for
-	 * @param start
-	 * 		the start of the change
-	 * @param end
-	 * 		the end of the change
+	 * @param action the action toe create changes for
+	 * @param start  the start of the change
+	 * @param end    the end of the change
 	 */
 	protected static void createChanges(Action action, Long start, Long end) {
 

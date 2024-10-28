@@ -15,17 +15,7 @@
  */
 package li.strolch.migrations;
 
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-
-import java.io.File;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Tags;
@@ -38,6 +28,15 @@ import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.Version;
 import li.strolch.utils.collections.MapOfLists;
+
+import java.io.File;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

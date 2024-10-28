@@ -15,18 +15,6 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
-import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
-import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.text.MessageFormat;
-
 import li.strolch.db.DbException;
 import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
@@ -35,6 +23,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.MessageFormat;
+
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
+import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

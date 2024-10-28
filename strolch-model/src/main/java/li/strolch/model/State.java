@@ -15,14 +15,14 @@
  */
 package li.strolch.model;
 
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
-
-import java.util.Set;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.Set;
+
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -282,8 +282,8 @@ public enum State {
 		// execution
 		if (states.contains(EXECUTABLE) || states.contains(EXECUTION))
 			return EXECUTION;
-		if (states.contains(EXECUTED) &&
-				(states.contains(CREATED) || states.contains(PLANNING) || states.contains(PLANNED)))
+		if (states.contains(EXECUTED) && (
+				states.contains(CREATED) || states.contains(PLANNING) || states.contains(PLANNED)))
 			return EXECUTION;
 
 		// executed

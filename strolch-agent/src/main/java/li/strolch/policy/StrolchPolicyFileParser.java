@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -46,23 +46,23 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 		switch (qName) {
-		case POLICY_TYPE -> {
-			String type = attributes.getValue(TYPE);
-			String api = attributes.getValue(API);
-			DBC.PRE.assertNotEmpty(TYPE + " not defined on a " + POLICY_TYPE, type);
-			DBC.PRE.assertNotEmpty(API + " not defined on a " + POLICY_TYPE, api);
-			this.policyType = new PolicyType(type, api);
-			this.policyModel.getPolicyTypes().put(type, policyType);
-		}
-		case POLICY -> {
-			String key = attributes.getValue(KEY);
-			String clazz = attributes.getValue(CLASS);
-			DBC.PRE.assertNotEmpty(KEY + " not defined on a " + POLICY_TYPE, key);
-			DBC.PRE.assertNotEmpty(CLASS + " not defined on a " + POLICY_TYPE, clazz);
-			this.policyType.getPolicyByKeyMap().put(key, clazz);
-		}
-		default -> {
-		}
+			case POLICY_TYPE -> {
+				String type = attributes.getValue(TYPE);
+				String api = attributes.getValue(API);
+				DBC.PRE.assertNotEmpty(TYPE + " not defined on a " + POLICY_TYPE, type);
+				DBC.PRE.assertNotEmpty(API + " not defined on a " + POLICY_TYPE, api);
+				this.policyType = new PolicyType(type, api);
+				this.policyModel.getPolicyTypes().put(type, policyType);
+			}
+			case POLICY -> {
+				String key = attributes.getValue(KEY);
+				String clazz = attributes.getValue(CLASS);
+				DBC.PRE.assertNotEmpty(KEY + " not defined on a " + POLICY_TYPE, key);
+				DBC.PRE.assertNotEmpty(CLASS + " not defined on a " + POLICY_TYPE, clazz);
+				this.policyType.getPolicyByKeyMap().put(key, clazz);
+			}
+			default -> {
+			}
 		}
 	}
 

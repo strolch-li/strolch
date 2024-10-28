@@ -15,10 +15,10 @@
  */
 package li.strolch.xmlpers.util;
 
-import java.text.MessageFormat;
-
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.objref.ObjectRef;
+
+import java.text.MessageFormat;
 
 public class AssertionUtil {
 

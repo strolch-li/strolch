@@ -15,14 +15,6 @@
  */
 package li.strolch.service;
 
-import static li.strolch.model.ModelGenerator.BAG_ID;
-import static li.strolch.model.StrolchModelConstants.*;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
@@ -38,6 +30,14 @@ import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static li.strolch.model.ModelGenerator.BAG_ID;
+import static li.strolch.model.StrolchModelConstants.*;
+import static org.junit.Assert.*;
 
 public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, ServiceResult> {
 
@@ -120,12 +120,12 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 
 			String activityId = StrolchAgent.getUniqueId();
 			Activity activity = ModelGenerator.createActivity(activityId, activityId, type, TimeOrdering.SERIES);
-			Activity activity1 = ModelGenerator
-					.createActivity(activityId + "1", activityId + "1", type, TimeOrdering.SERIES);
-			Activity activity2 = ModelGenerator
-					.createActivity(activityId + "2", activityId + "2", type, TimeOrdering.SERIES);
-			Activity activity3 = ModelGenerator
-					.createActivity(activityId + "3", activityId + "3", type, TimeOrdering.SERIES);
+			Activity activity1 = ModelGenerator.createActivity(activityId + "1", activityId + "1", type,
+					TimeOrdering.SERIES);
+			Activity activity2 = ModelGenerator.createActivity(activityId + "2", activityId + "2", type,
+					TimeOrdering.SERIES);
+			Activity activity3 = ModelGenerator.createActivity(activityId + "3", activityId + "3", type,
+					TimeOrdering.SERIES);
 			StringListParameter actRefsP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(activity1.getId(), activity2.getId(), activity3.getId()));
 			actRefsP.setInterpretation(INTERPRETATION_ACTIVITY_REF);
@@ -143,8 +143,8 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 
 				// find param
 				Resource location = tx.getResourceBy("Location", "Facility", true);
-				Optional<StringParameter> productionModeP = tx
-						.findParameterOnHierarchy(location, "parent", "parameters", "productionMode");
+				Optional<StringParameter> productionModeP = tx.findParameterOnHierarchy(location, "parent",
+						"parameters", "productionMode");
 				assertTrue(productionModeP.isPresent());
 				assertEquals("auto", productionModeP.get().getValue());
 
@@ -323,12 +323,12 @@ public class TxExtendedTest extends AbstractRealmServiceTest<ServiceArgument, Se
 
 			String activityId = StrolchAgent.getUniqueId();
 			Activity activity = ModelGenerator.createActivity(activityId, activityId, type, TimeOrdering.SERIES);
-			Activity activity1 = ModelGenerator
-					.createActivity(activityId + "1", activityId + "1", type, TimeOrdering.SERIES);
-			Activity activity2 = ModelGenerator
-					.createActivity(activityId + "2", activityId + "2", type, TimeOrdering.SERIES);
-			Activity activity3 = ModelGenerator
-					.createActivity(activityId + "3", activityId + "3", type, TimeOrdering.SERIES);
+			Activity activity1 = ModelGenerator.createActivity(activityId + "1", activityId + "1", type,
+					TimeOrdering.SERIES);
+			Activity activity2 = ModelGenerator.createActivity(activityId + "2", activityId + "2", type,
+					TimeOrdering.SERIES);
+			Activity activity3 = ModelGenerator.createActivity(activityId + "3", activityId + "3", type,
+					TimeOrdering.SERIES);
 			StringListParameter actRefP = new StringListParameter("refP", "Ref P",
 					Arrays.asList(activity1.getId(), activity2.getId(), activity3.getId()));
 			actRefP.setInterpretation(INTERPRETATION_ACTIVITY_REF);

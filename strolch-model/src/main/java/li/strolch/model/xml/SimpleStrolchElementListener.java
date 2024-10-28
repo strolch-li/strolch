@@ -15,16 +15,16 @@
  */
 package li.strolch.model.xml;
 
+import li.strolch.model.Order;
+import li.strolch.model.Resource;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.model.activity.Activity;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import li.strolch.model.Order;
-import li.strolch.model.Resource;
-import li.strolch.model.StrolchRootElement;
-import li.strolch.model.activity.Activity;
 
 /**
  * {@link StrolchElementListener} to store the {@link StrolchRootElement} in {@link Map} objects when parsing an object

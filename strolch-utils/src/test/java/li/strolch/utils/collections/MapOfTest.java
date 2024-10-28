@@ -1,12 +1,12 @@
 package li.strolch.utils.collections;
 
-import static java.util.Collections.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
 
 import java.util.*;
 
-import org.junit.Test;
+import static java.util.Collections.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class MapOfTest {
 

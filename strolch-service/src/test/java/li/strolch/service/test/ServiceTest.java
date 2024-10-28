@@ -15,16 +15,8 @@
  */
 package li.strolch.service.test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThrows;
-
-import java.time.ZonedDateTime;
-import java.util.HashSet;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.NotAuthenticatedException;
-import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserState;
@@ -35,6 +27,13 @@ import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import li.strolch.service.test.model.TestService;
 import li.strolch.utils.dbc.DBC;
 import org.junit.Test;
+
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -63,7 +62,8 @@ public class ServiceTest extends AbstractServiceTest {
 	@Test
 	public void shouldFailWithNoAccess() {
 
-		Certificate certificate = runtimeMock.getPrivilegeHandler()
+		Certificate certificate = runtimeMock
+				.getPrivilegeHandler()
 				.authenticate("jill", "jill".toCharArray());//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
@@ -77,7 +77,8 @@ public class ServiceTest extends AbstractServiceTest {
 
 	@Test
 	public void shouldNotFailWithAccess() {
-		Certificate certificate = runtimeMock.getPrivilegeHandler()
+		Certificate certificate = runtimeMock
+				.getPrivilegeHandler()
 				.authenticate("jill", "jill".toCharArray());//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();
@@ -93,7 +94,8 @@ public class ServiceTest extends AbstractServiceTest {
 	@Test
 	public void shouldNotFailWithLogin1() {
 
-		Certificate certificate = runtimeMock.getPrivilegeHandler()
+		Certificate certificate = runtimeMock
+				.getPrivilegeHandler()
 				.authenticate("bob", "bob".toCharArray());//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
@@ -105,7 +107,8 @@ public class ServiceTest extends AbstractServiceTest {
 
 	@Test
 	public void shouldNotFailWithLogin2() {
-		Certificate certificate = runtimeMock.getPrivilegeHandler()
+		Certificate certificate = runtimeMock
+				.getPrivilegeHandler()
 				.authenticate("bob", "bob".toCharArray());//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();

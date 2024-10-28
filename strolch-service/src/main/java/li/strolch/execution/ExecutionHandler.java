@@ -1,9 +1,5 @@
 package li.strolch.execution;
 
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.execution.policy.DurationExecution;
@@ -20,6 +16,10 @@ import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 import li.strolch.utils.helper.StringHelper;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 /**
  * <p>

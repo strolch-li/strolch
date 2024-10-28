@@ -15,14 +15,14 @@
  */
 package li.strolch.service.test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -36,11 +36,12 @@ public class GreetingServiceTest extends AbstractServiceTest {
 		GreetingArgument greetingArgument = new GreetingArgument();
 		greetingArgument.name = "Robert";
 
-		Certificate certificate = runtimeMock.getPrivilegeHandler()
+		Certificate certificate = runtimeMock
+				.getPrivilegeHandler()
 				.authenticate("jill", "jill".toCharArray());//$NON-NLS-2$
 		try {
-			GreetingResult greetingResult = getServiceHandler()
-					.doService(certificate, greetingService, greetingArgument);
+			GreetingResult greetingResult = getServiceHandler().doService(certificate, greetingService,
+					greetingArgument);
 			assertThat(greetingResult.getGreeting(), containsString("Hello Robert. Nice to meet you!"));
 		} finally {
 			runtimeMock.getPrivilegeHandler().invalidate(certificate);

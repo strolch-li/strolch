@@ -1,8 +1,8 @@
 package li.strolch.performance;
 
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.service.api.ServiceArgument;
+
+import java.util.concurrent.TimeUnit;
 
 public class PerformanceTestArgument extends ServiceArgument {
 

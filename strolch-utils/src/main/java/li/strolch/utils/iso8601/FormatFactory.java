@@ -42,8 +42,7 @@ public interface FormatFactory {
 	/**
 	 * Formats a date using {@link #getDateFormat()}
 	 *
-	 * @param date
-	 * 		the date to format to string
+	 * @param date the date to format to string
 	 *
 	 * @return String representation of the date
 	 */
@@ -52,8 +51,7 @@ public interface FormatFactory {
 	/**
 	 * Formats a long as date using {@link #getDateFormat()}
 	 *
-	 * @param date
-	 * 		the date to format to string
+	 * @param date the date to format to string
 	 *
 	 * @return String representation of the date
 	 */
@@ -62,8 +60,7 @@ public interface FormatFactory {
 	/**
 	 * Formats a floating point number to have the configured number of decimals
 	 *
-	 * @param value
-	 * 		the value to format
+	 * @param value the value to format
 	 *
 	 * @return the floating point formatted as a string
 	 */
@@ -72,8 +69,7 @@ public interface FormatFactory {
 	/**
 	 * Parses a date using {@link #getDateFormat()}
 	 *
-	 * @param date
-	 * 		the string to parse to date
+	 * @param date the string to parse to date
 	 *
 	 * @return the date
 	 */

@@ -15,10 +15,6 @@
  */
 package li.strolch.persistence.impl.dao.test;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.io.File;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -30,6 +26,10 @@ import li.strolch.utils.helper.FileHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+
+import static org.junit.Assert.assertNotNull;
 
 public class ExistingDbTest {
 
@@ -70,7 +70,8 @@ public class ExistingDbTest {
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
 		Certificate certificate = privilegeHandler.authenticate(TEST, TEST.toCharArray());
 
-		try (StrolchTransaction tx = runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = runtimeMock
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, TEST, true)) {
 			Resource resource = tx.getResourceBy("MyType", "@1"); //$NON-NLS-2$
 			assertNotNull("Should be able to read existing element from db", resource);

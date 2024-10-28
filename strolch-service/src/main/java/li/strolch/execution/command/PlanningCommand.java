@@ -15,14 +15,14 @@
  */
 package li.strolch.execution.command;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import li.strolch.model.State;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>

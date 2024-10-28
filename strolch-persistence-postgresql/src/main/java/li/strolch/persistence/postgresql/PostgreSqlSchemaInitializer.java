@@ -15,13 +15,13 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.db.DbMigrationState;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

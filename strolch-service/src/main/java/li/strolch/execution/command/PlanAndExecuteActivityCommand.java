@@ -1,11 +1,5 @@
 package li.strolch.execution.command;
 
-import static li.strolch.model.State.EXECUTION;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ATOMIC_PARALLEL_EXECUTION;
-
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import li.strolch.execution.Controller;
 import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.ExecutionPolicy;
@@ -18,6 +12,12 @@ import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.model.visitor.IActivityElementVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+import static li.strolch.model.State.EXECUTION;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ATOMIC_PARALLEL_EXECUTION;
 
 public class PlanAndExecuteActivityCommand extends BasePlanningAndExecutionCommand
 		implements TimeOrderingVisitor, IActivityElementVisitor<Void> {

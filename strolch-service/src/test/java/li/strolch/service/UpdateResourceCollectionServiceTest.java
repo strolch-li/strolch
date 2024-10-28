@@ -15,14 +15,14 @@
  */
 package li.strolch.service;
 
-import java.util.ArrayList;
-
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

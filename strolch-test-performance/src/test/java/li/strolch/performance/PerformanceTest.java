@@ -1,18 +1,5 @@
 package li.strolch.performance;
 
-import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
-import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-
 import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.postgresql.DataType;
@@ -26,6 +13,18 @@ import li.strolch.utils.helper.StringHelper;
 import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
+import static org.junit.Assert.assertEquals;
 
 public abstract class PerformanceTest {
 
@@ -51,8 +50,10 @@ public abstract class PerformanceTest {
 		runtimeMock.startContainer();
 
 		if (runtimeMock.getContainer().hasComponent(PersistenceHandler.class)) {
-			assertEquals(dataType, ((PostgreSqlPersistenceHandler) runtimeMock.getContainer()
-					.getComponent(PersistenceHandler.class)).getDataType());
+			assertEquals(dataType, (
+					(PostgreSqlPersistenceHandler) runtimeMock
+							.getContainer()
+							.getComponent(PersistenceHandler.class)).getDataType());
 		}
 	}
 
@@ -155,7 +156,8 @@ public abstract class PerformanceTest {
 		@Override
 		protected boolean exec() {
 
-			Certificate certificate = runtime().getPrivilegeHandler()
+			Certificate certificate = runtime()
+					.getPrivilegeHandler()
 					.authenticate(username, this.username.toCharArray());
 			ServiceHandler svcHandler = runtime().getServiceHandler();
 			this.svcResult = svcHandler.doService(certificate, new PerformanceTestService(), argInstance(nrOfElements));

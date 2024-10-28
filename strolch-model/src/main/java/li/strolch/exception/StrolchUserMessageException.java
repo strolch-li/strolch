@@ -2,7 +2,6 @@ package li.strolch.exception;
 
 import li.strolch.utils.I18nMessage;
 
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class StrolchUserMessageException extends StrolchException {

@@ -15,9 +15,6 @@
  */
 package li.strolch.service.executor;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
@@ -27,6 +24,9 @@ import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The {@link ServiceExecutionHandler} is used to perform long running services so that no singletons etc. are

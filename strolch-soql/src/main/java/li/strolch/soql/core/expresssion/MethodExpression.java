@@ -48,9 +48,14 @@ public class MethodExpression extends AbstractObjectExpression {
 		try {
 			method = object.getClass().getMethod(methodName, clazzes.toArray(new Class<?>[0]));
 		} catch (NoSuchMethodException e) {
-			throw new SOQLEvaluationException(
-					"Method " + methodName + " with arguments " + clazzes + " not declared on object " + object
-							+ " of class " + object.getClass());
+			throw new SOQLEvaluationException("Method "
+					+ methodName
+					+ " with arguments "
+					+ clazzes
+					+ " not declared on object "
+					+ object
+					+ " of class "
+					+ object.getClass());
 		} catch (SecurityException e) {
 			throw new RuntimeException("Failed to getMethod() " + this.methodName, e);
 		}
@@ -83,8 +88,13 @@ public class MethodExpression extends AbstractObjectExpression {
 
 	@Override
 	public String toString() {
-		return "MethodExpression [object=" + object + ", methodName=" + methodName + ", methodArguments="
-				+ methodArguments + "]";
+		return "MethodExpression [object="
+				+ object
+				+ ", methodName="
+				+ methodName
+				+ ", methodArguments="
+				+ methodArguments
+				+ "]";
 	}
 
 }

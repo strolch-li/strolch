@@ -49,10 +49,10 @@ public class RemoveStrolchRootElementsService extends AbstractService<LocatorLis
 				StrolchRootElement rootElement = tx.findElement(locator);
 
 				switch (rootElement.getObjectType()) {
-				case Tags.RESOURCE -> tx.remove((Resource) rootElement);
-				case Tags.ORDER -> tx.remove((Order) rootElement);
-				case Tags.ACTIVITY -> tx.remove((Activity) rootElement);
-				default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
+					case Tags.RESOURCE -> tx.remove((Resource) rootElement);
+					case Tags.ORDER -> tx.remove((Order) rootElement);
+					case Tags.ACTIVITY -> tx.remove((Activity) rootElement);
+					default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
 				}
 			}
 

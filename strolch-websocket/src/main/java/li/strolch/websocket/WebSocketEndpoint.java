@@ -2,10 +2,10 @@ package li.strolch.websocket;
 
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
-import java.util.concurrent.ConcurrentHashMap;
-
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.rest.RestfulStrolchComponent;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 @ServerEndpoint("/websocket/strolch/observer")
 public class WebSocketEndpoint {

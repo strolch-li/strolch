@@ -25,8 +25,7 @@ public class PrivilegeException extends RuntimeException {
 	/**
 	 * Default constructor
 	 *
-	 * @param string
-	 * 		message to go with the exception
+	 * @param string message to go with the exception
 	 */
 	public PrivilegeException(String string) {
 		super(string);
@@ -35,10 +34,8 @@ public class PrivilegeException extends RuntimeException {
 	/**
 	 * Constructor with underlying exception
 	 *
-	 * @param string
-	 * 		message to go with the exception
-	 * @param t
-	 * 		throwable to wrap with this exception which is the underlying exception of this exception
+	 * @param string message to go with the exception
+	 * @param t      throwable to wrap with this exception which is the underlying exception of this exception
 	 */
 	public PrivilegeException(String string, Throwable t) {
 		super(string, t);

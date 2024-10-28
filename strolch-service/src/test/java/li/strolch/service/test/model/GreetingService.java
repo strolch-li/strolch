@@ -15,12 +15,12 @@
  */
 package li.strolch.service.test.model;
 
-import java.text.MessageFormat;
-
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import li.strolch.utils.helper.StringHelper;
+
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

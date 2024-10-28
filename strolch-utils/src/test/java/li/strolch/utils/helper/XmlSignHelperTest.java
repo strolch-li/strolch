@@ -82,8 +82,8 @@ public class XmlSignHelperTest {
 	}
 
 	private void setIdAttrNs(Document document) {
-		NodeList authnRequestNodes = document
-				.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol", "AuthnRequest");
+		NodeList authnRequestNodes = document.getElementsByTagNameNS("urn:oasis:names:tc:SAML:2.0:protocol",
+				"AuthnRequest");
 		if (authnRequestNodes.getLength() != 1)
 			throw new IllegalStateException("Multiple or no AuthnRequest Node found in document!");
 		Element authnRequestNode = (Element) authnRequestNodes.item(0);

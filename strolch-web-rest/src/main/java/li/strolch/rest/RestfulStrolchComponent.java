@@ -29,7 +29,6 @@ import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.utils.dbc.DBC;
 
-import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 /**

@@ -15,10 +15,6 @@
  */
 package li.strolch.persistence.impl.dao.test;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
@@ -26,6 +22,10 @@ import li.strolch.testbase.runtime.AbstractModelTest;
 import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+
+import java.io.File;
+
+import static org.junit.Assert.assertTrue;
 
 public class XmlCachedDaoTest extends AbstractModelTest {
 

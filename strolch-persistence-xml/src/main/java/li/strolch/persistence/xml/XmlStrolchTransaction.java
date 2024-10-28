@@ -15,8 +15,6 @@
  */
 package li.strolch.persistence.xml;
 
-import java.util.Set;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.AbstractTransaction;
@@ -25,6 +23,8 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.xmlpers.api.ModificationResult;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.api.TransactionResult;
+
+import java.util.Set;
 
 public class XmlStrolchTransaction extends AbstractTransaction {
 

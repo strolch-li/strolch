@@ -15,15 +15,6 @@
  */
 package li.strolch.privilege.policy;
 
-import static java.util.stream.Collectors.toSet;
-import static li.strolch.privilege.base.PrivilegeConstants.ROLE_STROLCH_ADMIN;
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.text.MessageFormat;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
@@ -31,6 +22,15 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
+
+import java.text.MessageFormat;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
+import static li.strolch.privilege.base.PrivilegeConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * <p>
@@ -98,9 +98,12 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 			return true;
 
 		if (assertHasPrivilege)
-			throw new AccessDeniedException(
-					"User " + ctx.getUsername() + " may not access users outside of their organisation: " + userOrgs
-							+ " / " + orgs);
+			throw new AccessDeniedException("User "
+					+ ctx.getUsername()
+					+ " may not access users outside of their organisation: "
+					+ userOrgs
+					+ " / "
+					+ orgs);
 
 		return false;
 	}

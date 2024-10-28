@@ -25,8 +25,7 @@ public class PrivilegeModelException extends PrivilegeException {
 	/**
 	 * Default constructor
 	 *
-	 * @param string
-	 * 		message to go with the exception
+	 * @param string message to go with the exception
 	 */
 	public PrivilegeModelException(String string) {
 		super(string);
@@ -35,10 +34,8 @@ public class PrivilegeModelException extends PrivilegeException {
 	/**
 	 * Constructor with underlying exception
 	 *
-	 * @param string
-	 * 		message to go with the exception
-	 * @param t
-	 * 		throwable to wrap with this exception which is the underlying exception of this exception
+	 * @param string message to go with the exception
+	 * @param t      throwable to wrap with this exception which is the underlying exception of this exception
 	 */
 	public PrivilegeModelException(String string, Throwable t) {
 		super(string, t);

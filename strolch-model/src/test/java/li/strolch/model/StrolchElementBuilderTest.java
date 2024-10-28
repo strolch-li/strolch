@@ -1,14 +1,5 @@
 package li.strolch.model;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
-import static li.strolch.model.StrolchModelConstants.TEMPLATE;
-import static org.junit.Assert.*;
-
-import java.time.ZonedDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.IActivityElement;
@@ -18,6 +9,15 @@ import li.strolch.utils.collections.MapOfMaps;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.ZonedDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.BAG_OBJECTIVES;
+import static li.strolch.model.StrolchModelConstants.TEMPLATE;
+import static org.junit.Assert.*;
 
 public class StrolchElementBuilderTest {
 
@@ -134,8 +134,11 @@ public class StrolchElementBuilderTest {
 				;
 
 		List<StrolchRootElement> templates = builder.buildTemplates();
-		MapOfMaps<String, String, StrolchRootElement> elementsByType = templates.stream().collect(MapOfMaps::new,
-				(map, element) -> map.addElement(element.getObjectType(), element.getId(), element), MapOfMaps::putAll);
+		MapOfMaps<String, String, StrolchRootElement> elementsByType = templates
+				.stream()
+				.collect(MapOfMaps::new,
+						(map, element) -> map.addElement(element.getObjectType(), element.getId(), element),
+						MapOfMaps::putAll);
 		assertEquals(5, elementsByType.size());
 		elementsByType.forEach((t, map) -> map.values().forEach(element -> logger.info("\n{}", element.toXmlString())));
 

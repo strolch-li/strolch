@@ -15,20 +15,20 @@
  */
 package li.strolch.rest.inspector.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import java.util.Locale;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -100,7 +100,7 @@ public class EnumTest extends AbstractRestfulTest {
 		JsonObject strolchEnumJ = JsonParser.parseString(strolchEnumS).getAsJsonObject();
 		assertEquals("salutation", strolchEnumJ.get("name").getAsString());
 		assertEquals(3, strolchEnumJ.get("values").getAsJsonArray().size());
-		assertEquals("Herr", strolchEnumJ.get("values").getAsJsonArray().get(0).getAsJsonObject().get("value").
-				getAsString());
+		assertEquals("Herr",
+				strolchEnumJ.get("values").getAsJsonArray().get(0).getAsJsonObject().get("value").getAsString());
 	}
 }

@@ -21,8 +21,7 @@ import java.util.stream.Stream;
 /**
  * A timed variable storing a ordered sequence of {@link ITimeValue} objects modeling a time evolution of a quantity.
  *
- * @param <T>
- * 		the backing value of the timed value object
+ * @param <T> the backing value of the timed value object
  *
  * @author Martin Smock <smock.martin@gmail.com>
  */
@@ -32,10 +31,8 @@ public interface ITimeVariable<T extends IValue> {
 	/**
 	 * set the value at a point in time to a given time value object
 	 *
-	 * @param time
-	 * 		the time to set the {@link IValue}
-	 * @param value
-	 * 		the {@link IValue} to set
+	 * @param time  the time to set the {@link IValue}
+	 * @param value the {@link IValue} to set
 	 */
 	void setValueAt(long time, final T value);
 
@@ -47,20 +44,17 @@ public interface ITimeVariable<T extends IValue> {
 	/**
 	 * Applies a {@link IValueChange} propagating the change to all future values starting from the time of the change.
 	 *
-	 * @param change
-	 * 		the {@link IValueChange} to be applied
-	 * @param compact
-	 * 		if set to true, then the values are compacted, otherwiss not
+	 * @param change  the {@link IValueChange} to be applied
+	 * @param compact if set to true, then the values are compacted, otherwiss not
 	 */
 	void applyChange(final IValueChange<T> change, boolean compact);
 
 	/**
 	 * Get all {@link ITimeValue} objects whose time field is greater or equal to the given time
 	 *
-	 * @param time
-	 * 		the time the sequence starts with
+	 * @param time the time the sequence starts with
 	 *
-	 * 		<b>Note:</b> The returned result is unmodifiable
+	 *             <b>Note:</b> The returned result is unmodifiable
 	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
@@ -69,8 +63,7 @@ public interface ITimeVariable<T extends IValue> {
 	/**
 	 * Removes all {@link ITimeValue} objects whose time field is greater or equal to the given time
 	 *
-	 * @param time
-	 * 		the time the sequence starts with
+	 * @param time the time the sequence starts with
 	 *
 	 * @return the sequence of {@link ITimeValue} objects removed
 	 */
@@ -79,10 +72,9 @@ public interface ITimeVariable<T extends IValue> {
 	/**
 	 * Get all {@link ITimeValue} objects whose time field is strictly smaller than the given time
 	 *
-	 * @param time
-	 * 		the time the sequence starts with
+	 * @param time the time the sequence starts with
 	 *
-	 * 		<b>Note:</b> The returned result is unmodifiable
+	 *             <b>Note:</b> The returned result is unmodifiable
 	 *
 	 * @return the sequence of {@link ITimeValue} objects in the future
 	 */
@@ -91,8 +83,7 @@ public interface ITimeVariable<T extends IValue> {
 	/**
 	 * Remove all {@link ITimeValue} objects whose time field is strictly smaller than the given time
 	 *
-	 * @param time
-	 * 		the time the sequence starts with
+	 * @param time the time the sequence starts with
 	 *
 	 * @return the sequence of {@link ITimeValue} objects removed
 	 */

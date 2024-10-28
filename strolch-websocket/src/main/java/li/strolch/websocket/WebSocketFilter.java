@@ -1,15 +1,14 @@
 package li.strolch.websocket;
 
-import static li.strolch.rest.helper.RestfulHelper.getRemoteIp;
-
-import jakarta.servlet.annotation.WebFilter;
-
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+
+import static li.strolch.rest.helper.RestfulHelper.getRemoteIp;
 
 @WebFilter("/websocket/*")
 public class WebSocketFilter implements Filter {

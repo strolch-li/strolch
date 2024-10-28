@@ -1,12 +1,12 @@
 package li.strolch.utils.time;
 
-import static java.time.Period.between;
+import li.strolch.utils.dbc.DBC;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
-import li.strolch.utils.dbc.DBC;
+import static java.time.Period.between;
 
 public class PeriodHelper {
 
@@ -24,10 +24,8 @@ public class PeriodHelper {
 	 * <p>But for the day 28, 29, 30 or 31, if these are the last days of the given month, then the returned month is
 	 * also shifted to the last day</p>
 	 *
-	 * @param date
-	 * 		the date to shift
-	 * @param nrOfMonths
-	 * 		the number of months to shift the given date by
+	 * @param date       the date to shift
+	 * @param nrOfMonths the number of months to shift the given date by
 	 *
 	 * @return the shifted date
 	 */
@@ -46,10 +44,8 @@ public class PeriodHelper {
 	 * {@link #shiftMonths(ZonedDateTime, long)}. Furthermore, this method also specially handles weeks, i.e. if
 	 * shifting is by multiple of 7, then this is handled as shifting by weeks
 	 *
-	 * @param date
-	 * 		the date to shift
-	 * @param periodDuration
-	 * 		the period duration to shift the date by
+	 * @param date           the date to shift
+	 * @param periodDuration the period duration to shift the date by
 	 *
 	 * @return the shifted date
 	 */
@@ -133,12 +129,10 @@ public class PeriodHelper {
 	 * before the given end date. It does multiple tries end get as close as possible, due to the inexactness of 30 days
 	 * being one month, and 365 days being one year.
 	 *
-	 * @param dateWithTime
-	 * 		the start date to shift before the end date
-	 * @param end
-	 * 		the date to which the given date may be shifted
-	 * @param periodDuration
-	 * 		the period with which to shift the date with. Shifting is done in multiples of this given period
+	 * @param dateWithTime   the start date to shift before the end date
+	 * @param end            the date to which the given date may be shifted
+	 * @param periodDuration the period with which to shift the date with. Shifting is done in multiples of this given
+	 *                       period
 	 *
 	 * @return the shifted date
 	 */

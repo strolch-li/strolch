@@ -1,10 +1,10 @@
 package li.strolch.model.builder.states;
 
-import static java.util.Collections.emptySet;
-
 import li.strolch.model.builder.ResourceBuilder;
 import li.strolch.model.timedstate.StringSetTimedState;
 import li.strolch.model.timevalue.impl.StringSetValue;
+
+import static java.util.Collections.emptySet;
 
 public class StringSetStateBuilder extends TimedStateBuilder<StringSetTimedState> {
 

@@ -47,10 +47,10 @@ public class AddStrolchRootElementsService extends AbstractService<StrolchRootEl
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 			for (StrolchRootElement rootElement : arg.rootElements) {
 				switch (rootElement.getObjectType()) {
-				case Tags.RESOURCE -> tx.add((Resource) rootElement);
-				case Tags.ORDER -> tx.add((Order) rootElement);
-				case Tags.ACTIVITY -> tx.add((Activity) rootElement);
-				default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
+					case Tags.RESOURCE -> tx.add((Resource) rootElement);
+					case Tags.ORDER -> tx.add((Order) rootElement);
+					case Tags.ACTIVITY -> tx.add((Activity) rootElement);
+					default -> throw new IllegalStateException("Unexpected value: " + rootElement.getObjectType());
 				}
 			}
 			tx.commitOnClose();

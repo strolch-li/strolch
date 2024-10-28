@@ -63,6 +63,7 @@ public interface ExpressionBuilder {
 	default <T extends StrolchRootElement> SearchExpression<T> containsIgnoreCase(Object right) {
 		return element -> PredicatesSupport.containsIgnoreCase(right).matches(extract(element));
 	}
+
 	default <T extends StrolchRootElement> SearchExpression<T> containsIgnoreCaseMatchAny(Object right) {
 		return element -> PredicatesSupport.containsIgnoreCaseMatchAny(right).matches(extract(element));
 	}
@@ -70,6 +71,7 @@ public interface ExpressionBuilder {
 	default <T extends StrolchRootElement> SearchExpression<T> isIn(Object right) {
 		return element -> PredicatesSupport.isIn(right).matches(extract(element));
 	}
+
 	default <T extends StrolchRootElement> SearchExpression<T> isInArray(Object... right) {
 		return element -> PredicatesSupport.isIn(right).matches(extract(element));
 	}

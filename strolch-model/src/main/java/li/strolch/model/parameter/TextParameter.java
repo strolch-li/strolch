@@ -33,12 +33,9 @@ public class TextParameter extends StringParameter {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public TextParameter(String id, String name, String value) {
 		super(id, name, value);

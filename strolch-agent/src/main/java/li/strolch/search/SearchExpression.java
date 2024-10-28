@@ -11,8 +11,7 @@ public interface SearchExpression<T extends StrolchRootElement> {
 	/**
 	 * See if this search expression matches the given element
 	 *
-	 * @param element
-	 * 		the element to match
+	 * @param element the element to match
 	 *
 	 * @return true if the element is matched with this search expression
 	 */
@@ -21,8 +20,7 @@ public interface SearchExpression<T extends StrolchRootElement> {
 	/**
 	 * Returns a new search expression where this search expression is ORed with the given search expression
 	 *
-	 * @param right
-	 * 		the right hand side of the search expression
+	 * @param right the right hand side of the search expression
 	 *
 	 * @return the new search expression with an internal OR of the two search expressions
 	 */
@@ -34,8 +32,7 @@ public interface SearchExpression<T extends StrolchRootElement> {
 	/**
 	 * Returns a new search expression where this search expression is ANDed with the given search expression
 	 *
-	 * @param right
-	 * 		the right hand side of the search expression
+	 * @param right the right hand side of the search expression
 	 *
 	 * @return the new search expression with an internal AND of the two search expressions
 	 */

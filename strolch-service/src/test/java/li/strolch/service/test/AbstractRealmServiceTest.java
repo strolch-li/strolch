@@ -15,15 +15,6 @@
  */
 package li.strolch.service.test;
 
-import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
-import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
-import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
-
-import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.db.DbSchemaVersionCheck;
@@ -40,6 +31,15 @@ import org.junit.Before;
 import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
+import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -1,15 +1,15 @@
 package li.strolch.persistence.impl;
 
-import static java.util.stream.Collectors.toList;
+import li.strolch.model.StrolchRootElement;
+import li.strolch.persistence.api.StrolchDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
+import li.strolch.utils.collections.MapOfLists;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import li.strolch.model.StrolchRootElement;
-import li.strolch.persistence.api.StrolchDao;
-import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.utils.collections.MapOfLists;
+import static java.util.stream.Collectors.toList;
 
 public class InMemoryStrolchDao<T extends StrolchRootElement> implements StrolchDao<T> {
 

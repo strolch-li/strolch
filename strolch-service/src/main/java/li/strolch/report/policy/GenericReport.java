@@ -13,7 +13,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.report.ReportConstants;
 import li.strolch.report.ReportElement;
-import li.strolch.utils.ObjectHelper;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
@@ -32,7 +31,8 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
 import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.report.ReportConstants.*;
-import static li.strolch.utils.ObjectHelper.*;
+import static li.strolch.utils.ObjectHelper.compare;
+import static li.strolch.utils.ObjectHelper.contains;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
 
 /**

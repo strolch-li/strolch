@@ -15,16 +15,6 @@
  */
 package li.strolch.persistence.impl.dao.test;
 
-import static li.strolch.model.ModelGenerator.createOrder;
-import static li.strolch.model.ModelGenerator.createResource;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.*;
@@ -37,6 +27,16 @@ import li.strolch.xmlpers.api.ModificationResult;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static li.strolch.model.ModelGenerator.createOrder;
+import static li.strolch.model.ModelGenerator.createResource;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

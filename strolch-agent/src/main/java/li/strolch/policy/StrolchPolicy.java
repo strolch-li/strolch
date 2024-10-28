@@ -43,8 +43,7 @@ public abstract class StrolchPolicy {
 	/**
 	 * Instantiate a new {@link StrolchPolicy}
 	 *
-	 * @param tx
-	 * 		the transaction for this policy
+	 * @param tx the transaction for this policy
 	 */
 	public StrolchPolicy(StrolchTransaction tx) {
 		this.agent = tx.getAgent();
@@ -55,8 +54,7 @@ public abstract class StrolchPolicy {
 	/**
 	 * Returns true if the given component is registered on th container
 	 *
-	 * @param clazz
-	 * 		the type of component to check for
+	 * @param clazz the type of component to check for
 	 *
 	 * @return true if the component is available
 	 */
@@ -68,13 +66,11 @@ public abstract class StrolchPolicy {
 	 * Allows the concrete {@link Command} implementation access to {@link StrolchComponent StrolchComponents} at
 	 * runtime
 	 *
-	 * @param clazz
-	 * 		the type of component to be returned
+	 * @param clazz the type of component to be returned
 	 *
 	 * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the component with the given class does not exist
+	 * @throws IllegalArgumentException if the component with the given class does not exist
 	 */
 	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
@@ -105,6 +101,7 @@ public abstract class StrolchPolicy {
 
 	/**
 	 * Returns true if this TX is still open, or committing, and thus can still be used
+	 *
 	 * @return true if this TX is still open, or committing, and thus can still be used
 	 */
 	protected boolean isTxOpen() {

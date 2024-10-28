@@ -42,8 +42,8 @@ public class UpdateActivityServiceTest extends AbstractRealmServiceTest<StrolchR
 	protected StrolchRootElementArgument getArgInstance() {
 
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
-		arg.rootElement = ModelGenerator
-				.createActivity("activity_1", "Modified Car Activity", "ActivityType", TimeOrdering.SERIES);
+		arg.rootElement = ModelGenerator.createActivity("activity_1", "Modified Car Activity", "ActivityType",
+				TimeOrdering.SERIES);
 
 		return arg;
 	}

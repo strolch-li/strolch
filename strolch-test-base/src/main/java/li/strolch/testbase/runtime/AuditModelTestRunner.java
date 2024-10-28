@@ -15,10 +15,6 @@
  */
 package li.strolch.testbase.runtime;
 
-import static org.junit.Assert.*;
-
-import java.util.*;
-
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.ModelGenerator;
@@ -27,6 +23,10 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.collections.DateRange;
+
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

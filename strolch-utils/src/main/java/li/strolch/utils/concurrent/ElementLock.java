@@ -1,14 +1,14 @@
 package li.strolch.utils.concurrent;
 
-import static java.lang.Thread.currentThread;
-import static java.text.MessageFormat.format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.Thread.currentThread;
+import static java.text.MessageFormat.format;
 
 public class ElementLock extends ReentrantLock {
 

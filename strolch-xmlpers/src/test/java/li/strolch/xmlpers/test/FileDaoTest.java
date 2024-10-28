@@ -15,16 +15,16 @@
  */
 package li.strolch.xmlpers.test;
 
-import static li.strolch.xmlpers.test.model.ModelBuilder.*;
-import static org.junit.Assert.assertNull;
-
-import java.util.Properties;
-
 import li.strolch.xmlpers.api.*;
 import li.strolch.xmlpers.objref.ObjectReferenceCache;
 import li.strolch.xmlpers.test.model.MyModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.Properties;
+
+import static li.strolch.xmlpers.test.model.ModelBuilder.*;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -45,12 +45,14 @@ public class ClearUserPasswordService extends AbstractService<PrivilegeUserNameA
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD)) {
 			tx.setSuppressAudits(true);
 
-			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
+			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler
+					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 			privilegeHandler.setUserPassword(getCertificate(), arg.username, null);
 
 			// only persist if not setting own password
-			if (!getCertificate().getUsername().equals(arg.username) && getPrivilegeContext().getPrivilegeNames()
+			if (!getCertificate().getUsername().equals(arg.username) && getPrivilegeContext()
+					.getPrivilegeNames()
 					.contains(PrivilegeHandler.PRIVILEGE_ACTION_PERSIST)) {
 				if (privilegeHandler.isPersistOnUserDataChanged())
 					privilegeHandler.persist(getCertificate());

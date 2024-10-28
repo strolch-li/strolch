@@ -279,7 +279,9 @@ public abstract class AbstractionConfiguration {
 			propertyJ.addProperty(Tags.Json.TYPE, this.valueTypes.get(key));
 		}
 
-		JsonArray propertiesJ = propertiesMap.values().stream()
+		JsonArray propertiesJ = propertiesMap
+				.values()
+				.stream()
 				.sorted(comparing(e -> e.get(Tags.Json.KEY).getAsString()))
 				.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 		componentJ.add(Tags.Json.PROPERTIES, propertiesJ);

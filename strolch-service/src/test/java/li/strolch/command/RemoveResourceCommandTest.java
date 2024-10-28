@@ -15,9 +15,6 @@
  */
 package li.strolch.command;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.model.Tags;
@@ -25,6 +22,9 @@ import li.strolch.persistence.api.RemoveResourceCommand;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import org.junit.Before;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

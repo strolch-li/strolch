@@ -15,8 +15,6 @@
  */
 package li.strolch.rest.filters;
 
-import java.text.MessageFormat;
-
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -24,7 +22,6 @@ import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.Provider;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,16 +49,14 @@ public class AccessControlResponseFilter implements ContainerResponseFilter {
 	private static boolean logged;
 
 	/**
-	 * @param corsEnabled
-	 * 		the corsEnabled to set
+	 * @param corsEnabled the corsEnabled to set
 	 */
 	public static void setCorsEnabled(boolean corsEnabled) {
 		AccessControlResponseFilter.corsEnabled = corsEnabled;
 	}
 
 	/**
-	 * @param origin
-	 * 		the origin to set
+	 * @param origin the origin to set
 	 */
 	public static void setOrigin(String origin) {
 		AccessControlResponseFilter.origin = origin;

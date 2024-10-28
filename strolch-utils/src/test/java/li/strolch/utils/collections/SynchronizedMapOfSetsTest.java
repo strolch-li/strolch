@@ -1,7 +1,9 @@
 package li.strolch.utils.collections;
 
-import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,10 +12,8 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
+import static org.junit.Assert.*;
 
 public class SynchronizedMapOfSetsTest {
 

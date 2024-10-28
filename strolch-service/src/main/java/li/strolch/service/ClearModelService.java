@@ -15,8 +15,6 @@
  */
 package li.strolch.service;
 
-import java.text.MessageFormat;
-
 import li.strolch.command.ClearModelCommand;
 import li.strolch.model.ModelStatistics;
 import li.strolch.persistence.api.StrolchTransaction;

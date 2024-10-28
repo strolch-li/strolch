@@ -15,15 +15,15 @@
  */
 package li.strolch.command;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import li.strolch.agent.api.OrderMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Order;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -38,8 +38,7 @@ public class AddOrderCollectionCommand extends Command {
 	}
 
 	/**
-	 * @param orders
-	 * 		the orders to set
+	 * @param orders the orders to set
 	 */
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;

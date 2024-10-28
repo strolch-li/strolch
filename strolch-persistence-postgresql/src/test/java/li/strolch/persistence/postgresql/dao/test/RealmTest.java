@@ -15,15 +15,6 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-import java.io.File;
-
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.model.ModelGenerator;
@@ -40,6 +31,15 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.DB_PASSWORD;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class RealmTest extends AbstractModelTest {
 
@@ -79,7 +79,8 @@ public class RealmTest extends AbstractModelTest {
 			throw new IllegalStateException("Failed to create dir " + rootPath + "/" + DB_STORE_PATH_DIR);
 		runtimeMock.startContainer();
 
-		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock
+				.getContainer()
 				.getComponent(PersistenceHandler.class);
 		assertEquals(DataType.xml, persistenceHandler.getDataType());
 	}

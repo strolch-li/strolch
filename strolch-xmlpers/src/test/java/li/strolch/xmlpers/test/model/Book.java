@@ -66,8 +66,7 @@ public class Book {
 	}
 
 	/**
-	 * @param title
-	 * 		the title to set
+	 * @param title the title to set
 	 */
 	public void setTitle(String title) {
 		this.title = title;
@@ -81,8 +80,7 @@ public class Book {
 	}
 
 	/**
-	 * @param author
-	 * 		the author to set
+	 * @param author the author to set
 	 */
 	public void setAuthor(String author) {
 		this.author = author;
@@ -96,8 +94,7 @@ public class Book {
 	}
 
 	/**
-	 * @param press
-	 * 		the press to set
+	 * @param press the press to set
 	 */
 	public void setPress(String press) {
 		this.press = press;
@@ -111,8 +108,7 @@ public class Book {
 	}
 
 	/**
-	 * @param price
-	 * 		the price to set
+	 * @param price the price to set
 	 */
 	public void setPrice(double price) {
 		this.price = price;

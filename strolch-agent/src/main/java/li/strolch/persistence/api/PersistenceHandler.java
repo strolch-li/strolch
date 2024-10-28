@@ -36,14 +36,10 @@ public interface PersistenceHandler {
 	 * Opens a {@link StrolchTransaction} on the given {@link StrolchRealm}. The transaction is the main object to be
 	 * used when accessing and modifying the elements of a realm.
 	 *
-	 * @param realm
-	 * 		the realm for which the transaction is to be opened
-	 * @param certificate
-	 * 		the certificate which has access to the realm
-	 * @param action
-	 * 		the name of the transaction used for auditing
-	 * @param readOnly
-	 * 		if this TX is read-only
+	 * @param realm       the realm for which the transaction is to be opened
+	 * @param certificate the certificate which has access to the realm
+	 * @param action      the name of the transaction used for auditing
+	 * @param readOnly    if this TX is read-only
 	 *
 	 * @return the newly created {@link StrolchTransaction}
 	 */
@@ -54,8 +50,7 @@ public interface PersistenceHandler {
 	 * features. Accessing {@link Order Orders} should be done through the {@link OrderMap} accessed from the
 	 * transaction
 	 *
-	 * @param tx
-	 * 		the transaction for which the {@link OrderDao} is to be returned
+	 * @param tx the transaction for which the {@link OrderDao} is to be returned
 	 *
 	 * @return the {@link OrderDao}
 	 */
@@ -66,8 +61,7 @@ public interface PersistenceHandler {
 	 * transaction features. Accessing {@link Resource Resources} should be done through the {@link ResourceMap}
 	 * accessed from the transaction
 	 *
-	 * @param tx
-	 * 		the transaction for which the {@link ResourceDao} is to be returned
+	 * @param tx the transaction for which the {@link ResourceDao} is to be returned
 	 *
 	 * @return the {@link ResourceDao}
 	 */
@@ -78,8 +72,7 @@ public interface PersistenceHandler {
 	 * transaction features. Accessing {@link Activity Activities} should be done through the {@link ActivityMap}
 	 * accessed from the transaction
 	 *
-	 * @param tx
-	 * 		the transaction for which the {@link ActivityDao} is to be returned
+	 * @param tx the transaction for which the {@link ActivityDao} is to be returned
 	 *
 	 * @return the {@link ActivityDao}
 	 */
@@ -90,8 +83,7 @@ public interface PersistenceHandler {
 	 * features. Accessing {@link Audit Audits} should be done through the {@link AuditTrail} accessed from the
 	 * transaction
 	 *
-	 * @param tx
-	 * 		the transaction for which the {@link AuditDao} is to be returned
+	 * @param tx the transaction for which the {@link AuditDao} is to be returned
 	 *
 	 * @return the {@link AuditDao}
 	 */
@@ -100,8 +92,7 @@ public interface PersistenceHandler {
 	/**
 	 * Returns the {@link LogMessageDao} for the given transaction.
 	 *
-	 * @param tx
-	 * 		the transaction for which the {@link LogMessageDao} is to be returned
+	 * @param tx the transaction for which the {@link LogMessageDao} is to be returned
 	 *
 	 * @return the {@link LogMessageDao}
 	 */

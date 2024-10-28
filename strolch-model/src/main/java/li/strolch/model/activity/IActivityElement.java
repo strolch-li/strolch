@@ -15,13 +15,13 @@
  */
 package li.strolch.model.activity;
 
-import java.util.function.Predicate;
-
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.*;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.StrolchElementVisitor;
+
+import java.util.function.Predicate;
 
 /**
  * Marker for all child elements of {@link Activity} objects
@@ -58,8 +58,7 @@ public interface IActivityElement extends StrolchElement {
 	/**
 	 * Set the parent
 	 *
-	 * @param activity
-	 * 		the activity to set as parent
+	 * @param activity the activity to set as parent
 	 */
 	void setParent(Activity activity);
 
@@ -184,13 +183,10 @@ public interface IActivityElement extends StrolchElement {
 	 * If the policy def does not exist and no default policy is passed, then a {@link StrolchModelException} is thrown
 	 * </p>
 	 *
-	 * @param className
-	 * 		the class name of the policy to find
-	 * @param defaultDef
-	 * 		default {@link PolicyDef} to return if not found
+	 * @param className  the class name of the policy to find
+	 * @param defaultDef default {@link PolicyDef} to return if not found
 	 *
-	 * @throws StrolchModelException
-	 * 		if no default policy, and policy not found
+	 * @throws StrolchModelException if no default policy, and policy not found
 	 */
 	PolicyDef findPolicy(String className, PolicyDef defaultDef) throws StrolchModelException;
 
@@ -204,13 +200,10 @@ public interface IActivityElement extends StrolchElement {
 	 * If the policy def does not exist and no default policy is passed, then a {@link StrolchModelException} is thrown
 	 * </p>
 	 *
-	 * @param clazz
-	 * 		the class of the policy to find
-	 * @param defaultDef
-	 * 		default {@link PolicyDef} to return if not found
+	 * @param clazz      the class of the policy to find
+	 * @param defaultDef default {@link PolicyDef} to return if not found
 	 *
-	 * @throws StrolchModelException
-	 * 		if no default policy, and policy not found
+	 * @throws StrolchModelException if no default policy, and policy not found
 	 */
 	PolicyDef findPolicy(Class<?> clazz, PolicyDef defaultDef) throws StrolchModelException;
 
@@ -226,8 +219,7 @@ public interface IActivityElement extends StrolchElement {
 	/**
 	 * Implements the visitor pattern. Concrete implementation will call the proper method on the visitor
 	 *
-	 * @param visitor
-	 * 		the visitor to accept
+	 * @param visitor the visitor to accept
 	 *
 	 * @return the result of the visitor being accepted
 	 */

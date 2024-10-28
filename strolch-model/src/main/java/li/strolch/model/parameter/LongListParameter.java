@@ -39,12 +39,9 @@ public class LongListParameter extends AbstractListParameter<Long> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public LongListParameter(String id, String name, List<Long> value) {
 		super(id, name);

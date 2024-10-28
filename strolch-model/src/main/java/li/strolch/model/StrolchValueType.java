@@ -15,15 +15,6 @@
  */
 package li.strolch.model;
 
-import static java.util.stream.Collectors.joining;
-
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-
 import com.google.gson.JsonPrimitive;
 import li.strolch.model.parameter.*;
 import li.strolch.model.timedstate.*;
@@ -32,6 +23,15 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.*;
 import li.strolch.utils.iso8601.ISO8601;
 import li.strolch.utils.time.PeriodDuration;
+
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+import static java.util.stream.Collectors.joining;
 
 public enum StrolchValueType {
 
@@ -364,8 +364,7 @@ public enum StrolchValueType {
 	FLOAT_LIST("FloatList") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			@SuppressWarnings("unchecked")
-			List<Double> list = (List<Double>) value;
+			@SuppressWarnings("unchecked") List<Double> list = (List<Double>) value;
 			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
 		}
 
@@ -404,8 +403,7 @@ public enum StrolchValueType {
 	INTEGER_LIST("IntegerList") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			@SuppressWarnings("unchecked")
-			List<Integer> list = (List<Integer>) value;
+			@SuppressWarnings("unchecked") List<Integer> list = (List<Integer>) value;
 			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
 		}
 
@@ -444,8 +442,7 @@ public enum StrolchValueType {
 	LONG_LIST("LongList") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			@SuppressWarnings("unchecked")
-			List<Long> list = (List<Long>) value;
+			@SuppressWarnings("unchecked") List<Long> list = (List<Long>) value;
 			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
 		}
 
@@ -486,8 +483,7 @@ public enum StrolchValueType {
 	STRING_LIST("StringList") {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
-			@SuppressWarnings("unchecked")
-			List<String> list = (List<String>) value;
+			@SuppressWarnings("unchecked") List<String> list = (List<String>) value;
 			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
 		}
 

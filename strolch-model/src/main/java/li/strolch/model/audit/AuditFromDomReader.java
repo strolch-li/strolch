@@ -15,14 +15,14 @@
  */
 package li.strolch.model.audit;
 
-import java.text.MessageFormat;
-
 import li.strolch.model.Tags;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -47,20 +47,20 @@ public class AuditFromDomReader {
 			String txtContent = element.getTextContent();
 
 			switch (nodeName) {
-			case Tags.Audit.USERNAME -> audit.setUsername(txtContent);
-			case Tags.Audit.FIRSTNAME -> audit.setFirstname(txtContent);
-			case Tags.Audit.LASTNAME -> audit.setLastname(txtContent);
-			case Tags.Audit.DATE ->
-					audit.setDate(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
-			case Tags.Audit.ELEMENT_TYPE -> audit.setElementType(txtContent);
-			case Tags.Audit.ELEMENT_SUB_TYPE -> audit.setElementSubType(txtContent);
-			case Tags.Audit.ELEMENT_ACCESSED -> audit.setElementAccessed(txtContent);
-			case Tags.Audit.NEW_VERSION ->
-					audit.setNewVersion(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
-			case Tags.Audit.ACTION -> audit.setAction(txtContent);
-			case Tags.Audit.ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
-			default -> throw new IllegalArgumentException(
-					MessageFormat.format("Unhandled/Invalid tag {0} for Audit {1}", nodeName, idS));
+				case Tags.Audit.USERNAME -> audit.setUsername(txtContent);
+				case Tags.Audit.FIRSTNAME -> audit.setFirstname(txtContent);
+				case Tags.Audit.LASTNAME -> audit.setLastname(txtContent);
+				case Tags.Audit.DATE ->
+						audit.setDate(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
+				case Tags.Audit.ELEMENT_TYPE -> audit.setElementType(txtContent);
+				case Tags.Audit.ELEMENT_SUB_TYPE -> audit.setElementSubType(txtContent);
+				case Tags.Audit.ELEMENT_ACCESSED -> audit.setElementAccessed(txtContent);
+				case Tags.Audit.NEW_VERSION ->
+						audit.setNewVersion(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
+				case Tags.Audit.ACTION -> audit.setAction(txtContent);
+				case Tags.Audit.ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
+				default -> throw new IllegalArgumentException(
+						MessageFormat.format("Unhandled/Invalid tag {0} for Audit {1}", nodeName, idS));
 			}
 		}
 

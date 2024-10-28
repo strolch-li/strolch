@@ -39,8 +39,7 @@ public class AddOrderCommand extends Command {
 	}
 
 	/**
-	 * @param order
-	 * 		the order to set
+	 * @param order the order to set
 	 */
 	public void setOrder(Order order) {
 		this.order = order;

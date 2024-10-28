@@ -1,19 +1,19 @@
 package li.strolch.model.builder;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.concat;
-import static li.strolch.model.StrolchModelConstants.TEMPLATE;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
 import li.strolch.utils.helper.StringHelper;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.concat;
+import static li.strolch.model.StrolchModelConstants.TEMPLATE;
 
 public class StrolchElementBuilder {
 

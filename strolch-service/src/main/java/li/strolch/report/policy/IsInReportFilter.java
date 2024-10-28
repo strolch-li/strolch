@@ -1,16 +1,16 @@
 package li.strolch.report.policy;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.Arrays;
-import java.util.Date;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.parameter.DateParameter;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.ObjectHelper;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.Arrays;
+import java.util.Date;
+
+import static java.util.stream.Collectors.toList;
 
 public class IsInReportFilter extends ReportFilterPolicy {
 
@@ -27,8 +27,11 @@ public class IsInReportFilter extends ReportFilterPolicy {
 
 			if (this.right == null) {
 				logger.error("DEPRECATED, use ZonedDateTime");
-				this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim)
-						.map(this::parseFilterValueToDate).collect(toList());
+				this.right = Arrays
+						.stream(this.filterValue.split(","))
+						.map(String::trim)
+						.map(this::parseFilterValueToDate)
+						.collect(toList());
 			}
 
 			left = value;
@@ -38,10 +41,16 @@ public class IsInReportFilter extends ReportFilterPolicy {
 			if (this.right == null) {
 				StrolchValueType valueType = parameter.getValueType();
 				if (valueType == StrolchValueType.DATE)
-					this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim)
-							.map(this::parseFilterValueToZdt).collect(toList());
+					this.right = Arrays
+							.stream(this.filterValue.split(","))
+							.map(String::trim)
+							.map(this::parseFilterValueToZdt)
+							.collect(toList());
 				else
-					this.right = Arrays.stream(this.filterValue.split(",")).map(String::trim).map(valueType::parseValue)
+					this.right = Arrays
+							.stream(this.filterValue.split(","))
+							.map(String::trim)
+							.map(valueType::parseValue)
 							.collect(toList());
 			}
 

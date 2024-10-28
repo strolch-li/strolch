@@ -15,11 +15,6 @@
  */
 package li.strolch.execution;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.assertEquals;
-
-import java.util.SortedSet;
-
 import li.strolch.execution.command.AssignActionCommand;
 import li.strolch.execution.command.PlanActionCommand;
 import li.strolch.model.ModelGenerator;
@@ -44,6 +39,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.SortedSet;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>
@@ -155,8 +155,7 @@ public class AssignActionTest {
 	 * state variable to apply the change to
 	 * </p>
 	 *
-	 * @param action
-	 * 		the action to create the changes for
+	 * @param action the action to create the changes for
 	 */
 	protected static void createChanges(Action action) {
 

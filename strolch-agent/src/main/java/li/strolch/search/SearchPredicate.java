@@ -11,8 +11,7 @@ public interface SearchPredicate {
 	/**
 	 * Returns true if this predicate matches the given left hand side of the where clause
 	 *
-	 * @param left
-	 * 		the left side to match
+	 * @param left the left side to match
 	 *
 	 * @return true if the predicate matches
 	 */
@@ -22,8 +21,7 @@ public interface SearchPredicate {
 	 * Coerces the internal right handle side of this predicate using the given coercer. This is required to handle
 	 * situations where values are not compatible, i.e. Date object and date string
 	 *
-	 * @param coercer
-	 * 		the coercer to be applied to the right hand side
+	 * @param coercer the coercer to be applied to the right hand side
 	 *
 	 * @return the new search predicate with the coerced right hand side
 	 */

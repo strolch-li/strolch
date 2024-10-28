@@ -15,10 +15,6 @@
  */
 package li.strolch.model.timedstate;
 
-import java.time.ZonedDateTime;
-import java.util.Iterator;
-import java.util.NavigableSet;
-
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchModelConstants;
@@ -28,6 +24,10 @@ import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+
+import java.time.ZonedDateTime;
+import java.util.Iterator;
+import java.util.NavigableSet;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -50,8 +50,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	/**
 	 * set the hidden attribute
 	 *
-	 * @param hidden
-	 * 		the new hidden value
+	 * @param hidden the new hidden value
 	 */
 	void setHidden(boolean hidden);
 
@@ -65,8 +64,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	/**
 	 * Set the UOM of this {@link Parameter}
 	 *
-	 * @param uom
-	 * 		the new UOM
+	 * @param uom the new UOM
 	 */
 	void setUom(String uom);
 
@@ -94,8 +92,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	/**
 	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 *
-	 * @param index
-	 * 		the index to set
+	 * @param index the index to set
 	 */
 	void setIndex(int index);
 
@@ -121,8 +118,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
 	 *
-	 * @param interpretation
-	 * 		the interpretation
+	 * @param interpretation the interpretation
 	 */
 	void setInterpretation(String interpretation);
 
@@ -151,10 +147,8 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	/**
 	 * set the value at a point in time to a given time value object from a string value
 	 *
-	 * @param time
-	 * 		the time to set the {@link IValue}
-	 * @param value
-	 * 		the string to parse to an {@link IValue}
+	 * @param time  the time to set the {@link IValue}
+	 * @param value the string to parse to an {@link IValue}
 	 */
 	void setStateFromStringAt(final Long time, final String value);
 
@@ -170,8 +164,7 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	/**
 	 * Trims this timed state, so it has at most the given number of values
 	 *
-	 * @param maxValues
-	 * 		the number of values to keep
+	 * @param maxValues the number of values to keep
 	 *
 	 * @return true if the state was trimmed, false if not
 	 */
@@ -195,10 +188,8 @@ public interface StrolchTimedState<T extends IValue> extends StrolchElement {
 	/**
 	 * Trims this timed state, so all values before the given time stamp
 	 *
-	 * @param timeStamp
-	 * 		the max date the values may have
-	 * @param keepLastValue
-	 * 		if true, and the last value is before the max
+	 * @param timeStamp     the max date the values may have
+	 * @param keepLastValue if true, and the last value is before the max
 	 *
 	 * @return true if the state was trimmed, false if not
 	 */

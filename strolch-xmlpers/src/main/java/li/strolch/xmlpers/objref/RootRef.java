@@ -15,12 +15,12 @@
  */
 package li.strolch.xmlpers.objref;
 
-import java.io.File;
-import java.text.MessageFormat;
-
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.impl.PathBuilder;
+
+import java.io.File;
+import java.text.MessageFormat;
 
 public class RootRef extends ObjectRef {
 
@@ -68,8 +68,7 @@ public class RootRef extends ObjectRef {
 
 	@Override
 	public <T> PersistenceContext<T> createPersistenceContext(PersistenceTransaction tx) {
-		String msg = MessageFormat
-				.format("{0} is not a leaf and can thus not have a Persistence Context", getName());
+		String msg = MessageFormat.format("{0} is not a leaf and can thus not have a Persistence Context", getName());
 		throw new UnsupportedOperationException(msg);
 	}
 }

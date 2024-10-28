@@ -15,10 +15,10 @@
  */
 package li.strolch.model.visitor;
 
-import java.util.List;
-
 import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.impl.*;
+
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

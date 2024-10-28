@@ -1,13 +1,13 @@
 package li.strolch.execution.command;
 
-import java.text.MessageFormat;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
 
 public class SetActionToCreatedCommand extends BasePlanningAndExecutionCommand {
 

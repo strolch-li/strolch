@@ -41,9 +41,8 @@ public class PersistenceContextFactoryDelegator {
 
 	public <T> PersistenceContextFactory<T> getCtxFactory(Class<?> classType) {
 
-		@SuppressWarnings("unchecked")
-		PersistenceContextFactory<T> ctxFactory = (PersistenceContextFactory<T>) this.contextFactoryCacheByClass
-				.get(classType);
+		@SuppressWarnings("unchecked") PersistenceContextFactory<T> ctxFactory
+				= (PersistenceContextFactory<T>) this.contextFactoryCacheByClass.get(classType);
 		if (ctxFactory != null)
 			return ctxFactory;
 
@@ -54,9 +53,8 @@ public class PersistenceContextFactoryDelegator {
 
 	public <T> PersistenceContextFactory<T> getCtxFactory(String type) {
 
-		@SuppressWarnings("unchecked")
-		PersistenceContextFactory<T> ctxFactory = (PersistenceContextFactory<T>) this.contextFactoryCacheByType
-				.get(type);
+		@SuppressWarnings("unchecked") PersistenceContextFactory<T> ctxFactory
+				= (PersistenceContextFactory<T>) this.contextFactoryCacheByType.get(type);
 		if (ctxFactory != null)
 			return ctxFactory;
 

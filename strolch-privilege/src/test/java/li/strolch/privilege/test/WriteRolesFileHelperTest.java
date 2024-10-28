@@ -1,15 +1,14 @@
 package li.strolch.privilege.test;
 
-import static li.strolch.privilege.test.XmlTest.SRC_TEST;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-
 import li.strolch.privilege.helper.WriteRolesFileHelper;
 import org.junit.Test;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.IOException;
+
+import static li.strolch.privilege.test.XmlTest.SRC_TEST;
+import static org.junit.Assert.assertTrue;
 
 public class WriteRolesFileHelperTest {
 

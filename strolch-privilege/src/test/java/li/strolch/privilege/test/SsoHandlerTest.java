@@ -1,8 +1,5 @@
 package li.strolch.privilege.test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.test.model.TestRestrictable;
@@ -10,6 +7,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SsoHandlerTest extends AbstractPrivilegeTest {
 

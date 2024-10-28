@@ -1,20 +1,8 @@
 package li.strolch.websocket;
 
-import static li.strolch.model.Tags.Json.*;
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
-import static li.strolch.rest.StrolchRestfulConstants.MSG;
-import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
-import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
-import static li.strolch.utils.helper.StringHelper.DASH;
-
-import jakarta.websocket.CloseReason;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import jakarta.websocket.CloseReason;
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.ObserverHandler;
 import li.strolch.agent.api.StrolchAgent;
@@ -26,6 +14,18 @@ import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static li.strolch.model.Tags.Json.*;
+import static li.strolch.rest.StrolchRestfulConstants.DATA;
+import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
+import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
+import static li.strolch.utils.helper.StringHelper.DASH;
 
 public class WebSocketObserverHandler implements Observer {
 

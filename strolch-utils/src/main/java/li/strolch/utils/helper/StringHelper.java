@@ -15,8 +15,8 @@
  */
 package li.strolch.utils.helper;
 
-import static java.util.stream.Collectors.toSet;
-import static li.strolch.utils.helper.ByteHelper.setBit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -28,8 +28,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.stream.Collectors.toSet;
+import static li.strolch.utils.helper.ByteHelper.setBit;
 
 /**
  * A helper class to perform different actions on {@link String}s
@@ -59,22 +59,9 @@ public class StringHelper {
 	/**
 	 * Hex char table for fast calculating of hex values
 	 */
-	private static final byte[] HEX_CHAR_TABLE = { (byte) '0',
-			(byte) '1',
-			(byte) '2',
-			(byte) '3',
-			(byte) '4',
-			(byte) '5',
-			(byte) '6',
-			(byte) '7',
-			(byte) '8',
-			(byte) '9',
-			(byte) 'a',
-			(byte) 'b',
-			(byte) 'c',
-			(byte) 'd',
-			(byte) 'e',
-			(byte) 'f' };
+	private static final byte[] HEX_CHAR_TABLE = {(byte) '0', (byte) '1', (byte) '2', (byte) '3', (byte) '4',
+			(byte) '5', (byte) '6', (byte) '7', (byte) '8', (byte) '9', (byte) 'a', (byte) 'b', (byte) 'c', (byte) 'd',
+			(byte) 'e', (byte) 'f'};
 
 	public static String toHexString(byte data) {
 		return String.format("%02x", data);
@@ -110,13 +97,11 @@ public class StringHelper {
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
 	 *
-	 * @param raw
-	 * 		the bytes to convert to String using numbers in hexadecimal
+	 * @param raw the bytes to convert to String using numbers in hexadecimal
 	 *
 	 * @return the encoded string
 	 *
-	 * @throws RuntimeException
-	 * 		if {@link UnsupportedEncodingException} is thrown
+	 * @throws RuntimeException if {@link UnsupportedEncodingException} is thrown
 	 */
 	public static String toHexString(byte[] raw) throws RuntimeException {
 		return toHexString(raw, 0, raw.length);
@@ -125,13 +110,11 @@ public class StringHelper {
 	/**
 	 * Converts each byte of the given byte array to a HEX value and returns the concatenation of these values
 	 *
-	 * @param raw
-	 * 		the bytes to convert to String using numbers in hexadecimal
+	 * @param raw the bytes to convert to String using numbers in hexadecimal
 	 *
 	 * @return the encoded string
 	 *
-	 * @throws RuntimeException
-	 * 		if {@link UnsupportedEncodingException} is thrown
+	 * @throws RuntimeException if {@link UnsupportedEncodingException} is thrown
 	 */
 	public static String toHexString(byte[] raw, int offset, int length) throws RuntimeException {
 		byte[] hex = new byte[2 * length];
@@ -159,8 +142,7 @@ public class StringHelper {
 	/**
 	 * Returns a byte array of a given string by converting each character of the string to a number base 16
 	 *
-	 * @param encoded
-	 * 		the string to convert to a byt string
+	 * @param encoded the string to convert to a byt string
 	 *
 	 * @return the encoded byte stream
 	 */
@@ -232,8 +214,7 @@ public class StringHelper {
 	/**
 	 * Generates the MD5 Hash of a string and converts it to a HEX string
 	 *
-	 * @param string
-	 * 		the string to hash
+	 * @param string the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -245,8 +226,7 @@ public class StringHelper {
 	 * Generates the MD5 Hash of a string. Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
 	 * Hex String which is printable
 	 *
-	 * @param string
-	 * 		the string to hash
+	 * @param string the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -258,8 +238,7 @@ public class StringHelper {
 	 * Generates the MD5 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
 	 *
-	 * @param bytes
-	 * 		the bytes to hash
+	 * @param bytes the bytes to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -270,8 +249,7 @@ public class StringHelper {
 	/**
 	 * Generates the SHA1 Hash of a string and converts it to a HEX String
 	 *
-	 * @param string
-	 * 		the string to hash
+	 * @param string the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -283,8 +261,7 @@ public class StringHelper {
 	 * Generates the SHA1 Hash of a string Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
 	 * Hex String which is printable
 	 *
-	 * @param string
-	 * 		the string to hash
+	 * @param string the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -296,8 +273,7 @@ public class StringHelper {
 	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
 	 *
-	 * @param bytes
-	 * 		the bytes to hash
+	 * @param bytes the bytes to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -308,8 +284,7 @@ public class StringHelper {
 	/**
 	 * Generates the SHA-256 Hash of a string and converts it to a HEX String
 	 *
-	 * @param string
-	 * 		the string to hash
+	 * @param string the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -321,8 +296,7 @@ public class StringHelper {
 	 * Generates the SHA-256 Hash of a string Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
 	 *
-	 * @param string
-	 * 		the string to hash
+	 * @param string the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -334,8 +308,7 @@ public class StringHelper {
 	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
 	 * a Hex String which is printable
 	 *
-	 * @param bytes
-	 * 		the bytes to hash
+	 * @param bytes the bytes to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -346,10 +319,8 @@ public class StringHelper {
 	/**
 	 * Returns the hash of an algorithm
 	 *
-	 * @param algorithm
-	 * 		the algorithm to use
-	 * @param string
-	 * 		the string to hash
+	 * @param algorithm the algorithm to use
+	 * @param string    the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -360,10 +331,8 @@ public class StringHelper {
 	/**
 	 * Returns the hash of an algorithm
 	 *
-	 * @param algorithm
-	 * 		the algorithm to use
-	 * @param string
-	 * 		the string to hash
+	 * @param algorithm the algorithm to use
+	 * @param string    the string to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -382,10 +351,8 @@ public class StringHelper {
 	/**
 	 * Returns the hash of an algorithm
 	 *
-	 * @param algorithm
-	 * 		the algorithm to use
-	 * @param bytes
-	 * 		the bytes to hash
+	 * @param algorithm the algorithm to use
+	 * @param bytes     the bytes to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -396,10 +363,8 @@ public class StringHelper {
 	/**
 	 * Returns the hash of an algorithm
 	 *
-	 * @param algorithm
-	 * 		the algorithm to use
-	 * @param bytes
-	 * 		the bytes to hash
+	 * @param algorithm the algorithm to use
+	 * @param bytes     the bytes to hash
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
@@ -419,14 +384,10 @@ public class StringHelper {
 	 * Normalizes the length of a String. Does not shorten it when it is too long, but lengthens it, depending on the
 	 * options set: adding the char at the beginning or appending it at the end
 	 *
-	 * @param value
-	 * 		string to normalize
-	 * @param length
-	 * 		length string must have
-	 * @param beginning
-	 * 		add at beginning of value
-	 * @param c
-	 * 		char to append when appending
+	 * @param value     string to normalize
+	 * @param length    length string must have
+	 * @param beginning add at beginning of value
+	 * @param c         char to append when appending
 	 *
 	 * @return the new string
 	 */
@@ -438,16 +399,11 @@ public class StringHelper {
 	 * Normalizes the length of a String. Shortens it when it is too long, giving out a logger warning, or lengthens it,
 	 * depending on the options set: appending the char at the beginning or the end
 	 *
-	 * @param value
-	 * 		string to normalize
-	 * @param length
-	 * 		length string must have
-	 * @param beginning
-	 * 		append at beginning of value
-	 * @param shorten
-	 * 		allow shortening of value
-	 * @param c
-	 * 		char to append when appending
+	 * @param value     string to normalize
+	 * @param length    length string must have
+	 * @param beginning append at beginning of value
+	 * @param shorten   allow shortening of value
+	 * @param c         char to append when appending
 	 *
 	 * @return the new string
 	 */
@@ -495,10 +451,8 @@ public class StringHelper {
 	 * {@link Properties#getProperty(String)} value if such a value exists in the properties map. If the value of the
 	 * sequence is not in the properties, then the sequence is not replaced
 	 *
-	 * @param properties
-	 * 		the {@link Properties} in which to get the value
-	 * @param value
-	 * 		the value in which to replace any system properties
+	 * @param properties the {@link Properties} in which to get the value
+	 * @param value      the value in which to replace any system properties
 	 *
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
@@ -511,12 +465,10 @@ public class StringHelper {
 	 * replaced with a {@link Properties#getProperty(String)} value if such a value exists in the properties map. If the
 	 * value of the sequence is not in the properties, then the sequence is not replaced
 	 *
-	 * @param properties
-	 * 		the {@link Properties} in which to get the value
-	 * @param prefix
-	 * 		the prefix to use, for instance use <code>$</code> to replace occurrences of <code>$</code>{...}
-	 * @param value
-	 * 		the value in which to replace any system properties
+	 * @param properties the {@link Properties} in which to get the value
+	 * @param prefix     the prefix to use, for instance use <code>$</code> to replace occurrences of
+	 *                   <code>$</code>{...}
+	 * @param value      the value in which to replace any system properties
 	 *
 	 * @return a new string with all defined properties replaced or if an error occurred the original value is returned
 	 */
@@ -579,8 +531,8 @@ public class StringHelper {
 	 * Calls {@link #replaceProperties(Properties, Properties)} with null as the second argument. This allows for
 	 * replacing all properties with itself
 	 *
-	 * @param properties
-	 * 		the properties in which the values must have any ${...} replaced by values of the respective key
+	 * @param properties the properties in which the values must have any ${...} replaced by values of the respective
+	 *                   key
 	 */
 	public static void replaceProperties(Properties properties) {
 		replaceProperties(properties, null);
@@ -590,10 +542,9 @@ public class StringHelper {
 	 * Checks every value in the {@link Properties} and then then replaces any ${...} variables with keys in this
 	 * {@link Properties} value using {@link StringHelper#replacePropertiesIn(Properties, String)}
 	 *
-	 * @param properties
-	 * 		the properties in which the values must have any ${...} replaced by values of the respective key
-	 * @param altProperties
-	 * 		if properties does not contain the ${...} key, then try these alternative properties
+	 * @param properties    the properties in which the values must have any ${...} replaced by values of the respective
+	 *                      key
+	 * @param altProperties if properties does not contain the ${...} key, then try these alternative properties
 	 */
 	public static void replaceProperties(Properties properties, Properties altProperties) {
 
@@ -624,10 +575,8 @@ public class StringHelper {
 	 * shorter. The format of the string is 3 lines. The first line has information about where in the strings the
 	 * difference occurs, and the second and third lines contain contexts
 	 *
-	 * @param s1
-	 * 		the first string
-	 * @param s2
-	 * 		the second string
+	 * @param s1 the first string
+	 * @param s2 the second string
 	 *
 	 * @return the string from which the strings differ with a length of 40 characters within the original strings
 	 */
@@ -648,20 +597,23 @@ public class StringHelper {
 		int start = Math.max(0, (i - maxContext));
 		int end = Math.min(i + maxContext, (Math.min(bytes1.length, bytes2.length)));
 
-		return "Strings are not equal! Start of inequality is at " + i
-				+ ". Showing " + maxContext
+		return "Strings are not equal! Start of inequality is at "
+				+ i
+				+ ". Showing "
+				+ maxContext
 				+ " extra characters and start and end:\n"
 				+ "context s1: "
-				+ s1.substring(start, end) + "\n"
+				+ s1.substring(start, end)
+				+ "\n"
 				+ "context s2: "
-				+ s2.substring(start, end) + "\n";
+				+ s2.substring(start, end)
+				+ "\n";
 	}
 
 	/**
 	 * Formats the given number of milliseconds to a time like #h/m/s/ms/us/ns
 	 *
-	 * @param millis
-	 * 		the number of milliseconds
+	 * @param millis the number of milliseconds
 	 *
 	 * @return format the given number of milliseconds to a time like #h/m/s/ms/us/ns
 	 */
@@ -672,8 +624,7 @@ public class StringHelper {
 	/**
 	 * Formats the given number of nanoseconds to a time like #h/m/s/ms/us/ns
 	 *
-	 * @param nanos
-	 * 		the number of nanoseconds
+	 * @param nanos the number of nanoseconds
 	 *
 	 * @return format the given number of nanoseconds to a time like #h/m/s/ms/us/ns
 	 */
@@ -731,8 +682,7 @@ public class StringHelper {
 	/**
 	 * Simply returns true if the value is null, or empty
 	 *
-	 * @param value
-	 * 		the value to check
+	 * @param value the value to check
 	 *
 	 * @return true if the value is null, or empty
 	 */
@@ -743,8 +693,7 @@ public class StringHelper {
 	/**
 	 * Simply returns true if the value is neither null nor empty
 	 *
-	 * @param value
-	 * 		the value to check
+	 * @param value the value to check
 	 *
 	 * @return true if the value is neither null nor empty
 	 */
@@ -755,8 +704,7 @@ public class StringHelper {
 	/**
 	 * Checks if all characters in the string are digits
 	 *
-	 * @param value
-	 * 		the value to check
+	 * @param value the value to check
 	 *
 	 * @return true if all characters are digits, false if not, i.e. a letter, special character or a minus, etc.
 	 */
@@ -776,18 +724,15 @@ public class StringHelper {
 	 * <p> This additional restriction is important where false should really be caught, not any random vaue for false
 	 * </p>
 	 *
-	 * @param value
-	 * 		the value to check
+	 * @param value the value to check
 	 *
 	 * @return true or false, depending on the string value
 	 *
-	 * @throws RuntimeException
-	 * 		if the value is empty, or not equal to the case insensitive value "true" or "false"
+	 * @throws RuntimeException if the value is empty, or not equal to the case insensitive value "true" or "false"
 	 */
 	public static boolean parseBoolean(String value) throws RuntimeException {
 		if (isEmpty(value))
-			throw new RuntimeException(
-					"Value to parse to boolean is empty! Expected case insensitive true or false");
+			throw new RuntimeException("Value to parse to boolean is empty! Expected case insensitive true or false");
 		String tmp = value.toLowerCase();
 		if (tmp.equals(Boolean.TRUE.toString())) {
 			return true;
@@ -821,8 +766,7 @@ public class StringHelper {
 	/**
 	 * If the value parameter is empty, then a {@link #DASH} is returned, otherwise the value is returned
 	 *
-	 * @param value
-	 * 		the value
+	 * @param value the value
 	 *
 	 * @return the non-empty value, or a {@link #DASH}
 	 */
@@ -835,8 +779,7 @@ public class StringHelper {
 	/**
 	 * Returns the string trimmed, or the empty string if null
 	 *
-	 * @param value
-	 * 		the value to trim
+	 * @param value the value to trim
 	 *
 	 * @return the trimmed string, or the empty string if null
 	 */
@@ -849,8 +792,7 @@ public class StringHelper {
 	/**
 	 * Parses the given string as a comma separated value, returning as a set
 	 *
-	 * @param csv
-	 * 		the comma separated value
+	 * @param csv the comma separated value
 	 *
 	 * @return the set from parsing the value
 	 */
@@ -900,8 +842,7 @@ public class StringHelper {
 	 *     <li>WMQLJAQY2N</li>
 	 * </ul>
 	 *
-	 * @param length
-	 * 		the length of the ID to generate
+	 * @param length the length of the ID to generate
 	 *
 	 * @return the generated ID, e.g. RR1BEAQBS3
 	 */

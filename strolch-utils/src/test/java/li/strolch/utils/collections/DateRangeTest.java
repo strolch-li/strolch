@@ -15,12 +15,12 @@
  */
 package li.strolch.utils.collections;
 
-import static org.junit.Assert.*;
+import li.strolch.utils.dbc.DBC.DbcException;
+import org.junit.Test;
 
 import java.util.Date;
 
-import li.strolch.utils.dbc.DBC.DbcException;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 public class DateRangeTest {
 

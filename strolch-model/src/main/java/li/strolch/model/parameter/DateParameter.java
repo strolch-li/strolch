@@ -15,7 +15,10 @@
  */
 package li.strolch.model.parameter;
 
-import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE_ZONED_DATE;
+import li.strolch.model.StrolchValueType;
+import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -23,10 +26,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Objects;
 
-import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.StrolchElementVisitor;
-import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601;
+import static li.strolch.utils.iso8601.ISO8601.EMPTY_VALUE_ZONED_DATE;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -45,12 +45,9 @@ public class DateParameter extends AbstractParameter<Date> {
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public DateParameter(String id, String name, Date value) {
 		super(id, name);
@@ -60,12 +57,9 @@ public class DateParameter extends AbstractParameter<Date> {
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public DateParameter(String id, String name, LocalDateTime value) {
 		super(id, name);
@@ -75,12 +69,9 @@ public class DateParameter extends AbstractParameter<Date> {
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public DateParameter(String id, String name, ZonedDateTime value) {
 		super(id, name);

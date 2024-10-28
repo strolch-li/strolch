@@ -24,13 +24,15 @@ public class ObserverEvent {
 	}
 
 	private String collectSizes(MapOfLists<String, StrolchRootElement> added) {
-		return added.stream()
+		return added
+				.stream()
 				.map(entry -> entry.getKey() + "=[" + collectSizeByType(entry) + "]")
 				.collect(joining(","));
 	}
 
 	private static String collectSizeByType(Map.Entry<String, List<StrolchRootElement>> entry) {
-		return entry.getValue()
+		return entry
+				.getValue()
 				.stream()
 				.collect(groupingBy(StrolchElement::getType))
 				.entrySet()

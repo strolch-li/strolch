@@ -40,34 +40,26 @@ public interface PrivilegePolicy {
 	/**
 	 * Checks if the given {@link Role} and the given {@link Privilege} has access to the given {@link Restrictable}
 	 *
-	 * @param context
-	 * 		the privilege context
-	 * @param privilege
-	 * 		the {@link Privilege} containing the permissions
-	 * @param restrictable
-	 * 		the {@link Restrictable} to which the user wants access
+	 * @param context      the privilege context
+	 * @param privilege    the {@link Privilege} containing the permissions
+	 * @param restrictable the {@link Restrictable} to which the user wants access
 	 *
-	 * @throws AccessDeniedException
-	 * 		if action not allowed
+	 * @throws AccessDeniedException if action not allowed
 	 */
 	void validateAction(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
 			throws AccessDeniedException;
 
 	/**
-	 * Returns true if the given {@link Role} and the given {@link Privilege} has access to the given {@link
-	 * Restrictable}
+	 * Returns true if the given {@link Role} and the given {@link Privilege} has access to the given
+	 * {@link Restrictable}
 	 *
-	 * @param context
-	 * 		the privilege context
-	 * @param privilege
-	 * 		the {@link Privilege} containing the permissions
-	 * @param restrictable
-	 * 		the {@link Restrictable} to which the user wants access
+	 * @param context      the privilege context
+	 * @param privilege    the {@link Privilege} containing the permissions
+	 * @param restrictable the {@link Restrictable} to which the user wants access
 	 *
 	 * @return true if the user has the privilege, false if not
 	 *
-	 * @throws AccessDeniedException
-	 * 		if something goes wrong with the validate
+	 * @throws AccessDeniedException if something goes wrong with the validate
 	 */
 	boolean hasPrivilege(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
 			throws PrivilegeException;

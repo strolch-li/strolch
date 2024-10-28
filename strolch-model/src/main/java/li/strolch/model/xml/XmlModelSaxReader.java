@@ -15,13 +15,6 @@
  */
 package li.strolch.model.xml;
 
-import static li.strolch.model.Tags.*;
-
-import java.text.MessageFormat;
-import java.util.ArrayDeque;
-import java.util.Date;
-import java.util.Deque;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.*;
@@ -43,6 +36,13 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.text.MessageFormat;
+import java.util.ArrayDeque;
+import java.util.Date;
+import java.util.Deque;
+
+import static li.strolch.model.Tags.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -81,247 +81,267 @@ public class XmlModelSaxReader extends DefaultHandler {
 
 		switch (qName) {
 
-		case STROLCH_MODEL:
-			break;
+			case STROLCH_MODEL:
+				break;
 
-		case RESOURCE:
+			case RESOURCE:
 
-			String resId = attributes.getValue(ID);
-			String resName = attributes.getValue(NAME);
-			String resType = attributes.getValue(TYPE);
+				String resId = attributes.getValue(ID);
+				String resName = attributes.getValue(NAME);
+				String resType = attributes.getValue(TYPE);
 
-			this.parameterizedElement = new Resource(resId, resName, resType);
+				this.parameterizedElement = new Resource(resId, resName, resType);
 
-			break;
+				break;
 
-		case ACTIVITY:
+			case ACTIVITY:
 
-			String activityId = attributes.getValue(ID);
-			String activityName = attributes.getValue(NAME);
-			String activityType = attributes.getValue(TYPE);
-			String timeOrderingS = attributes.getValue(TIME_ORDERING);
-			if (StringHelper.isEmpty(timeOrderingS))
-				throw new StrolchException("TimeOrdering is not set for Activity with ID " + activityId);
-			TimeOrdering timeOrdering = TimeOrdering.parse(timeOrderingS);
-			Activity activity = new Activity(activityId, activityName, activityType, timeOrdering);
+				String activityId = attributes.getValue(ID);
+				String activityName = attributes.getValue(NAME);
+				String activityType = attributes.getValue(TYPE);
+				String timeOrderingS = attributes.getValue(TIME_ORDERING);
+				if (StringHelper.isEmpty(timeOrderingS))
+					throw new StrolchException("TimeOrdering is not set for Activity with ID " + activityId);
+				TimeOrdering timeOrdering = TimeOrdering.parse(timeOrderingS);
+				Activity activity = new Activity(activityId, activityName, activityType, timeOrdering);
 
-			this.parameterizedElement = activity;
+				this.parameterizedElement = activity;
 
-			this.activityStack.push(activity);
+				this.activityStack.push(activity);
 
-			break;
+				break;
 
-		case ACTION:
+			case ACTION:
 
-			String actionId = attributes.getValue(ID);
-			String actionName = attributes.getValue(NAME);
-			String actionType = attributes.getValue(TYPE);
-			String actionResourceId = attributes.getValue(RESOURCE_ID);
-			String actionResourceType = attributes.getValue(RESOURCE_TYPE);
-			String actionState = attributes.getValue(STATE);
-			Action action = new Action(actionId, actionName, actionType);
-			action.setResourceId(actionResourceId);
-			action.setResourceType(actionResourceType);
-			if (StringHelper.isNotEmpty(actionState))
-				action.setState(State.parse(actionState));
+				String actionId = attributes.getValue(ID);
+				String actionName = attributes.getValue(NAME);
+				String actionType = attributes.getValue(TYPE);
+				String actionResourceId = attributes.getValue(RESOURCE_ID);
+				String actionResourceType = attributes.getValue(RESOURCE_TYPE);
+				String actionState = attributes.getValue(STATE);
+				Action action = new Action(actionId, actionName, actionType);
+				action.setResourceId(actionResourceId);
+				action.setResourceType(actionResourceType);
+				if (StringHelper.isNotEmpty(actionState))
+					action.setState(State.parse(actionState));
 
-			this.parameterizedElement = action;
+				this.parameterizedElement = action;
 
-			break;
+				break;
 
-		case VALUE_CHANGE:
+			case VALUE_CHANGE:
 
-			String valueChangeStateId = attributes.getValue(STATE_ID);
-			String valueChangeTimeS = attributes.getValue(TIME);
-			String valueChangeValue = attributes.getValue(VALUE);
-			String valueChangeType = attributes.getValue(TYPE);
+				String valueChangeStateId = attributes.getValue(STATE_ID);
+				String valueChangeTimeS = attributes.getValue(TIME);
+				String valueChangeValue = attributes.getValue(VALUE);
+				String valueChangeType = attributes.getValue(TYPE);
 
-			IValue<?> value = StrolchValueType.parse(valueChangeType).valueInstance(valueChangeValue);
-			long valueChangeTime = ISO8601FormatFactory.getInstance().getDateFormat().parse(valueChangeTimeS).getTime();
-			ValueChange<IValue<?>> valueChange = new ValueChange<>(valueChangeTime, value, valueChangeStateId);
+				IValue<?> value = StrolchValueType.parse(valueChangeType).valueInstance(valueChangeValue);
+				long valueChangeTime = ISO8601FormatFactory
+						.getInstance()
+						.getDateFormat()
+						.parse(valueChangeTimeS)
+						.getTime();
+				ValueChange<IValue<?>> valueChange = new ValueChange<>(valueChangeTime, value, valueChangeStateId);
 
-			((Action) this.parameterizedElement).addChange(valueChange);
+				((Action) this.parameterizedElement).addChange(valueChange);
 
-			break;
+				break;
 
-		case ORDER:
-			String orderId = attributes.getValue(ID);
-			String orderName = attributes.getValue(NAME);
-			String orderType = attributes.getValue(TYPE);
-			String orderDateS = attributes.getValue(DATE);
-			String orderStateS = attributes.getValue(STATE);
-			Order order = new Order(orderId, orderName, orderType);
-			if (orderDateS != null) {
-				Date orderDate = ISO8601FormatFactory.getInstance().getDateFormat().parse(orderDateS);
-				order.setDate(orderDate);
-			}
-			if (StringHelper.isNotEmpty(orderStateS))
-				order.setState(State.parse(orderStateS));
+			case ORDER:
+				String orderId = attributes.getValue(ID);
+				String orderName = attributes.getValue(NAME);
+				String orderType = attributes.getValue(TYPE);
+				String orderDateS = attributes.getValue(DATE);
+				String orderStateS = attributes.getValue(STATE);
+				Order order = new Order(orderId, orderName, orderType);
+				if (orderDateS != null) {
+					Date orderDate = ISO8601FormatFactory.getInstance().getDateFormat().parse(orderDateS);
+					order.setDate(orderDate);
+				}
+				if (StringHelper.isNotEmpty(orderStateS))
+					order.setState(State.parse(orderStateS));
 
-			this.parameterizedElement = order;
+				this.parameterizedElement = order;
 
-			break;
+				break;
 
-		case PARAMETER_BAG:
-			String pBagId = attributes.getValue(ID);
-			String pBagName = attributes.getValue(NAME);
-			String pBagType = attributes.getValue(TYPE);
-			this.pBag = new ParameterBag(pBagId, pBagName, pBagType);
+			case PARAMETER_BAG:
+				String pBagId = attributes.getValue(ID);
+				String pBagName = attributes.getValue(NAME);
+				String pBagType = attributes.getValue(TYPE);
+				this.pBag = new ParameterBag(pBagId, pBagName, pBagType);
 
-			break;
+				break;
 
-		case PARAMETER:
+			case PARAMETER:
 
-			String paramId = attributes.getValue(ID);
-			try {
+				String paramId = attributes.getValue(ID);
+				try {
 
-				String paramName = attributes.getValue(NAME);
-				String paramType = attributes.getValue(TYPE);
-				String paramHiddenS = attributes.getValue(HIDDEN);
-				String paramIndexS = attributes.getValue(INDEX);
+					String paramName = attributes.getValue(NAME);
+					String paramType = attributes.getValue(TYPE);
+					String paramHiddenS = attributes.getValue(HIDDEN);
+					String paramIndexS = attributes.getValue(INDEX);
 
-				int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.parseInt(paramIndexS);
-				boolean paramHidden = !StringHelper.isEmpty(paramHiddenS) && StringHelper.parseBoolean(paramHiddenS);
-				String paramUom = attributes.getValue(UOM);
-				String paramInterpretation = attributes.getValue(INTERPRETATION);
+					int index = StringHelper.isEmpty(paramIndexS) ? 0 : Integer.parseInt(paramIndexS);
+					boolean paramHidden = !StringHelper.isEmpty(paramHiddenS) && StringHelper.parseBoolean(
+							paramHiddenS);
+					String paramUom = attributes.getValue(UOM);
+					String paramInterpretation = attributes.getValue(INTERPRETATION);
 
-				StrolchValueType type = StrolchValueType.parse(paramType);
+					StrolchValueType type = StrolchValueType.parse(paramType);
 
-				Parameter<?> param = type.parameterInstance();
-				param.setId(paramId);
-				param.setName(paramName);
+					Parameter<?> param = type.parameterInstance();
+					param.setId(paramId);
+					param.setName(paramName);
 
-				param.setHidden(paramHidden);
-				param.setUom(paramUom);
-				param.setInterpretation(paramInterpretation);
-				param.setIndex(index);
+					param.setHidden(paramHidden);
+					param.setUom(paramUom);
+					param.setInterpretation(paramInterpretation);
+					param.setIndex(index);
 
-				if (type != StrolchValueType.TEXT) {
-					String paramValue = attributes.getValue(VALUE);
-					param.setValueFromString(paramValue);
-				} else {
-					this.textBuffer = new StringBuilder();
-					this.textParam = (TextParameter) param;
+					if (type != StrolchValueType.TEXT) {
+						String paramValue = attributes.getValue(VALUE);
+						param.setValueFromString(paramValue);
+					} else {
+						this.textBuffer = new StringBuilder();
+						this.textParam = (TextParameter) param;
+					}
+
+					this.pBag.addParameter(param);
+
+				} catch (Exception e) {
+					throw new StrolchException("Failed to instantiate parameter "
+							+ paramId
+							+ " for bag "
+							+ this.pBag.getLocator()
+							+ " due to "
+							+ e.getMessage(), e);
 				}
 
-				this.pBag.addParameter(param);
+				break;
 
-			} catch (Exception e) {
-				throw new StrolchException(
-						"Failed to instantiate parameter " + paramId + " for bag " + this.pBag.getLocator() + " due to "
-								+ e.getMessage(), e);
-			}
+			case TIMED_STATE:
 
-			break;
+				String stateId = attributes.getValue(ID);
+				try {
+					String stateName = attributes.getValue(NAME);
+					String stateTypeS = attributes.getValue(TYPE);
+					String stateHiddenS = attributes.getValue(HIDDEN);
+					String stateIndexS = attributes.getValue(INDEX);
+					String stateUom = attributes.getValue(UOM);
+					String stateInterpretation = attributes.getValue(INTERPRETATION);
+					int stateIndex = StringHelper.isEmpty(stateIndexS) ? 0 : Integer.parseInt(stateIndexS);
+					boolean stateHidden = !StringHelper.isEmpty(stateHiddenS) && StringHelper.parseBoolean(
+							stateHiddenS);
 
-		case TIMED_STATE:
+					StrolchValueType stateType = StrolchValueType.parse(stateTypeS);
+					this.state = stateType.timedStateInstance();
+					this.state.setId(stateId);
+					this.state.setName(stateName);
+					this.state.setIndex(stateIndex);
+					this.state.setHidden(stateHidden);
+					this.state.setInterpretation(stateInterpretation);
+					this.state.setUom(stateUom);
 
-			String stateId = attributes.getValue(ID);
-			try {
-				String stateName = attributes.getValue(NAME);
-				String stateTypeS = attributes.getValue(TYPE);
-				String stateHiddenS = attributes.getValue(HIDDEN);
-				String stateIndexS = attributes.getValue(INDEX);
-				String stateUom = attributes.getValue(UOM);
-				String stateInterpretation = attributes.getValue(INTERPRETATION);
-				int stateIndex = StringHelper.isEmpty(stateIndexS) ? 0 : Integer.parseInt(stateIndexS);
-				boolean stateHidden = !StringHelper.isEmpty(stateHiddenS) && StringHelper.parseBoolean(stateHiddenS);
-
-				StrolchValueType stateType = StrolchValueType.parse(stateTypeS);
-				this.state = stateType.timedStateInstance();
-				this.state.setId(stateId);
-				this.state.setName(stateName);
-				this.state.setIndex(stateIndex);
-				this.state.setHidden(stateHidden);
-				this.state.setInterpretation(stateInterpretation);
-				this.state.setUom(stateUom);
-
-			} catch (Exception e) {
-				throw new StrolchException("Failed to instantiate TimedState " + stateId + " for resource "
-						+ this.parameterizedElement.getLocator() + " due to " + e.getMessage(), e);
-			}
-
-			break;
-
-		case VALUE:
-
-			String valueTime = attributes.getValue(TIME);
-			Date date = ISO8601FormatFactory.getInstance().parseDate(valueTime);
-			long time = date.getTime();
-			String valueValue = attributes.getValue(VALUE);
-
-			this.state.setStateFromStringAt(time, valueValue);
-
-			break;
-
-		case POLICIES:
-
-			this.policies = new PolicyDefs();
-
-			break;
-
-		case POLICY:
-
-			String policyType = attributes.getValue(TYPE);
-			String policyValue = attributes.getValue(VALUE);
-
-			try {
-
-				PolicyDef policyDef = PolicyDef.valueOf(policyType, policyValue);
-				if (policyDef instanceof JavaPolicyDef j && !j.isClassExists()) {
-					logger.error("Policy invalid for {} = {}: class does not exist for {}", policyType, policyValue,
-							this.parameterizedElement.getLocator());
+				} catch (Exception e) {
+					throw new StrolchException("Failed to instantiate TimedState "
+							+ stateId
+							+ " for resource "
+							+ this.parameterizedElement.getLocator()
+							+ " due to "
+							+ e.getMessage(), e);
 				}
 
-				this.policies.addOrUpdate(policyDef);
-			} catch (Exception e) {
-				throw new StrolchException("Failed to parse policy " + policyType + " = " + policyValue + " for bag "
-						+ this.parameterizedElement + " due to " + e.getMessage(), e);
-			}
+				break;
 
-			break;
+			case VALUE:
 
-		case VERSION:
+				String valueTime = attributes.getValue(TIME);
+				Date date = ISO8601FormatFactory.getInstance().parseDate(valueTime);
+				long time = date.getTime();
+				String valueValue = attributes.getValue(VALUE);
 
-			try {
-				String versionS = attributes.getValue(VERSION);
-				int v = Integer.parseInt(versionS);
-				String createdBy = attributes.getValue(CREATED_BY);
+				this.state.setStateFromStringAt(time, valueValue);
 
-				String updatedBy = attributes.getValue(UPDATED_BY);
-				if (updatedBy == null)
-					updatedBy = createdBy;
+				break;
 
-				String createdS;
-				createdS = attributes.getValue("CreatedAt");
-				if (createdS == null)
-					createdS = attributes.getValue(CREATED);
-				Date created = ISO8601FormatFactory.getInstance().getDateFormat().parse(createdS);
+			case POLICIES:
 
-				String updatedS = attributes.getValue(UPDATED);
-				Date updated;
-				if (updatedS == null)
-					updated = created;
-				else
-					updated = ISO8601FormatFactory.getInstance().getDateFormat().parse(updatedS);
+				this.policies = new PolicyDefs();
 
-				String deletedS = attributes.getValue(DELETED);
-				boolean deleted = StringHelper.parseBoolean(deletedS);
+				break;
 
-				Version version = new Version(this.parameterizedElement.getLocator(), v, createdBy, updatedBy, created,
-						updated, deleted);
-				((StrolchRootElement) this.parameterizedElement).setVersion(version);
+			case POLICY:
 
-			} catch (Exception e) {
-				throw new StrolchException(
-						"Failed to parse Version element for bag " + this.parameterizedElement + " due to "
-								+ e.getMessage(), e);
-			}
+				String policyType = attributes.getValue(TYPE);
+				String policyValue = attributes.getValue(VALUE);
 
-			break;
+				try {
 
-		default:
-			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+					PolicyDef policyDef = PolicyDef.valueOf(policyType, policyValue);
+					if (policyDef instanceof JavaPolicyDef j && !j.isClassExists()) {
+						logger.error("Policy invalid for {} = {}: class does not exist for {}", policyType, policyValue,
+								this.parameterizedElement.getLocator());
+					}
+
+					this.policies.addOrUpdate(policyDef);
+				} catch (Exception e) {
+					throw new StrolchException("Failed to parse policy "
+							+ policyType
+							+ " = "
+							+ policyValue
+							+ " for bag "
+							+ this.parameterizedElement
+							+ " due to "
+							+ e.getMessage(), e);
+				}
+
+				break;
+
+			case VERSION:
+
+				try {
+					String versionS = attributes.getValue(VERSION);
+					int v = Integer.parseInt(versionS);
+					String createdBy = attributes.getValue(CREATED_BY);
+
+					String updatedBy = attributes.getValue(UPDATED_BY);
+					if (updatedBy == null)
+						updatedBy = createdBy;
+
+					String createdS;
+					createdS = attributes.getValue("CreatedAt");
+					if (createdS == null)
+						createdS = attributes.getValue(CREATED);
+					Date created = ISO8601FormatFactory.getInstance().getDateFormat().parse(createdS);
+
+					String updatedS = attributes.getValue(UPDATED);
+					Date updated;
+					if (updatedS == null)
+						updated = created;
+					else
+						updated = ISO8601FormatFactory.getInstance().getDateFormat().parse(updatedS);
+
+					String deletedS = attributes.getValue(DELETED);
+					boolean deleted = StringHelper.parseBoolean(deletedS);
+
+					Version version = new Version(this.parameterizedElement.getLocator(), v, createdBy, updatedBy,
+							created, updated, deleted);
+					((StrolchRootElement) this.parameterizedElement).setVersion(version);
+
+				} catch (Exception e) {
+					throw new StrolchException("Failed to parse Version element for bag "
+							+ this.parameterizedElement
+							+ " due to "
+							+ e.getMessage(), e);
+				}
+
+				break;
+
+			default:
+				throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -336,96 +356,97 @@ public class XmlModelSaxReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 
 		switch (qName) {
-		case RESOURCE:
-			this.listener.notifyResource((Resource) this.parameterizedElement);
-			this.statistics.nrOfResources++;
-			this.parameterizedElement = null;
-
-			break;
-
-		case ACTIVITY:
-
-			Activity activity = this.activityStack.pop();
-			if (this.activityStack.isEmpty()) {
-				this.listener.notifyActivity(activity);
-				this.statistics.nrOfActivities++;
+			case RESOURCE:
+				this.listener.notifyResource((Resource) this.parameterizedElement);
+				this.statistics.nrOfResources++;
 				this.parameterizedElement = null;
-			} else {
-				this.activityStack.peek().addElement(activity);
+
+				break;
+
+			case ACTIVITY:
+
+				Activity activity = this.activityStack.pop();
+				if (this.activityStack.isEmpty()) {
+					this.listener.notifyActivity(activity);
+					this.statistics.nrOfActivities++;
+					this.parameterizedElement = null;
+				} else {
+					this.activityStack.peek().addElement(activity);
+					this.parameterizedElement = this.activityStack.peek();
+				}
+
+				break;
+
+			case ORDER:
+
+				this.listener.notifyOrder((Order) this.parameterizedElement);
+				this.statistics.nrOfOrders++;
+				this.parameterizedElement = null;
+
+				break;
+
+			case ACTION:
+
+				if (this.activityStack.isEmpty())
+					throw new IllegalStateException("Missing parent for action");
+				this.activityStack.peek().addElement((Action) parameterizedElement);
 				this.parameterizedElement = this.activityStack.peek();
-			}
 
-			break;
+				break;
 
-		case ORDER:
+			case PARAMETER_BAG:
 
-			this.listener.notifyOrder((Order) this.parameterizedElement);
-			this.statistics.nrOfOrders++;
-			this.parameterizedElement = null;
+				this.parameterizedElement.addParameterBag(pBag);
+				this.pBag = null;
 
-			break;
+				break;
 
-		case ACTION:
+			case TIMED_STATE:
 
-			if (this.activityStack.isEmpty())
-				throw new IllegalStateException("Missing parent for action");
-			this.activityStack.peek().addElement((Action) parameterizedElement);
-			this.parameterizedElement = this.activityStack.peek();
+				((Resource) this.parameterizedElement).addTimedState(this.state);
 
-			break;
+				break;
 
-		case PARAMETER_BAG:
+			case POLICIES:
 
-			this.parameterizedElement.addParameterBag(pBag);
-			this.pBag = null;
+				if (this.parameterizedElement instanceof Resource) {
+					((Resource) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else if (this.parameterizedElement instanceof Order) {
+					((Order) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else if (this.parameterizedElement instanceof Activity) {
+					((Activity) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else if (this.parameterizedElement instanceof Action) {
+					((Action) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else {
+					throw new StrolchPolicyException(
+							"Policies are not allowed on " + this.parameterizedElement.getClass());
+				}
 
-			break;
+				this.policies = null;
 
-		case TIMED_STATE:
+				break;
 
-			((Resource) this.parameterizedElement).addTimedState(this.state);
+			case PARAMETER:
 
-			break;
+				if (this.textParam != null) {
+					this.textParam.setValue(this.textBuffer.toString());
+					this.textBuffer = null;
+					this.textParam = null;
+				}
 
-		case POLICIES:
+				break;
 
-			if (this.parameterizedElement instanceof Resource) {
-				((Resource) this.parameterizedElement).setPolicyDefs(this.policies);
-			} else if (this.parameterizedElement instanceof Order) {
-				((Order) this.parameterizedElement).setPolicyDefs(this.policies);
-			} else if (this.parameterizedElement instanceof Activity) {
-				((Activity) this.parameterizedElement).setPolicyDefs(this.policies);
-			} else if (this.parameterizedElement instanceof Action) {
-				((Action) this.parameterizedElement).setPolicyDefs(this.policies);
-			} else {
-				throw new StrolchPolicyException("Policies are not allowed on " + this.parameterizedElement.getClass());
-			}
+			case POLICY:
+			case VERSION:
+			case INCLUDE_FILE:
+			case VALUE:
+			case VALUE_CHANGE:
+			case STROLCH_MODEL:
 
-			this.policies = null;
+				break;
 
-			break;
-
-		case PARAMETER:
-
-			if (this.textParam != null) {
-				this.textParam.setValue(this.textBuffer.toString());
-				this.textBuffer = null;
-				this.textParam = null;
-			}
-
-			break;
-
-		case POLICY:
-		case VERSION:
-		case INCLUDE_FILE:
-		case VALUE:
-		case VALUE_CHANGE:
-		case STROLCH_MODEL:
-
-			break;
-
-		default:
-			throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			default:
+				throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 }

@@ -15,9 +15,6 @@
  */
 package li.strolch.service;
 
-import java.io.File;
-import java.text.MessageFormat;
-
 import li.strolch.command.XmlImportModelCommand;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.ModelStatistics;
@@ -25,6 +22,9 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.utils.helper.StringHelper;
+
+import java.io.File;
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

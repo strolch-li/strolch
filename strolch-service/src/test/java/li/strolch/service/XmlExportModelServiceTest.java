@@ -15,18 +15,18 @@
  */
 package li.strolch.service;
 
-import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-
-import java.io.File;
-import java.io.IOException;
-
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+
+import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

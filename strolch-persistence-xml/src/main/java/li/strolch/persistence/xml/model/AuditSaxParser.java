@@ -15,13 +15,13 @@
  */
 package li.strolch.persistence.xml.model;
 
-import javax.xml.stream.XMLStreamWriter;
-
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditSaxReader;
 import li.strolch.model.audit.AuditToSaxWriterVisitor;
 import li.strolch.xmlpers.api.SaxParser;
 import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

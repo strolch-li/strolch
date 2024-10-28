@@ -15,15 +15,7 @@
  */
 package li.strolch.migrations;
 
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.Map.Entry;
-
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
@@ -35,6 +27,12 @@ import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 
 public class Migrations {
 

@@ -1,10 +1,10 @@
 package li.strolch.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class StringMapResult extends ServiceResult {
 

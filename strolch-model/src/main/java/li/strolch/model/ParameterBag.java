@@ -15,10 +15,10 @@
  */
 package li.strolch.model;
 
-import java.util.Objects;
-
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.visitor.StrolchElementVisitor;
+
+import java.util.Objects;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -35,12 +35,9 @@ public class ParameterBag extends ParameterizedElement {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param type
-	 * 		the type
+	 * @param id   the id
+	 * @param name the name
+	 * @param type the type
 	 */
 	public ParameterBag(String id, String name, String type) {
 		super(id, name, type);

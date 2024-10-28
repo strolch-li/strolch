@@ -96,7 +96,7 @@ public class Report implements AutoCloseable {
 	}
 
 	public Stream<JsonObject> generateFilterCriteria(String type, int limit, String query) {
-		return this.reportPolicy.generateFilterCriteria(type,limit, query);
+		return this.reportPolicy.generateFilterCriteria(type, limit, query);
 	}
 
 	public long getCounter() {

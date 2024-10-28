@@ -43,8 +43,13 @@ public class CompiledStatement {
 
 	@Override
 	public String toString() {
-		return "CompiledStatement [entities=" + entities + ", whereExpression=" + whereExpression + ", selectClause="
-				+ selectClause + "]";
+		return "CompiledStatement [entities="
+				+ entities
+				+ ", whereExpression="
+				+ whereExpression
+				+ ", selectClause="
+				+ selectClause
+				+ "]";
 	}
 
 }

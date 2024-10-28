@@ -15,13 +15,13 @@
  */
 package li.strolch.xmlpers.test.impl;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import li.strolch.xmlpers.api.DomParser;
 import li.strolch.xmlpers.test.model.Book;
 import li.strolch.xmlpers.util.DomUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.parsers.DocumentBuilder;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

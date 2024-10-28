@@ -62,16 +62,11 @@ public interface StrolchSessionHandler {
 	/**
 	 * Authenticates a user with the given credentials
 	 *
-	 * @param username
-	 * 		the username
-	 * @param password
-	 * 		the password
-	 * @param source
-	 * 		the source of the request
-	 * @param usage
-	 * 		the usage for this authentication
-	 * @param keepAlive
-	 * 		should the session have a keepAlive
+	 * @param username  the username
+	 * @param password  the password
+	 * @param source    the source of the request
+	 * @param usage     the usage for this authentication
+	 * @param keepAlive should the session have a keepAlive
 	 *
 	 * @return the {@link Certificate} for the logged in user
 	 */
@@ -80,8 +75,7 @@ public interface StrolchSessionHandler {
 	/**
 	 * Performs a single-sign-on with the given data, if SSO is enabled
 	 *
-	 * @param data
-	 * 		the data to pass to the SSO handler
+	 * @param data the data to pass to the SSO handler
 	 *
 	 * @return the {@link Certificate} for the logged in user
 	 */
@@ -90,10 +84,8 @@ public interface StrolchSessionHandler {
 	/**
 	 * Performs a single-sign-on with the given data, if SSO is enabled
 	 *
-	 * @param data
-	 * 		the data to pass to the SSO handler
-	 * @param source
-	 * 		the source of the request
+	 * @param data   the data to pass to the SSO handler
+	 * @param source the source of the request
 	 *
 	 * @return the {@link Certificate} for the logged in user
 	 */
@@ -102,10 +94,8 @@ public interface StrolchSessionHandler {
 	/**
 	 * Performs a refresh of the given certificate's session by returning a new certificate
 	 *
-	 * @param certificate
-	 * 		the certificate to refresh
-	 * @param source
-	 * 		the source of the request
+	 * @param certificate the certificate to refresh
+	 * @param source      the source of the request
 	 *
 	 * @return certificate a new certificate
 	 */
@@ -114,8 +104,7 @@ public interface StrolchSessionHandler {
 	/**
 	 * Returns true if a {@link Certificate} exists with the given auth token
 	 *
-	 * @param authToken
-	 * 		the auth token for the certificate
+	 * @param authToken the auth token for the certificate
 	 *
 	 * @return true if a {@link Certificate} exists with the given auth token
 	 */
@@ -124,66 +113,54 @@ public interface StrolchSessionHandler {
 	/**
 	 * Validates that a {@link Certificate} exists with the given auth token and is still valid
 	 *
-	 * @param authToken
-	 * 		the auth token for the certificate
+	 * @param authToken the auth token for the certificate
 	 *
 	 * @return the {@link Certificate} for the given auth token
 	 *
-	 * @throws StrolchNotAuthenticatedException
-	 * 		if no logged in user exists with the given auth token
+	 * @throws StrolchNotAuthenticatedException if no logged in user exists with the given auth token
 	 */
 	Certificate validate(String authToken) throws StrolchNotAuthenticatedException;
 
 	/**
 	 * Validates that a {@link Certificate} exists with the given auth token and is still valid
 	 *
-	 * @param authToken
-	 * 		the auth token for the certificate
-	 * @param source
-	 * 		the source of the request
+	 * @param authToken the auth token for the certificate
+	 * @param source    the source of the request
 	 *
 	 * @return the {@link Certificate} for the given auth token
 	 *
-	 * @throws StrolchNotAuthenticatedException
-	 * 		if no logged in user exists with the given auth token
+	 * @throws StrolchNotAuthenticatedException if no logged in user exists with the given auth token
 	 */
 	Certificate validate(String authToken, String source) throws StrolchNotAuthenticatedException;
 
 	/**
 	 * Validate that the given {@link Certificate} is still valid
 	 *
-	 * @param certificate
-	 * 		the certificate to validate
+	 * @param certificate the certificate to validate
 	 *
 	 * @return the {@link PrivilegeContext} for the given certificate to perform authorization checks against
 	 *
-	 * @throws StrolchNotAuthenticatedException
-	 * 		if no logged in user exists with the given auth token
+	 * @throws StrolchNotAuthenticatedException if no logged in user exists with the given auth token
 	 */
 	PrivilegeContext validate(Certificate certificate) throws StrolchNotAuthenticatedException;
 
 	/**
 	 * Validate that the given {@link Certificate} is still valid
 	 *
-	 * @param certificate
-	 * 		the certificate to validate
-	 * @param source
-	 * 		the source of the request
+	 * @param certificate the certificate to validate
+	 * @param source      the source of the request
 	 *
 	 * @return the {@link PrivilegeContext} for the given certificate to perform authorization checks against
 	 *
-	 * @throws StrolchNotAuthenticatedException
-	 * 		if no logged in user exists with the given auth token
+	 * @throws StrolchNotAuthenticatedException if no logged in user exists with the given auth token
 	 */
 	PrivilegeContext validate(Certificate certificate, String source) throws StrolchNotAuthenticatedException;
 
 	/**
 	 * Returns all the {@link UserSession}
 	 *
-	 * @param certificate
-	 * 		the certificate to validate if the requester may perform this action
-	 * @param source
-	 * 		the source of the request
+	 * @param certificate the certificate to validate if the requester may perform this action
+	 * @param source      the source of the request
 	 *
 	 * @return the list of {@link UserSession}
 	 */
@@ -192,19 +169,14 @@ public interface StrolchSessionHandler {
 	/**
 	 * Return the {@link UserSession} with the given sessionId
 	 *
-	 * @param certificate
-	 * 		the certificate to validate if the requester may perform this action
-	 * @param source
-	 * 		the source of the request
-	 * @param sessionId
-	 * 		the id of the {@link UserSession} to return
+	 * @param certificate the certificate to validate if the requester may perform this action
+	 * @param source      the source of the request
+	 * @param sessionId   the id of the {@link UserSession} to return
 	 *
 	 * @return the user session
 	 *
-	 * @throws AccessDeniedException
-	 * 		if the given {@link Certificate} may not access the {@link UserSession}
-	 * @throws PrivilegeException
-	 * 		if the {@link UserSession} does not exist, or another issues arises
+	 * @throws AccessDeniedException if the given {@link Certificate} may not access the {@link UserSession}
+	 * @throws PrivilegeException    if the {@link UserSession} does not exist, or another issues arises
 	 */
 	UserSession getSession(Certificate certificate, String source, String sessionId)
 			throws AccessDeniedException, PrivilegeException;
@@ -212,84 +184,67 @@ public interface StrolchSessionHandler {
 	/**
 	 * Invalidates the given certificate
 	 *
-	 * @param certificate
-	 * 		the certificate to invalidate
+	 * @param certificate the certificate to invalidate
 	 */
 	void invalidate(Certificate certificate);
 
 	/**
 	 * Invalidates the {@link Certificate} with the given sessionId
 	 *
-	 * @param certificate
-	 * 		the certificate of the user requesting to invalidate the requested certificate
+	 * @param certificate the certificate of the user requesting to invalidate the requested certificate
 	 */
 	void invalidate(Certificate certificate, String sessionId);
 
 	/**
 	 * Set the locale of the given sessionId to the given locale
 	 *
-	 * @param certificate
-	 * 		the certificate of the user requesting to invalidate the requested certificate
-	 * @param sessionId
-	 * 		the ID of the session on which to set the locale
-	 * @param locale
-	 * 		the locale to set
+	 * @param certificate the certificate of the user requesting to invalidate the requested certificate
+	 * @param sessionId   the ID of the session on which to set the locale
+	 * @param locale      the locale to set
 	 */
 	void setSessionLocale(Certificate certificate, String sessionId, Locale locale);
 
 	/**
 	 * Initiate a password reset challenge for the given username
 	 *
-	 * @param usage
-	 * 		the usage for which the challenge is requested
-	 * @param username
-	 * 		the username of the user to initiate the challenge for
+	 * @param usage    the usage for which the challenge is requested
+	 * @param username the username of the user to initiate the challenge for
 	 */
 	void initiateChallengeFor(Usage usage, String username);
 
 	/**
 	 * Initiate a password reset challenge for the given username
 	 *
-	 * @param usage
-	 * 		the usage for which the challenge is requested
-	 * @param username
-	 * 		the username of the user to initiate the challenge for
-	 * @param source
-	 * 		the source of the request
+	 * @param usage    the usage for which the challenge is requested
+	 * @param username the username of the user to initiate the challenge for
+	 * @param source   the source of the request
 	 */
 	void initiateChallengeFor(Usage usage, String username, String source);
 
 	/**
 	 * Validate the response of a challenge for the given username
 	 *
-	 * @param username
-	 * 		the username of the user for which the challenge is to be validated
-	 * @param challenge
-	 * 		the challenge from the user
+	 * @param username  the username of the user for which the challenge is to be validated
+	 * @param challenge the challenge from the user
 	 *
 	 * @return certificate with which the user can access the system with the {@link Usage} set to the value from the
 	 * initiated challenge
 	 *
-	 * @throws PrivilegeException
-	 * 		if anything goes wrong
+	 * @throws PrivilegeException if anything goes wrong
 	 */
 	Certificate validateChallenge(String username, String challenge) throws PrivilegeException;
 
 	/**
 	 * Validate the response of a challenge for the given username
 	 *
-	 * @param username
-	 * 		the username of the user for which the challenge is to be validated
-	 * @param challenge
-	 * 		the challenge from the user
-	 * @param source
-	 * 		the source of the request
+	 * @param username  the username of the user for which the challenge is to be validated
+	 * @param challenge the challenge from the user
+	 * @param source    the source of the request
 	 *
 	 * @return certificate with which the user can access the system with the {@link Usage} set to the value from the
 	 * initiated challenge
 	 *
-	 * @throws PrivilegeException
-	 * 		if anything goes wrong
+	 * @throws PrivilegeException if anything goes wrong
 	 */
 	Certificate validateChallenge(String username, String challenge, String source) throws PrivilegeException;
 }

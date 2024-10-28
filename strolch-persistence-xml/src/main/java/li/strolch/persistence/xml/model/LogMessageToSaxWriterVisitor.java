@@ -1,6 +1,9 @@
 package li.strolch.persistence.xml.model;
 
-import static li.strolch.utils.helper.StringHelper.isEmpty;
+import li.strolch.exception.StrolchException;
+import li.strolch.model.Tags;
+import li.strolch.model.log.LogMessage;
+import li.strolch.utils.iso8601.ISO8601;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -8,10 +11,7 @@ import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.Set;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.Tags;
-import li.strolch.utils.iso8601.ISO8601;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 public class LogMessageToSaxWriterVisitor {
 

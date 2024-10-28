@@ -1,7 +1,5 @@
 package li.strolch.model.json;
 
-import java.util.function.BiConsumer;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
@@ -12,6 +10,8 @@ import li.strolch.model.visitor.ActivityVisitor;
 import li.strolch.model.visitor.OrderVisitor;
 import li.strolch.model.visitor.ResourceVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
+
+import java.util.function.BiConsumer;
 
 public class StrolchRootElementToJsonVisitor implements StrolchRootElementVisitor<JsonObject> {
 

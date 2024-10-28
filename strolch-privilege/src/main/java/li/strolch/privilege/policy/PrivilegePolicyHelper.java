@@ -15,8 +15,6 @@
  */
 package li.strolch.privilege.policy;
 
-import java.text.MessageFormat;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
@@ -24,6 +22,8 @@ import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.utils.helper.StringHelper;
+
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -33,15 +33,12 @@ public class PrivilegePolicyHelper {
 	/**
 	 * Validates the given values and returns the privilege name
 	 *
-	 * @param privilege
-	 * 		the {@link Privilege}
-	 * @param restrictable
-	 * 		the {@link Restrictable}
+	 * @param privilege    the {@link Privilege}
+	 * @param restrictable the {@link Restrictable}
 	 *
 	 * @return the privilege name
 	 *
-	 * @throws PrivilegeException
-	 * 		if something is wrong
+	 * @throws PrivilegeException if something is wrong
 	 */
 	public static String preValidate(Privilege privilege, Restrictable restrictable) throws PrivilegeException {
 		if (privilege == null)
@@ -58,8 +55,9 @@ public class PrivilegePolicyHelper {
 
 		// we want the privileges names to match
 		if (!privilege.getName().equals(privilegeName)) {
-			throw new PrivilegeException(MessageFormat
-					.format(PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"),//$NON-NLS-1$
+			throw new PrivilegeException(
+					MessageFormat.format(PrivilegeMessages.getString("Privilege.illegalArgument.privilegeNameMismatch"),
+							//$NON-NLS-1$
 							privilege.getName(), privilegeName));
 		}
 
@@ -68,25 +66,19 @@ public class PrivilegePolicyHelper {
 
 	/**
 	 * Validates privilege is granted by checking first if all is allows, then the deny values, then the allow values.
-	 * If the privilegeValue is in the deny list or not in the allow list, then access is denied and the {@link
-	 * AccessDeniedException} is thrown
+	 * If the privilegeValue is in the deny list or not in the allow list, then access is denied and the
+	 * {@link AccessDeniedException} is thrown
 	 *
-	 * @param ctx
-	 * 		the context
-	 * @param privilege
-	 * 		the privielge
-	 * @param restrictable
-	 * 		the restrictable
-	 * @param privilegeValue
-	 * 		the privilege value
-	 * @param assertHasPrivilege
-	 * 		if true and the privilege is missing, then an {@link AccessDeniedException} is thrown if privilege, otherwise a
-	 * 		false is returned
+	 * @param ctx                the context
+	 * @param privilege          the privielge
+	 * @param restrictable       the restrictable
+	 * @param privilegeValue     the privilege value
+	 * @param assertHasPrivilege if true and the privilege is missing, then an {@link AccessDeniedException} is thrown
+	 *                           if privilege, otherwise a false is returned
 	 *
 	 * @return true if access is allowed, false if not allowed and assertHasPrivilege is false
 	 *
-	 * @throws AccessDeniedException
-	 * 		if access is denied
+	 * @throws AccessDeniedException if access is denied
 	 */
 	public static boolean checkByAllowDenyValues(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable,
 			String privilegeValue, boolean assertHasPrivilege) throws AccessDeniedException {
@@ -106,9 +98,8 @@ public class PrivilegePolicyHelper {
 			String privilegeValue, boolean assertHasPrivilege) {
 
 		if (assertHasPrivilege) {
-			String msg = MessageFormat
-					.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"),
-							ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
+			String msg = MessageFormat.format(PrivilegeMessages.getString("Privilege.accessdenied.noprivilege.value"),
+					ctx.getUsername(), privilege.getName(), privilegeValue, restrictable.getClass().getName());
 
 			throw new AccessDeniedException(msg);
 		}

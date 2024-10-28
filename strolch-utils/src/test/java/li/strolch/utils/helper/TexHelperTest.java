@@ -1,16 +1,16 @@
 package li.strolch.utils.helper;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+import org.junit.Assume;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.Locale;
 import java.util.Properties;
 
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assume;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TexHelperTest {
 

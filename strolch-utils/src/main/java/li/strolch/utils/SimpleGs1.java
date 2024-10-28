@@ -1,12 +1,12 @@
 package li.strolch.utils;
 
-import static li.strolch.utils.helper.ExceptionHelper.formatException;
-import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static li.strolch.utils.helper.ExceptionHelper.formatException;
+import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 
 public class SimpleGs1 {
 
@@ -19,7 +19,8 @@ public class SimpleGs1 {
 			throw new IllegalArgumentException("Can not parse GS1 " + gs1);
 		try {
 			this.gtin = gs1.substring(2, 14);
-			this.expirationDate = LocalDate.parse(gs1.substring(18, 24), DateTimeFormatter.ofPattern("yyMMdd"))
+			this.expirationDate = LocalDate
+					.parse(gs1.substring(18, 24), DateTimeFormatter.ofPattern("yyMMdd"))
 					.atStartOfDay(ZoneId.systemDefault());
 			this.batchNo = gs1.substring(26);
 		} catch (Exception e) {
@@ -45,7 +46,15 @@ public class SimpleGs1 {
 
 	@Override
 	public String toString() {
-		return "SimpleGs1{" + "gtin='" + gtin + '\'' + ", expirationDate=" + expirationDate + ", batchNo='" + batchNo
-				+ '\'' + '}';
+		return "SimpleGs1{"
+				+ "gtin='"
+				+ gtin
+				+ '\''
+				+ ", expirationDate="
+				+ expirationDate
+				+ ", batchNo='"
+				+ batchNo
+				+ '\''
+				+ '}';
 	}
 }

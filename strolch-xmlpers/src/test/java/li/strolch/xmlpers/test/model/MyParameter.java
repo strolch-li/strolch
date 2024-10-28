@@ -45,7 +45,14 @@ public class MyParameter {
 
 	@Override
 	public String toString() {
-		return "Parameter [id=" + this.id + ", name=" + this.name + ", type=" + this.type + ", value=" + this.value
+		return "Parameter [id="
+				+ this.id
+				+ ", name="
+				+ this.name
+				+ ", type="
+				+ this.type
+				+ ", value="
+				+ this.value
 				+ "]";
 	}
 
@@ -57,8 +64,7 @@ public class MyParameter {
 	}
 
 	/**
-	 * @param id
-	 * 		the id to set
+	 * @param id the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -72,8 +78,7 @@ public class MyParameter {
 	}
 
 	/**
-	 * @param name
-	 * 		the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -87,8 +92,7 @@ public class MyParameter {
 	}
 
 	/**
-	 * @param type
-	 * 		the type to set
+	 * @param type the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
@@ -102,8 +106,7 @@ public class MyParameter {
 	}
 
 	/**
-	 * @param value
-	 * 		the value to set
+	 * @param value the value to set
 	 */
 	public void setValue(String value) {
 		this.value = value;

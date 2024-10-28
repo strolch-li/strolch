@@ -51,10 +51,8 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
+	 * @param id   the id
+	 * @param name the name
 	 */
 	public AbstractParameter(String id, String name) {
 		super(trimOrEmpty(id).intern(), trimOrEmpty(name).intern());
@@ -180,11 +178,9 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	/**
 	 * Validates that the value is legal. This is the case when it is not null in this implementation
 	 *
-	 * @param value
-	 * 		the value to check for this parameter instance
+	 * @param value the value to check for this parameter instance
 	 *
-	 * @throws StrolchException
-	 * 		if the value is null
+	 * @throws StrolchException if the value is null
 	 */
 	protected void validateValue(T value) throws StrolchException {
 		if (value == null) {
@@ -197,8 +193,7 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 	/**
 	 * Fills the {@link Parameter} clone with the id, name, hidden, interpretation and uom
 	 *
-	 * @param clone
-	 * 		the clone to fill
+	 * @param clone the clone to fill
 	 */
 	@Override
 	protected void fillClone(AbstractStrolchElement clone) {
@@ -213,15 +208,20 @@ public abstract class AbstractParameter<T> extends AbstractStrolchElement implem
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + " [id=" + this.id + ", name=" + this.name + ", value=" + getValueAsString()
+		return getClass().getSimpleName()
+				+ " [id="
+				+ this.id
+				+ ", name="
+				+ this.name
+				+ ", value="
+				+ getValueAsString()
 				+ "]";
 	}
 
 	/**
 	 * Compares the value of the given parameter to this parameter
 	 *
-	 * @param otherParam
-	 * 		the parameter for which the value is to be compared to
+	 * @param otherParam the parameter for which the value is to be compared to
 	 *
 	 * @return the {@link Comparable#compareTo(Object)} result
 	 */

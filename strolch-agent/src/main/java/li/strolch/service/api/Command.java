@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- * Implementation of the Command Pattern to create re-usable components which are performed during {@link
- * StrolchTransaction StrolchTransactions} as part of the execution of {@link Service Services}
+ * Implementation of the Command Pattern to create re-usable components which are performed during
+ * {@link StrolchTransaction StrolchTransactions} as part of the execution of {@link Service Services}
  * </p>
  *
  * <p>
@@ -55,8 +55,7 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Instantiate a new command
 	 *
-	 * @param tx
-	 * 		the transaction
+	 * @param tx the transaction
 	 */
 	public Command(StrolchTransaction tx) {
 		this.container = tx.getContainer();
@@ -66,13 +65,11 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Allows the concrete command implementation access to {@link StrolchComponent StrolchComponents} at runtime
 	 *
-	 * @param clazz
-	 * 		the type of component to be returned
+	 * @param clazz the type of component to be returned
 	 *
 	 * @return the component with the given {@link Class} which is registered on the {@link ComponentContainer}
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the component with the given class does not exist
+	 * @throws IllegalArgumentException if the component with the given class does not exist
 	 */
 	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
@@ -88,10 +85,9 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Returns a {@link StrolchPolicy} instance from the given parameters
 	 *
-	 * @param policyClass
-	 * 		the policy type to return. The simple name of the class determines the type of Policy to return.
-	 * @param policyContainer
-	 * 		the container
+	 * @param policyClass     the policy type to return. The simple name of the class determines the type of Policy to
+	 *                        return.
+	 * @param policyContainer the container
 	 *
 	 * @return the policy
 	 */
@@ -105,15 +101,11 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Performs the given {@link SystemAction} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param action
-	 * 		the action to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param action   the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAs(String username, SystemAction action) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAs(username, action);
@@ -122,17 +114,13 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Performs the given {@link SystemAction} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param action
-	 * 		the action to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param action   the action to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <T> T runWithResult(String username, SystemActionWithResult<T> action)
 			throws PrivilegeException, Exception {
@@ -142,15 +130,11 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param runnable the runnable to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAs(username, runnable);
@@ -159,17 +143,13 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Performs the given {@link PrivilegedRunnableWithResult} as a system user with the given username
 	 *
-	 * @param username
-	 * 		the name of the system user to perform the action as
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param username the name of the system user to perform the action as
+	 * @param runnable the runnable to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <V> V runWithResult(String username, PrivilegedRunnableWithResult<V> runnable)
 			throws PrivilegeException, Exception {
@@ -179,13 +159,10 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param action
-	 * 		the action to perform
+	 * @param action the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(SystemAction action) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAsAgent(action);
@@ -194,49 +171,40 @@ public abstract class Command implements Restrictable {
 	/**
 	 * Performs the given {@link SystemAction} as the privileged system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param action
-	 * 		the action to perform
+	 * @param action the action to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <V> V runAsAgentWithResult(SystemActionWithResult<V> action) throws PrivilegeException, Exception {
 		return this.container.getPrivilegeHandler().runAsAgentWithResult(action);
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnable} as the privileged system user {@link
-	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the action to perform
+	 * @param runnable the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception {
 		this.container.getPrivilegeHandler().runAsAgent(runnable);
 	}
 
 	/**
-	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user {@link
-	 * StrolchConstants#SYSTEM_USER_AGENT}
+	 * Performs the given {@link PrivilegedRunnableWithResult} as the privileged system user
+	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the action to perform
+	 * @param runnable the action to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	protected <V> V runAsAgentWithResult(PrivilegedRunnableWithResult<V> runnable)
 			throws PrivilegeException, Exception {
@@ -281,8 +249,8 @@ public abstract class Command implements Restrictable {
 	 *
 	 * <p>
 	 * <b>Note:</b> Do not call this method directly, this method is called by the {@link StrolchTransaction} when the
-	 * transaction is committed. Add this {@link Command} to the transaction by calling {@link
-	 * StrolchTransaction#addCommand(Command)}
+	 * transaction is committed. Add this {@link Command} to the transaction by calling
+	 * {@link StrolchTransaction#addCommand(Command)}
 	 * </p>
 	 */
 	public abstract void doCommand();

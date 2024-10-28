@@ -15,15 +15,15 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import static li.strolch.model.parameter.ListParameter.VALUE_SEPARATOR2;
-
-import java.io.Serializable;
-import java.util.*;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.utils.helper.StringHelper;
+
+import java.io.Serializable;
+import java.util.*;
+
+import static li.strolch.model.parameter.ListParameter.VALUE_SEPARATOR2;
 
 /**
  * {@link IValue} implementation to work with Double valued {@link ITimeValue} objects

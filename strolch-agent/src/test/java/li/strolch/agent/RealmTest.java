@@ -15,21 +15,17 @@
  */
 package li.strolch.agent;
 
-import static li.strolch.agent.ComponentContainerTest.PATH_REALM_CONTAINER;
-import static li.strolch.agent.ComponentContainerTest.PATH_REALM_RUNTIME;
-import static li.strolch.agent.ComponentContainerTest.logger;
-import static li.strolch.agent.ComponentContainerTest.testContainer;
-import static org.junit.Assert.assertEquals;
+import li.strolch.RuntimeMock;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.impl.DataStoreMode;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
-
-import li.strolch.RuntimeMock;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.impl.DataStoreMode;
+import static li.strolch.agent.ComponentContainerTest.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

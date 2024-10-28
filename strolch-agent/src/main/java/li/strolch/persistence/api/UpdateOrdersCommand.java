@@ -38,16 +38,14 @@ public class UpdateOrdersCommand extends Command {
 	}
 
 	/**
-	 * @param orders
-	 * 		the orders to set for updating
+	 * @param orders the orders to set for updating
 	 */
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
 	}
 
 	/**
-	 * @param resource
-	 * 		the resource to add for updating
+	 * @param resource the resource to add for updating
 	 */
 	public void addOrder(Order resource) {
 		this.orders.add(resource);

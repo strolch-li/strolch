@@ -1,11 +1,5 @@
 package li.strolch.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import li.strolch.model.Order;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
@@ -20,6 +14,12 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class SimpleModelTest {
 
@@ -160,13 +160,20 @@ public class SimpleModelTest {
 			assertEquals(2, articles.size());
 
 			// get products
-			List<Resource> products = articles.stream().map(a -> tx.getResourceByRelation(a, "product", true))
-					.distinct().toList();
+			List<Resource> products = articles
+					.stream()
+					.map(a -> tx.getResourceByRelation(a, "product", true))
+					.distinct()
+					.toList();
 			assertEquals(1, products.size());
 
 			// search for all orders in state PLANNED and with customer
-			List<Order> orders = new OrderSearch().types("Order").stateIsIn(State.PLANNED)
-					.where(ExpressionsSupport.relationParam("customer").isEqualTo(customerId)).search(tx).toList();
+			List<Order> orders = new OrderSearch()
+					.types("Order")
+					.stateIsIn(State.PLANNED)
+					.where(ExpressionsSupport.relationParam("customer").isEqualTo(customerId))
+					.search(tx)
+					.toList();
 			assertEquals(1, orders.size());
 		}
 	}

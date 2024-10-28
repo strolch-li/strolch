@@ -15,7 +15,11 @@
  */
 package li.strolch.persistence.postgresql;
 
-import static li.strolch.utils.helper.StringHelper.commaSeparated;
+import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.Audit;
+import li.strolch.persistence.api.AuditDao;
+import li.strolch.persistence.api.StrolchPersistenceException;
+import li.strolch.utils.collections.DateRange;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,11 +28,7 @@ import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.*;
 
-import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
-import li.strolch.persistence.api.AuditDao;
-import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.utils.collections.DateRange;
+import static li.strolch.utils.helper.StringHelper.commaSeparated;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -53,14 +53,18 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	private static final String hasElementSql = "select count(*) from audits where element_type = ? and id = ?";
 	private static final String querySizeSql = "select count(*) from audits where date between ? and ?";
-	private static final String querySizeTypeSql = "select count(*) from audits where element_type = ? and date between ? and ?";
+	private static final String querySizeTypeSql
+			= "select count(*) from audits where element_type = ? and date between ? and ?";
 	private static final String queryTypesSql = "select distinct element_type from audits";
 	private static final String queryBySql = "select " + FIELDS + " from audits where element_type = ? and ID = ?";
-	private static final String queryAllSql =
-			"select " + FIELDS + " from audits where element_type = ? and date between ? and ?";
-	private static final String insertSql =
-			"insert into audits (" + FIELDS + ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)";
-	private static final String updateSql = "update audits set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_sub_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type where id = ?";
+	private static final String queryAllSql = "select "
+			+ FIELDS
+			+ " from audits where element_type = ? and date between ? and ?";
+	private static final String insertSql = "insert into audits ("
+			+ FIELDS
+			+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type)";
+	private static final String updateSql
+			= "update audits set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_sub_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type where id = ?";
 	private static final String removeSql = "delete from audits where id = ?";
 	private static final String removeAllSql = "delete from audits where element_type = ? and date between ? and ?";
 
@@ -86,8 +90,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 				if (numberOfElements == 1)
 					return true;
 
-				String msg = MessageFormat
-						.format("Non unique number of elements with type {0} and id {1}", type, id);
+				String msg = MessageFormat.format("Non unique number of elements with type {0} and id {1}", type, id);
 				throw new StrolchPersistenceException(msg);
 			}
 
@@ -163,8 +166,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 				Audit audit = auditFrom(result);
 				if (result.next())
 					throw new StrolchPersistenceException(
-							"Non unique result for query: " + queryBySql + " (type=" + type + ", id="
-									+ id);
+							"Non unique result for query: " + queryBySql + " (type=" + type + ", id=" + id);
 				return audit;
 			}
 		} catch (SQLException e) {
@@ -202,15 +204,14 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
-				throw new StrolchPersistenceException(MessageFormat
-						.format("Expected to insert 1 record, but inserted {0} for audit {2}", count,
+				throw new StrolchPersistenceException(
+						MessageFormat.format("Expected to insert 1 record, but inserted {0} for audit {2}", count,
 								audit.getId()));
 			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to insert Audit {0} due to {1}", audit,
-							e.getLocalizedMessage()), e);
+					MessageFormat.format("Failed to insert Audit {0} due to {1}", audit, e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -230,15 +231,14 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
-				throw new StrolchPersistenceException(MessageFormat
-						.format("Expected to update 1 record, but updated {0} for audit {2}", count,
+				throw new StrolchPersistenceException(
+						MessageFormat.format("Expected to update 1 record, but updated {0} for audit {2}", count,
 								audit.getId()));
 			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to update Audit {0} due to {1}", audit,
-							e.getLocalizedMessage()), e);
+					MessageFormat.format("Failed to update Audit {0} due to {1}", audit, e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -263,8 +263,8 @@ public class PostgreSqlAuditDao implements AuditDao {
 			}
 
 		} catch (SQLException e) {
-			throw new StrolchPersistenceException(MessageFormat.format("Failed to remove {0} due to {2}",
-					audit.getId(), e.getLocalizedMessage()), e);
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to remove {0} due to {2}", audit.getId(), e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -287,8 +287,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to remove all elements due to {0}",
-							e.getLocalizedMessage()), e);
+					MessageFormat.format("Failed to remove all elements due to {0}", e.getLocalizedMessage()), e);
 		}
 	}
 

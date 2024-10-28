@@ -15,12 +15,6 @@
  */
 package li.strolch.migrations;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-
-import java.io.File;
-import java.text.MessageFormat;
-import java.util.Collections;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.command.XmlImportModelCommand;
 import li.strolch.exception.StrolchException;
@@ -30,6 +24,12 @@ import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.Version;
+
+import java.io.File;
+import java.text.MessageFormat;
+import java.util.Collections;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
 public class DataMigration extends Migration {
 

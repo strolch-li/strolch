@@ -39,8 +39,7 @@ public class RemoveActivityCommand extends Command {
 	}
 
 	/**
-	 * @param activity
-	 * 		the activity to set
+	 * @param activity the activity to set
 	 */
 	public void setActivity(Activity activity) {
 		this.activity = activity;

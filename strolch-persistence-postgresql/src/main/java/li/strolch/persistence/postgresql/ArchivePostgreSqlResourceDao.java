@@ -1,8 +1,8 @@
 package li.strolch.persistence.postgresql;
 
-import java.sql.Connection;
-
 import li.strolch.persistence.api.TransactionResult;
+
+import java.sql.Connection;
 
 public class ArchivePostgreSqlResourceDao extends PostgreSqlResourceDao {
 

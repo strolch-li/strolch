@@ -61,19 +61,19 @@ public class ReservationExecution extends DurationExecution {
 	@Override
 	public void toExecution(Action action) {
 		switch (action.getType()) {
-		case TYPE_RESERVE, TYPE_RELEASE, TYPE_JOB_COUNT_SEMAPHORE -> toExecuted(action);
-		default -> super.toExecution(action);
+			case TYPE_RESERVE, TYPE_RELEASE, TYPE_JOB_COUNT_SEMAPHORE -> toExecuted(action);
+			default -> super.toExecution(action);
 		}
 	}
 
 	@Override
 	public void toExecuted(Action action) {
 		switch (action.getType()) {
-		case TYPE_RESERVE -> setReservation(tx(), action, true);
-		case TYPE_RELEASE -> setReservation(tx(), action, false);
-		default -> {
-			// do nothing
-		}
+			case TYPE_RESERVE -> setReservation(tx(), action, true);
+			case TYPE_RELEASE -> setReservation(tx(), action, false);
+			default -> {
+				// do nothing
+			}
 		}
 
 		super.toExecuted(action);
@@ -85,7 +85,11 @@ public class ReservationExecution extends DurationExecution {
 		Resource resource = tx.getResourceFor(action, true);
 
 		if (!resource.hasParameter(BAG_PARAMETERS, PARAM_RESERVED))
-			throw new StrolchModelException("Parameter " + PARAM_RESERVED + " on bag " + BAG_PARAMETERS + " missing on "
+			throw new StrolchModelException("Parameter "
+					+ PARAM_RESERVED
+					+ " on bag "
+					+ BAG_PARAMETERS
+					+ " missing on "
 					+ resource.getLocator());
 
 		BooleanParameter reservedP = resource.getParameter(BAG_PARAMETERS, PARAM_RESERVED);
@@ -106,11 +110,11 @@ public class ReservationExecution extends DurationExecution {
 	protected boolean jobCountSemaphoreSatisfied(Action action) {
 		StringListParameter jobCountSemaphoreTypesP = action.findObjectivesParam(PARAM_JOB_COUNT_SEMAPHORE_TYPES,
 				false);
-		String[] types = jobCountSemaphoreTypesP == null ?
-				new String[] { action.getRootElement().getType() } :
+		String[] types = jobCountSemaphoreTypesP == null ? new String[]{action.getRootElement().getType()} :
 				jobCountSemaphoreTypesP.getValue().toArray(String[]::new);
 
-		long nrOfActivitiesInExecution = getExecutionHandler().getControllers(tx().getRealmName())
+		long nrOfActivitiesInExecution = getExecutionHandler()
+				.getControllers(tx().getRealmName())
 				.stream()
 				.map(Controller::getActivity)
 				.filter(a -> isIn(a.getType(), types, false))

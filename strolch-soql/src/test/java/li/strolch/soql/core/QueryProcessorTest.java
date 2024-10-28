@@ -43,8 +43,8 @@ public class QueryProcessorTest extends BaseTest {
 	}
 
 	/**
-	 * verify that an exception is thrown, if the select statement declares classes other than {@link
-	 * StrolchRootElement}
+	 * verify that an exception is thrown, if the select statement declares classes other than
+	 * {@link StrolchRootElement}
 	 */
 	@Test
 	public void testProcess2() {

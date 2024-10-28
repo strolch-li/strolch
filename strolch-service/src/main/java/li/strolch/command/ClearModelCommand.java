@@ -77,24 +77,21 @@ public class ClearModelCommand extends Command {
 	}
 
 	/**
-	 * @param clearOrders
-	 * 		the clearOrders to set
+	 * @param clearOrders the clearOrders to set
 	 */
 	public void setClearOrders(boolean clearOrders) {
 		this.clearOrders = clearOrders;
 	}
 
 	/**
-	 * @param clearResources
-	 * 		the clearResources to set
+	 * @param clearResources the clearResources to set
 	 */
 	public void setClearResources(boolean clearResources) {
 		this.clearResources = clearResources;
 	}
 
 	/**
-	 * @param clearActivities
-	 * 		the clearActivities to set
+	 * @param clearActivities the clearActivities to set
 	 */
 	public void setClearActivities(boolean clearActivities) {
 		this.clearActivities = clearActivities;

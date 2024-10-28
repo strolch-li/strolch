@@ -1,8 +1,5 @@
 package li.strolch.privilege.handler;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.internal.User;
@@ -10,6 +7,9 @@ import li.strolch.privilege.model.internal.UserChallenge;
 import li.strolch.utils.CodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class UserChallengeHandler {
 

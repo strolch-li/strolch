@@ -15,11 +15,6 @@
  */
 package li.strolch.model;
 
-import static li.strolch.model.StrolchModelConstants.*;
-
-import java.util.Collection;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -32,6 +27,10 @@ import li.strolch.model.visitor.SetParameterValueVisitor;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.model.xml.StrolchElementToXmlStringVisitor;
+
+import java.util.Collection;
+
+import static li.strolch.model.StrolchModelConstants.*;
 
 /**
  * Root element for all top level {@link StrolchElement}. These are elements which have no parent, e.g.

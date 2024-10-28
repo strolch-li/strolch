@@ -1,13 +1,12 @@
 package li.strolch.model.activity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import li.strolch.model.ModelGenerator;
+import li.strolch.model.State;
 import org.junit.Before;
 import org.junit.Test;
 
-import li.strolch.model.ModelGenerator;
-import li.strolch.model.State;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class StateTest {
 

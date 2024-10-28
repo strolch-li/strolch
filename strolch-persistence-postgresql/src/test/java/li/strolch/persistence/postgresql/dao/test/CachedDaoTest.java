@@ -15,17 +15,6 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
-import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.text.MessageFormat;
-
 import li.strolch.db.DbSchemaVersionCheck;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.postgresql.DataType;
@@ -39,6 +28,16 @@ import org.junit.BeforeClass;
 import org.postgresql.Driver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
+import static org.junit.Assert.assertEquals;
 
 public class CachedDaoTest extends AbstractModelTest {
 
@@ -74,7 +73,8 @@ public class CachedDaoTest extends AbstractModelTest {
 			throw new IllegalStateException("Failed to created db store path " + dbStorePath);
 		runtimeMock.startContainer();
 
-		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock
+				.getContainer()
 				.getComponent(PersistenceHandler.class);
 		assertEquals(DataType.xml, persistenceHandler.getDataType());
 	}

@@ -1,28 +1,28 @@
 package li.strolch.testbase.runtime;
 
-import static java.util.stream.Collectors.toList;
-import static li.strolch.model.Tags.AGENT;
-import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
-
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
+import li.strolch.handler.operationslog.OperationsLog;
+import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
-import li.strolch.handler.operationslog.OperationsLog;
-import li.strolch.model.Locator;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import static java.util.stream.Collectors.toList;
+import static li.strolch.model.Tags.AGENT;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class LogMessagesTestRunner {
 

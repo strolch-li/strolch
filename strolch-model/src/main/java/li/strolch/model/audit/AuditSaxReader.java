@@ -15,13 +15,13 @@
  */
 package li.strolch.model.audit;
 
-import java.text.MessageFormat;
-import java.util.function.Consumer;
-
 import li.strolch.model.Tags;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
+
+import java.text.MessageFormat;
+import java.util.function.Consumer;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,14 +41,15 @@ public class AuditSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-		case Tags.AUDIT -> {
-			this.currentAudit = new Audit();
-			this.currentAudit.setId(Long.parseLong(attributes.getValue(Tags.Audit.ID)));
-		}
-		case Tags.Audit.USERNAME, Tags.Audit.FIRSTNAME, Tags.Audit.LASTNAME, Tags.Audit.DATE, Tags.Audit.ELEMENT_TYPE, Tags.Audit.ELEMENT_SUB_TYPE, Tags.Audit.ELEMENT_ACCESSED, Tags.Audit.NEW_VERSION, Tags.Audit.ACTION, Tags.Audit.ACCESS_TYPE ->
-				this.sb = new StringBuilder();
-		default -> throw new IllegalArgumentException(
-				MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			case Tags.AUDIT -> {
+				this.currentAudit = new Audit();
+				this.currentAudit.setId(Long.parseLong(attributes.getValue(Tags.Audit.ID)));
+			}
+			case Tags.Audit.USERNAME, Tags.Audit.FIRSTNAME, Tags.Audit.LASTNAME, Tags.Audit.DATE,
+				 Tags.Audit.ELEMENT_TYPE, Tags.Audit.ELEMENT_SUB_TYPE, Tags.Audit.ELEMENT_ACCESSED,
+				 Tags.Audit.NEW_VERSION, Tags.Audit.ACTION, Tags.Audit.ACCESS_TYPE -> this.sb = new StringBuilder();
+			default -> throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -56,52 +57,52 @@ public class AuditSaxReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 
 		switch (qName) {
-		case Tags.AUDIT -> {
-			this.auditConsumer.accept(this.currentAudit);
-			this.currentAudit = null;
-		}
-		case Tags.Audit.USERNAME -> {
-			this.currentAudit.setUsername(this.sb.toString());
-			this.sb = null;
-		}
-		case Tags.Audit.FIRSTNAME -> {
-			this.currentAudit.setFirstname(this.sb.toString());
-			this.sb = null;
-		}
-		case Tags.Audit.LASTNAME -> {
-			this.currentAudit.setLastname(this.sb.toString());
-			this.sb = null;
-		}
-		case Tags.Audit.DATE -> {
-			this.currentAudit.setDate(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
-			this.sb = null;
-		}
-		case Tags.Audit.ELEMENT_TYPE -> {
-			this.currentAudit.setElementType(this.sb.toString());
-			this.sb = null;
-		}
-		case Tags.Audit.ELEMENT_SUB_TYPE -> {
-			this.currentAudit.setElementSubType(this.sb.toString());
-			this.sb = null;
-		}
-		case Tags.Audit.ELEMENT_ACCESSED -> {
-			this.currentAudit.setElementAccessed(this.sb.toString());
-			this.sb = null;
-		}
-		case Tags.Audit.NEW_VERSION -> {
-			this.currentAudit.setNewVersion(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
-			this.sb = null;
-		}
-		case Tags.Audit.ACTION -> {
-			this.currentAudit.setAction(this.sb.toString());
-			this.sb = null;
-		}
-		case Tags.Audit.ACCESS_TYPE -> {
-			this.currentAudit.setAccessType(AccessType.valueOf(this.sb.toString()));
-			this.sb = null;
-		}
-		default -> throw new IllegalArgumentException(
-				MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			case Tags.AUDIT -> {
+				this.auditConsumer.accept(this.currentAudit);
+				this.currentAudit = null;
+			}
+			case Tags.Audit.USERNAME -> {
+				this.currentAudit.setUsername(this.sb.toString());
+				this.sb = null;
+			}
+			case Tags.Audit.FIRSTNAME -> {
+				this.currentAudit.setFirstname(this.sb.toString());
+				this.sb = null;
+			}
+			case Tags.Audit.LASTNAME -> {
+				this.currentAudit.setLastname(this.sb.toString());
+				this.sb = null;
+			}
+			case Tags.Audit.DATE -> {
+				this.currentAudit.setDate(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
+				this.sb = null;
+			}
+			case Tags.Audit.ELEMENT_TYPE -> {
+				this.currentAudit.setElementType(this.sb.toString());
+				this.sb = null;
+			}
+			case Tags.Audit.ELEMENT_SUB_TYPE -> {
+				this.currentAudit.setElementSubType(this.sb.toString());
+				this.sb = null;
+			}
+			case Tags.Audit.ELEMENT_ACCESSED -> {
+				this.currentAudit.setElementAccessed(this.sb.toString());
+				this.sb = null;
+			}
+			case Tags.Audit.NEW_VERSION -> {
+				this.currentAudit.setNewVersion(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
+				this.sb = null;
+			}
+			case Tags.Audit.ACTION -> {
+				this.currentAudit.setAction(this.sb.toString());
+				this.sb = null;
+			}
+			case Tags.Audit.ACCESS_TYPE -> {
+				this.currentAudit.setAccessType(AccessType.valueOf(this.sb.toString()));
+				this.sb = null;
+			}
+			default -> throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 

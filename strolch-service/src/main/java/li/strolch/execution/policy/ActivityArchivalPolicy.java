@@ -15,8 +15,8 @@ import li.strolch.policy.StrolchPolicy;
  */
 public class ActivityArchivalPolicy extends StrolchPolicy {
 
-	public static PolicyDef DEFAULT_ACTIVITY_ARCHIVAL = PolicyDef
-			.valueOf(ActivityArchivalPolicy.class.getSimpleName(), "key:DefaultActivityArchival");
+	public static PolicyDef DEFAULT_ACTIVITY_ARCHIVAL = PolicyDef.valueOf(ActivityArchivalPolicy.class.getSimpleName(),
+			"key:DefaultActivityArchival");
 
 	public ActivityArchivalPolicy(StrolchTransaction tx) {
 		super(tx);

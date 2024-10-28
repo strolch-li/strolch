@@ -40,11 +40,9 @@ public class ProgressableFileInputStream extends FileInputStream {
 	/**
 	 * Constructs a normal {@link FileInputStream} with the given {@link File}
 	 *
-	 * @param file
-	 * 		the file to read
+	 * @param file the file to read
 	 *
-	 * @throws FileNotFoundException
-	 * 		thrown if the {@link File} does not exist
+	 * @throws FileNotFoundException thrown if the {@link File} does not exist
 	 */
 	public ProgressableFileInputStream(File file) throws FileNotFoundException {
 		super(file);

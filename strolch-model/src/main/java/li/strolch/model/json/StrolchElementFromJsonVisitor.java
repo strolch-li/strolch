@@ -15,11 +15,6 @@
  */
 package li.strolch.model.json;
 
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -39,6 +34,11 @@ import li.strolch.model.timevalue.impl.ValueChange;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -197,45 +197,45 @@ public class StrolchElementFromJsonVisitor {
 			String objectType = elementJsonObject.get(Json.OBJECT_TYPE).getAsString();
 
 			switch (objectType) {
-			case Json.ACTIVITY -> {
-				Activity childActivity;
-				if (activity.hasElement(objectId)) {
-					IActivityElement tmp = activity.getElement(objectId);
-					if (!tmp.isActivity()) {
-						String msg = "Existing activity {0} has element {1} which is not an activity!";
-						msg = MessageFormat.format(msg, activity.getId(), objectId);
-						throw new IllegalStateException(msg);
+				case Json.ACTIVITY -> {
+					Activity childActivity;
+					if (activity.hasElement(objectId)) {
+						IActivityElement tmp = activity.getElement(objectId);
+						if (!tmp.isActivity()) {
+							String msg = "Existing activity {0} has element {1} which is not an activity!";
+							msg = MessageFormat.format(msg, activity.getId(), objectId);
+							throw new IllegalStateException(msg);
+						}
+						childActivity = tmp.asActivity();
+						fillElement(elementJsonObject, childActivity);
+					} else {
+						childActivity = new Activity();
+						fillElement(elementJsonObject, childActivity);
+						activity.addElement(childActivity);
 					}
-					childActivity = tmp.asActivity();
-					fillElement(elementJsonObject, childActivity);
-				} else {
-					childActivity = new Activity();
-					fillElement(elementJsonObject, childActivity);
-					activity.addElement(childActivity);
 				}
-			}
-			case Json.ACTION -> {
-				Action childAction;
-				if (activity.hasElement(objectId)) {
-					IActivityElement tmp = activity.getElement(objectId);
-					if (!tmp.isAction()) {
-						String msg = "Existing activity {0} has element {1} which is not an action!";
-						msg = MessageFormat.format(msg, activity.getId(), objectId);
-						throw new IllegalStateException(msg);
+				case Json.ACTION -> {
+					Action childAction;
+					if (activity.hasElement(objectId)) {
+						IActivityElement tmp = activity.getElement(objectId);
+						if (!tmp.isAction()) {
+							String msg = "Existing activity {0} has element {1} which is not an action!";
+							msg = MessageFormat.format(msg, activity.getId(), objectId);
+							throw new IllegalStateException(msg);
+						}
+						childAction = tmp.asAction();
+						fillElement(elementJsonObject, childAction);
+					} else {
+						childAction = new Action();
+						fillElement(elementJsonObject, childAction);
+						activity.addElement(childAction);
 					}
-					childAction = tmp.asAction();
-					fillElement(elementJsonObject, childAction);
-				} else {
-					childAction = new Action();
-					fillElement(elementJsonObject, childAction);
-					activity.addElement(childAction);
 				}
-			}
-			default -> {
-				String msg = "Check the values of the jsonObject: {0} unknown object Type {1} !";
-				msg = MessageFormat.format(msg, elementJsonObject, objectType);
-				throw new StrolchException(msg);
-			}
+				default -> {
+					String msg = "Check the values of the jsonObject: {0} unknown object Type {1} !";
+					msg = MessageFormat.format(msg, elementJsonObject, objectType);
+					throw new StrolchException(msg);
+				}
 			}
 		});
 	}

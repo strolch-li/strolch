@@ -59,23 +59,22 @@ public class ConfirmationPolicy extends StrolchPolicy {
 	/**
 	 * Calls the appropriate confirmation method depending on the state of the {@link Action}
 	 *
-	 * @param action
-	 * 		the action for which to perform the confirmation call
+	 * @param action the action for which to perform the confirmation call
 	 */
 	public void doConfirmation(Action action) {
 		switch (action.getState()) {
-		case CREATED -> toCreated(action);
-		case PLANNING -> toPlanning(action);
-		case PLANNED -> toPlanned(action);
-		case EXECUTION -> toExecution(action);
-		case WARNING -> toWarning(action);
-		case ERROR -> toError(action);
-		case STOPPED -> toStopped(action);
-		case EXECUTED -> toExecuted(action);
-		case CLOSED -> toClosed(action);
-		case EXECUTABLE -> {
-			// do nothing
-		}
+			case CREATED -> toCreated(action);
+			case PLANNING -> toPlanning(action);
+			case PLANNED -> toPlanned(action);
+			case EXECUTION -> toExecution(action);
+			case WARNING -> toWarning(action);
+			case ERROR -> toError(action);
+			case STOPPED -> toStopped(action);
+			case EXECUTED -> toExecuted(action);
+			case CLOSED -> toClosed(action);
+			case EXECUTABLE -> {
+				// do nothing
+			}
 		}
 	}
 }

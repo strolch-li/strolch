@@ -15,9 +15,6 @@
  */
 package li.strolch.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
@@ -31,6 +28,9 @@ import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import li.strolch.utils.dbc.DBC;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class TxTest extends AbstractRealmServiceTest<ServiceArgument, ServiceResult> {
 

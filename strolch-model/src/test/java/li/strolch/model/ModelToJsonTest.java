@@ -15,10 +15,6 @@
  */
 package li.strolch.model;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.List;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
@@ -28,6 +24,10 @@ import li.strolch.model.json.ResourceFromJsonVisitor;
 import li.strolch.model.json.StrolchRootElementToJsonVisitor;
 import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
 import org.junit.Test;
+
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 public class ModelToJsonTest extends ModelMarshallingTest {
 

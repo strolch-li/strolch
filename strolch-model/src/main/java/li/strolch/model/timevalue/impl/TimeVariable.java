@@ -15,17 +15,17 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import static java.util.Collections.unmodifiableNavigableSet;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Stream;
-
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static java.util.Collections.unmodifiableNavigableSet;
 
 /**
  * @author Martin Smock <smock.martin@gmail.com>
@@ -168,7 +168,8 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 
 	protected void assertNotReadonly() {
 		if (this.readonly) {
-			throw new StrolchModelException("The element " + this.getClass().getSimpleName()
+			throw new StrolchModelException("The element "
+					+ this.getClass().getSimpleName()
 					+ " is currently readOnly, to modify clone first!");
 		}
 	}
@@ -179,8 +180,7 @@ public class TimeVariable<T extends IValue> implements ITimeVariable<T>, Seriali
 			return true;
 		if (o == null || getClass() != o.getClass())
 			return false;
-		@SuppressWarnings("unchecked")
-		TimeVariable<T> other = (TimeVariable<T>) o;
+		@SuppressWarnings("unchecked") TimeVariable<T> other = (TimeVariable<T>) o;
 		if (this.container.size() != other.container.size())
 			return false;
 		Iterator<ITimeValue<T>> thisIter = this.container.iterator();

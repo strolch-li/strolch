@@ -33,8 +33,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	/**
 	 * Returns the value at the given index of this {@link ListParameter}'s value
 	 *
-	 * @param index
-	 * 		the index from which to return the value
+	 * @param index the index from which to return the value
 	 *
 	 * @return the value at the given index
 	 */
@@ -57,48 +56,42 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	/**
 	 * Set the internal value to have the content of the collection
 	 *
-	 * @param values
-	 * 		the values to set
+	 * @param values the values to set
 	 */
 	void setValue(Collection<E> values);
 
 	/**
 	 * Adds a single value to the {@link List} of values
 	 *
-	 * @param value
-	 * 		the value to add
+	 * @param value the value to add
 	 */
 	void addValue(E value);
 
 	/**
 	 * Adds the given values to the {@link List} of values
 	 *
-	 * @param values
-	 * 		the values to add
+	 * @param values the values to add
 	 */
 	void addAllValues(List<E> values);
 
 	/**
 	 * Adds all of the given values to the {@link List} of values which are not already in the current list
 	 *
-	 * @param values
-	 * 		the values to add
+	 * @param values the values to add
 	 */
 	void addAllValuesIfNotContains(List<E> values);
 
 	/**
 	 * Adds a single value to the {@link List} of values if the current list does not already contain the value
 	 *
-	 * @param value
-	 * 		the value to add
+	 * @param value the value to add
 	 */
 	boolean addValueIfNotContains(E value);
 
 	/**
 	 * Removes a single value from the {@link List} of values
 	 *
-	 * @param value
-	 * 		the value to remove
+	 * @param value the value to remove
 	 *
 	 * @return true if the value was removed, false if it did not exist
 	 */
@@ -107,8 +100,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	/**
 	 * Removes all values from the {@link List} of values if the predicate passes
 	 *
-	 * @param predicate
-	 * 		the predicate to evaluate if the value should be removed
+	 * @param predicate the predicate to evaluate if the value should be removed
 	 *
 	 * @return true if any values were removed
 	 */
@@ -136,8 +128,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	/**
 	 * Returns true if the list of values contains the given element, false if not
 	 *
-	 * @param value
-	 * 		the value to check if it is contained in the list of values
+	 * @param value the value to check if it is contained in the list of values
 	 *
 	 * @return true if the list of values contains the given element, false if not
 	 */
@@ -146,8 +137,7 @@ public interface ListParameter<E> extends Parameter<List<E>> {
 	/**
 	 * Returns true if the list of values contains all of the given elements, false if not
 	 *
-	 * @param values
-	 * 		the values to check if they are contained in the list of values
+	 * @param values the values to check if they are contained in the list of values
 	 *
 	 * @return true if the list of values contains all of the given elements, false if not
 	 */

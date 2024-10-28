@@ -15,13 +15,6 @@
  */
 package li.strolch.persistence.xml;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-
 import li.strolch.model.Order;
 import li.strolch.model.Tags;
 import li.strolch.persistence.api.OrderDao;
@@ -29,6 +22,13 @@ import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.xmlpers.objref.SubTypeRef;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 
@@ -105,7 +105,8 @@ public class XmlOrderDao extends AbstractDao<Order> implements OrderDao {
 		List<Order> objects = new ArrayList<>();
 		Set<String> types = queryTypes();
 		for (String type : types) {
-			List<Order> objectsByType = this.tx.getObjectDao()
+			List<Order> objectsByType = this.tx
+					.getObjectDao()
 					.queryAll(getTypeRef(type), getDateRangePredicate(dateRange));
 			objects.addAll(objectsByType);
 		}

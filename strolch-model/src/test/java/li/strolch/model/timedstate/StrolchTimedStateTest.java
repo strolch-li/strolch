@@ -15,20 +15,20 @@
  */
 package li.strolch.model.timedstate;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.*;
+import li.strolch.model.Resource;
+import li.strolch.model.timevalue.ITimeValue;
+import li.strolch.model.timevalue.impl.*;
+import org.junit.Test;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 
-import li.strolch.model.Resource;
-import li.strolch.model.timevalue.ITimeValue;
-import li.strolch.model.timevalue.impl.*;
-import org.junit.Test;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

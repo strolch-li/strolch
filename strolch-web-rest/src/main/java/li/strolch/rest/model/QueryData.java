@@ -1,7 +1,6 @@
 package li.strolch.rest.model;
 
 import jakarta.ws.rs.QueryParam;
-
 import li.strolch.runtime.StrolchConstants;
 
 public class QueryData {

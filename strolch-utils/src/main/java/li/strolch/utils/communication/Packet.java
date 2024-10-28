@@ -1,10 +1,10 @@
 package li.strolch.utils.communication;
 
-import static li.strolch.utils.helper.StringHelper.toHexString;
-
 import com.google.gson.JsonObject;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
+
+import static li.strolch.utils.helper.StringHelper.toHexString;
 
 public class Packet {
 

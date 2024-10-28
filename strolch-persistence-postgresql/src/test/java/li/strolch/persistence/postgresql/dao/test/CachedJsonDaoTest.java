@@ -15,13 +15,6 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.postgresql.DataType;
 import li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler;
@@ -31,6 +24,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.dropSchema;
+import static org.junit.Assert.assertEquals;
 
 public class CachedJsonDaoTest extends AbstractModelTest {
 
@@ -64,7 +64,8 @@ public class CachedJsonDaoTest extends AbstractModelTest {
 		new File(rootPath, DB_STORE_PATH_DIR).mkdir();
 		runtimeMock.startContainer();
 
-		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock
+				.getContainer()
 				.getComponent(PersistenceHandler.class);
 		assertEquals(DataType.json, persistenceHandler.getDataType());
 	}

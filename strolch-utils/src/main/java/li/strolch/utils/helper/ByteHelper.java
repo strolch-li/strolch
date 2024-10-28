@@ -183,8 +183,7 @@ public class ByteHelper {
 	 * Creates a long of the given byte array. They byte array must be 8 bytes long. The byte at index 0 is the highest
 	 * byte
 	 *
-	 * @param bytes
-	 * 		the bytes to convert to a long
+	 * @param bytes the bytes to convert to a long
 	 *
 	 * @return the long created from the bytes
 	 */
@@ -207,8 +206,7 @@ public class ByteHelper {
 	 * Creates an integer of the given byte array. They byte array must be 4 bytes long. The byte at index 0 is the
 	 * highest byte
 	 *
-	 * @param bytes
-	 * 		the bytes to convert to an integer
+	 * @param bytes the bytes to convert to an integer
 	 *
 	 * @return the integer created from the bytes
 	 */
@@ -227,8 +225,7 @@ public class ByteHelper {
 	 * Creates a short of the given byte array. They byte array must be 2 bytes long. The byte at index 0 is the highest
 	 * byte
 	 *
-	 * @param bytes
-	 * 		the bytes to convert to an integer
+	 * @param bytes the bytes to convert to an integer
 	 *
 	 * @return the integer created from the bytes
 	 */
@@ -237,8 +234,9 @@ public class ByteHelper {
 		if (bytes.length != 2)
 			throw new IllegalArgumentException("The input byte array for a short must have 2 values");
 
-		return (short) (((bytes[0] & 0xff) << 8) //
-				| ((bytes[1] & 0xff)));
+		return (short) (
+				((bytes[0] & 0xff) << 8) //
+						| ((bytes[1] & 0xff)));
 	}
 
 	public static short toShort(byte high, byte low) {
@@ -248,13 +246,13 @@ public class ByteHelper {
 	public static byte[] toByteArrayLittleEndian(short value) {
 		byte low = (byte) (value & 0xff);
 		byte high = (byte) ((value >> 8) & 0xff);
-		return new byte[] { low, high };
+		return new byte[]{low, high};
 	}
 
 	public static byte[] toByteArrayBigEndian(short value) {
 		byte low = (byte) (value & 0xff);
 		byte high = (byte) ((value >> 8) & 0xff);
-		return new byte[] { high, low };
+		return new byte[]{high, low};
 	}
 
 	public static byte reverse(byte x) {
@@ -308,8 +306,7 @@ public class ByteHelper {
 	/**
 	 * Formats the given byte array to a binary string, separating each byte by a space
 	 *
-	 * @param bytes
-	 * 		the byte to format to a binary string
+	 * @param bytes the byte to format to a binary string
 	 *
 	 * @return the binary string
 	 */
@@ -327,8 +324,7 @@ public class ByteHelper {
 	/**
 	 * Formats the given byte to a binary string
 	 *
-	 * @param b
-	 * 		the byte to format to a binary string
+	 * @param b the byte to format to a binary string
 	 *
 	 * @return the binary string
 	 */
@@ -352,8 +348,7 @@ public class ByteHelper {
 	/**
 	 * Formats the given integer to a binary string, each byte is separated by a space
 	 *
-	 * @param i
-	 * 		the integer to format to a string
+	 * @param i the integer to format to a string
 	 *
 	 * @return the binary string
 	 */
@@ -388,8 +383,7 @@ public class ByteHelper {
 	/**
 	 * Formats the given integer to a binary string, each byte is separated by a space
 	 *
-	 * @param i
-	 * 		the integer to format to a string
+	 * @param i the integer to format to a string
 	 *
 	 * @return the binary string
 	 */
@@ -446,8 +440,7 @@ public class ByteHelper {
 	/**
 	 * Formats the given long to a binary string, each byte is separated by a space
 	 *
-	 * @param i
-	 * 		the long to format
+	 * @param i the long to format
 	 *
 	 * @return the binary string
 	 */

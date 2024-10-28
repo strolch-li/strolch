@@ -1,17 +1,16 @@
 package li.strolch.model;
 
-import static org.junit.Assert.assertEquals;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.activity.TimeOrdering;
+import li.strolch.model.xml.StrolchXmlHelper;
+import org.junit.Test;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Test;
-
-import li.strolch.model.activity.Activity;
-import li.strolch.model.activity.TimeOrdering;
-import li.strolch.model.xml.StrolchXmlHelper;
+import static org.junit.Assert.assertEquals;
 
 public class StrolchXmlHelperTest {
 

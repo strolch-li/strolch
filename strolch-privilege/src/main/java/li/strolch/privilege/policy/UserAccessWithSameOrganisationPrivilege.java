@@ -15,20 +15,8 @@
  */
 package li.strolch.privilege.policy;
 
-import static java.text.MessageFormat.*;
-import static java.util.stream.Collectors.toSet;
-import static li.strolch.privilege.base.PrivilegeConstants.ROLE_STROLCH_ADMIN;
-import static li.strolch.privilege.handler.PrivilegeHandler.*;
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-
-import java.text.MessageFormat;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.i18n.PrivilegeMessages;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
@@ -36,6 +24,16 @@ import li.strolch.privilege.model.Restrictable;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.collections.Tuple;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.text.MessageFormat.format;
+import static java.util.stream.Collectors.toSet;
+import static li.strolch.privilege.base.PrivilegeConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.privilege.handler.PrivilegeHandler.*;
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * Validates that any access to a privilege User is done only by users in the same organisation

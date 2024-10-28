@@ -1,12 +1,12 @@
 package li.strolch.model.xml;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.activity.Activity;
 import li.strolch.utils.collections.MapOfMaps;
+
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public class StrolchElementToMapListener implements StrolchElementListener {
 

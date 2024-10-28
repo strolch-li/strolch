@@ -38,10 +38,8 @@ public interface PrivilegeHandler {
 	/**
 	 * Authenticate a user
 	 *
-	 * @param username
-	 * 		the username
-	 * @param password
-	 * 		the password
+	 * @param username the username
+	 * @param password the password
 	 *
 	 * @return the certificate
 	 *
@@ -52,16 +50,11 @@ public interface PrivilegeHandler {
 	/**
 	 * Authenticate a user
 	 *
-	 * @param username
-	 * 		the username
-	 * @param password
-	 * 		the password
-	 * @param source
-	 * 		the source of the request
-	 * @param usage
-	 * 		the usage for this authentication
-	 * @param keepAlive
-	 * 		should this session be kept alive
+	 * @param username  the username
+	 * @param password  the password
+	 * @param source    the source of the request
+	 * @param usage     the usage for this authentication
+	 * @param keepAlive should this session be kept alive
 	 *
 	 * @return the certificate
 	 *
@@ -72,38 +65,31 @@ public interface PrivilegeHandler {
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
 	 *
-	 * @param data
-	 * 		the data to perform the SSO
+	 * @param data the data to perform the SSO
 	 *
 	 * @return the {@link Certificate} for the user
 	 *
-	 * @throws PrivilegeException
-	 * 		if something goes wrong with the SSO
+	 * @throws PrivilegeException if something goes wrong with the SSO
 	 */
 	Certificate authenticateSingleSignOn(Object data) throws PrivilegeException;
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the
 	 *
-	 * @param data
-	 * 		the data to perform the SSO
-	 * @param source
-	 * 		the source of the request
+	 * @param data   the data to perform the SSO
+	 * @param source the source of the request
 	 *
 	 * @return the {@link Certificate} for the user
 	 *
-	 * @throws PrivilegeException
-	 * 		if something goes wrong with the SSO
+	 * @throws PrivilegeException if something goes wrong with the SSO
 	 */
 	Certificate authenticateSingleSignOn(Object data, String source) throws PrivilegeException;
 
 	/**
 	 * Performs a refresh of the given certificate's session by returning a new certificate
 	 *
-	 * @param certificate
-	 * 		the certificate to refresh
-	 * @param source
-	 * 		the source of the request
+	 * @param certificate the certificate to refresh
+	 * @param source      the source of the request
 	 *
 	 * @return certificate a new certificate
 	 */
@@ -119,13 +105,11 @@ public interface PrivilegeHandler {
 	/**
 	 * Returns the {@link PrivilegeContext} for the given certificate
 	 *
-	 * @param certificate
-	 * 		the certificate
+	 * @param certificate the certificate
 	 *
 	 * @return the {@link PrivilegeContext} for the given certificate
 	 *
-	 * @throws PrivilegeException
-	 * 		if the certificate is not valid anymore
+	 * @throws PrivilegeException if the certificate is not valid anymore
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#validate(li.strolch.privilege.model.Certificate)
 	 */
 	PrivilegeContext validate(Certificate certificate) throws PrivilegeException;
@@ -133,15 +117,12 @@ public interface PrivilegeHandler {
 	/**
 	 * Returns the {@link PrivilegeContext} for the given certificate
 	 *
-	 * @param certificate
-	 * 		the certificate
-	 * @param source
-	 * 		the source of the request
+	 * @param certificate the certificate
+	 * @param source      the source of the request
 	 *
 	 * @return the {@link PrivilegeContext} for the given certificate
 	 *
-	 * @throws PrivilegeException
-	 * 		if the certificate is not valid anymore
+	 * @throws PrivilegeException if the certificate is not valid anymore
 	 * @see li.strolch.privilege.handler.PrivilegeHandler#validate(li.strolch.privilege.model.Certificate)
 	 */
 	PrivilegeContext validate(Certificate certificate, String source) throws PrivilegeException;
@@ -149,8 +130,7 @@ public interface PrivilegeHandler {
 	/**
 	 * Validates that the given {@link PrivilegeContext} is still valid
 	 *
-	 * @param ctx
-	 * 		the {@link PrivilegeContext} to validate
+	 * @param ctx the {@link PrivilegeContext} to validate
 	 *
 	 * @throws PrivilegeException
 	 */
@@ -159,8 +139,7 @@ public interface PrivilegeHandler {
 	/**
 	 * Invalidates the given certificate
 	 *
-	 * @param certificate
-	 * 		the certificate
+	 * @param certificate the certificate
 	 *
 	 * @return true if the certificate was invalidated, or false if it was already invalidated
 	 *
@@ -171,8 +150,7 @@ public interface PrivilegeHandler {
 	/**
 	 * Notifies that the session has timed out, i.e. the certificate must be invalidated
 	 *
-	 * @param certificate
-	 * 		the certificate that has timed out
+	 * @param certificate the certificate that has timed out
 	 *
 	 * @return true if the certificate was invalidated, or false it was already invalidated
 	 *
@@ -183,135 +161,103 @@ public interface PrivilegeHandler {
 	/**
 	 * Run the given {@link SystemAction} as the given system user
 	 *
-	 * @param username
-	 * 		the system username
-	 * @param action
-	 * 		the action to perform
+	 * @param username the system username
+	 * @param action   the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	void runAs(String username, SystemAction action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link SystemActionWithResult} as the given system user
 	 *
-	 * @param username
-	 * 		the system username
-	 * @param action
-	 * 		the action to perform
+	 * @param username the system username
+	 * @param action   the action to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	<T> T runWithResult(String username, SystemActionWithResult<T> action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the given system user
 	 *
-	 * @param username
-	 * 		the system username
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param username the system username
+	 * @param runnable the runnable to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	void runAs(String username, PrivilegedRunnable runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the given system user
 	 *
-	 * @param username
-	 * 		the system username
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param username the system username
+	 * @param runnable the runnable to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	<T> T runWithResult(String username, PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link SystemAction} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param action
-	 * 		the action to perform
+	 * @param action the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	void runAsAgent(SystemAction action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link SystemActionWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param action
-	 * 		the action to perform
+	 * @param action the action to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	<T> T runAsAgentWithResult(SystemActionWithResult<T> action) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnable} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param runnable the runnable to perform
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	void runAsAgent(PrivilegedRunnable runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnableWithResult} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param runnable the runnable to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	<T> T runAsAgentWithResult(PrivilegedRunnableWithResult<T> runnable) throws PrivilegeException, Exception;
 
 	/**
 	 * Run the given {@link PrivilegedRunnableWithResult} as the given system user
 	 *
-	 * @param username
-	 * 		the system username
-	 * @param runnable
-	 * 		the runnable to perform
+	 * @param username the system username
+	 * @param runnable the runnable to perform
 	 *
 	 * @return the result
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
-	 * @throws Exception
-	 * 		if anything else goes wrong during execution
+	 * @throws PrivilegeException if there is something wrong
+	 * @throws Exception          if anything else goes wrong during execution
 	 */
 	<T> T runAsWithResult(String username, PrivilegedRunnableWithResult<T> runnable)
 			throws PrivilegeException, Exception;
@@ -319,8 +265,7 @@ public interface PrivilegeHandler {
 	/**
 	 * Opens a {@link PrivilegeContext} as the system user {@link StrolchConstants#SYSTEM_USER_AGENT}
 	 *
-	 * @throws PrivilegeException
-	 * 		if there is something wrong
+	 * @throws PrivilegeException if there is something wrong
 	 */
 	PrivilegeContext openAgentSystemUserContext() throws PrivilegeException;
 

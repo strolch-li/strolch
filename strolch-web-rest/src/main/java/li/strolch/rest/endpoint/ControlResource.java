@@ -1,18 +1,11 @@
 package li.strolch.rest.endpoint;
 
-import static li.strolch.execution.ExecutionHandler.PARAM_STATE;
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
-import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
-
+import com.google.gson.JsonArray;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Comparator;
-import java.util.Objects;
-
-import com.google.gson.JsonArray;
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.ExecutionHandlerState;
 import li.strolch.execution.service.*;
@@ -29,6 +22,13 @@ import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
+
+import java.util.Comparator;
+import java.util.Objects;
+
+import static li.strolch.execution.ExecutionHandler.PARAM_STATE;
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
+import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
 
 @Path("strolch/control")
 public class ControlResource {
@@ -139,15 +139,15 @@ public class ControlResource {
 		Service<LocatorArgument, ServiceResult> svc;
 
 		switch (state) {
-		case CREATED -> svc = new SetActionToCreatedService();
-		case PLANNED -> svc = new SetActionToPlannedService();
-		case EXECUTION -> svc = new ExecuteActionService();
-		case WARNING -> svc = new SetActionToWarningService();
-		case ERROR -> svc = new SetActionToErrorService();
-		case STOPPED -> svc = new SetActionToStoppedService();
-		case EXECUTED -> svc = new SetActionToExecutedService();
-		case CLOSED -> svc = new SetActionToClosedService();
-		default -> throw new UnsupportedOperationException("Unhandled state " + state);
+			case CREATED -> svc = new SetActionToCreatedService();
+			case PLANNED -> svc = new SetActionToPlannedService();
+			case EXECUTION -> svc = new ExecuteActionService();
+			case WARNING -> svc = new SetActionToWarningService();
+			case ERROR -> svc = new SetActionToErrorService();
+			case STOPPED -> svc = new SetActionToStoppedService();
+			case EXECUTED -> svc = new SetActionToExecutedService();
+			case CLOSED -> svc = new SetActionToClosedService();
+			default -> throw new UnsupportedOperationException("Unhandled state " + state);
 		}
 
 		svcResult = serviceHandler.doService(cert, svc, arg);

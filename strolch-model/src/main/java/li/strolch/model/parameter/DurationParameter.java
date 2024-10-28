@@ -41,12 +41,9 @@ public class DurationParameter extends AbstractParameter<PeriodDuration> {
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public DurationParameter(String id, String name, PeriodDuration value) {
 		super(id, name);
@@ -56,12 +53,9 @@ public class DurationParameter extends AbstractParameter<PeriodDuration> {
 	/**
 	 * Default Constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param millis
-	 * 		the value as milliseconds
+	 * @param id     the id
+	 * @param name   the name
+	 * @param millis the value as milliseconds
 	 */
 	public DurationParameter(String id, String name, long millis) {
 		super(id, name);

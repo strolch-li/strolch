@@ -15,9 +15,9 @@
  */
 package li.strolch.model.audit;
 
-import java.util.Date;
-
 import li.strolch.model.StrolchRootElement;
+
+import java.util.Date;
 
 /**
  * Used to log/audit access to {@link StrolchRootElement}

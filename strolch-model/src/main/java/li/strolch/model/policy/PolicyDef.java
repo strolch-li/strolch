@@ -45,10 +45,8 @@ public abstract class PolicyDef {
 	/**
 	 * Create a new policy definition
 	 *
-	 * @param type
-	 * 		the type of policy
-	 * @param value
-	 * 		the value referencing a policy implementation
+	 * @param type  the type of policy
+	 * @param value the value referencing a policy implementation
 	 */
 	public PolicyDef(String type, String value) {
 		super();
@@ -78,8 +76,7 @@ public abstract class PolicyDef {
 	 * Resolves an instance to the policy. The {@link PolicyDefVisitor} handles the resolving of an actual policy
 	 * implementation instantiating the found class and returning a new instance
 	 *
-	 * @param visitor
-	 * 		the policy definition visitor
+	 * @param visitor the policy definition visitor
 	 *
 	 * @return a concrete policy implementation
 	 */
@@ -108,10 +105,9 @@ public abstract class PolicyDef {
 	/**
 	 * Returns a {@link PolicyDef} instance which handles the given type of XML Value
 	 *
-	 * @param type
-	 * 		the type, using the {@link Class#getSimpleName()} to delegate to {@link #valueOf(String, String)}
-	 * @param xmlValue
-	 * 		the XML formatted value with the prefix denoting the {@link PolicyDef} type
+	 * @param type     the type, using the {@link Class#getSimpleName()} to delegate to
+	 *                 {@link #valueOf(String, String)}
+	 * @param xmlValue the XML formatted value with the prefix denoting the {@link PolicyDef} type
 	 *
 	 * @return a {@link PolicyDef} instance which handles the given type of XML Value
 	 */
@@ -122,10 +118,8 @@ public abstract class PolicyDef {
 	/**
 	 * Returns a {@link PolicyDef} instance which handles the given type of XML Value
 	 *
-	 * @param type
-	 * 		the type
-	 * @param xmlValue
-	 * 		the XML formatted value with the prefix denoting the {@link PolicyDef} type
+	 * @param type     the type
+	 * @param xmlValue the XML formatted value with the prefix denoting the {@link PolicyDef} type
 	 *
 	 * @return a {@link PolicyDef} instance which handles the given type of XML Value
 	 */

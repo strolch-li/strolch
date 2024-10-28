@@ -15,12 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
-import static li.strolch.runtime.StrolchConstants.makeRealmKey;
-
-import java.io.File;
-import java.text.MessageFormat;
-
 import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.impl.StoreToDaoElementListener;
@@ -35,6 +29,11 @@ import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+
+import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
+import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -15,15 +15,15 @@
  */
 package li.strolch.migrations;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-
-import java.io.File;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.Resource;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.Version;
+
+import java.io.File;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
 public class CodeMigration extends Migration {
 

@@ -23,9 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static java.text.MessageFormat.format;
 import static java.util.Collections.synchronizedMap;
-import static li.strolch.execution.EventBasedExecutionHandler.PROP_LOCK_RETRIES;
 
 public class Controller {
 

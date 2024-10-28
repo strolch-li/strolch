@@ -17,8 +17,8 @@ package li.strolch.model.policy;
 
 /**
  * This {@link PolicyDef} adds a further indirection in the resolving of a policy. In this {@link PolicyDef} the value
- * is a key used to look up the concrete implementation. Where the look-up is performed depends on the {@link
- * PolicyDefVisitor}
+ * is a key used to look up the concrete implementation. Where the look-up is performed depends on the
+ * {@link PolicyDefVisitor}
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

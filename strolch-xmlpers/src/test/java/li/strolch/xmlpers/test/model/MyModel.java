@@ -72,8 +72,7 @@ public class MyModel {
 	}
 
 	/**
-	 * @param id
-	 * 		the id to set
+	 * @param id the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -87,8 +86,7 @@ public class MyModel {
 	}
 
 	/**
-	 * @param name
-	 * 		the name to set
+	 * @param name the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -102,8 +100,7 @@ public class MyModel {
 	}
 
 	/**
-	 * @param type
-	 * 		the type to set
+	 * @param type the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;

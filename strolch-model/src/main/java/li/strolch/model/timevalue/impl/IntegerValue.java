@@ -15,12 +15,12 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * {@link IValue} implementation to work with Integer valued {@link ITimeValue} objects

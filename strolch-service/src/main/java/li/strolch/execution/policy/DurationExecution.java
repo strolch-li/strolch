@@ -1,12 +1,12 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
-
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 
 import java.util.concurrent.TimeUnit;
+
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_DURATION;
 
 /**
  * <p>

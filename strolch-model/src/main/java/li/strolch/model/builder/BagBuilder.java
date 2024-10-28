@@ -1,11 +1,11 @@
 package li.strolch.model.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.model.ParameterBag;
 import li.strolch.model.ParameterBagContainer;
 import li.strolch.model.builder.params.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static li.strolch.model.builder.BuilderHelper.buildParamName;
 

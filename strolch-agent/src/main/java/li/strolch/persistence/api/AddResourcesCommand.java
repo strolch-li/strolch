@@ -38,16 +38,14 @@ public class AddResourcesCommand extends Command {
 	}
 
 	/**
-	 * @param resources
-	 * 		the resources to set for adding
+	 * @param resources the resources to set for adding
 	 */
 	public void setResources(List<Resource> resources) {
 		this.resources = resources;
 	}
 
 	/**
-	 * @param resource
-	 * 		the resource to add for adding
+	 * @param resource the resource to add for adding
 	 */
 	public void addResource(Resource resource) {
 		this.resources.add(resource);

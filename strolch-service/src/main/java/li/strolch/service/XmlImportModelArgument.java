@@ -15,10 +15,10 @@
  */
 package li.strolch.service;
 
+import li.strolch.service.api.ServiceArgument;
+
 import java.util.HashSet;
 import java.util.Set;
-
-import li.strolch.service.api.ServiceArgument;
 
 public class XmlImportModelArgument extends ServiceArgument {
 	public String modelFileName;

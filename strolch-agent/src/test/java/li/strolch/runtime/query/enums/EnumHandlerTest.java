@@ -15,15 +15,15 @@
  */
 package li.strolch.runtime.query.enums;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Locale;
-
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.privilege.model.Certificate;
 import org.junit.Test;
+
+import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

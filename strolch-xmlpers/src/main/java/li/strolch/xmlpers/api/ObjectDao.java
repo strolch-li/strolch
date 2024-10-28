@@ -15,7 +15,10 @@
  */
 package li.strolch.xmlpers.api;
 
-import static li.strolch.xmlpers.util.AssertionUtil.*;
+import li.strolch.utils.objectfilter.ObjectFilter;
+import li.strolch.xmlpers.objref.ObjectRef;
+import li.strolch.xmlpers.objref.SubTypeRef;
+import li.strolch.xmlpers.objref.TypeRef;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,10 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import li.strolch.utils.objectfilter.ObjectFilter;
-import li.strolch.xmlpers.objref.ObjectRef;
-import li.strolch.xmlpers.objref.SubTypeRef;
-import li.strolch.xmlpers.objref.TypeRef;
+import static li.strolch.xmlpers.util.AssertionUtil.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -273,7 +273,8 @@ public class ObjectDao {
 	}
 
 	public <T> PersistenceContext<T> createCtx(T object, long lastModified) {
-		PersistenceContext<T> ctx = this.ctxFactoryDelegator.<T>getCtxFactory(object.getClass())
+		PersistenceContext<T> ctx = this.ctxFactoryDelegator
+				.<T>getCtxFactory(object.getClass())
 				.createCtx(this.tx.getManager().getObjectRefCache(), object);
 		ctx.setLastModified(lastModified);
 		return ctx;
@@ -289,7 +290,6 @@ public class ObjectDao {
 
 	private void assertNotClosed() {
 		if (!this.tx.isOpen())
-			throw new IllegalStateException(
-					"Transaction has been closed and thus no operation can be performed!");
+			throw new IllegalStateException("Transaction has been closed and thus no operation can be performed!");
 	}
 }

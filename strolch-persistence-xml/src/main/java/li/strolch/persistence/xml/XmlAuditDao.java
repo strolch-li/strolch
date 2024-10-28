@@ -15,12 +15,6 @@
  */
 package li.strolch.persistence.xml;
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
-
 import li.strolch.model.Tags;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.AuditDao;
@@ -31,6 +25,12 @@ import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
+
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -15,12 +15,6 @@
  */
 package li.strolch.model.visitor;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -31,6 +25,12 @@ import li.strolch.model.policy.PolicyDefs;
 import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Visitor of {@link StrolchRootElement} to check if they are equal. This implementations stores a list of
@@ -68,10 +68,8 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	/**
 	 * Checks the given orders for deep equality
 	 *
-	 * @param srcOrder
-	 * 		source order
-	 * @param dstOrder
-	 * 		destination order
+	 * @param srcOrder source order
+	 * @param dstOrder destination order
 	 */
 	public void deepEquals(Order srcOrder, Order dstOrder) {
 		deepEquals(srcOrder, (StrolchRootElement) dstOrder);
@@ -85,10 +83,8 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	/**
 	 * Checks the given resources for deep equality
 	 *
-	 * @param srcRes
-	 * 		source resource
-	 * @param dstRes
-	 * 		destination resource
+	 * @param srcRes source resource
+	 * @param dstRes destination resource
 	 */
 	public void deepEquals(Resource srcRes, Resource dstRes) {
 		deepEquals(srcRes, (StrolchRootElement) dstRes);
@@ -118,10 +114,8 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 	/**
 	 * Checks the given activities for deep equality
 	 *
-	 * @param srcActivity
-	 * 		source activity
-	 * @param dstActivity
-	 * 		destination activity
+	 * @param srcActivity source activity
+	 * @param dstActivity destination activity
 	 */
 	public void deepEquals(Activity srcActivity, Activity dstActivity) {
 		deepEquals(srcActivity, (StrolchRootElement) dstActivity);
@@ -236,8 +230,8 @@ public class StrolchElementDeepEqualsVisitor implements StrolchElementVisitor<Li
 		if (!srcAction.getState().equals(dstAction.getState()))
 			addLocator(dstAction.getLocator().append(Tags.STATE));
 
-		if ((srcAction.getParent() == null && srcAction.getParent() != null) || (srcAction.getParent() != null
-				&& srcAction.getParent() == null))
+		if ((srcAction.getParent() == null && srcAction.getParent() != null) || (
+				srcAction.getParent() != null && srcAction.getParent() == null))
 			addLocator(dstAction.getLocator());
 		else if (!srcAction.getParent().getId().equals(dstAction.getParent().getId()))
 			addLocator(dstAction.getLocator());

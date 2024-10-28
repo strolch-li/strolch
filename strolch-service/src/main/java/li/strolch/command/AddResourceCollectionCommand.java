@@ -15,15 +15,15 @@
  */
 package li.strolch.command;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,8 +41,7 @@ public class AddResourceCollectionCommand extends Command {
 	}
 
 	/**
-	 * @param resources
-	 * 		the resources to set
+	 * @param resources the resources to set
 	 */
 	public void setResources(List<Resource> resources) {
 		this.resources = resources;

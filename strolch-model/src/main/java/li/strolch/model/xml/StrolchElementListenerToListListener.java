@@ -1,13 +1,13 @@
 package li.strolch.model.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class StrolchElementListenerToListListener implements StrolchElementListener {
 

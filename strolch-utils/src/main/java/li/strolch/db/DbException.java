@@ -21,18 +21,15 @@ package li.strolch.db;
 public class DbException extends Exception {
 
 	/**
-	 * @param message
-	 * 		the message
+	 * @param message the message
 	 */
 	public DbException(String message) {
 		super(message);
 	}
 
 	/**
-	 * @param message
-	 * 		the message
-	 * @param cause
-	 * 		the cause
+	 * @param message the message
+	 * @param cause   the cause
 	 */
 	public DbException(String message, Throwable cause) {
 		super(message, cause);

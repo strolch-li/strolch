@@ -31,8 +31,7 @@ public class Crc {
 	/**
 	 * Implements a CRC-CCITT (XModem), using the initial value 0x0000 and the polynomial 0x1021
 	 *
-	 * @param bytes
-	 * 		the bytes to CRC
+	 * @param bytes the bytes to CRC
 	 *
 	 * @return the 2 byte CRC
 	 *
@@ -45,12 +44,9 @@ public class Crc {
 	/**
 	 * Implements a CRC-CCITT (XModem), using the initial value 0x0000 and the polynomial 0x1021
 	 *
-	 * @param bytes
-	 * 		the bytes to CRC
-	 * @param src
-	 * 		start if array to do CRC
-	 * @param length
-	 * 		end in array to do CRC
+	 * @param bytes  the bytes to CRC
+	 * @param src    start if array to do CRC
+	 * @param length end in array to do CRC
 	 *
 	 * @return the 2 byte CRC
 	 *
@@ -63,8 +59,7 @@ public class Crc {
 	/**
 	 * Implements a CRC-CCITT (XModem), using the initial value 0x0000 and the polynomial 0x1021
 	 *
-	 * @param bytes
-	 * 		the bytes to CRC
+	 * @param bytes the bytes to CRC
 	 *
 	 * @return the CRC as short
 	 *
@@ -77,12 +72,9 @@ public class Crc {
 	/**
 	 * Implements a CRC-CCITT (XModem), using the initial value 0x0000 and the polynomial 0x1021
 	 *
-	 * @param bytes
-	 * 		the bytes to CRC
-	 * @param src
-	 * 		start if array to do CRC
-	 * @param length
-	 * 		end in array to do CRC
+	 * @param bytes  the bytes to CRC
+	 * @param src    start if array to do CRC
+	 * @param length end in array to do CRC
 	 *
 	 * @return the CRC as short
 	 *

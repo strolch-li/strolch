@@ -1,12 +1,12 @@
 package li.strolch.utils.helper;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class DateHelperTest {
 

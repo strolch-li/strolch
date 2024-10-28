@@ -15,14 +15,14 @@
  */
 package li.strolch.model.timedstate;
 
-import static org.junit.Assert.*;
-
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.FloatValue;
 import li.strolch.model.timevalue.impl.ValueChange;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class TimeStateTest {
 

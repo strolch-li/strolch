@@ -76,8 +76,8 @@ public enum TransactionCloseStrategy {
 	},
 
 	/**
-	 * The main close strategy type where changes are written to the model. Use {@link
-	 * StrolchTransaction#commitOnClose()} to commit any changes i.e. commands added to the transaction
+	 * The main close strategy type where changes are written to the model. Use
+	 * {@link StrolchTransaction#commitOnClose()} to commit any changes i.e. commands added to the transaction
 	 */
 	COMMIT() {
 		@Override
@@ -97,8 +97,8 @@ public enum TransactionCloseStrategy {
 	},
 
 	/**
-	 * In exceptional cases one might not want any changes to be written to the model, thus calling {@link
-	 * StrolchTransaction#rollbackOnClose()} will have the transaction roll back all changes
+	 * In exceptional cases one might not want any changes to be written to the model, thus calling
+	 * {@link StrolchTransaction#rollbackOnClose()} will have the transaction roll back all changes
 	 */
 	ROLLBACK() {
 		@Override

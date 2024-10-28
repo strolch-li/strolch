@@ -28,8 +28,7 @@ public class DefaultedHashMap<K, V> extends HashMap<K, V> {
 	/**
 	 * Constructs this {@link Map} instance to have a default value on inexistent keys
 	 *
-	 * @param defaultValue
-	 * 		the default to return if a key is not mapped
+	 * @param defaultValue the default to return if a key is not mapped
 	 */
 	public DefaultedHashMap(V defaultValue) {
 		this.defaultValue = defaultValue;

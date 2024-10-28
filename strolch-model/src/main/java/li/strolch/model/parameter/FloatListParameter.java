@@ -39,12 +39,9 @@ public class FloatListParameter extends AbstractListParameter<Double> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param values
-	 * 		the values
+	 * @param id     the id
+	 * @param name   the name
+	 * @param values the values
 	 */
 	public FloatListParameter(String id, String name, List<Double> values) {
 		super(id, name);

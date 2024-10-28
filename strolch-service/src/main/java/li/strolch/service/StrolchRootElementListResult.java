@@ -1,10 +1,10 @@
 package li.strolch.service;
 
-import java.util.List;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+
+import java.util.List;
 
 public class StrolchRootElementListResult extends ServiceResult {
 

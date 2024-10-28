@@ -40,8 +40,8 @@ public class AddActivityServiceTest extends AbstractRealmServiceTest<StrolchRoot
 	@Override
 	protected StrolchRootElementArgument getArgInstance() {
 		StrolchRootElementArgument arg = new StrolchRootElementArgument();
-		arg.rootElement = ModelGenerator
-				.createActivity("firstActivity", "First Activity", "AdditionalActivitys", TimeOrdering.SERIES);
+		arg.rootElement = ModelGenerator.createActivity("firstActivity", "First Activity", "AdditionalActivitys",
+				TimeOrdering.SERIES);
 		return arg;
 	}
 }

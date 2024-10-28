@@ -40,10 +40,8 @@ public interface AuditTrail {
 	/**
 	 * Retrieves the audit with the given id, or null if it does not exist
 	 *
-	 * @param tx
-	 * 		the open transaction
-	 * @param id
-	 * 		the id of the element to retrieve
+	 * @param tx the open transaction
+	 * @param id the id of the element to retrieve
 	 *
 	 * @return the element with the type and id, or null if it does not exist
 	 */

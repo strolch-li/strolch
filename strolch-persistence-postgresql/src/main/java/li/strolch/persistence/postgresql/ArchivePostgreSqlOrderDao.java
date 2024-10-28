@@ -1,13 +1,13 @@
 package li.strolch.persistence.postgresql;
 
+import li.strolch.model.Order;
+import li.strolch.persistence.api.StrolchPersistenceException;
+import li.strolch.persistence.api.TransactionResult;
+
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import li.strolch.model.Order;
-import li.strolch.persistence.api.StrolchPersistenceException;
-import li.strolch.persistence.api.TransactionResult;
 
 public class ArchivePostgreSqlOrderDao extends PostgreSqlOrderDao {
 
@@ -36,7 +36,8 @@ public class ArchivePostgreSqlOrderDao extends PostgreSqlOrderDao {
 		List<Order> list = new ArrayList<>();
 
 		String ordering = this.descending ? "DESC" : "ASC";
-		String sql = "select id, type, asxml from {0} where type = ANY(?) and latest = true order by date " + ordering
+		String sql = "select id, type, asxml from {0} where type = ANY(?) and latest = true order by date "
+				+ ordering
 				+ " limit {1,number,#} offset {2,number,#}";
 		sql = MessageFormat.format(sql, TABLE_NAME, limit, offset);
 

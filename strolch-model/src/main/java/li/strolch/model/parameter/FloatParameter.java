@@ -15,12 +15,12 @@
  */
 package li.strolch.model.parameter;
 
-import java.util.Objects;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.MathHelper;
+
+import java.util.Objects;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -39,12 +39,9 @@ public class FloatParameter extends AbstractParameter<Double> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public FloatParameter(String id, String name, Double value) {
 		super(id, name);

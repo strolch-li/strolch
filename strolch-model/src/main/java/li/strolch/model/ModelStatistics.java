@@ -15,14 +15,14 @@
  */
 package li.strolch.model;
 
-import static li.strolch.utils.helper.StringHelper.NULL;
+import com.google.gson.JsonObject;
+import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import com.google.gson.JsonObject;
-import li.strolch.utils.helper.StringHelper;
-import li.strolch.utils.iso8601.ISO8601;
+import static li.strolch.utils.helper.StringHelper.NULL;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -69,8 +69,7 @@ public class ModelStatistics {
 	/**
 	 * Adds the statistics of the other statistics to this statistics instance
 	 *
-	 * @param statistics
-	 * 		further statistics to add to this {@link ModelStatistics}
+	 * @param statistics further statistics to add to this {@link ModelStatistics}
 	 */
 	public void add(ModelStatistics statistics) {
 		this.nrOfResources += statistics.nrOfResources;
@@ -86,8 +85,7 @@ public class ModelStatistics {
 		StringBuilder builder = new StringBuilder();
 		builder.append(getClass().getSimpleName());
 		builder.append(",\n- startTime=");
-		builder.append(this.startTime == null ?
-				NULL :
+		builder.append(this.startTime == null ? NULL :
 				this.startTime.toLocalTime().truncatedTo(ChronoUnit.SECONDS).toString());
 		builder.append(",\n- duration=");
 		builder.append(StringHelper.formatNanoDuration(this.durationNanos));
@@ -95,19 +93,28 @@ public class ModelStatistics {
 		if (this.nrOfResourcesUpdated == 0)
 			builder.append(",\n- Resources=").append(this.nrOfResources);
 		else
-			builder.append(",\n- Resources: added=").append(this.nrOfResources).append(" updated=")
+			builder
+					.append(",\n- Resources: added=")
+					.append(this.nrOfResources)
+					.append(" updated=")
 					.append(this.nrOfResourcesUpdated);
 
 		if (this.nrOfOrdersUpdated == 0)
 			builder.append(",\n- Orders=").append(this.nrOfOrders);
 		else
-			builder.append(",\n- Orders: added=").append(this.nrOfOrders).append(" updated=")
+			builder
+					.append(",\n- Orders: added=")
+					.append(this.nrOfOrders)
+					.append(" updated=")
 					.append(this.nrOfOrdersUpdated);
 
 		if (this.nrOfActivitiesUpdated == 0)
 			builder.append(",\n- Activities=").append(this.nrOfActivities);
 		else
-			builder.append(",\n- Activities: added=").append(this.nrOfActivities).append(" updated=")
+			builder
+					.append(",\n- Activities: added=")
+					.append(this.nrOfActivities)
+					.append(" updated=")
 					.append(this.nrOfActivitiesUpdated);
 		return builder.toString();
 	}

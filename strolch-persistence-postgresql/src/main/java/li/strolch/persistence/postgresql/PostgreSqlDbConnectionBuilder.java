@@ -15,6 +15,13 @@
  */
 package li.strolch.persistence.postgresql;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import li.strolch.agent.api.ComponentContainer;
+import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.DbConnectionBuilder;
+import li.strolch.utils.dbc.DBC;
+
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -22,13 +29,6 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.logging.Logger;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.runtime.configuration.ComponentConfiguration;
-import li.strolch.runtime.configuration.DbConnectionBuilder;
-import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -151,7 +151,11 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		@Override
 		public String toString() {
-			return "HikariDataSource for realm " + ds.getPoolName() + " for " + ds.getUsername() + " at "
+			return "HikariDataSource for realm "
+					+ ds.getPoolName()
+					+ " for "
+					+ ds.getUsername()
+					+ " at "
 					+ ds.getJdbcUrl();
 		}
 

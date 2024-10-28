@@ -471,9 +471,9 @@ public class OperationsLog extends StrolchComponent {
 		String stackTrace = logMessage.getStackTrace();
 		String text = """
 				Dear team,
-								
+				
 				the following message was logged:
-								
+				
 				=====================
 				Realm: %s
 				Severity: %s
@@ -481,16 +481,16 @@ public class OperationsLog extends StrolchComponent {
 				Username: %s
 				Timestamp: %s
 				Message ID: %s
-								
+				
 				Message:
 				---------------------
 				%s
-								
+				
 				StackTrace:
 				---------------------
 				%s
 				=====================
-								
+				
 				Kind regards
 					your server
 				""".formatted(logMessage.getRealm(), logMessage.getSeverity(), logMessage.getLocator(),

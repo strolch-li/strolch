@@ -54,14 +54,15 @@ public class SerialisationTest extends BaseTest {
 		assertEquals("10010", query.getParameterMap().get("p"));
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
 	public void testResponse2JSON() {
 		final QueryResponse response = buildTestResponse();
 		final List evalResult = getTestRessources(2);
 		response.getResultSet().add(evalResult);
 
-		String expected = "{\"objectType\":\"QueryResponse\",\"statement\":\"SELECT a FROM Activity a WHERE a.getId() = :p\",\"queryParameter\":{\"r\":\"Just a string!\"},\"resultSet\":[[{\"objectType\":\"Resource\",\"id\":\"0\",\"name\":null,\"type\":null,\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}},{\"objectType\":\"Resource\",\"id\":\"1\",\"name\":null,\"type\":null,\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}}]]}";
+		String expected
+				= "{\"objectType\":\"QueryResponse\",\"statement\":\"SELECT a FROM Activity a WHERE a.getId() = :p\",\"queryParameter\":{\"r\":\"Just a string!\"},\"resultSet\":[[{\"objectType\":\"Resource\",\"id\":\"0\",\"name\":null,\"type\":null,\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}},{\"objectType\":\"Resource\",\"id\":\"1\",\"name\":null,\"type\":null,\"parameterBags\":{\"testBag\":{\"id\":\"testBag\",\"name\":null,\"type\":null,\"parameters\":{\"testId\":{\"id\":\"testId\",\"name\":null,\"type\":\"Float\",\"value\":\"100.0\"}}}}}]]}";
 
 		final JsonObject jsonObject = response.asJson();
 		assertEquals(expected.trim(), jsonObject.toString());

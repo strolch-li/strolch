@@ -1,13 +1,5 @@
 package li.strolch.model.json;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-import static li.strolch.model.StrolchValueType.DATE;
-import static li.strolch.model.StrolchValueType.*;
-import static li.strolch.model.Tags.Json.*;
-
-import java.time.ZonedDateTime;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,6 +9,14 @@ import li.strolch.model.timedstate.StrolchTimedState;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.visitor.SetStateValueVisitor;
 import li.strolch.utils.DataUnit;
+
+import java.time.ZonedDateTime;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.model.StrolchValueType.DATE;
+import static li.strolch.model.StrolchValueType.*;
+import static li.strolch.model.Tags.Json.*;
 
 public class ResourceSystemStateFromJson {
 
@@ -190,8 +190,8 @@ public class ResourceSystemStateFromJson {
 
 		//
 		if (memoryJ.has(COMMITTED_VIRTUAL_MEMORY_SIZE) && !memoryJ.get(COMMITTED_VIRTUAL_MEMORY_SIZE).isJsonNull()) {
-			long value = this.memoryRoundingUnit
-					.roundBytesToUnit(memoryJ.get(COMMITTED_VIRTUAL_MEMORY_SIZE).getAsLong());
+			long value = this.memoryRoundingUnit.roundBytesToUnit(
+					memoryJ.get(COMMITTED_VIRTUAL_MEMORY_SIZE).getAsLong());
 			resource.setOrAddParam(bagId, bagName, bagType, COMMITTED_VIRTUAL_MEMORY_SIZE,
 					"Committed Virtual Memory Size", this.memoryRoundingUnit.getInterpretation(),
 					this.memoryRoundingUnit.getUom(), LONG, value, true);

@@ -15,9 +15,7 @@
  */
 package li.strolch.rest.endpoint;
 
-import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
-import static li.strolch.model.Tags.Json.*;
-
+import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -25,13 +23,15 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import com.google.gson.JsonObject;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.VersionQueryResult;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.model.Tags.Json.AGENT_VERSION;
+import static li.strolch.model.Tags.Json.APP_VERSION;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

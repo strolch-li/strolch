@@ -15,13 +15,13 @@
  */
 package li.strolch.model.parameter;
 
-import java.text.MessageFormat;
-import java.util.Objects;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.Objects;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -40,12 +40,9 @@ public class StringParameter extends AbstractParameter<String> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public StringParameter(String id, String name, String value) {
 		super(id, name);
@@ -55,12 +52,9 @@ public class StringParameter extends AbstractParameter<String> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public StringParameter(String id, String name, Enum<?> value) {
 		super(id, name);

@@ -45,28 +45,23 @@ public interface ObserverHandler {
 	/**
 	 * Update observers with the given event
 	 *
-	 * @param observerEvent
-	 * 		containing the updates
+	 * @param observerEvent containing the updates
 	 */
 	void notify(ObserverEvent observerEvent);
 
 	/**
 	 * Registers the {@link Observer} for notification of objects under the given key
 	 *
-	 * @param key
-	 * 		the key for which to the observer wants to be notified
-	 * @param observer
-	 * 		the observer to register
+	 * @param key      the key for which to the observer wants to be notified
+	 * @param observer the observer to register
 	 */
 	void registerObserver(String key, Observer observer);
 
 	/**
 	 * Unregister the given {@link Observer}
 	 *
-	 * @param key
-	 * 		the key for which to the observer was registered
-	 * @param observer
-	 * 		the observer unregister
+	 * @param key      the key for which to the observer was registered
+	 * @param observer the observer unregister
 	 */
 	void unregisterObserver(String key, Observer observer);
 

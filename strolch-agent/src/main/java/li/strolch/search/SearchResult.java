@@ -43,10 +43,8 @@ public class SearchResult<T> {
 	/**
 	 * Returns a new search result converting the elements with the given mapper
 	 *
-	 * @param mapper
-	 * 		the function to map the elements
-	 * @param <U>
-	 * 		the new element type
+	 * @param mapper the function to map the elements
+	 * @param <U>    the new element type
 	 *
 	 * @return the new search result
 	 */
@@ -57,8 +55,7 @@ public class SearchResult<T> {
 	/**
 	 * Appends a filter to the internal stream
 	 *
-	 * @param predicate
-	 * 		the predicate to filter the elements
+	 * @param predicate the predicate to filter the elements
 	 *
 	 * @return this for chaining
 	 */
@@ -70,8 +67,7 @@ public class SearchResult<T> {
 	/**
 	 * appends a comparator to this stream
 	 *
-	 * @param comparator
-	 * 		the comparator to append to the stream
+	 * @param comparator the comparator to append to the stream
 	 *
 	 * @return this for chaining
 	 */
@@ -110,8 +106,7 @@ public class SearchResult<T> {
 	/**
 	 * Collects this stream to a {@link Map}, using the given key mapper. The value is returned as is
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
+	 * @param keyMapper function to get the key of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -122,10 +117,8 @@ public class SearchResult<T> {
 	/**
 	 * Collects this stream to a {@link Map}
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
-	 * @param valueMapper
-	 * 		function to get the value of the element
+	 * @param keyMapper   function to get the key of the element
+	 * @param valueMapper function to get the value of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -136,8 +129,7 @@ public class SearchResult<T> {
 	/**
 	 * Collects this stream to a {@link MapOfSets}, using the given key mapper. The value is returned as is
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
+	 * @param keyMapper function to get the key of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -150,10 +142,8 @@ public class SearchResult<T> {
 	/**
 	 * Collects this stream to a {@link MapOfSets}, using the given key mapper
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
-	 * @param valueMapper
-	 * 		function to get the value of the element
+	 * @param keyMapper   function to get the key of the element
+	 * @param valueMapper function to get the value of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -166,8 +156,7 @@ public class SearchResult<T> {
 	/**
 	 * Collects this stream to a {@link MapOfLists}, using the given key mapper. The value is returned as is
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
+	 * @param keyMapper function to get the key of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -180,10 +169,8 @@ public class SearchResult<T> {
 	/**
 	 * Collects this stream to a {@link MapOfLists}, using the given key mapper
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
-	 * @param valueMapper
-	 * 		function to get the value of the element
+	 * @param keyMapper   function to get the key of the element
+	 * @param valueMapper function to get the value of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -197,10 +184,8 @@ public class SearchResult<T> {
 	 * Collects this stream to a {@link MapOfMaps}, using the given key mapper and sub key mapper. The value is returned
 	 * as is
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
-	 * @param subKeyMapper
-	 * 		function to get the sub key of the element
+	 * @param keyMapper    function to get the key of the element
+	 * @param subKeyMapper function to get the sub key of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -213,12 +198,9 @@ public class SearchResult<T> {
 	/**
 	 * Collects this stream to a {@link MapOfLists}, using the given key mapper
 	 *
-	 * @param keyMapper
-	 * 		function to get the key of the element
-	 * @param subKeyMapper
-	 * 		function to get the sub key of the element
-	 * @param valueMapper
-	 * 		function to get the value of the element
+	 * @param keyMapper    function to get the key of the element
+	 * @param subKeyMapper function to get the sub key of the element
+	 * @param valueMapper  function to get the value of the element
 	 *
 	 * @return a map of this stream
 	 */
@@ -232,10 +214,8 @@ public class SearchResult<T> {
 	/**
 	 * Returns a {@link Paging} element to use this object in paged results
 	 *
-	 * @param offset
-	 * 		the element offset
-	 * @param limit
-	 * 		the limit per page
+	 * @param offset the element offset
+	 * @param limit  the limit per page
 	 *
 	 * @return the paging
 	 */
@@ -246,12 +226,9 @@ public class SearchResult<T> {
 	/**
 	 * Returns a {@link Paging} element to use this object in paged results
 	 *
-	 * @param offset
-	 * 		the element offset
-	 * @param limit
-	 * 		the limit per page
-	 * @param dataSetSize
-	 * 		The number of items before filtering
+	 * @param offset      the element offset
+	 * @param limit       the limit per page
+	 * @param dataSetSize The number of items before filtering
 	 *
 	 * @return the paging
 	 */
@@ -265,8 +242,7 @@ public class SearchResult<T> {
 	 *
 	 * @return the single element in the stream
 	 *
-	 * @throws IllegalStateException
-	 * 		if there is more than 1 element in the stream
+	 * @throws IllegalStateException if there is more than 1 element in the stream
 	 */
 	public Optional<T> toSingletonO() {
 		return Optional.ofNullable(this.stream.collect(singletonCollector(true)));
@@ -276,13 +252,12 @@ public class SearchResult<T> {
 	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream contains more
 	 * * than 1 element, or the empty {@link Optional}
 	 *
-	 * @param errorMsgSupplier
-	 * 		the supplier for an error message to use if not 1 and only 1 element is in the collection
+	 * @param errorMsgSupplier the supplier for an error message to use if not 1 and only 1 element is in the
+	 *                         collection
 	 *
 	 * @return the single element in the stream
 	 *
-	 * @throws IllegalStateException
-	 * 		if there is more than 1 element in the stream
+	 * @throws IllegalStateException if there is more than 1 element in the stream
 	 */
 	public Optional<T> toSingletonO(Supplier<String> errorMsgSupplier) {
 		return Optional.ofNullable(this.stream.collect(singletonCollector(true, errorMsgSupplier)));
@@ -292,13 +267,12 @@ public class SearchResult<T> {
 	 * Returns the single element in the stream, or throws an {@link IllegalStateException} if the stream does not
 	 * contain 1 and only 1 element
 	 *
-	 * @param errorMsgSupplier
-	 * 		the supplier for an error message to use if not 1 and only 1 element is in the collection
+	 * @param errorMsgSupplier the supplier for an error message to use if not 1 and only 1 element is in the
+	 *                         collection
 	 *
 	 * @return the single element in the stream
 	 *
-	 * @throws IllegalStateException
-	 * 		if not 1 and only 1 element is in the stream
+	 * @throws IllegalStateException if not 1 and only 1 element is in the stream
 	 */
 	public T toSingleton(Supplier<String> errorMsgSupplier) throws IllegalStateException {
 		return this.stream.collect(singletonCollector(errorMsgSupplier));
@@ -307,8 +281,7 @@ public class SearchResult<T> {
 	/**
 	 * Performs a simple for each on every element
 	 *
-	 * @param consumer
-	 * 		the action to perform on each element
+	 * @param consumer the action to perform on each element
 	 */
 	public void forEach(Consumer<T> consumer) {
 		this.stream.forEach(consumer);

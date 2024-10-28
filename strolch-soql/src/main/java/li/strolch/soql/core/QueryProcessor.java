@@ -31,16 +31,14 @@ public class QueryProcessor {
 	/**
 	 * Set the input map of collections to take the input objects from. For testing purposes only.
 	 *
-	 * @param inputCollections
-	 * 		the input data
+	 * @param inputCollections the input data
 	 */
 	void setInputCollections(Map<String, List<? extends StrolchRootElement>> inputCollections) {
 		this.inputCollections = inputCollections;
 	}
 
 	/**
-	 * @param request
-	 * 		the query request
+	 * @param request the query request
 	 *
 	 * @return the query response object covering the result set
 	 */
@@ -88,10 +86,8 @@ public class QueryProcessor {
 	}
 
 	/**
-	 * @param inputCollections
-	 * 		the data
-	 * @param keys
-	 * 		the keys
+	 * @param inputCollections the data
+	 * @param keys             the keys
 	 *
 	 * @return List of Lists of the elements to be taken as input for the compiled statement
 	 */
@@ -147,8 +143,7 @@ public class QueryProcessor {
 	/**
 	 * compile the antlr tree to executable code
 	 *
-	 * @param tree
-	 * 		the tree to compile to a statement
+	 * @param tree the tree to compile to a statement
 	 *
 	 * @return CompiledSOQLStatement
 	 */
@@ -169,8 +164,7 @@ public class QueryProcessor {
 	/**
 	 * Query all strolch root elements declared in the FROM clause of the query
 	 *
-	 * @param entities
-	 * 		the entity types to query
+	 * @param entities the entity types to query
 	 *
 	 * @return the input collection
 	 */
@@ -184,13 +178,13 @@ public class QueryProcessor {
 			String clazzKey = entities.get(key);
 
 			switch (clazzKey) {
-			case Tags.RESOURCE -> result.put(key, new ResourceSearch().search(tx).toList());
-			case Tags.ORDER -> result.put(key, new OrderSearch().search(tx).toList());
-			case Tags.ACTIVITY -> result.put(key, new ActivitySearch().search(tx).toList());
-			default -> {
-				String s = "Unable to resolve " + clazzKey + " " + key + " to strolch root entities.";
-				throw new SOQLParseException(s);
-			}
+				case Tags.RESOURCE -> result.put(key, new ResourceSearch().search(tx).toList());
+				case Tags.ORDER -> result.put(key, new OrderSearch().search(tx).toList());
+				case Tags.ACTIVITY -> result.put(key, new ActivitySearch().search(tx).toList());
+				default -> {
+					String s = "Unable to resolve " + clazzKey + " " + key + " to strolch root entities.";
+					throw new SOQLParseException(s);
+				}
 			}
 		}
 

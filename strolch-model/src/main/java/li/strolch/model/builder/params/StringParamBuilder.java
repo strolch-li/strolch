@@ -1,10 +1,10 @@
 package li.strolch.model.builder.params;
 
-import static li.strolch.model.StrolchModelConstants.*;
-
 import li.strolch.model.builder.BagBuilder;
 import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.StringParameter;
+
+import static li.strolch.model.StrolchModelConstants.*;
 
 public class StringParamBuilder<T extends ParameterBagContainerBuilder<T>>
 		extends ParameterBuilder<String, StringParameter, T> {

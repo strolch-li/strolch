@@ -15,14 +15,14 @@
  */
 package li.strolch.model.timedstate;
 
-import java.io.Serializable;
-import java.util.NavigableSet;
-
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.model.timevalue.impl.TimeVariable;
+
+import java.io.Serializable;
+import java.util.NavigableSet;
 
 /**
  * @author Martin Smock <smock.martin@gmail.com>

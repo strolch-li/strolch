@@ -1,8 +1,5 @@
 package li.strolch.service.privilege.users;
 
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.USER;
-
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -11,6 +8,9 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.USER;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

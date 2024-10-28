@@ -15,9 +15,9 @@
  */
 package li.strolch.service.privilege.users;
 
-import java.util.Locale;
-
 import li.strolch.service.api.ServiceArgument;
+
+import java.util.Locale;
 
 public class PrivilegeSetUserLocaleArgument extends ServiceArgument {
 	public String username;

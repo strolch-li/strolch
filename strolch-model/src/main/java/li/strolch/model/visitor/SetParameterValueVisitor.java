@@ -15,11 +15,11 @@
  */
 package li.strolch.model.visitor;
 
-import java.util.Date;
-import java.util.List;
-
 import li.strolch.model.parameter.*;
 import li.strolch.utils.time.PeriodDuration;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

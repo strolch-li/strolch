@@ -1,11 +1,11 @@
 package li.strolch.utils.time;
 
-import static li.strolch.utils.I18nUtils.i18n;
-
 import java.time.Duration;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+
+import static li.strolch.utils.I18nUtils.i18n;
 
 public class PeriodDurationFormatter {
 

@@ -82,7 +82,8 @@ public class RoleAccessPrivilege implements PrivilegePolicy {
 		String newRole = tuple.getSecond() instanceof Role r ? r.getName() : tuple.getSecond();
 
 		switch (privilegeName) {
-			case PrivilegeHandler.PRIVILEGE_GET_ROLE, PrivilegeHandler.PRIVILEGE_ADD_ROLE, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE -> {
+			case PrivilegeHandler.PRIVILEGE_GET_ROLE, PrivilegeHandler.PRIVILEGE_ADD_ROLE,
+				 PrivilegeHandler.PRIVILEGE_REMOVE_ROLE -> {
 				DBC.INTERIM.assertNull("For " + privilegeName + " first must be null!", oldRole);
 				DBC.INTERIM.assertNotNull("For " + privilegeName + " second must not be null!", newRole);
 

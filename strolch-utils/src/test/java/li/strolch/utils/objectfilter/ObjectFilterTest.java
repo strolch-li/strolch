@@ -15,13 +15,13 @@
  */
 package li.strolch.utils.objectfilter;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.*;
+import org.hamcrest.MatcherAssert;
+import org.junit.Test;
 
 import java.util.List;
 
-import org.hamcrest.MatcherAssert;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;

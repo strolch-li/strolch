@@ -13,10 +13,7 @@ import li.strolch.runtime.configuration.SupportedLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
-import java.util.Set;
-
-import static java.util.Comparator.*;
+import static java.util.Comparator.comparing;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 
 @Path("strolch/languages")

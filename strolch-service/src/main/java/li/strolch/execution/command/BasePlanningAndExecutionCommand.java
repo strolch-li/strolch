@@ -1,12 +1,7 @@
 package li.strolch.execution.command;
 
-import static li.strolch.execution.policy.ConfirmationPolicy.DEFAULT_CONFIRMATION;
-import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
-
 import li.strolch.execution.policy.ConfirmationPolicy;
 import li.strolch.execution.policy.PlanningPolicy;
-import li.strolch.model.Locator;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -16,6 +11,10 @@ import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.service.api.Command;
+
+import static li.strolch.execution.policy.ConfirmationPolicy.DEFAULT_CONFIRMATION;
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 public abstract class BasePlanningAndExecutionCommand extends Command {
 
@@ -51,7 +50,8 @@ public abstract class BasePlanningAndExecutionCommand extends Command {
 
 	protected ConfirmationPolicy getConfirmationPolicy(Action action) {
 		Resource resource = getResource(action);
-		PolicyDef policyDef = resource.getPolicyDefs()
+		PolicyDef policyDef = resource
+				.getPolicyDefs()
 				.getPolicyDef(ConfirmationPolicy.class.getSimpleName(), DEFAULT_CONFIRMATION);
 		return getComponent(PolicyHandler.class).getPolicy(policyDef, tx());
 	}

@@ -1,12 +1,12 @@
 package li.strolch.model;
 
+import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
+
 import java.text.MessageFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
-
-import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * <p>
@@ -42,12 +42,10 @@ public class Version {
 	/**
 	 * Creates a new version instance with the given values. The creation date is now.
 	 *
-	 * @param version
-	 * 		the integer version which must be >= 0 and should be incremented for each new version of an object
-	 * @param createdBy
-	 * 		the username of the creator of this object
-	 * @param updatedBy
-	 * 		the username of the updater of this object
+	 * @param version   the integer version which must be >= 0 and should be incremented for each new version of an
+	 *                  object
+	 * @param createdBy the username of the creator of this object
+	 * @param updatedBy the username of the updater of this object
 	 */
 	public Version(Locator locator, int version, String createdBy, String updatedBy, boolean deleted) {
 		this(locator, version, createdBy, updatedBy, new Date(), new Date(), deleted);
@@ -56,16 +54,12 @@ public class Version {
 	/**
 	 * Creates a new version instance with the given values.
 	 *
-	 * @param version
-	 * 		the integer version which must be >= 0 and should be incremented for each new version of an object
-	 * @param createdBy
-	 * 		the username of the creator of this object
-	 * @param updatedBy
-	 * 		the username of the updater of this object
-	 * @param created
-	 * 		date when the version was created
-	 * @param updated
-	 * 		date when the version was updated
+	 * @param version   the integer version which must be >= 0 and should be incremented for each new version of an
+	 *                  object
+	 * @param createdBy the username of the creator of this object
+	 * @param updatedBy the username of the updater of this object
+	 * @param created   date when the version was created
+	 * @param updated   date when the version was updated
 	 */
 	public Version(Locator locator, int version, String createdBy, String updatedBy, Date created, Date updated,
 			boolean deleted) {
@@ -119,8 +113,7 @@ public class Version {
 	 *
 	 * @return the current version decremented
 	 *
-	 * @throws IllegalStateException
-	 * 		if this version is already the first version
+	 * @throws IllegalStateException if this version is already the first version
 	 */
 	public int getPreviousVersion() throws IllegalStateException {
 		if (this.version == 0)
@@ -195,13 +188,10 @@ public class Version {
 	/**
 	 * Validates that the given argument is a newer version to this version
 	 *
-	 * @param other
-	 * 		the other version to check
+	 * @param other the other version to check
 	 *
-	 * @throws IllegalArgumentException
-	 * 		if the given argument's locator is not equal to this version's locator
-	 * @throws IllegalStateException
-	 * 		if the given argument is not the next version
+	 * @throws IllegalArgumentException if the given argument's locator is not equal to this version's locator
+	 * @throws IllegalStateException    if the given argument is not the next version
 	 */
 	public void validateIsNewer(Version other) throws IllegalArgumentException, IllegalStateException {
 		if (!isNewer(other)) {
@@ -213,8 +203,7 @@ public class Version {
 	/**
 	 * Returns true if the given argument is a newer version than this version
 	 *
-	 * @param other
-	 * 		the other version to check
+	 * @param other the other version to check
 	 */
 	public boolean isNewer(Version other) {
 		if (!this.locator.equals(other.locator)) {
@@ -228,8 +217,7 @@ public class Version {
 	/**
 	 * Returns true if the given argument is a newer version than this version
 	 *
-	 * @param other
-	 * 		the other version to check
+	 * @param other the other version to check
 	 */
 	public boolean isNewerThan(Version other) {
 		if (!this.locator.equals(other.locator)) {
@@ -242,19 +230,28 @@ public class Version {
 
 	@Override
 	public String toString() {
-		return "Version [version=" + this.version + ", locator=" + this.locator + ", createdBy=" + this.createdBy
-				+ ", updatedBy=" + this.updatedBy + ", created=" + ISO8601FormatFactory.getInstance()
-				.formatDate(this.created) + ", updated=" + ISO8601FormatFactory.getInstance()
-				.formatDate(this.updated) + ", deleted=" + this.deleted + "]";
+		return "Version [version="
+				+ this.version
+				+ ", locator="
+				+ this.locator
+				+ ", createdBy="
+				+ this.createdBy
+				+ ", updatedBy="
+				+ this.updatedBy
+				+ ", created="
+				+ ISO8601FormatFactory.getInstance().formatDate(this.created)
+				+ ", updated="
+				+ ISO8601FormatFactory.getInstance().formatDate(this.updated)
+				+ ", deleted="
+				+ this.deleted
+				+ "]";
 	}
 
 	/**
 	 * Returns the next version, i.e. this version incremented by 1
 	 *
-	 * @param updatedBy
-	 * 		the updatedBy to set
-	 * @param deleted
-	 * 		the deleted flag to set
+	 * @param updatedBy the updatedBy to set
+	 * @param deleted   the deleted flag to set
 	 *
 	 * @return the next version
 	 */
@@ -265,10 +262,8 @@ public class Version {
 	/**
 	 * Sets the initial version = 0 for the given element which is also set to not deleted
 	 *
-	 * @param element
-	 * 		the element for which to create a new version
-	 * @param username
-	 * 		the username of the user who created this version of the object
+	 * @param element  the element for which to create a new version
+	 * @param username the username of the user who created this version of the object
 	 */
 	public static void setInitialVersionFor(StrolchRootElement element, String username) {
 		Version version = new Version(element.getLocator(), 0, username, username, false);
@@ -279,12 +274,10 @@ public class Version {
 	 * Sets a new version on the given element. If the element has no version yet, then the result will be version 0,
 	 * otherwise the version will be an increment to the current version
 	 *
-	 * @param element
-	 * 		the element for which to create a new version
-	 * @param updatedBy
-	 * 		the username of the user who created this version of the object
-	 * @param deleted
-	 * 		if true, then the version will be marked as deleted, i.e. this object was removed from the element maps
+	 * @param element   the element for which to create a new version
+	 * @param updatedBy the username of the user who created this version of the object
+	 * @param deleted   if true, then the version will be marked as deleted, i.e. this object was removed from the
+	 *                  element maps
 	 */
 	public static void updateVersionFor(StrolchRootElement element, String updatedBy, boolean deleted) {
 		Version version;
@@ -305,14 +298,11 @@ public class Version {
 	 * Sets a new version on the given element. If the element has no version yet, then the result will be version 0,
 	 * otherwise the version will be an increment to the current version
 	 *
-	 * @param element
-	 * 		the element for which to create a new version
-	 * @param updatedBy
-	 * 		the username of the user who created this version of the object
-	 * @param version
-	 * 		the version to use
-	 * @param deleted
-	 * 		if true, then the version will be marked as deleted, i.e. this object was removed from the element maps
+	 * @param element   the element for which to create a new version
+	 * @param updatedBy the username of the user who created this version of the object
+	 * @param version   the version to use
+	 * @param deleted   if true, then the version will be marked as deleted, i.e. this object was removed from the
+	 *                  element maps
 	 */
 	public static void updateVersionFor(StrolchRootElement element, int version, String updatedBy, boolean deleted) {
 		if (version == -1)

@@ -3,7 +3,8 @@ package li.strolch.utils.helper;
 import java.io.File;
 
 /**
- * The options to create the path for a temporary file using {@link FileHelper#getTempFile(File, String, String, TempFileOptions)}
+ * The options to create the path for a temporary file using
+ * {@link FileHelper#getTempFile(File, String, String, TempFileOptions)}
  */
 public enum TempFileOptions {
 	NONE,

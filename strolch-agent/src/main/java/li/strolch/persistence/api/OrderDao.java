@@ -35,10 +35,8 @@ public interface OrderDao extends StrolchDao<Order> {
 	/**
 	 * Returns the number of elements in the underlying persistence layer for the given type(s)
 	 *
-	 * @param dateRange
-	 * 		the date range filter
-	 * @param types
-	 * 		the type(s) to query the size for
+	 * @param dateRange the date range filter
+	 * @param types     the type(s) to query the size for
 	 *
 	 * @return the number of elements in the underlying persistence layer for the given type(s)
 	 */
@@ -47,68 +45,52 @@ public interface OrderDao extends StrolchDao<Order> {
 	/**
 	 * Queries and returns all elements regardless of type
 	 *
-	 * @param dateRange
-	 * 		the date range filter
+	 * @param dateRange the date range filter
 	 *
 	 * @return all elements regardless of type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<Order> queryAll(DateRange dateRange) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all elements regardless of type
 	 *
-	 * @param dateRange
-	 * 		the date range filter
-	 * @param limit
-	 * 		the max amount, or @{@link Integer#MAX_VALUE} for all
-	 * @param offset
-	 * 		if max amount defined, then the offset to start from
-	 * @param asc
-	 * 		true for ascending, false for descending
+	 * @param dateRange the date range filter
+	 * @param limit     the max amount, or @{@link Integer#MAX_VALUE} for all
+	 * @param offset    if max amount defined, then the offset to start from
+	 * @param asc       true for ascending, false for descending
 	 *
 	 * @return all elements regardless of type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all elements of the given type
 	 *
-	 * @param dateRange
-	 * 		the date range filter
-	 * @param types
-	 * 		the type(s) of element(s) to return
+	 * @param dateRange the date range filter
+	 * @param types     the type(s) of element(s) to return
 	 *
 	 * @return all elements of the given type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<Order> queryAll(DateRange dateRange, String... types) throws StrolchPersistenceException;
 
 	/**
 	 * Queries and returns all elements of the given type
 	 *
-	 * @param dateRange
-	 * 		the date range filter
-	 * @param limit
-	 * 		the max amount, or @{@link Integer#MAX_VALUE} for all
-	 * @param offset
-	 * 		if max amount defined, then the offset to start from
-	 * @param types
-	 * 		the type(s) of element(s) to return
-	 * @param asc
-	 * 		true for ascending, false for descending
+	 * @param dateRange the date range filter
+	 * @param limit     the max amount, or @{@link Integer#MAX_VALUE} for all
+	 * @param offset    if max amount defined, then the offset to start from
+	 * @param types     the type(s) of element(s) to return
+	 * @param asc       true for ascending, false for descending
 	 *
 	 * @return all elements of the given type
 	 *
-	 * @throws StrolchPersistenceException
-	 * 		if something goes wrong
+	 * @throws StrolchPersistenceException if something goes wrong
 	 */
 	List<Order> queryAll(DateRange dateRange, long limit, long offset, boolean asc, String... types)
 			throws StrolchPersistenceException;

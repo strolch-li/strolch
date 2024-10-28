@@ -23,18 +23,15 @@ package li.strolch.privilege.base;
 public class AccessDeniedException extends PrivilegeException {
 
 	/**
-	 * @param msg
-	 * 		detail on why and where access was denied
+	 * @param msg detail on why and where access was denied
 	 */
 	public AccessDeniedException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * @param msg
-	 * 		detail on why and where access was denied
-	 * @param e
-	 * 		root exception
+	 * @param msg detail on why and where access was denied
+	 * @param e   root exception
 	 */
 	public AccessDeniedException(String msg, Exception e) {
 		super(msg, e);

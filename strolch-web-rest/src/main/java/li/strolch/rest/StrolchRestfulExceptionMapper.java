@@ -31,14 +31,13 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.rest.helper.ResponseUtil;
-import li.strolch.utils.helper.ExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ResourceBundle;
 
 import static li.strolch.model.Tags.AGENT;
-import static li.strolch.utils.helper.ExceptionHelper.*;
+import static li.strolch.utils.helper.ExceptionHelper.hasCause;
 
 @Provider
 public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception> {

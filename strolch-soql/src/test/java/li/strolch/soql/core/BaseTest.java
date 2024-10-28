@@ -41,8 +41,7 @@ public abstract class BaseTest {
 	/**
 	 * compile the antlr tree to executable
 	 *
-	 * @param tree
-	 * 		the tree to compile
+	 * @param tree the tree to compile
 	 *
 	 * @return CompiledSOQLStatement
 	 */

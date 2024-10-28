@@ -31,9 +31,6 @@
  */
 package li.strolch.utils.time;
 
-import static java.time.temporal.ChronoUnit.*;
-import static li.strolch.utils.time.PeriodHelper.daysIn;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.*;
@@ -41,8 +38,13 @@ import java.time.chrono.ChronoPeriod;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.*;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import static java.time.temporal.ChronoUnit.*;
+import static li.strolch.utils.time.PeriodHelper.daysIn;
 
 /**
  * An amount of time in the ISO-8601 calendar system that combines a period and a duration.
@@ -99,10 +101,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * The total amount of time of the resulting instance is the period plus the duration.
 	 *
-	 * @param period
-	 * 		the period, not null
-	 * @param duration
-	 * 		the duration, not null
+	 * @param period   the period, not null
+	 * @param duration the duration, not null
 	 *
 	 * @return the combined period-duration, not null
 	 */
@@ -117,8 +117,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * The duration will be zero.
 	 *
-	 * @param period
-	 * 		the period, not null
+	 * @param period the period, not null
 	 *
 	 * @return the combined period-duration, not null
 	 */
@@ -132,8 +131,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * The period will be zero.
 	 *
-	 * @param duration
-	 * 		the duration, not null
+	 * @param duration the duration, not null
 	 *
 	 * @return the combined period-duration, not null
 	 */
@@ -156,15 +154,12 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * totalled into the months part of the period. If the unit is years, decades, centuries or millennia, it will be
 	 * totalled into the years part of the period.
 	 *
-	 * @param amount
-	 * 		the temporal amount to convert, not null
+	 * @param amount the temporal amount to convert, not null
 	 *
 	 * @return the equivalent duration, not null
 	 *
-	 * @throws DateTimeException
-	 * 		if unable to convert to a {@code Duration}
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws DateTimeException   if unable to convert to a {@code Duration}
+	 * @throws ArithmeticException if numeric overflow occurs
 	 */
 	public static PeriodDuration from(TemporalAmount amount) {
 		if (amount instanceof PeriodDuration) {
@@ -224,8 +219,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	/**
 	 * Obtains an instance from a text string such as {@code PnYnMnDTnHnMnS}.
 	 * <p>
-	 * This will parse the string produced by {@code toString()} which is based on the ISO-8601 period formats {@code
-	 * PnYnMnDTnHnMnS} and {@code PnW}.
+	 * This will parse the string produced by {@code toString()} which is based on the ISO-8601 period formats
+	 * {@code PnYnMnDTnHnMnS} and {@code PnW}.
 	 * <p>
 	 * The string starts with an optional sign, denoted by the ASCII negative or positive symbol. If negative, the whole
 	 * amount is negated. The ASCII letter "P" is next in upper or lower case. There are then a number of sections, each
@@ -253,13 +248,11 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 *   "-P1Y2M"          -- PeriodDuration.of(Period.of(-1, -2, 0))
 	 * </pre>
 	 *
-	 * @param text
-	 * 		the text to parse, not null
+	 * @param text the text to parse, not null
 	 *
 	 * @return the parsed period, not null
 	 *
-	 * @throws DateTimeParseException
-	 * 		if the text cannot be parsed to a period
+	 * @throws DateTimeParseException if the text cannot be parsed to a period
 	 */
 	public static PeriodDuration parse(CharSequence text) {
 		Objects.requireNonNull(text, "text");
@@ -298,10 +291,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * missing, it will be defaulted to midnight. If one date is missing, it will be defaulted to the other date. It
 	 * then finds the amount of time between the two dates and between the two times.
 	 *
-	 * @param startInclusive
-	 * 		the start, inclusive, not null
-	 * @param endExclusive
-	 * 		the end, exclusive, not null
+	 * @param startInclusive the start, inclusive, not null
+	 * @param endExclusive   the end, exclusive, not null
 	 *
 	 * @return the number of days between this date and the end date, not null
 	 */
@@ -325,10 +316,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	/**
 	 * Constructs an instance.
 	 *
-	 * @param period
-	 * 		the period
-	 * @param duration
-	 * 		the duration
+	 * @param period   the period
+	 * @param duration the duration
 	 */
 	private PeriodDuration(Period period, Duration duration) {
 		this.period = period;
@@ -350,39 +339,37 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	/**
 	 * Gets the value of the requested unit.
 	 * <p>
-	 * This returns a value for the supported units - {@link ChronoUnit#YEARS}, {@link ChronoUnit#MONTHS}, {@link
-	 * ChronoUnit#DAYS}, {@link ChronoUnit#SECONDS} and {@link ChronoUnit#NANOS}. All other units throw an exception.
-	 * Note that hours and minutes throw an exception.
+	 * This returns a value for the supported units - {@link ChronoUnit#YEARS}, {@link ChronoUnit#MONTHS},
+	 * {@link ChronoUnit#DAYS}, {@link ChronoUnit#SECONDS} and {@link ChronoUnit#NANOS}. All other units throw an
+	 * exception. Note that hours and minutes throw an exception.
 	 *
-	 * @param unit
-	 * 		the {@code TemporalUnit} for which to return the value
+	 * @param unit the {@code TemporalUnit} for which to return the value
 	 *
 	 * @return the long value of the unit
 	 *
-	 * @throws UnsupportedTemporalTypeException
-	 * 		if the unit is not supported
+	 * @throws UnsupportedTemporalTypeException if the unit is not supported
 	 */
 	@Override
 	public long get(TemporalUnit unit) {
 		if (unit instanceof ChronoUnit) {
 			switch ((ChronoUnit) unit) {
-			case YEARS -> {
-				return period.getYears();
-			}
-			case MONTHS -> {
-				return period.getMonths();
-			}
-			case DAYS -> {
-				return period.getDays();
-			}
-			case SECONDS -> {
-				return duration.getSeconds();
-			}
-			case NANOS -> {
-				return duration.getNano();
-			}
-			default -> {
-			}
+				case YEARS -> {
+					return period.getYears();
+				}
+				case MONTHS -> {
+					return period.getMonths();
+				}
+				case DAYS -> {
+					return period.getDays();
+				}
+				case SECONDS -> {
+					return duration.getSeconds();
+				}
+				case NANOS -> {
+					return duration.getNano();
+				}
+				default -> {
+				}
 			}
 		}
 		throw new UnsupportedTemporalTypeException("Unsupported unit: " + unit);
@@ -391,8 +378,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	/**
 	 * Gets the set of units supported by this amount.
 	 * <p>
-	 * This returns the list {@link ChronoUnit#YEARS}, {@link ChronoUnit#MONTHS}, {@link ChronoUnit#DAYS}, {@link
-	 * ChronoUnit#SECONDS} and {@link ChronoUnit#NANOS}.
+	 * This returns the list {@link ChronoUnit#YEARS}, {@link ChronoUnit#MONTHS}, {@link ChronoUnit#DAYS},
+	 * {@link ChronoUnit#SECONDS} and {@link ChronoUnit#NANOS}.
 	 * <p>
 	 * This set can be used in conjunction with {@link #get(TemporalUnit)} to access the entire state of the amount.
 	 *
@@ -419,8 +406,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * This instance is immutable and unaffected by this method call.
 	 *
-	 * @param period
-	 * 		the new period
+	 * @param period the new period
 	 *
 	 * @return the updated period-duration
 	 */
@@ -442,8 +428,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * This instance is immutable and unaffected by this method call.
 	 *
-	 * @param duration
-	 * 		the new duration
+	 * @param duration the new duration
 	 *
 	 * @return the updated period-duration
 	 */
@@ -493,15 +478,12 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * This instance is immutable and unaffected by this method call.
 	 *
-	 * @param amountToAdd
-	 * 		the amount to add, not null
+	 * @param amountToAdd the amount to add, not null
 	 *
 	 * @return a {@code Days} based on this instance with the requested amount added, not null
 	 *
-	 * @throws DateTimeException
-	 * 		if the specified amount contains an invalid unit
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws DateTimeException   if the specified amount contains an invalid unit
+	 * @throws ArithmeticException if numeric overflow occurs
 	 */
 	public PeriodDuration plus(TemporalAmount amountToAdd) {
 		PeriodDuration other = PeriodDuration.from(amountToAdd);
@@ -518,15 +500,12 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * This instance is immutable and unaffected by this method call.
 	 *
-	 * @param amountToAdd
-	 * 		the amount to add, not null
+	 * @param amountToAdd the amount to add, not null
 	 *
 	 * @return a {@code Days} based on this instance with the requested amount subtracted, not null
 	 *
-	 * @throws DateTimeException
-	 * 		if the specified amount contains an invalid unit
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws DateTimeException   if the specified amount contains an invalid unit
+	 * @throws ArithmeticException if numeric overflow occurs
 	 */
 	public PeriodDuration minus(TemporalAmount amountToAdd) {
 		PeriodDuration other = PeriodDuration.from(amountToAdd);
@@ -540,13 +519,11 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * This instance is immutable and unaffected by this method call.
 	 *
-	 * @param scalar
-	 * 		the scalar to multiply by, not null
+	 * @param scalar the scalar to multiply by, not null
 	 *
 	 * @return the amount multiplied by the specified scalar, not null
 	 *
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws ArithmeticException if numeric overflow occurs
 	 */
 	public PeriodDuration multipliedBy(int scalar) {
 		if (scalar == 1) {
@@ -562,8 +539,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 *
 	 * @return the negated amount, not null
 	 *
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs, which only happens if the amount is {@code Long.MIN_VALUE}
+	 * @throws ArithmeticException if numeric overflow occurs, which only happens if the amount is
+	 *                             {@code Long.MIN_VALUE}
 	 */
 	public PeriodDuration negated() {
 		return multipliedBy(-1);
@@ -589,8 +566,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 *
 	 * @return a {@code PeriodDuration} based on this one with excess months normalized to years, not null
 	 *
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws ArithmeticException if numeric overflow occurs
 	 */
 	public PeriodDuration normalizedYears() {
 		return withPeriod(period.normalized());
@@ -614,8 +590,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 *
 	 * @return a {@code PeriodDuration} based on this one with excess duration normalized to days, not null
 	 *
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws ArithmeticException if numeric overflow occurs
 	 */
 	public PeriodDuration normalizedStandardDays() {
 		long totalSecs = period.getDays() * SECONDS_PER_DAY + duration.getSeconds();
@@ -637,17 +612,13 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * This instance is immutable and unaffected by this method call.
 	 *
-	 * @param temporal
-	 * 		the temporal object to adjust, not null
+	 * @param temporal the temporal object to adjust, not null
 	 *
 	 * @return an object of the same type with the adjustment made, not null
 	 *
-	 * @throws DateTimeException
-	 * 		if unable to add
-	 * @throws UnsupportedTemporalTypeException
-	 * 		if the DAYS unit is not supported
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws DateTimeException                if unable to add
+	 * @throws UnsupportedTemporalTypeException if the DAYS unit is not supported
+	 * @throws ArithmeticException              if numeric overflow occurs
 	 */
 	@Override
 	public Temporal addTo(Temporal temporal) {
@@ -662,17 +633,13 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * This instance is immutable and unaffected by this method call.
 	 *
-	 * @param temporal
-	 * 		the temporal object to adjust, not null
+	 * @param temporal the temporal object to adjust, not null
 	 *
 	 * @return an object of the same type with the adjustment made, not null
 	 *
-	 * @throws DateTimeException
-	 * 		if unable to subtract
-	 * @throws UnsupportedTemporalTypeException
-	 * 		if the DAYS unit is not supported
-	 * @throws ArithmeticException
-	 * 		if numeric overflow occurs
+	 * @throws DateTimeException                if unable to subtract
+	 * @throws UnsupportedTemporalTypeException if the DAYS unit is not supported
+	 * @throws ArithmeticException              if numeric overflow occurs
 	 */
 	@Override
 	public Temporal subtractFrom(Temporal temporal) {
@@ -686,8 +653,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * <p>
 	 * The comparison is based on the underlying period and duration.
 	 *
-	 * @param otherAmount
-	 * 		the other amount, null returns false
+	 * @param otherAmount the other amount, null returns false
 	 *
 	 * @return true if the other amount is equal to this one
 	 */

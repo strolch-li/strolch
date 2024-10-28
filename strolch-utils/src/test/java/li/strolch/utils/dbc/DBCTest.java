@@ -15,16 +15,16 @@
  */
 package li.strolch.utils.dbc;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
+import li.strolch.utils.dbc.DBC.DbcException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
 import java.text.MessageFormat;
 
-import li.strolch.utils.dbc.DBC.DbcException;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
 
 /**
  * The class <code>DBCTest</code> contains tests for the class <code>{@link DBC}</code>.

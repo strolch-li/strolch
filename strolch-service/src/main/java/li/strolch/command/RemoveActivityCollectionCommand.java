@@ -15,15 +15,15 @@
  */
 package li.strolch.command;
 
-import java.text.MessageFormat;
-import java.util.List;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.text.MessageFormat;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -41,8 +41,7 @@ public class RemoveActivityCollectionCommand extends Command {
 	}
 
 	/**
-	 * @param activities
-	 * 		the activities to set
+	 * @param activities the activities to set
 	 */
 	public void setActivities(List<Activity> activities) {
 		this.activities = activities;

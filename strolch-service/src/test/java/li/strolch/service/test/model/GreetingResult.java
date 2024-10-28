@@ -33,8 +33,7 @@ public class GreetingResult extends ServiceResult {
 	}
 
 	/**
-	 * @param greeting
-	 * 		the greeting to set
+	 * @param greeting the greeting to set
 	 */
 	public void setGreeting(String greeting) {
 		this.greeting = greeting;

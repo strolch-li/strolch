@@ -1,5 +1,9 @@
 package li.strolch.utils.helper;
 
+import li.strolch.utils.UTF8Control;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -8,10 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import li.strolch.utils.UTF8Control;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by eitch on 03.11.16.
@@ -67,7 +67,8 @@ public class TexHelper {
 			}
 
 			// clean old builds
-			File[] texFiles = texPath.toFile()
+			File[] texFiles = texPath
+					.toFile()
 					.listFiles(
 							file -> (System.currentTimeMillis() - file.lastModified()) > TimeUnit.MINUTES.toMillis(1));
 			if (texFiles == null)
@@ -84,9 +85,10 @@ public class TexHelper {
 			}
 
 			if (!FileHelper.copy(templatePath.getParentFile().listFiles(), tmpPathF, false))
-				throw new RuntimeException(
-						"Failed to copy " + templatePath.getParentFile().getAbsolutePath() + " to tmpPath "
-								+ tmpPathF.getAbsolutePath());
+				throw new RuntimeException("Failed to copy "
+						+ templatePath.getParentFile().getAbsolutePath()
+						+ " to tmpPath "
+						+ tmpPathF.getAbsolutePath());
 
 			// then write TEX file
 			String texFileName = fileName + ".tex";

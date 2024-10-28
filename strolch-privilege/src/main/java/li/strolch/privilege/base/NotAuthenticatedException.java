@@ -23,18 +23,15 @@ package li.strolch.privilege.base;
 public class NotAuthenticatedException extends PrivilegeException {
 
 	/**
-	 * @param msg
-	 * 		detail on why and where access was denied
+	 * @param msg detail on why and where access was denied
 	 */
 	public NotAuthenticatedException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * @param msg
-	 * 		detail on why and where access was denied
-	 * @param e
-	 * 		root exception
+	 * @param msg detail on why and where access was denied
+	 * @param e   root exception
 	 */
 	public NotAuthenticatedException(String msg, Exception e) {
 		super(msg, e);

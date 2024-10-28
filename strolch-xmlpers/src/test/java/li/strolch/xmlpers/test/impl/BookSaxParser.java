@@ -15,13 +15,13 @@
  */
 package li.strolch.xmlpers.test.impl;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import li.strolch.xmlpers.api.SaxParser;
 import li.strolch.xmlpers.test.model.Book;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

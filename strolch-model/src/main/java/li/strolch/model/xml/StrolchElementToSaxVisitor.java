@@ -15,16 +15,6 @@
  */
 package li.strolch.model.xml;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
-import java.text.MessageFormat;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -42,6 +32,16 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.text.MessageFormat;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedSet;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

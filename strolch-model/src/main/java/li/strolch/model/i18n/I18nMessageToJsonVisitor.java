@@ -1,11 +1,11 @@
 package li.strolch.model.i18n;
 
-import java.util.Properties;
-
 import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.I18nMessageVisitor;
+
+import java.util.Properties;
 
 public class I18nMessageToJsonVisitor implements I18nMessageVisitor<JsonObject> {
 

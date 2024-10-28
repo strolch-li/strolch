@@ -15,9 +15,6 @@
  */
 package li.strolch.agent;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.*;
-
 import li.strolch.RuntimeMock;
 import li.strolch.agent.api.*;
 import li.strolch.model.Order;
@@ -34,6 +31,9 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("nls")
 public class ComponentContainerTest {
@@ -116,8 +116,8 @@ public class ComponentContainerTest {
 		ServiceResultTest result = serviceHandler.doService();
 		assertEquals(1, result.result());
 
-		ResourceGeneratorHandlerTest resourceGeneratorHandler = container
-				.getComponent(ResourceGeneratorHandlerTest.class);
+		ResourceGeneratorHandlerTest resourceGeneratorHandler = container.getComponent(
+				ResourceGeneratorHandlerTest.class);
 		Resource resource = resourceGeneratorHandler.getTestResource("@testRes", "Test Res", "Test");
 		assertNotNull(resource);
 		assertEquals("@testRes", resource.getId());
@@ -137,7 +137,8 @@ public class ComponentContainerTest {
 		assertEquals(1, result.result());
 
 		Certificate certificate = login(agent);
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = container
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", false)) {
 			tx.add(createResource("@testRes0", "Test Res", "Test"));
 			Resource queriedRes = tx.getResourceBy("Test", "@testRes0");
@@ -147,7 +148,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = container
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", false)) {
 			tx.add(createOrder("@testOrder0", "Test Order", "Test"));
 			Order queriedOrder = tx.getOrderBy("Test", "@testOrder0");
@@ -157,7 +159,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = container
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", false)) {
 			tx.add(createActivity("@testActivity0", "Test Activity", "Test", TimeOrdering.SERIES));
 			Activity queriedActivity = tx.getActivityBy("Test", "@testActivity0");
@@ -173,7 +176,8 @@ public class ComponentContainerTest {
 		ComponentContainer container = agent.getContainer();
 
 		Certificate certificate = login(agent);
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = container
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", false)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			resourceMap.add(tx, createResource("@testRes1", "Test Res", "Test"));
@@ -184,7 +188,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = container
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", false)) {
 			OrderMap orderMap = tx.getOrderMap();
 			orderMap.add(tx, createOrder("@testOrder1", "Test Order", "Test"));
@@ -195,7 +200,8 @@ public class ComponentContainerTest {
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = container
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", false)) {
 			ActivityMap activityMap = tx.getActivityMap();
 			activityMap.add(tx, createActivity("@testActivity0", "Test Activity", "Test", TimeOrdering.SERIES));
@@ -212,7 +218,8 @@ public class ComponentContainerTest {
 		ComponentContainer container = agent.getContainer();
 
 		Certificate certificate = login(agent);
-		try (StrolchTransaction tx = container.getRealm(StrolchConstants.DEFAULT_REALM)
+		try (StrolchTransaction tx = container
+				.getRealm(StrolchConstants.DEFAULT_REALM)
 				.openTx(certificate, "test", false)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			resourceMap.add(tx, createResource("@testRes1", "Test Res", "Test"));

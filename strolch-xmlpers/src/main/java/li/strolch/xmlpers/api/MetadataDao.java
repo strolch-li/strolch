@@ -15,7 +15,11 @@
  */
 package li.strolch.xmlpers.api;
 
-import static li.strolch.xmlpers.api.FileIo.TMP_PREFIX;
+import li.strolch.xmlpers.impl.PathBuilder;
+import li.strolch.xmlpers.objref.ObjectRef;
+import li.strolch.xmlpers.util.FilenameUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -25,11 +29,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 
-import li.strolch.xmlpers.impl.PathBuilder;
-import li.strolch.xmlpers.objref.ObjectRef;
-import li.strolch.xmlpers.util.FilenameUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static li.strolch.xmlpers.api.FileIo.TMP_PREFIX;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -124,8 +124,7 @@ public class MetadataDao {
 	/**
 	 * Returns the types, i.e. directories in the given query path
 	 *
-	 * @param queryPath
-	 * 		the path for which the types should be gathered
+	 * @param queryPath the path for which the types should be gathered
 	 *
 	 * @return a set of types in the given query path
 	 */
@@ -157,8 +156,7 @@ public class MetadataDao {
 	 * Returns the ids of all objects in the given query path, i.e. the id part of all the files in the given query
 	 * path
 	 *
-	 * @param queryPath
-	 * 		the path for which the ids should be gathered
+	 * @param queryPath the path for which the ids should be gathered
 	 *
 	 * @return a set of ids for the objects in the given query path
 	 */
@@ -200,8 +198,7 @@ public class MetadataDao {
 	/**
 	 * Returns the number of all types, i.e. directories in the given query path
 	 *
-	 * @param queryPath
-	 * 		the path in which to count the types
+	 * @param queryPath the path in which to count the types
 	 *
 	 * @return the number of types in the given query path
 	 */
@@ -231,8 +228,7 @@ public class MetadataDao {
 	/**
 	 * Returns the number of all objects in the given query path
 	 *
-	 * @param queryPath
-	 * 		the path in which to count the objects
+	 * @param queryPath the path in which to count the objects
 	 *
 	 * @return the number of objects in the given query path
 	 */

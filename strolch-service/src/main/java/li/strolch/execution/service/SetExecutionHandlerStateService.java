@@ -32,28 +32,28 @@ public class SetExecutionHandlerStateService extends AbstractService<StringMapAr
 		getPrivilegeContext().validateAction(new SimpleRestrictable(getPrivilegeValue(), state));
 
 		switch (state) {
-		case "Running" -> {
-			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.Running);
-			executionHandler.triggerExecution(realm);
-		}
-		case "HaltNew" -> {
-			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.HaltNew);
-		}
-		case "Paused" -> {
-			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.Paused);
-		}
-		case "Trigger" -> {
-			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.triggerExecution(realm);
-		}
-		case "ReloadActivities" -> {
-			ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
-			executionHandler.reloadActivitiesInExecution(getPrivilegeContext(), realm);
-		}
-		default -> throw new UnsupportedOperationException("Unhandled state " + state);
+			case "Running" -> {
+				ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
+				executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.Running);
+				executionHandler.triggerExecution(realm);
+			}
+			case "HaltNew" -> {
+				ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
+				executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.HaltNew);
+			}
+			case "Paused" -> {
+				ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
+				executionHandler.getExecutionState(getCertificate(), realm, ExecutionHandlerState.Paused);
+			}
+			case "Trigger" -> {
+				ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
+				executionHandler.triggerExecution(realm);
+			}
+			case "ReloadActivities" -> {
+				ExecutionHandler executionHandler = getContainer().getComponent(ExecutionHandler.class);
+				executionHandler.reloadActivitiesInExecution(getPrivilegeContext(), realm);
+			}
+			default -> throw new UnsupportedOperationException("Unhandled state " + state);
 		}
 
 		return ServiceResult.success();

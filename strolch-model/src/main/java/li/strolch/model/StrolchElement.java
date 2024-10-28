@@ -63,8 +63,7 @@ public interface StrolchElement {
 	/**
 	 * Set the currently set long value which defines the primary key for use in RDBM-Systems
 	 *
-	 * @param dbid
-	 * 		the dbid to set
+	 * @param dbid the dbid to set
 	 */
 	void setDbid(long dbid);
 
@@ -111,8 +110,7 @@ public interface StrolchElement {
 	/**
 	 * Asserts that this element is not read-only, throwing {@link StrolchModelException} if it is read-only
 	 *
-	 * @throws StrolchModelException
-	 * 		if this element is read-only
+	 * @throws StrolchModelException if this element is read-only
 	 */
 	void assertNotReadonly() throws StrolchModelException;
 
@@ -156,8 +154,7 @@ public interface StrolchElement {
 	 * element, but certain implementations might require more specific attributes
 	 * </p>
 	 *
-	 * @param obj
-	 * 		the object to which to check for equality
+	 * @param obj the object to which to check for equality
 	 *
 	 * @return true if this object equals the given parameter object
 	 *

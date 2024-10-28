@@ -41,8 +41,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 	/**
 	 * Reload the jobs from the {@link Resource Resources} of type {@link StrolchConstants#TYPE_STROLCH_JOB}
 	 *
-	 * @throws Exception
-	 * 		if something goes wrong while instantiating the jobs
+	 * @throws Exception if something goes wrong while instantiating the jobs
 	 */
 	public void reloadJobs() throws Exception {
 		reloadJobs(false);
@@ -93,9 +92,11 @@ public class StrolchJobsHandler extends StrolchComponent {
 				job = instantiateJob(className, jobRes.getId(), jobRes.getName(), mode);
 			} catch (ClassNotFoundException e) {
 				if (!catchExceptions) {
-					throw new IllegalStateException(
-							"Failed to load StrolchJob " + jobRes.getId() + " from model as class " + className
-									+ " does not exist!");
+					throw new IllegalStateException("Failed to load StrolchJob "
+							+ jobRes.getId()
+							+ " from model as class "
+							+ className
+							+ " does not exist!");
 				}
 
 				logger.error("Failed to load StrolchJob {} from model as class {} does not exist!", jobRes.getId(),
@@ -165,8 +166,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 	/**
 	 * Registers the given job as a recurring job, and schedules it for execution
 	 *
-	 * @param strolchJobClass
-	 * 		the job to instantiate and schedule for execution
+	 * @param strolchJobClass the job to instantiate and schedule for execution
 	 *
 	 * @return the instantiated job
 	 */
@@ -180,8 +180,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 	/**
 	 * Registers the given job as a manual job, which can be executed later by a job admin
 	 *
-	 * @param strolchJobClass
-	 * 		the job to register
+	 * @param strolchJobClass the job to register
 	 *
 	 * @return the instantiated job
 	 */
@@ -195,8 +194,7 @@ public class StrolchJobsHandler extends StrolchComponent {
 	/**
 	 * Registers the given job, not changing its current schedule or type
 	 *
-	 * @param job
-	 * 		the job to register
+	 * @param job the job to register
 	 *
 	 * @return the job
 	 */
@@ -207,8 +205,9 @@ public class StrolchJobsHandler extends StrolchComponent {
 	private StrolchJob internalRegister(StrolchJob job) {
 		if (this.jobs.containsKey(job.getName())) {
 			StrolchJob existingJob = this.jobs.get(job.getName());
-			if (existingJob.getClass().equals(job.getClass()) && existingJob.getConfigureMethod().isModel()
-					&& job.getConfigureMethod().isProgrammatic()) {
+			if (existingJob.getClass().equals(job.getClass()) && existingJob.getConfigureMethod().isModel() && job
+					.getConfigureMethod()
+					.isProgrammatic()) {
 				logger.error("Not registering job {} as it is already registered by a model specific job!",
 						job.getName());
 			} else {
@@ -223,15 +222,14 @@ public class StrolchJobsHandler extends StrolchComponent {
 	/**
 	 * Returns the current list of registered jobs
 	 *
-	 * @param cert
-	 * 		the certificate to assert privilege
-	 * @param source
-	 * 		the source of the request
+	 * @param cert   the certificate to assert privilege
+	 * @param source the source of the request
 	 *
 	 * @return a list of registered jobs
 	 */
 	public List<StrolchJob> getJobs(Certificate cert, String source) {
-		getContainer().getPrivilegeHandler()
+		getContainer()
+				.getPrivilegeHandler()
 				.validate(cert, source)
 				.assertHasPrivilege(StrolchJobsHandler.class.getName());
 		return new ArrayList<>(this.jobs.values());
@@ -240,17 +238,15 @@ public class StrolchJobsHandler extends StrolchComponent {
 	/**
 	 * Returns the job with the given name
 	 *
-	 * @param cert
-	 * 		the certificate to assert privilege
-	 * @param source
-	 * 		the source of the request
-	 * @param jobName
-	 * 		the name of the job to return
+	 * @param cert    the certificate to assert privilege
+	 * @param source  the source of the request
+	 * @param jobName the name of the job to return
 	 *
 	 * @return the job with the requested name
 	 */
 	public StrolchJob getJob(Certificate cert, String source, String jobName) {
-		getContainer().getPrivilegeHandler()
+		getContainer()
+				.getPrivilegeHandler()
 				.validate(cert, source)
 				.assertHasPrivilege(StrolchJobsHandler.class.getName());
 		StrolchJob strolchJob = this.jobs.get(jobName);

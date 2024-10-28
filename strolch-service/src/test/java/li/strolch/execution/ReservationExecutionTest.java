@@ -1,11 +1,5 @@
 package li.strolch.execution;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_RESERVED;
-import static org.junit.Assert.*;
-
-import java.io.File;
-
 import li.strolch.execution.service.StartActivityExecutionService;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
@@ -25,6 +19,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_RESERVED;
+import static org.junit.Assert.*;
 
 public class ReservationExecutionTest extends RuntimeMock {
 
@@ -52,8 +52,8 @@ public class ReservationExecutionTest extends RuntimeMock {
 		// before we execute, we reserve, so execution can't be done
 		SetParameterService setParamSvc = new SetParameterService();
 		SetParameterArg setParamArg = new SetParameterArg();
-		setParamArg.locator = Locator
-				.valueOf(Tags.RESOURCE, "Machine", "machine1", Tags.BAG, BAG_PARAMETERS, PARAM_RESERVED);
+		setParamArg.locator = Locator.valueOf(Tags.RESOURCE, "Machine", "machine1", Tags.BAG, BAG_PARAMETERS,
+				PARAM_RESERVED);
 		setParamArg.valueAsString = "true";
 
 		doServiceAssertResult(cert, setParamSvc, setParamArg);

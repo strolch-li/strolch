@@ -22,7 +22,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.text.MessageFormat;
 import java.util.*;
 
 import static li.strolch.privilege.helper.XmlConstants.*;

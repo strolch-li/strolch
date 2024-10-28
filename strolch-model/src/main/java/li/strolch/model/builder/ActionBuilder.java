@@ -1,6 +1,5 @@
 package li.strolch.model.builder;
 
-import li.strolch.model.PolicyContainer;
 import li.strolch.model.activity.Action;
 import li.strolch.utils.dbc.DBC;
 

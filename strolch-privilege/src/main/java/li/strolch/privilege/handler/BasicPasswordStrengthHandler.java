@@ -1,12 +1,12 @@
 package li.strolch.privilege.handler;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Integer.parseInt;
-import static li.strolch.privilege.i18n.PrivilegeMessages.getString;
-
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
+
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
+import static li.strolch.privilege.i18n.PrivilegeMessages.getString;
 
 public class BasicPasswordStrengthHandler implements PasswordStrengthHandler {
 

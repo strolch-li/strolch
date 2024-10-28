@@ -15,10 +15,6 @@
  */
 package li.strolch.persistence.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
@@ -26,6 +22,10 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractDao<T extends StrolchRootElement> implements StrolchDao<T> {
 

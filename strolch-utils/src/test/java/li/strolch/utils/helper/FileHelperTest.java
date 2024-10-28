@@ -1,9 +1,9 @@
 package li.strolch.utils.helper;
 
-import static li.strolch.utils.helper.FileHelper.getTempFile;
-import static li.strolch.utils.helper.StringHelper.normalizeLength;
-import static li.strolch.utils.helper.TempFileOptions.*;
-import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -11,10 +11,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static li.strolch.utils.helper.FileHelper.getTempFile;
+import static li.strolch.utils.helper.StringHelper.normalizeLength;
+import static li.strolch.utils.helper.TempFileOptions.*;
+import static org.junit.Assert.assertEquals;
 
 public class FileHelperTest {
 	private static final Logger logger = LoggerFactory.getLogger(FileHelperTest.class);

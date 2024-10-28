@@ -53,7 +53,6 @@ import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
-import org.glassfish.grizzly.utils.StringFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;

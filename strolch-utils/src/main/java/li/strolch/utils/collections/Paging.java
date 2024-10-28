@@ -21,8 +21,7 @@ import java.util.List;
  * Paging helper creating windows on result list of queries. The input is the original complete list, and with the help
  * of an offset and a limit, a page/window can be fetched.
  *
- * @param <T>
- * 		the type of element in the list
+ * @param <T> the type of element in the list
  *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
@@ -96,8 +95,7 @@ public class Paging<T> {
 	/**
 	 * Set the size of all the data unfiltered
 	 *
-	 * @param dataSetSize
-	 * 		the size of all the data unfiltered
+	 * @param dataSetSize the size of all the data unfiltered
 	 */
 	public void setDataSetSize(long dataSetSize) {
 		this.dataSetSize = dataSetSize;
@@ -120,14 +118,10 @@ public class Paging<T> {
 	/**
 	 * Creates a sub list of the input list with the given limit and offset
 	 *
-	 * @param list
-	 * 		the list to paginate / create a window for
-	 * @param offset
-	 * 		where to start the sub list
-	 * @param limit
-	 * 		The number of items to return in each page/window
-	 * @param <T>
-	 * 		the type of element in the list
+	 * @param list   the list to paginate / create a window for
+	 * @param offset where to start the sub list
+	 * @param limit  The number of items to return in each page/window
+	 * @param <T>    the type of element in the list
 	 *
 	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
 	 */
@@ -138,16 +132,11 @@ public class Paging<T> {
 	/**
 	 * Creates a sub list of the input list with the given limit and offset
 	 *
-	 * @param list
-	 * 		the list to paginate / create a window for
-	 * @param offset
-	 * 		where to start the sub list
-	 * @param limit
-	 * 		The number of items to return in each page/window
-	 * @param dataSetSize
-	 * 		The number of items before filtering
-	 * @param <T>
-	 * 		the type of element in the list
+	 * @param list        the list to paginate / create a window for
+	 * @param offset      where to start the sub list
+	 * @param limit       The number of items to return in each page/window
+	 * @param dataSetSize The number of items before filtering
+	 * @param <T>         the type of element in the list
 	 *
 	 * @return a {@link Paging} instance from which the selected page (list) can be retrieved
 	 */

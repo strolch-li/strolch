@@ -15,8 +15,12 @@
  */
 package li.strolch.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import li.strolch.model.activity.Activity;
+import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
+import li.strolch.model.xml.SimpleStrolchElementListener;
+import li.strolch.model.xml.StrolchElementToSaxWriterVisitor;
+import li.strolch.model.xml.StrolchXmlHelper;
+import li.strolch.model.xml.XmlModelSaxStreamReader;
 
 import javax.xml.stream.XMLStreamWriter;
 import java.io.ByteArrayInputStream;
@@ -24,12 +28,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
 
-import li.strolch.model.activity.Activity;
-import li.strolch.model.visitor.StrolchElementDeepEqualsVisitor;
-import li.strolch.model.xml.SimpleStrolchElementListener;
-import li.strolch.model.xml.StrolchElementToSaxWriterVisitor;
-import li.strolch.model.xml.StrolchXmlHelper;
-import li.strolch.model.xml.XmlModelSaxStreamReader;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

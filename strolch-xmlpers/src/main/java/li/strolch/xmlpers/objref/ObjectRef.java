@@ -15,13 +15,13 @@
  */
 package li.strolch.xmlpers.objref;
 
-import java.io.File;
-import java.util.Objects;
-
 import li.strolch.utils.concurrent.LockableObject;
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.impl.PathBuilder;
+
+import java.io.File;
+import java.util.Objects;
 
 public abstract class ObjectRef extends LockableObject implements Comparable<ObjectRef> {
 

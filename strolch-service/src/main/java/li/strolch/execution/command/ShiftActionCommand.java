@@ -15,10 +15,6 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
-
-import java.util.List;
-
 import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -28,6 +24,10 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.List;
+
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
 
 /**
  * @author Martin Smock <martin.smock@bluewin.ch>

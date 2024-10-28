@@ -15,16 +15,16 @@
  */
 package li.strolch.service.privilege.users;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.UserState;
 import li.strolch.service.api.Service;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import org.junit.Test;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

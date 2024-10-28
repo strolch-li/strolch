@@ -15,18 +15,18 @@
  */
 package li.strolch.xmlpers.impl;
 
-import static li.strolch.utils.helper.PropertiesHelper.*;
-import static li.strolch.xmlpers.api.PersistenceConstants.*;
+import li.strolch.utils.concurrent.LockableObject;
+import li.strolch.xmlpers.api.*;
+import li.strolch.xmlpers.objref.ObjectReferenceCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import li.strolch.xmlpers.api.*;
-import li.strolch.utils.concurrent.LockableObject;
-import li.strolch.xmlpers.objref.ObjectReferenceCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static li.strolch.utils.helper.PropertiesHelper.*;
+import static li.strolch.xmlpers.api.PersistenceConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

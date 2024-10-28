@@ -15,10 +15,6 @@
  */
 package li.strolch.service.privilege.users;
 
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE;
-import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.USER;
-
 import li.strolch.model.Tags;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
@@ -28,6 +24,10 @@ import li.strolch.service.StringMapArgument;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_SET_USER_PASSWORD;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.USER;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -56,7 +56,8 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_PASSWORD)) {
 			tx.setSuppressAudits(true);
 
-			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
+			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler
+					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 			privilegeHandler.requirePasswordChange(getCertificate(), username);
 			if (privilegeHandler.isPersistOnUserDataChanged())

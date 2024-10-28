@@ -58,8 +58,18 @@ public class SystemHelper {
 	 * @see java.lang.Object#toString()
 	 */
 	public static String asString() {
-		return "OS: " + osName + " " + osVersion + " Arch: " + osArch + " on Java " + javaVendor + " " + javaVersion
-				+ " CPU Cores: " + nrOfCores;
+		return "OS: "
+				+ osName
+				+ " "
+				+ osVersion
+				+ " Arch: "
+				+ osArch
+				+ " on Java "
+				+ javaVendor
+				+ " "
+				+ javaVersion
+				+ " CPU Cores: "
+				+ nrOfCores;
 	}
 
 	public static String getUserDir() {
@@ -104,9 +114,12 @@ public class SystemHelper {
 
 	public static String getMemorySummary() {
 		return "System Memory available "
-				+ SystemHelper.getMaxMemory() + ",  Total: "
-				+ SystemHelper.getTotalMemory() + ",  Used: "
-				+ SystemHelper.getUsedMemory() + ",  Free: "
+				+ SystemHelper.getMaxMemory()
+				+ ",  Total: "
+				+ SystemHelper.getTotalMemory()
+				+ ",  Used: "
+				+ SystemHelper.getUsedMemory()
+				+ ",  Free: "
 				+ SystemHelper.getFreeMemory();
 	}
 }

@@ -15,22 +15,22 @@
  */
 package li.strolch.xmlpers.test;
 
+import li.strolch.xmlpers.api.*;
+import li.strolch.xmlpers.test.model.Book;
+import li.strolch.xmlpers.test.model.MyModel;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import static li.strolch.xmlpers.test.model.ModelBuilder.RES_ID;
 import static li.strolch.xmlpers.test.model.ModelBuilder.createResource;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import li.strolch.xmlpers.api.*;
-import li.strolch.xmlpers.test.model.Book;
-import li.strolch.xmlpers.test.model.MyModel;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -101,8 +101,7 @@ public class TransactionResultTest extends AbstractPersistenceTest {
 		i = 0;
 		for (; i < 10; i++) {
 			String title = "Tx Result Test Book " + i;
-			Book book = new Book((long) i, title, "Douglas Adams", "Apress",
-					Math.random() * i); //$NON-NLS-2$
+			Book book = new Book((long) i, title, "Douglas Adams", "Apress", Math.random() * i); //$NON-NLS-2$
 			books.add(book);
 		}
 

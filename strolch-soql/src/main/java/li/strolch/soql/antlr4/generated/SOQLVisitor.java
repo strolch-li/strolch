@@ -6,15 +6,13 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 /**
  * This interface defines a complete generic visitor for a parse tree produced by {@link SOQLParser}.
  *
- * @param <T>
- * 		The return type of the visit operation. Use {@link Void} for operations with no return type.
+ * @param <T> The return type of the visit operation. Use {@link Void} for operations with no return type.
  */
 public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#select_statement}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -23,8 +21,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#select_clause}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -33,8 +30,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#select_expression}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -43,8 +39,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#chained_method_expression}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -53,8 +48,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#method_expression}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -63,8 +57,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#method_name}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -73,8 +66,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#method_argument}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -83,8 +75,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#from_clause}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -93,8 +84,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#entity_declaration}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -103,8 +93,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#class_declaration}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -113,8 +102,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#object_declaration}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -123,8 +111,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#where_clause}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -133,8 +120,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#or_expression}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -143,8 +129,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#and_expression}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -153,8 +138,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#expression_term}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -163,8 +147,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#comparison_expression}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -173,8 +156,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#comparison_operator}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -183,8 +165,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#var_reference}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -193,8 +174,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#value_declaration}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -203,8 +183,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#orderby_clause}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */
@@ -213,8 +192,7 @@ public interface SOQLVisitor<T> extends ParseTreeVisitor<T> {
 	/**
 	 * Visit a parse tree produced by {@link SOQLParser#orderby_item}.
 	 *
-	 * @param ctx
-	 * 		the parse tree
+	 * @param ctx the parse tree
 	 *
 	 * @return the visitor result
 	 */

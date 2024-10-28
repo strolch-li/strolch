@@ -35,8 +35,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * Set the value of the parameter from a string
 	 *
-	 * @param valueAsString
-	 * 		the string from which to set the value
+	 * @param valueAsString the string from which to set the value
 	 */
 	void setValueFromString(String valueAsString);
 
@@ -50,16 +49,14 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * set the value of the parameter
 	 *
-	 * @param value
-	 * 		the new value
+	 * @param value the new value
 	 */
 	void setValue(T value);
 
 	/**
 	 * set the value of the parameter from another value, i.e. copying the value
 	 *
-	 * @param parameter
-	 * 		the parameter from which to copy the new value
+	 * @param parameter the parameter from which to copy the new value
 	 */
 	void setValueFrom(Parameter<T> parameter);
 
@@ -86,8 +83,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * Returns true if the given parameter's value is equal to the current value
 	 *
-	 * @param otherValue
-	 * 		the value to check on equality
+	 * @param otherValue the value to check on equality
 	 *
 	 * @return true if the given parameter's value is equal to the current value
 	 */
@@ -96,8 +92,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * Returns true if the given value is equal to the current value
 	 *
-	 * @param otherValue
-	 * 		the value to check on equality
+	 * @param otherValue the value to check on equality
 	 *
 	 * @return true if the given value is equal to the current value
 	 */
@@ -113,8 +108,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * set the hidden attribute
 	 *
-	 * @param hidden
-	 * 		new hidden value
+	 * @param hidden new hidden value
 	 */
 	void setHidden(boolean hidden);
 
@@ -128,8 +122,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * Set the UOM of this {@link Parameter}
 	 *
-	 * @param uom
-	 * 		the new UOM
+	 * @param uom the new UOM
 	 */
 	void setUom(String uom);
 
@@ -157,8 +150,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * Set the index of this {@link Parameter}. This can be used to sort the parameters in a UI
 	 *
-	 * @param index
-	 * 		the index to set
+	 * @param index the index to set
 	 */
 	void setIndex(int index);
 
@@ -184,8 +176,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	 * <li>{@link StrolchModelConstants#INTERPRETATION_RESOURCE_REF}</li>
 	 * </ul>
 	 *
-	 * @param interpretation
-	 * 		the interpretation
+	 * @param interpretation the interpretation
 	 */
 	void setInterpretation(String interpretation);
 
@@ -225,8 +216,7 @@ public interface Parameter<T> extends StrolchElement, Comparable<Parameter<?>> {
 	/**
 	 * Compares the value of the given parameter to this parameter
 	 *
-	 * @param o
-	 * 		the parameter for which the value is to be compared to
+	 * @param o the parameter for which the value is to be compared to
 	 *
 	 * @return the {@link Comparable#compareTo(Object)} result
 	 */

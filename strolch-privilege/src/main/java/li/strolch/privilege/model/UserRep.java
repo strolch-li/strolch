@@ -55,19 +55,18 @@ public class UserRep {
 	/**
 	 * Default constructor
 	 *
-	 * @param userId      the user's id
-	 * @param username    the user's login name
-	 * @param firstname   the user's first name
-	 * @param lastname    the user's last name
-	 * @param userState   the user's {@link UserState}
-	 * @param groups      the set of {@link Group}s assigned to this user
-	 * @param roles       the set of {@link Role}s assigned to this user
-	 * @param locale      the user's {@link Locale}
+	 * @param userId     the user's id
+	 * @param username   the user's login name
+	 * @param firstname  the user's first name
+	 * @param lastname   the user's last name
+	 * @param userState  the user's {@link UserState}
+	 * @param groups     the set of {@link Group}s assigned to this user
+	 * @param roles      the set of {@link Role}s assigned to this user
+	 * @param locale     the user's {@link Locale}
 	 * @param properties a {@link Map} containing string value pairs of properties for this user
 	 */
 	public UserRep(String userId, String username, String firstname, String lastname, UserState userState,
-			Set<String> groups, Set<String> roles, Locale locale, Map<String, String> properties,
-			UserHistory history) {
+			Set<String> groups, Set<String> roles, Locale locale, Map<String, String> properties, UserHistory history) {
 		this.userId = trimOrEmpty(userId);
 		this.username = trimOrEmpty(username);
 		this.firstname = trimOrEmpty(firstname);
@@ -384,9 +383,23 @@ public class UserRep {
 	 */
 	@Override
 	public String toString() {
-		return "UserRep [userId=" + this.userId + ", username=" + this.username + ", firstname=" + this.firstname +
-				", lastname=" + this.lastname + ", userState=" + this.userState + ", locale=" + this.locale +
-				", roles=" + this.roles + ", groups=" + this.groups + "]";
+		return "UserRep [userId="
+				+ this.userId
+				+ ", username="
+				+ this.username
+				+ ", firstname="
+				+ this.firstname
+				+ ", lastname="
+				+ this.lastname
+				+ ", userState="
+				+ this.userState
+				+ ", locale="
+				+ this.locale
+				+ ", roles="
+				+ this.roles
+				+ ", groups="
+				+ this.groups
+				+ "]";
 	}
 
 	@Override

@@ -186,7 +186,9 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		runtimeJ.addProperty(Tags.Json.DATA_PATH, dataPath.getAbsolutePath());
 		runtimeJ.addProperty(Tags.Json.TEMP_PATH, tempPath.getAbsolutePath());
 		runtimeJ.addProperty(Tags.Json.LOCALE, locale.toLanguageTag());
-		runtimeJ.add(Tags.Json.SUPPORTED_LANGUAGES, supportedLanguages.stream().map(SupportedLanguage::name)
+		runtimeJ.add(Tags.Json.SUPPORTED_LANGUAGES, supportedLanguages
+				.stream()
+				.map(SupportedLanguage::name)
 				.collect(JsonArray::new, JsonArray::add, JsonArray::addAll));
 
 		return runtimeJ;

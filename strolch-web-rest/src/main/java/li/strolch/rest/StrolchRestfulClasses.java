@@ -15,12 +15,12 @@
  */
 package li.strolch.rest;
 
+import li.strolch.rest.endpoint.*;
+import li.strolch.rest.filters.*;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import li.strolch.rest.endpoint.*;
-import li.strolch.rest.filters.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

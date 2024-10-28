@@ -15,8 +15,6 @@
  */
 package li.strolch.utils.objectfilter;
 
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,8 +79,7 @@ public class ObjectCache {
 	/**
 	 * Set the new object version of this cache.
 	 *
-	 * @param object
-	 * 		the object to set
+	 * @param object the object to set
 	 */
 	public void setObject(Object object) {
 		this.object = object;
@@ -91,8 +88,7 @@ public class ObjectCache {
 	/**
 	 * Change the operation to execute for this object.
 	 *
-	 * @param newOperation
-	 * 		the operation to set
+	 * @param newOperation the operation to set
 	 */
 	public void setOperation(Operation newOperation) {
 		this.operation = newOperation;

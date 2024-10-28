@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.List;
 
-@SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class SOQLParser extends Parser {
 	static {
 		RuntimeMetaData.checkVersion("4.7", RuntimeMetaData.VERSION);
@@ -21,83 +21,28 @@ public class SOQLParser extends Parser {
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache = new PredictionContextCache();
-	public static final int T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, IDENTIFICATION_VARIABLE = 25, STRING_VARIABLE = 26, WS = 27;
-	public static final int RULE_select_statement = 0, RULE_select_clause = 1, RULE_select_expression = 2, RULE_chained_method_expression = 3, RULE_method_expression = 4, RULE_method_name = 5, RULE_method_argument = 6, RULE_from_clause = 7, RULE_entity_declaration = 8, RULE_class_declaration = 9, RULE_object_declaration = 10, RULE_where_clause = 11, RULE_or_expression = 12, RULE_and_expression = 13, RULE_expression_term = 14, RULE_comparison_expression = 15, RULE_comparison_operator = 16, RULE_var_reference = 17, RULE_value_declaration = 18, RULE_orderby_clause = 19, RULE_orderby_item = 20;
-	public static final String[] ruleNames = { "select_statement",
-			"select_clause",
-			"select_expression",
-			"chained_method_expression",
-			"method_expression",
-			"method_name",
-			"method_argument",
-			"from_clause",
-			"entity_declaration",
-			"class_declaration",
-			"object_declaration",
-			"where_clause",
-			"or_expression",
-			"and_expression",
-			"expression_term",
-			"comparison_expression",
-			"comparison_operator",
-			"var_reference",
-			"value_declaration",
-			"orderby_clause",
-			"orderby_item" };
+	public static final int T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, T__7 = 8, T__8 = 9,
+			T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18,
+			T__18 = 19, T__19 = 20, T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, IDENTIFICATION_VARIABLE = 25,
+			STRING_VARIABLE = 26, WS = 27;
+	public static final int RULE_select_statement = 0, RULE_select_clause = 1, RULE_select_expression = 2,
+			RULE_chained_method_expression = 3, RULE_method_expression = 4, RULE_method_name = 5, RULE_method_argument
+			= 6, RULE_from_clause = 7, RULE_entity_declaration = 8, RULE_class_declaration = 9, RULE_object_declaration
+			= 10, RULE_where_clause = 11, RULE_or_expression = 12, RULE_and_expression = 13, RULE_expression_term = 14,
+			RULE_comparison_expression = 15, RULE_comparison_operator = 16, RULE_var_reference = 17,
+			RULE_value_declaration = 18, RULE_orderby_clause = 19, RULE_orderby_item = 20;
+	public static final String[] ruleNames = {"select_statement", "select_clause", "select_expression",
+			"chained_method_expression", "method_expression", "method_name", "method_argument", "from_clause",
+			"entity_declaration", "class_declaration", "object_declaration", "where_clause", "or_expression",
+			"and_expression", "expression_term", "comparison_expression", "comparison_operator", "var_reference",
+			"value_declaration", "orderby_clause", "orderby_item"};
 
-	private static final String[] _LITERAL_NAMES = { null,
-			"'SELECT'",
-			"'DISTINCT'",
-			"','",
-			"'.'",
-			"'()'",
-			"'('",
-			"')'",
-			"'FROM'",
-			"'WHERE'",
-			"'OR'",
-			"'AND'",
-			"'NOT'",
-			"'='",
-			"'>'",
-			"'>='",
-			"'<'",
-			"'<='",
-			"'<>'",
-			"':'",
-			"'\"'",
-			"'ORDER'",
-			"'BY'",
-			"'ASC'",
-			"'DESC'" };
-	private static final String[] _SYMBOLIC_NAMES = { null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			"IDENTIFICATION_VARIABLE",
-			"STRING_VARIABLE",
-			"WS" };
+	private static final String[] _LITERAL_NAMES = {null, "'SELECT'", "'DISTINCT'", "','", "'.'", "'()'", "'('", "')'",
+			"'FROM'", "'WHERE'", "'OR'", "'AND'", "'NOT'", "'='", "'>'", "'>='", "'<'", "'<='", "'<>'", "':'", "'\"'",
+			"'ORDER'", "'BY'", "'ASC'", "'DESC'"};
+	private static final String[] _SYMBOLIC_NAMES = {null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+			"IDENTIFICATION_VARIABLE", "STRING_VARIABLE", "WS"};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
@@ -379,20 +324,20 @@ public class SOQLParser extends Parser {
 			setState(64);
 			_errHandler.sync(this);
 			switch (getInterpreter().adaptivePredict(_input, 4, _ctx)) {
-			case 1:
-				enterOuterAlt(_localctx, 1);
-			{
-				setState(62);
-				chained_method_expression();
-			}
-			break;
-			case 2:
-				enterOuterAlt(_localctx, 2);
-			{
-				setState(63);
-				object_declaration();
-			}
-			break;
+				case 1:
+					enterOuterAlt(_localctx, 1);
+				{
+					setState(62);
+					chained_method_expression();
+				}
+				break;
+				case 2:
+					enterOuterAlt(_localctx, 2);
+				{
+					setState(63);
+					object_declaration();
+				}
+				break;
 			}
 		} catch (RecognitionException re) {
 			_localctx.exception = re;
@@ -648,42 +593,42 @@ public class SOQLParser extends Parser {
 			setState(93);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__4:
-				enterOuterAlt(_localctx, 1);
-			{
-				setState(81);
-				match(T__4);
-			}
-			break;
-			case T__5:
-				enterOuterAlt(_localctx, 2);
-			{
-				setState(82);
-				match(T__5);
-				setState(83);
-				var_reference();
-				setState(88);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				while (_la == T__2) {
-					{
-						{
-							setState(84);
-							match(T__2);
-							setState(85);
-							var_reference();
-						}
-					}
-					setState(90);
+				case T__4:
+					enterOuterAlt(_localctx, 1);
+				{
+					setState(81);
+					match(T__4);
+				}
+				break;
+				case T__5:
+					enterOuterAlt(_localctx, 2);
+				{
+					setState(82);
+					match(T__5);
+					setState(83);
+					var_reference();
+					setState(88);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
+					while (_la == T__2) {
+						{
+							{
+								setState(84);
+								match(T__2);
+								setState(85);
+								var_reference();
+							}
+						}
+						setState(90);
+						_errHandler.sync(this);
+						_la = _input.LA(1);
+					}
+					setState(91);
+					match(T__6);
 				}
-				setState(91);
-				match(T__6);
-			}
-			break;
-			default:
-				throw new NoViableAltException(this);
+				break;
+				default:
+					throw new NoViableAltException(this);
 			}
 		} catch (RecognitionException re) {
 			_localctx.exception = re;
@@ -1279,23 +1224,23 @@ public class SOQLParser extends Parser {
 				setState(140);
 				_errHandler.sync(this);
 				switch (_input.LA(1)) {
-				case T__19: {
-					setState(137);
-					value_declaration();
-				}
-				break;
-				case T__18: {
-					setState(138);
-					var_reference();
-				}
-				break;
-				case IDENTIFICATION_VARIABLE: {
-					setState(139);
-					chained_method_expression();
-				}
-				break;
-				default:
-					throw new NoViableAltException(this);
+					case T__19: {
+						setState(137);
+						value_declaration();
+					}
+					break;
+					case T__18: {
+						setState(138);
+						var_reference();
+					}
+					break;
+					case IDENTIFICATION_VARIABLE: {
+						setState(139);
+						chained_method_expression();
+					}
+					break;
+					default:
+						throw new NoViableAltException(this);
 				}
 			}
 		} catch (RecognitionException re) {
@@ -1348,9 +1293,18 @@ public class SOQLParser extends Parser {
 			{
 				setState(142);
 				_la = _input.LA(1);
-				if (!((((_la) & ~0x3f) == 0 &&
-						((1L << _la) & ((1L << T__12) | (1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16)
-								| (1L << T__17))) != 0))) {
+				if (!(
+						(
+								((_la) & ~0x3f) == 0 && (
+										(1L << _la) & (
+												(1L << T__12)
+														| (1L << T__13)
+														| (1L << T__14)
+														| (1L << T__15)
+														| (
+														1L
+																<< T__16)
+														| (1L << T__17))) != 0))) {
 					_errHandler.recoverInline(this);
 				} else {
 					if (_input.LA(1) == Token.EOF)

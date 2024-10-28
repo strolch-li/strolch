@@ -15,15 +15,15 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import java.io.Serializable;
-import java.util.*;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * {@link IValue} implementation to work with String valued {@link ITimeValue} objects. Since a java.util.String object
@@ -79,8 +79,9 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 			for (Iterator<AString> iter = this.aStrings.iterator(); iter.hasNext(); ) {
 				AString aString = iter.next();
 				boolean valueMatch = aString.getString().equals(toAdd.getString());
-				boolean compensate =
-						(toAdd.isInverse() && !aString.isInverse()) || (!toAdd.isInverse() && aString.isInverse());
+				boolean compensate = (toAdd.isInverse() && !aString.isInverse()) || (
+						!toAdd.isInverse()
+								&& aString.isInverse());
 				if (valueMatch && compensate) {
 					iter.remove();
 					iter1.remove();

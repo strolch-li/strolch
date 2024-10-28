@@ -28,8 +28,7 @@ public interface Service<T extends ServiceArgument, U extends ServiceResult> ext
 	/**
 	 * Performs the actual service
 	 *
-	 * @param argument
-	 * 		the argument for the service
+	 * @param argument the argument for the service
 	 *
 	 * @return the service result
 	 */

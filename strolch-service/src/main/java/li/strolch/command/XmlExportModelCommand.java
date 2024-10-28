@@ -15,19 +15,6 @@
  */
 package li.strolch.command;
 
-import static li.strolch.utils.helper.StringHelper.UNDERLINE;
-
-import javax.xml.stream.XMLStreamWriter;
-import java.io.File;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.text.MessageFormat;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.api.ResourceMap;
@@ -42,6 +29,19 @@ import li.strolch.model.xml.StrolchXmlHelper;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import javax.xml.stream.XMLStreamWriter;
+import java.io.File;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static li.strolch.utils.helper.StringHelper.UNDERLINE;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -166,8 +166,12 @@ public class XmlExportModelCommand extends Command {
 					if (!this.multiFile) {
 						writeResourcesByType(writer, resourceMap, type);
 					} else {
-						String typeXmlFile =
-								exportName + UNDERLINE + Tags.RESOURCE + UNDERLINE + type + XML_FILE_SUFFIX;
+						String typeXmlFile = exportName
+								+ UNDERLINE
+								+ Tags.RESOURCE
+								+ UNDERLINE
+								+ type
+								+ XML_FILE_SUFFIX;
 						writer.writeEmptyElement(Tags.INCLUDE_FILE);
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
@@ -225,8 +229,12 @@ public class XmlExportModelCommand extends Command {
 					if (!this.multiFile) {
 						writeActivitiesByType(writer, activityMap, type);
 					} else {
-						String typeXmlFile =
-								exportName + UNDERLINE + Tags.ACTIVITY + UNDERLINE + type + XML_FILE_SUFFIX;
+						String typeXmlFile = exportName
+								+ UNDERLINE
+								+ Tags.ACTIVITY
+								+ UNDERLINE
+								+ type
+								+ XML_FILE_SUFFIX;
 						writer.writeEmptyElement(Tags.INCLUDE_FILE);
 						writer.writeAttribute(Tags.FILE, typeXmlFile);
 
@@ -307,8 +315,7 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	/**
-	 * @param modelFile
-	 * 		the modelFile to set
+	 * @param modelFile the modelFile to set
 	 */
 	public void setModelFile(File modelFile) {
 		this.modelFile = modelFile;
@@ -322,48 +329,42 @@ public class XmlExportModelCommand extends Command {
 	}
 
 	/**
-	 * @param doOrders
-	 * 		the doOrders to set
+	 * @param doOrders the doOrders to set
 	 */
 	public void setDoOrders(boolean doOrders) {
 		this.doOrders = doOrders;
 	}
 
 	/**
-	 * @param doResources
-	 * 		the doResources to set
+	 * @param doResources the doResources to set
 	 */
 	public void setDoResources(boolean doResources) {
 		this.doResources = doResources;
 	}
 
 	/**
-	 * @param doActivities
-	 * 		the doActivities to set
+	 * @param doActivities the doActivities to set
 	 */
 	public void setDoActivities(boolean doActivities) {
 		this.doActivities = doActivities;
 	}
 
 	/**
-	 * @param orderTypes
-	 * 		the orderTypes to set
+	 * @param orderTypes the orderTypes to set
 	 */
 	public void setOrderTypes(Set<String> orderTypes) {
 		this.orderTypes = orderTypes;
 	}
 
 	/**
-	 * @param resourceTypes
-	 * 		the resourceTypes to set
+	 * @param resourceTypes the resourceTypes to set
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
 	}
 
 	/**
-	 * @param activityTypes
-	 * 		the activityTypes to set
+	 * @param activityTypes the activityTypes to set
 	 */
 	public void setActivityTypes(Set<String> activityTypes) {
 		this.activityTypes = activityTypes;

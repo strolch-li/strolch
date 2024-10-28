@@ -20,8 +20,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Locale;
-
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
@@ -29,6 +27,8 @@ import li.strolch.runtime.query.enums.EnumHandler;
 import li.strolch.runtime.query.enums.StrolchEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,7 +46,8 @@ public class EnumResource {
 
 		try {
 
-			EnumHandler enumHandler = RestfulStrolchComponent.getInstance()
+			EnumHandler enumHandler = RestfulStrolchComponent
+					.getInstance()
 					.getContainer()
 					.getComponent(EnumHandler.class);
 
@@ -68,7 +69,8 @@ public class EnumResource {
 
 		try {
 
-			EnumHandler enumHandler = RestfulStrolchComponent.getInstance()
+			EnumHandler enumHandler = RestfulStrolchComponent
+					.getInstance()
 					.getContainer()
 					.getComponent(EnumHandler.class);
 

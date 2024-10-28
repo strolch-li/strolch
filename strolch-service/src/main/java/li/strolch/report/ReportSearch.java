@@ -1,12 +1,12 @@
 package li.strolch.report;
 
-import static li.strolch.report.ReportConstants.TYPE_REPORT;
-
-import java.util.Set;
-
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.search.ResourceSearch;
+
+import java.util.Set;
+
+import static li.strolch.report.ReportConstants.TYPE_REPORT;
 
 /**
  * Query to get report resources

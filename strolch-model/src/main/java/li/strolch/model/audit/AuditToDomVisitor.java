@@ -15,13 +15,13 @@
  */
 package li.strolch.model.audit;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.DomUtil;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.parsers.DocumentBuilder;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

@@ -1,7 +1,5 @@
 package li.strolch.execution.policy;
 
-import java.util.List;
-
 import li.strolch.model.Resource;
 import li.strolch.model.State;
 import li.strolch.model.activity.Action;
@@ -10,6 +8,8 @@ import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.List;
 
 public class SimplePlanning extends PlanningPolicy {
 
@@ -23,11 +23,10 @@ public class SimplePlanning extends PlanningPolicy {
 	 *
 	 * <br>
 	 * <p>
-	 * It iterates the {@link IValueChange} operators and registers the resulting changes on the {@link
-	 * StrolchTimedState} objects assigned to the {@link Resource}.
+	 * It iterates the {@link IValueChange} operators and registers the resulting changes on the
+	 * {@link StrolchTimedState} objects assigned to the {@link Resource}.
 	 *
-	 * @param action
-	 * 		the action to plan
+	 * @param action the action to plan
 	 */
 	@Override
 	public void plan(Action action) {
@@ -46,8 +45,7 @@ public class SimplePlanning extends PlanningPolicy {
 
 		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (IValueChange<?> change : changes) {
-			@SuppressWarnings("rawtypes")
-			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
+			@SuppressWarnings("rawtypes") StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			//noinspection unchecked
 			timedState.applyChange(change, true);
 		}
@@ -65,8 +63,7 @@ public class SimplePlanning extends PlanningPolicy {
 	 * It iterates the {@link IValueChange} operators and unregisters the changes from the {@link StrolchTimedState}
 	 * objects on the {@link Resource}.
 	 *
-	 * @param action
-	 * 		the action to unplan
+	 * @param action the action to unplan
 	 */
 	@Override
 	public void unplan(Action action) {
@@ -76,8 +73,7 @@ public class SimplePlanning extends PlanningPolicy {
 
 		List<IValueChange<? extends IValue<?>>> changes = action.getChanges();
 		for (IValueChange<?> change : changes) {
-			@SuppressWarnings("rawtypes")
-			StrolchTimedState timedState = resource.getTimedState(change.getStateId());
+			@SuppressWarnings("rawtypes") StrolchTimedState timedState = resource.getTimedState(change.getStateId());
 			//noinspection unchecked
 			timedState.applyChange(change.getInverse(), true);
 		}

@@ -23,16 +23,14 @@ package li.strolch.model.policy;
 public interface PolicyDefVisitor {
 
 	/**
-	 * Resolves a policy instance by returning an instance of a Java class by instantiating it by the {@link
-	 * PolicyDef#getValue()} defined on the {@link JavaPolicyDef}
+	 * Resolves a policy instance by returning an instance of a Java class by instantiating it by the
+	 * {@link PolicyDef#getValue()} defined on the {@link JavaPolicyDef}
 	 *
-	 * @param javaPolicyDef
-	 * 		the {@link PolicyDef} referencing a Java Class
+	 * @param javaPolicyDef the {@link PolicyDef} referencing a Java Class
 	 *
 	 * @return an instance of the policy referenced by the {@link PolicyDef#getValue()}
 	 *
-	 * @throws ClassNotFoundException
-	 * 		if the class referenced by this {@link PolicyDef} does not exist
+	 * @throws ClassNotFoundException if the class referenced by this {@link PolicyDef} does not exist
 	 */
 	<T> Class<T> visit(JavaPolicyDef javaPolicyDef) throws ClassNotFoundException;
 
@@ -41,11 +39,9 @@ public interface PolicyDefVisitor {
 	 * actual implementation. Use this if many elements use the same policy and it is required to change the
 	 * implementation easily
 	 *
-	 * @param keyPolicyDef
-	 * 		the {@link PolicyDef} using a key to reference a policy
+	 * @param keyPolicyDef the {@link PolicyDef} using a key to reference a policy
 	 *
 	 * @return an instance of the policy resolved by the key {@link PolicyDef#getValue()}
-	 *
 	 */
 	<T> Class<T> visit(KeyPolicyDef keyPolicyDef);
 }

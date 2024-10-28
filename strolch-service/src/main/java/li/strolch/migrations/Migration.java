@@ -15,10 +15,6 @@
  */
 package li.strolch.migrations;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-
-import java.io.File;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
@@ -28,6 +24,10 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.utils.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
 public abstract class Migration {
 

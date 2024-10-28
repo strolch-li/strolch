@@ -15,9 +15,6 @@
  */
 package li.strolch.model.xml;
 
-import java.text.MessageFormat;
-import java.util.Date;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
@@ -35,6 +32,9 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.text.MessageFormat;
+import java.util.Date;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -145,22 +145,22 @@ public class StrolchElementFromDomVisitor {
 				continue;
 
 			switch (childElem.getNodeName()) {
-			case Tags.ACTIVITY:
-				Activity childActivity = new Activity();
-				fillElement(childElem, childActivity);
-				activity.addElement(childActivity);
-				break;
-			case Tags.ACTION:
-				Action childAction = new Action();
-				fillElement(childElem, childAction);
-				activity.addElement(childAction);
-				break;
-			case Tags.PARAMETER_BAG:
-			case Tags.POLICIES:
-			case Tags.VERSION:
-				break;
-			default:
-				throw new IllegalArgumentException("Unexpected element tag " + childElem.getNodeName());
+				case Tags.ACTIVITY:
+					Activity childActivity = new Activity();
+					fillElement(childElem, childActivity);
+					activity.addElement(childActivity);
+					break;
+				case Tags.ACTION:
+					Action childAction = new Action();
+					fillElement(childElem, childAction);
+					activity.addElement(childAction);
+					break;
+				case Tags.PARAMETER_BAG:
+				case Tags.POLICIES:
+				case Tags.VERSION:
+					break;
+				default:
+					throw new IllegalArgumentException("Unexpected element tag " + childElem.getNodeName());
 			}
 		}
 	}
@@ -360,8 +360,7 @@ public class StrolchElementFromDomVisitor {
 			int v = Integer.parseInt(versionElem.getAttribute(Tags.VERSION));
 			String createdBy = versionElem.getAttribute(Tags.CREATED_BY);
 
-			String updatedBy = versionElem.hasAttribute(Tags.UPDATED_BY) ?
-					versionElem.getAttribute(Tags.UPDATED_BY) :
+			String updatedBy = versionElem.hasAttribute(Tags.UPDATED_BY) ? versionElem.getAttribute(Tags.UPDATED_BY) :
 					createdBy;
 
 			String createdS;

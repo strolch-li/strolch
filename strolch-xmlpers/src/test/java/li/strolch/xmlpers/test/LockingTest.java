@@ -15,24 +15,24 @@
  */
 package li.strolch.xmlpers.test;
 
-import static li.strolch.xmlpers.test.impl.TestConstants.TYPE_RES;
-import static li.strolch.xmlpers.test.model.ModelBuilder.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import li.strolch.utils.concurrent.LockableObject;
+import li.strolch.xmlpers.api.IoMode;
+import li.strolch.xmlpers.api.PersistenceConstants;
+import li.strolch.xmlpers.api.PersistenceTransaction;
+import li.strolch.xmlpers.objref.IdOfSubTypeRef;
+import li.strolch.xmlpers.test.model.MyModel;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import li.strolch.xmlpers.api.IoMode;
-import li.strolch.xmlpers.api.PersistenceConstants;
-import li.strolch.xmlpers.api.PersistenceTransaction;
-import li.strolch.xmlpers.objref.IdOfSubTypeRef;
-import li.strolch.utils.concurrent.LockableObject;
-import li.strolch.xmlpers.test.model.MyModel;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static li.strolch.xmlpers.test.impl.TestConstants.TYPE_RES;
+import static li.strolch.xmlpers.test.model.ModelBuilder.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -216,7 +216,9 @@ public class LockingTest extends AbstractPersistenceTest {
 		@Override
 		protected void doWork(PersistenceTransaction tx) {
 
-			IdOfSubTypeRef objectRef = tx.getManager().getObjectRefCache()
+			IdOfSubTypeRef objectRef = tx
+					.getManager()
+					.getObjectRefCache()
 					.getIdOfSubTypeRef(TYPE_RES, RES_TYPE, this.resourceId);
 			MyModel resource = tx.getObjectDao().queryById(objectRef);
 			assertNotNull(resource);

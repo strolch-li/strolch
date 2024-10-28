@@ -1,11 +1,11 @@
 package li.strolch.model.builder.params;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-
 import li.strolch.model.builder.BagBuilder;
 import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.Parameter;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
 public abstract class ParameterBuilder<R, S extends Parameter<R>, T extends ParameterBagContainerBuilder<T>> {
 

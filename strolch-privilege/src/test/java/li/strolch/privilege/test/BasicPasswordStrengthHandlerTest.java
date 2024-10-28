@@ -1,14 +1,14 @@
 package li.strolch.privilege.test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import li.strolch.privilege.handler.BasicPasswordStrengthHandler;
+import li.strolch.privilege.handler.PasswordStrengthHandler;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import li.strolch.privilege.handler.BasicPasswordStrengthHandler;
-import li.strolch.privilege.handler.PasswordStrengthHandler;
-import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BasicPasswordStrengthHandlerTest {
 

@@ -56,7 +56,8 @@ public class OrderModelTestRunner {
 
 		// create
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType");//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newOrder);
 			tx.commitOnClose();
@@ -66,7 +67,8 @@ public class OrderModelTestRunner {
 	public void runQuerySizeTest() {
 
 		// remove all
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.getOrderMap().removeAll(tx, tx.getOrderMap().getAllElements(tx));
 			tx.commitOnClose();
@@ -85,7 +87,8 @@ public class OrderModelTestRunner {
 		order2.setDate(LocalDate.of(2019, 4, 1));
 		order3.setDate(LocalDate.of(2019, 5, 1));
 
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(order1);
 			tx.add(order2);
@@ -176,7 +179,8 @@ public class OrderModelTestRunner {
 
 		// create
 		Order newOrder = createOrder(ID, NAME, TYPE);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newOrder);
 			tx.commitOnClose();
@@ -184,7 +188,8 @@ public class OrderModelTestRunner {
 
 		// read
 		Order readOrder;
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			readOrder = tx.getOrderBy(TYPE, ID);
 		}
@@ -194,7 +199,8 @@ public class OrderModelTestRunner {
 		StringParameter sParam = readOrder.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.update(readOrder);
 			tx.commitOnClose();
@@ -212,7 +218,8 @@ public class OrderModelTestRunner {
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.remove(readOrder);
 			tx.commitOnClose();
@@ -225,13 +232,15 @@ public class OrderModelTestRunner {
 		}
 
 		// create with same ID, but different types
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Order order = createOrder("non-unique-id", "NonUnique1", "NonUnique1");
 			tx.add(order);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Order order = createOrder("non-unique-id", "NonUnique2", "NonUnique2");
 			tx.add(order);
@@ -239,7 +248,8 @@ public class OrderModelTestRunner {
 		}
 
 		// update elements
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Order order1 = tx.getOrderBy("NonUnique1", "non-unique-id");
 			Order order2 = tx.getOrderBy("NonUnique2", "non-unique-id");
@@ -256,7 +266,8 @@ public class OrderModelTestRunner {
 		}
 
 		// remove elements
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Order order1 = tx.getOrderBy("NonUnique1", "non-unique-id");
 			Order order2 = tx.getOrderBy("NonUnique2", "non-unique-id");
@@ -271,7 +282,8 @@ public class OrderModelTestRunner {
 		}
 
 		// validate doesn't exist anymore
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Order order1 = tx.getOrderBy("NonUnique1", "non-unique-id");
 			Order order2 = tx.getOrderBy("NonUnique2", "non-unique-id");
@@ -292,7 +304,8 @@ public class OrderModelTestRunner {
 		orders.sort(Comparator.comparing(StrolchElement::getId));
 
 		// first clear the map, so that we have a clean state
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			OrderMap orderMap = tx.getOrderMap();
 			List<Order> allElements = orderMap.getAllElements(tx);
@@ -304,21 +317,24 @@ public class OrderModelTestRunner {
 
 		{
 			// make sure it is empty
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				OrderMap orderMap = tx.getOrderMap();
 				assertEquals(0, orderMap.querySize(tx));
 			}
 
 			// now add some orders
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", false)) {
 				tx.getOrderMap().addAll(tx, orders);
 				tx.commitOnClose();
 			}
 
 			// make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				OrderMap orderMap = tx.getOrderMap();
 				assertEquals(orders.size(), orderMap.querySize(tx));
@@ -326,14 +342,16 @@ public class OrderModelTestRunner {
 			}
 
 			// now use the remove all by type
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", false)) {
 				tx.getOrderMap().removeAllBy(tx, "MyType3");
 				tx.commitOnClose();
 			}
 
 			// again make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				OrderMap orderMap = tx.getOrderMap();
 				assertEquals(orders.size() - 5, orderMap.querySize(tx));
@@ -341,7 +359,8 @@ public class OrderModelTestRunner {
 			}
 
 			// now use the remove all
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", false)) {
 				long removed = tx.getOrderMap().removeAll(tx);
 				assertEquals(orders.size() - 5, removed);
@@ -349,7 +368,8 @@ public class OrderModelTestRunner {
 			}
 
 			// again make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				OrderMap orderMap = tx.getOrderMap();
 				assertEquals(0, orderMap.querySize(tx));
@@ -360,7 +380,8 @@ public class OrderModelTestRunner {
 		orders.forEach(t -> t.setVersion(null));
 
 		// now add all again
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.getOrderMap().addAll(tx, orders);
 			tx.commitOnClose();

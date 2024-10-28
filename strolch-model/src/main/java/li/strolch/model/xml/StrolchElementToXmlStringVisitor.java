@@ -1,12 +1,5 @@
 package li.strolch.model.xml;
 
-import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
-import static li.strolch.model.StrolchModelConstants.DEFAULT_XML_VERSION;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.StringWriter;
-
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -14,6 +7,13 @@ import li.strolch.model.StrolchRootElement;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.utils.dbc.DBC;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.StringWriter;
+
+import static li.strolch.model.StrolchModelConstants.DEFAULT_ENCODING;
+import static li.strolch.model.StrolchModelConstants.DEFAULT_XML_VERSION;
 
 public class StrolchElementToXmlStringVisitor implements StrolchRootElementVisitor<String> {
 

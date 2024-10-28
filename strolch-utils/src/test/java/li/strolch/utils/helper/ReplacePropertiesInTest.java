@@ -1,10 +1,10 @@
 package li.strolch.utils.helper;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.util.Properties;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class ReplacePropertiesInTest {
 

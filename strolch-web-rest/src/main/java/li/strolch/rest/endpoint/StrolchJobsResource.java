@@ -15,19 +15,12 @@
  */
 package li.strolch.rest.endpoint;
 
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.List;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.job.StrolchJob;
 import li.strolch.job.StrolchJobsHandler;
@@ -40,6 +33,13 @@ import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
+import static li.strolch.rest.StrolchRestfulConstants.DATA;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -106,10 +106,10 @@ public class StrolchJobsResource {
 				ctx.validateAction(job);
 
 			switch (action) {
-			case "runNow" -> job.runNow();
-			case "schedule" -> job.schedule();
-			case "cancel" -> job.cancel(true);
-			default -> throw new IllegalArgumentException("Unhandled action " + action);
+				case "runNow" -> job.runNow();
+				case "schedule" -> job.schedule();
+				case "cancel" -> job.cancel(true);
+				default -> throw new IllegalArgumentException("Unhandled action " + action);
 			}
 
 			return ResponseUtil.toResponse();

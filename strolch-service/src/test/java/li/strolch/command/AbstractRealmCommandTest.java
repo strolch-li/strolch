@@ -15,13 +15,6 @@
  */
 package li.strolch.command;
 
-import static li.strolch.service.test.AbstractRealmServiceTest.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -32,6 +25,13 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+
+import static li.strolch.service.test.AbstractRealmServiceTest.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

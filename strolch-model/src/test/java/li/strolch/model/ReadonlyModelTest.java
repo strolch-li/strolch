@@ -1,12 +1,5 @@
 package li.strolch.model;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
-
-import java.util.Collections;
-import java.util.Date;
-
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -16,6 +9,14 @@ import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.impl.*;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
+
+import java.util.Collections;
+import java.util.Date;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ReadonlyModelTest {
 

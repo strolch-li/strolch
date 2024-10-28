@@ -15,19 +15,6 @@
  */
 package li.strolch.model;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static li.strolch.model.ModelGenerator.*;
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.Tags.*;
-import static org.junit.Assert.*;
-
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
@@ -43,6 +30,19 @@ import li.strolch.utils.time.PeriodDuration;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static li.strolch.model.ModelGenerator.*;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.Tags.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("nls")
 public class ModelTest {

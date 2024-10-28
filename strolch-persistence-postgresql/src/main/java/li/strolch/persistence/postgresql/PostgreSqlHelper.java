@@ -15,12 +15,11 @@
  */
 package li.strolch.persistence.postgresql;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-
 import li.strolch.utils.StringMatchMode;
 import li.strolch.utils.collections.DateRange;
+
+import java.sql.Date;
+import java.util.List;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

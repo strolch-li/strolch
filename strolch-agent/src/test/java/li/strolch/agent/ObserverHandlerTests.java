@@ -1,11 +1,5 @@
 package li.strolch.agent;
 
-import static org.junit.Assert.assertEquals;
-
-import java.security.SecureRandom;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import li.strolch.RuntimeMock;
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.StrolchRealm;
@@ -19,6 +13,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.SecureRandom;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
 
 public class ObserverHandlerTests {
 

@@ -1,12 +1,12 @@
 /*
  * Copyright 2015 Robert von Burg <eitch@eitchnet.ch>
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,20 +15,11 @@
  */
 package li.strolch.model;
 
-import static li.strolch.model.ModelGenerator.PARAM_BOOLEAN_ID;
-import static li.strolch.model.ModelGenerator.PARAM_DATE_ID;
-import static li.strolch.model.ModelGenerator.PARAM_FLOAT_ID;
-import static li.strolch.model.ModelGenerator.PARAM_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_FLOAT_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_INTEGER_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_LONG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LIST_STRING_ID;
-import static li.strolch.model.ModelGenerator.PARAM_LONG_ID;
-import static li.strolch.model.ModelGenerator.PARAM_STRING_ID;
-import static org.junit.Assert.assertEquals;
 import li.strolch.model.parameter.Parameter;
-
 import org.junit.Test;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

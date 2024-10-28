@@ -15,11 +15,11 @@
  */
 package li.strolch.model;
 
-import java.nio.charset.StandardCharsets;
-
 import li.strolch.model.activity.Activity;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.privilege.base.PrivilegeConstants;
+
+import java.nio.charset.StandardCharsets;
 
 public class StrolchModelConstants {
 

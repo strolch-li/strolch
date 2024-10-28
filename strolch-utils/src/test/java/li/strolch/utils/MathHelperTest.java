@@ -3,7 +3,8 @@ package li.strolch.utils;
 import org.junit.Test;
 
 import static li.strolch.utils.helper.MathHelper.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class MathHelperTest {
 	@Test
@@ -80,14 +81,17 @@ public class MathHelperTest {
 	public void shouldTestToPrecisionString2() {
 		assertEquals("1.034", toPrecisionString(1.0344444));
 	}
+
 	@Test
 	public void shouldTestGetNumberOfDecimalPlaces1() {
 		assertEquals(7, getNumberOfDecimalPlaces(1.0344444));
 	}
+
 	@Test
 	public void shouldTestGetNumberOfDecimalPlaces2() {
 		assertEquals(3, getNumberOfDecimalPlaces(1.034));
 	}
+
 	@Test
 	public void shouldTestDoubleToString() {
 		assertEquals("0.0000000453453335", doubleToString(0.0000000453453335));

@@ -1,10 +1,10 @@
 package li.strolch.model.builder.params;
 
-import java.util.List;
-
 import li.strolch.model.builder.BagBuilder;
 import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.FloatListParameter;
+
+import java.util.List;
 
 public class FloatListParamBuilder<T extends ParameterBagContainerBuilder<T>>
 		extends ParameterBuilder<List<Double>, FloatListParameter, T> {

@@ -1,14 +1,14 @@
 package li.strolch.utils.time;
 
+import org.junit.Test;
+
+import java.time.*;
+
 import static java.time.ZoneId.systemDefault;
 import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 import static li.strolch.utils.time.PeriodHelper.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.time.*;
-
-import org.junit.Test;
 
 public class PeriodHelperTest {
 
@@ -322,8 +322,8 @@ public class PeriodHelperTest {
 
 	@Test
 	public void shouldCalcShiftDays4() {
-		ZonedDateTime past = ZonedDateTime
-				.parse("2007-12-03T10:15:30+01:00", ISO_OFFSET_DATE_TIME.withZone(systemDefault()));
+		ZonedDateTime past = ZonedDateTime.parse("2007-12-03T10:15:30+01:00",
+				ISO_OFFSET_DATE_TIME.withZone(systemDefault()));
 		ZonedDateTime now = ZonedDateTime.now();
 		PeriodDuration periodDuration = PeriodDuration.parse("P7D");
 		ZonedDateTime shiftedDate = shiftByMultipleOfPeriod(past, now, periodDuration);

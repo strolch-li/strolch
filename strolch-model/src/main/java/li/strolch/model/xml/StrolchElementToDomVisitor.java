@@ -15,15 +15,6 @@
  */
 package li.strolch.model.xml;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-
-import javax.xml.parsers.DocumentBuilder;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.SortedSet;
-
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -40,6 +31,15 @@ import li.strolch.utils.helper.DomUtil;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import javax.xml.parsers.DocumentBuilder;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.SortedSet;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

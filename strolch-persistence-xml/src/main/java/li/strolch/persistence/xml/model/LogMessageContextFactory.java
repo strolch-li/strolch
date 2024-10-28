@@ -1,7 +1,7 @@
 package li.strolch.persistence.xml.model;
 
-import li.strolch.model.log.LogMessage;
 import li.strolch.model.Tags;
+import li.strolch.model.log.LogMessage;
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceContextFactory;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
@@ -18,8 +18,8 @@ public class LogMessageContextFactory implements PersistenceContextFactory<LogMe
 
 	@Override
 	public PersistenceContext<LogMessage> createCtx(ObjectReferenceCache objectRefCache, LogMessage logMessage) {
-		IdOfSubTypeRef objectRef = objectRefCache
-				.getIdOfSubTypeRef(Tags.LOG_MESSAGE, logMessage.getRealm(), logMessage.getId());
+		IdOfSubTypeRef objectRef = objectRefCache.getIdOfSubTypeRef(Tags.LOG_MESSAGE, logMessage.getRealm(),
+				logMessage.getId());
 		PersistenceContext<LogMessage> ctx = createCtx(objectRef);
 		ctx.setObject(logMessage);
 		return ctx;

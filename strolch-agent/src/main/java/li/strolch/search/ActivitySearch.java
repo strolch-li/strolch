@@ -2,7 +2,6 @@ package li.strolch.search;
 
 import li.strolch.model.Order;
 import li.strolch.model.activity.Activity;
-import li.strolch.persistence.api.StrolchTransaction;
 
 import java.util.stream.Stream;
 

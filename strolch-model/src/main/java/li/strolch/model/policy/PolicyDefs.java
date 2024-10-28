@@ -15,16 +15,16 @@
  */
 package li.strolch.model.policy;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import li.strolch.exception.StrolchPolicyException;
 import li.strolch.model.Locator;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Tags;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The {@link PolicyDefs} contains the policy configuration of any {@link StrolchRootElement} which requires policies
@@ -107,8 +107,11 @@ public class PolicyDefs {
 
 	@Override
 	public String toString() {
-		return "PolicyDefs [parent=" + (this.parent == null ? "null" : this.parent.getLocator()) + ", policyDefMap="
-				+ this.policyDefMap + "]";
+		return "PolicyDefs [parent="
+				+ (this.parent == null ? "null" : this.parent.getLocator())
+				+ ", policyDefMap="
+				+ this.policyDefMap
+				+ "]";
 	}
 
 	public boolean isReadOnly() {

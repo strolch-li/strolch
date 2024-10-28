@@ -55,11 +55,15 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 		List<String> objectTypes = elements.stream().map(StrolchRootElement::getObjectType).distinct().toList();
 		List<String> types = elements.stream().map(StrolchRootElement::getType).distinct().toList();
 		if (objectTypes.size() != 1)
-			throw new IllegalStateException("Only allow to have one type of object: " +
-					elements.stream().map(StrolchElement::getId).collect(Collectors.joining(", ")));
+			throw new IllegalStateException("Only allow to have one type of object: " + elements
+					.stream()
+					.map(StrolchElement::getId)
+					.collect(Collectors.joining(", ")));
 		if (types.size() != 1)
-			throw new IllegalStateException("Only allow to have one type of object: " +
-					elements.stream().map(StrolchElement::getId).collect(Collectors.joining(", ")));
+			throw new IllegalStateException("Only allow to have one type of object: " + elements
+					.stream()
+					.map(StrolchElement::getId)
+					.collect(Collectors.joining(", ")));
 
 		StringListParameter relationsP = relationsBag().getParameter(param);
 		if (relationsP == null) {

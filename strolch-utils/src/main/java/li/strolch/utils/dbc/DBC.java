@@ -15,13 +15,13 @@
  */
 package li.strolch.utils.dbc;
 
+import li.strolch.utils.helper.StringHelper;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Supplier;
-
-import li.strolch.utils.helper.StringHelper;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;

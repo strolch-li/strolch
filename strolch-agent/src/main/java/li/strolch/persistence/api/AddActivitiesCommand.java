@@ -38,16 +38,14 @@ public class AddActivitiesCommand extends Command {
 	}
 
 	/**
-	 * @param activities
-	 * 		the activities to set for adding
+	 * @param activities the activities to set for adding
 	 */
 	public void setActivities(List<Activity> activities) {
 		this.activities = activities;
 	}
 
 	/**
-	 * @param activity
-	 * 		the activity to add for adding
+	 * @param activity the activity to add for adding
 	 */
 	public void addActivitiy(Activity activity) {
 		this.activities.add(activity);

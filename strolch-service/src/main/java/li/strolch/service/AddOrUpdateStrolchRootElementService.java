@@ -46,10 +46,10 @@ public class AddOrUpdateStrolchRootElementService extends AbstractService<Strolc
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
 			switch (arg.rootElement.getObjectType()) {
-			case Tags.RESOURCE -> tx.addOrUpdate((Resource) arg.rootElement);
-			case Tags.ORDER -> tx.addOrUpdate((Order) arg.rootElement);
-			case Tags.ACTIVITY -> tx.addOrUpdate((Activity) arg.rootElement);
-			default -> throw new IllegalStateException("Unexpected value: " + arg.rootElement.getObjectType());
+				case Tags.RESOURCE -> tx.addOrUpdate((Resource) arg.rootElement);
+				case Tags.ORDER -> tx.addOrUpdate((Order) arg.rootElement);
+				case Tags.ACTIVITY -> tx.addOrUpdate((Activity) arg.rootElement);
+				default -> throw new IllegalStateException("Unexpected value: " + arg.rootElement.getObjectType());
 			}
 
 			tx.commitOnClose();

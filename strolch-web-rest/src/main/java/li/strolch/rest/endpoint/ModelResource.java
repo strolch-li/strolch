@@ -1,5 +1,7 @@
 package li.strolch.rest.endpoint;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -8,9 +10,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
@@ -47,7 +46,8 @@ public class ModelResource {
 			queryResponse = queryProcessor.process(queryRequest, tx);
 		}
 
-		return Response.ok(queryResponse.asJson(Boolean.parseBoolean(flat)).toString(), MediaType.APPLICATION_JSON)
+		return Response
+				.ok(queryResponse.asJson(Boolean.parseBoolean(flat)).toString(), MediaType.APPLICATION_JSON)
 				.build();
 	}
 }

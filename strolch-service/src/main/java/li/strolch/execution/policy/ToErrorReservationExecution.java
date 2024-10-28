@@ -1,18 +1,19 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.TYPE_RESERVE;
-
-import java.util.ResourceBundle;
-
+import li.strolch.model.State;
+import li.strolch.model.activity.Action;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
-import li.strolch.model.State;
-import li.strolch.model.activity.Action;
 import li.strolch.persistence.api.StrolchTransaction;
 
+import java.util.ResourceBundle;
+
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.TYPE_RESERVE;
+
 /**
- * The {@link ToErrorReservationExecution} executes same as {@link ReservationExecution} with the difference that {@link
+ * The {@link ToErrorReservationExecution} executes same as {@link ReservationExecution} with the difference that
+ * {@link
  * #isExecutable(Action)} always returns true, and if the action's resource is currently reserved, the execution fails
  * and the state is set to ERROR
  *
@@ -44,8 +45,8 @@ public class ToErrorReservationExecution extends ReservationExecution {
 			setActionState(action, State.EXECUTION);
 			toError(new LogMessage(tx().getRealmName(), tx().getCertificate().getUsername(), action.getLocator(),
 					LogSeverity.Error, LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
-					"execution.policy.reservation.alreadyReserved")
-					.value("resourceLoc", action.getResourceLocator().toString()));
+					"execution.policy.reservation.alreadyReserved").value("resourceLoc",
+					action.getResourceLocator().toString()));
 		} else {
 			super.toExecution(action);
 		}

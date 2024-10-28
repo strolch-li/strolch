@@ -1,12 +1,12 @@
 package li.strolch.privilege.handler;
 
-import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
-
-import java.util.concurrent.CompletableFuture;
-
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.SmtpMailer;
 import li.strolch.utils.helper.StringHelper;
+
+import java.util.concurrent.CompletableFuture;
+
+import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
 
 public class MailUserChallengeHandler extends UserChallengeHandler {
 

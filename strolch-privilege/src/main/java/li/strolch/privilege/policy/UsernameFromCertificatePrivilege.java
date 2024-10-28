@@ -15,11 +15,6 @@
  */
 package li.strolch.privilege.policy;
 
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
-import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
-
-import java.text.MessageFormat;
-
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.i18n.PrivilegeMessages;
@@ -27,6 +22,11 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
+
+import java.text.MessageFormat;
+
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
+import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
 
 /**
  * <p>
@@ -65,8 +65,8 @@ public class UsernameFromCertificatePrivilege implements PrivilegePolicy {
 
 		// RoleAccessPrivilege policy expects the privilege value to be a role
 		if (!(object instanceof Certificate cert)) {
-			String msg = Restrictable.class.getName() + PrivilegeMessages
-					.getString("Privilege.illegalArgument.noncertificate");
+			String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
+					"Privilege.illegalArgument.noncertificate");
 			msg = MessageFormat.format(msg, restrictable.getClass().getSimpleName());
 			throw new PrivilegeException(msg);
 		}

@@ -15,8 +15,7 @@ public interface SearchNavigator<T extends StrolchRootElement> {
 	/**
 	 * Navigate the TX to a stream of {@link StrolchRootElement}
 	 *
-	 * @param tx
-	 * 		the TX to navigate
+	 * @param tx the TX to navigate
 	 *
 	 * @return a stream of {@link StrolchRootElement}
 	 */

@@ -53,7 +53,8 @@ public class ResourceModelTestRunner {
 
 		// create
 		Resource newResource = createResource("MyTestResource", "Test Name", "TestType");//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newResource);
 			tx.commitOnClose();
@@ -63,7 +64,8 @@ public class ResourceModelTestRunner {
 	public void runQuerySizeTest() {
 
 		// remove all
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.getResourceMap().removeAll(tx, tx.getResourceMap().getAllElements(tx));
 			tx.commitOnClose();
@@ -73,7 +75,8 @@ public class ResourceModelTestRunner {
 		Resource resource1 = createResource("myTestResource1", "Test Name", "QTestType1");//$NON-NLS-2$ //$NON-NLS-3$
 		Resource resource2 = createResource("myTestResource2", "Test Name", "QTestType2");//$NON-NLS-2$ //$NON-NLS-3$
 		Resource resource3 = createResource("myTestResource3", "Test Name", "QTestType3");//$NON-NLS-2$ //$NON-NLS-3$
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(resource1);
 			tx.add(resource2);
@@ -104,7 +107,8 @@ public class ResourceModelTestRunner {
 
 		// create
 		Resource newResource = createResource(ID, NAME, TYPE);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.add(newResource);
 			tx.commitOnClose();
@@ -120,7 +124,8 @@ public class ResourceModelTestRunner {
 		StringParameter sParam = readResource.getParameter(BAG_ID, PARAM_STRING_ID);
 		String newStringValue = "Giddiya!";
 		sParam.setValue(newStringValue);
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.getResourceMap().update(tx, readResource);
 			tx.commitOnClose();
@@ -138,7 +143,8 @@ public class ResourceModelTestRunner {
 		assertEquals(newStringValue, updatedParam.getValue());
 
 		// delete
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.getResourceMap().remove(tx, readResource);
 			tx.commitOnClose();
@@ -150,15 +156,16 @@ public class ResourceModelTestRunner {
 			assertNull("Should not read Resource with id " + ID, resource);
 		}
 
-
 		// create with same ID, but different types
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Resource res = createResource("non-unique-id", "NonUnique1", "NonUnique1");
 			tx.add(res);
 			tx.commitOnClose();
 		}
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Resource res = createResource("non-unique-id", "NonUnique2", "NonUnique2");
 			tx.add(res);
@@ -166,7 +173,8 @@ public class ResourceModelTestRunner {
 		}
 
 		// update elements
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Resource res1 = tx.getResourceBy("NonUnique1", "non-unique-id");
 			Resource res2 = tx.getResourceBy("NonUnique2", "non-unique-id");
@@ -183,7 +191,8 @@ public class ResourceModelTestRunner {
 		}
 
 		// remove elements
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Resource res1 = tx.getResourceBy("NonUnique1", "non-unique-id");
 			Resource res2 = tx.getResourceBy("NonUnique2", "non-unique-id");
@@ -198,7 +207,8 @@ public class ResourceModelTestRunner {
 		}
 
 		// validate doesn't exist anymore
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			Resource res1 = tx.getResourceBy("NonUnique1", "non-unique-id");
 			Resource res2 = tx.getResourceBy("NonUnique2", "non-unique-id");
@@ -219,7 +229,8 @@ public class ResourceModelTestRunner {
 		resources.sort(Comparator.comparing(StrolchElement::getId));
 
 		// first clear the map, so that we have a clean state
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			ResourceMap resourceMap = tx.getResourceMap();
 			List<Resource> allElements = resourceMap.getAllElements(tx);
@@ -231,21 +242,24 @@ public class ResourceModelTestRunner {
 
 		{
 			// make sure it is empty
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(0, resourceMap.querySize(tx));
 			}
 
 			// now add some resources
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", false)) {
 				tx.getResourceMap().addAll(tx, resources);
 				tx.commitOnClose();
 			}
 
 			// make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(resources.size(), resourceMap.querySize(tx));
@@ -253,7 +267,8 @@ public class ResourceModelTestRunner {
 			}
 
 			// now use the remove all by type
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", false)) {
 				long removed = tx.getResourceMap().removeAllBy(tx, "MyType3");
 				assertEquals(5, removed);
@@ -261,7 +276,8 @@ public class ResourceModelTestRunner {
 			}
 
 			// again make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(resources.size() - 5, resourceMap.querySize(tx));
@@ -269,7 +285,8 @@ public class ResourceModelTestRunner {
 			}
 
 			// now use the remove all
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", false)) {
 				long removed = tx.getResourceMap().removeAll(tx);
 				assertEquals(resources.size() - 5, removed);
@@ -277,7 +294,8 @@ public class ResourceModelTestRunner {
 			}
 
 			// again make sure we have our expected size
-			try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+			try (StrolchTransaction tx = this.runtimeMock
+					.getRealm(this.realmName)
 					.openTx(this.certificate, "test", true)) {
 				ResourceMap resourceMap = tx.getResourceMap();
 				assertEquals(0, resourceMap.querySize(tx));
@@ -287,7 +305,8 @@ public class ResourceModelTestRunner {
 		resources.forEach(t -> t.setVersion(null));
 
 		// now add all again
-		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName)
+		try (StrolchTransaction tx = this.runtimeMock
+				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
 			tx.getResourceMap().addAll(tx, resources);
 			tx.commitOnClose();

@@ -15,9 +15,9 @@
  */
 package li.strolch.xmlpers.api;
 
-import java.util.Properties;
-
 import li.strolch.xmlpers.impl.DefaultPersistenceManager;
+
+import java.util.Properties;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

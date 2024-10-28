@@ -1,5 +1,7 @@
 package li.strolch.utils.helper;
 
+import li.strolch.utils.iso8601.ISO8601FormatFactory;
+
 import java.time.LocalDateTime;
 import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
@@ -9,8 +11,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
 
 /**
  * Helper class to format dates and periods to Strings
@@ -23,13 +23,10 @@ public class DateHelper {
 	 * Formats the given ISO 8601 date to the given locale using {@link FormatStyle#MEDIUM}. If the year is > 2100 then
 	 * a - (dash) is returned.
 	 *
-	 * @param locale
-	 * 		the locale to use
-	 * @param isoDate
-	 * 		the date as ISO String
-	 * @param withTimeIfNonZero
-	 * 		if true and the time part is not 0, then it is appended to the string, if the time is not 0, then it is always
-	 * 		appended
+	 * @param locale            the locale to use
+	 * @param isoDate           the date as ISO String
+	 * @param withTimeIfNonZero if true and the time part is not 0, then it is appended to the string, if the time is
+	 *                          not 0, then it is always appended
 	 *
 	 * @return the string in the locale' format using {@link FormatStyle#MEDIUM}
 	 */
@@ -48,13 +45,12 @@ public class DateHelper {
 		}
 
 		if (withTimeIfNonZero && (ldt.getHour() != 0 || ldt.getMinute() != 0)) {
-			String pattern = DateTimeFormatterBuilder
-					.getLocalizedDateTimePattern(FormatStyle.MEDIUM, FormatStyle.MEDIUM, Chronology.ofLocale(locale),
-							locale);
+			String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM,
+					FormatStyle.MEDIUM, Chronology.ofLocale(locale), locale);
 			return ldt.format(DateTimeFormatter.ofPattern(pattern, locale));
 		} else {
-			String pattern = DateTimeFormatterBuilder
-					.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null, Chronology.ofLocale(locale), locale);
+			String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(FormatStyle.MEDIUM, null,
+					Chronology.ofLocale(locale), locale);
 			return ldt.format(DateTimeFormatter.ofPattern(pattern, locale));
 		}
 	}
@@ -71,12 +67,9 @@ public class DateHelper {
 	 * <li>month</li>
 	 * </ul>
 	 *
-	 * @param prefixKey
-	 * 		if not null, then prefix lookup key in bundle to set before result
-	 * @param bundle
-	 * 		the bundle where to get the translations
-	 * @param iso8601Period
-	 * 		the period
+	 * @param prefixKey     if not null, then prefix lookup key in bundle to set before result
+	 * @param bundle        the bundle where to get the translations
+	 * @param iso8601Period the period
 	 *
 	 * @return the formatted period
 	 */
@@ -105,8 +98,7 @@ public class DateHelper {
 	/**
 	 * Parses the given ISO8601 time stamp and truncates the time from it, returning the time in long
 	 *
-	 * @param iso8601Timestamp
-	 * 		the ISO 8601 date to parse
+	 * @param iso8601Timestamp the ISO 8601 date to parse
 	 *
 	 * @return the truncated time in milliseconds
 	 */

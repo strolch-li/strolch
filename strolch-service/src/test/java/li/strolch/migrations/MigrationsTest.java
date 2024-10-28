@@ -15,11 +15,6 @@
  */
 package li.strolch.migrations;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
@@ -34,6 +29,11 @@ import li.strolch.utils.collections.MapOfLists;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -73,9 +73,8 @@ public class MigrationsTest {
 		assertEquals("0.0.0", currentVersions.get("other").codeVersion().toString());
 
 		MapOfLists<String, Version> lastMigrations = migrationsHandler.getLastMigrations();
-		List<Version> expectedMigrations = Arrays
-				.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"), Version.valueOf("0.5.2"),
-						Version.valueOf("1.0.0"), Version.valueOf("1.0.5"), Version.valueOf("1.1.1"));
+		List<Version> expectedMigrations = Arrays.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"),
+				Version.valueOf("0.5.2"), Version.valueOf("1.0.0"), Version.valueOf("1.0.5"), Version.valueOf("1.1.1"));
 		assertEquals(expectedMigrations, lastMigrations.getList(defRealm));
 		assertNull(lastMigrations.getList("other"));
 

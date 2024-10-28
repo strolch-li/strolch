@@ -15,13 +15,13 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
+import li.strolch.model.timevalue.IValue;
+import li.strolch.model.timevalue.IValueChange;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import li.strolch.model.timevalue.IValue;
-import li.strolch.model.timevalue.IValueChange;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
  * @author Martin Smock <smock.martin@gmail.com>
@@ -35,10 +35,8 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	private boolean readonly;
 
 	/**
-	 * @param time
-	 * 		the time the change applies
-	 * @param value
-	 * 		the value to be applied
+	 * @param time  the time the change applies
+	 * @param value the value to be applied
 	 */
 	public ValueChange(final Long time, final T value) {
 		this.time = time;
@@ -46,12 +44,9 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 	}
 
 	/**
-	 * @param time
-	 * 		the time the change applies
-	 * @param value
-	 * 		the value to be applied
-	 * @param stateId
-	 * 		the id of the state the change applies to
+	 * @param time    the time the change applies
+	 * @param value   the value to be applied
+	 * @param stateId the id of the state the change applies to
 	 */
 	public ValueChange(final Long time, final T value, final String stateId) {
 		this.time = time;
@@ -134,7 +129,10 @@ public class ValueChange<T extends IValue> implements IValueChange<T>, Serializa
 
 	protected void assertNotReadonly() {
 		if (this.readonly) {
-			throw new IllegalStateException("The element " + getClass().getSimpleName() + " for stateId " + this.stateId
+			throw new IllegalStateException("The element "
+					+ getClass().getSimpleName()
+					+ " for stateId "
+					+ this.stateId
 					+ " is currently readOnly, to modify clone first!");
 		}
 	}

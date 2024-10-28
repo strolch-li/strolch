@@ -35,8 +35,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	/**
 	 * Appends a comparator to the stream of elements to compare by ID
 	 *
-	 * @param reversed
-	 * 		flag to reverse the comparison
+	 * @param reversed flag to reverse the comparison
 	 *
 	 * @return this for chaining
 	 */
@@ -60,8 +59,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	/**
 	 * Appends a comparator to the stream of elements to compare by name
 	 *
-	 * @param reversed
-	 * 		flag to reverse the comparison
+	 * @param reversed flag to reverse the comparison
 	 *
 	 * @return this for chaining
 	 */
@@ -77,8 +75,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	 * Appends a comparator to the stream of elements to compare by a parameter on the {@link ParameterBag} with the ID
 	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
-	 * @param paramId
-	 * 		the ID of the parameter to use for comparing
+	 * @param paramId the ID of the parameter to use for comparing
 	 *
 	 * @return this for chaining
 	 */
@@ -91,10 +88,8 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	 * Appends a comparator to the stream of elements to compare by a parameter on the {@link ParameterBag} with the ID
 	 * {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *
-	 * @param paramId
-	 * 		the ID of the parameter to use for comparing
-	 * @param reversed
-	 * 		flag to reverse the comparison
+	 * @param paramId  the ID of the parameter to use for comparing
+	 * @param reversed flag to reverse the comparison
 	 *
 	 * @return this for chaining
 	 */
@@ -106,12 +101,9 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	/**
 	 * Appends a comparator to the stream of elements to compare by a parameter
 	 *
-	 * @param bagId
-	 * 		the ID of the bag where the parameter is to be found
-	 * @param paramId
-	 * 		the ID of the parameter to use for comparing
-	 * @param reversed
-	 * 		flag to reverse the comparison
+	 * @param bagId    the ID of the bag where the parameter is to be found
+	 * @param paramId  the ID of the parameter to use for comparing
+	 * @param reversed flag to reverse the comparison
 	 *
 	 * @return this for chaining
 	 */
@@ -136,8 +128,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	/**
 	 * appends a comparator to this stream
 	 *
-	 * @param comparator
-	 * 		the comparator to append to the stream
+	 * @param comparator the comparator to append to the stream
 	 *
 	 * @return this for chaining
 	 */
@@ -159,8 +150,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 		this.stream = this.stream.map(e -> {
 			if (!e.isReadOnly())
 				return e;
-			@SuppressWarnings("unchecked")
-			T clone = (T) e.getClone(true);
+			@SuppressWarnings("unchecked") T clone = (T) e.getClone(true);
 			return clone;
 		});
 		return this;
@@ -171,8 +161,7 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	 *
 	 * <p>Use this method to make sure you have exclusive access to the element and need to modify it</p>
 	 *
-	 * @param tx
-	 * 		the transaction on which to perform the read-lock
+	 * @param tx the transaction on which to perform the read-lock
 	 *
 	 * @return this instance for chaining.
 	 */
@@ -184,10 +173,8 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	/**
 	 * Transforms this search result to be a search result returning elements with the given visitor
 	 *
-	 * @param visitor
-	 * 		the visitor to transform this search result's elements
-	 * @param <U>
-	 * 		the type of element to transform to
+	 * @param visitor the visitor to transform this search result's elements
+	 * @param <U>     the type of element to transform to
 	 *
 	 * @return the new search result for chaining
 	 */

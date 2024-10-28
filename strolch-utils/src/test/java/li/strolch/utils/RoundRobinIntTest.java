@@ -1,14 +1,14 @@
 package li.strolch.utils;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class RoundRobinIntTest {
 
 	@Test
 	public void shouldDoRoundRobin0_2() {
-		RoundRobinInt rr = new RoundRobinInt(0,2);
+		RoundRobinInt rr = new RoundRobinInt(0, 2);
 		assertEquals(0, rr.next());
 		assertEquals(1, rr.next());
 		assertEquals(2, rr.next());
@@ -16,17 +16,19 @@ public class RoundRobinIntTest {
 		assertEquals(1, rr.next());
 		assertEquals(2, rr.next());
 	}
+
 	@Test
 	public void shouldDoRoundRobin1_2() {
-		RoundRobinInt rr = new RoundRobinInt(1,2);
+		RoundRobinInt rr = new RoundRobinInt(1, 2);
 		assertEquals(1, rr.next());
 		assertEquals(2, rr.next());
 		assertEquals(1, rr.next());
 		assertEquals(2, rr.next());
 	}
+
 	@Test
 	public void shouldDoRoundRobinNeg10_2() {
-		RoundRobinInt rr = new RoundRobinInt(-10,2);
+		RoundRobinInt rr = new RoundRobinInt(-10, 2);
 		assertEquals(-10, rr.next());
 		assertEquals(-9, rr.next());
 		assertEquals(-8, rr.next());

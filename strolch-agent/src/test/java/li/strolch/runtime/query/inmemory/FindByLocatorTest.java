@@ -15,9 +15,6 @@
  */
 package li.strolch.runtime.query.inmemory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import li.strolch.RuntimeMock;
 import li.strolch.agent.ComponentContainerTest;
 import li.strolch.model.Locator;
@@ -34,6 +31,9 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.StrolchConstants;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -58,7 +58,9 @@ public class FindByLocatorTest {
 	@Test
 	public void shouldFindByResource() throws Exception {
 		runtimeMock.run(agent -> {
-			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+			try (StrolchTransaction tx = agent
+					.getContainer()
+					.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test", true)) {
 
 				// Resource
@@ -78,8 +80,8 @@ public class FindByLocatorTest {
 						resStringParam);
 
 				// TimedState on Resource
-				Locator locResIntegerState = Locator
-						.valueOf("Resource/TestType/MyTestResource/TimedState/@integerState");
+				Locator locResIntegerState = Locator.valueOf(
+						"Resource/TestType/MyTestResource/TimedState/@integerState");
 				IntegerTimedState integerS = tx.findElement(locResIntegerState);
 				assertNotNull("Should have found a IntegerTimedState with the locator " + locResIntegerState, integerS);
 
@@ -90,7 +92,9 @@ public class FindByLocatorTest {
 	@Test
 	public void shouldFindByOrder() throws Exception {
 		runtimeMock.run(agent -> {
-			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+			try (StrolchTransaction tx = agent
+					.getContainer()
+					.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test", true)) {
 
 				// Order
@@ -115,7 +119,9 @@ public class FindByLocatorTest {
 	@Test
 	public void shouldFindByActivity() throws Exception {
 		runtimeMock.run(agent -> {
-			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+			try (StrolchTransaction tx = agent
+					.getContainer()
+					.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test", true)) {
 
 				// Activity
@@ -139,7 +145,9 @@ public class FindByLocatorTest {
 	@Test
 	public void shouldFindByAction() throws Exception {
 		runtimeMock.run(agent -> {
-			try (StrolchTransaction tx = agent.getContainer().getRealm(StrolchConstants.DEFAULT_REALM)
+			try (StrolchTransaction tx = agent
+					.getContainer()
+					.getRealm(StrolchConstants.DEFAULT_REALM)
 					.openTx(certificate, "test", true)) {
 
 				// sub action

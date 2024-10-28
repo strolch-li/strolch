@@ -10,8 +10,11 @@ public record PasswordCrypt(byte[] password, byte[] salt, String hashAlgorithm, 
 	}
 
 	public String buildPasswordString() {
-		if (this.password == null || this.salt == null || this.hashAlgorithm == null || this.hashIterations == -1 ||
-				this.hashKeyLength == -1) {
+		if (this.password == null
+				|| this.salt == null
+				|| this.hashAlgorithm == null
+				|| this.hashIterations == -1
+				|| this.hashKeyLength == -1) {
 			return null;
 		}
 

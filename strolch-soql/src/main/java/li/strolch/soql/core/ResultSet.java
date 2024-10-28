@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * The query result set as List of Lists
  * <p>
- *
+ * <p>
  * TODO: the result set should carry arbitrary objects, not only StrolchRootElements
  *
  * @author msmock
@@ -21,8 +21,7 @@ public class ResultSet {
 	private final List<List<StrolchRootElement>> rows = new ArrayList<>();
 
 	/**
-	 * @param row
-	 * 		the result of the execution of a single statement
+	 * @param row the result of the execution of a single statement
 	 */
 	public void add(final List<Object> row) {
 
@@ -31,7 +30,10 @@ public class ResultSet {
 			if (object instanceof StrolchRootElement) {
 				toBeAdded.add((StrolchRootElement) object);
 			} else {
-				throw new SOQLEvaluationException("Could not add object " + object + " of class " + object.getClass()
+				throw new SOQLEvaluationException("Could not add object "
+						+ object
+						+ " of class "
+						+ object.getClass()
 						+ " to result set. Only StrolchRootElements are supported yet.");
 			}
 		}
@@ -40,8 +42,7 @@ public class ResultSet {
 	}
 
 	/**
-	 * @param flat
-	 * 		if JSON should be flat or not
+	 * @param flat if JSON should be flat or not
 	 *
 	 * @return all rows as JSON Array
 	 */

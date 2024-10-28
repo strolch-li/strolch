@@ -1,10 +1,10 @@
 package li.strolch.model.builder.states;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-
 import li.strolch.model.builder.ResourceBuilder;
 import li.strolch.model.timedstate.StrolchTimedState;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
 
 public abstract class TimedStateBuilder<T extends StrolchTimedState<?>> {
 

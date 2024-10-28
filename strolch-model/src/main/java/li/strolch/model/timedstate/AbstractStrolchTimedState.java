@@ -15,10 +15,6 @@
  */
 package li.strolch.model.timedstate;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
-
 import li.strolch.model.*;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.timevalue.ITimeValue;
@@ -26,6 +22,10 @@ import li.strolch.model.timevalue.ITimeVariable;
 import li.strolch.model.timevalue.IValue;
 import li.strolch.model.timevalue.IValueChange;
 import li.strolch.utils.helper.StringHelper;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
  * Wrapper for a {@link IntegerTimedState}
@@ -200,8 +200,7 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	protected void fillClone(AbstractStrolchElement clone) {
 		super.fillClone(clone);
 
-		@SuppressWarnings("unchecked")
-		AbstractStrolchTimedState<T> cloneT = (AbstractStrolchTimedState<T>) clone;
+		@SuppressWarnings("unchecked") AbstractStrolchTimedState<T> cloneT = (AbstractStrolchTimedState<T>) clone;
 		cloneT.hidden = this.hidden;
 		cloneT.index = this.index;
 		cloneT.interpretation = this.interpretation;
@@ -224,7 +223,13 @@ public abstract class AbstractStrolchTimedState<T extends IValue> extends Abstra
 	@Override
 	public String toString() {
 
-		return getClass().getSimpleName() + " [id=" + this.id + ", name=" + this.name + ", valueNow="
-				+ this.state.getStateAt(System.currentTimeMillis()) + "]";
+		return getClass().getSimpleName()
+				+ " [id="
+				+ this.id
+				+ ", name="
+				+ this.name
+				+ ", valueNow="
+				+ this.state.getStateAt(System.currentTimeMillis())
+				+ "]";
 	}
 }

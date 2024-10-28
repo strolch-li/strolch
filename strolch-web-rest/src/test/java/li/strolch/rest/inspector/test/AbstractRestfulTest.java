@@ -15,16 +15,6 @@
  */
 package li.strolch.rest.inspector.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.logging.Level;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.ws.rs.ProcessingException;
@@ -53,6 +43,16 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.logging.Level;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -171,7 +171,8 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 						try {
 							this.server = GrizzlyWebContainerFactory.create(baseUri,
 									Collections.singletonMap("jersey.config.server.provider.packages",
-											InspectorResource.class.getPackage().getName() + ";"
+											InspectorResource.class.getPackage().getName()
+													+ ";"
 													+ AuthenticationRequestFilter.class.getPackage().getName()));
 						} catch (ProcessingException | IOException e) {
 							throw new TestContainerException(e);

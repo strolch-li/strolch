@@ -52,9 +52,8 @@ public class PrivilegeUpdateRoleService extends AbstractService<PrivilegeRoleArg
 			role = privilegeHandler.replaceRole(getCertificate(), arg.role);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx
-					.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE, StrolchPrivilegeConstants.ROLE,
-							role.getName());
+			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
+					StrolchPrivilegeConstants.ROLE, role.getName());
 			tx.getAuditTrail().add(tx, audit);
 		}
 

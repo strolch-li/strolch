@@ -1,13 +1,13 @@
 package li.strolch.model.audit;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-import java.text.MessageFormat;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.text.MessageFormat;
 
 public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 

@@ -15,8 +15,6 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
-
 import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -28,6 +26,8 @@ import li.strolch.model.timevalue.IValueChange;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
 
 /**
  * Command to plan an {@link Action} to a {@link Resource}. This {@link Command} assumes that the {@link IValueChange}

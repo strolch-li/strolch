@@ -1,12 +1,5 @@
 package li.strolch.metrics;
 
-import static li.strolch.model.StrolchModelConstants.STATE_VALUES;
-
-import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-
 import li.strolch.model.Resource;
 import li.strolch.model.timedstate.BooleanTimedState;
 import li.strolch.model.timedstate.IntegerListTimedState;
@@ -18,6 +11,13 @@ import li.strolch.model.timevalue.impl.IntegerListValue;
 import li.strolch.model.timevalue.impl.IntegerValue;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.StrolchPolicy;
+
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import static li.strolch.model.StrolchModelConstants.STATE_VALUES;
 
 public abstract class MetricPolicy extends StrolchPolicy {
 

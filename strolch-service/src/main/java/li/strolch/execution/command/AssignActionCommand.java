@@ -15,8 +15,6 @@
  */
 package li.strolch.execution.command;
 
-import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
-
 import li.strolch.execution.policy.PlanningPolicy;
 import li.strolch.model.Resource;
 import li.strolch.model.State;
@@ -25,6 +23,8 @@ import li.strolch.model.activity.Activity;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
+
+import static li.strolch.execution.policy.NoPlanning.DEFAULT_PLANNING;
 
 /**
  * Command to assign an {@link Action} to a new {@link Resource}.

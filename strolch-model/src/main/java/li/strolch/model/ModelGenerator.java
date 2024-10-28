@@ -15,8 +15,6 @@
  */
 package li.strolch.model;
 
-import java.util.*;
-
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
@@ -30,6 +28,8 @@ import li.strolch.model.timedstate.*;
 import li.strolch.model.timevalue.impl.*;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.time.PeriodDuration;
+
+import java.util.*;
 
 /**
  * Class which can be used to generate objects which implement {@link StrolchElement}. These generated classes can then
@@ -131,12 +131,9 @@ public class ModelGenerator {
 	 * Creates an {@link Resource} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param id
-	 * 		the id of the {@link Resource}
-	 * @param name
-	 * 		the name of the {@link Resource}
-	 * @param type
-	 * 		the type of the {@link Resource}
+	 * @param id   the id of the {@link Resource}
+	 * @param name the name of the {@link Resource}
+	 * @param type the type of the {@link Resource}
 	 *
 	 * @return the newly created {@link Resource}
 	 */
@@ -154,8 +151,7 @@ public class ModelGenerator {
 	/**
 	 * Creates {@link StrolchTimedState} instances and adds them to the {@link Resource}
 	 *
-	 * @param resource
-	 * 		the resource to which to addd the newly created {@link StrolchTimedState}
+	 * @param resource the resource to which to addd the newly created {@link StrolchTimedState}
 	 */
 	public static void addTimedStates(Resource resource) {
 
@@ -236,16 +232,11 @@ public class ModelGenerator {
 	 * Creates a list of {@link Resource Resources} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param idStart
-	 * 		id range start
-	 * @param count
-	 * 		the number of elements to create
-	 * @param idPrefix
-	 * 		the prefix to generate IDs for the {@link Resource Resources}
-	 * @param name
-	 * 		the name of the {@link Resource}
-	 * @param type
-	 * 		the type of the {@link Resource}
+	 * @param idStart  id range start
+	 * @param count    the number of elements to create
+	 * @param idPrefix the prefix to generate IDs for the {@link Resource Resources}
+	 * @param name     the name of the {@link Resource}
+	 * @param type     the type of the {@link Resource}
 	 *
 	 * @return the list of newly created {@link Resource Resources}
 	 */
@@ -262,12 +253,9 @@ public class ModelGenerator {
 	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param id
-	 * 		the id of the {@link Order}
-	 * @param name
-	 * 		the name of the {@link Order}
-	 * @param type
-	 * 		the type of the {@link Order}
+	 * @param id   the id of the {@link Order}
+	 * @param name the name of the {@link Order}
+	 * @param type the type of the {@link Order}
 	 *
 	 * @return the newly created {@link Order}
 	 */
@@ -279,16 +267,11 @@ public class ModelGenerator {
 	 * Creates an {@link Order} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param id
-	 * 		the id of the {@link Order}
-	 * @param name
-	 * 		the name of the {@link Order}
-	 * @param type
-	 * 		the type of the {@link Order}
-	 * @param date
-	 * 		the date of the {@link Order}
-	 * @param state
-	 * 		the {@link State} of the {@link Order}
+	 * @param id    the id of the {@link Order}
+	 * @param name  the name of the {@link Order}
+	 * @param type  the type of the {@link Order}
+	 * @param date  the date of the {@link Order}
+	 * @param state the {@link State} of the {@link Order}
 	 *
 	 * @return the newly created {@link Order}
 	 */
@@ -319,16 +302,11 @@ public class ModelGenerator {
 	 * Creates a list of {@link Order Orders} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param idStart
-	 * 		id range start
-	 * @param count
-	 * 		the number of elements to create
-	 * @param idPrefix
-	 * 		the prefix to generate IDs for the {@link Order Orders}
-	 * @param name
-	 * 		the name of the {@link Order}
-	 * @param type
-	 * 		the type of the {@link Order}
+	 * @param idStart  id range start
+	 * @param count    the number of elements to create
+	 * @param idPrefix the prefix to generate IDs for the {@link Order Orders}
+	 * @param name     the name of the {@link Order}
+	 * @param type     the type of the {@link Order}
 	 *
 	 * @return the list of newly created {@link Order Orders}
 	 */
@@ -345,16 +323,11 @@ public class ModelGenerator {
 	 * Creates a list of {@link Activity Activities} with the given values and adds a {@link ParameterBag} by calling
 	 * {@link #createParameterBag(String, String, String)}
 	 *
-	 * @param idStart
-	 * 		id range start
-	 * @param count
-	 * 		the number of elements to create
-	 * @param idPrefix
-	 * 		the prefix to generate IDs for the {@link Activity Activities}
-	 * @param name
-	 * 		the name of the {@link Activity}
-	 * @param type
-	 * 		the type of the {@link Activity}
+	 * @param idStart  id range start
+	 * @param count    the number of elements to create
+	 * @param idPrefix the prefix to generate IDs for the {@link Activity Activities}
+	 * @param name     the name of the {@link Activity}
+	 * @param type     the type of the {@link Activity}
 	 *
 	 * @return the list of newly created {@link Activity Activities}
 	 */
@@ -430,12 +403,9 @@ public class ModelGenerator {
 	 * Creates a {@link ParameterBag} with the given values and calls {@link #addAllParameters(ParameterBag)} to add
 	 * {@link Parameter}s
 	 *
-	 * @param id
-	 * 		the id of the {@link ParameterBag}
-	 * @param name
-	 * 		the name of the {@link ParameterBag}
-	 * @param type
-	 * 		the type of the {@link ParameterBag}
+	 * @param id   the id of the {@link ParameterBag}
+	 * @param name the name of the {@link ParameterBag}
+	 * @param type the type of the {@link ParameterBag}
 	 *
 	 * @return the newly created {@link ParameterBag}
 	 */
@@ -533,17 +503,13 @@ public class ModelGenerator {
 	public static Audit randomAudit() {
 
 		Random rand = new Random(234234L);
-		String[] usernames = new String[] { "bob", "alice", "jenny" };
-		String[] firstnames = new String[] { "Bob", "Alice", "Jenny" };
-		String[] lastnames = new String[] { "Richards", "Kennedy", "Davids" };
-		String[] types = new String[] { Tags.RESOURCE, Tags.ORDER, Tags.AUDIT };
-		String[] subTypes = new String[] { "Ball", "Something", "Foo", "Bar" };
-		String[] actions = new String[] { "AddResourceService",
-				"UpdateResourceService",
-				"RemoveResourceService",
-				"AddOrderService",
-				"UpdateOrderService",
-				"RemoveOrderService" };
+		String[] usernames = new String[]{"bob", "alice", "jenny"};
+		String[] firstnames = new String[]{"Bob", "Alice", "Jenny"};
+		String[] lastnames = new String[]{"Richards", "Kennedy", "Davids"};
+		String[] types = new String[]{Tags.RESOURCE, Tags.ORDER, Tags.AUDIT};
+		String[] subTypes = new String[]{"Ball", "Something", "Foo", "Bar"};
+		String[] actions = new String[]{"AddResourceService", "UpdateResourceService", "RemoveResourceService",
+				"AddOrderService", "UpdateOrderService", "RemoveOrderService"};
 
 		Audit audit = new Audit();
 		audit.setId(StringHelper.getUniqueIdLong());

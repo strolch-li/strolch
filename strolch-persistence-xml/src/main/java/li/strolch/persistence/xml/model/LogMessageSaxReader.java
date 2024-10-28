@@ -15,19 +15,19 @@
  */
 package li.strolch.persistence.xml.model;
 
+import li.strolch.model.Locator;
+import li.strolch.model.Tags;
+import li.strolch.model.log.LogMessage;
+import li.strolch.model.log.LogMessageState;
+import li.strolch.model.log.LogSeverity;
+import li.strolch.utils.iso8601.ISO8601;
+import org.xml.sax.Attributes;
+import org.xml.sax.helpers.DefaultHandler;
+
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.util.Properties;
 import java.util.function.Consumer;
-
-import li.strolch.model.log.LogMessage;
-import li.strolch.model.log.LogMessageState;
-import li.strolch.model.log.LogSeverity;
-import li.strolch.model.Locator;
-import li.strolch.model.Tags;
-import li.strolch.utils.iso8601.ISO8601;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -59,21 +59,21 @@ public class LogMessageSaxReader extends DefaultHandler {
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
 		switch (qName) {
-		case Tags.LOG_MESSAGE -> {
-			this.id = attributes.getValue(Tags.ID);
-			this.dateTime = ISO8601.parseToZdt(attributes.getValue(Tags.DATE));
-			this.realm = attributes.getValue(Tags.REALM);
-		}
-		case Tags.USERNAME, Tags.LOCATOR, Tags.SEVERITY, Tags.BUNDLE, Tags.KEY, Tags.MESSAGE, Tags.EXCEPTION, Tags.STATE ->
-				this.sb = new StringBuilder();
-		case Tags.PROPERTIES -> this.properties = new Properties();
-		case Tags.PROPERTY -> {
-			String key = attributes.getValue(Tags.KEY);
-			String value = attributes.getValue(Tags.VALUE);
-			this.properties.setProperty(key, value);
-		}
-		default -> throw new IllegalArgumentException(
-				MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			case Tags.LOG_MESSAGE -> {
+				this.id = attributes.getValue(Tags.ID);
+				this.dateTime = ISO8601.parseToZdt(attributes.getValue(Tags.DATE));
+				this.realm = attributes.getValue(Tags.REALM);
+			}
+			case Tags.USERNAME, Tags.LOCATOR, Tags.SEVERITY, Tags.BUNDLE, Tags.KEY, Tags.MESSAGE, Tags.EXCEPTION,
+				 Tags.STATE -> this.sb = new StringBuilder();
+			case Tags.PROPERTIES -> this.properties = new Properties();
+			case Tags.PROPERTY -> {
+				String key = attributes.getValue(Tags.KEY);
+				String value = attributes.getValue(Tags.VALUE);
+				this.properties.setProperty(key, value);
+			}
+			default -> throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -82,62 +82,62 @@ public class LogMessageSaxReader extends DefaultHandler {
 
 		switch (qName) {
 
-		case Tags.LOG_MESSAGE:
-			if (this.state == null)
-				this.state = LogMessageState.Information;
+			case Tags.LOG_MESSAGE:
+				if (this.state == null)
+					this.state = LogMessageState.Information;
 
-			LogMessage logMessage = new LogMessage(this.id, this.dateTime, this.realm, this.username, this.locator,
-					this.severity, this.state, this.bundle, this.key, this.properties, this.message, this.exception);
-			this.logMessageConsumer.accept(logMessage);
-			break;
+				LogMessage logMessage = new LogMessage(this.id, this.dateTime, this.realm, this.username, this.locator,
+						this.severity, this.state, this.bundle, this.key, this.properties, this.message,
+						this.exception);
+				this.logMessageConsumer.accept(logMessage);
+				break;
 
-		case Tags.USERNAME:
-			this.username = this.sb.toString();
-			this.sb = null;
-			break;
+			case Tags.USERNAME:
+				this.username = this.sb.toString();
+				this.sb = null;
+				break;
 
-		case Tags.LOCATOR:
-			this.locator = Locator.valueOf(this.sb.toString());
-			this.sb = null;
-			break;
+			case Tags.LOCATOR:
+				this.locator = Locator.valueOf(this.sb.toString());
+				this.sb = null;
+				break;
 
-		case Tags.SEVERITY:
-			this.severity = LogSeverity.valueOf(this.sb.toString());
-			this.sb = null;
-			break;
+			case Tags.SEVERITY:
+				this.severity = LogSeverity.valueOf(this.sb.toString());
+				this.sb = null;
+				break;
 
-		case Tags.STATE:
-			this.state = LogMessageState.valueOf(this.sb.toString());
-			this.sb = null;
-			break;
+			case Tags.STATE:
+				this.state = LogMessageState.valueOf(this.sb.toString());
+				this.sb = null;
+				break;
 
-		case Tags.BUNDLE:
-			this.bundle = this.sb.toString();
-			this.sb = null;
-			break;
+			case Tags.BUNDLE:
+				this.bundle = this.sb.toString();
+				this.sb = null;
+				break;
 
-		case Tags.KEY:
-			this.key = this.sb.toString();
-			this.sb = null;
-			break;
+			case Tags.KEY:
+				this.key = this.sb.toString();
+				this.sb = null;
+				break;
 
-		case Tags.MESSAGE:
-			this.message = this.sb.toString();
-			this.sb = null;
-			break;
+			case Tags.MESSAGE:
+				this.message = this.sb.toString();
+				this.sb = null;
+				break;
 
-		case Tags.EXCEPTION:
-			this.exception = this.sb.toString();
-			this.sb = null;
-			break;
+			case Tags.EXCEPTION:
+				this.exception = this.sb.toString();
+				this.sb = null;
+				break;
 
-		case Tags.PROPERTIES:
-		case Tags.PROPERTY:
-			break;
+			case Tags.PROPERTIES:
+			case Tags.PROPERTY:
+				break;
 
-		default:
-			throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			default:
+				throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 

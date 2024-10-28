@@ -36,12 +36,9 @@ import java.util.stream.Stream;
  * MapOfMaps&lt;String, String, MyObject&gt; mapOfMaps = new MapOfMaps&lt;&gt;();
  * </pre>
  *
- * @param <T>
- * 		The key to a map with U as the key and V as the value
- * @param <U>
- * 		The key to get a value (leaf)
- * @param <V>
- * 		The value stored in the tree (leaf)
+ * @param <T> The key to a map with U as the key and V as the value
+ * @param <U> The key to get a value (leaf)
+ * @param <V> The value stored in the tree (leaf)
  *
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */

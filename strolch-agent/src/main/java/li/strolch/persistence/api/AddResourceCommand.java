@@ -39,8 +39,7 @@ public class AddResourceCommand extends Command {
 	}
 
 	/**
-	 * @param resource
-	 * 		the resource to set
+	 * @param resource the resource to set
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;

@@ -39,12 +39,9 @@ public class IntegerListParameter extends AbstractListParameter<Integer> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public IntegerListParameter(String id, String name, List<Integer> value) {
 		super(id, name);

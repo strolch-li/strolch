@@ -38,16 +38,14 @@ public class AddOrdersCommand extends Command {
 	}
 
 	/**
-	 * @param orders
-	 * 		the orders to set for adding
+	 * @param orders the orders to set for adding
 	 */
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
 	}
 
 	/**
-	 * @param resource
-	 * 		the resource to add for adding
+	 * @param resource the resource to add for adding
 	 */
 	public void addOrder(Order resource) {
 		this.orders.add(resource);

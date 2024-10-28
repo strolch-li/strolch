@@ -15,9 +15,9 @@
  */
 package li.strolch.utils.concurrent;
 
-import java.util.Locale;
-
 import li.strolch.utils.I18nMessage;
+
+import java.util.Locale;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

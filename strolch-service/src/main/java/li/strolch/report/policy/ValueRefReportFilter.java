@@ -1,12 +1,12 @@
 package li.strolch.report.policy;
 
-import java.util.Date;
-
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.policy.KeyPolicyDef;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.dbc.DBC;
+
+import java.util.Date;
 
 public class ValueRefReportFilter extends ReportFilterPolicy {
 
@@ -20,8 +20,8 @@ public class ValueRefReportFilter extends ReportFilterPolicy {
 	public void init(String value) {
 		super.init(value);
 
-		PolicyDef filterPolicyDef = PolicyDef
-				.valueOf(ReportFilterPolicy.class.getSimpleName(), KeyPolicyDef.XML_PREFIX + this.filterValue);
+		PolicyDef filterPolicyDef = PolicyDef.valueOf(ReportFilterPolicy.class.getSimpleName(),
+				KeyPolicyDef.XML_PREFIX + this.filterValue);
 		this.filterPolicy = tx().getPolicy(ReportFilterPolicy.class, filterPolicyDef);
 	}
 

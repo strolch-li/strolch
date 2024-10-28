@@ -1,11 +1,11 @@
 package li.strolch.persistence.impl;
 
-import java.util.List;
-import java.util.Set;
-
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.ResourceDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
+
+import java.util.List;
+import java.util.Set;
 
 public class InMemoryResourceDao implements ResourceDao {
 

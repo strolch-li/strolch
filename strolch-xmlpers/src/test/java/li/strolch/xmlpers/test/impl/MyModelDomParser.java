@@ -15,8 +15,6 @@
  */
 package li.strolch.xmlpers.test.impl;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import li.strolch.xmlpers.api.DomParser;
 import li.strolch.xmlpers.test.model.MyModel;
 import li.strolch.xmlpers.test.model.MyParameter;
@@ -25,6 +23,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
 
 public class MyModelDomParser implements DomParser<MyModel> {
 

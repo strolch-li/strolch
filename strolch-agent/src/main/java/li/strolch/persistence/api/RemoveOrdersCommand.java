@@ -38,16 +38,14 @@ public class RemoveOrdersCommand extends Command {
 	}
 
 	/**
-	 * @param orders
-	 * 		the orders to set for removal
+	 * @param orders the orders to set for removal
 	 */
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
 	}
 
 	/**
-	 * @param order
-	 * 		the order to add for removal
+	 * @param order the order to add for removal
 	 */
 	public void addOrder(Order order) {
 		this.orders.add(order);

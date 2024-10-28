@@ -15,12 +15,12 @@
  */
 package li.strolch.model;
 
-import java.text.MessageFormat;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
 import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.utils.helper.StringHelper;
+
+import java.text.MessageFormat;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

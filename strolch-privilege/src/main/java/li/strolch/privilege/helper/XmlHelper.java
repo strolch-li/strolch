@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.privilege.helper.XmlConstants.ATTR_NAME;
+import static li.strolch.privilege.helper.XmlConstants.ATTR_VALUE;
 
 public class XmlHelper {
 

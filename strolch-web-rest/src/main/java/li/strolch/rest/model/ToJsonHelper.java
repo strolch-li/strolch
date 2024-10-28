@@ -1,11 +1,11 @@
 package li.strolch.rest.model;
 
-import static li.strolch.model.Tags.Json.EXECUTION_POLICY;
-
 import li.strolch.execution.Controller;
 import li.strolch.execution.ExecutionHandler;
 import li.strolch.execution.policy.ExecutionPolicy;
 import li.strolch.model.json.StrolchElementToJsonVisitor;
+
+import static li.strolch.model.Tags.Json.EXECUTION_POLICY;
 
 public class ToJsonHelper {
 

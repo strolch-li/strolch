@@ -52,9 +52,14 @@ public class ComparisonExpression extends AbstractBooleanExpression {
 		final Class<?> clazz_2 = result_2.getClass();
 
 		if (!clazz_1.equals(clazz_2)) {
-			throw new SOQLEvaluationException(
-					"Operation < not defined for comparison of " + result_1 + " of class " + clazz_1 + " with "
-							+ result_2 + " of class " + clazz_2);
+			throw new SOQLEvaluationException("Operation < not defined for comparison of "
+					+ result_1
+					+ " of class "
+					+ clazz_1
+					+ " with "
+					+ result_2
+					+ " of class "
+					+ clazz_2);
 		}
 
 		if (result_1 instanceof Integer && result_2 instanceof Integer) {
@@ -79,9 +84,14 @@ public class ComparisonExpression extends AbstractBooleanExpression {
 		final Class<?> clazz_2 = result_2.getClass();
 
 		if (!clazz_1.equals(clazz_2)) {
-			throw new SOQLEvaluationException(
-					"Operation < not defined for comparison of " + result_1 + " of class " + clazz_1 + " with "
-							+ result_2 + " of class " + clazz_2);
+			throw new SOQLEvaluationException("Operation < not defined for comparison of "
+					+ result_1
+					+ " of class "
+					+ clazz_1
+					+ " with "
+					+ result_2
+					+ " of class "
+					+ clazz_2);
 		}
 
 		if (result_1 instanceof Integer && result_2 instanceof Integer) {

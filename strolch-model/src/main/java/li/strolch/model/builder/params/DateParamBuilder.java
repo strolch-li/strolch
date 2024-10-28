@@ -1,12 +1,12 @@
 package li.strolch.model.builder.params;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Date;
-
 import li.strolch.model.builder.BagBuilder;
 import li.strolch.model.builder.ParameterBagContainerBuilder;
 import li.strolch.model.parameter.DateParameter;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 public class DateParamBuilder<T extends ParameterBagContainerBuilder<T>>
 		extends ParameterBuilder<Date, DateParameter, T> {

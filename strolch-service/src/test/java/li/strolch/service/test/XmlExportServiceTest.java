@@ -15,11 +15,6 @@
  */
 package li.strolch.service.test;
 
-import static li.strolch.model.StrolchModelConstants.TEMPLATE;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.*;
 import li.strolch.service.api.ServiceResult;
@@ -28,6 +23,11 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+
+import static li.strolch.model.StrolchModelConstants.TEMPLATE;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

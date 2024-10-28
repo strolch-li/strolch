@@ -34,14 +34,12 @@ public interface PersistenceTransaction extends AutoCloseable {
 	 *
 	 * @return the {@link TransactionResult}
 	 *
-	 * @throws IllegalStateException
-	 * 		if the transaction has not yet been closed
+	 * @throws IllegalStateException if the transaction has not yet been closed
 	 */
 	TransactionResult getTransactionResult() throws IllegalStateException;
 
 	/**
-	 * @throws IllegalStateException
-	 * 		if a result is already set
+	 * @throws IllegalStateException if a result is already set
 	 */
 	void setTransactionResult(TransactionResult txResult) throws IllegalStateException;
 

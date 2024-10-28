@@ -8,18 +8,15 @@ package li.strolch.privilege.base;
 public class InvalidCredentialsException extends AccessDeniedException {
 
 	/**
-	 * @param msg
-	 * 		the message to accompany the exception
+	 * @param msg the message to accompany the exception
 	 */
 	public InvalidCredentialsException(String msg) {
 		super(msg);
 	}
 
 	/**
-	 * @param msg
-	 * 		detail on why and where access was denied
-	 * @param e
-	 * 		root exception
+	 * @param msg detail on why and where access was denied
+	 * @param e   root exception
 	 */
 	public InvalidCredentialsException(String msg, Exception e) {
 		super(msg, e);

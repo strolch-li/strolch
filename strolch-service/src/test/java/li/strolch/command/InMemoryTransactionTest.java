@@ -1,8 +1,5 @@
 package li.strolch.command;
 
-import static li.strolch.service.test.AbstractRealmServiceTest.*;
-import static org.junit.Assert.*;
-
 import li.strolch.model.ModelGenerator;
 import li.strolch.model.Order;
 import li.strolch.model.Resource;
@@ -15,6 +12,9 @@ import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static li.strolch.service.test.AbstractRealmServiceTest.*;
+import static org.junit.Assert.*;
 
 public class InMemoryTransactionTest {
 

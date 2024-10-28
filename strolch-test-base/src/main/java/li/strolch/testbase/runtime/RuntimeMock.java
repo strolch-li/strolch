@@ -15,14 +15,6 @@
  */
 package li.strolch.testbase.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.Properties;
-
 import li.strolch.agent.api.*;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -34,6 +26,14 @@ import li.strolch.utils.helper.FileHelper;
 import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class RuntimeMock {
 
@@ -207,7 +207,11 @@ public class RuntimeMock {
 			else
 				errorMsg = StringHelper.formatException(result.getThrowable());
 
-			fail("Expected service result state " + expectedState + " but was " + result.getState() + ": Reason: "
+			fail("Expected service result state "
+					+ expectedState
+					+ " but was "
+					+ result.getState()
+					+ ": Reason: "
 					+ errorMsg);
 		}
 	}
@@ -220,7 +224,11 @@ public class RuntimeMock {
 			else
 				errorMsg = StringHelper.formatException(result.getThrowable());
 
-			fail("Expected service result state " + expectedState + " but was " + result.getState() + ": Reason: "
+			fail("Expected service result state "
+					+ expectedState
+					+ " but was "
+					+ result.getState()
+					+ ": Reason: "
 					+ errorMsg);
 		}
 	}

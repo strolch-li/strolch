@@ -33,10 +33,8 @@ public enum StringMatchMode {
 	private final boolean caseSensitve;
 
 	/**
-	 * @param equals
-	 * 		true if should be matched for entire string
-	 * @param caseSensitive
-	 * 		true if should be a case insensitive match
+	 * @param equals        true if should be matched for entire string
+	 * @param caseSensitive true if should be a case insensitive match
 	 */
 	StringMatchMode(boolean equals, boolean caseSensitive) {
 		this.equals = equals;
@@ -61,10 +59,8 @@ public enum StringMatchMode {
 	 * Returns true if <code>value2</code> matches <code>value1</code>. I.e. for contains <code>value2</code> must be
 	 * contained in <code>value1</code>
 	 *
-	 * @param value1
-	 * 		the value to be matched against
-	 * @param value2
-	 * 		the value to match with the first value
+	 * @param value1 the value to be matched against
+	 * @param value2 the value to match with the first value
 	 *
 	 * @return if <code>value2</code> matches <code>value1</code> according to the current settings
 	 */

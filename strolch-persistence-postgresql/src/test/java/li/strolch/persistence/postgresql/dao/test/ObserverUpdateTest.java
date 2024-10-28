@@ -15,19 +15,6 @@
  */
 package li.strolch.persistence.postgresql.dao.test;
 
-import static li.strolch.model.ModelGenerator.createOrder;
-import static li.strolch.model.ModelGenerator.createResource;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
-import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
-import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import li.strolch.agent.api.Observer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.*;
@@ -43,6 +30,19 @@ import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static li.strolch.model.ModelGenerator.createOrder;
+import static li.strolch.model.ModelGenerator.createResource;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_ARCHIVE;
+import static li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler.SCRIPT_PREFIX_STROLCH;
+import static li.strolch.persistence.postgresql.dao.test.CachedDaoTest.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -69,7 +69,8 @@ public class ObserverUpdateTest {
 			throw new IllegalStateException("Failed to create dir " + rootPath + "/" + DB_STORE_PATH_DIR);
 		runtimeMock.startContainer();
 
-		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock.getContainer()
+		PostgreSqlPersistenceHandler persistenceHandler = (PostgreSqlPersistenceHandler) runtimeMock
+				.getContainer()
 				.getComponent(PersistenceHandler.class);
 		assertEquals(DataType.xml, persistenceHandler.getDataType());
 	}
@@ -119,8 +120,7 @@ public class ObserverUpdateTest {
 		realm.getObserverHandler().registerObserver(Tags.RESOURCE, observer);
 
 		PrivilegeHandler privilegeHandler = runtimeMock.getAgent().getContainer().getPrivilegeHandler();
-		Certificate certificate = privilegeHandler
-				.authenticate("test", "test".toCharArray()); //$NON-NLS-2$
+		Certificate certificate = privilegeHandler.authenticate("test", "test".toCharArray()); //$NON-NLS-2$
 
 		// create order
 		Order newOrder = createOrder("MyTestOrder", "Test Name", "TestType", new Date(),
@@ -131,8 +131,7 @@ public class ObserverUpdateTest {
 		}
 
 		// create resource
-		Resource newResource = createResource("MyTestResource", "Test Name",
-				"TestType");//$NON-NLS-2$ //$NON-NLS-3$
+		Resource newResource = createResource("MyTestResource", "Test Name", "TestType");//$NON-NLS-2$ //$NON-NLS-3$
 		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
 			tx.add(newResource);
 			tx.commitOnClose();

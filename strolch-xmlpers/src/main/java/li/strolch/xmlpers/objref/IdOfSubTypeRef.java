@@ -15,12 +15,12 @@
  */
 package li.strolch.xmlpers.objref;
 
-import java.text.MessageFormat;
-
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceContextFactory;
 import li.strolch.xmlpers.api.PersistenceContextFactoryDelegator;
 import li.strolch.xmlpers.api.PersistenceTransaction;
+
+import java.text.MessageFormat;
 
 public class IdOfSubTypeRef extends ObjectRef {
 

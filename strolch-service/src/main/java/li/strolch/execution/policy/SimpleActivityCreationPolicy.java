@@ -1,10 +1,10 @@
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
-
 import li.strolch.model.Order;
 import li.strolch.model.activity.Activity;
 import li.strolch.persistence.api.StrolchTransaction;
+
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 public class SimpleActivityCreationPolicy extends ActivityCreationPolicy {
 	public SimpleActivityCreationPolicy(StrolchTransaction tx) {

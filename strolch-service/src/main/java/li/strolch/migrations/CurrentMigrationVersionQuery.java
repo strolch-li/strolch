@@ -15,13 +15,6 @@
  */
 package li.strolch.migrations;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static li.strolch.migrations.Migration.*;
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.Resource;
@@ -30,6 +23,13 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.Version;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static li.strolch.migrations.Migration.*;
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 
 public class CurrentMigrationVersionQuery {
 
@@ -50,19 +50,19 @@ public class CurrentMigrationVersionQuery {
 
 				Resource migrationsRes = tx.getResourceBy(MIGRATIONS_TYPE, MIGRATIONS_ID);
 				if (migrationsRes == null) {
-					this.currentVersions
-							.put(realmName, new MigrationVersion(Version.emptyVersion, Version.emptyVersion));
+					this.currentVersions.put(realmName,
+							new MigrationVersion(Version.emptyVersion, Version.emptyVersion));
 					continue;
 				}
 
-				StringParameter currentDataVersionP = migrationsRes
-						.getParameter(BAG_PARAMETERS, PARAM_CURRENT_DATA_VERSION);
-				StringParameter currentCodeVersionP = migrationsRes
-						.getParameter(BAG_PARAMETERS, PARAM_CURRENT_CODE_VERSION);
+				StringParameter currentDataVersionP = migrationsRes.getParameter(BAG_PARAMETERS,
+						PARAM_CURRENT_DATA_VERSION);
+				StringParameter currentCodeVersionP = migrationsRes.getParameter(BAG_PARAMETERS,
+						PARAM_CURRENT_CODE_VERSION);
 
 				if (currentDataVersionP == null && currentCodeVersionP == null) {
-					this.currentVersions
-							.put(realmName, new MigrationVersion(Version.emptyVersion, Version.emptyVersion));
+					this.currentVersions.put(realmName,
+							new MigrationVersion(Version.emptyVersion, Version.emptyVersion));
 				} else if (currentDataVersionP == null) {
 					Version codeVersion = getVersionFromParam(currentCodeVersionP);
 					this.currentVersions.put(realmName, new MigrationVersion(Version.emptyVersion, codeVersion));

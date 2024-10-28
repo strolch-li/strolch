@@ -39,12 +39,9 @@ public class StringListParameter extends AbstractListParameter<String> {
 	/**
 	 * Default constructor
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public StringListParameter(String id, String name, List<String> value) {
 		super(id, name);

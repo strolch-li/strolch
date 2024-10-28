@@ -15,15 +15,15 @@
  */
 package li.strolch.command;
 
-import java.io.File;
-import java.util.Set;
-
 import li.strolch.agent.impl.InMemoryElementListener;
 import li.strolch.model.ModelStatistics;
 import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
+
+import java.io.File;
+import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -98,72 +98,63 @@ public class XmlImportModelCommand extends Command {
 	}
 
 	/**
-	 * @param addOrders
-	 * 		the addOrders to set
+	 * @param addOrders the addOrders to set
 	 */
 	public void setAddOrders(boolean addOrders) {
 		this.addOrders = addOrders;
 	}
 
 	/**
-	 * @param addResources
-	 * 		the addResources to set
+	 * @param addResources the addResources to set
 	 */
 	public void setAddResources(boolean addResources) {
 		this.addResources = addResources;
 	}
 
 	/**
-	 * @param addActivities
-	 * 		the addActivities to set
+	 * @param addActivities the addActivities to set
 	 */
 	public void setAddActivities(boolean addActivities) {
 		this.addActivities = addActivities;
 	}
 
 	/**
-	 * @param updateOrders
-	 * 		the updateOrders to set
+	 * @param updateOrders the updateOrders to set
 	 */
 	public void setUpdateOrders(boolean updateOrders) {
 		this.updateOrders = updateOrders;
 	}
 
 	/**
-	 * @param updateResources
-	 * 		the updateResources to set
+	 * @param updateResources the updateResources to set
 	 */
 	public void setUpdateResources(boolean updateResources) {
 		this.updateResources = updateResources;
 	}
 
 	/**
-	 * @param updateActivities
-	 * 		the updateActivities to set
+	 * @param updateActivities the updateActivities to set
 	 */
 	public void setUpdateActivities(boolean updateActivities) {
 		this.updateActivities = updateActivities;
 	}
 
 	/**
-	 * @param orderTypes
-	 * 		the orderTypes to set
+	 * @param orderTypes the orderTypes to set
 	 */
 	public void setOrderTypes(Set<String> orderTypes) {
 		this.orderTypes = orderTypes;
 	}
 
 	/**
-	 * @param resourceTypes
-	 * 		the resourceTypes to set
+	 * @param resourceTypes the resourceTypes to set
 	 */
 	public void setResourceTypes(Set<String> resourceTypes) {
 		this.resourceTypes = resourceTypes;
 	}
 
 	/**
-	 * @param activityTypes
-	 * 		the activityTypes to set
+	 * @param activityTypes the activityTypes to set
 	 */
 	public void setActivityTypes(Set<String> activityTypes) {
 		this.activityTypes = activityTypes;

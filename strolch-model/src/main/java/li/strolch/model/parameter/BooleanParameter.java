@@ -15,13 +15,12 @@
  */
 package li.strolch.model.parameter;
 
-import java.util.Objects;
-
 import li.strolch.model.StrolchValueType;
-import li.strolch.model.timedstate.FloatTimedState;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+
+import java.util.Objects;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -40,12 +39,9 @@ public class BooleanParameter extends AbstractParameter<Boolean> {
 	/**
 	 * Default constructors
 	 *
-	 * @param id
-	 * 		the id
-	 * @param name
-	 * 		the name
-	 * @param value
-	 * 		the value
+	 * @param id    the id
+	 * @param name  the name
+	 * @param value the value
 	 */
 	public BooleanParameter(String id, String name, Boolean value) {
 		super(id, name);
