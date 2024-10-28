@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-/**
- *
- */
 package li.strolch.migrations;
 
 import li.strolch.utils.Version;
