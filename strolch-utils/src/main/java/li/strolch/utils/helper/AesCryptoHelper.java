@@ -386,9 +386,7 @@ public class AesCryptoHelper {
 			SecretKeys other = (SecretKeys) obj;
 			if (!integrityKey.equals(other.integrityKey))
 				return false;
-			if (!confidentialityKey.equals(other.confidentialityKey))
-				return false;
-			return true;
+			return confidentialityKey.equals(other.confidentialityKey);
 		}
 	}
 }

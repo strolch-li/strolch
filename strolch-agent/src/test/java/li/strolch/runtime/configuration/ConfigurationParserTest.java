@@ -60,7 +60,7 @@ public class ConfigurationParserTest {
 		assertNotNull("Should have created a runtime configuration", runtimeConfiguration);
 		assertEquals("StrolchRuntimeTest", runtimeConfiguration.getApplicationName());
 		assertEquals("dev", runtimeConfiguration.getEnvironment());
-		assertEquals(true, runtimeConfiguration.getBoolean("verbose", null));
+		assertTrue(runtimeConfiguration.getBoolean("verbose", null));
 
 		//	<Component>
 		//		<name>ServiceHandler</name>
@@ -117,7 +117,7 @@ public class ConfigurationParserTest {
 		assertEquals("li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTestImpl",
 				persistenceHandlerConfiguration.getImpl());
 		assertEquals(1, persistenceHandlerConfiguration.getPropertyKeys().size());
-		assertEquals(true, persistenceHandlerConfiguration.getBoolean("verbose", null));
+		assertTrue(persistenceHandlerConfiguration.getBoolean("verbose", null));
 
 		//	<env id="global">
 		//		<Component>
@@ -174,7 +174,7 @@ public class ConfigurationParserTest {
 		assertNotNull("Should have created a runtime configuration", runtimeConfiguration);
 		assertEquals("StrolchRuntimeTest", runtimeConfiguration.getApplicationName());
 		assertEquals("test", runtimeConfiguration.getEnvironment());
-		assertEquals(true, runtimeConfiguration.getBoolean("verbose", null));
+		assertTrue(runtimeConfiguration.getBoolean("verbose", null));
 
 		//	<env id="global">
 		//		<Component>

@@ -15,9 +15,6 @@
  */
 package li.strolch.migrations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +34,8 @@ import li.strolch.utils.collections.MapOfLists;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class MigrationsTest {
 
@@ -78,7 +77,7 @@ public class MigrationsTest {
 				.asList(Version.valueOf("0.1.0"), Version.valueOf("0.1.1"), Version.valueOf("0.5.2"),
 						Version.valueOf("1.0.0"), Version.valueOf("1.0.5"), Version.valueOf("1.1.1"));
 		assertEquals(expectedMigrations, lastMigrations.getList(defRealm));
-		assertEquals(null, lastMigrations.getList("other"));
+		assertNull(lastMigrations.getList("other"));
 
 		MapOfLists<String, Version> migrationsToRun = migrationsHandler.queryMigrationsToRun(certificate);
 		assertTrue("Expected to have all migrations run", migrationsToRun.isEmpty());

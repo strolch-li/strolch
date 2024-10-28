@@ -106,9 +106,7 @@ public class NetworkHelper {
 				return false;
 			if (device.startsWith("veth"))
 				return false;
-			if (device.startsWith("docker"))
-				return false;
-			return true;
+			return !device.startsWith("docker");
 		}).map(device -> {
 			try {
 				String hwAddress = readString(Path.of("/sys/class/net/" + device + "/address")).trim();

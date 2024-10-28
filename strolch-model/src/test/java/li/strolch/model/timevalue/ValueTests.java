@@ -15,8 +15,6 @@
  */
 package li.strolch.model.timevalue;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +25,8 @@ import li.strolch.model.timevalue.impl.StringSetValue;
 import li.strolch.model.timevalue.impl.TimeVariable;
 
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Basic tests for a {@link TimeVariable} with {@link StringValue}.
@@ -68,7 +68,7 @@ public class ValueTests {
 		}
 		IValue<Set<AString>> value = new StringSetValue(aStrings);
 		IValue<Set<AString>> inverse = value.getInverse();
-		assertEquals(true, value.matches(inverse.getInverse()));
+		assertTrue(value.matches(inverse.getInverse()));
 		assertEquals(0, value.add(inverse.getValue()).getValue().size());
 	}
 
@@ -90,7 +90,7 @@ public class ValueTests {
 		}
 		IValue<Set<AString>> value2 = new StringSetValue(aStrings2);
 
-		assertEquals(false, value1.matches(value2));
+		assertFalse(value1.matches(value2));
 		assertEquals(1, value1.add(value2.getValue()).getValue().size());
 		assertEquals(10, value1.add(value2.getInverse().getValue()).getValue().size());
 	}

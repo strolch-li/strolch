@@ -37,7 +37,7 @@ import li.strolch.privilege.policy.PrivilegePolicy;
  */
 public class PrivilegeContainerModel {
 
-	private File basePath;
+	private final File basePath;
 
 	private String encryptionHandlerClassName;
 	private String passwordStrengthHandlerClassName;
