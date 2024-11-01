@@ -1,10 +1,9 @@
 package li.strolch.rest.filters;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.container.PreMatching;
+import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.RestfulHelper;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_URL;
 import static li.strolch.rest.helper.ServletRequestHelper.logRequest;
 
 @PreMatching
-public class LogRequestFilter implements ContainerRequestFilter {
+public class LogRequestFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(LogRequestFilter.class);
 
@@ -36,5 +35,17 @@ public class LogRequestFilter implements ContainerRequestFilter {
 				requestContext.getMethod() + " " + requestContext.getUriInfo().getRequestUri());
 
 		logRequest(this.request);
+	}
+
+	@Override
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
+			throws IOException {
+		int status = responseContext.getStatus();
+		if (status != Response.Status.OK.getStatusCode()) {
+			String method = requestContext.getMethod();
+			String uri = request.getRequestURI();
+
+			logger.error("Request failed {}: {} {}", responseContext.getStatus(), method, uri);
+		}
 	}
 }
