@@ -141,6 +141,10 @@ public class ServiceResult {
 		return new ServiceResult(ServiceResultState.WARNING, warning);
 	}
 
+	public static ServiceResult warning(I18nMessage i18nMessage) {
+		return new ServiceResult(ServiceResultState.WARNING, i18nMessage);
+	}
+
 	public static ServiceResult warning(String warning, Throwable t) {
 		return new ServiceResult(ServiceResultState.WARNING, warning, t);
 	}
