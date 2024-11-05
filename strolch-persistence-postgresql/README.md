@@ -18,24 +18,20 @@ $ postgres=#
 $ sudo -u postgres psql
 $ postgres=# 
 create user testuser with password 'test';
-create database testdb;
-GRANT ALL PRIVILEGES ON DATABASE testdb to testuser;
+create database testdb owner testuser;
 GRANT CONNECT ON DATABASE testdb TO testuser ;
    
 # For tests:
 create user testuser with password 'test';
-create database testdb;
-GRANT ALL PRIVILEGES ON DATABASE testdb to testuser;
+create database testdb owner testuser;
 GRANT CONNECT ON DATABASE testdb TO testuser ;
 
 create user testuser1 with password 'test';
-create database testdb1;
-GRANT ALL PRIVILEGES ON DATABASE testdb1 to testuser1;
+create database testdb1 owner testuser1;
 GRANT CONNECT ON DATABASE testdb1 TO testuser1 ;
 
 create user testuser2 with password 'test';
-create database testdb2;
-GRANT ALL PRIVILEGES ON DATABASE testdb2 to testuser2;
+create database testdb2 owner testuser2;
 GRANT CONNECT ON DATABASE testdb2 TO testuser2 ;
 
 4.	Added new component, setting properties for PostgreSQL DB:

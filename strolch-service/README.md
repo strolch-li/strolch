@@ -12,13 +12,11 @@ Start PostgreSQL console and create the users:
 	$ sudo -u postgres psql
 	$ postgres=# 
 	create user cacheduser with password 'test';
-	create database cacheduserdb;
-	GRANT ALL PRIVILEGES ON DATABASE cacheduserdb to cacheduser;
+	create database cacheduserdb owner cacheduser;
 	GRANT CONNECT ON DATABASE cacheduserdb TO cacheduser;
 	
 	create user cacheduserauditsversioning with password 'test';
-	create database cacheduserauditsversioningdb;
-	GRANT ALL PRIVILEGES ON DATABASE cacheduserauditsversioningdb to cacheduserauditsversioning;
+	create database cacheduserauditsversioningdb owner cacheduserauditsversioning;
 	GRANT CONNECT ON DATABASE cacheduserauditsversioningdb TO cacheduserauditsversioning;
 
 You can revoke the privileges with the following:
