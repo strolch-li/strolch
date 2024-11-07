@@ -503,9 +503,8 @@ public class StringHelper {
 
 			// make sure sequence doesn't contain $ { } characters
 			if (sequence.contains(startTag) || sequence.contains("}")) { //$NON-NLS-2$ //$NON-NLS-3$
-				String msg = "Enclosed sequence in offsets {0} - {1} contains one of the illegal chars: {2} { }: {3}";
-				msg = MessageFormat.format(msg, pos, stop, prefix, sequence);
-				logger.error(msg);
+				logger.error("Enclosed sequence in offsets {} - {} contains one of the illegal chars: $ { } in: {}",
+						pos, stop, sequence);
 				tmpValue = value;
 				break;
 			}
@@ -597,17 +596,8 @@ public class StringHelper {
 		int start = Math.max(0, (i - maxContext));
 		int end = Math.min(i + maxContext, (Math.min(bytes1.length, bytes2.length)));
 
-		return "Strings are not equal! Start of inequality is at "
-				+ i
-				+ ". Showing "
-				+ maxContext
-				+ " extra characters and start and end:\n"
-				+ "context s1: "
-				+ s1.substring(start, end)
-				+ "\n"
-				+ "context s2: "
-				+ s2.substring(start, end)
-				+ "\n";
+		return "Strings are not equal! Start of inequality is at %d. Showing %d extra characters and start and end:\ncontext s1: %s\ncontext s2: %s\n".formatted(
+				i, maxContext, s1.substring(start, end), s2.substring(start, end));
 	}
 
 	/**
@@ -797,7 +787,7 @@ public class StringHelper {
 	 * @return the set from parsing the value
 	 */
 	public static Set<String> getStringAsSet(String csv) {
-		return Stream.of(trimOrEmpty(csv).split(",")).map(String::trim).filter(s -> s.length() > 0).collect(toSet());
+		return Stream.of(trimOrEmpty(csv).split(",")).map(String::trim).filter(s -> !s.isEmpty()).collect(toSet());
 	}
 
 	/**
