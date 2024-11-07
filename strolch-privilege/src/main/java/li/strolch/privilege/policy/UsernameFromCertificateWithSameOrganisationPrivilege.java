@@ -98,12 +98,9 @@ public class UsernameFromCertificateWithSameOrganisationPrivilege extends Userna
 			return true;
 
 		if (assertHasPrivilege)
-			throw new AccessDeniedException("User "
-					+ ctx.getUsername()
-					+ " may not access users outside of their organisation: "
-					+ userOrgs
-					+ " / "
-					+ orgs);
+			throw new AccessDeniedException(
+					"User %s may not access users outside of their organisation: %s / %s".formatted(ctx.getUsername(),
+							userOrgs, orgs));
 
 		return false;
 	}

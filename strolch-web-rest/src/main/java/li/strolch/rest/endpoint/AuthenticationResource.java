@@ -67,7 +67,7 @@ public class AuthenticationResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authenticate(@Context HttpServletRequest request, @Context HttpHeaders headers, String data) {
+	public Response authenticate(@Context HttpServletRequest request, String data) {
 		JsonObject login = JsonParser.parseString(data).getAsJsonObject();
 
 		try {
@@ -116,7 +116,7 @@ public class AuthenticationResource {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("sso")
-	public Response authenticateSingleSignOn(@Context HttpServletRequest request, @Context HttpHeaders headers) {
+	public Response authenticateSingleSignOn(@Context HttpServletRequest request) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
@@ -311,41 +311,43 @@ public class AuthenticationResource {
 		loginResult.addProperty("usage", certificate.getUsage().getValue());
 
 		if (!certificate.getPropertyMap().isEmpty()) {
-			JsonObject propObj = new JsonObject();
-			loginResult.add("properties", propObj);
+			JsonObject propertyJ = new JsonObject();
+			loginResult.add("properties", propertyJ);
 			for (String propKey : certificate.getPropertyMap().keySet()) {
-				propObj.addProperty(propKey, certificate.getPropertyMap().get(propKey));
+				propertyJ.addProperty(propKey, certificate.getPropertyMap().get(propKey));
 			}
 		}
 
-		if (!certificate.getUserRoles().isEmpty()) {
-			JsonArray rolesArr = new JsonArray();
-			loginResult.add("roles", rolesArr);
-			for (String role : certificate.getUserRoles()) {
-				rolesArr.add(new JsonPrimitive(role));
-			}
+		JsonArray groupsJ = new JsonArray();
+		loginResult.add("groups", groupsJ);
+		for (String group : certificate.getUserGroups()) {
+			groupsJ.add(new JsonPrimitive(group));
 		}
 
-		if (!privilegeContext.getPrivilegeNames().isEmpty()) {
-			JsonArray privArr = new JsonArray();
-			loginResult.add("privileges", privArr);
+		JsonArray rolesJ = new JsonArray();
+		loginResult.add("roles", rolesJ);
+		for (String role : certificate.getUserRoles()) {
+			rolesJ.add(new JsonPrimitive(role));
+		}
 
-			for (String name : privilegeContext.getPrivilegeNames()) {
-				Privilege privilege = privilegeContext.getPrivilege(name);
+		JsonArray privilegesJ = new JsonArray();
+		loginResult.add("privileges", privilegesJ);
 
-				JsonObject privObj = new JsonObject();
-				privArr.add(privObj);
+		for (String name : privilegeContext.getPrivilegeNames()) {
+			Privilege privilege = privilegeContext.getPrivilege(name);
 
-				privObj.addProperty("name", name);
-				privObj.addProperty("allAllowed", privilege.isAllAllowed());
+			JsonObject privilegeJ = new JsonObject();
+			privilegesJ.add(privilegeJ);
 
-				Set<String> allowSet = privilege.getAllowList();
-				if (!allowSet.isEmpty()) {
-					JsonArray allowArr = new JsonArray();
-					privObj.add("allowList", allowArr);
-					for (String allow : allowSet) {
-						allowArr.add(new JsonPrimitive(allow));
-					}
+			privilegeJ.addProperty("name", name);
+			privilegeJ.addProperty("allAllowed", privilege.isAllAllowed());
+
+			Set<String> allowSet = privilege.getAllowList();
+			if (!allowSet.isEmpty()) {
+				JsonArray allowJ = new JsonArray();
+				privilegeJ.add("allowList", allowJ);
+				for (String allow : allowSet) {
+					allowJ.add(new JsonPrimitive(allow));
 				}
 			}
 		}

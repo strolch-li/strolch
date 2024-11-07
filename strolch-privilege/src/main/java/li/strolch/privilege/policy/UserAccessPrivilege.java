@@ -39,7 +39,7 @@ import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UserAccessPrivilege implements PrivilegePolicy {
+public class UserAccessPrivilege extends PrivilegePolicy {
 
 	@Override
 	public void validateAction(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable)

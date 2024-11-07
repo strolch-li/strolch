@@ -31,7 +31,7 @@ import java.text.MessageFormat;
 import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDenyValues;
 import static li.strolch.privilege.policy.PrivilegePolicyHelper.preValidate;
 
-public class ModelPrivilege implements PrivilegePolicy {
+public class ModelPrivilege extends PrivilegePolicy {
 
 	/**
 	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege

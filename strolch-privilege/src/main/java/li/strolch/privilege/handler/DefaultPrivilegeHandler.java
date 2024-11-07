@@ -199,7 +199,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep getUser(Certificate certificate, String username) {
-		return crudHandler.getUser(certificate, username);
+		return crudHandler.getUserRep(certificate, username);
 	}
 
 	@Override
@@ -209,10 +209,10 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = validate(certificate);
 		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER_PRIVILEGES);
 
-		UserRep userRep = crudHandler.getUser(certificate, username);
-		if (userRep == null)
+		User user = crudHandler.getUser(certificate, username);
+		if (user == null)
 			throw new PrivilegeModelException(format("User {0} does not exist!", username));
-		return new PrivilegeContextBuilder(this).buildUserPrivilege(userRep);
+		return new PrivilegeContextBuilder(this).buildUserPrivilege(user);
 	}
 
 	@Override
@@ -1327,17 +1327,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	}
 
 	private void replacePrivilegeContextForCert(User user, Certificate cert) {
-		PrivilegeContext privilegeContext = new PrivilegeContextBuilder(this).buildPrivilegeContext(cert.getUsage(),
-				user, cert.getAuthToken(), cert.getSessionId(), cert.getSource(), cert.getLoginTime(),
-				cert.isKeepAlive());
-		this.privilegeContextMap.put(privilegeContext.getCertificate().getSessionId(), privilegeContext);
+		PrivilegeContext ctx = new PrivilegeContextBuilder(this).buildPrivilegeContext(cert.getUsage(), user,
+				cert.getAuthToken(), cert.getSessionId(), cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
+		this.privilegeContextMap.put(ctx.getCertificate().getSessionId(), ctx);
 	}
 
 	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, String source, ZonedDateTime loginTime,
 			boolean keepAlive) {
-		PrivilegeContext privilegeContext = new PrivilegeContextBuilder(this).buildPrivilegeContext(usage, user, source,
-				loginTime, keepAlive);
-		this.privilegeContextMap.put(privilegeContext.getCertificate().getSessionId(), privilegeContext);
-		return privilegeContext;
+		PrivilegeContext ctx = new PrivilegeContextBuilder(this).buildPrivilegeContext(usage, user, source, loginTime,
+				keepAlive);
+		this.privilegeContextMap.put(ctx.getCertificate().getSessionId(), ctx);
+		return ctx;
 	}
 }

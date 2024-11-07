@@ -43,7 +43,8 @@ public class PrivilegeContextBuilder {
 	private final PersistenceHandler persistenceHandler;
 
 	private Set<String> groups;
-	private Set<String> roles;
+	private Set<String> userDirectRoles;
+	private Set<String> rolesWithGroupRoles;
 	private Map<String, String> properties;
 
 	public PrivilegeContextBuilder(DefaultPrivilegeHandler privilegeHandler) {
@@ -72,46 +73,47 @@ public class PrivilegeContextBuilder {
 		Map<String, PrivilegePolicy> policies = new HashMap<>();
 
 		// cache the privileges and policies for this user by role
-		addPrivilegesForRoles(this.roles, user.getUsername(), privileges, policies);
+		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, policies);
 
 		UserRep userRep = user.asUserRep();
-		userRep.setRoles(this.roles);
+		userRep.setRoles(this.userDirectRoles);
 		userRep.setGroups(this.groups);
 		userRep.setProperties(this.properties);
 		userRep.readOnly();
 
 		Certificate certificate = new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(),
 				user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive, user.getLocale(),
-				this.groups, this.roles, this.properties);
+				this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
 
 		return new PrivilegeContext(userRep, certificate, privileges, policies);
 	}
 
-	public UserPrivileges buildUserPrivilege(UserRep userRep) {
-		this.roles = streamAllRolesForUser(this.persistenceHandler, userRep)
-				.sorted()
-				.collect(toCollection(TreeSet::new));
+	public UserPrivileges buildUserPrivilege(User user) {
+		prepare(user);
 
 		// cache the privileges and policies for this user by role
 		Map<String, Privilege> privileges = new HashMap<>();
-		addPrivilegesForRoles(this.roles, userRep.getUsername(), privileges, new HashMap<>());
+		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, new HashMap<>());
 
-		return new UserPrivileges(userRep, List.copyOf(privileges.values()));
+		return new UserPrivileges(user.asUserRep(), List.copyOf(privileges.values()));
 	}
 
 	public GroupPrivileges buildGroupPrivilege(Group group) {
-		this.roles = group.roles().stream().sorted().collect(toCollection(TreeSet::new));
+		Set<String> groupRoles = group.roles().stream().sorted().collect(toCollection(TreeSet::new));
 
 		// cache the privileges and policies for this group by role
 		Map<String, Privilege> privileges = new HashMap<>();
-		addPrivilegesForRoles(this.roles, group.name(), privileges, new HashMap<>());
+		addPrivilegesForRoles(groupRoles, group.name(), privileges, new HashMap<>());
 
 		return new GroupPrivileges(group, List.copyOf(privileges.values()));
 	}
 
 	private void prepare(User user) {
 		this.groups = user.getGroups().stream().sorted().collect(toCollection(TreeSet::new));
-		this.roles = streamAllRolesForUser(this.persistenceHandler, user).sorted().collect(toCollection(TreeSet::new));
+		this.userDirectRoles = user.getRoles().stream().sorted().collect(toCollection(TreeSet::new));
+		this.rolesWithGroupRoles = streamAllRolesForUser(this.persistenceHandler, user)
+				.sorted()
+				.collect(toCollection(TreeSet::new));
 		this.properties = new HashMap<>(user.getProperties());
 
 		// copy properties from groups to user properties
@@ -234,6 +236,7 @@ public class PrivilegeContextBuilder {
 			throw new PrivilegeModelException(msg, e);
 		}
 
+		policy.initialize(this.privilegeHandler);
 		return policy;
 	}
 }

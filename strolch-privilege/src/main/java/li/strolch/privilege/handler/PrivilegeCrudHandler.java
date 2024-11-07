@@ -84,7 +84,11 @@ public class PrivilegeCrudHandler {
 		return group;
 	}
 
-	public UserRep getUser(Certificate certificate, String username) {
+	public UserRep getUserRep(Certificate certificate, String username) {
+		return getUser(certificate, username).asUserRep();
+	}
+
+	public User getUser(Certificate certificate, String username) {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
@@ -95,7 +99,7 @@ public class PrivilegeCrudHandler {
 			return null;
 
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user)));
-		return user.asUserRep();
+		return user;
 	}
 
 	public Map<String, String> getPolicyDefs(Certificate certificate) {

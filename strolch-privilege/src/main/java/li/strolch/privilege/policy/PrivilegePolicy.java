@@ -17,6 +17,7 @@ package li.strolch.privilege.policy;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
@@ -35,7 +36,17 @@ import li.strolch.privilege.model.internal.User;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public interface PrivilegePolicy {
+public abstract class PrivilegePolicy {
+
+	private PrivilegeHandler privilegeHandler;
+
+	public void initialize(PrivilegeHandler privilegeHandler) {
+		this.privilegeHandler = privilegeHandler;
+	}
+
+	protected PrivilegeHandler getPrivilegeHandler() {
+		return this.privilegeHandler;
+	}
 
 	/**
 	 * Checks if the given {@link Role} and the given {@link Privilege} has access to the given {@link Restrictable}
@@ -46,7 +57,7 @@ public interface PrivilegePolicy {
 	 *
 	 * @throws AccessDeniedException if action not allowed
 	 */
-	void validateAction(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
+	public abstract void validateAction(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
 			throws AccessDeniedException;
 
 	/**
@@ -61,6 +72,6 @@ public interface PrivilegePolicy {
 	 *
 	 * @throws AccessDeniedException if something goes wrong with the validate
 	 */
-	boolean hasPrivilege(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
+	public abstract boolean hasPrivilege(PrivilegeContext context, Privilege privilege, Restrictable restrictable)
 			throws PrivilegeException;
 }

@@ -33,7 +33,7 @@ import static li.strolch.privilege.policy.PrivilegePolicyHelper.checkByAllowDeny
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class DefaultPrivilege implements PrivilegePolicy {
+public class DefaultPrivilege extends PrivilegePolicy {
 
 	/**
 	 * The value of {@link Restrictable#getPrivilegeValue()} is used to check if the {@link Role} has this privilege

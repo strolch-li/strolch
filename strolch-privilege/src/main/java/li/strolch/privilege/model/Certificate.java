@@ -49,6 +49,7 @@ public final class Certificate {
 	private final boolean keepAlive;
 
 	private final Set<String> userGroups;
+	private final Set<String> userDirectRoles;
 	private final Set<String> userRoles;
 	private final Map<String, String> propertyMap;
 
@@ -77,7 +78,8 @@ public final class Certificate {
 	 */
 	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
 			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
-			Locale locale, Set<String> userGroups, Set<String> userRoles, Map<String, String> propertyMap) {
+			Locale locale, Set<String> userGroups, Set<String> userRoles, Set<String> userDirectRoles,
+			Map<String, String> propertyMap) {
 
 		DBC.PRE.assertNotEmpty("sessionId must not be empty", sessionId);
 		DBC.PRE.assertNotEmpty("username must not be empty", username);
@@ -109,6 +111,7 @@ public final class Certificate {
 			this.propertyMap = Map.copyOf(propertyMap);
 
 		this.userGroups = Set.copyOf(userGroups);
+		this.userDirectRoles = Set.copyOf(userDirectRoles);
 		this.userRoles = Set.copyOf(userRoles);
 		this.lastAccess = ZonedDateTime.now();
 	}
@@ -135,6 +138,10 @@ public final class Certificate {
 
 	public Set<String> getUserRoles() {
 		return this.userRoles;
+	}
+
+	public Set<String> getUserDirectRoles() {
+		return this.userDirectRoles;
 	}
 
 	/**

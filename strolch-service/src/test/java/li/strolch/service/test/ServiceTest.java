@@ -46,7 +46,7 @@ public class ServiceTest extends AbstractServiceTest {
 			TestService testService = new TestService();
 			getServiceHandler().doService(
 					new Certificate(null, null, null, null, null, null, null, null, ZonedDateTime.now(), false, null,
-							new HashSet<>(), new HashSet<>(), null), testService);
+							new HashSet<>(), new HashSet<>(), new HashSet<>(), null), testService);
 		});
 	}
 
@@ -54,7 +54,7 @@ public class ServiceTest extends AbstractServiceTest {
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", "asd",
-				ZonedDateTime.now(), false, null, new HashSet<>(), new HashSet<>(), null);
+				ZonedDateTime.now(), false, null, new HashSet<>(), new HashSet<>(), new HashSet<>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
 		assertThat(svcResult.getThrowable(), instanceOf(NotAuthenticatedException.class));
 	}
