@@ -844,9 +844,9 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			throw new PrivilegeException("PrivilegeContext may not be null!");
 
 		// validate user state is system
-		if (ctx.getUserRep().getUserState() != UserState.SYSTEM) {
+		if (ctx.getUserState() != UserState.SYSTEM) {
 			String msg = "The PrivilegeContext user {0} does not have expected user state {1}";
-			msg = format(msg, ctx.getUserRep().getUsername(), UserState.SYSTEM);
+			msg = format(msg, ctx.getUsername(), UserState.SYSTEM);
 			throw new PrivilegeException(msg);
 		}
 
@@ -1162,7 +1162,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	void invalidateSessionsFor(User user) {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
 		for (PrivilegeContext ctx : contexts) {
-			if (ctx.getUserRep().getUsername().equals(user.getUsername()))
+			if (ctx.getUsername().equals(user.getUsername()))
 				invalidate(ctx.getCertificate());
 		}
 
@@ -1177,7 +1177,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	void updateExistingSessionsForUser(User newUser, boolean persistSessions) {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
 		for (PrivilegeContext ctx : contexts) {
-			if (!ctx.getUserRep().getUsername().equals(newUser.getUsername()))
+			if (!ctx.getUsername().equals(newUser.getUsername()))
 				continue;
 			replacePrivilegeContextForCert(newUser, ctx.getCertificate());
 		}
@@ -1194,7 +1194,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	void updateExistingSessionsWithNewRole(Role role) {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
 		for (PrivilegeContext ctx : contexts) {
-			if (!ctx.getUserRep().hasRole(role.getName()))
+			if (!ctx.getCertificate().hasRole(role.getName()))
 				continue;
 			User user = this.persistenceHandler.getUser(ctx.getUsername());
 			if (user == null)
@@ -1213,7 +1213,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	void updateExistingSessionsWithNewGroup(Group group) {
 		List<PrivilegeContext> contexts = new ArrayList<>(this.privilegeContextMap.values());
 		for (PrivilegeContext ctx : contexts) {
-			if (!ctx.getUserRep().hasGroup(group.name()))
+			if (!ctx.getCertificate().hasGroup(group.name()))
 				continue;
 			User user = this.persistenceHandler.getUser(ctx.getUsername());
 			if (user == null)

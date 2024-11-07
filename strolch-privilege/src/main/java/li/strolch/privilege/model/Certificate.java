@@ -120,7 +120,7 @@ public final class Certificate {
 		return this.userState.isSystem();
 	}
 
-	public boolean isisRemoteUser() {
+	public boolean isRemoteUser() {
 		return this.userState.isRemote();
 	}
 
@@ -173,6 +173,15 @@ public final class Certificate {
 	 */
 	public Map<String, String> getPropertyMap() {
 		return this.propertyMap;
+	}
+
+	/**
+	 * Returns the {@link User User's} property's key set. The set is immutable
+	 *
+	 * @return the set of property keys
+	 */
+	public Set<String> getPropertyKeySet() {
+		return this.propertyMap.keySet();
 	}
 
 	/**

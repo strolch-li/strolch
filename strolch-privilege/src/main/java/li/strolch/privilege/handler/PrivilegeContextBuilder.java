@@ -75,17 +75,11 @@ public class PrivilegeContextBuilder {
 		// cache the privileges and policies for this user by role
 		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, policies);
 
-		UserRep userRep = user.asUserRep();
-		userRep.setRoles(this.userDirectRoles);
-		userRep.setGroups(this.groups);
-		userRep.setProperties(this.properties);
-		userRep.readOnly();
-
 		Certificate certificate = new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(),
 				user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive, user.getLocale(),
 				this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
 
-		return new PrivilegeContext(userRep, certificate, privileges, policies);
+		return new PrivilegeContext(certificate, privileges, policies);
 	}
 
 	public UserPrivileges buildUserPrivilege(User user) {

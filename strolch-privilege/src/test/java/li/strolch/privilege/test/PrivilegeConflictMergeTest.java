@@ -51,15 +51,15 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	public void shouldMergePrivileges1() {
 		try {
 			login("userA", "admin".toCharArray());
-			assertEquals(Set.of(), this.ctx.getUserRep().getGroups());
+			assertEquals(Set.of(), this.ctx.getGroups());
 			assertFalse(this.ctx.hasGroup("GroupA1"));
 			assertFalse(this.ctx.hasGroup("GroupA2"));
-			assertEquals(Set.of("RoleA1", "RoleA2"), this.ctx.getUserRep().getRoles());
+			assertEquals(Set.of("RoleA1", "RoleA2"), this.ctx.getRoles());
 			assertTrue(this.ctx.hasRole("RoleA1"));
 			assertTrue(this.ctx.hasRole("RoleA2"));
 			assertFalse(this.ctx.hasRole("RoleB2"));
-			assertNull(this.ctx.getUserRep().getLocation());
-			assertEquals(Set.of(), this.ctx.getUserRep().getPropertyKeySet());
+			assertNull(this.ctx.getLocation());
+			assertEquals(Set.of(), this.ctx.getPropertyKeySet());
 			Privilege privilege = this.ctx.getPrivilege("Foo");
 			assertTrue(privilege.isAllAllowed());
 			assertTrue(privilege.getAllowList().isEmpty());
@@ -74,15 +74,15 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	public void shouldMergePrivileges2() {
 		try {
 			login("userB", "admin".toCharArray());
-			assertEquals(Set.of(), this.ctx.getUserRep().getGroups());
+			assertEquals(Set.of(), this.ctx.getGroups());
 			assertFalse(this.ctx.hasGroup("GroupB1"));
 			assertFalse(this.ctx.hasGroup("GroupB2"));
-			assertEquals(Set.of("RoleB1", "RoleB2"), this.ctx.getUserRep().getRoles());
+			assertEquals(Set.of("RoleB1", "RoleB2"), this.ctx.getRoles());
 			assertTrue(this.ctx.hasRole("RoleB1"));
 			assertTrue(this.ctx.hasRole("RoleB2"));
 			assertFalse(this.ctx.hasRole("RoleA2"));
-			assertNull(this.ctx.getUserRep().getLocation());
-			assertEquals(Set.of(), this.ctx.getUserRep().getPropertyKeySet());
+			assertNull(this.ctx.getLocation());
+			assertEquals(Set.of(), this.ctx.getPropertyKeySet());
 			Privilege privilege = this.ctx.getPrivilege("Bar");
 			assertFalse(privilege.isAllAllowed());
 			assertEquals(2, privilege.getAllowList().size());
@@ -96,16 +96,16 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	public void shouldMergePrivileges3() {
 		try {
 			login("userC", "admin".toCharArray());
-			assertEquals(Set.of("GroupA1", "GroupA2"), this.ctx.getUserRep().getGroups());
+			assertEquals(Set.of("GroupA1", "GroupA2"), this.ctx.getGroups());
 			assertTrue(this.ctx.hasGroup("GroupA1"));
 			assertTrue(this.ctx.hasGroup("GroupA2"));
 			assertFalse(this.ctx.hasGroup("GroupB2"));
-			assertEquals(Set.of("RoleA1", "RoleA2"), this.ctx.getUserRep().getRoles());
+			assertEquals(Set.of("RoleA1", "RoleA2"), this.ctx.getRoles());
 			assertTrue(this.ctx.hasRole("RoleA1"));
 			assertTrue(this.ctx.hasRole("RoleA2"));
 			assertFalse(this.ctx.hasRole("RoleB2"));
-			assertEquals("LocationA2", this.ctx.getUserRep().getLocation());
-			assertEquals(Set.of("location"), this.ctx.getUserRep().getPropertyKeySet());
+			assertEquals("LocationA2", this.ctx.getLocation());
+			assertEquals(Set.of("location"), this.ctx.getPropertyKeySet());
 			Privilege privilege = this.ctx.getPrivilege("Foo");
 			assertTrue(privilege.isAllAllowed());
 			assertTrue(privilege.getAllowList().isEmpty());
@@ -120,16 +120,16 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 	public void shouldMergePrivileges4() {
 		try {
 			login("userD", "admin".toCharArray());
-			assertEquals(Set.of("GroupB1", "GroupB2"), this.ctx.getUserRep().getGroups());
+			assertEquals(Set.of("GroupB1", "GroupB2"), this.ctx.getGroups());
 			assertTrue(this.ctx.hasGroup("GroupB1"));
 			assertTrue(this.ctx.hasGroup("GroupB2"));
 			assertFalse(this.ctx.hasGroup("GroupA2"));
-			assertEquals(Set.of("RoleB1", "RoleB2"), this.ctx.getUserRep().getRoles());
+			assertEquals(Set.of("RoleB1", "RoleB2"), this.ctx.getRoles());
 			assertTrue(this.ctx.hasRole("RoleB1"));
 			assertTrue(this.ctx.hasRole("RoleB2"));
 			assertFalse(this.ctx.hasRole("RoleA2"));
-			assertEquals("LocationB2", this.ctx.getUserRep().getLocation());
-			assertEquals(Set.of("location"), this.ctx.getUserRep().getPropertyKeySet());
+			assertEquals("LocationB2", this.ctx.getLocation());
+			assertEquals(Set.of("location"), this.ctx.getPropertyKeySet());
 			Privilege privilege = this.ctx.getPrivilege("Bar");
 			assertFalse(privilege.isAllAllowed());
 			assertEquals(2, privilege.getAllowList().size());
