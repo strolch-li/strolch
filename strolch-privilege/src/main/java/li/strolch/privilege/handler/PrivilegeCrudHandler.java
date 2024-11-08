@@ -85,7 +85,10 @@ public class PrivilegeCrudHandler {
 	}
 
 	public UserRep getUserRep(Certificate certificate, String username) {
-		return getUser(certificate, username).asUserRep();
+		User user = getUser(certificate, username);
+		if (user == null)
+			return null;
+		return user.asUserRep();
 	}
 
 	public User getUser(Certificate certificate, String username) {
