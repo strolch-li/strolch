@@ -89,7 +89,7 @@ public class MapOfMaps<T, U, V> {
 		return new HashMap<>(initialSize);
 	}
 
-	private HashMap<U, V> getMap() {
+	private HashMap<U, V> newMap() {
 		if (this.keepInsertionOrder)
 			return new LinkedHashMap<>();
 		return new HashMap<>();
@@ -101,7 +101,7 @@ public class MapOfMaps<T, U, V> {
 
 	public List<V> values() {
 		List<V> values = new ArrayList<>();
-		forEach((t, us) -> values.addAll(us.values()));
+		forEach((_, us) -> values.addAll(us.values()));
 		return values;
 	}
 
@@ -117,7 +117,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public V addElement(T t, U u, V v) {
-		return this.mapOfMaps.computeIfAbsent(t, k -> getMap()).put(u, v);
+		return this.mapOfMaps.computeIfAbsent(t, _ -> newMap()).put(u, v);
 	}
 
 	public List<V> getAllElements() {
@@ -138,7 +138,7 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	public void addMap(T t, Map<U, V> u) {
-		this.mapOfMaps.computeIfAbsent(t, k -> getMap()).putAll(u);
+		this.mapOfMaps.computeIfAbsent(t, _ -> newMap()).putAll(u);
 	}
 
 	public V removeElement(T t, U u) {
@@ -228,7 +228,7 @@ public class MapOfMaps<T, U, V> {
 
 	public V computeIfAbsent(T t, U u, Supplier<V> mappingFunction) {
 		Objects.requireNonNull(mappingFunction);
-		Map<U, V> uvMap = this.mapOfMaps.computeIfAbsent(t, k -> getMap());
+		Map<U, V> uvMap = this.mapOfMaps.computeIfAbsent(t, _ -> newMap());
 		return uvMap.computeIfAbsent(u, k -> mappingFunction.get());
 	}
 

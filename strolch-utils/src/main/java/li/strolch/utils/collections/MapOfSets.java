@@ -55,7 +55,7 @@ public class MapOfSets<T, U> {
 		return new HashMap<>();
 	}
 
-	private HashSet<U> getSet() {
+	private HashSet<U> newSet() {
 		if (this.keepInsertionOrder)
 			return new LinkedHashSet<>();
 		return new HashSet<>();
@@ -67,7 +67,7 @@ public class MapOfSets<T, U> {
 
 	public List<U> values() {
 		List<U> values = new ArrayList<>();
-		forEach((t, us) -> values.addAll(us));
+		forEach((_, us) -> values.addAll(us));
 		return values;
 	}
 
@@ -76,11 +76,11 @@ public class MapOfSets<T, U> {
 	}
 
 	public boolean addElement(T t, U u) {
-		return this.mapOfSets.computeIfAbsent(t, k -> getSet()).add(u);
+		return this.mapOfSets.computeIfAbsent(t, _ -> newSet()).add(u);
 	}
 
 	public boolean addSet(T t, Set<U> u) {
-		return this.mapOfSets.computeIfAbsent(t, k -> getSet()).addAll(u);
+		return this.mapOfSets.computeIfAbsent(t, _ -> newSet()).addAll(u);
 	}
 
 	public boolean removeElement(T t, U u) {
@@ -135,7 +135,7 @@ public class MapOfSets<T, U> {
 
 	public int size(T t) {
 		Set<U> set = this.mapOfSets.get(t);
-		if (set == null || set.size() == 0)
+		if (set == null || set.isEmpty())
 			return 0;
 		return set.size();
 	}

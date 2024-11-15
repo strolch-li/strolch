@@ -49,7 +49,7 @@ public class MapOfLists<T, U> {
 
 	public List<U> values() {
 		List<U> values = new ArrayList<>();
-		forEach((t, us) -> values.addAll(us));
+		forEach((_, us) -> values.addAll(us));
 		return values;
 	}
 
@@ -58,11 +58,11 @@ public class MapOfLists<T, U> {
 	}
 
 	public boolean addElement(T t, U u) {
-		return this.mapOfLists.computeIfAbsent(t, k -> new ArrayList<>()).add(u);
+		return this.mapOfLists.computeIfAbsent(t, _ -> new ArrayList<>()).add(u);
 	}
 
 	public boolean addList(T t, List<U> u) {
-		return this.mapOfLists.computeIfAbsent(t, k -> new ArrayList<>()).addAll(u);
+		return this.mapOfLists.computeIfAbsent(t, _ -> new ArrayList<>()).addAll(u);
 	}
 
 	public boolean removeElement(T t, U u) {
@@ -117,7 +117,7 @@ public class MapOfLists<T, U> {
 
 	public int size(T t) {
 		List<U> list = this.mapOfLists.get(t);
-		if (list == null || list.size() == 0)
+		if (list == null || list.isEmpty())
 			return 0;
 		return list.size();
 	}
