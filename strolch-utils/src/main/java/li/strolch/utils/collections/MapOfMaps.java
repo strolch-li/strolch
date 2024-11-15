@@ -52,16 +52,6 @@ public class MapOfMaps<T, U, V> {
 		this.mapOfMaps = new HashMap<>();
 	}
 
-	public MapOfMaps(Map<T, Map<U, V>> mapOfMaps) {
-		this.keepInsertionOrder = false;
-		this.mapOfMaps = mapOfMaps;
-	}
-
-	public MapOfMaps(Map<T, Map<U, V>> mapOfMaps, boolean keepInsertionOrder) {
-		this.mapOfMaps = mapOfMaps;
-		this.keepInsertionOrder = keepInsertionOrder;
-	}
-
 	public MapOfMaps(int initialSize) {
 		this.keepInsertionOrder = false;
 		this.mapOfMaps = new HashMap<>(initialSize);
@@ -69,21 +59,51 @@ public class MapOfMaps<T, U, V> {
 
 	public MapOfMaps(boolean keepInsertionOrder) {
 		this.keepInsertionOrder = keepInsertionOrder;
-		this.mapOfMaps = getMapOfMaps();
+		this.mapOfMaps = newMapOfMaps();
 	}
 
 	public MapOfMaps(int initialSize, boolean keepInsertionOrder) {
 		this.keepInsertionOrder = keepInsertionOrder;
-		this.mapOfMaps = getMapOfMaps(initialSize);
+		this.mapOfMaps = newMapOfMaps(initialSize);
 	}
 
-	private Map<T, Map<U, V>> getMapOfMaps() {
+	public MapOfMaps(MapOfMaps<T, U, V> mapOfMaps) {
+		this.keepInsertionOrder = mapOfMaps.keepInsertionOrder;
+		this.mapOfMaps = newMapOfMaps();
+		mapOfMaps.forEach((t, us) -> {
+			HashMap<U, V> map = newMap();
+			map.putAll(us);
+			this.mapOfMaps.put(t, map);
+		});
+	}
+
+	public MapOfMaps(Map<T, Map<U, V>> mapOfMaps) {
+		this.keepInsertionOrder = false;
+		this.mapOfMaps = newMapOfMaps();
+		mapOfMaps.forEach((t, us) -> {
+			HashMap<U, V> map = newMap();
+			map.putAll(us);
+			this.mapOfMaps.put(t, map);
+		});
+	}
+
+	public MapOfMaps(Map<T, Map<U, V>> mapOfMaps, boolean keepInsertionOrder) {
+		this.keepInsertionOrder = keepInsertionOrder;
+		this.mapOfMaps = newMapOfMaps();
+		mapOfMaps.forEach((t, us) -> {
+			HashMap<U, V> map = newMap();
+			map.putAll(us);
+			this.mapOfMaps.put(t, map);
+		});
+	}
+
+	private Map<T, Map<U, V>> newMapOfMaps() {
 		if (this.keepInsertionOrder)
 			return new LinkedHashMap<>();
 		return new HashMap<>();
 	}
 
-	private Map<T, Map<U, V>> getMapOfMaps(int initialSize) {
+	private Map<T, Map<U, V>> newMapOfMaps(int initialSize) {
 		if (this.keepInsertionOrder)
 			return new LinkedHashMap<>(initialSize);
 		return new HashMap<>(initialSize);
@@ -229,7 +249,7 @@ public class MapOfMaps<T, U, V> {
 	public V computeIfAbsent(T t, U u, Supplier<V> mappingFunction) {
 		Objects.requireNonNull(mappingFunction);
 		Map<U, V> uvMap = this.mapOfMaps.computeIfAbsent(t, _ -> newMap());
-		return uvMap.computeIfAbsent(u, k -> mappingFunction.get());
+		return uvMap.computeIfAbsent(u, _ -> mappingFunction.get());
 	}
 
 	public void forEach(BiConsumer<? super T, ? super Map<U, V>> action) {
@@ -256,6 +276,15 @@ public class MapOfMaps<T, U, V> {
 		return this.mapOfMaps.entrySet().stream();
 	}
 
+	/**
+	 * Returns a read only copy of this {@link MapOfSets}
+	 */
+	public MapOfMaps<T, U, V> copyOf() {
+		if (this instanceof MapOfMaps.ImmutableMapOfMaps)
+			return this;
+		return new ImmutableMapOfMaps<>(this);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -271,5 +300,61 @@ public class MapOfMaps<T, U, V> {
 	@Override
 	public int hashCode() {
 		return this.mapOfMaps != null ? this.mapOfMaps.hashCode() : 0;
+	}
+
+	final static class ImmutableMapOfMaps<T, U, V> extends MapOfMaps<T, U, V> {
+		ImmutableMapOfMaps(MapOfMaps<T, U, V> mapOfMaps) {
+			super(getCopy(mapOfMaps), mapOfMaps.keepInsertionOrder);
+		}
+
+		@Override
+		public V addElement(T t, U u, V v) {
+			throw uoe();
+		}
+
+		@Override
+		public void addMap(T t, Map<U, V> u) {
+			throw uoe();
+		}
+
+		@Override
+		public V removeElement(T t, U u) {
+			throw uoe();
+		}
+
+		@Override
+		public Map<U, V> removeMap(T t) {
+			throw uoe();
+		}
+
+		@Override
+		public void clear() {
+			throw uoe();
+		}
+
+		@Override
+		public MapOfMaps<T, U, V> putAll(MapOfMaps<T, U, V> other) {
+			throw uoe();
+		}
+
+		@Override
+		public Map<U, V> computeIfAbsent(T key, Function<? super T, ? extends Map<U, V>> mappingFunction) {
+			throw uoe();
+		}
+
+		@Override
+		public V computeIfAbsent(T t, U u, Supplier<V> mappingFunction) {
+			throw uoe();
+		}
+
+		static UnsupportedOperationException uoe() {
+			return new UnsupportedOperationException();
+		}
+
+		private static <T, U, V> Map<T, Map<U, V>> getCopy(MapOfMaps<T, U, V> mapOfMaps) {
+			Map<T, Map<U, V>> copy = mapOfMaps.newMapOfMaps();
+			mapOfMaps.forEach((t, us) -> copy.put(t, Map.copyOf(us)));
+			return Map.copyOf(copy);
+		}
 	}
 }

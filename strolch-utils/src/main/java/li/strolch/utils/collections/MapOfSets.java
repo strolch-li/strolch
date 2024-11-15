@@ -31,25 +31,45 @@ public class MapOfSets<T, U> {
 
 	public MapOfSets() {
 		this.keepInsertionOrder = false;
-		this.mapOfSets = getMapOfSets();
-	}
-
-	public MapOfSets(Map<T, Set<U>> mapOfSets) {
-		this.keepInsertionOrder = false;
-		this.mapOfSets = mapOfSets;
+		this.mapOfSets = newMapOfSets();
 	}
 
 	public MapOfSets(boolean keepInsertionOrder) {
 		this.keepInsertionOrder = keepInsertionOrder;
-		this.mapOfSets = getMapOfSets();
+		this.mapOfSets = newMapOfSets();
+	}
+
+	public MapOfSets(MapOfSets<T, U> mapOfSets) {
+		this.keepInsertionOrder = mapOfSets.keepInsertionOrder;
+		this.mapOfSets = newMapOfSets();
+		mapOfSets.forEach((t, us) -> {
+			HashSet<U> set = newSet();
+			set.addAll(us);
+			this.mapOfSets.put(t, set);
+		});
+	}
+
+	public MapOfSets(Map<T, Set<U>> mapOfSets) {
+		this.keepInsertionOrder = false;
+		this.mapOfSets = newMapOfSets();
+		mapOfSets.forEach((t, us) -> {
+			HashSet<U> set = newSet();
+			set.addAll(us);
+			this.mapOfSets.put(t, set);
+		});
 	}
 
 	public MapOfSets(Map<T, Set<U>> mapOfSets, boolean keepInsertionOrder) {
 		this.keepInsertionOrder = keepInsertionOrder;
-		this.mapOfSets = mapOfSets;
+		this.mapOfSets = newMapOfSets();
+		mapOfSets.forEach((t, us) -> {
+			HashSet<U> set = newSet();
+			set.addAll(us);
+			this.mapOfSets.put(t, set);
+		});
 	}
 
-	private HashMap<T, Set<U>> getMapOfSets() {
+	private HashMap<T, Set<U>> newMapOfSets() {
 		if (this.keepInsertionOrder)
 			return new LinkedHashMap<>();
 		return new HashMap<>();
@@ -194,6 +214,15 @@ public class MapOfSets<T, U> {
 		return this.mapOfSets.entrySet().stream();
 	}
 
+	/**
+	 * Returns a read only copy of this {@link MapOfSets}
+	 */
+	public MapOfSets<T, U> copyOf() {
+		if (this instanceof ImmutableMapOfSets)
+			return this;
+		return new ImmutableMapOfSets<>(this);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -208,5 +237,56 @@ public class MapOfSets<T, U> {
 	@Override
 	public int hashCode() {
 		return this.mapOfSets != null ? this.mapOfSets.hashCode() : 0;
+	}
+
+	final static class ImmutableMapOfSets<T, U> extends MapOfSets<T, U> {
+		ImmutableMapOfSets(MapOfSets<T, U> mapOfSets) {
+			super(getCopy(mapOfSets), mapOfSets.keepInsertionOrder);
+		}
+
+		@Override
+		public boolean addElement(T t, U u) {
+			throw uoe();
+		}
+
+		@Override
+		public boolean addSet(T t, Set<U> u) {
+			throw uoe();
+		}
+
+		@Override
+		public boolean removeElement(T t, U u) {
+			throw uoe();
+		}
+
+		@Override
+		public Set<U> removeSet(T t) {
+			throw uoe();
+		}
+
+		@Override
+		public void clear() {
+			throw uoe();
+		}
+
+		@Override
+		public MapOfSets<T, U> addAll(MapOfSets<T, U> other) {
+			throw uoe();
+		}
+
+		@Override
+		public Set<U> computeIfAbsent(T key, Function<? super T, ? extends Set<U>> mappingFunction) {
+			throw uoe();
+		}
+
+		static UnsupportedOperationException uoe() {
+			return new UnsupportedOperationException();
+		}
+
+		private static <T, U> Map<T, Set<U>> getCopy(MapOfSets<T, U> mapOfSets) {
+			Map<T, Set<U>> copy = mapOfSets.newMapOfSets();
+			mapOfSets.forEach((t, us) -> copy.put(t, Set.copyOf(us)));
+			return Map.copyOf(copy);
+		}
 	}
 }

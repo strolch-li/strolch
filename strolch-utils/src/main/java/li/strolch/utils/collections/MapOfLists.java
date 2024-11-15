@@ -26,21 +26,41 @@ import java.util.stream.Stream;
  */
 public class MapOfLists<T, U> {
 
+	private final boolean keepInsertionOrder;
 	private final Map<T, List<U>> mapOfLists;
 
 	public MapOfLists() {
-		this.mapOfLists = new HashMap<>();
+		this.keepInsertionOrder = false;
+		this.mapOfLists = newMapOfLists();
 	}
 
 	public MapOfLists(boolean keepInsertionOrder) {
-		if (keepInsertionOrder)
-			this.mapOfLists = new LinkedHashMap<>();
-		else
-			this.mapOfLists = new HashMap<>();
+		this.keepInsertionOrder = keepInsertionOrder;
+		this.mapOfLists = newMapOfLists();
+	}
+
+	public MapOfLists(MapOfLists<T, U> mapOfLists) {
+		this.keepInsertionOrder = mapOfLists.keepInsertionOrder;
+		this.mapOfLists = newMapOfLists();
+		mapOfLists.forEach((t, us) -> this.mapOfLists.put(t, new ArrayList<>(us)));
 	}
 
 	public MapOfLists(Map<T, List<U>> mapOfLists) {
-		this.mapOfLists = mapOfLists;
+		this.keepInsertionOrder = false;
+		this.mapOfLists = newMapOfLists();
+		mapOfLists.forEach((t, us) -> this.mapOfLists.put(t, new ArrayList<>(us)));
+	}
+
+	public MapOfLists(Map<T, List<U>> mapOfLists, boolean keepInsertionOrder) {
+		this.keepInsertionOrder = keepInsertionOrder;
+		this.mapOfLists = newMapOfLists();
+		mapOfLists.forEach((t, us) -> this.mapOfLists.put(t, new ArrayList<>(us)));
+	}
+
+	private Map<T, List<U>> newMapOfLists() {
+		if (this.keepInsertionOrder)
+			return new LinkedHashMap<>();
+		return new HashMap<>();
 	}
 
 	public Set<T> keySet() {
@@ -176,6 +196,15 @@ public class MapOfLists<T, U> {
 		return this.mapOfLists.entrySet().stream();
 	}
 
+	/**
+	 * Returns a read only copy of this {@link MapOfSets}
+	 */
+	public MapOfLists<T, U> copyOf() {
+		if (this instanceof ImmutableMapOfLists<T, U>)
+			return this;
+		return new ImmutableMapOfLists<>(this);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -191,5 +220,56 @@ public class MapOfLists<T, U> {
 	@Override
 	public int hashCode() {
 		return this.mapOfLists != null ? this.mapOfLists.hashCode() : 0;
+	}
+
+	final static class ImmutableMapOfLists<T, U> extends MapOfLists<T, U> {
+		ImmutableMapOfLists(MapOfLists<T, U> mapOfLists) {
+			super(getCopy(mapOfLists), mapOfLists.keepInsertionOrder);
+		}
+
+		@Override
+		public boolean addElement(T t, U u) {
+			throw uoe();
+		}
+
+		@Override
+		public boolean addList(T t, List<U> u) {
+			throw uoe();
+		}
+
+		@Override
+		public boolean removeElement(T t, U u) {
+			throw uoe();
+		}
+
+		@Override
+		public List<U> removeList(T t) {
+			throw uoe();
+		}
+
+		@Override
+		public void clear() {
+			throw uoe();
+		}
+
+		@Override
+		public MapOfLists<T, U> addAll(MapOfLists<T, U> other) {
+			throw uoe();
+		}
+
+		@Override
+		public List<U> computeIfAbsent(T key, Function<? super T, ? extends List<U>> mappingFunction) {
+			throw uoe();
+		}
+
+		static UnsupportedOperationException uoe() {
+			return new UnsupportedOperationException();
+		}
+
+		private static <T, U> Map<T, List<U>> getCopy(MapOfLists<T, U> mapOfLists) {
+			Map<T, List<U>> copy = mapOfLists.newMapOfLists();
+			mapOfLists.forEach((t, us) -> copy.put(t, List.copyOf(us)));
+			return Map.copyOf(copy);
+		}
 	}
 }
