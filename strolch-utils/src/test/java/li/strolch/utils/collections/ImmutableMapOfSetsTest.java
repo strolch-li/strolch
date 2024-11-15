@@ -16,7 +16,7 @@ public class ImmutableMapOfSetsTest {
 		MapOfSets<String, Integer> mapOfSets = new MapOfSets<>();
 		mapOfSets.addSet("Key1", Set.of(1, 2, 3));
 		mapOfSets.addSet("Key2", Set.of(4, 5, 6));
-		this.mapOfSets = mapOfSets.copyOf();
+		this.mapOfSets = MapOfSets.copyOf(mapOfSets);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)

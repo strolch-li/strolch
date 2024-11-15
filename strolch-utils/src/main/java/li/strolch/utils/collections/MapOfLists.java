@@ -196,15 +196,6 @@ public class MapOfLists<T, U> {
 		return this.mapOfLists.entrySet().stream();
 	}
 
-	/**
-	 * Returns a read only copy of this {@link MapOfSets}
-	 */
-	public MapOfLists<T, U> copyOf() {
-		if (this instanceof ImmutableMapOfLists<T, U>)
-			return this;
-		return new ImmutableMapOfLists<>(this);
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -220,6 +211,15 @@ public class MapOfLists<T, U> {
 	@Override
 	public int hashCode() {
 		return this.mapOfLists != null ? this.mapOfLists.hashCode() : 0;
+	}
+
+	/**
+	 * Returns a read only copy of the given {@link MapOfLists}
+	 */
+	public static <T, U> MapOfLists<T, U> copyOf(MapOfLists<T, U> mapOfLists) {
+		if (mapOfLists instanceof ImmutableMapOfLists<T, U>)
+			return mapOfLists;
+		return new ImmutableMapOfLists<>(mapOfLists);
 	}
 
 	final static class ImmutableMapOfLists<T, U> extends MapOfLists<T, U> {
