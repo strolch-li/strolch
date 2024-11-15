@@ -56,6 +56,11 @@ public class ImmutableMapOfListsTest {
 		this.mapOfLists.computeIfAbsent("Key1", _ -> Arrays.asList(1, 2, 3));
 	}
 
+	@Test(expected = UnsupportedOperationException.class)
+	public void testGetListThenAddWhenImmutable_ShouldThrowException() {
+		this.mapOfLists.getList("Key1").add(2);
+	}
+
 	@Test
 	public void testAddAllWhenMutable_ShouldAddAll() {
 		MapOfLists<String, Integer> otherMap = new MapOfLists<>();

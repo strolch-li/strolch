@@ -56,6 +56,11 @@ public class ImmutableMapOfMapsTest {
 		this.mapOfMaps.computeIfAbsent("Key1", _ -> Map.of("fruits", 2));
 	}
 
+	@Test(expected = UnsupportedOperationException.class)
+	public void testGeMapThenPutWhenImmutable_ShouldThrowException() {
+		this.mapOfMaps.getMap("Key1").put("fruits", 2);
+	}
+
 	@Test
 	public void testPutAllWhenMutable_ShouldPutAll() {
 		MapOfMaps<String, String, Integer> otherMap = new MapOfMaps<>();

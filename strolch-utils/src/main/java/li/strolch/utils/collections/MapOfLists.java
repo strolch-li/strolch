@@ -21,6 +21,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static java.util.Collections.*;
+
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;
  */
@@ -223,8 +225,82 @@ public class MapOfLists<T, U> {
 	}
 
 	final static class ImmutableMapOfLists<T, U> extends MapOfLists<T, U> {
+		private final MapOfLists<T, U> m;
+
+		private transient Set<T> keySet;
+		private transient List<U> values;
+
 		ImmutableMapOfLists(MapOfLists<T, U> mapOfLists) {
-			super(getCopy(mapOfLists), mapOfLists.keepInsertionOrder);
+			this.m = mapOfLists;
+		}
+
+		@Override
+		public Set<T> keySet() {
+			if (this.keySet == null)
+				this.keySet = unmodifiableSet(this.m.keySet());
+			return this.keySet;
+		}
+
+		@Override
+		public List<U> values() {
+			if (this.values == null)
+				this.values = unmodifiableList(this.m.values());
+			return this.values;
+		}
+
+		@Override
+		public List<U> getList(T t) {
+			return unmodifiableList(this.m.getList(t));
+		}
+
+		@Override
+		public boolean containsList(T t) {
+			return this.m.containsList(t);
+		}
+
+		@Override
+		public boolean containsElement(T t, U u) {
+			return this.m.containsElement(t, u);
+		}
+
+		@Override
+		public int sizeKeys() {
+			return this.m.sizeKeys();
+		}
+
+		@Override
+		public int size() {
+			return this.m.size();
+		}
+
+		@Override
+		public int size(T t) {
+			return this.m.size(t);
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.m.isEmpty();
+		}
+
+		@Override
+		public List<U> getListOrDefault(T key, List<U> defaultValue) {
+			return unmodifiableList(this.m.getListOrDefault(key, defaultValue));
+		}
+
+		@Override
+		public void forEach(BiConsumer<? super T, ? super List<U>> action) {
+			this.m.stream().forEach(e -> action.accept(e.getKey(), unmodifiableList(e.getValue())));
+		}
+
+		@Override
+		public Stream<U> streamValues() {
+			return this.m.streamValues();
+		}
+
+		@Override
+		public Stream<Entry<T, List<U>>> stream() {
+			return this.m.stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), unmodifiableList(e.getValue())));
 		}
 
 		@Override
@@ -262,14 +338,17 @@ public class MapOfLists<T, U> {
 			throw uoe();
 		}
 
-		static UnsupportedOperationException uoe() {
-			return new UnsupportedOperationException();
+		@SuppressWarnings({"EqualsWhichDoesntCheckParameterClass", "EqualsDoesntCheckParameterClass"})
+		public boolean equals(Object o) {
+			return o == this || this.m.equals(o);
 		}
 
-		private static <T, U> Map<T, List<U>> getCopy(MapOfLists<T, U> mapOfLists) {
-			Map<T, List<U>> copy = mapOfLists.newMapOfLists();
-			mapOfLists.forEach((t, us) -> copy.put(t, List.copyOf(us)));
-			return Map.copyOf(copy);
+		public int hashCode() {
+			return this.m.hashCode();
+		}
+
+		static UnsupportedOperationException uoe() {
+			return new UnsupportedOperationException();
 		}
 	}
 }

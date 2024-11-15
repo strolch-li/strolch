@@ -22,6 +22,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static java.util.Collections.*;
+
 /**
  * <p>
  * Collection to store a tree with a depth of 3 elements. This solves having to always write the declaration:
@@ -303,8 +305,108 @@ public class MapOfMaps<T, U, V> {
 	}
 
 	final static class ImmutableMapOfMaps<T, U, V> extends MapOfMaps<T, U, V> {
+		private final MapOfMaps<T, U, V> m;
+
+		private transient Set<T> keySet;
+		private transient List<V> values;
+
 		ImmutableMapOfMaps(MapOfMaps<T, U, V> mapOfMaps) {
-			super(getCopy(mapOfMaps), mapOfMaps.keepInsertionOrder);
+			this.m = mapOfMaps;
+		}
+
+		@Override
+		public Set<T> keySet() {
+			if (this.keySet == null)
+				this.keySet = unmodifiableSet(this.m.keySet());
+			return this.keySet;
+		}
+
+		@Override
+		public List<V> values() {
+			if (this.values == null)
+				this.values = unmodifiableList(this.m.values());
+			return this.values;
+		}
+
+		@Override
+		public Map<U, V> getMap(T t) {
+			return unmodifiableMap(this.m.getMap(t));
+		}
+
+		@Override
+		public V getElement(T t, U u) {
+			return this.m.getElement(t, u);
+		}
+
+		@Override
+		public List<V> getAllElements() {
+			if (this.values == null)
+				this.values = unmodifiableList(this.m.values());
+			return this.values;
+		}
+
+		@Override
+		public List<V> getAllElements(T t) {
+			return super.getAllElements(t);
+		}
+
+		@Override
+		public boolean containsMap(T t) {
+			return this.m.containsMap(t);
+		}
+
+		@Override
+		public boolean containsElement(T t, U u) {
+			return this.m.containsElement(t, u);
+		}
+
+		@Override
+		public int sizeKeys() {
+			return this.m.sizeKeys();
+		}
+
+		@Override
+		public int size() {
+			return this.m.size();
+		}
+
+		@Override
+		public int size(T t) {
+			return this.m.size(t);
+		}
+
+		@Override
+		public boolean isEmpty() {
+			return this.m.isEmpty();
+		}
+
+		@Override
+		public Map<U, V> getMapOrDefault(T key, Map<U, V> defaultValue) {
+			return unmodifiableMap(this.m.getMapOrDefault(key, defaultValue));
+		}
+
+		@Override
+		public void forEach(BiConsumer<? super T, ? super Map<U, V>> action) {
+			this.m.stream().forEach(e -> action.accept(e.getKey(), unmodifiableMap(e.getValue())));
+		}
+
+		@Override
+		public Stream<V> streamValues() {
+			return this.m.streamValues();
+		}
+
+		@Override
+		public Stream<Entry<T, Map<U, V>>> stream() {
+			return this.m.stream().map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), unmodifiableMap(e.getValue())));
+		}
+
+		@SuppressWarnings({"EqualsWhichDoesntCheckParameterClass", "EqualsDoesntCheckParameterClass"})
+		public boolean equals(Object o) {
+			return o == this || this.m.equals(o);
+		}
+
+		public int hashCode() {
+			return this.m.hashCode();
 		}
 
 		@Override
@@ -349,12 +451,6 @@ public class MapOfMaps<T, U, V> {
 
 		static UnsupportedOperationException uoe() {
 			return new UnsupportedOperationException();
-		}
-
-		private static <T, U, V> Map<T, Map<U, V>> getCopy(MapOfMaps<T, U, V> mapOfMaps) {
-			Map<T, Map<U, V>> copy = mapOfMaps.newMapOfMaps();
-			mapOfMaps.forEach((t, us) -> copy.put(t, Map.copyOf(us)));
-			return Map.copyOf(copy);
 		}
 	}
 }

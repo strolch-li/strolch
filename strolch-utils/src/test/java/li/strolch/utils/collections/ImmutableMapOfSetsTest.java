@@ -56,6 +56,11 @@ public class ImmutableMapOfSetsTest {
 		this.mapOfSets.computeIfAbsent("Key1", _ -> Set.of(1, 2, 3));
 	}
 
+	@Test(expected = UnsupportedOperationException.class)
+	public void testGetSetThenAddWhenImmutable_ShouldThrowException() {
+		this.mapOfSets.getSet("Key1").add(2);
+	}
+
 	@Test
 	public void testAddAllWhenMutable_ShouldAddAll() {
 		MapOfSets<String, Integer> otherMap = new MapOfSets<>();
