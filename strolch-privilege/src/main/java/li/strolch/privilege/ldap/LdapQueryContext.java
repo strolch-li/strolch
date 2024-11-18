@@ -48,6 +48,8 @@ public abstract class LdapQueryContext {
 	public static final String PARAM_SEARCH_BASE = "searchBase";
 	public static final String PARAM_ADDITIONAL_FILTER = "additionalFilter";
 	public static final String PARAM_DEFAULT_LOCALE = "defaultLocale";
+	public static final String PARAM_OVERRIDE_USER_IDENTIFIER = "overrideUserIdentifier";
+	public static final String PARAM_OVERRIDE_USER_CLASS = "overrideUserClass";
 
 	public static final String LDAP_SN = "sn";
 	public static final String LDAP_GIVEN_NAME = "givenName";
@@ -60,6 +62,9 @@ public abstract class LdapQueryContext {
 	protected final String additionalFilter;
 	protected final Locale defaultLocale;
 	protected final RemoteGroupMappingModel groupMappingModel;
+
+	protected final String overrideUserIdentifier;
+	protected final String overrideUserClass;
 
 	public LdapQueryContext(Map<String, String> parameterMap, RemoteGroupMappingModel groupMappingModel) {
 		this.providerUrl = parameterMap.get(PARAM_PROVIDER_URL);
@@ -77,6 +82,9 @@ public abstract class LdapQueryContext {
 		logger.info("searchBase: {}", this.searchBase);
 		if (!this.additionalFilter.isEmpty())
 			logger.info("additionalFilter: {}", this.additionalFilter);
+
+		this.overrideUserIdentifier = parameterMap.get(PARAM_OVERRIDE_USER_IDENTIFIER);
+		this.overrideUserClass = parameterMap.get(PARAM_OVERRIDE_USER_CLASS);
 	}
 
 	public String buildUserDn(String username) {

@@ -30,6 +30,7 @@ import java.util.Set;
 
 import static li.strolch.utils.LdapHelper.encodeForLDAP;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class LinuxLdapQueryContext extends LdapQueryContext {
 
@@ -58,11 +59,15 @@ public class LinuxLdapQueryContext extends LdapQueryContext {
 
 	@Override
 	public String getObjectClassFilter() {
+		if (isNotEmpty(this.overrideUserClass))
+			return this.overrideUserClass;
 		return "(objectClass=inetOrgPerson)";
 	}
 
 	@Override
 	public String getUserAttributeIdentifier() {
+		if (isNotEmpty(this.overrideUserIdentifier))
+			return this.overrideUserIdentifier;
 		return "uid";
 	}
 

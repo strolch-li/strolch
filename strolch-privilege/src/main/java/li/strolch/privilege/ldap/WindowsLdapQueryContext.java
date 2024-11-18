@@ -52,8 +52,6 @@ public class WindowsLdapQueryContext extends LdapQueryContext {
 	protected final String domainPrefix;
 
 	protected final boolean useBaseDnForDistinguishedName;
-	protected final String overrideUserIdentifier;
-	protected final String overrideUserClass;
 
 	public WindowsLdapQueryContext(Map<String, String> parameterMap, RemoteGroupMappingModel groupMappingModel) {
 		super(parameterMap, groupMappingModel);
@@ -76,8 +74,6 @@ public class WindowsLdapQueryContext extends LdapQueryContext {
 		this.domainPrefix = domainPrefix;
 		this.useBaseDnForDistinguishedName = Boolean.parseBoolean(
 				parameterMap.get(PARAM_USE_BASE_DN_FOR_DISTINGUISHED_NAME));
-		this.overrideUserIdentifier = parameterMap.get("overrideUserIdentifier");
-		this.overrideUserClass = parameterMap.get("overrideUserClass");
 	}
 
 	@Override
