@@ -17,8 +17,8 @@
 package li.strolch.privilege.test;
 
 import li.strolch.privilege.handler.XmlPersistenceHandler;
-import li.strolch.privilege.helper.LinuxLdapQuery;
-import li.strolch.privilege.helper.LinuxLdapQueryContext;
+import li.strolch.privilege.ldap.LinuxLdapQuery;
+import li.strolch.privilege.ldap.LinuxLdapQueryContext;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.model.internal.User;
 import org.junit.BeforeClass;
@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static li.strolch.privilege.handler.WindowsLdapQueryContext.*;
+import static li.strolch.privilege.ldap.WindowsLdapQueryContext.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static org.junit.Assert.*;
 

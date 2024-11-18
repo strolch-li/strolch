@@ -20,7 +20,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.privilege.base.PrivilegeException;
-import li.strolch.privilege.handler.LdapPrivilegeHandler;
 import li.strolch.privilege.handler.PersistenceHandler;
 import li.strolch.privilege.model.Group;
 import li.strolch.utils.dbc.DBC;
@@ -73,14 +72,14 @@ public class RemoteGroupMappingModel {
 		if (!configFile.isAbsolute()) {
 			if (isEmpty(basePath)) {
 				String msg = "[{0}] Config file parameter {1} is not absolute, and base bath {2} is not set!";
-				msg = format(msg, LdapPrivilegeHandler.class.getName(), PARAM_CONFIG_FILE, basePath);
+				msg = format(msg, RemoteGroupMappingModel.class.getName(), PARAM_CONFIG_FILE, basePath);
 				throw new PrivilegeException(msg);
 			}
 
 			File basePathF = new File(basePath);
 			if (!basePathF.exists() && !basePathF.isDirectory()) {
 				String msg = "[{0}] Config file parameter {1} is not absolute, and base bath {2} is not a directory!";
-				msg = format(msg, LdapPrivilegeHandler.class.getName(), PARAM_CONFIG_FILE, basePathF.getAbsolutePath());
+				msg = format(msg, RemoteGroupMappingModel.class.getName(), PARAM_CONFIG_FILE, basePathF.getAbsolutePath());
 				throw new PrivilegeException(msg);
 			}
 

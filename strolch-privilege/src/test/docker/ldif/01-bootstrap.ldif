@@ -1,3 +1,7 @@
+dn: ou=Admins,dc=strolch,dc=li
+objectClass: organizationalUnit
+ou: Admins
+
 dn: ou=People,dc=strolch,dc=li
 objectClass: organizationalUnit
 ou: People
@@ -5,6 +9,24 @@ ou: People
 dn: ou=Groups,dc=strolch,dc=li
 objectClass: organizationalUnit
 ou: Groups
+
+dn: uid=admin,ou=Admins,dc=strolch,dc=li
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: posixAccount
+objectClass: simpleSecurityObject
+objectClass: top
+cn: Admin User
+gidNumber: 1
+homeDirectory: /home/admin
+givenName: Admin
+surname: Administrator
+uid: admin
+uidNumber: 100
+userPassword:: e1NTSEF9V1R2bVJUL1ZHWEFhYXFFTnJvcFIvSmxoZXMxejFueGsK
+mail: admin@strolch.li
+ou: Administrator
 
 dn: uid=test1,ou=People,dc=strolch,dc=li
 objectClass: inetOrgPerson
@@ -22,6 +44,7 @@ uid: test1
 uidNumber: 1
 userPassword:: e1NTSEF9RDY2RXhpQVBnaVZ3c2lob3o4NFNzSElvTVliSUQ1RTQK
 mail: test1@strolch.li
+ou: AppUser
 
 dn: uid=test2,ou=People,dc=strolch,dc=li
 objectClass: inetOrgPerson
@@ -39,6 +62,7 @@ uid: test2
 uidNumber: 2
 userPassword:: e1NTSEF9RDY2RXhpQVBnaVZ3c2lob3o4NFNzSElvTVliSUQ1RTQK
 mail: test2@strolch.li
+ou: AppSuperUser_LocationA
 
 dn: cn=Accounts,ou=Groups,dc=strolch,dc=li
 objectClass: groupOfUniqueNames

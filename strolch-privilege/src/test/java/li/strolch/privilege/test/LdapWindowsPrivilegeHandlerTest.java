@@ -29,20 +29,20 @@ import java.nio.file.Files;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class LdapPrivilegeHandlerTest extends AbstractPrivilegeTest {
+public class LdapWindowsPrivilegeHandlerTest extends AbstractPrivilegeTest {
 
 	@BeforeClass
 	public static void init() throws IOException {
-		removeConfigs(LdapPrivilegeHandlerTest.class.getSimpleName());
-		prepareConfigs(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigLdap.xml", "PrivilegeUsers.xml",
+		removeConfigs(LdapWindowsPrivilegeHandlerTest.class.getSimpleName());
+		prepareConfigs(LdapWindowsPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigLdapWindows.xml", "PrivilegeUsers.xml",
 				"PrivilegeGroups.xml", "PrivilegeRoles.xml");
 		Files.copy(new File(SRC_TEST_RESOURCES_CONFIG, "LdapGroupsConfig.json").toPath(),
-				new File("target/" + LdapPrivilegeHandlerTest.class.getSimpleName(), "LdapGroupsConfig.json").toPath());
+				new File("target/" + LdapWindowsPrivilegeHandlerTest.class.getSimpleName(), "LdapGroupsConfig.json").toPath());
 	}
 
 	@Before
 	public void setup() {
-		initialize(LdapPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigLdap.xml");
+		initialize(LdapWindowsPrivilegeHandlerTest.class.getSimpleName(), "PrivilegeConfigLdapWindows.xml");
 	}
 
 	@Test

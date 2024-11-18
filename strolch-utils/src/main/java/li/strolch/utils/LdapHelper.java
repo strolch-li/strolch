@@ -16,6 +16,10 @@
 
 package li.strolch.utils;
 
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -79,4 +83,14 @@ public class LdapHelper {
 		return sb.toString();
 	}
 
+	public static String ldapAttributesToString(Attributes attributes) throws NamingException {
+		NamingEnumeration<? extends Attribute> attrs = attributes.getAll();
+		StringBuilder sb = new StringBuilder();
+		while (attrs.hasMore()) {
+			Attribute attr = attrs.next();
+			sb.append(" - ").append(attr.getID()).append(": ").append(attr.get()).append("\n");
+		}
+
+		return sb.toString();
+	}
 }

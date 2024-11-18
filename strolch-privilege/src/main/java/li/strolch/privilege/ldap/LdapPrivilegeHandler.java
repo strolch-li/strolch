@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2024 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package li.strolch.privilege.handler;
+package li.strolch.privilege.ldap;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.InvalidCredentialsException;
-import li.strolch.privilege.helper.LinuxLdapQueryContext;
+import li.strolch.privilege.handler.*;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
-import li.strolch.privilege.helper.WindowsLdapQuery;
 import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
@@ -35,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static li.strolch.privilege.base.PrivilegeConstants.REALM;
-import static li.strolch.privilege.handler.WindowsLdapQueryContext.PLATFORM;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_CONFIG_FILE;
 
@@ -43,7 +41,9 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(LdapPrivilegeHandler.class);
 
-	private WindowsLdapQueryContext queryContext;
+	public static final String PLATFORM = "platform";
+
+	private LdapQueryContext queryContext;
 
 	@Override
 	public void initialize(ScheduledExecutorService executorService, Map<String, String> parameterMap,
@@ -80,7 +80,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 
 		// Perform LDAP query
 		SearchResult searchResult;
-		try (WindowsLdapQuery query = new WindowsLdapQuery(this.queryContext)) {
+		try (LdapQuery query = this.queryContext.getLdapQuery()) {
 			searchResult = query.searchLdap(username, password);
 		} catch (NamingException e) {
 			logger.error("Could not login with user: {} on Ldap", username, e);
