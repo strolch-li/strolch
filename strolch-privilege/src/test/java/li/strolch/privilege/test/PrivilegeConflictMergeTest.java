@@ -104,7 +104,7 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 			assertTrue(this.ctx.hasRole("RoleA1"));
 			assertTrue(this.ctx.hasRole("RoleA2"));
 			assertFalse(this.ctx.hasRole("RoleB2"));
-			assertEquals("LocationA2", this.ctx.getLocation());
+			assertEquals("LocationA1,LocationA2", this.ctx.getLocation());
 			assertEquals(Set.of("location"), this.ctx.getPropertyKeySet());
 			Privilege privilege = this.ctx.getPrivilege("Foo");
 			assertTrue(privilege.isAllAllowed());
@@ -128,7 +128,7 @@ public class PrivilegeConflictMergeTest extends AbstractPrivilegeTest {
 			assertTrue(this.ctx.hasRole("RoleB1"));
 			assertTrue(this.ctx.hasRole("RoleB2"));
 			assertFalse(this.ctx.hasRole("RoleA2"));
-			assertEquals("LocationB2", this.ctx.getLocation());
+			assertEquals("LocationB1,LocationB2", this.ctx.getLocation());
 			assertEquals(Set.of("location"), this.ctx.getPropertyKeySet());
 			Privilege privilege = this.ctx.getPrivilege("Bar");
 			assertFalse(privilege.isAllAllowed());

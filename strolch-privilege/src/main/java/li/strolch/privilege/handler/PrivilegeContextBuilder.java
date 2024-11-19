@@ -33,9 +33,7 @@ import java.util.*;
 
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toSet;
-import static li.strolch.privilege.base.PrivilegeConstants.VALID_FROM;
-import static li.strolch.privilege.base.PrivilegeConstants.VALID_TO;
+import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.privilege.handler.DefaultPrivilegeHandler.streamAllRolesForUser;
 
 public class PrivilegeContextBuilder {
@@ -107,7 +105,7 @@ public class PrivilegeContextBuilder {
 	}
 
 	private void prepare(User user) {
-		Set<Group> groups = user.getGroups().stream().map(groupName -> {
+		Set<Group> groups = user.getGroups().stream().sorted().map(groupName -> {
 			Group group = this.persistenceHandler.getGroup(groupName);
 			if (group == null) {
 				logger.error("Group {} does not exist!", groupName);
@@ -124,7 +122,7 @@ public class PrivilegeContextBuilder {
 			}
 
 			return group;
-		}).filter(Objects::nonNull).collect(toSet());
+		}).filter(Objects::nonNull).collect(toCollection(TreeSet::new));
 		this.groups = groups.stream().map(Group::name).collect(toCollection(TreeSet::new));
 		this.userDirectRoles = user.getRoles().stream().sorted().collect(toCollection(TreeSet::new));
 		this.rolesWithGroupRoles = streamAllRolesForUser(this.persistenceHandler, user)
@@ -133,16 +131,40 @@ public class PrivilegeContextBuilder {
 		this.properties = new HashMap<>(user.getProperties());
 
 		// copy properties from groups to user properties
+		copyGroupProperties(user, groups);
+	}
+
+	private void copyGroupProperties(User user, Set<Group> groups) {
 		for (Group group : groups) {
 			Map<String, String> groupProperties = group.getProperties();
 			for (String key : groupProperties.keySet()) {
+
+				// we have special handling for certain duplicate group properties
+				if (this.properties.containsKey(key)) {
+					if (handleDuplicateGroupProperty(key, group))
+						continue;
+				}
+
 				String value = groupProperties.get(key);
 				String replaced = this.properties.put(key, value);
-				if (replaced != null && !replaced.equals(value))
-					logger.error("Duplicate property {} for user {} from group {}", key, user.getUsername(),
-							group.name());
+				if (replaced != null && !replaced.equals(value)) {
+					logger.error("Duplicate property {} for user {} from group {} replaced: {} with: {}", key,
+							user.getUsername(), group.name(), replaced, value);
+				}
 			}
 		}
+	}
+
+	private boolean handleDuplicateGroupProperty(String key, Group group) {
+		if (!key.equals(LOCATION))
+			return false;
+
+		String currentValue = this.properties.get(key);
+		String groupValue = group.getProperty(key);
+
+		this.properties.put(key, currentValue + "," + groupValue);
+
+		return true;
 	}
 
 	private void addPrivilegesForRoles(Set<String> roles, String name, Map<String, Privilege> privileges,
