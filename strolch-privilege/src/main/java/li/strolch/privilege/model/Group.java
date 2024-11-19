@@ -32,14 +32,14 @@ import static li.strolch.privilege.base.PrivilegeConstants.*;
  * properties which are always duplicated on users on to the group, and the User is then in the group, eliminating
  * duplication.
  */
-public record Group(String name, Set<String> roles, Map<String, String> propertyMap) {
-	public Group(String name, Set<String> roles, Map<String, String> propertyMap) {
+public record Group(String name, Set<String> roles, Map<String, String> properties) {
+	public Group(String name, Set<String> roles, Map<String, String> properties) {
 		DBC.PRE.assertNotEmpty("name must not be empty", name);
 		DBC.PRE.assertNotNull("roles must not be null", roles);
-		DBC.PRE.assertNotNull("propertyMap must not be null", propertyMap);
+		DBC.PRE.assertNotNull("properties must not be null", properties);
 		this.name = name;
 		this.roles = Set.copyOf(roles);
-		this.propertyMap = Map.copyOf(propertyMap);
+		this.properties = Map.copyOf(properties);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public record Group(String name, Set<String> roles, Map<String, String> property
 	 * @return the property with the given key, or null if the property is not defined
 	 */
 	public String getProperty(String key) {
-		return this.propertyMap.get(key);
+		return this.properties.get(key);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public record Group(String name, Set<String> roles, Map<String, String> property
 	 * @return the {@link Set} of keys of all properties
 	 */
 	public Set<String> getPropertyKeySet() {
-		return this.propertyMap.keySet();
+		return this.properties.keySet();
 	}
 
 	/**
@@ -79,7 +79,7 @@ public record Group(String name, Set<String> roles, Map<String, String> property
 	 * @return the map of properties
 	 */
 	public Map<String, String> getProperties() {
-		return this.propertyMap;
+		return this.properties;
 	}
 
 	/**

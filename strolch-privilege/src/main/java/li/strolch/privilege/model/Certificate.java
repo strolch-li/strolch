@@ -51,7 +51,7 @@ public final class Certificate {
 	private final Set<String> userGroups;
 	private final Set<String> userDirectRoles;
 	private final Set<String> userRoles;
-	private final Map<String, String> propertyMap;
+	private final Map<String, String> properties;
 
 	private Locale locale;
 	private ZonedDateTime lastAccess;
@@ -73,13 +73,13 @@ public final class Certificate {
 	 *                    certificate.
 	 * @param locale      the users {@link Locale}
 	 * @param userRoles   the user's roles
-	 * @param propertyMap a {@link Map} containing string value pairs of properties for the logged in user. These
+	 * @param properties a {@link Map} containing string value pairs of properties for the logged in user. These
 	 *                    properties can be edited and can be used for the user to change settings of this session
 	 */
 	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
 			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
 			Locale locale, Set<String> userGroups, Set<String> userRoles, Set<String> userDirectRoles,
-			Map<String, String> propertyMap) {
+			Map<String, String> properties) {
 
 		DBC.PRE.assertNotEmpty("sessionId must not be empty", sessionId);
 		DBC.PRE.assertNotEmpty("username must not be empty", username);
@@ -105,10 +105,10 @@ public final class Certificate {
 		else
 			this.locale = locale;
 
-		if (propertyMap == null)
-			this.propertyMap = Map.of();
+		if (properties == null)
+			this.properties = Map.of();
 		else
-			this.propertyMap = Map.copyOf(propertyMap);
+			this.properties = Map.copyOf(properties);
 
 		this.userGroups = Set.copyOf(userGroups);
 		this.userDirectRoles = Set.copyOf(userDirectRoles);
@@ -169,10 +169,10 @@ public final class Certificate {
 	/**
 	 * Returns the {@link User User's} property map. The map is immutable
 	 *
-	 * @return the propertyMap
+	 * @return the properties
 	 */
-	public Map<String, String> getPropertyMap() {
-		return this.propertyMap;
+	public Map<String, String> getProperties() {
+		return this.properties;
 	}
 
 	/**
@@ -181,7 +181,7 @@ public final class Certificate {
 	 * @return the set of property keys
 	 */
 	public Set<String> getPropertyKeySet() {
-		return this.propertyMap.keySet();
+		return this.properties.keySet();
 	}
 
 	/**
@@ -192,7 +192,7 @@ public final class Certificate {
 	 * @return the value of the property with the given key, or null if it does not exist
 	 */
 	public String getProperty(String key) {
-		return this.propertyMap.get(key);
+		return this.properties.get(key);
 	}
 
 	/**
