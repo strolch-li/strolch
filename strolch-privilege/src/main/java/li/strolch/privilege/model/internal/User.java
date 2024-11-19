@@ -46,16 +46,16 @@ import static li.strolch.privilege.base.PrivilegeConstants.*;
  * @param groups        the set of {@link Group}s assigned to this user
  * @param roles         the set of {@link Role}s assigned to this user
  * @param locale        the user's {@link Locale}
- * @param propertyMap   a {@link Map} containing string value pairs of properties for this user
+ * @param properties    a {@link Map} containing string value pairs of properties for this user
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public record User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
 				   UserState userState, Set<String> groups, Set<String> roles, Locale locale,
-				   Map<String, String> propertyMap, boolean passwordChangeRequested, UserHistory history) {
+				   Map<String, String> properties, boolean passwordChangeRequested, UserHistory history) {
 
 	public User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
-			UserState userState, Set<String> groups, Set<String> roles, Locale locale, Map<String, String> propertyMap,
+			UserState userState, Set<String> groups, Set<String> roles, Locale locale, Map<String, String> properties,
 			boolean passwordChangeRequested, UserHistory history) {
 
 		DBC.PRE.assertNotEmpty("userId must not be empty", userId);
@@ -86,7 +86,7 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 		this.groups = groups == null ? Set.of() : Set.copyOf(groups);
 		this.roles = roles == null ? Set.of() : Set.copyOf(roles);
 		this.locale = locale == null ? Locale.getDefault() : locale;
-		this.propertyMap = propertyMap == null ? Map.of() : Map.copyOf(propertyMap);
+		this.properties = properties == null ? Map.of() : Map.copyOf(properties);
 
 		this.passwordChangeRequested = passwordChangeRequested;
 		this.history = history;
@@ -166,7 +166,7 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	 * @return the property with the given key, or null if the property is not defined
 	 */
 	public String getProperty(String key) {
-		return this.propertyMap.get(key);
+		return this.properties.get(key);
 	}
 
 	/**
@@ -175,7 +175,7 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	 * @return the {@link Set} of keys of all properties
 	 */
 	public Set<String> getPropertyKeySet() {
-		return this.propertyMap.keySet();
+		return this.properties.keySet();
 	}
 
 	/**
@@ -184,7 +184,18 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	 * @return the map of properties
 	 */
 	public Map<String, String> getProperties() {
-		return this.propertyMap;
+		return this.properties;
+	}
+
+	/**
+	 * Checks if the group has a property with the specified key.
+	 *
+	 * @param key the key of the property to check for
+	 *
+	 * @return true if the group has a property with the specified key, false otherwise
+	 */
+	public boolean hasProperty(String key) {
+		return this.properties.containsKey(key);
 	}
 
 	/**
@@ -228,7 +239,7 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	 */
 	public UserRep asUserRep() {
 		return new UserRep(this.userId, this.username, this.firstname, this.lastname, this.userState, this.groups,
-				this.roles, this.locale, new HashMap<>(this.propertyMap), this.history);
+				this.roles, this.locale, new HashMap<>(this.properties), this.history);
 	}
 
 	/**
@@ -281,6 +292,6 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 
 	public User withHistory(UserHistory history) {
 		return new User(this.userId, this.username, this.passwordCrypt, this.firstname, this.lastname, this.userState,
-				this.groups, this.roles, this.locale, this.propertyMap, this.passwordChangeRequested, history);
+				this.groups, this.roles, this.locale, this.properties, this.passwordChangeRequested, history);
 	}
 }

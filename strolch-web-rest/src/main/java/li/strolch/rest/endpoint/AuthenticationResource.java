@@ -310,11 +310,11 @@ public class AuthenticationResource {
 		loginResult.addProperty("refreshAllowed", sessionHandler.isRefreshAllowed());
 		loginResult.addProperty("usage", certificate.getUsage().getValue());
 
-		if (!certificate.getPropertyMap().isEmpty()) {
+		if (!certificate.getProperties().isEmpty()) {
 			JsonObject propertyJ = new JsonObject();
 			loginResult.add("properties", propertyJ);
-			for (String propKey : certificate.getPropertyMap().keySet()) {
-				propertyJ.addProperty(propKey, certificate.getPropertyMap().get(propKey));
+			for (String propKey : certificate.getProperties().keySet()) {
+				propertyJ.addProperty(propKey, certificate.getProperties().get(propKey));
 			}
 		}
 

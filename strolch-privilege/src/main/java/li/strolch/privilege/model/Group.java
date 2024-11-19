@@ -65,6 +65,17 @@ public record Group(String name, Set<String> roles, Map<String, String> properti
 	}
 
 	/**
+	 * Checks if the group has a property with the specified key.
+	 *
+	 * @param key the key of the property to check for
+	 *
+	 * @return true if the group has a property with the specified key, false otherwise
+	 */
+	public boolean hasProperty(String key) {
+		return this.properties.containsKey(key);
+	}
+
+	/**
 	 * Returns the {@link Set} of keys of all properties
 	 *
 	 * @return the {@link Set} of keys of all properties

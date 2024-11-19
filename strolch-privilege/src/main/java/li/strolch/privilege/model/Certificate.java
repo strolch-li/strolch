@@ -64,17 +64,17 @@ public final class Certificate {
 	 * by the {@link PrivilegeHandler}
 	 * </p>
 	 *
-	 * @param usage       the usage allowed for this certificate
-	 * @param sessionId   the users session id
-	 * @param username    the users login name
-	 * @param firstName   the users first name
-	 * @param lastName    the users last name
-	 * @param authToken   the authentication token defining the users unique session and is a private field of this
-	 *                    certificate.
-	 * @param locale      the users {@link Locale}
-	 * @param userRoles   the user's roles
+	 * @param usage      the usage allowed for this certificate
+	 * @param sessionId  the users session id
+	 * @param username   the users login name
+	 * @param firstName  the users first name
+	 * @param lastName   the users last name
+	 * @param authToken  the authentication token defining the users unique session and is a private field of this
+	 *                   certificate.
+	 * @param locale     the users {@link Locale}
+	 * @param userRoles  the user's roles
 	 * @param properties a {@link Map} containing string value pairs of properties for the logged in user. These
-	 *                    properties can be edited and can be used for the user to change settings of this session
+	 *                   properties can be edited and can be used for the user to change settings of this session
 	 */
 	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
 			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
@@ -193,6 +193,17 @@ public final class Certificate {
 	 */
 	public String getProperty(String key) {
 		return this.properties.get(key);
+	}
+
+	/**
+	 * Checks if the group has a property with the specified key.
+	 *
+	 * @param key the key of the property to check for
+	 *
+	 * @return true if the group has a property with the specified key, false otherwise
+	 */
+	public boolean hasProperty(String key) {
+		return this.properties.containsKey(key);
 	}
 
 	/**
