@@ -41,7 +41,8 @@ import java.util.Set;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public record Privilege(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
+public record Privilege(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList)
+		implements Comparable<Privilege> {
 
 	public Privilege(String name, String policy, boolean allAllowed, Set<String> denyList, Set<String> allowList) {
 		DBC.PRE.assertNotEmpty("name must not be empty", name);
@@ -121,5 +122,10 @@ public record Privilege(String name, String policy, boolean allAllowed, Set<Stri
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
 		return visitor.visitPrivilegeRep(this);
+	}
+
+	@Override
+	public int compareTo(Privilege o) {
+		return this.name.compareTo(o.name);
 	}
 }
