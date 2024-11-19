@@ -50,6 +50,35 @@ public record PasswordCrypt(byte[] password, byte[] salt, String hashAlgorithm, 
 		return new PasswordCrypt(password, salt, null, -1, -1);
 	}
 
+	public static PasswordCrypt parse(String passwordS) {
+		passwordS = passwordS.trim();
+
+		byte[] password;
+		if (!passwordS.startsWith("$"))
+			throw new IllegalArgumentException("Invalid password: " + passwordS);
+
+		String[] parts = passwordS.split("\\$");
+		if (parts.length != 4)
+			throw new IllegalArgumentException(
+					"Illegal password " + passwordS + ": Starts with $, but does not have 3 parts!");
+
+		String hashAlgorithmS = parts[1];
+		String[] hashParts = hashAlgorithmS.split(",");
+
+		if (hashParts.length != 3)
+			throw new IllegalArgumentException(
+					"Illegal password " + passwordS + ": hashAlgorithm part does not have 3 parts separated by comma!");
+
+		String hashAlgorithm = hashParts[0];
+		int hashIterations = Integer.parseInt(hashParts[1]);
+		int hashKeyLength = Integer.parseInt(hashParts[2]);
+
+		byte[] salt = fromHexString(parts[2]);
+		password = fromHexString(parts[3]);
+
+		return new PasswordCrypt(password, salt, hashAlgorithm, hashIterations, hashKeyLength);
+	}
+
 	public static PasswordCrypt parse(String passwordS, String saltS) {
 		if (isEmpty(passwordS))
 			return null;
