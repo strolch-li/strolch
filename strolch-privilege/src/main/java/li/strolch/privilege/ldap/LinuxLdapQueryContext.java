@@ -84,7 +84,9 @@ public class LinuxLdapQueryContext extends LdapQueryContext {
 		Set<String> groups = new HashSet<>();
 		NamingEnumeration<?> all = ou.getAll();
 		while (all.hasMore()) {
-			groups.add(all.next().toString());
+			String group = all.next().toString();
+			if (isEmpty(this.groupPrefixFilter) || group.startsWith(this.groupPrefixFilter))
+				groups.add(group);
 		}
 
 		return groups;

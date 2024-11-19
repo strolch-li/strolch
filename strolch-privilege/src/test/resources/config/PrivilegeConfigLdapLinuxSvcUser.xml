@@ -35,6 +35,7 @@
                 <Parameter name="searchBase" value="ou=People,dc=strolch,dc=li"/>
                 <Parameter name="svcUserBinding" value="uid=admin,ou=Admins,dc=strolch,dc=li"/>
                 <Parameter name="svcUserPassword" value="admin"/>
+                <Parameter name="groupPrefixFilter" value="ebx-"/>
                 <Parameter name="defaultLocale" value="de"/>
                 <Parameter name="realm" value="defaultRealm"/>
                 <Parameter name="configFile" value="LdapGroupsConfig.json"/>

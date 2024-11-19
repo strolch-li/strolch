@@ -32,8 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static li.strolch.utils.LdapHelper.encodeForLDAP;
-import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
+import static li.strolch.utils.helper.StringHelper.*;
 
 public class WindowsLdapQueryContext extends LdapQueryContext {
 
@@ -158,7 +157,8 @@ public class WindowsLdapQueryContext extends LdapQueryContext {
 			for (Rdn rdn : memberOfName.getRdns()) {
 				if (rdn.getType().equalsIgnoreCase(LDAP_CN)) {
 					String groupName = rdn.getValue().toString();
-					ldapRoles.add(groupName);
+					if (isEmpty(this.groupPrefixFilter) || groupName.startsWith(this.groupPrefixFilter))
+						ldapRoles.add(groupName);
 					break;
 				}
 			}

@@ -50,6 +50,7 @@ public abstract class LdapQueryContext {
 	public static final String PARAM_DEFAULT_LOCALE = "defaultLocale";
 	public static final String PARAM_OVERRIDE_USER_IDENTIFIER = "overrideUserIdentifier";
 	public static final String PARAM_OVERRIDE_USER_CLASS = "overrideUserClass";
+	public static final String PARAM_GROUP_PREFIX_FILTER = "groupPrefixFilter";
 
 	public static final String LDAP_SN = "sn";
 	public static final String LDAP_GIVEN_NAME = "givenName";
@@ -65,16 +66,17 @@ public abstract class LdapQueryContext {
 
 	protected final String overrideUserIdentifier;
 	protected final String overrideUserClass;
+	protected final String groupPrefixFilter;
 
 	public LdapQueryContext(Map<String, String> parameterMap, RemoteGroupMappingModel groupMappingModel) {
-		this.providerUrl = parameterMap.get(PARAM_PROVIDER_URL);
-		this.searchBase = parameterMap.get(PARAM_SEARCH_BASE);
+		this.providerUrl = trimOrEmpty(parameterMap.get(PARAM_PROVIDER_URL));
+		this.searchBase = trimOrEmpty(parameterMap.get(PARAM_SEARCH_BASE));
 		this.additionalFilter = trimOrEmpty(parameterMap.get(PARAM_ADDITIONAL_FILTER));
 		this.defaultLocale = parameterMap.containsKey(PARAM_DEFAULT_LOCALE) ?
 				Locale.forLanguageTag(parameterMap.get(PARAM_DEFAULT_LOCALE)) : Locale.getDefault();
 
-		this.svcUserBinding = parameterMap.getOrDefault(PARAM_SVC_USER_BINDING, "");
-		this.svcUserPassword = parameterMap.getOrDefault(PARAM_SVC_USER_PASSWORD, "");
+		this.svcUserBinding = trimOrEmpty(parameterMap.getOrDefault(PARAM_SVC_USER_BINDING, ""));
+		this.svcUserPassword = trimOrEmpty(parameterMap.getOrDefault(PARAM_SVC_USER_PASSWORD, ""));
 
 		this.groupMappingModel = groupMappingModel;
 
@@ -83,8 +85,9 @@ public abstract class LdapQueryContext {
 		if (!this.additionalFilter.isEmpty())
 			logger.info("additionalFilter: {}", this.additionalFilter);
 
-		this.overrideUserIdentifier = parameterMap.get(PARAM_OVERRIDE_USER_IDENTIFIER);
-		this.overrideUserClass = parameterMap.get(PARAM_OVERRIDE_USER_CLASS);
+		this.overrideUserIdentifier = trimOrEmpty(parameterMap.get(PARAM_OVERRIDE_USER_IDENTIFIER));
+		this.overrideUserClass = trimOrEmpty(parameterMap.get(PARAM_OVERRIDE_USER_CLASS));
+		this.groupPrefixFilter = trimOrEmpty(parameterMap.get(PARAM_GROUP_PREFIX_FILTER));
 	}
 
 	public String buildUserDn(String username) {
