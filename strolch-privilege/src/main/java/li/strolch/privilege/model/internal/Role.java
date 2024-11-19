@@ -39,7 +39,7 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public record Role(String name, Map<String, Privilege> privilegeMap) {
+public record Role(String name, Map<String, Privilege> privilegeMap) implements Comparable<Role> {
 
 	public Role(String name, Map<String, Privilege> privilegeMap) {
 		DBC.PRE.assertNotEmpty("name must not be empty", name);
@@ -143,5 +143,10 @@ public record Role(String name, Map<String, Privilege> privilegeMap) {
 			return other.name == null;
 		} else
 			return this.name.equals(other.name);
+	}
+
+	@Override
+	public int compareTo(Role o) {
+		return this.name.compareTo(o.name);
 	}
 }

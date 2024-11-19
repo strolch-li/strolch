@@ -32,7 +32,7 @@ import static li.strolch.privilege.base.PrivilegeConstants.*;
  * properties which are always duplicated on users on to the group, and the User is then in the group, eliminating
  * duplication.
  */
-public record Group(String name, Set<String> roles, Map<String, String> properties) {
+public record Group(String name, Set<String> roles, Map<String, String> properties) implements Comparable<Group> {
 	public Group(String name, Set<String> roles, Map<String, String> properties) {
 		DBC.PRE.assertNotEmpty("name must not be empty", name);
 		DBC.PRE.assertNotNull("roles must not be null", roles);
@@ -135,5 +135,10 @@ public record Group(String name, Set<String> roles, Map<String, String> properti
 	public void validate() {
 		if (this.roles.isEmpty())
 			throw new PrivilegeException("Group must have at least one role assigned!");
+	}
+
+	@Override
+	public int compareTo(Group o) {
+		return this.name.compareTo(o.name);
 	}
 }

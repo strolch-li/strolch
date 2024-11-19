@@ -36,7 +36,7 @@ import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class UserRep {
+public class UserRep implements Comparable<UserRep> {
 
 	private String userId;
 	private String username;
@@ -432,5 +432,10 @@ public class UserRep {
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
 		return visitor.visitUserRep(this);
+	}
+
+	@Override
+	public int compareTo(UserRep o) {
+		return this.username.compareTo(o.username);
 	}
 }

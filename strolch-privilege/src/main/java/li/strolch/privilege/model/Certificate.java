@@ -35,7 +35,7 @@ import static li.strolch.utils.helper.StringHelper.isNotEmpty;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public final class Certificate {
+public final class Certificate implements Comparable<Certificate> {
 
 	private final Usage usage;
 	private final String sessionId;
@@ -355,5 +355,10 @@ public final class Certificate {
 			return other.username == null;
 		} else
 			return this.username.equals(other.username);
+	}
+
+	@Override
+	public int compareTo(Certificate o) {
+		return this.username.compareTo(o.username);
 	}
 }

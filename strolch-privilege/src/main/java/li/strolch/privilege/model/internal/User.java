@@ -52,7 +52,8 @@ import static li.strolch.privilege.base.PrivilegeConstants.*;
  */
 public record User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
 				   UserState userState, Set<String> groups, Set<String> roles, Locale locale,
-				   Map<String, String> properties, boolean passwordChangeRequested, UserHistory history) {
+				   Map<String, String> properties, boolean passwordChangeRequested, UserHistory history)
+		implements Comparable<User> {
 
 	public User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
 			UserState userState, Set<String> groups, Set<String> roles, Locale locale, Map<String, String> properties,
@@ -293,5 +294,10 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	public User withHistory(UserHistory history) {
 		return new User(this.userId, this.username, this.passwordCrypt, this.firstname, this.lastname, this.userState,
 				this.groups, this.roles, this.locale, this.properties, this.passwordChangeRequested, history);
+	}
+
+	@Override
+	public int compareTo(User o) {
+		return this.username.compareTo(o.username);
 	}
 }

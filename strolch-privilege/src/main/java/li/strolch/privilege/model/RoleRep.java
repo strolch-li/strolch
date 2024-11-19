@@ -32,7 +32,7 @@ import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class RoleRep {
+public class RoleRep implements Comparable<RoleRep> {
 
 	private String name;
 	private Map<String, Privilege> privileges;
@@ -146,5 +146,10 @@ public class RoleRep {
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {
 		return visitor.visitRoleRep(this);
+	}
+
+	@Override
+	public int compareTo(RoleRep o) {
+		return this.name.compareTo(o.name);
 	}
 }
