@@ -33,6 +33,8 @@ public class PrivilegeConstants {
 	public static final String ROLES = "roles";
 	public static final String GROUPS = "groups";
 	public static final String EMAIL = "email";
+	public static final String VALID_FROM = "validFrom";
+	public static final String VALID_TO = "validTo";
 
 	public static final String ROLE_STROLCH_ADMIN = "StrolchAdmin";
 }

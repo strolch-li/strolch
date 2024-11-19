@@ -24,6 +24,7 @@ import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,9 @@ import java.util.*;
 
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
+import static li.strolch.privilege.base.PrivilegeConstants.VALID_FROM;
+import static li.strolch.privilege.base.PrivilegeConstants.VALID_TO;
 import static li.strolch.privilege.handler.DefaultPrivilegeHandler.streamAllRolesForUser;
 
 public class PrivilegeContextBuilder {
@@ -103,7 +107,25 @@ public class PrivilegeContextBuilder {
 	}
 
 	private void prepare(User user) {
-		this.groups = user.getGroups().stream().sorted().collect(toCollection(TreeSet::new));
+		Set<Group> groups = user.getGroups().stream().map(groupName -> {
+			Group group = this.persistenceHandler.getGroup(groupName);
+			if (group == null) {
+				logger.error("Group {} does not exist!", groupName);
+				return null;
+			}
+
+			if (group.hasProperty(VALID_FROM)) {
+				if (ZonedDateTime.now().isBefore(ISO8601.parseToZdt(group.getProperty(VALID_FROM))))
+					return null;
+			}
+			if (group.hasProperty(VALID_TO)) {
+				if (ZonedDateTime.now().isAfter(ISO8601.parseToZdt(group.getProperty(VALID_TO))))
+					return null;
+			}
+
+			return group;
+		}).filter(Objects::nonNull).collect(toSet());
+		this.groups = groups.stream().map(Group::name).collect(toCollection(TreeSet::new));
 		this.userDirectRoles = user.getRoles().stream().sorted().collect(toCollection(TreeSet::new));
 		this.rolesWithGroupRoles = streamAllRolesForUser(this.persistenceHandler, user)
 				.sorted()
@@ -111,18 +133,14 @@ public class PrivilegeContextBuilder {
 		this.properties = new HashMap<>(user.getProperties());
 
 		// copy properties from groups to user properties
-		for (String groupName : this.groups) {
-			Group group = this.persistenceHandler.getGroup(groupName);
-			if (group == null) {
-				logger.error("Group {} does not exist!", groupName);
-				continue;
-			}
+		for (Group group : groups) {
 			Map<String, String> groupProperties = group.getProperties();
 			for (String key : groupProperties.keySet()) {
 				String value = groupProperties.get(key);
 				String replaced = this.properties.put(key, value);
 				if (replaced != null && !replaced.equals(value))
-					logger.error("Duplicate property {} for user {} from group {}", key, user.getUsername(), groupName);
+					logger.error("Duplicate property {} for user {} from group {}", key, user.getUsername(),
+							group.name());
 			}
 		}
 	}
