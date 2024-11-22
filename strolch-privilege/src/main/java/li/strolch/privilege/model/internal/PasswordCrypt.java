@@ -16,6 +16,9 @@
 
 package li.strolch.privilege.model.internal;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import static li.strolch.utils.helper.StringHelper.*;
 
 public record PasswordCrypt(byte[] password, byte[] salt, String hashAlgorithm, int hashIterations, int hashKeyLength) {
@@ -118,5 +121,21 @@ public record PasswordCrypt(byte[] password, byte[] salt, String hashAlgorithm, 
 		password = fromHexString(parts[3]);
 
 		return new PasswordCrypt(password, salt, hashAlgorithm, hashIterations, hashKeyLength);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass())
+			return false;
+		PasswordCrypt that = (PasswordCrypt) o;
+		return hashKeyLength == that.hashKeyLength && hashIterations == that.hashIterations && Objects.deepEquals(salt,
+				that.salt) && Objects.deepEquals(password, that.password) && Objects.equals(hashAlgorithm,
+				that.hashAlgorithm);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(Arrays.hashCode(password), Arrays.hashCode(salt), hashAlgorithm, hashIterations,
+				hashKeyLength);
 	}
 }

@@ -36,6 +36,8 @@ public class XmlConstants {
 	public static final String HANDLER_SSO = "SsoHandler";
 	public static final String HANDLER_PRIVILEGE = "PrivilegeHandler";
 	public static final String ROLES = "Roles";
+	public static final String TOKENS = "Tokens";
+	public static final String TOKEN = "Token";
 	public static final String ROLE = "Role";
 	public static final String USERS = "Users";
 	public static final String GROUPS = "Groups";
@@ -72,6 +74,10 @@ public class XmlConstants {
 	public static final String ATTR_SESSION_ID = "sessionId";
 	public static final String ATTR_USAGE = "usage";
 	public static final String ATTR_USERNAME = "username";
+	public static final String ATTR_TOKEN_ID = "tokenId";
+	public static final String ATTR_TOKEN = "token";
+	public static final String ATTR_VALID_FROM = "validFrom";
+	public static final String ATTR_VALID_TO = "validTo";
 	public static final String ATTR_AUTH_TOKEN = "authToken";
 	public static final String ATTR_SOURCE = "source";
 	public static final String ATTR_LOCALE = "locale";
@@ -85,6 +91,7 @@ public class XmlConstants {
 	public static final String PARAM_USERS_FILE_DEF = "PrivilegeUsers.xml";
 	public static final String PARAM_GROUPS_FILE = "groupsXmlFile";
 	public static final String PARAM_GROUPS_FILE_DEF = "PrivilegeGroups.xml";
+	public static final String PARAM_TOKENS_FILE = "tokensXmlFile";
 	public static final String PARAM_ROLES_FILE = "rolesXmlFile";
 	public static final String PARAM_ROLES_FILE_DEF = "PrivilegeRoles.xml";
 	public static final String PARAM_BASE_PATH = "basePath";

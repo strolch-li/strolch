@@ -18,6 +18,7 @@ package li.strolch.privilege.handler;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.Restrictable;
+import li.strolch.privilege.model.internal.AccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
@@ -63,6 +64,13 @@ public interface PersistenceHandler {
 	 * @return all currently known {@link Role}s
 	 */
 	List<Role> getAllRoles();
+
+	/**
+	 * Returns all currently known {@link AccessToken}s.
+	 *
+	 * @return a list of all currently known {@link AccessToken}s.
+	 */
+	List<AccessToken> getAllAccessTokens();
 
 	/**
 	 * Returns a {@link User} object from the underlying database
@@ -168,6 +176,38 @@ public interface PersistenceHandler {
 	 * @param group the {@link Group} object to add
 	 */
 	void replaceGroup(Group group);
+
+	/**
+	 * Returns a {@link AccessToken} object from the underlying database
+	 *
+	 * @param tokenId the id of the {@link AccessToken} object to return
+	 *
+	 * @return the {@link AccessToken} object, or null if it was not found
+	 */
+	AccessToken getAccessToken(String tokenId);
+
+	/**
+	 * Adds an {@link AccessToken} to the underlying database.
+	 *
+	 * @param accessToken the {@link AccessToken} to be added
+	 */
+	void addAccessToken(AccessToken accessToken);
+
+	/**
+	 * Removes an {@link AccessToken} from the underlying database.
+	 *
+	 * @param tokenId the id of the {@link AccessToken} to be removed
+	 */
+	AccessToken removeAccessToken(String tokenId);
+
+	/**
+	 * Retrieves a list of access tokens associated with a specified user.
+	 *
+	 * @param username the name of the user whose access tokens are to be retrieved
+	 *
+	 * @return a list of access tokens associated with the specified user
+	 */
+	List<AccessToken> getAccessTokensForUser(String username);
 
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved

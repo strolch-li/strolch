@@ -54,10 +54,6 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(RoleParser.class)))
 				throw new IllegalArgumentException("Previous Role not closed!");
 			this.buildersStack.push(new RoleParser());
-		} else if (qName.equals(PROPERTIES)) {
-			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
-				throw new IllegalArgumentException("Previous Properties not closed!");
-			this.buildersStack.push(new PropertyParser());
 		}
 
 		if (!this.buildersStack.isEmpty())
@@ -78,8 +74,6 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 		ElementParser elementParser = null;
 		if (qName.equals(ROLE)) {
-			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -183,28 +177,6 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 		private String getText() {
 			return this.text.toString().trim();
-		}
-	}
-
-	static class PropertyParser extends ElementParserAdapter {
-
-		//	      <Property name="organizationalUnit" value="Development" />
-
-		public final Map<String, String> parameterMap = new HashMap<>();
-
-		@Override
-		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-			if (qName.equals(PROPERTY)) {
-				String key = attributes.getValue(ATTR_NAME).trim();
-				String value = attributes.getValue(ATTR_VALUE).trim();
-				this.parameterMap.put(key, value);
-			} else if (!qName.equals(PROPERTIES)) {
-				throw new IllegalArgumentException("Unhandled tag " + qName);
-			}
-		}
-
-		public Map<String, String> getParameterMap() {
-			return this.parameterMap;
 		}
 	}
 }

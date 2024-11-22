@@ -18,6 +18,7 @@ package li.strolch.privilege.handler;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.Group;
+import li.strolch.privilege.model.internal.AccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.xml.*;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -54,16 +56,19 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private final Map<String, User> userMap;
 	private final Map<String, Group> groupMap;
 	private final Map<String, Role> roleMap;
+	private final Map<String, AccessToken> tokensMap;
 
 	private boolean userMapDirty;
 	private boolean groupMapDirty;
 	private boolean roleMapDirty;
+	private boolean tokensMapDirty;
 
 	private Map<String, String> parameterMap;
 
 	private File usersPath;
 	private File groupsPath;
 	private File rolesPath;
+	private File tokensPath;
 
 	private boolean caseInsensitiveUsername;
 
@@ -71,6 +76,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.roleMap = new ConcurrentHashMap<>();
 		this.groupMap = new ConcurrentHashMap<>();
 		this.userMap = new ConcurrentHashMap<>();
+		this.tokensMap = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -96,6 +102,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	public List<Role> getAllRoles() {
 		synchronized (this.roleMap) {
 			return new LinkedList<>(this.roleMap.values());
+		}
+	}
+
+	@Override
+	public List<AccessToken> getAllAccessTokens() {
+		synchronized (this.tokensMap) {
+			return new LinkedList<>(this.tokensMap.values());
 		}
 	}
 
@@ -193,6 +206,33 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.roleMapDirty = true;
 	}
 
+	@Override
+	public AccessToken getAccessToken(String tokenId) {
+		return this.tokensMap.get(tokenId);
+	}
+
+	@Override
+	public void addAccessToken(AccessToken accessToken) {
+		if (this.tokensMap.containsKey(accessToken.tokenId()))
+			throw new IllegalStateException(format("The access token {0} already exists!", accessToken.tokenId()));
+		this.tokensMap.put(accessToken.tokenId(), accessToken);
+		this.tokensMapDirty = true;
+	}
+
+	@Override
+	public AccessToken removeAccessToken(String tokenId) {
+		AccessToken token = this.tokensMap.remove(tokenId);
+		this.tokensMapDirty = token != null;
+		return token;
+	}
+
+	@Override
+	public List<AccessToken> getAccessTokensForUser(String username) {
+		synchronized (this.tokensMap) {
+			return this.tokensMap.values().stream().filter(t -> t.username().equals(username)).toList();
+		}
+	}
+
 	/**
 	 * Initializes this {@link XmlPersistenceHandler} by reading the following parameters:
 	 * <ul>
@@ -200,6 +240,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	 * <li>{@link XmlConstants#PARAM_USERS_FILE}</li>
 	 * <li>{@link XmlConstants#PARAM_GROUPS_FILE}</li>
 	 * <li>{@link XmlConstants#PARAM_ROLES_FILE}</li>
+	 * <li>{@link XmlConstants#PARAM_TOKENS_FILE}</li>
 	 * </ul>
 	 */
 	@Override
@@ -218,11 +259,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		File usersPath = getFile(basePath, PARAM_USERS_FILE, PARAM_USERS_FILE_DEF, true);
 		File groupsPath = getFile(basePath, PARAM_GROUPS_FILE, PARAM_GROUPS_FILE_DEF, false);
 		File rolesPath = getFile(basePath, PARAM_ROLES_FILE, PARAM_ROLES_FILE_DEF, true);
+		File tokensPath = getFile(basePath, PARAM_ROLES_FILE, PARAM_TOKENS_FILE, false);
 
 		// save path to model
 		this.usersPath = usersPath;
 		this.groupsPath = groupsPath;
 		this.rolesPath = rolesPath;
+		this.tokensPath = tokensPath;
 
 		this.caseInsensitiveUsername = parseBoolean(
 				this.parameterMap.getOrDefault(PARAM_CASE_INSENSITIVE_USERNAME, "true"));
@@ -268,6 +311,10 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		if (this.groupsPath.exists())
 			XmlHelper.parseDocument(this.groupsPath, groupsXmlHandler);
 
+		PrivilegeTokensSaxReader tokensXmlHandler = new PrivilegeTokensSaxReader();
+		if (this.tokensPath.exists())
+			XmlHelper.parseDocument(this.tokensPath, tokensXmlHandler);
+
 		PrivilegeRolesSaxReader rolesXmlHandler = new PrivilegeRolesSaxReader();
 		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler);
 
@@ -289,13 +336,21 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 			this.userMap.putAll(usersXmlHandler.getUsers());
 		}
 
+		// TOKENS
+		synchronized (this.tokensMap) {
+			this.tokensMap.clear();
+			this.tokensMap.putAll(tokensXmlHandler.getTokens());
+		}
+
 		this.userMapDirty = false;
 		this.groupMapDirty = false;
 		this.roleMapDirty = false;
+		this.tokensMapDirty = false;
 
 		logger.info("Read {} Users", this.userMap.size());
 		logger.info("Read {} Groups", this.groupMap.size());
 		logger.info("Read {} Roles", this.roleMap.size());
+		logger.info("Read {} Tokens", this.tokensMap.size());
 
 		// validate referenced elements exist
 		for (User user : this.userMap.values()) {
@@ -318,6 +373,15 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 				// validate that role exists
 				if (getRole(roleName) == null)
 					logger.error("Role {} does not exist referenced by group {}", roleName, group.name());
+			}
+		}
+
+		// validate users exist for tokens
+		for (Iterator<AccessToken> iterator = this.tokensMap.values().iterator(); iterator.hasNext(); ) {
+			AccessToken token = iterator.next();
+			if (getUser(token.username()) == null) {
+				logger.error("User {} does not exist referenced by token {}", token.username(), token.tokenId());
+				iterator.remove();
 			}
 		}
 
@@ -350,6 +414,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		if (this.roleMapDirty) {
 			new PrivilegeRolesSaxWriter(getAllRoles(), this.rolesPath).write();
 			this.roleMapDirty = false;
+			saved = true;
+		}
+
+		// write tokens file
+		if (this.tokensMapDirty) {
+			new PrivilegeTokensSaxWriter(getAllAccessTokens(), this.tokensPath).write();
+			this.tokensMapDirty = false;
 			saved = true;
 		}
 

@@ -17,7 +17,8 @@ package li.strolch.privilege.xml;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.privilege.model.Privilege;
-import li.strolch.privilege.model.internal.Role;
+import li.strolch.privilege.model.internal.AccessToken;
+import li.strolch.utils.iso8601.ISO8601;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
@@ -28,18 +29,18 @@ import java.util.Locale;
 
 import static java.util.Comparator.comparing;
 import static li.strolch.privilege.helper.XmlConstants.*;
-import static li.strolch.privilege.helper.XmlHelper.*;
+import static li.strolch.privilege.helper.XmlHelper.openXmlStreamWriterDocument;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeRolesSaxWriter {
+public class PrivilegeTokensSaxWriter {
 
-	private final List<Role> roles;
+	private final List<AccessToken> tokens;
 	private final File modelFile;
 
-	public PrivilegeRolesSaxWriter(List<Role> roles, File modelFile) {
-		this.roles = roles;
+	public PrivilegeTokensSaxWriter(List<AccessToken> tokens, File modelFile) {
+		this.tokens = tokens;
 		this.modelFile = modelFile;
 	}
 
@@ -48,18 +49,23 @@ public class PrivilegeRolesSaxWriter {
 		try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.modelFile), StandardCharsets.UTF_8)) {
 
 			IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
-			xmlWriter.writeStartElement(ROLES);
+			xmlWriter.writeStartElement(TOKENS);
 
-			List<Role> roles = new ArrayList<>(this.roles);
-			roles.sort(comparing(r -> r.getName().toLowerCase(Locale.ROOT)));
-			for (Role role : roles) {
+			List<AccessToken> tokens = new ArrayList<>(this.tokens);
+			tokens.sort(comparing((AccessToken t) -> t.username().toLowerCase(Locale.ROOT)).thenComparing(
+					AccessToken::tokenId));
+			for (AccessToken token : tokens) {
 
 				// start the role element
-				xmlWriter.writeStartElement(ROLE);
-				xmlWriter.writeAttribute(ATTR_NAME, role.getName());
+				xmlWriter.writeStartElement(TOKEN);
+				xmlWriter.writeAttribute(ATTR_USERNAME, token.username());
+				xmlWriter.writeAttribute(ATTR_TOKEN_ID, token.tokenId());
+				xmlWriter.writeAttribute(ATTR_TOKEN, token.passwordCrypt().buildPasswordString());
+				xmlWriter.writeAttribute(ATTR_VALID_FROM, ISO8601.toString(token.validFrom()));
+				xmlWriter.writeAttribute(ATTR_VALID_TO, ISO8601.toString(token.validTo()));
 
-				List<Privilege> privileges = new ArrayList<>(role.privilegeMap().values());
-				writePrivileges(privileges, xmlWriter);
+				List<Privilege> privileges = new ArrayList<>(token.privileges().values());
+				PrivilegeRolesSaxWriter.writePrivileges(privileges, xmlWriter);
 
 				xmlWriter.writeEndElement();
 			}
@@ -67,24 +73,6 @@ public class PrivilegeRolesSaxWriter {
 			// and now end
 			xmlWriter.writeEndDocument();
 			xmlWriter.flush();
-		}
-	}
-
-	static void writePrivileges(List<Privilege> privileges, IndentingXMLStreamWriter xmlWriter)
-			throws XMLStreamException {
-		privileges.sort(comparing(Privilege::getName));
-		for (Privilege privilege : privileges) {
-
-			xmlWriter.writeStartElement(PRIVILEGE);
-			xmlWriter.writeAttribute(ATTR_NAME, privilege.getName());
-			xmlWriter.writeAttribute(ATTR_POLICY, privilege.getPolicy());
-
-			if (privilege.isAllAllowed())
-				writeStringElement(xmlWriter, ALL_ALLOWED, "true");
-			writeStringList(xmlWriter, DENY, privilege.getDenyList());
-			writeStringList(xmlWriter, ALLOW, privilege.getAllowList());
-
-			xmlWriter.writeEndElement();
 		}
 	}
 }

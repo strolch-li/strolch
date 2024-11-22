@@ -30,6 +30,7 @@
                 <Parameter name="basePath" value="target/${target}"/>
                 <Parameter name="usersXmlFile" value="PrivilegeUsers.xml"/>
                 <Parameter name="rolesXmlFile" value="PrivilegeRoles.xml"/>
+                <Parameter name="tokensXmlFile" value="PrivilegeTokens.xml"/>
             </Parameters>
         </PersistenceHandler>
 

@@ -23,7 +23,6 @@ import li.strolch.privilege.model.internal.*;
 import li.strolch.privilege.test.model.DummySsoHandler;
 import li.strolch.privilege.xml.*;
 import li.strolch.utils.helper.FileHelper;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
 import org.hamcrest.MatcherAssert;
 import org.junit.BeforeClass;
@@ -38,8 +37,11 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static li.strolch.utils.helper.StringHelper.toHexString;
+import static li.strolch.utils.iso8601.ISO8601.parseToZdt;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
 
@@ -91,6 +93,11 @@ public class XmlTest {
 			throw new RuntimeException("Tmp still exists and can not be deleted at " + tmpFile.getAbsolutePath());
 		}
 
+		tmpFile = new File(TARGET_TEST + "PrivilegeTokensTest.xml");
+		if (tmpFile.exists() && !tmpFile.delete()) {
+			throw new RuntimeException("Tmp still exists and can not be deleted at " + tmpFile.getAbsolutePath());
+		}
+
 		// and temporary parent
 		if (!tmpDir.delete()) {
 			throw new RuntimeException("Could not remove temporary parent for tmp " + tmpFile);
@@ -117,7 +124,7 @@ public class XmlTest {
 		assertEquals(6, containerModel.getParameterMap().size());
 		assertEquals(4, containerModel.getPolicies().size());
 		assertEquals(3, containerModel.getEncryptionHandlerParameterMap().size());
-		assertEquals(3, containerModel.getPersistenceHandlerParameterMap().size());
+		assertEquals(4, containerModel.getPersistenceHandlerParameterMap().size());
 	}
 
 	@Test
@@ -198,8 +205,8 @@ public class XmlTest {
 		assertEquals("1", admin.getUserId());
 		assertEquals("admin", admin.getUsername());
 		assertEquals("cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344",
-				StringHelper.toHexString(admin.getPasswordCrypt().password()));
-		assertEquals("61646d696e", StringHelper.toHexString(admin.getPasswordCrypt().salt()));
+				toHexString(admin.getPasswordCrypt().password()));
+		assertEquals("61646d696e", toHexString(admin.getPasswordCrypt().salt()));
 		assertEquals("Application", admin.getFirstname());
 		assertEquals("Administrator", admin.getLastname());
 		assertEquals(UserState.ENABLED, admin.getUserState());
@@ -229,7 +236,7 @@ public class XmlTest {
 		assertEquals("1", admin2.getUserId());
 		assertEquals("admin2", admin2.getUsername());
 		assertEquals("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
-				StringHelper.toHexString(admin2.getPasswordCrypt().password()));
+				toHexString(admin2.getPasswordCrypt().password()));
 		assertEquals("Application", admin2.getFirstname());
 		assertEquals("Administrator", admin2.getLastname());
 		assertEquals(UserState.ENABLED, admin2.getUserState());
@@ -268,6 +275,34 @@ public class XmlTest {
 		properties = group.getProperties();
 		assertTrue(properties.isEmpty());
 		assertTrue(group.roles().isEmpty());
+	}
+
+	@Test
+	public void canReadTokens() {
+
+		PrivilegeTokensSaxReader xmlHandler = new PrivilegeTokensSaxReader();
+		File xmlFile = new File(SRC_TEST + "PrivilegeTokens.xml");
+		XmlHelper.parseDocument(xmlFile, xmlHandler);
+
+		Map<String, AccessToken> tokens = xmlHandler.getTokens();
+		assertNotNull(tokens);
+
+		assertEquals(1, tokens.size());
+
+		AccessToken token = tokens.get("50b31270-bc49-4940-97ec-d4aa0d1ad649");
+		assertEquals("50b31270-bc49-4940-97ec-d4aa0d1ad649", token.tokenId());
+		assertEquals("admin", token.username());
+		assertEquals("cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344",
+				toHexString(token.passwordCrypt().password()));
+		assertEquals(parseToZdt("2024-02-12T08:00:00.000+01:00"), token.validFrom());
+		assertEquals(parseToZdt("3000-01-01T01:00:00.000+01:00"), token.validTo());
+		assertEquals(2, token.privileges().size());
+
+		Privilege privilegeAction = token.privileges().get("Foo");
+		assertFalse(privilegeAction.isAllAllowed());
+		assertEquals(1, privilegeAction.getAllowList().size());
+		assertEquals(1, privilegeAction.getDenyList().size());
+		assertEquals("DefaultPrivilege", privilegeAction.getPolicy());
 	}
 
 	@Test
@@ -563,5 +598,60 @@ public class XmlTest {
 			assertEquals(privilege.getName(), privilege2.getName());
 			assertEquals(privilege.getPolicy(), privilege2.getPolicy());
 		}
+	}
+
+	@Test
+	public void canWriteTokens() throws XMLStreamException, IOException {
+
+		Map<String, Privilege> privileges1 = new HashMap<>();
+		privileges1.put("Foo1",
+				new Privilege("Foo1", "DefaultPrivilege", false, Set.of("allowFoo1"), Set.of("denyFoo1")));
+		privileges1.put("Bar1",
+				new Privilege("Bar1", "DefaultPrivilege", true, Collections.emptySet(), Collections.emptySet()));
+
+		Map<String, Privilege> privileges2 = new HashMap<>();
+		privileges2.put("Foo2",
+				new Privilege("Foo2", "DefaultPrivilege", false, Set.of("allowFoo2"), Set.of("denyFoo2")));
+		privileges2.put("Bar2",
+				new Privilege("Bar2", "DefaultPrivilege", true, Collections.emptySet(), Collections.emptySet()));
+
+		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+		AccessToken token1 = new AccessToken(UUID.randomUUID().toString(), "admin",
+				new PasswordCrypt("password1".getBytes(), "salt1".getBytes(), "PBKDF2WithHmacSHA512", 10000, 256), now,
+				now.plusDays(1), privileges1);
+
+		AccessToken token2 = new AccessToken(UUID.randomUUID().toString(), "user",
+				new PasswordCrypt("password2".getBytes(), "salt2".getBytes(), "PBKDF2WithHmacSHA512", 10000, 256), now,
+				now.plusDays(2), privileges2);
+
+		List<AccessToken> tokens = new ArrayList<>();
+		tokens.add(token1);
+		tokens.add(token2);
+
+		File tokensFile = new File(TARGET_TEST + "PrivilegeTokensTest.xml");
+		PrivilegeTokensSaxWriter tokensSaxWriter = new PrivilegeTokensSaxWriter(tokens, tokensFile);
+		tokensSaxWriter.write();
+
+		PrivilegeTokensSaxReader xmlHandler = new PrivilegeTokensSaxReader();
+		XmlHelper.parseDocument(tokensFile, xmlHandler);
+
+		Map<String, AccessToken> parsedTokens = xmlHandler.getTokens();
+		assertNotNull(parsedTokens);
+		assertEquals(2, parsedTokens.size());
+
+		AccessToken parsedToken1 = parsedTokens.get(token1.tokenId());
+		AccessToken parsedToken2 = parsedTokens.get(token2.tokenId());
+
+		assertEquals(token1.username(), parsedToken1.username());
+		assertEquals(token1.validFrom(), parsedToken1.validFrom());
+		assertEquals(token1.validTo(), parsedToken1.validTo());
+		assertEquals(token1.passwordCrypt(), parsedToken1.passwordCrypt());
+		assertEquals(token1.privileges(), parsedToken1.privileges());
+
+		assertEquals(token2.username(), parsedToken2.username());
+		assertEquals(token2.validFrom(), parsedToken2.validFrom());
+		assertEquals(token2.validTo(), parsedToken2.validTo());
+		assertEquals(token2.passwordCrypt(), parsedToken2.passwordCrypt());
+		assertEquals(token2.privileges(), parsedToken2.privileges());
 	}
 }
