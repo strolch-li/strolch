@@ -37,8 +37,6 @@ import java.util.Map;
  */
 public interface PrivilegeHandler {
 
-	///
-
 	/**
 	 * Privilege "PrivilegeAction" which is used for privileges which are not further categorized e.g.
 	 * {@link #PRIVILEGE_ACTION_PERSIST} and {@link #PRIVILEGE_ACTION_GET_POLICIES}
