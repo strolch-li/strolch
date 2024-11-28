@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REMOTE_IP;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_URL;
@@ -60,8 +61,16 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 		if (status != Response.Status.OK.getStatusCode()) {
 			String method = requestContext.getMethod();
 			String uri = request.getRequestURI();
+			Enumeration<String> contentTypeEnumeration = request.getHeaders("content-type");
+			StringBuilder contentType = new StringBuilder();
+			while (contentTypeEnumeration.hasMoreElements()) {
+				contentType.append(contentTypeEnumeration.nextElement());
+				if (contentTypeEnumeration.hasMoreElements())
+					contentType.append(", ");
+			}
 
-			logger.error("Request failed {}: {} {}", responseContext.getStatus(), method, uri);
+			logger.error("Request failed {}: {} {}. Content-type: {}", responseContext.getStatus(), method, uri,
+					contentType);
 		}
 	}
 }
