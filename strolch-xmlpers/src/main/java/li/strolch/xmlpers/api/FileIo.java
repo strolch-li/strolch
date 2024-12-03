@@ -36,6 +36,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.nio.channels.FileChannel;
 import java.text.MessageFormat;
 
 import static li.strolch.utils.helper.XmlHelper.PROP_LINE_SEPARATOR;
@@ -61,7 +62,9 @@ public class FileIo {
 
 		XMLStreamWriter xmlWriter;
 		try {
-			try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.tmpPath), DEFAULT_ENCODING)) {
+			try (FileOutputStream fos = new FileOutputStream(this.tmpPath);
+				 OutputStreamWriter ioWriter = new OutputStreamWriter(fos, DEFAULT_ENCODING);
+				 FileChannel fileChannel = fos.getChannel()) {
 
 				XMLOutputFactory factory = XMLOutputFactory.newInstance();
 				xmlWriter = factory.createXMLStreamWriter(ioWriter);
@@ -78,6 +81,9 @@ public class FileIo {
 				// and now end
 				xmlWriter.writeEndDocument();
 				xmlWriter.flush();
+
+				// Ensure data is written to disk using FileChannel
+				fileChannel.force(true);
 			}
 
 			if (logger.isDebugEnabled())
@@ -152,10 +158,16 @@ public class FileIo {
 			// transformer.setOutputProperty("{http://xml.apache.org/xalan}line-separator", "\t");
 
 			// Transform to file
-			try (Writer ioWriter = new OutputStreamWriter(new FileOutputStream(this.tmpPath), encoding)) {
+			try (FileOutputStream fos = new FileOutputStream(this.tmpPath);
+				 OutputStreamWriter ioWriter = new OutputStreamWriter(fos, encoding);
+				 FileChannel fileChannel = fos.getChannel()) {
+
 				StreamResult result = new StreamResult(ioWriter);
 				Source xmlSource = new DOMSource(document);
 				transformer.transform(xmlSource, result);
+
+				// Ensure data is written to disk using FileChannel
+				fileChannel.force(true);
 			}
 
 			if (logger.isDebugEnabled())
