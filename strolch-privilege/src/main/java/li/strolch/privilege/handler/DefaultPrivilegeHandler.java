@@ -815,21 +815,18 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// remove registration
 		PrivilegeContext privilegeContext = this.privilegeContextMap.remove(certificate.getSessionId());
+		if (privilegeContext == null)
+			return false;
 
 		// persist sessions
-		if (privilegeContext != null && privilegeContext.getCertificate().getUsage().isAny())
+		if (privilegeContext.getCertificate().getUsage().isAny())
 			persistSessionsAsync();
 
 		// return true if object was really removed
-		boolean loggedOut = privilegeContext != null;
-		if (loggedOut) {
-			if (certificate.getUsage().isAny())
-				logger.info("User {} logged out.", certificate.getUsername());
-		} else {
-			logger.warn("User already logged out!");
-		}
+		if (certificate.getUsage().isAny())
+			logger.info("User {} logged out.", certificate.getUsername());
 
-		return loggedOut;
+		return true;
 	}
 
 	@Override
