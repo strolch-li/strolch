@@ -29,7 +29,7 @@ public class AssertionUtil {
 
 	public static void assertObjectRead(PersistenceContext<?> context) {
 		if (context.getObject() == null) {
-			String msg = "Failed to read object with for {0}";
+			String msg = "Failed to read object with {0}";
 			ObjectRef objectRef = context.getObjectRef();
 			msg = MessageFormat.format(msg, objectRef.getName());
 			throw new RuntimeException(msg);
