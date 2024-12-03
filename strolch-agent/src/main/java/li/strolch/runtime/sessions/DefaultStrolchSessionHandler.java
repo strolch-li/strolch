@@ -243,6 +243,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 			return privilegeContext;
 		} catch (PrivilegeException e) {
+			invalidate(certificate);
 			throw new StrolchNotAuthenticatedException(e.getMessage(), e);
 		}
 	}
