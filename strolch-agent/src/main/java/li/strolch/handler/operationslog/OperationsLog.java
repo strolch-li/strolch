@@ -196,6 +196,10 @@ public class OperationsLog extends StrolchComponent {
 		this.maxMessages = maxMessages;
 	}
 
+	public boolean isQueueEmpty() {
+		return this.queue.isEmpty();
+	}
+
 	public void addMessage(LogMessage logMessage) {
 		addMessage(logMessage, false);
 	}

@@ -73,7 +73,9 @@ public class LogMessagesTestRunner {
 			this.operationsLog.addMessage(logMessage);
 
 			// default is async persisting...
-			Thread.sleep(100L);
+			while (!this.operationsLog.isQueueEmpty())
+				//noinspection BusyWait
+				Thread.sleep(10L);
 
 			StrolchRealm realm = this.container.getRealm(this.realmName);
 
