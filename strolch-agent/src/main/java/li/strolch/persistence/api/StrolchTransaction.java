@@ -1709,6 +1709,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean hasPrivilege(String privilegeName, String privilegeValue) throws AccessDeniedException;
 
 	/**
+	 * @see PrivilegeContext#hasPrivilege(Restrictable)
+	 */
+	boolean hasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException;
+
+	/**
 	 * Asserts that the current {@link Certificate} has the given role
 	 *
 	 * @param roleName the name of the role the user should have

@@ -1319,6 +1319,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public boolean hasPrivilege(Operation operation, StrolchRootElement element) throws AccessDeniedException {
+		DBC.PRE.assertNotNull("operation must not be null", operation);
+		DBC.PRE.assertNotNull("element must not be null", element);
+		return getPrivilegeContext().hasPrivilege(
+				new TransactedRestrictable(this, operation.getPrivilegeName(element), element));
+	}
+
+	@Override
 	public void assertHasRole(String roleName) throws AccessDeniedException {
 		DBC.PRE.assertNotNull("roleName must not be null", roleName);
 		getPrivilegeContext().assertHasRole(roleName);
