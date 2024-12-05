@@ -114,24 +114,28 @@ public record PrivilegeContext(Certificate certificate, Map<String, Privilege> p
 		return this.certificate.getUserGroups();
 	}
 
-	public void assertHasGroup(String groupName) throws AccessDeniedException {
+	public boolean assertHasGroup(String groupName) throws AccessDeniedException {
 		if (!this.certificate.hasGroup(groupName)) {
 			String msg = format(getString("Privilege.noprivilege.group"), this.certificate.getUsername(), groupName);
 			throw new AccessDeniedException(msg);
 		}
+
+		return true;
 	}
 
-	public void assertHasRole(String roleName) throws AccessDeniedException {
+	public boolean assertHasRole(String roleName) throws AccessDeniedException {
 		if (!this.certificate.hasRole(roleName)) {
 			String msg = format(getString("Privilege.noprivilege.role"), this.certificate.getUsername(), roleName);
 			throw new AccessDeniedException(msg);
 		}
+
+		return true;
 	}
 
-	public void assertHasAnyGroup(String... groupNames) throws AccessDeniedException {
+	public boolean assertHasAnyGroup(String... groupNames) throws AccessDeniedException {
 		for (String groupName : groupNames) {
 			if (this.certificate.hasGroup(groupName))
-				return;
+				return true;
 		}
 
 		String msg = format(getString("Privilege.noprivilege.group"), this.certificate.getUsername(),
@@ -139,10 +143,10 @@ public record PrivilegeContext(Certificate certificate, Map<String, Privilege> p
 		throw new AccessDeniedException(msg);
 	}
 
-	public void assertHasAnyRole(String... roleNames) throws AccessDeniedException {
+	public boolean assertHasAnyRole(String... roleNames) throws AccessDeniedException {
 		for (String roleName : roleNames) {
 			if (this.certificate.hasRole(roleName))
-				return;
+				return true;
 		}
 
 		String msg = format(getString("Privilege.noprivilege.role"), this.certificate.getUsername(),
