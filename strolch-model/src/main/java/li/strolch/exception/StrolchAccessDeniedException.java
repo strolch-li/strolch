@@ -34,6 +34,12 @@ public class StrolchAccessDeniedException extends StrolchException {
 		this.restrictable = restrictable;
 	}
 
+	public StrolchAccessDeniedException(Certificate certificate, Restrictable restrictable, I18nMessage i18n) {
+		super(i18n);
+		this.certificate = certificate;
+		this.restrictable = restrictable;
+	}
+
 	public Certificate getCertificate() {
 		return certificate;
 	}
