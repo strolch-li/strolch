@@ -43,11 +43,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toList;
 import static li.strolch.privilege.handler.PrivilegeCrudHandler.clearPassword;
+import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForUser;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
@@ -74,7 +74,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(DefaultPrivilegeHandler.class);
 	public static final String SOURCE_UNKNOWN = "unknown";
-	private PrivilegeCrudHandler crudHandler;
+	protected PrivilegeCrudHandler crudHandler;
 
 	/**
 	 * Reference to all active sessions
@@ -145,12 +145,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected PrivilegeConflictResolution privilegeConflictResolution;
 
-	private Map<String, String> parameterMap;
+	protected Map<String, String> parameterMap;
 
-	private ElementLockingHandler<String> lockingHandler;
-	private ScheduledExecutorService executorService;
-	private Future<?> persistSessionsTask;
-	private Future<?> persistModelTask;
+	protected ElementLockingHandler<String> lockingHandler;
+	protected ScheduledExecutorService executorService;
+	protected Future<?> persistSessionsTask;
+	protected Future<?> persistModelTask;
 
 	@Override
 	public SingleSignOnHandler getSsoHandler() {
@@ -212,7 +212,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		User user = crudHandler.getUser(certificate, username);
 		if (user == null)
 			throw new PrivilegeModelException(format("User {0} does not exist!", username));
-		return new PrivilegeContextBuilder(this).buildUserPrivilege(user);
+		return getPrivilegeContextBuilder().buildUserPrivilege(user);
 	}
 
 	@Override
@@ -225,7 +225,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		Group group = crudHandler.getGroup(certificate, groupName);
 		if (group == null)
 			throw new PrivilegeModelException(format("Group {0} does not exist!", groupName));
-		return new PrivilegeContextBuilder(this).buildGroupPrivilege(group);
+		return getPrivilegeContextBuilder().buildGroupPrivilege(group);
 	}
 
 	@Override
@@ -355,7 +355,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.lockingHandler.lockedExecute(username, () -> internalInitiateChallengeFor(usage, username, source));
 	}
 
-	private void internalInitiateChallengeFor(Usage usage, String username, String source) {
+	protected void internalInitiateChallengeFor(Usage usage, String username, String source) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
 		// get User
@@ -380,7 +380,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				() -> internalValidateChallenge(username, challenge, source));
 	}
 
-	private Certificate internalValidateChallenge(String username, String challenge, String source)
+	protected Certificate internalValidateChallenge(String username, String challenge, String source)
 			throws PrivilegeException {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
@@ -420,7 +420,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				() -> internalAuthenticate(username, password, source, usage, keepAlive));
 	}
 
-	private Certificate internalAuthenticate(String username, char[] password, String source, Usage usage,
+	protected Certificate internalAuthenticate(String username, char[] password, String source, Usage usage,
 			boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
 
@@ -490,37 +490,6 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	/**
-	 * Returns a {@link Stream} of all roles of the given user. This includes the roles referenced by the user's groups
-	 *
-	 * @param user the user for which to stream the roles
-	 *
-	 * @return a stream of role names
-	 */
-	public static Stream<String> streamAllRolesForUser(PersistenceHandler persistenceHandler, User user) {
-		return Stream.concat(user.getRoles().stream(), streamAllRolesForGroups(persistenceHandler, user.groups()));
-	}
-
-	/**
-	 * Returns a {@link Stream} of all roles of the given user. This includes the roles referenced by the user's groups
-	 *
-	 * @param userRep the user for which to stream the roles
-	 *
-	 * @return a stream of role names
-	 */
-	public static Stream<String> streamAllRolesForUser(PersistenceHandler persistenceHandler, UserRep userRep) {
-		return Stream.concat(userRep.getRoles().stream(),
-				streamAllRolesForGroups(persistenceHandler, userRep.getGroups()));
-	}
-
-	private static Stream<String> streamAllRolesForGroups(PersistenceHandler persistenceHandler, Set<String> groups) {
-		return groups
-				.stream()
-				.map(persistenceHandler::getGroup)
-				.filter(Objects::nonNull)
-				.flatMap(g -> g.roles().stream());
-	}
-
 	@Override
 	public Certificate authenticateSingleSignOn(Object data, boolean keepAlive) throws PrivilegeException {
 		return authenticateSingleSignOn(data, "unknown", keepAlive);
@@ -538,7 +507,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				() -> internalAuthenticateSingleSignOn(user, source, keepAlive));
 	}
 
-	private Certificate internalAuthenticateSingleSignOn(User user, String source, boolean keepAlive)
+	protected Certificate internalAuthenticateSingleSignOn(User user, String source, boolean keepAlive)
 			throws PrivilegeException {
 
 		DBC.PRE.assertEquals("SSO Users must have UserState.REMOTE!", UserState.REMOTE, user.getUserState());
@@ -574,7 +543,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				() -> internalRefresh(certificate, source));
 	}
 
-	private Certificate internalRefresh(Certificate certificate, String source) throws AccessDeniedException {
+	protected Certificate internalRefresh(Certificate certificate, String source) throws AccessDeniedException {
 		DBC.PRE.assertNotNull("certificate must not be null!", certificate);
 
 		try {
@@ -619,7 +588,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	private synchronized boolean persistSessionsAsync() {
+	protected synchronized boolean persistSessionsAsync() {
 		if (!this.persistSessions)
 			return false;
 
@@ -630,7 +599,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return true;
 	}
 
-	private void internalPersistSessions() {
+	protected void internalPersistSessions() {
 		// get sessions reference
 		AtomicReference<List<Certificate>> sessions = new AtomicReference<>();
 		this.lockingHandler.lockedExecute("persist-sessions", () -> sessions.set(
@@ -658,7 +627,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	private void loadSessions() {
+	protected void loadSessions() {
 		if (!this.persistSessions) {
 			logger.info("Persisting of sessions not enabled, so not loading!.");
 			return;
@@ -1034,7 +1003,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.initialized = true;
 	}
 
-	private void handleAutoPersistOnUserDataChange(Map<String, String> parameterMap) {
+	protected void handleAutoPersistOnUserDataChange(Map<String, String> parameterMap) {
 		String autoPersistS = parameterMap.get(PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA);
 		if (isEmpty(autoPersistS) || autoPersistS.equals(Boolean.FALSE.toString())) {
 			this.autoPersistOnUserChangesData = false;
@@ -1049,7 +1018,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	private void handlePersistSessionsParam(Map<String, String> parameterMap) {
+	protected void handlePersistSessionsParam(Map<String, String> parameterMap) {
 		String persistSessionsS = parameterMap.get(PARAM_PERSIST_SESSIONS);
 		if (isEmpty(persistSessionsS) || persistSessionsS.equals(Boolean.FALSE.toString())) {
 			this.persistSessions = false;
@@ -1073,7 +1042,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 	}
 
-	private static File getPersistSessionFile(String persistSessionsPathS) {
+	protected File getPersistSessionFile(String persistSessionsPathS) {
 		File persistSessionsPath = new File(persistSessionsPathS);
 		if (!persistSessionsPath.getParentFile().isDirectory()) {
 			String msg = "Path for param {0} is invalid as parent does not exist or is not a directory. Value: {1}";
@@ -1250,7 +1219,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return buildSystemUserPrivilegeContext(username);
 	}
 
-	private PrivilegeContext initiateSystemPrivilege(String username, Restrictable restrictable) {
+	protected PrivilegeContext initiateSystemPrivilege(String username, Restrictable restrictable) {
 		if (username == null)
 			throw new PrivilegeException("systemUsername may not be null!");
 		if (restrictable == null)
@@ -1269,7 +1238,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 *
 	 * @return the {@link Certificate} for this system user
 	 */
-	private PrivilegeContext buildSystemUserPrivilegeContext(String systemUsername) {
+	protected PrivilegeContext buildSystemUserPrivilegeContext(String systemUsername) {
 
 		// get user object
 		User user = this.persistenceHandler.getUser(systemUsername);
@@ -1313,27 +1282,30 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		return privilegeContext;
 	}
 
-	private void buildPrivilegeContext(User user, CertificateStub stub) {
-		PrivilegeContext privilegeContext = new PrivilegeContextBuilder(this).buildPrivilegeContext(stub.getUsage(),
-				user, stub.getAuthToken(), stub.getSessionId(), stub.getSource(), stub.getLoginTime(),
-				stub.isKeepAlive());
+	protected void buildPrivilegeContext(User user, CertificateStub stub) {
+		PrivilegeContext privilegeContext = getPrivilegeContextBuilder().buildPrivilegeContext(stub.getUsage(), user,
+				stub.getAuthToken(), stub.getSessionId(), stub.getSource(), stub.getLoginTime(), stub.isKeepAlive());
 		Certificate certificate = privilegeContext.getCertificate();
 		certificate.setLocale(stub.getLocale());
 		certificate.setLastAccess(stub.getLastAccess());
 		this.privilegeContextMap.put(certificate.getSessionId(), privilegeContext);
 	}
 
-	private void replacePrivilegeContextForCert(User user, Certificate cert) {
-		PrivilegeContext ctx = new PrivilegeContextBuilder(this).buildPrivilegeContext(cert.getUsage(), user,
+	protected void replacePrivilegeContextForCert(User user, Certificate cert) {
+		PrivilegeContext ctx = getPrivilegeContextBuilder().buildPrivilegeContext(cert.getUsage(), user,
 				cert.getAuthToken(), cert.getSessionId(), cert.getSource(), cert.getLoginTime(), cert.isKeepAlive());
 		this.privilegeContextMap.put(ctx.getCertificate().getSessionId(), ctx);
 	}
 
-	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, String source, ZonedDateTime loginTime,
+	protected PrivilegeContext buildPrivilegeContext(Usage usage, User user, String source, ZonedDateTime loginTime,
 			boolean keepAlive) {
-		PrivilegeContext ctx = new PrivilegeContextBuilder(this).buildPrivilegeContext(usage, user, source, loginTime,
+		PrivilegeContext ctx = getPrivilegeContextBuilder().buildPrivilegeContext(usage, user, source, loginTime,
 				keepAlive);
 		this.privilegeContextMap.put(ctx.getCertificate().getSessionId(), ctx);
 		return ctx;
+	}
+
+	protected PrivilegeContextBuilder getPrivilegeContextBuilder() {
+		return new PrivilegeContextBuilder(this);
 	}
 }

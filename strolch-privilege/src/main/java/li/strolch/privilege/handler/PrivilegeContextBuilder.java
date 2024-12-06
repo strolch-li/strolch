@@ -34,20 +34,20 @@ import java.util.*;
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
-import static li.strolch.privilege.handler.DefaultPrivilegeHandler.streamAllRolesForUser;
+import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForUser;
 
 public class PrivilegeContextBuilder {
-	private static final Logger logger = LoggerFactory.getLogger(PrivilegeContextBuilder.class);
+	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeContextBuilder.class);
 
-	private final Map<String, Class<PrivilegePolicy>> policyMap;
-	private final DefaultPrivilegeHandler privilegeHandler;
-	private final PrivilegeConflictResolution conflictResolution;
-	private final PersistenceHandler persistenceHandler;
+	protected final Map<String, Class<PrivilegePolicy>> policyMap;
+	protected final DefaultPrivilegeHandler privilegeHandler;
+	protected final PrivilegeConflictResolution conflictResolution;
+	protected final PersistenceHandler persistenceHandler;
 
-	private Set<String> groups;
-	private Set<String> userDirectRoles;
-	private Set<String> rolesWithGroupRoles;
-	private Map<String, String> properties;
+	protected Set<String> groups;
+	protected Set<String> userDirectRoles;
+	protected Set<String> rolesWithGroupRoles;
+	protected Map<String, String> properties;
 
 	public PrivilegeContextBuilder(DefaultPrivilegeHandler privilegeHandler) {
 		this.privilegeHandler = privilegeHandler;
@@ -104,25 +104,15 @@ public class PrivilegeContextBuilder {
 		return new GroupPrivileges(group, List.copyOf(privileges.values()));
 	}
 
-	private void prepare(User user) {
-		Set<Group> groups = user.getGroups().stream().sorted().map(groupName -> {
-			Group group = this.persistenceHandler.getGroup(groupName);
-			if (group == null) {
-				logger.error("Group {} does not exist!", groupName);
-				return null;
-			}
-
-			if (group.hasProperty(VALID_FROM)) {
-				if (ZonedDateTime.now().isBefore(ISO8601.parseToZdt(group.getProperty(VALID_FROM))))
-					return null;
-			}
-			if (group.hasProperty(VALID_TO)) {
-				if (ZonedDateTime.now().isAfter(ISO8601.parseToZdt(group.getProperty(VALID_TO))))
-					return null;
-			}
-
-			return group;
-		}).filter(Objects::nonNull).collect(toCollection(TreeSet::new));
+	protected void prepare(User user) {
+		Set<Group> groups = user
+				.getGroups()
+				.stream()
+				.sorted()
+				.map(this::getGroup)
+				.filter(Objects::nonNull)
+				.filter(this::isGroupActive)
+				.collect(toCollection(TreeSet::new));
 		this.groups = groups.stream().map(Group::name).collect(toCollection(TreeSet::new));
 		this.userDirectRoles = user.getRoles().stream().sorted().collect(toCollection(TreeSet::new));
 		this.rolesWithGroupRoles = streamAllRolesForUser(this.persistenceHandler, user)
@@ -134,7 +124,22 @@ public class PrivilegeContextBuilder {
 		copyGroupProperties(user, groups);
 	}
 
-	private void copyGroupProperties(User user, Set<Group> groups) {
+	protected boolean isGroupActive(Group group) {
+		ZonedDateTime now = ZonedDateTime.now();
+		if (group.hasProperty(VALID_FROM) && now.isBefore(ISO8601.parseToZdt(group.getProperty(VALID_FROM))))
+			return false;
+		return !group.hasProperty(VALID_TO) || now.isBefore(ISO8601.parseToZdt(group.getProperty(VALID_TO)));
+	}
+
+	protected Group getGroup(String groupName) {
+		Group group = this.persistenceHandler.getGroup(groupName);
+		if (group != null)
+			return group;
+		logger.error("Group {} does not exist!", groupName);
+		return null;
+	}
+
+	protected void copyGroupProperties(User user, Set<Group> groups) {
 		for (Group group : groups) {
 			Map<String, String> groupProperties = group.getProperties();
 			for (String key : groupProperties.keySet()) {
@@ -155,7 +160,7 @@ public class PrivilegeContextBuilder {
 		}
 	}
 
-	private boolean handleDuplicateGroupProperty(String key, Group group) {
+	protected boolean handleDuplicateGroupProperty(String key, Group group) {
 		if (!key.equals(LOCATION))
 			return false;
 
@@ -167,7 +172,7 @@ public class PrivilegeContextBuilder {
 		return true;
 	}
 
-	private void addPrivilegesForRoles(Set<String> roles, String name, Map<String, Privilege> privileges,
+	protected void addPrivilegesForRoles(Set<String> roles, String name, Map<String, Privilege> privileges,
 			Map<String, PrivilegePolicy> policies) {
 
 		for (String roleName : roles) {
@@ -180,7 +185,7 @@ public class PrivilegeContextBuilder {
 		}
 	}
 
-	private void addPrivilegesForRole(String name, Role role, Map<String, Privilege> privileges,
+	protected void addPrivilegesForRole(String name, Role role, Map<String, Privilege> privileges,
 			Map<String, PrivilegePolicy> policies) {
 
 		for (Privilege privilege : role.privilegeMap().values()) {
@@ -197,7 +202,7 @@ public class PrivilegeContextBuilder {
 		}
 	}
 
-	private void addPolicyForPrivilege(Map<String, PrivilegePolicy> policies, Privilege privilege,
+	protected void addPolicyForPrivilege(Map<String, PrivilegePolicy> policies, Privilege privilege,
 			String privilegeName) {
 		String policyName = privilege.getPolicy();
 		if (policies.containsKey(policyName))
@@ -211,7 +216,7 @@ public class PrivilegeContextBuilder {
 		}
 	}
 
-	private void handleDuplicatePrivilege(String name, Role role, Map<String, Privilege> privileges,
+	protected void handleDuplicatePrivilege(String name, Role role, Map<String, Privilege> privileges,
 			Privilege additionalPrivilege, String privilegeName) {
 
 		// for strict, we have to throw an exception
@@ -253,7 +258,7 @@ public class PrivilegeContextBuilder {
 	 * @throws PrivilegeException if the {@link PrivilegePolicy} object for the given policy name could not be
 	 *                            instantiated
 	 */
-	private PrivilegePolicy getPolicy(String policyName) {
+	protected PrivilegePolicy getPolicy(String policyName) {
 
 		// get the policies class
 		Class<PrivilegePolicy> policyClazz = this.policyMap.get(policyName);
