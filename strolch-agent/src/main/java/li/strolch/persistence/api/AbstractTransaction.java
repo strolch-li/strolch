@@ -365,6 +365,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public <T extends StrolchRootElement> List<T> readLock(List<T> elements) throws StrolchLockException {
+		List<T> list = new ArrayList<>();
+		for (T element : elements) {
+			T readLock = readLock(element);
+			list.add(readLock);
+		}
+		return list;
+	}
+
+	@Override
 	public <T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException {
 		Locator locator = element.getLocator();
 		releaseLock(locator);
