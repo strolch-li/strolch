@@ -16,6 +16,8 @@
 
 package li.strolch.privilege.ldap;
 
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.PrivilegeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,21 +56,29 @@ public class LinuxLdapQuery extends LdapQuery {
 
 	private SearchResult fetchUserDataWithServiceUser(String username, char[] password, String safeUsername)
 			throws NamingException {
+
 		// Step 1: Validate the user's credentials by attempting to bind
 		logger.info("Logging in with username {}", safeUsername);
 		String userDn = this.queryContext.buildUserDn(username);
-		if (validateUserPassword(userDn, password)) {
-			// Step 2: Fetch additional user data using the service user
-			this.directoryContext = new InitialDirContext(this.queryContext.buildServiceUserLdapEnv());
-			return fetchUserData(userDn);
-		}
+		if (!validateUserPassword(userDn, password))
+			throw new AccessDeniedException("Authentication failed for user %s".formatted(safeUsername));
 
-		throw new IllegalStateException("Authentication failed for user %s".formatted(safeUsername));
+		// Step 2: Fetch additional user data using the service user
+		try {
+			this.directoryContext = new InitialDirContext(this.queryContext.buildServiceUserLdapEnv());
+		} catch (AuthenticationException e) {
+			throw new AccessDeniedException("Authentication failed for service user!");
+		}
+		return fetchUserData(userDn);
 	}
 
 	private SearchResult fetchUserData(String username, char[] password) throws NamingException {
 		String userDn = this.queryContext.buildUserDn(username);
-		this.directoryContext = new InitialDirContext(this.queryContext.buildLdapEnv(password, userDn));
+		try {
+			this.directoryContext = new InitialDirContext(this.queryContext.buildLdapEnv(password, userDn));
+		} catch (AuthenticationException e) {
+			throw new AccessDeniedException("Authentication failed for user %s".formatted(username));
+		}
 		return fetchUserData(userDn);
 	}
 
@@ -78,7 +88,7 @@ public class LinuxLdapQuery extends LdapQuery {
 		NamingEnumeration<SearchResult> results = this.directoryContext.search(userDn, filter, this.searchControls);
 
 		if (!results.hasMore())
-			throw new IllegalStateException("No data found for user %s".formatted(userDn));
+			throw new PrivilegeException("No data found for user %s".formatted(userDn));
 
 		return results.next();
 	}
