@@ -167,7 +167,8 @@ public class PrivilegeContextBuilder {
 		String currentValue = this.properties.get(key);
 		String groupValue = group.getProperty(key);
 
-		this.properties.put(key, currentValue + "," + groupValue);
+		if (!currentValue.contains(groupValue))
+			this.properties.put(key, currentValue + "," + groupValue);
 
 		return true;
 	}
