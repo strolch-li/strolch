@@ -108,7 +108,7 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 
 			ParameterBag languageBag = new ParameterBag(language, language, TYPE_TEXT);
 			languageBag.setString(PARAM_TITLE, title);
-			languageBag.setString(PARAM_TEXT, text);
+			languageBag.setText(PARAM_TEXT, text);
 			notification.addParameterBag(languageBag);
 		}
 		return notification;

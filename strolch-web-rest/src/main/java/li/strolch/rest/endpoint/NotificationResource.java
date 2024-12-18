@@ -158,7 +158,7 @@ public class NotificationResource {
 			ParameterBag textBag = textBagO.get();
 
 			notificationJ.addProperty(PARAM_TITLE, textBag.getString(PARAM_TITLE));
-			notificationJ.addProperty(PARAM_TEXT, textBag.getString(PARAM_TEXT));
+			notificationJ.addProperty(PARAM_TEXT, textBag.getTextP(PARAM_TEXT).removeIndentation());
 			notificationJ.addProperty(PARAM_VISIBLE_FROM,
 					ISO8601.toString(notification.getDate(BAG_VISIBILITY, PARAM_VISIBLE_FROM)));
 			notificationJ.addProperty(PARAM_VISIBLE_TO,
