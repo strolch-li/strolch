@@ -51,6 +51,39 @@ public class TextParameter extends StringParameter {
 		return StrolchValueType.TEXT;
 	}
 
+	/**
+	 * Updates the text value, by removing any indentation which will occur when the TextParameter is stored as XML and
+	 * the text is indented by an IDE.
+	 * </p>
+	 * <b>Note:</b>If the parameter is read only, then the value is not updated, but text without the indentation is
+	 * returned
+	 *
+	 * @return the text without the indentation.
+	 */
+	public String removeIndentation() {
+		String text = this.value;
+
+		if (text.startsWith("\n"))
+			text = text.substring(1);
+
+		StringBuilder whiteSpacePrefix = new StringBuilder();
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '\n')
+				continue;
+			if (Character.isWhitespace(text.charAt(i)))
+				whiteSpacePrefix.append(text.charAt(i));
+			else
+				break;
+		}
+
+		text = text.replace(whiteSpacePrefix.toString(), "").trim();
+
+		if (!isReadOnly())
+			this.value = text;
+
+		return text;
+	}
+
 	@Override
 	public TextParameter getClone() {
 		TextParameter clone = new TextParameter();
