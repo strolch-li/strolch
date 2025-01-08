@@ -278,11 +278,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	private File getFile(String basePath, String param, String defaultValue, boolean required) {
 		String fileName = this.parameterMap.get(param);
-		if (isEmpty(fileName) && logger.isDebugEnabled()) {
+		if (isEmpty(fileName)) {
 			fileName = defaultValue;
-			String msg = "[{0}] Parameter {1} is not defined, using default {2}!";
-			msg = format(msg, PersistenceHandler.class.getName(), param, defaultValue);
-			logger.debug(msg);
+			if (logger.isDebugEnabled()) {
+				String msg = "[{0}] Parameter {1} is not defined, using default {2}!";
+				msg = format(msg, PersistenceHandler.class.getName(), param, defaultValue);
+				logger.debug(msg);
+			}
 		}
 
 		String path = basePath + "/" + fileName;
