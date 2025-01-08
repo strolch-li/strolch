@@ -96,4 +96,5 @@ public class XmlConstants {
 	public static final String PARAM_ROLES_FILE_DEF = "PrivilegeRoles.xml";
 	public static final String PARAM_BASE_PATH = "basePath";
 	public static final String PARAM_CONFIG_FILE = "configFile";
+	public static final String PARAM_VERBOSE = "verbose";
 }

@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static li.strolch.model.Tags.Json.VERBOSE;
+
 public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public static final String PROP_LOCALE = "locale";
@@ -42,7 +44,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public RuntimeConfiguration(String applicationName, String environment, Map<String, String> configurationValues,
 			File configPathF, File dataPathF, File tempPathF, Set<SupportedLanguage> supportedLanguages) {
-		super(RUNTIME, configurationValues);
+		super(RUNTIME, configurationValues,
+				configurationValues.getOrDefault(VERBOSE, "false").equalsIgnoreCase("true"));
 
 		// config path: readable directory
 		if (!configPathF.isDirectory() || !configPathF.canRead()) {
@@ -114,6 +117,10 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public String getTimezone() {
 		return getString(RuntimeConfiguration.PROP_TIMEZONE, System.getProperty("user.timezone"));
+	}
+
+	public boolean isVerbose() {
+		return this.verbose;
 	}
 
 	/**

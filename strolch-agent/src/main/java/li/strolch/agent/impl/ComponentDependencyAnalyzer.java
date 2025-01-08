@@ -33,11 +33,13 @@ public class ComponentDependencyAnalyzer {
 	private static final Logger logger = LoggerFactory.getLogger(ComponentDependencyAnalyzer.class);
 	private final StrolchConfiguration strolchConfiguration;
 	private final Map<String, ComponentController> controllerMap;
+	private final boolean verbose;
 
 	public ComponentDependencyAnalyzer(StrolchConfiguration strolchConfiguration,
 			Map<String, ComponentController> controllerMap) {
 		this.strolchConfiguration = strolchConfiguration;
 		this.controllerMap = controllerMap;
+		this.verbose = strolchConfiguration.getRuntimeConfiguration().isVerbose();
 	}
 
 	public Set<ComponentController> findRootUpstreamComponents() {
@@ -153,11 +155,16 @@ public class ComponentDependencyAnalyzer {
 			}
 		}
 
-		logDependencies(1, findRootUpstreamComponents());
+		if (this.verbose)
+			logDependencies(1, findRootUpstreamComponents());
 	}
 
 	/**
-	 * @param components
+	 * Logs the dependency tree of components, starting at a specified depth level. Each component and its downstream
+	 * dependencies are traversed and logged recursively.
+	 *
+	 * @param depth      the current depth level of the dependency tree to log, used for indentation
+	 * @param components the set of component controllers representing the dependencies to be logged
 	 */
 	private void logDependencies(int depth, Set<ComponentController> components) {
 		if (depth == 1) {

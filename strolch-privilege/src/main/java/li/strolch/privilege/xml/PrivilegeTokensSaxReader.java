@@ -42,8 +42,10 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 	private final Deque<DefaultHandler> buildersStack = new ArrayDeque<>();
 
 	private final Map<String, AccessToken> tokens;
+	private final boolean verbose;
 
-	public PrivilegeTokensSaxReader() {
+	public PrivilegeTokensSaxReader(boolean verbose) {
+		this.verbose = verbose;
 		this.tokens = new HashMap<>();
 	}
 
@@ -173,7 +175,8 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 				AccessToken token = new AccessToken(this.tokenId, this.username, this.token, this.validFrom,
 						this.validTo, this.privileges);
 				tokens.put(token.tokenId(), token);
-				logger.info("New AccessToken: {}", token);
+				if (verbose)
+					logger.info("New AccessToken: {}", token);
 				init();
 			}
 		}

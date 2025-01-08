@@ -36,8 +36,10 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
 	private final Map<String, Group> groups;
+	private final boolean verbose;
 
-	public PrivilegeGroupsSaxReader() {
+	public PrivilegeGroupsSaxReader(boolean verbose) {
+		this.verbose = verbose;
 		this.groups = new HashMap<>();
 	}
 
@@ -144,7 +146,8 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 
 					Group group = new Group(this.name, this.roles, this.parameters);
 
-					logger.info("New Group: {}", group);
+					if (verbose)
+						logger.info("New Group: {}", group);
 					groups.put(this.name, group);
 				}
 				default -> {

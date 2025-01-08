@@ -38,8 +38,10 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
 	private final Map<String, Role> roles;
+	private final boolean verbose;
 
-	public PrivilegeRolesSaxReader() {
+	public PrivilegeRolesSaxReader(boolean verbose) {
+		this.verbose = verbose;
 		this.roles = new HashMap<>();
 	}
 
@@ -168,7 +170,8 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 				case ROLE -> {
 					Role role = new Role(this.roleName, this.privileges);
 					roles.put(role.getName(), role);
-					logger.info("New Role: {}", role);
+					if (verbose)
+						logger.info("New Role: {}", role);
 					init();
 				}
 				default -> throw new IllegalStateException("Unexpected value: " + qName);

@@ -41,9 +41,11 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	private final Map<String, User> users;
 	private final boolean caseInsensitiveUsername;
+	private final boolean verbose;
 
-	public PrivilegeUsersSaxReader(boolean caseInsensitiveUsername) {
+	public PrivilegeUsersSaxReader(boolean caseInsensitiveUsername, boolean verbose) {
 		this.caseInsensitiveUsername = caseInsensitiveUsername;
+		this.verbose = verbose;
 		this.users = new HashMap<>();
 	}
 
@@ -180,7 +182,8 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 							this.userState, this.groups, this.userRoles, this.locale, this.parameters,
 							this.passwordChangeRequested, this.history);
 
-					logger.info("New User: {}", user);
+					if (verbose)
+						logger.info("New User: {}", user);
 					String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
 					users.put(username, user);
 				}

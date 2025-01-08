@@ -47,6 +47,7 @@ import static li.strolch.persistence.api.TransactionThreadLocal.getTx;
 import static li.strolch.persistence.api.TransactionThreadLocal.hasTx;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS;
 import static li.strolch.privilege.handler.PrivilegeHandler.PARAM_PERSIST_SESSIONS_PATH;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_VERBOSE;
 import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements PrivilegeHandler {
@@ -122,6 +123,9 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 				String sessionsPath = new File(dataPath, "sessions.dat").getAbsolutePath();
 				parameterMap.put(PARAM_PERSIST_SESSIONS_PATH, sessionsPath);
 			}
+
+			if (getConfiguration().isVerbose())
+				parameterMap.put(PARAM_VERBOSE, "true");
 
 			return new PrivilegeInitializer(getScheduledExecutor(getName())).initializeFromXml(containerModel);
 

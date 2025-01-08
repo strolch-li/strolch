@@ -180,6 +180,7 @@ public class Tags {
 		public static final String COMPONENT_NAME = "componentName";
 		public static final String AGENT_NAME = "agentName";
 		public static final String ENVIRONMENT = "environment";
+		public static final String VERBOSE = "verbose";
 		public static final String LOCALE = "locale";
 		public static final String TIMEZONE = "timezone";
 		public static final String BUILD_TIMESTAMP = "buildTimestamp";

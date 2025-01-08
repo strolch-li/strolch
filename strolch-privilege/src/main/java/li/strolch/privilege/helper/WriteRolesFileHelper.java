@@ -43,7 +43,7 @@ public class WriteRolesFileHelper {
 		if (dst.exists())
 			throw new IllegalStateException("Destination file " + src + " exists already!");
 
-		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader();
+		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader(true);
 		XmlHelper.parseDocument(src, xmlHandler);
 
 		Map<String, Role> rolesMap = xmlHandler.getRoles();

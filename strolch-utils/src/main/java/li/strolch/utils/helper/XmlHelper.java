@@ -76,11 +76,27 @@ public class XmlHelper {
 	 * @param xmlFile the {@link File} which has the path to the XML file to read
 	 */
 	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler) {
+		parseDocument(xmlFile, xmlHandler, false);
+	}
+
+	/**
+	 * Parses an XML file on the file system using the specified {@link DefaultHandler} and optionally logs parsing
+	 * information if verbose mode is enabled.
+	 *
+	 * @param xmlFile    the {@link File} representing the XML file to be parsed
+	 * @param xmlHandler the {@link DefaultHandler} to handle SAX events during parsing
+	 * @param verbose    a boolean flag indicating whether to log additional information during parsing (if true,
+	 *                   parsing details will be logged)
+	 *
+	 * @throws XmlException if an error occurs while attempting to read or parse the XML file
+	 */
+	public static void parseDocument(File xmlFile, DefaultHandler xmlHandler, boolean verbose) {
 
 		try (InputStream xmlFileInputStream = Files.newInputStream(xmlFile.toPath())) {
 
 			parseDocument(xmlFileInputStream, xmlHandler);
-			logger.info("SAX parsed file {}", xmlFile.getAbsolutePath());
+			if (verbose)
+				logger.info("SAX parsed file {}", xmlFile.getAbsolutePath());
 
 		} catch (IOException e) {
 			String msg = "Failed to parse XML file: {0} due to: {1}";

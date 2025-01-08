@@ -187,7 +187,7 @@ public class XmlTest {
 	@Test
 	public void canReadUsers() {
 
-		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true);
+		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true, true);
 		File xmlFile = new File(SRC_TEST + "PrivilegeUsers.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
@@ -253,7 +253,7 @@ public class XmlTest {
 	@Test
 	public void canReadGroups() {
 
-		PrivilegeGroupsSaxReader xmlHandler = new PrivilegeGroupsSaxReader();
+		PrivilegeGroupsSaxReader xmlHandler = new PrivilegeGroupsSaxReader(true);
 		File xmlFile = new File(SRC_TEST + "PrivilegeGroups.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
@@ -280,7 +280,7 @@ public class XmlTest {
 	@Test
 	public void canReadTokens() {
 
-		PrivilegeTokensSaxReader xmlHandler = new PrivilegeTokensSaxReader();
+		PrivilegeTokensSaxReader xmlHandler = new PrivilegeTokensSaxReader(true);
 		File xmlFile = new File(SRC_TEST + "PrivilegeTokens.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
@@ -308,7 +308,7 @@ public class XmlTest {
 	@Test
 	public void canReadRoles() {
 
-		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader();
+		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader(true);
 		File xmlFile = new File(SRC_TEST + "PrivilegeRoles.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
@@ -448,7 +448,7 @@ public class XmlTest {
 		PrivilegeUsersSaxWriter configSaxWriter = new PrivilegeUsersSaxWriter(users, modelFile);
 		configSaxWriter.write();
 
-		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true);
+		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true, true);
 		XmlHelper.parseDocument(modelFile, xmlHandler);
 
 		Map<String, User> parsedUsers = xmlHandler.getUsers();
@@ -507,7 +507,7 @@ public class XmlTest {
 		PrivilegeGroupsSaxWriter configSaxWriter = new PrivilegeGroupsSaxWriter(groups, modelFile);
 		configSaxWriter.write();
 
-		PrivilegeGroupsSaxReader xmlHandler = new PrivilegeGroupsSaxReader();
+		PrivilegeGroupsSaxReader xmlHandler = new PrivilegeGroupsSaxReader(true);
 		XmlHelper.parseDocument(modelFile, xmlHandler);
 
 		Map<String, Group> parsedGroups = xmlHandler.getGroups();
@@ -548,7 +548,7 @@ public class XmlTest {
 		PrivilegeRolesSaxWriter writer = new PrivilegeRolesSaxWriter(roles, modelFile);
 		writer.write();
 
-		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader();
+		PrivilegeRolesSaxReader xmlHandler = new PrivilegeRolesSaxReader(true);
 		XmlHelper.parseDocument(modelFile, xmlHandler);
 
 		Map<String, Role> parsedRoles = xmlHandler.getRoles();
@@ -632,7 +632,7 @@ public class XmlTest {
 		PrivilegeTokensSaxWriter tokensSaxWriter = new PrivilegeTokensSaxWriter(tokens, tokensFile);
 		tokensSaxWriter.write();
 
-		PrivilegeTokensSaxReader xmlHandler = new PrivilegeTokensSaxReader();
+		PrivilegeTokensSaxReader xmlHandler = new PrivilegeTokensSaxReader(true);
 		XmlHelper.parseDocument(tokensFile, xmlHandler);
 
 		Map<String, AccessToken> parsedTokens = xmlHandler.getTokens();

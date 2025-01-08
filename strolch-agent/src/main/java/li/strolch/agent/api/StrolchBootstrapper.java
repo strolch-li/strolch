@@ -325,7 +325,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 		if (StringHelper.isEmpty(this.environmentOverride)) {
 			env = this.environment;
 		} else {
-			logger.info("[{}] Environment override to ''{}''", this.environment, this.environmentOverride);
+			logger.info("[{}] Environment override to '{}'", this.environment, this.environmentOverride);
 			env = this.environmentOverride;
 		}
 

@@ -37,12 +37,14 @@ public abstract class AbstractionConfiguration {
 
 	private final String name;
 	private final Map<String, String> configurationValues;
+	protected final boolean verbose;
 	private final Map<String, String> defaultValues;
 	private final Map<String, String> valueTypes;
 
-	public AbstractionConfiguration(String name, Map<String, String> configurationValues) {
+	public AbstractionConfiguration(String name, Map<String, String> configurationValues, boolean verbose) {
 		this.name = name;
 		this.configurationValues = configurationValues == null ? new HashMap<>() : new HashMap<>(configurationValues);
+		this.verbose = verbose;
 		this.defaultValues = new HashMap<>();
 		this.valueTypes = new HashMap<>();
 	}
@@ -229,12 +231,20 @@ public abstract class AbstractionConfiguration {
 	}
 
 	private void logDefValueUse(String key, Object defValue, boolean isSecret) {
+		if (this.verbose)
+			logger.info(formatDefaultUsage(key, defValue, isSecret));
+		else if (logger.isDebugEnabled()) {
+			logger.debug(formatDefaultUsage(key, defValue, isSecret));
+		}
+	}
+
+	private String formatDefaultUsage(String key, Object defValue, boolean isSecret) {
 		String msg = "{0}: Using default for key {1}={2}";
 		if (isSecret)
 			msg = MessageFormat.format(msg, this.name, "***", "***");
 		else
 			msg = MessageFormat.format(msg, this.name, key, defValue);
-		logger.info(msg);
+		return msg;
 	}
 
 	private void assertDefValueExist(String key, Object defValue) {

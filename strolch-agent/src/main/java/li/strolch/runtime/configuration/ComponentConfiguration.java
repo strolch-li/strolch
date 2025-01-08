@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
+import static li.strolch.model.Tags.Json.VERBOSE;
+
 public class ComponentConfiguration extends AbstractionConfiguration {
 
 	private final RuntimeConfiguration runtimeConfiguration;
@@ -33,7 +35,7 @@ public class ComponentConfiguration extends AbstractionConfiguration {
 
 	public ComponentConfiguration(RuntimeConfiguration runtimeConfiguration, String name,
 			Map<String, String> configurationValues, String api, String impl, Set<String> dependencies) {
-		super(name, configurationValues);
+		super(name, configurationValues, runtimeConfiguration.getBoolean(VERBOSE, false));
 		this.runtimeConfiguration = runtimeConfiguration;
 		this.api = api;
 		this.impl = impl;
@@ -50,6 +52,10 @@ public class ComponentConfiguration extends AbstractionConfiguration {
 
 	public String getImpl() {
 		return this.impl;
+	}
+
+	public boolean isVerbose() {
+		return this.runtimeConfiguration.isVerbose();
 	}
 
 	public Set<String> getDependencies() {

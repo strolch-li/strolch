@@ -64,6 +64,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private boolean tokensMapDirty;
 
 	private Map<String, String> parameterMap;
+	private boolean verbose;
 
 	private File usersPath;
 	private File groupsPath;
@@ -246,6 +247,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	@Override
 	public void initialize(Map<String, String> paramsMap) {
 		this.parameterMap = Map.copyOf(paramsMap);
+		this.verbose = parseBoolean(paramsMap.getOrDefault(PARAM_VERBOSE, "false"));
 
 		// get and validate base bath
 		String basePath = this.parameterMap.get(PARAM_BASE_PATH);
@@ -276,11 +278,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	private File getFile(String basePath, String param, String defaultValue, boolean required) {
 		String fileName = this.parameterMap.get(param);
-		if (isEmpty(fileName)) {
+		if (isEmpty(fileName) && logger.isDebugEnabled()) {
 			fileName = defaultValue;
 			String msg = "[{0}] Parameter {1} is not defined, using default {2}!";
 			msg = format(msg, PersistenceHandler.class.getName(), param, defaultValue);
-			logger.warn(msg);
+			logger.debug(msg);
 		}
 
 		String path = basePath + "/" + fileName;
@@ -304,19 +306,20 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	public boolean reload() {
 
 		// parse models xml file to XML document
-		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader(this.caseInsensitiveUsername);
-		XmlHelper.parseDocument(this.usersPath, usersXmlHandler);
+		PrivilegeUsersSaxReader usersXmlHandler = new PrivilegeUsersSaxReader(this.caseInsensitiveUsername,
+				this.verbose);
+		XmlHelper.parseDocument(this.usersPath, usersXmlHandler, this.verbose);
 
-		PrivilegeGroupsSaxReader groupsXmlHandler = new PrivilegeGroupsSaxReader();
+		PrivilegeGroupsSaxReader groupsXmlHandler = new PrivilegeGroupsSaxReader(this.verbose);
 		if (this.groupsPath.exists())
-			XmlHelper.parseDocument(this.groupsPath, groupsXmlHandler);
+			XmlHelper.parseDocument(this.groupsPath, groupsXmlHandler, this.verbose);
 
-		PrivilegeTokensSaxReader tokensXmlHandler = new PrivilegeTokensSaxReader();
+		PrivilegeTokensSaxReader tokensXmlHandler = new PrivilegeTokensSaxReader(this.verbose);
 		if (this.tokensPath.exists())
-			XmlHelper.parseDocument(this.tokensPath, tokensXmlHandler);
+			XmlHelper.parseDocument(this.tokensPath, tokensXmlHandler, this.verbose);
 
-		PrivilegeRolesSaxReader rolesXmlHandler = new PrivilegeRolesSaxReader();
-		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler);
+		PrivilegeRolesSaxReader rolesXmlHandler = new PrivilegeRolesSaxReader(this.verbose);
+		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler, this.verbose);
 
 		// ROLES
 		synchronized (this.roleMap) {
