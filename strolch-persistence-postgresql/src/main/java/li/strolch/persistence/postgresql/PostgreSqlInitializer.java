@@ -45,6 +45,7 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 	protected final PostgreSqlPersistenceHandler persistenceHandler;
 	protected final RuntimeConfiguration runtimeConfig;
 	protected final ComponentConfiguration realmConfig;
+	private final boolean verbose;
 
 	public PostgreSqlInitializer(StrolchAgent agent, PostgreSqlPersistenceHandler persistenceHandler) {
 		this.agent = agent;
@@ -52,6 +53,7 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 		StrolchConfiguration strolchConfiguration = agent.getStrolchConfiguration();
 		this.runtimeConfig = strolchConfiguration.getRuntimeConfiguration();
 		this.realmConfig = strolchConfiguration.getComponentConfiguration(RealmHandler.class.getSimpleName());
+		this.verbose = this.runtimeConfig.isVerbose();
 	}
 
 	protected abstract Certificate getCertificate();
@@ -72,7 +74,7 @@ public abstract class PostgreSqlInitializer extends SystemAction {
 			File dataStoreF = getDataStoreFile(this.runtimeConfig, this.realmConfig, realmName);
 
 			StoreToDaoElementListener listener = new StoreToDaoElementListener(tx);
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF, true);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF, true, this.verbose);
 			handler.parseFile();
 			statistics = handler.getStatistics();
 			tx.commitOnClose();

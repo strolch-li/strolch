@@ -31,6 +31,7 @@ import java.util.Set;
 public class XmlImportModelCommand extends Command {
 
 	// input
+	private final boolean verbose;
 	private boolean failOnUpdate;
 	private File modelFile;
 	private boolean addOrders;
@@ -49,6 +50,7 @@ public class XmlImportModelCommand extends Command {
 
 	public XmlImportModelCommand(StrolchTransaction tx) {
 		super(tx);
+		this.verbose = tx.getAgent().getRuntimeConfiguration().isVerbose();
 	}
 
 	@Override
@@ -73,7 +75,8 @@ public class XmlImportModelCommand extends Command {
 		elementListener.setActivityTypes(this.activityTypes);
 
 		long start = System.nanoTime();
-		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, this.allowInclude);
+		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, this.allowInclude,
+				this.verbose);
 		handler.parseFile();
 
 		this.statistics = elementListener.getStatistics();

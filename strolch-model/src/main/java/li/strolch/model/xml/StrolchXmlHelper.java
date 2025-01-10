@@ -77,7 +77,7 @@ public class StrolchXmlHelper {
 
 	public static SimpleStrolchElementListener parse(File file) {
 		SimpleStrolchElementListener elementListener = new SimpleStrolchElementListener();
-		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
+		new XmlModelSaxFileReader(elementListener, file, false, false).parseFile();
 		return elementListener;
 	}
 
@@ -93,13 +93,13 @@ public class StrolchXmlHelper {
 
 	public static List<StrolchRootElement> parseFile(File file) {
 		StrolchElementListenerToListListener elementListener = new StrolchElementListenerToListListener();
-		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
+		new XmlModelSaxFileReader(elementListener, file, false, false).parseFile();
 		return elementListener.getElements();
 	}
 
 	public static Stream<StrolchRootElement> parseFileAsStream(File file) {
 		StrolchElementListenerToListListener elementListener = new StrolchElementListenerToListListener();
-		new XmlModelSaxFileReader(elementListener, file, false).parseFile();
+		new XmlModelSaxFileReader(elementListener, file, false, false).parseFile();
 		return elementListener.streamElements();
 	}
 

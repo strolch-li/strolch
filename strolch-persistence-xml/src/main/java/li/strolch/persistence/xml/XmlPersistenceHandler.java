@@ -183,7 +183,8 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 							getClass().getSimpleName(), false)) {
 
 						StoreToDaoElementListener listener = new StoreToDaoElementListener(tx);
-						XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF, true);
+						XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, dataStoreF, true,
+								runtimeConfiguration.isVerbose());
 						handler.parseFile();
 						statistics = handler.getStatistics();
 						tx.commitOnClose();

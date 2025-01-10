@@ -35,11 +35,14 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 	private final File modelFile;
 	private final boolean allowInclude;
+	private final boolean verbose;
 
-	public XmlModelSaxFileReader(StrolchElementListener listener, File modelFile, boolean allowInclude) {
+	public XmlModelSaxFileReader(StrolchElementListener listener, File modelFile, boolean allowInclude,
+			boolean verbose) {
 		super(listener);
 		this.modelFile = modelFile;
 		this.allowInclude = allowInclude;
+		this.verbose = verbose;
 	}
 
 	@Override
@@ -67,7 +70,7 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 				throw new IllegalArgumentException(msg);
 			}
 
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile, true);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile, true, this.verbose);
 			handler.parseFile();
 			this.statistics.add(handler.statistics);
 		}
@@ -83,8 +86,9 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 
 			long endNanos = System.nanoTime();
 			this.statistics.durationNanos = endNanos - startNanos;
-			logger.info("SAX parsed model file {} took {}", this.modelFile.getAbsolutePath(),
-					formatNanoDuration(this.statistics.durationNanos));
+			if (this.verbose)
+				logger.info("SAX parsed model file {} took {}", this.modelFile.getAbsolutePath(),
+						formatNanoDuration(this.statistics.durationNanos));
 
 		} catch (Exception e) {
 

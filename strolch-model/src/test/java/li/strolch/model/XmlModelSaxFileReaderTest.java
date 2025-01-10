@@ -62,7 +62,7 @@ public class XmlModelSaxFileReaderTest {
 			}
 		};
 
-		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, file, true);
+		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(listener, file, true, true);
 		handler.parseFile();
 
 		assertEquals(3, resourceMap.size());

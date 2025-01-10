@@ -43,6 +43,7 @@ public class TransientRealm extends InternalStrolchRealm {
 	private AuditTrail auditTrail;
 
 	private File modelFile;
+	private boolean verbose;
 
 	public TransientRealm(String realm) {
 		super(realm);
@@ -96,6 +97,7 @@ public class TransientRealm extends InternalStrolchRealm {
 			throw new StrolchConfigurationException(msg);
 		}
 
+		this.verbose = configuration.isVerbose();
 		this.modelFile = configuration.getDataFile(key, null, configuration.getRuntimeConfiguration(), true);
 
 		this.resourceMap = new TransientResourceMap();
@@ -122,7 +124,7 @@ public class TransientRealm extends InternalStrolchRealm {
 			elementListener.setUpdateActivities(false);
 			elementListener.setFailOnUpdate(true);
 
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, true);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, true, this.verbose);
 			handler.parseFile();
 			statistics = handler.getStatistics();
 			tx.commitOnClose();
