@@ -35,6 +35,7 @@ import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForUser;
+import static li.strolch.utils.iso8601.ISO8601.*;
 
 public class PrivilegeContextBuilder {
 	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeContextBuilder.class);
@@ -126,9 +127,9 @@ public class PrivilegeContextBuilder {
 
 	protected boolean isGroupActive(Group group) {
 		ZonedDateTime now = ZonedDateTime.now();
-		if (group.hasProperty(VALID_FROM) && now.isBefore(ISO8601.parseToZdt(group.getProperty(VALID_FROM))))
+		if (group.hasProperty(VALID_FROM) && now.isBefore(parseToZdt(group.getProperty(VALID_FROM))))
 			return false;
-		return !group.hasProperty(VALID_TO) || now.isBefore(ISO8601.parseToZdt(group.getProperty(VALID_TO)));
+		return !group.hasProperty(VALID_TO) || now.isAfter(parseToZdt(group.getProperty(VALID_TO)));
 	}
 
 	protected Group getGroup(String groupName) {
