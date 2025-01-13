@@ -5,6 +5,11 @@
 			<Allow>li.strolch.runtime.privilege.StrolchSystemAction</Allow>
 			<Allow>li.strolch.runtime.privilege.StrolchSystemActionWithResult</Allow>
 		</Privilege>
+        <Privilege name="PrivilegeAction" policy="DefaultPrivilege">
+            <Allow>Persist</Allow>
+            <Allow>GetCertificates</Allow>
+            <Allow>PersistSessions</Allow>
+        </Privilege>
 
 		<Privilege name="GetResource" policy="ModelPrivilege">
 			<AllAllowed>true</AllAllowed>
