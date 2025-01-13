@@ -16,10 +16,13 @@
 
 package li.strolch.rest.filters;
 
+import jakarta.annotation.Priority;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.RestfulHelper;
 import org.slf4j.Logger;
@@ -32,7 +35,9 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REMOTE_IP;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_URL;
 import static li.strolch.rest.helper.ServletRequestHelper.logRequest;
 
+@Provider
 @PreMatching
+@Priority(0)
 public class LogRequestFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(LogRequestFilter.class);
