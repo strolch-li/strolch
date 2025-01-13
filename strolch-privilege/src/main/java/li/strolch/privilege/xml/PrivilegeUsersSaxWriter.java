@@ -16,7 +16,6 @@
 package li.strolch.privilege.xml;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
-import li.strolch.privilege.model.UserState;
 import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
@@ -86,28 +85,24 @@ public class PrivilegeUsersSaxWriter {
 				if (user.isPasswordChangeRequested())
 					writeStringElement(xmlWriter, PASSWORD_CHANGE_REQUESTED, "true");
 
-				// only right groups and roles if not a remote user
-				if (user.getUserState() != UserState.REMOTE) {
-
-					// add all the group elements
-					if (!user.getGroups().isEmpty()) {
-						xmlWriter.writeStartElement(GROUPS);
-						writeStringList(xmlWriter, GROUP, user.getGroups());
-						xmlWriter.writeEndElement();
-					}
-
-					// add all the role elements
-					if (!user.getRoles().isEmpty()) {
-						xmlWriter.writeStartElement(ROLES);
-						writeStringList(xmlWriter, ROLE, user.getRoles());
-						xmlWriter.writeEndElement();
-					}
-
-					// add the parameters
-					Map<String, String> properties = user.getProperties();
-					if (!properties.isEmpty())
-						writeStringMapElement(xmlWriter, properties, PROPERTIES, PROPERTY);
+				// add all the group elements
+				if (!user.getGroups().isEmpty()) {
+					xmlWriter.writeStartElement(GROUPS);
+					writeStringList(xmlWriter, GROUP, user.getGroups());
+					xmlWriter.writeEndElement();
 				}
+
+				// add all the role elements
+				if (!user.getRoles().isEmpty()) {
+					xmlWriter.writeStartElement(ROLES);
+					writeStringList(xmlWriter, ROLE, user.getRoles());
+					xmlWriter.writeEndElement();
+				}
+
+				// add the parameters
+				Map<String, String> properties = user.getProperties();
+				if (!properties.isEmpty())
+					writeStringMapElement(xmlWriter, properties, PROPERTIES, PROPERTY);
 
 				if (!user.isHistoryEmpty()) {
 					UserHistory history = user.getHistory();
