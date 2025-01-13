@@ -42,8 +42,6 @@ import static org.junit.Assert.assertFalse;
 
 public class LogMessagesTestRunner {
 
-	private static final Logger logger = LoggerFactory.getLogger(LogMessagesTestRunner.class);
-
 	private static final int MAX_MESSAGES = 100;
 
 	private final ComponentContainer container;
@@ -75,7 +73,7 @@ public class LogMessagesTestRunner {
 			// default is async persisting...
 			while (!this.operationsLog.isQueueEmpty())
 				//noinspection BusyWait
-				Thread.sleep(10L);
+				Thread.sleep(100L);
 
 			StrolchRealm realm = this.container.getRealm(this.realmName);
 
@@ -88,7 +86,7 @@ public class LogMessagesTestRunner {
 					List<LogMessage> logMessages = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE);
 					assertEquals(2, logMessages.size());
 
-					LogMessage m = logMessages.get(0);
+					LogMessage m = logMessages.getFirst();
 					assertEquals(logMessage.getId(), m.getId());
 					assertEquals(logMessage.getRealm(), m.getRealm());
 					assertEquals(logMessage.getLocator(), m.getLocator());
@@ -119,7 +117,9 @@ public class LogMessagesTestRunner {
 			}
 
 			// default is async persisting...
-			Thread.sleep(1500L);
+			while (!this.operationsLog.isQueueEmpty())
+				//noinspection BusyWait
+				Thread.sleep(100L);
 
 			int trimSize = (int) (MAX_MESSAGES * 0.1);
 			int expectedSize = MAX_MESSAGES - trimSize + 2; // +2 => startup and first message
@@ -161,17 +161,21 @@ public class LogMessagesTestRunner {
 			// update state of element
 			this.operationsLog.updateState(this.realmName, logMessage1.getLocator(), LogMessageState.Inactive);
 
-			// default is async persisting...
-			Thread.sleep(50L);
+			while (!this.operationsLog.isQueueEmpty())
+				//noinspection BusyWait
+				Thread.sleep(100L);
 
 			assertEquals(LogMessageState.Inactive, logMessage1.getState());
 
 			this.operationsLog.updateState(this.realmName, logMessage1.getId(), LogMessageState.Active);
-			Thread.sleep(50L);
+			while (!this.operationsLog.isQueueEmpty())
+				//noinspection BusyWait
+				Thread.sleep(100L);
 			assertEquals(LogMessageState.Active, logMessage1.getState());
 
-			// default is async persisting...
-			Thread.sleep(50L);
+			while (!this.operationsLog.isQueueEmpty())
+				//noinspection BusyWait
+				Thread.sleep(100L);
 
 			// now try and remove a single element
 			this.operationsLog.removeMessage(logMessage1);
@@ -182,8 +186,9 @@ public class LogMessagesTestRunner {
 			List<LogMessage> toRemove = Arrays.asList(logMessage2, logMessage3);
 			this.operationsLog.removeMessages(toRemove);
 
-			// default is async persisting...
-			Thread.sleep(300L);
+			while (!this.operationsLog.isQueueEmpty())
+				//noinspection BusyWait
+				Thread.sleep(100L);
 
 			// assert all are removed
 			if (realm.getMode().isTransient()) {
