@@ -439,7 +439,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 			// validate user has at least one role
 			if (streamAllRolesForUser(this.persistenceHandler, user).findAny().isEmpty())
-				throw new InvalidCredentialsException(
+				throw new AccessDeniedException(
 						format("User {0} does not have any groups or roles defined!", username));
 
 			if (user.isPasswordChangeRequested()) {
