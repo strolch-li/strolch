@@ -22,6 +22,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.visitor.StrolchRootElementVisitor;
 import li.strolch.privilege.model.Certificate;
+import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.QueryData;
 import li.strolch.search.RootElementSearchResult;
@@ -121,13 +122,20 @@ public class RestfulHelper {
 		String remoteAddr = request.getRemoteAddr();
 
 		StringBuilder sb = new StringBuilder();
+		String xForwardedFor = request.getHeader("X-Forwarded-For");
+		if (isNotEmpty(xForwardedFor) && RestfulStrolchComponent
+				.getInstance()
+				.getForwardIgnoreIp()
+				.equals(remoteAddr)) {
+			return xForwardedFor;
+		}
+
 		if (remoteHost.equals(remoteAddr))
 			sb.append(remoteAddr);
 		else {
 			sb.append(remoteHost).append(": (").append(remoteAddr).append(")");
 		}
 
-		String xForwardedFor = request.getHeader("X-Forwarded-For");
 		if (isNotEmpty(xForwardedFor))
 			sb.append(" (fwd)=> ").append(xForwardedFor);
 

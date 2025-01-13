@@ -73,10 +73,17 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	 */
 	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold";
 
+	/**
+	 * Configuration parameter name used to specify the IP address to be ignored by the forward handling logic.
+	 * This parameter can be used to exclude certain IP addresses from processing when forwarding requests.
+	 */
+	private static final String PARAM_FORWARD_IGNORE_IP = "forwardIgnoreIp";
+
 	private static RestfulStrolchComponent instance;
 
 	private String restTracing;
 	private String restTracingThreshold;
+	private String forwardIgnoreIp;
 	private boolean corsEnabled;
 	private String corsOrigin;
 	private boolean restLogging;
@@ -118,6 +125,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return this.restTracingThreshold;
 	}
 
+	public String getForwardIgnoreIp() {
+		return this.forwardIgnoreIp;
+	}
 	public boolean isRestLogging() {
 		return this.restLogging;
 	}
@@ -174,6 +184,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.restLoggingEntity = configuration.getBoolean(PARAM_REST_LOGGING_ENTITY, Boolean.FALSE);
 		this.restTracing = configuration.getString(PARAM_REST_TRACING, "OFF");
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE");
+		this.forwardIgnoreIp = configuration.getString(PARAM_FORWARD_IGNORE_IP, "");
 
 		logger.info("Set restLogging={} with logEntities={} restTracing={} with threshold={}", this.restLogging,
 				this.restLoggingEntity, this.restTracing, this.restTracingThreshold);
