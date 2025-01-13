@@ -16,15 +16,16 @@
 
 package li.strolch.privilege.handler;
 
+import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.base.PrivilegeConflictResolution;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
+import li.strolch.privilege.helper.ModelHelper;
 import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +34,9 @@ import java.util.*;
 
 import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toCollection;
-import static li.strolch.privilege.base.PrivilegeConstants.*;
-import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForUser;
-import static li.strolch.utils.iso8601.ISO8601.*;
+import static java.util.stream.Stream.concat;
+import static li.strolch.privilege.base.PrivilegeConstants.LOCATION;
+import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForGroups;
 
 public class PrivilegeContextBuilder {
 	protected static final Logger logger = LoggerFactory.getLogger(PrivilegeContextBuilder.class);
@@ -112,24 +113,24 @@ public class PrivilegeContextBuilder {
 				.sorted()
 				.map(this::getGroup)
 				.filter(Objects::nonNull)
-				.filter(this::isGroupActive)
+				.filter(ModelHelper::isGroupActive)
 				.collect(toCollection(TreeSet::new));
+
 		this.groups = groups.stream().map(Group::name).collect(toCollection(TreeSet::new));
 		this.userDirectRoles = user.getRoles().stream().sorted().collect(toCollection(TreeSet::new));
-		this.rolesWithGroupRoles = streamAllRolesForUser(this.persistenceHandler, user)
+		if (this.groups.isEmpty() && this.userDirectRoles.isEmpty())
+			throw new AccessDeniedException("User " + user.getUsername() + " has no active groups or roles!");
+
+		this.rolesWithGroupRoles = concat(user.getRoles().stream(), streamAllRolesForGroups(groups.stream()))
 				.sorted()
 				.collect(toCollection(TreeSet::new));
+		if (this.rolesWithGroupRoles.isEmpty())
+			throw new AccessDeniedException("No roles were evaluated for user " + user.getUsername());
+
 		this.properties = new HashMap<>(user.getProperties());
 
 		// copy properties from groups to user properties
 		copyGroupProperties(user, groups);
-	}
-
-	protected boolean isGroupActive(Group group) {
-		ZonedDateTime now = ZonedDateTime.now();
-		if (group.hasProperty(VALID_FROM) && now.isBefore(parseToZdt(group.getProperty(VALID_FROM))))
-			return false;
-		return !group.hasProperty(VALID_TO) || now.isAfter(parseToZdt(group.getProperty(VALID_TO)));
 	}
 
 	protected Group getGroup(String groupName) {

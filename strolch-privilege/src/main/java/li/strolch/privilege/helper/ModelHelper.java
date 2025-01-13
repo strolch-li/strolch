@@ -17,9 +17,11 @@
 package li.strolch.privilege.helper;
 
 import li.strolch.privilege.handler.PersistenceHandler;
+import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.privilege.model.internal.User;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +31,7 @@ import java.util.stream.Stream;
 import static java.lang.String.join;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
+import static li.strolch.utils.iso8601.ISO8601.parseToZdt;
 
 public class ModelHelper {
 
@@ -72,10 +75,25 @@ public class ModelHelper {
 	}
 
 	public static Stream<String> streamAllRolesForGroups(PersistenceHandler persistenceHandler, Set<String> groups) {
-		return groups
-				.stream()
-				.map(persistenceHandler::getGroup)
-				.filter(Objects::nonNull)
-				.flatMap(g -> g.roles().stream());
+		return streamAllRolesForGroups(groups.stream().map(persistenceHandler::getGroup).filter(Objects::nonNull));
+	}
+
+	public static Stream<String> streamAllRolesForGroups(Stream<Group> groups) {
+		return groups.filter(Objects::nonNull).filter(ModelHelper::isGroupActive).flatMap(g -> g.roles().stream());
+	}
+
+	public static boolean isGroupActive(Group group) {
+		ZonedDateTime now = ZonedDateTime.now();
+		if (group.hasProperty(VALID_FROM)) {
+			if (now.isBefore(parseToZdt(group.getProperty(VALID_FROM))))
+				return false;
+		}
+
+		if (group.hasProperty(VALID_TO)) {
+			if (now.isAfter(parseToZdt(group.getProperty(VALID_TO))))
+				return false;
+		}
+
+		return true;
 	}
 }
