@@ -132,12 +132,14 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	public Response invalidateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
-
 		JsonObject logoutResult = new JsonObject();
 
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			String source = getRemoteIp(request);
+			if (!sessionHandler.isSessionKnown(authToken))
+				return Response.ok().build();
+
 			Certificate certificate = sessionHandler.validate(authToken, source);
 			sessionHandler.invalidate(certificate);
 
@@ -146,7 +148,6 @@ public class AuthenticationResource {
 			logoutResult.addProperty("msg",
 					MessageFormat.format("{0} has been logged out.", certificate.getUsername()));
 			return Response.ok().entity(logoutResult.toString()).build();
-
 		} catch (Exception e) {
 			return handleSessionException("Failed to invalidate session", e);
 		}

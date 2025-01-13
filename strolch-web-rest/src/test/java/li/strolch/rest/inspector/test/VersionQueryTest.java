@@ -73,7 +73,7 @@ public class VersionQueryTest extends AbstractRestfulTest {
 		JsonObject agentVersionJ = versionQueryResultJ.get("agentVersion").getAsJsonObject();
 		assertEquals("StrolchPersistenceTest", agentVersionJ.get("agentName").getAsString());
 		assertEquals("li.strolch", agentVersionJ.get("groupId").getAsString());
-		assertEquals("agent", agentVersionJ.get("artifactId").getAsString());
+		assertEquals("strolch-agent", agentVersionJ.get("artifactId").getAsString());
 
 		JsonArray componentVersionsJ = versionQueryResultJ.get("componentVersions").getAsJsonArray();
 		assertEquals(6, componentVersionsJ.size());

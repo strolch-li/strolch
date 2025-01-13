@@ -47,15 +47,20 @@ public class AuthenticationTest extends AbstractRestfulTest {
 		login.addProperty("password", Base64.getEncoder().encodeToString("blabla".getBytes()));
 		Entity<String> entity = Entity.entity(login.toString(), MediaType.APPLICATION_JSON);
 
-		Response result = target().path(AUTHENTICATION_PATH).request(MediaType.APPLICATION_JSON).post(entity);
-		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		try (Response result = target().path(AUTHENTICATION_PATH).request(MediaType.APPLICATION_JSON).post(entity)) {
+			assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		}
 	}
 
 	@Test
-	public void shouldFailLogoutIllegalSession() {
+	public void shouldNotFailLogoutIllegalSession() {
 
 		// logout
-		Response result = target().path(AUTHENTICATION_PATH + "/blabla").request(MediaType.APPLICATION_JSON).delete();
-		assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		try (Response result = target()
+				.path(AUTHENTICATION_PATH + "/blabla")
+				.request(MediaType.APPLICATION_JSON)
+				.delete()) {
+			assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		}
 	}
 }

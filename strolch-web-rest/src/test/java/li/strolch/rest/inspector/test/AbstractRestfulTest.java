@@ -69,13 +69,11 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 
 	@BeforeClass
 	public static void beforeClass() throws IllegalArgumentException {
-
 		File rootPath = new File(RUNTIME_PATH);
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
 		runtimeMock.startContainer();
-
 	}
 
 	@AfterClass
@@ -99,13 +97,12 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 		login.addProperty("password", Base64.getEncoder().encodeToString(username.getBytes()));
 		Entity<String> entity = Entity.entity(login.toString(), MediaType.APPLICATION_JSON);
 
-		Response result = target() //
-				.path(AUTHENTICATION_PATH) //
-				.request(MediaType.APPLICATION_JSON) //
-				.post(entity);
-		assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+		JsonObject loginResult;
+		try (Response result = target().path(AUTHENTICATION_PATH).request(MediaType.APPLICATION_JSON).post(entity)) {
+			assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+			loginResult = JsonParser.parseString(result.readEntity(String.class)).getAsJsonObject();
+		}
 
-		JsonObject loginResult = JsonParser.parseString(result.readEntity(String.class)).getAsJsonObject();
 		assertEquals("jill", loginResult.get("username").getAsString());
 		assertEquals(64, loginResult.get("authToken").getAsString().length());
 		assertNull(loginResult.get("msg"));
@@ -115,13 +112,15 @@ public abstract class AbstractRestfulTest extends JerseyTest {
 
 	protected void logout(String username, String authToken) {
 
-		Response result = target() //
-				.path(AUTHENTICATION_PATH + "/" + authToken) //
-				.request(MediaType.APPLICATION_JSON) //
-				.delete();
-		assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+		JsonObject logoutResult;
+		try (Response result = target()
+				.path(AUTHENTICATION_PATH + "/" + authToken)
+				.request(MediaType.APPLICATION_JSON)
+				.delete()) {
+			assertEquals(Response.Status.OK.getStatusCode(), result.getStatus());
+			logoutResult = JsonParser.parseString(result.readEntity(String.class)).getAsJsonObject();
+		}
 
-		JsonObject logoutResult = JsonParser.parseString(result.readEntity(String.class)).getAsJsonObject();
 		assertEquals("jill has been logged out.", logoutResult.get("msg").getAsString());
 	}
 

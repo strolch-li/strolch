@@ -53,10 +53,10 @@ public class EnumTest extends AbstractRestfulTest {
 	public void shouldQuerySex() {
 
 		// query
-		Response result = target() //
-				.path(ROOT_PATH + "/sex") //
-				.request(MediaType.APPLICATION_JSON) //
-				.header(HttpHeaders.AUTHORIZATION, this.authToken) //
+		Response result = target()
+				.path(ROOT_PATH + "/sex")
+				.request(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, this.authToken)
 				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
@@ -70,10 +70,10 @@ public class EnumTest extends AbstractRestfulTest {
 	public void shouldQuerySalutation() {
 
 		// query
-		Response result = target() //
-				.path(ROOT_PATH + "/salutation") //
-				.request(MediaType.APPLICATION_JSON) //
-				.header(HttpHeaders.AUTHORIZATION, this.authToken) //
+		Response result = target()
+				.path(ROOT_PATH + "/salutation")
+				.request(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, this.authToken)
 				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
@@ -89,10 +89,10 @@ public class EnumTest extends AbstractRestfulTest {
 	public void shouldQueryGermanSalutation() {
 
 		// query
-		Response result = target() //
-				.path(ROOT_PATH + "/salutation/" + Locale.GERMAN.toLanguageTag()) //
-				.request(MediaType.APPLICATION_JSON) //
-				.header(HttpHeaders.AUTHORIZATION, this.authToken) //
+		Response result = target()
+				.path(ROOT_PATH + "/salutation/" + Locale.GERMAN.toLanguageTag())
+				.request(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, this.authToken)
 				.get();
 		assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		String strolchEnumS = result.readEntity(String.class);
