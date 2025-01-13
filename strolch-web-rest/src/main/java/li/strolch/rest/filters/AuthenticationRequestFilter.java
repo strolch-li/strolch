@@ -138,7 +138,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					.entity("User is not authorized!")
 					.build());
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error(e.getMessage(), e);
 			requestContext.abortWith(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
