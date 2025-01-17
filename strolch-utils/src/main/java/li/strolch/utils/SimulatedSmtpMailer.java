@@ -88,7 +88,7 @@ public class SimulatedSmtpMailer extends SmtpMailer {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			message.writeTo(out);
 			logger.info("Simulated sending of the following message to recipients: {}:\n{}",
-					addressesToString(recipients), out.toString().substring(0, 200));
+					addressesToString(recipients), out.toString().substring(0, 300));
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to print message!", e);
 		}

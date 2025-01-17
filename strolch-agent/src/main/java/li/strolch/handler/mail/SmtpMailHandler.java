@@ -44,6 +44,8 @@ public class SmtpMailHandler extends MailHandler {
 	public static final String PARAM_SIGNING_KEY = "signingKey";
 	public static final String PARAM_SIGNING_KEY_PASSWORD = "signingKeyPassword";
 	public static final String PARAM_RECIPIENT_PUBLIC_KEYS = "recipientPublicKeys";
+	public static final String PARAM_SIGN = "sign";
+	public static final String PARAM_ENCRYPT = "encrypt";
 	public static final String ENCRYPTED_MAIL_TEXT
 			= "This is an encrypted mail. Please decrypt the attached file for details.";
 
@@ -72,8 +74,9 @@ public class SmtpMailHandler extends MailHandler {
 		SmtpMailer smtpMailer = initializeSmtpMailer(configuration);
 
 		File configPath = configuration.getRuntimeConfiguration().getConfigPath();
-		if (!configuration.hasProperty(PARAM_SIGNING_KEY)) {
-			logger.info("Signing of emails is not enabled!");
+		if (!configuration.getBoolean(PARAM_SIGN, false) || !configuration.hasProperty(PARAM_SIGNING_KEY)) {
+			logger.info(
+					"Signing of emails is not enabled as signing is not enabled in configuration and no signing key is defined in configuration!");
 		} else {
 
 			String signingKeyPassword = configuration.getSecret(PARAM_SIGNING_KEY_PASSWORD);
@@ -81,11 +84,14 @@ public class SmtpMailHandler extends MailHandler {
 			if (!signingKey.exists())
 				throw new IllegalArgumentException("Can not find signing key file: " + signingKey);
 			smtpMailer.setSigningKeyFileName(signingKey.getAbsolutePath(), signingKeyPassword.toCharArray());
-			signingEnabled = true;
+			this.signingEnabled = true;
 			logger.info("Enabled signing of emails with key {}", signingKey.getAbsolutePath());
 		}
 
-		if (configuration.hasProperty(PARAM_RECIPIENT_PUBLIC_KEYS)) {
+		if (!configuration.getBoolean(PARAM_ENCRYPT, false) || !configuration.hasProperty(
+				PARAM_RECIPIENT_PUBLIC_KEYS)) {
+			logger.info("Not enabling encryption of e-mails as encryption is not enabled in configuration!");
+		} else {
 			if (!this.signingEnabled)
 				throw new IllegalStateException(
 						"Can not enable encryption without a signing key! Please set configuration property %s and %s".formatted(
