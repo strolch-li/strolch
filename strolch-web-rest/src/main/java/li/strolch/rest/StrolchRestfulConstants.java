@@ -51,5 +51,7 @@ public class StrolchRestfulConstants {
 	public static final String PARAM_QUERY = "query";
 
 	public static final MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
+	public static final MediaType APPLICATION_PDF_TYPE = new MediaType("application", "pdf");
 	public static final String TEXT_CSV = "text/csv";
+	public static final String APPLICATION_PDF = "application/pdf";
 }
