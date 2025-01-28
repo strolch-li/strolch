@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static li.strolch.model.StrolchModelConstants.*;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE_GET_NOTIFICATIONS_ALL;
 
 public class DefaultNotificationsPolicy extends NotificationsPolicy {
 	public DefaultNotificationsPolicy(StrolchTransaction tx) {
@@ -38,6 +39,8 @@ public class DefaultNotificationsPolicy extends NotificationsPolicy {
 
 	@Override
 	public boolean canView(Resource notification) {
+		if (tx().getPrivilegeContext().hasPrivilege(PRIVILEGE_GET_NOTIFICATIONS_ALL, notification.getId()))
+			return true;
 		return isForAll(notification) || isForRole(notification) || isForGroup(notification);
 	}
 
