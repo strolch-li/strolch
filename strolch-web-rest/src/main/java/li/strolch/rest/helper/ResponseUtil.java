@@ -25,8 +25,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import li.strolch.exception.*;
 import li.strolch.model.i18n.I18nMessageToJsonVisitor;
-import li.strolch.privilege.base.AccessDeniedException;
-import li.strolch.privilege.base.PrivilegeException;
+import li.strolch.privilege.base.*;
 import li.strolch.service.JsonServiceResult;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.I18nMessage;
@@ -160,6 +159,8 @@ public class ResponseUtil {
 			status = switch (rootCause) {
 				case AccessDeniedException ignored -> Status.FORBIDDEN;
 				case StrolchAccessDeniedException ignored -> Status.FORBIDDEN;
+				case PrivilegeModelException ignored -> Status.FORBIDDEN;
+				case NotAuthenticatedException ignored -> Status.UNAUTHORIZED;
 				case PrivilegeException ignored -> Status.UNAUTHORIZED;
 				case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
 				case null, default -> Status.INTERNAL_SERVER_ERROR;
