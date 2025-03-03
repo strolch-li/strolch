@@ -19,6 +19,7 @@ package li.strolch.rest.endpoint;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,7 +47,7 @@ public class LanguagesResource {
 	@Operation(summary = "Get supported languages",
 			description = "Retrieves a list of supported languages available in the system.")
 	@ApiResponse(responseCode = "200", description = "List of supported languages retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
+			content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(type = "object"))))
 	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("supported")

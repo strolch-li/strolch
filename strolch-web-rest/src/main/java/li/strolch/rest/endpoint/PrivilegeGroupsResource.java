@@ -17,6 +17,11 @@ package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -31,6 +36,7 @@ import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.GroupPrivileges;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
+import li.strolch.rest.model.ServiceResultResponse;
 import li.strolch.search.StrolchValueSearch;
 import li.strolch.search.ValueSearch;
 import li.strolch.service.JsonServiceArgument;
@@ -51,6 +57,7 @@ import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/groups")
+@Tag(name = "Privilege Groups", description = "Endpoints for managing privilege groups.")
 public class PrivilegeGroupsResource {
 
 	private PrivilegeHandler getPrivilegeHandler() {
@@ -63,6 +70,11 @@ public class PrivilegeGroupsResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Get all groups",
+			description = "Retrieves a list of all privilege groups, optionally filtered by a query.")
+	@ApiResponse(responseCode = "200", description = "Groups retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getGroups(@Context HttpServletRequest request, @QueryParam("query") String query) {
@@ -90,6 +102,11 @@ public class PrivilegeGroupsResource {
 		}
 	}
 
+	@Operation(summary = "Get a specific group", description = "Retrieves details of a specific privilege group.")
+	@ApiResponse(responseCode = "200", description = "Group details retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "404", description = "Group not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{group}")
@@ -106,6 +123,11 @@ public class PrivilegeGroupsResource {
 		}
 	}
 
+	@Operation(summary = "Get group privileges", description = "Retrieves privilege details for a specific group.")
+	@ApiResponse(responseCode = "200", description = "Group privileges retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "404", description = "Group not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{group}/privileges")
@@ -122,6 +144,12 @@ public class PrivilegeGroupsResource {
 		}
 	}
 
+	@Operation(summary = "Add a new group", description = "Creates a new privilege group.")
+	@ApiResponse(responseCode = "201", description = "Group created successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid request format.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -137,6 +165,12 @@ public class PrivilegeGroupsResource {
 		return toResponse(svcResult);
 	}
 
+	@Operation(summary = "Update a group", description = "Updates an existing privilege group.")
+	@ApiResponse(responseCode = "200", description = "Group updated successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "404", description = "Group not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -154,6 +188,12 @@ public class PrivilegeGroupsResource {
 		return toResponse(svcResult);
 	}
 
+	@Operation(summary = "Remove a group", description = "Deletes a privilege group from the system.")
+	@ApiResponse(responseCode = "200", description = "Group removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "404", description = "Group not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

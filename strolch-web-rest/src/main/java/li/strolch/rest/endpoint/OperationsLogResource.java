@@ -16,6 +16,11 @@
 
 package li.strolch.rest.endpoint;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -29,6 +34,7 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.rest.model.PagingResponse;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.search.ValueSearch;
 import li.strolch.utils.collections.Paging;
@@ -46,8 +52,15 @@ import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 @Path("strolch/operations-log")
+@Tag(name = "Operations Log", description = "Endpoints for retrieving operations log messages.")
 public class OperationsLogResource {
 
+	@Operation(summary = "Get operation logs",
+			description = "Retrieves operation logs for a given realm with optional filters for severity, date range, and search query.")
+	@ApiResponse(responseCode = "200", description = "Operation logs retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class)))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("{realm}")
 	@Produces(MediaType.APPLICATION_JSON)

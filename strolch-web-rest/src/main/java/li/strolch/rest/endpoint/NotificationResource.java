@@ -18,6 +18,7 @@ package li.strolch.rest.endpoint;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -92,7 +93,7 @@ public class NotificationResource {
 	@io.swagger.v3.oas.annotations.Operation(summary = "Get user notifications",
 			description = "Retrieves notifications relevant to the authenticated user.")
 	@ApiResponse(responseCode = "200", description = "Notifications retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
+			content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(type = "object"))))
 	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -132,7 +133,7 @@ public class NotificationResource {
 	@io.swagger.v3.oas.annotations.Operation(summary = "Get all notifications",
 			description = "Retrieves all notifications available in the system.")
 	@ApiResponse(responseCode = "200", description = "All notifications retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
+			content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(type = "object"))))
 	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("all")
