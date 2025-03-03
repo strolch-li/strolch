@@ -221,24 +221,4 @@ public class ServiceResult {
 	public void setI18nMessage(I18nMessage i18nMessage) {
 		this.i18nMessage = i18nMessage;
 	}
-
-	public JsonObject toJson() {
-		JsonObject json = new JsonObject();
-
-		json.addProperty(Tags.Json.STATE, this.state.name());
-		json.addProperty(MSG, isEmpty(this.message) ? "-" : this.message);
-
-		if (this.throwable != null) {
-			json.addProperty(EXCEPTION_MSG, getRootMessage());
-			json.addProperty(THROWABLE, formatException(this.throwable));
-
-			if (this.throwable instanceof StrolchException ex && ex.hasI18n())
-				json.add(I_18_N, ex.getI18n().accept(new I18nMessageToJsonVisitor()));
-		}
-
-		if (!json.has(I_18_N) && this.i18nMessage != null)
-			json.add("i18n", this.i18nMessage.accept(new I18nMessageToJsonVisitor()));
-
-		return json;
-	}
 }
