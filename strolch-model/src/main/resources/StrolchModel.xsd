@@ -8,6 +8,9 @@
     </xs:annotation>
 
     <xs:element name="StrolchModel" type="StrolchModelType"/>
+    <xs:element name="Resource" type="ResourceType"/>
+    <xs:element name="Order" type="OrderType"/>
+    <xs:element name="Activity" type="ActivityType"/>
 
     <xs:complexType name="StrolchModelType">
         <xs:sequence maxOccurs="unbounded" minOccurs="0">
