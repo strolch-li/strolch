@@ -18,11 +18,13 @@ package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -35,6 +37,7 @@ import li.strolch.soql.core.QueryRequest;
 import li.strolch.soql.core.QueryResponse;
 
 @Path("strolch/model")
+@Tag(name = "Model", description = "Endpoints for querying and managing Strolch models.")
 public class ModelResource {
 
 	private static String getContext() {
@@ -46,11 +49,18 @@ public class ModelResource {
 		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getContext());
 	}
 
+	@Operation(summary = "Execute SOQL query",
+			description = "Processes a Strolch Object Query Language (SOQL) request and returns the result.")
+	@ApiResponse(responseCode = "200", description = "Query executed successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid query format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("soql")
 	public Response doQuery(@Context HttpServletRequest request, @QueryParam("realmName") String realmName,
-			@QueryParam("flat") String flat, String data) {
+			@QueryParam("flat") @DefaultValue("false") boolean flat, String data) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -62,8 +72,6 @@ public class ModelResource {
 			queryResponse = queryProcessor.process(queryRequest, tx);
 		}
 
-		return Response
-				.ok(queryResponse.asJson(Boolean.parseBoolean(flat)).toString(), MediaType.APPLICATION_JSON)
-				.build();
+		return Response.ok(queryResponse.asJson(flat).toString(), MediaType.APPLICATION_JSON).build();
 	}
 }

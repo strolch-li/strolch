@@ -19,6 +19,10 @@ package li.strolch.rest.endpoint;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -30,6 +34,7 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.rest.model.StrolchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,10 +48,16 @@ import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 @Path("strolch/i18n")
+@Tag(name = "I18n Resource", description = "Provides operations for retrieving and updating internationalization data.")
 public class I18nResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(I18nResource.class);
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Retrieve I18n data as plain text",
+			description = "Fetches the internationalization data file and returns it as a pretty-printed JSON string.")
+	@ApiResponse(responseCode = "200", description = "I18n data retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("data")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -71,6 +82,11 @@ public class I18nResource {
 		return Response.ok(response, MediaType.APPLICATION_JSON).build();
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Retrieve I18n data as JSON",
+			description = "Fetches the internationalization data file and returns it as a JSON object.")
+	@ApiResponse(responseCode = "200", description = "I18n data retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("data")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -94,6 +110,16 @@ public class I18nResource {
 		return ResponseUtil.toResponse(DATA, i18nJ);
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Update I18n data",
+			description = "Updates the internationalization data file with new content.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))))
+	@ApiResponse(responseCode = "200", description = "I18n data updated successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = StrolchResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Path("data")
 	@Consumes(MediaType.APPLICATION_JSON)

@@ -18,6 +18,10 @@ package li.strolch.rest.endpoint;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -33,6 +37,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.notifications.NotificationsPolicy;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
+import li.strolch.rest.model.ServiceResultResponse;
 import li.strolch.service.JsonServiceArgument;
 import li.strolch.service.StringArgument;
 import li.strolch.service.api.ServiceHandler;
@@ -65,6 +70,7 @@ import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/notifications")
+@Tag(name = "Notifications", description = "Endpoints for managing user notifications.")
 public class NotificationResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificationResource.class);
@@ -83,6 +89,11 @@ public class NotificationResource {
 		return cert;
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Get user notifications",
+			description = "Retrieves notifications relevant to the authenticated user.")
+	@ApiResponse(responseCode = "200", description = "Notifications retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserNotifications(@Context HttpServletRequest request) {
@@ -97,6 +108,12 @@ public class NotificationResource {
 		}
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Get a specific notification",
+			description = "Retrieves a single notification by its ID.")
+	@ApiResponse(responseCode = "200", description = "Notification retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "404", description = "Notification not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -112,6 +129,11 @@ public class NotificationResource {
 		}
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Get all notifications",
+			description = "Retrieves all notifications available in the system.")
+	@ApiResponse(responseCode = "200", description = "All notifications retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("all")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -169,6 +191,13 @@ public class NotificationResource {
 		};
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Create a notification",
+			description = "Creates a new notification in the system.")
+	@ApiResponse(responseCode = "201", description = "Notification created successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid request format.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -189,6 +218,13 @@ public class NotificationResource {
 		return toResponse(result);
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Update a notification",
+			description = "Updates an existing notification in the system.")
+	@ApiResponse(responseCode = "200", description = "Notification updated successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "404", description = "Notification not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Path("{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -211,6 +247,13 @@ public class NotificationResource {
 		return toResponse(result);
 	}
 
+	@io.swagger.v3.oas.annotations.Operation(summary = "Remove a notification",
+			description = "Deletes a notification from the system by its ID.")
+	@ApiResponse(responseCode = "200", description = "Notification removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "404", description = "Notification not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
 	@Path("{id}")
 	@Consumes(MediaType.APPLICATION_JSON)

@@ -19,6 +19,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.StringToClassMapItem;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -60,6 +65,7 @@ import static li.strolch.utils.helper.ExceptionHelper.hasCause;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/authentication")
+@Tag(name = "Authentication", description = "Handles user authentication")
 public class AuthenticationResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthenticationResource.class);
@@ -67,6 +73,14 @@ public class AuthenticationResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Authenticate a user using provided credentials",
+			description = "Processes a login request using credentials provided in the request body and returns an authentication token or an error.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					description = "User credentials for authentication", required = true,
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
+							properties = {@StringToClassMapItem(key = "username", value = String.class),
+									@StringToClassMapItem(key = "password", value = String.class),
+									@StringToClassMapItem(key = "keepAlive", value = Boolean.class)}))))
 	public Response authenticate(@Context HttpServletRequest request, String data) {
 		JsonObject login = JsonParser.parseString(data).getAsJsonObject();
 
@@ -116,6 +130,8 @@ public class AuthenticationResource {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("sso")
+	@Operation(summary = "Authenticate a user through Single Sign-On (SSO)",
+			description = "Handles Single Sign-On authentication and provides an authentication token or an error.")
 	public Response authenticateSingleSignOn(@Context HttpServletRequest request) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -131,6 +147,8 @@ public class AuthenticationResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
+	@Operation(summary = "Invalidate a session",
+			description = "Invalidates a session associated with the provided authentication token.")
 	public Response invalidateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		JsonObject logoutResult = new JsonObject();
 
@@ -157,6 +175,8 @@ public class AuthenticationResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
+	@Operation(summary = "Validate a session",
+			description = "Checks if the session associated with the given authentication token is valid.")
 	public Response validateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -210,6 +230,8 @@ public class AuthenticationResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
+	@Operation(summary = "Get validated session details",
+			description = "Returns details of the session associated with the provided authentication token if valid.")
 	public Response getValidatedSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -225,6 +247,8 @@ public class AuthenticationResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
+	@Operation(summary = "Refresh an active session",
+			description = "Extends the session validity associated with the given authentication token.")
 	public Response refreshSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -240,6 +264,13 @@ public class AuthenticationResource {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("challenge")
+	@Operation(summary = "Initiate an authentication challenge",
+			description = "Starts an authentication challenge for clients requiring additional authentication mechanisms.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					description = "User credentials for authentication", required = true,
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
+							properties = {@StringToClassMapItem(key = "username", value = String.class),
+									@StringToClassMapItem(key = "usage", value = Usage.class)}))))
 	public Response initiateChallenge(@Context HttpServletRequest request, String data) {
 		try {
 			JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -258,6 +289,13 @@ public class AuthenticationResource {
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("challenge")
+	@Operation(summary = "Validate an authentication challenge",
+			description = "Validates the response to an earlier initiated authentication challenge.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					description = "User credentials for authentication", required = true,
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
+							properties = {@StringToClassMapItem(key = "username", value = String.class),
+									@StringToClassMapItem(key = "challenge", value = String.class)}))))
 	public Response validateChallenge(@Context HttpServletRequest request, String data) {
 		try {
 

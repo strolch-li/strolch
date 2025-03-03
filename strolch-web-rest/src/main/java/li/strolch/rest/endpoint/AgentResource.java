@@ -18,6 +18,15 @@ package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -30,6 +39,7 @@ import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.rest.model.StrolchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +51,10 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
 
 @Path("strolch/agent")
+@OpenAPIDefinition(info = @Info(title = "Strolch RESTful API", version = "1.0", description = "Agent specific API",
+		license = @License(name = "Apache 2.0", url = "https://strolch.li"),
+		contact = @Contact(url = "https://www.eitchnet.ch", name = "Robert von Burg", email = "eitch@eitchnet.ch")))
+@Tag(name = "Agent", description = "API to view and modify components and configuration")
 public class AgentResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(AgentResource.class);
@@ -51,6 +65,12 @@ public class AgentResource {
 		rest.validate(cert).validateAction(Tags.AGENT, getCallerMethodNoClass(2));
 	}
 
+	@Operation(summary = "Get agent statistics", description = "Retrieves runtime statistics of the agent.")
+	@ApiResponse(responseCode = "200", description = "Agent statistics retrieved.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = StrolchResponse.class)))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("statistics")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -61,6 +81,12 @@ public class AgentResource {
 		return ResponseUtil.toResponse(DATA, statisticsJson);
 	}
 
+	@Operation(summary = "Reload agent configuration", description = "Forces the agent to reload its configuration.")
+	@ApiResponse(responseCode = "200", description = "Configuration reloaded successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = StrolchResponse.class)))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Path("configuration/reload")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -73,6 +99,12 @@ public class AgentResource {
 		return ResponseUtil.toResponse();
 	}
 
+	@Operation(summary = "Get agent components", description = "Retrieves all components registered in the agent.")
+	@ApiResponse(responseCode = "200", description = "List of agent components.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = StrolchResponse.class)))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("components")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -92,6 +124,13 @@ public class AgentResource {
 		return ResponseUtil.toResponse(DATA, resultJ);
 	}
 
+	@Operation(summary = "Set component state", description = "Updates the state of a specific component.")
+	@ApiResponse(responseCode = "200", description = "Component state updated successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = StrolchResponse.class)))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "404", description = "Component not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Path("components/{name}/state")
 	@Produces(MediaType.APPLICATION_JSON)

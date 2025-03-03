@@ -18,6 +18,11 @@ package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -33,10 +38,16 @@ import static java.util.Comparator.comparing;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 
 @Path("strolch/languages")
+@Tag(name = "I18n", description = "Provides operations for inspecting the agent's supported languages")
 public class LanguagesResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(LanguagesResource.class);
 
+	@Operation(summary = "Get supported languages",
+			description = "Retrieves a list of supported languages available in the system.")
+	@ApiResponse(responseCode = "200", description = "List of supported languages retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("supported")
 	@Produces(MediaType.APPLICATION_JSON)

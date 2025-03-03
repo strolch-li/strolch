@@ -17,6 +17,11 @@
 package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonArray;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -32,6 +37,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.rest.model.ServiceResultResponse;
+import li.strolch.rest.model.StrolchResponse;
 import li.strolch.service.LocatorArgument;
 import li.strolch.service.StringMapArgument;
 import li.strolch.service.api.Service;
@@ -47,6 +54,7 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.rest.model.ToJsonHelper.inExecutionActivityToJson;
 
 @Path("strolch/control")
+@Tag(name = "Control Resource", description = "Manage execution activities and states.")
 public class ControlResource {
 
 	private static String getContext() {
@@ -58,6 +66,12 @@ public class ControlResource {
 		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getContext());
 	}
 
+	@Operation(summary = "Get active execution activities",
+			description = "Retrieves all currently active execution activities in the given realm.")
+	@ApiResponse(responseCode = "200", description = "List of active execution activities.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = StrolchResponse.class)))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getActivities(@Context HttpServletRequest request, @QueryParam("realm") String realm) {
@@ -66,12 +80,13 @@ public class ControlResource {
 
 		try (StrolchTransaction tx = openTx(cert, realm)) {
 			ExecutionHandler executionHandler = tx.getContainer().getComponent(ExecutionHandler.class);
-			JsonArray activitiesJ = executionHandler.getActiveActivitiesLocator(realm) //
-					.stream() //
-					.map(locator -> tx.getActivityBy(locator.get(1), locator.get(2))) //
-					.filter(Objects::nonNull) //
-					.sorted(Comparator.comparing(Activity::getId)) //
-					.map(activity -> activity.accept(inExecutionActivityToJson(tx.getRealmName(), executionHandler))) //
+			JsonArray activitiesJ = executionHandler
+					.getActiveActivitiesLocator(realm)
+					.stream()
+					.map(locator -> tx.getActivityBy(locator.get(1), locator.get(2)))
+					.filter(Objects::nonNull)
+					.sorted(Comparator.comparing(Activity::getId))
+					.map(activity -> activity.accept(inExecutionActivityToJson(tx.getRealmName(), executionHandler)))
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			ExecutionHandlerState state = executionHandler.getExecutionState(tx.getRealmName());
@@ -79,6 +94,12 @@ public class ControlResource {
 		}
 	}
 
+	@Operation(summary = "Clear all execution activities",
+			description = "Removes all currently running execution activities.")
+	@ApiResponse(responseCode = "200", description = "All execution activities cleared.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
 	@Path("all")
 	public Response clearAllActivities(@Context HttpServletRequest request, @QueryParam("realm") String realm) {
@@ -94,16 +115,27 @@ public class ControlResource {
 		return ResponseUtil.toResponse(svcResult);
 	}
 
+	@Operation(summary = "Get execution handler state",
+			description = "Retrieves the current state of the execution handler.")
+	@ApiResponse(responseCode = "200", description = "Execution handler state returned.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = StrolchResponse.class)))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("executionHandler/state")
-	public Response getExecutionHandlerState(@Context HttpServletRequest request, @QueryParam("realm") String realm) {
-
+	public Response getExecutionHandlerState(@QueryParam("realm") String realm) {
 		ExecutionHandler executionHandler = RestfulStrolchComponent.getInstance().getComponent(ExecutionHandler.class);
 		String state = executionHandler.getExecutionState(realm).name();
 
 		return ResponseUtil.toResponse(PARAM_STATE, state);
 	}
 
+	@Operation(summary = "Set execution handler state", description = "Sets the state of the execution handler.")
+	@ApiResponse(responseCode = "200", description = "Execution handler state updated.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid state value.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Path("executionHandler/state")
 	public Response setExecutionHandlerState(@Context HttpServletRequest request, @QueryParam("realm") String realm,
@@ -121,6 +153,13 @@ public class ControlResource {
 		return ResponseUtil.toResponse(svcResult);
 	}
 
+	@Operation(summary = "Execute an activity", description = "Starts execution of the specified activity.")
+	@ApiResponse(responseCode = "200", description = "Activity execution started successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid parameters provided.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Path("activity/state")
 	public Response executeActivity(@Context HttpServletRequest request, @QueryParam("realm") String realm,
@@ -138,6 +177,13 @@ public class ControlResource {
 		return ResponseUtil.toResponse(svcResult);
 	}
 
+	@Operation(summary = "Set activity state", description = "Updates the state of an activity element.")
+	@ApiResponse(responseCode = "200", description = "Activity state updated successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid state or locator provided.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Path("activity/state")
 	public Response setElementState(@Context HttpServletRequest request, @QueryParam("realm") String realm,
@@ -170,6 +216,14 @@ public class ControlResource {
 		return ResponseUtil.toResponse(svcResult);
 	}
 
+	@Operation(summary = "Remove activity from execution",
+			description = "Stops execution of an activity and removes it from tracking.")
+	@ApiResponse(responseCode = "200", description = "Activity successfully removed from execution.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid activity parameters provided.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
 	@Path("activity/state")
 	public Response removeActivityFromExecution(@Context HttpServletRequest request, @QueryParam("realm") String realm,

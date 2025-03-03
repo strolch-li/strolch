@@ -16,6 +16,11 @@
 package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonArray;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -27,9 +32,11 @@ import jakarta.ws.rs.core.Response;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.rest.StrolchRestfulConstants;
+
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 @Path("strolch/audits")
+@Tag(name = "Audits Resource", description = "Manage and query audit logs.")
 public class AuditsResource {
 
 	private static String getContext() {
@@ -37,12 +44,16 @@ public class AuditsResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Get audit types", description = "Retrieves all available audit types.")
+	@ApiResponse(responseCode = "200", description = "List of audit types.",
+			content = @Content(mediaType = "application/json", examples = @ExampleObject("[\"Type1\",\"Type2\"]")))
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Path("types")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queryTypes(@Context HttpServletRequest request) {
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 			JsonArray dataJ = new JsonArray();

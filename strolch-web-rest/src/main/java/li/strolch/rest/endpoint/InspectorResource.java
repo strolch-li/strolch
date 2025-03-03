@@ -19,6 +19,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -46,6 +51,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.model.QueryData;
+import li.strolch.rest.model.ServiceResultResponse;
 import li.strolch.search.*;
 import li.strolch.service.*;
 import li.strolch.service.api.ServiceHandler;
@@ -87,6 +93,8 @@ import static li.strolch.utils.helper.XmlHelper.getSaxParser;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/inspector")
+@Tag(name = "Inspector",
+		description = "Provides operations for inspecting realms and elements in various formats.")
 public class InspectorResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(InspectorResource.class);
@@ -102,6 +110,12 @@ public class InspectorResource {
 		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getCallerMethod());
 	}
 
+	@Operation(summary = "Get agent overview",
+			description = "Retrieves an overview of the available realms and their element counts.")
+	@ApiResponse(responseCode = "200", description = "Agent overview retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAgentOverview(@Context HttpServletRequest request) {
@@ -132,6 +146,11 @@ public class InspectorResource {
 		return Response.ok().entity(agentOverview.toString()).build();
 	}
 
+	@Operation(summary = "Get realm overview", description = "Retrieves detailed information about a specific realm.")
+	@ApiResponse(responseCode = "200", description = "Realm overview retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}")
@@ -185,6 +204,12 @@ public class InspectorResource {
 		return Response.ok().entity(realmDetailJ.toString()).build();
 	}
 
+	@Operation(summary = "Export realm data as XML", description = "Exports all elements of a realm in XML format.")
+	@ApiResponse(responseCode = "200", description = "Realm data exported successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/xml")
@@ -216,6 +241,11 @@ public class InspectorResource {
 				.build();
 	}
 
+	@Operation(summary = "Get resources overview", description = "Retrieves an overview of resources within a realm.")
+	@ApiResponse(responseCode = "200", description = "Resources overview retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources")
@@ -249,6 +279,11 @@ public class InspectorResource {
 		return Response.ok().entity(mapOverview.toString()).build();
 	}
 
+	@Operation(summary = "Get orders overview", description = "Retrieves an overview of orders within a realm.")
+	@ApiResponse(responseCode = "200", description = "Orders overview retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders")
@@ -282,6 +317,11 @@ public class InspectorResource {
 		return Response.ok().entity(mapOverview.toString()).build();
 	}
 
+	@Operation(summary = "Get activities overview", description = "Retrieves an overview of activities within a realm.")
+	@ApiResponse(responseCode = "200", description = "Activities overview retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities")
@@ -315,6 +355,12 @@ public class InspectorResource {
 		return Response.ok().entity(mapOverview.toString()).build();
 	}
 
+	@Operation(summary = "Export resources as XML", description = "Exports all resources of a realm in XML format.")
+	@ApiResponse(responseCode = "200", description = "Resources exported successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/resources/xml")
@@ -344,6 +390,12 @@ public class InspectorResource {
 				.build();
 	}
 
+	@Operation(summary = "Export orders as XML", description = "Exports all orders of a realm in XML format.")
+	@ApiResponse(responseCode = "200", description = "Orders exported successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/orders/xml")
@@ -373,6 +425,12 @@ public class InspectorResource {
 				.build();
 	}
 
+	@Operation(summary = "Export activities as XML", description = "Exports all activities of a realm in XML format.")
+	@ApiResponse(responseCode = "200", description = "Activities exported successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/activities/xml")
@@ -402,6 +460,12 @@ public class InspectorResource {
 				.build();
 	}
 
+	@Operation(summary = "Query resources by type",
+			description = "Retrieves resources of a specific type within a realm.")
+	@ApiResponse(responseCode = "200", description = "Resources retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}")
@@ -447,6 +511,11 @@ public class InspectorResource {
 		return Response.ok(root.toString()).build();
 	}
 
+	@Operation(summary = "Query orders by type", description = "Retrieves orders of a specific type within a realm.")
+	@ApiResponse(responseCode = "200", description = "Orders retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}")
@@ -494,6 +563,12 @@ public class InspectorResource {
 		return Response.ok(root.toString()).build();
 	}
 
+	@Operation(summary = "Query activities by type",
+			description = "Retrieves activities of a specific type within a realm.")
+	@ApiResponse(responseCode = "200", description = "Activities retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
@@ -541,6 +616,13 @@ public class InspectorResource {
 		return Response.ok(root.toString()).build();
 	}
 
+	@Operation(summary = "Export resources of a specific type as XML",
+			description = "Exports all resources of a given type within a realm in XML format.")
+	@ApiResponse(responseCode = "200", description = "Resources exported successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/resources/{type}/xml")
@@ -576,6 +658,13 @@ public class InspectorResource {
 				.build();
 	}
 
+	@Operation(summary = "Export orders of a specific type as XML",
+			description = "Exports all orders of a given type within a realm in XML format.")
+	@ApiResponse(responseCode = "200", description = "Orders exported successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/orders/{type}/xml")
@@ -611,6 +700,13 @@ public class InspectorResource {
 				.build();
 	}
 
+	@Operation(summary = "Export activities of a specific type as XML",
+			description = "Exports all activities of a given type within a realm in XML format.")
+	@ApiResponse(responseCode = "200", description = "Activities exported successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/activities/{type}/xml")
@@ -646,6 +742,12 @@ public class InspectorResource {
 				.build();
 	}
 
+	@Operation(summary = "Get resource as JSON", description = "Retrieves a specific resource in JSON format.")
+	@ApiResponse(responseCode = "200", description = "Resource retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "404", description = "Resource not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}/{id}")
@@ -676,6 +778,13 @@ public class InspectorResource {
 		return id;
 	}
 
+	@Operation(summary = "Get resource as XML", description = "Retrieves a specific resource in XML format.")
+	@ApiResponse(responseCode = "200", description = "Resource retrieved successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "404", description = "Resource not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/resources/{type}/{id}")
@@ -697,6 +806,12 @@ public class InspectorResource {
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
+	@Operation(summary = "Get order as JSON", description = "Retrieves a specific order in JSON format.")
+	@ApiResponse(responseCode = "200", description = "Order retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "404", description = "Order not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}/{id}")
@@ -721,6 +836,13 @@ public class InspectorResource {
 		return Response.ok().entity(jsonElement.toString()).build();
 	}
 
+	@Operation(summary = "Get order as XML", description = "Retrieves a specific order in XML format.")
+	@ApiResponse(responseCode = "200", description = "Order retrieved successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "404", description = "Order not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/orders/{type}/{id}")
@@ -742,6 +864,12 @@ public class InspectorResource {
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
+	@Operation(summary = "Get activity as JSON", description = "Retrieves a specific activity in JSON format.")
+	@ApiResponse(responseCode = "200", description = "Activity retrieved successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "404", description = "Activity not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}/{id}")
@@ -766,6 +894,13 @@ public class InspectorResource {
 		return Response.ok().entity(jsonElement.toString()).build();
 	}
 
+	@Operation(summary = "Get activity as XML", description = "Retrieves a specific activity in XML format.")
+	@ApiResponse(responseCode = "200", description = "Activity retrieved successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "404", description = "Activity not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	@Path("{realm}/activities/{type}/{id}")
@@ -787,6 +922,17 @@ public class InspectorResource {
 		return Response.ok().type(MediaType.APPLICATION_XML).entity(asXml).build();
 	}
 
+	@Operation(summary = "Update a resource as XML", description = "Updates a specific resource in XML format.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/xml",
+							schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd"))))
+	@ApiResponse(responseCode = "200", description = "Resource updated successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "400", description = "Invalid XML format or mismatched ID.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "404", description = "Resource not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
@@ -815,6 +961,13 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Update a resource as JSON", description = "Updates a specific resource in JSON format.")
+	@ApiResponse(responseCode = "200", description = "Resource updated successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format or mismatched ID.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "404", description = "Resource not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -866,6 +1019,17 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Update an order as XML", description = "Updates a specific order in XML format.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/xml",
+							schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd"))))
+	@ApiResponse(responseCode = "200", description = "Order updated successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "400", description = "Invalid XML format or mismatched ID.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "404", description = "Order not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
@@ -894,6 +1058,13 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Update an order as JSON", description = "Updates a specific order in JSON format.")
+	@ApiResponse(responseCode = "200", description = "Order updated successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format or mismatched ID.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "404", description = "Order not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -945,6 +1116,17 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Update an activity as XML", description = "Updates a specific activity in XML format.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/xml",
+							schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd"))))
+	@ApiResponse(responseCode = "200", description = "Activity updated successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "400", description = "Invalid XML format or mismatched ID.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "404", description = "Activity not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
@@ -973,6 +1155,13 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Update an activity as JSON", description = "Updates a specific activity in JSON format.")
+	@ApiResponse(responseCode = "200", description = "Activity updated successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format or mismatched ID.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "404", description = "Activity not found.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1024,8 +1213,19 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Import model data as XML",
+			description = "Imports model data into the system from an XML file, with various options for adding or updating resources, orders, and activities.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/xml",
+							schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd"))))
+	@ApiResponse(responseCode = "200", description = "Import successful.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid XML format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_XML)
 	@Path("{realm}/import")
 	public Response importAsXml(@Context HttpServletRequest request, //
@@ -1085,6 +1285,16 @@ public class InspectorResource {
 		return RestfulStrolchComponent.getInstance().getServiceHandler();
 	}
 
+	@Operation(summary = "Add a resource as XML", description = "Adds a new resource to the system using XML format.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/xml",
+							schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd"))))
+	@ApiResponse(responseCode = "200", description = "Resource added successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "400", description = "Invalid XML format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
@@ -1110,6 +1320,12 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add a resource as JSON", description = "Adds a new resource to the system using JSON format.")
+	@ApiResponse(responseCode = "200", description = "Resource added successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1139,6 +1355,13 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add a resource as JSON (flat)",
+			description = "Adds a new resource to the system using flat JSON format.")
+	@ApiResponse(responseCode = "200", description = "Resource added successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1167,6 +1390,16 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add an order as XML", description = "Adds a new order to the system using XML format.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/xml",
+							schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd"))))
+	@ApiResponse(responseCode = "200", description = "Order added successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "400", description = "Invalid XML format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
@@ -1191,6 +1424,12 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add an order as JSON", description = "Adds a new order to the system using JSON format.")
+	@ApiResponse(responseCode = "200", description = "Order added successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1219,6 +1458,13 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add an order as JSON (flat)",
+			description = "Adds a new order to the system using flat JSON format.")
+	@ApiResponse(responseCode = "200", description = "Order added successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1247,6 +1493,16 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add an activity as XML", description = "Adds a new activity to the system using XML format.",
+			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+					content = @Content(mediaType = "application/xml",
+							schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd"))))
+	@ApiResponse(responseCode = "200", description = "Activity added successfully.",
+			content = @Content(mediaType = "application/xml",
+					schema = @Schema(description = "See https://strolch.li/schema/StrolchModel.xsd")))
+	@ApiResponse(responseCode = "400", description = "Invalid XML format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_XML)
 	@Consumes(MediaType.APPLICATION_XML)
@@ -1272,6 +1528,13 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add an activity as JSON",
+			description = "Adds a new activity to the system using JSON format.")
+	@ApiResponse(responseCode = "200", description = "Activity added successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1301,6 +1564,13 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Add an activity as JSON (flat)",
+			description = "Adds a new activity to the system using flat JSON format.")
+	@ApiResponse(responseCode = "200", description = "Activity added successfully.",
+			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
+	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1329,6 +1599,14 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Remove resources by type",
+			description = "Removes multiple resources of a specified type within a realm.")
+	@ApiResponse(responseCode = "200", description = "Resources removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid request format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
 	@Path("{realm}/resources/{type}")
 	public Response removeResourcesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
@@ -1350,6 +1628,14 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Remove orders by type",
+			description = "Removes multiple orders of a specified type within a realm.")
+	@ApiResponse(responseCode = "200", description = "Orders removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid request format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
 	@Path("{realm}/orders/{type}")
 	public Response removeOrdersByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
@@ -1371,6 +1657,14 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Remove activities by type",
+			description = "Removes multiple activities of a specified type within a realm.")
+	@ApiResponse(responseCode = "200", description = "Activities removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid request format.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
 	@Path("{realm}/activities/{type}")
 	public Response removeActivitiesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
@@ -1392,8 +1686,15 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Remove a specific resource", description = "Removes a single resource from the system by ID.")
+	@ApiResponse(responseCode = "200", description = "Resource removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "404", description = "Resource not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}/{id}")
 	public Response removeResource(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
@@ -1410,8 +1711,15 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Remove a specific order", description = "Removes a single order from the system by ID.")
+	@ApiResponse(responseCode = "200", description = "Order removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "404", description = "Order not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}/{id}")
 	public Response removeOrder(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
@@ -1428,8 +1736,15 @@ public class InspectorResource {
 		return toResponse(result);
 	}
 
+	@Operation(summary = "Remove a specific activity", description = "Removes a single activity from the system by ID.")
+	@ApiResponse(responseCode = "200", description = "Activity removed successfully.",
+			content = @Content(mediaType = "application/json",
+					schema = @Schema(implementation = ServiceResultResponse.class)))
+	@ApiResponse(responseCode = "404", description = "Activity not found.")
+	@ApiResponse(responseCode = "403", description = "Access denied.")
+	@ApiResponse(responseCode = "500", description = "Internal server error.")
 	@DELETE
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}/{id}")
 	public Response removeActivity(@PathParam("realm") String realm, @PathParam("type") String type,
 			@PathParam("id") String id, @Context HttpServletRequest request) {
