@@ -31,6 +31,7 @@ import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.rest.model.JsonServiceResultResponse;
+import li.strolch.rest.model.PagingResponse;
 import li.strolch.rest.model.ServiceResultResponse;
 import li.strolch.rest.model.StrolchResponse;
 import li.strolch.service.JsonServiceResult;
@@ -44,7 +45,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.rest.StrolchRestfulConstants.DATA;
+import static li.strolch.rest.StrolchRestfulConstants.MSG;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 
@@ -175,13 +177,13 @@ public class ResponseUtil {
 
 	public static <T> Response toResponse(Paging<T> paging, Function<T, JsonObject> visitor) {
 		JsonObject response = StrolchResponse.valueOf().toJsonObject();
-		addPagingInfo(paging, response);
+		new PagingResponse<>(paging).addPagingInfo(response);
 		return handleIterable(visitor, response, paging.getPage());
 	}
 
 	public static Response toResponse(Paging<JsonObject> paging) {
 		JsonObject response = StrolchResponse.valueOf().toJsonObject();
-		addPagingInfo(paging, response);
+		new PagingResponse<>(paging).addPagingInfo(response);
 		return handleIterable(e -> e, response, paging.getPage());
 	}
 
@@ -190,16 +192,6 @@ public class ResponseUtil {
 		page.forEach(t -> data.add(visitor.apply(t)));
 		response.add(DATA, data);
 		return Response.ok(new Gson().toJson(response), APPLICATION_JSON).build();
-	}
-
-	private static <T> void addPagingInfo(Paging<T> paging, JsonObject response) {
-		response.addProperty(DATA_SET_SIZE, paging.getDataSetSize());
-		response.addProperty(LIMIT, paging.getLimit());
-		response.addProperty(OFFSET, paging.getOffset());
-		response.addProperty(SIZE, paging.getSize());
-		response.addProperty(PREVIOUS_OFFSET, paging.getPreviousOffset());
-		response.addProperty(NEXT_OFFSET, paging.getNextOffset());
-		response.addProperty(LAST_OFFSET, paging.getLastOffset());
 	}
 
 	private static Status evaluateStatus(Throwable throwable) {
