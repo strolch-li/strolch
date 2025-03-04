@@ -48,13 +48,13 @@ public class EnumResource {
 	private static final Logger logger = LoggerFactory.getLogger(EnumResource.class);
 
 	@Operation(summary = "Retrieve an enumeration",
-			description = "Fetches an enumeration by name with optional hidden elements filtering.")
-	@ApiResponse(responseCode = "200", description = "Successful retrieval of enumeration.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
-					properties = {@StringToClassMapItem(key = "name", value = String.class),
-							@StringToClassMapItem(key = "locale", value = String.class),
-							@StringToClassMapItem(key = "values", value = Object.class)})))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Fetches an enumeration by name with optional hidden elements filtering.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successful retrieval of enumeration.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
+							properties = {@StringToClassMapItem(key = "name", value = String.class),
+									@StringToClassMapItem(key = "locale", value = String.class),
+									@StringToClassMapItem(key = "values", value = Object.class)}))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}")
@@ -76,13 +76,13 @@ public class EnumResource {
 	}
 
 	@Operation(summary = "Retrieve an enumeration with specific locale",
-			description = "Fetches an enumeration by name with a specific locale override.")
-	@ApiResponse(responseCode = "200", description = "Successful retrieval of enumeration with locale.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
-					properties = {@StringToClassMapItem(key = "name", value = String.class),
-							@StringToClassMapItem(key = "locale", value = String.class),
-							@StringToClassMapItem(key = "values", value = Object.class)})))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Fetches an enumeration by name with a specific locale override.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successful retrieval of enumeration with locale.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
+							properties = {@StringToClassMapItem(key = "name", value = String.class),
+									@StringToClassMapItem(key = "locale", value = String.class),
+									@StringToClassMapItem(key = "values", value = Object.class)}))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}/{locale}")

@@ -45,10 +45,11 @@ public class LanguagesResource {
 	private static final Logger logger = LoggerFactory.getLogger(LanguagesResource.class);
 
 	@Operation(summary = "Get supported languages",
-			description = "Retrieves a list of supported languages available in the system.")
-	@ApiResponse(responseCode = "200", description = "List of supported languages retrieved successfully.",
-			content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(type = "object"))))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Retrieves a list of supported languages available in the system.", responses = {
+			@ApiResponse(responseCode = "200", description = "List of supported languages retrieved successfully.",
+					content = @Content(mediaType = "application/json",
+							array = @ArraySchema(schema = @Schema(type = "object")))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Path("supported")
 	@Produces(MediaType.APPLICATION_JSON)

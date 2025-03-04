@@ -16,6 +16,10 @@
 package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -37,8 +41,14 @@ import static li.strolch.model.Tags.Json.APP_VERSION;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/version")
+@Tag(name = "Version", description = "Retrieves version information")
 public class VersionResource {
 
+	@Operation(summary = "Get system versions",
+			description = "Retrieves the agent and application version information.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successfully retrieved version information",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getVersions(@Context HttpServletRequest request) {

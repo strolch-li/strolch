@@ -91,10 +91,11 @@ public class NotificationResource {
 	}
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Get user notifications",
-			description = "Retrieves notifications relevant to the authenticated user.")
-	@ApiResponse(responseCode = "200", description = "Notifications retrieved successfully.",
-			content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(type = "object"))))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Retrieves notifications relevant to the authenticated user.", responses = {
+			@ApiResponse(responseCode = "200", description = "Notifications retrieved successfully.",
+					content = @Content(mediaType = "application/json",
+							array = @ArraySchema(schema = @Schema(type = "object")))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUserNotifications(@Context HttpServletRequest request) {
@@ -110,11 +111,11 @@ public class NotificationResource {
 	}
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Get a specific notification",
-			description = "Retrieves a single notification by its ID.")
-	@ApiResponse(responseCode = "200", description = "Notification retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
-	@ApiResponse(responseCode = "404", description = "Notification not found.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Retrieves a single notification by its ID.", responses = {
+			@ApiResponse(responseCode = "200", description = "Notification retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+			@ApiResponse(responseCode = "404", description = "Notification not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -131,10 +132,11 @@ public class NotificationResource {
 	}
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Get all notifications",
-			description = "Retrieves all notifications available in the system.")
-	@ApiResponse(responseCode = "200", description = "All notifications retrieved successfully.",
-			content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(type = "object"))))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Retrieves all notifications available in the system.", responses = {
+			@ApiResponse(responseCode = "200", description = "All notifications retrieved successfully.",
+					content = @Content(mediaType = "application/json",
+							array = @ArraySchema(schema = @Schema(type = "object")))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Path("all")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -193,12 +195,12 @@ public class NotificationResource {
 	}
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Create a notification",
-			description = "Creates a new notification in the system.")
-	@ApiResponse(responseCode = "201", description = "Notification created successfully.",
-			content = @Content(mediaType = "application/json",
-					schema = @Schema(implementation = ServiceResultResponse.class)))
-	@ApiResponse(responseCode = "400", description = "Invalid request format.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Creates a new notification in the system.", responses = {
+			@ApiResponse(responseCode = "200", description = "Notification created successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Invalid request format."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -220,12 +222,12 @@ public class NotificationResource {
 	}
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Update a notification",
-			description = "Updates an existing notification in the system.")
-	@ApiResponse(responseCode = "200", description = "Notification updated successfully.",
-			content = @Content(mediaType = "application/json",
-					schema = @Schema(implementation = ServiceResultResponse.class)))
-	@ApiResponse(responseCode = "404", description = "Notification not found.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Updates an existing notification in the system.", responses = {
+			@ApiResponse(responseCode = "200", description = "Notification updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Notification not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Path("{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -249,12 +251,12 @@ public class NotificationResource {
 	}
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Remove a notification",
-			description = "Deletes a notification from the system by its ID.")
-	@ApiResponse(responseCode = "200", description = "Notification removed successfully.",
-			content = @Content(mediaType = "application/json",
-					schema = @Schema(implementation = ServiceResultResponse.class)))
-	@ApiResponse(responseCode = "404", description = "Notification not found.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Deletes a notification from the system by its ID.", responses = {
+			@ApiResponse(responseCode = "200", description = "Notification removed successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Notification not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
 	@Path("{id}")
 	@Consumes(MediaType.APPLICATION_JSON)

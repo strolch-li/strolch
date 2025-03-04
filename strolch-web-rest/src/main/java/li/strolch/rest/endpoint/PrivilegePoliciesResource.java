@@ -16,6 +16,11 @@
 package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -40,6 +45,7 @@ import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_ACTION_GET
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/policies")
+@Tag(name = "Privilege Policies", description = "Endpoints for managing privilege policies.")
 public class PrivilegePoliciesResource {
 
 	// private static final Logger logger = LoggerFactory.getLogger(PrivilegePoliciesService.class);
@@ -54,6 +60,10 @@ public class PrivilegePoliciesResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Get privilege policies", description = "Retrieves a list of available privilege policies.",
+			responses = {@ApiResponse(responseCode = "200", description = "Privilege policies retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPrivilegePolicies(@Context HttpServletRequest request) {

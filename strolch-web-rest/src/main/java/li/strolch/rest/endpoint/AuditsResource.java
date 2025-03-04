@@ -44,10 +44,11 @@ public class AuditsResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
-	@Operation(summary = "Get audit types", description = "Retrieves all available audit types.")
-	@ApiResponse(responseCode = "200", description = "List of audit types.",
-			content = @Content(mediaType = "application/json", examples = @ExampleObject("[\"Type1\",\"Type2\"]")))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+	@Operation(summary = "Get audit types", description = "Retrieves all available audit types.", responses = {
+			@ApiResponse(responseCode = "200", description = "List of audit types.",
+					content = @Content(mediaType = "application/json",
+							examples = @ExampleObject("[\"Type1\",\"Type2\"]"))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Path("types")
 	@Consumes(MediaType.APPLICATION_JSON)

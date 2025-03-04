@@ -101,6 +101,7 @@
         <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
         <jakarta.websocket.version>2.1.1</jakarta.websocket.version>
         <jersey.version>3.1.10</jersey.version>
+        <swagger-v3.version>2.2.28</swagger-v3.version>
 
         <camel.version>3.22.1</camel.version>
         <hapi.version>2.3</hapi.version>
@@ -386,6 +387,13 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- Swagger Core Annotations -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-jaxrs2-jakarta</artifactId>
+                <version>${swagger-v3.version}</version>
+            </dependency>
+
             <!-- websocket -->
             <dependency>
                 <groupId>jakarta.websocket</groupId>
@@ -585,6 +593,20 @@
                         <includeTests>true</includeTests>
                         <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
                     </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>io.swagger.core.v3</groupId>
+                    <artifactId>swagger-maven-plugin-jakarta</artifactId>
+                    <version>${swagger-v3.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>resolve</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
 
                 <plugin>

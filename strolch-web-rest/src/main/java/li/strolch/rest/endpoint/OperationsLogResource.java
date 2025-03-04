@@ -56,11 +56,12 @@ import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 public class OperationsLogResource {
 
 	@Operation(summary = "Get operation logs",
-			description = "Retrieves operation logs for a given realm with optional filters for severity, date range, and search query.")
-	@ApiResponse(responseCode = "200", description = "Operation logs retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(implementation = PagingResponse.class)))
-	@ApiResponse(responseCode = "403", description = "Access denied.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Retrieves operation logs for a given realm with optional filters for severity, date range, and search query.",
+			responses = {@ApiResponse(responseCode = "200", description = "Operation logs retrieved successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = PagingResponse.class))),
+					@ApiResponse(responseCode = "403", description = "Access denied."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Path("{realm}")
 	@Produces(MediaType.APPLICATION_JSON)

@@ -15,6 +15,12 @@
  */
 package li.strolch.rest.endpoint;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -45,6 +51,7 @@ import static li.strolch.rest.StrolchRestfulConstants.DATA;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/jobs")
+@Tag(name = "Strolch Jobs", description = "Handles Strolch job management")
 public class StrolchJobsResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchJobsResource.class);
@@ -54,6 +61,11 @@ public class StrolchJobsResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Get all jobs", description = "Retrieves a list of all available jobs.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successfully retrieved jobs",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "403", description = "Forbidden - insufficient privileges"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll(@Context HttpServletRequest request, @Context HttpHeaders headers) {
@@ -85,6 +97,16 @@ public class StrolchJobsResource {
 		}
 	}
 
+	@Operation(summary = "Perform an action on a job",
+			description = "Executes a specified action (run, schedule, cancel) on a job.", parameters = {
+			@Parameter(name = "action", description = "Action to perform on the job", required = true,
+					example = "runNow", schema = @Schema(allowableValues = {"runNow", "schedule", "cancel"}))},
+			responses = {@ApiResponse(responseCode = "200", description = "Action executed successfully",
+					content = @Content(mediaType = "application/json")),
+					@ApiResponse(responseCode = "400", description = "Invalid action specified"),
+					@ApiResponse(responseCode = "403", description = "Forbidden - insufficient privileges"),
+					@ApiResponse(responseCode = "404", description = "Job not found"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{name}/action")

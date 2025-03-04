@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.StringToClassMapItem;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -80,7 +81,12 @@ public class AuthenticationResource {
 					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
 							properties = {@StringToClassMapItem(key = "username", value = String.class),
 									@StringToClassMapItem(key = "password", value = String.class),
-									@StringToClassMapItem(key = "keepAlive", value = Boolean.class)}))))
+									@StringToClassMapItem(key = "keepAlive", value = Boolean.class)}))), responses = {
+			@ApiResponse(responseCode = "200", description = "Successfully authenticated",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "401", description = "Invalid credentials"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response authenticate(@Context HttpServletRequest request, String data) {
 		JsonObject login = JsonParser.parseString(data).getAsJsonObject();
 
@@ -131,7 +137,11 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("sso")
 	@Operation(summary = "Authenticate a user through Single Sign-On (SSO)",
-			description = "Handles Single Sign-On authentication and provides an authentication token or an error.")
+			description = "Handles Single Sign-On authentication and provides an authentication token or an error.",
+			responses = {@ApiResponse(responseCode = "200", description = "Successfully authenticated",
+					content = @Content(mediaType = "application/json")),
+					@ApiResponse(responseCode = "401", description = "SSO authentication failed"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response authenticateSingleSignOn(@Context HttpServletRequest request) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -148,7 +158,10 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	@Operation(summary = "Invalidate a session",
-			description = "Invalidates a session associated with the provided authentication token.")
+			description = "Invalidates a session associated with the provided authentication token.",
+			responses = {@ApiResponse(responseCode = "200", description = "Session invalidated successfully"),
+					@ApiResponse(responseCode = "401", description = "Invalid authentication token"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response invalidateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		JsonObject logoutResult = new JsonObject();
 
@@ -176,7 +189,10 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	@Operation(summary = "Validate a session",
-			description = "Checks if the session associated with the given authentication token is valid.")
+			description = "Checks if the session associated with the given authentication token is valid.",
+			responses = {@ApiResponse(responseCode = "200", description = "Session is valid"),
+					@ApiResponse(responseCode = "401", description = "Invalid or expired session"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response validateSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -231,7 +247,11 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	@Operation(summary = "Get validated session details",
-			description = "Returns details of the session associated with the provided authentication token if valid.")
+			description = "Returns details of the session associated with the provided authentication token if valid.",
+			responses = {@ApiResponse(responseCode = "200", description = "Session details retrieved successfully",
+					content = @Content(mediaType = "application/json")),
+					@ApiResponse(responseCode = "401", description = "Invalid authentication token"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response getValidatedSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -248,7 +268,11 @@ public class AuthenticationResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{authToken}")
 	@Operation(summary = "Refresh an active session",
-			description = "Extends the session validity associated with the given authentication token.")
+			description = "Extends the session validity associated with the given authentication token.", responses = {
+			@ApiResponse(responseCode = "200", description = "Session refreshed successfully",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "401", description = "Invalid or expired session"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response refreshSession(@Context HttpServletRequest request, @PathParam("authToken") String authToken) {
 		try {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
@@ -270,7 +294,11 @@ public class AuthenticationResource {
 					description = "User credentials for authentication", required = true,
 					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
 							properties = {@StringToClassMapItem(key = "username", value = String.class),
-									@StringToClassMapItem(key = "usage", value = Usage.class)}))))
+									@StringToClassMapItem(key = "usage", value = Usage.class)}))), responses = {
+			@ApiResponse(responseCode = "200", description = "Challenge initiated successfully",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response initiateChallenge(@Context HttpServletRequest request, String data) {
 		try {
 			JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -295,7 +323,12 @@ public class AuthenticationResource {
 					description = "User credentials for authentication", required = true,
 					content = @Content(mediaType = "application/json", schema = @Schema(type = "object",
 							properties = {@StringToClassMapItem(key = "username", value = String.class),
-									@StringToClassMapItem(key = "challenge", value = String.class)}))))
+									@StringToClassMapItem(key = "challenge", value = String.class)}))), responses = {
+			@ApiResponse(responseCode = "200", description = "Challenge validated successfully",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "400", description = "Invalid challenge response"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized access"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	public Response validateChallenge(@Context HttpServletRequest request, String data) {
 		try {
 

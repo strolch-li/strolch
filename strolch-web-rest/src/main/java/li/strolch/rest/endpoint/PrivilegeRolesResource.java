@@ -16,6 +16,11 @@
 package li.strolch.rest.endpoint;
 
 import com.google.gson.JsonArray;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -31,6 +36,7 @@ import li.strolch.privilege.model.RoleRep;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
+import li.strolch.rest.model.ServiceResultResponse;
 import li.strolch.search.StrolchValueSearch;
 import li.strolch.search.ValueSearch;
 import li.strolch.service.api.ServiceHandler;
@@ -47,6 +53,7 @@ import static li.strolch.search.ValueSearchExpressionBuilder.containsIgnoreCase;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/roles")
+@Tag(name = "Privilege Roles", description = "Endpoints for managing privilege roles.")
 public class PrivilegeRolesResource {
 
 	private PrivilegeHandler getPrivilegeHandler() {
@@ -59,6 +66,11 @@ public class PrivilegeRolesResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Get all roles",
+			description = "Retrieves a list of all privilege roles, optionally filtered by a query.", responses = {
+			@ApiResponse(responseCode = "200", description = "Roles retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "array"))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRoles(@Context HttpServletRequest request, @QueryParam("query") String query) {
@@ -91,6 +103,11 @@ public class PrivilegeRolesResource {
 		}
 	}
 
+	@Operation(summary = "Get a specific role", description = "Retrieves details of a specific privilege role.",
+			responses = {@ApiResponse(responseCode = "200", description = "Role details retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+					@ApiResponse(responseCode = "404", description = "Role not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{roleName}")
@@ -108,6 +125,12 @@ public class PrivilegeRolesResource {
 		}
 	}
 
+	@Operation(summary = "Add a new role", description = "Creates a new privilege role.", responses = {
+			@ApiResponse(responseCode = "200", description = "Role created successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Invalid request format."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -125,6 +148,12 @@ public class PrivilegeRolesResource {
 		return handleServiceResult(svcResult);
 	}
 
+	@Operation(summary = "Update a role", description = "Updates an existing privilege role.", responses = {
+			@ApiResponse(responseCode = "200", description = "Role updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Role not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -148,6 +177,12 @@ public class PrivilegeRolesResource {
 		return handleServiceResult(svcResult);
 	}
 
+	@Operation(summary = "Remove a role", description = "Deletes a privilege role from the system.", responses = {
+			@ApiResponse(responseCode = "200", description = "Role removed successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Role not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

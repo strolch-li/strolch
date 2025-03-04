@@ -16,6 +16,11 @@
 package li.strolch.rest.endpoint;
 
 import com.google.gson.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -35,6 +40,7 @@ import li.strolch.privilege.model.UserState;
 import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.model.QueryData;
+import li.strolch.rest.model.ServiceResultResponse;
 import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.search.SearchResult;
 import li.strolch.search.ValueSearch;
@@ -61,6 +67,7 @@ import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Path("strolch/privilege/users")
+@Tag(name = "Privilege Users", description = "Endpoints for managing privilege users.")
 public class PrivilegeUsersResource {
 
 	private PrivilegeHandler getPrivilegeHandler() {
@@ -73,6 +80,11 @@ public class PrivilegeUsersResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Get all users",
+			description = "Retrieves a list of all privilege users, optionally filtered by a query.", responses = {
+			@ApiResponse(responseCode = "200", description = "Users retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "array"))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response queryUsers(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
@@ -97,6 +109,13 @@ public class PrivilegeUsersResource {
 		}
 	}
 
+	@Operation(summary = "Query users by user representation",
+			description = "Queries users based on the provided user representation in JSON format.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successfully retrieved users",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "400", description = "Invalid input data"),
+			@ApiResponse(responseCode = "403", description = "Forbidden - insufficient privileges"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -121,6 +140,11 @@ public class PrivilegeUsersResource {
 		}
 	}
 
+	@Operation(summary = "Get a specific user", description = "Retrieves details of a specific privilege user.",
+			responses = {@ApiResponse(responseCode = "200", description = "User details retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+					@ApiResponse(responseCode = "404", description = "User not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}")
@@ -137,6 +161,12 @@ public class PrivilegeUsersResource {
 		}
 	}
 
+	@Operation(summary = "Get user privileges",
+			description = "Retrieves the privileges associated with a specific user.", responses = {
+			@ApiResponse(responseCode = "200", description = "User privileges retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}/privileges")
@@ -153,6 +183,12 @@ public class PrivilegeUsersResource {
 		}
 	}
 
+	@Operation(summary = "Add a new user", description = "Creates a new privilege user.", responses = {
+			@ApiResponse(responseCode = "200", description = "User created successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Invalid request format."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -168,6 +204,12 @@ public class PrivilegeUsersResource {
 		return handleServiceResult(svcResult);
 	}
 
+	@Operation(summary = "Remove a user", description = "Deletes a privilege user from the system.", responses = {
+			@ApiResponse(responseCode = "200", description = "User removed successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -184,6 +226,12 @@ public class PrivilegeUsersResource {
 		return toResponse(svcResult);
 	}
 
+	@Operation(summary = "Update a user", description = "Updates an existing privilege user.", responses = {
+			@ApiResponse(responseCode = "200", description = "User updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -203,6 +251,13 @@ public class PrivilegeUsersResource {
 		return handleServiceResult(svcResult);
 	}
 
+	@Operation(summary = "Set user state", description = "Updates the state of a specific user.", responses = {
+			@ApiResponse(responseCode = "200", description = "User state updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Invalid state provided."),
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}/state/{state}")
@@ -228,6 +283,13 @@ public class PrivilegeUsersResource {
 		return handleServiceResult(svcResult);
 	}
 
+	@Operation(summary = "Set user locale", description = "Updates the locale of a specific user.", responses = {
+			@ApiResponse(responseCode = "200", description = "User locale updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Invalid locale provided."),
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}/locale/{locale}")
@@ -253,6 +315,13 @@ public class PrivilegeUsersResource {
 		return handleServiceResult(svcResult);
 	}
 
+	@Operation(summary = "Set user password", description = "Updates the password of a specific user.", responses = {
+			@ApiResponse(responseCode = "200", description = "User password updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "406", description = "Password does not meet strength requirements."),
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}/password")
@@ -287,6 +356,12 @@ public class PrivilegeUsersResource {
 		return toResponse();
 	}
 
+	@Operation(summary = "Set user password state", description = "Updates the password state of a specific user.",
+			responses = {@ApiResponse(responseCode = "200", description = "User password state updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+					@ApiResponse(responseCode = "404", description = "User not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}/password/state")
@@ -305,6 +380,12 @@ public class PrivilegeUsersResource {
 		return toResponse(svcResult);
 	}
 
+	@Operation(summary = "Clear user password", description = "Removes the password of a specific user.", responses = {
+			@ApiResponse(responseCode = "200", description = "User password cleared successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{username}/password")

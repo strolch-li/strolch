@@ -18,14 +18,16 @@ public class StrolchResponse {
 	@Schema(description = "Internationalization message details if available.", nullable = true)
 	private final I18nMessageResponse i18n;
 
-	@Schema(description = "Message describing the result.", example = "Operation completed successfully.",
-			nullable = true, type = "object")
-	private final JsonElement data;
+	@Schema(description = "Message describing the result.", nullable = true, type = "object")
+	private final Object data;
+
+	private final JsonElement _data;
 
 	public StrolchResponse(String msg, I18nMessageResponse i18n, JsonElement data) {
 		this.msg = msg;
 		this.i18n = i18n;
 		this.data = data;
+		this._data = data;
 	}
 
 	public String getMsg() {
@@ -36,7 +38,7 @@ public class StrolchResponse {
 		return this.i18n;
 	}
 
-	public JsonElement getData() {
+	public Object getData() {
 		return this.data;
 	}
 
@@ -73,8 +75,8 @@ public class StrolchResponse {
 		response.addProperty(MSG, DASH);
 		if (this.i18n != null)
 			response.add(I18N, this.i18n.toJson());
-		if (this.data != null)
-			response.add(DATA, this.data);
+		if (this._data != null)
+			response.add(DATA, this._data);
 		return response;
 	}
 }

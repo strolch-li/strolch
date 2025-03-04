@@ -50,12 +50,12 @@ public class ModelResource {
 	}
 
 	@Operation(summary = "Execute SOQL query",
-			description = "Processes a Strolch Object Query Language (SOQL) request and returns the result.")
-	@ApiResponse(responseCode = "200", description = "Query executed successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
-	@ApiResponse(responseCode = "400", description = "Invalid query format.")
-	@ApiResponse(responseCode = "403", description = "Access denied.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Processes a Strolch Object Query Language (SOQL) request and returns the result.",
+			responses = {@ApiResponse(responseCode = "200", description = "Query executed successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+					@ApiResponse(responseCode = "400", description = "Invalid query format."),
+					@ApiResponse(responseCode = "403", description = "Access denied."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("soql")

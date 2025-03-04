@@ -71,10 +71,10 @@ public class PrivilegeGroupsResource {
 	}
 
 	@Operation(summary = "Get all groups",
-			description = "Retrieves a list of all privilege groups, optionally filtered by a query.")
-	@ApiResponse(responseCode = "200", description = "Groups retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "array")))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Retrieves a list of all privilege groups, optionally filtered by a query.", responses = {
+			@ApiResponse(responseCode = "200", description = "Groups retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "array"))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getGroups(@Context HttpServletRequest request, @QueryParam("query") String query) {
@@ -102,11 +102,11 @@ public class PrivilegeGroupsResource {
 		}
 	}
 
-	@Operation(summary = "Get a specific group", description = "Retrieves details of a specific privilege group.")
-	@ApiResponse(responseCode = "200", description = "Group details retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
-	@ApiResponse(responseCode = "404", description = "Group not found.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+	@Operation(summary = "Get a specific group", description = "Retrieves details of a specific privilege group.",
+			responses = {@ApiResponse(responseCode = "200", description = "Group details retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+					@ApiResponse(responseCode = "404", description = "Group not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{group}")
@@ -123,11 +123,11 @@ public class PrivilegeGroupsResource {
 		}
 	}
 
-	@Operation(summary = "Get group privileges", description = "Retrieves privilege details for a specific group.")
-	@ApiResponse(responseCode = "200", description = "Group privileges retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
-	@ApiResponse(responseCode = "404", description = "Group not found.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+	@Operation(summary = "Get group privileges", description = "Retrieves privilege details for a specific group.",
+			responses = {@ApiResponse(responseCode = "200", description = "Group privileges retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+					@ApiResponse(responseCode = "404", description = "Group not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{group}/privileges")
@@ -144,12 +144,12 @@ public class PrivilegeGroupsResource {
 		}
 	}
 
-	@Operation(summary = "Add a new group", description = "Creates a new privilege group.")
-	@ApiResponse(responseCode = "201", description = "Group created successfully.",
-			content = @Content(mediaType = "application/json",
-					schema = @Schema(implementation = ServiceResultResponse.class)))
-	@ApiResponse(responseCode = "400", description = "Invalid request format.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+	@Operation(summary = "Add a new group", description = "Creates a new privilege group.", responses = {
+			@ApiResponse(responseCode = "200", description = "Group created successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "400", description = "Invalid request format."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -165,12 +165,12 @@ public class PrivilegeGroupsResource {
 		return toResponse(svcResult);
 	}
 
-	@Operation(summary = "Update a group", description = "Updates an existing privilege group.")
-	@ApiResponse(responseCode = "200", description = "Group updated successfully.",
-			content = @Content(mediaType = "application/json",
-					schema = @Schema(implementation = ServiceResultResponse.class)))
-	@ApiResponse(responseCode = "404", description = "Group not found.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+	@Operation(summary = "Update a group", description = "Updates an existing privilege group.", responses = {
+			@ApiResponse(responseCode = "200", description = "Group updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Group not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -188,12 +188,12 @@ public class PrivilegeGroupsResource {
 		return toResponse(svcResult);
 	}
 
-	@Operation(summary = "Remove a group", description = "Deletes a privilege group from the system.")
-	@ApiResponse(responseCode = "200", description = "Group removed successfully.",
-			content = @Content(mediaType = "application/json",
-					schema = @Schema(implementation = ServiceResultResponse.class)))
-	@ApiResponse(responseCode = "404", description = "Group not found.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+	@Operation(summary = "Remove a group", description = "Deletes a privilege group from the system.", responses = {
+			@ApiResponse(responseCode = "200", description = "Group removed successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = ServiceResultResponse.class))),
+			@ApiResponse(responseCode = "404", description = "Group not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)

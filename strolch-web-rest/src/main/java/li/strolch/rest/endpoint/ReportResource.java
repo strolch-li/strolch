@@ -20,6 +20,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -63,12 +67,13 @@ import static java.util.Comparator.comparing;
 import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
 import static li.strolch.report.ReportConstants.*;
 import static li.strolch.rest.RestfulStrolchComponent.getInstance;
-import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
 import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
 import static li.strolch.utils.helper.StringHelper.*;
 import static li.strolch.utils.iso8601.ISO8601.MAX_LOCAL_TIME;
 
 @Path("strolch/reports")
+@Tag(name = "Report API", description = "API for managing reports")
 public class ReportResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(ReportResource.class);
@@ -78,6 +83,10 @@ public class ReportResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Get all report IDs", description = "Retrieves a list of all report IDs.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successful retrieval",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllReportIds(@Context HttpServletRequest request, @QueryParam("realm") String realm) {
@@ -109,6 +118,11 @@ public class ReportResource {
 		}
 	}
 
+	@Operation(summary = "Get report facets", description = "Retrieves facets of a specific report.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successful retrieval",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "404", description = "Report not found"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Path("{id}/facets")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -173,6 +187,11 @@ public class ReportResource {
 		}
 	}
 
+	@Operation(summary = "Get report facet values", description = "Retrieves specific facet values for a report.",
+			responses = {@ApiResponse(responseCode = "200", description = "Successful retrieval",
+					content = @Content(mediaType = "application/json")),
+					@ApiResponse(responseCode = "404", description = "Facet not found"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Path("{id}/facets/{type}/fields")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -221,6 +240,11 @@ public class ReportResource {
 		}
 	}
 
+	@Operation(summary = "Get report by ID", description = "Retrieves a report based on its ID.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successful retrieval",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "404", description = "Report not found"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@POST
 	@Path("{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -352,6 +376,11 @@ public class ReportResource {
 		}
 	}
 
+	@Operation(summary = "Get report as CSV", description = "Retrieves a report as a CSV file.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successful retrieval",
+					content = @Content(mediaType = "text/csv")),
+			@ApiResponse(responseCode = "404", description = "Report not found"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@POST
 	@Path("{id}/csv")
 	@Consumes(MediaType.APPLICATION_JSON)

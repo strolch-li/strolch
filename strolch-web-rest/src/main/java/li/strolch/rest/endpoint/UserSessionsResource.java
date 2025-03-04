@@ -18,6 +18,10 @@ package li.strolch.rest.endpoint;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
@@ -47,6 +51,7 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIV
 import static li.strolch.search.SearchBuilder.buildSimpleValueSearch;
 
 @Path("strolch/sessions")
+@Tag(name = "User Sessions", description = "Manages user sessions")
 public class UserSessionsResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(UserSessionsResource.class);
@@ -56,6 +61,11 @@ public class UserSessionsResource {
 		return element.getClassName() + "." + element.getMethodName();
 	}
 
+	@Operation(summary = "Query user sessions", description = "Retrieves a list of active user sessions.", responses = {
+			@ApiResponse(responseCode = "200", description = "Successfully retrieved sessions",
+					content = @Content(mediaType = "application/json")),
+			@ApiResponse(responseCode = "403", description = "Forbidden - insufficient privileges"),
+			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response querySessions(@Context HttpServletRequest request, @BeanParam QueryData queryData) {
@@ -80,6 +90,12 @@ public class UserSessionsResource {
 		}
 	}
 
+	@Operation(summary = "Get session details", description = "Retrieves details of a specific session by session ID.",
+			responses = {@ApiResponse(responseCode = "200", description = "Session details retrieved successfully",
+					content = @Content(mediaType = "application/json")),
+					@ApiResponse(responseCode = "403", description = "Forbidden - insufficient privileges"),
+					@ApiResponse(responseCode = "404", description = "Session not found"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{sessionId}")
@@ -97,6 +113,11 @@ public class UserSessionsResource {
 		}
 	}
 
+	@Operation(summary = "Invalidate a session", description = "Invalidates a user session by session ID.",
+			responses = {@ApiResponse(responseCode = "200", description = "Session invalidated successfully"),
+					@ApiResponse(responseCode = "403", description = "Forbidden - insufficient privileges"),
+					@ApiResponse(responseCode = "404", description = "Session not found"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{sessionId}")
@@ -113,6 +134,12 @@ public class UserSessionsResource {
 		}
 	}
 
+	@Operation(summary = "Set session locale", description = "Updates the locale for a specific user session.",
+			responses = {@ApiResponse(responseCode = "200", description = "Locale updated successfully"),
+					@ApiResponse(responseCode = "400", description = "Invalid locale format"),
+					@ApiResponse(responseCode = "403", description = "Forbidden - insufficient privileges"),
+					@ApiResponse(responseCode = "404", description = "Session not found"),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{sessionId}/locale/{locale}")

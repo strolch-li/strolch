@@ -99,7 +99,6 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2-jakarta</artifactId>
-            <version>2.2.28</version>
         </dependency>
 
         <!-- test -->
@@ -166,29 +165,32 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
             </plugin>
-
-            <plugin>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-maven-plugin-jakarta</artifactId>
-                <version>2.2.28</version>
-                <configuration>
-                    <outputFileName>openapi</outputFileName>
-                    <outputPath>${project.build.directory}/generatedtest</outputPath>
-                    <outputFormat>JSONANDYAML</outputFormat>
-                    <resourcePackages>
-                        <package>li.strolch.rest.endpoint</package>
-                    </resourcePackages>
-                    <prettyPrint>TRUE</prettyPrint>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>resolve</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.swagger.core.v3</groupId>
+                        <artifactId>swagger-maven-plugin-jakarta</artifactId>
+                        <configuration>
+                            <outputFileName>${project.artifactId}-openapi-spec</outputFileName>
+                            <outputPath>${project.build.directory}/generated-openapi-spec</outputPath>
+                            <outputFormat>YAML</outputFormat>
+                            <sortOutput>true</sortOutput>
+                            <openapi31>true</openapi31>
+                            <resourcePackages>
+                                <package>li.strolch.rest.endpoint</package>
+                            </resourcePackages>
+                            <prettyPrint>true</prettyPrint>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>

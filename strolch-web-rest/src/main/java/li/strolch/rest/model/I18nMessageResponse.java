@@ -18,7 +18,7 @@ public class I18nMessageResponse {
 	@Schema(description = "The stack trace if available")
 	private final String exception;
 
-	@Schema(type = "object")
+	@Schema(description = "formatting values", type = "object")
 	private final Map<String, String> values;
 
 	protected I18nMessageResponse(I18nMessage i18nMessage) {

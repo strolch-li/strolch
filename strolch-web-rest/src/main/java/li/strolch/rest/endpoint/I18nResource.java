@@ -54,10 +54,10 @@ public class I18nResource {
 	private static final Logger logger = LoggerFactory.getLogger(I18nResource.class);
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Retrieve I18n data as plain text",
-			description = "Fetches the internationalization data file and returns it as a pretty-printed JSON string.")
-	@ApiResponse(responseCode = "200", description = "I18n data retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Fetches the internationalization data file and returns it as a pretty-printed JSON string.",
+			responses = {@ApiResponse(responseCode = "200", description = "I18n data retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Path("data")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -83,10 +83,10 @@ public class I18nResource {
 	}
 
 	@io.swagger.v3.oas.annotations.Operation(summary = "Retrieve I18n data as JSON",
-			description = "Fetches the internationalization data file and returns it as a JSON object.")
-	@ApiResponse(responseCode = "200", description = "I18n data retrieved successfully.",
-			content = @Content(mediaType = "application/json", schema = @Schema(type = "object")))
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+			description = "Fetches the internationalization data file and returns it as a JSON object.", responses = {
+			@ApiResponse(responseCode = "200", description = "I18n data retrieved successfully.",
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Path("data")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -113,13 +113,13 @@ public class I18nResource {
 	@io.swagger.v3.oas.annotations.Operation(summary = "Update I18n data",
 			description = "Updates the internationalization data file with new content.",
 			requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))))
-	@ApiResponse(responseCode = "200", description = "I18n data updated successfully.",
-			content = @Content(mediaType = "application/json",
-					schema = @Schema(implementation = StrolchResponse.class)))
-	@ApiResponse(responseCode = "400", description = "Invalid JSON format.")
-	@ApiResponse(responseCode = "403", description = "Access denied.")
-	@ApiResponse(responseCode = "500", description = "Internal server error.")
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
+			responses = {@ApiResponse(responseCode = "200", description = "I18n data updated successfully.",
+					content = @Content(mediaType = "application/json",
+							schema = @Schema(implementation = StrolchResponse.class))),
+					@ApiResponse(responseCode = "400", description = "Invalid JSON format."),
+					@ApiResponse(responseCode = "403", description = "Access denied."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Path("data")
 	@Consumes(MediaType.APPLICATION_JSON)
