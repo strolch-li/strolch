@@ -280,7 +280,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	}
 
 	public void initialize(ServletContext servletContext) {
-		if (initialized)
+		if (!initialized)
 			throw new IllegalStateException("Strolch Component not yet initialized!");
 
 		this.webPath = servletContext.getContextPath();
