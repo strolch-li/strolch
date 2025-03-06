@@ -46,7 +46,8 @@ public class ServiceResultResponse {
 		} else {
 			this.exceptionMsg = null;
 			this.throwable = null;
-			this.i18n = new I18nMessageResponse(serviceResult.getI18nMessage());
+			this.i18n = serviceResult.getI18nMessage() == null ? null :
+					new I18nMessageResponse(serviceResult.getI18nMessage());
 		}
 	}
 
