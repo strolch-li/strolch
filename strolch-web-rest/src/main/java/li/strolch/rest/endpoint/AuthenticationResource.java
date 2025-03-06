@@ -442,7 +442,7 @@ public class AuthenticationResource {
 
 		String expirationDateS = ISO8601.toString(expirationDate);
 		String domain = restComponent.isDomainSet() ? restComponent.getDomain() : request.getServerName();
-		String path = (restComponent.isPathSet() ? restComponent.getPath() : "/") + ";SameSite=Strict";
+		String path = (restComponent.isPathSet() ? restComponent.getPath() : "/");
 
 		Date expiry = Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant());
 		boolean httpOnly = false;
@@ -453,10 +453,12 @@ public class AuthenticationResource {
 		NewCookie authExpirationCookie = getNewCookie(STROLCH_AUTHORIZATION_EXPIRATION_DATE, expirationDateS, path,
 				domain, version, "Strolch Authorization Expiration Date", cookieMaxAge, expiry, secureCookie, httpOnly);
 
-		return Response.ok().entity(loginResult.toString()) //
-				.header(HttpHeaders.AUTHORIZATION, authToken) //
-				.cookie(authCookie) //
-				.cookie(authExpirationCookie) //
+		return Response
+				.ok()
+				.entity(loginResult.toString())
+				.header(HttpHeaders.AUTHORIZATION, authToken)
+				.cookie(authCookie)
+				.cookie(authExpirationCookie)
 				.build();
 	}
 
@@ -473,7 +475,7 @@ public class AuthenticationResource {
 
 	private static NewCookie getNewCookie(String strolchAuthorization, String authToken, String path, String domain,
 			int version, String comment, int cookieMaxAge, Date expiry, boolean secureCookie, boolean httpOnly) {
-		return new NewCookie.Builder(strolchAuthorization) //
+		return new NewCookie.Builder(strolchAuthorization)
 				.value(authToken)
 				.path(path)
 				.domain(domain)
@@ -483,6 +485,7 @@ public class AuthenticationResource {
 				.expiry(expiry)
 				.secure(secureCookie)
 				.httpOnly(httpOnly)
+				.sameSite(NewCookie.SameSite.STRICT)
 				.build();
 	}
 }
