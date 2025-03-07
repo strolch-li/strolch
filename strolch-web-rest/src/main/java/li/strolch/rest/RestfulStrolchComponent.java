@@ -283,7 +283,10 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		if (!initialized)
 			throw new IllegalStateException("Strolch Component not yet initialized!");
 
+		logger.info("Local web path is {}", servletContext.getRealPath("/"));
+
 		this.webPath = servletContext.getContextPath();
+		logger.info("Context path is {}", this.webPath);
 
 		SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
 		if (this.secureCookie)
