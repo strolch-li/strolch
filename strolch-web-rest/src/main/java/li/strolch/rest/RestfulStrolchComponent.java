@@ -296,7 +296,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		if (this.path != null)
 			sessionCookieConfig.setPath(this.path);
 		sessionCookieConfig.setMaxAge(this.cookieMaxAge);
-		sessionCookieConfig.setHttpOnly(false);
+		sessionCookieConfig.setHttpOnly(true);
 		sessionCookieConfig.setAttribute("SameSite", "Strict");
 	}
 }
