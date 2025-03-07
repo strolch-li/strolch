@@ -51,6 +51,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
  * A simple helper class to send e-mails. Uses jakarta.mail and is built as a singleton, so configuration has to be done
@@ -228,6 +229,10 @@ public class SmtpMailer {
 		this.signingKeyPassword = signingKeyPassword;
 	}
 
+	private boolean shouldSign() {
+		return this.signingKeyRing != null;
+	}
+
 	/**
 	 * Sends an e-mail to the given recipients (unless override address defined).
 	 *
@@ -236,8 +241,12 @@ public class SmtpMailer {
 	 * @param text       the test of the e-mail
 	 */
 	public void sendMail(String recipients, String subject, String text) {
-		Session session = Session.getInstance(this.props, this.authenticator);
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of mail with subject {}", subject);
+			return;
+		}
 
+		Session session = Session.getInstance(this.props, this.authenticator);
 		MimeMessage message;
 		InternetAddress[] recipientAddresses;
 		try {
@@ -260,12 +269,14 @@ public class SmtpMailer {
 		logger.info("Sent {} E-mail with subject {} to {}", shouldSign() ? "signed" : "unsigned", subject, recipients);
 	}
 
-	private boolean shouldSign() {
-		return this.signingKeyRing != null;
-	}
-
 	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
 			String fileName, String type) {
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of mail with subject {} and attachment {}", subject,
+					fileName);
+			return;
+		}
+
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
@@ -298,6 +309,11 @@ public class SmtpMailer {
 
 	public void sendEncryptedEmail(String recipients, String subject, String mailText, String secretText,
 			String encryptedTextFileName) {
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of encrypted mail with subject {}", subject);
+			return;
+		}
+
 		DBC.PRE.assertNotNull("Encrypted e-mails require a signing key!", this.signingKeyRing);
 		DBC.PRE.assertNotEmpty("Encrypted e-mails require at least one recipient key ring!", this.recipientKeyRings);
 		Session session = Session.getInstance(this.props, this.authenticator);
@@ -318,6 +334,12 @@ public class SmtpMailer {
 
 	public void sendEncryptedEmailWithAttachment(String recipients, String subject, String mailText, String secretText,
 			String encryptedTextFileName, String attachment, String fileName) {
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of encrypted mail with subject {} and attachment {}",
+					subject, fileName);
+			return;
+		}
+
 		DBC.PRE.assertNotNull("Encrypted e-mails require a signing key!", this.signingKeyRing);
 		DBC.PRE.assertNotEmpty("Encrypted e-mails require at least one recipient key ring!", this.recipientKeyRings);
 		Session session = Session.getInstance(this.props, this.authenticator);
