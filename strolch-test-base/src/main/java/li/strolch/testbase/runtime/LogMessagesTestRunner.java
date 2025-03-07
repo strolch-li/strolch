@@ -27,8 +27,6 @@ import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +69,7 @@ public class LogMessagesTestRunner {
 			this.operationsLog.addMessage(logMessage);
 
 			// default is async persisting...
-			while (!this.operationsLog.isQueueEmpty())
+			while (this.operationsLog.isQueueNonEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
@@ -117,7 +115,7 @@ public class LogMessagesTestRunner {
 			}
 
 			// default is async persisting...
-			while (!this.operationsLog.isQueueEmpty())
+			while (this.operationsLog.isQueueNonEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
@@ -161,19 +159,19 @@ public class LogMessagesTestRunner {
 			// update state of element
 			this.operationsLog.updateState(this.realmName, logMessage1.getLocator(), LogMessageState.Inactive);
 
-			while (!this.operationsLog.isQueueEmpty())
+			while (this.operationsLog.isQueueNonEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
 			assertEquals(LogMessageState.Inactive, logMessage1.getState());
 
 			this.operationsLog.updateState(this.realmName, logMessage1.getId(), LogMessageState.Active);
-			while (!this.operationsLog.isQueueEmpty())
+			while (this.operationsLog.isQueueNonEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 			assertEquals(LogMessageState.Active, logMessage1.getState());
 
-			while (!this.operationsLog.isQueueEmpty())
+			while (this.operationsLog.isQueueNonEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
@@ -186,7 +184,7 @@ public class LogMessagesTestRunner {
 			List<LogMessage> toRemove = Arrays.asList(logMessage2, logMessage3);
 			this.operationsLog.removeMessages(toRemove);
 
-			while (!this.operationsLog.isQueueEmpty())
+			while (this.operationsLog.isQueueNonEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
