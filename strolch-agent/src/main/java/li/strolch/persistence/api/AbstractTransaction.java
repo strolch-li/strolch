@@ -495,6 +495,16 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public boolean hasComponent(Class<?> clazz) {
+		return getAgent().hasComponent(clazz);
+	}
+
+	@Override
+	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
+		return getAgent().getComponent(clazz);
+	}
+
+	@Override
 	public <T extends StrolchPolicy> T getPolicy(PolicyContainer element, Class<T> clazz) {
 		PolicyDef policyDef = element.getPolicyDef(clazz);
 		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, this);

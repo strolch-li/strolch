@@ -236,6 +236,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	ComponentContainer getContainer();
 
 	/**
+	 * @see ComponentContainer#hasComponent(Class)
+	 */
+	boolean hasComponent(Class<?> clazz);
+
+	/**
+	 * @see ComponentContainer#getComponent(Class)
+	 */
+	<T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
+
+	/**
 	 * Instantiates the policy using the given {@link Class} to retrieve the {@link PolicyDef} from the given element
 	 *
 	 * @param element the element from which to retrieve the {@link PolicyDef
