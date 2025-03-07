@@ -59,7 +59,7 @@ public class OperationsLog extends StrolchComponent {
 	private boolean run;
 	private boolean sendMails;
 	private LogSeverity sendMailsMinSeverity;
-	private String sendMailsRecipients;
+	private String mailRecipients;
 
 	private Map<String, Long> sentMessageHashes;
 	private long lastSentHashesPruning;
@@ -76,13 +76,13 @@ public class OperationsLog extends StrolchComponent {
 		this.sendMailsMinSeverity = LogSeverity.valueOf(
 				configuration.getString(PARAM_SEND_MAILS_MIN_SEVERITY, LogSeverity.Exception.name()));
 		if (this.sendMails) {
-			String sendMailsRecipients = configuration.getString(PARAM_SEND_MAILS_RECIPIENTS, null);
+			String mailRecipients = configuration.getString(PARAM_SEND_MAILS_RECIPIENTS, null);
 			try {
-				InternetAddress.parse(sendMailsRecipients);
+				InternetAddress.parse(mailRecipients);
 			} catch (AddressException e) {
-				throw new IllegalArgumentException("Failed to parse email recipients " + sendMailsRecipients, e);
+				throw new IllegalArgumentException("Failed to parse email recipients " + mailRecipients, e);
 			}
-			this.sendMailsRecipients = sendMailsRecipients;
+			this.mailRecipients = mailRecipients;
 		}
 
 		this.maxMessages = configuration.getInt(PARAM_MAX_MESSAGES, 10000);
@@ -200,13 +200,21 @@ public class OperationsLog extends StrolchComponent {
 		return this.queue.isEmpty();
 	}
 
+	public boolean isQueueNonEmpty() {
+		return !this.queue.isEmpty();
+	}
+
+	public String getMailRecipients() {
+		return mailRecipients;
+	}
+
 	public void addMessage(LogMessage logMessage) {
 		addMessage(logMessage, false);
 	}
 
-	public void addMessage(LogMessage logMessage, boolean mailError) {
+	public void addMessage(LogMessage logMessage, boolean suppressMailNotification) {
 		if (this.queue != null)
-			this.queue.add(() -> _addMessage(logMessage, mailError));
+			this.queue.add(() -> _addMessage(logMessage, suppressMailNotification));
 	}
 
 	public void removeMessage(LogMessage message) {
@@ -225,7 +233,7 @@ public class OperationsLog extends StrolchComponent {
 		this.queue.add(() -> _updateState(realmName, id, state));
 	}
 
-	private void _addMessage(LogMessage logMessage, boolean mailError) {
+	private void _addMessage(LogMessage logMessage, boolean suppressMailNotification) {
 		// store in global list
 		String realmName = logMessage.getRealm();
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
@@ -247,12 +255,13 @@ public class OperationsLog extends StrolchComponent {
 		if (!realm.getMode().isTransient())
 			persist(realm, logMessage, messagesToRemove);
 
-		if (!mailError) {
-			try {
-				sendMessageAsMail(logMessage);
-			} catch (Exception e) {
-				logger.error("Failed to send mail for log message {}", logMessage.getLocator(), e);
-			}
+		if (suppressMailNotification)
+			return;
+
+		try {
+			sendMessageAsMail(logMessage);
+		} catch (Exception e) {
+			logger.error("Failed to send mail for log message {}", logMessage.getLocator(), e);
 		}
 	}
 
@@ -517,7 +526,7 @@ public class OperationsLog extends StrolchComponent {
 				logMessage.getUsername(), ISO8601.toString(logMessage.getZonedDateTime()), logMessage.getId(),
 				logMessage.getMessage(Locale.ENGLISH), stackTrace == null ? "(none)" : stackTrace);
 
-		mailHandler.sendEncryptedMailAsync(this.sendMailsRecipients, subject, text);
+		mailHandler.sendEncryptedMailAsync(this.mailRecipients, subject, text);
 	}
 
 	private static Locator trimAgentLocator(Locator tmp) {
