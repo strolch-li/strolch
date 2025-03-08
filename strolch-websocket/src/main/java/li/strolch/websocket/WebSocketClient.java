@@ -61,7 +61,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		this.sessionHandler = agent.getComponent(StrolchSessionHandler.class);
 		this.session = session;
 		this.config = config;
-		this.remoteIp = WebSocketRemoteIp.get();
+		this.remoteIp = session.getUserProperties().getOrDefault("remoteIp", "notset").toString();
 		this.observerHandlersByRealm = new HashMap<>(1);
 	}
 

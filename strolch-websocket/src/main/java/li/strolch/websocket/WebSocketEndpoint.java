@@ -23,7 +23,7 @@ import li.strolch.rest.RestfulStrolchComponent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-@ServerEndpoint("/websocket/strolch/observer")
+@ServerEndpoint(value = "/websocket/strolch/observer", configurator = WebSocketConfigurator.class)
 public class WebSocketEndpoint {
 
 	private final ConcurrentHashMap<Session, WebSocketClient> clientMap = new ConcurrentHashMap<>();
