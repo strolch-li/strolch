@@ -49,7 +49,6 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
 			String remoteHost;
 			String remoteAddr;
 			if (httpSession != null) {
-				logger.info("Using HTTP Session to get remote IP.");
 				remoteHost = httpSession.getRemoteHost();
 				remoteAddr = httpSession.getRemoteAddr();
 			} else {
@@ -64,9 +63,6 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
 			}
 
 			List<String> xForwardedForList = request.getHeaders().get(HEADER_X_FORWARDED_FOR);
-			logger.info("X-Forwarded-For: {}", xForwardedForList);
-			logger.info("Headers: ");
-			request.getHeaders().forEach((s, strings) -> logger.info("{}: {}", s, String.join(", ", strings)));
 			String xForwardedFor = xForwardedForList == null || xForwardedForList.isEmpty() ? null :
 					xForwardedForList.getFirst();
 
