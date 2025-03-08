@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import static li.strolch.rest.StrolchRestfulConstants.HEADER_X_FORWARDED_FOR;
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REMOTE_IP;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
@@ -37,7 +39,7 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
 	public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
 		String remoteIp = getRemoteIp(request);
 		logger.info("Remote IP: {}: {} {}", remoteIp, "WS Upgrade", request.getRequestURI());
-		sec.getUserProperties().put("remoteIp", remoteIp);
+		sec.getUserProperties().put(STROLCH_REMOTE_IP, remoteIp);
 	}
 
 	public static String getRemoteIp(HandshakeRequest request) {
@@ -47,6 +49,7 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
 			String remoteHost;
 			String remoteAddr;
 			if (httpSession != null) {
+				logger.info("Using HTTP Session to get remote IP.");
 				remoteHost = httpSession.getRemoteHost();
 				remoteAddr = httpSession.getRemoteAddr();
 			} else {
@@ -60,7 +63,10 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
 				}
 			}
 
-			List<String> xForwardedForList = request.getHeaders().get("X-Forwarded-For");
+			List<String> xForwardedForList = request.getHeaders().get(HEADER_X_FORWARDED_FOR);
+			logger.info("X-Forwarded-For: {}", xForwardedForList);
+			logger.info("Headers: ");
+			request.getHeaders().forEach((s, strings) -> logger.info("{}: {}", s, String.join(", ", strings)));
 			String xForwardedFor = xForwardedForList == null || xForwardedForList.isEmpty() ? null :
 					xForwardedForList.getFirst();
 
