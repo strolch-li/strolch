@@ -18,7 +18,6 @@ package li.strolch.service.parameter;
 import li.strolch.model.Locator;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.service.parameter.SetParameterService.SetParameterArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import org.junit.Test;
 
