@@ -120,6 +120,7 @@ public class AuditHelper {
 					audit.setElementAccessed("");
 
 					audit.setAccessType(AccessType.EXECUTE);
+					audit.setAction("");
 
 					tx.getAuditTrail().add(tx, audit);
 					tx.commitOnClose();
