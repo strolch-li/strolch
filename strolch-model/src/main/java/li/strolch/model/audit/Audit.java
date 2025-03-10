@@ -15,6 +15,7 @@
  */
 package li.strolch.model.audit;
 
+import com.google.gson.JsonElement;
 import li.strolch.model.StrolchRootElement;
 
 import java.util.Date;
@@ -37,6 +38,7 @@ public class Audit implements Comparable<Audit> {
 	private Date newVersion;
 	private String action;
 	private AccessType accessType;
+	private JsonElement additionalData;
 
 	public Long getId() {
 		return this.id;
@@ -98,12 +100,12 @@ public class Audit implements Comparable<Audit> {
 		return this.elementAccessed;
 	}
 
-	public void setElementAccessed(String elementAccessed) {
-		this.elementAccessed = elementAccessed;
-	}
-
 	public Date getNewVersion() {
 		return this.newVersion;
+	}
+
+	public void setElementAccessed(String elementAccessed) {
+		this.elementAccessed = elementAccessed;
 	}
 
 	public void setNewVersion(Date newVersion) {
@@ -120,6 +122,14 @@ public class Audit implements Comparable<Audit> {
 
 	public AccessType getAccessType() {
 		return this.accessType;
+	}
+
+	public JsonElement getAdditionalData() {
+		return this.additionalData;
+	}
+
+	public void setAdditionalData(JsonElement additionalData) {
+		this.additionalData = additionalData;
 	}
 
 	public void setAccessType(AccessType accessType) {
