@@ -166,7 +166,9 @@ public class ResponseUtil {
 	public static Response toResponse(Status status, Throwable t) {
 		I18nMessage i18nMessage = evaluateI18nMessage(t);
 		String msg = getExceptionMessageWithCauses(t, false);
-		String json = StrolchResponse.valueOf(msg, i18nMessage).toJson();
+		String json = (
+				i18nMessage == null ? StrolchResponse.valueOf(msg) :
+						StrolchResponse.valueOf(msg, i18nMessage)).toJson();
 		return Response.status(status).entity(json).type(APPLICATION_JSON).build();
 	}
 
