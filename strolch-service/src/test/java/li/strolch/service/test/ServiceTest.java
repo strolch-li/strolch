@@ -20,10 +20,10 @@ import li.strolch.privilege.base.NotAuthenticatedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.UserState;
+import li.strolch.service.StringArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
-import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import li.strolch.service.test.model.TestService;
 import li.strolch.utils.dbc.DBC;
 import org.junit.Test;
@@ -46,7 +46,8 @@ public class ServiceTest extends AbstractServiceTest {
 			TestService testService = new TestService();
 			getServiceHandler().doService(
 					new Certificate(null, null, null, null, null, null, null, null, ZonedDateTime.now(), false, null,
-							new HashSet<>(), new HashSet<>(), new HashSet<>(), null), testService);
+							new HashSet<>(), new HashSet<>(), new HashSet<>(), null), testService,
+					testService.getArgumentInstance());
 		});
 	}
 
@@ -55,7 +56,8 @@ public class ServiceTest extends AbstractServiceTest {
 		TestService testService = new TestService();
 		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", "asd",
 				ZonedDateTime.now(), false, null, new HashSet<>(), new HashSet<>(), new HashSet<>(), null);
-		ServiceResult svcResult = getServiceHandler().doService(badCert, testService);
+		ServiceResult svcResult = getServiceHandler().doService(badCert, testService,
+				testService.getArgumentInstance());
 		assertThat(svcResult.getThrowable(), instanceOf(NotAuthenticatedException.class));
 	}
 
@@ -67,7 +69,8 @@ public class ServiceTest extends AbstractServiceTest {
 				.authenticate("jill", "jill".toCharArray());//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
-			ServiceResult svcResult = getServiceHandler().doService(certificate, testService);
+			ServiceResult svcResult = getServiceHandler().doService(certificate, testService,
+					testService.getArgumentInstance());
 			assertThat(svcResult.getMessage(), containsString("User jill may not perform service TestService"));
 			assertThat(svcResult.getThrowable(), instanceOf(AccessDeniedException.class));
 		} finally {
@@ -82,8 +85,8 @@ public class ServiceTest extends AbstractServiceTest {
 				.authenticate("jill", "jill".toCharArray());//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();
-			GreetingArgument argument = new GreetingArgument();
-			argument.name = "Jill";
+			StringArgument argument = service.getArgumentInstance();
+			argument.value = "Jill";
 			GreetingResult greetingResult = getServiceHandler().doService(certificate, service, argument);
 			assertThat(greetingResult.getGreeting(), equalTo("Hello Jill. Nice to meet you!"));
 		} finally {
@@ -99,7 +102,7 @@ public class ServiceTest extends AbstractServiceTest {
 				.authenticate("bob", "bob".toCharArray());//$NON-NLS-2$
 		try {
 			TestService testService = new TestService();
-			getServiceHandler().doService(certificate, testService);
+			getServiceHandler().doService(certificate, testService, testService.getArgumentInstance());
 		} finally {
 			runtimeMock.getPrivilegeHandler().invalidate(certificate);
 		}
@@ -112,8 +115,8 @@ public class ServiceTest extends AbstractServiceTest {
 				.authenticate("bob", "bob".toCharArray());//$NON-NLS-2$
 		try {
 			GreetingService service = new GreetingService();
-			GreetingArgument argument = new GreetingArgument();
-			argument.name = "Bob";
+			StringArgument argument = service.getArgumentInstance();
+			argument.value = "Bob";
 			GreetingResult greetingResult = getServiceHandler().doService(certificate, service, argument);
 			assertThat(greetingResult.getGreeting(), equalTo("Hello Bob. Nice to meet you!"));
 		} finally {

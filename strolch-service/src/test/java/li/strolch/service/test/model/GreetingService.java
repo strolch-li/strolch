@@ -15,9 +15,8 @@
  */
 package li.strolch.service.test.model;
 
+import li.strolch.service.StringArgument;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
-import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import li.strolch.utils.helper.StringHelper;
 
 import java.text.MessageFormat;
@@ -25,16 +24,16 @@ import java.text.MessageFormat;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class GreetingService extends AbstractService<GreetingArgument, GreetingResult> {
+public class GreetingService extends AbstractService<StringArgument, GreetingResult> {
 
 	@Override
-	protected GreetingResult internalDoService(GreetingArgument argument) {
+	protected GreetingResult internalDoService(StringArgument argument) {
 
-		if (StringHelper.isEmpty(argument.name))
+		if (StringHelper.isEmpty(argument.value))
 			throw new IllegalArgumentException("The name must always be set!");
 
 		GreetingResult greetingResult = new GreetingResult();
-		String greeting = MessageFormat.format("Hello {0}. Nice to meet you!", argument.name);
+		String greeting = MessageFormat.format("Hello {0}. Nice to meet you!", argument.value);
 		greetingResult.setGreeting(greeting);
 		return greetingResult;
 	}
@@ -45,12 +44,7 @@ public class GreetingService extends AbstractService<GreetingArgument, GreetingR
 	}
 
 	@Override
-	public GreetingArgument getArgumentInstance() {
-		return new GreetingArgument();
-	}
-
-	public static class GreetingArgument extends ServiceArgument {
-
-		public String name;
+	public StringArgument getArgumentInstance() {
+		return new StringArgument();
 	}
 }
