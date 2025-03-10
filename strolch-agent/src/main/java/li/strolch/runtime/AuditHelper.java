@@ -50,6 +50,10 @@ public class AuditHelper {
 	public static void writeAuditForService(StrolchAgent agent, ServiceArgument arg, Certificate certificate,
 			ServiceResult result, String realmName, String username, String svcName) {
 
+		// we currently down't want to create audits for the agent user
+		if (certificate.isSystemUser())
+			return;
+
 		StrolchRealm realm = agent.getComponent(RealmHandler.class).getRealm(realmName);
 		if (!realm.isAuditTrailEnabled())
 			return;
@@ -99,6 +103,10 @@ public class AuditHelper {
 
 	public static void writeAuditForSearch(StrolchAgent agent, Certificate certificate, String realmName,
 			String searchName) {
+
+		// we currently down't want to create audits for the agent user
+		if (certificate.isSystemUser())
+			return;
 
 		StrolchRealm realm = agent.getRealm(realmName);
 		try {
