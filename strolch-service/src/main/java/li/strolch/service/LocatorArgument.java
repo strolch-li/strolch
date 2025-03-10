@@ -16,9 +16,21 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import li.strolch.model.Locator;
+import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceArgument;
 
 public class LocatorArgument extends ServiceArgument {
 	public Locator locator;
+
+	@Override
+	public JsonElement toJson() {
+		if (this.locator == null)
+			return new JsonObject();
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.LOCATOR, this.locator.toString());
+		return jsonObject;
+	}
 }

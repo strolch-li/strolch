@@ -15,10 +15,21 @@
  */
 package li.strolch.service.privilege.users;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.privilege.model.UserState;
 import li.strolch.service.api.ServiceArgument;
 
 public class PrivilegeSetUserStateArgument extends ServiceArgument {
 	public String username;
 	public UserState userState;
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.USERNAME, this.username);
+		jsonObject.addProperty(Tags.Json.USER_STATE, this.userState == null ? "null" : this.userState.name());
+		return jsonObject;
+	}
 }

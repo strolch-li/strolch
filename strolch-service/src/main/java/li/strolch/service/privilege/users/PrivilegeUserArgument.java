@@ -15,9 +15,19 @@
  */
 package li.strolch.service.privilege.users;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.service.api.ServiceArgument;
 
 public class PrivilegeUserArgument extends ServiceArgument {
 	public UserRep user;
+
+	@Override
+	public JsonElement toJson() {
+		if (this.user == null)
+			return new JsonObject();
+		return this.user.accept(new PrivilegeElementToJsonVisitor());
+	}
 }

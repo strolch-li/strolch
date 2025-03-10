@@ -16,11 +16,25 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.service.api.ServiceArgument;
 
 import java.util.List;
 
 public class StrolchRootElementListArgument extends ServiceArgument {
 	public List<StrolchRootElement> rootElements;
+
+	@Override
+	public JsonElement toJson() {
+		if (this.rootElements == null || this.rootElements.isEmpty())
+			return new JsonArray();
+
+		return this.rootElements
+				.stream()
+				.map(e -> e.accept(new StrolchElementToJsonVisitor().flatBagsByType(e.getParameterBagTypes())))
+				.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
+	}
 }

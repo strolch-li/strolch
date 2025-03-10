@@ -16,8 +16,18 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceArgument;
 
 public class StringArgument extends ServiceArgument {
 	public String value;
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.VALUE, this.value);
+		return jsonObject;
+	}
 }

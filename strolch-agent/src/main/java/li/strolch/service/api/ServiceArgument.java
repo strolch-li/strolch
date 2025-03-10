@@ -15,6 +15,9 @@
  */
 package li.strolch.service.api;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * Base argument to be used when performing {@link Service Services}. The realm parameter is null and can be overridden
  * when the caller of the service wants to perform the service in a different realm
@@ -28,4 +31,8 @@ public class ServiceArgument {
 	 * </p>
 	 */
 	public String realm;
+
+	public JsonElement toJson() {
+		return new JsonObject();
+	}
 }

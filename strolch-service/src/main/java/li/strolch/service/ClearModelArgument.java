@@ -15,9 +15,19 @@
  */
 package li.strolch.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import li.strolch.service.api.ServiceArgument;
 
 public class ClearModelArgument extends ServiceArgument {
 	public boolean clearOrders;
 	public boolean clearResources;
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty("clearOrders", this.clearOrders);
+		jsonObject.addProperty("clearResources", this.clearResources);
+		return jsonObject;
+	}
 }

@@ -15,6 +15,8 @@
  */
 package li.strolch.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import li.strolch.service.api.ServiceArgument;
 
 import java.util.HashSet;
@@ -31,6 +33,11 @@ public class XmlExportModelArgument extends ServiceArgument {
 	public final Set<String> orderTypes = new HashSet<>();
 	public final Set<String> resourceTypes = new HashSet<>();
 	public final Set<String> activityTypes = new HashSet<>();
+
+	@Override
+	public JsonElement toJson() {
+		return new JsonObject();
+	}
 
 	@Override
 	public String toString() {

@@ -16,6 +16,9 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 
@@ -48,4 +51,18 @@ public class ByteArrayServiceArgument extends ServiceArgument {
 	 * The input object
 	 */
 	public byte[] bytes;
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.OBJECT_TYPE, this.objectType);
+		jsonObject.addProperty(Tags.Json.ID, this.objectId);
+		JsonObject mapJson = new JsonObject();
+		for (Map.Entry<String, String> stringStringEntry : map.entrySet()) {
+			mapJson.addProperty(stringStringEntry.getKey(), stringStringEntry.getValue());
+		}
+		jsonObject.add("map", mapJson);
+		jsonObject.addProperty("bytes", this.bytes.length);
+		return jsonObject;
+	}
 }

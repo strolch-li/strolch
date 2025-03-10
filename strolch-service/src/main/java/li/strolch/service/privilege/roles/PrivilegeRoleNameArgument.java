@@ -15,8 +15,18 @@
  */
 package li.strolch.service.privilege.roles;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceArgument;
 
 public class PrivilegeRoleNameArgument extends ServiceArgument {
 	public String roleName;
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.ROLE, this.roleName);
+		return jsonObject;
+	}
 }

@@ -16,6 +16,8 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import li.strolch.service.api.ServiceArgument;
 
 import java.util.ArrayList;
@@ -23,4 +25,13 @@ import java.util.List;
 
 public class StringListArgument extends ServiceArgument {
 	public List<String> list = new ArrayList<>();
+
+	@Override
+	public JsonElement toJson() {
+		if (this.list.isEmpty())
+			return new JsonArray();
+		JsonArray jsonArray = new JsonArray();
+		this.list.forEach(jsonArray::add);
+		return jsonArray;
+	}
 }

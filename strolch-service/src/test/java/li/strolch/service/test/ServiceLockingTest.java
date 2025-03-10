@@ -15,6 +15,8 @@
  */
 package li.strolch.service.test;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import li.strolch.model.Locator;
 import li.strolch.model.Resource;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -177,6 +179,11 @@ public class ServiceLockingTest {
 		public boolean longRunning;
 		public int nrOfLocks = 1;
 		public Locator resourceLoc;
+
+		@Override
+		public JsonElement toJson() {
+			return new JsonObject();
+		}
 	}
 
 	private static class LockingServiceTest extends AbstractService<LockingArgumentTest, ServiceResult> {

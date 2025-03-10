@@ -15,8 +15,18 @@
  */
 package li.strolch.service.privilege.users;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceArgument;
 
 public class PrivilegeUserNameArgument extends ServiceArgument {
 	public String username;
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.USERNAME, this.username);
+		return jsonObject;
+	}
 }

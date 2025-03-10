@@ -17,6 +17,8 @@
 package li.strolch.service;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 
@@ -59,5 +61,14 @@ public class JsonServiceArgument extends ServiceArgument {
 		this.objectType = objectType;
 		this.objectId = objectId;
 		this.jsonElement = jsonElement;
+	}
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.OBJECT_TYPE, this.objectType);
+		jsonObject.addProperty(Tags.Json.ID, this.objectId);
+		jsonObject.add(Tags.Json.DATA, this.jsonElement);
+		return jsonObject;
 	}
 }

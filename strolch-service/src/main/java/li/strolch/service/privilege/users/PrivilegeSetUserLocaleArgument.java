@@ -15,6 +15,9 @@
  */
 package li.strolch.service.privilege.users;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceArgument;
 
 import java.util.Locale;
@@ -22,4 +25,12 @@ import java.util.Locale;
 public class PrivilegeSetUserLocaleArgument extends ServiceArgument {
 	public String username;
 	public Locale locale;
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.USERNAME, this.username);
+		jsonObject.addProperty(Tags.Json.LOCALE, this.locale == null ? "null" : this.locale.toLanguageTag());
+		return jsonObject;
+	}
 }
