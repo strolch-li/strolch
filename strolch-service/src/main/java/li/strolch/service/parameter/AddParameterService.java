@@ -15,17 +15,13 @@
  */
 package li.strolch.service.parameter;
 
-import li.strolch.model.Locator;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.TxUpdateStrolchRootElementVisitor;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
-import li.strolch.service.parameter.AddParameterService.AddParameterArg;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -59,9 +55,4 @@ public class AddParameterService extends AbstractService<AddParameterArg, Servic
 		return ServiceResult.success();
 	}
 
-	public static class AddParameterArg extends ServiceArgument {
-
-		public Locator locator;
-		public Parameter<?> parameter;
-	}
 }

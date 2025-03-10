@@ -15,16 +15,13 @@
  */
 package li.strolch.service.parameter;
 
-import li.strolch.model.Locator;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.TxUpdateStrolchRootElementVisitor;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
-import li.strolch.service.parameter.SetParameterService.SetParameterArg;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -75,18 +72,5 @@ public class SetParameterService extends AbstractService<SetParameterArg, Servic
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class SetParameterArg extends ServiceArgument {
-		public static final long serialVersionUID = 1L;
-		public Locator locator;
-
-		public String name;
-		public String interpretation;
-		public String uom;
-		public Boolean hidden;
-		public Integer index;
-
-		public String valueAsString;
 	}
 }
