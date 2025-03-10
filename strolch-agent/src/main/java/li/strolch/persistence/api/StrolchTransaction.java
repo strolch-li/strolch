@@ -502,11 +502,23 @@ public interface StrolchTransaction extends AutoCloseable {
 	void setSuppressAuditsForAudits(boolean suppressAuditsForAudits);
 
 	/**
+	 * Suppresses audits for audits, which should be the default, as the AuditTrail is also audited
+	 */
+	StrolchTransaction suppressAuditsForAudits();
+
+	/**
 	 * Returns true if writing {@link Audit Audits} is currently suppressed
 	 *
 	 * @return true if writing {@link Audit Audits} is currently suppressed
 	 */
 	boolean isSuppressAudits();
+
+	/**
+	 * Returns true if audits for audits should be written
+	 *
+	 * @return true if audits for audits should be written
+	 */
+	boolean isAuditsForAuditsEnabled();
 
 	/**
 	 * Returns true if writing {@link Audit Audits} for Audits is currently suppressed

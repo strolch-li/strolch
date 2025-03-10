@@ -48,13 +48,13 @@ public class CachedRealm extends InternalStrolchRealm {
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
-		return this.persistenceHandler.openTx(this, certificate, action, readOnly);
+		return this.persistenceHandler.openTx(this, certificate, action, readOnly).suppressAuditsForAudits();
 	}
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
-		return this.persistenceHandler.openTx(this, certificate, clazz.getName(), readOnly);
+		return this.persistenceHandler.openTx(this, certificate, clazz.getName(), readOnly).suppressAuditsForAudits();
 	}
 
 	@Override

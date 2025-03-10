@@ -98,7 +98,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private AuditingOrderMap orderMap;
 	private AuditingResourceMap resourceMap;
 	private AuditingActivityMap activityMap;
-	private AuditingAuditMapFacade auditTrail;
+	private AuditTrail auditTrail;
 
 	private final String action;
 	private final Certificate certificate;
@@ -286,8 +286,19 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public StrolchTransaction suppressAuditsForAudits() {
+		this.suppressAuditsForAudits = true;
+		return this;
+	}
+
+	@Override
 	public boolean isSuppressAudits() {
 		return this.suppressAudits;
+	}
+
+	@Override
+	public boolean isAuditsForAuditsEnabled() {
+		return !this.suppressAuditsForAudits;
 	}
 
 	@Override
@@ -446,6 +457,18 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public AuditTrail getAuditTrail() {
+		if (this.auditTrail == null) {
+			if (this.isSuppressAuditsForAudits())
+				this.auditTrail = this.realm.getAuditTrail();
+			else
+				this.auditTrail = new AuditingAuditMapFacade(this.realm.getAuditTrail(),
+						this.realm.isAuditTrailEnabledForRead());
+		}
+		return this.auditTrail;
+	}
+
+	@Override
 	public long getResourceCount() {
 		return getResourceMap().querySize(this);
 	}
@@ -473,15 +496,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public long getActivityCount(String type) {
 		return getActivityMap().querySize(this, type);
-	}
-
-	@Override
-	public AuditTrail getAuditTrail() {
-		if (this.auditTrail == null) {
-			this.auditTrail = new AuditingAuditMapFacade(this.realm.getAuditTrail(),
-					this.realm.isAuditTrailEnabledForRead());
-		}
-		return this.auditTrail;
 	}
 
 	@Override
@@ -1964,7 +1978,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private boolean isAuditTrailEnabled() {
-		return getAuditTrail().isEnabled();
+		if (this.auditTrail != null)
+			return this.auditTrail.isEnabled();
+		return getRealm().isAuditTrailEnabled();
 	}
 
 	private long updateObservers() {
@@ -2060,12 +2076,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			auditsFor(audits, AccessType.DELETE, this.activityMap.getDeleted());
 		}
 
-		if (this.auditTrail != null && !isSuppressAuditsForAudits()) {
+		if (this.auditTrail != null && isAuditsForAuditsEnabled()) {
+			AuditingAuditMapFacade auditingAuditMapFacade = (AuditingAuditMapFacade) this.auditTrail;
 			if (this.realm.isAuditTrailEnabledForRead())
-				auditsForAudits(audits, AccessType.READ, this.auditTrail.getRead());
-			auditsForAudits(audits, AccessType.CREATE, this.auditTrail.getCreated());
-			auditsForAudits(audits, AccessType.UPDATE, this.auditTrail.getUpdated());
-			auditsForAudits(audits, AccessType.DELETE, this.auditTrail.getDeleted());
+				auditsForAudits(audits, AccessType.READ, auditingAuditMapFacade.getRead());
+			auditsForAudits(audits, AccessType.CREATE, auditingAuditMapFacade.getCreated());
+			auditsForAudits(audits, AccessType.UPDATE, auditingAuditMapFacade.getUpdated());
+			auditsForAudits(audits, AccessType.DELETE, auditingAuditMapFacade.getDeleted());
 		}
 
 		if (!audits.isEmpty())
