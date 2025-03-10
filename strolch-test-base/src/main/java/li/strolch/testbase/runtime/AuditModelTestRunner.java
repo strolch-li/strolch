@@ -70,11 +70,12 @@ public class AuditModelTestRunner {
 		// first cleanup
 		cleanup(realm);
 
+		// generate a random audit
+		Audit audit = ModelGenerator.randomAudit();
+		audit.setDate(current);
+
 		// single element actions
 		{
-			Audit audit = ModelGenerator.randomAudit();
-			audit.setDate(current);
-
 			// add
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
@@ -136,9 +137,6 @@ public class AuditModelTestRunner {
 
 		// querying
 		{
-			Audit audit = ModelGenerator.randomAudit();
-			audit.setDate(current);
-
 			// querySize
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
