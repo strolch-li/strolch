@@ -15,15 +15,17 @@
  */
 package li.strolch.service.api;
 
-import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchComponent;
+import li.strolch.agent.api.*;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
+import li.strolch.model.audit.AccessType;
+import li.strolch.model.audit.Audit;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
+import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.Certificate;
@@ -35,9 +37,14 @@ import li.strolch.utils.I18nMessage;
 import li.strolch.utils.dbc.DBC;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 
+import static java.util.ResourceBundle.getBundle;
+import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.Tags.AGENT;
+import static li.strolch.model.log.LogMessageState.Information;
+import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
 import static li.strolch.service.api.ServiceResultState.*;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
@@ -291,6 +298,55 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		}
 
 		// record the event
+		getExecutorService(ServiceHandler.class.getSimpleName()).submit(
+				() -> writeAuditForService(arg, certificate, result, realmName, username, svcName));
 		getAgent().getAgentStatistics().recordService(durationNanos);
+	}
+
+	private void writeAuditForService(ServiceArgument arg, Certificate certificate, ServiceResult result,
+			String realmName, String username, String svcName) {
+
+		StrolchRealm realm = getComponent(RealmHandler.class).getRealm(realmName);
+		if (!realm.isAuditTrailEnabled())
+			return;
+
+		try {
+			runAsAgent(ctx -> {
+				try (StrolchTransaction tx = realm.openTx(ctx.certificate(), getClass(), false)) {
+					Audit audit = new Audit();
+
+					audit.setId(StrolchAgent.getUniqueIdLong());
+					audit.setUsername(username);
+					audit.setFirstname(certificate.getFirstname() == null ? certificate.getUsername() :
+							certificate.getFirstname());
+					audit.setLastname(
+							certificate.getLastname() == null ? certificate.getUsername() : certificate.getLastname());
+					audit.setDate(new Date());
+
+					audit.setElementType(Service.class.getSimpleName());
+					audit.setElementSubType(svcName);
+					audit.setElementAccessed("");
+
+					audit.setAccessType(AccessType.EXECUTE);
+					audit.setAction(result.getState().name());
+
+					audit.setAdditionalData(arg.toJson());
+
+					tx.getAuditTrail().add(tx, audit);
+					tx.commitOnClose();
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to log audit for service {}!", svcName, e);
+			if (hasComponent(OperationsLog.class)) {
+				getComponent(OperationsLog.class).addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
+						Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception, Information,
+						getBundle("strolch-agent"), "agent.service.audit.failed")
+						.value("service", svcName)
+						.value("user", username)
+						.value("reason", e.getMessage())
+						.withException(e));
+			}
+		}
 	}
 }
