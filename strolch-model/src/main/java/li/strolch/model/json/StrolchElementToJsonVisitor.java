@@ -206,6 +206,11 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		return this;
 	}
 
+	public StrolchElementToJsonVisitor flatBagsByType(Collection<String> bagTypes) {
+		this.flatBagsByType.addAll(bagTypes);
+		return this;
+	}
+
 	public StrolchElementToJsonVisitor ignoreBag(String bagId) {
 		this.ignoredKeys.addSet(bagId, Collections.emptySet());
 		return this;

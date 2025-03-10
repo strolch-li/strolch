@@ -15,6 +15,7 @@
  */
 package li.strolch.model.audit;
 
+import com.google.gson.JsonParser;
 import li.strolch.model.Tags;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.xml.sax.Attributes;
@@ -22,6 +23,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.text.MessageFormat;
 import java.util.function.Consumer;
+
+import static li.strolch.model.Tags.Audit.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -43,11 +46,10 @@ public class AuditSaxReader extends DefaultHandler {
 		switch (qName) {
 			case Tags.AUDIT -> {
 				this.currentAudit = new Audit();
-				this.currentAudit.setId(Long.parseLong(attributes.getValue(Tags.Audit.ID)));
+				this.currentAudit.setId(Long.parseLong(attributes.getValue(ID)));
 			}
-			case Tags.Audit.USERNAME, Tags.Audit.FIRSTNAME, Tags.Audit.LASTNAME, Tags.Audit.DATE,
-				 Tags.Audit.ELEMENT_TYPE, Tags.Audit.ELEMENT_SUB_TYPE, Tags.Audit.ELEMENT_ACCESSED,
-				 Tags.Audit.NEW_VERSION, Tags.Audit.ACTION, Tags.Audit.ACCESS_TYPE -> this.sb = new StringBuilder();
+			case USERNAME, FIRSTNAME, LASTNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION,
+				 ACTION, ACCESS_TYPE, ADDITIONAL_DATA -> this.sb = new StringBuilder();
 			default -> throw new IllegalArgumentException(
 					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
@@ -61,44 +63,48 @@ public class AuditSaxReader extends DefaultHandler {
 				this.auditConsumer.accept(this.currentAudit);
 				this.currentAudit = null;
 			}
-			case Tags.Audit.USERNAME -> {
+			case USERNAME -> {
 				this.currentAudit.setUsername(this.sb.toString());
 				this.sb = null;
 			}
-			case Tags.Audit.FIRSTNAME -> {
+			case FIRSTNAME -> {
 				this.currentAudit.setFirstname(this.sb.toString());
 				this.sb = null;
 			}
-			case Tags.Audit.LASTNAME -> {
+			case LASTNAME -> {
 				this.currentAudit.setLastname(this.sb.toString());
 				this.sb = null;
 			}
-			case Tags.Audit.DATE -> {
+			case DATE -> {
 				this.currentAudit.setDate(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
 				this.sb = null;
 			}
-			case Tags.Audit.ELEMENT_TYPE -> {
+			case ELEMENT_TYPE -> {
 				this.currentAudit.setElementType(this.sb.toString());
 				this.sb = null;
 			}
-			case Tags.Audit.ELEMENT_SUB_TYPE -> {
+			case ELEMENT_SUB_TYPE -> {
 				this.currentAudit.setElementSubType(this.sb.toString());
 				this.sb = null;
 			}
-			case Tags.Audit.ELEMENT_ACCESSED -> {
+			case ELEMENT_ACCESSED -> {
 				this.currentAudit.setElementAccessed(this.sb.toString());
 				this.sb = null;
 			}
-			case Tags.Audit.NEW_VERSION -> {
+			case NEW_VERSION -> {
 				this.currentAudit.setNewVersion(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
 				this.sb = null;
 			}
-			case Tags.Audit.ACTION -> {
+			case ACTION -> {
 				this.currentAudit.setAction(this.sb.toString());
 				this.sb = null;
 			}
-			case Tags.Audit.ACCESS_TYPE -> {
+			case ACCESS_TYPE -> {
 				this.currentAudit.setAccessType(AccessType.valueOf(this.sb.toString()));
+				this.sb = null;
+			}
+			case ADDITIONAL_DATA -> {
+				this.currentAudit.setAdditionalData(JsonParser.parseString(this.sb.toString()));
 				this.sb = null;
 			}
 			default -> throw new IllegalArgumentException(

@@ -16,6 +16,8 @@
 
 package li.strolch.model.audit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
@@ -24,6 +26,8 @@ import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.text.MessageFormat;
+
+import static li.strolch.model.Tags.Audit.*;
 
 public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 
@@ -51,33 +55,45 @@ public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 	private void writeElement(Audit audit) throws XMLStreamException {
 
 		this.writer.writeStartElement(Tags.AUDIT);
-		this.writer.writeAttribute(Tags.Audit.ID, audit.getId().toString());
+		this.writer.writeAttribute(ID, audit.getId().toString());
 
-		writeElem(Tags.Audit.USERNAME, audit.getUsername());
+		writeElem(USERNAME, audit.getUsername());
 
-		writeElem(Tags.Audit.FIRSTNAME, audit.getFirstname());
-		writeElem(Tags.Audit.LASTNAME, audit.getLastname());
-		writeElem(Tags.Audit.DATE, ISO8601FormatFactory.getInstance().formatDate(audit.getDate()));
+		writeElem(FIRSTNAME, audit.getFirstname());
+		writeElem(LASTNAME, audit.getLastname());
+		writeElem(DATE, ISO8601FormatFactory.getInstance().formatDate(audit.getDate()));
 
-		writeElem(Tags.Audit.ELEMENT_TYPE, audit.getElementType());
-		writeElem(Tags.Audit.ELEMENT_SUB_TYPE, audit.getElementSubType());
-		writeElem(Tags.Audit.ELEMENT_ACCESSED, audit.getElementAccessed());
+		writeElem(ELEMENT_TYPE, audit.getElementType());
+		writeElem(ELEMENT_SUB_TYPE, audit.getElementSubType());
+		writeElem(ELEMENT_ACCESSED, audit.getElementAccessed());
 
 		if (audit.getNewVersion() != null)
-			writeElem(Tags.Audit.NEW_VERSION, ISO8601FormatFactory.getInstance().formatDate(audit.getNewVersion()));
+			writeElem(NEW_VERSION, ISO8601FormatFactory.getInstance().formatDate(audit.getNewVersion()));
 
-		writeElem(Tags.Audit.ACTION, audit.getAction());
-		writeElem(Tags.Audit.ACCESS_TYPE, audit.getAccessType().name());
+		writeElem(ACTION, audit.getAction());
+		writeElem(ACCESS_TYPE, audit.getAccessType().name());
+
+		if (audit.getAdditionalData() != null) {
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			writeElem(ADDITIONAL_DATA, gson.toJson(audit.getAdditionalData()), true);
+		}
 
 		this.writer.writeEndElement();
 	}
 
 	private void writeElem(String tag, String text) throws XMLStreamException {
+		writeElem(tag, text, false);
+	}
+
+	private void writeElem(String tag, String text, boolean cdata) throws XMLStreamException {
 		if (StringHelper.isEmpty(text))
 			return;
 
 		this.writer.writeStartElement(tag);
-		this.writer.writeCharacters(text);
+		if (cdata)
+			this.writer.writeCData(text);
+		else
+			this.writer.writeCharacters(text);
 		this.writer.writeEndElement();
 	}
 }

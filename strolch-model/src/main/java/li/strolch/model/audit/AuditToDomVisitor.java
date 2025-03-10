@@ -15,13 +15,17 @@
  */
 package li.strolch.model.audit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.DomUtil;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
+
+import static li.strolch.model.Tags.Audit.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -34,24 +38,28 @@ public class AuditToDomVisitor implements AuditVisitor<Document> {
 		Document doc = documentBuilder.getDOMImplementation().createDocument(null, null, null);
 
 		Element auditE = doc.createElement(Tags.AUDIT);
-		auditE.setAttribute(Tags.Audit.ID, audit.getId().toString());
+		auditE.setAttribute(ID, audit.getId().toString());
 
-		auditE.appendChild(elem(doc, Tags.Audit.USERNAME, audit.getUsername()));
+		auditE.appendChild(elem(doc, USERNAME, audit.getUsername()));
 
-		auditE.appendChild(elem(doc, Tags.Audit.FIRSTNAME, audit.getFirstname()));
-		auditE.appendChild(elem(doc, Tags.Audit.LASTNAME, audit.getLastname()));
-		auditE.appendChild(elem(doc, Tags.Audit.DATE, ISO8601FormatFactory.getInstance().formatDate(audit.getDate())));
+		auditE.appendChild(elem(doc, FIRSTNAME, audit.getFirstname()));
+		auditE.appendChild(elem(doc, LASTNAME, audit.getLastname()));
+		auditE.appendChild(elem(doc, DATE, ISO8601.toString(audit.getDate())));
 
-		auditE.appendChild(elem(doc, Tags.Audit.ELEMENT_TYPE, audit.getElementType()));
-		auditE.appendChild(elem(doc, Tags.Audit.ELEMENT_SUB_TYPE, audit.getElementSubType()));
-		auditE.appendChild(elem(doc, Tags.Audit.ELEMENT_ACCESSED, audit.getElementAccessed()));
+		auditE.appendChild(elem(doc, ELEMENT_TYPE, audit.getElementType()));
+		auditE.appendChild(elem(doc, ELEMENT_SUB_TYPE, audit.getElementSubType()));
+		auditE.appendChild(elem(doc, ELEMENT_ACCESSED, audit.getElementAccessed()));
 
 		if (audit.getNewVersion() != null)
-			auditE.appendChild(elem(doc, Tags.Audit.NEW_VERSION,
-					ISO8601FormatFactory.getInstance().formatDate(audit.getNewVersion())));
+			auditE.appendChild(elem(doc, NEW_VERSION, ISO8601.toString(audit.getNewVersion())));
 
-		auditE.appendChild(elem(doc, Tags.Audit.ACTION, audit.getAction()));
-		auditE.appendChild(elem(doc, Tags.Audit.ACCESS_TYPE, audit.getAccessType().name()));
+		auditE.appendChild(elem(doc, ACTION, audit.getAction()));
+		auditE.appendChild(elem(doc, ACCESS_TYPE, audit.getAccessType().name()));
+
+		if (audit.getAdditionalData() != null) {
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			auditE.appendChild(elem(doc, ADDITIONAL_DATA, gson.toJson(audit.getAdditionalData())));
+		}
 
 		doc.appendChild(auditE);
 		return doc;
