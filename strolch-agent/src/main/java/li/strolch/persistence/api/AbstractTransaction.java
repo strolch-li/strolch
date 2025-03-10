@@ -276,6 +276,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public boolean isAuditTrailEnabled() {
+		if (this.auditTrail != null)
+			return this.auditTrail.isEnabled();
+		return getRealm().isAuditTrailEnabled();
+	}
+
+	@Override
 	public void setSuppressAudits(boolean suppressAudits) {
 		this.suppressAudits = suppressAudits;
 	}
@@ -1975,12 +1982,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		else
 			logger.error("Transaction failed in non-commit mode! Logging TX exception, so exception is not suppressed.",
 					ex);
-	}
-
-	private boolean isAuditTrailEnabled() {
-		if (this.auditTrail != null)
-			return this.auditTrail.isEnabled();
-		return getRealm().isAuditTrailEnabled();
 	}
 
 	private long updateObservers() {

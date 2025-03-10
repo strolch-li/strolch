@@ -507,6 +507,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	StrolchTransaction suppressAuditsForAudits();
 
 	/**
+	 * Determines whether the audit trail feature is enabled.
+	 *
+	 * @return true if the audit trail is enabled, false otherwise
+	 */
+	boolean isAuditTrailEnabled();
+
+	/**
 	 * Returns true if writing {@link Audit Audits} is currently suppressed
 	 *
 	 * @return true if writing {@link Audit Audits} is currently suppressed
