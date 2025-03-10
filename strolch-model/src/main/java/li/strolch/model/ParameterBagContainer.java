@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static li.strolch.model.StrolchModelConstants.*;
 
 /**
@@ -1928,5 +1929,14 @@ public interface ParameterBagContainer extends StrolchElement {
 	default void copyParameterValue(String bagId, String paramId, ParameterBagContainer otherElement) {
 		Parameter<?> otherParam = otherElement.getParameter(bagId, paramId);
 		getParameter(bagId, paramId, true).setValue(otherParam.getValue());
+	}
+
+	/**
+	 * Retrieves a set of parameter bag types based on the stream of parameter bags.
+	 *
+	 * @return a set of strings representing the types of all parameter bags.
+	 */
+	default Set<String> getParameterBagTypes() {
+		return streamOfParameterBags().map(ParameterizedElement::getType).collect(toSet());
 	}
 }
