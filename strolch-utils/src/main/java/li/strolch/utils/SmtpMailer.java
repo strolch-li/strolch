@@ -352,12 +352,17 @@ public class SmtpMailer {
 			Multipart multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText),
 					encryptedTextFileName);
 			attachEncryptedFile(attachment, fileName, multipart);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			logger.error("Interrupted while waiting to lock", e);
+			return;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent signed and encrypted E-mail with subject {} to {}", subject, recipients);
+		logger.info("Sent signed and encrypted E-mail with subject {} and attachment {} to {}", subject, fileName,
+				recipients);
 	}
 
 	protected void send(InternetAddress[] recipients, MimeMessage message) {
@@ -382,7 +387,8 @@ public class SmtpMailer {
 		InternetAddress[] recipientAddresses;
 		if (this.overrideRecipients == null) {
 			recipientAddresses = parseAddress(recipients);
-			logger.info("Sending e-mail with subject {} to {}", subject, addressesToString(recipientAddresses));
+			logger.info("Sending e-mail with subject {} to recipients {}", subject,
+					addressesToString(recipientAddresses));
 		} else {
 			recipientAddresses = this.overrideRecipients;
 			logger.info("Sending e-mail with subject {} to override recipient {}", subject,
@@ -428,7 +434,7 @@ public class SmtpMailer {
 	}
 
 	protected void attachEncryptedFile(String attachment, String fileName, Multipart multipart)
-			throws MessagingException {
+			throws InterruptedException, MessagingException {
 		fileName = fileName + ".asc";
 
 		MimeBodyPart attachmentPart = new MimeBodyPart();
@@ -475,7 +481,7 @@ public class SmtpMailer {
 		}
 	}
 
-	protected String signAndEncrypt(String plainText) {
+	protected String signAndEncrypt(String plainText) throws InterruptedException {
 		try {
 			// locking is required, as key rings are not thread safe
 			// can be removed in a future version, when bouncy castle is thread safe
@@ -499,13 +505,13 @@ public class SmtpMailer {
 
 			return signatureResult.toString(UTF_8);
 		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new IllegalStateException("Interrupted while waiting to lock", e);
+			throw e;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to encrypt and sign plain text!", e);
 		} finally {
-			if (this.lock.isHeldByCurrentThread() && this.lock.isLocked())
+			if (this.lock.isLocked() && this.lock.isHeldByCurrentThread()) {
 				this.lock.unlock();
+			}
 		}
 	}
 
