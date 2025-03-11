@@ -74,7 +74,7 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 					contentType.append(", ");
 			}
 
-			logger.error("Request failed {}: {} {}. Content-type: {}", responseContext.getStatus(), method, uri,
+			logger.error("Request failed {}: {} {} Content-type: {}", responseContext.getStatus(), method, uri,
 					contentType);
 		}
 	}
