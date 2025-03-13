@@ -245,8 +245,6 @@ public class Tags {
 		public static final String ID = Tags.ID;
 
 		public static final String USERNAME = "Username";
-		public static final String FIRSTNAME = "Firstname";
-		public static final String LASTNAME = "Lastname";
 		public static final String DATE = "Date";
 
 		public static final String ELEMENT_TYPE = "ElementType";

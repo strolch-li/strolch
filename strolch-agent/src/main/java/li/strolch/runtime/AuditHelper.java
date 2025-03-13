@@ -66,10 +66,6 @@ public class AuditHelper {
 
 					audit.setId(StrolchAgent.getUniqueIdLong());
 					audit.setUsername(username);
-					audit.setFirstname(certificate.getFirstname() == null ? certificate.getUsername() :
-							certificate.getFirstname());
-					audit.setLastname(
-							certificate.getLastname() == null ? certificate.getUsername() : certificate.getLastname());
 					audit.setDate(new Date());
 
 					audit.setElementType(Service.class.getSimpleName());
@@ -117,10 +113,6 @@ public class AuditHelper {
 
 					audit.setId(StrolchAgent.getUniqueIdLong());
 					audit.setUsername(certificate.getUsername());
-					audit.setFirstname(certificate.getFirstname() == null ? certificate.getUsername() :
-							certificate.getFirstname());
-					audit.setLastname(
-							certificate.getLastname() == null ? certificate.getUsername() : certificate.getLastname());
 					audit.setDate(new Date());
 
 					audit.setElementType(StrolchSearch.class.getSimpleName());

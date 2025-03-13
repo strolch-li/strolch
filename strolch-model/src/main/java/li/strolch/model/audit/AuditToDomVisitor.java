@@ -41,9 +41,6 @@ public class AuditToDomVisitor implements AuditVisitor<Document> {
 		auditE.setAttribute(ID, audit.getId().toString());
 
 		auditE.appendChild(elem(doc, USERNAME, audit.getUsername()));
-
-		auditE.appendChild(elem(doc, FIRSTNAME, audit.getFirstname()));
-		auditE.appendChild(elem(doc, LASTNAME, audit.getLastname()));
 		auditE.appendChild(elem(doc, DATE, ISO8601.toString(audit.getDate())));
 
 		auditE.appendChild(elem(doc, ELEMENT_TYPE, audit.getElementType()));

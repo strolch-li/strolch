@@ -516,8 +516,6 @@ public class ModelGenerator {
 		Audit audit = new Audit();
 		audit.setId(StringHelper.getUniqueIdLong());
 		audit.setUsername(randomValue(random, usernames));
-		audit.setFirstname(randomValue(random, firstnames));
-		audit.setLastname(randomValue(random, lastnames));
 		audit.setDate(new Date(random.nextInt(5000)));
 		audit.setElementType(randomValue(random, types));
 		audit.setElementSubType(randomValue(random, subTypes));

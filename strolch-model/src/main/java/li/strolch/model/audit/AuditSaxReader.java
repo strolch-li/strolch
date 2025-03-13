@@ -48,7 +48,7 @@ public class AuditSaxReader extends DefaultHandler {
 				this.currentAudit = new Audit();
 				this.currentAudit.setId(Long.parseLong(attributes.getValue(ID)));
 			}
-			case USERNAME, FIRSTNAME, LASTNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION,
+			case USERNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION,
 				 ACTION, ACCESS_TYPE, ADDITIONAL_DATA -> this.sb = new StringBuilder();
 			default -> throw new IllegalArgumentException(
 					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
@@ -65,14 +65,6 @@ public class AuditSaxReader extends DefaultHandler {
 			}
 			case USERNAME -> {
 				this.currentAudit.setUsername(this.sb.toString());
-				this.sb = null;
-			}
-			case FIRSTNAME -> {
-				this.currentAudit.setFirstname(this.sb.toString());
-				this.sb = null;
-			}
-			case LASTNAME -> {
-				this.currentAudit.setLastname(this.sb.toString());
 				this.sb = null;
 			}
 			case DATE -> {

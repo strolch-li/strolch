@@ -59,8 +59,6 @@ public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 
 		writeElem(USERNAME, audit.getUsername());
 
-		writeElem(FIRSTNAME, audit.getFirstname());
-		writeElem(LASTNAME, audit.getLastname());
 		writeElem(DATE, ISO8601FormatFactory.getInstance().formatDate(audit.getDate()));
 
 		writeElem(ELEMENT_TYPE, audit.getElementType());

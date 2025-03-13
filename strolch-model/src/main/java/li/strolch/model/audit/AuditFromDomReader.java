@@ -51,8 +51,6 @@ public class AuditFromDomReader {
 
 			switch (nodeName) {
 				case USERNAME -> audit.setUsername(txtContent);
-				case FIRSTNAME -> audit.setFirstname(txtContent);
-				case LASTNAME -> audit.setLastname(txtContent);
 				case DATE -> audit.setDate(ISO8601.parseToDate(txtContent));
 				case ELEMENT_TYPE -> audit.setElementType(txtContent);
 				case ELEMENT_SUB_TYPE -> audit.setElementSubType(txtContent);
@@ -71,8 +69,6 @@ public class AuditFromDomReader {
 
 		String msg = " missing for element with id " + audit.getId();
 		DBC.INTERIM.assertNotEmpty("Username" + msg, audit.getUsername());
-		DBC.INTERIM.assertNotEmpty("Firstname" + msg, audit.getFirstname());
-		DBC.INTERIM.assertNotEmpty("Lastname" + msg, audit.getLastname());
 		DBC.INTERIM.assertNotNull("Date" + msg, audit.getDate());
 		DBC.INTERIM.assertNotEmpty("ElementType" + msg, audit.getElementType());
 		DBC.INTERIM.assertNotEmpty("ElementSubType" + msg, audit.getElementSubType());

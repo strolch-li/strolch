@@ -46,11 +46,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public static final String ELEMENT_SUB_TYPE = "element_sub_type";
 	public static final String ELEMENT_ACCESSED = "element_accessed";
 	public static final String DATE = "date";
-	public static final String LASTNAME = "lastname";
-	public static final String FIRSTNAME = "firstname";
 	public static final String USERNAME = "username";
 	public static final String ADDITIONAL_DATA = "additional_data";
-	public static final String FIELDS = commaSeparated(ID, USERNAME, FIRSTNAME, LASTNAME, DATE, ELEMENT_TYPE,
+	public static final String FIELDS = commaSeparated(ID, USERNAME, DATE, ELEMENT_TYPE,
 			ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE, ADDITIONAL_DATA);
 	public static final String TABLE_NAME = "audits";
 
@@ -65,9 +63,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 			+ " from audits where element_type = ? and date between ? and ?";
 	private static final String insertSql = "insert into audits ("
 			+ FIELDS
-			+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::access_type, ?)";
+			+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?::access_type, ?)";
 	private static final String updateSql
-			= "update audits set id = ?, username = ?, firstname = ?, lastname = ?, date = ?, element_type = ?, element_sub_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type, additional_data = ? where id = ?";
+			= "update audits set id = ?, username = ?, date = ?, element_type = ?, element_sub_type = ?, element_accessed = ?, new_version = ?, action = ?, access_type = ?::access_type, additional_data = ? where id = ?";
 	private static final String removeSql = "delete from audits where id = ?";
 	private static final String removeAllSql = "delete from audits where element_type = ? and date between ? and ?";
 
@@ -230,7 +228,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(updateSql)) {
 
 			setAuditFields(audit, preparedStatement);
-			preparedStatement.setLong(13, audit.getId());
+			preparedStatement.setLong(11, audit.getId());
 
 			int count = preparedStatement.executeUpdate();
 			if (count != 1) {
@@ -311,28 +309,26 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 		ps.setLong(1, audit.getId());
 		ps.setString(2, audit.getUsername());
-		ps.setString(3, audit.getFirstname());
-		ps.setString(4, audit.getLastname());
-		ps.setTimestamp(5, new Timestamp(audit.getDate().getTime()), Calendar.getInstance());
-		ps.setString(6, audit.getElementType());
-		ps.setString(7, audit.getElementSubType());
-		ps.setString(8, audit.getElementAccessed());
+		ps.setTimestamp(3, new Timestamp(audit.getDate().getTime()), Calendar.getInstance());
+		ps.setString(4, audit.getElementType());
+		ps.setString(5, audit.getElementSubType());
+		ps.setString(6, audit.getElementAccessed());
 
 		if (audit.getNewVersion() == null)
-			ps.setDate(9, null);
+			ps.setDate(7, null);
 		else
-			ps.setTimestamp(9, new Timestamp(audit.getNewVersion().getTime()), Calendar.getInstance());
+			ps.setTimestamp(7, new Timestamp(audit.getNewVersion().getTime()), Calendar.getInstance());
 
-		ps.setString(10, audit.getAction());
-		ps.setString(11, audit.getAccessType().name());
+		ps.setString(8, audit.getAction());
+		ps.setString(9, audit.getAccessType().name());
 
 		if (audit.getAdditionalData() == null) {
-			ps.setObject(12, null);
+			ps.setObject(10, null);
 		} else {
 			PGobject pGobject = new PGobject();
 			pGobject.setType("json");
 			pGobject.setValue(audit.getAdditionalData().toString());
-			ps.setObject(12, pGobject);
+			ps.setObject(10, pGobject);
 		}
 	}
 
@@ -341,17 +337,15 @@ public class PostgreSqlAuditDao implements AuditDao {
 		Audit audit = new Audit();
 		audit.setId(resultSet.getLong(1));
 		audit.setUsername(resultSet.getString(2));
-		audit.setFirstname(resultSet.getString(3));
-		audit.setLastname(resultSet.getString(4));
-		audit.setDate(resultSet.getTimestamp(5));
-		audit.setElementType(resultSet.getString(6));
-		audit.setElementSubType(resultSet.getString(7));
-		audit.setElementAccessed(resultSet.getString(8));
-		audit.setNewVersion(resultSet.getTimestamp(9));
-		audit.setAction(resultSet.getString(10));
-		audit.setAccessType(AccessType.valueOf(resultSet.getString(11)));
+		audit.setDate(resultSet.getTimestamp(3));
+		audit.setElementType(resultSet.getString(4));
+		audit.setElementSubType(resultSet.getString(5));
+		audit.setElementAccessed(resultSet.getString(6));
+		audit.setNewVersion(resultSet.getTimestamp(7));
+		audit.setAction(resultSet.getString(8));
+		audit.setAccessType(AccessType.valueOf(resultSet.getString(9)));
 
-		PGobject pGobject = (PGobject) resultSet.getObject(ADDITIONAL_DATA);
+		PGobject pGobject = (PGobject) resultSet.getObject(10);
 		if (pGobject != null) {
 			String json = pGobject.getValue();
 			if (json != null)

@@ -29,8 +29,6 @@ public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
 
 		jsonObject.addProperty("id", audit.getId());
 		jsonObject.addProperty("username", audit.getUsername());
-		jsonObject.addProperty("firstname", audit.getFirstname());
-		jsonObject.addProperty("lastname", audit.getLastname());
 		jsonObject.addProperty("date", ISO8601FormatFactory.getInstance().formatDate(audit.getDate()));
 		jsonObject.addProperty("elementType", audit.getElementType());
 		jsonObject.addProperty("elementSubType", audit.getElementSubType());
