@@ -17,7 +17,6 @@ package li.strolch.service.privilege.users;
 
 import li.strolch.model.Tags;
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.service.StringMapArgument;
@@ -54,8 +53,6 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 			return ServiceResult.error("Unhandled state " + state);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_PASSWORD)) {
-			tx.setSuppressAudits(true);
-
 			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler
 					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
@@ -63,8 +60,8 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 			if (privilegeHandler.isPersistOnUserDataChanged())
 				privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, username);
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, username));
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

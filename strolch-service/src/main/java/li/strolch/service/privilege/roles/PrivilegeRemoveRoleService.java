@@ -16,13 +16,13 @@
 package li.strolch.service.privilege.roles;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.RoleRep;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
+
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,15 +46,12 @@ public class PrivilegeRemoveRoleService extends AbstractService<PrivilegeRoleNam
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		RoleRep role;
-		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_ROLE)) {
-			tx.setSuppressAudits(true);
-
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_REMOVE_ROLE)) {
 			role = privilegeHandler.removeRole(getCertificate(), arg.roleName);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.DELETE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.ROLE, role.getName());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.DELETE, PRIVILEGE, ROLE, role.getName()));
+			tx.commitOnClose();
 		}
 
 		return new PrivilegeRoleResult(role);

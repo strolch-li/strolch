@@ -16,13 +16,13 @@
 package li.strolch.service.privilege.users;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.UserRep;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
+
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -47,16 +47,13 @@ public class PrivilegeSetUserLocaleService
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		UserRep user;
-		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_SET_USER_LOCALE)) {
-			tx.setSuppressAudits(true);
-
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_LOCALE)) {
 			user = privilegeHandler.setUserLocale(getCertificate(), arg.username, arg.locale);
 			if (privilegeHandler.isPersistOnUserDataChanged())
 				privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.USER, user.getUsername());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, user.getUsername()));
+			tx.commitOnClose();
 		}
 
 		return new PrivilegeUserResult(user);

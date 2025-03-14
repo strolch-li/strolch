@@ -94,7 +94,9 @@ public interface StrolchRealm {
 	 *
 	 * @return the newly created transaction
 	 */
-	StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly);
+	default StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
+		return openTx(certificate, clazz.getName(), readOnly);
+	}
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the given certificate
@@ -108,18 +110,32 @@ public interface StrolchRealm {
 	StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly);
 
 	/**
-	 * Returns if the audit trail is enabled for reads
-	 *
-	 * @return if the audit trail is enabled for reads
-	 */
-	boolean isAuditTrailEnabledForRead();
-
-	/**
 	 * Returns if the audit trail is enabled for modifications
 	 *
 	 * @return if the audit trail is enabled for modifications
 	 */
 	boolean isAuditTrailEnabled();
+
+	/**
+	 * Returns true if audits should be enabled for model changes
+	 *
+	 * @return true if audits should be enabled for model changes
+	 */
+	boolean isModelAuditsEnabled();
+
+	/**
+	 * Returns true if audits should be enabled for model reads
+	 *
+	 * @return true if audits should be enabled for model reads
+	 */
+	boolean isAuditsEnabledOnRead();
+
+	/**
+	 * Returns true if audits for audits should be enabled
+	 *
+	 * @return true if audits for audits should be enabled
+	 */
+	boolean isAuditsForAuditsEnabled();
 
 	/**
 	 * Returns if observer updates is enabled
@@ -133,7 +149,7 @@ public interface StrolchRealm {
 	 *
 	 * @return if versioning is enabled
 	 */
-	boolean isVersioningEnabled();
+	boolean isEnableVersioning();
 
 	/**
 	 * Returns the minimum duration of a TX to enable logging if the TX was successful. If it failed, then it will be

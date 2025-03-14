@@ -19,7 +19,6 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.*;
@@ -183,15 +182,11 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	private void writeAudit(Certificate certificate, String action, AccessType accessType, String username) {
 		if (hasTx()) {
 			StrolchTransaction tx = getTx();
-			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username);
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username));
 		} else {
 			StrolchRealm realm = getContainer().getRealm(certificate);
 			try (StrolchTransaction tx = openTx(certificate, action, realm)) {
-				tx.setSuppressAudits(true);
-				Audit audit = tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username);
-				tx.getAuditTrail().add(tx, audit);
+				tx.add(tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username));
 				tx.commitOnClose();
 			}
 		}

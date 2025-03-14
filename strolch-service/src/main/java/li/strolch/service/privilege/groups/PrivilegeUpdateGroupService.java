@@ -16,7 +16,6 @@
 package li.strolch.service.privilege.groups;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.model.json.PrivilegeElementFromJsonVisitor;
 import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
@@ -57,13 +56,11 @@ public class PrivilegeUpdateGroupService extends AbstractService<JsonServiceArgu
 
 		Group group;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_MODIFY_GROUP)) {
-			tx.setSuppressAudits(true);
-
 			group = privilegeHandler.replaceGroup(getCertificate(), newGroup);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.UPDATE, PRIVILEGE, GROUP, group.name());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, GROUP, group.name()));
+			tx.commitOnClose();
 		}
 
 		return new JsonServiceResult(group.accept(new PrivilegeElementToJsonVisitor()));

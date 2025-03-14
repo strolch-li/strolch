@@ -16,7 +16,6 @@
 package li.strolch.service.privilege.roles;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.RoleRep;
@@ -47,13 +46,11 @@ public class PrivilegeAddRoleService extends AbstractService<PrivilegeRoleArgume
 
 		RoleRep role;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_ADD_ROLE)) {
-			tx.setSuppressAudits(true);
-
 			role = privilegeHandler.addRole(getCertificate(), arg.role);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, ROLE, role.getName());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.CREATE, PRIVILEGE, ROLE, role.getName()));
+			tx.commitOnClose();
 		}
 
 		return new PrivilegeRoleResult(role);

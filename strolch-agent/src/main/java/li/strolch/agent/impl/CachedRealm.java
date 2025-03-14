@@ -17,7 +17,6 @@ package li.strolch.agent.impl;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -52,12 +51,6 @@ public class CachedRealm extends InternalStrolchRealm {
 	}
 
 	@Override
-	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
-		return this.persistenceHandler.openTx(this, certificate, clazz.getName(), readOnly).suppressAuditsForAudits();
-	}
-
-	@Override
 	public CachedResourceMap getResourceMap() {
 		return this.resourceMap;
 	}
@@ -77,10 +70,6 @@ public class CachedRealm extends InternalStrolchRealm {
 		return this.auditTrail;
 	}
 
-	StrolchAgent getAgent() {
-		return this.container.getAgent();
-	}
-
 	@Override
 	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
 		super.initialize(container, configuration);
@@ -90,10 +79,7 @@ public class CachedRealm extends InternalStrolchRealm {
 		this.orderMap = new CachedOrderMap(this);
 		this.activityMap = new CachedActivityMap(this);
 
-		if (isAuditTrailEnabled())
-			this.auditTrail = new CachedAuditTrail();
-		else
-			this.auditTrail = new NoStrategyAuditTrail();
+		this.auditTrail = isAuditTrailEnabled() ? new TransactionalAuditTrail() : new NoStrategyAuditTrail();
 	}
 
 	@Override

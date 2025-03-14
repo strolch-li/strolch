@@ -17,7 +17,6 @@
 package li.strolch.service.privilege.users;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.runtime.sessions.StrolchSessionHandler;
@@ -56,7 +55,6 @@ public class PrivilegeRemoveUserCommand extends Command {
 
 		getComponent(StrolchSessionHandler.class).refreshSessions();
 
-		Audit audit = tx().auditFrom(AccessType.DELETE, PRIVILEGE, USER, this.username);
-		tx().getAuditTrail().add(tx(), audit);
+		tx().add(tx().auditFrom(AccessType.DELETE, PRIVILEGE, USER, this.username));
 	}
 }

@@ -17,7 +17,6 @@
 package li.strolch.service.privilege.users;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.Certificate;
@@ -68,10 +67,9 @@ public class PrivilegeAddUsersCommand extends Command {
 	}
 
 	protected void writeAudits() {
-		tx().setSuppressAuditsForAudits(true);
+		StrolchTransaction tx = tx();
 		for (UserRep userRep : usersIn) {
-			Audit audit = tx().auditFrom(AccessType.CREATE, PRIVILEGE, USER, userRep.getUsername());
-			tx().getAuditTrail().add(tx(), audit);
+			tx.add(tx.auditFrom(AccessType.CREATE, PRIVILEGE, USER, userRep.getUsername()));
 		}
 	}
 }

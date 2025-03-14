@@ -57,13 +57,8 @@ public class TransientRealm extends InternalStrolchRealm {
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
-		return new TransientTransaction(this.container, this, certificate, action, readOnly);
-	}
-
-	@Override
-	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
-		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
-		return new TransientTransaction(this.container, this, certificate, clazz.getName(), readOnly);
+		//noinspection resource
+		return new TransientTransaction(this.container, this, certificate, action, readOnly).suppressAuditsForAudits();
 	}
 
 	@Override
@@ -124,7 +119,8 @@ public class TransientRealm extends InternalStrolchRealm {
 			elementListener.setUpdateActivities(false);
 			elementListener.setFailOnUpdate(true);
 
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, true, this.verbose);
+			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, true,
+					this.verbose);
 			handler.parseFile();
 			statistics = handler.getStatistics();
 			tx.commitOnClose();

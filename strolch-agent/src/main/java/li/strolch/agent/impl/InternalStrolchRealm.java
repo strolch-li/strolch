@@ -36,12 +36,16 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 	public static final String PROP_TRY_LOCK_TIME_UNIT = "tryLockTimeUnit";
 	public static final String PROP_TRY_LOCK_TIME = "tryLockTime";
-	protected static final Logger logger = LoggerFactory.getLogger(StrolchRealm.class);
+
+	protected static final Logger logger = LoggerFactory.getLogger(InternalStrolchRealm.class);
+
 	private final String realm;
 	private ElementLockingHandler<Locator> lockHandler;
 	private boolean auditTrailEnabled;
-	private boolean auditTrailEnabledForRead;
-	private boolean versioningEnabled;
+	private boolean enableModelAudits;
+	private boolean enableAuditsOnRead;
+	private boolean enableAuditsForAudits;
+	private boolean enableVersioning;
 	private boolean updateObservers;
 	private ObserverHandler observerHandler;
 
@@ -82,10 +86,14 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		// audits
 		String enableAuditKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL);
 		this.auditTrailEnabled = configuration.getBoolean(enableAuditKey, false);
-
-		// audits for read
-		String enableAuditForReadKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDIT_TRAIL_FOR_READ);
-		this.auditTrailEnabledForRead = configuration.getBoolean(enableAuditForReadKey, false);
+		String enableModelAuditsKey = makeRealmKey(getRealm(), PROP_ENABLE_MODEL_AUDITS);
+		this.enableModelAudits = configuration.getBoolean(enableModelAuditsKey, false);
+		if (this.enableModelAudits) {
+			String enableAuditsOnReadKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDITS_ON_READ);
+			this.enableAuditsOnRead = configuration.getBoolean(enableAuditsOnReadKey, false);
+		}
+		String enableAuditsForAuditsKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDITS_FOR_AUDITS);
+		this.enableAuditsForAudits = configuration.getBoolean(enableAuditsForAuditsKey, false);
 
 		// observer updates
 		String updateObserversKey = makeRealmKey(getRealm(), PROP_ENABLE_OBSERVER_UPDATES);
@@ -104,24 +112,39 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 		// versioning
 		String enableVersioningKey = makeRealmKey(getRealm(), PROP_ENABLE_VERSIONING);
-		this.versioningEnabled = configuration.getBoolean(enableVersioningKey, false);
+		this.enableVersioning = configuration.getBoolean(enableVersioningKey, false);
 
 		String txLoggingThresholdMsKey = makeRealmKey(getRealm(), PROP_TX_LOGGING_THRESHOLD_MS);
 		this.txLoggingThresholdMs = configuration.getLong(txLoggingThresholdMsKey, 0L);
 
-		if (this.auditTrailEnabled)
+		if (this.auditTrailEnabled) {
 			logger.info("Enabling AuditTrail for realm {}", getRealm());
-		else
+
+			if (this.enableModelAudits) {
+				logger.info("Enabling model audits for realm {}", getRealm());
+				if (this.enableAuditsOnRead)
+					logger.info("Enabling model audits on read for realm {}", getRealm());
+				else
+					logger.info("Not enabling model audits on read for realm {}", getRealm());
+			} else {
+				logger.info("Not enabling model audits for realm {}", getRealm());
+			}
+
+			if (this.enableAuditsForAudits) {
+				logger.info("Enabling audits for audits for realm {}", getRealm());
+			} else {
+				logger.info("Not enabling audits for audits for realm {}", getRealm());
+			}
+		} else {
 			logger.info("AuditTrail not enabled for realm {}", getRealm());
-		if (this.auditTrailEnabledForRead)
-			logger.info("Enabling AuditTrail for read for realm {}", getRealm());
-		else
-			logger.info("AuditTrail not enabled for read for realm {}", getRealm());
+		}
+
 		if (this.updateObservers)
 			logger.info("Enabling Observer Updates for realm {}", getRealm());
 		else
 			logger.info("Observer Updates not enabled for realm {}", getRealm());
-		if (this.versioningEnabled)
+
+		if (this.enableVersioning)
 			logger.info("Enabling Versioning for realm {}", getRealm());
 		else
 			logger.info("Versioning not enabled for realm {}", getRealm());
@@ -135,8 +158,18 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	}
 
 	@Override
-	public boolean isAuditTrailEnabledForRead() {
-		return this.auditTrailEnabledForRead;
+	public boolean isModelAuditsEnabled() {
+		return this.enableModelAudits;
+	}
+
+	@Override
+	public boolean isAuditsEnabledOnRead() {
+		return this.enableAuditsOnRead;
+	}
+
+	@Override
+	public boolean isAuditsForAuditsEnabled() {
+		return this.enableAuditsForAudits;
 	}
 
 	@Override
@@ -145,8 +178,8 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	}
 
 	@Override
-	public boolean isVersioningEnabled() {
-		return this.versioningEnabled;
+	public boolean isEnableVersioning() {
+		return this.enableVersioning;
 	}
 
 	@Override

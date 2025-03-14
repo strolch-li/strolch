@@ -52,13 +52,15 @@ public class PrivilegeAddGroupService extends AbstractService<JsonServiceArgumen
 
 		Group group;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_ADD_GROUP)) {
-			tx.setSuppressAudits(true);
-
 			group = privilegeHandler.addGroup(getCertificate(), newGroup);
 			privilegeHandler.persist(getCertificate());
 
 			Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, GROUP, newGroup.name());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(audit);
+			tx.update(audit);
+			tx.remove(audit);
+
+			tx.commitOnClose();
 		}
 
 		return new JsonServiceResult(group.accept(new PrivilegeElementToJsonVisitor()));

@@ -46,7 +46,7 @@ public class VersioningTestRunner {
 	}
 
 	public void runTestsForVersioning() {
-		assumeTrue(runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).isVersioningEnabled());
+		assumeTrue(runtimeMock.getRealm(StrolchConstants.DEFAULT_REALM).isEnableVersioning());
 
 		runResourceTests();
 		runOrderTests();

@@ -48,7 +48,6 @@ import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.objectfilter.ObjectFilter;
 import li.strolch.utils.objectfilter.ObjectFilterStatistics;
 import org.slf4j.Logger;
@@ -57,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
@@ -64,7 +64,7 @@ import static li.strolch.model.StrolchModelConstants.*;
 import static li.strolch.model.Tags.*;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
-import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
+import static li.strolch.utils.helper.StringHelper.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -89,6 +89,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private long silentThreshold;
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
+	private boolean suppressAuditsForReads;
 	private boolean suppressAuditsForAudits;
 
 	private List<Command> commands;
@@ -279,12 +280,32 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public boolean isAuditTrailEnabled() {
 		if (this.auditTrail != null)
 			return this.auditTrail.isEnabled();
-		return getRealm().isAuditTrailEnabled();
+		return this.realm.isAuditTrailEnabled();
 	}
 
 	@Override
 	public void setSuppressAudits(boolean suppressAudits) {
 		this.suppressAudits = suppressAudits;
+	}
+
+	@Override
+	public void suppressAudits() {
+		this.suppressAudits = true;
+	}
+
+	@Override
+	public boolean isSuppressAudits() {
+		return this.suppressAudits;
+	}
+
+	@Override
+	public void suppressAuditsForReads() {
+		this.suppressAuditsForReads = true;
+	}
+
+	@Override
+	public void setSuppressAuditsForReads(boolean suppressAuditsForReads) {
+		this.suppressAuditsForReads = suppressAuditsForReads;
 	}
 
 	@Override
@@ -299,11 +320,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public boolean isSuppressAudits() {
-		return this.suppressAudits;
-	}
-
-	@Override
 	public boolean isAuditsForAuditsEnabled() {
 		return !this.suppressAuditsForAudits;
 	}
@@ -315,7 +331,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public boolean isVersioningEnabled() {
-		return this.realm.isVersioningEnabled();
+		return this.realm.isEnableVersioning();
 	}
 
 	@Override
@@ -440,7 +456,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public ResourceMap getResourceMap() {
 		if (this.resourceMap == null) {
 			this.resourceMap = new AuditingResourceMap(this.realm.getResourceMap(), isReadOnly(),
-					this.realm.isAuditTrailEnabledForRead());
+					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.resourceMap;
 	}
@@ -449,7 +465,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public OrderMap getOrderMap() {
 		if (this.orderMap == null) {
 			this.orderMap = new AuditingOrderMap(this.realm.getOrderMap(), isReadOnly(),
-					this.realm.isAuditTrailEnabledForRead());
+					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.orderMap;
 	}
@@ -458,7 +474,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	public ActivityMap getActivityMap() {
 		if (this.activityMap == null) {
 			this.activityMap = new AuditingActivityMap(this.realm.getActivityMap(), isReadOnly(),
-					this.realm.isAuditTrailEnabledForRead());
+					this.realm.isAuditsEnabledOnRead());
 		}
 		return this.activityMap;
 	}
@@ -466,11 +482,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	@Override
 	public AuditTrail getAuditTrail() {
 		if (this.auditTrail == null) {
-			if (this.isSuppressAuditsForAudits())
+			if (this.suppressAuditsForAudits)
 				this.auditTrail = this.realm.getAuditTrail();
 			else
 				this.auditTrail = new AuditingAuditMapFacade(this.realm.getAuditTrail(),
-						this.realm.isAuditTrailEnabledForRead());
+						this.realm.isAuditsEnabledOnRead());
 		}
 		return this.auditTrail;
 	}
@@ -1470,6 +1486,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void add(Audit audit) {
+		assertNotReadOnly();
+		DBC.PRE.assertNotNull("audit must not be null", audit);
+		getAuditTrail().add(this, audit);
+	}
+
+	@Override
 	public void update(Resource resource) throws StrolchException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
@@ -1494,6 +1517,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		activity.assertNotReadonly();
 		this.objectFilter.update(Tags.ACTIVITY, activity.getLocator(), activity);
 		this.activityCache.addElement(activity.getType(), activity.getId(), activity);
+	}
+
+	@Override
+	public void update(Audit audit) {
+		assertNotReadOnly();
+		DBC.PRE.assertNotNull("audit must not be null", audit);
+		getAuditTrail().update(this, audit);
 	}
 
 	@Override
@@ -1524,6 +1554,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.activityCache != null) {
 			this.activityCache.removeElement(activity.getType(), activity.getId());
 		}
+	}
+
+	@Override
+	public void remove(Audit audit) {
+		assertNotReadOnly();
+		DBC.PRE.assertNotNull("audit must not be null", audit);
+		getAuditTrail().remove(this, audit);
 	}
 
 	private void addModelChangeCommands() {
@@ -2044,42 +2081,42 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private long writeAuditTrail() {
-		if (!isAuditTrailEnabled())
-			return 0L;
-		if (isSuppressAudits())
+		if (!this.realm.isAuditTrailEnabled())
 			return 0L;
 
 		long auditTrailStart = System.nanoTime();
-
 		List<Audit> audits = new ArrayList<>();
+		boolean auditsForRead = this.realm.isAuditsEnabledOnRead() && !this.suppressAuditsForReads;
 
-		if (this.orderMap != null) {
-			if (this.realm.isAuditTrailEnabledForRead())
-				auditsFor(audits, AccessType.READ, this.orderMap.getRead());
-			auditsFor(audits, AccessType.CREATE, this.orderMap.getCreated());
-			auditsFor(audits, AccessType.UPDATE, this.orderMap.getUpdated());
-			auditsFor(audits, AccessType.DELETE, this.orderMap.getDeleted());
+		if (this.realm.isModelAuditsEnabled() && !this.suppressAudits) {
+			if (this.orderMap != null) {
+				if (auditsForRead)
+					auditsFor(audits, AccessType.READ, this.orderMap.getRead());
+				auditsFor(audits, AccessType.CREATE, this.orderMap.getCreated());
+				auditsFor(audits, AccessType.UPDATE, this.orderMap.getUpdated());
+				auditsFor(audits, AccessType.DELETE, this.orderMap.getDeleted());
+			}
+
+			if (this.resourceMap != null) {
+				if (auditsForRead)
+					auditsFor(audits, AccessType.READ, this.resourceMap.getRead());
+				auditsFor(audits, AccessType.CREATE, this.resourceMap.getCreated());
+				auditsFor(audits, AccessType.UPDATE, this.resourceMap.getUpdated());
+				auditsFor(audits, AccessType.DELETE, this.resourceMap.getDeleted());
+			}
+
+			if (this.activityMap != null) {
+				if (auditsForRead)
+					auditsFor(audits, AccessType.READ, this.activityMap.getRead());
+				auditsFor(audits, AccessType.CREATE, this.activityMap.getCreated());
+				auditsFor(audits, AccessType.UPDATE, this.activityMap.getUpdated());
+				auditsFor(audits, AccessType.DELETE, this.activityMap.getDeleted());
+			}
 		}
 
-		if (this.resourceMap != null) {
-			if (this.realm.isAuditTrailEnabledForRead())
-				auditsFor(audits, AccessType.READ, this.resourceMap.getRead());
-			auditsFor(audits, AccessType.CREATE, this.resourceMap.getCreated());
-			auditsFor(audits, AccessType.UPDATE, this.resourceMap.getUpdated());
-			auditsFor(audits, AccessType.DELETE, this.resourceMap.getDeleted());
-		}
-
-		if (this.activityMap != null) {
-			if (this.realm.isAuditTrailEnabledForRead())
-				auditsFor(audits, AccessType.READ, this.activityMap.getRead());
-			auditsFor(audits, AccessType.CREATE, this.activityMap.getCreated());
-			auditsFor(audits, AccessType.UPDATE, this.activityMap.getUpdated());
-			auditsFor(audits, AccessType.DELETE, this.activityMap.getDeleted());
-		}
-
-		if (this.auditTrail != null && isAuditsForAuditsEnabled()) {
+		if (this.auditTrail != null && this.realm.isAuditsForAuditsEnabled() && !this.suppressAuditsForAudits) {
 			AuditingAuditMapFacade auditingAuditMapFacade = (AuditingAuditMapFacade) this.auditTrail;
-			if (this.realm.isAuditTrailEnabledForRead())
+			if (auditsForRead)
 				auditsForAudits(audits, AccessType.READ, auditingAuditMapFacade.getRead());
 			auditsForAudits(audits, AccessType.CREATE, auditingAuditMapFacade.getCreated());
 			auditsForAudits(audits, AccessType.UPDATE, auditingAuditMapFacade.getUpdated());
@@ -2093,15 +2130,32 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	private <T extends StrolchRootElement> void auditsFor(List<Audit> audits, AccessType accessType, Set<T> elements) {
-		for (StrolchRootElement element : elements) {
-			audits.add(auditFrom(accessType, element));
+		if (elements.isEmpty())
+			return;
+
+		String ids = elementsToIds(elements, StrolchElement::getId);
+		T element = elements.iterator().next();
+		String type = element.getObjectType();
+		String subType = element.getType();
+		audits.add(auditFrom(accessType, type, subType, ids));
+	}
+
+	private static <T> String elementsToIds(Set<T> elements, Function<T, String> idExtractor) {
+		StringBuilder sb = new StringBuilder();
+		for (Iterator<T> iterator = elements.iterator(); iterator.hasNext(); ) {
+			sb.append(idExtractor.apply(iterator.next()));
+			if (iterator.hasNext())
+				sb.append(COMMA).append(SPACE);
 		}
+		return sb.toString();
 	}
 
 	private void auditsForAudits(List<Audit> audits, AccessType accessType, Set<Audit> elements) {
-		for (Audit element : elements) {
-			audits.add(auditFrom(accessType, Tags.AUDIT, StringHelper.DASH, element.getId().toString()));
-		}
+		if (elements.isEmpty())
+			return;
+
+		String ids = elementsToIds(elements, t -> t.getId().toString());
+		audits.add(auditFrom(accessType, Tags.AUDIT, DASH, ids));
 	}
 
 	@Override

@@ -76,9 +76,8 @@ public class PrivilegeAddUserCommand extends Command {
 	}
 
 	protected void writeAudit() {
-		tx().setSuppressAuditsForAudits(true);
 		this.audit = tx().auditFrom(AccessType.CREATE, PRIVILEGE, USER, this.userOut.getUsername());
-		tx().getAuditTrail().add(tx(), this.audit);
+		tx().add(this.audit);
 	}
 
 	@Override
@@ -90,7 +89,7 @@ public class PrivilegeAddUserCommand extends Command {
 				privilegeHandler.removeUser(tx().getCertificate(), this.userIn.getUsername());
 
 			if (this.audit != null)
-				tx().getAuditTrail().remove(tx(), this.audit);
+				tx().remove(this.audit);
 		}
 	}
 }

@@ -40,8 +40,6 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 	protected ServiceResult internalDoService(PrivilegeUserNameArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_USER)) {
-			tx.setSuppressAudits(true);
-
 			PrivilegeRemoveUserCommand cmd = new PrivilegeRemoveUserCommand(tx);
 			cmd.setUsername(arg.username);
 			tx.addCommand(cmd);

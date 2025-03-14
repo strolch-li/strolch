@@ -77,7 +77,7 @@ public class AuditHelper {
 
 					audit.setAdditionalData(arg.toJson());
 
-					tx.getAuditTrail().add(tx, audit);
+					tx.add(audit);
 					tx.commitOnClose();
 				}
 			});
@@ -122,7 +122,7 @@ public class AuditHelper {
 					audit.setAccessType(AccessType.EXECUTE);
 					audit.setAction("");
 
-					tx.getAuditTrail().add(tx, audit);
+					tx.add(audit);
 					tx.commitOnClose();
 				}
 			});

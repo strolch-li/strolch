@@ -39,7 +39,10 @@ import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 public class DefaultRealmHandler extends StrolchComponent implements RealmHandler {
 
 	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail";
-	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead";
+	public static final String PROP_ENABLE_MODEL_AUDITS = "enableModelAudits";
+	public static final String PROP_ENABLE_AUDITS_ON_READ = "enableAuditsOnRead";
+	public static final String PROP_ENABLE_AUDITS_FOR_AUDITS = "enableAuditsForAudits";
+
 	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates";
 	public static final String PROP_ENABLE_VERSIONING = "enableVersioning";
 	public static final String PROP_TX_LOGGING_THRESHOLD_MS = "txLoggingThresholdMs";

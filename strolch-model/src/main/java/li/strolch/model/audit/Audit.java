@@ -16,12 +16,11 @@
 package li.strolch.model.audit;
 
 import com.google.gson.JsonElement;
-import li.strolch.model.StrolchRootElement;
 
 import java.util.Date;
 
 /**
- * Used to log/audit access to {@link StrolchRootElement}
+ * Used to log/audit access to the agent
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
