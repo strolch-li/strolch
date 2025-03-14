@@ -138,6 +138,13 @@ public interface StrolchRealm {
 	boolean isAuditsForAuditsEnabled();
 
 	/**
+	 * Returns true if audits for system users should be enabled
+	 *
+	 * @return true if audits for system users should be enabled
+	 */
+	boolean isAuditsForSystemUsersEnabled();
+
+	/**
 	 * Returns if observer updates is enabled
 	 *
 	 * @return if observer updates is enabled

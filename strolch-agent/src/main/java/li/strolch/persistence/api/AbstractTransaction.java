@@ -2084,6 +2084,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (!this.realm.isAuditTrailEnabled())
 			return 0L;
 
+		if (this.certificate.isSystemUser() && !this.realm.isAuditsForSystemUsersEnabled())
+			return 0L;
+
 		long auditTrailStart = System.nanoTime();
 		List<Audit> audits = new ArrayList<>();
 		boolean auditsForRead = this.realm.isAuditsEnabledOnRead() && !this.suppressAuditsForReads;

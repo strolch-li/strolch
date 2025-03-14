@@ -42,6 +42,7 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 	public static final String PROP_ENABLE_MODEL_AUDITS = "enableModelAudits";
 	public static final String PROP_ENABLE_AUDITS_ON_READ = "enableAuditsOnRead";
 	public static final String PROP_ENABLE_AUDITS_FOR_AUDITS = "enableAuditsForAudits";
+	public static final String PROP_ENABLE_AUDITS_FOR_SYSTEM_USERS = "enableAuditsForSystemUsers";
 
 	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates";
 	public static final String PROP_ENABLE_VERSIONING = "enableVersioning";

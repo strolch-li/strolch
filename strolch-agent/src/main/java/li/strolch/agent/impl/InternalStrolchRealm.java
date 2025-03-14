@@ -45,6 +45,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	private boolean enableModelAudits;
 	private boolean enableAuditsOnRead;
 	private boolean enableAuditsForAudits;
+	private boolean enableAuditsForSystemUsers;
 	private boolean enableVersioning;
 	private boolean updateObservers;
 	private ObserverHandler observerHandler;
@@ -94,6 +95,8 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		}
 		String enableAuditsForAuditsKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDITS_FOR_AUDITS);
 		this.enableAuditsForAudits = configuration.getBoolean(enableAuditsForAuditsKey, false);
+		String enableAuditsForSystemUsersKey = makeRealmKey(getRealm(), PROP_ENABLE_AUDITS_FOR_SYSTEM_USERS);
+		this.enableAuditsForSystemUsers = configuration.getBoolean(enableAuditsForSystemUsersKey, false);
 
 		// observer updates
 		String updateObserversKey = makeRealmKey(getRealm(), PROP_ENABLE_OBSERVER_UPDATES);
@@ -170,6 +173,11 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	@Override
 	public boolean isAuditsForAuditsEnabled() {
 		return this.enableAuditsForAudits;
+	}
+
+	@Override
+	public boolean isAuditsForSystemUsersEnabled() {
+		return this.enableAuditsForSystemUsers;
 	}
 
 	@Override
