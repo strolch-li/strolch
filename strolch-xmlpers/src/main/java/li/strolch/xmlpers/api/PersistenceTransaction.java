@@ -54,6 +54,8 @@ public interface PersistenceTransaction extends AutoCloseable {
 
 	boolean isOpen();
 
+	void flush();
+
 	ObjectDao getObjectDao();
 
 	MetadataDao getMetadataDao();

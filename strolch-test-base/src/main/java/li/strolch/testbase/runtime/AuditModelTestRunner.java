@@ -271,12 +271,15 @@ public class AuditModelTestRunner {
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				assertEquals(5, auditTrail.removeAll(tx, "BarBarBar", containsRange));
+				tx.flush();
 				assertEquals(10, auditTrail.querySize(tx, containsRange));
 
 				assertEquals(5, auditTrail.removeAll(tx, "FooFooFoo", containsRange));
+				tx.flush();
 				assertEquals(5, auditTrail.querySize(tx, containsRange));
 
 				assertEquals(5, auditTrail.removeAll(tx, "BarFooBar", containsRange));
+				tx.flush();
 				assertEquals(0, auditTrail.querySize(tx, containsRange));
 				tx.commitOnClose();
 			}
@@ -294,6 +297,7 @@ public class AuditModelTestRunner {
 				auditTrail.removeAll(tx, type, dateRange);
 			}
 
+			tx.flush();
 			assertEquals(0, auditTrail.querySize(tx, dateRange));
 			tx.commitOnClose();
 		}

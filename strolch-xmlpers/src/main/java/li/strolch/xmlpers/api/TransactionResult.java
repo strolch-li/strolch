@@ -78,8 +78,8 @@ public class TransactionResult {
 		this.closeDuration = closeDuration;
 	}
 
-	public void setModificationByKey(Map<String, ModificationResult> modificationByKey) {
-		this.modificationByKey = modificationByKey;
+	public void addModifications(Map<String, ModificationResult> modificationByKey) {
+		this.modificationByKey.putAll(modificationByKey);
 	}
 
 	public Set<String> getKeys() {

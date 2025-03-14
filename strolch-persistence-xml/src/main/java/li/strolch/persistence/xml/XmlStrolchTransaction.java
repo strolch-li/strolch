@@ -44,7 +44,7 @@ public class XmlStrolchTransaction extends AbstractTransaction {
 
 	@Override
 	protected void writeChanges() {
-		// do nothing
+		this.tx.flush();
 	}
 
 	@Override
