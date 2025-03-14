@@ -117,7 +117,7 @@ public class AuditModelTestRunner {
 				tx.add(audit);
 				tx.commitOnClose();
 			}
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
+			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
 				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
 				dbAudit.setAction("Foo");
