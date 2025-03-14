@@ -51,8 +51,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 	private final Set<LockableObject> lockedObjects;
 
-	public DefaultPersistenceTransaction(PersistenceManager manager, IoMode ioMode, boolean verbose,
-			boolean allowOverwriteOnCreate) {
+	public DefaultPersistenceTransaction(PersistenceManager manager, boolean verbose, boolean allowOverwriteOnCreate) {
 		this.startTime = System.nanoTime();
 		this.startTimeDate = new Date();
 		this.manager = manager;

@@ -102,6 +102,6 @@ public class DefaultPersistenceManager implements PersistenceManager {
 
 	@Override
 	public PersistenceTransaction openTx() {
-		return new DefaultPersistenceTransaction(this, this.ioMode, this.verbose, this.allowOverwriteOnCreate);
+		return new DefaultPersistenceTransaction(this, this.verbose, this.allowOverwriteOnCreate);
 	}
 }
