@@ -77,7 +77,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			String msg = "The transaction already has a result set!";
 			throw new IllegalStateException(msg);
 		}
-		txResult.clear();
+		if (txResult != null)
+			txResult.clear();
 		this.txResult = txResult;
 	}
 
