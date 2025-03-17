@@ -24,12 +24,14 @@ import li.strolch.utils.collections.MapOfMaps;
 
 import java.util.*;
 
+import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
+
 public class TransientAuditTrail implements AuditTrail {
 
 	private final MapOfMaps<String, Long, Audit> auditMap;
 
 	public TransientAuditTrail() {
-		this.auditMap = new MapOfMaps<>();
+		this.auditMap = synchronizedMapOfMaps(new MapOfMaps<>());
 	}
 
 	@Override
@@ -47,7 +49,6 @@ public class TransientAuditTrail implements AuditTrail {
 
 	@Override
 	public long querySize(StrolchTransaction tx) {
-
 		return this.auditMap.keySet().stream().map(this.auditMap::getMap).mapToLong(Map::size).sum();
 	}
 
@@ -101,7 +102,7 @@ public class TransientAuditTrail implements AuditTrail {
 
 	@Override
 	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
-			List<Audit> audits = new ArrayList<>();
+		List<Audit> audits = new ArrayList<>();
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
 		if (byType == null)
 			return audits;
