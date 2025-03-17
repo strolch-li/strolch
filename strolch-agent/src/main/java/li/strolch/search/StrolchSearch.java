@@ -22,6 +22,7 @@ import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.Tags;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
@@ -199,7 +200,7 @@ public abstract class StrolchSearch<T extends StrolchRootElement, U extends Root
 		if (tx.isAuditTrailEnabled()) {
 			StrolchAgent agent = tx.getAgent();
 			agent
-					.getExecutor(StrolchSearch.class.getSimpleName())
+					.getExecutor(Tags.AUDIT)
 					.submit(() -> writeAuditForSearch(agent, tx.getCertificate(), tx.getRealmName(),
 							getClass().getName()));
 		}

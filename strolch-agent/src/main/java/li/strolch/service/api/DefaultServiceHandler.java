@@ -21,6 +21,7 @@ import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
+import li.strolch.model.Tags;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
@@ -292,8 +293,8 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		}
 
 		// record the event
-		getExecutorService(ServiceHandler.class.getSimpleName()).submit(
-				() -> writeAuditForService(getAgent(), arg, certificate, result, realmName, username, svcName));
+		getExecutorService(Tags.AUDIT).submit(
+				() -> writeAuditForService(getAgent(), arg, certificate, result, realmName, svcName));
 		getAgent().getAgentStatistics().recordService(durationNanos);
 	}
 }
