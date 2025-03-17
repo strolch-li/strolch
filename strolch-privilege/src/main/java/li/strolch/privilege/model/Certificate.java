@@ -19,6 +19,7 @@ import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 import java.time.ZonedDateTime;
 import java.util.Locale;
@@ -213,6 +214,16 @@ public final class Certificate implements Comparable<Certificate> {
 	 */
 	public String getRealm() {
 		return getProperty(REALM);
+	}
+
+	/**
+	 * Returns the value of the property {@link PrivilegeConstants#REALM}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#REALM}
+	 */
+	public String getRealmOrDefault() {
+		String realm = getProperty(REALM);
+		return StringHelper.isEmpty(realm) ? DEFAULT_REALM : realm;
 	}
 
 	/**

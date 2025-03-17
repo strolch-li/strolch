@@ -25,6 +25,7 @@ public class PrivilegeConstants {
 	public static final int DEFAULT_ITERATIONS = 200000;
 
 	public static final String REALM = "realm";
+	public static final String DEFAULT_REALM = "defaultRealm";
 	public static final String ORGANISATION = "organisation";
 	public static final String LOCATION = "location";
 	public static final String LOCATIONS = "locations";
