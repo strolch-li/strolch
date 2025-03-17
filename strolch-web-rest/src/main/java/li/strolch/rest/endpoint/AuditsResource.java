@@ -139,7 +139,7 @@ public class AuditsResource {
 			paging.setDataSetSize(totalAudits);
 		}
 
-		AuditToJsonVisitor toJsonVisitor = new AuditToJsonVisitor();
+		AuditToJsonVisitor toJsonVisitor = new AuditToJsonVisitor().withAdditionalData();
 		return ResponseUtil.toResponse(paging, toJsonVisitor::visitAudit);
 	}
 
