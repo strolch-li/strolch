@@ -19,7 +19,7 @@ package li.strolch.model.json;
 import com.google.gson.JsonObject;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditVisitor;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
 
@@ -29,11 +29,12 @@ public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
 
 		jsonObject.addProperty("id", audit.getId());
 		jsonObject.addProperty("username", audit.getUsername());
-		jsonObject.addProperty("date", ISO8601FormatFactory.getInstance().formatDate(audit.getDate()));
+		jsonObject.addProperty("date", ISO8601.toString(audit.getDate()));
 		jsonObject.addProperty("elementType", audit.getElementType());
 		jsonObject.addProperty("elementSubType", audit.getElementSubType());
 		jsonObject.addProperty("elementAccessed", audit.getElementAccessed());
-		jsonObject.addProperty("newVersion", ISO8601FormatFactory.getInstance().formatDate(audit.getNewVersion()));
+		jsonObject.addProperty("newVersion",
+				audit.getNewVersion() == null ? "null" : ISO8601.toString(audit.getNewVersion()));
 		jsonObject.addProperty("action", audit.getAction());
 		jsonObject.addProperty("accessType", audit.getAccessType().name());
 

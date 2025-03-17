@@ -27,6 +27,7 @@ import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +64,16 @@ public class XmlAuditDao implements AuditDao {
 	}
 
 	@Override
+	public long querySize() {
+		long size = 0;
+		Set<String> types = queryTypes();
+		for (String type : types) {
+			size += this.tx.getMetadataDao().querySize(getTypeRef(type), _ -> true);
+		}
+		return size;
+	}
+
+	@Override
 	public long querySize(DateRange dateRange) {
 		long size = 0;
 		Set<String> types = queryTypes();
@@ -87,6 +98,17 @@ public class XmlAuditDao implements AuditDao {
 	@Override
 	public Audit queryBy(String type, Long id) {
 		return this.tx.getObjectDao().queryById(getIdRef(type, id));
+	}
+
+	@Override
+	public List<Audit> queryAll(DateRange dateRange) {
+		List<Audit> result = new ArrayList<>();
+		Set<String> types = queryTypes();
+		for (String type : types) {
+			result.addAll(queryAll(type, dateRange));
+		}
+
+		return result;
 	}
 
 	@Override

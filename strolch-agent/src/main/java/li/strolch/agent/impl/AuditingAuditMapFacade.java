@@ -114,6 +114,11 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx) {
+		return this.auditTrail.querySize(tx);
+	}
+
+	@Override
 	public long querySize(StrolchTransaction tx, DateRange dateRange) {
 		return this.auditTrail.querySize(tx, dateRange);
 	}
@@ -134,6 +139,14 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		if (this.observeAccessReads)
 			this.read.add(audit);
 		return audit;
+	}
+
+	@Override
+	public List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange) {
+		List<Audit> elements = this.auditTrail.getAllElements(tx, dateRange);
+		if (this.observeAccessReads)
+			this.read.addAll(elements);
+		return elements;
 	}
 
 	@Override

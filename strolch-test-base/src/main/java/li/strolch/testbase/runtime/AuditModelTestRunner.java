@@ -136,6 +136,8 @@ public class AuditModelTestRunner {
 			// querySize
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
+				assertEquals(1, auditTrail.querySize(tx));
+				assertEquals(1, auditTrail.querySize(tx, equalsRange));
 				assertEquals(1, auditTrail.querySize(tx, audit.getElementType(), equalsRange));
 				assertEquals(1, auditTrail.querySize(tx, audit.getElementType(), containsRange));
 				assertEquals(0, auditTrail.querySize(tx, audit.getElementType(), earlierRange));
@@ -161,11 +163,26 @@ public class AuditModelTestRunner {
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
+				assertEquals(101, auditTrail.querySize(tx));
+				assertEquals(101, auditTrail.querySize(tx, containsRange));
 				assertEquals(100, auditTrail.querySize(tx, "FooBar", containsRange));
 
 				List<Audit> allElements = auditTrail.getAllElements(tx, "FooBar", containsRange);
 				allElements.sort(new AuditByIdComparator());
 				assertEquals(audits, allElements);
+
+				allElements = auditTrail.getAllElements(tx, "FooBar", earlierRange);
+				assertEquals(0, allElements.size());
+				allElements = auditTrail.getAllElements(tx, "FooBar", laterRange);
+				assertEquals(0, allElements.size());
+			}
+
+			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
+				AuditTrail auditTrail = tx.getAuditTrail();
+
+				List<Audit> allElements = auditTrail.getAllElements(tx, containsRange);
+				allElements.sort(new AuditByIdComparator());
+				assertEquals(101, allElements.size());
 
 				allElements = auditTrail.getAllElements(tx, "FooBar", earlierRange);
 				assertEquals(0, allElements.size());

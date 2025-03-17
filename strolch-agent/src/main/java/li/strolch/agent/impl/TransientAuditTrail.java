@@ -46,6 +46,12 @@ public class TransientAuditTrail implements AuditTrail {
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx) {
+
+		return this.auditMap.keySet().stream().map(this.auditMap::getMap).mapToLong(Map::size).sum();
+	}
+
+	@Override
 	public long querySize(StrolchTransaction tx, DateRange dateRange) {
 		long size = 0L;
 		for (String type : this.auditMap.keySet()) {
@@ -84,8 +90,18 @@ public class TransientAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
+	public List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange) {
 		List<Audit> audits = new ArrayList<>();
+		this.auditMap.streamValues().forEach(audit -> {
+			if (dateRange.contains(audit.getDate()))
+				audits.add(audit);
+		});
+		return audits;
+	}
+
+	@Override
+	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
+			List<Audit> audits = new ArrayList<>();
 		Map<Long, Audit> byType = this.auditMap.getMap(type);
 		if (byType == null)
 			return audits;

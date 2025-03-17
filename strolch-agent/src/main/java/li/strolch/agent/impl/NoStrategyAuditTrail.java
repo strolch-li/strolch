@@ -42,6 +42,11 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx) {
+		return 0;
+	}
+
+	@Override
 	public long querySize(StrolchTransaction tx, DateRange dateRange) {
 		return 0;
 	}
@@ -53,7 +58,7 @@ public class NoStrategyAuditTrail implements AuditTrail {
 
 	@Override
 	public Set<String> getTypes(StrolchTransaction tx) {
-		return null;
+		return Set.of();
 	}
 
 	@Override
@@ -62,8 +67,13 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
+	public List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange) {
+		return List.of();
+	}
+
+	@Override
 	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
-		return null;
+		return List.of();
 	}
 
 	@Override

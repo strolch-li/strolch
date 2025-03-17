@@ -48,17 +48,19 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public static final String DATE = "date";
 	public static final String USERNAME = "username";
 	public static final String ADDITIONAL_DATA = "additional_data";
-	public static final String FIELDS = commaSeparated(ID, USERNAME, DATE, ELEMENT_TYPE,
-			ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE, ADDITIONAL_DATA);
+	public static final String FIELDS = commaSeparated(ID, USERNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE,
+			ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE, ADDITIONAL_DATA);
 	public static final String TABLE_NAME = "audits";
 
 	private static final String hasElementSql = "select count(*) from audits where element_type = ? and id = ?";
-	private static final String querySizeSql = "select count(*) from audits where date between ? and ?";
+	private static final String querySizeSql = "select count(*) from audits";
+	private static final String querySizeBetweenSql = "select count(*) from audits where date between ? and ?";
 	private static final String querySizeTypeSql
 			= "select count(*) from audits where element_type = ? and date between ? and ?";
 	private static final String queryTypesSql = "select distinct element_type from audits";
 	private static final String queryBySql = "select " + FIELDS + " from audits where element_type = ? and ID = ?";
-	private static final String queryAllSql = "select "
+	private static final String queryAllBetweenSql = "select " + FIELDS + " from audits where date between ? and ?";
+	private static final String queryAllByTypeAndBetweenSql = "select "
 			+ FIELDS
 			+ " from audits where element_type = ? and date between ? and ?";
 	private static final String insertSql = "insert into audits ("
@@ -77,9 +79,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public boolean hasElement(String type, Long id) {
-
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(hasElementSql)) {
-
 			statement.setString(1, type);
 			statement.setLong(2, id);
 
@@ -101,9 +101,20 @@ public class PostgreSqlAuditDao implements AuditDao {
 	}
 
 	@Override
-	public long querySize(DateRange dateRange) {
+	public long querySize() {
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(querySizeSql)) {
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
 
+	@Override
+	public long querySize(DateRange dateRange) {
+		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(querySizeBetweenSql)) {
 			statement.setTimestamp(1, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
 			statement.setTimestamp(2, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
 
@@ -120,7 +131,6 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public long querySize(String type, DateRange dateRange) {
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(querySizeTypeSql)) {
-
 			statement.setString(1, type);
 			statement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
 			statement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
@@ -154,9 +164,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 	@Override
 	public Audit queryBy(String type, Long id) {
-
 		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(queryBySql)) {
-
 			statement.setString(1, type);
 			statement.setLong(2, id);
 
@@ -176,10 +184,29 @@ public class PostgreSqlAuditDao implements AuditDao {
 	}
 
 	@Override
+	public List<Audit> queryAll(DateRange dateRange) {
+		List<Audit> list = new ArrayList<>();
+		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(queryAllBetweenSql)) {
+			statement.setTimestamp(1, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
+			statement.setTimestamp(2, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
+
+			try (ResultSet result = statement.executeQuery()) {
+				while (result.next()) {
+					list.add(auditFrom(result));
+				}
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query types due to: " + e.getMessage(), e);
+		}
+
+		return list;
+	}
+
+	@Override
 	public List<Audit> queryAll(String type, DateRange dateRange) {
 		List<Audit> list = new ArrayList<>();
-		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(queryAllSql)) {
-
+		try (PreparedStatement statement = this.tx.getConnection().prepareStatement(queryAllByTypeAndBetweenSql)) {
 			statement.setString(1, type);
 			statement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
 			statement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());
@@ -200,7 +227,6 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public void save(Audit audit) {
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(insertSql)) {
-
 			setAuditFields(audit, preparedStatement);
 
 			int count = preparedStatement.executeUpdate();
@@ -226,7 +252,6 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public void update(Audit audit) {
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(updateSql)) {
-
 			setAuditFields(audit, preparedStatement);
 			preparedStatement.setLong(11, audit.getId());
 
@@ -253,7 +278,6 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public void remove(Audit audit) {
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(removeSql)) {
-
 			preparedStatement.setLong(1, audit.getId());
 
 			int count = preparedStatement.executeUpdate();
@@ -279,7 +303,6 @@ public class PostgreSqlAuditDao implements AuditDao {
 	@Override
 	public long removeAll(String type, DateRange dateRange) {
 		try (PreparedStatement preparedStatement = this.tx.getConnection().prepareStatement(removeAllSql)) {
-
 			preparedStatement.setString(1, type);
 			preparedStatement.setTimestamp(2, new Timestamp(dateRange.getFromDate().getTime()), Calendar.getInstance());
 			preparedStatement.setTimestamp(3, new Timestamp(dateRange.getToDate().getTime()), Calendar.getInstance());

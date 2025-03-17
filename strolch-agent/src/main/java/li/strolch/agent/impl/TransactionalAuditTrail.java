@@ -26,6 +26,11 @@ public class TransactionalAuditTrail implements AuditTrail {
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx) {
+		return getDbDao(tx).querySize();
+	}
+
+	@Override
 	public long querySize(StrolchTransaction tx, DateRange dateRange) {
 		return getDbDao(tx).querySize(dateRange);
 	}
@@ -43,6 +48,11 @@ public class TransactionalAuditTrail implements AuditTrail {
 	@Override
 	public Audit getBy(StrolchTransaction tx, String type, Long id) {
 		return getDbDao(tx).queryBy(type, id);
+	}
+
+	@Override
+	public List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange) {
+		return getDbDao(tx).queryAll(dateRange);
 	}
 
 	@Override

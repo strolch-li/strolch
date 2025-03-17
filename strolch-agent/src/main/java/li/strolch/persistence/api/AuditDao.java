@@ -28,6 +28,8 @@ public interface AuditDao {
 
 	boolean hasElement(String type, Long id);
 
+	long querySize();
+
 	long querySize(DateRange dateRange);
 
 	long querySize(String type, DateRange dateRange);
@@ -35,6 +37,8 @@ public interface AuditDao {
 	Audit queryBy(String type, Long id);
 
 	Set<String> queryTypes();
+
+	List<Audit> queryAll(DateRange dateRange);
 
 	List<Audit> queryAll(String type, DateRange dateRange);
 
