@@ -49,6 +49,7 @@ public class StrolchRestfulConstants {
 	public static final String PARAM_TO = "to";
 	public static final String PARAM_FILTER = "filter";
 	public static final String PARAM_QUERY = "query";
+	public static final String REMOTE_IP = "remote_ip";
 
 	public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 

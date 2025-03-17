@@ -15,17 +15,19 @@
  */
 package li.strolch.rest.filters;
 
+import com.google.gson.JsonObject;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.Cookie;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.ext.Provider;
+import li.strolch.agent.api.RealmHandler;
+import li.strolch.agent.api.StrolchAgent;
+import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
+import li.strolch.model.Tags;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.privilege.model.Usage;
@@ -38,8 +40,13 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static jakarta.ws.rs.core.HttpHeaders.*;
+import static java.lang.String.join;
+import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.*;
+import static li.strolch.runtime.AuditHelper.writeAuditForApiCall;
 import static li.strolch.utils.helper.StringHelper.*;
+import static org.glassfish.jersey.http.HttpHeaders.*;
 
 /**
  * This authentication request filter secures any requests to a Strolch server, by verifying that the request contains
@@ -121,36 +128,91 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 				certificate = validateSession(requestContext, remoteIp);
 			}
 
-			certificate.ifPresent(CertificateThreadLocal::setCert);
+			certificate.ifPresent(cert -> {
+				CertificateThreadLocal.setCert(cert);
+				writeAudit(requestContext, cert, remoteIp);
+			});
 
 		} catch (StrolchNotAuthenticatedException e) {
 			logger.error(e.getMessage());
 			requestContext.abortWith(Response
 					.status(Response.Status.UNAUTHORIZED)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("User is not authenticated!")
 					.build());
 		} catch (StrolchAccessDeniedException e) {
 			logger.error(e.getMessage());
 			requestContext.abortWith(Response
 					.status(Response.Status.UNAUTHORIZED)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("User is not authorized!")
 					.build());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			requestContext.abortWith(Response
 					.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("User cannot access the resource.")
 					.build());
 		}
 	}
 
+	private static final Set<String> skippedHeaders = Set.of(AUTHORIZATION.toLowerCase(), USER_AGENT.toLowerCase(),
+			HOST.toLowerCase(), ACCEPT_ENCODING.toLowerCase(), ACCEPT_LANGUAGE.toLowerCase(), COOKIE.toLowerCase(),
+			ORIGIN.toLowerCase(), REFERER.toLowerCase(), CONTENT_LENGTH.toLowerCase(), CACHE_CONTROL.toLowerCase(),
+			CONNECTION.toLowerCase(), "upgrade-insecure-requests", "dnt", "priority");
+
+	private static void writeAudit(ContainerRequestContext requestContext, Certificate cert, String remoteIp) {
+		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
+		StrolchRealm realm = agent.getComponent(RealmHandler.class).getRealm(cert.getRealmOrDefault());
+		if (!realm.isAuditTrailEnabled())
+			return;
+
+		String _url = requestContext.getUriInfo().getPath();
+
+		if (_url.startsWith("strolch/authentication/")) {
+			String extractedUrl = _url.substring("strolch/authentication/".length());
+
+			// Check if URL ends with an SHA-256 checksum
+			if (extractedUrl.length() == 64 && extractedUrl.matches("[a-fA-F0-9]{64}"))
+				_url = "strolch/authentication/xxx";
+		}
+
+		String url = _url;
+
+		String method = requestContext.getMethod();
+
+		JsonObject headers = new JsonObject();
+		requestContext.getHeaders().forEach((key, value) -> {
+			if (skippedHeaders.contains(key.toLowerCase()))
+				return;
+			if (key.toLowerCase().startsWith("sec-"))
+				return;
+			if (key.equalsIgnoreCase(AUTHORIZATION))
+				headers.addProperty(key, "***");
+			else
+				headers.addProperty(key, join(", ", value));
+		});
+		MultivaluedMap<String, String> queryParams = requestContext.getUriInfo().getQueryParameters();
+		JsonObject params = new JsonObject();
+		queryParams.forEach((key, value) -> params.addProperty(key, join(", ", value)));
+
+		JsonObject additionalData = new JsonObject();
+		additionalData.addProperty(METHOD, method);
+		additionalData.addProperty(URL, url);
+		additionalData.addProperty(REMOTE_IP, remoteIp);
+		if (headers.size() > 0)
+			additionalData.add(HEADERS, headers);
+		if (params.size() > 0)
+			additionalData.add(PARAMS, params);
+
+		agent.getExecutor(Tags.AUDIT).submit(() -> writeAuditForApiCall(agent, cert, url, method, additionalData));
+	}
+
 	protected Optional<Certificate> setCertificateIfAvailable(ContainerRequestContext requestContext, String remoteIp) {
 		StrolchSessionHandler sessionHandler = getSessionHandler();
 
-		String sessionId = trimOrEmpty(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
+		String sessionId = trimOrEmpty(requestContext.getHeaderString(AUTHORIZATION));
 		if (isNotEmpty(sessionId)) {
 			if (sessionHandler.isSessionKnown(sessionId)) {
 				return validateCertificate(requestContext, sessionId, remoteIp);
@@ -187,7 +249,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 	 * authorization token
 	 */
 	protected Optional<Certificate> validateSession(ContainerRequestContext requestContext, String remoteIp) {
-		String authorization = trimOrEmpty(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
+		String authorization = trimOrEmpty(requestContext.getHeaderString(AUTHORIZATION));
 		if (authorization.isEmpty())
 			return validateCookie(requestContext, remoteIp);
 		if (authorization.startsWith("Basic "))
@@ -214,7 +276,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					requestContext.getUriInfo().getPath());
 			requestContext.abortWith(Response
 					.status(Response.Status.UNAUTHORIZED)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("Missing Authorization!")
 					.build());
 			return Optional.empty();
@@ -230,7 +292,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			logger.error("Basic Auth is not available for URL {}", requestContext.getUriInfo().getPath());
 			requestContext.abortWith(Response
 					.status(Response.Status.FORBIDDEN)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("Basic Auth not available")
 					.build());
 			return Optional.empty();
@@ -242,7 +304,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		if (parts.length != 2) {
 			requestContext.abortWith(Response
 					.status(Response.Status.BAD_REQUEST)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("Invalid Basic Authorization!")
 					.build());
 			return Optional.empty();
@@ -266,7 +328,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			logger.debug("Ignoring unknown session!");
 			requestContext.abortWith(Response
 					.status(Response.Status.UNAUTHORIZED)
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("User is not authenticated!")
 					.build());
 			return Optional.empty();
@@ -281,7 +343,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 					.contains("strolch/privilege/users/" + certificate.getUsername() + "/password")) {
 				requestContext.abortWith(Response
 						.status(Response.Status.FORBIDDEN)
-						.header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+						.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 						.entity("Can only set password!")
 						.build());
 				return Optional.empty();

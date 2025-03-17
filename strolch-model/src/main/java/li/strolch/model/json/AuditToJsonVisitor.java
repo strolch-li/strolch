@@ -23,6 +23,13 @@ import li.strolch.utils.iso8601.ISO8601;
 
 public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
 
+	private boolean withAdditionalData;
+
+	public AuditToJsonVisitor withAdditionalData() {
+		this.withAdditionalData = true;
+		return this;
+	}
+
 	@Override
 	public JsonObject visitAudit(Audit audit) {
 		JsonObject jsonObject = new JsonObject();
@@ -37,6 +44,8 @@ public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
 				audit.getNewVersion() == null ? "null" : ISO8601.toString(audit.getNewVersion()));
 		jsonObject.addProperty("action", audit.getAction());
 		jsonObject.addProperty("accessType", audit.getAccessType().name());
+		if (this.withAdditionalData)
+			jsonObject.add("additionalData", audit.getAdditionalData());
 
 		return jsonObject;
 	}

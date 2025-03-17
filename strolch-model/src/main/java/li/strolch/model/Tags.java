@@ -239,6 +239,9 @@ public class Tags {
 		public static final String DATA_PATH = "dataPath";
 		public static final String TEMP_PATH = "tempPath";
 		public static final String SUPPORTED_LANGUAGES = "supportedLanguages";
+		public static final String HEADERS = "headers";
+		public static final String METHOD = "method";
+		public static final String URL = "url";
 	}
 
 	public static class Audit {

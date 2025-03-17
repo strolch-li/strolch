@@ -16,6 +16,7 @@
 
 package li.strolch.runtime;
 
+import com.google.gson.JsonObject;
 import li.strolch.agent.api.RealmHandler;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
@@ -48,24 +49,24 @@ public class AuditHelper {
 	private static final Logger logger = LoggerFactory.getLogger(AuditHelper.class);
 
 	public static void writeAuditForService(StrolchAgent agent, ServiceArgument arg, Certificate certificate,
-			ServiceResult result, String realmName, String username, String svcName) {
-
-		// we currently down't want to create audits for the agent user
-		if (certificate.isSystemUser())
-			return;
-
-		StrolchRealm realm = agent.getComponent(RealmHandler.class).getRealm(realmName);
-		if (!realm.isAuditTrailEnabled())
-			return;
-
+			ServiceResult result, String realmName, String svcName) {
 		try {
+
+			// we currently don't want to create audits for the agent user
+			if (certificate.isSystemUser())
+				return;
+
+			StrolchRealm realm = agent.getComponent(RealmHandler.class).getRealm(realmName);
+			if (!realm.isAuditTrailEnabled())
+				return;
+
 			agent.runAsAgent(ctx -> {
 				try (StrolchTransaction tx = realm.openTx(ctx.certificate(), ServiceHandler.class.getSimpleName(),
 						false)) {
 					Audit audit = new Audit();
 
 					audit.setId(StrolchAgent.getUniqueIdLong());
-					audit.setUsername(username);
+					audit.setUsername(certificate.getUsername());
 					audit.setDate(new Date());
 
 					audit.setElementType(Service.class.getSimpleName());
@@ -90,7 +91,7 @@ public class AuditHelper {
 								Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception,
 								Information, getBundle("strolch-agent"), "agent.service.audit.failed")
 								.value("service", svcName)
-								.value("user", username)
+								.value("user", certificate.getUsername())
 								.value("reason", e.getMessage())
 								.withException(e));
 			}
@@ -99,13 +100,13 @@ public class AuditHelper {
 
 	public static void writeAuditForSearch(StrolchAgent agent, Certificate certificate, String realmName,
 			String searchName) {
-
-		// we currently down't want to create audits for the agent user
-		if (certificate.isSystemUser())
-			return;
-
-		StrolchRealm realm = agent.getRealm(realmName);
 		try {
+
+			// we currently don't want to create audits for the agent user
+			if (certificate.isSystemUser())
+				return;
+
+			StrolchRealm realm = agent.getRealm(realmName);
 			agent.runAsAgent(ctx -> {
 				try (StrolchTransaction tx = realm.openTx(ctx.certificate(), StrolchSearch.class.getSimpleName(),
 						false)) {
@@ -135,6 +136,55 @@ public class AuditHelper {
 								Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception,
 								Information, getBundle("strolch-agent"), "agent.search.audit.failed")
 								.value("search", searchName)
+								.value("user", certificate.getUsername())
+								.value("reason", e.getMessage())
+								.withException(e));
+			}
+		}
+	}
+
+	public static void writeAuditForApiCall(StrolchAgent agent, Certificate certificate, String url, String method,
+			JsonObject additionalData) {
+
+		String realmName = certificate.getRealmOrDefault();
+		try {
+			// we currently don't want to create audits for the agent user
+			if (certificate.isSystemUser())
+				return;
+
+			StrolchRealm realm = agent.getComponent(RealmHandler.class).getRealm(realmName);
+			if (!realm.isAuditTrailEnabled())
+				return;
+
+			agent.runAsAgent(ctx -> {
+				try (StrolchTransaction tx = realm.openTx(ctx.certificate(), "REST_API", false)) {
+					Audit audit = new Audit();
+
+					audit.setId(StrolchAgent.getUniqueIdLong());
+					audit.setUsername(certificate.getUsername());
+					audit.setDate(new Date());
+
+					audit.setElementType("REST_API");
+					audit.setElementSubType(url);
+					audit.setElementAccessed("");
+
+					audit.setAccessType(AccessType.EXECUTE);
+					audit.setAction(method);
+
+					audit.setAdditionalData(additionalData);
+
+					tx.add(audit);
+					tx.commitOnClose();
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Failed to log audit for REST API {}!", url, e);
+			if (agent.hasComponent(OperationsLog.class)) {
+				agent
+						.getComponent(OperationsLog.class)
+						.addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
+								Locator.valueOf(AGENT, "strolch-agent", getUniqueId()), LogSeverity.Exception,
+								Information, getBundle("strolch-agent"), "agent.rest_api.audit.failed")
 								.value("user", certificate.getUsername())
 								.value("reason", e.getMessage())
 								.withException(e));
