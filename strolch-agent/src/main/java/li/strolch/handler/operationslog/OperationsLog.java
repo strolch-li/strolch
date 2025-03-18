@@ -504,12 +504,14 @@ public class OperationsLog extends StrolchComponent {
 				the following message was logged:
 				
 				=====================
-				Realm: %s
+				System: %s
+				Environment: %s
+				Username: %s
 				Severity: %s
 				Locator: %s
-				Username: %s
 				Timestamp: %s
 				Message ID: %s
+				Realm: %s
 				
 				Message:
 				---------------------
@@ -522,8 +524,8 @@ public class OperationsLog extends StrolchComponent {
 				
 				Kind regards
 					your server
-				""".formatted(logMessage.getRealm(), logMessage.getSeverity(), logMessage.getLocator(),
-				logMessage.getUsername(), ISO8601.toString(logMessage.getZonedDateTime()), logMessage.getId(),
+				""".formatted(appName, env, logMessage.getUsername(), logMessage.getSeverity(), logMessage.getLocator(),
+				ISO8601.toString(logMessage.getZonedDateTime()), logMessage.getId(), logMessage.getRealm(),
 				logMessage.getMessage(Locale.ENGLISH), stackTrace == null ? "(none)" : stackTrace);
 
 		mailHandler.sendEncryptedMailAsync(this.mailRecipients, subject, text);
