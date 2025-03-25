@@ -126,7 +126,7 @@ public class UserSessionsResource {
 		logger.info("[{}] Invalidating session {}", cert.getUsername(), sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext(), false)) {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_SESSION);
 
 			sessionHandler.invalidate(cert, sessionId);
