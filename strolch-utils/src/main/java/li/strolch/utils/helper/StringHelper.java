@@ -212,41 +212,6 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the MD5 Hash of a string and converts it to a HEX string
-	 *
-	 * @param string the string to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static String hashMd5AsHex(String string) {
-		return toHexString(hashMd5(string.getBytes()));
-	}
-
-	/**
-	 * Generates the MD5 Hash of a string. Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
-	 * Hex String which is printable
-	 *
-	 * @param string the string to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static byte[] hashMd5(String string) {
-		return hashMd5(string.getBytes());
-	}
-
-	/**
-	 * Generates the MD5 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
-	 * a Hex String which is printable
-	 *
-	 * @param bytes the bytes to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static byte[] hashMd5(byte[] bytes) {
-		return hash("MD5", bytes);
-	}
-
-	/**
 	 * Generates the SHA1 Hash of a string and converts it to a HEX String
 	 *
 	 * @param string the string to hash
