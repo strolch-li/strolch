@@ -25,6 +25,7 @@ import li.strolch.utils.time.PeriodDuration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -1766,6 +1767,22 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * @return the removed {@link ParameterBag}, or null if it does not exist
 	 */
 	ParameterBag removeParameterBag(String key);
+
+	/**
+	 * Removes the {@link ParameterBag}s with the given type
+	 *
+	 * @param type the type of bag to remove
+	 *
+	 * @return the list of removed {@link ParameterBag}s
+	 */
+	default List<ParameterBag> removeParameterBagsByType(String type) {
+		return getParameterBagKeySet().stream().map(key -> {
+			ParameterBag bag = getParameterBag(key);
+			if (bag == null || !bag.getType().equals(type))
+				return null;
+			return removeParameterBag(key);
+		}).filter(Objects::nonNull).toList();
+	}
 
 	/**
 	 * Returns true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
