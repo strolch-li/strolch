@@ -35,12 +35,15 @@ import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
+import static java.time.ZoneId.systemDefault;
+import static java.time.ZonedDateTime.ofInstant;
+import static java.time.temporal.ChronoUnit.MILLIS;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
@@ -520,8 +523,8 @@ public class GenericReport extends ReportPolicy {
 		StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
 		Object value = evaluateColumnValue(columnDefP, row, false);
 		return switch (value) {
-			case ZonedDateTime zonedDateTime -> ISO8601.toString(zonedDateTime);
-			case Date date -> ISO8601.toString(date);
+			case ZonedDateTime dateTime -> formatDateTime(columnId, dateTime);
+			case Date date -> formatDateTime(columnId, ofInstant(date.toInstant(), systemDefault()));
 			case Parameter<?> parameter -> formatColumn(columnDefP.getId(), parameter);
 			default -> value.toString();
 		};
@@ -534,17 +537,20 @@ public class GenericReport extends ReportPolicy {
 				return this.i18nData.get(value).getAsString();
 			return value;
 		} else if (param instanceof DateParameter d) {
-			ZonedDateTime dateTime = d.getValueZdt();
-			String hint = this.reportRes.getString(BAG_FORMATTING_HINTS, columnId);
-			return switch (hint) {
-				case UOM_DATE -> DateTimeFormatter.ISO_LOCAL_DATE.format(dateTime);
-				case UOM_DATE_TIME -> DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateTime);
-				case UOM_TIME -> DateTimeFormatter.ISO_LOCAL_TIME.format(dateTime);
-				default -> ISO8601.toString(dateTime.truncatedTo(ChronoUnit.SECONDS));
-			};
+			return formatDateTime(columnId, d.getValueZdt());
 		} else {
 			return param.getValueAsString();
 		}
+	}
+
+	protected String formatDateTime(String columnId, ZonedDateTime dt) {
+		String hint = this.reportRes.getString(BAG_FORMATTING_HINTS, columnId);
+		return switch (hint) {
+			case UOM_DATE -> DateTimeFormatter.ISO_LOCAL_DATE.format(dt);
+			case UOM_DATE_TIME -> DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dt.truncatedTo(SECONDS));
+			case UOM_TIME -> DateTimeFormatter.ISO_LOCAL_TIME.format(dt.truncatedTo(SECONDS));
+			default -> ISO8601.toString(dt.truncatedTo(MILLIS));
+		};
 	}
 
 	@Override
