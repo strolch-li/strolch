@@ -67,6 +67,9 @@ public class StrolchModelConstants {
 	 * This uom value indicates that the {@link Parameter} has no defined uom
 	 */
 	public static final String UOM_NONE = "None";
+	public static final String UOM_DATE = "Date";
+	public static final String UOM_DATE_TIME = "DateTime";
+	public static final String UOM_TIME = "Time";
 
 	public static final String INTERNAL = "internal";
 
