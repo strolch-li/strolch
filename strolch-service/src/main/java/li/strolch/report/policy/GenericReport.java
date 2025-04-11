@@ -18,10 +18,7 @@ package li.strolch.report.policy;
 
 import com.google.gson.JsonObject;
 import li.strolch.model.*;
-import li.strolch.model.parameter.AbstractParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.parameter.*;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.ElementStateVisitor;
 import li.strolch.model.visitor.ElementZdtDateVisitor;
@@ -37,6 +34,8 @@ import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -523,13 +522,29 @@ public class GenericReport extends ReportPolicy {
 		return switch (value) {
 			case ZonedDateTime zonedDateTime -> ISO8601.toString(zonedDateTime);
 			case Date date -> ISO8601.toString(date);
-			case Parameter<?> parameter -> formatColumn(parameter);
+			case Parameter<?> parameter -> formatColumn(columnDefP.getId(), parameter);
 			default -> value.toString();
 		};
 	}
 
-	protected String formatColumn(Parameter<?> param) {
-		return param.getValueAsString();
+	protected String formatColumn(String columnId, Parameter<?> param) {
+		if (param instanceof BooleanParameter b) {
+			String value = b.getValueAsString();
+			if (this.i18nData != null && this.i18nData.has(value))
+				return this.i18nData.get(value).getAsString();
+			return value;
+		} else if (param instanceof DateParameter d) {
+			ZonedDateTime dateTime = d.getValueZdt();
+			String hint = this.reportRes.getString(BAG_FORMATTING_HINTS, columnId);
+			return switch (hint) {
+				case UOM_DATE -> DateTimeFormatter.ISO_LOCAL_DATE.format(dateTime);
+				case UOM_DATE_TIME -> DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateTime);
+				case UOM_TIME -> DateTimeFormatter.ISO_LOCAL_TIME.format(dateTime);
+				default -> ISO8601.toString(dateTime.truncatedTo(ChronoUnit.SECONDS));
+			};
+		} else {
+			return param.getValueAsString();
+		}
 	}
 
 	@Override

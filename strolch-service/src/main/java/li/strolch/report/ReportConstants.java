@@ -26,6 +26,7 @@ public class ReportConstants {
 	public static final String BAG_ORDERING = "ordering";
 	public static final String BAG_ADDITIONAL_TYPE = "additionalType";
 	public static final String BAG_ADDITIONAL_JOINS = "additionalJoins";
+	public static final String BAG_FORMATTING_HINTS = "formattingHints";
 
 	public static final String PARAM_OBJECT_TYPE = "objectType";
 	public static final String PARAM_PARALLEL = "parallel";
