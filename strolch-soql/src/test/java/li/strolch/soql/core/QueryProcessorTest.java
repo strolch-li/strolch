@@ -80,7 +80,6 @@ public class QueryProcessorTest extends BaseTest {
 		request.setStatement(
 				"SELECT r, o, r.getId() FROM Resource r, Order o WHERE r.getId() = :id AND o.getId() = :id");
 
-		// TODO can be simpler but currently forgot how
 		boolean thrown = false;
 		try {
 			System.out.println(processor.process(request, null).asJson().toString());

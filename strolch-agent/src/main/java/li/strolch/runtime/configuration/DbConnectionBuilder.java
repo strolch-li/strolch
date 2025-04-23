@@ -96,7 +96,6 @@ public abstract class DbConnectionBuilder {
 				if (!key.startsWith(dbPoolPrefix))
 					continue;
 
-				// TODO we should change how properties for realms are configured
 				// since defaultRealm does not have to be on the key, we need this hack:
 				String[] segments = key.split(dbUseEnv ? UNDERLINE : "\\.");
 				String poolKey;

@@ -28,7 +28,6 @@ import java.util.List;
  * The query result set as List of Lists
  * <p>
  * <p>
- * TODO: the result set should carry arbitrary objects, not only StrolchRootElements
  *
  * @author msmock
  */

@@ -52,8 +52,6 @@ public class ComparisonExpression extends AbstractBooleanExpression {
 	}
 
 	/**
-	 * TODO: allow comparison, if the classes do not match. I.e. compare Integer with Double
-	 *
 	 * @param inputObjects
 	 * @param queryParameter
 	 *

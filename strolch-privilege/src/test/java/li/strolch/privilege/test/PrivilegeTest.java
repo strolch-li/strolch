@@ -47,7 +47,6 @@ import static org.junit.Assert.*;
 /**
  * JUnit for performing Privilege tests. This JUnit is by no means complete, but checks the bare minimum.br />
  * <p>
- * TODO add more tests, especially with deny and allow lists
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */

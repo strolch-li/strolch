@@ -30,10 +30,6 @@ import li.strolch.privilege.model.internal.User;
  * given {@link Privilege} has access to the given {@link Restrictable}
  * </p>
  *
- * <p>
- * TODO
- * </p>
- *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public abstract class PrivilegePolicy {

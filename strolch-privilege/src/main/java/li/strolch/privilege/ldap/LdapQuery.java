@@ -26,7 +26,6 @@ public abstract class LdapQuery implements AutoCloseable {
 
 	protected LdapQuery() {
 		this.searchControls = new SearchControls();
-		// TODO change this to object scope
 		this.searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE	);
 		this.searchControls.setReturningAttributes(new String[]{"*", "+"});
 	}
