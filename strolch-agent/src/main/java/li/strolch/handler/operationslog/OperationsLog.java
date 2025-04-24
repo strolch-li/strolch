@@ -72,6 +72,7 @@ public class OperationsLog extends StrolchComponent {
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		this.sentMessageHashes = new ConcurrentHashMap<>();
+		this.lastSentHashesPruning = System.currentTimeMillis();
 		this.sendMails = configuration.getBoolean(PARAM_SEND_MAILS, false);
 		this.sendMailsMinSeverity = LogSeverity.valueOf(
 				configuration.getString(PARAM_SEND_MAILS_MIN_SEVERITY, LogSeverity.Exception.name()));
@@ -482,8 +483,8 @@ public class OperationsLog extends StrolchComponent {
 
 		String hash = logMessage.buildRelevantHash();
 		long now = System.currentTimeMillis();
-		if (this.sentMessageHashes.containsKey(hash)) {
-			long sentTime = this.sentMessageHashes.get(hash);
+		Long sentTime = this.sentMessageHashes.get(hash);
+		if (sentTime != null) {
 			if (now - sentTime < TimeUnit.MINUTES.toMillis(30)) {
 				logger.warn(
 						"LogMessage {} {} has already been sent less than 30min ago as hash is already known. Ignoring.",

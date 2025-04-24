@@ -19,9 +19,9 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
+import li.strolch.handler.audits.AuditHandler;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
-import li.strolch.model.Tags;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
@@ -39,7 +39,6 @@ import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import static li.strolch.model.Tags.AGENT;
-import static li.strolch.runtime.AuditHelper.writeAuditForService;
 import static li.strolch.service.api.ServiceResultState.*;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
@@ -293,8 +292,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		}
 
 		// record the event
-		getExecutorService(Tags.AUDIT).submit(
-				() -> writeAuditForService(getAgent(), arg, certificate, result, realmName, svcName));
+		getAgent()
+				.getComponentO(AuditHandler.class)
+				.ifPresent(handler -> handler.writeAuditForServiceAsync(arg, certificate, result, realmName, svcName));
 		getAgent().getAgentStatistics().recordService(durationNanos);
 	}
 }

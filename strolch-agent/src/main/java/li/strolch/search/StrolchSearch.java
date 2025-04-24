@@ -16,13 +16,12 @@
 
 package li.strolch.search;
 
-import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.handler.audits.AuditHandler;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
-import li.strolch.model.Tags;
 import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
@@ -38,7 +37,6 @@ import java.util.stream.Stream;
 
 import static li.strolch.model.StrolchModelConstants.INTERNAL;
 import static li.strolch.model.Tags.AGENT;
-import static li.strolch.runtime.AuditHelper.writeAuditForSearch;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCauseMessage;
 
 /**
@@ -198,10 +196,10 @@ public abstract class StrolchSearch<T extends StrolchRootElement, U extends Root
 			stream = stream.filter(e -> this.expression.matches(e));
 
 		if (tx.isAuditTrailEnabled()) {
-			StrolchAgent agent = tx.getAgent();
-			agent
-					.getExecutor(Tags.AUDIT)
-					.submit(() -> writeAuditForSearch(agent, tx.getCertificate(), tx.getRealmName(),
+			tx
+					.getAgent()
+					.getComponentO(AuditHandler.class)
+					.ifPresent(handler -> handler.writeAuditForSearchAsync(tx.getCertificate(), tx.getRealmName(),
 							getClass().getName()));
 		}
 

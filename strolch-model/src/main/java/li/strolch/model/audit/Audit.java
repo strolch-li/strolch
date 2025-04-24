@@ -19,6 +19,8 @@ import com.google.gson.JsonElement;
 
 import java.util.Date;
 
+import static li.strolch.utils.helper.StringHelper.hashSha256AsHex;
+
 /**
  * Used to log/audit access to the agent
  *
@@ -119,6 +121,44 @@ public class Audit implements Comparable<Audit> {
 
 	public <U> U accept(AuditVisitor<U> visitor) {
 		return visitor.visitAudit(this);
+	}
+
+	public String buildRelevantHash() {
+		String builder = this.username
+				+ this.elementType
+				+ this.elementSubType
+				+ this.elementAccessed
+				+ this.action
+				+ this.accessType
+				+ this.additionalData;
+		return hashSha256AsHex(builder);
+	}
+
+	@Override
+	public String toString() {
+		return "Audit{"
+				+ "id="
+				+ id
+				+ ", username='"
+				+ username
+				+ '\''
+				+ ", date="
+				+ date
+				+ ", elementType='"
+				+ elementType
+				+ '\''
+				+ ", elementSubType='"
+				+ elementSubType
+				+ '\''
+				+ ", elementAccessed='"
+				+ elementAccessed
+				+ '\''
+				+ ", action='"
+				+ action
+				+ '\''
+				+ ", accessType="
+				+ accessType
+				+ '}';
 	}
 
 	@Override

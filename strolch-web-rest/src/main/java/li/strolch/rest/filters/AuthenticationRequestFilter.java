@@ -27,7 +27,7 @@ import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
-import li.strolch.model.Tags;
+import li.strolch.handler.audits.AuditHandler;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.privilege.model.Usage;
@@ -44,7 +44,6 @@ import static jakarta.ws.rs.core.HttpHeaders.*;
 import static java.lang.String.join;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.*;
-import static li.strolch.runtime.AuditHelper.writeAuditForApiCall;
 import static li.strolch.utils.helper.StringHelper.*;
 import static org.glassfish.jersey.http.HttpHeaders.*;
 
@@ -201,12 +200,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		additionalData.addProperty(METHOD, method);
 		additionalData.addProperty(URL, url);
 		additionalData.addProperty(REMOTE_IP, remoteIp);
-		if (headers.size() > 0)
+		if (!headers.isEmpty())
 			additionalData.add(HEADERS, headers);
-		if (params.size() > 0)
+		if (!params.isEmpty())
 			additionalData.add(PARAMS, params);
 
-		agent.getExecutor(Tags.AUDIT).submit(() -> writeAuditForApiCall(agent, cert, url, method, additionalData));
+		agent
+				.getComponentO(AuditHandler.class)
+				.ifPresent(handler -> handler.writeAuditForApiCallAsync(cert, url, method, additionalData));
 	}
 
 	protected Optional<Certificate> setCertificateIfAvailable(ContainerRequestContext requestContext, String remoteIp) {
