@@ -41,10 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.*;
 import java.text.MessageFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -112,6 +109,13 @@ public class StrolchAgent {
 	 */
 	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
+	}
+
+	/**
+	 * @see ComponentContainer#getComponentO(Class)
+	 */
+	public <T> Optional<T> getComponentO(Class<T> clazz) throws IllegalArgumentException {
+		return this.container.getComponentO(clazz);
 	}
 
 	/**

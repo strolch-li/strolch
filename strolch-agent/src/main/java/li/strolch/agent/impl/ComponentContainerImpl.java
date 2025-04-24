@@ -93,6 +93,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 	}
 
 	@Override
+	public <T> Optional<T> getComponentO(Class<T> clazz) throws IllegalArgumentException {
+		if (!this.componentsByType.containsList(clazz))
+			return Optional.empty();
+		return Optional.of(getComponent(clazz));
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T getComponent(Class<T> clazz) throws IllegalArgumentException {
 		List<StrolchComponent> components = this.componentsByType.getList(clazz);
