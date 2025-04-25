@@ -73,7 +73,6 @@ public class AuditFromDomReader {
 		DBC.INTERIM.assertNotEmpty("ElementType" + msg, audit.getElementType());
 		DBC.INTERIM.assertNotEmpty("ElementSubType" + msg, audit.getElementSubType());
 		DBC.INTERIM.assertNotEmpty("ElementAccessed" + msg, audit.getElementAccessed());
-		//DBC.INTERIM.assertNotNull("NewVersion" + msg, audit.getNewVersion());
 		DBC.INTERIM.assertNotEmpty("Action" + msg, audit.getAction());
 		DBC.INTERIM.assertNotNull("AccessType" + msg, audit.getAccessType());
 
