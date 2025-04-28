@@ -24,6 +24,7 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.MailAttachment;
 import li.strolch.utils.SmtpMailer;
+import org.pgpainless.algorithm.DocumentSignatureType;
 
 import java.io.File;
 import java.text.Normalizer;
@@ -248,7 +249,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public String signPlainText(String text) {
-		return getSmtpMailer().sign(text);
+		return getSmtpMailer().sign(text, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
 	}
 
 	private void doSendEncryptedMail(String recipients, String subject, String text) {
