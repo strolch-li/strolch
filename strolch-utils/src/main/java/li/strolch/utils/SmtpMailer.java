@@ -446,7 +446,19 @@ public class SmtpMailer {
 		multipart.addBodyPart(attachmentPart);
 	}
 
-	protected String sign(String plainText) {
+	/**
+	 * Signs the given plain text input using PGP (Pretty Good Privacy) encryption.
+	 * This method generates a detached signature for the provided plain text
+	 * and returns the generated signature string.
+	 *
+	 * The signing process involves locking to ensure thread safety when accessing
+	 * key rings, as they are not inherently thread-safe.
+	 *
+	 * @param plainText the plain text string to be signed
+	 * @return the PGP-generated signature as a string
+	 * @throws IllegalStateException if locking fails or if an error occurs during the signing process
+	 */
+	public String sign(String plainText) {
 		try {
 			// locking is required, as key rings are not thread safe
 			// can be removed in a future version, when bouncy castle is thread safe

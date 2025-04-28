@@ -237,4 +237,12 @@ public abstract class MailHandler extends StrolchComponent {
 	public abstract void sendUnencryptedMailWithAttachmentAsync(String recipients, String subject, String text,
 			String attachment, String fileName, String type);
 
+	/**
+	 * Signs a given plain text using the implemented signing mechanism.
+	 *
+	 * @param text the plain text input that needs to be signed
+	 *
+	 * @return the generated digital signature as a string
+	 */
+	public abstract String signPlainText(String text);
 }

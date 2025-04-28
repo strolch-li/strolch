@@ -246,6 +246,11 @@ public class SmtpMailHandler extends MailHandler {
 		svc.submit(() -> doSendUnencryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
 	}
 
+	@Override
+	public String signPlainText(String text) {
+		return getSmtpMailer().sign(text);
+	}
+
 	private void doSendEncryptedMail(String recipients, String subject, String text) {
 		try {
 			sendEncryptedMail(recipients, subject, text);
