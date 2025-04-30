@@ -93,7 +93,8 @@ public class TransientAuditTrail implements AuditTrail {
 	@Override
 	public List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange) {
 		List<Audit> audits = new ArrayList<>();
-		this.auditMap.streamValues().forEach(audit -> {
+		List<Audit> allElements = this.auditMap.getAllElements();
+		allElements.forEach(audit -> {
 			if (dateRange.contains(audit.getDate()))
 				audits.add(audit);
 		});
