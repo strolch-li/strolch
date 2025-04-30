@@ -17,7 +17,7 @@ package li.strolch.model.audit;
 
 import com.google.gson.JsonElement;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import static li.strolch.utils.helper.StringHelper.hashSha256AsHex;
 
@@ -30,11 +30,11 @@ public class Audit implements Comparable<Audit> {
 
 	private Long id;
 	private String username;
-	private Date date;
+	private ZonedDateTime date;
 	private String elementType;
 	private String elementSubType;
 	private String elementAccessed;
-	private Date newVersion;
+	private ZonedDateTime newVersion;
 	private String action;
 	private AccessType accessType;
 	private JsonElement additionalData;
@@ -55,11 +55,11 @@ public class Audit implements Comparable<Audit> {
 		this.username = username;
 	}
 
-	public Date getDate() {
+	public ZonedDateTime getDate() {
 		return this.date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(ZonedDateTime date) {
 		this.date = date;
 	}
 
@@ -83,7 +83,7 @@ public class Audit implements Comparable<Audit> {
 		return this.elementAccessed;
 	}
 
-	public Date getNewVersion() {
+	public ZonedDateTime getNewVersion() {
 		return this.newVersion;
 	}
 
@@ -91,7 +91,7 @@ public class Audit implements Comparable<Audit> {
 		this.elementAccessed = elementAccessed;
 	}
 
-	public void setNewVersion(Date newVersion) {
+	public void setNewVersion(ZonedDateTime newVersion) {
 		this.newVersion = newVersion;
 	}
 
@@ -189,6 +189,6 @@ public class Audit implements Comparable<Audit> {
 
 	@Override
 	public int compareTo(Audit o) {
-		return getId().compareTo(o.getId());
+		return this.date.compareTo(o.date);
 	}
 }

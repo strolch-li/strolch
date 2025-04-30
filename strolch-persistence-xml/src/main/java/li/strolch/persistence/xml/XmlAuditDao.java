@@ -119,42 +119,54 @@ public class XmlAuditDao implements AuditDao {
 
 	@Override
 	public void save(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, audit.getDate().getTime());
+		PersistenceContext<Audit> ctx = this.tx
+				.getObjectDao()
+				.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
 		this.tx.getFileDao().performCreate(ctx);
 	}
 
 	@Override
 	public void saveAll(List<Audit> audits) {
 		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, audit.getDate().getTime());
+			PersistenceContext<Audit> ctx = this.tx
+					.getObjectDao()
+					.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
 			this.tx.getFileDao().performCreate(ctx);
 		}
 	}
 
 	@Override
 	public void update(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, audit.getDate().getTime());
+		PersistenceContext<Audit> ctx = this.tx
+				.getObjectDao()
+				.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
 		this.tx.getFileDao().performUpdate(ctx);
 	}
 
 	@Override
 	public void updateAll(List<Audit> audits) {
 		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, audit.getDate().getTime());
+			PersistenceContext<Audit> ctx = this.tx
+					.getObjectDao()
+					.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
 			this.tx.getFileDao().performUpdate(ctx);
 		}
 	}
 
 	@Override
 	public void remove(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, audit.getDate().getTime());
+		PersistenceContext<Audit> ctx = this.tx
+				.getObjectDao()
+				.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
 		this.tx.getFileDao().performDelete(ctx);
 	}
 
 	@Override
 	public void removeAll(List<Audit> audits) {
 		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx.getObjectDao().createCtx(audit, audit.getDate().getTime());
+			PersistenceContext<Audit> ctx = this.tx
+					.getObjectDao()
+					.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
 			this.tx.getFileDao().performDelete(ctx);
 		}
 	}

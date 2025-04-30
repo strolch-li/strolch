@@ -26,6 +26,7 @@ import li.strolch.utils.collections.DateRange;
 
 import java.util.*;
 
+import static java.time.ZoneId.systemDefault;
 import static org.junit.Assert.*;
 
 /**
@@ -72,7 +73,7 @@ public class AuditModelTestRunner {
 
 		// generate a random audit
 		Audit audit = ModelGenerator.randomAudit();
-		audit.setDate(current);
+		audit.setDate(current.toInstant().atZone(systemDefault()));
 
 		// single element actions
 		{
@@ -151,7 +152,7 @@ public class AuditModelTestRunner {
 			for (int i = 0; i < 100; i++) {
 				Audit randomAudit = ModelGenerator.randomAudit();
 				randomAudit.setElementType("FooBar");
-				randomAudit.setDate(current);
+				randomAudit.setDate(current.toInstant().atZone(systemDefault()));
 				audits.add(randomAudit);
 			}
 			audits.sort(new AuditByIdComparator());
@@ -209,7 +210,7 @@ public class AuditModelTestRunner {
 			for (int i = 0; i < 100; i++) {
 				Audit randomAudit = ModelGenerator.randomAudit();
 				randomAudit.setElementType("Bar");
-				randomAudit.setDate(current);
+				randomAudit.setDate(current.toInstant().atZone(systemDefault()));
 				randomAudit.setAction("BarFoo");
 				audits.add(randomAudit);
 			}
@@ -255,19 +256,19 @@ public class AuditModelTestRunner {
 			List<Audit> audits = new ArrayList<>();
 			for (int i = 0; i < 5; i++) {
 				Audit randomAudit = ModelGenerator.randomAudit();
-				randomAudit.setDate(current);
+				randomAudit.setDate(current.toInstant().atZone(systemDefault()));
 				randomAudit.setElementType("BarBarBar");
 				audits.add(randomAudit);
 			}
 			for (int i = 0; i < 5; i++) {
 				Audit randomAudit = ModelGenerator.randomAudit();
-				randomAudit.setDate(current);
+				randomAudit.setDate(current.toInstant().atZone(systemDefault()));
 				randomAudit.setElementType("FooFooFoo");
 				audits.add(randomAudit);
 			}
 			for (int i = 0; i < 5; i++) {
 				Audit randomAudit = ModelGenerator.randomAudit();
-				randomAudit.setDate(current);
+				randomAudit.setDate(current.toInstant().atZone(systemDefault()));
 				randomAudit.setElementType("BarFooBar");
 				audits.add(randomAudit);
 			}

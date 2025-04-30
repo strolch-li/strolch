@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -2175,7 +2176,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
 		audit.setUsername(this.certificate.getUsername());
-		audit.setDate(new Date());
+		audit.setDate(ZonedDateTime.now());
 
 		audit.setElementType(elementType);
 		audit.setElementSubType(elementSubType);

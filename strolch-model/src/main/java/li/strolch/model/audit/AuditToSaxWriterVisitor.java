@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -59,14 +59,14 @@ public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 
 		writeElem(USERNAME, audit.getUsername());
 
-		writeElem(DATE, ISO8601FormatFactory.getInstance().formatDate(audit.getDate()));
+		writeElem(DATE, ISO8601.toString(audit.getDate()));
 
 		writeElem(ELEMENT_TYPE, audit.getElementType());
 		writeElem(ELEMENT_SUB_TYPE, audit.getElementSubType());
 		writeElem(ELEMENT_ACCESSED, audit.getElementAccessed());
 
 		if (audit.getNewVersion() != null)
-			writeElem(NEW_VERSION, ISO8601FormatFactory.getInstance().formatDate(audit.getNewVersion()));
+			writeElem(NEW_VERSION, ISO8601.toString(audit.getNewVersion()));
 
 		writeElem(ACTION, audit.getAction());
 		writeElem(ACCESS_TYPE, audit.getAccessType().name());

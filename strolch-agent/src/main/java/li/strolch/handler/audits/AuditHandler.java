@@ -33,7 +33,7 @@ import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -264,7 +264,7 @@ public class AuditHandler extends StrolchComponent {
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
 		audit.setUsername(certificate.getUsername());
-		audit.setDate(new Date());
+		audit.setDate(ZonedDateTime.now());
 
 		audit.setElementType(Service.class.getSimpleName());
 		audit.setElementSubType(svcName);
@@ -282,7 +282,7 @@ public class AuditHandler extends StrolchComponent {
 
 		audit.setId(StrolchAgent.getUniqueIdLong());
 		audit.setUsername(certificate.getUsername());
-		audit.setDate(new Date());
+		audit.setDate(ZonedDateTime.now());
 
 		audit.setElementType(StrolchSearch.class.getSimpleName());
 		audit.setElementSubType(searchName);
@@ -297,7 +297,7 @@ public class AuditHandler extends StrolchComponent {
 		Audit audit = new Audit();
 		audit.setId(StrolchAgent.getUniqueIdLong());
 		audit.setUsername(certificate.getUsername());
-		audit.setDate(new Date());
+		audit.setDate(ZonedDateTime.now());
 
 		audit.setElementType("REST_API");
 		audit.setElementSubType(url);

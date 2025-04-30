@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
+import java.time.ZoneId;
 import java.util.*;
 
 import static li.strolch.utils.helper.StringHelper.commaSeparated;
@@ -332,7 +333,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 		ps.setLong(1, audit.getId());
 		ps.setString(2, audit.getUsername());
-		ps.setTimestamp(3, new Timestamp(audit.getDate().getTime()), Calendar.getInstance());
+		ps.setTimestamp(3, new Timestamp(audit.getDate().toInstant().toEpochMilli()), Calendar.getInstance());
 		ps.setString(4, audit.getElementType());
 		ps.setString(5, audit.getElementSubType());
 		ps.setString(6, audit.getElementAccessed());
@@ -340,7 +341,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 		if (audit.getNewVersion() == null)
 			ps.setDate(7, null);
 		else
-			ps.setTimestamp(7, new Timestamp(audit.getNewVersion().getTime()), Calendar.getInstance());
+			ps.setTimestamp(7, new Timestamp(audit.getNewVersion().toInstant().toEpochMilli()), Calendar.getInstance());
 
 		ps.setString(8, audit.getAction());
 		ps.setString(9, audit.getAccessType().name());
@@ -360,11 +361,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 		Audit audit = new Audit();
 		audit.setId(resultSet.getLong(1));
 		audit.setUsername(resultSet.getString(2));
-		audit.setDate(resultSet.getTimestamp(3));
+		audit.setDate(resultSet.getTimestamp(3).toInstant().atZone(ZoneId.systemDefault()));
 		audit.setElementType(resultSet.getString(4));
 		audit.setElementSubType(resultSet.getString(5));
 		audit.setElementAccessed(resultSet.getString(6));
-		audit.setNewVersion(resultSet.getTimestamp(7));
+		audit.setNewVersion(resultSet.getTimestamp(7).toInstant().atZone(ZoneId.systemDefault()));
 		audit.setAction(resultSet.getString(8));
 		audit.setAccessType(AccessType.valueOf(resultSet.getString(9)));
 

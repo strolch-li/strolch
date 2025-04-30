@@ -17,7 +17,7 @@ package li.strolch.model.audit;
 
 import com.google.gson.JsonParser;
 import li.strolch.model.Tags;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -48,8 +48,8 @@ public class AuditSaxReader extends DefaultHandler {
 				this.currentAudit = new Audit();
 				this.currentAudit.setId(Long.parseLong(attributes.getValue(ID)));
 			}
-			case USERNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION,
-				 ACTION, ACCESS_TYPE, ADDITIONAL_DATA -> this.sb = new StringBuilder();
+			case USERNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE,
+				 ADDITIONAL_DATA -> this.sb = new StringBuilder();
 			default -> throw new IllegalArgumentException(
 					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
@@ -68,7 +68,7 @@ public class AuditSaxReader extends DefaultHandler {
 				this.sb = null;
 			}
 			case DATE -> {
-				this.currentAudit.setDate(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
+				this.currentAudit.setDate(ISO8601.parseToZdt(this.sb.toString()));
 				this.sb = null;
 			}
 			case ELEMENT_TYPE -> {
@@ -84,7 +84,7 @@ public class AuditSaxReader extends DefaultHandler {
 				this.sb = null;
 			}
 			case NEW_VERSION -> {
-				this.currentAudit.setNewVersion(ISO8601FormatFactory.getInstance().parseDate(this.sb.toString()));
+				this.currentAudit.setNewVersion(ISO8601.parseToZdt(this.sb.toString()));
 				this.sb = null;
 			}
 			case ACTION -> {

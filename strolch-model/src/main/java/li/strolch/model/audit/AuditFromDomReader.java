@@ -51,11 +51,11 @@ public class AuditFromDomReader {
 
 			switch (nodeName) {
 				case USERNAME -> audit.setUsername(txtContent);
-				case DATE -> audit.setDate(ISO8601.parseToDate(txtContent));
+				case DATE -> audit.setDate(ISO8601.parseToZdt(txtContent));
 				case ELEMENT_TYPE -> audit.setElementType(txtContent);
 				case ELEMENT_SUB_TYPE -> audit.setElementSubType(txtContent);
 				case ELEMENT_ACCESSED -> audit.setElementAccessed(txtContent);
-				case NEW_VERSION -> audit.setNewVersion(ISO8601.parseToDate(txtContent));
+				case NEW_VERSION -> audit.setNewVersion(ISO8601.parseToZdt(txtContent));
 				case ACTION -> audit.setAction(txtContent);
 				case ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
 				case ADDITIONAL_DATA -> {

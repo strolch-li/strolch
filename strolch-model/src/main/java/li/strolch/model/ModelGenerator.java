@@ -31,6 +31,7 @@ import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.time.PeriodDuration;
 
 import java.security.SecureRandom;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -506,8 +507,6 @@ public class ModelGenerator {
 
 		Random random = new SecureRandom();
 		String[] usernames = new String[]{"bob", "alice", "jenny"};
-		String[] firstnames = new String[]{"Bob", "Alice", "Jenny"};
-		String[] lastnames = new String[]{"Richards", "Kennedy", "Davids"};
 		String[] types = new String[]{Tags.RESOURCE, Tags.ORDER, Tags.AUDIT};
 		String[] subTypes = new String[]{"Ball", "Something", "Foo", "Bar"};
 		String[] actions = new String[]{"AddResourceService", "UpdateResourceService", "RemoveResourceService",
@@ -516,11 +515,11 @@ public class ModelGenerator {
 		Audit audit = new Audit();
 		audit.setId(StringHelper.getUniqueIdLong());
 		audit.setUsername(randomValue(random, usernames));
-		audit.setDate(new Date(random.nextInt(5000)));
+		audit.setDate(ZonedDateTime.now().plusDays(random.nextInt(100) - 20));
 		audit.setElementType(randomValue(random, types));
 		audit.setElementSubType(randomValue(random, subTypes));
 		audit.setElementAccessed(StringHelper.getUniqueId());
-		audit.setNewVersion(new Date(random.nextInt(5000)));
+		audit.setNewVersion(ZonedDateTime.now().plusDays(random.nextInt(100) - 20));
 		audit.setAction(randomValue(random, actions));
 		audit.setAccessType(AccessType.values()[random.nextInt(AccessType.values().length)]);
 		if (new Random().nextBoolean()) {
