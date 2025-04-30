@@ -48,19 +48,20 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.util.Comparator.comparing;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
-import static li.strolch.utils.iso8601.ISO8601.parseToDate;
+import static li.strolch.utils.iso8601.ISO8601.parseToZdt;
 
 @Path("strolch/audits")
 @Tag(name = "Audits Resource", description = "Manage and query audit logs.")
 public class AuditsResource {
 
-	private StrolchTransaction openTx(Certificate certificate) {
-		return RestfulStrolchComponent.getInstance().openTx(certificate, getCallerMethod());
+	private StrolchTransaction openTx(Certificate certificate, String realm) {
+		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getCallerMethod());
 	}
 
 	@Operation(summary = "Get audits",
@@ -71,11 +72,13 @@ public class AuditsResource {
 			@ApiResponse(responseCode = "400", description = "Invalid input parameters."),
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
+	@Path("{realm}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAudits(@Context HttpServletRequest request, @QueryParam("offset") @DefaultValue("0") int offset,
-			@QueryParam("limit") @DefaultValue("50") int limit, @QueryParam("from") String fromS,
-			@QueryParam("to") String toS, @QueryParam("username") String username, @QueryParam("type") String type,
-			@QueryParam("subType") String subType, @QueryParam("id") String id, @QueryParam("action") String action,
+	public Response getAudits(@Context HttpServletRequest request, @PathParam("realm") String realm,
+			@QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("50") int limit,
+			@QueryParam("from") String fromS, @QueryParam("to") String toS, @QueryParam("username") String username,
+			@QueryParam("elementType") String elementType, @QueryParam("elementSubType") String elementSubType,
+			@QueryParam("elementAccessed") String elementAccessed, @QueryParam("action") String action,
 			@QueryParam("accessType") String accessType) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
@@ -90,21 +93,21 @@ public class AuditsResource {
 			dateRange.to(now.plusDays(1));
 		} else {
 			if (isNotEmpty(fromS))
-				dateRange.from(parseToDate(fromS), true);
-			if (isNotEmpty(fromS))
-				dateRange.to(parseToDate(toS), false);
+				dateRange.from(parseToZdt(fromS), true);
+			if (isNotEmpty(toS))
+				dateRange.to(parseToZdt(toS), false);
 		}
 
 		if (dateRange.isUnbounded())
 			throw new IllegalArgumentException(
 					"The date range must be bounded and the date range must be at least 1 day long and at most 30 days long.");
 		Interval interval = dateRange.toInterval();
-		if (PeriodDuration.of(interval.toDuration()).toMillis() > Duration.ofDays(30).toMillis())
+		if (PeriodDuration.of(interval.toDuration()).toMillis() > Duration.ofDays(35).toMillis())
 			throw new IllegalArgumentException(
 					"The duration of the date range is too long. Please use a date range of at most 30 days.");
 
 		Paging<Audit> paging;
-		try (StrolchTransaction tx = openTx(cert)) {
+		try (StrolchTransaction tx = openTx(cert, realm)) {
 			if (!tx.isAuditTrailEnabled())
 				return ResponseUtil.toResponse(DATA, new JsonArray());
 
@@ -113,18 +116,18 @@ public class AuditsResource {
 			long totalAudits = auditTrail.querySize(tx);
 			List<Audit> auditsUnfiltered;
 
-			if (isEmpty(type))
+			if (isEmpty(elementType))
 				auditsUnfiltered = auditTrail.getAllElements(tx, dateRange);
 			else
-				auditsUnfiltered = auditTrail.getAllElements(tx, type, dateRange);
-			Stream<Audit> audits = auditsUnfiltered.stream();
+				auditsUnfiltered = auditTrail.getAllElements(tx, elementType, dateRange);
+			Stream<Audit> audits = auditsUnfiltered.stream().sorted(comparing(Audit::getDate).reversed());
 
 			if (isNotEmpty(username))
 				audits = audits.filter(audit -> audit.getUsername().equals(username));
-			if (isNotEmpty(subType))
-				audits = audits.filter(audit -> audit.getElementSubType().equals(subType));
-			if (isNotEmpty(id))
-				audits = audits.filter(audit -> audit.getElementAccessed().equals(id));
+			if (isNotEmpty(elementSubType))
+				audits = audits.filter(audit -> audit.getElementSubType().equals(elementSubType));
+			if (isNotEmpty(elementAccessed))
+				audits = audits.filter(audit -> audit.getElementAccessed().equals(elementAccessed));
 			if (isNotEmpty(action))
 				audits = audits.filter(audit -> audit.getAction().equals(action));
 			if (isNotEmpty(accessType)) {
@@ -149,13 +152,13 @@ public class AuditsResource {
 							examples = @ExampleObject("[\"Type1\",\"Type2\"]"))),
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
-	@Path("types")
+	@Path("{realm}/types")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response queryTypes(@Context HttpServletRequest request) {
+	public Response queryTypes(@Context HttpServletRequest request, @PathParam("realm") String realm) {
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
 
-		try (StrolchTransaction tx = openTx(cert)) {
+		try (StrolchTransaction tx = openTx(cert, realm)) {
 			JsonArray dataJ = new JsonArray();
 			if (tx.isAuditTrailEnabled())
 				tx.getAuditTrail().getTypes(tx).forEach(dataJ::add);
