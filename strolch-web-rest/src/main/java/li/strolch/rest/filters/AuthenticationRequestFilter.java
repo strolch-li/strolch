@@ -338,10 +338,12 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
-			if (!requestContext
+			String allowedPwUrl = ("strolch/privilege/users/" + certificate.getUsername() + "/password").toLowerCase();
+			if (requestContext
 					.getUriInfo()
 					.getMatchedURIs()
-					.contains("strolch/privilege/users/" + certificate.getUsername() + "/password")) {
+					.stream()
+					.noneMatch(s -> s.toLowerCase().equals(allowedPwUrl))) {
 				requestContext.abortWith(Response
 						.status(Response.Status.FORBIDDEN)
 						.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
