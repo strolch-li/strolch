@@ -365,7 +365,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 		audit.setElementType(resultSet.getString(4));
 		audit.setElementSubType(resultSet.getString(5));
 		audit.setElementAccessed(resultSet.getString(6));
-		audit.setNewVersion(resultSet.getTimestamp(7).toInstant().atZone(ZoneId.systemDefault()));
+		Timestamp timestamp = resultSet.getTimestamp(7);
+		if (timestamp != null)
+			audit.setNewVersion(timestamp.toInstant().atZone(ZoneId.systemDefault()));
 		audit.setAction(resultSet.getString(8));
 		audit.setAccessType(AccessType.valueOf(resultSet.getString(9)));
 
