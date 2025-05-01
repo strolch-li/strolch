@@ -21,7 +21,7 @@ import li.strolch.utils.Version;
 /**
  * Migration versions for data and code migrations
  *
- * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
+ * @author Reto Breitenmoser <reto.breitenmoser@atexxi.ch>
  */
 public record MigrationVersion(Version dataVersion, Version codeVersion) {
 

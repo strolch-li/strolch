@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 /**
- * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
+ * @author Reto Breitenmoser <reto.breitenmoser@atexxi.ch>
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Provider

@@ -56,7 +56,7 @@ import static org.glassfish.jersey.http.HttpHeaders.*;
  * <p>
  * Sub classes should override {@link #validateSession(ContainerRequestContext, String)} to add further validation.
  *
- * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
+ * @author Reto Breitenmoser <reto.breitenmoser@atexxi.ch>
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Provider
