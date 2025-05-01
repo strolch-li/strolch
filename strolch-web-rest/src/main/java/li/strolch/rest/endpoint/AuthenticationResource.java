@@ -59,8 +59,7 @@ import java.util.concurrent.TimeUnit;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION_EXPIRATION_DATE;
 import static li.strolch.rest.helper.RestfulHelper.getRemoteIp;
-import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
-import static li.strolch.utils.helper.ExceptionHelper.hasCause;
+import static li.strolch.utils.helper.ExceptionHelper.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -205,11 +204,17 @@ public class AuthenticationResource {
 	}
 
 	private static Response handleAuthenticationException(Exception e) {
-		logger.error(e.getMessage(), e);
 		Throwable rootCause = getRootCause(e);
-		String msg = MessageFormat.format("Could not log in due to: {0}", rootCause);
-		if (hasCause(e, InvalidCredentialsException.class))
-			msg = "Could not log in as the given credentials are invalid";
+		String msg = MessageFormat.format("Login failed due to: {0}", getExceptionMessage(rootCause, false));
+		if (hasCause(e, InvalidCredentialsException.class)) {
+			logger.error(msg);
+			msg = "Login failed as the given credentials are invalid";
+		} else if (hasCause(e, AccessDeniedException.class)) {
+			logger.error(msg);
+			msg = "Login failed as access is denied!";
+		} else {
+			logger.error(e.getMessage(), e);
+		}
 		return evaluateResponseByCause(e, msg);
 	}
 
