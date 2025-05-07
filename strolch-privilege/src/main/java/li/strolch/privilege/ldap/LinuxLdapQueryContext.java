@@ -37,7 +37,7 @@ public class LinuxLdapQueryContext extends LdapQueryContext {
 
 	public static final String LDAP_DEPARTMENT_NUMBER = "departmentNumber";
 	public static final String LDAP_PREFERRED_LANGUAGE = "preferredLanguage";
-	public static final String LDAP_UID_NUMBER = "uidNumber";
+	public static final String LDAP_ENTRY_UUID = "entryUUID";
 
 	public LinuxLdapQueryContext(Map<String, String> parameterMap, RemoteGroupMappingModel groupMappingModel) {
 		super(parameterMap, groupMappingModel);
@@ -105,8 +105,8 @@ public class LinuxLdapQueryContext extends LdapQueryContext {
 
 	@Override
 	protected String getUserId(Attributes attrs) throws NamingException {
-		String value = getLdapString(attrs, LDAP_UID_NUMBER);
-		DBC.PRE.assertNotEmpty("LDAP field " + LDAP_UID_NUMBER + " is empty!", value);
+		String value = getLdapString(attrs, LDAP_ENTRY_UUID);
+		DBC.PRE.assertNotEmpty("LDAP field " + LDAP_ENTRY_UUID + " is empty!", value);
 		return value;
 	}
 }
