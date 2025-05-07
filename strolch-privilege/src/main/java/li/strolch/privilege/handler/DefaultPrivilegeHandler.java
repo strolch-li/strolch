@@ -189,7 +189,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public RoleRep getRole(Certificate certificate, String roleName) {
-		return crudHandler.getRole(certificate, roleName);
+		return this.crudHandler.getRole(certificate, roleName);
 	}
 
 	@Override
@@ -199,7 +199,12 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public UserRep getUser(Certificate certificate, String username) {
-		return crudHandler.getUserRep(certificate, username);
+		return this.crudHandler.getUserRep(certificate, username);
+	}
+
+	@Override
+	public UserRep getUserById(Certificate certificate, String userId) {
+		return this.crudHandler.getUserRepById(certificate, userId);
 	}
 
 	@Override
@@ -209,9 +214,22 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = validate(certificate);
 		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER_PRIVILEGES);
 
-		User user = crudHandler.getUser(certificate, username);
+		User user = this.crudHandler.getUser(certificate, username);
 		if (user == null)
 			throw new PrivilegeModelException(format("User {0} does not exist!", username));
+		return getPrivilegeContextBuilder().buildUserPrivilege(user);
+	}
+
+	@Override
+	public UserPrivileges getUserPrivilegesById(Certificate certificate, String userId) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER_PRIVILEGES);
+
+		User user = this.crudHandler.getUserById(certificate, userId);
+		if (user == null)
+			throw new PrivilegeModelException(format("User with ID {0} does not exist!", userId));
 		return getPrivilegeContextBuilder().buildUserPrivilege(user);
 	}
 
@@ -222,7 +240,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = validate(certificate);
 		prvCtx.assertHasPrivilege(PRIVILEGE_GET_GROUP_PRIVILEGES);
 
-		Group group = crudHandler.getGroup(certificate, groupName);
+		Group group = this.crudHandler.getGroup(certificate, groupName);
 		if (group == null)
 			throw new PrivilegeModelException(format("Group {0} does not exist!", groupName));
 		return getPrivilegeContextBuilder().buildGroupPrivilege(group);
@@ -230,7 +248,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public Map<String, String> getPolicyDefs(Certificate certificate) {
-		return crudHandler.getPolicyDefs(certificate);
+		return this.crudHandler.getPolicyDefs(certificate);
 	}
 
 	@Override
@@ -245,104 +263,137 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public List<RoleRep> getRoles(Certificate certificate) {
-		return crudHandler.getRoles(certificate);
+		return this.crudHandler.getRoles(certificate);
 	}
 
 	@Override
 	public List<UserRep> getUsers(Certificate certificate) {
-		return crudHandler.getUsers(certificate);
+		return this.crudHandler.getUsers(certificate);
 	}
 
 	@Override
 	public List<UserRep> queryUsers(Certificate certificate, UserRep selectorRep) {
-		return crudHandler.queryUsers(certificate, selectorRep);
+		return this.crudHandler.queryUsers(certificate, selectorRep);
 	}
 
 	@Override
 	public UserRep addUser(Certificate certificate, UserRep userRepParam, char[] password) {
 		return this.lockingHandler.lockedExecuteWithResult(userRepParam.getUsername(),
-				() -> crudHandler.addUser(certificate, userRepParam, password));
+				() -> this.crudHandler.addUser(certificate, userRepParam, password));
 	}
 
 	@Override
 	public void addOrUpdateUsers(Certificate certificate, List<UserRep> userReps) throws PrivilegeException {
 		this.lockingHandler.lockedExecute(PrivilegeHandler.class.getSimpleName(),
-				() -> crudHandler.addOrUpdateUsers(certificate, userReps));
+				() -> this.crudHandler.addOrUpdateUsers(certificate, userReps));
 	}
 
 	@Override
 	public UserRep updateUser(Certificate certificate, UserRep userRep, char[] password) throws PrivilegeException {
 		return this.lockingHandler.lockedExecuteWithResult(userRep.getUsername(),
-				() -> crudHandler.updateUser(certificate, userRep, password));
+				() -> this.crudHandler.updateUser(certificate, userRep, password));
 	}
 
 	@Override
 	public UserRep removeUser(Certificate certificate, String username) {
 		return this.lockingHandler.lockedExecuteWithResult(username,
-				() -> crudHandler.removeUser(certificate, username));
+				() -> this.crudHandler.removeUser(certificate, username));
+	}
+
+	@Override
+	public UserRep removeUserById(Certificate certificate, String userId) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(userId,
+				() -> this.crudHandler.removeUserById(certificate, userId));
 	}
 
 	@Override
 	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
 		return this.lockingHandler.lockedExecuteWithResult(username,
-				() -> crudHandler.setUserLocale(certificate, username, locale));
+				() -> this.crudHandler.setUserLocale(certificate, username, locale));
 	}
 
 	@Override
-	public void requirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
-		this.lockingHandler.lockedExecute(username, () -> crudHandler.requirePasswordChange(certificate, username));
+	public UserRep setUserLocaleById(Certificate certificate, String userId, Locale locale) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(userId,
+				() -> this.crudHandler.setUserLocaleById(certificate, userId, locale));
 	}
 
 	@Override
-	public void setUserPassword(Certificate certificate, String username, char[] password) {
-		this.lockingHandler.lockedExecute(username, () -> crudHandler.setUserPassword(certificate, username, password));
+	public UserRep requirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> this.crudHandler.requirePasswordChange(certificate, username));
+	}
+
+	@Override
+	public UserRep requirePasswordChangeById(Certificate certificate, String userId) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(userId,
+				() -> this.crudHandler.requirePasswordChangeById(certificate, userId));
+	}
+
+	@Override
+	public UserRep setUserPassword(Certificate certificate, String username, char[] password) {
+		return this.lockingHandler.lockedExecuteWithResult(username,
+				() -> this.crudHandler.setUserPassword(certificate, username, password));
+	}
+
+	@Override
+	public UserRep setUserPasswordById(Certificate certificate, String userId, char[] password)
+			throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(userId,
+				() -> this.crudHandler.setUserPasswordById(certificate, userId, password));
 	}
 
 	@Override
 	public UserRep setUserState(Certificate certificate, String username, UserState state) {
 		return this.lockingHandler.lockedExecuteWithResult(username,
-				() -> crudHandler.setUserState(certificate, username, state));
+				() -> this.crudHandler.setUserState(certificate, username, state));
+	}
+
+	@Override
+	public UserRep setUserStateById(Certificate certificate, String userId, UserState state) throws PrivilegeException {
+		return this.lockingHandler.lockedExecuteWithResult(userId,
+				() -> this.crudHandler.setUserStateById(certificate, userId, state));
 	}
 
 	@Override
 	public RoleRep addRole(Certificate certificate, RoleRep roleRep) {
 		return this.lockingHandler.lockedExecuteWithResult(roleRep.getName(),
-				() -> crudHandler.addRole(certificate, roleRep));
+				() -> this.crudHandler.addRole(certificate, roleRep));
 	}
 
 	@Override
 	public RoleRep replaceRole(Certificate certificate, RoleRep roleRep) {
 		return this.lockingHandler.lockedExecuteWithResult(roleRep.getName(),
-				() -> crudHandler.replaceRole(certificate, roleRep));
+				() -> this.crudHandler.replaceRole(certificate, roleRep));
 	}
 
 	@Override
 	public RoleRep removeRole(Certificate certificate, String roleName) {
 		return this.lockingHandler.lockedExecuteWithResult(roleName,
-				() -> crudHandler.removeRole(certificate, roleName));
+				() -> this.crudHandler.removeRole(certificate, roleName));
 	}
 
 	@Override
 	public List<Group> getGroups(Certificate certificate) {
-		return crudHandler.getGroups(certificate);
+		return this.crudHandler.getGroups(certificate);
 	}
 
 	@Override
 	public Group addGroup(Certificate certificate, Group group) {
 		return this.lockingHandler.lockedExecuteWithResult(group.name(),
-				() -> crudHandler.addGroup(certificate, group));
+				() -> this.crudHandler.addGroup(certificate, group));
 	}
 
 	@Override
 	public Group replaceGroup(Certificate certificate, Group group) {
 		return this.lockingHandler.lockedExecuteWithResult(group.name(),
-				() -> crudHandler.replaceGroup(certificate, group));
+				() -> this.crudHandler.replaceGroup(certificate, group));
 	}
 
 	@Override
 	public Group removeGroup(Certificate certificate, String groupName) {
 		return this.lockingHandler.lockedExecuteWithResult(groupName,
-				() -> crudHandler.removeGroup(certificate, groupName));
+				() -> this.crudHandler.removeGroup(certificate, groupName));
 	}
 
 	@Override
@@ -517,9 +568,19 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		// persist this user
 		User internalUser = this.persistenceHandler.getUser(user.getUsername());
 		if (internalUser == null) {
+
+			// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
+			if (user.getUserId() == null)
+				user = user.withUserId(UUID.randomUUID().toString());
+
 			history = history.withFirstLogin(ZonedDateTime.now());
 			this.persistenceHandler.addUser(user.withHistory(history));
 		} else {
+
+			// from single-sign-on we don't necessarily have a user ID, so if it is null, update it
+			if (user.getUserId() == null)
+				user = user.withUserId(internalUser.getUserId());
+
 			history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
 			this.persistenceHandler.replaceUser(user.withHistory(history));
 		}

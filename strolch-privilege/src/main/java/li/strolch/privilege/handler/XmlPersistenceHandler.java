@@ -22,6 +22,7 @@ import li.strolch.privilege.model.internal.AccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.xml.*;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.XmlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +54,16 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	protected static final Logger logger = LoggerFactory.getLogger(XmlPersistenceHandler.class);
 
-	private final Map<String, User> userMap;
-	private final Map<String, Group> groupMap;
-	private final Map<String, Role> roleMap;
-	private final Map<String, AccessToken> tokensMap;
+	private final Map<String, User> usersByUsername;
+	private final Map<String, User> usersById;
+	private final Map<String, Group> groups;
+	private final Map<String, Role> roles;
+	private final Map<String, AccessToken> tokens;
 
-	private boolean userMapDirty;
-	private boolean groupMapDirty;
-	private boolean roleMapDirty;
-	private boolean tokensMapDirty;
+	private boolean usersDirty;
+	private boolean groupsDirty;
+	private boolean rolesDirty;
+	private boolean tokensDirty;
 
 	private Map<String, String> parameterMap;
 	private boolean verbose;
@@ -74,10 +76,11 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private boolean caseInsensitiveUsername;
 
 	public XmlPersistenceHandler() {
-		this.roleMap = new ConcurrentHashMap<>();
-		this.groupMap = new ConcurrentHashMap<>();
-		this.userMap = new ConcurrentHashMap<>();
-		this.tokensMap = new ConcurrentHashMap<>();
+		this.roles = new ConcurrentHashMap<>();
+		this.groups = new ConcurrentHashMap<>();
+		this.usersByUsername = new ConcurrentHashMap<>();
+		this.usersById = new ConcurrentHashMap<>();
+		this.tokens = new ConcurrentHashMap<>();
 	}
 
 	@Override
@@ -87,150 +90,171 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 
 	@Override
 	public List<User> getAllUsers() {
-		synchronized (this.userMap) {
-			return new LinkedList<>(this.userMap.values());
+		synchronized (this.usersByUsername) {
+			return new LinkedList<>(this.usersByUsername.values());
 		}
 	}
 
 	@Override
 	public List<Group> getAllGroups() {
-		synchronized (this.groupMap) {
-			return new LinkedList<>(this.groupMap.values());
+		synchronized (this.groups) {
+			return new LinkedList<>(this.groups.values());
 		}
 	}
 
 	@Override
 	public List<Role> getAllRoles() {
-		synchronized (this.roleMap) {
-			return new LinkedList<>(this.roleMap.values());
+		synchronized (this.roles) {
+			return new LinkedList<>(this.roles.values());
 		}
 	}
 
 	@Override
 	public List<AccessToken> getAllAccessTokens() {
-		synchronized (this.tokensMap) {
-			return new LinkedList<>(this.tokensMap.values());
+		synchronized (this.tokens) {
+			return new LinkedList<>(this.tokens.values());
 		}
 	}
 
 	@Override
 	public boolean hasUser(String username) {
-		return this.userMap.containsKey(evaluateUsername(username));
+		return this.usersByUsername.containsKey(evaluateUsername(username));
 	}
 
 	@Override
 	public User getUser(String username) {
-		return this.userMap.get(evaluateUsername(username));
+		return this.usersByUsername.get(evaluateUsername(username));
+	}
+
+	@Override
+	public User getUserById(String userId) {
+		return this.usersById.get(userId);
 	}
 
 	@Override
 	public Group getGroup(String groupName) {
-		return this.groupMap.get(groupName);
+		return this.groups.get(groupName);
 	}
 
 	@Override
 	public Role getRole(String roleName) {
-		return this.roleMap.get(roleName);
+		return this.roles.get(roleName);
 	}
 
 	@Override
-	public User removeUser(String username) {
-		User user = this.userMap.remove(evaluateUsername(username));
-		this.userMapDirty = user != null;
+	public synchronized User removeUserById(String userId) {
+		User user = this.usersById.remove(userId);
+		if (user != null) {
+			this.usersByUsername.remove(evaluateUsername(user.getUsername()));
+			this.usersDirty = true;
+		}
 		return user;
 	}
 
 	@Override
 	public Group removeGroup(String groupName) {
-		Group group = this.groupMap.remove(groupName);
-		this.groupMapDirty = group != null;
+		Group group = this.groups.remove(groupName);
+		this.groupsDirty = group != null;
 		return group;
 	}
 
 	@Override
 	public Role removeRole(String roleName) {
-		Role role = this.roleMap.remove(roleName);
-		this.roleMapDirty = role != null;
+		Role role = this.roles.remove(roleName);
+		this.rolesDirty = role != null;
 		return role;
 	}
 
 	@Override
-	public void addUser(User user) {
+	public synchronized void addUser(User user) {
+		DBC.PRE.assertNotEmpty(() -> "userId must not be empty for user " + user.username(), user.userId());
 		String username = evaluateUsername(user.getUsername());
-		if (this.userMap.containsKey(username))
-			throw new IllegalStateException(format("The user {0} already exists!", user.getUsername()));
-		this.userMap.put(username, user);
-		this.userMapDirty = true;
+		if (this.usersByUsername.containsKey(username))
+			throw new IllegalStateException(format("The user with username {0} already exists!", user.getUsername()));
+		if (this.usersById.containsKey(user.getUserId()))
+			throw new IllegalStateException(format("The user with user ID {0} already exists!", user.getUsername()));
+		this.usersByUsername.put(username, user);
+		this.usersById.put(user.getUserId(), user);
+		this.usersDirty = true;
 	}
 
 	@Override
-	public void replaceUser(User user) {
+	public synchronized void replaceUser(User user) {
+		DBC.PRE.assertNotEmpty(() -> "userId must not be empty for user " + user.username(), user.userId());
 		String username = evaluateUsername(user.getUsername());
-		if (!this.userMap.containsKey(username))
+		if (!this.usersByUsername.containsKey(username))
 			throw new IllegalStateException(
-					format("The user {0} can not be replaced as it does not exist!", user.getUsername()));
-		this.userMap.put(username, user);
-		this.userMapDirty = true;
+					format("The user with username {0} can not be replaced as it does not exist!", user.getUsername()));
+		if (!this.usersById.containsKey(user.getUserId()))
+			throw new IllegalStateException(
+					format("The user with user ID {0} can not be replaced as it does not exist!", user.getUserId()));
+		User existingUser = this.usersByUsername.put(username, user);
+		if (existingUser != null && !existingUser.getUserId().equals(user.getUserId()))
+			throw new IllegalStateException(
+					format("Existing user ID {0} differs from new user ID {1}. User ID change is not possible!",
+							existingUser.getUserId(), user.getUserId()));
+		this.usersById.put(user.getUserId(), user);
+		this.usersDirty = true;
 	}
 
 	@Override
 	public void addGroup(Group group) {
-		if (this.groupMap.containsKey(group.name()))
+		if (this.groups.containsKey(group.name()))
 			throw new IllegalStateException(format("The group {0} already exists!", group.name()));
-		this.groupMap.put(group.name(), group);
-		this.groupMapDirty = true;
+		this.groups.put(group.name(), group);
+		this.groupsDirty = true;
 	}
 
 	@Override
 	public void replaceGroup(Group group) {
-		if (!this.groupMap.containsKey(group.name()))
+		if (!this.groups.containsKey(group.name()))
 			throw new IllegalStateException(
 					format("The group {0} can not be replaced as it does not exist!", group.name()));
-		this.groupMap.put(group.name(), group);
-		this.groupMapDirty = true;
+		this.groups.put(group.name(), group);
+		this.groupsDirty = true;
 	}
 
 	@Override
 	public void addRole(Role role) {
-		if (this.roleMap.containsKey(role.getName()))
+		if (this.roles.containsKey(role.getName()))
 			throw new IllegalStateException(format("The role {0} already exists!", role.getName()));
-		this.roleMap.put(role.getName(), role);
-		this.roleMapDirty = true;
+		this.roles.put(role.getName(), role);
+		this.rolesDirty = true;
 	}
 
 	@Override
 	public void replaceRole(Role role) {
-		if (!this.roleMap.containsKey(role.getName()))
+		if (!this.roles.containsKey(role.getName()))
 			throw new IllegalStateException(
 					format("The role {0} can not be replaced as it does not exist!", role.getName()));
-		this.roleMap.put(role.getName(), role);
-		this.roleMapDirty = true;
+		this.roles.put(role.getName(), role);
+		this.rolesDirty = true;
 	}
 
 	@Override
 	public AccessToken getAccessToken(String tokenId) {
-		return this.tokensMap.get(tokenId);
+		return this.tokens.get(tokenId);
 	}
 
 	@Override
 	public void addAccessToken(AccessToken accessToken) {
-		if (this.tokensMap.containsKey(accessToken.tokenId()))
+		if (this.tokens.containsKey(accessToken.tokenId()))
 			throw new IllegalStateException(format("The access token {0} already exists!", accessToken.tokenId()));
-		this.tokensMap.put(accessToken.tokenId(), accessToken);
-		this.tokensMapDirty = true;
+		this.tokens.put(accessToken.tokenId(), accessToken);
+		this.tokensDirty = true;
 	}
 
 	@Override
 	public AccessToken removeAccessToken(String tokenId) {
-		AccessToken token = this.tokensMap.remove(tokenId);
-		this.tokensMapDirty = token != null;
+		AccessToken token = this.tokens.remove(tokenId);
+		this.tokensDirty = token != null;
 		return token;
 	}
 
 	@Override
 	public List<AccessToken> getAccessTokensForUser(String username) {
-		synchronized (this.tokensMap) {
-			return this.tokensMap.values().stream().filter(t -> t.username().equals(username)).toList();
+		synchronized (this.tokens) {
+			return this.tokens.values().stream().filter(t -> t.username().equals(username)).toList();
 		}
 	}
 
@@ -324,41 +348,44 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		XmlHelper.parseDocument(this.rolesPath, rolesXmlHandler, this.verbose);
 
 		// ROLES
-		synchronized (this.roleMap) {
-			this.roleMap.clear();
-			this.roleMap.putAll(rolesXmlHandler.getRoles());
+		synchronized (this.roles) {
+			this.roles.clear();
+			this.roles.putAll(rolesXmlHandler.getRoles());
 		}
 
 		// GROUPS
-		synchronized (this.groupMap) {
-			this.groupMap.clear();
-			this.groupMap.putAll(groupsXmlHandler.getGroups());
+		synchronized (this.groups) {
+			this.groups.clear();
+			this.groups.putAll(groupsXmlHandler.getGroups());
 		}
 
 		// USERS
-		synchronized (this.userMap) {
-			this.userMap.clear();
-			this.userMap.putAll(usersXmlHandler.getUsers());
+		synchronized (this) {
+			this.usersByUsername.clear();
+			usersXmlHandler.getUsers().forEach((username, user) -> {
+				this.usersByUsername.put(username, user);
+				this.usersById.put(user.getUserId(), user);
+			});
 		}
 
 		// TOKENS
-		synchronized (this.tokensMap) {
-			this.tokensMap.clear();
-			this.tokensMap.putAll(tokensXmlHandler.getTokens());
+		synchronized (this.tokens) {
+			this.tokens.clear();
+			this.tokens.putAll(tokensXmlHandler.getTokens());
 		}
 
-		this.userMapDirty = false;
-		this.groupMapDirty = false;
-		this.roleMapDirty = false;
-		this.tokensMapDirty = false;
+		this.usersDirty = false;
+		this.groupsDirty = false;
+		this.rolesDirty = false;
+		this.tokensDirty = false;
 
-		logger.info("Read {} Users", this.userMap.size());
-		logger.info("Read {} Groups", this.groupMap.size());
-		logger.info("Read {} Roles", this.roleMap.size());
-		logger.info("Read {} Tokens", this.tokensMap.size());
+		logger.info("Read {} Users", this.usersByUsername.size());
+		logger.info("Read {} Groups", this.groups.size());
+		logger.info("Read {} Roles", this.roles.size());
+		logger.info("Read {} Tokens", this.tokens.size());
 
 		// validate referenced elements exist
-		for (User user : this.userMap.values()) {
+		for (User user : this.usersByUsername.values()) {
 			for (String roleName : user.getRoles()) {
 				// validate that role exists
 				if (getRole(roleName) == null)
@@ -373,7 +400,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// validate referenced roles exist on groups
-		for (Group group : this.groupMap.values()) {
+		for (Group group : this.groups.values()) {
 			for (String roleName : group.roles()) {
 				// validate that role exists
 				if (getRole(roleName) == null)
@@ -382,7 +409,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// validate users exist for tokens
-		for (Iterator<AccessToken> iterator = this.tokensMap.values().iterator(); iterator.hasNext(); ) {
+		for (Iterator<AccessToken> iterator = this.tokens.values().iterator(); iterator.hasNext(); ) {
 			AccessToken token = iterator.next();
 			if (getUser(token.username()) == null) {
 				logger.error("User {} does not exist referenced by token {}", token.username(), token.tokenId());
@@ -402,30 +429,30 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		boolean saved = false;
 
 		// write users file
-		if (this.userMapDirty) {
+		if (this.usersDirty) {
 			new PrivilegeUsersSaxWriter(getAllUsers(), this.usersPath).write();
-			this.userMapDirty = false;
+			this.usersDirty = false;
 			saved = true;
 		}
 
 		// write groups file
-		if (this.groupMapDirty) {
+		if (this.groupsDirty) {
 			new PrivilegeGroupsSaxWriter(getAllGroups(), this.groupsPath).write();
-			this.groupMapDirty = false;
+			this.groupsDirty = false;
 			saved = true;
 		}
 
 		// write roles file
-		if (this.roleMapDirty) {
+		if (this.rolesDirty) {
 			new PrivilegeRolesSaxWriter(getAllRoles(), this.rolesPath).write();
-			this.roleMapDirty = false;
+			this.rolesDirty = false;
 			saved = true;
 		}
 
 		// write tokens file
-		if (this.tokensMapDirty) {
+		if (this.tokensDirty) {
 			new PrivilegeTokensSaxWriter(getAllAccessTokens(), this.tokensPath).write();
-			this.tokensMapDirty = false;
+			this.tokensDirty = false;
 			saved = true;
 		}
 

@@ -19,6 +19,7 @@ import li.strolch.model.Tags;
 import li.strolch.model.audit.AccessType;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.UserRep;
 import li.strolch.service.StringMapArgument;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
@@ -46,7 +47,7 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 	@Override
 	protected ServiceResult internalDoService(StringMapArgument arg) {
 
-		String username = arg.map.get(Tags.Json.USERNAME);
+		String userId = arg.map.get(Tags.Json.USER_ID);
 		String state = arg.map.get(Tags.Json.STATE);
 
 		if (!state.equals("RequirePasswordChange"))
@@ -56,11 +57,11 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler
 					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
-			privilegeHandler.requirePasswordChange(getCertificate(), username);
+			UserRep userRep = privilegeHandler.requirePasswordChangeById(getCertificate(), userId);
 			if (privilegeHandler.isPersistOnUserDataChanged())
 				privilegeHandler.persist(getCertificate());
 
-			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, username));
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, userRep.getUsername()));
 			tx.commitOnClose();
 		}
 

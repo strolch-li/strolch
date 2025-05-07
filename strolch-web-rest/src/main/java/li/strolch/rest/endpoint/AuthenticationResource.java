@@ -376,6 +376,7 @@ public class AuthenticationResource {
 		loginResult.addProperty("sessionId", certificate.getSessionId());
 		String authToken = certificate.getAuthToken();
 		loginResult.addProperty("authToken", authToken);
+		loginResult.addProperty("userId", certificate.getUserId());
 		loginResult.addProperty("username", certificate.getUsername());
 		loginResult.addProperty("firstname", certificate.getFirstname());
 		loginResult.addProperty("lastname", certificate.getLastname());

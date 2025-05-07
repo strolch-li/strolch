@@ -45,8 +45,8 @@ public class ServiceTest extends AbstractServiceTest {
 		assertThrows(DBC.DbcException.class, () -> {
 			TestService testService = new TestService();
 			getServiceHandler().doService(
-					new Certificate(null, null, null, null, null, null, null, null, ZonedDateTime.now(), false, null,
-							new HashSet<>(), new HashSet<>(), new HashSet<>(), null), testService,
+					new Certificate(null, null, null, null, null, null, null, null, null, ZonedDateTime.now(), false,
+							null, new HashSet<>(), new HashSet<>(), new HashSet<>(), null), testService,
 					testService.getArgumentInstance());
 		});
 	}
@@ -54,8 +54,8 @@ public class ServiceTest extends AbstractServiceTest {
 	@Test
 	public void shouldFailInvalidCertificate2() {
 		TestService testService = new TestService();
-		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf", "asd",
-				ZonedDateTime.now(), false, null, new HashSet<>(), new HashSet<>(), new HashSet<>(), null);
+		Certificate badCert = new Certificate(Usage.ANY, "1", "bob", "bob", "Bob", "Brown", UserState.ENABLED, "dsdf",
+				"asd", ZonedDateTime.now(), false, null, new HashSet<>(), new HashSet<>(), new HashSet<>(), null);
 		ServiceResult svcResult = getServiceHandler().doService(badCert, testService,
 				testService.getArgumentInstance());
 		assertThat(svcResult.getThrowable(), instanceOf(NotAuthenticatedException.class));

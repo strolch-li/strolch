@@ -338,7 +338,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		Certificate certificate = sessionHandler.validate(sessionId, remoteIp);
 
 		if (certificate.getUsage() == Usage.SET_PASSWORD) {
-			String allowedPwUrl = ("strolch/privilege/users/" + certificate.getUsername() + "/password").toLowerCase();
+			String allowedPwUrl = ("strolch/privilege/users/" + certificate.getUserId() + "/password").toLowerCase();
 			if (requestContext
 					.getUriInfo()
 					.getMatchedURIs()

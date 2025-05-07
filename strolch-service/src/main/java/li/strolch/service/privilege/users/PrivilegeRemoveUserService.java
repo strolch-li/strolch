@@ -24,7 +24,7 @@ import li.strolch.service.api.ServiceResultState;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNameArgument, ServiceResult> {
+public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserIdArgument, ServiceResult> {
 
 	@Override
 	protected ServiceResult getResultInstance() {
@@ -32,16 +32,16 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 	}
 
 	@Override
-	public PrivilegeUserNameArgument getArgumentInstance() {
-		return new PrivilegeUserNameArgument();
+	public PrivilegeUserIdArgument getArgumentInstance() {
+		return new PrivilegeUserIdArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(PrivilegeUserNameArgument arg) {
+	protected ServiceResult internalDoService(PrivilegeUserIdArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_USER)) {
 			PrivilegeRemoveUserCommand cmd = new PrivilegeRemoveUserCommand(tx);
-			cmd.setUsername(arg.username);
+			cmd.setUserId(arg.userId);
 			tx.addCommand(cmd);
 
 			tx.commitOnClose();

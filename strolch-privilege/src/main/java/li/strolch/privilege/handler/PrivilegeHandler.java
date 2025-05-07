@@ -119,6 +119,16 @@ public interface PrivilegeHandler {
 	UserRep getUser(Certificate certificate, String username);
 
 	/**
+	 * Returns a {@link UserRep} for the given user ID
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userId      the ID of the {@link UserRep} to return
+	 *
+	 * @return the {@link UserRep} for the given user ID, or null if it was not found
+	 */
+	UserRep getUserById(Certificate certificate, String userId);
+
+	/**
 	 * Returns a {@link UserPrivileges} for the given username. This object contains all the privileges the user has
 	 * assigned by its roles and groups
 	 *
@@ -130,6 +140,19 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException if the certificate may not access the user, or the request user does not exist
 	 */
 	UserPrivileges getUserPrivileges(Certificate certificate, String username);
+
+	/**
+	 * Returns a {@link UserPrivileges} for the given user ID. This object contains all the privileges the user has
+	 * assigned by its roles and groups
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userId      the ID of the user
+	 *
+	 * @return the {@link UserPrivileges} for the given user ID
+	 *
+	 * @throws PrivilegeException if the certificate may not access the user, or the requested user does not exist
+	 */
+	UserPrivileges getUserPrivilegesById(Certificate certificate, String userId);
 
 	/**
 	 * Returns a {@link GroupPrivileges} for the given group name. This object contains all the privileges the group has
@@ -232,6 +255,19 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException    if there is anything wrong with this certificate
 	 */
 	UserRep removeUser(Certificate certificate, String username) throws PrivilegeException;
+
+	/**
+	 * Removes the user with the given username
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userId      the user ID of the user to remove
+	 *
+	 * @return the {@link UserRep} of the user removed, or null if the user did not exist
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate
+	 */
+	UserRep removeUserById(Certificate certificate, String userId) throws PrivilegeException;
 
 	/**
 	 * Removes the role with the given roleName
@@ -385,7 +421,29 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException if the user for this certificate may not perform the action
 	 * @throws PrivilegeException    if there is anything wrong with this certificate
 	 */
-	void setUserPassword(Certificate certificate, String username, char[] password) throws PrivilegeException;
+	UserRep setUserPassword(Certificate certificate, String username, char[] password) throws PrivilegeException;
+
+	/**
+	 * <p>
+	 * Changes the password for the {@link User} with the given user ID. If the password is null, then the {@link User}
+	 * can not login anymore. Otherwise the password must meet the requirements of the implementation under
+	 * {@link PrivilegeHandler#validatePassword(Locale, char[])}
+	 * </p>
+	 *
+	 * <p>
+	 * It should be possible for a user to change their own password
+	 * </p>
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userId      the user ID of the {@link User} for which the password is to be changed
+	 * @param password    the new password for this user. If the password is null, then the {@link User} can not login
+	 *                    anymore. Otherwise the password must meet the requirements of the implementation under
+	 *                    {@link PrivilegeHandler#validatePassword(Locale, char[])}
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate
+	 */
+	UserRep setUserPasswordById(Certificate certificate, String userId, char[] password) throws PrivilegeException;
 
 	/**
 	 * <p>
@@ -398,7 +456,20 @@ public interface PrivilegeHandler {
 	 * @throws AccessDeniedException if the user for this certificate may not perform the action
 	 * @throws PrivilegeException    if there is anything wrong with this certificate
 	 */
-	void requirePasswordChange(Certificate certificate, String username) throws PrivilegeException;
+	UserRep requirePasswordChange(Certificate certificate, String username) throws PrivilegeException;
+
+	/**
+	 * <p>
+	 * Requires the given user to change their password after next login
+	 * </p>
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userId      the user ID of the {@link User} for which the password change is requested
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate
+	 */
+	UserRep requirePasswordChangeById(Certificate certificate, String userId) throws PrivilegeException;
 
 	/**
 	 * Changes the {@link UserState} of the user
@@ -413,6 +484,18 @@ public interface PrivilegeHandler {
 	UserRep setUserState(Certificate certificate, String username, UserState state) throws PrivilegeException;
 
 	/**
+	 * Changes the {@link UserState} of the user
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userId      the user ID of the {@link User} for which the {@link UserState} is to be changed
+	 * @param state       the new state for the user
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate
+	 */
+	UserRep setUserStateById(Certificate certificate, String userId, UserState state) throws PrivilegeException;
+
+	/**
 	 * Changes the {@link Locale} of the user
 	 *
 	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
@@ -423,6 +506,18 @@ public interface PrivilegeHandler {
 	 * @throws PrivilegeException    if there is anything wrong with this certificate
 	 */
 	UserRep setUserLocale(Certificate certificate, String username, Locale locale) throws PrivilegeException;
+
+	/**
+	 * Changes the {@link Locale} of the user
+	 *
+	 * @param certificate the {@link Certificate} of the user which has the privilege to perform this action
+	 * @param userId      the user ID of the {@link User} for which the {@link Locale} is to be changed
+	 * @param locale      the new {@link Locale} for the user
+	 *
+	 * @throws AccessDeniedException if the user for this certificate may not perform the action
+	 * @throws PrivilegeException    if there is anything wrong with this certificate
+	 */
+	UserRep setUserLocaleById(Certificate certificate, String userId, Locale locale) throws PrivilegeException;
 
 	/**
 	 * Initiate a password reset challenge for the given username

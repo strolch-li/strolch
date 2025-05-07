@@ -26,6 +26,7 @@ import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.collections.Tuple;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
@@ -91,16 +92,35 @@ public class PrivilegeCrudHandler {
 		return user.asUserRep();
 	}
 
-	public User getUser(Certificate certificate, String username) {
+	public UserRep getUserRepById(Certificate certificate, String userId) {
+		User user = getUserById(certificate, userId);
+		if (user == null)
+			return null;
+		return user.asUserRep();
+	}
 
+	public User getUser(Certificate certificate, String username) {
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER);
 
 		User user = this.persistenceHandler.getUser(username);
+		return validateGetUserPrivilege(user, prvCtx);
+	}
+
+	public User getUserById(Certificate certificate, String userId) {
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_GET_USER);
+
+		User user = this.persistenceHandler.getUserById(userId);
+		return validateGetUserPrivilege(user, prvCtx);
+	}
+
+	@Nullable
+	private static User validateGetUserPrivilege(User user, PrivilegeContext prvCtx) {
 		if (user == null)
 			return null;
-
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user)));
 		return user;
 	}
@@ -594,7 +614,6 @@ public class PrivilegeCrudHandler {
 	}
 
 	public UserRep removeUser(Certificate certificate, String username) {
-
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		prvCtx.assertHasPrivilege(PRIVILEGE_REMOVE_USER);
@@ -602,20 +621,37 @@ public class PrivilegeCrudHandler {
 		// validate user exists
 		User existingUser = this.persistenceHandler.getUser(username);
 		if (existingUser == null) {
-			String msg = "Can not remove User {0} because user does not exist!";
+			String msg = "Can not remove User with username {0} because the user does not exist!";
 			throw new PrivilegeModelException(MessageFormat.format(msg, username));
 		}
+		return doRemoveUser(existingUser, prvCtx);
+	}
 
+	public UserRep removeUserById(Certificate certificate, String userId) {
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_REMOVE_USER);
+
+		// validate user exists
+		User existingUser = this.persistenceHandler.getUserById(userId);
+		if (existingUser == null) {
+			String msg = "Can not remove User with ID {0} because the user does not exist!";
+			throw new PrivilegeModelException(MessageFormat.format(msg, userId));
+		}
+
+		return doRemoveUser(existingUser, prvCtx);
+	}
+
+	private UserRep doRemoveUser(User user, PrivilegeContext prvCtx) {
 		// validate this user may remove this user
-		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_REMOVE_USER, new Tuple(null, existingUser)));
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_REMOVE_USER, new Tuple(null, user)));
 
 		// delegate user removal to persistence handler
-		this.privilegeHandler.invalidateSessionsFor(existingUser);
-		this.persistenceHandler.removeUser(username);
+		this.privilegeHandler.invalidateSessionsFor(user);
+		this.persistenceHandler.removeUserById(user.getUserId());
 
-		logger.info("Removed user {}", username);
-
-		return existingUser.asUserRep();
+		logger.info("Removed user with ID {}", user.getUserId());
+		return user.asUserRep();
 	}
 
 	public UserRep setUserLocale(Certificate certificate, String username, Locale locale) {
@@ -627,8 +663,27 @@ public class PrivilegeCrudHandler {
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
 		if (existingUser == null)
-			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username));
+			throw new PrivilegeModelException(MessageFormat.format("User with username {0} does not exist!", username));
 
+		return doSetUserLocale(certificate, locale, existingUser, prvCtx);
+	}
+
+	public UserRep setUserLocaleById(Certificate certificate, String userId, Locale locale) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_LOCALE);
+
+		// get User
+		User existingUser = this.persistenceHandler.getUserById(userId);
+		if (existingUser == null)
+			throw new PrivilegeModelException(MessageFormat.format("User with ID {0} does not exist!", userId));
+
+		return doSetUserLocale(certificate, locale, existingUser, prvCtx);
+	}
+
+	private UserRep doSetUserLocale(Certificate certificate, Locale locale, User existingUser,
+			PrivilegeContext prvCtx) {
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPasswordCrypt(),
 				existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
@@ -636,20 +691,18 @@ public class PrivilegeCrudHandler {
 				existingUser.isPasswordChangeRequested(), existingUser.getHistory());
 
 		// if the user is not setting their own locale, then make sure this user may set this user's locale
-		if (!certificate.getUsername().equals(username)) {
+		if (!certificate.getUsername().equals(existingUser.getUsername()))
 			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_LOCALE, new Tuple(existingUser, newUser)));
-		}
 
 		// delegate user replacement to persistence handler
 		this.persistenceHandler.replaceUser(newUser);
 		this.privilegeHandler.persistModelAsync();
 
 		logger.info("Set locale to {} for {}", locale, newUser.getUsername());
-
 		return newUser.asUserRep();
 	}
 
-	public void requirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
+	public UserRep requirePasswordChange(Certificate certificate, String username) throws PrivilegeException {
 
 		// validate user actually has this type of privilege
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
@@ -658,11 +711,29 @@ public class PrivilegeCrudHandler {
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
 		if (existingUser == null)
-			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username));
+			throw new PrivilegeModelException(MessageFormat.format("User with username {0} does not exist!", username));
 
+		return doRequirePasswordChange(existingUser);
+	}
+
+	public UserRep requirePasswordChangeById(Certificate certificate, String userId) throws PrivilegeException {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_REQUIRE_PASSWORD_CHANGE);
+
+		// get User
+		User existingUser = this.persistenceHandler.getUserById(userId);
+		if (existingUser == null)
+			throw new PrivilegeModelException(MessageFormat.format("User with ID {0} does not exist!", userId));
+
+		return doRequirePasswordChange(existingUser);
+	}
+
+	private UserRep doRequirePasswordChange(User existingUser) {
 		if (existingUser.getUserState().isRemote())
 			throw new PrivilegeModelException(
-					MessageFormat.format("User {0} is remote and can not set password!", username));
+					MessageFormat.format("User {0} is remote and can not set password!", existingUser.getUsername()));
 
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPasswordCrypt(),
@@ -675,15 +746,14 @@ public class PrivilegeCrudHandler {
 		this.privilegeHandler.persistModelAsync();
 
 		logger.info("Requiring user {} to change their password on next login.", newUser.getUsername());
+		return newUser.asUserRep();
 	}
 
-	public void setUserPassword(Certificate certificate, String username, char[] password) {
-
+	public UserRep setUserPassword(Certificate certificate, String username, char[] password) {
 		// we don't want the user to worry about whitespace
 		username = trimOrEmpty(username);
 
 		try {
-
 			// validate user actually has this type of privilege
 			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 			prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_PASSWORD);
@@ -691,52 +761,77 @@ public class PrivilegeCrudHandler {
 			// get User
 			User existingUser = this.persistenceHandler.getUser(username);
 			if (existingUser == null)
-				throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username));
+				throw new PrivilegeModelException(
+						MessageFormat.format("User with username {0} does not exist!", username));
 
-			UserHistory history = existingUser.getHistory();
-
-			PasswordCrypt passwordCrypt = null;
-			if (password != null) {
-
-				// validate password meets basic requirements
-				this.privilegeHandler.validatePassword(certificate.getLocale(), password);
-
-				// get new salt for user
-				byte[] salt = this.privilegeHandler.getEncryptionHandler().nextSalt();
-
-				// hash password
-				passwordCrypt = this.privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
-
-				history = history.withLastPasswordChange(ZonedDateTime.now());
-			}
-
-			// create new user
-			User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), passwordCrypt,
-					existingUser.getFirstname(), existingUser.getLastname(), existingUser.getUserState(),
-					existingUser.getGroups(), existingUser.getRoles(), existingUser.getLocale(),
-					existingUser.getProperties(), false, history);
-
-			if (!certificate.getUsername().equals(username)) {
-				// check that the user may change their own password
-				Tuple value = new Tuple(existingUser, newUser);
-				prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, value));
-			}
-
-			// delegate user replacement to persistence handler
-			this.persistenceHandler.replaceUser(newUser);
-			this.privilegeHandler.persistModelAsync();
-
-			if (certificate.getUsage() == Usage.SET_PASSWORD)
-				this.privilegeHandler.invalidate(certificate);
-
-			if (password == null)
-				logger.info("Cleared password for {}", newUser.getUsername());
-			else
-				logger.info("Updated password for {}", newUser.getUsername());
-
+			return doSetUserPassword(certificate, password, existingUser, prvCtx);
 		} finally {
 			clearPassword(password);
 		}
+	}
+
+	public UserRep setUserPasswordById(Certificate certificate, String userId, char[] password) {
+		// we don't want the user to worry about whitespace
+		userId = trimOrEmpty(userId);
+
+		try {
+			// validate user actually has this type of privilege
+			PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+			prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_PASSWORD);
+
+			// get User
+			User existingUser = this.persistenceHandler.getUserById(userId);
+			if (existingUser == null)
+				throw new PrivilegeModelException(MessageFormat.format("User with ID {0} does not exist!", userId));
+
+			return doSetUserPassword(certificate, password, existingUser, prvCtx);
+		} finally {
+			clearPassword(password);
+		}
+	}
+
+	private UserRep doSetUserPassword(Certificate certificate, char[] password, User user, PrivilegeContext prvCtx) {
+		UserHistory history = user.getHistory();
+
+		PasswordCrypt passwordCrypt = null;
+		if (password != null) {
+
+			// validate password meets basic requirements
+			this.privilegeHandler.validatePassword(certificate.getLocale(), password);
+
+			// get new salt for user
+			byte[] salt = this.privilegeHandler.getEncryptionHandler().nextSalt();
+
+			// hash password
+			passwordCrypt = this.privilegeHandler.getEncryptionHandler().hashPassword(password, salt);
+
+			history = history.withLastPasswordChange(ZonedDateTime.now());
+		}
+
+		// create new user
+		User newUser = new User(user.getUserId(), user.getUsername(), passwordCrypt, user.getFirstname(),
+				user.getLastname(), user.getUserState(), user.getGroups(), user.getRoles(), user.getLocale(),
+				user.getProperties(), false, history);
+
+		if (!certificate.getUsername().equals(user.getUsername())) {
+			// check that the user may change their own password
+			Tuple value = new Tuple(user, newUser);
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_SET_USER_PASSWORD, value));
+		}
+
+		// delegate user replacement to persistence handler
+		this.persistenceHandler.replaceUser(newUser);
+		this.privilegeHandler.persistModelAsync();
+
+		if (certificate.getUsage() == Usage.SET_PASSWORD)
+			this.privilegeHandler.invalidate(certificate);
+
+		if (password == null)
+			logger.info("Cleared password for {}", newUser.getUsername());
+		else
+			logger.info("Updated password for {}", newUser.getUsername());
+
+		return newUser.asUserRep();
 	}
 
 	public UserRep setUserState(Certificate certificate, String username, UserState state) {
@@ -748,8 +843,26 @@ public class PrivilegeCrudHandler {
 		// get User
 		User existingUser = this.persistenceHandler.getUser(username);
 		if (existingUser == null)
-			throw new PrivilegeModelException(MessageFormat.format("User {0} does not exist!", username));
+			throw new PrivilegeModelException(MessageFormat.format("User with username {0} does not exist!", username));
 
+		return doSetUserState(state, existingUser, prvCtx);
+	}
+
+	public UserRep setUserStateById(Certificate certificate, String userId, UserState state) {
+
+		// validate user actually has this type of privilege
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		prvCtx.assertHasPrivilege(PRIVILEGE_SET_USER_STATE);
+
+		// get User
+		User existingUser = this.persistenceHandler.getUserById(userId);
+		if (existingUser == null)
+			throw new PrivilegeModelException(MessageFormat.format("User with ID {0} does not exist!", userId));
+
+		return doSetUserState(state, existingUser, prvCtx);
+	}
+
+	private UserRep doSetUserState(UserState state, User existingUser, PrivilegeContext prvCtx) {
 		// create new user
 		User newUser = new User(existingUser.getUserId(), existingUser.getUsername(), existingUser.getPasswordCrypt(),
 				existingUser.getFirstname(), existingUser.getLastname(), state, existingUser.getGroups(),

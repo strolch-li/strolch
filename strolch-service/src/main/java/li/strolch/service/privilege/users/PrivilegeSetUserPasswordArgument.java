@@ -21,13 +21,13 @@ import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceArgument;
 
 public class PrivilegeSetUserPasswordArgument extends ServiceArgument {
-	public String username;
+	public String userId;
 	public char[] password;
 
 	@Override
 	public JsonElement toJson() {
 		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty(Tags.Json.USERNAME, this.username);
+		jsonObject.addProperty(Tags.Json.USER_ID, this.userId);
 		jsonObject.addProperty(Tags.Json.PASSWORD, "***");
 		return jsonObject;
 	}

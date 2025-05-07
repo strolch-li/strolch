@@ -18,6 +18,7 @@ package li.strolch.service.privilege.users;
 import li.strolch.model.audit.AccessType;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.UserRep;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
@@ -28,7 +29,7 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ClearUserPasswordService extends AbstractService<PrivilegeUserNameArgument, ServiceResult> {
+public class ClearUserPasswordService extends AbstractService<PrivilegeUserIdArgument, ServiceResult> {
 
 	@Override
 	protected ServiceResult getResultInstance() {
@@ -36,28 +37,28 @@ public class ClearUserPasswordService extends AbstractService<PrivilegeUserNameA
 	}
 
 	@Override
-	public PrivilegeUserNameArgument getArgumentInstance() {
-		return new PrivilegeUserNameArgument();
+	public PrivilegeUserIdArgument getArgumentInstance() {
+		return new PrivilegeUserIdArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(PrivilegeUserNameArgument arg) {
+	protected ServiceResult internalDoService(PrivilegeUserIdArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_PASSWORD)) {
 			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler
 					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
-			privilegeHandler.setUserPassword(getCertificate(), arg.username, null);
+			UserRep userRep = privilegeHandler.setUserPasswordById(getCertificate(), arg.userId, null);
 
 			// only persist if not setting own password
-			if (!getCertificate().getUsername().equals(arg.username) && getPrivilegeContext()
+			if (!getCertificate().getUserId().equals(arg.userId) && getPrivilegeContext()
 					.getPrivilegeNames()
 					.contains(PRIVILEGE_ACTION_PERSIST)) {
 				if (privilegeHandler.isPersistOnUserDataChanged())
 					privilegeHandler.persist(getCertificate());
 			}
 
-			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, arg.username));
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, userRep.getUsername()));
 			tx.commitOnClose();
 		}
 

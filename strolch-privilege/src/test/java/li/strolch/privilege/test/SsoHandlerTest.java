@@ -47,14 +47,38 @@ public class SsoHandlerTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
-	public void testSsoAdmin() {
+	public void testSsoKnownUserAdmin() {
 
 		try {
 			Map<String, String> data = new HashMap<>();
-			data.put("userId", "admin");
 			data.put("username", "admin");
 			data.put("firstName", "Admin");
 			data.put("lastName", "Istrator");
+			data.put("groups", "AppUserLocationA");
+			data.put("roles", "PrivilegeAdmin, AppUser");
+
+			// auth
+			Certificate cert = this.privilegeHandler.authenticateSingleSignOn(data, false);
+			this.ctx = this.privilegeHandler.validate(cert);
+
+			// validate action
+			Restrictable restrictable = new TestRestrictable();
+			this.ctx.validateAction(restrictable);
+
+		} finally {
+			// de-auth
+			logout();
+		}
+	}
+
+	@Test
+	public void testSsoUnknownUserBob() {
+
+		try {
+			Map<String, String> data = new HashMap<>();
+			data.put("username", "bob");
+			data.put("firstName", "Bobby");
+			data.put("lastName", "Someone");
 			data.put("groups", "AppUserLocationA");
 			data.put("roles", "PrivilegeAdmin, AppUser");
 

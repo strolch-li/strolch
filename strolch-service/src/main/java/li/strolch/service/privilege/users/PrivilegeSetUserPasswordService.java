@@ -18,6 +18,7 @@ package li.strolch.service.privilege.users;
 import li.strolch.model.audit.AccessType;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.UserRep;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
@@ -47,17 +48,17 @@ public class PrivilegeSetUserPasswordService extends AbstractService<PrivilegeSe
 			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler
 					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
-			privilegeHandler.setUserPassword(getCertificate(), arg.username, arg.password);
+			UserRep userRep = privilegeHandler.setUserPasswordById(getCertificate(), arg.userId, arg.password);
 
 			// only persist if not setting own password
-			if (!getCertificate().getUsername().equals(arg.username) && getPrivilegeContext()
+			if (!getCertificate().getUserId().equals(arg.userId) && getPrivilegeContext()
 					.getPrivilegeNames()
 					.contains(PRIVILEGE_ACTION_PERSIST)) {
 				if (privilegeHandler.isPersistOnUserDataChanged())
 					privilegeHandler.persist(getCertificate());
 			}
 
-			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, arg.username));
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, userRep.getUsername()));
 			tx.commitOnClose();
 		}
 

@@ -23,13 +23,13 @@ import li.strolch.service.api.ServiceArgument;
 import java.util.Locale;
 
 public class PrivilegeSetUserLocaleArgument extends ServiceArgument {
-	public String username;
+	public String userId;
 	public Locale locale;
 
 	@Override
 	public JsonElement toJson() {
 		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty(Tags.Json.USERNAME, this.username);
+		jsonObject.addProperty(Tags.Json.USER_ID, this.userId);
 		jsonObject.addProperty(Tags.Json.LOCALE, this.locale == null ? "null" : this.locale.toLanguageTag());
 		return jsonObject;
 	}

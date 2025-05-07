@@ -40,6 +40,7 @@ public final class Certificate implements Comparable<Certificate> {
 
 	private final Usage usage;
 	private final String sessionId;
+	private final String userId;
 	private final String username;
 	private final String firstname;
 	private final String lastname;
@@ -67,6 +68,7 @@ public final class Certificate implements Comparable<Certificate> {
 	 *
 	 * @param usage      the usage allowed for this certificate
 	 * @param sessionId  the users session id
+	 * @param userId     the users unique id
 	 * @param username   the users login name
 	 * @param firstName  the users first name
 	 * @param lastName   the users last name
@@ -77,12 +79,13 @@ public final class Certificate implements Comparable<Certificate> {
 	 * @param properties a {@link Map} containing string value pairs of properties for the logged in user. These
 	 *                   properties can be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
+	public Certificate(Usage usage, String sessionId, String userId, String username, String firstName, String lastName,
 			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
 			Locale locale, Set<String> userGroups, Set<String> userRoles, Set<String> userDirectRoles,
 			Map<String, String> properties) {
 
 		DBC.PRE.assertNotEmpty("sessionId must not be empty", sessionId);
+		DBC.PRE.assertNotEmpty("userId must not be empty", userId);
 		DBC.PRE.assertNotEmpty("username must not be empty", username);
 		DBC.PRE.assertNotEmpty("authToken must not be empty", authToken);
 		DBC.PRE.assertNotNull("userState must not be empty", userState);
@@ -91,6 +94,7 @@ public final class Certificate implements Comparable<Certificate> {
 
 		this.usage = usage;
 		this.sessionId = sessionId;
+		this.userId = userId;
 		this.username = username;
 		this.firstname = firstName;
 		this.lastname = lastName;
@@ -267,6 +271,10 @@ public final class Certificate implements Comparable<Certificate> {
 
 	public String getUsername() {
 		return this.username;
+	}
+
+	public String getUserId() {
+		return this.userId;
 	}
 
 	public String getFirstname() {
