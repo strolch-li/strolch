@@ -124,6 +124,8 @@ public abstract class LdapQueryContext {
 
 	protected abstract Locale getLocale(Attributes attrs) throws NamingException;
 
+	protected abstract String getUserId(Attributes attrs) throws NamingException;
+
 	protected String getFirstName(String username, Attributes attrs) throws NamingException {
 		String value = getLdapString(attrs, LDAP_GIVEN_NAME);
 		return isEmpty(value) ? username : value;
@@ -148,6 +150,7 @@ public abstract class LdapQueryContext {
 
 		username = validateLdapUsername(username, attrs);
 
+		String userId = getUserId(attrs);
 		String firstName = getFirstName(username, attrs);
 		String lastName = getLastName(username, attrs);
 		Locale locale = getLocale(attrs);
@@ -175,7 +178,7 @@ public abstract class LdapQueryContext {
 		String department = getDepartment(attrs);
 		Map<String, String> properties = this.groupMappingModel.buildProperties(department, ldapGroups);
 
-		return new User(username, username, null, firstName, lastName, UserState.REMOTE, groupsAndRoles.groups(),
+		return new User(userId, username, null, firstName, lastName, UserState.REMOTE, groupsAndRoles.groups(),
 				groupsAndRoles.roles(), locale, properties, false, UserHistory.EMPTY);
 	}
 

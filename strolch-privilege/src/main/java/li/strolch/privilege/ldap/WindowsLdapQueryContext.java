@@ -18,6 +18,7 @@ package li.strolch.privilege.ldap;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
+import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ public class WindowsLdapQueryContext extends LdapQueryContext {
 	public static final String LDAP_CN = "CN";
 	public static final String LDAP_SAM_ACCOUNT_NAME = "sAMAccountName";
 	public static final String LDAP_USER_PRINCIPAL_NAME = "userPrincipalName";
+	public static final String LDAP_OBJECT_GUID = "objectGUID";
 
 	protected final String domain;
 	protected final String domainPrefix;
@@ -100,6 +102,12 @@ public class WindowsLdapQueryContext extends LdapQueryContext {
 		if (isNotEmpty(this.overrideUserIdentifier))
 			return this.overrideUserIdentifier;
 		return LDAP_SAM_ACCOUNT_NAME;
+	}
+
+	protected String getUserId(Attributes attrs) throws NamingException {
+		String value = getLdapString(attrs, LDAP_OBJECT_GUID);
+		DBC.PRE.assertNotEmpty("LDAP field " + LDAP_OBJECT_GUID + " is empty!", value);
+		return value;
 	}
 
 	public String getUserAttributeIdentifier1() {
