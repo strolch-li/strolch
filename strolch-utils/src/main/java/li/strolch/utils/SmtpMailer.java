@@ -326,6 +326,12 @@ public class SmtpMailer {
 			message = prepareMimeMessage(subject, session);
 			attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), encryptedTextFileName);
 		} catch (Exception e) {
+			if (e instanceof InterruptedException) {
+				Thread.currentThread().interrupt();
+				logger.error("Interrupted while encrypting message. Cancelling sending of message.");
+				return;
+			}
+
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
