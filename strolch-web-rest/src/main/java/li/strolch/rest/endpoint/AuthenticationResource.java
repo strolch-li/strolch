@@ -351,6 +351,8 @@ public class AuthenticationResource {
 
 			JsonObject result = new JsonObject();
 			String authToken = certificate.getAuthToken();
+			result.addProperty("userId", certificate.getUserId());
+			result.addProperty("userName", certificate.getUsername());
 			result.addProperty("authToken", authToken);
 
 			return setCookiesAndReturnResponse(request, restComponent, cookieMaxAge, expirationDate, result, authToken);
