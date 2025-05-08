@@ -61,9 +61,9 @@ public class MailUserChallengeHandler extends UserChallengeHandler {
 		// send e-mail async
 		CompletableFuture
 				.runAsync(() -> SmtpMailer.getInstance().sendMail(recipient, subject, text))
-				.whenComplete((unused, throwable) -> {
+				.whenComplete((_, throwable) -> {
 					if (throwable == null)
-						logger.error("Sent Mail TAN email for user {} to {}", user, recipient);
+						logger.info("Sent Mail TAN email for user {} to {}", user, recipient);
 					else
 						logger.error("Failed to send email for user {} to {}", user, recipient, throwable);
 				});
