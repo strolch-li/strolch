@@ -60,7 +60,7 @@ public class MailUserChallengeHandler extends UserChallengeHandler {
 
 		// send e-mail async
 		CompletableFuture
-				.runAsync(() -> SmtpMailer.getInstance().sendMail(subject, text, recipient))
+				.runAsync(() -> SmtpMailer.getInstance().sendMail(recipient, subject, text))
 				.whenComplete((unused, throwable) -> {
 					if (throwable == null)
 						logger.error("Sent Mail TAN email for user {} to {}", user, recipient);
