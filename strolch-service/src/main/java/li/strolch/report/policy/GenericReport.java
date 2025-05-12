@@ -49,6 +49,7 @@ import static li.strolch.report.ReportConstants.*;
 import static li.strolch.utils.ObjectHelper.compare;
 import static li.strolch.utils.ObjectHelper.contains;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * A Generic Report defines a report as is described at <a href="https://strolch.li/documentation-reports.html">Strolch
@@ -533,6 +534,8 @@ public class GenericReport extends ReportPolicy {
 
 	protected String formatDateTime(String columnId, ZonedDateTime dt) {
 		String hint = this.reportRes.getString(BAG_FORMATTING_HINTS, columnId);
+		if (isEmpty(hint))
+			return DateFormattingHint.None.format(tx().getLocale(), dt);
 		return DateFormattingHint.valueOf(hint).format(tx().getLocale(), dt);
 	}
 
