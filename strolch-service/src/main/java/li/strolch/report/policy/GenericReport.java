@@ -26,15 +26,14 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.report.ReportConstants;
 import li.strolch.report.ReportElement;
+import li.strolch.utils.DateFormattingHint;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.collections.TypedTuple;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -42,8 +41,6 @@ import java.util.stream.Stream;
 import static java.text.MessageFormat.format;
 import static java.time.ZoneId.systemDefault;
 import static java.time.ZonedDateTime.ofInstant;
-import static java.time.temporal.ChronoUnit.MILLIS;
-import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
@@ -536,12 +533,7 @@ public class GenericReport extends ReportPolicy {
 
 	protected String formatDateTime(String columnId, ZonedDateTime dt) {
 		String hint = this.reportRes.getString(BAG_FORMATTING_HINTS, columnId);
-		return switch (hint) {
-			case UOM_DATE -> DateTimeFormatter.ISO_LOCAL_DATE.format(dt);
-			case UOM_DATE_TIME -> DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dt.truncatedTo(SECONDS));
-			case UOM_TIME -> DateTimeFormatter.ISO_LOCAL_TIME.format(dt.truncatedTo(SECONDS));
-			default -> ISO8601.toString(dt.truncatedTo(MILLIS));
-		};
+		return DateFormattingHint.valueOf(hint).format(tx().getLocale(), dt);
 	}
 
 	@Override
