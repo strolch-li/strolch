@@ -55,7 +55,7 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 	}
 
 	protected boolean isStrolchAdminAndIgnoreOrganisation(PrivilegeContext ctx) {
-		return ctx.hasRole(ROLE_STROLCH_ADMIN);
+		return ctx.hasRole(ROLE_STROLCH_ADMIN) || ctx.isSystemUser();
 	}
 
 	@Override
