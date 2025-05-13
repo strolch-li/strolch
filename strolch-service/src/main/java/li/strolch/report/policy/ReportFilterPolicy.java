@@ -66,42 +66,44 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 		DBC.PRE.assertNotNull("value required!", value);
 
 		Object left;
-		if (value instanceof ZonedDateTime) {
+		switch (value) {
+			case ZonedDateTime zonedDateTime -> {
 
-			if (this.right == null)
-				this.right = parseFilterValueToZdt(this.filterValue);
-
-			left = value;
-
-		} else if (value instanceof Date) {
-
-			if (this.right == null) {
-				logger.error("DEPRECATED, use ZonedDateTime");
-				this.right = parseFilterValueToDate(this.filterValue);
-			}
-
-			left = value;
-
-		} else if (value instanceof Parameter<?> parameter) {
-
-			if (this.right == null) {
-				StrolchValueType valueType = parameter.getValueType();
-				if (valueType == StrolchValueType.DATE)
+				if (this.right == null)
 					this.right = parseFilterValueToZdt(this.filterValue);
-				else
-					this.right = valueType.parseValue(this.filterValue);
+
+				left = zonedDateTime;
 			}
+			case Date date -> {
 
-			if (value instanceof DateParameter)
-				left = ((DateParameter) parameter).getValueZdt();
-			else
-				left = parameter.getValue();
+				if (this.right == null) {
+					logger.error("DEPRECATED, use ZonedDateTime");
+					this.right = parseFilterValueToDate(this.filterValue);
+				}
 
-		} else {
-			if (this.right == null)
-				this.right = this.filterValue;
+				left = date;
+			}
+			case Parameter<?> parameter -> {
 
-			left = value.toString();
+				if (this.right == null) {
+					StrolchValueType valueType = parameter.getValueType();
+					if (valueType == StrolchValueType.DATE)
+						this.right = parseFilterValueToZdt(this.filterValue);
+					else
+						this.right = valueType.parseValue(this.filterValue);
+				}
+
+				if (value instanceof DateParameter)
+					left = ((DateParameter) parameter).getValueZdt();
+				else
+					left = parameter.getValue();
+			}
+			default -> {
+				if (this.right == null)
+					this.right = this.filterValue;
+
+				left = value.toString();
+			}
 		}
 
 		return filter(left, this.right, this.negate);
