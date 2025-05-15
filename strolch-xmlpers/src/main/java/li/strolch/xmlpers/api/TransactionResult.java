@@ -31,7 +31,7 @@ public class TransactionResult {
 	private long txDuration;
 	private long closeDuration;
 
-	private Map<String, ModificationResult> modificationByKey;
+	private final Map<String, ModificationResult> modificationByKey;
 
 	public TransactionResult() {
 		this.state = TransactionState.OPEN;
