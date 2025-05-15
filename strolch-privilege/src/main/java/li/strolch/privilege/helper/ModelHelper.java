@@ -90,8 +90,7 @@ public class ModelHelper {
 		}
 
 		if (group.hasProperty(VALID_TO)) {
-			if (now.isAfter(parseToZdt(group.getProperty(VALID_TO))))
-				return false;
+			return !now.isAfter(parseToZdt(group.getProperty(VALID_TO)));
 		}
 
 		return true;
