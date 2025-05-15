@@ -18,5 +18,5 @@ package li.strolch.model;
 
 public enum NotificationType {
 	Information,
-	Notification;
+	Notification
 }
