@@ -63,7 +63,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	@Override
 	public synchronized long querySize(StrolchTransaction tx) {
 		return this.elementMap.values().stream() //
-				.map(map -> map.entrySet().size()) //
+				.map(map -> map.size()) //
 				.mapToInt(Integer::valueOf) //
 				.sum();
 	}
@@ -74,7 +74,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (byType == null)
 			return 0;
 
-		return byType.entrySet().size();
+		return byType.size();
 	}
 
 	@Override
