@@ -16,16 +16,22 @@
 
 package li.strolch.utils;
 
+import jakarta.mail.BodyPart;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class SimulatedSmtpMailer extends SmtpMailer {
 
+	public static volatile boolean debug;
 	private static final Logger logger = LoggerFactory.getLogger(SimulatedSmtpMailer.class);
 	private static SimulatedSmtpMailer instance;
 
@@ -87,10 +93,48 @@ public class SimulatedSmtpMailer extends SmtpMailer {
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			message.writeTo(out);
-			logger.info("Simulated sending of the following message to recipients: {}:\n{}",
-					addressesToString(recipients), out.toString().substring(0, 300));
+
+			Object content = message.getContent();
+			String messageAsString = switch (content) {
+				case String stringContent -> stringContent;
+				case MimeMultipart mimeMultipart -> {
+					StringBuilder sb = new StringBuilder();
+					for (int i = 0; i < mimeMultipart.getCount(); i++) {
+						BodyPart bodyPart = mimeMultipart.getBodyPart(i);
+						addBodyPart(bodyPart.getFileName(), sb, bodyPart.getFileName(), bodyPart.getContentType(),
+								bodyPart.getContent());
+					}
+					yield sb.toString();
+				}
+				case MimeBodyPart bodyPart -> {
+					StringBuilder sb = new StringBuilder();
+					addBodyPart(bodyPart.getFileName(), sb, bodyPart.getFileName(), bodyPart.getContentType(),
+							bodyPart.getContent());
+					yield sb.toString();
+				}
+				case null, default -> out.toString();
+			};
+
+			if (!debug) {
+				messageAsString = messageAsString.substring(0, 300);
+			}
+			logger.info("""
+					Simulated sending of the following message:
+					To: {}
+					Subject: {}
+					Body:
+					{}""", addressesToString(recipients), message.getSubject(), messageAsString);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to print message!", e);
 		}
+	}
+
+	private static void addBodyPart(String bodyPart, StringBuilder sb, String bodyPart1, String bodyPart2,
+			Object bodyPart3) throws MessagingException, IOException {
+		if (bodyPart != null)
+			sb.append("File: ").append(bodyPart1).append(":\n");
+		sb.append("Content-Type: ").append(bodyPart2).append("\n");
+		sb.append("Content: ").append(bodyPart3.toString());
+		sb.append("\n");
 	}
 }
