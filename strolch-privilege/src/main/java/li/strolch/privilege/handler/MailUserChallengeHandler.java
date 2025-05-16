@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.SmtpMailer;
-import li.strolch.utils.helper.StringHelper;
 
 import java.util.concurrent.CompletableFuture;
 
 import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
-import static li.strolch.utils.helper.StringHelper.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 public class MailUserChallengeHandler extends UserChallengeHandler {
 

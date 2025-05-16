@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * {@link IValue} implementation to work with Long valued {@link ITimeValue} objects

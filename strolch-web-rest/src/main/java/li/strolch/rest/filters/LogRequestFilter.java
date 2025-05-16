@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package li.strolch.rest.filters;
 
 import jakarta.annotation.Priority;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;

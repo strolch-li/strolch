@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package li.strolch.utils.iso8601;
 
-import java.util.Date;
-
 import li.strolch.utils.helper.MathHelper;
+
+import java.util.Date;
 
 /**
  * Default factory for date formats used for serialization.

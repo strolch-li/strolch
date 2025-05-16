@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import java.time.ZonedDateTime;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
 import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-import static li.strolch.model.StrolchValueType.DATE;
 import static li.strolch.model.StrolchValueType.*;
+import static li.strolch.model.StrolchValueType.DATE;
 import static li.strolch.model.Tags.Json.*;
 
 public class ResourceSystemStateFromJson {

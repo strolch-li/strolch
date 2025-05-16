@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package li.strolch.model.timevalue.impl;
 
-import java.io.Serializable;
-
 import li.strolch.utils.dbc.DBC;
+
+import java.io.Serializable;
 
 /**
  * Wrapper for java.util.String object defining a inverse to support algebraic operations.

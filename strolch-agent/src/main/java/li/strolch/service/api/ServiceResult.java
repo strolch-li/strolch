@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,10 @@
  */
 package li.strolch.service.api;
 
-import com.google.gson.JsonObject;
-import li.strolch.exception.StrolchException;
-import li.strolch.model.Tags;
-import li.strolch.model.i18n.I18nMessageToJsonVisitor;
 import li.strolch.utils.I18nMessage;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import static li.strolch.model.Tags.Json.*;
-import static li.strolch.utils.helper.ExceptionHelper.formatException;
-import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

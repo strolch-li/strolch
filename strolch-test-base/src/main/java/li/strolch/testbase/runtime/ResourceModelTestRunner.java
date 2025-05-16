@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,19 @@
  */
 package li.strolch.testbase.runtime;
 
-import static li.strolch.model.ModelGenerator.*;
-import static org.junit.Assert.*;
-
-import java.util.*;
-
 import li.strolch.agent.api.ResourceMap;
 import li.strolch.agent.impl.DataStoreMode;
-import li.strolch.model.Order;
 import li.strolch.model.Resource;
 import li.strolch.model.StrolchElement;
 import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+
+import java.util.*;
+
+import static li.strolch.model.ModelGenerator.*;
+import static org.junit.Assert.*;
 
 @SuppressWarnings("nls")
 public class ResourceModelTestRunner {
