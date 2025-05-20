@@ -188,10 +188,8 @@ public class RemoteGroupMappingModel {
 		}
 
 		for (String remoteGroup : remoteGroups) {
-			logger.info("Checking group config for {}", remoteGroup);
 			JsonElement mappingE = this.groupConfigs.get(remoteGroup);
 			if (mappingE == null) {
-				logger.info("No configs for {}", remoteGroup);
 				continue;
 			}
 

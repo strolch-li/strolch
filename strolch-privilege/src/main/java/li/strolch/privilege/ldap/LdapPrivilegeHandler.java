@@ -76,7 +76,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		if (internalUser != null && internalUser.getUserState() != UserState.REMOTE)
 			return super.checkCredentialsAndUserState(username, password);
 
-		logger.info("User {} tries to login on ldap {}", username, this.queryContext.getProviderUrl());
+		logger.info("User {} tries to login on url {}", username, this.queryContext.getProviderUrl());
 
 		// Perform LDAP query
 		SearchResult searchResult;
