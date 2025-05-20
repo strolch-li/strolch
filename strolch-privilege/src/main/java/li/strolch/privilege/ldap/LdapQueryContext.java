@@ -17,6 +17,7 @@
 package li.strolch.privilege.ldap;
 
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.helper.GroupsAndRoles;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.model.UserState;
@@ -35,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.utils.LdapHelper.ldapAttributesToString;
 import static li.strolch.utils.helper.StringHelper.*;
 
@@ -54,6 +56,7 @@ public abstract class LdapQueryContext {
 
 	public static final String LDAP_SN = "sn";
 	public static final String LDAP_GIVEN_NAME = "givenName";
+	public static final String LDAP_MAIL = "mail";
 
 	protected final String svcUserBinding;
 	protected final String svcUserPassword;
@@ -136,6 +139,38 @@ public abstract class LdapQueryContext {
 		return isEmpty(value) ? username : value;
 	}
 
+	protected String getEmail(Attributes attrs) throws NamingException {
+		// Try standard mail attribute first
+		String email = getLdapString(attrs, LDAP_MAIL);
+
+		if (isNotEmpty(email))
+			return email;
+
+		// Check for proxyAddresses (common in AD)
+		Attribute proxyAddresses = attrs.get("proxyAddresses");
+		if (proxyAddresses == null)
+			return email;
+
+		// Iterate through all proxy addresses
+		for (int i = 0; i < proxyAddresses.size(); i++) {
+			String addr = proxyAddresses.get(i).toString();
+			// Primary SMTP address usually starts with "SMTP:" (uppercase)
+			if (addr.startsWith("SMTP:")) {
+				return addr.substring(5); // Remove the "SMTP:" prefix
+			}
+		}
+
+		// If no primary found, take the first smtp address
+		for (int i = 0; i < proxyAddresses.size(); i++) {
+			String addr = proxyAddresses.get(i).toString();
+			if (addr.startsWith("smtp:")) {
+				return addr.substring(5);
+			}
+		}
+
+		return email;
+	}
+
 	public abstract String getLoginUsername(String safeUsername);
 
 	protected abstract String validateLdapUsername(String username, Attributes attrs) throws NamingException;
@@ -177,6 +212,11 @@ public abstract class LdapQueryContext {
 		// first see if we can find the primaryLocation from the department attribute:
 		String department = getDepartment(attrs);
 		Map<String, String> properties = this.groupMappingModel.buildProperties(department, ldapGroups);
+
+		// Get email address and to properties if not null
+		String email = getEmail(attrs);
+		if (email != null)
+			properties.put(EMAIL, email);
 
 		return new User(userId, username, null, firstName, lastName, UserState.REMOTE, groupsAndRoles.groups(),
 				groupsAndRoles.roles(), locale, properties, false, UserHistory.EMPTY);

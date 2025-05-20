@@ -58,6 +58,7 @@ public class LdapLinuxPrivilegeHandlerTest extends AbstractPrivilegeTest {
 		assertNotNull(cert);
 
 		assertEquals("LocationA", cert.getLocation());
+		assertEquals("test1@strolch.li", cert.getEmail());
 	}
 
 	@Ignore("This test requires a running LDAP server")
@@ -67,5 +68,6 @@ public class LdapLinuxPrivilegeHandlerTest extends AbstractPrivilegeTest {
 		assertNotNull(cert);
 
 		assertEquals("LocationA,LocationB", cert.getLocation());
+		assertEquals("test2@strolch.li", cert.getEmail());
 	}
 }
