@@ -184,6 +184,8 @@ public class RemoteGroupMappingModel {
 				String localL = this.remoteLocationToLocalLocationMap.get(remoteLocation);
 				logger.info("Using primary location {} for LDAP department {}", localL, remoteLocation);
 				primaryLocation = localL;
+			} else {
+				logger.warn("No mapping for LDAP location {} found, ignoring...", remoteLocation);
 			}
 		}
 
