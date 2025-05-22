@@ -18,7 +18,6 @@ package li.strolch.privilege.ldap;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
-import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +26,8 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 import static li.strolch.utils.LdapHelper.encodeForLDAP;
 import static li.strolch.utils.helper.StringHelper.*;
@@ -78,6 +75,13 @@ public class WindowsLdapQueryContext extends LdapQueryContext {
 	}
 
 	@Override
+	public Hashtable<String, String> buildLdapEnv(char[] password, String userPrincipalName) {
+		Hashtable<String, String> env = super.buildLdapEnv(password, userPrincipalName);
+		env.put("java.naming.ldap.attributes.binary", LDAP_OBJECT_GUID);
+		return env;
+	}
+
+	@Override
 	public LdapQuery getLdapQuery() {
 		return new WindowsLdapQuery(this);
 	}
@@ -105,9 +109,34 @@ public class WindowsLdapQueryContext extends LdapQueryContext {
 	}
 
 	protected String getUserId(Attributes attrs) throws NamingException {
-		String value = getLdapString(attrs, LDAP_OBJECT_GUID);
-		DBC.PRE.assertNotEmpty("LDAP field " + LDAP_OBJECT_GUID + " is empty!", value);
-		return value;
+		Attribute attribute = attrs.get(LDAP_OBJECT_GUID);
+		if (attribute == null)
+			throw new IllegalStateException("LDAP field " + LDAP_OBJECT_GUID + " doesn't exist!");
+		byte[] guidBytes = (byte[]) attribute.get();
+		if (guidBytes == null)
+			throw new IllegalStateException("The value for LDAP field " + LDAP_OBJECT_GUID + " is null!");
+		return decodeObjectGuid(guidBytes).toString();
+	}
+
+	public static UUID decodeObjectGuid(byte[] bytes) {
+		// Thanks to robotdan: https://gist.github.com/davidmc24/0588900f3200eba3ea80?permalink_comment_id=3464812#gistcomment-3464812
+		// MSB bytes are the first 8 bytes in this order [3,2,1,0,5,4,7,6]
+		long msb = ByteBuffer
+				.allocate(8)
+				.put(3, bytes[0])
+				.put(2, bytes[1])
+				.put(1, bytes[2])
+				.put(0, bytes[3])
+				.put(5, bytes[4])
+				.put(4, bytes[5])
+				.put(7, bytes[6])
+				.put(6, bytes[7])
+				.getLong();
+
+		// LSB are just the last 8 bytes in the same order
+		long lsb = ByteBuffer.wrap(bytes, 8, 8).getLong();
+
+		return new UUID(msb, lsb);
 	}
 
 	public String getUserAttributeIdentifier1() {
