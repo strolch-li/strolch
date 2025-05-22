@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 CREATE TABLE IF NOT EXISTS db_version (
   id SERIAL PRIMARY KEY,
   version varchar(255),

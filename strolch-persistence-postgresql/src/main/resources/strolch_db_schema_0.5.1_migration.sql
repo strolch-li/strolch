@@ -1,6 +1,3 @@
-
-CREATE TYPE order_state1 AS ENUM ('CREATED', 'PLANNING', 'PLANNED', 'EXECUTION', 'STOPPED', 'WARNING', 'ERROR', 'EXECUTED', 'CLOSED');
-
 /*
  * Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
  *
@@ -16,6 +13,8 @@ CREATE TYPE order_state1 AS ENUM ('CREATED', 'PLANNING', 'PLANNED', 'EXECUTION',
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+CREATE TYPE order_state1 AS ENUM ('CREATED', 'PLANNING', 'PLANNED', 'EXECUTION', 'STOPPED', 'WARNING', 'ERROR', 'EXECUTED', 'CLOSED');
 
 -- Convert to new type, casting via text representation
 ALTER TABLE orders 

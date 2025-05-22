@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 DROP TABLE IF EXISTS resources;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS activities;

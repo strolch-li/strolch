@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 CREATE TABLE IF NOT EXISTS archive_orders (
   id varchar(255) not null,
   version integer not null,

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'log_severity_type') THEN

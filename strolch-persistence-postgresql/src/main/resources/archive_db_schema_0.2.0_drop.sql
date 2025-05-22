@@ -14,5 +14,4 @@
  * limitations under the License.
  */
 
-
 DROP TABLE IF EXISTS archive_orders;
