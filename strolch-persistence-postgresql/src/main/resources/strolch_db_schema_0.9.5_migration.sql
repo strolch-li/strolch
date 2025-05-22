@@ -15,7 +15,16 @@
  */
 
 -- update primary keys
-ALTER TYPE access_type ADD VALUE IF NOT EXISTS 'EXECUTE';
+ALTER TABLE audits
+    ALTER COLUMN access_type TYPE VARCHAR(255);
+
+DROP TYPE IF EXISTS access_type;
+CREATE TYPE access_type AS ENUM ('READ', 'CREATE', 'UPDATE', 'DELETE', 'EXECUTE');
+
+ALTER TABLE audits
+    ALTER COLUMN access_type TYPE access_type
+    USING (access_type::access_type);
+
 ALTER TABLE audits ADD COLUMN additional_data json;
 
 INSERT INTO db_version

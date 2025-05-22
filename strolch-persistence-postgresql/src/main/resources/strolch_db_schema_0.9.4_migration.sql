@@ -15,7 +15,15 @@
  */
 
 -- update primary keys
-ALTER TYPE log_severity_type ADD VALUE IF NOT EXISTS 'System';
+ALTER TABLE operations_log
+    ALTER COLUMN severity TYPE VARCHAR(255);
+
+DROP TYPE IF EXISTS log_severity_type;
+CREATE TYPE log_severity_type AS ENUM ('Info', 'Notification', 'Warning', 'Error', 'Exception', 'System');
+
+ALTER TABLE operations_log
+    ALTER COLUMN severity TYPE log_severity_type
+    USING (severity::log_severity_type);
 
 INSERT INTO db_version
   (version, app, description, created)
