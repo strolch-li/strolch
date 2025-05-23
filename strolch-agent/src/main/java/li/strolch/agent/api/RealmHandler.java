@@ -33,7 +33,7 @@ public interface RealmHandler {
 	Set<String> getRealmNames();
 
 	/**
-	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constante
+	 * Returns the {@link StrolchRealm} with the given name. To get the default realm, use the constant
 	 * {@link StrolchConstants#DEFAULT_REALM}.
 	 *
 	 * @param realm the name of the {@link StrolchRealm} to return
