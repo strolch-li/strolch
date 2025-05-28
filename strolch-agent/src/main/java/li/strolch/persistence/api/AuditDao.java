@@ -19,24 +19,15 @@ import li.strolch.model.audit.Audit;
 import li.strolch.utils.collections.DateRange;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface AuditDao {
 
-	boolean hasElement(String type, Long id);
-
 	long querySize();
 
 	long querySize(DateRange dateRange);
-
-	long querySize(String type, DateRange dateRange);
-
-	Audit queryBy(String type, Long id);
-
-	Set<String> queryTypes();
 
 	List<Audit> queryAll(DateRange dateRange);
 
@@ -45,14 +36,4 @@ public interface AuditDao {
 	void save(Audit audit);
 
 	void saveAll(List<Audit> audits);
-
-	void update(Audit audit);
-
-	void updateAll(List<Audit> audits);
-
-	void remove(Audit audit);
-
-	void removeAll(List<Audit> audits);
-
-	long removeAll(String type, DateRange dateRange);
 }

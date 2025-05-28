@@ -37,11 +37,6 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public boolean hasAudit(StrolchTransaction tx, String type, Long id) {
-		return false;
-	}
-
-	@Override
 	public long querySize(StrolchTransaction tx) {
 		return 0;
 	}
@@ -49,21 +44,6 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	@Override
 	public long querySize(StrolchTransaction tx, DateRange dateRange) {
 		return 0;
-	}
-
-	@Override
-	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
-		return 0;
-	}
-
-	@Override
-	public Set<String> getTypes(StrolchTransaction tx) {
-		return Set.of();
-	}
-
-	@Override
-	public Audit getBy(StrolchTransaction tx, String type, Long id) {
-		return null;
 	}
 
 	@Override
@@ -78,36 +58,9 @@ public class NoStrategyAuditTrail implements AuditTrail {
 
 	@Override
 	public void add(StrolchTransaction tx, Audit audit) {
-		//
 	}
 
 	@Override
 	public void addAll(StrolchTransaction tx, List<Audit> audits) {
-		//
-	}
-
-	@Override
-	public void update(StrolchTransaction tx, Audit audit) {
-		//
-	}
-
-	@Override
-	public void updateAll(StrolchTransaction tx, List<Audit> audits) {
-		//
-	}
-
-	@Override
-	public void remove(StrolchTransaction tx, Audit audit) {
-		//
-	}
-
-	@Override
-	public void removeAll(StrolchTransaction tx, List<Audit> audits) {
-		//
-	}
-
-	@Override
-	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
-		return 0;
 	}
 }

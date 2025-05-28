@@ -35,17 +35,6 @@ public interface AuditTrail {
 	boolean isEnabled();
 
 	/**
-	 * Checks if an audit of the given type and ID exists in the audit trail.
-	 *
-	 * @param tx   the open transaction
-	 * @param type the type of the audit
-	 * @param id   the ID of the audit
-	 *
-	 * @return true if the audit exists, false otherwise
-	 */
-	boolean hasAudit(StrolchTransaction tx, String type, Long id);
-
-	/**
 	 * Queries the total number of audits in the audit trail.
 	 *
 	 * @param tx the open transaction
@@ -63,36 +52,6 @@ public interface AuditTrail {
 	 * @return the count of audits within the date range
 	 */
 	long querySize(StrolchTransaction tx, DateRange dateRange);
-
-	/**
-	 * Queries the number of audits of the specified type within the given date range.
-	 *
-	 * @param tx        the open transaction
-	 * @param type      the type of audits to filter
-	 * @param dateRange the date range to filter audits
-	 *
-	 * @return the count of audits of the specified type within the date range
-	 */
-	long querySize(StrolchTransaction tx, String type, DateRange dateRange);
-
-	/**
-	 * Retrieves all unique audit types available in the audit trail.
-	 *
-	 * @param tx the open transaction
-	 *
-	 * @return a set of all available audit types
-	 */
-	Set<String> getTypes(StrolchTransaction tx);
-
-	/**
-	 * Retrieves the audit with the given id, or null if it does not exist
-	 *
-	 * @param tx the open transaction
-	 * @param id the id of the element to retrieve
-	 *
-	 * @return the element with the type and id, or null if it does not exist
-	 */
-	Audit getBy(StrolchTransaction tx, String type, Long id);
 
 	/**
 	 * Retrieves all audits within the specified date range.
@@ -130,47 +89,4 @@ public interface AuditTrail {
 	 * @param audits the audits to add
 	 */
 	void addAll(StrolchTransaction tx, List<Audit> audits);
-
-	/**
-	 * Updates a single audit in the audit trail.
-	 *
-	 * @param tx    the open transaction
-	 * @param audit the audit to update
-	 */
-	void update(StrolchTransaction tx, Audit audit);
-
-	/**
-	 * Updates multiple audits in the audit trail.
-	 *
-	 * @param tx     the open transaction
-	 * @param audits the audits to update
-	 */
-	void updateAll(StrolchTransaction tx, List<Audit> audits);
-
-	/**
-	 * Removes a single audit from the audit trail.
-	 *
-	 * @param tx    the open transaction
-	 * @param audit the audit to remove
-	 */
-	void remove(StrolchTransaction tx, Audit audit);
-
-	/**
-	 * Removes multiple audits from the audit trail.
-	 *
-	 * @param tx     the open transaction
-	 * @param audits the audits to remove
-	 */
-	void removeAll(StrolchTransaction tx, List<Audit> audits);
-
-	/**
-	 * Removes all audits of a specified type within the given date range.
-	 *
-	 * @param tx        the open transaction
-	 * @param type      the type of audits to remove
-	 * @param dateRange the date range to filter audits for removal
-	 *
-	 * @return the number of audits removed
-	 */
-	long removeAll(StrolchTransaction tx, String type, DateRange dateRange);
 }

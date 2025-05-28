@@ -1521,13 +1521,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void update(Audit audit) {
-		assertNotReadOnly();
-		DBC.PRE.assertNotNull("audit must not be null", audit);
-		getAuditTrail().update(this, audit);
-	}
-
-	@Override
 	public synchronized void remove(Resource resource) throws StrolchException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
@@ -1555,13 +1548,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		if (this.activityCache != null) {
 			this.activityCache.removeElement(activity.getType(), activity.getId());
 		}
-	}
-
-	@Override
-	public void remove(Audit audit) {
-		assertNotReadOnly();
-		DBC.PRE.assertNotNull("audit must not be null", audit);
-		getAuditTrail().remove(this, audit);
 	}
 
 	private void addModelChangeCommands() {
@@ -2123,8 +2109,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			if (auditsForRead)
 				auditsForAudits(audits, AccessType.READ, auditingAuditMapFacade.getRead());
 			auditsForAudits(audits, AccessType.CREATE, auditingAuditMapFacade.getCreated());
-			auditsForAudits(audits, AccessType.UPDATE, auditingAuditMapFacade.getUpdated());
-			auditsForAudits(audits, AccessType.DELETE, auditingAuditMapFacade.getDeleted());
 		}
 
 		if (!audits.isEmpty())

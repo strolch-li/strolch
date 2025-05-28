@@ -50,7 +50,6 @@ import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
@@ -144,25 +143,5 @@ public class AuditsResource {
 
 		AuditToJsonVisitor toJsonVisitor = new AuditToJsonVisitor().withAdditionalData();
 		return ResponseUtil.toResponse(paging, toJsonVisitor::visitAudit);
-	}
-
-	@Operation(summary = "Get audit types", description = "Retrieves all available audit types.", responses = {
-			@ApiResponse(responseCode = "200", description = "List of audit types.",
-					content = @Content(mediaType = "application/json",
-							examples = @ExampleObject("[\"Type1\",\"Type2\"]"))),
-			@ApiResponse(responseCode = "500", description = "Internal server error.")})
-	@GET
-	@Path("{realm}/types")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response queryTypes(@Context HttpServletRequest request, @PathParam("realm") String realm) {
-		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
-
-		try (StrolchTransaction tx = openTx(cert, realm)) {
-			JsonArray dataJ = new JsonArray();
-			if (tx.isAuditTrailEnabled())
-				tx.getAuditTrail().getTypes(tx).forEach(dataJ::add);
-			return Response.ok(dataJ.toString(), MediaType.APPLICATION_JSON).build();
-		}
 	}
 }

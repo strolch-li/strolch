@@ -22,7 +22,9 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfMaps;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfMaps;
 
@@ -37,14 +39,6 @@ public class TransientAuditTrail implements AuditTrail {
 	@Override
 	public boolean isEnabled() {
 		return true;
-	}
-
-	@Override
-	public boolean hasAudit(StrolchTransaction tx, String type, Long id) {
-		Map<Long, Audit> byType = this.auditMap.getMap(type);
-		if (byType == null)
-			return false;
-		return byType.containsKey(id);
 	}
 
 	@Override
@@ -64,30 +58,6 @@ public class TransientAuditTrail implements AuditTrail {
 		}
 
 		return size;
-	}
-
-	@Override
-	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
-		Map<Long, Audit> byType = this.auditMap.getMap(type);
-		if (byType == null)
-			return 0L;
-
-		long size = 0L;
-		for (Audit audit : byType.values()) {
-			if (dateRange.contains(audit.getDate()))
-				size++;
-		}
-		return size;
-	}
-
-	@Override
-	public Set<String> getTypes(StrolchTransaction tx) {
-		return new HashSet<>(this.auditMap.keySet());
-	}
-
-	@Override
-	public Audit getBy(StrolchTransaction tx, String type, Long id) {
-		return this.auditMap.getElement(type, id);
 	}
 
 	@Override
@@ -125,50 +95,5 @@ public class TransientAuditTrail implements AuditTrail {
 		for (Audit audit : audits) {
 			this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
 		}
-	}
-
-	@Override
-	public void update(StrolchTransaction tx, Audit audit) {
-		this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
-	}
-
-	@Override
-	public void updateAll(StrolchTransaction tx, List<Audit> audits) {
-		for (Audit audit : audits) {
-			this.auditMap.addElement(audit.getElementType(), audit.getId(), audit);
-		}
-	}
-
-	@Override
-	public void remove(StrolchTransaction tx, Audit audit) {
-		this.auditMap.removeElement(audit.getElementType(), audit.getId());
-	}
-
-	@Override
-	public void removeAll(StrolchTransaction tx, List<Audit> audits) {
-		for (Audit audit : audits) {
-			this.auditMap.removeElement(audit.getElementType(), audit.getId());
-		}
-	}
-
-	@Override
-	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
-		Map<Long, Audit> byType = this.auditMap.getMap(type);
-		if (byType == null)
-			return 0L;
-
-		List<Audit> toRemoveList = new ArrayList<>();
-
-		for (Audit audit : byType.values()) {
-			if (dateRange.contains(audit.getDate())) {
-				toRemoveList.add(audit);
-			}
-		}
-
-		for (Audit toRemove : toRemoveList) {
-			this.auditMap.removeElement(type, toRemove.getId());
-		}
-
-		return toRemoveList.size();
 	}
 }

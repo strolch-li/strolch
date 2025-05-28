@@ -37,11 +37,6 @@ public class TransactionalAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public boolean hasAudit(StrolchTransaction tx, String type, Long id) {
-		return getDbDao(tx).hasElement(type, id);
-	}
-
-	@Override
 	public long querySize(StrolchTransaction tx) {
 		return getDbDao(tx).querySize();
 	}
@@ -49,21 +44,6 @@ public class TransactionalAuditTrail implements AuditTrail {
 	@Override
 	public long querySize(StrolchTransaction tx, DateRange dateRange) {
 		return getDbDao(tx).querySize(dateRange);
-	}
-
-	@Override
-	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
-		return getDbDao(tx).querySize(type, dateRange);
-	}
-
-	@Override
-	public Set<String> getTypes(StrolchTransaction tx) {
-		return getDbDao(tx).queryTypes();
-	}
-
-	@Override
-	public Audit getBy(StrolchTransaction tx, String type, Long id) {
-		return getDbDao(tx).queryBy(type, id);
 	}
 
 	@Override
@@ -84,30 +64,5 @@ public class TransactionalAuditTrail implements AuditTrail {
 	@Override
 	public synchronized void addAll(StrolchTransaction tx, List<Audit> audits) {
 		getDbDao(tx).saveAll(audits);
-	}
-
-	@Override
-	public synchronized void update(StrolchTransaction tx, Audit audit) {
-		getDbDao(tx).update(audit);
-	}
-
-	@Override
-	public synchronized void updateAll(StrolchTransaction tx, List<Audit> audits) {
-		getDbDao(tx).updateAll(audits);
-	}
-
-	@Override
-	public synchronized void remove(StrolchTransaction tx, Audit audit) {
-		getDbDao(tx).remove(audit);
-	}
-
-	@Override
-	public synchronized void removeAll(StrolchTransaction tx, List<Audit> audits) {
-		getDbDao(tx).removeAll(audits);
-	}
-
-	@Override
-	public synchronized long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
-		return getDbDao(tx).removeAll(type, dateRange);
 	}
 }

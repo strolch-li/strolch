@@ -22,7 +22,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.xmlpers.api.PersistenceContext;
 import li.strolch.xmlpers.api.PersistenceTransaction;
-import li.strolch.xmlpers.objref.IdOfSubTypeRef;
 import li.strolch.xmlpers.objref.SubTypeRef;
 import li.strolch.xmlpers.objref.TypeRef;
 
@@ -49,18 +48,8 @@ public class XmlAuditDao implements AuditDao {
 		return Tags.AUDIT;
 	}
 
-	protected IdOfSubTypeRef getIdRef(String type, Long id) {
-		return this.tx.getManager().getObjectRefCache().getIdOfSubTypeRef(getClassType(), type, id.toString());
-	}
-
 	protected SubTypeRef getTypeRef(String type) {
 		return this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), type);
-	}
-
-	@Override
-	public boolean hasElement(String type, Long id) {
-		IdOfSubTypeRef ref = getIdRef(type, id);
-		return this.tx.getObjectDao().hasElement(ref);
 	}
 
 	@Override
@@ -83,21 +72,14 @@ public class XmlAuditDao implements AuditDao {
 		return size;
 	}
 
-	@Override
-	public long querySize(String type, DateRange dateRange) {
+	private long querySize(String type, DateRange dateRange) {
 		Predicate<File> predicate = file -> dateRange.contains(new Date(file.lastModified()));
 		return this.tx.getMetadataDao().querySize(getTypeRef(type), predicate);
 	}
 
-	@Override
-	public Set<String> queryTypes() {
+	private Set<String> queryTypes() {
 		TypeRef typeRef = this.tx.getManager().getObjectRefCache().getTypeRef(getClassType());
 		return this.tx.getMetadataDao().queryTypeSet(typeRef);
-	}
-
-	@Override
-	public Audit queryBy(String type, Long id) {
-		return this.tx.getObjectDao().queryById(getIdRef(type, id));
 	}
 
 	@Override
@@ -133,47 +115,5 @@ public class XmlAuditDao implements AuditDao {
 					.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
 			this.tx.getFileDao().performCreate(ctx);
 		}
-	}
-
-	@Override
-	public void update(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx
-				.getObjectDao()
-				.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
-		this.tx.getFileDao().performUpdate(ctx);
-	}
-
-	@Override
-	public void updateAll(List<Audit> audits) {
-		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx
-					.getObjectDao()
-					.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
-			this.tx.getFileDao().performUpdate(ctx);
-		}
-	}
-
-	@Override
-	public void remove(Audit audit) {
-		PersistenceContext<Audit> ctx = this.tx
-				.getObjectDao()
-				.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
-		this.tx.getFileDao().performDelete(ctx);
-	}
-
-	@Override
-	public void removeAll(List<Audit> audits) {
-		for (Audit audit : audits) {
-			PersistenceContext<Audit> ctx = this.tx
-					.getObjectDao()
-					.createCtx(audit, audit.getDate().toInstant().toEpochMilli());
-			this.tx.getFileDao().performDelete(ctx);
-		}
-	}
-
-	@Override
-	public long removeAll(String type, DateRange dateRange) {
-		Predicate<File> predicate = file -> dateRange.contains(new Date(file.lastModified()));
-		return this.tx.getObjectDao().removeAllBy(getTypeRef(type), predicate);
 	}
 }

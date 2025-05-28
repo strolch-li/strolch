@@ -87,9 +87,6 @@ public class PrivilegeAddUserCommand extends Command {
 
 			if (this.userOut != null)
 				privilegeHandler.removeUser(tx().getCertificate(), this.userIn.getUsername());
-
-			if (this.audit != null)
-				tx().remove(this.audit);
 		}
 	}
 }

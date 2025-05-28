@@ -57,9 +57,6 @@ public class PrivilegeAddGroupService extends AbstractService<JsonServiceArgumen
 
 			Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, GROUP, newGroup.name());
 			tx.add(audit);
-			tx.update(audit);
-			tx.remove(audit);
-
 			tx.commitOnClose();
 		}
 

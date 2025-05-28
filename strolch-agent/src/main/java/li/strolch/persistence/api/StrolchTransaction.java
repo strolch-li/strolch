@@ -1711,15 +1711,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	void update(Activity activity) throws StrolchException;
 
 	/**
-	 * Updates the given {@link Audit}
-	 *
-	 * @param audit the audit to update
-	 *
-	 * @throws StrolchModelException if the audit is null
-	 */
-	void update(Audit audit);
-
-	/**
 	 * Removes the given {@link Resource}
 	 *
 	 * @param resource the resource to remove
@@ -1745,15 +1736,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException if the activity is null
 	 */
 	void remove(Activity activity) throws StrolchException;
-
-	/**
-	 * Removes the given {@link Audit}
-	 *
-	 * @param audit the audit Gto remove
-	 *
-	 * @throws StrolchModelException if the audit is null
-	 */
-	void remove(Audit audit);
 
 	/**
 	 * Return true if this transaction has any registered elements or commands for persistence. E.g. {@link #add(Order)}
