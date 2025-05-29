@@ -65,6 +65,11 @@
             <artifactId>cron</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.eclipse.store</groupId>
+            <artifactId>storage-embedded</artifactId>
+        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>

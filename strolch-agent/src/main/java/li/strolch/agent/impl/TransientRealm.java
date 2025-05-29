@@ -16,8 +16,6 @@
 package li.strolch.agent.impl;
 
 import li.strolch.agent.api.*;
-import li.strolch.model.ModelStatistics;
-import li.strolch.model.xml.XmlModelSaxFileReader;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
@@ -25,7 +23,6 @@ import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -109,28 +106,8 @@ public class TransientRealm extends InternalStrolchRealm {
 	public void start(PrivilegeContext privilegeContext) {
 		super.start(privilegeContext);
 
-		ModelStatistics statistics;
-		try (StrolchTransaction tx = openTx(privilegeContext.getCertificate(), "strolch_boot", false)) {
-			InMemoryElementListener elementListener = new InMemoryElementListener(tx);
-
-			// explicitly deny updating, so that we can detect XML files with duplicates
-			elementListener.setUpdateResources(false);
-			elementListener.setUpdateOrders(false);
-			elementListener.setUpdateActivities(false);
-			elementListener.setFailOnUpdate(true);
-
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(elementListener, this.modelFile, true,
-					this.verbose);
-			handler.parseFile();
-			statistics = handler.getStatistics();
-			tx.commitOnClose();
-		}
-
-		String durationS = StringHelper.formatNanoDuration(statistics.durationNanos);
-		logger.info("Loaded XML Model file {} for realm {} took {}.", this.modelFile.getName(), getRealm(), durationS);
-		logger.info("Loaded {} Orders", statistics.nrOfOrders);
-		logger.info("Loaded {} Resources", statistics.nrOfResources);
-		logger.info("Loaded {} Activities", statistics.nrOfActivities);
+		XmlModelLoader loader = new XmlModelLoader(getRealm(), verbose, this.modelFile);
+		loader.load(privilegeContext, this);
 	}
 
 	@Override

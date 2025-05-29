@@ -156,7 +156,7 @@ public class RuntimeMock implements AutoCloseable {
 	}
 
 	public void run(StrolchRunnable runnable) throws Exception {
-		runnable.run(getAgent());
+		runnable.run(this, getAgent());
 	}
 
 	@Override
@@ -199,6 +199,6 @@ public class RuntimeMock implements AutoCloseable {
 
 	public interface StrolchRunnable {
 
-		void run(StrolchAgent agent) throws Exception;
+		void run(RuntimeMock runtimeMock, StrolchAgent agent) throws Exception;
 	}
 }

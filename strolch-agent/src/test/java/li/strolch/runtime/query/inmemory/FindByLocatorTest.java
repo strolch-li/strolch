@@ -57,7 +57,7 @@ public class FindByLocatorTest {
 
 	@Test
 	public void shouldFindByResource() throws Exception {
-		runtimeMock.run(agent -> {
+		runtimeMock.run((_, agent) -> {
 			try (StrolchTransaction tx = agent
 					.getContainer()
 					.getRealm(StrolchConstants.DEFAULT_REALM)
@@ -91,7 +91,7 @@ public class FindByLocatorTest {
 
 	@Test
 	public void shouldFindByOrder() throws Exception {
-		runtimeMock.run(agent -> {
+		runtimeMock.run((_, agent) -> {
 			try (StrolchTransaction tx = agent
 					.getContainer()
 					.getRealm(StrolchConstants.DEFAULT_REALM)
@@ -118,7 +118,7 @@ public class FindByLocatorTest {
 
 	@Test
 	public void shouldFindByActivity() throws Exception {
-		runtimeMock.run(agent -> {
+		runtimeMock.run((_, agent) -> {
 			try (StrolchTransaction tx = agent
 					.getContainer()
 					.getRealm(StrolchConstants.DEFAULT_REALM)
@@ -144,7 +144,7 @@ public class FindByLocatorTest {
 
 	@Test
 	public void shouldFindByAction() throws Exception {
-		runtimeMock.run(agent -> {
+		runtimeMock.run((_, agent) -> {
 			try (StrolchTransaction tx = agent
 					.getContainer()
 					.getRealm(StrolchConstants.DEFAULT_REALM)

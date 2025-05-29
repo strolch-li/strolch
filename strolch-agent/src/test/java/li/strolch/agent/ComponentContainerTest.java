@@ -83,8 +83,8 @@ public class ComponentContainerTest {
 	@Test
 	public void shouldTestRealms() throws Exception {
 		try {
-			RuntimeMock.runInStrolch(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER, agent -> {
-				testContainer(agent);
+			RuntimeMock.runInStrolch(PATH_REALM_RUNTIME, PATH_REALM_CONTAINER, (mock, agent) -> {
+				testContainer(mock, agent);
 				testRealms(agent);
 			});
 		} catch (Exception e) {
@@ -96,7 +96,7 @@ public class ComponentContainerTest {
 	@Test
 	public void shouldTestMinimal() throws Exception {
 		try {
-			RuntimeMock.runInStrolch(PATH_REALM_RUNTIME, PATH_MINIMAL_CONTAINER, agent -> {
+			RuntimeMock.runInStrolch(PATH_REALM_RUNTIME, PATH_MINIMAL_CONTAINER, (_, agent) -> {
 				ComponentContainer container = agent.getContainer();
 				ServiceHandlerTest serviceHandler = container.getComponent(ServiceHandlerTest.class);
 				ServiceResultTest result = serviceHandler.doService();
@@ -108,7 +108,7 @@ public class ComponentContainerTest {
 		}
 	}
 
-	public static void testContainer(StrolchAgent agent) {
+	public static void testContainer(RuntimeMock mock, StrolchAgent agent) {
 
 		ComponentContainer container = agent.getContainer();
 

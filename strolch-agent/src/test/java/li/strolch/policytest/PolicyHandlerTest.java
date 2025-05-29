@@ -38,7 +38,7 @@ public class PolicyHandlerTest {
 	@Test
 	public void shouldInstantiatePolicies() throws Exception {
 
-		RuntimeMock.runInStrolch(PATH_EMPTY_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER, agent -> {
+		RuntimeMock.runInStrolch(PATH_EMPTY_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER, (_, agent) -> {
 
 			PolicyHandler policyHandler = agent.getContainer().getComponent(PolicyHandler.class);
 

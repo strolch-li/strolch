@@ -15,15 +15,8 @@
  */
 package li.strolch.agent.impl;
 
-import li.strolch.agent.api.ElementMap;
-import li.strolch.agent.api.StrolchAgent;
-import li.strolch.exception.StrolchElementNotFoundException;
-import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.Version;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringListParameter;
-import li.strolch.model.parameter.StringParameter;
 import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.persistence.api.StrolchTransaction;
 import org.slf4j.Logger;
@@ -31,15 +24,14 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static li.strolch.model.StrolchModelConstants.TEMPLATE;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public abstract class TransientElementMap<T extends StrolchRootElement> implements ElementMap<T> {
+public abstract class TransientElementMap<T extends StrolchRootElement> extends BaseElementMap<T> {
 
 	protected static final Logger logger = LoggerFactory.getLogger(TransientElementMap.class);
 
@@ -47,6 +39,11 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	public TransientElementMap() {
 		this.elementMap = new HashMap<>();
+	}
+
+	@Override
+	public DataStoreMode getDataStoreMode() {
+		return DataStoreMode.TRANSIENT;
 	}
 
 	@Override
@@ -62,10 +59,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized long querySize(StrolchTransaction tx) {
-		return this.elementMap.values().stream() //
-				.map(map -> map.size()) //
-				.mapToInt(Integer::valueOf) //
-				.sum();
+		return this.elementMap.values().stream().map(Map::size).mapToInt(Integer::valueOf).sum();
 	}
 
 	@Override
@@ -78,104 +72,11 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 	}
 
 	@Override
-	public synchronized T getTemplate(StrolchTransaction tx, String type) {
-		return getTemplate(tx, type, false);
-	}
-
-	@Override
-	public T getTemplate(StrolchTransaction tx, String type, boolean assertExists) {
-
-		T t = getBy(tx, TEMPLATE, type);
-		if (assertExists && t == null) {
-			String msg = "The template with type \"{0}\" does not exist!";
-			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type));
-		}
-
-		if (t == null)
-			return null;
-
-		@SuppressWarnings("unchecked") T clone = (T) t.getClone();
-		clone.setId(StrolchAgent.getUniqueId());
-		clone.setType(type);
-		return clone;
-	}
-
-	@Override
-	public synchronized T getBy(StrolchTransaction tx, String type, String id) {
-		return getBy(tx, type, id, false);
-	}
-
-	@Override
-	public T getBy(StrolchTransaction tx, String type, String id, boolean assertExists) throws StrolchException {
-
-		T t = null;
+	protected T _getBy(String type, String id) {
 		Map<String, T> byType = this.elementMap.get(type);
-		if (byType != null) {
-			t = byType.get(id);
-		}
-
-		if (assertExists && t == null) {
-			String msg = "The element with type \"{0}\" and id \"{1}\" does not exist!";
-			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type, id));
-		}
-
-		if (t == null)
+		if (byType == null)
 			return null;
-
-		if (tx.isReadOnly() && !type.equals(TEMPLATE))
-			return t;
-
-		@SuppressWarnings("unchecked") T clone = (T) t.getClone(true);
-		return clone;
-	}
-
-	@Override
-	public T getBy(StrolchTransaction tx, StringParameter refP, boolean assertExists) throws StrolchException {
-		assertIsRefParam(refP);
-		String type = refP.getUom();
-		String id = refP.getValue();
-		T t = getBy(tx, type, id, false);
-		if (assertExists && t == null) {
-			String msg = "The element with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\"";
-			throw new StrolchElementNotFoundException(MessageFormat.format(msg, type, id, refP.getLocator()));
-		}
-		return t;
-	}
-
-	@Override
-	public List<T> getBy(StrolchTransaction tx, StringListParameter refP, boolean assertExists)
-			throws StrolchException {
-		assertIsRefParam(refP);
-
-		String type = refP.getUom();
-		List<String> ids = refP.getValue();
-
-		return ids.stream() //
-				.map(id -> {
-					T t = getBy(tx, type, id, false);
-					if (assertExists && t == null) {
-						String msg = "The element with type \"{0}\" and id \"{1}\" does not exist for param \"{2}\"";
-						throw new StrolchElementNotFoundException(
-								MessageFormat.format(msg, type, id, refP.getLocator()));
-					}
-					return t;
-				}) //
-				.filter(Objects::nonNull) //
-				.collect(Collectors.toList());
-	}
-
-	@Override
-	public synchronized List<T> getAllElements(StrolchTransaction tx) {
-		Stream<T> stream = this.elementMap.values().stream() //
-				.flatMap(e -> e.values().stream());
-
-		if (tx.isReadOnly())
-			return stream.collect(Collectors.toList());
-
-		return stream.map(t -> {
-			@SuppressWarnings("unchecked") T clone = (T) t.getClone(true);
-			return clone;
-		}).collect(Collectors.toList());
+		return byType.get(id);
 	}
 
 	@Override
@@ -184,17 +85,13 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		if (byType == null)
 			return new ArrayList<>(0);
 
-		if (tx.isReadOnly() && !type.equals(TEMPLATE))
-			return new ArrayList<>(byType.values());
-
-		return byType.values().stream().map(t -> {
-			@SuppressWarnings("unchecked") T clone = (T) t.getClone(true);
-			return clone;
-		}).collect(Collectors.toList());
+		return _getElementsByType(tx, type, byType);
 	}
 
 	@Override
 	public synchronized Stream<T> stream(StrolchTransaction tx, String... types) {
+
+		// TODO XXX update this to use concatenated streams if possible
 
 		if (types.length == 0) {
 			List<T> elements = new ArrayList<>();
@@ -230,9 +127,7 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 	@Override
 	public synchronized Set<String> getAllKeys(StrolchTransaction tx) {
-		return this.elementMap.values().stream() //
-				.flatMap(map -> map.keySet().stream()) //
-				.collect(Collectors.toSet());
+		return this.elementMap.values().stream().flatMap(map -> map.keySet().stream()).collect(toSet());
 	}
 
 	@Override
@@ -240,7 +135,6 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)
 			return new HashSet<>(0);
-
 		return new HashSet<>(byType.keySet());
 	}
 
@@ -254,7 +148,8 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		elements.forEach(this::internalInsert);
 	}
 
-	private void internalInsert(T element) {
+	@Override
+	protected void internalInsert(T element) {
 		Map<String, T> byType = this.elementMap.computeIfAbsent(element.getType(), k -> new HashMap<>());
 
 		// assert no object already exists with this id
@@ -270,32 +165,11 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 		element.setReadOnly();
 	}
 
-	@Override
-	public synchronized void add(StrolchTransaction tx, T element) {
-		Version.updateVersionFor(element, 0, tx.getUsername(), false);
-		internalAdd(tx, element);
-	}
-
 	protected void internalAdd(StrolchTransaction tx, T element) {
 		if (!element.hasVersion())
 			Version.setInitialVersionFor(element, tx.getCertificate().getUsername());
 
 		internalInsert(element);
-	}
-
-	@Override
-	public synchronized void addAll(StrolchTransaction tx, List<T> elements) {
-		for (T element : elements) {
-			Version.updateVersionFor(element, 0, tx.getUsername(), false);
-			internalAdd(tx, element);
-		}
-	}
-
-	@Override
-	public synchronized void update(StrolchTransaction tx, T element) {
-		element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
-		Version.updateVersionFor(element, 0, tx.getUsername(), false);
-		internalUpdate(element);
 	}
 
 	protected void internalUpdate(T element) {
@@ -319,15 +193,6 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		// now make read only
 		element.setReadOnly();
-	}
-
-	@Override
-	public synchronized void updateAll(StrolchTransaction tx, List<T> elements) {
-		for (T element : elements) {
-			element.setVersion(getBy(tx, element.getType(), element.getId(), true).getVersion());
-			Version.updateVersionFor(element, 0, tx.getUsername(), false);
-			internalUpdate(element);
-		}
 	}
 
 	@Override
@@ -380,42 +245,4 @@ public abstract class TransientElementMap<T extends StrolchRootElement> implemen
 
 		return removed;
 	}
-
-	@Override
-	public T getBy(StrolchTransaction tx, String type, String id, int version) {
-		return getBy(tx, type, id, version, false);
-	}
-
-	@Override
-	public T getBy(StrolchTransaction tx, String type, String id, int version, boolean assertExists)
-			throws StrolchException {
-		throw new IllegalStateException("Transient mode does not support versioning");
-	}
-
-	@Override
-	public List<T> getVersionsFor(StrolchTransaction tx, String type, String id) {
-		throw new IllegalStateException("Transient mode does not support versioning");
-	}
-
-	@Override
-	public int getLatestVersionFor(StrolchTransaction tx, String type, String id) {
-		throw new IllegalStateException("Transient mode does not support versioning");
-	}
-
-	@Override
-	public T revertToVersion(StrolchTransaction tx, T element) throws StrolchException {
-		throw new IllegalStateException("Transient mode does not support versioning");
-	}
-
-	@Override
-	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException {
-		throw new IllegalStateException("Transient mode does not support versioning");
-	}
-
-	@Override
-	public T undoVersion(StrolchTransaction tx, T element) throws StrolchException {
-		throw new IllegalStateException("Transient mode does not support versioning");
-	}
-
-	protected abstract void assertIsRefParam(Parameter<?> refP);
 }

@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.impl;
 
+import li.strolch.agent.impl.eclipsestorage.EclipseStorageRealm;
+
 import java.text.MessageFormat;
 
 /**
@@ -31,7 +33,7 @@ public enum DataStoreMode {
 		public InternalStrolchRealm createRealm(String realm) {
 			return new EmptyRealm(realm);
 		}
-	}, //
+	},
 	TRANSIENT {
 		@Override
 		public boolean isTransient() {
@@ -42,7 +44,7 @@ public enum DataStoreMode {
 		public InternalStrolchRealm createRealm(String realm) {
 			return new TransientRealm(realm);
 		}
-	}, //
+	},
 	CACHED {
 		@Override
 		public boolean isTransient() {
@@ -53,7 +55,18 @@ public enum DataStoreMode {
 		public InternalStrolchRealm createRealm(String realm) {
 			return new CachedRealm(realm);
 		}
-	}; //
+	},
+	ECLIPSE_STORAGE {
+		@Override
+		public boolean isTransient() {
+			return false;
+		}
+
+		@Override
+		public InternalStrolchRealm createRealm(String realm) {
+			return new EclipseStorageRealm(realm);
+		}
+	};
 
 	public abstract InternalStrolchRealm createRealm(String realm);
 

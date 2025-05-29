@@ -39,6 +39,11 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		this.realm = realm;
 	}
 
+	@Override
+	public DataStoreMode getDataStoreMode() {
+		return DataStoreMode.CACHED;
+	}
+
 	protected abstract StrolchDao<T> getDbDao(StrolchTransaction tx);
 
 	@Override

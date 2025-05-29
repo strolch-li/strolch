@@ -68,6 +68,11 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 		this.observeAccessReads = observeAccessReads;
 	}
 
+	@Override
+	public DataStoreMode getDataStoreMode() {
+		return this.elementMap.getDataStoreMode();
+	}
+
 	protected ElementMap<T> getElementMap() {
 		return elementMap;
 	}
