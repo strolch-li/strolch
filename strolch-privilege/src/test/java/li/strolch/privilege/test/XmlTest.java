@@ -191,7 +191,7 @@ public class XmlTest {
 		File xmlFile = new File(SRC_TEST + "PrivilegeUsers.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
-		Map<String, User> users = xmlHandler.getUsers();
+		Map<String, User> users = xmlHandler.getUsersByUsername();
 		assertNotNull(users);
 
 		assertEquals(4, users.size());
@@ -220,7 +220,7 @@ public class XmlTest {
 
 		// system_admin
 		User systemAdmin = findUser("system_admin", users);
-		assertEquals("2", systemAdmin.getUserId());
+		assertEquals("3", systemAdmin.getUserId());
 		assertEquals("system_admin", systemAdmin.getUsername());
 		assertNull(systemAdmin.getPasswordCrypt());
 		assertEquals("System User", systemAdmin.getFirstname());
@@ -233,7 +233,7 @@ public class XmlTest {
 
 		// admin2
 		User admin2 = findUser("admin2", users);
-		assertEquals("1", admin2.getUserId());
+		assertEquals("2", admin2.getUserId());
 		assertEquals("admin2", admin2.getUsername());
 		assertEquals("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
 				toHexString(admin2.getPasswordCrypt().password()));
@@ -451,7 +451,7 @@ public class XmlTest {
 		PrivilegeUsersSaxReader xmlHandler = new PrivilegeUsersSaxReader(true, true);
 		XmlHelper.parseDocument(modelFile, xmlHandler);
 
-		Map<String, User> parsedUsers = xmlHandler.getUsers();
+		Map<String, User> parsedUsers = xmlHandler.getUsersByUsername();
 		assertNotNull(parsedUsers);
 		assertEquals(2, parsedUsers.size());
 

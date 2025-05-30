@@ -35,7 +35,7 @@
         </Properties>
     </User>
 
-    <User userId="1" username="admin2" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+    <User userId="2" username="admin2" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
         <Firstname>Application</Firstname>
         <Lastname>Administrator</Lastname>
         <State>ENABLED</State>
@@ -52,7 +52,7 @@
         </Properties>
     </User>
 
-    <User userId="2" username="system_admin">
+    <User userId="3" username="system_admin">
         <Firstname>System User</Firstname>
         <Lastname>Administrator</Lastname>
         <State>SYSTEM</State>
@@ -62,7 +62,7 @@
         </Roles>
     </User>
 
-    <User userId="3" username="system_admin2">
+    <User userId="4" username="system_admin2">
         <Firstname>System User</Firstname>
         <Lastname>Administrator</Lastname>
         <State>SYSTEM</State>

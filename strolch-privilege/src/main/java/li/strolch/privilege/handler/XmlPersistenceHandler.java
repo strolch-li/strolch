@@ -362,7 +362,13 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		// USERS
 		synchronized (this) {
 			this.usersByUsername.clear();
-			usersXmlHandler.getUsers().forEach((username, user) -> {
+			this.usersById.clear();
+			usersXmlHandler.getUsersByUsername().forEach((username, user) -> {
+				// validate that user does not already exist
+				if (this.usersByUsername.containsKey(username))
+					throw new IllegalStateException(format("The user with username {0} already exists!", username));
+				if (this.usersById.containsKey(user.getUserId()))
+					throw new IllegalStateException(format("The user with user ID {0} already exists!", user.getUserId()));
 				this.usersByUsername.put(username, user);
 				this.usersById.put(user.getUserId(), user);
 			});
