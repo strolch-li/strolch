@@ -34,12 +34,16 @@
             <impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
             <depends>PrivilegeHandler</depends>
             <Properties>
+                <allowDataInitOnSchemaCreate>true</allowDataInitOnSchemaCreate>
+
                 <realms>defaultRealm, myRealm, otherRealm, emptyRealm, eclipseStorage</realms>
                 <dataStoreMode>TRANSIENT</dataStoreMode>
                 <dataStoreFile>DefaultRealm.xml</dataStoreFile>
                 <enableAuditTrail>true</enableAuditTrail>
+
                 <dataStoreMode.myRealm>TRANSIENT</dataStoreMode.myRealm>
                 <dataStoreFile.myRealm>MyRealm.xml</dataStoreFile.myRealm>
+
                 <dataStoreMode.otherRealm>TRANSIENT</dataStoreMode.otherRealm>
                 <dataStoreFile.otherRealm>OtherRealm.xml</dataStoreFile.otherRealm>
                 <dataStoreMode.emptyRealm>EMPTY</dataStoreMode.emptyRealm>

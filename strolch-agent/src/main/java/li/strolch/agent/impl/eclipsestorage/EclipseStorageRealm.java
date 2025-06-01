@@ -21,11 +21,9 @@ import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.agent.impl.InternalStrolchRealm;
 import li.strolch.agent.impl.TransientTransaction;
 import li.strolch.agent.impl.XmlModelLoader;
-import li.strolch.model.Tags;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
-import li.strolch.runtime.StrolchConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.dbc.DBC;
@@ -44,6 +42,7 @@ import java.text.MessageFormat;
 
 import static java.lang.System.currentTimeMillis;
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
+import static li.strolch.db.DbConstants.PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE;
 import static li.strolch.model.Tags.*;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
@@ -61,6 +60,7 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 	private EclipseStorageAuditTrail auditTrail;
 	private boolean verbose;
 	private File modelFile;
+	private boolean allowDataInitOnSchemaCreate;
 
 	public EclipseStorageRealm(String realm) {
 		super(realm);
@@ -99,26 +99,29 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 	}
 
 	@Override
-	public void initialize(ComponentContainer container, ComponentConfiguration configuration) {
-		super.initialize(container, configuration);
+	public void initialize(ComponentContainer container, ComponentConfiguration config) {
+		super.initialize(container, config);
 
-		this.verbose = configuration.isVerbose();
-
-		String dataStoreFile = StrolchConstants.makeRealmKey(getRealm(), PREFIX_DATA_STORE_FILE);
-		if (!configuration.hasProperty(dataStoreFile)) {
-			String msg = "There is no data store file for realm {0}. Set a property with key {1}";
-			msg = MessageFormat.format(msg, getRealm(), dataStoreFile);
-			throw new StrolchConfigurationException(msg);
+		this.verbose = config.isVerbose();
+		this.allowDataInitOnSchemaCreate = config.getBoolean(PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE, false);
+		if (this.allowDataInitOnSchemaCreate) {
+			String dataStoreFile = makeRealmKey(getRealm(), PREFIX_DATA_STORE_FILE);
+			if (!config.hasProperty(dataStoreFile)) {
+				String msg
+						= "There is no data store file for realm {0}. Set a property with key {1} when allowing to init data on schema creation";
+				msg = MessageFormat.format(msg, getRealm(), dataStoreFile);
+				throw new StrolchConfigurationException(msg);
+			}
+			this.modelFile = config.getDataFile(dataStoreFile, null, config.getRuntimeConfiguration(), true);
 		}
-		this.modelFile = configuration.getDataFile(dataStoreFile, null, configuration.getRuntimeConfiguration(), true);
 
 		String dbStoreKey = makeRealmKey(getRealm(), PROP_DB_STORE);
-		if (!configuration.hasProperty(dbStoreKey)) {
+		if (!config.hasProperty(dbStoreKey)) {
 			String msg = "There is no property {0} for realm {1}. Set a property with key {2}";
 			msg = MessageFormat.format(msg, PROP_DB_STORE, getRealm(), dbStoreKey);
 			throw new StrolchConfigurationException(msg);
 		}
-		this.storageDir = configuration.getDataDir(dbStoreKey, null, configuration.getRuntimeConfiguration(), false);
+		this.storageDir = config.getDataDir(dbStoreKey, null, config.getRuntimeConfiguration(), false);
 		if (!this.storageDir.exists()) {
 			try {
 				Files.createDirectory(this.storageDir.toPath());
@@ -170,34 +173,49 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 		}
 
 		if (this.resourceMap.getStorageManager().root() == null) {
-			try {
-				logger.info("First load of storage, thus loading the model from {}", this.modelFile.getName());
-				startStep = currentTimeMillis();
-				this.resourceMap.initStorageManager();
-				this.orderMap.initStorageManager();
-				this.activityMap.initStorageManager();
-				this.auditTrail.initStorageManager();
-				logger.info("Stored initial storages in {}",
-						formatMillisecondsDuration(currentTimeMillis() - startStep));
-
-				startStep = currentTimeMillis();
-				XmlModelLoader loader = new XmlModelLoader(getRealm(), this.verbose, this.modelFile);
-				loader.load(privilegeContext, this);
-				logger.info("Loaded model into storage in {}",
-						formatMillisecondsDuration(currentTimeMillis() - startStep));
-
-				this.resourceMap.storeRoot();
-				this.orderMap.storeRoot();
-				this.activityMap.storeRoot();
-				this.auditTrail.storeRoot();
-			} catch (Exception e) {
-				throw new IllegalStateException(
-						"Failed to load model from " + this.modelFile.getName() + " for realm " + getRealm(), e);
+			if (!this.allowDataInitOnSchemaCreate) {
+				logger.info("First load of storage, but data init not allowed thus only initializing");
+				initializeStorageManager();
+				storeRoot();
+			} else {
+				try {
+					logger.info("First load of storage, thus loading the model from {}", this.modelFile.getName());
+					initializeStorageManager();
+					loadModelIntoStorage(privilegeContext);
+					storeRoot();
+				} catch (Exception e) {
+					throw new IllegalStateException(
+							"Failed to load model from " + this.modelFile.getName() + " for realm " + getRealm(), e);
+				}
 			}
 		}
 
 		logger.info("Initialized Eclipse Storage for realm {} in {}", getRealm(),
 				formatMillisecondsDuration(currentTimeMillis() - start));
+	}
+
+	private void loadModelIntoStorage(PrivilegeContext privilegeContext) {
+		long startStep;
+		startStep = currentTimeMillis();
+		XmlModelLoader loader = new XmlModelLoader(getRealm(), this.verbose, this.modelFile);
+		loader.load(privilegeContext, this);
+		logger.info("Loaded model into storage in {}", formatMillisecondsDuration(currentTimeMillis() - startStep));
+	}
+
+	private void storeRoot() {
+		this.resourceMap.storeRoot();
+		this.orderMap.storeRoot();
+		this.activityMap.storeRoot();
+		this.auditTrail.storeRoot();
+	}
+
+	private void initializeStorageManager() {
+		long startStep = currentTimeMillis();
+		this.resourceMap.initStorageManager();
+		this.orderMap.initStorageManager();
+		this.activityMap.initStorageManager();
+		this.auditTrail.initStorageManager();
+		logger.info("Stored initial storages in {}", formatMillisecondsDuration(currentTimeMillis() - startStep));
 	}
 
 	private EmbeddedStorageFoundation<?> buildFoundation(String databaseName) {
