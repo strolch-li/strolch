@@ -119,8 +119,6 @@ public class DefaultObserverHandler implements ObserverHandler {
 			} catch (InterruptedException e) {
 				if (this.run)
 					logger.error("Failed to do updates!", e);
-				else
-					logger.warn("Interrupted!");
 				Thread.currentThread().interrupt();
 			}
 		}
