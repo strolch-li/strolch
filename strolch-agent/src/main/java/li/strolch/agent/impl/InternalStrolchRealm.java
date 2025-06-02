@@ -19,11 +19,13 @@ import li.strolch.agent.api.*;
 import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.runtime.configuration.StrolchConfigurationException;
 import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 import static li.strolch.agent.impl.DefaultRealmHandler.*;
@@ -52,10 +54,16 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 
 	protected ComponentContainer container;
 	private long txLoggingThresholdMs;
+	private ComponentState state;
 
 	public InternalStrolchRealm(String realm) {
 		DBC.PRE.assertNotEmpty("RealmName may not be empty!", realm);
 		this.realm = realm;
+	}
+
+	@Override
+	public ComponentState getState() {
+		return this.state;
 	}
 
 	@Override
@@ -153,6 +161,8 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 			logger.info("Versioning not enabled for realm {}", getRealm());
 
 		logger.info("Using a locking try timeout of {}s", timeUnit.toSeconds(time));
+
+		this.state = ComponentState.INITIALIZED;
 	}
 
 	@Override
@@ -208,6 +218,8 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 			this.lockHandler.start();
 		if (this.observerHandler != null)
 			this.observerHandler.start();
+
+		this.state = ComponentState.STARTED;
 	}
 
 	public void stop() {
@@ -216,9 +228,13 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 			this.lockHandler.stop();
 		if (this.observerHandler != null)
 			this.observerHandler.stop();
+
+		this.state = ComponentState.INITIALIZED;
 	}
 
-	public abstract void destroy();
+	public void destroy() {
+		this.state = ComponentState.DESTROYED;
+	}
 
 	public abstract ResourceMap getResourceMap();
 
@@ -227,4 +243,12 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	public abstract ActivityMap getActivityMap();
 
 	public abstract AuditTrail getAuditTrail();
+
+	protected void assertKeyExists(ComponentConfiguration config, String enableBackupKey, String propEnableBackup) {
+		if (!config.hasProperty(enableBackupKey)) {
+			String msg = "There is no property {0} for realm {1}. Set a property with key {2}";
+			msg = MessageFormat.format(msg, propEnableBackup, getRealm(), enableBackupKey);
+			throw new StrolchConfigurationException(msg);
+		}
+	}
 }

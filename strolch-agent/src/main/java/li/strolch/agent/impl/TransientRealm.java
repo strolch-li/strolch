@@ -53,6 +53,7 @@ public class TransientRealm extends InternalStrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
+		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		//noinspection resource
 		return new TransientTransaction(this.container, this, certificate, action, readOnly).suppressAuditsForAudits();
@@ -108,10 +109,5 @@ public class TransientRealm extends InternalStrolchRealm {
 
 		XmlModelLoader loader = new XmlModelLoader(getRealm(), verbose, this.modelFile);
 		loader.load(privilegeContext, this);
-	}
-
-	@Override
-	public void destroy() {
-		// 
 	}
 }

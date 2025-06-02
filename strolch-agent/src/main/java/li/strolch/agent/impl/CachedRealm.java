@@ -17,6 +17,7 @@ package li.strolch.agent.impl;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.agent.api.ComponentContainer;
+import li.strolch.agent.api.ComponentState;
 import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
@@ -46,6 +47,7 @@ public class CachedRealm extends InternalStrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
+		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		return this.persistenceHandler.openTx(this, certificate, action, readOnly).suppressAuditsForAudits();
 	}
@@ -86,10 +88,5 @@ public class CachedRealm extends InternalStrolchRealm {
 	public void start(PrivilegeContext privilegeContext) {
 		super.start(privilegeContext);
 		new CachedRealmLoader(this, this.persistenceHandler, privilegeContext).load(getRealm());
-	}
-
-	@Override
-	public void destroy() {
-		// 
 	}
 }

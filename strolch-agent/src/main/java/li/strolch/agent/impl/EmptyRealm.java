@@ -43,6 +43,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
+		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		return new TransientTransaction(this.container, this, certificate, action, readOnly);
 	}
@@ -90,10 +91,5 @@ public class EmptyRealm extends InternalStrolchRealm {
 	public void start(PrivilegeContext privilegeContext) {
 		super.start(privilegeContext);
 		logger.info("Initialized EMPTY Realm {}", getRealm());
-	}
-
-	@Override
-	public void destroy() {
-		// 
 	}
 }

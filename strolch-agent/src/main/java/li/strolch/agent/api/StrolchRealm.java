@@ -45,6 +45,13 @@ import li.strolch.utils.concurrent.ElementLockingHandler;
 public interface StrolchRealm {
 
 	/**
+	 * Retrieves the current state of the component.
+	 *
+	 * @return the current {@link ComponentState} of the component
+	 */
+	ComponentState getState();
+
+	/**
 	 * Returns the name of the realm
 	 *
 	 * @return the name of the realm
