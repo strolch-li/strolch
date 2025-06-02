@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package li.strolch.agent.impl.eclipsestorage;
+package li.strolch.agent.impl.eclipsestore;
 
 import li.strolch.agent.api.ActivityMap;
 import li.strolch.agent.impl.ElementMapHelpers;
@@ -25,9 +25,9 @@ import org.eclipse.store.storage.types.StorageManager;
 
 import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ACTIVITY_REF;
 
-public class EclipseStorageActivityMap extends EclipseStorageElementMap<Activity> implements ActivityMap {
+public class EclipseStoreActivityMap extends EclipseStoreElementMap<Activity> implements ActivityMap {
 
-	public EclipseStorageActivityMap(String realm, StorageManager storageManager) {
+	public EclipseStoreActivityMap(String realm, StorageManager storageManager) {
 		super(realm, Tags.ACTIVITY, storageManager);
 	}
 

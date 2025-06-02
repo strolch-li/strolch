@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package li.strolch.agent.impl.eclipsestorage;
+package li.strolch.agent.impl.eclipsestore;
 
 import li.strolch.model.audit.Audit;
 import li.strolch.utils.collections.DateRange;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 
-public class EclipseStorageAuditRoot {
+public class EclipseStoreAuditRoot {
 
 	private final HashMap<Integer, AuditsYear> years = new HashMap<>();
 

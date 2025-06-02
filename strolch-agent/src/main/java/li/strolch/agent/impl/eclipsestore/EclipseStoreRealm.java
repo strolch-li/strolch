@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package li.strolch.agent.impl.eclipsestorage;
+package li.strolch.agent.impl.eclipsestore;
 
 import li.strolch.agent.api.*;
 import li.strolch.agent.impl.DataStoreMode;
@@ -38,37 +38,39 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 
 import static java.lang.System.currentTimeMillis;
+import static java.text.MessageFormat.format;
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
 import static li.strolch.db.DbConstants.PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE;
 import static li.strolch.model.Tags.*;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
-public class EclipseStorageRealm extends InternalStrolchRealm {
+public class EclipseStoreRealm extends InternalStrolchRealm {
 
 	public static final String PROP_DB_STORE = "dbStore";
+	public static final String PROP_ENABLE_BACKUP = "enableBackup";
 	public static final String BACKUP = "Backup";
 
 	private File storageDir;
 
-	private EclipseStorageResourceMap resourceMap;
-	private EclipseStorageOrderMap orderMap;
-	private EclipseStorageActivityMap activityMap;
-	private EclipseStorageAuditTrail auditTrail;
+	private EclipseStoreResourceMap resourceMap;
+	private EclipseStoreOrderMap orderMap;
+	private EclipseStoreActivityMap activityMap;
+	private EclipseStoreAuditTrail auditTrail;
 	private boolean verbose;
 	private File modelFile;
 	private boolean allowDataInitOnSchemaCreate;
+	private boolean enableBackup;
 
-	public EclipseStorageRealm(String realm) {
+	public EclipseStoreRealm(String realm) {
 		super(realm);
 	}
 
 	@Override
 	public DataStoreMode getMode() {
-		return DataStoreMode.ECLIPSE_STORAGE;
+		return DataStoreMode.ECLIPSE_STORE;
 	}
 
 	@Override
@@ -93,6 +95,7 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
+		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		//noinspection resource
 		return new TransientTransaction(this.container, this, certificate, action, readOnly).suppressAuditsForAudits();
@@ -109,18 +112,17 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 			if (!config.hasProperty(dataStoreFile)) {
 				String msg
 						= "There is no data store file for realm {0}. Set a property with key {1} when allowing to init data on schema creation";
-				msg = MessageFormat.format(msg, getRealm(), dataStoreFile);
+				msg = format(msg, getRealm(), dataStoreFile);
 				throw new StrolchConfigurationException(msg);
 			}
 			this.modelFile = config.getDataFile(dataStoreFile, null, config.getRuntimeConfiguration(), true);
 		}
 
+		String enableBackupKey = makeRealmKey(getRealm(), PROP_ENABLE_BACKUP);
+		this.enableBackup = config.getBoolean(enableBackupKey, false);
+
 		String dbStoreKey = makeRealmKey(getRealm(), PROP_DB_STORE);
-		if (!config.hasProperty(dbStoreKey)) {
-			String msg = "There is no property {0} for realm {1}. Set a property with key {2}";
-			msg = MessageFormat.format(msg, PROP_DB_STORE, getRealm(), dbStoreKey);
-			throw new StrolchConfigurationException(msg);
-		}
+		assertKeyExists(config, dbStoreKey, PROP_DB_STORE);
 		this.storageDir = config.getDataDir(dbStoreKey, null, config.getRuntimeConfiguration(), false);
 		if (!this.storageDir.exists()) {
 			try {
@@ -137,30 +139,31 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 		super.start(privilegeContext);
 
 		long start = currentTimeMillis();
-		logger.info("Initializing Eclipse Storage Realm {}...", getRealm());
+		logger.info("Initializing Eclipse Store Realm {} using storage directory {}...", getRealm(), this.storageDir);
 
 		long startStep;
 		try {
 			startStep = currentTimeMillis();
-			this.resourceMap = new EclipseStorageResourceMap(getRealm(),
-					buildFoundation(RESOURCE).createEmbeddedStorageManager());
+			EmbeddedStorageFoundation<?> foundation = buildFoundation(RESOURCE);
+			this.resourceMap = new EclipseStoreResourceMap(getRealm(), foundation.createEmbeddedStorageManager());
 			logger.info("Initialized Resource Storage in {}",
 					formatMillisecondsDuration(currentTimeMillis() - startStep));
 			startStep = currentTimeMillis();
-			this.orderMap = new EclipseStorageOrderMap(getRealm(),
-					buildFoundation(ORDER).createEmbeddedStorageManager());
+			this.orderMap = new EclipseStoreOrderMap(getRealm(), buildFoundation(ORDER).createEmbeddedStorageManager());
 			logger.info("Initialized Order Storage in {}", formatMillisecondsDuration(currentTimeMillis() - startStep));
 			startStep = currentTimeMillis();
-			this.activityMap = new EclipseStorageActivityMap(getRealm(),
+			this.activityMap = new EclipseStoreActivityMap(getRealm(),
 					buildFoundation(ACTIVITY).createEmbeddedStorageManager());
 			logger.info("Initialized Activity Storage in {}",
 					formatMillisecondsDuration(currentTimeMillis() - startStep));
 			startStep = currentTimeMillis();
-			this.auditTrail = new EclipseStorageAuditTrail(getRealm(),
+			this.auditTrail = new EclipseStoreAuditTrail(getRealm(),
 					buildFoundation(AUDIT).createEmbeddedStorageManager());
 			logger.info("Initialized Audit Storage in {}", formatMillisecondsDuration(currentTimeMillis() - startStep));
 		} catch (Exception e) {
-			throw new IllegalStateException("Failed to configure storages for realm " + getRealm(), e);
+			throw new IllegalStateException(
+					format("Failed to configure storages for realm {0} in storage directory {1}", getRealm(),
+							this.storageDir.getAbsolutePath()), e);
 		}
 
 		try {
@@ -190,7 +193,7 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 			}
 		}
 
-		logger.info("Initialized Eclipse Storage for realm {} in {}", getRealm(),
+		logger.info("Initialized Eclipse Store for realm {} in {}", getRealm(),
 				formatMillisecondsDuration(currentTimeMillis() - start));
 	}
 
@@ -220,26 +223,30 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 
 	private EmbeddedStorageFoundation<?> buildFoundation(String databaseName) {
 		Path databasePath = new File(this.storageDir, databaseName).toPath();
-		Path backupPath = new File(this.storageDir, databaseName + BACKUP).toPath();
-
 		NioFileSystem fileSystem = NioFileSystem.New();
+
+		int channelCount = 2;
+		StorageConfiguration.Builder<?> storageConfigurationBuilder = StorageConfiguration
+				.Builder()
+				.setStorageFileProvider(Storage
+						.FileProviderBuilder(fileSystem)
+						.setDirectory(fileSystem.ensureDirectory(databasePath))
+						.createFileProvider())
+				.setChannelCountProvider(StorageChannelCountProvider.New(channelCount));
+
+		if (this.enableBackup) {
+			Path backupPath = new File(this.storageDir, databaseName + BACKUP).toPath();
+			storageConfigurationBuilder.setBackupSetup(StorageBackupSetup.New(fileSystem.ensureDirectory(backupPath)));
+		}
+
 		return EmbeddedStorageFoundation
 				.New()
 				.setDataBaseName(databaseName)
-				.setConfiguration(StorageConfiguration
-						.Builder()
-						.setStorageFileProvider(Storage
-								.FileProviderBuilder(fileSystem)
-								.setDirectory(fileSystem.ensureDirectory(databasePath))
-								.createFileProvider())
-						.setChannelCountProvider(StorageChannelCountProvider.New(4))
-						.setBackupSetup(StorageBackupSetup.New(fileSystem.ensureDirectory(backupPath)))
-						.createConfiguration());
+				.setConfiguration(storageConfigurationBuilder.createConfiguration());
 	}
 
 	@Override
 	public void stop() {
-
 		try {
 			if (this.resourceMap != null)
 				this.resourceMap.stop();
@@ -250,7 +257,7 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 			if (this.auditTrail != null)
 				this.auditTrail.stop();
 		} catch (Exception e) {
-			throw new IllegalStateException("Failed to stop storages for realm " + getRealm(), e);
+			logger.error("Failed to stop storages for realm {}", getRealm(), e);
 		}
 
 		super.stop();
@@ -258,9 +265,19 @@ public class EclipseStorageRealm extends InternalStrolchRealm {
 
 	@Override
 	public void destroy() {
-		this.resourceMap.destroy();
-		this.orderMap.destroy();
-		this.activityMap.destroy();
-		this.auditTrail.destroy();
+		try {
+			if (this.resourceMap != null)
+				this.resourceMap.destroy();
+			if (this.orderMap != null)
+				this.orderMap.destroy();
+			if (this.activityMap != null)
+				this.activityMap.destroy();
+			if (this.auditTrail != null)
+				this.auditTrail.destroy();
+		} catch (Exception e) {
+			logger.error("Failed to destroy storages for realm {}", getRealm(), e);
+		}
+
+		super.destroy();
 	}
 }

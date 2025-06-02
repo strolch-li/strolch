@@ -21,9 +21,10 @@ import li.strolch.utils.helper.SystemHelper;
 import org.eclipse.serializer.collections.lazy.LazyHashMap;
 import org.eclipse.serializer.reference.Lazy;
 import org.eclipse.serializer.reference.Referencing;
-import org.eclipse.store.storage.embedded.types.EmbeddedStorage;
+import org.eclipse.store.afs.nio.types.NioFileSystem;
+import org.eclipse.store.storage.embedded.types.EmbeddedStorageFoundation;
 import org.eclipse.store.storage.embedded.types.EmbeddedStorageManager;
-import org.eclipse.store.storage.types.StorageManager;
+import org.eclipse.store.storage.types.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -31,7 +32,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Paths;
+import java.io.File;
+import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -43,11 +45,12 @@ import static li.strolch.model.ModelGenerator.createResource;
 import static li.strolch.utils.helper.StringHelper.generateId;
 import static org.junit.Assert.assertEquals;
 
-@Ignore("Test on how to use Eclipse Storage")
+@Ignore("Test on how to use EclipseStore")
 public class EclipseStoreTest {
 
 	private static final Logger log = LoggerFactory.getLogger(EclipseStoreTest.class);
 	public static final int DATA_SIZE = 3000;
+	public static final String STORAGE_PATH = "target/" + EclipseStoreTest.class.getSimpleName();
 	private static EmbeddedStorageManager storageManager;
 	private static ResourceRoot root;
 
@@ -62,7 +65,7 @@ public class EclipseStoreTest {
 	public static void beforeClass() {
 		log.info("Starting storage manager...");
 		long start = System.currentTimeMillis();
-		storageManager = EmbeddedStorage.start(Paths.get("target/data"));
+		storageManager = buildFoundation("TEST", false).start();
 		root = (ResourceRoot) storageManager.root();
 		log.info("Started storage manager in {}ms", System.currentTimeMillis() - start);
 		log.info(SystemHelper.getMemorySummary());
@@ -71,6 +74,30 @@ public class EclipseStoreTest {
 	@AfterClass
 	public static void afterClass() {
 		storageManager.shutdown();
+	}
+
+	private static EmbeddedStorageFoundation<?> buildFoundation(String databaseName, boolean enableBackup) {
+		Path databasePath = new File(STORAGE_PATH, databaseName).toPath();
+		NioFileSystem fileSystem = NioFileSystem.New();
+
+		int channelCount = 1;
+		StorageConfiguration.Builder<?> storageConfigurationBuilder = StorageConfiguration
+				.Builder()
+				.setStorageFileProvider(Storage
+						.FileProviderBuilder(fileSystem)
+						.setDirectory(fileSystem.ensureDirectory(databasePath))
+						.createFileProvider())
+				.setChannelCountProvider(StorageChannelCountProvider.New(channelCount));
+
+		if (enableBackup) {
+			Path backupPath = new File(STORAGE_PATH, databaseName + "_Backup").toPath();
+			storageConfigurationBuilder.setBackupSetup(StorageBackupSetup.New(fileSystem.ensureDirectory(backupPath)));
+		}
+
+		return EmbeddedStorageFoundation
+				.New()
+				.setDataBaseName(databaseName)
+				.setConfiguration(storageConfigurationBuilder.createConfiguration());
 	}
 
 	@Test

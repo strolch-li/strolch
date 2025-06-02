@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package li.strolch.agent.impl.eclipsestorage;
+package li.strolch.agent.impl.eclipsestore;
 
 import li.strolch.agent.api.AuditTrail;
 import li.strolch.model.audit.Audit;
@@ -27,19 +27,19 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class EclipseStorageAuditTrail implements AuditTrail {
+public class EclipseStoreAuditTrail implements AuditTrail {
 
-	private static final Logger logger = LoggerFactory.getLogger(EclipseStorageAuditTrail.class);
+	private static final Logger logger = LoggerFactory.getLogger(EclipseStoreAuditTrail.class);
 
 	private final String realm;
 	private final StorageManager storageManager;
-	private EclipseStorageAuditRoot root;
+	private EclipseStoreAuditRoot root;
 
-	public EclipseStorageAuditTrail(String realm, StorageManager storageManager) {
+	public EclipseStoreAuditTrail(String realm, StorageManager storageManager) {
 		this.realm = realm;
 		DBC.PRE.assertNotNull("storageManager must be set!", storageManager);
 		this.storageManager = storageManager;
-		this.root = (EclipseStorageAuditRoot) this.storageManager.root();
+		this.root = (EclipseStoreAuditRoot) this.storageManager.root();
 	}
 
 	public StorageManager getStorageManager() {
@@ -48,7 +48,7 @@ public class EclipseStorageAuditTrail implements AuditTrail {
 
 	public void initStorageManager() {
 		if (this.root == null)
-			this.root = new EclipseStorageAuditRoot();
+			this.root = new EclipseStoreAuditRoot();
 		this.storageManager.setRoot(this.root);
 	}
 

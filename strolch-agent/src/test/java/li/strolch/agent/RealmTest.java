@@ -55,14 +55,14 @@ public class RealmTest {
 				assertEquals(5, realmNames.size());
 
 				Set<String> expectedRealmNames = new HashSet<>(
-						Arrays.asList("defaultRealm", "myRealm", "otherRealm", "emptyRealm", "eclipseStorage"));
+						Arrays.asList("defaultRealm", "myRealm", "otherRealm", "emptyRealm", "eclipseStore"));
 				assertEquals(expectedRealmNames, realmNames);
 
 				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("defaultRealm").getMode());
 				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("myRealm").getMode());
 				assertEquals(DataStoreMode.TRANSIENT, container.getRealm("otherRealm").getMode());
 				assertEquals(DataStoreMode.EMPTY, container.getRealm("emptyRealm").getMode());
-				assertEquals(DataStoreMode.ECLIPSE_STORAGE, container.getRealm("eclipseStorage").getMode());
+				assertEquals(DataStoreMode.ECLIPSE_STORE, container.getRealm("eclipseStore").getMode());
 
 				for (String realm : realmNames) {
 					agent.runAsAgent(ctx -> {
@@ -71,7 +71,7 @@ public class RealmTest {
 								.openTx(ctx.getCertificate(), "test", true)) {
 							switch (tx.getRealmName()) {
 								case "defaultRealm" -> assertElements(3, tx);
-								case "eclipseStorage" -> assertElements(2, tx);
+								case "eclipseStore" -> assertElements(2, tx);
 								case "otherRealm", "myRealm" -> assertElements(1, tx);
 								case "emptyRealm" -> assertElements(0, tx);
 							}

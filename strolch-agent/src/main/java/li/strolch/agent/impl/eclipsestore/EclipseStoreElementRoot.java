@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package li.strolch.agent.impl.eclipsestorage;
+package li.strolch.agent.impl.eclipsestore;
 
 import li.strolch.model.StrolchRootElement;
 import li.strolch.persistence.api.StrolchPersistenceException;
@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EclipseStorageElementRoot<T extends StrolchRootElement> {
+public class EclipseStoreElementRoot<T extends StrolchRootElement> {
 
 	private final Map<String, LazyHashMap<String, Lazy<T>>> elementsByType = new HashMap<>();
 

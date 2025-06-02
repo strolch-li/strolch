@@ -36,7 +36,7 @@
             <Properties>
                 <allowDataInitOnSchemaCreate>true</allowDataInitOnSchemaCreate>
 
-                <realms>defaultRealm, myRealm, otherRealm, emptyRealm, eclipseStorage</realms>
+                <realms>defaultRealm, myRealm, otherRealm, emptyRealm, eclipseStore</realms>
                 <dataStoreMode>TRANSIENT</dataStoreMode>
                 <dataStoreFile>DefaultRealm.xml</dataStoreFile>
                 <enableAuditTrail>true</enableAuditTrail>
@@ -48,9 +48,10 @@
                 <dataStoreFile.otherRealm>OtherRealm.xml</dataStoreFile.otherRealm>
                 <dataStoreMode.emptyRealm>EMPTY</dataStoreMode.emptyRealm>
 
-                <dataStoreMode.eclipseStorage>ECLIPSE_STORAGE</dataStoreMode.eclipseStorage>
-                <dataStoreFile.eclipseStorage>DefaultRealm.xml</dataStoreFile.eclipseStorage>
-                <dbStore.eclipseStorage>EclipseStorage</dbStore.eclipseStorage>
+                <dataStoreMode.eclipseStore>ECLIPSE_STORE</dataStoreMode.eclipseStore>
+                <dataStoreFile.eclipseStore>DefaultRealm.xml</dataStoreFile.eclipseStore>
+                <dbStore.eclipseStore>eclipseStore</dbStore.eclipseStore>
+                <forTesting.eclipseStore>true</forTesting.eclipseStore>
             </Properties>
         </Component>
         <Component>

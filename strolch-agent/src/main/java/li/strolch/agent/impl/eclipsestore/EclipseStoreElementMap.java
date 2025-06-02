@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package li.strolch.agent.impl.eclipsestorage;
+package li.strolch.agent.impl.eclipsestore;
 
 import li.strolch.agent.impl.BaseElementMap;
 import li.strolch.agent.impl.DataStoreMode;
@@ -28,21 +28,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public abstract class EclipseStorageElementMap<T extends StrolchRootElement> extends BaseElementMap<T> {
+public abstract class EclipseStoreElementMap<T extends StrolchRootElement> extends BaseElementMap<T> {
 
-	protected static final Logger logger = LoggerFactory.getLogger(EclipseStorageElementMap.class);
+	protected static final Logger logger = LoggerFactory.getLogger(EclipseStoreElementMap.class);
 
 	private final String realm;
 	private final String objectType;
 	private final StorageManager storageManager;
-	private EclipseStorageElementRoot<T> root;
+	private EclipseStoreElementRoot<T> root;
 
-	public EclipseStorageElementMap(String realm, String objectType, StorageManager storageManager) {
+	public EclipseStoreElementMap(String realm, String objectType, StorageManager storageManager) {
 		this.realm = realm;
 		this.objectType = objectType;
 		this.storageManager = storageManager;
 		//noinspection unchecked
-		this.root = (EclipseStorageElementRoot<T>) this.storageManager.root();
+		this.root = (EclipseStoreElementRoot<T>) this.storageManager.root();
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public abstract class EclipseStorageElementMap<T extends StrolchRootElement> ext
 
 	public void initStorageManager() {
 		if (this.root == null)
-			this.root = new EclipseStorageElementRoot<>();
+			this.root = new EclipseStoreElementRoot<>();
 		this.storageManager.setRoot(this.root);
 	}
 
@@ -79,7 +79,13 @@ public abstract class EclipseStorageElementMap<T extends StrolchRootElement> ext
 	}
 
 	public void destroy() {
-		this.storageManager.shutdown();
+		if (this.storageManager != null) {
+			try {
+				this.storageManager.shutdown();
+			} catch (Exception e) {
+				logger.error("Failed to shutdown storage manage for {} on realm {}!", this.objectType, this.realm, e);
+			}
+		}
 	}
 
 	@Override

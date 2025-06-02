@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package li.strolch.agent.impl.eclipsestorage;
+package li.strolch.agent.impl.eclipsestore;
 
-import li.strolch.agent.api.ResourceMap;
+import li.strolch.agent.api.OrderMap;
 import li.strolch.agent.impl.ElementMapHelpers;
-import li.strolch.model.Resource;
+import li.strolch.model.Order;
 import li.strolch.model.Tags;
 import li.strolch.model.parameter.Parameter;
 import org.eclipse.store.storage.types.StorageManager;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_RESOURCE_REF;
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_ORDER_REF;
 
-public class EclipseStorageResourceMap extends EclipseStorageElementMap<Resource> implements ResourceMap {
+public class EclipseStoreOrderMap extends EclipseStoreElementMap<Order> implements OrderMap {
 
-	public EclipseStorageResourceMap(String realm, StorageManager storageManager) {
-		super(realm, Tags.RESOURCE, storageManager);
+	public EclipseStoreOrderMap(String realm, StorageManager storageManager) {
+		super(realm, Tags.ORDER, storageManager);
 	}
 
 	@Override
 	protected void assertIsRefParam(Parameter<?> refP) {
-		ElementMapHelpers.assertIsRefParam(INTERPRETATION_RESOURCE_REF, refP);
+		ElementMapHelpers.assertIsRefParam(INTERPRETATION_ORDER_REF, refP);
 	}
 }
