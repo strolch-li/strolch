@@ -78,7 +78,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 		for (String realmName : realmNames) {
 
 			StrolchRealm realm = getContainer().getRealm(realmName);
-			if (realm.getMode().isTransient())
+			if (!realm.getMode().requiresPersistenceHandler())
 				continue;
 
 			String dbUseEnvKey = makeRealmKey(realmName, PROP_USE_ENV, false);
