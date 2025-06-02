@@ -133,4 +133,17 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 		}
 		super.stop();
 	}
+
+	@Override
+	public void destroy() throws Exception {
+		for (String realmName : this.realms.keySet()) {
+			InternalStrolchRealm realm = this.realms.get(realmName);
+			try {
+				realm.destroy();
+			} catch (Exception e) {
+				logger.error("Failed to destroy realm {}", realm.getRealm(), e);
+			}
+		}
+		super.destroy();
+	}
 }
