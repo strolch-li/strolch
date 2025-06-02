@@ -59,7 +59,7 @@ public abstract class DbConnectionBuilder {
 		for (String realmName : realmNames) {
 
 			StrolchRealm realm = this.container.getRealm(realmName);
-			if (realm.getMode().isTransient())
+			if (!realm.getMode().requiresPersistenceHandler())
 				continue;
 
 			String dbUseEnvKey = makeRealmKey(realmName, PROP_USE_ENV, false);
