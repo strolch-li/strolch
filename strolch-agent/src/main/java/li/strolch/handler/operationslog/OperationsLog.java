@@ -29,6 +29,7 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.ThreadHelper;
 import li.strolch.utils.iso8601.ISO8601;
 
 import java.util.*;
@@ -116,8 +117,12 @@ public class OperationsLog extends StrolchComponent {
 	@Override
 	public void stop() throws Exception {
 		this.run = false;
-		if (this.handleQueueTask != null)
+		if (this.handleQueueTask != null) {
 			this.handleQueueTask.cancel(true);
+			while (!this.handleQueueTask.isDone())
+				ThreadHelper.sleep(10);
+			flushQueue();
+		}
 		if (this.executorService != null)
 			this.executorService.shutdownNow();
 		if (this.sentMessageHashes != null)
@@ -144,12 +149,27 @@ public class OperationsLog extends StrolchComponent {
 				poll.run();
 
 			} catch (InterruptedException e) {
-				if (!this.run)
+				if (!this.run) {
+					flushQueue();
 					logger.warn("Interrupted!");
-				else
+				} else {
 					logger.error("Failed to perform a task", e);
+				}
+
+				Thread.currentThread().interrupt();
 			} catch (Exception e) {
 				logger.error("Failed to perform a task", e);
+			}
+		}
+	}
+
+	private void flushQueue() {
+		LogTask poll;
+		while ((poll = this.queue.poll()) != null) {
+			try {
+				poll.run();
+			} catch (Exception ex) {
+				logger.error("Failed to handle log task", ex);
 			}
 		}
 	}
@@ -157,6 +177,10 @@ public class OperationsLog extends StrolchComponent {
 	private void loadMessages(String realmName) {
 		try {
 			runAsAgent(ctx -> {
+
+				// TODO XXX eclipse store doesn't yet support operation logs
+				if (!getAgent().getRealm(realmName).getMode().requiresPersistenceHandler())
+					return;
 
 				logger.info("Loading OperationsLog for realm {}...", realmName);
 
@@ -372,6 +396,11 @@ public class OperationsLog extends StrolchComponent {
 	private void persist(StrolchRealm realm, LogMessage logMessage, List<LogMessage> messagesToRemove) {
 		try {
 			runAsAgent(ctx -> {
+				if (!realm.getState().isStarted())
+					return;
+				// TODO XXX eclipse store doesn't yet support OperationLogs
+				if (!realm.getMode().requiresPersistenceHandler())
+					return;
 				try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass(), false)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					if (messagesToRemove != null && !messagesToRemove.isEmpty())
