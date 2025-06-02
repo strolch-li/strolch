@@ -26,6 +26,26 @@ public enum ComponentState {
 	STOPPED,
 	DESTROYED;
 
+	public boolean isStarted() {
+		return this == STARTED;
+	}
+
+	public boolean isStopped() {
+		return this == STOPPED;
+	}
+
+	public boolean isDestroyed() {
+		return this == DESTROYED;
+	}
+
+	public boolean isSetup() {
+		return this == SETUP;
+	}
+
+	public boolean isInitialized() {
+		return this == INITIALIZED;
+	}
+
 	public ComponentState validateStateChange(ComponentState newState, String componentName) {
 
 		if (this == newState)
