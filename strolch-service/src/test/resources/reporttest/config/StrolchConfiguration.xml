@@ -46,6 +46,7 @@
 			<name>ServiceHandler</name>
 			<api>li.strolch.service.api.ServiceHandler</api>
 			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+			<depends>RealmHandler</depends>
 			<Properties>
 				<verbose>true</verbose>
 			</Properties>
@@ -65,6 +66,7 @@
 			<name>ExecutionHandler</name>
 			<api>li.strolch.execution.ExecutionHandler</api>
 			<impl>li.strolch.execution.EventBasedExecutionHandler</impl>
+			<depends>RealmHandler</depends>
 		</Component>
 
 	</env>

@@ -35,7 +35,7 @@
 			<depends>PrivilegeHandler</depends>
 			<depends>PersistenceHandler</depends>
 			<Properties>
-				<realms>defaultRealm, svcTransient, svcCached, svcCachedAuditsVersioning</realms>
+				<realms>defaultRealm, svcTransient, svcCached, svcCachedAuditsVersioning, eclipseStore</realms>
 
 				<dataStoreMode>EMPTY</dataStoreMode>
 
@@ -54,6 +54,10 @@
 				<enableAuditTrail.svcCachedAuditsVersioning>true</enableAuditTrail.svcCachedAuditsVersioning>
 				<enableVersioning.svcCachedAuditsVersioning>true</enableVersioning.svcCachedAuditsVersioning>
 
+                <dataStoreMode.eclipseStore>ECLIPSE_STORE</dataStoreMode.eclipseStore>
+                <dataStoreFile.eclipseStore>DefaultRealm.xml</dataStoreFile.eclipseStore>
+                <dbStore.eclipseStore>eclipseStore</dbStore.eclipseStore>
+                <forTesting.eclipseStore>true</forTesting.eclipseStore>
 			</Properties>
 		</Component>
 
@@ -87,6 +91,7 @@
 			<name>ServiceHandler</name>
 			<api>li.strolch.service.api.ServiceHandler</api>
 			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+			<depends>RealmHandler</depends>
 			<Properties>
 				<verbose>true</verbose>
 			</Properties>
@@ -106,6 +111,7 @@
 			<name>ExecutionHandler</name>
 			<api>li.strolch.execution.ExecutionHandler</api>
 			<impl>li.strolch.execution.EventBasedExecutionHandler</impl>
+			<depends>RealmHandler</depends>
 		</Component>
 
 		<Component>

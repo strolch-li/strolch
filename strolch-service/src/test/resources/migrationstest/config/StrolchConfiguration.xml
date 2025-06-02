@@ -45,6 +45,7 @@
 			<name>ServiceHandler</name>
 			<api>li.strolch.service.api.ServiceHandler</api>
 			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+			<depends>RealmHandler</depends>
 		</Component>
 		<Component>
 			<name>MigrationsHandler</name>
