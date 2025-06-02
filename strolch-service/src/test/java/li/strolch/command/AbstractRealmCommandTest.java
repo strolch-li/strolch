@@ -29,6 +29,7 @@ import org.junit.Test;
 import java.io.File;
 
 import static li.strolch.service.test.AbstractRealmServiceTest.*;
+import static li.strolch.utils.helper.StringHelper.generateId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertTrue;
@@ -47,12 +48,11 @@ public abstract class AbstractRealmCommandTest {
 	}
 
 	@Before
-	public void beforeClass() throws Exception {
+	public void beforeSuper() throws Exception {
 
-		dropSchema(AbstractRealmCommandTest.class.getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb",
-				"cacheduser", "test");
+		dropSchema(getClass().getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 
-		File rootPath = new File(RUNTIME_PATH);
+		File rootPath = new File(RUNTIME_PATH, getClass().getSimpleName() + "_" + generateId(8));
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
@@ -63,7 +63,7 @@ public abstract class AbstractRealmCommandTest {
 	}
 
 	@After
-	public void afterClass() {
+	public void afterSuper() {
 		if (runtimeMock != null)
 			runtimeMock.destroyRuntime();
 	}

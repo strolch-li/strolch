@@ -40,6 +40,7 @@ import java.sql.DriverManager;
 import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
 import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
+import static li.strolch.utils.helper.StringHelper.generateId;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -54,7 +55,7 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractRealmServiceTest.class);
 
-	protected static RuntimeMock runtimeMock;
+	protected RuntimeMock runtimeMock;
 	protected Certificate certificate;
 
 	protected String getUsername() {
@@ -64,12 +65,11 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 	@Before
 	public void before() throws Exception {
 
-		dropSchema(AbstractRealmServiceTest.class.getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb",
-				"cacheduser", "test");
-		dropSchema(AbstractRealmServiceTest.class.getSimpleName(),
-				"jdbc:postgresql://localhost/cacheduserauditsversioningdb", "cacheduserauditsversioning", "test");
+		dropSchema(getClass().getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
+		dropSchema(getClass().getSimpleName(), "jdbc:postgresql://localhost/cacheduserauditsversioningdb",
+				"cacheduserauditsversioning", "test");
 
-		File rootPath = new File(RUNTIME_PATH);
+		File rootPath = new File(RUNTIME_PATH, getClass().getSimpleName() + "_" + generateId(8));
 		File configSrc = new File(CONFIG_SRC);
 		runtimeMock = new RuntimeMock();
 		runtimeMock.mockRuntime(rootPath, configSrc);
@@ -135,7 +135,7 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 			after.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
 	}
 
-	public static ServiceHandler getServiceHandler() {
+	public ServiceHandler getServiceHandler() {
 		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
 	}
 

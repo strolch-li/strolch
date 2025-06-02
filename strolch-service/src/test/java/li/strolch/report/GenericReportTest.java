@@ -55,8 +55,10 @@ public class GenericReportTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.logout(certificate);
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null) {
+			runtimeMock.logout(certificate);
+			runtimeMock.destroyRuntime();
+		}
 	}
 
 	@Test
