@@ -120,6 +120,7 @@ public class DefaultObserverHandler implements ObserverHandler {
 				if (this.run)
 					logger.error("Failed to do updates!", e);
 				Thread.currentThread().interrupt();
+				break;
 			}
 		}
 	}
