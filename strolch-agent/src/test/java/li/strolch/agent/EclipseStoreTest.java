@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static li.strolch.model.ModelGenerator.createResource;
+import static li.strolch.model.ModelGenerator.*;
 import static li.strolch.utils.helper.StringHelper.generateId;
 import static org.junit.Assert.assertEquals;
 
@@ -139,7 +139,8 @@ public class EclipseStoreTest {
 		start = System.currentTimeMillis();
 		root.stream().forEach(resource -> {
 			if (counter.incrementAndGet() % 100 == 0)
-				log.info("Found {} {}", resource.getType(), resource.getId());
+				log.info("Found {} {}: {}", resource.getType(), resource.getId(),
+						resource.getString(BAG_ID, PARAM_STRING_ID));
 		});
 		log.info("Tested root.stream().forEach(resource -> ...) in {}ms", System.currentTimeMillis() - start);
 
