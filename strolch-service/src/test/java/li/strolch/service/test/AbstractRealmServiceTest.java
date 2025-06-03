@@ -40,7 +40,6 @@ import java.sql.DriverManager;
 import static li.strolch.db.DbConstants.PROP_DB_HOST_OVERRIDE;
 import static li.strolch.runtime.configuration.DbConnectionBuilder.overridePostgresqlHost;
 import static li.strolch.testbase.runtime.RuntimeMock.assertServiceResult;
-import static li.strolch.utils.helper.StringHelper.generateId;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -48,6 +47,7 @@ import static li.strolch.utils.helper.StringHelper.generateId;
 public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U extends ServiceResult> {
 
 	public static final String REALM_CACHED = "svcCached";
+	public static final String REALM_ECLIPSE_STORE = "eclipseStore";
 	public static final String REALM_CACHED_AUDITS_VERSIONING = "svcCachedAuditsVersioning";
 	public static final String REALM_TRANSIENT = "svcTransient";
 	public static final String RUNTIME_PATH = "target/svcTestRuntime/";
@@ -63,27 +63,28 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 	}
 
 	@Before
-	public void before() throws Exception {
-
+	public void beforeSuper() throws Exception {
 		dropSchema(getClass().getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 		dropSchema(getClass().getSimpleName(), "jdbc:postgresql://localhost/cacheduserauditsversioningdb",
 				"cacheduserauditsversioning", "test");
 
-		File rootPath = new File(RUNTIME_PATH, getClass().getSimpleName() + "_" + generateId(8));
+		File rootPath = new File(RUNTIME_PATH, getClass().getSimpleName());
 		File configSrc = new File(CONFIG_SRC);
-		runtimeMock = new RuntimeMock();
-		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer();
+		this.runtimeMock = new RuntimeMock();
+		this.runtimeMock.mockRuntime(rootPath, configSrc);
+		this.runtimeMock.startContainer();
 
-		this.certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), getUsername().toCharArray());
+		this.certificate = this.runtimeMock
+				.getPrivilegeHandler()
+				.authenticate(getUsername(), getUsername().toCharArray());
 		importFromXml(REALM_CACHED, this.certificate, getServiceHandler());
 		importFromXml(REALM_CACHED_AUDITS_VERSIONING, this.certificate, getServiceHandler());
 	}
 
 	@After
-	public void after() {
-		if (runtimeMock != null)
-			runtimeMock.destroyRuntime();
+	public void afterSuper() {
+		if (this.runtimeMock != null)
+			this.runtimeMock.destroyRuntime();
 	}
 
 	public static void dropSchema(String ctx, String dbUrl, String dbUsername, String dbPassword) throws Exception {
@@ -121,18 +122,18 @@ public abstract class AbstractRealmServiceTest<T extends ServiceArgument, U exte
 		T arg = getArgInstance();
 
 		if (before != null)
-			before.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
+			before.run(this.runtimeMock.getContainer().getRealm(realm), this.runtimeMock.getContainer());
 
 		arg.realm = realm;
 
-		ServiceResult result = getServiceHandler().doService(this.certificate, svc, arg);
+		ServiceResult result = getServiceHandler().doService(certificate, svc, arg);
 		assertServiceResult(expectedState, expectedServiceResultType, result);
 
 		if (validator != null)
-			validator.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
+			validator.run(this.runtimeMock.getContainer().getRealm(realm), this.runtimeMock.getContainer());
 
 		if (after != null)
-			after.run(runtimeMock.getContainer().getRealm(realm), runtimeMock.getContainer());
+			after.run(this.runtimeMock.getContainer().getRealm(realm), this.runtimeMock.getContainer());
 	}
 
 	public ServiceHandler getServiceHandler() {

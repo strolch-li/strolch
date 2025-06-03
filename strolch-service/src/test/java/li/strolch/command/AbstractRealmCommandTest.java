@@ -29,7 +29,6 @@ import org.junit.Test;
 import java.io.File;
 
 import static li.strolch.service.test.AbstractRealmServiceTest.*;
-import static li.strolch.utils.helper.StringHelper.generateId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertTrue;
@@ -39,9 +38,8 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class AbstractRealmCommandTest {
 
-	protected static RuntimeMock runtimeMock;
-
-	protected static Certificate certificate;
+	protected RuntimeMock runtimeMock;
+	protected Certificate certificate;
 
 	protected String getUsername() {
 		return "test";
@@ -49,27 +47,30 @@ public abstract class AbstractRealmCommandTest {
 
 	@Before
 	public void beforeSuper() throws Exception {
-
 		dropSchema(getClass().getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 
-		File rootPath = new File(RUNTIME_PATH, getClass().getSimpleName() + "_" + generateId(8));
+		File rootPath = new File(RUNTIME_PATH, getClass().getSimpleName());
 		File configSrc = new File(CONFIG_SRC);
-		runtimeMock = new RuntimeMock();
-		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer();
+		this.runtimeMock = new RuntimeMock();
+		this.runtimeMock.mockRuntime(rootPath, configSrc);
+		this.runtimeMock.startContainer();
 
 		certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), getUsername().toCharArray());
 		importFromXml(REALM_CACHED, certificate, getServiceHandler());
+		this.certificate = this.runtimeMock
+				.getPrivilegeHandler()
+				.authenticate(getUsername(), getUsername().toCharArray());
+		importFromXml(REALM_CACHED, this.certificate, getServiceHandler());
 	}
 
 	@After
 	public void afterSuper() {
-		if (runtimeMock != null)
-			runtimeMock.destroyRuntime();
+		if (this.runtimeMock != null)
+			this.runtimeMock.destroyRuntime();
 	}
 
-	public static ServiceHandler getServiceHandler() {
-		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
+	public ServiceHandler getServiceHandler() {
+		return this.runtimeMock.getContainer().getComponent(ServiceHandler.class);
 	}
 
 	protected abstract Command getCommandInstance(StrolchTransaction tx);
@@ -79,11 +80,11 @@ public abstract class AbstractRealmCommandTest {
 	protected abstract void validateAfterCommandFailed(StrolchTransaction tx);
 
 	protected void doCommandAsFail(String realmName) {
-		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
+		StrolchRealm realm = this.runtimeMock.getContainer().getRealm(realmName);
 		boolean caught = false;
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
+		try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
 			Command command = getCommandInstance(tx);
-			FailCommandFacade commandFacade = new FailCommandFacade(runtimeMock.getContainer(), tx, command);
+			FailCommandFacade commandFacade = new FailCommandFacade(this.runtimeMock.getContainer(), tx, command);
 
 			tx.addCommand(commandFacade);
 			tx.commitOnClose();
@@ -93,20 +94,20 @@ public abstract class AbstractRealmCommandTest {
 		}
 		assertTrue(caught);
 
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", true)) {
+		try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 			validateAfterCommandFailed(tx);
 		}
 	}
 
 	protected void doCommand(String realmName) {
-		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
+		StrolchRealm realm = this.runtimeMock.getContainer().getRealm(realmName);
 		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
 			Command command = getCommandInstance(tx);
 			tx.addCommand(command);
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", true)) {
+		try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 			validateAfterCommand(tx);
 		}
 	}
