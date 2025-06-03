@@ -118,7 +118,7 @@ public class EclipseStoreElementRoot<T extends StrolchRootElement> {
 		Lazy<T> reference = Lazy.Reference(element);
 		byId.put(element.getId(), reference);
 		if (newMap) {
-			storageManager.storeAll(elementsByType, byId);
+			storageManager.storeAll(this.elementsByType, byId);
 		} else {
 			storageManager.store(byId);
 		}
