@@ -55,12 +55,11 @@ public abstract class AbstractRealmCommandTest {
 		this.runtimeMock.mockRuntime(rootPath, configSrc);
 		this.runtimeMock.startContainer();
 
-		certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), getUsername().toCharArray());
-		importFromXml(REALM_CACHED, certificate, getServiceHandler());
 		this.certificate = this.runtimeMock
 				.getPrivilegeHandler()
 				.authenticate(getUsername(), getUsername().toCharArray());
 		importFromXml(REALM_CACHED, this.certificate, getServiceHandler());
+		importFromXml(REALM_ECLIPSE_STORE, this.certificate, getServiceHandler());
 	}
 
 	@After
@@ -122,6 +121,12 @@ public abstract class AbstractRealmCommandTest {
 	public void shouldDoCommandCached() {
 		doCommandAsFail(REALM_CACHED);
 		doCommand(REALM_CACHED);
+	}
+
+	@Test
+	public void shouldDoCommandEclipseStore() {
+		doCommandAsFail(REALM_ECLIPSE_STORE);
+		doCommand(REALM_ECLIPSE_STORE);
 	}
 
 	private static class FailCommandFacade extends Command {
