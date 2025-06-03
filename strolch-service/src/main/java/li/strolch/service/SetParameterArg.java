@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package li.strolch.service.parameter;
+package li.strolch.service;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

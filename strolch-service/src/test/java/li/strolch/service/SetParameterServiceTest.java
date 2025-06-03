@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.parameter;
+package li.strolch.service;
 
 import li.strolch.model.Locator;
 import li.strolch.service.api.Service;

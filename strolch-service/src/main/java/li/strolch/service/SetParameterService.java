@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.parameter;
+package li.strolch.service;
 
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
