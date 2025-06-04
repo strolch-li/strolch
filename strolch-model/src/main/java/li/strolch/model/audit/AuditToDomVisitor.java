@@ -15,8 +15,6 @@
  */
 package li.strolch.model.audit;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.DomUtil;
 import li.strolch.utils.iso8601.ISO8601;
@@ -53,10 +51,8 @@ public class AuditToDomVisitor implements AuditVisitor<Document> {
 		auditE.appendChild(elem(doc, ACTION, audit.getAction()));
 		auditE.appendChild(elem(doc, ACCESS_TYPE, audit.getAccessType().name()));
 
-		if (audit.getAdditionalData() != null) {
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			auditE.appendChild(elem(doc, ADDITIONAL_DATA, gson.toJson(audit.getAdditionalData())));
-		}
+		if (audit.getAdditionalDataAsString() != null)
+			auditE.appendChild(elem(doc, ADDITIONAL_DATA, audit.getAdditionalDataAsString()));
 
 		doc.appendChild(auditE);
 		return doc;

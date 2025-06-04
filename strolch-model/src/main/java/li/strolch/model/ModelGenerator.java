@@ -525,7 +525,7 @@ public class ModelGenerator {
 		if (new Random().nextBoolean()) {
 			JsonObject json = new JsonObject();
 			json.addProperty("key", "value");
-			audit.setAdditionalData(json);
+			audit.setAdditionalDataAsJson(json);
 		}
 
 		return audit;

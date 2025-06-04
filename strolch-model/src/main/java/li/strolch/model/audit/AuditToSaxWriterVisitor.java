@@ -16,8 +16,6 @@
 
 package li.strolch.model.audit;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
@@ -71,9 +69,8 @@ public class AuditToSaxWriterVisitor implements AuditVisitor<Void> {
 		writeElem(ACTION, audit.getAction());
 		writeElem(ACCESS_TYPE, audit.getAccessType().name());
 
-		if (audit.getAdditionalData() != null) {
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			writeElem(ADDITIONAL_DATA, gson.toJson(audit.getAdditionalData()), true);
+		if (audit.getAdditionalDataAsString() != null) {
+			writeElem(ADDITIONAL_DATA, audit.getAdditionalDataAsString(), true);
 		}
 
 		this.writer.writeEndElement();

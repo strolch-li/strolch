@@ -15,7 +15,6 @@
  */
 package li.strolch.model.audit;
 
-import com.google.gson.JsonParser;
 import li.strolch.model.Tags;
 import li.strolch.utils.iso8601.ISO8601;
 import org.xml.sax.Attributes;
@@ -96,7 +95,7 @@ public class AuditSaxReader extends DefaultHandler {
 				this.sb = null;
 			}
 			case ADDITIONAL_DATA -> {
-				this.currentAudit.setAdditionalData(JsonParser.parseString(this.sb.toString()));
+				this.currentAudit.setAdditionalDataAsString(this.sb.toString());
 				this.sb = null;
 			}
 			default -> throw new IllegalArgumentException(

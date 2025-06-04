@@ -60,7 +60,7 @@ public class AuditFromDomReader {
 				case ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
 				case ADDITIONAL_DATA -> {
 					if (isNotEmpty(txtContent))
-						audit.setAdditionalData(JsonParser.parseString(txtContent));
+						audit.setAdditionalDataAsString(txtContent);
 				}
 				default -> throw new IllegalArgumentException(
 						MessageFormat.format("Unhandled/Invalid tag {0} for Audit {1}", nodeName, idS));

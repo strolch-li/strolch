@@ -19,6 +19,7 @@ import com.google.gson.JsonElement;
 
 import java.time.ZonedDateTime;
 
+import static com.google.gson.JsonParser.parseString;
 import static li.strolch.utils.helper.StringHelper.hashSha256AsHex;
 
 /**
@@ -37,7 +38,8 @@ public class Audit implements Comparable<Audit> {
 	private ZonedDateTime newVersion;
 	private String action;
 	private AccessType accessType;
-	private JsonElement additionalData;
+	private String additionalDataAsString;	
+	private transient JsonElement additionalDataAsJson;
 
 	public Long getId() {
 		return this.id;
@@ -107,12 +109,22 @@ public class Audit implements Comparable<Audit> {
 		return this.accessType;
 	}
 
-	public JsonElement getAdditionalData() {
-		return this.additionalData;
+	public String getAdditionalDataAsString() {
+		return this.additionalDataAsString;
 	}
 
-	public void setAdditionalData(JsonElement additionalData) {
-		this.additionalData = additionalData;
+	public void setAdditionalDataAsString(String additionalDataAsString) {
+		this.additionalDataAsString = additionalDataAsString;
+		this.additionalDataAsJson = additionalDataAsString == null ? null : parseString(additionalDataAsString);
+	}
+
+	public JsonElement getAdditionalDataAsJson() {
+		return this.additionalDataAsJson;
+	}
+
+	public void setAdditionalDataAsJson(JsonElement additionalDataAsJson) {
+		this.additionalDataAsJson = additionalDataAsJson;
+		this.additionalDataAsString = additionalDataAsJson == null ? null : additionalDataAsJson.toString();
 	}
 
 	public void setAccessType(AccessType accessType) {
@@ -125,40 +137,40 @@ public class Audit implements Comparable<Audit> {
 
 	public String buildRelevantHash() {
 		String builder = this.username
-				+ this.elementType
-				+ this.elementSubType
-				+ this.elementAccessed
-				+ this.action
-				+ this.accessType
-				+ this.additionalData;
+						 + this.elementType
+						 + this.elementSubType
+						 + this.elementAccessed
+						 + this.action
+						 + this.accessType
+						 + this.additionalDataAsString;
 		return hashSha256AsHex(builder);
 	}
 
 	@Override
 	public String toString() {
 		return "Audit{"
-				+ "id="
-				+ id
-				+ ", username='"
-				+ username
-				+ '\''
-				+ ", date="
-				+ date
-				+ ", elementType='"
-				+ elementType
-				+ '\''
-				+ ", elementSubType='"
-				+ elementSubType
-				+ '\''
-				+ ", elementAccessed='"
-				+ elementAccessed
-				+ '\''
-				+ ", action='"
-				+ action
-				+ '\''
-				+ ", accessType="
-				+ accessType
-				+ '}';
+			   + "id="
+			   + id
+			   + ", username='"
+			   + username
+			   + '\''
+			   + ", date="
+			   + date
+			   + ", elementType='"
+			   + elementType
+			   + '\''
+			   + ", elementSubType='"
+			   + elementSubType
+			   + '\''
+			   + ", elementAccessed='"
+			   + elementAccessed
+			   + '\''
+			   + ", action='"
+			   + action
+			   + '\''
+			   + ", accessType="
+			   + accessType
+			   + '}';
 	}
 
 	@Override

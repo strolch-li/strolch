@@ -45,7 +45,7 @@ public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
 		jsonObject.addProperty("action", audit.getAction());
 		jsonObject.addProperty("accessType", audit.getAccessType().name());
 		if (this.withAdditionalData)
-			jsonObject.add("additionalData", audit.getAdditionalData());
+			jsonObject.add("additionalData", audit.getAdditionalDataAsJson());
 
 		return jsonObject;
 	}

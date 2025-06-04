@@ -273,7 +273,7 @@ public class AuditHandler extends StrolchComponent {
 		audit.setAccessType(AccessType.EXECUTE);
 		audit.setAction(result.getState().name());
 
-		audit.setAdditionalData(arg.toJson());
+		audit.setAdditionalDataAsJson(arg.toJson());
 		return audit;
 	}
 
@@ -306,7 +306,7 @@ public class AuditHandler extends StrolchComponent {
 		audit.setAccessType(AccessType.EXECUTE);
 		audit.setAction(method);
 
-		audit.setAdditionalData(additionalData);
+		audit.setAdditionalDataAsJson(additionalData);
 		return audit;
 	}
 

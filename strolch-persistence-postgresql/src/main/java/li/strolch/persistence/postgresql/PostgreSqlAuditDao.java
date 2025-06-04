@@ -15,7 +15,6 @@
  */
 package li.strolch.persistence.postgresql;
 
-import com.google.gson.JsonParser;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.AuditDao;
@@ -59,11 +58,11 @@ public class PostgreSqlAuditDao implements AuditDao {
 	private static final String querySizeBetweenSql = "select count(*) from audits where date between ? and ?";
 	private static final String queryAllBetweenSql = "select " + FIELDS + " from audits where date between ? and ?";
 	private static final String queryAllByTypeAndBetweenSql = "select "
-			+ FIELDS
-			+ " from audits where element_type = ? and date between ? and ?";
+															  + FIELDS
+															  + " from audits where element_type = ? and date between ? and ?";
 	private static final String insertSql = "insert into audits ("
-			+ FIELDS
-			+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?::access_type, ?)";
+											+ FIELDS
+											+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?::access_type, ?)";
 
 	private final PostgreSqlStrolchTransaction tx;
 
@@ -195,12 +194,12 @@ public class PostgreSqlAuditDao implements AuditDao {
 		ps.setString(8, audit.getAction());
 		ps.setString(9, audit.getAccessType().name());
 
-		if (audit.getAdditionalData() == null) {
+		if (audit.getAdditionalDataAsString() == null) {
 			ps.setObject(10, null);
 		} else {
 			PGobject pGobject = new PGobject();
 			pGobject.setType("json");
-			pGobject.setValue(audit.getAdditionalData().toString());
+			pGobject.setValue(audit.getAdditionalDataAsString());
 			ps.setObject(10, pGobject);
 		}
 	}
@@ -224,7 +223,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 		if (pGobject != null) {
 			String json = pGobject.getValue();
 			if (json != null)
-				audit.setAdditionalData(JsonParser.parseString(json));
+				audit.setAdditionalDataAsString(json);
 		}
 		return audit;
 	}
