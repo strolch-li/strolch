@@ -39,7 +39,6 @@ public class EclipseStoreAuditTrail implements AuditTrail {
 		this.realm = realm;
 		DBC.PRE.assertNotNull("storageManager must be set!", storageManager);
 		this.storageManager = storageManager;
-		this.root = (EclipseStoreAuditRoot) this.storageManager.root();
 	}
 
 	public StorageManager getStorageManager() {
@@ -58,6 +57,7 @@ public class EclipseStoreAuditTrail implements AuditTrail {
 
 	public void start() {
 		this.storageManager.start();
+		this.root = (EclipseStoreAuditRoot) this.storageManager.root();
 	}
 
 	public void stop() {

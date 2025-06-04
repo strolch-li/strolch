@@ -41,8 +41,6 @@ public abstract class EclipseStoreElementMap<T extends StrolchRootElement> exten
 		this.realm = realm;
 		this.objectType = objectType;
 		this.storageManager = storageManager;
-		//noinspection unchecked
-		this.root = (EclipseStoreElementRoot<T>) this.storageManager.root();
 	}
 
 	@Override
@@ -66,6 +64,8 @@ public abstract class EclipseStoreElementMap<T extends StrolchRootElement> exten
 
 	public void start() {
 		this.storageManager.start();
+		//noinspection unchecked
+		this.root = (EclipseStoreElementRoot<T>) this.storageManager.root();
 	}
 
 	public void stop() {
