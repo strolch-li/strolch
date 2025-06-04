@@ -198,18 +198,22 @@ public class EclipseStoreRealm extends InternalStrolchRealm {
 	}
 
 	private void loadModelIntoStorage(PrivilegeContext privilegeContext) {
-		long startStep;
-		startStep = currentTimeMillis();
-		XmlModelLoader loader = new XmlModelLoader(getRealm(), this.verbose, this.modelFile);
+		long startStep = currentTimeMillis();
+		logger.info("Loading model from {} into storage...", this.modelFile.getName());
+		XmlModelLoader loader = new XmlModelLoader(getRealm(), true, this.modelFile);
 		loader.load(privilegeContext, this);
 		logger.info("Loaded model into storage in {}", formatMillisecondsDuration(currentTimeMillis() - startStep));
 	}
 
 	private void storeRoot() {
+		long startStep = currentTimeMillis();
+		logger.info("Storing root objects into storage...");
 		this.resourceMap.storeRoot();
 		this.orderMap.storeRoot();
 		this.activityMap.storeRoot();
 		this.auditTrail.storeRoot();
+		logger.info("Stored root objects into storage in {}",
+				formatMillisecondsDuration(currentTimeMillis() - startStep));
 	}
 
 	private void initializeStorageManager() {
