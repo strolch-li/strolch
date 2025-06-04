@@ -57,7 +57,6 @@
                 <dataStoreMode.eclipseStore>ECLIPSE_STORE</dataStoreMode.eclipseStore>
                 <dataStoreFile.eclipseStore>DefaultRealm.xml</dataStoreFile.eclipseStore>
                 <dbStore.eclipseStore>eclipseStore</dbStore.eclipseStore>
-                <forTesting.eclipseStore>true</forTesting.eclipseStore>
 			</Properties>
 		</Component>
 
