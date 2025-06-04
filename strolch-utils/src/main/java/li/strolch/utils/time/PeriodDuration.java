@@ -304,8 +304,13 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * @param duration the duration
 	 */
 	private PeriodDuration(Period period, Duration duration) {
-		this.period = period;
-		this.duration = duration;
+		this.period = isZero(period) ? Period.ZERO : period;
+		this.duration = duration.isZero() ? Duration.ZERO : duration;
+	}
+
+	private boolean isZero(Period period) {
+		// for EclipseStore, the object is serialized and thus (this == Period.ZERO) doesn't work anymore.
+		return period.getYears() == 0 && period.getMonths() == 0 && period.getDays() == 0;
 	}
 
 	/**
@@ -382,6 +387,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * @return the period part
 	 */
 	public Period getPeriod() {
+		if (isZero(this.period))
+			return Period.ZERO;
 		return period;
 	}
 
@@ -404,6 +411,8 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * @return the duration part
 	 */
 	public Duration getDuration() {
+		if (this.duration.isZero())
+			return Duration.ZERO;
 		return duration;
 	}
 
@@ -430,7 +439,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 * @return true if this period is zero-length
 	 */
 	public boolean isZero() {
-		return period.isZero() && duration.isZero();
+		return isZero(period) && duration.isZero();
 	}
 
 	/**
@@ -672,7 +681,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	 */
 	@Override
 	public String toString() {
-		if (period.isZero()) {
+		if (isZero(period)) {
 			return duration.toString();
 		}
 		if (duration.isZero()) {
@@ -694,7 +703,7 @@ public final class PeriodDuration implements TemporalAmount, Serializable, Compa
 	}
 
 	public long toMillis() {
-		if (this.period.isZero())
+		if (this.isZero(period))
 			return this.duration.toMillis();
 		return TimeUnit.DAYS.toMillis(periodPartToDays()) + this.duration.toMillis();
 	}
