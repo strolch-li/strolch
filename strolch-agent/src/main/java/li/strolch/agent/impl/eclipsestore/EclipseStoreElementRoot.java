@@ -42,7 +42,7 @@ public class EclipseStoreElementRoot<T extends StrolchRootElement> {
 	}
 
 	public int size() {
-		return this.elementsByType.values().stream().mapToInt(Map::size).sum();
+		return new ArrayList<>(this.elementsByType.values()).stream().mapToInt(Map::size).sum();
 	}
 
 	public int size(String type) {
@@ -57,25 +57,27 @@ public class EclipseStoreElementRoot<T extends StrolchRootElement> {
 
 	public List<T> getByType(String type) {
 		LazyHashMap<String, Lazy<T>> byId = this.elementsByType.get(type);
-		return byId == null ? List.of() : byId.values().stream().map(Referencing::get).toList();
+		return byId == null ? List.of() : new ArrayList<>(byId.values()).stream().map(Referencing::get).toList();
 	}
 
 	public Stream<T> stream(String... types) {
 		if (types.length == 0)
-			return this.elementsByType.values().stream().flatMap(map -> map.values().stream().map(Referencing::get));
+			return new ArrayList<>(this.elementsByType.values())
+					.stream()
+					.flatMap(map -> new ArrayList<>(map.values()).stream().map(Referencing::get));
 
 		if (types.length == 1) {
 			LazyHashMap<String, Lazy<T>> byId = this.elementsByType.get(types[0]);
 			if (byId == null)
 				return Stream.empty();
-			return byId.values().stream().map(Referencing::get);
+			return new ArrayList<>(byId.values()).stream().map(Referencing::get);
 		}
 
 		Stream<T> stream = Stream.empty();
 		for (String type : types) {
 			LazyHashMap<String, Lazy<T>> byId = this.elementsByType.get(type);
 			if (byId != null)
-				stream = Stream.concat(stream, byId.values().stream().map(Referencing::get));
+				stream = Stream.concat(stream, new ArrayList<>(byId.values()).stream().map(Referencing::get));
 		}
 
 		return stream;
@@ -86,10 +88,9 @@ public class EclipseStoreElementRoot<T extends StrolchRootElement> {
 	}
 
 	public Set<String> getAllKeys() {
-		return this.elementsByType
-				.values()
+		return new ArrayList<>(this.elementsByType.values())
 				.stream()
-				.flatMap(map -> map.values().stream().map(tLazy -> tLazy.get().getId()))
+				.flatMap(map -> new ArrayList<>(map.values()).stream().map(tLazy -> tLazy.get().getId()))
 				.collect(Collectors.toUnmodifiableSet());
 	}
 
