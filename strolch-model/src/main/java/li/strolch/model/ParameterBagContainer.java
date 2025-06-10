@@ -225,7 +225,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 */
 	default double getDouble(String bagKey, String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(bagKey, false);
-		return bag.getDouble(paramKey);
+		return bag == null ? 0.0D : bag.getDouble(paramKey);
 	}
 
 	/**
