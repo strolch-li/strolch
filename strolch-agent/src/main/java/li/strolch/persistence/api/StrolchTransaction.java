@@ -24,6 +24,7 @@ import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
+import li.strolch.model.log.LogMessage;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.model.parameter.StringParameter;
@@ -169,6 +170,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the {@link ActivityMap}
 	 */
 	ActivityMap getActivityMap();
+
+	/**
+	 * Returns a reference to the {@link OperationsLog}
+	 *
+	 * @return the {@link OperationsLog}
+	 */
+	OperationsLog getOperationsLog();
 
 	/**
 	 * Returns the count of all resources
@@ -510,20 +518,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	void setSuppressAuditsForReads(boolean suppressAuditsForReads);
 
 	/**
-	 * If the given argument is true, then no {@link Audit Audits} for Audits are written. Since the {@link AuditTrail}
-	 * is also audited, {@link Audit Audits} for Audits are generated, this allows to suppress this should that be
-	 * required.
-	 *
-	 * @param suppressAuditsForAudits true to suppress writing {@link Audit Audits}, false to enable them
-	 */
-	void setSuppressAuditsForAudits(boolean suppressAuditsForAudits);
-
-	/**
-	 * Suppresses audits for audits, which should be the default, as the AuditTrail is also audited
-	 */
-	StrolchTransaction suppressAuditsForAudits();
-
-	/**
 	 * Determines whether the audit trail feature is enabled.
 	 *
 	 * @return true if the audit trail is enabled, false otherwise
@@ -536,20 +530,6 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return true if writing {@link Audit Audits} is currently suppressed
 	 */
 	boolean isSuppressAudits();
-
-	/**
-	 * Returns true if audits for audits should be written
-	 *
-	 * @return true if audits for audits should be written
-	 */
-	boolean isAuditsForAuditsEnabled();
-
-	/**
-	 * Returns true if writing {@link Audit Audits} for Audits is currently suppressed
-	 *
-	 * @return true if writing {@link Audit Audits} for Audits is currently suppressed
-	 */
-	boolean isSuppressAuditsForAudits();
 
 	/**
 	 * Returns true if versioning is enabled on the {@link StrolchRealm} for which this transaction has been opened
@@ -1664,6 +1644,13 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @throws StrolchModelException if the audit is null
 	 */
 	void add(Audit audit);
+
+	/**
+	 * Adds and thus persists the given {@link LogMessage}
+	 *
+	 * @param logMessage the logMessage to add
+	 */
+	void add(LogMessage logMessage);
 
 	/**
 	 * Adds and thus persists the given {@link Order}

@@ -38,6 +38,7 @@ public class TransientRealm extends InternalStrolchRealm {
 	private OrderMap orderMap;
 	private ActivityMap activityMap;
 	private AuditTrail auditTrail;
+	private OperationsLog operationsLog;
 
 	private File modelFile;
 	private boolean verbose;
@@ -56,7 +57,7 @@ public class TransientRealm extends InternalStrolchRealm {
 		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		//noinspection resource
-		return new TransientTransaction(this.container, this, certificate, action, readOnly).suppressAuditsForAudits();
+		return new TransientTransaction(this.container, this, certificate, action, readOnly);
 	}
 
 	@Override
@@ -101,6 +102,8 @@ public class TransientRealm extends InternalStrolchRealm {
 			this.auditTrail = new TransientAuditTrail();
 		else
 			this.auditTrail = new NoStrategyAuditTrail();
+
+		this.operationsLog = new TransientOperationsLog();
 	}
 
 	@Override

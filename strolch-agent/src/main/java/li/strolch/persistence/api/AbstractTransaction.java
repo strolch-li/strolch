@@ -20,7 +20,6 @@ import li.strolch.agent.api.*;
 import li.strolch.agent.impl.*;
 import li.strolch.exception.StrolchException;
 import li.strolch.exception.StrolchModelException;
-import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.*;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
@@ -91,7 +90,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private boolean suppressUpdates;
 	private boolean suppressAudits;
 	private boolean suppressAuditsForReads;
-	private boolean suppressAuditsForAudits;
 
 	private List<Command> commands;
 	private final List<Command> flushedCommands;
@@ -101,6 +99,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private AuditingResourceMap resourceMap;
 	private AuditingActivityMap activityMap;
 	private AuditTrail auditTrail;
+	private li.strolch.agent.api.OperationsLog operationsLog;
 
 	private final String action;
 	private final Certificate certificate;
@@ -310,27 +309,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public void setSuppressAuditsForAudits(boolean suppressAuditsForAudits) {
-		this.suppressAuditsForAudits = suppressAuditsForAudits;
-	}
-
-	@Override
-	public StrolchTransaction suppressAuditsForAudits() {
-		this.suppressAuditsForAudits = true;
-		return this;
-	}
-
-	@Override
-	public boolean isAuditsForAuditsEnabled() {
-		return !this.suppressAuditsForAudits;
-	}
-
-	@Override
-	public boolean isSuppressAuditsForAudits() {
-		return this.suppressAuditsForAudits;
-	}
-
-	@Override
 	public boolean isVersioningEnabled() {
 		return this.realm.isEnableVersioning();
 	}
@@ -482,14 +460,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public AuditTrail getAuditTrail() {
-		if (this.auditTrail == null) {
-			if (this.suppressAuditsForAudits)
-				this.auditTrail = this.realm.getAuditTrail();
-			else
-				this.auditTrail = new AuditingAuditMapFacade(this.realm.getAuditTrail(),
-						this.realm.isAuditsEnabledOnRead());
-		}
+		if (this.auditTrail == null)
+			this.auditTrail = this.realm.getAuditTrail();
 		return this.auditTrail;
+	}
+
+	@Override
+	public OperationsLog getOperationsLog() {
+		return this.operationsLog;
 	}
 
 	@Override
@@ -1494,6 +1472,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public void add(LogMessage logMessage) {
+		DBC.PRE.assertNotNull("logMessage must not be null", logMessage);
+		getOperationsLog().addMessage(logMessage);
+	}
+
+	@Override
 	public void update(Resource resource) throws StrolchException {
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
@@ -1989,13 +1973,11 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			sb.append(formatNanoDuration(closeDuration));
 		}
 
-		if (this.container.hasComponent(OperationsLog.class)) {
-			OperationsLog operationsLog = container.getComponent(OperationsLog.class);
-			operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
-					Locator.valueOf(AGENT, StrolchTransaction.class.getSimpleName(), this.action),
-					LogSeverity.Exception, LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"),
-					"agent.tx.failed").withException(e).value("reason", e));
-		}
+		this.operationsLog.addMessage(new LogMessage(this.realm.getRealm(), this.certificate.getUsername(),
+				Locator.valueOf(AGENT, StrolchTransaction.class.getSimpleName(), this.action), LogSeverity.Exception,
+				LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "agent.tx.failed")
+				.withException(e)
+				.value("reason", e));
 
 		String msg = "Strolch Transaction for realm {0} failed due to {1}\n{2}";
 		msg = format(msg, getRealmName(), getExceptionMessage(e), sb.toString());
@@ -2104,13 +2086,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 			}
 		}
 
-		if (this.auditTrail != null && this.realm.isAuditsForAuditsEnabled() && !this.suppressAuditsForAudits) {
-			AuditingAuditMapFacade auditingAuditMapFacade = (AuditingAuditMapFacade) this.auditTrail;
-			if (auditsForRead)
-				auditsForAudits(audits, AccessType.READ, auditingAuditMapFacade.getRead());
-			auditsForAudits(audits, AccessType.CREATE, auditingAuditMapFacade.getCreated());
-		}
-
 		if (!audits.isEmpty())
 			this.realm.getAuditTrail().addAll(this, audits);
 
@@ -2136,14 +2111,6 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 				sb.append(COMMA).append(SPACE);
 		}
 		return sb.toString();
-	}
-
-	private void auditsForAudits(List<Audit> audits, AccessType accessType, Set<Audit> elements) {
-		if (elements.isEmpty())
-			return;
-
-		String ids = elementsToIds(elements, t -> t.getId().toString());
-		audits.add(auditFrom(accessType, Tags.AUDIT, DASH, ids));
 	}
 
 	@Override
