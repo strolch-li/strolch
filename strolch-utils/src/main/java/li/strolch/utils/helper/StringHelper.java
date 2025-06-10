@@ -686,6 +686,22 @@ public class StringHelper {
 	}
 
 	/**
+	 * Removes all leading zeroes from the given string.
+	 *
+	 * @param value the input string from which leading zeroes are to be removed
+	 *
+	 * @return a string with all leading zeroes removed
+	 */
+	public static String stripLeadingZeroes(String value) {
+		value = trimOrEmpty(value);
+		if (value.isEmpty())
+			return value;
+		while (value.charAt(0) == '0')
+			value = value.substring(1);
+		return value;
+	}
+
+	/**
 	 * Parses the given string as a comma separated value, returning as a set
 	 *
 	 * @param csv the comma separated value
