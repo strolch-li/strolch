@@ -107,6 +107,11 @@ public class DbSchemaVersionCheck {
 		// get current version
 		Version currentVersion;
 		try (Connection con = ds.getConnection()) {
+
+			DatabaseMetaData metaData = con.getMetaData();
+			String version = metaData.getDatabaseProductVersion();
+			logger.info("Connected to PostgreSQL {}", version);
+
 			currentVersion = getCurrentVersion(con, this.app);
 			con.commit();
 		} catch (SQLException e) {
