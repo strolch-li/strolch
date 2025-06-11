@@ -1522,6 +1522,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized void remove(Resource resource) throws StrolchException {
+		if (isRemoved(resource))
+			return;
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("resource must not be null", resource);
 		this.objectFilter.remove(Tags.RESOURCE, resource.getLocator(), resource);
@@ -1532,6 +1534,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized void remove(Order order) throws StrolchException {
+		if (isRemoved(order))
+			return;
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("order must not be null", order);
 		this.objectFilter.remove(Tags.ORDER, order.getLocator(), order);
@@ -1542,6 +1546,8 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public synchronized void remove(Activity activity) throws StrolchException {
+		if (isRemoved(activity))
+			return;
 		assertNotReadOnly();
 		DBC.PRE.assertNotNull("activity must not be null", activity);
 		this.objectFilter.remove(Tags.ACTIVITY, activity.getLocator(), activity);
