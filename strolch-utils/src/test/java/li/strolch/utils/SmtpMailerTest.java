@@ -20,6 +20,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Properties;
+
 @Ignore("Requires configured username and password")
 public class SmtpMailerTest {
 
@@ -40,10 +42,19 @@ public class SmtpMailerTest {
 		boolean startTls = true;
 		String username = System.getenv("email.username");
 		String password = System.getenv("email.password");
-		this.emailSender = new SmtpMailer(SENDER, SMTP_HOST, port, auth, startTls, username, password);
 
-		emailSender.addRecipientPublicKeyFileName(RECIPIENT_PUBLIC_KEY_FILE_NAME);
-		emailSender.setSigningKeyFileName(SIGNING_KEY_FILE_NAME, SIGNING_KEY_PASSWORD);
+		Properties props = new Properties();
+		props.setProperty(SmtpMailer.PARAM_FROM_ADDR, SENDER);
+		props.setProperty(SmtpMailer.PARAM_AUTH, String.valueOf(auth));
+		props.setProperty(SmtpMailer.PARAM_USERNAME, username);
+		props.setProperty(SmtpMailer.PARAM_PASSWORD, password);
+		props.setProperty(SmtpMailer.PARAM_START_TLS, String.valueOf(startTls));
+		props.setProperty(SmtpMailer.PARAM_HOST, SMTP_HOST);
+		props.setProperty(SmtpMailer.PARAM_PORT, String.valueOf(port));
+
+		this.emailSender = new SmtpMailer(props);
+		this.emailSender.addRecipientPublicKeyFileName(RECIPIENT_PUBLIC_KEY_FILE_NAME);
+		this.emailSender.setSigningKeyFileName(SIGNING_KEY_FILE_NAME, SIGNING_KEY_PASSWORD);
 	}
 
 	@Test
@@ -52,20 +63,19 @@ public class SmtpMailerTest {
 		String subject = "Unsigned email test";
 		String plainText = "This text is unsigned!";
 
-		emailSender.sendMail(RECIPIENT, subject, plainText);
+		this.emailSender.sendUnsignedMail(RECIPIENT, subject, plainText);
 	}
 
 	@Test
 	public void shouldSendUnsignedMailWithUnsignedAttachment() {
-
-		String subject = "Unsigned email test";
+		String subject = "Unsigned email test with unsigned attachment";
 		String plainText
 				= "Hello user\n\nThis text is unsigned!\n\nWe are making it quite long, adding indentations to see how it gets mangled by the mail reader\n\n  regards, Your server!";
 
 		long timestamp = System.currentTimeMillis();
 		MailAttachment mailAttachment = new MailAttachment("This is the attached text",
 				"attachment_" + timestamp + ".txt");
-		emailSender.sendMailWithAttachment(RECIPIENT, subject, plainText, mailAttachment);
+		this.emailSender.sendUnsignedMailWithAttachment(RECIPIENT, subject, plainText, mailAttachment);
 	}
 
 	@Test
@@ -77,18 +87,18 @@ public class SmtpMailerTest {
 
 		long timestamp = System.currentTimeMillis();
 		MailAttachment mailAttachment = new MailAttachment(plainText, "attachment_" + timestamp + ".txt", true);
-		emailSender.sendMailWithAttachment(RECIPIENT, subject, plainText, mailAttachment);
+		this.emailSender.sendUnsignedMailWithAttachment(RECIPIENT, subject, plainText, mailAttachment);
 	}
 
 	@Test
 	public void shouldSendSignedMail() {
 
-		emailSender.setSigningKeyFileName(SIGNING_KEY_FILE_NAME, SIGNING_KEY_PASSWORD);
+		this.emailSender.setSigningKeyFileName(SIGNING_KEY_FILE_NAME, SIGNING_KEY_PASSWORD);
 
 		String subject = "Signed email test";
 		String plainText = "This text should be signed!";
 
-		emailSender.sendMail(RECIPIENT, subject, plainText);
+		this.emailSender.sendMailSignedIfAvailable(RECIPIENT, subject, plainText);
 	}
 
 	@Test
@@ -99,13 +109,13 @@ public class SmtpMailerTest {
 
 		String mailText = "This is an encrypted mail. Please decrypt the attached file for details.";
 		String encryptedTextFileName = "encrypted-text_" + System.currentTimeMillis() + ".txt";
-		emailSender.sendEncryptedEmail(RECIPIENT, subject, mailText, secretText, encryptedTextFileName);
+		this.emailSender.sendEncryptedEmail(RECIPIENT, subject, mailText, secretText, encryptedTextFileName);
 	}
 
 	@Test
 	public void shouldSendEncryptedMailWithAttachment() {
 
-		String subject = "Encrypted email test with attachment";
+		String subject = "Encrypted email test with encrypted attachment";
 		String secretText = "This is the plain text!";
 
 		String mailText = "This is an encrypted mail with attachments. Please decrypt the attached files for details.";
@@ -113,7 +123,7 @@ public class SmtpMailerTest {
 		String encryptedTextFileName = "encrypted-text_" + timestamp + ".txt";
 		MailAttachment mailAttachment = new MailAttachment("This is the attached text",
 				"attachment_" + timestamp + ".txt");
-		emailSender.sendEncryptedEmailWithAttachment(RECIPIENT, subject, mailText, secretText, encryptedTextFileName,
-				mailAttachment);
+		this.emailSender.sendEncryptedEmailWithAttachment(RECIPIENT, subject, mailText, secretText,
+				encryptedTextFileName, mailAttachment);
 	}
 }

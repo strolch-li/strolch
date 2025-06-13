@@ -54,12 +54,12 @@ import static java.util.stream.Collectors.joining;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
- * A simple helper class to send e-mails. Uses jakarta.mail and is built as a singleton, so configuration has to be done
+ * A simple helper class to send emails. Uses jakarta.mail and is built as a singleton, so configuration has to be done
  * only once.
  * <p>
  * When using a {@link Properties} to initialize, the following keys are defined:
  * <ul>
- * <li><code>fromAddr</code> - defines the address from which the e-mail comes from</li>
+ * <li><code>fromAddr</code> - defines the address from which the email comes from</li>
  * <li><code>overrideRecipients</code> - if defined, overrides any recipients - useful for testng purposes</li>
  * <li>username - the username to authenticate at the SMTP Server</li>
  * <li>password - the password to authenticate at the SMTP Server</li>
@@ -234,18 +234,47 @@ public class SmtpMailer {
 	}
 
 	private void assertCanEncrypt() {
-		DBC.PRE.assertNotNull("Encrypted e-mails require a signing key!", this.signingKeyRing);
-		DBC.PRE.assertNotEmpty("Encrypted e-mails require at least one recipient key ring!", this.recipientKeyRings);
+		DBC.PRE.assertNotNull("Encrypted emails require a signing key!", this.signingKeyRing);
+		DBC.PRE.assertNotEmpty("Encrypted emails require at least one recipient key ring!", this.recipientKeyRings);
 	}
 
 	/**
-	 * Sends an e-mail to the given recipients (unless override address defined).
+	 * Sends an email to the given recipients (unless override address defined).
+	 * <p></p>
+	 * <b>Note:</b> The mail is not signed even if signing is available
 	 *
-	 * @param recipients the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
+	 * @param recipients the addresses to whom to send the email. See {@link InternetAddress#parse(String)}
+	 * @param subject    the subject of the email
+	 * @param text       the test of the email
 	 */
-	public void sendMail(String recipients, String subject, String text) {
+	public void sendUnsignedMail(String recipients, String subject, String text) {
+		sendMail(recipients, subject, text, false);
+	}
+
+	/**
+	 * Sends an email to the given recipients (unless override address defined).
+	 * <p></p>
+	 * <b>Note:</b> The mail is signed if signing is available, i.e. {@link #canSign()} returns true
+	 *
+	 * @param recipients the addresses to whom to send the email. See {@link InternetAddress#parse(String)}
+	 * @param subject    the subject of the email
+	 * @param text       the test of the email
+	 */
+	public void sendMailSignedIfAvailable(String recipients, String subject, String text) {
+		sendMail(recipients, subject, text, canSign());
+	}
+
+	/**
+	 * Sends an email to the given recipients (unless override address defined).
+	 * <p></p>
+	 * <b>Note:</b> The mail is signed if signing is available, i.e. {@link #canSign()} returns true
+	 *
+	 * @param recipients      the addresses to whom to send the email. See {@link InternetAddress#parse(String)}
+	 * @param subject         the subject of the email
+	 * @param text            the test of the email
+	 * @param signIfAvailable signs the email if signing is available, i.e. {@link #canSign()} returns true
+	 */
+	public void sendMail(String recipients, String subject, String text, boolean signIfAvailable) {
 		if (trimOrEmpty(recipients).isEmpty()) {
 			logger.error("No recipients defined, aborting sending of mail with subject {}", subject);
 			return;
@@ -257,24 +286,28 @@ public class SmtpMailer {
 		try {
 			recipientAddresses = evaluateRecipients(subject, recipients);
 			message = prepareMimeMessage(subject, session);
-
-			if (canSign()) {
-				logger.info("Signing text with key {}", this.signingKeyRing.getPublicKey().getUserIDs().next());
-				String signedMessage = sign(text, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
-				message.setText(signedMessage, UTF_8.name());
-			} else {
-				logger.info("Not signing text, as signing key not available.");
-				message.setText(text, UTF_8.name());
-			}
+			setMessageText(text, signIfAvailable, message);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent {} E-mail with subject {} to {}", canSign() ? "signed" : "unsigned", subject, recipients);
+		logger.info("Sent {} email with subject {} to {}", signIfAvailable && canSign() ? "signed" : "unsigned",
+				subject, recipients);
 	}
 
-	public void sendMailWithAttachment(String recipients, String subject, String text, MailAttachment... attachments) {
+	public void sendUnsignedMailWithAttachment(String recipients, String subject, String text,
+			MailAttachment... attachments) {
+		sendMailWithAttachment(recipients, subject, text, false, attachments);
+	}
+
+	public void sendMailWithAttachmentSignedIfAvailable(String recipients, String subject, String text,
+			MailAttachment... attachments) {
+		sendMailWithAttachment(recipients, subject, text, canSign(), attachments);
+	}
+
+	public void sendMailWithAttachment(String recipients, String subject, String text, boolean signIfAvailable,
+			MailAttachment... attachments) {
 		String attachmentsSummary = getAttachmentsSummary(attachments);
 		if (trimOrEmpty(recipients).isEmpty()) {
 			logger.error("No recipients defined, aborting sending of mail with subject {} and {}", subject,
@@ -291,7 +324,7 @@ public class SmtpMailer {
 			message = prepareMimeMessage(subject, session);
 
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
-			messageBodyPart.setText(text);
+			setMessageText(text, signIfAvailable, messageBodyPart);
 
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(messageBodyPart);
@@ -305,8 +338,25 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent {} E-mail with subject {} to {} and {}", canSign() ? "signed" : "unsigned", subject,
-				recipients, attachmentsSummary);
+		logger.info("Sent {} email with subject {} to {} and {}", signIfAvailable && canSign() ? "signed" : "unsigned",
+				subject, recipients, attachmentsSummary);
+	}
+
+	private void setMessageText(String text, boolean signIfAvailable, MimePart messageBodyPart)
+			throws MessagingException {
+		if (!signIfAvailable) {
+			messageBodyPart.setText(text, UTF_8.name());
+			return;
+		}
+
+		if (canSign()) {
+			logger.info("Signing text with key {}", this.signingKeyRing.getPublicKey().getUserIDs().next());
+			String signedMessage = sign(text, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
+			messageBodyPart.setText(signedMessage, UTF_8.name());
+		} else {
+			logger.info("Not signing text, as signing key not available.");
+			messageBodyPart.setText(text, UTF_8.name());
+		}
 	}
 
 	public void sendEncryptedEmail(String recipients, String subject, String mailText, String secretText,
@@ -336,7 +386,7 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent signed and encrypted E-mail with subject {} to {}", subject, recipients);
+		logger.info("Sent signed and encrypted email with subject {} to {}", subject, recipients);
 	}
 
 	public void sendEncryptedEmailWithAttachment(String recipients, String subject, String mailText, String secretText,
@@ -372,7 +422,7 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent signed and encrypted E-mail with subject {} and {} to {}", subject, attachmentsSummary,
+		logger.info("Sent signed and encrypted email with subject {} and {} to {}", subject, attachmentsSummary,
 				recipients);
 	}
 
@@ -396,11 +446,11 @@ public class SmtpMailer {
 		InternetAddress[] recipientAddresses;
 		if (this.overrideRecipients == null) {
 			recipientAddresses = parseAddress(recipients);
-			logger.info("Sending e-mail with subject {} to recipients {}", subject,
+			logger.info("Sending email with subject {} to recipients {}", subject,
 					addressesToString(recipientAddresses));
 		} else {
 			recipientAddresses = this.overrideRecipients;
-			logger.info("Sending e-mail with subject {} to override recipient {}", subject,
+			logger.info("Sending email with subject {} to override recipient {}", subject,
 					addressesToString(recipientAddresses));
 		}
 		return recipientAddresses;
