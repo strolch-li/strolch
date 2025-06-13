@@ -143,14 +143,14 @@ public class SmtpMailHandler extends MailHandler {
 			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
 			mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
 		} else {
-			mailer.sendMail(recipients, subject, text);
+			mailer.sendMailSignedIfAvailable(recipients, subject, text);
 		}
 	}
 
 	@Override
 	public void sendUnencryptedMail(String recipients, String subject, String text) {
 		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMail(recipients, subject, text);
+		mailer.sendMailSignedIfAvailable(recipients, subject, text);
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class SmtpMailHandler extends MailHandler {
 			mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
 					encryptedFileNameFromSubject, attachments);
 		} else {
-			mailer.sendMailWithAttachment(recipients, subject, text, attachments);
+			mailer.sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
 		}
 	}
 
@@ -193,7 +193,7 @@ public class SmtpMailHandler extends MailHandler {
 	public void sendUnencryptedMailWithAttachment(String recipients, String subject, String text,
 			MailAttachment... attachments) {
 		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMailWithAttachment(recipients, subject, text, attachments);
+		mailer.sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
 	}
 
 	@Override
