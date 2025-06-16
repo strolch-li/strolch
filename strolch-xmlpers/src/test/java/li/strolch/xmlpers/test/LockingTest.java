@@ -15,12 +15,15 @@
  */
 package li.strolch.xmlpers.test;
 
+import li.strolch.utils.ExecutorPool;
+import li.strolch.utils.ThreadHelper;
 import li.strolch.utils.concurrent.LockableObject;
 import li.strolch.xmlpers.api.IoMode;
 import li.strolch.xmlpers.api.PersistenceConstants;
 import li.strolch.xmlpers.api.PersistenceTransaction;
 import li.strolch.xmlpers.objref.IdOfSubTypeRef;
 import li.strolch.xmlpers.test.model.MyModel;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +31,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static li.strolch.xmlpers.test.impl.TestConstants.TYPE_RES;
 import static li.strolch.xmlpers.test.model.ModelBuilder.*;
@@ -41,12 +47,21 @@ public class LockingTest extends AbstractPersistenceTest {
 
 	private static final String BASE_PATH = "target/db/LockingTest/";
 
+	private static ExecutorPool executorPool;
+
 	private long waitForWorkersTime;
 	private boolean run;
 
 	@BeforeClass
 	public static void beforeClass() {
 		cleanPath(BASE_PATH);
+		executorPool = new ExecutorPool();
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		if (executorPool != null)
+			executorPool.destroy();
 	}
 
 	@Before
@@ -62,7 +77,7 @@ public class LockingTest extends AbstractPersistenceTest {
 	}
 
 	@Test
-	public void shouldLockObjects() throws InterruptedException {
+	public void shouldLockObjects() throws InterruptedException, ExecutionException {
 
 		List<CreateResourceWorker> workers = new ArrayList<>(5);
 
@@ -70,18 +85,16 @@ public class LockingTest extends AbstractPersistenceTest {
 		for (int i = 0; i < 5; i++) {
 			String workerName = resoureId + "_" + i;
 			CreateResourceWorker worker = new CreateResourceWorker(workerName, workerName);
-			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread {}", worker.getName());
+			logger.info("Setup worker {}", worker.getName());
 		}
 
 		int nrOfSuccess = runWorkers(workers);
-
-		assertEquals("Only one thread should be able to perform the TX!", 5, nrOfSuccess);
+		assertEquals("All threads should be able to perform the TX!", 5, nrOfSuccess);
 	}
 
 	@Test
-	public void shouldFailIfResourceAlreadyExists() throws InterruptedException {
+	public void shouldFailIfResourceAlreadyExists() throws InterruptedException, ExecutionException {
 
 		List<CreateResourceWorker> workers = new ArrayList<>(5);
 
@@ -89,9 +102,8 @@ public class LockingTest extends AbstractPersistenceTest {
 		for (int i = 0; i < 5; i++) {
 			String workerName = resourceId + "_" + i;
 			CreateResourceWorker worker = new CreateResourceWorker(workerName, resourceId);
-			worker.start();
 			workers.add(worker);
-			logger.info("Setup thread {}", worker.getName());
+			logger.info("Setup worker {}", worker.getName());
 		}
 
 		int nrOfSuccess = runWorkers(workers);
@@ -100,15 +112,14 @@ public class LockingTest extends AbstractPersistenceTest {
 	}
 
 	@Test
-	public void shouldFailUpdateIfLockNotAcquirable() throws InterruptedException {
+	public void shouldFailUpdateIfLockNotAcquirable() throws InterruptedException, ExecutionException {
 
 		// prepare workers
 		List<UpdateResourceWorker> workers = new ArrayList<>(5);
-		String resourceId = "updatWorkerRes";
+		String resourceId = "updateWorkerRes";
 		for (int i = 0; i < 5; i++) {
 			String workerName = resourceId + "_" + i;
 			UpdateResourceWorker worker = new UpdateResourceWorker(workerName, resourceId);
-			worker.start();
 			workers.add(worker);
 			logger.info("Setup thread {}", worker.getName());
 		}
@@ -127,17 +138,26 @@ public class LockingTest extends AbstractPersistenceTest {
 		assertEquals("Only one thread should be able to perform the TX!", 0, nrOfSuccess);
 	}
 
-	private int runWorkers(List<? extends AbstractWorker> workers) throws InterruptedException {
+	private int runWorkers(List<? extends AbstractWorker> workers) throws InterruptedException, ExecutionException {
 
+		List<Future<AbstractWorker>> workerTasks = workers
+				.stream()
+				.map(worker -> executorPool.getExecutor(worker.getClass().getSimpleName()).submit(worker))
+				.toList();
+
+		// only now allow them to run
 		setRun(true);
 
-		for (AbstractWorker worker : workers) {
-			worker.join(getWaitForWorkersTime() + 5000L);
-		}
-
 		int nrOfSuccess = 0;
-		for (AbstractWorker worker : workers) {
-			if (worker.isSuccess())
+		for (Future<AbstractWorker> task : workerTasks) {
+			long start = System.currentTimeMillis();
+			while (!task.isDone()) {
+				ThreadHelper.sleep(10L);
+				if (System.currentTimeMillis() - start > getWaitForWorkersTime() + 5000L)
+					throw new RuntimeException("Timeout waiting for worker to complete!");
+			}
+
+			if (task.get().isSuccess())
 				nrOfSuccess++;
 		}
 
@@ -156,35 +176,40 @@ public class LockingTest extends AbstractPersistenceTest {
 		this.run = run;
 	}
 
-	public abstract class AbstractWorker extends Thread {
+	public abstract class AbstractWorker implements Callable<AbstractWorker> {
 
+		private final String name;
 		protected boolean success;
 		protected final String resourceId;
 
 		public AbstractWorker(String name, String resourceId) {
-			super(name);
+			this.name = name;
 			this.resourceId = resourceId;
 		}
 
-		@Override
-		public void run() {
+		public String getName() {
+			return this.name;
+		}
 
+		@Override
+		public AbstractWorker call() {
 			logger.info("Waiting for ok to work...");
 			while (!isRun()) {
-				try {
-					Thread.sleep(10L);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
+				ThreadHelper.sleep(10L);
 			}
 
 			logger.info("Starting work...");
 			try (PersistenceTransaction tx = LockingTest.this.persistenceManager.openTx()) {
 				doWork(tx);
+			} catch (Exception e) {
+				logger.error("Failed to perform work!", e);
+				this.success = false;
+				return this;
 			}
 
 			this.success = true;
 			logger.info("Work completed.");
+			return this;
 		}
 
 		protected abstract void doWork(PersistenceTransaction tx);
