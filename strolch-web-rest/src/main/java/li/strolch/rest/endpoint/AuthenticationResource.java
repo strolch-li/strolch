@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,7 @@ import java.util.concurrent.TimeUnit;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_AUTHORIZATION_EXPIRATION_DATE;
 import static li.strolch.rest.helper.RestfulHelper.getRemoteIp;
-import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
-import static li.strolch.utils.helper.ExceptionHelper.hasCause;
+import static li.strolch.utils.helper.ExceptionHelper.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -205,11 +204,17 @@ public class AuthenticationResource {
 	}
 
 	private static Response handleAuthenticationException(Exception e) {
-		logger.error(e.getMessage(), e);
 		Throwable rootCause = getRootCause(e);
-		String msg = MessageFormat.format("Could not log in due to: {0}", rootCause);
-		if (hasCause(e, InvalidCredentialsException.class))
-			msg = "Could not log in as the given credentials are invalid";
+		String msg = MessageFormat.format("Login failed due to: {0}", getExceptionMessage(rootCause, false));
+		if (hasCause(e, InvalidCredentialsException.class)) {
+			logger.error(msg);
+			msg = "Login failed as the given credentials are invalid";
+		} else if (hasCause(e, AccessDeniedException.class)) {
+			logger.error(msg);
+			msg = "Login failed as access is denied!";
+		} else {
+			logger.error(e.getMessage(), e);
+		}
 		return evaluateResponseByCause(e, msg);
 	}
 
@@ -346,6 +351,8 @@ public class AuthenticationResource {
 
 			JsonObject result = new JsonObject();
 			String authToken = certificate.getAuthToken();
+			result.addProperty("userId", certificate.getUserId());
+			result.addProperty("userName", certificate.getUsername());
 			result.addProperty("authToken", authToken);
 
 			return setCookiesAndReturnResponse(request, restComponent, cookieMaxAge, expirationDate, result, authToken);
@@ -371,6 +378,7 @@ public class AuthenticationResource {
 		loginResult.addProperty("sessionId", certificate.getSessionId());
 		String authToken = certificate.getAuthToken();
 		loginResult.addProperty("authToken", authToken);
+		loginResult.addProperty("userId", certificate.getUserId());
 		loginResult.addProperty("username", certificate.getUsername());
 		loginResult.addProperty("firstname", certificate.getFirstname());
 		loginResult.addProperty("lastname", certificate.getLastname());
@@ -442,7 +450,7 @@ public class AuthenticationResource {
 
 		String expirationDateS = ISO8601.toString(expirationDate);
 		String domain = restComponent.isDomainSet() ? restComponent.getDomain() : request.getServerName();
-		String path = (restComponent.isPathSet() ? restComponent.getPath() : "/") + ";SameSite=Strict";
+		String path = (restComponent.isPathSet() ? restComponent.getPath() : "/");
 
 		Date expiry = Date.from(expirationDate.atZone(ZoneId.systemDefault()).toInstant());
 		boolean httpOnly = false;
@@ -453,10 +461,12 @@ public class AuthenticationResource {
 		NewCookie authExpirationCookie = getNewCookie(STROLCH_AUTHORIZATION_EXPIRATION_DATE, expirationDateS, path,
 				domain, version, "Strolch Authorization Expiration Date", cookieMaxAge, expiry, secureCookie, httpOnly);
 
-		return Response.ok().entity(loginResult.toString()) //
-				.header(HttpHeaders.AUTHORIZATION, authToken) //
-				.cookie(authCookie) //
-				.cookie(authExpirationCookie) //
+		return Response
+				.ok()
+				.entity(loginResult.toString())
+				.header(HttpHeaders.AUTHORIZATION, authToken)
+				.cookie(authCookie)
+				.cookie(authExpirationCookie)
 				.build();
 	}
 
@@ -473,7 +483,7 @@ public class AuthenticationResource {
 
 	private static NewCookie getNewCookie(String strolchAuthorization, String authToken, String path, String domain,
 			int version, String comment, int cookieMaxAge, Date expiry, boolean secureCookie, boolean httpOnly) {
-		return new NewCookie.Builder(strolchAuthorization) //
+		return new NewCookie.Builder(strolchAuthorization)
 				.value(authToken)
 				.path(path)
 				.domain(domain)
@@ -483,6 +493,7 @@ public class AuthenticationResource {
 				.expiry(expiry)
 				.secure(secureCookie)
 				.httpOnly(httpOnly)
+				.sameSite(NewCookie.SameSite.STRICT)
 				.build();
 	}
 }

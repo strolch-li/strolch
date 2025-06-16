@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,13 +52,12 @@ public class PrivilegeAddGroupService extends AbstractService<JsonServiceArgumen
 
 		Group group;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_ADD_GROUP)) {
-			tx.setSuppressAudits(true);
-
 			group = privilegeHandler.addGroup(getCertificate(), newGroup);
 			privilegeHandler.persist(getCertificate());
 
 			Audit audit = tx.auditFrom(AccessType.CREATE, PRIVILEGE, GROUP, newGroup.name());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(audit);
+			tx.commitOnClose();
 		}
 
 		return new JsonServiceResult(group.accept(new PrivilegeElementToJsonVisitor()));

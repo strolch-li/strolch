@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 import java.time.ZonedDateTime;
 import java.util.Locale;
@@ -39,6 +40,7 @@ public final class Certificate implements Comparable<Certificate> {
 
 	private final Usage usage;
 	private final String sessionId;
+	private final String userId;
 	private final String username;
 	private final String firstname;
 	private final String lastname;
@@ -66,6 +68,7 @@ public final class Certificate implements Comparable<Certificate> {
 	 *
 	 * @param usage      the usage allowed for this certificate
 	 * @param sessionId  the users session id
+	 * @param userId     the users unique id
 	 * @param username   the users login name
 	 * @param firstName  the users first name
 	 * @param lastName   the users last name
@@ -76,12 +79,13 @@ public final class Certificate implements Comparable<Certificate> {
 	 * @param properties a {@link Map} containing string value pairs of properties for the logged in user. These
 	 *                   properties can be edited and can be used for the user to change settings of this session
 	 */
-	public Certificate(Usage usage, String sessionId, String username, String firstName, String lastName,
+	public Certificate(Usage usage, String sessionId, String userId, String username, String firstName, String lastName,
 			UserState userState, String authToken, String source, ZonedDateTime loginTime, boolean keepAlive,
 			Locale locale, Set<String> userGroups, Set<String> userRoles, Set<String> userDirectRoles,
 			Map<String, String> properties) {
 
 		DBC.PRE.assertNotEmpty("sessionId must not be empty", sessionId);
+		DBC.PRE.assertNotEmpty("userId must not be empty", userId);
 		DBC.PRE.assertNotEmpty("username must not be empty", username);
 		DBC.PRE.assertNotEmpty("authToken must not be empty", authToken);
 		DBC.PRE.assertNotNull("userState must not be empty", userState);
@@ -90,6 +94,7 @@ public final class Certificate implements Comparable<Certificate> {
 
 		this.usage = usage;
 		this.sessionId = sessionId;
+		this.userId = userId;
 		this.username = username;
 		this.firstname = firstName;
 		this.lastname = lastName;
@@ -216,6 +221,16 @@ public final class Certificate implements Comparable<Certificate> {
 	}
 
 	/**
+	 * Returns the value of the property {@link PrivilegeConstants#REALM}
+	 *
+	 * @return the value of the property {@link PrivilegeConstants#REALM}
+	 */
+	public String getRealmOrDefault() {
+		String realm = getProperty(REALM);
+		return StringHelper.isEmpty(realm) ? DEFAULT_REALM : realm;
+	}
+
+	/**
 	 * Returns the value of the property {@link PrivilegeConstants#ORGANISATION}
 	 *
 	 * @return the value of the property {@link PrivilegeConstants#ORGANISATION}
@@ -256,6 +271,10 @@ public final class Certificate implements Comparable<Certificate> {
 
 	public String getUsername() {
 		return this.username;
+	}
+
+	public String getUserId() {
+		return this.userId;
 	}
 
 	public String getFirstname() {

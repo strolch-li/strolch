@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,13 @@ import li.strolch.utils.concurrent.ElementLockingHandler;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface StrolchRealm {
+
+	/**
+	 * Retrieves the current state of the component.
+	 *
+	 * @return the current {@link ComponentState} of the component
+	 */
+	ComponentState getState();
 
 	/**
 	 * Returns the name of the realm
@@ -94,7 +101,9 @@ public interface StrolchRealm {
 	 *
 	 * @return the newly created transaction
 	 */
-	StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly);
+	default StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
+		return openTx(certificate, clazz.getName(), readOnly);
+	}
 
 	/**
 	 * Opens a {@link StrolchTransaction} for the given certificate
@@ -108,18 +117,39 @@ public interface StrolchRealm {
 	StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly);
 
 	/**
-	 * Returns if the audit trail is enabled for reads
-	 *
-	 * @return if the audit trail is enabled for reads
-	 */
-	boolean isAuditTrailEnabledForRead();
-
-	/**
 	 * Returns if the audit trail is enabled for modifications
 	 *
 	 * @return if the audit trail is enabled for modifications
 	 */
 	boolean isAuditTrailEnabled();
+
+	/**
+	 * Returns true if audits should be enabled for model changes
+	 *
+	 * @return true if audits should be enabled for model changes
+	 */
+	boolean isModelAuditsEnabled();
+
+	/**
+	 * Returns true if audits should be enabled for model reads
+	 *
+	 * @return true if audits should be enabled for model reads
+	 */
+	boolean isAuditsEnabledOnRead();
+
+	/**
+	 * Returns true if audits for audits should be enabled
+	 *
+	 * @return true if audits for audits should be enabled
+	 */
+	boolean isAuditsForAuditsEnabled();
+
+	/**
+	 * Returns true if audits for system users should be enabled
+	 *
+	 * @return true if audits for system users should be enabled
+	 */
+	boolean isAuditsForSystemUsersEnabled();
 
 	/**
 	 * Returns if observer updates is enabled
@@ -133,7 +163,7 @@ public interface StrolchRealm {
 	 *
 	 * @return if versioning is enabled
 	 */
-	boolean isVersioningEnabled();
+	boolean isEnableVersioning();
 
 	/**
 	 * Returns the minimum duration of a TX to enable logging if the TX was successful. If it failed, then it will be

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,7 @@ public abstract class AbstractionConfiguration {
 		String value = getValue(key, defValue);
 
 		File dataDir = new File(configuration.getDataPath(), value);
-		if (checkExists && !dataDir.isDirectory() || !dataDir.canRead()) {
+		if (checkExists && (!dataDir.isDirectory() || !dataDir.canRead())) {
 			String msg
 					= "Component {0} requires data directory for configuration property ''{1}'' which does not exist with value: {2}";
 			msg = MessageFormat.format(msg, this.name, key, value);

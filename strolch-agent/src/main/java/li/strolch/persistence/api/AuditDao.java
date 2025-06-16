@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,36 +19,21 @@ import li.strolch.model.audit.Audit;
 import li.strolch.utils.collections.DateRange;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface AuditDao {
 
-	boolean hasElement(String type, Long id);
+	long querySize();
 
 	long querySize(DateRange dateRange);
 
-	long querySize(String type, DateRange dateRange);
-
-	Audit queryBy(String type, Long id);
-
-	Set<String> queryTypes();
+	List<Audit> queryAll(DateRange dateRange);
 
 	List<Audit> queryAll(String type, DateRange dateRange);
 
 	void save(Audit audit);
 
 	void saveAll(List<Audit> audits);
-
-	void update(Audit audit);
-
-	void updateAll(List<Audit> audits);
-
-	void remove(Audit audit);
-
-	void removeAll(List<Audit> audits);
-
-	long removeAll(String type, DateRange dateRange);
 }

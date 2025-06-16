@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class PrivilegeContextBuilder {
 		// cache the privileges and policies for this user by role
 		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, policies);
 
-		Certificate certificate = new Certificate(usage, sessionId, user.getUsername(), user.getFirstname(),
+		Certificate certificate = new Certificate(usage, sessionId, user.getUserId(), user.getUsername(), user.getFirstname(),
 				user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive, user.getLocale(),
 				this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
 

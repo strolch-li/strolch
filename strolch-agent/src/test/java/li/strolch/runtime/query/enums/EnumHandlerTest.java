@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,30 +36,33 @@ public class EnumHandlerTest {
 	@Test
 	public void shouldFindByLocator() throws Exception {
 
-		RuntimeMock.runInStrolch(ENUM_HANDLER_TEST_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER, agent -> {
+		RuntimeMock.runInStrolch(ENUM_HANDLER_TEST_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER,
+				(_, agent) -> {
 
-			ComponentContainer container = agent.getContainer();
+					ComponentContainer container = agent.getContainer();
 
-			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".toCharArray());
+					Certificate certificate = container
+							.getPrivilegeHandler()
+							.authenticate("test", "test".toCharArray());
 
-			EnumHandler enumHandler = container.getComponent(EnumHandler.class);
-			StrolchEnum sexEnum = enumHandler.getEnum(certificate, "sex", Locale.ENGLISH);
-			assertEquals("sex", sexEnum.getName());
-			assertEquals("en", sexEnum.getLocale());
-			assertEquals(3, sexEnum.size());
-			assertEquals("both", sexEnum.getValue("both"));
+					EnumHandler enumHandler = container.getComponent(EnumHandler.class);
+					StrolchEnum sexEnum = enumHandler.getEnum(certificate, "sex", Locale.ENGLISH);
+					assertEquals("sex", sexEnum.getName());
+					assertEquals("en", sexEnum.getLocale());
+					assertEquals(3, sexEnum.size());
+					assertEquals("both", sexEnum.getValue("both"));
 
-			StrolchEnum salutationsEnum = enumHandler.getEnum(certificate, "salutations", Locale.UK);
-			assertEquals("salutations", salutationsEnum.getName());
-			assertEquals("en-GB", salutationsEnum.getLocale());
-			assertEquals(3, salutationsEnum.size());
-			assertEquals("Mr", salutationsEnum.getValue("mr"));
+					StrolchEnum salutationsEnum = enumHandler.getEnum(certificate, "salutations", Locale.UK);
+					assertEquals("salutations", salutationsEnum.getName());
+					assertEquals("en-GB", salutationsEnum.getLocale());
+					assertEquals(3, salutationsEnum.size());
+					assertEquals("Mr", salutationsEnum.getValue("mr"));
 
-			StrolchEnum religionsEnum = enumHandler.getEnum(certificate, "religions", Locale.CANADA);
-			assertEquals("religions", religionsEnum.getName());
-			assertEquals("en-CA", religionsEnum.getLocale());
-			assertEquals(9, religionsEnum.size());
-			assertEquals("Atheist", religionsEnum.getValue("Atheist"));
-		});
+					StrolchEnum religionsEnum = enumHandler.getEnum(certificate, "religions", Locale.CANADA);
+					assertEquals("religions", religionsEnum.getName());
+					assertEquals("en-CA", religionsEnum.getLocale());
+					assertEquals(9, religionsEnum.size());
+					assertEquals("Atheist", religionsEnum.getValue("Atheist"));
+				});
 	}
 }

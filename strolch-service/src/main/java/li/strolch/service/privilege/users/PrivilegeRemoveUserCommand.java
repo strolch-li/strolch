@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package li.strolch.service.privilege.users;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.UserRep;
 import li.strolch.runtime.sessions.StrolchSessionHandler;
 import li.strolch.service.api.Command;
 import li.strolch.utils.dbc.DBC;
@@ -29,19 +29,19 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.USER
 
 public class PrivilegeRemoveUserCommand extends Command {
 
-	private String username;
+	private String userId;
 
 	public PrivilegeRemoveUserCommand(StrolchTransaction tx) {
 		super(tx);
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	@Override
 	public void validate() {
-		DBC.PRE.assertNotEmpty("username must be set", this.username);
+		DBC.PRE.assertNotEmpty("userId must be set", this.userId);
 	}
 
 	@Override
@@ -50,13 +50,12 @@ public class PrivilegeRemoveUserCommand extends Command {
 		li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler = getContainer().getPrivilegeHandler();
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
-		privilegeHandler.removeUser(tx().getCertificate(), this.username);
+		UserRep userRep = privilegeHandler.removeUserById(tx().getCertificate(), this.userId);
 		if (privilegeHandler.isPersistOnUserDataChanged())
 			privilegeHandler.persist(tx().getCertificate());
 
 		getComponent(StrolchSessionHandler.class).refreshSessions();
 
-		Audit audit = tx().auditFrom(AccessType.DELETE, PRIVILEGE, USER, this.username);
-		tx().getAuditTrail().add(tx(), audit);
+		tx().add(tx().auditFrom(AccessType.DELETE, PRIVILEGE, USER, userRep.getUsername()));
 	}
 }

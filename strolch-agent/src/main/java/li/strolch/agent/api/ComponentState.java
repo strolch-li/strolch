@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,26 @@ public enum ComponentState {
 	STARTED,
 	STOPPED,
 	DESTROYED;
+
+	public boolean isStarted() {
+		return this == STARTED;
+	}
+
+	public boolean isStopped() {
+		return this == STOPPED;
+	}
+
+	public boolean isDestroyed() {
+		return this == DESTROYED;
+	}
+
+	public boolean isSetup() {
+		return this == SETUP;
+	}
+
+	public boolean isInitialized() {
+		return this == INITIALIZED;
+	}
 
 	public ComponentState validateStateChange(ComponentState newState, String componentName) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2024-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ public abstract class LdapQuery implements AutoCloseable {
 
 	protected LdapQuery() {
 		this.searchControls = new SearchControls();
-		// TODO change this to object scope
 		this.searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE	);
 		this.searchControls.setReturningAttributes(new String[]{"*", "+"});
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,15 @@
  */
 package li.strolch.model.audit;
 
-import li.strolch.model.StrolchRootElement;
+import com.google.gson.JsonElement;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
+
+import static com.google.gson.JsonParser.parseString;
+import static li.strolch.utils.helper.StringHelper.hashSha256AsHex;
 
 /**
- * Used to log/audit access to {@link StrolchRootElement}
+ * Used to log/audit access to the agent
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -28,15 +31,15 @@ public class Audit implements Comparable<Audit> {
 
 	private Long id;
 	private String username;
-	private String firstname;
-	private String lastname;
-	private Date date;
+	private ZonedDateTime date;
 	private String elementType;
 	private String elementSubType;
 	private String elementAccessed;
-	private Date newVersion;
+	private ZonedDateTime newVersion;
 	private String action;
 	private AccessType accessType;
+	private String additionalDataAsString;	
+	private transient JsonElement additionalDataAsJson;
 
 	public Long getId() {
 		return this.id;
@@ -54,27 +57,11 @@ public class Audit implements Comparable<Audit> {
 		this.username = username;
 	}
 
-	public String getFirstname() {
-		return this.firstname;
-	}
-
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-
-	public String getLastname() {
-		return this.lastname;
-	}
-
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
-
-	public Date getDate() {
+	public ZonedDateTime getDate() {
 		return this.date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(ZonedDateTime date) {
 		this.date = date;
 	}
 
@@ -98,15 +85,15 @@ public class Audit implements Comparable<Audit> {
 		return this.elementAccessed;
 	}
 
+	public ZonedDateTime getNewVersion() {
+		return this.newVersion;
+	}
+
 	public void setElementAccessed(String elementAccessed) {
 		this.elementAccessed = elementAccessed;
 	}
 
-	public Date getNewVersion() {
-		return this.newVersion;
-	}
-
-	public void setNewVersion(Date newVersion) {
+	public void setNewVersion(ZonedDateTime newVersion) {
 		this.newVersion = newVersion;
 	}
 
@@ -122,12 +109,68 @@ public class Audit implements Comparable<Audit> {
 		return this.accessType;
 	}
 
+	public String getAdditionalDataAsString() {
+		return this.additionalDataAsString;
+	}
+
+	public void setAdditionalDataAsString(String additionalDataAsString) {
+		this.additionalDataAsString = additionalDataAsString;
+		this.additionalDataAsJson = additionalDataAsString == null ? null : parseString(additionalDataAsString);
+	}
+
+	public JsonElement getAdditionalDataAsJson() {
+		return this.additionalDataAsJson;
+	}
+
+	public void setAdditionalDataAsJson(JsonElement additionalDataAsJson) {
+		this.additionalDataAsJson = additionalDataAsJson;
+		this.additionalDataAsString = additionalDataAsJson == null ? null : additionalDataAsJson.toString();
+	}
+
 	public void setAccessType(AccessType accessType) {
 		this.accessType = accessType;
 	}
 
 	public <U> U accept(AuditVisitor<U> visitor) {
 		return visitor.visitAudit(this);
+	}
+
+	public String buildRelevantHash() {
+		String builder = this.username
+						 + this.elementType
+						 + this.elementSubType
+						 + this.elementAccessed
+						 + this.action
+						 + this.accessType
+						 + this.additionalDataAsString;
+		return hashSha256AsHex(builder);
+	}
+
+	@Override
+	public String toString() {
+		return "Audit{"
+			   + "id="
+			   + id
+			   + ", username='"
+			   + username
+			   + '\''
+			   + ", date="
+			   + date
+			   + ", elementType='"
+			   + elementType
+			   + '\''
+			   + ", elementSubType='"
+			   + elementSubType
+			   + '\''
+			   + ", elementAccessed='"
+			   + elementAccessed
+			   + '\''
+			   + ", action='"
+			   + action
+			   + '\''
+			   + ", accessType="
+			   + accessType
+			   + '}';
 	}
 
 	@Override
@@ -158,6 +201,6 @@ public class Audit implements Comparable<Audit> {
 
 	@Override
 	public int compareTo(Audit o) {
-		return getId().compareTo(o.getId());
+		return this.date.compareTo(o.date);
 	}
 }

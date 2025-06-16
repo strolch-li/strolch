@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.ThreadHelper;
 import li.strolch.utils.iso8601.ISO8601;
 
 import java.util.*;
@@ -59,7 +60,7 @@ public class OperationsLog extends StrolchComponent {
 	private boolean run;
 	private boolean sendMails;
 	private LogSeverity sendMailsMinSeverity;
-	private String sendMailsRecipients;
+	private String mailRecipients;
 
 	private Map<String, Long> sentMessageHashes;
 	private long lastSentHashesPruning;
@@ -72,17 +73,18 @@ public class OperationsLog extends StrolchComponent {
 	public void initialize(ComponentConfiguration configuration) throws Exception {
 
 		this.sentMessageHashes = new ConcurrentHashMap<>();
+		this.lastSentHashesPruning = System.currentTimeMillis();
 		this.sendMails = configuration.getBoolean(PARAM_SEND_MAILS, false);
 		this.sendMailsMinSeverity = LogSeverity.valueOf(
 				configuration.getString(PARAM_SEND_MAILS_MIN_SEVERITY, LogSeverity.Exception.name()));
 		if (this.sendMails) {
-			String sendMailsRecipients = configuration.getString(PARAM_SEND_MAILS_RECIPIENTS, null);
+			String mailRecipients = configuration.getString(PARAM_SEND_MAILS_RECIPIENTS, null);
 			try {
-				InternetAddress.parse(sendMailsRecipients);
+				InternetAddress.parse(mailRecipients);
 			} catch (AddressException e) {
-				throw new IllegalArgumentException("Failed to parse email recipients " + sendMailsRecipients, e);
+				throw new IllegalArgumentException("Failed to parse email recipients " + mailRecipients, e);
 			}
-			this.sendMailsRecipients = sendMailsRecipients;
+			this.mailRecipients = mailRecipients;
 		}
 
 		this.maxMessages = configuration.getInt(PARAM_MAX_MESSAGES, 10000);
@@ -115,8 +117,12 @@ public class OperationsLog extends StrolchComponent {
 	@Override
 	public void stop() throws Exception {
 		this.run = false;
-		if (this.handleQueueTask != null)
+		if (this.handleQueueTask != null) {
 			this.handleQueueTask.cancel(true);
+			while (!this.handleQueueTask.isDone())
+				ThreadHelper.sleep(10);
+			flushQueue();
+		}
 		if (this.executorService != null)
 			this.executorService.shutdownNow();
 		if (this.sentMessageHashes != null)
@@ -143,12 +149,27 @@ public class OperationsLog extends StrolchComponent {
 				poll.run();
 
 			} catch (InterruptedException e) {
-				if (!this.run)
+				if (!this.run) {
+					flushQueue();
 					logger.warn("Interrupted!");
-				else
+				} else {
 					logger.error("Failed to perform a task", e);
+				}
+
+				Thread.currentThread().interrupt();
 			} catch (Exception e) {
 				logger.error("Failed to perform a task", e);
+			}
+		}
+	}
+
+	private void flushQueue() {
+		LogTask poll;
+		while ((poll = this.queue.poll()) != null) {
+			try {
+				poll.run();
+			} catch (Exception ex) {
+				logger.error("Failed to handle log task", ex);
 			}
 		}
 	}
@@ -156,6 +177,10 @@ public class OperationsLog extends StrolchComponent {
 	private void loadMessages(String realmName) {
 		try {
 			runAsAgent(ctx -> {
+
+				// TODO XXX eclipse store doesn't yet support operation logs
+				if (!getAgent().getRealm(realmName).getMode().requiresPersistenceHandler())
+					return;
 
 				logger.info("Loading OperationsLog for realm {}...", realmName);
 
@@ -200,13 +225,21 @@ public class OperationsLog extends StrolchComponent {
 		return this.queue.isEmpty();
 	}
 
+	public boolean isQueueNonEmpty() {
+		return !this.queue.isEmpty();
+	}
+
+	public String getMailRecipients() {
+		return mailRecipients;
+	}
+
 	public void addMessage(LogMessage logMessage) {
 		addMessage(logMessage, false);
 	}
 
-	public void addMessage(LogMessage logMessage, boolean mailError) {
+	public void addMessage(LogMessage logMessage, boolean suppressMailNotification) {
 		if (this.queue != null)
-			this.queue.add(() -> _addMessage(logMessage, mailError));
+			this.queue.add(() -> _addMessage(logMessage, suppressMailNotification));
 	}
 
 	public void removeMessage(LogMessage message) {
@@ -225,7 +258,7 @@ public class OperationsLog extends StrolchComponent {
 		this.queue.add(() -> _updateState(realmName, id, state));
 	}
 
-	private void _addMessage(LogMessage logMessage, boolean mailError) {
+	private void _addMessage(LogMessage logMessage, boolean suppressMailNotification) {
 		// store in global list
 		String realmName = logMessage.getRealm();
 		LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
@@ -247,12 +280,13 @@ public class OperationsLog extends StrolchComponent {
 		if (!realm.getMode().isTransient())
 			persist(realm, logMessage, messagesToRemove);
 
-		if (!mailError) {
-			try {
-				sendMessageAsMail(logMessage);
-			} catch (Exception e) {
-				logger.error("Failed to send mail for log message {}", logMessage.getLocator(), e);
-			}
+		if (suppressMailNotification)
+			return;
+
+		try {
+			sendMessageAsMail(logMessage);
+		} catch (Exception e) {
+			logger.error("Failed to send mail for log message {}", logMessage.getLocator(), e);
 		}
 	}
 
@@ -362,6 +396,11 @@ public class OperationsLog extends StrolchComponent {
 	private void persist(StrolchRealm realm, LogMessage logMessage, List<LogMessage> messagesToRemove) {
 		try {
 			runAsAgent(ctx -> {
+				if (!realm.getState().isStarted())
+					return;
+				// TODO XXX eclipse store doesn't yet support OperationLogs
+				if (!realm.getMode().requiresPersistenceHandler())
+					return;
 				try (StrolchTransaction tx = realm.openTx(ctx.getCertificate(), getClass(), false)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					if (messagesToRemove != null && !messagesToRemove.isEmpty())
@@ -473,8 +512,8 @@ public class OperationsLog extends StrolchComponent {
 
 		String hash = logMessage.buildRelevantHash();
 		long now = System.currentTimeMillis();
-		if (this.sentMessageHashes.containsKey(hash)) {
-			long sentTime = this.sentMessageHashes.get(hash);
+		Long sentTime = this.sentMessageHashes.get(hash);
+		if (sentTime != null) {
 			if (now - sentTime < TimeUnit.MINUTES.toMillis(30)) {
 				logger.warn(
 						"LogMessage {} {} has already been sent less than 30min ago as hash is already known. Ignoring.",
@@ -495,12 +534,14 @@ public class OperationsLog extends StrolchComponent {
 				the following message was logged:
 				
 				=====================
-				Realm: %s
+				System: %s
+				Environment: %s
+				Username: %s
 				Severity: %s
 				Locator: %s
-				Username: %s
 				Timestamp: %s
 				Message ID: %s
+				Realm: %s
 				
 				Message:
 				---------------------
@@ -513,11 +554,11 @@ public class OperationsLog extends StrolchComponent {
 				
 				Kind regards
 					your server
-				""".formatted(logMessage.getRealm(), logMessage.getSeverity(), logMessage.getLocator(),
-				logMessage.getUsername(), ISO8601.toString(logMessage.getZonedDateTime()), logMessage.getId(),
+				""".formatted(appName, env, logMessage.getUsername(), logMessage.getSeverity(), logMessage.getLocator(),
+				ISO8601.toString(logMessage.getZonedDateTime()), logMessage.getId(), logMessage.getRealm(),
 				logMessage.getMessage(Locale.ENGLISH), stackTrace == null ? "(none)" : stackTrace);
 
-		mailHandler.sendEncryptedMailAsync(this.sendMailsRecipients, subject, text);
+		mailHandler.sendEncryptedMailAsync(this.mailRecipients, subject, text);
 	}
 
 	private static Locator trimAgentLocator(Locator tmp) {

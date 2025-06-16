@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2024-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ public class LinuxLdapQuery extends LdapQuery {
 			throws NamingException {
 
 		// Step 1: Validate the user's credentials by attempting to bind
-		logger.info("Logging in with username {}", safeUsername);
 		String userDn = this.queryContext.buildUserDn(username);
+		logger.info("Checking password for user with DN {}", userDn);
 		if (!validateUserPassword(userDn, password))
 			throw new AccessDeniedException("Authentication failed for user %s".formatted(safeUsername));
 
@@ -74,6 +74,7 @@ public class LinuxLdapQuery extends LdapQuery {
 
 	private SearchResult fetchUserData(String username, char[] password) throws NamingException {
 		String userDn = this.queryContext.buildUserDn(username);
+		logger.info("Logging in with user DN {}", userDn);
 		try {
 			this.directoryContext = new InitialDirContext(this.queryContext.buildLdapEnv(password, userDn));
 		} catch (AuthenticationException e) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,6 @@ public class QueryProcessorTest extends BaseTest {
 		request.setStatement(
 				"SELECT r, o, r.getId() FROM Resource r, Order o WHERE r.getId() = :id AND o.getId() = :id");
 
-		// TODO can be simpler but currently forgot how
 		boolean thrown = false;
 		try {
 			System.out.println(processor.process(request, null).asJson().toString());

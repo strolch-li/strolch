@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class PolicyHandlerTest {
 	@Test
 	public void shouldInstantiatePolicies() throws Exception {
 
-		RuntimeMock.runInStrolch(PATH_EMPTY_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER, agent -> {
+		RuntimeMock.runInStrolch(PATH_EMPTY_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER, (_, agent) -> {
 
 			PolicyHandler policyHandler = agent.getContainer().getComponent(PolicyHandler.class);
 

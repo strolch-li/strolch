@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.parameter;
+package li.strolch.service;
 
 import li.strolch.model.Locator;
 import li.strolch.service.api.Service;
 import li.strolch.service.api.ServiceResult;
-import li.strolch.service.parameter.SetParameterService.SetParameterArg;
 import li.strolch.service.test.AbstractRealmServiceTest;
 import org.junit.Test;
 

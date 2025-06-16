@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,38 @@ public class SsoHandlerTest extends AbstractPrivilegeTest {
 	}
 
 	@Test
-	public void testSsoAdmin() {
+	public void testSsoKnownUserAdmin() {
 
 		try {
 			Map<String, String> data = new HashMap<>();
-			data.put("userId", "admin");
 			data.put("username", "admin");
 			data.put("firstName", "Admin");
 			data.put("lastName", "Istrator");
+			data.put("groups", "AppUserLocationA");
+			data.put("roles", "PrivilegeAdmin, AppUser");
+
+			// auth
+			Certificate cert = this.privilegeHandler.authenticateSingleSignOn(data, false);
+			this.ctx = this.privilegeHandler.validate(cert);
+
+			// validate action
+			Restrictable restrictable = new TestRestrictable();
+			this.ctx.validateAction(restrictable);
+
+		} finally {
+			// de-auth
+			logout();
+		}
+	}
+
+	@Test
+	public void testSsoUnknownUserBob() {
+
+		try {
+			Map<String, String> data = new HashMap<>();
+			data.put("username", "bob");
+			data.put("firstName", "Bobby");
+			data.put("lastName", "Someone");
 			data.put("groups", "AppUserLocationA");
 			data.put("roles", "PrivilegeAdmin, AppUser");
 

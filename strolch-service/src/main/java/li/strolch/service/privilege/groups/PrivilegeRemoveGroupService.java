@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package li.strolch.service.privilege.groups;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
@@ -51,13 +50,11 @@ public class PrivilegeRemoveGroupService extends AbstractService<StringArgument,
 
 		Group group;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_REMOVE_GROUP)) {
-			tx.setSuppressAudits(true);
-
 			group = privilegeHandler.removeGroup(getCertificate(), groupName);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.DELETE, PRIVILEGE, GROUP, groupName);
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.DELETE, PRIVILEGE, GROUP, groupName));
+			tx.commitOnClose();
 		}
 
 		return new JsonServiceResult(group.accept(new PrivilegeElementToJsonVisitor()));

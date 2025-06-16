@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package li.strolch.service.notifications;
 
 import com.google.gson.JsonObject;
 import li.strolch.agent.api.StrolchAgent;
+import li.strolch.model.NotificationType;
 import li.strolch.model.ParameterBag;
 import li.strolch.model.Resource;
 import li.strolch.model.builder.ResourceBuilder;
@@ -70,6 +71,11 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 			Set<String> supportedLanguages) {
 		Resource notification = newNotification();
 		PrivilegeContext ctx = tx.getPrivilegeContext();
+
+		if (jsonObject.has(PARAM_NOTIFICATION_TYPE))
+			notification.setString(PARAM_NOTIFICATION_TYPE, jsonObject.get(PARAM_NOTIFICATION_TYPE).getAsString());
+		else
+			notification.setString(PARAM_NOTIFICATION_TYPE, NotificationType.Information);
 
 		JsonObject visibilityJ = jsonObject.get(BAG_VISIBILITY).getAsJsonObject();
 		ParameterBag visibility = notification.getParameterBag(BAG_VISIBILITY);
@@ -126,6 +132,8 @@ public class CreateNotificationService extends AbstractService<JsonServiceArgume
 
 	public static Resource newNotification() {
 		ResourceBuilder notificationBuilder = new ResourceBuilder(TYPE_NOTIFICATION, TYPE_NOTIFICATION)
+
+				.defaultBag().string(PARAM_NOTIFICATION_TYPE).end().endBag()
 
 				.bag(BAG_VISIBILITY, TYPE_VISIBILITY)
 

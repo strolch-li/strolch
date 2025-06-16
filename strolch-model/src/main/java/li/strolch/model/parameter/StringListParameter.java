@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package li.strolch.model.parameter;
 
+import li.strolch.model.StrolchValueType;
+import li.strolch.model.visitor.StrolchElementVisitor;
+import li.strolch.utils.dbc.DBC;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import li.strolch.model.StrolchValueType;
-import li.strolch.model.visitor.StrolchElementVisitor;
-import li.strolch.utils.dbc.DBC;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

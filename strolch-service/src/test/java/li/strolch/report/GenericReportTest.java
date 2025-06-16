@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,10 @@ public class GenericReportTest {
 
 	@AfterClass
 	public static void afterClass() {
-		runtimeMock.logout(certificate);
-		runtimeMock.destroyRuntime();
+		if (runtimeMock != null) {
+			runtimeMock.logout(certificate);
+			runtimeMock.destroyRuntime();
+		}
 	}
 
 	@Test

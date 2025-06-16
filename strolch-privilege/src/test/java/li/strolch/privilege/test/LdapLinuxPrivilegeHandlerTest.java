@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ public class LdapLinuxPrivilegeHandlerTest extends AbstractPrivilegeTest {
 		assertNotNull(cert);
 
 		assertEquals("LocationA", cert.getLocation());
+		assertEquals("test1@strolch.li", cert.getEmail());
 	}
 
 	@Ignore("This test requires a running LDAP server")
@@ -67,5 +68,6 @@ public class LdapLinuxPrivilegeHandlerTest extends AbstractPrivilegeTest {
 		assertNotNull(cert);
 
 		assertEquals("LocationA,LocationB", cert.getLocation());
+		assertEquals("test2@strolch.li", cert.getEmail());
 	}
 }

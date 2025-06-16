@@ -1,57 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <StrolchConfiguration>
-	<env id="dev">
-		<Runtime>
-			<applicationName>StrolchRuntimeTest</applicationName>
-		</Runtime>
-		<Component>
-			<name>PrivilegeHandler</name>
-			<api>li.strolch.runtime.privilege.PrivilegeHandler</api>
-			<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
-			<Properties>
-				<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
-			</Properties>
-		</Component>
-		<Component>
-			<name>RealmHandler</name>
-			<api>li.strolch.agent.api.RealmHandler</api>
-			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
-			<depends>PrivilegeHandler</depends>
-			<Properties>
-				<realms>defaultRealm, myRealm, otherRealm, emptyRealm</realms>
-				<dataStoreMode>TRANSIENT</dataStoreMode>
-				<dataStoreFile>DefaultRealm.xml</dataStoreFile>
-				<enableAuditTrail>true</enableAuditTrail>
-				<dataStoreMode.myRealm>TRANSIENT</dataStoreMode.myRealm>
-				<dataStoreFile.myRealm>MyRealm.xml</dataStoreFile.myRealm>
-				<dataStoreMode.otherRealm>TRANSIENT</dataStoreMode.otherRealm>
-				<dataStoreFile.otherRealm>OtherRealm.xml</dataStoreFile.otherRealm>
-				<dataStoreMode.emptyRealm>EMPTY</dataStoreMode.emptyRealm>
-			</Properties>
-		</Component>
-		<Component>
-			<name>ServiceHandler</name>
-			<api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
-			<impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
-			<depends>RealmHandler</depends>
-			<Properties>
-			</Properties>
-		</Component>
-		<Component>
-			<name>PostInitializer</name>
-			<api>li.strolch.runtime.configuration.model.PostInitializerTest</api>
-			<impl>li.strolch.runtime.configuration.model.PostInitializerTestImpl</impl>
-			<depends>ServiceHandler</depends>
-			<Properties>
-			</Properties>
-		</Component>
-		<Component>
-			<name>ResourceGeneratorHandler</name>
-			<api>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest</api>
-			<impl>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTestImpl</impl>
-			<Properties>
-				<verbose>true</verbose>
-			</Properties>
-		</Component>
-	</env>
+    <env id="dev">
+        <Runtime>
+            <applicationName>StrolchRuntimeTest</applicationName>
+        </Runtime>
+        <Component>
+            <name>PrivilegeHandler</name>
+            <api>li.strolch.runtime.privilege.PrivilegeHandler</api>
+            <impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
+            <Properties>
+                <privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
+            </Properties>
+        </Component>
+        <Component>
+            <name>RealmHandler</name>
+            <api>li.strolch.agent.api.RealmHandler</api>
+            <impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+            <depends>PrivilegeHandler</depends>
+            <Properties>
+                <allowDataInitOnSchemaCreate>true</allowDataInitOnSchemaCreate>
+
+                <realms>defaultRealm, myRealm, otherRealm, emptyRealm, eclipseStore</realms>
+                <dataStoreMode>TRANSIENT</dataStoreMode>
+                <dataStoreFile>DefaultRealm.xml</dataStoreFile>
+                <enableAuditTrail>true</enableAuditTrail>
+
+                <dataStoreMode.myRealm>TRANSIENT</dataStoreMode.myRealm>
+                <dataStoreFile.myRealm>MyRealm.xml</dataStoreFile.myRealm>
+
+                <dataStoreMode.otherRealm>TRANSIENT</dataStoreMode.otherRealm>
+                <dataStoreFile.otherRealm>OtherRealm.xml</dataStoreFile.otherRealm>
+                <dataStoreMode.emptyRealm>EMPTY</dataStoreMode.emptyRealm>
+
+                <dataStoreMode.eclipseStore>ECLIPSE_STORE</dataStoreMode.eclipseStore>
+                <dataStoreFile.eclipseStore>DefaultRealm.xml</dataStoreFile.eclipseStore>
+                <dbStore.eclipseStore>eclipseStore</dbStore.eclipseStore>
+                <forTesting.eclipseStore>true</forTesting.eclipseStore>
+            </Properties>
+        </Component>
+        <Component>
+            <name>ServiceHandler</name>
+            <api>li.strolch.runtime.configuration.model.ServiceHandlerTest</api>
+            <impl>li.strolch.runtime.configuration.model.ServiceHandlerTestImpl</impl>
+            <depends>RealmHandler</depends>
+            <Properties>
+            </Properties>
+        </Component>
+        <Component>
+            <name>PostInitializer</name>
+            <api>li.strolch.runtime.configuration.model.PostInitializerTest</api>
+            <impl>li.strolch.runtime.configuration.model.PostInitializerTestImpl</impl>
+            <depends>ServiceHandler</depends>
+            <Properties>
+            </Properties>
+        </Component>
+        <Component>
+            <name>ResourceGeneratorHandler</name>
+            <api>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTest</api>
+            <impl>li.strolch.runtime.configuration.model.ResourceGeneratorHandlerTestImpl</impl>
+            <Properties>
+                <verbose>true</verbose>
+            </Properties>
+        </Component>
+    </env>
 </StrolchConfiguration>

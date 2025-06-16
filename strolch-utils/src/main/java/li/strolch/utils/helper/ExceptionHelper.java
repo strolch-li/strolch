@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package li.strolch.utils.helper;
 
-import static li.strolch.utils.helper.StringHelper.isEmpty;
-import static li.strolch.utils.helper.XmlHelper.PROP_LINE_SEPARATOR;
-import static li.strolch.utils.helper.XmlHelper.UNIX_LINE_SEP;
+import li.strolch.utils.RemoveCRFilterWriter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import li.strolch.utils.RemoveCRFilterWriter;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.XmlHelper.PROP_LINE_SEPARATOR;
+import static li.strolch.utils.helper.XmlHelper.UNIX_LINE_SEP;
 
 /**
  * @author Robert von Burg &lt;eitch@eitchnet.ch&gt;

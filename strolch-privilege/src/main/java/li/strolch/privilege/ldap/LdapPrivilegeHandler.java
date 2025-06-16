@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2024-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 		if (internalUser != null && internalUser.getUserState() != UserState.REMOTE)
 			return super.checkCredentialsAndUserState(username, password);
 
-		logger.info("User {} tries to login on ldap {}", username, this.queryContext.getProviderUrl());
+		logger.info("User {} tries to login on url {}", username, this.queryContext.getProviderUrl());
 
 		// Perform LDAP query
 		SearchResult searchResult;

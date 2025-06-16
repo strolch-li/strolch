@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,44 +140,45 @@ public class PrivilegeUsersResource {
 		}
 	}
 
-	@Operation(summary = "Get a specific user", description = "Retrieves details of a specific privilege user.",
-			responses = {@ApiResponse(responseCode = "200", description = "User details retrieved successfully.",
+	@Operation(summary = "Get a specific user",
+			description = "Retrieves details of a specific privilege user by its ID", responses = {
+			@ApiResponse(responseCode = "200", description = "User details retrieved successfully.",
 					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
-					@ApiResponse(responseCode = "404", description = "User not found."),
-					@ApiResponse(responseCode = "500", description = "Internal server error.")})
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}")
-	public Response getUser(@PathParam("username") String username, @Context HttpServletRequest request) {
+	@Path("{userId}")
+	public Response getUser(@PathParam("userId") String userId, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER);
 
-			UserRep user = privilegeHandler.getUser(cert, username);
+			UserRep user = privilegeHandler.getUserById(cert, userId);
 			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 			return Response.ok(user.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
 		}
 	}
 
 	@Operation(summary = "Get user privileges",
-			description = "Retrieves the privileges associated with a specific user.", responses = {
+			description = "Retrieves the privileges associated with a specific user by its ID", responses = {
 			@ApiResponse(responseCode = "200", description = "User privileges retrieved successfully.",
 					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
 			@ApiResponse(responseCode = "404", description = "User not found."),
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/privileges")
-	public Response getUserPrivileges(@PathParam("username") String username, @Context HttpServletRequest request) {
+	@Path("{userId}/privileges")
+	public Response getUserPrivileges(@PathParam("userId") String userId, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = getPrivilegeHandler();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_USER_PRIVILEGES);
 
-			UserPrivileges userPrivileges = privilegeHandler.getUserPrivileges(cert, username);
+			UserPrivileges userPrivileges = privilegeHandler.getUserPrivilegesById(cert, userId);
 			PrivilegeElementToJsonVisitor visitor = new PrivilegeElementToJsonVisitor();
 			return Response.ok(userPrivileges.accept(visitor).toString(), MediaType.APPLICATION_JSON).build();
 		}
@@ -204,29 +205,29 @@ public class PrivilegeUsersResource {
 		return handleServiceResult(svcResult);
 	}
 
-	@Operation(summary = "Remove a user", description = "Deletes a privilege user from the system.", responses = {
-			@ApiResponse(responseCode = "200", description = "User removed successfully.",
+	@Operation(summary = "Remove a user", description = "Deletes a privilege user from the system by its ID",
+			responses = {@ApiResponse(responseCode = "200", description = "User removed successfully.",
 					content = @Content(mediaType = "application/json",
 							schema = @Schema(implementation = ServiceResultResponse.class))),
-			@ApiResponse(responseCode = "404", description = "User not found."),
-			@ApiResponse(responseCode = "500", description = "Internal server error.")})
+					@ApiResponse(responseCode = "404", description = "User not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}")
-	public Response removeUser(@PathParam("username") String username, @Context HttpServletRequest request) {
+	@Path("{userId}")
+	public Response removeUser(@PathParam("userId") String userId, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeRemoveUserService svc = new PrivilegeRemoveUserService();
-		PrivilegeUserNameArgument arg = new PrivilegeUserNameArgument();
-		arg.username = username;
+		PrivilegeUserIdArgument arg = svc.getArgumentInstance();
+		arg.userId = userId;
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
 		return toResponse(svcResult);
 	}
 
-	@Operation(summary = "Update a user", description = "Updates an existing privilege user.", responses = {
+	@Operation(summary = "Update a user", description = "Updates an existing privilege user by its ID", responses = {
 			@ApiResponse(responseCode = "200", description = "User updated successfully.",
 					content = @Content(mediaType = "application/json",
 							schema = @Schema(implementation = ServiceResultResponse.class))),
@@ -235,23 +236,23 @@ public class PrivilegeUsersResource {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}")
-	public Response updateUser(@PathParam("username") String username, String updatedFields,
+	@Path("{userId}")
+	public Response updateUser(@PathParam("userId") String userId, String updatedFields,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeUpdateUserService svc = new PrivilegeUpdateUserService();
-		PrivilegeUserArgument arg = new PrivilegeUserArgument();
+		PrivilegeUserArgument arg = svc.getArgumentInstance();
 		arg.user = new PrivilegeElementFromJsonVisitor().userRepFromJson(updatedFields);
-		if (!username.equals(arg.user.getUsername()))
-			throw new IllegalArgumentException("Username mismatch");
+		if (!userId.equals(arg.user.getUserId()))
+			throw new IllegalArgumentException("User ID mismatch");
 
 		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
 		return handleServiceResult(svcResult);
 	}
 
-	@Operation(summary = "Set user state", description = "Updates the state of a specific user.", responses = {
+	@Operation(summary = "Set user state", description = "Updates the state of a specific user by its ID", responses = {
 			@ApiResponse(responseCode = "200", description = "User state updated successfully.",
 					content = @Content(mediaType = "application/json",
 							schema = @Schema(implementation = ServiceResultResponse.class))),
@@ -260,8 +261,8 @@ public class PrivilegeUsersResource {
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/state/{state}")
-	public Response setUserState(@PathParam("username") String username, @PathParam("state") String state,
+	@Path("{userId}/state/{state}")
+	public Response setUserState(@PathParam("userId") String userId, @PathParam("state") String state,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -275,25 +276,25 @@ public class PrivilegeUsersResource {
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeSetUserStateService svc = new PrivilegeSetUserStateService();
-		PrivilegeSetUserStateArgument arg = new PrivilegeSetUserStateArgument();
-		arg.username = username;
+		PrivilegeSetUserStateArgument arg = svc.getArgumentInstance();
+		arg.userId = userId;
 		arg.userState = userState;
 
 		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
 		return handleServiceResult(svcResult);
 	}
 
-	@Operation(summary = "Set user locale", description = "Updates the locale of a specific user.", responses = {
-			@ApiResponse(responseCode = "200", description = "User locale updated successfully.",
+	@Operation(summary = "Set user locale", description = "Updates the locale of a specific user by its ID",
+			responses = {@ApiResponse(responseCode = "200", description = "User locale updated successfully.",
 					content = @Content(mediaType = "application/json",
 							schema = @Schema(implementation = ServiceResultResponse.class))),
-			@ApiResponse(responseCode = "400", description = "Invalid locale provided."),
-			@ApiResponse(responseCode = "404", description = "User not found."),
-			@ApiResponse(responseCode = "500", description = "Internal server error.")})
+					@ApiResponse(responseCode = "400", description = "Invalid locale provided."),
+					@ApiResponse(responseCode = "404", description = "User not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/locale/{locale}")
-	public Response setUserLocale(@PathParam("username") String username, @PathParam("locale") String localeS,
+	@Path("{userId}/locale/{locale}")
+	public Response setUserLocale(@PathParam("userId") String userId, @PathParam("locale") String localeS,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
@@ -307,25 +308,25 @@ public class PrivilegeUsersResource {
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeSetUserLocaleService svc = new PrivilegeSetUserLocaleService();
-		PrivilegeSetUserLocaleArgument arg = new PrivilegeSetUserLocaleArgument();
-		arg.username = username;
+		PrivilegeSetUserLocaleArgument arg = svc.getArgumentInstance();
+		arg.userId = userId;
 		arg.locale = locale;
 
 		PrivilegeUserResult svcResult = svcHandler.doService(cert, svc, arg);
 		return handleServiceResult(svcResult);
 	}
 
-	@Operation(summary = "Set user password", description = "Updates the password of a specific user.", responses = {
-			@ApiResponse(responseCode = "200", description = "User password updated successfully.",
+	@Operation(summary = "Set user password", description = "Updates the password of a specific user by its ID",
+			responses = {@ApiResponse(responseCode = "200", description = "User password updated successfully.",
 					content = @Content(mediaType = "application/json",
 							schema = @Schema(implementation = ServiceResultResponse.class))),
-			@ApiResponse(responseCode = "406", description = "Password does not meet strength requirements."),
-			@ApiResponse(responseCode = "404", description = "User not found."),
-			@ApiResponse(responseCode = "500", description = "Internal server error.")})
+					@ApiResponse(responseCode = "406", description = "Password does not meet strength requirements."),
+					@ApiResponse(responseCode = "404", description = "User not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/password")
-	public Response setUserPassword(@PathParam("username") String username, String data,
+	@Path("{userId}/password")
+	public Response setUserPassword(@PathParam("userId") String userId, String data,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -336,8 +337,8 @@ public class PrivilegeUsersResource {
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeSetUserPasswordService svc = new PrivilegeSetUserPasswordService();
-		PrivilegeSetUserPasswordArgument arg = new PrivilegeSetUserPasswordArgument();
-		arg.username = username;
+		PrivilegeSetUserPasswordArgument arg = svc.getArgumentInstance();
+		arg.userId = userId;
 		arg.password = passwordString.toCharArray();
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
@@ -348,7 +349,7 @@ public class PrivilegeUsersResource {
 		}
 
 		// if user changes their own password, then invalidate the session
-		if (cert.getUsername().equals(username)) {
+		if (cert.getUserId().equals(userId)) {
 			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 			sessionHandler.invalidate(cert);
 		}
@@ -356,16 +357,17 @@ public class PrivilegeUsersResource {
 		return toResponse();
 	}
 
-	@Operation(summary = "Set user password state", description = "Updates the password state of a specific user.",
-			responses = {@ApiResponse(responseCode = "200", description = "User password state updated successfully.",
+	@Operation(summary = "Set user password state",
+			description = "Updates the password state of a specific user by its ID", responses = {
+			@ApiResponse(responseCode = "200", description = "User password state updated successfully.",
 					content = @Content(mediaType = "application/json",
 							schema = @Schema(implementation = ServiceResultResponse.class))),
-					@ApiResponse(responseCode = "404", description = "User not found."),
-					@ApiResponse(responseCode = "500", description = "Internal server error.")})
+			@ApiResponse(responseCode = "404", description = "User not found."),
+			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/password/state")
-	public Response setUserPasswordState(@PathParam("username") String username, String data,
+	@Path("{userId}/password/state")
+	public Response setUserPasswordState(@PathParam("userId") String userId, String data,
 			@Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
@@ -373,28 +375,28 @@ public class PrivilegeUsersResource {
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		PrivilegeSetUserPasswordStateService svc = new PrivilegeSetUserPasswordStateService();
 		StringMapArgument arg = svc.getArgumentInstance();
-		arg.map.put(Tags.Json.USERNAME, username);
+		arg.map.put(Tags.Json.USER_ID, userId);
 		arg.map.put(Tags.Json.STATE, jsonObject.get(Tags.Json.STATE).getAsString());
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
 		return toResponse(svcResult);
 	}
 
-	@Operation(summary = "Clear user password", description = "Removes the password of a specific user.", responses = {
-			@ApiResponse(responseCode = "200", description = "User password cleared successfully.",
+	@Operation(summary = "Clear user password", description = "Removes the password of a specific user by its ID",
+			responses = {@ApiResponse(responseCode = "200", description = "User password cleared successfully.",
 					content = @Content(mediaType = "application/json",
 							schema = @Schema(implementation = ServiceResultResponse.class))),
-			@ApiResponse(responseCode = "404", description = "User not found."),
-			@ApiResponse(responseCode = "500", description = "Internal server error.")})
+					@ApiResponse(responseCode = "404", description = "User not found."),
+					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("{username}/password")
-	public Response clearUserPassword(@PathParam("username") String username, @Context HttpServletRequest request) {
+	@Path("{userId}/password")
+	public Response clearUserPassword(@PathParam("userId") String userId, @Context HttpServletRequest request) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		ClearUserPasswordService svc = new ClearUserPasswordService();
-		PrivilegeUserNameArgument arg = svc.getArgumentInstance();
-		arg.username = username;
+		PrivilegeUserIdArgument arg = svc.getArgumentInstance();
+		arg.userId = userId;
 
 		ServiceResult svcResult = svcHandler.doService(cert, svc, arg);
 		return toResponse(svcResult);

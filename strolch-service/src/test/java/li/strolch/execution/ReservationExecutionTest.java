@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import li.strolch.model.parameter.BooleanParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.service.LocatorArgument;
-import li.strolch.service.parameter.SetParameterService;
-import li.strolch.service.parameter.SetParameterService.SetParameterArg;
+import li.strolch.service.SetParameterArg;
+import li.strolch.service.SetParameterService;
 import li.strolch.testbase.runtime.RuntimeMock;
 import org.junit.After;
 import org.junit.Before;

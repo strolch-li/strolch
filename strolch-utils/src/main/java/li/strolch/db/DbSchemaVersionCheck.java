@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,6 +107,11 @@ public class DbSchemaVersionCheck {
 		// get current version
 		Version currentVersion;
 		try (Connection con = ds.getConnection()) {
+
+			DatabaseMetaData metaData = con.getMetaData();
+			String version = metaData.getDatabaseProductVersion();
+			logger.info("Connected to PostgreSQL {}", version);
+
 			currentVersion = getCurrentVersion(con, this.app);
 			con.commit();
 		} catch (SQLException e) {

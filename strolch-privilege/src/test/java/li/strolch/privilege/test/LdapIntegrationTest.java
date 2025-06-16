@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package li.strolch.privilege.test;
 
 import li.strolch.privilege.handler.XmlPersistenceHandler;
+import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.ldap.LinuxLdapQuery;
 import li.strolch.privilege.ldap.LinuxLdapQueryContext;
-import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.model.internal.User;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -30,8 +30,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static li.strolch.privilege.ldap.WindowsLdapQueryContext.*;
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
+import static li.strolch.privilege.ldap.WindowsLdapQueryContext.*;
 import static org.junit.Assert.*;
 
 @Ignore("This test requires a running LDAP server")

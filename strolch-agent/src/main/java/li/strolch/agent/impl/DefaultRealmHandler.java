@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,11 @@ import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 public class DefaultRealmHandler extends StrolchComponent implements RealmHandler {
 
 	public static final String PROP_ENABLE_AUDIT_TRAIL = "enableAuditTrail";
-	public static final String PROP_ENABLE_AUDIT_TRAIL_FOR_READ = "enableAuditTrailForRead";
+	public static final String PROP_ENABLE_MODEL_AUDITS = "enableModelAudits";
+	public static final String PROP_ENABLE_AUDITS_ON_READ = "enableAuditsOnRead";
+	public static final String PROP_ENABLE_AUDITS_FOR_AUDITS = "enableAuditsForAudits";
+	public static final String PROP_ENABLE_AUDITS_FOR_SYSTEM_USERS = "enableAuditsForSystemUsers";
+
 	public static final String PROP_ENABLE_OBSERVER_UPDATES = "enableObserverUpdates";
 	public static final String PROP_ENABLE_VERSIONING = "enableVersioning";
 	public static final String PROP_TX_LOGGING_THRESHOLD_MS = "txLoggingThresholdMs";
@@ -128,5 +132,18 @@ public class DefaultRealmHandler extends StrolchComponent implements RealmHandle
 			}
 		}
 		super.stop();
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		for (String realmName : this.realms.keySet()) {
+			InternalStrolchRealm realm = this.realms.get(realmName);
+			try {
+				realm.destroy();
+			} catch (Exception e) {
+				logger.error("Failed to destroy realm {}", realm.getRealm(), e);
+			}
+		}
+		super.destroy();
 	}
 }

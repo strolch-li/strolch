@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <Users>
 
     <User userId="1" username="admin" password="$PBKDF2WithHmacSHA512,10000,256$61646d696e$cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344">
@@ -19,7 +35,7 @@
         </Properties>
     </User>
 
-    <User userId="1" username="admin2" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+    <User userId="2" username="admin2" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
         <Firstname>Application</Firstname>
         <Lastname>Administrator</Lastname>
         <State>ENABLED</State>
@@ -36,7 +52,7 @@
         </Properties>
     </User>
 
-    <User userId="2" username="system_admin">
+    <User userId="3" username="system_admin">
         <Firstname>System User</Firstname>
         <Lastname>Administrator</Lastname>
         <State>SYSTEM</State>
@@ -46,7 +62,7 @@
         </Roles>
     </User>
 
-    <User userId="3" username="system_admin2">
+    <User userId="4" username="system_admin2">
         <Firstname>System User</Firstname>
         <Lastname>Administrator</Lastname>
         <State>SYSTEM</State>

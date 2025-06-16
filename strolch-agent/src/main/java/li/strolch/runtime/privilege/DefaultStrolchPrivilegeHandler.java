@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.handler.*;
@@ -30,7 +29,6 @@ import li.strolch.privilege.model.Usage;
 import li.strolch.privilege.model.internal.PrivilegeContainerModel;
 import li.strolch.privilege.xml.PrivilegeConfigSaxReader;
 import li.strolch.runtime.StrolchConstants;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
 import li.strolch.utils.helper.XmlHelper;
@@ -172,7 +170,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public Certificate refreshSession(Certificate certificate, String source) {
 		assertContainerStarted();
 		Certificate refreshedCert = this.privilegeHandler.refresh(certificate, source);
-		writeAudit(refreshedCert, LOGIN, AccessType.CREATE, refreshedCert.getUsername());
+		writeAudit(refreshedCert, LOGIN, AccessType.UPDATE, refreshedCert.getUsername());
 		return refreshedCert;
 	}
 
@@ -181,20 +179,16 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		return this.privilegeHandler.isRefreshAllowed();
 	}
 
-	private void writeAudit(Certificate certificate, String login, AccessType accessType, String username) {
+	private void writeAudit(Certificate certificate, String action, AccessType accessType, String username) {
 		if (hasTx()) {
 			StrolchTransaction tx = getTx();
-			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username);
-			tx.getAuditTrail().add(tx, audit);
-			return;
-		}
-
-		StrolchRealm realm = getContainer().getRealm(certificate);
-		try (StrolchTransaction tx = hasTx() ? getTx() : openTx(certificate, login, realm)) {
-			tx.setSuppressAudits(true);
-			Audit audit = tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username);
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username));
+		} else {
+			StrolchRealm realm = getContainer().getRealm(certificate);
+			try (StrolchTransaction tx = openTx(certificate, action, realm)) {
+				tx.add(tx.auditFrom(accessType, PRIVILEGE, CERTIFICATE, username));
+				tx.commitOnClose();
+			}
 		}
 	}
 
@@ -220,7 +214,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	@Override
 	public boolean invalidate(Certificate certificate) {
 		boolean invalidateSession = this.privilegeHandler.invalidate(certificate);
-		writeAudit(certificate, StrolchPrivilegeConstants.LOGOUT, AccessType.DELETE, certificate.getUsername());
+		writeAudit(certificate, LOGOUT, AccessType.DELETE, certificate.getUsername());
 		return invalidateSession;
 	}
 
@@ -228,8 +222,7 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 	public boolean sessionTimeout(Certificate certificate) {
 		assertStarted();
 		boolean invalidateSession = this.privilegeHandler.invalidate(certificate);
-		writeAudit(certificate, StrolchPrivilegeConstants.SESSION_TIME_OUT, AccessType.DELETE,
-				certificate.getUsername());
+		writeAudit(certificate, SESSION_TIME_OUT, AccessType.DELETE, certificate.getUsername());
 		return invalidateSession;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package li.strolch.agent.impl;
 
+import li.strolch.agent.impl.eclipsestore.EclipseStoreRealm;
+
 import java.text.MessageFormat;
 
 /**
@@ -28,10 +30,15 @@ public enum DataStoreMode {
 		}
 
 		@Override
+		public boolean requiresPersistenceHandler() {
+			return false;
+		}
+
+		@Override
 		public InternalStrolchRealm createRealm(String realm) {
 			return new EmptyRealm(realm);
 		}
-	}, //
+	},
 	TRANSIENT {
 		@Override
 		public boolean isTransient() {
@@ -39,10 +46,15 @@ public enum DataStoreMode {
 		}
 
 		@Override
+		public boolean requiresPersistenceHandler() {
+			return false;
+		}
+
+		@Override
 		public InternalStrolchRealm createRealm(String realm) {
 			return new TransientRealm(realm);
 		}
-	}, //
+	},
 	CACHED {
 		@Override
 		public boolean isTransient() {
@@ -50,14 +62,48 @@ public enum DataStoreMode {
 		}
 
 		@Override
+		public boolean requiresPersistenceHandler() {
+			return true;
+		}
+
+		@Override
 		public InternalStrolchRealm createRealm(String realm) {
 			return new CachedRealm(realm);
 		}
-	}; //
+	},
+	ECLIPSE_STORE {
+		@Override
+		public boolean isTransient() {
+			// data is persisted, but no persistence handler is required
+			return false;
+		}
+
+		@Override
+		public boolean requiresPersistenceHandler() {
+			return false;
+		}
+
+		@Override
+		public InternalStrolchRealm createRealm(String realm) {
+			return new EclipseStoreRealm(realm);
+		}
+	};
 
 	public abstract InternalStrolchRealm createRealm(String realm);
 
+	/**
+	 * Determines if the data store mode is transient, i.e. not data is persisted
+	 *
+	 * @return {@code true} if the data store mode is transient, otherwise {@code false}.
+	 */
 	public abstract boolean isTransient();
+
+	/**
+	 * Determines if the data store mode requires a {@link li.strolch.persistence.api.PersistenceHandler}
+	 *
+	 * @return {@code true} if the data store mode requires a {@link li.strolch.persistence.api.PersistenceHandler}
+	 */
+	public abstract boolean requiresPersistenceHandler();
 
 	public static DataStoreMode parseDataStoreMode(String modeS) {
 		for (DataStoreMode dataStoreMode : values()) {

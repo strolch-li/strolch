@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchException;
+import li.strolch.handler.audits.AuditHandler;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
@@ -291,6 +292,9 @@ public class DefaultServiceHandler extends StrolchComponent implements ServiceHa
 		}
 
 		// record the event
+		getAgent()
+				.getComponentO(AuditHandler.class)
+				.ifPresent(handler -> handler.writeAuditForServiceAsync(arg, certificate, result, realmName, svcName));
 		getAgent().getAgentStatistics().recordService(durationNanos);
 	}
 }

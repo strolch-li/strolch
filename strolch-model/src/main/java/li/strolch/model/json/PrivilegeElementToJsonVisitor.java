@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Comparator.comparing;
+import static li.strolch.model.Tags.Json.*;
 
 public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<JsonObject> {
 
@@ -35,15 +36,15 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	public JsonObject visitUserRep(UserRep userRep) {
 		JsonObject jsonObject = new JsonObject();
 
-		jsonObject.addProperty("userId", userRep.getUserId());
-		jsonObject.addProperty("username", userRep.getUsername());
-		jsonObject.addProperty("firstname", userRep.getFirstname());
-		jsonObject.addProperty("lastname", userRep.getLastname());
-		jsonObject.addProperty("userState", userRep.getUserState().name());
-		jsonObject.addProperty("locale", userRep.getLocale().toLanguageTag());
+		jsonObject.addProperty(USER_ID, userRep.getUserId());
+		jsonObject.addProperty(USERNAME, userRep.getUsername());
+		jsonObject.addProperty(FIRSTNAME, userRep.getFirstname());
+		jsonObject.addProperty(LASTNAME, userRep.getLastname());
+		jsonObject.addProperty(USER_STATE, userRep.getUserState().name());
+		jsonObject.addProperty(LOCALE, userRep.getLocale().toLanguageTag());
 
-		addSet(jsonObject, userRep.getGroups(), "groups");
-		addSet(jsonObject, userRep.getRoles(), "roles");
+		addSet(jsonObject, userRep.getGroups(), GROUPS);
+		addSet(jsonObject, userRep.getRoles(), ROLES);
 		addProperties(userRep.getProperties(), jsonObject);
 		addHistory(userRep, jsonObject);
 
@@ -53,7 +54,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	@Override
 	public JsonObject visitRoleRep(RoleRep roleRep) {
 		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("name", roleRep.getName());
+		jsonObject.addProperty(NAME, roleRep.getName());
 		addPrivileges(roleRep.getPrivileges().values(), jsonObject);
 		return jsonObject;
 	}
@@ -75,9 +76,9 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	@Override
 	public JsonObject visitGroup(Group group) {
 		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty("name", group.name());
+		jsonObject.addProperty(NAME, group.name());
 
-		addSet(jsonObject, group.roles(), "roles");
+		addSet(jsonObject, group.roles(), ROLES);
 		addProperties(group.getProperties(), jsonObject);
 
 		return jsonObject;
@@ -87,12 +88,12 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	public JsonObject visitPrivilegeRep(Privilege privilegeRep) {
 		JsonObject jsonObject = new JsonObject();
 
-		jsonObject.addProperty("name", privilegeRep.getName());
-		jsonObject.addProperty("policy", privilegeRep.getPolicy());
-		jsonObject.addProperty("allAllowed", privilegeRep.isAllAllowed());
+		jsonObject.addProperty(NAME, privilegeRep.getName());
+		jsonObject.addProperty(POLICY, privilegeRep.getPolicy());
+		jsonObject.addProperty(ALL_ALLOWED, privilegeRep.isAllAllowed());
 
-		addList(jsonObject, privilegeRep.getDenyList(), "denyList");
-		addList(jsonObject, privilegeRep.getAllowList(), "allowList");
+		addList(jsonObject, privilegeRep.getDenyList(), DENY_LIST);
+		addList(jsonObject, privilegeRep.getAllowList(), ALLOW_LIST);
 
 		return jsonObject;
 	}
@@ -103,7 +104,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 				.stream()
 				.sorted(comparing(p -> p.name().toLowerCase()))
 				.forEach(p -> privilegesJ.add(p.accept(this)));
-		jsonObject.add("privileges", privilegesJ);
+		jsonObject.add(PRIVILEGES, privilegesJ);
 	}
 
 	private static void addList(JsonObject jsonObject, Set<String> privilegeRep, String listName) {
@@ -120,20 +121,20 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 
 	private static void addHistory(UserRep userRep, JsonObject jsonObject) {
 		JsonObject historyJ = new JsonObject();
-		jsonObject.add("history", historyJ);
+		jsonObject.add(HISTORY, historyJ);
 		UserHistory history = userRep.getHistory();
-		historyJ.addProperty("firstLogin", ISO8601.toString(history.getFirstLogin()));
-		historyJ.addProperty("lastLogin", ISO8601.toString(history.getLastLogin()));
-		historyJ.addProperty("lastPasswordChange", ISO8601.toString(history.getLastPasswordChange()));
+		historyJ.addProperty(FIRST_LOGIN, ISO8601.toString(history.getFirstLogin()));
+		historyJ.addProperty(LAST_LOGIN, ISO8601.toString(history.getLastLogin()));
+		historyJ.addProperty(LAST_PASSWORD_CHANGE, ISO8601.toString(history.getLastPasswordChange()));
 	}
 
 	private static void addProperties(Map<String, String> properties, JsonObject jsonObject) {
 		JsonArray propsArr = new JsonArray();
-		jsonObject.add("properties", propsArr);
+		jsonObject.add(PROPERTIES, propsArr);
 		properties.keySet().stream().sorted(String::compareToIgnoreCase).forEach(propKey -> {
 			JsonObject propObj = new JsonObject();
-			propObj.addProperty("key", propKey);
-			propObj.addProperty("value", properties.get(propKey));
+			propObj.addProperty(KEY, propKey);
+			propObj.addProperty(VALUE, properties.get(propKey));
 			propsArr.add(propObj);
 		});
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ public class PrivilegeConstants {
 	public static final int DEFAULT_ITERATIONS = 200000;
 
 	public static final String REALM = "realm";
+	public static final String DEFAULT_REALM = "defaultRealm";
 	public static final String ORGANISATION = "organisation";
 	public static final String LOCATION = "location";
 	public static final String LOCATIONS = "locations";

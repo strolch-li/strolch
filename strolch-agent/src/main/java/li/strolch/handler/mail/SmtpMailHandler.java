@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
 import li.strolch.runtime.configuration.ComponentConfiguration;
+import li.strolch.utils.MailAttachment;
 import li.strolch.utils.SmtpMailer;
+import org.pgpainless.algorithm.DocumentSignatureType;
 
 import java.io.File;
 import java.text.Normalizer;
@@ -141,14 +143,14 @@ public class SmtpMailHandler extends MailHandler {
 			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
 			mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
 		} else {
-			mailer.sendMail(recipients, subject, text);
+			mailer.sendMailSignedIfAvailable(recipients, subject, text);
 		}
 	}
 
 	@Override
 	public void sendUnencryptedMail(String recipients, String subject, String text) {
 		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMail(recipients, subject, text);
+		mailer.sendMailSignedIfAvailable(recipients, subject, text);
 	}
 
 	@Override
@@ -163,21 +165,20 @@ public class SmtpMailHandler extends MailHandler {
 	}
 
 	@Override
-	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	public void sendMailWithAttachment(String recipients, String subject, String text, MailAttachment... attachments) {
 		SmtpMailer mailer = getSmtpMailer();
 		if (this.encryptionEnabled) {
 			String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
 			mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
-					encryptedFileNameFromSubject, attachment, fileName);
+					encryptedFileNameFromSubject, attachments);
 		} else {
-			mailer.sendMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+			mailer.sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
 		}
 	}
 
 	@Override
-	public void sendEncryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	public void sendEncryptedMailWithAttachment(String recipients, String subject, String text,
+			MailAttachment... attachments) {
 		if (!this.encryptionEnabled)
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
@@ -185,14 +186,14 @@ public class SmtpMailHandler extends MailHandler {
 		SmtpMailer mailer = getSmtpMailer();
 		String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
 		mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
-				encryptedFileNameFromSubject, attachment, fileName);
+				encryptedFileNameFromSubject, attachments);
 	}
 
 	@Override
-	public void sendUnencryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	public void sendUnencryptedMailWithAttachment(String recipients, String subject, String text,
+			MailAttachment... attachments) {
 		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+		mailer.sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
 	}
 
 	@Override
@@ -218,32 +219,37 @@ public class SmtpMailHandler extends MailHandler {
 	}
 
 	@Override
-	public void sendMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	public void sendMailWithAttachmentAsync(String recipients, String subject, String text,
+			MailAttachment... attachments) {
 		if (this.encryptionEnabled) {
 			getExecutorService("Mail").submit(
-					() -> doSendEncryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+					() -> doSendEncryptedMailWithAttachment(recipients, subject, text, attachments));
 		} else {
 			getExecutorService("Mail").submit(
-					() -> doSendUnencryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+					() -> doSendUnencryptedMailWithAttachment(recipients, subject, text, attachments));
 		}
 	}
 
 	@Override
-	public void sendEncryptedMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	public void sendEncryptedMailWithAttachmentAsync(String recipients, String subject, String text,
+			MailAttachment... attachments) {
 		if (!this.encryptionEnabled)
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 		ExecutorService svc = getExecutorService("Mail");
-		svc.submit(() -> doSendEncryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+		svc.submit(() -> doSendEncryptedMailWithAttachment(recipients, subject, text, attachments));
 	}
 
 	@Override
 	public void sendUnencryptedMailWithAttachmentAsync(String recipients, String subject, String text,
-			String attachment, String fileName, String type) {
+			MailAttachment... attachments) {
 		ExecutorService svc = getExecutorService("Mail");
-		svc.submit(() -> doSendUnencryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type));
+		svc.submit(() -> doSendUnencryptedMailWithAttachment(recipients, subject, text, attachments));
+	}
+
+	@Override
+	public String signPlainText(String text) {
+		return getSmtpMailer().sign(text, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
 	}
 
 	private void doSendEncryptedMail(String recipients, String subject, String text) {
@@ -266,25 +272,27 @@ public class SmtpMailHandler extends MailHandler {
 		}
 	}
 
-	private void doSendEncryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	private void doSendEncryptedMailWithAttachment(String recipients, String subject, String text,
+			MailAttachment... attachments) {
 		try {
-			sendEncryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+			sendEncryptedMailWithAttachment(recipients, subject, text, attachments);
 		} catch (Throwable e) {
-			logger.error("Failed to send mail \"{}\" to {} with attachment {}", subject, recipients, fileName, e);
+			String attachmentsSummary = getAttachmentsSummary(attachments);
+			logger.error("Failed to send mail \"{}\" to {} with {}", subject, recipients, attachmentsSummary, e);
 			if (hasComponent(OperationsLog.class))
-				addFailedToSendMailWithAttachmentLogMessage(recipients, subject, fileName, e);
+				addFailedToSendMailWithAttachmentLogMessage(recipients, subject, attachmentsSummary, e);
 		}
 	}
 
-	private void doSendUnencryptedMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	private void doSendUnencryptedMailWithAttachment(String recipients, String subject, String text,
+			MailAttachment... attachments) {
 		try {
-			sendUnencryptedMailWithAttachment(recipients, subject, text, attachment, fileName, type);
+			sendUnencryptedMailWithAttachment(recipients, subject, text, attachments);
 		} catch (Throwable e) {
-			logger.error("Failed to send mail \"{}\" to {} with attachment {}", subject, recipients, fileName, e);
+			String attachmentsSummary = getAttachmentsSummary(attachments);
+			logger.error("Failed to send mail \"{}\" to {} with {}", subject, recipients, attachmentsSummary, e);
 			if (hasComponent(OperationsLog.class))
-				addFailedToSendMailWithAttachmentLogMessage(recipients, subject, fileName, e);
+				addFailedToSendMailWithAttachmentLogMessage(recipients, subject, attachmentsSummary, e);
 		}
 	}
 
@@ -321,5 +329,9 @@ public class SmtpMailHandler extends MailHandler {
 				.replaceAll(" ", "_")
 				.replaceAll("[:/]", "-");
 		return normalized + "_" + System.currentTimeMillis() + ".txt";
+	}
+
+	private static String getAttachmentsSummary(MailAttachment[] attachments) {
+		return attachments.length == 0 ? "no attachments" : "attachment " + attachments[0].fileName();
 	}
 }

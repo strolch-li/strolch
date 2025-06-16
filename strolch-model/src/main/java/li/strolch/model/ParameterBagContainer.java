@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,13 @@ import li.strolch.utils.time.PeriodDuration;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static li.strolch.model.StrolchModelConstants.*;
 
 /**
@@ -223,7 +225,7 @@ public interface ParameterBagContainer extends StrolchElement {
 	 */
 	default double getDouble(String bagKey, String paramKey) throws StrolchModelException {
 		ParameterBag bag = getParameterBag(bagKey, false);
-		return bag.getDouble(paramKey);
+		return bag == null ? 0.0D : bag.getDouble(paramKey);
 	}
 
 	/**
@@ -1767,6 +1769,22 @@ public interface ParameterBagContainer extends StrolchElement {
 	ParameterBag removeParameterBag(String key);
 
 	/**
+	 * Removes the {@link ParameterBag}s with the given type
+	 *
+	 * @param type the type of bag to remove
+	 *
+	 * @return the list of removed {@link ParameterBag}s
+	 */
+	default List<ParameterBag> removeParameterBagsByType(String type) {
+		return getParameterBagKeySet().stream().map(key -> {
+			ParameterBag bag = getParameterBag(key);
+			if (bag == null || !bag.getType().equals(type))
+				return null;
+			return removeParameterBag(key);
+		}).filter(Objects::nonNull).toList();
+	}
+
+	/**
 	 * Returns true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
 	 *
 	 * @return true if this {@link GroupedParameterizedElement} has any {@link ParameterBag ParameterBag}
@@ -1928,5 +1946,14 @@ public interface ParameterBagContainer extends StrolchElement {
 	default void copyParameterValue(String bagId, String paramId, ParameterBagContainer otherElement) {
 		Parameter<?> otherParam = otherElement.getParameter(bagId, paramId);
 		getParameter(bagId, paramId, true).setValue(otherParam.getValue());
+	}
+
+	/**
+	 * Retrieves a set of parameter bag types based on the stream of parameter bags.
+	 *
+	 * @return a set of strings representing the types of all parameter bags.
+	 */
+	default Set<String> getParameterBagTypes() {
+		return streamOfParameterBags().map(ParameterizedElement::getType).collect(toSet());
 	}
 }

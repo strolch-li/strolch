@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,8 +51,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 	private final Set<LockableObject> lockedObjects;
 
-	public DefaultPersistenceTransaction(PersistenceManager manager, IoMode ioMode, boolean verbose,
-			boolean allowOverwriteOnCreate) {
+	public DefaultPersistenceTransaction(PersistenceManager manager, boolean verbose, boolean allowOverwriteOnCreate) {
 		this.startTime = System.nanoTime();
 		this.startTimeDate = new Date();
 		this.manager = manager;
@@ -78,6 +77,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			String msg = "The transaction already has a result set!";
 			throw new IllegalStateException(msg);
 		}
+		if (txResult != null)
+			txResult.clear();
 		this.txResult = txResult;
 	}
 
@@ -136,7 +137,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 					this.txResult.setStartTime(this.startTimeDate);
 					this.txResult.setTxDuration(txDuration);
 					this.txResult.setCloseDuration(closeDuration);
-					this.txResult.setModificationByKey(Collections.emptyMap());
+					this.txResult.addModifications(Collections.emptyMap());
 				}
 			}
 		} finally {
@@ -146,7 +147,25 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 		}
 	}
 
-	private void internalCommit() {
+	@Override
+	public void flush() {
+		if (this.state == TransactionState.ROLLED_BACK)
+			throw new IllegalStateException("Transaction has already been rolled back!");
+
+		if (this.state == TransactionState.COMMITTED)
+			throw new IllegalStateException("Transaction has already been committed!");
+
+		Map<String, ModificationResult> modifications = writeChanges();
+		if (this.txResult != null) {
+			if (modifications != null && !modifications.isEmpty())
+				this.txResult.addModifications(modifications);
+			this.txResult.setState(TransactionState.COMMITTED);
+		}
+	}
+
+	private Map<String, ModificationResult> writeChanges() {
+		if (this.objectFilter.isEmpty())
+			return Collections.emptyMap();
 
 		Set<String> keySet = this.objectFilter.keySet();
 		Map<String, ModificationResult> modifications;
@@ -205,11 +224,8 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 			}
 		}
 
-		if (this.txResult != null) {
-			this.txResult.clear();
-			this.txResult.setState(TransactionState.COMMITTED);
-			this.txResult.setModificationByKey(modifications);
-		}
+		this.objectFilter.clearCache();
+		return modifications;
 	}
 
 	@Override
@@ -223,7 +239,13 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 				logger.info("Committing {} operations in TX...", this.objectFilter.sizeCache());
 			}
 
-			internalCommit();
+			Map<String, ModificationResult> modifications = writeChanges();
+
+			if (this.txResult != null) {
+				if (modifications != null && !modifications.isEmpty())
+					this.txResult.addModifications(modifications);
+				this.txResult.setState(TransactionState.COMMITTED);
+			}
 
 		} catch (Exception e) {
 			logger.error("Failed to commit!", e);
@@ -242,7 +264,7 @@ public class DefaultPersistenceTransaction implements PersistenceTransaction {
 
 			this.txResult.clear();
 			this.txResult.setState(TransactionState.FAILED);
-			this.txResult.setModificationByKey(Collections.emptyMap());
+			this.txResult.addModifications(Collections.emptyMap());
 			this.txResult.setFailCause(e);
 
 		} finally {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,17 @@
  */
 package li.strolch.model.audit;
 
-import li.strolch.model.Tags;
+import com.google.gson.JsonParser;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.text.MessageFormat;
+
+import static li.strolch.model.Tags.Audit.*;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -33,7 +36,7 @@ public class AuditFromDomReader {
 
 		Audit audit = new Audit();
 
-		String idS = rootElement.getAttribute(Tags.Audit.ID);
+		String idS = rootElement.getAttribute(ID);
 		DBC.INTERIM.assertNotEmpty("Id must be set!", idS);
 		audit.setId(Long.parseLong(idS));
 
@@ -47,18 +50,18 @@ public class AuditFromDomReader {
 			String txtContent = element.getTextContent();
 
 			switch (nodeName) {
-				case Tags.Audit.USERNAME -> audit.setUsername(txtContent);
-				case Tags.Audit.FIRSTNAME -> audit.setFirstname(txtContent);
-				case Tags.Audit.LASTNAME -> audit.setLastname(txtContent);
-				case Tags.Audit.DATE ->
-						audit.setDate(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
-				case Tags.Audit.ELEMENT_TYPE -> audit.setElementType(txtContent);
-				case Tags.Audit.ELEMENT_SUB_TYPE -> audit.setElementSubType(txtContent);
-				case Tags.Audit.ELEMENT_ACCESSED -> audit.setElementAccessed(txtContent);
-				case Tags.Audit.NEW_VERSION ->
-						audit.setNewVersion(ISO8601FormatFactory.getInstance().getXmlDateFormat().parse(txtContent));
-				case Tags.Audit.ACTION -> audit.setAction(txtContent);
-				case Tags.Audit.ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
+				case USERNAME -> audit.setUsername(txtContent);
+				case DATE -> audit.setDate(ISO8601.parseToZdt(txtContent));
+				case ELEMENT_TYPE -> audit.setElementType(txtContent);
+				case ELEMENT_SUB_TYPE -> audit.setElementSubType(txtContent);
+				case ELEMENT_ACCESSED -> audit.setElementAccessed(txtContent);
+				case NEW_VERSION -> audit.setNewVersion(ISO8601.parseToZdt(txtContent));
+				case ACTION -> audit.setAction(txtContent);
+				case ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
+				case ADDITIONAL_DATA -> {
+					if (isNotEmpty(txtContent))
+						audit.setAdditionalDataAsString(txtContent);
+				}
 				default -> throw new IllegalArgumentException(
 						MessageFormat.format("Unhandled/Invalid tag {0} for Audit {1}", nodeName, idS));
 			}
@@ -66,13 +69,10 @@ public class AuditFromDomReader {
 
 		String msg = " missing for element with id " + audit.getId();
 		DBC.INTERIM.assertNotEmpty("Username" + msg, audit.getUsername());
-		DBC.INTERIM.assertNotEmpty("Firstname" + msg, audit.getFirstname());
-		DBC.INTERIM.assertNotEmpty("Lastname" + msg, audit.getLastname());
 		DBC.INTERIM.assertNotNull("Date" + msg, audit.getDate());
 		DBC.INTERIM.assertNotEmpty("ElementType" + msg, audit.getElementType());
 		DBC.INTERIM.assertNotEmpty("ElementSubType" + msg, audit.getElementSubType());
 		DBC.INTERIM.assertNotEmpty("ElementAccessed" + msg, audit.getElementAccessed());
-		//DBC.INTERIM.assertNotNull("NewVersion" + msg, audit.getNewVersion());
 		DBC.INTERIM.assertNotEmpty("Action" + msg, audit.getAction());
 		DBC.INTERIM.assertNotNull("AccessType" + msg, audit.getAccessType());
 

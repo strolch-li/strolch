@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import li.strolch.service.api.ServiceResultState;
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNameArgument, ServiceResult> {
+public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserIdArgument, ServiceResult> {
 
 	@Override
 	protected ServiceResult getResultInstance() {
@@ -32,18 +32,16 @@ public class PrivilegeRemoveUserService extends AbstractService<PrivilegeUserNam
 	}
 
 	@Override
-	public PrivilegeUserNameArgument getArgumentInstance() {
-		return new PrivilegeUserNameArgument();
+	public PrivilegeUserIdArgument getArgumentInstance() {
+		return new PrivilegeUserIdArgument();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(PrivilegeUserNameArgument arg) {
+	protected ServiceResult internalDoService(PrivilegeUserIdArgument arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_REMOVE_USER)) {
-			tx.setSuppressAudits(true);
-
 			PrivilegeRemoveUserCommand cmd = new PrivilegeRemoveUserCommand(tx);
-			cmd.setUsername(arg.username);
+			cmd.setUserId(arg.userId);
 			tx.addCommand(cmd);
 
 			tx.commitOnClose();

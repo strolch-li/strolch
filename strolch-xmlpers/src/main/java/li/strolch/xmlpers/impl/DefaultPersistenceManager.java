@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,6 @@ public class DefaultPersistenceManager implements PersistenceManager {
 
 	@Override
 	public PersistenceTransaction openTx() {
-		return new DefaultPersistenceTransaction(this, this.ioMode, this.verbose, this.allowOverwriteOnCreate);
+		return new DefaultPersistenceTransaction(this, this.verbose, this.allowOverwriteOnCreate);
 	}
 }

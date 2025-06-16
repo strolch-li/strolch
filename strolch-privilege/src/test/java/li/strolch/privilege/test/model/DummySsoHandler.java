@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class DummySsoHandler implements SingleSignOnHandler {
 		Set<String> groups = Arrays.stream(map.get("groups").split(",")).map(String::trim).collect(Collectors.toSet());
 		Set<String> roles = Arrays.stream(map.get("roles").split(",")).map(String::trim).collect(Collectors.toSet());
 		Map<String, String> properties = new HashMap<>();
-		return new User(map.get("userId"), map.get("username"), null, map.get("firstName"), map.get("lastName"),
-				UserState.REMOTE, groups, roles, Locale.ENGLISH, properties, false, UserHistory.EMPTY);
+		return new User(null, map.get("username"), null, map.get("firstName"), map.get("lastName"), UserState.REMOTE,
+				groups, roles, Locale.ENGLISH, properties, false, UserHistory.EMPTY);
 	}
 }

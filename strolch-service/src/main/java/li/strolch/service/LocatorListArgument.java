@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import li.strolch.model.Locator;
 import li.strolch.service.api.ServiceArgument;
 
@@ -23,4 +25,13 @@ import java.util.List;
 
 public class LocatorListArgument extends ServiceArgument {
 	public List<Locator> locators;
+
+	@Override
+	public JsonElement toJson() {
+		if (this.locators.isEmpty())
+			return new JsonArray();
+		JsonArray jsonArray = new JsonArray();
+		this.locators.forEach(l -> jsonArray.add(l.toString()));
+		return jsonArray;
+	}
 }

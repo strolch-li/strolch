@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.parameter;
+package li.strolch.service;
 
-import li.strolch.model.Locator;
-import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.model.parameter.Parameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.persistence.api.TxUpdateStrolchRootElementVisitor;
 import li.strolch.service.api.AbstractService;
-import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
-import li.strolch.service.parameter.AddParameterService.AddParameterArg;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class AddParameterService extends AbstractService<AddParameterArg, ServiceResult> {
+public class SetParameterService extends AbstractService<SetParameterArg, ServiceResult> {
 
 	@Override
 	protected ServiceResult getResultInstance() {
@@ -38,30 +34,43 @@ public class AddParameterService extends AbstractService<AddParameterArg, Servic
 	}
 
 	@Override
-	public AddParameterArg getArgumentInstance() {
-		return new AddParameterArg();
+	public SetParameterArg getArgumentInstance() {
+		return new SetParameterArg();
 	}
 
 	@Override
-	protected ServiceResult internalDoService(AddParameterArg arg) {
+	protected ServiceResult internalDoService(SetParameterArg arg) {
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
 
-			ParameterizedElement element = tx.findElement(arg.locator);
-			element.addParameter(arg.parameter);
+			Parameter<?> parameter = tx.findElement(arg.locator);
 
-			StrolchRootElement rootElement = element.getRootElement();
+			if (arg.name != null) {
+				parameter.setName(arg.name);
+			}
+			if (arg.interpretation != null) {
+				parameter.setInterpretation(arg.interpretation);
+			}
+			if (arg.uom != null) {
+				parameter.setUom(arg.uom);
+			}
+			if (arg.hidden != null) {
+				parameter.setHidden(arg.hidden);
+			}
+			if (arg.index != null) {
+				parameter.setIndex(arg.index);
+			}
+
+			if (arg.valueAsString != null) {
+				parameter.setValueFromString(arg.valueAsString);
+			}
+
+			StrolchRootElement rootElement = parameter.getRootElement();
 			rootElement.accept(new TxUpdateStrolchRootElementVisitor(tx));
 
 			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();
-	}
-
-	public static class AddParameterArg extends ServiceArgument {
-
-		public Locator locator;
-		public Parameter<?> parameter;
 	}
 }

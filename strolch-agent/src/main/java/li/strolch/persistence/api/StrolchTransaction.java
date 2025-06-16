@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,6 +234,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	 * @return the reference to the container
 	 */
 	ComponentContainer getContainer();
+
+	/**
+	 * @see ComponentContainer#hasComponent(Class)
+	 */
+	boolean hasComponent(Class<?> clazz);
+
+	/**
+	 * @see ComponentContainer#getComponent(Class)
+	 */
+	<T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
 
 	/**
 	 * Instantiates the policy using the given {@link Class} to retrieve the {@link PolicyDef} from the given element
@@ -483,6 +493,23 @@ public interface StrolchTransaction extends AutoCloseable {
 	void setSuppressAudits(boolean suppressAudits);
 
 	/**
+	 * Enables suppressing of {@link Audit Audits}
+	 */
+	void suppressAudits();
+
+	/**
+	 * Enables suppressing of {@link Audit Audits} for reads
+	 */
+	void suppressAuditsForReads();
+
+	/**
+	 * Enables suppressing of {@link Audit Audits} for reads
+	 *
+	 * @param suppressAuditsForReads true if audits for reads should be suppresed, false otherwise
+	 */
+	void setSuppressAuditsForReads(boolean suppressAuditsForReads);
+
+	/**
 	 * If the given argument is true, then no {@link Audit Audits} for Audits are written. Since the {@link AuditTrail}
 	 * is also audited, {@link Audit Audits} for Audits are generated, this allows to suppress this should that be
 	 * required.
@@ -492,11 +519,30 @@ public interface StrolchTransaction extends AutoCloseable {
 	void setSuppressAuditsForAudits(boolean suppressAuditsForAudits);
 
 	/**
+	 * Suppresses audits for audits, which should be the default, as the AuditTrail is also audited
+	 */
+	StrolchTransaction suppressAuditsForAudits();
+
+	/**
+	 * Determines whether the audit trail feature is enabled.
+	 *
+	 * @return true if the audit trail is enabled, false otherwise
+	 */
+	boolean isAuditTrailEnabled();
+
+	/**
 	 * Returns true if writing {@link Audit Audits} is currently suppressed
 	 *
 	 * @return true if writing {@link Audit Audits} is currently suppressed
 	 */
 	boolean isSuppressAudits();
+
+	/**
+	 * Returns true if audits for audits should be written
+	 *
+	 * @return true if audits for audits should be written
+	 */
+	boolean isAuditsForAuditsEnabled();
 
 	/**
 	 * Returns true if writing {@link Audit Audits} for Audits is currently suppressed
@@ -1575,7 +1621,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	boolean isRemoved(Activity activity);
 
 	/**
-	 * Add or update and thus persist the given {@link Resource} by calling the relevant {@link Command}
+	 * Add or update and thus persist the given {@link Resource}
 	 *
 	 * @param resource the resource to add or update
 	 *
@@ -1584,7 +1630,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void addOrUpdate(Resource resource) throws StrolchModelException;
 
 	/**
-	 * Add or update and thus persist the given {@link Order} by calling the relevant {@link Command}
+	 * Add or update and thus persist the given {@link Order}
 	 *
 	 * @param order the order to add or update
 	 *
@@ -1593,7 +1639,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void addOrUpdate(Order order) throws StrolchModelException;
 
 	/**
-	 * Add or update and thus persist the given {@link Activity} by calling the relevant {@link Command}
+	 * Add or update and thus persist the given {@link Activity}
 	 *
 	 * @param activity the activity to add or update
 	 *
@@ -1602,7 +1648,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void addOrUpdate(Activity activity) throws StrolchModelException;
 
 	/**
-	 * Adds and thus persists the given {@link Resource} by calling the relevant {@link Command}
+	 * Adds and thus persists the given {@link Resource}
 	 *
 	 * @param resource the resource to add
 	 *
@@ -1611,7 +1657,16 @@ public interface StrolchTransaction extends AutoCloseable {
 	void add(Resource resource) throws StrolchModelException;
 
 	/**
-	 * Adds and thus persists the given {@link Order} by calling the relevant {@link Command}
+	 * Adds and thus persists the given {@link Audit}
+	 *
+	 * @param audit the audit to add
+	 *
+	 * @throws StrolchModelException if the audit is null
+	 */
+	void add(Audit audit);
+
+	/**
+	 * Adds and thus persists the given {@link Order}
 	 *
 	 * @param order the order to add
 	 *
@@ -1620,7 +1675,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void add(Order order) throws StrolchException;
 
 	/**
-	 * Adds and thus persists the given {@link Activity} by calling the relevant {@link Command}.
+	 * Adds and thus persists the given {@link Activity}.
 	 *
 	 * @param activity the activity to add
 	 *
@@ -1629,7 +1684,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void add(Activity activity) throws StrolchException;
 
 	/**
-	 * Updates the given {@link Resource} by calling the relevant {@link Command}
+	 * Updates the given {@link Resource}
 	 *
 	 * @param resource the resource to update
 	 *
@@ -1638,7 +1693,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void update(Resource resource) throws StrolchException;
 
 	/**
-	 * Updates the given {@link Order} by calling the relevant {@link Command}
+	 * Updates the given {@link Order}
 	 *
 	 * @param order the order to update
 	 *
@@ -1647,7 +1702,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void update(Order order);
 
 	/**
-	 * Updates the given {@link Activity} by calling the relevant {@link Command}
+	 * Updates the given {@link Activity}
 	 *
 	 * @param activity the activity to update
 	 *
@@ -1656,7 +1711,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void update(Activity activity) throws StrolchException;
 
 	/**
-	 * Removes the given {@link Resource} by calling the relevant {@link Command}
+	 * Removes the given {@link Resource}
 	 *
 	 * @param resource the resource to remove
 	 *
@@ -1665,7 +1720,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void remove(Resource resource) throws StrolchException;
 
 	/**
-	 * Removes the given {@link Order} by calling the relevant {@link Command}
+	 * Removes the given {@link Order}
 	 *
 	 * @param order the order to remove
 	 *
@@ -1674,7 +1729,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	void remove(Order order) throws StrolchException;
 
 	/**
-	 * Removes the given {@link Activity} by calling the relevant {@link Command}
+	 * Removes the given {@link Activity}
 	 *
 	 * @param activity the activity to remove
 	 *

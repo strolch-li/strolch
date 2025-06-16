@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package li.strolch.search;
 
 import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.handler.audits.AuditHandler;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.StrolchModelConstants;
@@ -193,6 +194,15 @@ public abstract class StrolchSearch<T extends StrolchRootElement, U extends Root
 
 		if (this.expression != null)
 			stream = stream.filter(e -> this.expression.matches(e));
+
+		if (tx.isAuditTrailEnabled()) {
+			tx
+					.getAgent()
+					.getComponentO(AuditHandler.class)
+					.ifPresent(handler -> handler.writeAuditForSearchAsync(tx.getCertificate(), tx.getRealmName(),
+							getClass().getName()));
+		}
+
 		return stream;
 	}
 

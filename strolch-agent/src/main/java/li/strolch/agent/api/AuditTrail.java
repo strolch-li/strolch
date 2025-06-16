@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,39 +27,66 @@ import java.util.Set;
  */
 public interface AuditTrail {
 
+	/**
+	 * Checks if the audit trail is enabled.
+	 *
+	 * @return true if the audit trail is enabled, false otherwise
+	 */
 	boolean isEnabled();
 
-	boolean hasAudit(StrolchTransaction tx, String type, Long id);
-
-	long querySize(StrolchTransaction tx, DateRange dateRange);
-
-	long querySize(StrolchTransaction tx, String type, DateRange dateRange);
-
-	Set<String> getTypes(StrolchTransaction tx);
-
 	/**
-	 * Retrieves the audit with the given id, or null if it does not exist
+	 * Queries the total number of audits in the audit trail.
 	 *
 	 * @param tx the open transaction
-	 * @param id the id of the element to retrieve
 	 *
-	 * @return the element with the type and id, or null if it does not exist
+	 * @return the total audit count
 	 */
-	Audit getBy(StrolchTransaction tx, String type, Long id);
+	long querySize(StrolchTransaction tx);
 
+	/**
+	 * Queries the number of audits within the given date range.
+	 *
+	 * @param tx        the open transaction
+	 * @param dateRange the date range to filter audits
+	 *
+	 * @return the count of audits within the date range
+	 */
+	long querySize(StrolchTransaction tx, DateRange dateRange);
+
+	/**
+	 * Retrieves all audits within the specified date range.
+	 *
+	 * @param tx        the open transaction
+	 * @param dateRange the date range to filter audits
+	 *
+	 * @return a list of audits within the date range
+	 */
+	List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange);
+
+	/**
+	 * Retrieves all audits of the specified type within the given date range.
+	 *
+	 * @param tx        the open transaction
+	 * @param type      the type of audits to filter
+	 * @param dateRange the date range to filter audits
+	 *
+	 * @return a list of audits of the specified type within the date range
+	 */
 	List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange);
 
+	/**
+	 * Adds a single audit to the audit trail.
+	 *
+	 * @param tx    the open transaction
+	 * @param audit the audit to add
+	 */
 	void add(StrolchTransaction tx, Audit audit);
 
+	/**
+	 * Adds multiple audits to the audit trail.
+	 *
+	 * @param tx     the open transaction
+	 * @param audits the audits to add
+	 */
 	void addAll(StrolchTransaction tx, List<Audit> audits);
-
-	void update(StrolchTransaction tx, Audit audit);
-
-	void updateAll(StrolchTransaction tx, List<Audit> audits);
-
-	void remove(StrolchTransaction tx, Audit audit);
-
-	void removeAll(StrolchTransaction tx, List<Audit> audits);
-
-	long removeAll(StrolchTransaction tx, String type, DateRange dateRange);
 }

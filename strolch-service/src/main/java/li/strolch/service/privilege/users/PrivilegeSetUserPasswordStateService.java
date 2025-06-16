@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package li.strolch.service.privilege.users;
 
 import li.strolch.model.Tags;
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
+import li.strolch.privilege.model.UserRep;
 import li.strolch.service.StringMapArgument;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResult;
@@ -47,24 +47,22 @@ public class PrivilegeSetUserPasswordStateService extends AbstractService<String
 	@Override
 	protected ServiceResult internalDoService(StringMapArgument arg) {
 
-		String username = arg.map.get(Tags.Json.USERNAME);
+		String userId = arg.map.get(Tags.Json.USER_ID);
 		String state = arg.map.get(Tags.Json.STATE);
 
 		if (!state.equals("RequirePasswordChange"))
 			return ServiceResult.error("Unhandled state " + state);
 
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_PASSWORD)) {
-			tx.setSuppressAudits(true);
-
 			li.strolch.runtime.privilege.PrivilegeHandler strolchPrivilegeHandler
 					= getContainer().getPrivilegeHandler();
 			PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
-			privilegeHandler.requirePasswordChange(getCertificate(), username);
+			UserRep userRep = privilegeHandler.requirePasswordChangeById(getCertificate(), userId);
 			if (privilegeHandler.isPersistOnUserDataChanged())
 				privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, username);
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, userRep.getUsername()));
+			tx.commitOnClose();
 		}
 
 		return ServiceResult.success();

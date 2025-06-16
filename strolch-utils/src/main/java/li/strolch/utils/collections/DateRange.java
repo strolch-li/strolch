@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,9 @@ package li.strolch.utils.collections;
 
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
+import li.strolch.utils.time.Interval;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Date;
 
 /**
@@ -42,14 +40,6 @@ public class DateRange {
 		return this;
 	}
 
-	public DateRange to(LocalDate to, boolean inclusive) {
-		DBC.PRE.assertNotNull("to must be set!", to);
-		this.toDate = ZonedDateTime.of(to.atStartOfDay(), ZoneId.systemDefault());
-		this.toInclusive = inclusive;
-		validate();
-		return this;
-	}
-
 	public DateRange from(LocalDateTime from, boolean inclusive) {
 		DBC.PRE.assertNotNull("from must be set!", from);
 		this.fromDate = ZonedDateTime.of(from, ZoneId.systemDefault());
@@ -58,10 +48,15 @@ public class DateRange {
 		return this;
 	}
 
-	public DateRange to(LocalDateTime to, boolean inclusive) {
-		DBC.PRE.assertNotNull("to must be set!", to);
-		this.toDate = ZonedDateTime.of(to, ZoneId.systemDefault());
-		this.toInclusive = inclusive;
+	public DateRange from(ZonedDateTime from) {
+		from(from, true);
+		return this;
+	}
+
+	public DateRange from(Date from, boolean inclusive) {
+		DBC.PRE.assertNotNull("from must be set!", from);
+		this.fromDate = ZonedDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault());
+		this.fromInclusive = inclusive;
 		validate();
 		return this;
 	}
@@ -74,18 +69,31 @@ public class DateRange {
 		return this;
 	}
 
-	public DateRange to(ZonedDateTime to, boolean inclusive) {
+	public DateRange to(LocalDate to, boolean inclusive) {
 		DBC.PRE.assertNotNull("to must be set!", to);
-		this.toDate = to;
+		this.toDate = ZonedDateTime.of(to.atStartOfDay(), ZoneId.systemDefault());
 		this.toInclusive = inclusive;
 		validate();
 		return this;
 	}
 
-	public DateRange from(Date from, boolean inclusive) {
-		DBC.PRE.assertNotNull("from must be set!", from);
-		this.fromDate = ZonedDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault());
-		this.fromInclusive = inclusive;
+	public DateRange to(LocalDateTime to, boolean inclusive) {
+		DBC.PRE.assertNotNull("to must be set!", to);
+		this.toDate = ZonedDateTime.of(to, ZoneId.systemDefault());
+		this.toInclusive = inclusive;
+		validate();
+		return this;
+	}
+
+	public DateRange to(ZonedDateTime to) {
+		to(to, false);
+		return this;
+	}
+
+	public DateRange to(ZonedDateTime to, boolean inclusive) {
+		DBC.PRE.assertNotNull("to must be set!", to);
+		this.toDate = to;
+		this.toInclusive = inclusive;
 		validate();
 		return this;
 	}
@@ -214,6 +222,20 @@ public class DateRange {
 				fromContains = compare < 0;
 		}
 		return toContains && fromContains;
+	}
+
+	public Interval toInterval() {
+		if (this.fromInclusive && !this.toInclusive) {
+			if (this.fromDate == null && this.toDate == null)
+				return Interval.of(Instant.MIN, Instant.MAX);
+			if (this.fromDate == null)
+				return Interval.of(Instant.MIN, getToDateZdt().toInstant());
+			if (this.toDate == null)
+				return Interval.of(Instant.MAX, getToDateZdt().toInstant());
+			return Interval.of(getFromDateZdt().toInstant(), getToDateZdt().toInstant());
+		}
+		throw new UnsupportedOperationException(
+				"Can only convert range to interval where start is inclusive and end is exclusive!");
 	}
 
 	@Override

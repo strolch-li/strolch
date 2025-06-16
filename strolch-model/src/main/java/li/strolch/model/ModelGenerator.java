@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package li.strolch.model;
 
+import com.google.gson.JsonObject;
 import li.strolch.model.activity.Action;
 import li.strolch.model.activity.Activity;
 import li.strolch.model.activity.TimeOrdering;
@@ -29,6 +30,8 @@ import li.strolch.model.timevalue.impl.*;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.time.PeriodDuration;
 
+import java.security.SecureRandom;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -502,10 +505,8 @@ public class ModelGenerator {
 
 	public static Audit randomAudit() {
 
-		Random rand = new Random(234234L);
+		Random random = new SecureRandom();
 		String[] usernames = new String[]{"bob", "alice", "jenny"};
-		String[] firstnames = new String[]{"Bob", "Alice", "Jenny"};
-		String[] lastnames = new String[]{"Richards", "Kennedy", "Davids"};
 		String[] types = new String[]{Tags.RESOURCE, Tags.ORDER, Tags.AUDIT};
 		String[] subTypes = new String[]{"Ball", "Something", "Foo", "Bar"};
 		String[] actions = new String[]{"AddResourceService", "UpdateResourceService", "RemoveResourceService",
@@ -513,16 +514,19 @@ public class ModelGenerator {
 
 		Audit audit = new Audit();
 		audit.setId(StringHelper.getUniqueIdLong());
-		audit.setUsername(randomValue(rand, usernames));
-		audit.setFirstname(randomValue(rand, firstnames));
-		audit.setLastname(randomValue(rand, lastnames));
-		audit.setDate(new Date(rand.nextInt(5000)));
-		audit.setElementType(randomValue(rand, types));
-		audit.setElementSubType(randomValue(rand, subTypes));
+		audit.setUsername(randomValue(random, usernames));
+		audit.setDate(ZonedDateTime.now().plusDays(random.nextInt(100) - 20));
+		audit.setElementType(randomValue(random, types));
+		audit.setElementSubType(randomValue(random, subTypes));
 		audit.setElementAccessed(StringHelper.getUniqueId());
-		audit.setNewVersion(new Date(rand.nextInt(5000)));
-		audit.setAction(randomValue(rand, actions));
-		audit.setAccessType(AccessType.values()[rand.nextInt(AccessType.values().length)]);
+		audit.setNewVersion(ZonedDateTime.now().plusDays(random.nextInt(100) - 20));
+		audit.setAction(randomValue(random, actions));
+		audit.setAccessType(AccessType.values()[random.nextInt(AccessType.values().length)]);
+		if (new Random().nextBoolean()) {
+			JsonObject json = new JsonObject();
+			json.addProperty("key", "value");
+			audit.setAdditionalDataAsJson(json);
+		}
 
 		return audit;
 	}

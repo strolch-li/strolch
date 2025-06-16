@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,11 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 		this.elementMap = elementMap;
 		this.readOnly = readOnly;
 		this.observeAccessReads = observeAccessReads;
+	}
+
+	@Override
+	public DataStoreMode getDataStoreMode() {
+		return this.elementMap.getDataStoreMode();
 	}
 
 	protected ElementMap<T> getElementMap() {

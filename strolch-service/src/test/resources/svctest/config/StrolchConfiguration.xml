@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <StrolchConfiguration>
 	<env id="dev">
 		<Runtime>
@@ -19,7 +35,7 @@
 			<depends>PrivilegeHandler</depends>
 			<depends>PersistenceHandler</depends>
 			<Properties>
-				<realms>defaultRealm, svcTransient, svcCached, svcCachedAuditsVersioning</realms>
+				<realms>defaultRealm, svcTransient, svcCached, svcCachedAuditsVersioning, eclipseStore</realms>
 
 				<dataStoreMode>EMPTY</dataStoreMode>
 
@@ -38,6 +54,9 @@
 				<enableAuditTrail.svcCachedAuditsVersioning>true</enableAuditTrail.svcCachedAuditsVersioning>
 				<enableVersioning.svcCachedAuditsVersioning>true</enableVersioning.svcCachedAuditsVersioning>
 
+                <dataStoreMode.eclipseStore>ECLIPSE_STORE</dataStoreMode.eclipseStore>
+                <dataStoreFile.eclipseStore>DefaultRealm.xml</dataStoreFile.eclipseStore>
+                <dbStore.eclipseStore>eclipseStore</dbStore.eclipseStore>
 			</Properties>
 		</Component>
 
@@ -71,6 +90,7 @@
 			<name>ServiceHandler</name>
 			<api>li.strolch.service.api.ServiceHandler</api>
 			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+			<depends>RealmHandler</depends>
 			<Properties>
 				<verbose>true</verbose>
 			</Properties>
@@ -90,6 +110,7 @@
 			<name>ExecutionHandler</name>
 			<api>li.strolch.execution.ExecutionHandler</api>
 			<impl>li.strolch.execution.EventBasedExecutionHandler</impl>
+			<depends>RealmHandler</depends>
 		</Component>
 
 		<Component>

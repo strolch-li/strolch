@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 /**
- * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
+ * @author Reto Breitenmoser <reto.breitenmoser@atexxi.ch>
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 @Provider

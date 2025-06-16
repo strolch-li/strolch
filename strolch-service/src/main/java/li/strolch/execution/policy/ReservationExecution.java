@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,6 @@
 
 package li.strolch.execution.policy;
 
-import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
-import static li.strolch.model.StrolchModelConstants.PolicyConstants.*;
-import static li.strolch.utils.ObjectHelper.isIn;
-
 import li.strolch.exception.StrolchModelException;
 import li.strolch.execution.Controller;
 import li.strolch.model.Resource;
@@ -31,6 +27,10 @@ import li.strolch.model.parameter.IntegerParameter;
 import li.strolch.model.parameter.StringListParameter;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.runtime.StrolchConstants;
+
+import static li.strolch.model.StrolchModelConstants.BAG_PARAMETERS;
+import static li.strolch.model.StrolchModelConstants.PolicyConstants.*;
+import static li.strolch.utils.ObjectHelper.isIn;
 
 /**
  * <p>This reservation execution policy has two modes of functioning:</p>

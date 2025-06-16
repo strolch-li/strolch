@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import java.util.Map;
 import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REMOTE_IP;
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.*;
@@ -61,7 +62,7 @@ public class WebSocketClient implements MessageHandler.Whole<String> {
 		this.sessionHandler = agent.getComponent(StrolchSessionHandler.class);
 		this.session = session;
 		this.config = config;
-		this.remoteIp = WebSocketRemoteIp.get();
+		this.remoteIp = session.getUserProperties().getOrDefault(STROLCH_REMOTE_IP, "unknown").toString();
 		this.observerHandlersByRealm = new HashMap<>(1);
 	}
 

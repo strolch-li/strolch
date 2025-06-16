@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,16 @@ package li.strolch.model.json;
 import com.google.gson.JsonObject;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.audit.AuditVisitor;
-import li.strolch.utils.iso8601.ISO8601FormatFactory;
+import li.strolch.utils.iso8601.ISO8601;
 
 public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
+
+	private boolean withAdditionalData;
+
+	public AuditToJsonVisitor withAdditionalData() {
+		this.withAdditionalData = true;
+		return this;
+	}
 
 	@Override
 	public JsonObject visitAudit(Audit audit) {
@@ -29,15 +36,16 @@ public class AuditToJsonVisitor implements AuditVisitor<JsonObject> {
 
 		jsonObject.addProperty("id", audit.getId());
 		jsonObject.addProperty("username", audit.getUsername());
-		jsonObject.addProperty("firstname", audit.getFirstname());
-		jsonObject.addProperty("lastname", audit.getLastname());
-		jsonObject.addProperty("date", ISO8601FormatFactory.getInstance().formatDate(audit.getDate()));
+		jsonObject.addProperty("date", ISO8601.toString(audit.getDate()));
 		jsonObject.addProperty("elementType", audit.getElementType());
 		jsonObject.addProperty("elementSubType", audit.getElementSubType());
 		jsonObject.addProperty("elementAccessed", audit.getElementAccessed());
-		jsonObject.addProperty("newVersion", ISO8601FormatFactory.getInstance().formatDate(audit.getNewVersion()));
+		if (audit.getNewVersion() != null)
+			jsonObject.addProperty("newVersion", ISO8601.toString(audit.getNewVersion()));
 		jsonObject.addProperty("action", audit.getAction());
 		jsonObject.addProperty("accessType", audit.getAccessType().name());
+		if (this.withAdditionalData)
+			jsonObject.add("additionalData", audit.getAdditionalDataAsJson());
 
 		return jsonObject;
 	}

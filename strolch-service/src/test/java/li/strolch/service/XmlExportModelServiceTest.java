@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest<XmlExpor
 	public void runTest() {
 
 		Runner before = (strolchRealm, container) -> {
-			File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
+			File file = new File(new File(this.runtimeMock.getTargetPath(), "/data"), TMP_XML_EXPORT_XML);
 			if (file.exists())
 				if (!file.delete())
 					throw new IllegalStateException("Failed to delete " + file.getAbsolutePath());
@@ -65,7 +65,7 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest<XmlExpor
 
 	@Test
 	public void runTestFailOnExisting() {
-		File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
+		File file = new File(new File(this.runtimeMock.getTargetPath(), "/data"), TMP_XML_EXPORT_XML);
 		if (!file.exists()) {
 			try {
 				if (!file.createNewFile())
@@ -89,7 +89,7 @@ public class XmlExportModelServiceTest extends AbstractRealmServiceTest<XmlExpor
 
 	@Test
 	public void runTestOverwrite() {
-		File file = new File(RUNTIME_PATH + "/data", TMP_XML_EXPORT_XML);
+		File file = new File(new File(this.runtimeMock.getTargetPath(), "/data"), TMP_XML_EXPORT_XML);
 		if (!file.exists()) {
 			try {
 				if (!file.createNewFile())

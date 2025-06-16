@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,6 @@ import li.strolch.privilege.model.internal.User;
  * <p>
  * {@link PrivilegePolicy} implements logic to determine if a {@link User} which has the given {@link Role} and the
  * given {@link Privilege} has access to the given {@link Restrictable}
- * </p>
- *
- * <p>
- * TODO
  * </p>
  *
  * @author Robert von Burg <eitch@eitchnet.ch>

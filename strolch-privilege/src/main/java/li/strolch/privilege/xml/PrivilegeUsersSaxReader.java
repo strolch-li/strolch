@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,21 +39,23 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	private final Deque<ElementParser> buildersStack = new ArrayDeque<>();
 
-	private final Map<String, User> users;
+	private final Map<String, User> usersByUsername;
+	private final Map<String, User> usersById;
 	private final boolean caseInsensitiveUsername;
 	private final boolean verbose;
 
 	public PrivilegeUsersSaxReader(boolean caseInsensitiveUsername, boolean verbose) {
 		this.caseInsensitiveUsername = caseInsensitiveUsername;
 		this.verbose = verbose;
-		this.users = new HashMap<>();
+		this.usersByUsername = new HashMap<>();
+		this.usersById = new HashMap<>();
 	}
 
 	/**
 	 * @return the users
 	 */
-	public Map<String, User> getUsers() {
-		return this.users;
+	public Map<String, User> getUsersByUsername() {
+		return this.usersByUsername;
 	}
 
 	@Override
@@ -185,7 +187,12 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 					if (verbose)
 						logger.info("New User: {}", user);
 					String username = caseInsensitiveUsername ? user.getUsername().toLowerCase() : user.getUsername();
-					users.put(username, user);
+					if (usersByUsername.containsKey(username))
+						throw new IllegalStateException("Duplicate username " + username);
+					if (usersById.containsKey(user.getUserId()))
+						throw new IllegalStateException("Duplicate userId " + user.getUserId());
+					usersByUsername.put(username, user);
+					usersById.put(user.getUserId(), user);
 				}
 				default -> {
 					if (!(

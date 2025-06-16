@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 package li.strolch.service.privilege.roles;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.RoleRep;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
+
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,15 +46,12 @@ public class PrivilegeUpdateRoleService extends AbstractService<PrivilegeRoleArg
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		RoleRep role;
-		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_MODIFY_ROLE)) {
-			tx.setSuppressAudits(true);
-
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_MODIFY_ROLE)) {
 			role = privilegeHandler.replaceRole(getCertificate(), arg.role);
 			privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.ROLE, role.getName());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, ROLE, role.getName()));
+			tx.commitOnClose();
 		}
 
 		return new PrivilegeRoleResult(role);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public class TransactionResult {
 	private long txDuration;
 	private long closeDuration;
 
-	private Map<String, ModificationResult> modificationByKey;
+	private final Map<String, ModificationResult> modificationByKey;
 
 	public TransactionResult() {
 		this.state = TransactionState.OPEN;
@@ -78,8 +78,8 @@ public class TransactionResult {
 		this.closeDuration = closeDuration;
 	}
 
-	public void setModificationByKey(Map<String, ModificationResult> modificationByKey) {
-		this.modificationByKey = modificationByKey;
+	public void addModifications(Map<String, ModificationResult> modificationByKey) {
+		this.modificationByKey.putAll(modificationByKey);
 	}
 
 	public Set<String> getKeys() {

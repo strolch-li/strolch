@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,7 @@ public class Tags {
 		public static final String TIME_ORDERING = "timeOrdering";
 
 		public static final String PARAMETER_BAGS = "parameterBags";
+		public static final String PARAMETER = "parameter";
 		public static final String PARAMETERS = "parameters";
 		public static final String INTERPRETATION = "interpretation";
 		public static final String UOM = "uom";
@@ -143,6 +144,7 @@ public class Tags {
 		public static final String MESSAGE = "message";
 		public static final String MESSAGES = "messages";
 		public static final String REALM = "realm";
+		public static final String ROLE = "role";
 		public static final String ROLES = "roles";
 
 		// miscellaneous
@@ -171,6 +173,22 @@ public class Tags {
 		public static final String OPERATION = "operation";
 		public static final String EXECUTION_POLICY = "executionPolicy";
 
+		public static final String USER_ID = "userId";
+		public static final String FIRSTNAME = "firstname";
+		public static final String LASTNAME = "lastname";
+		public static final String USER_STATE = "userState";
+		public static final String LOCALE = "locale";
+		public static final String GROUPS = "groups";
+		public static final String POLICY = "policy";
+		public static final String ALL_ALLOWED = "allAllowed";
+		public static final String DENY_LIST = "denyList";
+		public static final String ALLOW_LIST = "allowList";
+		public static final String PRIVILEGES = "privileges";
+		public static final String HISTORY = "history";
+		public static final String FIRST_LOGIN = "firstLogin";
+		public static final String LAST_LOGIN = "lastLogin";
+		public static final String LAST_PASSWORD_CHANGE = "lastPasswordChange";
+
 		public static final String APP_VERSION = "appVersion";
 		public static final String APPLICATION_NAME = "applicationName";
 		public static final String SYSTEM_STATE = "systemState";
@@ -181,7 +199,6 @@ public class Tags {
 		public static final String AGENT_NAME = "agentName";
 		public static final String ENVIRONMENT = "environment";
 		public static final String VERBOSE = "verbose";
-		public static final String LOCALE = "locale";
 		public static final String TIMEZONE = "timezone";
 		public static final String BUILD_TIMESTAMP = "buildTimestamp";
 		public static final String SCM_BRANCH = "scmBranch";
@@ -222,14 +239,15 @@ public class Tags {
 		public static final String DATA_PATH = "dataPath";
 		public static final String TEMP_PATH = "tempPath";
 		public static final String SUPPORTED_LANGUAGES = "supportedLanguages";
+		public static final String HEADERS = "headers";
+		public static final String METHOD = "method";
+		public static final String URL = "url";
 	}
 
 	public static class Audit {
 		public static final String ID = Tags.ID;
 
 		public static final String USERNAME = "Username";
-		public static final String FIRSTNAME = "Firstname";
-		public static final String LASTNAME = "Lastname";
 		public static final String DATE = "Date";
 
 		public static final String ELEMENT_TYPE = "ElementType";
@@ -239,5 +257,6 @@ public class Tags {
 
 		public static final String ACTION = "Action";
 		public static final String ACCESS_TYPE = "AccessType";
+		public static final String ADDITIONAL_DATA = "AdditionalData";
 	}
 }

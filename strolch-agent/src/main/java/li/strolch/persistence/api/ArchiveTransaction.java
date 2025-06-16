@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import li.strolch.model.activity.Activity;
 import li.strolch.utils.collections.DateRange;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import static li.strolch.model.Version.setInitialVersionFor;

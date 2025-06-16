@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package li.strolch.model.parameter;
 
-import static java.util.stream.Collectors.joining;
+import li.strolch.exception.StrolchException;
+import li.strolch.utils.helper.StringHelper;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -26,8 +27,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import li.strolch.exception.StrolchException;
-import li.strolch.utils.helper.StringHelper;
+import static java.util.stream.Collectors.joining;
 
 public abstract class AbstractListParameter<E> extends AbstractParameter<List<E>> implements ListParameter<E> {
 

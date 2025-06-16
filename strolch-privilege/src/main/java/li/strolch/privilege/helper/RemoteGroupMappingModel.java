@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -184,14 +184,14 @@ public class RemoteGroupMappingModel {
 				String localL = this.remoteLocationToLocalLocationMap.get(remoteLocation);
 				logger.info("Using primary location {} for LDAP department {}", localL, remoteLocation);
 				primaryLocation = localL;
+			} else {
+				logger.warn("No mapping for LDAP location {} found, ignoring...", remoteLocation);
 			}
 		}
 
 		for (String remoteGroup : remoteGroups) {
-			logger.info("Checking group config for {}", remoteGroup);
 			JsonElement mappingE = this.groupConfigs.get(remoteGroup);
 			if (mappingE == null) {
-				logger.info("No configs for {}", remoteGroup);
 				continue;
 			}
 

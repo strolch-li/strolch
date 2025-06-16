@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,22 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import li.strolch.model.StrolchRootElement;
+import li.strolch.model.json.StrolchElementToJsonVisitor;
 import li.strolch.service.api.ServiceArgument;
 
 public class StrolchRootElementArgument extends ServiceArgument {
 	public StrolchRootElement rootElement;
 	public boolean refreshUnknownVersion;
+
+	@Override
+	public JsonElement toJson() {
+		if (this.rootElement == null)
+			return new JsonObject();
+
+		return this.rootElement.accept(
+				new StrolchElementToJsonVisitor().flatBagsByType(this.rootElement.getParameterBagTypes()));
+	}
 }

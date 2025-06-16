@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package li.strolch.websocket;
+package li.strolch.utils;
 
-public class WebSocketRemoteIp {
+import java.time.ZonedDateTime;
+import java.util.Locale;
 
-	private static final ThreadLocal<String> threadLocal = ThreadLocal.withInitial(() -> "notset");
+public enum DateFormattingHint {
+	None,
+	Date,
+	DateTime,
+	DateTimeSeconds,
+	Time,
+	TimeSeconds;
 
-	public static String get() {
-		return threadLocal.get();
-	}
-
-	public static void set(String remoteIp) {
-		threadLocal.set(remoteIp);
+	public String format(Locale locale, ZonedDateTime dt) {
+		return LocaleAwareDateTimeFormatting.getFormatter(locale, this).format(dt);
 	}
 }

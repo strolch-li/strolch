@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package li.strolch.utils.iso8601;
 
-import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +28,7 @@ import java.util.Date;
 
 import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoField.*;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * @author Martin Smock &lt;smock.martin@gmail.com&gt;
@@ -163,13 +163,15 @@ public class ISO8601 implements DateFormat {
 	}
 
 	private static ZonedDateTime _parse(String s, ChronoField precision) {
-		if (StringHelper.isEmpty(s)) {
+		if (isEmpty(s)) {
 			String msg = "An empty value can not pe parsed to a date!";
 			throw new IllegalArgumentException(msg);
 		}
 
 		if (s.equals("-"))
 			return ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+		if (!s.contains("T"))
+			return LocalDate.parse(s, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay(systemDefault());
 		return ZonedDateTime.parse(s, getIso8601Formatter(precision));
 	}
 

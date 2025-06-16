@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ public class ReportConstants {
 	public static final String BAG_ORDERING = "ordering";
 	public static final String BAG_ADDITIONAL_TYPE = "additionalType";
 	public static final String BAG_ADDITIONAL_JOINS = "additionalJoins";
+	public static final String BAG_FORMATTING_HINTS = "formattingHints";
 
 	public static final String PARAM_OBJECT_TYPE = "objectType";
 	public static final String PARAM_PARALLEL = "parallel";

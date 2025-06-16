@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import li.strolch.utils.Version;
 /**
  * Migration versions for data and code migrations
  *
- * @author Reto Breitenmoser <reto.breitenmoser@4trees.ch>
+ * @author Reto Breitenmoser <reto.breitenmoser@atexxi.ch>
  */
 public record MigrationVersion(Version dataVersion, Version codeVersion) {
 

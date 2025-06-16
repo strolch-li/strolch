@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package li.strolch.rest;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.SessionCookieConfig;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.agent.api.StrolchComponent;
@@ -74,12 +76,13 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	private static final String PARAM_REST_TRACING_THRESHOLD = "restTracingThreshold";
 
 	/**
-	 * Configuration parameter name used to specify the IP address to be ignored by the forward handling logic.
-	 * This parameter can be used to exclude certain IP addresses from processing when forwarding requests.
+	 * Configuration parameter name used to specify the IP address to be ignored by the forward handling logic. This
+	 * parameter can be used to exclude certain IP addresses from processing when forwarding requests.
 	 */
 	private static final String PARAM_FORWARD_IGNORE_IP = "forwardIgnoreIp";
 
 	private static RestfulStrolchComponent instance;
+	private static volatile boolean initialized;
 
 	private String restTracing;
 	private String restTracingThreshold;
@@ -105,10 +108,6 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		return this.webPath;
 	}
 
-	public void setWebPath(String webPath) {
-		this.webPath = webPath;
-	}
-
 	public boolean isCorsEnabled() {
 		return this.corsEnabled;
 	}
@@ -128,6 +127,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	public String getForwardIgnoreIp() {
 		return this.forwardIgnoreIp;
 	}
+
 	public boolean isRestLogging() {
 		return this.restLogging;
 	}
@@ -207,6 +207,7 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 		logger.info("Cookie max age is {}s and is {}", this.cookieMaxAge, this.secureCookie ? "secure" : "not secure");
 
+		initialized = true;
 		super.initialize(configuration);
 	}
 
@@ -276,5 +277,26 @@ public class RestfulStrolchComponent extends StrolchComponent {
 
 	public StrolchTransaction openTx(Certificate certificate, String realm, String name) {
 		return getContainer().getRealm(realm).openTx(certificate, name, true);
+	}
+
+	public void initialize(ServletContext servletContext) {
+		if (!initialized)
+			throw new IllegalStateException("Strolch Component not yet initialized!");
+
+		logger.info("Local web path is {}", servletContext.getRealPath("/"));
+
+		this.webPath = servletContext.getContextPath();
+		logger.info("Context path is {}", this.webPath);
+
+		SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
+		if (this.secureCookie)
+			sessionCookieConfig.setSecure(true);
+		if (this.domain != null)
+			sessionCookieConfig.setDomain(this.domain);
+		if (this.path != null)
+			sessionCookieConfig.setPath(this.path);
+		sessionCookieConfig.setMaxAge(this.cookieMaxAge);
+		sessionCookieConfig.setHttpOnly(true);
+		sessionCookieConfig.setAttribute("SameSite", "Strict");
 	}
 }

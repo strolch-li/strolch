@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,25 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.utils.collections.DateRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static java.time.ZoneId.systemDefault;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class AuditModelTestRunner {
 
+	private static final Logger log = LoggerFactory.getLogger(AuditModelTestRunner.class);
 	private final RuntimeMock runtimeMock;
 	private final String realmName;
 	private final Certificate certificate;
@@ -66,86 +75,47 @@ public class AuditModelTestRunner {
 		DateRange equalsRange = new DateRange().from(current, true).to(current, true);
 		DateRange laterRange = new DateRange().from(afterCurrent, true).to(later, true);
 		DateRange containsRange = new DateRange().from(earlier, true).to(later, true);
+		DateRange noRange = new DateRange().from(LocalDate.EPOCH, true).to(LocalDate.of(2101, 1, 1), true);
 
-		// first cleanup
-		cleanup(realm);
+		// generate a random audit
+		Audit audit = ModelGenerator.randomAudit();
+		audit.setDate(current.toInstant().atZone(systemDefault()));
 
 		// single element actions
 		{
-			Audit audit = ModelGenerator.randomAudit();
-			audit.setDate(current);
-
 			// add
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				auditTrail.add(tx, audit);
+				tx.add(audit);
 				tx.commitOnClose();
 			}
 
+			// exists
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
-				Set<String> types = auditTrail.getTypes(tx);
-				assertEquals(1, types.size());
-				assertTrue(types.contains(audit.getElementType()));
-			}
-
-			// has
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				assertTrue(auditTrail.hasAudit(tx, audit.getElementType(), audit.getId()));
-
-				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
-				assertNotNull(dbAudit);
-				assertEquals(audit, dbAudit);
-
-				dbAudit = auditTrail.getBy(tx, "Foo", audit.getId());
-				assertNull(dbAudit);
-			}
-
-			// remove
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				auditTrail.remove(tx, audit);
-				tx.commitOnClose();
-			}
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
-				assertNull(dbAudit);
-			}
-
-			// update
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				auditTrail.add(tx, audit);
-				tx.commitOnClose();
-			}
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
-				dbAudit.setAction("Foo");
-				auditTrail.update(tx, dbAudit);
-				tx.commitOnClose();
-			}
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				Audit dbAudit = auditTrail.getBy(tx, audit.getElementType(), audit.getId());
-				assertEquals("Foo", dbAudit.getAction());
+				assertEquals(1, auditTrail.querySize(tx, equalsRange));
+				List<Audit> allElements = auditTrail.getAllElements(tx, audit.getElementType(), equalsRange);
+				assertEquals(1, allElements.size());
+				assertTrue(allElements.contains(audit));
 			}
 		}
 
 		// querying
 		{
-			Audit audit = ModelGenerator.randomAudit();
-			audit.setDate(current);
-
 			// querySize
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
-				assertEquals(1, auditTrail.querySize(tx, audit.getElementType(), equalsRange));
-				assertEquals(1, auditTrail.querySize(tx, audit.getElementType(), containsRange));
-				assertEquals(0, auditTrail.querySize(tx, audit.getElementType(), earlierRange));
-				assertEquals(0, auditTrail.querySize(tx, audit.getElementType(), laterRange));
+				auditTrail.getAllElements(tx, noRange).forEach(audit1 -> {
+					log.info(audit1.toString());
+				});
+				assertTrue(auditTrail.querySize(tx) >= 1);
+				assertEquals(1, auditTrail.querySize(tx, equalsRange));
+				assertEquals(1, auditTrail.getAllElements(tx, equalsRange).size());
+				assertEquals(1, auditTrail.querySize(tx, containsRange));
+				assertEquals(1, auditTrail.getAllElements(tx, containsRange).size());
+				assertEquals(0, auditTrail.querySize(tx, earlierRange));
+				assertEquals(0, auditTrail.getAllElements(tx, earlierRange).size());
+				assertEquals(0, auditTrail.querySize(tx, laterRange));
+				assertEquals(0, auditTrail.getAllElements(tx, laterRange).size());
 			}
 		}
 
@@ -155,23 +125,23 @@ public class AuditModelTestRunner {
 			for (int i = 0; i < 100; i++) {
 				Audit randomAudit = ModelGenerator.randomAudit();
 				randomAudit.setElementType("FooBar");
-				randomAudit.setDate(current);
+				randomAudit.setDate(current.toInstant().atZone(systemDefault()));
 				audits.add(randomAudit);
 			}
-			audits.sort(new AuditByIdComparator());
+			audits.sort(Audit::compareTo);
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				auditTrail.addAll(tx, audits);
+				audits.forEach(tx::add);
 				tx.commitOnClose();
 			}
 
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
-				assertEquals(100, auditTrail.querySize(tx, "FooBar", containsRange));
+				assertTrue(auditTrail.querySize(tx) >= 101);
+				assertEquals(101, auditTrail.querySize(tx, containsRange));
 
 				List<Audit> allElements = auditTrail.getAllElements(tx, "FooBar", containsRange);
-				allElements.sort(new AuditByIdComparator());
+				allElements.sort(Audit::compareTo);
 				assertEquals(audits, allElements);
 
 				allElements = auditTrail.getAllElements(tx, "FooBar", earlierRange);
@@ -180,138 +150,18 @@ public class AuditModelTestRunner {
 				assertEquals(0, allElements.size());
 			}
 
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				auditTrail.removeAll(tx, audits);
-				assertEquals(0, auditTrail.querySize(tx, "FooBar", containsRange));
-				tx.commitOnClose();
-			}
-
 			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 				AuditTrail auditTrail = tx.getAuditTrail();
-				assertEquals(0, auditTrail.querySize(tx, "FooBar", containsRange));
+
+				List<Audit> allElements = auditTrail.getAllElements(tx, containsRange);
+				allElements.sort(Audit::compareTo);
+				assertEquals(101, allElements.size());
+
+				allElements = auditTrail.getAllElements(tx, "FooBar", earlierRange);
+				assertEquals(0, allElements.size());
+				allElements = auditTrail.getAllElements(tx, "FooBar", laterRange);
+				assertEquals(0, allElements.size());
 			}
-		}
-
-		// update all
-		{
-			List<Audit> audits = new ArrayList<>();
-			for (int i = 0; i < 100; i++) {
-				Audit randomAudit = ModelGenerator.randomAudit();
-				randomAudit.setElementType("Bar");
-				randomAudit.setDate(current);
-				randomAudit.setAction("BarFoo");
-				audits.add(randomAudit);
-			}
-			audits.sort(new AuditByIdComparator());
-
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				auditTrail.addAll(tx, audits);
-				tx.commitOnClose();
-			}
-
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				List<Audit> allElements = auditTrail.getAllElements(tx, "Bar", containsRange);
-				allElements.sort(new AuditByIdComparator());
-				assertEquals(audits, allElements);
-
-				for (Audit dbAudit : allElements) {
-					assertEquals("BarFoo", dbAudit.getAction());
-				}
-
-				for (Audit dbAudit : allElements) {
-					dbAudit.setAction("Foo");
-				}
-
-				auditTrail.updateAll(tx, allElements);
-				tx.commitOnClose();
-			}
-
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				List<Audit> allElements = auditTrail.getAllElements(tx, "Bar", containsRange);
-				for (Audit dbAudit : allElements) {
-					assertEquals("Foo", dbAudit.getAction());
-				}
-			}
-		}
-
-		// remove all
-		{
-			// first cleanup
-			cleanup(realm);
-
-			List<Audit> audits = new ArrayList<>();
-			for (int i = 0; i < 5; i++) {
-				Audit randomAudit = ModelGenerator.randomAudit();
-				randomAudit.setDate(current);
-				randomAudit.setElementType("BarBarBar");
-				audits.add(randomAudit);
-			}
-			for (int i = 0; i < 5; i++) {
-				Audit randomAudit = ModelGenerator.randomAudit();
-				randomAudit.setDate(current);
-				randomAudit.setElementType("FooFooFoo");
-				audits.add(randomAudit);
-			}
-			for (int i = 0; i < 5; i++) {
-				Audit randomAudit = ModelGenerator.randomAudit();
-				randomAudit.setDate(current);
-				randomAudit.setElementType("BarFooBar");
-				audits.add(randomAudit);
-			}
-
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				auditTrail.addAll(tx, audits);
-				tx.commitOnClose();
-			}
-
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				assertEquals(15, auditTrail.querySize(tx, containsRange));
-				assertEquals(5, auditTrail.querySize(tx, "BarBarBar", containsRange));
-				assertEquals(5, auditTrail.querySize(tx, "FooFooFoo", containsRange));
-				assertEquals(5, auditTrail.querySize(tx, "BarFooBar", containsRange));
-			}
-
-			try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-				AuditTrail auditTrail = tx.getAuditTrail();
-				assertEquals(5, auditTrail.removeAll(tx, "BarBarBar", containsRange));
-				assertEquals(10, auditTrail.querySize(tx, containsRange));
-
-				assertEquals(5, auditTrail.removeAll(tx, "FooFooFoo", containsRange));
-				assertEquals(5, auditTrail.querySize(tx, containsRange));
-
-				assertEquals(5, auditTrail.removeAll(tx, "BarFooBar", containsRange));
-				assertEquals(0, auditTrail.querySize(tx, containsRange));
-				tx.commitOnClose();
-			}
-		}
-	}
-
-	private void cleanup(StrolchRealm realm) {
-
-		DateRange dateRange = new DateRange().from(new Date(0), true).to(new Date((long) Math.pow(2, 50)), true);
-
-		try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
-			AuditTrail auditTrail = tx.getAuditTrail();
-			Set<String> types = auditTrail.getTypes(tx);
-			for (String type : types) {
-				auditTrail.removeAll(tx, type, dateRange);
-			}
-
-			assertEquals(0, auditTrail.querySize(tx, dateRange));
-			tx.commitOnClose();
-		}
-	}
-
-	private static final class AuditByIdComparator implements Comparator<Audit> {
-		@Override
-		public int compare(Audit o1, Audit o2) {
-			return o1.getId().compareTo(o2.getId());
 		}
 	}
 }

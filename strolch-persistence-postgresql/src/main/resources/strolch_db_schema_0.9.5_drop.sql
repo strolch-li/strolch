@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-package li.strolch.service;
+DROP TABLE IF EXISTS resources;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS activities;
 
-import li.strolch.service.api.ServiceArgument;
+DROP TABLE IF EXISTS audits;
 
-public class StringServiceArgument extends ServiceArgument {
-	public String value;
-}
+DROP TABLE IF EXISTS operations_log;
+DROP TABLE IF EXISTS operations_log_values;
+
+DROP TABLE IF EXISTS db_version;
+
+DROP TYPE IF EXISTS order_state;
+DROP TYPE IF EXISTS access_type;
+DROP TYPE IF EXISTS log_severity_type;
+DROP TYPE IF EXISTS log_state_type;
+
+DROP INDEX IF EXISTS ids_orders_date;

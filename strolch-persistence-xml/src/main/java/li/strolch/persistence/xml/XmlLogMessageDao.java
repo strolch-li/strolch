@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,27 +42,31 @@ public class XmlLogMessageDao implements LogMessageDao {
 	@Override
 	public List<LogMessage> queryLatest(String realm, int maxNr) {
 		SubTypeRef subTypeRef = this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), realm);
-		return this.tx.getObjectDao().queryAll(subTypeRef, true, file -> true, maxNr);
+		return this.tx.getObjectDao().queryAll(subTypeRef, true, _ -> true, maxNr);
 	}
 
 	@Override
 	public void save(LogMessage logMessage) {
-		this.tx.getObjectDao().add(logMessage);
+		this.tx.getObjectDao().add(logMessage, logMessage.getZonedDateTime().toInstant().toEpochMilli());
 	}
 
 	@Override
 	public void saveAll(List<LogMessage> logMessages) {
-		this.tx.getObjectDao().addAll(logMessages);
+		logMessages.forEach(logMessage -> this.tx
+				.getObjectDao()
+				.add(logMessage, logMessage.getZonedDateTime().toInstant().toEpochMilli()));
 	}
 
 	@Override
 	public void updateState(LogMessage logMessage) {
-		this.tx.getObjectDao().update(logMessage);
+		this.tx.getObjectDao().update(logMessage, logMessage.getZonedDateTime().toInstant().toEpochMilli());
 	}
 
 	@Override
 	public void updateStates(Collection<LogMessage> logMessages) {
-		logMessages.forEach(logMessage -> this.tx.getObjectDao().update(logMessage));
+		logMessages.forEach(logMessage -> this.tx
+				.getObjectDao()
+				.update(logMessage, logMessage.getZonedDateTime().toInstant().toEpochMilli()));
 	}
 
 	@Override

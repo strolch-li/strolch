@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,76 +212,6 @@ public class StringHelper {
 	}
 
 	/**
-	 * Generates the MD5 Hash of a string and converts it to a HEX string
-	 *
-	 * @param string the string to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static String hashMd5AsHex(String string) {
-		return toHexString(hashMd5(string.getBytes()));
-	}
-
-	/**
-	 * Generates the MD5 Hash of a string. Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
-	 * Hex String which is printable
-	 *
-	 * @param string the string to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static byte[] hashMd5(String string) {
-		return hashMd5(string.getBytes());
-	}
-
-	/**
-	 * Generates the MD5 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
-	 * a Hex String which is printable
-	 *
-	 * @param bytes the bytes to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static byte[] hashMd5(byte[] bytes) {
-		return hash("MD5", bytes);
-	}
-
-	/**
-	 * Generates the SHA1 Hash of a string and converts it to a HEX String
-	 *
-	 * @param string the string to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static String hashSha1AsHex(String string) {
-		return toHexString(hashSha1(string.getBytes()));
-	}
-
-	/**
-	 * Generates the SHA1 Hash of a string Use {@link StringHelper#toHexString(byte[])} to convert the byte array to a
-	 * Hex String which is printable
-	 *
-	 * @param string the string to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static byte[] hashSha1(String string) {
-		return hashSha1(string.getBytes());
-	}
-
-	/**
-	 * Generates the SHA1 Hash of a byte array Use {@link StringHelper#toHexString(byte[])} to convert the byte array to
-	 * a Hex String which is printable
-	 *
-	 * @param bytes the bytes to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static byte[] hashSha1(byte[] bytes) {
-		return hash("SHA-1", bytes);
-	}
-
-	/**
 	 * Generates the SHA-256 Hash of a string and converts it to a HEX String
 	 *
 	 * @param string the string to hash
@@ -324,18 +254,6 @@ public class StringHelper {
 	 *
 	 * @return the hash or null, if an exception was thrown
 	 */
-	public static String hashAsHex(String algorithm, String string) {
-		return toHexString(hash(algorithm, string));
-	}
-
-	/**
-	 * Returns the hash of an algorithm
-	 *
-	 * @param algorithm the algorithm to use
-	 * @param string    the string to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
 	public static byte[] hash(String algorithm, String string) {
 		try {
 
@@ -346,18 +264,6 @@ public class StringHelper {
 			String msg = MessageFormat.format("Algorithm {0} does not exist!", algorithm);
 			throw new RuntimeException(msg, e);
 		}
-	}
-
-	/**
-	 * Returns the hash of an algorithm
-	 *
-	 * @param algorithm the algorithm to use
-	 * @param bytes     the bytes to hash
-	 *
-	 * @return the hash or null, if an exception was thrown
-	 */
-	public static String hashAsHex(String algorithm, byte[] bytes) {
-		return toHexString(hash(algorithm, bytes));
 	}
 
 	/**
@@ -777,6 +683,22 @@ public class StringHelper {
 		if (value == null)
 			return EMPTY;
 		return value.trim();
+	}
+
+	/**
+	 * Removes all leading zeroes from the given string.
+	 *
+	 * @param value the input string from which leading zeroes are to be removed
+	 *
+	 * @return a string with all leading zeroes removed
+	 */
+	public static String stripLeadingZeroes(String value) {
+		value = trimOrEmpty(value);
+		if (value.isEmpty())
+			return value;
+		while (value.charAt(0) == '0')
+			value = value.substring(1);
+		return value;
 	}
 
 	/**

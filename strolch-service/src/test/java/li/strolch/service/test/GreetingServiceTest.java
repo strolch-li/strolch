@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package li.strolch.service.test;
 
 import li.strolch.privilege.model.Certificate;
+import li.strolch.service.StringArgument;
 import li.strolch.service.test.model.GreetingResult;
 import li.strolch.service.test.model.GreetingService;
-import li.strolch.service.test.model.GreetingService.GreetingArgument;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,12 +33,10 @@ public class GreetingServiceTest extends AbstractServiceTest {
 	public void shouldPerformSimpleService() {
 
 		GreetingService greetingService = new GreetingService();
-		GreetingArgument greetingArgument = new GreetingArgument();
-		greetingArgument.name = "Robert";
+		StringArgument greetingArgument = greetingService.getArgumentInstance();
+		greetingArgument.value = "Robert";
 
-		Certificate certificate = runtimeMock
-				.getPrivilegeHandler()
-				.authenticate("jill", "jill".toCharArray());//$NON-NLS-2$
+		Certificate certificate = runtimeMock.getPrivilegeHandler().authenticate("jill", "jill".toCharArray());
 		try {
 			GreetingResult greetingResult = getServiceHandler().doService(certificate, greetingService,
 					greetingArgument);

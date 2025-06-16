@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,9 +76,8 @@ public class PrivilegeAddUserCommand extends Command {
 	}
 
 	protected void writeAudit() {
-		tx().setSuppressAuditsForAudits(true);
 		this.audit = tx().auditFrom(AccessType.CREATE, PRIVILEGE, USER, this.userOut.getUsername());
-		tx().getAuditTrail().add(tx(), this.audit);
+		tx().add(this.audit);
 	}
 
 	@Override
@@ -88,9 +87,6 @@ public class PrivilegeAddUserCommand extends Command {
 
 			if (this.userOut != null)
 				privilegeHandler.removeUser(tx().getCertificate(), this.userIn.getUsername());
-
-			if (this.audit != null)
-				tx().getAuditTrail().remove(tx(), this.audit);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.Optional;
 
 import static li.strolch.runtime.StrolchConstants.DEFAULT_REALM;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
@@ -141,6 +142,13 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	 */
 	public boolean hasComponent(Class<?> clazz) {
 		return this.container.hasComponent(clazz);
+	}
+
+	/**
+	 * @see ComponentContainer#getComponentO(Class)
+	 */
+	public <T> Optional<T> getComponentO(Class<T> clazz) throws IllegalArgumentException {
+		return this.container.getComponentO(clazz);
 	}
 
 	/**

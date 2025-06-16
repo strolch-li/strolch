@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2024-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package li.strolch.privilege.ldap;
 
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
+import li.strolch.utils.dbc.DBC;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -33,6 +34,10 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class LinuxLdapQueryContext extends LdapQueryContext {
+
+	public static final String LDAP_DEPARTMENT_NUMBER = "departmentNumber";
+	public static final String LDAP_PREFERRED_LANGUAGE = "preferredLanguage";
+	public static final String LDAP_ENTRY_UUID = "entryUUID";
 
 	public LinuxLdapQueryContext(Map<String, String> parameterMap, RemoteGroupMappingModel groupMappingModel) {
 		super(parameterMap, groupMappingModel);
@@ -73,7 +78,7 @@ public class LinuxLdapQueryContext extends LdapQueryContext {
 
 	@Override
 	protected String getDepartment(Attributes attrs) throws NamingException {
-		return getLdapString(attrs, "departmentNumber");
+		return getLdapString(attrs, LDAP_DEPARTMENT_NUMBER);
 	}
 
 	@Override
@@ -94,7 +99,14 @@ public class LinuxLdapQueryContext extends LdapQueryContext {
 
 	@Override
 	protected Locale getLocale(Attributes attrs) throws NamingException {
-		String preferredLanguage = getLdapString(attrs, "preferredLanguage");
+		String preferredLanguage = getLdapString(attrs, LDAP_PREFERRED_LANGUAGE);
 		return isEmpty(preferredLanguage) ? this.defaultLocale : Locale.forLanguageTag(preferredLanguage);
+	}
+
+	@Override
+	protected String getUserId(Attributes attrs) throws NamingException {
+		String value = getLdapString(attrs, LDAP_ENTRY_UUID);
+		DBC.PRE.assertNotEmpty("LDAP field " + LDAP_ENTRY_UUID + " is empty!", value);
+		return value;
 	}
 }

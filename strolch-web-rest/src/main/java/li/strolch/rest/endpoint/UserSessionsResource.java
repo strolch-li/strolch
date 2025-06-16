@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ public class UserSessionsResource {
 		logger.info("[{}] Invalidating session {}", cert.getUsername(), sessionId);
 		StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
 
-		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
+		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext(), false)) {
 			tx.getPrivilegeContext().assertHasPrivilege(PRIVILEGE_GET_SESSION);
 
 			sessionHandler.invalidate(cert, sessionId);

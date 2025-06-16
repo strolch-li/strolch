@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,6 @@
  */
 package li.strolch.model.parameter;
 
-import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
-import static li.strolch.model.StrolchModelConstants.UOM_NONE;
-import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
-
-import java.text.MessageFormat;
-
 import li.strolch.exception.StrolchException;
 import li.strolch.model.AbstractStrolchElement;
 import li.strolch.model.Locator;
@@ -28,6 +22,12 @@ import li.strolch.model.Locator.LocatorBuilder;
 import li.strolch.model.ParameterizedElement;
 import li.strolch.model.StrolchRootElement;
 import li.strolch.utils.helper.StringHelper;
+
+import java.text.MessageFormat;
+
+import static li.strolch.model.StrolchModelConstants.INTERPRETATION_NONE;
+import static li.strolch.model.StrolchModelConstants.UOM_NONE;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>

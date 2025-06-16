@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -564,12 +564,8 @@ public enum StrolchValueType {
 	}
 
 	public static StrolchValueType parse(String value) {
-
-		// TODO this is for backwards compatibility where we still had States of type BooleanState instead of Boolean
-		String strippedValue = value.replace("State", "");
-
 		for (StrolchValueType type : StrolchValueType.values()) {
-			if (type.type.equals(strippedValue))
+			if (type.type.equals(value))
 				return type;
 		}
 		throw new IllegalArgumentException("Type " + value + " does not exist!");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package li.strolch.service.privilege.users;
 
-import li.strolch.service.api.ServiceArgument;
+-- update primary keys
+ALTER TABLE audits DROP COLUMN firstname;
+ALTER TABLE audits DROP COLUMN lastname;
 
-public class PrivilegeRoleUserNamesArgument extends ServiceArgument {
-	public String username;
-	public String rolename;
-}
+INSERT INTO db_version
+  (version, app, description, created)
+values(
+  '0.9.6',
+  'strolch',
+  'remove audit columns firstname and lastname',
+  CURRENT_TIMESTAMP
+);

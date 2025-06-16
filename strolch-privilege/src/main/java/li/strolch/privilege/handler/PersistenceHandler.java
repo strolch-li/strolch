@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,11 +75,20 @@ public interface PersistenceHandler {
 	/**
 	 * Returns a {@link User} object from the underlying database
 	 *
-	 * @param username the name/id of the {@link User} object to return
+	 * @param username the username of the {@link User} object to return
 	 *
 	 * @return the {@link User} object, or null if it was not found
 	 */
 	User getUser(String username);
+
+	/**
+	 * Returns a {@link User} object from the underlying database
+	 *
+	 * @param userId the id of the {@link User} object to return
+	 *
+	 * @return the {@link User} object, or null if it was not found
+	 */
+	User getUserById(String userId);
 
 	/**
 	 * Returns true if the user exists with the give name, false otherwise
@@ -109,13 +118,13 @@ public interface PersistenceHandler {
 	Role getRole(String roleName);
 
 	/**
-	 * Removes a {@link User} with the given name and returns the removed object if it existed
+	 * Removes a {@link User} with the given user ID and returns the removed object if it existed
 	 *
-	 * @param username the name of the {@link User} to remove
+	 * @param userId the user ID of the {@link User} to remove
 	 *
 	 * @return the {@link User} removed, or null if it did not exist
 	 */
-	User removeUser(String username);
+	User removeUserById(String userId);
 
 	/**
 	 * Removes a {@link Group} with the given name and returns the removed object if it existed

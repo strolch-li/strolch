@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,8 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public boolean hasAudit(StrolchTransaction tx, String type, Long id) {
-		return false;
+	public long querySize(StrolchTransaction tx) {
+		return 0;
 	}
 
 	@Override
@@ -47,57 +47,20 @@ public class NoStrategyAuditTrail implements AuditTrail {
 	}
 
 	@Override
-	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
-		return 0;
-	}
-
-	@Override
-	public Set<String> getTypes(StrolchTransaction tx) {
-		return null;
-	}
-
-	@Override
-	public Audit getBy(StrolchTransaction tx, String type, Long id) {
-		return null;
+	public List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange) {
+		return List.of();
 	}
 
 	@Override
 	public List<Audit> getAllElements(StrolchTransaction tx, String type, DateRange dateRange) {
-		return null;
+		return List.of();
 	}
 
 	@Override
 	public void add(StrolchTransaction tx, Audit audit) {
-		//
 	}
 
 	@Override
 	public void addAll(StrolchTransaction tx, List<Audit> audits) {
-		//
-	}
-
-	@Override
-	public void update(StrolchTransaction tx, Audit audit) {
-		//
-	}
-
-	@Override
-	public void updateAll(StrolchTransaction tx, List<Audit> audits) {
-		//
-	}
-
-	@Override
-	public void remove(StrolchTransaction tx, Audit audit) {
-		//
-	}
-
-	@Override
-	public void removeAll(StrolchTransaction tx, List<Audit> audits) {
-		//
-	}
-
-	@Override
-	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
-		return 0;
 	}
 }

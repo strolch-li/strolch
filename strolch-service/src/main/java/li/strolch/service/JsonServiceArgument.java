@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package li.strolch.service;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.Tags;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 
@@ -59,5 +61,14 @@ public class JsonServiceArgument extends ServiceArgument {
 		this.objectType = objectType;
 		this.objectId = objectId;
 		this.jsonElement = jsonElement;
+	}
+
+	@Override
+	public JsonElement toJson() {
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.OBJECT_TYPE, this.objectType);
+		jsonObject.addProperty(Tags.Json.ID, this.objectId);
+		jsonObject.add(Tags.Json.DATA, this.jsonElement);
+		return jsonObject;
 	}
 }

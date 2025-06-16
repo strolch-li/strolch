@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,13 @@ public class ComponentContainerImpl implements ComponentContainer {
 	@Override
 	public boolean hasComponent(Class<?> clazz) {
 		return this.componentsByType != null && this.componentsByType.containsList(clazz);
+	}
+
+	@Override
+	public <T> Optional<T> getComponentO(Class<T> clazz) throws IllegalArgumentException {
+		if (!this.componentsByType.containsList(clazz))
+			return Optional.empty();
+		return Optional.of(getComponent(clazz));
 	}
 
 	@Override

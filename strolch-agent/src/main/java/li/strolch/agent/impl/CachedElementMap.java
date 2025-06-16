@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,11 +39,16 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		this.realm = realm;
 	}
 
+	@Override
+	public DataStoreMode getDataStoreMode() {
+		return DataStoreMode.CACHED;
+	}
+
 	protected abstract StrolchDao<T> getDbDao(StrolchTransaction tx);
 
 	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
-		if (this.realm.isVersioningEnabled()) {
+		if (this.realm.isEnableVersioning()) {
 			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId()) + 1;
 			Version.updateVersionFor(element, latestVersion, tx.getUsername(), false);
 		} else {
@@ -62,7 +67,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 
 		// first perform cached change
 		for (T element : elements) {
-			if (this.realm.isVersioningEnabled()) {
+			if (this.realm.isEnableVersioning()) {
 				int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId()) + 1;
 				Version.updateVersionFor(element, latestVersion, tx.getUsername(), false);
 			} else {
@@ -77,7 +82,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 	}
 
 	private void updateVersion(StrolchTransaction tx, T element, boolean deleted) {
-		if (this.realm.isVersioningEnabled()) {
+		if (this.realm.isEnableVersioning()) {
 			if (!element.hasVersion()) {
 				T current = getBy(tx, element.getType(), element.getId(), true);
 				if (current.hasVersion()) {
@@ -126,7 +131,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		super.remove(tx, element);
 
 		// last is to perform DB changes
-		if (this.realm.isVersioningEnabled()) {
+		if (this.realm.isEnableVersioning()) {
 			getDbDao(tx).update(element);
 		} else {
 			getDbDao(tx).remove(element);
@@ -143,7 +148,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 		super.removeAll(tx, elements);
 
 		// last is to perform DB changes
-		if (this.realm.isVersioningEnabled()) {
+		if (this.realm.isEnableVersioning()) {
 			getDbDao(tx).updateAll(elements);
 		} else {
 			getDbDao(tx).removeAll(elements);
@@ -218,7 +223,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 
 	@Override
 	public T revertToVersion(StrolchTransaction tx, String type, String id, int version) throws StrolchException {
-		if (!this.realm.isVersioningEnabled())
+		if (!this.realm.isEnableVersioning())
 			throw new StrolchPersistenceException("Can not undo a version if versioning is not enabled!");
 
 		// get the current and specified version
@@ -238,7 +243,7 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 
 	@Override
 	public T undoVersion(StrolchTransaction tx, T element) throws StrolchException {
-		if (!this.realm.isVersioningEnabled())
+		if (!this.realm.isEnableVersioning())
 			throw new StrolchPersistenceException("Can not undo a version if versioning is not enabled!");
 
 		String type = element.getType();

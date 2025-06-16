@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package li.strolch.service.api;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * Base argument to be used when performing {@link Service Services}. The realm parameter is null and can be overridden
  * when the caller of the service wants to perform the service in a different realm
@@ -22,10 +25,15 @@ package li.strolch.service.api;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class ServiceArgument {
+
 	/**
 	 * <p>
 	 * Set this to the realm in which the service should operate
 	 * </p>
 	 */
 	public String realm;
+
+	public JsonElement toJson() {
+		return new JsonObject();
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,38 +38,38 @@ import static org.junit.Assert.assertTrue;
  */
 public abstract class AbstractRealmCommandTest {
 
-	protected static RuntimeMock runtimeMock;
-
-	protected static Certificate certificate;
+	protected RuntimeMock runtimeMock;
+	protected Certificate certificate;
 
 	protected String getUsername() {
 		return "test";
 	}
 
 	@Before
-	public void beforeClass() throws Exception {
+	public void beforeSuper() throws Exception {
+		dropSchema(getClass().getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb", "cacheduser", "test");
 
-		dropSchema(AbstractRealmCommandTest.class.getSimpleName(), "jdbc:postgresql://localhost/cacheduserdb",
-				"cacheduser", "test");
-
-		File rootPath = new File(RUNTIME_PATH);
+		File rootPath = new File(RUNTIME_PATH, getClass().getSimpleName());
 		File configSrc = new File(CONFIG_SRC);
-		runtimeMock = new RuntimeMock();
-		runtimeMock.mockRuntime(rootPath, configSrc);
-		runtimeMock.startContainer();
+		this.runtimeMock = new RuntimeMock();
+		this.runtimeMock.mockRuntime(rootPath, configSrc);
+		this.runtimeMock.startContainer();
 
-		certificate = runtimeMock.getPrivilegeHandler().authenticate(getUsername(), getUsername().toCharArray());
-		importFromXml(REALM_CACHED, certificate, getServiceHandler());
+		this.certificate = this.runtimeMock
+				.getPrivilegeHandler()
+				.authenticate(getUsername(), getUsername().toCharArray());
+		importFromXml(REALM_CACHED, this.certificate, getServiceHandler());
+		importFromXml(REALM_ECLIPSE_STORE, this.certificate, getServiceHandler());
 	}
 
 	@After
-	public void afterClass() {
-		if (runtimeMock != null)
-			runtimeMock.destroyRuntime();
+	public void afterSuper() {
+		if (this.runtimeMock != null)
+			this.runtimeMock.destroyRuntime();
 	}
 
-	public static ServiceHandler getServiceHandler() {
-		return runtimeMock.getContainer().getComponent(ServiceHandler.class);
+	public ServiceHandler getServiceHandler() {
+		return this.runtimeMock.getContainer().getComponent(ServiceHandler.class);
 	}
 
 	protected abstract Command getCommandInstance(StrolchTransaction tx);
@@ -79,11 +79,11 @@ public abstract class AbstractRealmCommandTest {
 	protected abstract void validateAfterCommandFailed(StrolchTransaction tx);
 
 	protected void doCommandAsFail(String realmName) {
-		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
+		StrolchRealm realm = this.runtimeMock.getContainer().getRealm(realmName);
 		boolean caught = false;
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
+		try (StrolchTransaction tx = realm.openTx(this.certificate, "test", false)) {
 			Command command = getCommandInstance(tx);
-			FailCommandFacade commandFacade = new FailCommandFacade(runtimeMock.getContainer(), tx, command);
+			FailCommandFacade commandFacade = new FailCommandFacade(this.runtimeMock.getContainer(), tx, command);
 
 			tx.addCommand(commandFacade);
 			tx.commitOnClose();
@@ -93,20 +93,20 @@ public abstract class AbstractRealmCommandTest {
 		}
 		assertTrue(caught);
 
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", true)) {
+		try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 			validateAfterCommandFailed(tx);
 		}
 	}
 
 	protected void doCommand(String realmName) {
-		StrolchRealm realm = runtimeMock.getContainer().getRealm(realmName);
+		StrolchRealm realm = this.runtimeMock.getContainer().getRealm(realmName);
 		try (StrolchTransaction tx = realm.openTx(certificate, "test", false)) {
 			Command command = getCommandInstance(tx);
 			tx.addCommand(command);
 			tx.commitOnClose();
 		}
 
-		try (StrolchTransaction tx = realm.openTx(certificate, "test", true)) {
+		try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 			validateAfterCommand(tx);
 		}
 	}
@@ -121,6 +121,12 @@ public abstract class AbstractRealmCommandTest {
 	public void shouldDoCommandCached() {
 		doCommandAsFail(REALM_CACHED);
 		doCommand(REALM_CACHED);
+	}
+
+	@Test
+	public void shouldDoCommandEclipseStore() {
+		doCommandAsFail(REALM_ECLIPSE_STORE);
+		doCommand(REALM_ECLIPSE_STORE);
 	}
 
 	private static class FailCommandFacade extends Command {

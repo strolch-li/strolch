@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package li.strolch.performance;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import li.strolch.service.api.ServiceArgument;
 
 import java.util.concurrent.TimeUnit;
@@ -25,4 +27,9 @@ public class PerformanceTestArgument extends ServiceArgument {
 	public final long duration = 15;
 	public final TimeUnit unit = TimeUnit.SECONDS;
 	public int nrOfElements = 1;
+
+	@Override
+	public JsonElement toJson() {
+		return new JsonObject();
+	}
 }

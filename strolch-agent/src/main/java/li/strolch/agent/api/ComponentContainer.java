@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -45,6 +46,20 @@ public interface ComponentContainer {
 	 * @return true if the component is available
 	 */
 	boolean hasComponent(Class<?> clazz);
+
+	/**
+	 * Retrieves an optional component of the specified type from the container. If the component is not registered in
+	 * the container, an empty {@code Optional} is returned.
+	 *
+	 * @param <T>   the type of the component to retrieve
+	 * @param clazz the class of the component type to retrieve
+	 *
+	 * @return an {@code Optional} containing the component if it exists, or an empty {@code Optional} if it does not
+	 *
+	 * @throws IllegalArgumentException if the retrieval fails due to invalid arguments
+	 */
+	@SuppressWarnings("unchecked")
+	<T> Optional<T> getComponentO(Class<T> clazz) throws IllegalArgumentException;
 
 	/**
 	 * Returns the reference to the {@link StrolchComponent} with the given name, if it exists. If it does not exist, an

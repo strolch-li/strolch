@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,14 +51,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 /**
- * A simple helper class to send e-mails. Uses jakarta.mail and is built as a singleton, so configuration has to be done
+ * A simple helper class to send emails. Uses jakarta.mail and is built as a singleton, so configuration has to be done
  * only once.
  * <p>
  * When using a {@link Properties} to initialize, the following keys are defined:
  * <ul>
- * <li><code>fromAddr</code> - defines the address from which the e-mail comes from</li>
+ * <li><code>fromAddr</code> - defines the address from which the email comes from</li>
  * <li><code>overrideRecipients</code> - if defined, overrides any recipients - useful for testng purposes</li>
  * <li>username - the username to authenticate at the SMTP Server</li>
  * <li>password - the password to authenticate at the SMTP Server</li>
@@ -228,44 +229,92 @@ public class SmtpMailer {
 		this.signingKeyPassword = signingKeyPassword;
 	}
 
-	/**
-	 * Sends an e-mail to the given recipients (unless override address defined).
-	 *
-	 * @param recipients the addresses to whom to send the e-mail. See {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
-	 */
-	public void sendMail(String recipients, String subject, String text) {
-		Session session = Session.getInstance(this.props, this.authenticator);
+	private boolean canSign() {
+		return this.signingKeyRing != null;
+	}
 
+	private void assertCanEncrypt() {
+		DBC.PRE.assertNotNull("Encrypted emails require a signing key!", this.signingKeyRing);
+		DBC.PRE.assertNotEmpty("Encrypted emails require at least one recipient key ring!", this.recipientKeyRings);
+	}
+
+	/**
+	 * Sends an email to the given recipients (unless override address defined).
+	 * <p></p>
+	 * <b>Note:</b> The mail is not signed even if signing is available
+	 *
+	 * @param recipients the addresses to whom to send the email. See {@link InternetAddress#parse(String)}
+	 * @param subject    the subject of the email
+	 * @param text       the test of the email
+	 */
+	public void sendUnsignedMail(String recipients, String subject, String text) {
+		sendMail(recipients, subject, text, false);
+	}
+
+	/**
+	 * Sends an email to the given recipients (unless override address defined).
+	 * <p></p>
+	 * <b>Note:</b> The mail is signed if signing is available, i.e. {@link #canSign()} returns true
+	 *
+	 * @param recipients the addresses to whom to send the email. See {@link InternetAddress#parse(String)}
+	 * @param subject    the subject of the email
+	 * @param text       the test of the email
+	 */
+	public void sendMailSignedIfAvailable(String recipients, String subject, String text) {
+		sendMail(recipients, subject, text, canSign());
+	}
+
+	/**
+	 * Sends an email to the given recipients (unless override address defined).
+	 * <p></p>
+	 * <b>Note:</b> The mail is signed if signing is available, i.e. {@link #canSign()} returns true
+	 *
+	 * @param recipients      the addresses to whom to send the email. See {@link InternetAddress#parse(String)}
+	 * @param subject         the subject of the email
+	 * @param text            the test of the email
+	 * @param signIfAvailable signs the email if signing is available, i.e. {@link #canSign()} returns true
+	 */
+	public void sendMail(String recipients, String subject, String text, boolean signIfAvailable) {
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of mail with subject {}", subject);
+			return;
+		}
+
+		Session session = Session.getInstance(this.props, this.authenticator);
 		MimeMessage message;
 		InternetAddress[] recipientAddresses;
 		try {
 			recipientAddresses = evaluateRecipients(subject, recipients);
 			message = prepareMimeMessage(subject, session);
-
-			if (shouldSign()) {
-				logger.info("Signing text with key {}", this.signingKeyRing.getPublicKey().getUserIDs().next());
-				String signedMessage = sign(text);
-				message.setText(signedMessage, UTF_8.name());
-			} else {
-				logger.info("Not signing text, as signing key not available.");
-				message.setText(text, UTF_8.name());
-			}
+			setMessageText(text, signIfAvailable, message);
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent {} E-mail with subject {} to {}", shouldSign() ? "signed" : "unsigned", subject, recipients);
+		logger.info("Sent {} email with subject {} to {}", signIfAvailable && canSign() ? "signed" : "unsigned",
+				subject, recipients);
 	}
 
-	private boolean shouldSign() {
-		return this.signingKeyRing != null;
+	public void sendUnsignedMailWithAttachment(String recipients, String subject, String text,
+			MailAttachment... attachments) {
+		sendMailWithAttachment(recipients, subject, text, false, attachments);
 	}
 
-	public void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type) {
+	public void sendMailWithAttachmentSignedIfAvailable(String recipients, String subject, String text,
+			MailAttachment... attachments) {
+		sendMailWithAttachment(recipients, subject, text, canSign(), attachments);
+	}
+
+	public void sendMailWithAttachment(String recipients, String subject, String text, boolean signIfAvailable,
+			MailAttachment... attachments) {
+		String attachmentsSummary = getAttachmentsSummary(attachments);
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of mail with subject {} and {}", subject,
+					attachmentsSummary);
+			return;
+		}
+
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
@@ -275,15 +324,12 @@ public class SmtpMailer {
 			message = prepareMimeMessage(subject, session);
 
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
-			messageBodyPart.setText(text);
-
-			MimeBodyPart attachmentPart = new MimeBodyPart();
-			attachmentPart.setContent(attachment, type);
-			attachmentPart.setFileName(fileName);
+			setMessageText(text, signIfAvailable, messageBodyPart);
 
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(messageBodyPart);
-			multipart.addBodyPart(attachmentPart);
+
+			attachParts(attachments, multipart);
 
 			message.setContent(multipart);
 
@@ -292,14 +338,35 @@ public class SmtpMailer {
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent {} E-mail with subject {} to {} and attachment {}", shouldSign() ? "signed" : "unsigned",
-				subject, recipients, fileName);
+		logger.info("Sent {} email with subject {} to {} and {}", signIfAvailable && canSign() ? "signed" : "unsigned",
+				subject, recipients, attachmentsSummary);
+	}
+
+	private void setMessageText(String text, boolean signIfAvailable, MimePart messageBodyPart)
+			throws MessagingException {
+		if (!signIfAvailable) {
+			messageBodyPart.setText(text, UTF_8.name());
+			return;
+		}
+
+		if (canSign()) {
+			logger.info("Signing text with key {}", this.signingKeyRing.getPublicKey().getUserIDs().next());
+			String signedMessage = sign(text, DocumentSignatureType.CANONICAL_TEXT_DOCUMENT);
+			messageBodyPart.setText(signedMessage, UTF_8.name());
+		} else {
+			logger.info("Not signing text, as signing key not available.");
+			messageBodyPart.setText(text, UTF_8.name());
+		}
 	}
 
 	public void sendEncryptedEmail(String recipients, String subject, String mailText, String secretText,
 			String encryptedTextFileName) {
-		DBC.PRE.assertNotNull("Encrypted e-mails require a signing key!", this.signingKeyRing);
-		DBC.PRE.assertNotEmpty("Encrypted e-mails require at least one recipient key ring!", this.recipientKeyRings);
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of encrypted mail with subject {}", subject);
+			return;
+		}
+
+		assertCanEncrypt();
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
@@ -309,17 +376,30 @@ public class SmtpMailer {
 			message = prepareMimeMessage(subject, session);
 			attachEncryptedMessage(message, mailText, signAndEncrypt(secretText), encryptedTextFileName);
 		} catch (Exception e) {
+			if (e instanceof InterruptedException) {
+				Thread.currentThread().interrupt();
+				logger.error("Interrupted while encrypting message. Cancelling sending of message.");
+				return;
+			}
+
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent signed and encrypted E-mail with subject {} to {}", subject, recipients);
+		logger.info("Sent signed and encrypted email with subject {} to {}", subject, recipients);
 	}
 
 	public void sendEncryptedEmailWithAttachment(String recipients, String subject, String mailText, String secretText,
-			String encryptedTextFileName, String attachment, String fileName) {
-		DBC.PRE.assertNotNull("Encrypted e-mails require a signing key!", this.signingKeyRing);
-		DBC.PRE.assertNotEmpty("Encrypted e-mails require at least one recipient key ring!", this.recipientKeyRings);
+			String encryptedTextFileName, MailAttachment... attachments) {
+		String attachmentsSummary = getAttachmentsSummary(attachments);
+		if (trimOrEmpty(recipients).isEmpty()) {
+			logger.error("No recipients defined, aborting sending of encrypted mail with subject {} and {}", subject,
+					attachmentsSummary);
+			return;
+		}
+
+		assertCanEncrypt();
+
 		Session session = Session.getInstance(this.props, this.authenticator);
 
 		MimeMessage message;
@@ -329,13 +409,21 @@ public class SmtpMailer {
 			message = prepareMimeMessage(subject, session);
 			Multipart multipart = attachEncryptedMessage(message, mailText, signAndEncrypt(secretText),
 					encryptedTextFileName);
-			attachEncryptedFile(attachment, fileName, multipart);
+
+			for (MailAttachment attachment : attachments) {
+				attachEncryptedFile(attachment, multipart);
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			logger.error("Interrupted while waiting to lock", e);
+			return;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to prepare message for sending!", e);
 		}
 
 		send(recipientAddresses, message);
-		logger.info("Sent signed and encrypted E-mail with subject {} to {}", subject, recipients);
+		logger.info("Sent signed and encrypted email with subject {} and {} to {}", subject, attachmentsSummary,
+				recipients);
 	}
 
 	protected void send(InternetAddress[] recipients, MimeMessage message) {
@@ -348,9 +436,7 @@ public class SmtpMailer {
 	}
 
 	protected MimeMessage prepareMimeMessage(String subject, Session session) throws MessagingException {
-
-		MimeMessage message;
-		message = new MimeMessage(session);
+		MimeMessage message = new MimeMessage(session);
 		message.setFrom(this.from);
 		message.setSubject(subject);
 		return message;
@@ -360,10 +446,11 @@ public class SmtpMailer {
 		InternetAddress[] recipientAddresses;
 		if (this.overrideRecipients == null) {
 			recipientAddresses = parseAddress(recipients);
-			logger.info("Sending e-mail with subject {} to {}", subject, addressesToString(recipientAddresses));
+			logger.info("Sending email with subject {} to recipients {}", subject,
+					addressesToString(recipientAddresses));
 		} else {
 			recipientAddresses = this.overrideRecipients;
-			logger.info("Sending e-mail with subject {} to override recipient {}", subject,
+			logger.info("Sending email with subject {} to override recipient {}", subject,
 					addressesToString(recipientAddresses));
 		}
 		return recipientAddresses;
@@ -405,20 +492,70 @@ public class SmtpMailer {
 		return multiPart;
 	}
 
-	protected void attachEncryptedFile(String attachment, String fileName, Multipart multipart)
-			throws MessagingException {
-		fileName = fileName + ".asc";
+	protected void attachEncryptedFile(MailAttachment attachment, Multipart multipart)
+			throws InterruptedException, MessagingException {
+		String fileName = attachment.fileName() + ".asc";
 
 		MimeBodyPart attachmentPart = new MimeBodyPart();
 		attachmentPart.setFileName(fileName);
-		attachmentPart.setContent(signAndEncrypt(attachment),
+		attachmentPart.setContent(signAndEncrypt(attachment.attachment()),
 				"application/pgp-encrypted; name=\"" + fileName + ".asc\"");
 		attachmentPart.setDescription(fileName);
 		attachmentPart.setDisposition("inline; filename=\"" + fileName + ".asc\"");
 		multipart.addBodyPart(attachmentPart);
 	}
 
-	protected String sign(String plainText) {
+	protected void attachParts(MailAttachment[] attachments, Multipart multipart)
+			throws MessagingException, InterruptedException {
+		for (MailAttachment attachment : attachments) {
+
+			if (attachment.encrypt()) {
+				assertCanEncrypt();
+				attachEncryptedFile(attachment, multipart);
+				continue;
+			}
+
+			String fileName = attachment.fileName();
+			String content;
+			if (canSign() && attachment.sign()) {
+				content = sign(attachment.attachment(), evaluateSignatureType(attachment));
+			} else {
+				content = attachment.attachment();
+			}
+
+			MimeBodyPart attachmentPart = new MimeBodyPart();
+			attachmentPart.setContent(content, attachment.type() + "; name=\"" + fileName + "\"");
+			attachmentPart.setFileName(fileName);
+			attachmentPart.setDescription(fileName);
+			attachmentPart.setDisposition("inline; filename=\"" + fileName + "\"");
+
+			multipart.addBodyPart(attachmentPart);
+		}
+	}
+
+	private DocumentSignatureType evaluateSignatureType(MailAttachment attachment) {
+		return switch (attachment.type()) {
+			case "application/octet-stream", //
+				 "application/pgp-encrypted", //
+				 "application/pgp-signature" -> DocumentSignatureType.BINARY_DOCUMENT;
+			default -> DocumentSignatureType.CANONICAL_TEXT_DOCUMENT;
+		};
+	}
+
+	/**
+	 * Signs the given plain text input using PGP (Pretty Good Privacy) encryption. This method generates a detached
+	 * signature for the provided plain text and returns the generated signature string.
+	 * <p>
+	 * The signing process involves locking to ensure thread safety when accessing key rings, as they are not inherently
+	 * thread-safe.
+	 *
+	 * @param plainText the plain text string to be signed
+	 *
+	 * @return the PGP-generated signature as a string
+	 *
+	 * @throws IllegalStateException if locking fails or if an error occurs during the signing process
+	 */
+	public String sign(String plainText, DocumentSignatureType signatureType) {
 		try {
 			// locking is required, as key rings are not thread safe
 			// can be removed in a future version, when bouncy castle is thread safe
@@ -431,7 +568,7 @@ public class SmtpMailer {
 			SigningOptions signingOptions = new SigningOptions()
 					.addDetachedSignature(
 							SecretKeyRingProtector.unlockAnyKeyWith(new Passphrase(this.signingKeyPassword)),
-							this.signingKeyRing, DocumentSignatureType.BINARY_DOCUMENT)
+							this.signingKeyRing, signatureType)
 					.overrideHashAlgorithm(HashAlgorithm.SHA256);
 
 			ByteArrayOutputStream signatureResult = new ByteArrayOutputStream();
@@ -453,7 +590,7 @@ public class SmtpMailer {
 		}
 	}
 
-	protected String signAndEncrypt(String plainText) {
+	protected String signAndEncrypt(String plainText) throws InterruptedException {
 		try {
 			// locking is required, as key rings are not thread safe
 			// can be removed in a future version, when bouncy castle is thread safe
@@ -477,13 +614,13 @@ public class SmtpMailer {
 
 			return signatureResult.toString(UTF_8);
 		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new IllegalStateException("Interrupted while waiting to lock", e);
+			throw e;
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to encrypt and sign plain text!", e);
 		} finally {
-			if (this.lock.isHeldByCurrentThread() && this.lock.isLocked())
+			if (this.lock.isLocked() && this.lock.isHeldByCurrentThread()) {
 				this.lock.unlock();
+			}
 		}
 	}
 
@@ -524,5 +661,9 @@ public class SmtpMailer {
 		if (recipientKeyRing == null)
 			throw new IllegalStateException("No public key found for recipient key file " + recipientPublicKeyFileName);
 		return recipientKeyRing;
+	}
+
+	private static String getAttachmentsSummary(MailAttachment[] attachments) {
+		return attachments.length == 0 ? "no attachments" : "attachment " + attachments[0].fileName();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,19 @@
  */
 package li.strolch.service.privilege.users;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import li.strolch.model.json.PrivilegeElementToJsonVisitor;
 import li.strolch.privilege.model.UserRep;
 import li.strolch.service.api.ServiceArgument;
 
 public class PrivilegeUserArgument extends ServiceArgument {
 	public UserRep user;
+
+	@Override
+	public JsonElement toJson() {
+		if (this.user == null)
+			return new JsonObject();
+		return this.user.accept(new PrivilegeElementToJsonVisitor());
+	}
 }

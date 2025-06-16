@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 package li.strolch.service.privilege.users;
 
 import li.strolch.model.audit.AccessType;
-import li.strolch.model.audit.Audit;
 import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.handler.PrivilegeHandler;
 import li.strolch.privilege.model.UserRep;
-import li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants;
 import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceResultState;
+
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_SET_USER_STATE;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIVILEGE;
+import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.USER;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -46,16 +48,13 @@ public class PrivilegeSetUserStateService extends AbstractService<PrivilegeSetUs
 		PrivilegeHandler privilegeHandler = strolchPrivilegeHandler.getPrivilegeHandler();
 
 		UserRep user;
-		try (StrolchTransaction tx = openArgOrUserTx(arg, PrivilegeHandler.PRIVILEGE_SET_USER_STATE)) {
-			tx.setSuppressAudits(true);
-
-			user = privilegeHandler.setUserState(getCertificate(), arg.username, arg.userState);
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_SET_USER_STATE)) {
+			user = privilegeHandler.setUserStateById(getCertificate(), arg.userId, arg.userState);
 			if (privilegeHandler.isPersistOnUserDataChanged())
 				privilegeHandler.persist(getCertificate());
 
-			Audit audit = tx.auditFrom(AccessType.UPDATE, StrolchPrivilegeConstants.PRIVILEGE,
-					StrolchPrivilegeConstants.USER, user.getUsername());
-			tx.getAuditTrail().add(tx, audit);
+			tx.add(tx.auditFrom(AccessType.UPDATE, PRIVILEGE, USER, user.getUsername()));
+			tx.commitOnClose();
 		}
 
 		return new PrivilegeUserResult(user);

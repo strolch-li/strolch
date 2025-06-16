@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,8 @@ public interface PersistenceTransaction extends AutoCloseable {
 	void close() throws XmlPersistenceException;
 
 	boolean isOpen();
+
+	void flush();
 
 	ObjectDao getObjectDao();
 

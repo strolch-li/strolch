@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package li.strolch.agent.api;
 
+import li.strolch.agent.impl.DataStoreMode;
 import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchModelConstants;
 import li.strolch.model.StrolchRootElement;
@@ -45,6 +46,13 @@ import java.util.stream.Stream;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public interface ElementMap<T extends StrolchRootElement> {
+
+	/**
+	 * Retrieves the current mode of the data store.
+	 *
+	 * @return the current data store mode as a {@code DataStoreMode} enumeration value
+	 */
+	DataStoreMode getDataStoreMode();
 
 	/**
 	 * Returns true if the underlying persistence layer has elements with the given type

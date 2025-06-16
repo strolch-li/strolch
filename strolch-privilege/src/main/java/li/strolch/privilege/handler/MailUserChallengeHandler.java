@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 
 package li.strolch.privilege.handler;
 
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.utils.SmtpMailer;
-import li.strolch.utils.helper.StringHelper;
 
 import java.util.concurrent.CompletableFuture;
 
 import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
 
 public class MailUserChallengeHandler extends UserChallengeHandler {
 
@@ -30,29 +33,39 @@ public class MailUserChallengeHandler extends UserChallengeHandler {
 	public void sendChallengeToUser(User user, String challenge) {
 
 		String subject = "Mail TAN";
-
-		String text = "Hello "
-				+ user.getFirstname()
-				+ " "
-				+ user.getLastname()
-				+ "\n\n"
-				+ "You have requested an action which requires you to respond to a challenge.\n\n"
-				+ "Please use the following code to response to the challenge:\n\n"
-				+ challenge;
-		String recipient = user.getEmail();
-		if (StringHelper.isEmpty(recipient)) {
-			logger.error("User {} has no property {}, so can not initiate challenge!", user.getUsername(), EMAIL);
+		String text = """
+				Hello %s %s
+				
+				You have requested an action which requires you to respond to a challenge.
+				
+				Please use the following code to response to the challenge:
+				
+				    %s
+				
+				""".formatted(user.getFirstname(), user.getLastname(), challenge);
+		String recipient = trimOrEmpty(user.getEmail());
+		if (isEmpty(recipient)) {
+			logger.error("User {} has no or empty property {}, so can not initiate challenge!", user.getUsername(),
+					EMAIL);
 			return;
+		}
+
+		// validate email address
+		try {
+			InternetAddress.parse(recipient);
+		} catch (AddressException e) {
+			logger.error("Failed to parse address: {}", recipient, e);
+			throw new IllegalArgumentException("Email address " + recipient + " is invalid!");
 		}
 
 		// send e-mail async
 		CompletableFuture
-				.runAsync(() -> SmtpMailer.getInstance().sendMail(subject, text, recipient))
-				.whenComplete((unused, throwable) -> {
+				.runAsync(() -> SmtpMailer.getInstance().sendMailSignedIfAvailable(recipient, subject, text))
+				.whenComplete((_, throwable) -> {
 					if (throwable == null)
-						logger.error("Sent Mail TAN e-mail for user {}", user, throwable);
+						logger.info("Sent Mail TAN email for user {} to {}", user, recipient);
 					else
-						logger.error("Failed to send e-mail for user {}", user, throwable);
+						logger.error("Failed to send email for user {} to {}", user, recipient, throwable);
 				});
 	}
 }

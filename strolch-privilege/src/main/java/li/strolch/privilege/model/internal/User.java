@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,6 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 			UserState userState, Set<String> groups, Set<String> roles, Locale locale, Map<String, String> properties,
 			boolean passwordChangeRequested, UserHistory history) {
 
-		DBC.PRE.assertNotEmpty("userId must not be empty", userId);
 		DBC.PRE.assertNotEmpty("username must not be empty", username);
 		DBC.PRE.assertNotNull("userState must not be null", userState);
 		DBC.PRE.assertNotNull("history must not be null", history);
@@ -294,6 +293,13 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	public User withHistory(UserHistory history) {
 		return new User(this.userId, this.username, this.passwordCrypt, this.firstname, this.lastname, this.userState,
 				this.groups, this.roles, this.locale, this.properties, this.passwordChangeRequested, history);
+	}
+
+	public User withUserId(String userId) {
+		DBC.PRE.assertNotEmpty("New userId must not be empty", userId);
+		DBC.PRE.assertEmpty(() -> "User " + this.username + " already has user ID " + this.userId, this.userId);
+		return new User(userId, this.username, this.passwordCrypt, this.firstname, this.lastname, this.userState,
+				this.groups, this.roles, this.locale, this.properties, this.passwordChangeRequested, this.history);
 	}
 
 	@Override

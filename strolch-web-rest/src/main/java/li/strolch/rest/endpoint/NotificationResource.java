@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2024-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@ public class NotificationResource {
 	public Response getAllNotifications(@Context HttpServletRequest request) {
 		Certificate cert = validateCertificate(request, PRIVILEGE_GET_NOTIFICATIONS_ALL);
 		try (StrolchTransaction tx = openTx(cert)) {
-			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor()
+			StrolchRootElementToJsonVisitor visitor = new StrolchRootElementToJsonVisitor().flat()
 					.withoutPolicies()
 					.withoutStateVariables()
 					.flatBagsByType(TYPE_TEXT, TYPE_VISIBILITY)
@@ -173,6 +173,7 @@ public class NotificationResource {
 		return notification -> {
 			JsonObject notificationJ = new JsonObject();
 			notificationJ.addProperty(Tags.Json.ID, notification.getId());
+			notificationJ.addProperty(PARAM_NOTIFICATION_TYPE, notification.getString(PARAM_NOTIFICATION_TYPE));
 
 			String lang = cert.getLocale().getLanguage();
 			Optional<ParameterBag> textBagO = ofNullable(notification.getParameterBag(lang))

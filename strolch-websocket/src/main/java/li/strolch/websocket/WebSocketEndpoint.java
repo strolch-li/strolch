@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import li.strolch.rest.RestfulStrolchComponent;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-@ServerEndpoint("/websocket/strolch/observer")
+@ServerEndpoint(value = "/websocket/strolch/observer", configurator = WebSocketConfigurator.class)
 public class WebSocketEndpoint {
 
 	private final ConcurrentHashMap<Session, WebSocketClient> clientMap = new ConcurrentHashMap<>();

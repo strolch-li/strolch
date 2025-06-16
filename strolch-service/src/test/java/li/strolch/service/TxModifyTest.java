@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ public class TxModifyTest extends AbstractRealmServiceTest<ServiceArgument, Serv
 				// search for all cars
 				List<Resource> cars = new ResourceSearch().types(type).search(tx).cloneIfReadOnly().toList();
 				assertEquals(1, cars.size());
-				assertSame("We didn't get the same car!", car001, cars.get(0));
+				assertSame("We didn't get the same car!", car001, cars.getFirst());
 
 				// also validate get returns the same instance
 				Resource carByGet = tx.getResourceBy(type, id, true);

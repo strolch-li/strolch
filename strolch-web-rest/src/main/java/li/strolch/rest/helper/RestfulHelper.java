@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static li.strolch.rest.StrolchRestfulConstants.HEADER_X_FORWARDED_FOR;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 /**
@@ -122,7 +123,7 @@ public class RestfulHelper {
 		String remoteAddr = request.getRemoteAddr();
 
 		StringBuilder sb = new StringBuilder();
-		String xForwardedFor = request.getHeader("X-Forwarded-For");
+		String xForwardedFor = request.getHeader(HEADER_X_FORWARDED_FOR);
 		if (isNotEmpty(xForwardedFor) && RestfulStrolchComponent
 				.getInstance()
 				.getForwardIgnoreIp()

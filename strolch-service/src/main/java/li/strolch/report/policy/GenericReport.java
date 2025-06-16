@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@ package li.strolch.report.policy;
 
 import com.google.gson.JsonObject;
 import li.strolch.model.*;
-import li.strolch.model.parameter.AbstractParameter;
-import li.strolch.model.parameter.DateParameter;
-import li.strolch.model.parameter.Parameter;
-import li.strolch.model.parameter.StringParameter;
+import li.strolch.model.parameter.*;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.visitor.ElementStateVisitor;
 import li.strolch.model.visitor.ElementZdtDateVisitor;
@@ -29,12 +26,12 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.policy.PolicyHandler;
 import li.strolch.report.ReportConstants;
 import li.strolch.report.ReportElement;
+import li.strolch.utils.DateFormattingHint;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.MapOfLists;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.collections.TypedTuple;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -42,6 +39,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import static java.text.MessageFormat.format;
+import static java.time.ZoneId.systemDefault;
+import static java.time.ZonedDateTime.ofInstant;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
@@ -50,6 +49,7 @@ import static li.strolch.report.ReportConstants.*;
 import static li.strolch.utils.ObjectHelper.compare;
 import static li.strolch.utils.ObjectHelper.contains;
 import static li.strolch.utils.helper.StringHelper.EMPTY;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * A Generic Report defines a report as is described at <a href="https://strolch.li/documentation-reports.html">Strolch
@@ -125,12 +125,9 @@ public class GenericReport extends ReportPolicy {
 		StringParameter objectTypeFilterCriteriaP = objectTypeP.getClone();
 		objectTypeFilterCriteriaP.setId(objectType);
 		if (objectTypeFilterCriteriaP.getUom().equals(UOM_NONE))
-			throw new IllegalStateException("Join UOM "
-					+ objectTypeFilterCriteriaP.getUom()
-					+ " invalid: "
-					+ objectTypeFilterCriteriaP.getId()
-					+ " for "
-					+ objectTypeFilterCriteriaP.getLocator());
+			throw new IllegalStateException(
+					format("Join UOM {0} invalid: {1} for {2}", objectTypeFilterCriteriaP.getUom(),
+							objectTypeFilterCriteriaP.getId(), objectTypeFilterCriteriaP.getLocator()));
 		this.filterCriteriaParams.put(objectType, objectTypeFilterCriteriaP);
 		if (this.reportRes.hasParameterBag(BAG_JOINS)) {
 			ParameterBag joinBag = this.reportRes.getParameterBag(BAG_JOINS);
@@ -146,12 +143,9 @@ public class GenericReport extends ReportPolicy {
 			ParameterBag additionalTypeBag = this.reportRes.getParameterBag(BAG_ADDITIONAL_TYPE);
 			StringParameter additionalTypeP = additionalTypeBag.getParameter(PARAM_OBJECT_TYPE, true);
 			if (additionalTypeP.getUom().equals(UOM_NONE))
-				throw new IllegalStateException("Additional Type UOM "
-						+ additionalTypeP.getUom()
-						+ " invalid: "
-						+ additionalTypeP.getId()
-						+ " for "
-						+ additionalTypeP.getLocator());
+				throw new IllegalStateException(
+						format("Additional Type UOM {0} invalid: {1} for {2}", additionalTypeP.getUom(),
+								additionalTypeP.getId(), additionalTypeP.getLocator()));
 			this.filterCriteriaParams.put(additionalTypeP.getValue(), additionalTypeP);
 		}
 		if (this.reportRes.hasParameterBag(BAG_ADDITIONAL_JOINS)) {
@@ -159,12 +153,9 @@ public class GenericReport extends ReportPolicy {
 			joinBag.getParameters().forEach(parameter -> {
 				StringParameter joinP = (StringParameter) parameter;
 				if (joinP.getUom().equals(UOM_NONE))
-					throw new IllegalStateException("Additional Join UOM "
-							+ joinP.getUom()
-							+ " invalid: "
-							+ joinP.getId()
-							+ " for "
-							+ joinP.getLocator());
+					throw new IllegalStateException(
+							format("Additional Join UOM {0} invalid: {1} for {2}", joinP.getUom(), joinP.getId(),
+									joinP.getLocator()));
 				this.filterCriteriaParams.put(parameter.getId(), joinP);
 			});
 		}
@@ -521,15 +512,31 @@ public class GenericReport extends ReportPolicy {
 		StringParameter columnDefP = this.columnsBag.getParameter(columnId, true);
 		Object value = evaluateColumnValue(columnDefP, row, false);
 		return switch (value) {
-			case ZonedDateTime zonedDateTime -> ISO8601.toString(zonedDateTime);
-			case Date date -> ISO8601.toString(date);
-			case Parameter<?> parameter -> formatColumn(parameter);
+			case ZonedDateTime dateTime -> formatDateTime(columnId, dateTime);
+			case Date date -> formatDateTime(columnId, ofInstant(date.toInstant(), systemDefault()));
+			case Parameter<?> parameter -> formatColumn(columnDefP.getId(), parameter);
 			default -> value.toString();
 		};
 	}
 
-	protected String formatColumn(Parameter<?> param) {
-		return param.getValueAsString();
+	protected String formatColumn(String columnId, Parameter<?> param) {
+		if (param instanceof BooleanParameter b) {
+			String value = b.getValueAsString();
+			if (this.i18nData != null && this.i18nData.has(value))
+				return this.i18nData.get(value).getAsString();
+			return value;
+		} else if (param instanceof DateParameter d) {
+			return formatDateTime(columnId, d.getValueZdt());
+		} else {
+			return param.getValueAsString();
+		}
+	}
+
+	protected String formatDateTime(String columnId, ZonedDateTime dt) {
+		String hint = this.reportRes.getString(BAG_FORMATTING_HINTS, columnId);
+		if (isEmpty(hint))
+			return DateFormattingHint.None.format(tx().getLocale(), dt);
+		return DateFormattingHint.valueOf(hint).format(tx().getLocale(), dt);
 	}
 
 	@Override

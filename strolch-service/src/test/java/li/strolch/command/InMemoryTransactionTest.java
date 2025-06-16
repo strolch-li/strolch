@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.base.AccessDeniedException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.testbase.runtime.RuntimeMock;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -48,6 +49,12 @@ public class InMemoryTransactionTest {
 		runtimeMock = new RuntimeMock().mockRuntime(TARGET_RUNTIME, CONFIG_SRC);
 		runtimeMock.startContainer();
 		certificate = runtimeMock.getPrivilegeHandler().authenticate("test", "test".toCharArray());
+	}
+
+	@AfterClass
+	public static void afterClass() throws Exception {
+		if (runtimeMock != null)
+			runtimeMock.destroyRuntime();
 	}
 
 	protected StrolchTransaction openTx(String realmName, boolean readOnly) {

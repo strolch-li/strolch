@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,21 @@
 
 package li.strolch.service;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import li.strolch.model.Locator;
+import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceArgument;
 
 public class LocatorArgument extends ServiceArgument {
 	public Locator locator;
+
+	@Override
+	public JsonElement toJson() {
+		if (this.locator == null)
+			return new JsonObject();
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty(Tags.Json.LOCATOR, this.locator.toString());
+		return jsonObject;
+	}
 }

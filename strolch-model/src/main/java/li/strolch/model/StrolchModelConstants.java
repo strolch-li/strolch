@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,7 @@ public class StrolchModelConstants {
 	public static final String PARAM_MODE = "mode";
 	public static final String PARAM_GROUP = "group";
 	public static final String PARAM_ENABLED = "enabled";
+	public static final String PARAM_NOTIFICATION_TYPE = "notificationType";
 	public static final String PARAM_VISIBLE_FROM = "visibleFrom";
 	public static final String PARAM_VISIBLE_TO = "visibleTo";
 	public static final String PARAM_TITLE = "title";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,11 @@ import static org.junit.Assert.fail;
 public class RuntimeMock {
 
 	private static final Logger logger = LoggerFactory.getLogger(RuntimeMock.class);
-	private static final String TARGET = "target";
+	private static final String TARGET = "target/";
 
 	private ComponentContainer container;
 	private StrolchAgent agent;
+	private File targetPath;
 
 	public ComponentContainer getContainer() {
 		return this.container;
@@ -49,6 +50,10 @@ public class RuntimeMock {
 
 	public StrolchAgent getAgent() {
 		return this.agent;
+	}
+
+	public File getTargetPath() {
+		return this.targetPath;
 	}
 
 	public PrivilegeHandler getPrivilegeHandler() {
@@ -95,7 +100,7 @@ public class RuntimeMock {
 
 	public RuntimeMock mockRuntime(File targetPathF, File srcPathF) {
 
-		if (!targetPathF.getParentFile().getName().equals(TARGET)) {
+		if (!targetPathF.getAbsolutePath().contains(TARGET)) {
 			String msg = "Mocking path must be in a maven target: {0}";
 			msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
@@ -127,6 +132,7 @@ public class RuntimeMock {
 		logger.info("Mocking runtime from {} to {}", srcPathF.getAbsolutePath(), targetPathF.getAbsolutePath());
 
 		// setup the container
+		this.targetPath = targetPathF;
 		this.agent = new StrolchBootstrapper(getAppVersion()).setupByCopyingRoot("dev", srcPathF, targetPathF);
 
 		return this;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package li.strolch.handler.mail;
 import jakarta.mail.internet.InternetAddress;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
+import li.strolch.utils.MailAttachment;
 
 /**
  * {@link StrolchComponent} to send e-mails
@@ -94,16 +95,14 @@ public abstract class MailHandler extends StrolchComponent {
 	 *
 	 * <p>If signing is enabled, then the sent mail will be signed</p>
 	 *
-	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
-	 *                   {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
-	 * @param attachment the attachment as a string
-	 * @param fileName   the file name of the attachment
-	 * @param type       the mime type of the attachment
+	 * @param recipients  the comma separated list of addresses to whom to send the e-mail see
+	 *                    {@link InternetAddress#parse(String)}
+	 * @param subject     the subject of the e-mail
+	 * @param text        the test of the e-mail
+	 * @param attachments the attachments to send
 	 */
-	public abstract void sendMailWithAttachment(String recipients, String subject, String text, String attachment,
-			String fileName, String type);
+	public abstract void sendMailWithAttachment(String recipients, String subject, String text,
+			MailAttachment... attachments);
 
 	/**
 	 * <p>Sends an encrypted e-mail with an encrypted attachment to the given recipients.</p>
@@ -112,16 +111,14 @@ public abstract class MailHandler extends StrolchComponent {
 	 *
 	 * <p>If signing is not enabled, then an {@link IllegalStateException} is thrown</p>
 	 *
-	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
-	 *                   {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
-	 * @param attachment the attachment as a string
-	 * @param fileName   the file name of the attachment
-	 * @param type       the mime type of the attachment
+	 * @param recipients  the comma separated list of addresses to whom to send the e-mail see
+	 *                    {@link InternetAddress#parse(String)}
+	 * @param subject     the subject of the e-mail
+	 * @param text        the test of the e-mail
+	 * @param attachments the attachments to send
 	 */
 	public abstract void sendEncryptedMailWithAttachment(String recipients, String subject, String text,
-			String attachment, String fileName, String type);
+			MailAttachment... attachments);
 
 	/**
 	 * <p>Sends an e-mail with an attachment to the given recipients.</p>
@@ -130,16 +127,14 @@ public abstract class MailHandler extends StrolchComponent {
 	 *
 	 * <p>If signing is enabled, then the sent mail will be signed</p>
 	 *
-	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
-	 *                   {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
-	 * @param attachment the attachment as a string
-	 * @param fileName   the file name of the attachment
-	 * @param type       the mime type of the attachment
+	 * @param recipients  the comma separated list of addresses to whom to send the e-mail see
+	 *                    {@link InternetAddress#parse(String)}
+	 * @param subject     the subject of the e-mail
+	 * @param text        the test of the e-mail
+	 * @param attachments the attachments to send
 	 */
 	public abstract void sendUnencryptedMailWithAttachment(String recipients, String subject, String text,
-			String attachment, String fileName, String type);
+			MailAttachment... attachments);
 
 	/**
 	 * <p>Sends an e-mail to the given recipients asynchronously.</p>
@@ -190,16 +185,14 @@ public abstract class MailHandler extends StrolchComponent {
 	 *
 	 * <p>If signing is enabled, then the sent mail will be signed</p>
 	 *
-	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
-	 *                   {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
-	 * @param attachment the attachment as a string
-	 * @param fileName   the file name of the attachment
-	 * @param type       the mime type of the attachment
+	 * @param recipients  the comma separated list of addresses to whom to send the e-mail see
+	 *                    {@link InternetAddress#parse(String)}
+	 * @param subject     the subject of the e-mail
+	 * @param text        the test of the e-mail
+	 * @param attachments the attachments to send
 	 */
-	public abstract void sendMailWithAttachmentAsync(String recipients, String subject, String text, String attachment,
-			String fileName, String type);
+	public abstract void sendMailWithAttachmentAsync(String recipients, String subject, String text,
+			MailAttachment... attachments);
 
 	/**
 	 * <p>Sends an e-mail with an attachment to the given recipients asynchronously.</p>
@@ -208,16 +201,14 @@ public abstract class MailHandler extends StrolchComponent {
 	 *
 	 * <p>If signing is not enabled, then an {@link IllegalStateException} is thrown</p>
 	 *
-	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
-	 *                   {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
-	 * @param attachment the attachment as a string
-	 * @param fileName   the file name of the attachment
-	 * @param type       the mime type of the attachment
+	 * @param recipients  the comma separated list of addresses to whom to send the e-mail see
+	 *                    {@link InternetAddress#parse(String)}
+	 * @param subject     the subject of the e-mail
+	 * @param text        the test of the e-mail
+	 * @param attachments the attachments to send
 	 */
 	public abstract void sendEncryptedMailWithAttachmentAsync(String recipients, String subject, String text,
-			String attachment, String fileName, String type);
+			MailAttachment... attachments);
 
 	/**
 	 * <p>Sends an e-mail with an attachment to the given recipients asynchronously.</p>
@@ -226,15 +217,21 @@ public abstract class MailHandler extends StrolchComponent {
 	 *
 	 * <p>If signing is enabled, then the sent mail will be signed</p>
 	 *
-	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
-	 *                   {@link InternetAddress#parse(String)}
-	 * @param subject    the subject of the e-mail
-	 * @param text       the test of the e-mail
-	 * @param attachment the attachment as a string
-	 * @param fileName   the file name of the attachment
-	 * @param type       the mime type of the attachment
+	 * @param recipients  the comma separated list of addresses to whom to send the e-mail see
+	 *                    {@link InternetAddress#parse(String)}
+	 * @param subject     the subject of the e-mail
+	 * @param text        the test of the e-mail
+	 * @param attachments the attachments to send
 	 */
 	public abstract void sendUnencryptedMailWithAttachmentAsync(String recipients, String subject, String text,
-			String attachment, String fileName, String type);
+			MailAttachment... attachments);
 
+	/**
+	 * Signs a given plain text using the implemented signing mechanism.
+	 *
+	 * @param text the plain text input that needs to be signed
+	 *
+	 * @return the generated digital signature as a string
+	 */
+	public abstract String signPlainText(String text);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,9 @@ public class StrolchRestfulConstants {
 	public static final String PARAM_TO = "to";
 	public static final String PARAM_FILTER = "filter";
 	public static final String PARAM_QUERY = "query";
+	public static final String REMOTE_IP = "remote_ip";
+
+	public static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 
 	public static final MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
 	public static final MediaType APPLICATION_PDF_TYPE = new MediaType("application", "pdf");

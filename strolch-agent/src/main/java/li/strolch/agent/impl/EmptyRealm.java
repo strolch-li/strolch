@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ public class EmptyRealm extends InternalStrolchRealm {
 
 	@Override
 	public StrolchTransaction openTx(Certificate certificate, String action, boolean readOnly) {
+		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		return new TransientTransaction(this.container, this, certificate, action, readOnly);
 	}
@@ -90,10 +91,5 @@ public class EmptyRealm extends InternalStrolchRealm {
 	public void start(PrivilegeContext privilegeContext) {
 		super.start(privilegeContext);
 		logger.info("Initialized EMPTY Realm {}", getRealm());
-	}
-
-	@Override
-	public void destroy() {
-		// 
 	}
 }

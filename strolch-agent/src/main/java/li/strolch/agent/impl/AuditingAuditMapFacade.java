@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2024 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.dbc.DBC;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -42,10 +44,6 @@ public class AuditingAuditMapFacade implements AuditTrail {
 
 	private final Set<Audit> read;
 	private final Set<Audit> created;
-	private final Set<Audit> updated;
-	private final Set<Audit> deleted;
-	private long deletedAll;
-	private final Map<String, Long> deletedAllByType;
 
 	private final boolean observeAccessReads;
 
@@ -56,9 +54,6 @@ public class AuditingAuditMapFacade implements AuditTrail {
 
 		this.created = new HashSet<>();
 		this.read = new HashSet<>();
-		this.updated = new HashSet<>();
-		this.deleted = new HashSet<>();
-		this.deletedAllByType = new HashMap<>();
 	}
 
 	/**
@@ -75,42 +70,14 @@ public class AuditingAuditMapFacade implements AuditTrail {
 		return this.created;
 	}
 
-	/**
-	 * @return the updated
-	 */
-	public Set<Audit> getUpdated() {
-		return this.updated;
-	}
-
-	/**
-	 * @return the deleted
-	 */
-	public Set<Audit> getDeleted() {
-		return this.deleted;
-	}
-
-	/**
-	 * @return the deletedAll
-	 */
-	public long getDeletedAll() {
-		return this.deletedAll;
-	}
-
-	/**
-	 * @return the deletedAllByType
-	 */
-	public Map<String, Long> getDeletedAllByType() {
-		return this.deletedAllByType;
-	}
-
 	@Override
 	public boolean isEnabled() {
 		return this.auditTrail.isEnabled();
 	}
 
 	@Override
-	public boolean hasAudit(StrolchTransaction tx, String type, Long id) {
-		return this.auditTrail.hasAudit(tx, type, id);
+	public long querySize(StrolchTransaction tx) {
+		return this.auditTrail.querySize(tx);
 	}
 
 	@Override
@@ -119,21 +86,11 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	}
 
 	@Override
-	public long querySize(StrolchTransaction tx, String type, DateRange dateRange) {
-		return this.auditTrail.querySize(tx, type, dateRange);
-	}
-
-	@Override
-	public Set<String> getTypes(StrolchTransaction tx) {
-		return this.auditTrail.getTypes(tx);
-	}
-
-	@Override
-	public Audit getBy(StrolchTransaction tx, String type, Long id) {
-		Audit audit = this.auditTrail.getBy(tx, type, id);
+	public List<Audit> getAllElements(StrolchTransaction tx, DateRange dateRange) {
+		List<Audit> elements = this.auditTrail.getAllElements(tx, dateRange);
 		if (this.observeAccessReads)
-			this.read.add(audit);
-		return audit;
+			this.read.addAll(elements);
+		return elements;
 	}
 
 	@Override
@@ -154,43 +111,5 @@ public class AuditingAuditMapFacade implements AuditTrail {
 	public void addAll(StrolchTransaction tx, List<Audit> audits) {
 		this.auditTrail.addAll(tx, audits);
 		this.created.addAll(audits);
-	}
-
-	@Override
-	public void update(StrolchTransaction tx, Audit audit) {
-		this.auditTrail.update(tx, audit);
-		this.updated.add(audit);
-	}
-
-	@Override
-	public void updateAll(StrolchTransaction tx, List<Audit> audits) {
-		this.auditTrail.updateAll(tx, audits);
-		this.updated.addAll(audits);
-	}
-
-	@Override
-	public void remove(StrolchTransaction tx, Audit audit) {
-		this.auditTrail.remove(tx, audit);
-		this.deleted.add(audit);
-	}
-
-	@Override
-	public void removeAll(StrolchTransaction tx, List<Audit> audits) {
-		this.auditTrail.removeAll(tx, audits);
-		this.deleted.addAll(audits);
-	}
-
-	@Override
-	public long removeAll(StrolchTransaction tx, String type, DateRange dateRange) {
-		long removed = this.auditTrail.removeAll(tx, type, dateRange);
-
-		Long byType = this.deletedAllByType.get(type);
-		if (byType == null)
-			byType = 0L;
-		byType += removed;
-		this.deletedAllByType.put(type, byType);
-
-		this.deletedAll += removed;
-		return removed;
 	}
 }
