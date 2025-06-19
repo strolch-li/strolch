@@ -44,13 +44,11 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
 
 	public static String getRemoteIp(HandshakeRequest request) {
 		try {
-			HttpServletRequest httpSession = (HttpServletRequest) request.getHttpSession();
-
 			String remoteHost;
 			String remoteAddr;
-			if (httpSession != null) {
-				remoteHost = httpSession.getRemoteHost();
-				remoteAddr = httpSession.getRemoteAddr();
+			if (request.getHttpSession() instanceof HttpServletRequest servletRequest) {
+				remoteHost = servletRequest.getRemoteHost();
+				remoteAddr = servletRequest.getRemoteAddr();
 			} else {
 				HttpServletRequest httpServletRequest = getHttpServletRequest(request);
 				if (httpServletRequest != null) {
