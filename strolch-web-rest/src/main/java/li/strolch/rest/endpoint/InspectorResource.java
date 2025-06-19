@@ -1607,6 +1607,7 @@ public class InspectorResource {
 			@ApiResponse(responseCode = "403", description = "Access denied."),
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/resources/{type}")
 	public Response removeResourcesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("ids") String ids) {
@@ -1636,6 +1637,7 @@ public class InspectorResource {
 			@ApiResponse(responseCode = "403", description = "Access denied."),
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/orders/{type}")
 	public Response removeOrdersByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("ids") String ids) {
@@ -1665,6 +1667,7 @@ public class InspectorResource {
 			@ApiResponse(responseCode = "403", description = "Access denied."),
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@DELETE
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("{realm}/activities/{type}")
 	public Response removeActivitiesByType(@Context HttpServletRequest request, @PathParam("realm") String realm,
 			@PathParam("type") String type, @QueryParam("ids") String ids) {
