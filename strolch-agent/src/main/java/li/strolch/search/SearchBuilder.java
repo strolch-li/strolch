@@ -177,11 +177,15 @@ public class SearchBuilder {
 
 				SearchExpression<T> expression;
 				if (part.startsWith("$state") && (search instanceof OrderSearch || search instanceof ActivitySearch)) {
-					part = part.substring("$state".length() + 1);
-					if (part.isEmpty() || State.parseAllowNull(part) == null) {
-						expression = id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
+					if (part.length() > "$state".length() + 1) {
+						part = part.substring("$state".length() + 1);
+						if (State.parseAllowNull(part) == null) {
+							expression = id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
+						} else {
+							expression = state(isEqualTo(part));
+						}
 					} else {
-						expression = state(isEqualTo(part));
+						expression = id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
 					}
 				} else {
 					expression = id(containsIgnoreCase(part)).or(name(containsIgnoreCase(part)));
