@@ -216,6 +216,16 @@ public class SmtpMailHandler extends MailHandler {
 	}
 
 	@Override
+	public void sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailableAsync(String recipients, String subject,
+			String text) {
+		if (this.signingEnabled)
+			getExecutorService("Mail").submit(() -> doSendUnencryptedMailWithAttachment(recipients, subject, text,
+					new MailAttachment(createEncryptedFileNameFromSubject(subject), text, true)));
+		else
+			getExecutorService("Mail").submit(() -> doSendUnencryptedMail(recipients, subject, text));
+	}
+
+	@Override
 	public void sendMailWithAttachmentAsync(String recipients, String subject, String text,
 			MailAttachment... attachments) {
 		if (this.encryptionEnabled) {
