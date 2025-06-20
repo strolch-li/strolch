@@ -205,6 +205,7 @@ public class ResponseUtil {
 			case NotAuthenticatedException ignored -> Status.UNAUTHORIZED;
 			case PrivilegeException ignored -> Status.UNAUTHORIZED;
 			case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
+			case StrolchUserMessageException ignored -> Status.BAD_REQUEST;
 			case null, default -> Status.INTERNAL_SERVER_ERROR;
 		};
 	}
