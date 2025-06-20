@@ -218,11 +218,30 @@ public class SmtpMailHandler extends MailHandler {
 	@Override
 	public void sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailableAsync(String recipients, String subject,
 			String text) {
-		if (this.signingEnabled)
-			getExecutorService("Mail").submit(() -> doSendUnencryptedMailWithAttachment(recipients, subject, text,
-					new MailAttachment(createEncryptedFileNameFromSubject(subject), text, true)));
-		else
-			getExecutorService("Mail").submit(() -> doSendUnencryptedMail(recipients, subject, text));
+		getExecutorService("Mail").submit(
+				() -> doSendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(recipients, subject, text));
+	}
+
+	public void doSendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(String recipients, String subject,
+			String text) {
+		try {
+			sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(recipients, subject, text);
+		} catch (Throwable e) {
+			logger.error("Failed to send mail \"{}\" to {}", subject, recipients, e);
+			if (hasComponent(OperationsLog.class))
+				addFailedToSendMailLogMessage(recipients, subject, e);
+		}
+	}
+
+	@Override
+	public void sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(String recipients, String subject,
+			String text) {
+		if (!this.signingEnabled) {
+			sendUnencryptedMail(recipients, subject, text);
+		} else {
+			getSmtpMailer().sendMailWithAttachment(recipients, subject, text, false,
+					new MailAttachment(createEncryptedFileNameFromSubject(subject), text, true));
+		}
 	}
 
 	@Override
