@@ -149,8 +149,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendUnencryptedMail(String recipients, String subject, String text) {
-		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMailSignedIfAvailable(recipients, subject, text);
+		getSmtpMailer().sendMailSignedIfAvailable(recipients, subject, text);
 	}
 
 	@Override
@@ -159,9 +158,9 @@ public class SmtpMailHandler extends MailHandler {
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 
-		SmtpMailer mailer = getSmtpMailer();
 		String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
-		mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
+		getSmtpMailer().sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
+				encryptedFileNameFromSubject);
 	}
 
 	@Override
@@ -183,17 +182,15 @@ public class SmtpMailHandler extends MailHandler {
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 
-		SmtpMailer mailer = getSmtpMailer();
 		String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
-		mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
+		getSmtpMailer().sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
 				encryptedFileNameFromSubject, attachments);
 	}
 
 	@Override
 	public void sendUnencryptedMailWithAttachment(String recipients, String subject, String text,
 			MailAttachment... attachments) {
-		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
+		getSmtpMailer().sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
 	}
 
 	@Override
