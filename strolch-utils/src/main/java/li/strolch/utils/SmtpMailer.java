@@ -473,7 +473,8 @@ public class SmtpMailer {
 	protected Multipart attachEncryptedMessage(MimeMessage message, String mailText, String encryptedAndSignedMessage,
 			String encryptedTextFileName) throws MessagingException {
 
-		String fileName = encryptedTextFileName + ".asc";
+		String fileName = encryptedTextFileName.endsWith(".asc") ? encryptedTextFileName :
+				encryptedTextFileName + ".asc";
 
 		MimeBodyPart textPart = new MimeBodyPart();
 		textPart.setText(mailText, UTF_8.name());
