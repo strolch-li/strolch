@@ -240,7 +240,7 @@ public class SmtpMailHandler extends MailHandler {
 			sendUnencryptedMail(recipients, subject, text);
 		} else {
 			getSmtpMailer().sendMailWithAttachment(recipients, subject, text, false,
-					new MailAttachment(createEncryptedFileNameFromSubject(subject), text, true));
+					new MailAttachment(text, "Signed_Text.txt", true));
 		}
 	}
 
