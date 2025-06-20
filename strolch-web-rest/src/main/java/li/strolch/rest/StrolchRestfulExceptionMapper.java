@@ -26,6 +26,7 @@ import jakarta.ws.rs.ext.Provider;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
+import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.handler.operationslog.OperationsLog;
 import li.strolch.model.Locator;
 import li.strolch.model.log.LogMessage;
@@ -60,8 +61,10 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 		StrolchAgent agent = RestfulStrolchComponent.getInstance().getAgent();
 		boolean isNotAccessDeniedException = !hasCause(ex, AccessDeniedException.class) && !hasCause(ex,
 				StrolchAccessDeniedException.class);
-		// access denied exceptions have already been handled
-		if (isNotAccessDeniedException && agent.hasComponent(OperationsLog.class)) {
+		boolean logException = isNotAccessDeniedException
+				&& !hasCause(ex, StrolchUserMessageException.class)
+				&& agent.hasComponent(OperationsLog.class);
+		if (logException) {
 			try {
 				String username = hasCert() ? getCert().getUsername() : "anonymous";
 				String realm = agent.getRealmNames().iterator().next();
