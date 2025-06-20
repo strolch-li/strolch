@@ -179,6 +179,36 @@ public abstract class MailHandler extends StrolchComponent {
 	public abstract void sendUnencryptedMailAsync(String recipients, String subject, String text);
 
 	/**
+	 * <p>Sends an e-mail to the given recipients asynchronously</p>
+	 *
+	 * <p>This method guarantees the email is not encrypted</p>
+	 *
+	 * <p>If signing is enabled, then the mail body will be added as signed attachment</p>
+	 *
+	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
+	 *                   {@link InternetAddress#parse(String)}
+	 * @param subject    the subject of the e-mail
+	 * @param text       the test of the e-mail
+	 */
+	public abstract void sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailableAsync(String recipients,
+			String subject, String text);
+
+	/**
+	 * <p>Sends an e-mail to the given recipients</p>
+	 *
+	 * <p>This method guarantees the email is not encrypted</p>
+	 *
+	 * <p>If signing is enabled, then the mail body will be added as signed attachment</p>
+	 *
+	 * @param recipients the comma separated list of addresses to whom to send the e-mail see
+	 *                   {@link InternetAddress#parse(String)}
+	 * @param subject    the subject of the e-mail
+	 * @param text       the test of the e-mail
+	 */
+	public abstract void sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(String recipients, String subject,
+			String text);
+
+	/**
 	 * <p>Sends an e-mail with an attachment to the given recipients asynchronously.</p>
 	 *
 	 * <p>If encryption is enabled, then the sent mail will be encrypted</p>

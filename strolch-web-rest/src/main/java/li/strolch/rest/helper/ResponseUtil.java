@@ -45,8 +45,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
-import static li.strolch.rest.StrolchRestfulConstants.MSG;
+import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 
@@ -169,7 +168,10 @@ public class ResponseUtil {
 		String json = (
 				i18nMessage == null ? StrolchResponse.valueOf(msg) :
 						StrolchResponse.valueOf(msg, i18nMessage)).toJson();
-		return Response.status(status).entity(json).type(APPLICATION_JSON).build();
+		Response.ResponseBuilder responseBuilder = Response.status(status).entity(json).type(APPLICATION_JSON);
+		if (i18nMessage != null)
+			responseBuilder.header(STROLCH_STROLCH_EXCEPTION_I18N, true);
+		return responseBuilder.build();
 	}
 
 	public static <T> Response toResponse(List<T> list, Function<T, JsonObject> visitor) {
@@ -205,6 +207,7 @@ public class ResponseUtil {
 			case NotAuthenticatedException ignored -> Status.UNAUTHORIZED;
 			case PrivilegeException ignored -> Status.UNAUTHORIZED;
 			case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
+			case StrolchUserMessageException ignored -> Status.BAD_REQUEST;
 			case null, default -> Status.INTERNAL_SERVER_ERROR;
 		};
 	}

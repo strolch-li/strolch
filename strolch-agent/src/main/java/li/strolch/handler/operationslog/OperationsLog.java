@@ -123,8 +123,6 @@ public class OperationsLog extends StrolchComponent {
 				ThreadHelper.sleep(10);
 			flushQueue();
 		}
-		if (this.executorService != null)
-			this.executorService.shutdownNow();
 		if (this.sentMessageHashes != null)
 			this.sentMessageHashes.clear();
 		super.stop();

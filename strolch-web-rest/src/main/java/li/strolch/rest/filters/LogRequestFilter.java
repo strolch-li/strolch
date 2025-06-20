@@ -30,8 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REMOTE_IP;
-import static li.strolch.rest.StrolchRestfulConstants.STROLCH_REQUEST_URL;
+import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.rest.helper.ServletRequestHelper.logRequest;
 
 @Provider
@@ -73,8 +72,9 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 					contentType.append(", ");
 			}
 
-			logger.error("Request failed {}: {} {} Content-type: {}", responseContext.getStatus(), method, uri,
-					contentType);
+			if (!responseContext.getHeaders().containsKey(STROLCH_STROLCH_EXCEPTION_I18N))
+				logger.error("Request failed {}: {} {} Content-type: {}", responseContext.getStatus(), method, uri,
+						contentType);
 		}
 	}
 }

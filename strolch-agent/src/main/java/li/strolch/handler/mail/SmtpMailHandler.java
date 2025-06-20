@@ -149,8 +149,7 @@ public class SmtpMailHandler extends MailHandler {
 
 	@Override
 	public void sendUnencryptedMail(String recipients, String subject, String text) {
-		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMailSignedIfAvailable(recipients, subject, text);
+		getSmtpMailer().sendMailSignedIfAvailable(recipients, subject, text);
 	}
 
 	@Override
@@ -159,9 +158,9 @@ public class SmtpMailHandler extends MailHandler {
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 
-		SmtpMailer mailer = getSmtpMailer();
 		String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
-		mailer.sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text, encryptedFileNameFromSubject);
+		getSmtpMailer().sendEncryptedEmail(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
+				encryptedFileNameFromSubject);
 	}
 
 	@Override
@@ -183,17 +182,15 @@ public class SmtpMailHandler extends MailHandler {
 			throw new IllegalStateException(
 					"Can not send mail with subject %s as encryption is not enabled".formatted(subject));
 
-		SmtpMailer mailer = getSmtpMailer();
 		String encryptedFileNameFromSubject = createEncryptedFileNameFromSubject(subject);
-		mailer.sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
+		getSmtpMailer().sendEncryptedEmailWithAttachment(recipients, subject, ENCRYPTED_MAIL_TEXT, text,
 				encryptedFileNameFromSubject, attachments);
 	}
 
 	@Override
 	public void sendUnencryptedMailWithAttachment(String recipients, String subject, String text,
 			MailAttachment... attachments) {
-		SmtpMailer mailer = getSmtpMailer();
-		mailer.sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
+		getSmtpMailer().sendMailWithAttachmentSignedIfAvailable(recipients, subject, text, attachments);
 	}
 
 	@Override
@@ -216,6 +213,35 @@ public class SmtpMailHandler extends MailHandler {
 	@Override
 	public void sendUnencryptedMailAsync(String recipients, String subject, String text) {
 		getExecutorService("Mail").submit(() -> doSendUnencryptedMail(recipients, subject, text));
+	}
+
+	@Override
+	public void sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailableAsync(String recipients, String subject,
+			String text) {
+		getExecutorService("Mail").submit(
+				() -> doSendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(recipients, subject, text));
+	}
+
+	public void doSendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(String recipients, String subject,
+			String text) {
+		try {
+			sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(recipients, subject, text);
+		} catch (Throwable e) {
+			logger.error("Failed to send mail \"{}\" to {}", subject, recipients, e);
+			if (hasComponent(OperationsLog.class))
+				addFailedToSendMailLogMessage(recipients, subject, e);
+		}
+	}
+
+	@Override
+	public void sendUnencryptedMailWithBodyAsSignedAttachmentIfAvailable(String recipients, String subject,
+			String text) {
+		if (!this.signingEnabled) {
+			sendUnencryptedMail(recipients, subject, text);
+		} else {
+			getSmtpMailer().sendMailWithAttachment(recipients, subject, text, false,
+					new MailAttachment(text, "Signed_Text.txt", true));
+		}
 	}
 
 	@Override
