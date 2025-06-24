@@ -199,16 +199,23 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 			throw new IllegalStateException(
 					"ExecutionHandler state is " + state + ", can not add activities for execution!");
 
-		Locator locator = activity.getRootElement().getLocator();
-		if (this.controllers.containsElement(realm, locator))
-			throw new IllegalStateException(locator + " is already registered for execution!");
-
-		logger.info("Added {} @ {}", locator, realm);
-		Controller controller = newController(realm, activity);
-		this.controllers.addElement(realm, locator, controller);
-		notifyObserverAdd(controller);
-
+		Controller controller = internalAddForExecution(realm, activity);
 		triggerExecution(realm);
+		return controller;
+	}
+
+	protected Controller internalAddForExecution(String realm, Activity activity) {
+		Locator locator = activity.getRootElement().getLocator();
+		Controller controller;
+		synchronized (this.controllers) {
+			if (this.controllers.containsElement(realm, locator))
+				throw new IllegalStateException(locator + " is already registered for execution!");
+
+			logger.info("Added {} @ {}", locator, realm);
+			controller = newController(realm, activity);
+			this.controllers.addElement(realm, locator, controller);
+		}
+		notifyObserverAdd(controller);
 		return controller;
 	}
 
@@ -225,13 +232,20 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 					"ExecutionHandler state is " + state + ", can not add activities for execution!");
 
 		Locator locator = activity.getRootElement().getLocator();
-		Controller controller = this.controllers.getElement(realm, locator);
-		if (controller == null) {
-			controller = newController(realm, activity);
-			logger.info("Added {} @ {}", locator, realm);
-			this.controllers.addElement(realm, locator, controller);
-			notifyObserverAdd(controller);
+		Controller controller;
+		boolean added = false;
+		synchronized (this.controllers) {
+			controller = this.controllers.getElement(realm, locator);
+			if (controller == null) {
+				controller = newController(realm, activity);
+				logger.info("Added {} @ {}", locator, realm);
+				this.controllers.addElement(realm, locator, controller);
+				added = true;
+			}
 		}
+
+		if (added)
+			notifyObserverAdd(controller);
 
 		toExecution(controller);
 	}
@@ -258,12 +272,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void removeFromExecution(Controller controller) {
-		if (this.controllers.removeElement(controller.getRealm(), controller.getLocator()) != null) {
-			logger.info("Removed controller {} from execution.", controller.getLocator());
-			getExecutor().submit(() -> notifyObserverRemove(controller));
-		} else {
-			logger.error("Controller {} {} was already removed.", controller.getRealm(), controller.getLocator());
-		}
+		removeFromExecution(controller.getRealm(), controller.getLocator());
 	}
 
 	@Override
@@ -274,8 +283,12 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public void removeFromExecution(String realm, Locator activityLoc) {
 		Controller controller = this.controllers.removeElement(realm, trimLocator(activityLoc));
-		if (controller != null)
+		if (controller != null) {
+			logger.info("Removed controller {} from execution.", controller.getLocator());
 			getExecutor().submit(() -> notifyObserverRemove(controller));
+		} else {
+			logger.error("Controller {} {} was already removed.", realm, activityLoc);
+		}
 	}
 
 	@Override
@@ -286,6 +299,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 	@Override
 	public void clearAllCurrentExecutions(String realm) {
 		Map<Locator, Controller> removed = this.controllers.removeMap(realm);
+		logger.info("Removed {} controllers from execution.", removed.size());
 		getExecutor().submit(() -> notifyObserverRemove(realm, removed));
 	}
 
@@ -300,6 +314,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 	@Override
 	public void reloadActivitiesInExecution(PrivilegeContext ctx, String realmName) {
+		logger.info("Reloading execution of activities in realm {}...", realmName);
 		try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), false)) {
 
 			// first stop and clear all existing controllers
@@ -307,6 +322,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 
 			// iterate all activities
 			tx.streamActivities().forEach(activity -> {
+				tx.lock(activity);
 
 				// we only want to restart activities which were in execution
 				State state = activity.getState();
@@ -328,9 +344,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				tx.update(activity);
 
 				// register for execution
-				Controller controller = newController(realmName, activity);
-				logger.info(ADDED_MSG, locator, realmName);
-				this.controllers.addElement(realmName, locator, controller);
+				internalAddForExecution(realmName, activity);
 			});
 
 			// commit changes to state
