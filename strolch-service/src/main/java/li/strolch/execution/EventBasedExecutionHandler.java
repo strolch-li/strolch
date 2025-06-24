@@ -313,8 +313,7 @@ public class EventBasedExecutionHandler extends ExecutionHandler {
 				if (!state.inExecutionPlanningPhase())
 					return;
 
-				if (activity.isReadOnly())
-					activity = activity.getClone(true);
+				activity = activity.ensureModifiable();
 
 				Locator locator = activity.getRootElement().getLocator();
 				logger.info("Restarting Execution of {} on realm {}", locator, realmName);
