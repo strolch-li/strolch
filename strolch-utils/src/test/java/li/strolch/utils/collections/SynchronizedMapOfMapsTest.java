@@ -16,6 +16,7 @@
 
 package li.strolch.utils.collections;
 
+import li.strolch.utils.ThreadHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -49,9 +50,8 @@ public class SynchronizedMapOfMapsTest {
 		Callable<Boolean> addTask = () -> addToMap(mapOfMaps, run);
 
 		Callable<Boolean> iterateTask = () -> {
-			for (; ; ) {
-				if (run.get())
-					break;
+			while (!run.get()) {
+				ThreadHelper.sleep(5L);
 			}
 
 			while (run.get()) {
@@ -73,9 +73,8 @@ public class SynchronizedMapOfMapsTest {
 		AtomicBoolean run = new AtomicBoolean(false);
 		Callable<Boolean> addTask = () -> addToMap(mapOfMaps, run);
 		Callable<Boolean> iterateTask = () -> {
-			for (; ; ) {
-				if (run.get())
-					break;
+			while (!run.get()) {
+				ThreadHelper.sleep(5L);
 			}
 
 			while (run.get()) {
@@ -115,28 +114,20 @@ public class SynchronizedMapOfMapsTest {
 		Future<Boolean> task5 = this.executorService.submit(iterateTask);
 
 		run.set(true);
-		Thread.sleep(20L);
+		Thread.sleep(100L);
 		run.set(false);
 
-		Boolean result0 = task0.get();
-		Boolean result1 = task1.get();
-		Boolean result2 = task2.get();
-		Boolean result3 = task3.get();
-		Boolean result4 = task4.get();
-		Boolean result5 = task5.get();
-
-		assertTrue(result0);
-		assertTrue(result1);
-		assertTrue(result2);
-		assertTrue(result3);
-		assertTrue(result4);
-		assertTrue(result5);
+		assertTrue(task0.get());
+		assertTrue(task1.get());
+		assertTrue(task2.get());
+		assertTrue(task3.get());
+		assertTrue(task4.get());
+		assertTrue(task5.get());
 	}
 
 	private Boolean addToMap(MapOfMaps<String, String, String> mapOfMaps, AtomicBoolean run) {
-		for (; ; ) {
-			if (run.get())
-				break;
+		while (!run.get()) {
+			ThreadHelper.sleep(5L);
 		}
 
 		while (run.get()) {

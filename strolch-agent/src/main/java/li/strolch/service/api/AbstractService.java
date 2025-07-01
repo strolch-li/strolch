@@ -193,14 +193,11 @@ public abstract class AbstractService<T extends ServiceArgument, U extends Servi
 	}
 
 	protected String getArgOrUserRealm(ServiceArgument arg) {
-		String realm;
 		if (isNotEmpty(arg.realm))
-			realm = arg.realm;
-		else if (isNotEmpty(getCertificate().getRealm()))
-			realm = getCertificate().getRealm();
-		else
-			realm = DEFAULT_REALM;
-		return realm;
+			return arg.realm;
+		if (isNotEmpty(getCertificate().getRealm()))
+			return getCertificate().getRealm();
+		return DEFAULT_REALM;
 	}
 
 	/**
