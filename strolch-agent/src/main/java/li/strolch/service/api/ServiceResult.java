@@ -20,6 +20,8 @@ import li.strolch.utils.I18nMessage;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import static li.strolch.utils.helper.ExceptionHelper.formatExceptionMessage;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -96,7 +98,7 @@ public class ServiceResult {
 		Throwable t = getRootCause();
 		if (t == null)
 			return null;
-		return t.getMessage() == null ? t.getClass().getName() : (t.getClass().getName() + ": " + t.getMessage());
+		return formatExceptionMessage(t, true);
 	}
 
 	/**
