@@ -140,8 +140,12 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(ServiceResult svcResult) {
+		return toResponse(svcResult, true);
+	}
+
+	public static Response toResponse(ServiceResult svcResult, boolean withStackTrace) {
 		Throwable t = svcResult.getThrowable();
-		ServiceResultResponse response = new ServiceResultResponse(svcResult);
+		ServiceResultResponse response = new ServiceResultResponse(svcResult, withStackTrace);
 		String json = new Gson().toJson(response);
 
 		if (svcResult.isOk())
