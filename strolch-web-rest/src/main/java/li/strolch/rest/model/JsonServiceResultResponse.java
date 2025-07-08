@@ -29,8 +29,8 @@ public class JsonServiceResultResponse extends ServiceResultResponse {
 	@Schema(description = "Data returned by the service for the consumer", nullable = true, type = "object")
 	private final JsonElement data;
 
-	public JsonServiceResultResponse(JsonServiceResult serviceResult) {
-		super(serviceResult);
+	public JsonServiceResultResponse(JsonServiceResult serviceResult, boolean withStackTrace) {
+		super(serviceResult, withStackTrace);
 		this.data = serviceResult.getResult();
 	}
 

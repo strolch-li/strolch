@@ -134,8 +134,14 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(JsonServiceResult svcResult) {
+		return toResponse(svcResult, true);
+	}
+
+	public static Response toResponse(JsonServiceResult svcResult, boolean withStackTrace) {
 		if (svcResult.isOk())
-			return Response.ok(new JsonServiceResultResponse(svcResult).toJson(), APPLICATION_JSON).build();
+			return Response
+					.ok(new JsonServiceResultResponse(svcResult, withStackTrace).toJson(), APPLICATION_JSON)
+					.build();
 		return toResponse((ServiceResult) svcResult);
 	}
 
