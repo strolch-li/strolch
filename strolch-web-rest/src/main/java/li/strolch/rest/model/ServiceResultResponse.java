@@ -27,6 +27,7 @@ import li.strolch.service.api.ServiceResultState;
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.I18N;
 import static li.strolch.utils.helper.ExceptionHelper.formatException;
+import static li.strolch.utils.helper.ExceptionHelper.formatExceptionMessage;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 @Schema(description = "Represents the result of a service execution.")
@@ -48,14 +49,17 @@ public class ServiceResultResponse {
 	@Schema(description = "Internationalization message details if available.", nullable = true)
 	private final I18nMessageResponse i18n;
 
-	public ServiceResultResponse(ServiceResult serviceResult) {
+	public ServiceResultResponse(ServiceResult serviceResult, boolean withStackTrace) {
 		this.state = serviceResult.getState();
 		this.msg = serviceResult.getMessage();
 
 		Throwable throwable = serviceResult.getThrowable();
 		if (throwable != null) {
 			this.exceptionMsg = serviceResult.getRootMessage();
-			this.throwable = formatException(throwable);
+			if (withStackTrace)
+				this.throwable = formatException(throwable);
+			else
+				this.throwable = formatExceptionMessage(throwable, true);
 
 			this.i18n = throwable instanceof StrolchException ex && ex.hasI18n() ?
 					new I18nMessageResponse(ex.getI18n()) : null;
