@@ -134,24 +134,25 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(JsonServiceResult svcResult) {
-		return toResponse(svcResult, true);
+		return toResponse(svcResult, true, false);
 	}
 
-	public static Response toResponse(JsonServiceResult svcResult, boolean withStackTrace) {
+	public static Response toResponse(JsonServiceResult svcResult, boolean withStackTrace, boolean onlyRootCause) {
 		if (svcResult.isOk())
 			return Response
-					.ok(new JsonServiceResultResponse(svcResult, withStackTrace).toJson(), APPLICATION_JSON)
+					.ok(new JsonServiceResultResponse(svcResult, withStackTrace, onlyRootCause).toJson(),
+							APPLICATION_JSON)
 					.build();
 		return toResponse((ServiceResult) svcResult);
 	}
 
 	public static Response toResponse(ServiceResult svcResult) {
-		return toResponse(svcResult, true);
+		return toResponse(svcResult, true, true);
 	}
 
-	public static Response toResponse(ServiceResult svcResult, boolean withStackTrace) {
+	public static Response toResponse(ServiceResult svcResult, boolean withStackTrace, boolean onlyRootCause) {
 		Throwable t = svcResult.getThrowable();
-		ServiceResultResponse response = new ServiceResultResponse(svcResult, withStackTrace);
+		ServiceResultResponse response = new ServiceResultResponse(svcResult, withStackTrace, onlyRootCause);
 		String json = new Gson().toJson(response);
 
 		if (svcResult.isOk())
