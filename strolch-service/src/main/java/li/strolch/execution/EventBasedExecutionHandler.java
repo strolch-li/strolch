@@ -52,7 +52,6 @@ import static li.strolch.utils.collections.SynchronizedCollections.synchronizedM
  */
 public class EventBasedExecutionHandler extends ExecutionHandler {
 
-	public static final String ADDED_MSG = "Added {} @ {}";
 	protected final MapOfMaps<String, Locator, Controller> controllers;
 	protected Map<String, ExecutionHandlerState> statesByRealm;
 	protected DelayedExecutionTimer delayedExecutionTimer;
