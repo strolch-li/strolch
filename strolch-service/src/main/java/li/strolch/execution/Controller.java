@@ -18,7 +18,6 @@ package li.strolch.execution;
 
 import li.strolch.agent.api.ObserverEvent;
 import li.strolch.agent.api.StrolchAgent;
-import li.strolch.agent.api.StrolchLockException;
 import li.strolch.agent.api.StrolchRealm;
 import li.strolch.execution.command.*;
 import li.strolch.execution.policy.ExecutionPolicy;
@@ -32,6 +31,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.runtime.privilege.PrivilegedRunnable;
 import li.strolch.runtime.privilege.PrivilegedRunnableWithResult;
+import li.strolch.utils.concurrent.ElementLockingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -458,29 +458,9 @@ public class Controller {
 		command.doCommand();
 	}
 
-	protected void lockWithRetries(StrolchTransaction tx) throws StrolchLockException {
-		if (tx.hasLock(this.locator))
-			return;
-
-		int tries = 0;
-		while (true) {
-			try {
-
-				tx.lock(this.locator);
-				return;
-
-			} catch (StrolchLockException e) {
-				tries++;
-				if (tries >= this.lockRetries) {
-					logger.error("Failed to lock {}. Max retries {} reached, throwing exception!", this.locator, tries);
-					throw e;
-				}
-
-				logger.error("LOCK FAILURE!");
-				logger.error("Failed to lock {}. Trying again...", this.locator);
-				logger.error("LOCK FAILURE!");
-			}
-		}
+	protected void lockWithRetries(StrolchTransaction tx) throws ElementLockingException {
+		if (!tx.hasLock(this.locator))
+			tx.lock(this.locator, this.lockRetries);
 	}
 
 	public void updateObservers() {
