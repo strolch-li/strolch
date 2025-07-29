@@ -78,6 +78,12 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	}
 
 	@Override
+	public void lock(Locator locator, int retries) {
+		DBC.PRE.assertNotNull("Can not lock a null pointer =)", locator);
+		this.lockHandler.lock(locator, retries);
+	}
+
+	@Override
 	public void unlock(Locator locator) {
 		this.lockHandler.unlock(locator);
 	}

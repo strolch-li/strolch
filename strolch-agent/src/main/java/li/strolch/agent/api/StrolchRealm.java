@@ -68,6 +68,16 @@ public interface StrolchRealm {
 	void lock(Locator locator);
 
 	/**
+	 * Locks the element with the given {@link Locator}
+	 *
+	 * @param locator the locator of the element to lock
+	 * @param retries the number of retries to lock the element
+	 *
+	 * @see ElementLockingHandler#lock(Object)
+	 */
+	void lock(Locator locator, int retries);
+
+	/**
 	 * Unlocks the element with the given {@link Locator} (lock might still be held, if lock counter is used)
 	 *
 	 * @param locator the locator of the element to unlock
