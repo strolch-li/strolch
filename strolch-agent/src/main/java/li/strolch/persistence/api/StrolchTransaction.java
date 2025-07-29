@@ -36,6 +36,7 @@ import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.privilege.model.Restrictable;
 import li.strolch.runtime.StrolchConstants;
 import li.strolch.service.api.Command;
+import li.strolch.utils.concurrent.ElementLockingException;
 import li.strolch.utils.objectfilter.ObjectFilterStatistics;
 
 import java.util.List;
@@ -565,7 +566,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *
 	 * @return true if this TX has a lock on the given {@link Locator}
 	 */
-	boolean hasLock(Locator locator) throws StrolchLockException;
+	boolean hasLock(Locator locator);
 
 	/**
 	 * Returns true if this TX has a lock on the given {@link StrolchRootElement}
@@ -574,7 +575,7 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *
 	 * @return true if this TX has a lock on the given {@link Locator}
 	 */
-	<T extends StrolchRootElement> boolean hasLock(T element) throws StrolchLockException;
+	<T extends StrolchRootElement> boolean hasLock(T element);
 
 	/**
 	 * Locks the element with the given locator and registers it on the transaction so the lock is released when the
@@ -582,9 +583,20 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *
 	 * @param locator the {@link Locator} of the element to lock
 	 *
-	 * @throws StrolchLockException if something goes wrong while locking
+	 * @throws ElementLockingException if something goes wrong while locking
 	 */
-	void lock(Locator locator) throws StrolchLockException;
+	void lock(Locator locator) throws ElementLockingException;
+
+	/**
+	 * Locks the element with the given locator and registers it on the transaction so the lock is released when the
+	 * transaction is closed
+	 *
+	 * @param locator the {@link Locator} of the element to lock
+	 * @param retries the number of retries to perform if the lock cannot be acquired
+	 *
+	 * @throws ElementLockingException if something goes wrong while locking
+	 */
+	void lock(Locator locator, int retries) throws ElementLockingException;
 
 	/**
 	 * Locks the given element and registers it on the transaction so the lock is released when the transaction is
@@ -592,23 +604,55 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *
 	 * @param element the element to lock
 	 *
-	 * @throws StrolchLockException if something goes wrong while locking
+	 * @throws ElementLockingException if something goes wrong while locking
 	 */
-	<T extends StrolchRootElement> void lock(T element) throws StrolchLockException;
+	<T extends StrolchRootElement> void lock(T element) throws ElementLockingException;
 
 	/**
 	 * Performs a read-lock on the given element. This means that the given element is locked by calling
 	 * {@link #lock(StrolchRootElement)}, then the object is removed from cache, and then the object is read again from
 	 * the {@link ElementMap} so that we have the most current version of the element.
+	 *
+	 * @param element the element to lock
+	 *
+	 * @return the locked element
 	 */
-	<T extends StrolchRootElement> T readLock(T element) throws StrolchLockException;
+	<T extends StrolchRootElement> T readLock(T element) throws ElementLockingException;
+
+	/**
+	 * Performs a read-lock on the given element. This means that the given element is locked by calling
+	 * {@link #lock(StrolchRootElement)}, then the object is removed from cache, and then the object is read again from
+	 * the {@link ElementMap} so that we have the most current version of the element.
+	 *
+	 * @param element the element to lock
+	 * @param retries the number of retries to perform if the lock cannot be acquired
+	 *
+	 * @return the locked element
+	 */
+	<T extends StrolchRootElement> T readLock(T element, int retries) throws ElementLockingException;
 
 	/**
 	 * Performs a read-lock on the given elements. This means that the given elements are locked by calling
 	 * {@link #lock(StrolchRootElement)}, then the object is removed from cache, and then the object is read again from
 	 * the {@link ElementMap} so that we have the most current version of the elements.
+	 *
+	 * @param elements the elements to lock
+	 *
+	 * @return the locked elements
 	 */
-	<T extends StrolchRootElement> List<T> readLock(List<T> elements) throws StrolchLockException;
+	<T extends StrolchRootElement> List<T> readLock(List<T> elements) throws ElementLockingException;
+
+	/**
+	 * Performs a read-lock on the given elements. This means that the given elements are locked by calling
+	 * {@link #lock(StrolchRootElement)}, then the object is removed from cache, and then the object is read again from
+	 * the {@link ElementMap} so that we have the most current version of the elements.
+	 *
+	 * @param elements the elements to lock
+	 * @param retries  the number of retries to perform if the lock cannot be acquired
+	 *
+	 * @return the locked elements
+	 */
+	<T extends StrolchRootElement> List<T> readLock(List<T> elements, int retries) throws ElementLockingException;
 
 	/**
 	 * Releases the lock of the element so that even though the transaction is still open, another thread/transaction
@@ -616,9 +660,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *
 	 * @param element the element for which the lock is to be released
 	 *
-	 * @throws StrolchLockException if something goes wrong while unlocking
+	 * @throws ElementLockingException if something goes wrong while unlocking
 	 */
-	<T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException;
+	<T extends StrolchRootElement> void releaseLock(T element) throws ElementLockingException;
 
 	/**
 	 * Releases the lock of the element with the given {@link Locator} so that even though the transaction is still
@@ -626,9 +670,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	 *
 	 * @param locator the {@link Locator} of the element for which the lock is to be released
 	 *
-	 * @throws StrolchLockException if something goes wrong while unlocking
+	 * @throws ElementLockingException if something goes wrong while unlocking
 	 */
-	void releaseLock(Locator locator) throws StrolchLockException;
+	void releaseLock(Locator locator) throws ElementLockingException;
 
 	/**
 	 * Adds the given {@link Command} to the transaction. Using this method guarantees that a {@link Command} is

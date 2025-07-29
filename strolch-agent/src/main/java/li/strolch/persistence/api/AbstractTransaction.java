@@ -47,6 +47,7 @@ import li.strolch.runtime.privilege.PrivilegeHandler;
 import li.strolch.runtime.privilege.TransactedRestrictable;
 import li.strolch.service.api.Command;
 import li.strolch.utils.collections.MapOfMaps;
+import li.strolch.utils.concurrent.ElementLockingException;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.objectfilter.ObjectFilter;
 import li.strolch.utils.objectfilter.ObjectFilterStatistics;
@@ -348,24 +349,29 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public boolean hasLock(Locator locator) throws StrolchLockException {
+	public boolean hasLock(Locator locator) {
 		return this.lockedElements.contains(locator);
 	}
 
 	@Override
-	public <T extends StrolchRootElement> boolean hasLock(T element) throws StrolchLockException {
+	public <T extends StrolchRootElement> boolean hasLock(T element) {
 		return this.lockedElements.contains(element.getLocator());
 	}
 
 	@Override
-	public void lock(Locator locator) throws StrolchLockException {
+	public void lock(Locator locator) throws ElementLockingException {
+		lock(locator, 0);
+	}
+
+	@Override
+	public void lock(Locator locator, int retries) throws ElementLockingException {
 		locator = locator.trim(3);
-		this.realm.lock(locator);
+		this.realm.lock(locator, retries);
 		this.lockedElements.add(locator);
 	}
 
 	@Override
-	public <T extends StrolchRootElement> void lock(T element) throws StrolchLockException {
+	public <T extends StrolchRootElement> void lock(T element) throws ElementLockingException {
 		Locator locator = element.getLocator();
 		this.realm.lock(locator);
 		this.lockedElements.add(locator);
@@ -379,7 +385,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public <T extends StrolchRootElement> T readLock(T element) throws StrolchLockException {
+	public <T extends StrolchRootElement> T readLock(T element) throws ElementLockingException {
+		return readLock(element, 0);
+	}
+
+	@Override
+	public <T extends StrolchRootElement> T readLock(T element, int retries) throws ElementLockingException {
 		if (hasLock(element))
 			return element;
 
@@ -400,28 +411,34 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
-	public <T extends StrolchRootElement> List<T> readLock(List<T> elements) throws StrolchLockException {
+	public <T extends StrolchRootElement> List<T> readLock(List<T> elements) throws ElementLockingException {
+		return readLock(elements, 0);
+	}
+
+	@Override
+	public <T extends StrolchRootElement> List<T> readLock(List<T> elements, int retries)
+			throws ElementLockingException {
 		List<T> list = new ArrayList<>();
 		for (T element : elements) {
-			T readLock = readLock(element);
+			T readLock = readLock(element, retries);
 			list.add(readLock);
 		}
 		return list;
 	}
 
 	@Override
-	public <T extends StrolchRootElement> void releaseLock(T element) throws StrolchLockException {
+	public <T extends StrolchRootElement> void releaseLock(T element) throws ElementLockingException {
 		Locator locator = element.getLocator();
 		releaseLock(locator);
 	}
 
 	@Override
-	public void releaseLock(Locator locator) throws StrolchLockException {
+	public void releaseLock(Locator locator) throws ElementLockingException {
 		this.realm.releaseLock(locator);
 		this.lockedElements.remove(locator);
 	}
 
-	private void releaseElementLocks() {
+	private void releaseElementLocks() throws ElementLockingException {
 		for (Locator locator : this.lockedElements) {
 			this.realm.releaseLock(locator);
 		}

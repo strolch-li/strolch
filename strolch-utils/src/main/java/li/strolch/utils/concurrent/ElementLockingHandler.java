@@ -63,7 +63,22 @@ public class ElementLockingHandler<T> {
 	 * @param action  the action to perform
 	 */
 	public void lockedExecute(T element, CheckedRunnable action) {
-		lock(element);
+		lockedExecute(element, action, 0);
+	}
+
+	/**
+	 * First locks the given element, then calls the given action, using a try catch/finally to unlock the element after
+	 * the action has completed.
+	 * <p>
+	 * Note that only {@link #lock(Object)} and {@link #unlock(Object)} are called, if the element was locked
+	 * previously, then the lock counter is only reduced to the value prior to the call
+	 *
+	 * @param element the element to lock
+	 * @param action  the action to perform
+	 * @param retries the number of times to retry the lock
+	 */
+	public void lockedExecute(T element, CheckedRunnable action, int retries) {
+		lock(element, retries);
 		try {
 			action.run();
 		} catch (Exception e) {
@@ -89,7 +104,24 @@ public class ElementLockingHandler<T> {
 	 * @return the result of the action
 	 */
 	public <U> U lockedExecuteWithResult(T element, CheckedSupplier<U> action) {
-		lock(element);
+		return lockedExecuteWithResult(element, action, 0);
+	}
+
+	/**
+	 * First locks the given element, then calls the given action, returning any result, using a try catch/finally to
+	 * unlock the element after the action has completed.
+	 * <p>
+	 * Note that only {@link #lock(Object)} and {@link #unlock(Object)} are called, if the element was locked
+	 * previously, then the lock counter is only reduced to the value prior to the call
+	 *
+	 * @param element the element to lock
+	 * @param action  the action to perform
+	 * @param retries the number of times to retry the lock
+	 *
+	 * @return the result of the action
+	 */
+	public <U> U lockedExecuteWithResult(T element, CheckedSupplier<U> action, int retries) {
+		lock(element, retries);
 		try {
 			return action.get();
 		} catch (Exception e) {
@@ -111,9 +143,22 @@ public class ElementLockingHandler<T> {
 	 * @throws ElementLockingException if the lock could not be acquired
 	 */
 	public void lock(T element) throws ElementLockingException {
+		lock(element, 0);
+	}
+
+	/**
+	 * Locks the given element by creating a {@link ReentrantLock} on it. If the lock is already held by the calling
+	 * thread, then the lock count is increased
+	 *
+	 * @param element the element for which a {@link ReentrantLock} is to be created and/or locked
+	 * @param retries the number of times to retry the lock
+	 *
+	 * @throws ElementLockingException if the lock could not be acquired
+	 */
+	public void lock(T element, int retries) throws ElementLockingException {
 		DBC.PRE.assertNotNull("element may not be null!", element);
 		TypedTuple<ElementLock, Long> tuple = this.lockMap.computeIfAbsent(element, this::newLock);
-		tuple.getFirst().lock(this.tryLockTimeUnit, this.tryLockTime);
+		tuple.getFirst().lock(this.tryLockTimeUnit, this.tryLockTime, retries);
 	}
 
 	/**
