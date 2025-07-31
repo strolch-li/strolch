@@ -30,6 +30,8 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import static java.text.MessageFormat.format;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
@@ -57,6 +59,9 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		config.setJdbcUrl(url);
 		config.setUsername(username);
 		config.setPassword(password);
+
+		//		config.addDataSourceProperty(PGProperty.XML_FACTORY_FACTORY.getName(),
+		//				CachingPGXmlFactoryFactory.class.getName());
 
 		logger.info("Preparing HikariDataSource with a fail timeout of {}ms for realm {} to {}",
 				config.getInitializationFailTimeout(), realm, url);
@@ -151,12 +156,8 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 
 		@Override
 		public String toString() {
-			return "HikariDataSource for realm "
-					+ ds.getPoolName()
-					+ " for "
-					+ ds.getUsername()
-					+ " at "
-					+ ds.getJdbcUrl();
+			return format("HikariDataSource for realm {0} for {1} at {2}", ds.getPoolName(), ds.getUsername(),
+					ds.getJdbcUrl());
 		}
 
 		/**

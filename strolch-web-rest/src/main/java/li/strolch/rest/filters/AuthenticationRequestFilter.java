@@ -28,6 +28,8 @@ import li.strolch.agent.api.StrolchRealm;
 import li.strolch.exception.StrolchAccessDeniedException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.handler.audits.AuditHandler;
+import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.InvalidCredentialsException;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.CertificateThreadLocal;
 import li.strolch.privilege.model.Usage;
@@ -132,14 +134,14 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 				writeAudit(requestContext, cert, remoteIp);
 			});
 
-		} catch (StrolchNotAuthenticatedException e) {
+		} catch (StrolchNotAuthenticatedException | InvalidCredentialsException e) {
 			logger.error(e.getMessage());
 			requestContext.abortWith(Response
 					.status(Response.Status.UNAUTHORIZED)
 					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
 					.entity("User is not authenticated!")
 					.build());
-		} catch (StrolchAccessDeniedException e) {
+		} catch (StrolchAccessDeniedException | AccessDeniedException e) {
 			logger.error(e.getMessage());
 			requestContext.abortWith(Response
 					.status(Response.Status.UNAUTHORIZED)
