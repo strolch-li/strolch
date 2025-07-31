@@ -70,6 +70,44 @@ public class XmlHelper {
 
 	private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
+	private static SAXParserFactory saxParserFactory;
+	private static DocumentBuilderFactory documentBuilderFactory;
+	private static DocumentBuilder documentBuilder;
+	private static TransformerFactory transformerFactory;
+
+	public synchronized static SAXParserFactory getSaxParserFactory()
+			throws ParserConfigurationException, SAXNotRecognizedException, SAXNotSupportedException {
+		if (saxParserFactory != null)
+			return saxParserFactory;
+
+		saxParserFactory = SAXParserFactory.newInstance();
+		saxParserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		return saxParserFactory;
+	}
+
+	public synchronized static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
+		if (documentBuilder != null)
+			return documentBuilder;
+		documentBuilder = getDocumentBuilderFactory().newDocumentBuilder();
+		return documentBuilder;
+	}
+
+	public synchronized static DocumentBuilderFactory getDocumentBuilderFactory() throws ParserConfigurationException {
+		if (documentBuilderFactory != null)
+			return documentBuilderFactory;
+
+		documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		return documentBuilderFactory;
+	}
+
+	private synchronized static TransformerFactory getTransformerFactory() {
+		if (transformerFactory != null)
+			return transformerFactory;
+		transformerFactory = TransformerFactory.newInstance();
+		return transformerFactory;
+	}
+
 	/**
 	 * Parses an XML file on the file system and returns the resulting {@link Document} object
 	 *
@@ -124,26 +162,7 @@ public class XmlHelper {
 	}
 
 	public static SAXParser getSaxParser() throws SAXException, ParserConfigurationException {
-		SAXParserFactory factory = getSaxParserFactory();
-		return factory.newSAXParser();
-	}
-
-	public static SAXParserFactory getSaxParserFactory()
-			throws ParserConfigurationException, SAXNotRecognizedException, SAXNotSupportedException {
-		SAXParserFactory factory = SAXParserFactory.newInstance();
-		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-		return factory;
-	}
-
-	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {
-		DocumentBuilderFactory dbf = getDocumentBuilderFactory();
-		return dbf.newDocumentBuilder();
-	}
-
-	public static DocumentBuilderFactory getDocumentBuilderFactory() throws ParserConfigurationException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-		return factory;
+		return getSaxParserFactory().newSAXParser();
 	}
 
 	/**
@@ -309,8 +328,8 @@ public class XmlHelper {
 			}
 
 			// Set up a transformer
-			TransformerFactory transfac = TransformerFactory.newInstance();
-			Transformer transformer = transfac.newTransformer();
+			TransformerFactory transformerFactory = getTransformerFactory();
+			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
