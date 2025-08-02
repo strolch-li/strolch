@@ -22,7 +22,7 @@
         <Parameters>
             <!-- parameters for the container itself -->
             <Parameter name="secretKey" value="secret-key"/>
-            <Parameter name="secretSalt" value="00F6E88C-A64F-410A-8FCF-9CD340E340F7"/>
+            <Parameter name="secretSalt" value="secret-key"/>
             <Parameter name="persistSessions" value="true"/>
             <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
             <Parameter name="autoPersistOnUserChangesData" value="true"/>

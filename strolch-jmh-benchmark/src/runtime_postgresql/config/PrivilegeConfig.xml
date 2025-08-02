@@ -22,7 +22,7 @@
         <Parameters>
             <!-- parameters for the container itself -->
             <Parameter name="secretKey" value="secret-key"/>
-            <Parameter name="secretSalt" value="25bd8911-0008-464f-82b8-4c5200db8dd7"/>
+            <Parameter name="secretSalt" value="secret-key"/>
             <Parameter name="autoPersistOnPasswordChange" value="true"/>
         </Parameters>
 
