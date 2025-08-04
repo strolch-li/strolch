@@ -40,7 +40,15 @@ public class XmlLogMessageDao implements LogMessageDao {
 	}
 
 	@Override
-	public List<LogMessage> queryLatest(String realm, int maxNr) {
+	public int querySize(String realm) {
+		SubTypeRef subTypeRef = this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), realm);
+		return (int) this.tx.getObjectDao().querySize(subTypeRef, _ -> true);
+	}
+
+	@Override
+	public List<LogMessage> queryLatest(String realm, int maxNr, int offset) {
+		if (offset > 0)
+			throw new UnsupportedOperationException("Offset is not supported for LogMessageDao.queryLatest()");
 		SubTypeRef subTypeRef = this.tx.getManager().getObjectRefCache().getSubTypeRef(getClassType(), realm);
 		return this.tx.getObjectDao().queryAll(subTypeRef, true, _ -> true, maxNr);
 	}

@@ -81,7 +81,7 @@ public class LogMessagesTestRunner {
 			} else {
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-					List<LogMessage> logMessages = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE);
+					List<LogMessage> logMessages = logMessageDao.queryLatest(this.realmName, Integer.MAX_VALUE, 0);
 					assertEquals(2, logMessages.size());
 
 					LogMessage m = logMessages.getFirst();
@@ -130,7 +130,7 @@ public class LogMessagesTestRunner {
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<String> actualIds = logMessageDao
-							.queryLatest(this.realmName, Integer.MAX_VALUE)
+							.queryLatest(this.realmName, Integer.MAX_VALUE, 0)
 							.stream()
 							.map(LogMessage::getId)
 							.sorted()
@@ -198,7 +198,7 @@ public class LogMessagesTestRunner {
 				try (StrolchTransaction tx = realm.openTx(this.certificate, "test", true)) {
 					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
 					List<String> logMessageIds = logMessageDao
-							.queryLatest(this.realmName, Integer.MAX_VALUE)
+							.queryLatest(this.realmName, Integer.MAX_VALUE, 0)
 							.stream()
 							.map(LogMessage::getId)
 							.sorted()

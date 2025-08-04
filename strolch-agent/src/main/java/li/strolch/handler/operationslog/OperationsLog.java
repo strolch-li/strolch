@@ -27,9 +27,12 @@ import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.LogMessageDao;
+import li.strolch.persistence.api.PersistenceHandler;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.ThreadHelper;
+import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.iso8601.ISO8601;
 
 import java.util.*;
@@ -39,10 +42,14 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.ResourceBundle.getBundle;
+import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static li.strolch.agent.api.StrolchAgent.getUniqueId;
 import static li.strolch.model.Tags.AGENT;
 import static li.strolch.model.log.LogMessageState.Information;
 import static li.strolch.runtime.StrolchConstants.SYSTEM_USER_AGENT;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 public class OperationsLog extends StrolchComponent {
 
@@ -182,27 +189,34 @@ public class OperationsLog extends StrolchComponent {
 
 				logger.info("Loading OperationsLog for realm {}...", realmName);
 
-				try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), true)) {
-					LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
-					List<LogMessage> messages = logMessageDao.queryLatest(realmName, this.maxMessages);
-					logger.info("Loaded {} messages for OperationsLog for realm {}", messages.size(), realmName);
-
-					// get collections to which to add
-					LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
-							OperationsLog::newHashSet);
-					LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesByLocator
-							= this.logMessagesByLocator.computeIfAbsent(realmName, this::newBoundedLocatorMap);
-
-					// add the messages
-					messages.forEach(logMessage -> {
-						logMessages.add(logMessage);
-						LinkedHashSet<LogMessage> tmp = logMessagesByLocator.computeIfAbsent(logMessage.getLocator(),
-								OperationsLog::newHashSet);
-						tmp.add(logMessage);
-					});
-				} catch (RuntimeException e) {
-					logger.error("Failed to load operations log for realm {}", realmName, e);
+				List<LogMessage> messages;
+				if (!getAgent().getRealm(realmName).getMode().isTransient() && getComponent(
+						PersistenceHandler.class).supportsPaging()) {
+					int size;
+					try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), true)) {
+						LogMessageDao dao = tx.getPersistenceHandler().getLogMessageDao(tx);
+						size = dao.querySize(realmName);
+					}
+					messages = queryMessagesInPages(ctx, realmName, size);
+				} else {
+					messages = queryMessagesInSinglePage(ctx, realmName);
 				}
+
+				logger.info("Loaded {} messages for OperationsLog for realm {}", messages.size(), realmName);
+
+				// get collections to which to add
+				LinkedHashSet<LogMessage> logMessages = this.logMessagesByRealmAndId.computeIfAbsent(realmName,
+						OperationsLog::newHashSet);
+				LinkedHashMap<Locator, LinkedHashSet<LogMessage>> logMessagesByLocator
+						= this.logMessagesByLocator.computeIfAbsent(realmName, this::newBoundedLocatorMap);
+
+				// add the messages
+				messages.forEach(logMessage -> {
+					logMessages.add(logMessage);
+					LinkedHashSet<LogMessage> tmp = logMessagesByLocator.computeIfAbsent(logMessage.getLocator(),
+							OperationsLog::newHashSet);
+					tmp.add(logMessage);
+				});
 			});
 		} catch (Exception e) {
 			logger.error("Failed to load operations logs!", e);
@@ -212,6 +226,64 @@ public class OperationsLog extends StrolchComponent {
 							"operationsLog.load.failed") //
 							.value("reason", e.getMessage()) //
 							.withException(e));
+		}
+	}
+
+	private List<LogMessage> queryMessagesInSinglePage(PrivilegeContext ctx, String realmName) {
+		try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), true)) {
+			LogMessageDao logMessageDao = tx.getPersistenceHandler().getLogMessageDao(tx);
+			return logMessageDao.queryLatest(realmName, this.maxMessages, 0);
+		} catch (RuntimeException e) {
+			logger.error("Failed to load operations log for realm {}", realmName, e);
+			return List.of();
+		}
+	}
+
+	private List<LogMessage> queryMessagesInPages(PrivilegeContext ctx, String realmName, int size) {
+		final int MIN_PAGE_SIZE = 200;
+		final int nrOfElements = Math.min(size, this.maxMessages);
+		int availableProcessors = Runtime.getRuntime().availableProcessors();
+
+		long start = System.nanoTime();
+		List<CompletableFuture<List<LogMessage>>> tasks = new ArrayList<>();
+
+		if (nrOfElements < MIN_PAGE_SIZE) {
+			logger.info("Loading {} LogMessages from DB async in parallel...", nrOfElements);
+			tasks.add(supplyAsync(() -> loadPage(ctx, realmName, nrOfElements, 0)));
+		} else {
+			int pageSize = Math.max(MIN_PAGE_SIZE, nrOfElements / availableProcessors);
+			logger.info("Loading {} in pages of {} LogMessages from DB async in parallel...", nrOfElements, pageSize);
+			int position = 0;
+			while (position < nrOfElements) {
+				int offset = position;
+				tasks.add(supplyAsync(() -> loadPage(ctx, realmName, pageSize, offset)));
+				position += pageSize;
+			}
+		}
+
+		// wait for all tasks to complete
+		Throwable failureEx = allOf(tasks.toArray(new CompletableFuture[0])).handle((u, t) -> t).join();
+		if (failureEx != null)
+			throw new IllegalStateException("Failed to load LogMessages in pages", failureEx);
+
+		// collect messages
+		List<LogMessage> messages = tasks
+				.stream()
+				.flatMap(listCompletableFuture -> listCompletableFuture.join().stream())
+				.toList();
+
+		DBC.POST.assertEquals("Expected size should be same as nrOfElements", nrOfElements, messages.size());
+		String durationS = formatNanoDuration(System.nanoTime() - start);
+		logger.info("Loading of {} LogMessages took {}.", messages.size(), durationS);
+
+		return messages;
+	}
+
+	private List<LogMessage> loadPage(PrivilegeContext ctx, String realmName, int pageSize, int offset) {
+		try (StrolchTransaction tx = openTx(realmName, ctx.getCertificate(), "operations_log_load_page", true)
+				.silentThreshold(10, SECONDS)
+				.suppressUpdates()) {
+			return tx.getPersistenceHandler().getLogMessageDao(tx).queryLatest(realmName, pageSize, offset);
 		}
 	}
 
