@@ -57,6 +57,8 @@ public abstract class PerformanceTest {
 	}
 
 	public static void buildRuntime(String sourcePath, String targetPath, DataType dataType) {
+		if (runtimeMock != null)
+			return;
 		File configSrc = new File(sourcePath);
 		File rootPath = new File(targetPath);
 		runtimeMock = new RuntimeMock();
@@ -92,9 +94,11 @@ public abstract class PerformanceTest {
 		}
 	}
 
-	public static void afterClass(String targetPath) throws Exception {
-		if (runtimeMock != null)
+	public static void tearDown(String targetPath) throws Exception {
+		if (runtimeMock != null) {
 			runtimeMock.destroyRuntime();
+			runtimeMock = null;
+		}
 
 		File rootPath = new File(targetPath);
 		if (rootPath.exists()) {

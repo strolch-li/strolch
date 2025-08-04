@@ -16,6 +16,7 @@
 package li.strolch.test.benchmark;
 
 import li.strolch.persistence.postgresql.DataType;
+import li.strolch.persistence.postgresql.PostgreSqlDbConnectionBuilder;
 import org.openjdk.jmh.annotations.*;
 
 import java.util.concurrent.TimeUnit;
@@ -43,21 +44,22 @@ public class PerformancePostgreSqlTest extends PerformanceTest {
 
 	@TearDown
 	public static void tearDown() throws Exception {
-		afterClass(RUNTIME_PATH);
+		tearDown(RUNTIME_PATH);
 	}
 
 	@Benchmark
 	public void runCreateResourceBenchmarkTest() {
+		PostgreSqlDbConnectionBuilder.USE_CUSTOM_XML_FACTORY_FACTORY = true;
 		runCreateResource();
 	}
 
-	@Benchmark
-	public void runCreateOrderBenchmarkTest() {
-		runCreateOrder();
-	}
-
-	@Benchmark
-	public void runCreateActivityBenchmarkTest() {
-		runCreateActivity();
-	}
+	//	@Benchmark
+	//	public void runCreateOrderBenchmarkTest() {
+	//		runCreateOrder();
+	//	}
+	//
+	//	@Benchmark
+	//	public void runCreateActivityBenchmarkTest() {
+	//		runCreateActivity();
+	//	}
 }

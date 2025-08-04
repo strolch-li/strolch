@@ -18,6 +18,7 @@ package li.strolch.test.benchmark;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openjdk.jmh.profile.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
@@ -83,6 +84,16 @@ public class StrolchBenchmarkTest {
 				.shouldFailOnError(true)
 				.verbosity(VerboseMode.EXTRA)
 				.resultFormat(ResultFormatType.JSON)
+
+				.addProfiler(GCProfiler.class)
+				.addProfiler(MemPoolProfiler.class)
+//				.addProfiler(CompilerProfiler.class)
+//				.addProfiler(PausesProfiler.class)
+//				.addProfiler(StackProfiler.class)
+//				.addProfiler(ClassloaderProfiler.class)
+
+//				.addProfiler(JavaFlightRecorderProfiler.class)
+
 				.forks(1);
 	}
 }

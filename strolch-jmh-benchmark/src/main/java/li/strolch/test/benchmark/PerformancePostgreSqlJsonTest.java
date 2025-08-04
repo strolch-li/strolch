@@ -43,7 +43,7 @@ public class PerformancePostgreSqlJsonTest extends PerformanceTest {
 
 	@TearDown
 	public static void tearDown() throws Exception {
-		afterClass(RUNTIME_PATH);
+		tearDown(RUNTIME_PATH);
 	}
 
 	@Benchmark
