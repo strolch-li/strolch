@@ -139,8 +139,8 @@ public class CachedRealmLoader {
 				tasks.add(supplyAsync(() -> loadPage(daoSupplier, type, MAX_VALUE, 0)));
 			} else {
 				long pageSize = Math.max(MIN_PAGE_SIZE, size / availableProcessors);
-				logger.info("Loading {} {} of type {} in pages of {} from DB async in parallel...", size, context, type,
-						pageSize);
+				logger.info("Loading {} {} of type {} in {} pages of {} from DB async in parallel...", size, context,
+						type, availableProcessors, pageSize);
 				long position = 0;
 				while (position < size) {
 					long offset = position;
