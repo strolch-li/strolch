@@ -21,6 +21,7 @@ import li.strolch.agent.api.ComponentContainer;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.DbConnectionBuilder;
 import li.strolch.utils.dbc.DBC;
+import org.postgresql.PGProperty;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -36,6 +37,8 @@ import static java.text.MessageFormat.format;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
+
+	public static boolean USE_CUSTOM_XML_FACTORY_FACTORY;
 
 	public PostgreSqlDbConnectionBuilder(ComponentContainer container,
 			ComponentConfiguration persistenceHandlerConfiguration) {
@@ -60,8 +63,14 @@ public final class PostgreSqlDbConnectionBuilder extends DbConnectionBuilder {
 		config.setUsername(username);
 		config.setPassword(password);
 
-		//		config.addDataSourceProperty(PGProperty.XML_FACTORY_FACTORY.getName(),
-		//				CachingPGXmlFactoryFactory.class.getName());
+		if (!USE_CUSTOM_XML_FACTORY_FACTORY) {
+			logger.info("Not configuring custom XmlFactorFactory on datasource for realm: {}", realm);
+		} else {
+			logger.info("Configuring custom XmlFactorFactory=CachingPGXmlFactoryFactory on datasource for realm: {}",
+					realm);
+			config.addDataSourceProperty(PGProperty.XML_FACTORY_FACTORY.getName(),
+					CachingPGXmlFactoryFactory.class.getName());
+		}
 
 		logger.info("Preparing HikariDataSource with a fail timeout of {}ms for realm {} to {}",
 				config.getInitializationFailTimeout(), realm, url);
