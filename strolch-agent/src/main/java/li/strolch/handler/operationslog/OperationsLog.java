@@ -252,7 +252,7 @@ public class OperationsLog extends StrolchComponent {
 			tasks.add(supplyAsync(() -> loadPage(ctx, realmName, nrOfElements, 0)));
 		} else {
 			int pageSize = Math.max(MIN_PAGE_SIZE, nrOfElements / availableProcessors);
-			logger.info("Loading {} in pages of {} LogMessages from DB async in parallel...", nrOfElements, pageSize);
+			logger.info("Loading {} LogMessages in pages of {} from DB async in parallel...", nrOfElements, pageSize);
 			int position = 0;
 			while (position < nrOfElements) {
 				int offset = position;
