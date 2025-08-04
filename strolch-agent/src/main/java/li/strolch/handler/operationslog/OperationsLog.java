@@ -125,7 +125,7 @@ public class OperationsLog extends StrolchComponent {
 	public void stop() throws Exception {
 		this.run = false;
 		if (this.handleQueueTask != null) {
-			this.handleQueueTask.cancel(true);
+			this.handleQueueTask.cancel(false);
 			while (!this.handleQueueTask.isDone())
 				ThreadHelper.sleep(10);
 			flushQueue();
@@ -252,7 +252,8 @@ public class OperationsLog extends StrolchComponent {
 			tasks.add(supplyAsync(() -> loadPage(ctx, realmName, nrOfElements, 0)));
 		} else {
 			int pageSize = Math.max(MIN_PAGE_SIZE, nrOfElements / availableProcessors);
-			logger.info("Loading {} LogMessages in pages of {} from DB async in parallel...", nrOfElements, pageSize);
+			logger.info("Loading {} LogMessages in {} pages of {} from DB async in parallel...", nrOfElements,
+					availableProcessors, pageSize);
 			int position = 0;
 			while (position < nrOfElements) {
 				int offset = position;
