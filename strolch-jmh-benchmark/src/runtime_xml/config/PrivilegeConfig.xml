@@ -23,10 +23,7 @@
             <!-- parameters for the container itself -->
             <Parameter name="secretKey" value="secret-key"/>
             <Parameter name="secretSalt" value="secret-key"/>
-            <Parameter name="persistSessions" value="true"/>
-            <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
-            <Parameter name="autoPersistOnUserChangesData" value="true"/>
-            <Parameter name="privilegeConflictResolution" value="STRICT"/>
+            <Parameter name="autoPersistOnPasswordChange" value="true"/>
         </Parameters>
 
         <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
@@ -43,24 +40,21 @@
 
         <PersistenceHandler class="li.strolch.privilege.handler.XmlPersistenceHandler">
             <Parameters>
-                <Parameter name="basePath" value="target/${target}"/>
                 <Parameter name="usersXmlFile" value="PrivilegeUsers.xml"/>
                 <Parameter name="rolesXmlFile" value="PrivilegeRoles.xml"/>
-                <Parameter name="tokensXmlFile" value="PrivilegeTokens.xml"/>
             </Parameters>
         </PersistenceHandler>
 
-        <UserChallengeHandler class="li.strolch.privilege.test.model.TestUserChallengeHandler">
+        <UserChallengeHandler class="li.strolch.privilege.handler.ConsoleUserChallengeHandler">
         </UserChallengeHandler>
-
-        <SsoHandler class="li.strolch.privilege.test.model.DummySsoHandler"/>
 
     </Container>
 
     <Policies>
-        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
-        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege" />
-        <Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
+        <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege"/>
+        <Policy name="ModelPrivilege" class="li.strolch.runtime.privilege.ModelPrivilege"/>
+        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege"/>
+        <Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege"/>
         <Policy name="UserSessionAccessPrivilege" class="li.strolch.privilege.policy.UsernameFromCertificatePrivilege"/>
     </Policies>
 

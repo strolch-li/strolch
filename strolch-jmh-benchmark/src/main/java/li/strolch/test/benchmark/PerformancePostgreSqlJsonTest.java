@@ -1,0 +1,63 @@
+/*
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package li.strolch.test.benchmark;
+
+import li.strolch.persistence.postgresql.DataType;
+import org.openjdk.jmh.annotations.*;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @author Robert von Burg <eitch@eitchnet.ch>
+ */
+@BenchmarkMode(Mode.Throughput)
+@OutputTimeUnit(TimeUnit.SECONDS)
+@State(Scope.Thread)
+public class PerformancePostgreSqlJsonTest extends PerformanceTest {
+
+	public static final String RUNTIME_PATH = "target/runtime_postgresql_test/";
+	public static final String CONFIG_SRC = "src/runtime_postgresql_json";
+
+	public static final String DB_URL = "jdbc:postgresql://localhost/testdb";
+	public static final String DB_USERNAME = "testuser";
+	public static final String DB_PASSWORD = "test";
+
+	@Setup
+	public static void setup() throws Exception {
+		dropSchema(PerformancePostgreSqlJsonTest.class.getSimpleName(), DB_URL, DB_USERNAME, DB_PASSWORD);
+		buildRuntime(CONFIG_SRC, RUNTIME_PATH, DataType.json);
+	}
+
+	@TearDown
+	public static void tearDown() throws Exception {
+		tearDown(RUNTIME_PATH);
+	}
+
+	@Benchmark
+	public void runCreateResourceBenchmarkTest() {
+		runCreateResource();
+	}
+
+	@Benchmark
+	public void runCreateOrderBenchmarkTest() {
+		runCreateOrder();
+	}
+
+	@Benchmark
+	public void runCreateActivityBenchmarkTest() {
+		runCreateActivity();
+	}
+}

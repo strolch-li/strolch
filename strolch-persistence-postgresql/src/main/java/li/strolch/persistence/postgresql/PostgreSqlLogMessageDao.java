@@ -51,14 +51,15 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	private static final String FIELDS = commaSeparated(ID, REALM, DATE_TIME, USERNAME, SEVERITY, STATE, LOCATOR,
 			BUNDLE, KEY, MESSAGE, STACK_TRACE);
 
+	private static final String queryCountByRealmSql = "select count(id) from operations_log where realm = ?";
 	private static final String queryByRealmMaxSql = "select "
-			+ FIELDS
-			+ " from operations_log where realm = ? order by id desc limit ?";
+													 + FIELDS
+													 + " from operations_log where realm = ? order by id desc limit ? offset ?";
 	private static final String queryValuesSql = "select key, value from operations_log_values where id = ?";
 
 	private static final String insertLogMessageSql = "insert into operations_log ("
-			+ FIELDS
-			+ ") values (?, ?, ?, ?, ?::log_severity_type, ?::log_state_type, ?, ?, ?, ?, ?)";
+													  + FIELDS
+													  + ") values (?, ?, ?, ?, ?::log_severity_type, ?::log_state_type, ?, ?, ?, ?, ?)";
 	private static final String insertValuesSql = "insert into operations_log_values (id, key, value) values (?, ?, ?)";
 
 	private static final String updateLogMessageStateSql
@@ -74,13 +75,31 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	}
 
 	@Override
-	public List<LogMessage> queryLatest(String realm, int maxNr) {
+	public boolean supportsPaging() {
+		return true;
+	}
 
+	@Override
+	public int querySize(String realm) {
+		try (PreparedStatement queryStatement = this.tx.getConnection().prepareStatement(queryCountByRealmSql)) {
+			queryStatement.setString(1, realm);
+			try (ResultSet result = queryStatement.executeQuery()) {
+				result.next();
+				return result.getInt(1);
+			}
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException("Failed to query size due to: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public List<LogMessage> queryLatest(String realm, int maxNr, int offset) {
 		try (PreparedStatement queryMsgStatement = this.tx.getConnection().prepareStatement(queryByRealmMaxSql);
 			 PreparedStatement queryValuesStatement = this.tx.getConnection().prepareStatement(queryValuesSql)) {
 
 			queryMsgStatement.setString(1, realm);
 			queryMsgStatement.setInt(2, maxNr);
+			queryMsgStatement.setInt(3, offset);
 
 			List<LogMessage> messages = new ArrayList<>();
 

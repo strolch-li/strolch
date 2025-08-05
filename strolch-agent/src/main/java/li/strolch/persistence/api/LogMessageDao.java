@@ -25,7 +25,9 @@ import java.util.List;
  */
 public interface LogMessageDao {
 
-	List<LogMessage> queryLatest(String realm, int maxNr);
+	int querySize(String realm);
+
+	List<LogMessage> queryLatest(String realm, int maxNr, int offset);
 
 	void save(LogMessage logMessage);
 
@@ -38,4 +40,8 @@ public interface LogMessageDao {
 	void remove(LogMessage logMessage);
 
 	void removeAll(List<LogMessage> logMessages);
+
+	default boolean supportsPaging() {
+		return false;
+	}
 }

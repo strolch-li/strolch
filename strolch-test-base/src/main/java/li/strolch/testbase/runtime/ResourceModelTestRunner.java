@@ -51,7 +51,7 @@ public class ResourceModelTestRunner {
 	public void runCreateResourceTest() {
 
 		// create
-		Resource newResource = createResource("MyTestResource", "Test Name", "TestType");//$NON-NLS-2$ //$NON-NLS-3$
+		Resource newResource = createResource("MyTestResource", "Test Name", "TestType");
 		try (StrolchTransaction tx = this.runtimeMock
 				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
@@ -71,9 +71,9 @@ public class ResourceModelTestRunner {
 		}
 
 		// create three resources
-		Resource resource1 = createResource("myTestResource1", "Test Name", "QTestType1");//$NON-NLS-2$ //$NON-NLS-3$
-		Resource resource2 = createResource("myTestResource2", "Test Name", "QTestType2");//$NON-NLS-2$ //$NON-NLS-3$
-		Resource resource3 = createResource("myTestResource3", "Test Name", "QTestType3");//$NON-NLS-2$ //$NON-NLS-3$
+		Resource resource1 = createResource("myTestResource1", "Test Name", "QTestType1");
+		Resource resource2 = createResource("myTestResource2", "Test Name", "QTestType2");
+		Resource resource3 = createResource("myTestResource3", "Test Name", "QTestType3");
 		try (StrolchTransaction tx = this.runtimeMock
 				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {

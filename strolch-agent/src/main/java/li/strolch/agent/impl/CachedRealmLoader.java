@@ -23,7 +23,6 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.utils.dbc.DBC;
-import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +36,7 @@ import static java.lang.Integer.MAX_VALUE;
 import static java.util.concurrent.CompletableFuture.allOf;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 
 public class CachedRealmLoader {
 
@@ -81,7 +81,7 @@ public class CachedRealmLoader {
 		}
 
 		long duration = System.nanoTime() - start;
-		String durationS = StringHelper.formatNanoDuration(duration);
+		String durationS = formatNanoDuration(duration);
 		logger.info("Loading Model from Database for realm {} took {}.", realm, durationS);
 		logger.info("Loaded {} Orders", this.nrOfOrders);
 		logger.info("Loaded {} Resources", this.nrOfResources);
@@ -114,7 +114,7 @@ public class CachedRealmLoader {
 			tx.commitOnClose();
 		}
 
-		String durationS = StringHelper.formatNanoDuration(System.nanoTime() - start);
+		String durationS = formatNanoDuration(System.nanoTime() - start);
 		logger.info("Loading of {} {} took {}.", nrOfElements, context, durationS);
 	}
 
@@ -127,6 +127,7 @@ public class CachedRealmLoader {
 		Map<String, Long> sizeByTypes = getSizesByType(daoSupplier);
 		CachedElementMap<T> elementMap = elementMapSupplier.get();
 
+		int availableProcessors = Runtime.getRuntime().availableProcessors();
 		long nrOfElements = sizeByTypes.values().stream().mapToLong(Long::longValue).sum();
 		logger.info("Loading {} {} from DB...", nrOfElements, context);
 
@@ -137,9 +138,9 @@ public class CachedRealmLoader {
 				logger.info("Loading {} {} of type {} from DB async in parallel...", size, context, type);
 				tasks.add(supplyAsync(() -> loadPage(daoSupplier, type, MAX_VALUE, 0)));
 			} else {
-				long pageSize = Math.max(MIN_PAGE_SIZE, size / Runtime.getRuntime().availableProcessors());
-				logger.info("Loading {} {} of type {} in pages of {} from DB async in parallel...", size, context, type,
-						pageSize);
+				long pageSize = Math.max(MIN_PAGE_SIZE, size / availableProcessors);
+				logger.info("Loading {} {} of type {} in {} pages of {} from DB async in parallel...", size, context,
+						type, availableProcessors, pageSize);
 				long position = 0;
 				while (position < size) {
 					long offset = position;
@@ -161,7 +162,7 @@ public class CachedRealmLoader {
 		});
 
 		DBC.POST.assertEquals("Expected size should be same as counter", nrOfElements, counter.get());
-		String durationS = StringHelper.formatNanoDuration(System.nanoTime() - start);
+		String durationS = formatNanoDuration(System.nanoTime() - start);
 		logger.info("Loading of {} {} took {}.", counter, context, durationS);
 	}
 

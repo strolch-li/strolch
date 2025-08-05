@@ -52,8 +52,7 @@ public class ActivityModelTestRunner {
 	public void runCreateActivityTest() {
 
 		// create
-		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType",
-				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
+		Activity newActivity = createActivity("MyTestActivity", "Test Name", "TestType", TimeOrdering.SERIES);
 		try (StrolchTransaction tx = this.runtimeMock
 				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
@@ -73,12 +72,9 @@ public class ActivityModelTestRunner {
 		}
 
 		// create three activities
-		Activity activity1 = createActivity("myTestActivity1", "Test Name", "QTestType1",
-				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
-		Activity activity2 = createActivity("myTestActivity2", "Test Name", "QTestType2",
-				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
-		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3",
-				TimeOrdering.SERIES);//$NON-NLS-2$ //$NON-NLS-3$
+		Activity activity1 = createActivity("myTestActivity1", "Test Name", "QTestType1", TimeOrdering.SERIES);
+		Activity activity2 = createActivity("myTestActivity2", "Test Name", "QTestType2", TimeOrdering.SERIES);
+		Activity activity3 = createActivity("myTestActivity3", "Test Name", "QTestType3", TimeOrdering.SERIES);
 		try (StrolchTransaction tx = this.runtimeMock
 				.getRealm(this.realmName)
 				.openTx(this.certificate, "test", false)) {
