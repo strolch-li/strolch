@@ -266,7 +266,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error("No session was registered with token {}", certificate.getAuthToken());
+			logger.error("No session was registered with ID {}", certificate.getSessionId());
 
 		this.privilegeHandler.invalidate(certificate);
 	}
@@ -338,9 +338,13 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		Certificate removedCert = this.certificateMap.remove(certificate.getAuthToken());
 		if (removedCert == null)
-			logger.error("No session was registered with token {}", certificate.getAuthToken());
+			logger.error("No session was registered with ID {}", certificate.getSessionId());
 
-		this.privilegeHandler.sessionTimeout(certificate);
+		try {
+			this.privilegeHandler.sessionTimeout(certificate);
+		} catch (Exception e) {
+			logger.error("Failed to invalidate session {}", certificate.getSessionId(), e);
+		}
 	}
 
 	@Override
@@ -356,7 +360,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 			}
 		}
 
-		throw new PrivilegeException("No Session exists with the id " + sessionId);
+		throw new PrivilegeException("No Session exists with the ID " + sessionId);
 	}
 
 	@Override
