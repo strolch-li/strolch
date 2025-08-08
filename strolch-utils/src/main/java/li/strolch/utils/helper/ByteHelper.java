@@ -285,6 +285,10 @@ public class ByteHelper {
 		return (byte) (0x0f & b);
 	}
 
+	public static String toBinary(byte configByte) {
+		return String.format("%8s", Integer.toBinaryString(configByte & 0xFF)).replace(' ', '0');
+	}
+
 	public static byte parseBinaryToByte(String value) {
 		if (value.length() != Byte.SIZE)
 			throw new IllegalStateException("parsing binary to byte requires exactly " + Byte.SIZE + " digits!");
