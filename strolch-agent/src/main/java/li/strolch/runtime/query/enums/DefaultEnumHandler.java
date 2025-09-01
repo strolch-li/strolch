@@ -102,6 +102,10 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 		if (enumeration.hasParameterBag(localeS))
 			return enumeration.getParameterBag(localeS);
 
+		localeS = getAgent().getLocale().getLanguage();
+		if (enumeration.hasParameterBag(localeS))
+			return enumeration.getParameterBag(localeS);
+
 		String msg = "No enumeration exists for language {0} on enumeration {1}";
 		msg = MessageFormat.format(msg, locale, enumeration.getLocator());
 		throw new StrolchException(msg);
