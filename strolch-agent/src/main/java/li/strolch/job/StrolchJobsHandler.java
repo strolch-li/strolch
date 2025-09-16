@@ -180,11 +180,24 @@ public class StrolchJobsHandler extends StrolchComponent {
 	}
 
 	/**
-	 * Registers the given job as a recurring job, and schedules it for execution
+	 * Registers the given job as a recurring job, and schedules it for execution. If the job with the same name already
+	 * exists, then it is returned.
 	 *
 	 * @param strolchJobClass the job to instantiate and schedule for execution
 	 *
 	 * @return the instantiated job
+	 */
+	public StrolchJob registerLenientAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
+		if (this.jobs.containsKey(strolchJobClass.getSimpleName()))
+			return this.jobs.get(strolchJobClass.getSimpleName());
+		return registerAndScheduleJob(strolchJobClass);
+	}
+
+	/**
+	 * * Registers the given job as a recurring job, and schedules it for execution. If the job with the same name
+	 * already * exists, then an exception is thrown. * * @param strolchJobClass the job to instantiate and schedule for
+	 * execution * * @return the instantiated job
+	 *
 	 */
 	public StrolchJob registerAndScheduleJob(Class<? extends StrolchJob> strolchJobClass) {
 		StrolchJob job = instantiateJob(strolchJobClass, strolchJobClass.getSimpleName(),
@@ -194,7 +207,22 @@ public class StrolchJobsHandler extends StrolchComponent {
 	}
 
 	/**
-	 * Registers the given job as a manual job, which can be executed later by a job admin
+	 * Registers the given job as a manual job, which can be executed later by a job admin. If the job with the same
+	 * name already exists, then it is returned
+	 *
+	 * @param strolchJobClass the job to register
+	 *
+	 * @return the instantiated job
+	 */
+	public StrolchJob registerLenient(Class<? extends StrolchJob> strolchJobClass) {
+		if (this.jobs.containsKey(strolchJobClass.getSimpleName()))
+			return this.jobs.get(strolchJobClass.getSimpleName());
+		return register(strolchJobClass);
+	}
+
+	/**
+	 * Registers the given job as a manual job, which can be executed later by a job admin. If the job with the same
+	 * name already exists, then an exception is thrown
 	 *
 	 * @param strolchJobClass the job to register
 	 *
@@ -208,7 +236,22 @@ public class StrolchJobsHandler extends StrolchComponent {
 	}
 
 	/**
-	 * Registers the given job, not changing its current schedule or type
+	 * Registers the given job, not changing its current schedule or type. If the job with the same name already exists,
+	 * then it is returned.
+	 *
+	 * @param job the job to register
+	 *
+	 * @return the job
+	 */
+	public StrolchJob registerLenient(StrolchJob job) {
+		if (this.jobs.containsKey(job.getName()))
+			return this.jobs.get(job.getName());
+		return register(job);
+	}
+
+	/**
+	 * Registers the given job, not changing its current schedule or type. If the job with the same name already exists,
+	 * then an exception is thrown.
 	 *
 	 * @param job the job to register
 	 *
@@ -218,20 +261,30 @@ public class StrolchJobsHandler extends StrolchComponent {
 		return internalRegister(job.setConfigureMethod(ConfigureMethod.Programmatic));
 	}
 
+	/**
+	 * Returns true if a job with the given name is registered
+	 *
+	 * @param jobName the name of the job to check for
+	 *
+	 * @return true if a job with the given name is registered
+	 */
+	public boolean hasJob(String jobName) {
+		return this.jobs.containsKey(jobName);
+	}
+
 	private StrolchJob internalRegister(StrolchJob job) {
 		if (this.jobs.containsKey(job.getName())) {
 			StrolchJob existingJob = this.jobs.get(job.getName());
-			if (existingJob.getClass().equals(job.getClass()) && existingJob.getConfigureMethod().isModel() && job
+			if (!existingJob.getClass().equals(job.getClass()) || !existingJob.getConfigureMethod().isModel() || !job
 					.getConfigureMethod()
 					.isProgrammatic()) {
-				logger.error("Not registering job {} as it is already registered by a model specific job!",
-						job.getName());
-			} else {
 				throw new IllegalArgumentException("Job " + job.getName() + " is already registered!");
 			}
-		}
-		this.jobs.put(job.getName(), job);
 
+			logger.error("Not registering job {} as it is already registered by a model specific job!", job.getName());
+		}
+
+		this.jobs.put(job.getName(), job);
 		return job;
 	}
 

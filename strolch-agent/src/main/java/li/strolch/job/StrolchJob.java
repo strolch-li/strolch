@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -60,7 +61,8 @@ import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 /**
  * A StrolchJob is a simple job which performs an action. A StrolchJob can be scheduled so that it executes
- * periodically, or trigger externally e.g. from a UI. Subclasses must implement the
+ * periodically, or triggered externally e.g. from a UI. Subclasses must implement the
+ * {@link #execute(PrivilegeContext)} method.
  */
 public abstract class StrolchJob implements Runnable, Restrictable {
 
@@ -119,8 +121,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	}
 
 	public void setCronExpression(String cron, ZonedDateTime startDate) {
-		this.cronExpression = CronExpression.createWithoutSeconds(cron);
 		this.cron = cron;
+		this.cronExpression = CronExpression.createWithoutSeconds(cron);
 		this.cronStartDate = startDate.isBefore(ZonedDateTime.now()) ? ZonedDateTime.now() : startDate;
 
 		this.initialDelay = 0;
@@ -135,8 +137,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		this.delay = delay;
 		this.delayTimeUnit = delayTimeUnit;
 
-		this.cronExpression = null;
 		this.cron = null;
+		this.cronExpression = null;
 		this.cronStartDate = null;
 
 		return this;
@@ -169,6 +171,50 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 
 	protected ScheduledExecutorService getScheduledExecutor() {
 		return getAgent().getScheduledExecutor("StrolchJob");
+	}
+
+	public String getRealmName() {
+		return this.realmName;
+	}
+
+	public long getInitialDelay() {
+		return this.initialDelay;
+	}
+
+	public TimeUnit getInitialDelayTimeUnit() {
+		return this.initialDelayTimeUnit;
+	}
+
+	public long getDelay() {
+		return this.delay;
+	}
+
+	public TimeUnit getDelayTimeUnit() {
+		return this.delayTimeUnit;
+	}
+
+	public ZonedDateTime getCronStartDate() {
+		return this.cronStartDate;
+	}
+
+	public ZonedDateTime getLastExecution() {
+		return this.lastExecution;
+	}
+
+	public long getNrOfExecutions() {
+		return this.nrOfExecutions;
+	}
+
+	public long getTotalDuration() {
+		return this.totalDuration;
+	}
+
+	public long getLastDuration() {
+		return this.lastDuration;
+	}
+
+	public Exception getLastException() {
+		return this.lastException;
 	}
 
 	/**
@@ -236,13 +282,22 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	}
 
 	/**
-	 * Executes this job now, but if the job is currently running, then it is blocked till the job is complete
+	 * Executes this job now, throwing an exception if the execution failed.
 	 */
 	public void runNow() throws Exception {
 		doWork();
 		schedule();
 		if (this.lastException != null)
 			throw this.lastException;
+	}
+
+	/**
+	 * Executes this job. If the job failed, then the exception is registered and available for retrieval throught #exc
+	 */
+	@Override
+	public final void run() {
+		doWork();
+		schedule();
 	}
 
 	private void doWork() {
@@ -276,29 +331,11 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 			this.lastDuration = took;
 			this.lastExecution = ZonedDateTime.now();
 			this.nrOfExecutions++;
+			this.first = false;
 
 			synchronized (this.mutex) {
 				this.running = false;
 			}
-		}
-	}
-
-	@Override
-	public final void run() {
-
-		doWork();
-
-		if (this.first) {
-			this.first = false;
-
-			if (this.mode == JobMode.Recurring) {
-				schedule();
-			} else {
-				logger.info("Not scheduling {} after first execution as mode is {}", getName(), this.mode);
-			}
-
-		} else {
-			schedule();
 		}
 	}
 
@@ -327,7 +364,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	 * @return this instance for chaining
 	 */
 	public StrolchJob schedule() {
-		if (this.mode == JobMode.Manual) {
+		if (this.mode != JobMode.Recurring) {
 			logger.info("Not scheduling {} as mode is {}", getName(), this.mode);
 			return this;
 		}
@@ -335,64 +372,47 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		// first cancel a possibly already scheduled task
 		cancel(false);
 
-		if (this.first) {
+		if (this.cronExpression != null) {
+			ZonedDateTime executionTime = nextCronExecution(this.first ? this.cronStartDate : this.lastExecution);
+			if (executionTime == null)
+				return this;
+			logger.info("Next execution of {} will be at {} with CRON pattern {}", getName(),
+					executionTime.format(ISO_OFFSET_DATE_TIME), this.cron);
 
-			if (this.cronExpression != null) {
-				ZonedDateTime executionTime;
-				try {
-					executionTime = this.cronExpression.nextTimeAfter(this.cronStartDate);
-				} catch (IllegalArgumentException e) {
-					logger.error(
-							"Can not schedule {} after start date {} as no next time exists for cron expression {}",
-							getName(), this.cronStartDate, this.cron);
-					return this;
-				}
-
-				logger.info("First execution of {} will be at {}", getName(),
-						executionTime.format(ISO_OFFSET_DATE_TIME));
-
-				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
-				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
-
-			} else {
-
-				long millis = this.initialDelayTimeUnit.toMillis(this.initialDelay);
-				logger.info("First execution of {} will be at {}", getName(),
-						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME));
-
-				this.future = getScheduledExecutor().schedule(this, this.initialDelay, this.initialDelayTimeUnit);
-			}
+			long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
+			this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
 
 		} else {
 
-			if (this.cronExpression != null) {
-				ZonedDateTime executionTime;
-				try {
-					executionTime = this.cronExpression.nextTimeAfter(this.lastExecution);
-				} catch (IllegalArgumentException e) {
-					logger.error(
-							"Can not schedule {} after start date {} as no next time exists for cron expression {}",
-							getName(), this.lastExecution, this.cron);
-					return this;
-				}
+			if (this.first) {
+				long millis = this.initialDelayTimeUnit.toMillis(this.initialDelay);
+				logger.info("First execution of {} will be at {} with delay {} {}", getName(),
+						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME),
+						this.initialDelay, this.initialDelayTimeUnit.name());
 
-				logger.info("Next execution of {} will be at {}", getName(),
-						executionTime.format(ISO_OFFSET_DATE_TIME));
-
-				long delay = PeriodDuration.between(ZonedDateTime.now(), executionTime).toMillis();
-				this.future = getScheduledExecutor().schedule(this, delay, TimeUnit.MILLISECONDS);
-
+				this.future = getScheduledExecutor().schedule(this, this.initialDelay, this.initialDelayTimeUnit);
 			} else {
 
 				long millis = this.delayTimeUnit.toMillis(this.delay);
-				logger.info("Next execution of {} will be at {}", getName(),
-						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME));
+				logger.info("Next execution of {} will be at {} with delay {} {}", getName(),
+						ZonedDateTime.now().plus(millis, ChronoUnit.MILLIS).format(ISO_OFFSET_DATE_TIME), this.delay,
+						this.delayTimeUnit.name());
 
 				this.future = getScheduledExecutor().schedule(this, this.delay, this.delayTimeUnit);
 			}
 		}
 
 		return this;
+	}
+
+	private ZonedDateTime nextCronExecution(ZonedDateTime afterTime) {
+		try {
+			return this.cronExpression.nextTimeAfter(afterTime);
+		} catch (IllegalArgumentException e) {
+			logger.error("Can not schedule {} after start date {} as no next time exists for cron expression {}",
+					getName(), afterTime, this.cron);
+			return null;
+		}
 	}
 
 	protected abstract void execute(PrivilegeContext ctx) throws Exception;
