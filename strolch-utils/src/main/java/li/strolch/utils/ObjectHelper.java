@@ -206,21 +206,15 @@ public class ObjectHelper {
 
 		// try to coerce the right side to the left side
 		if (right instanceof String rightString) {
-			Object rightO;
-			if (left instanceof Integer) {
-				rightO = Integer.valueOf(rightString);
-			} else if (left instanceof Float) {
-				rightO = Float.valueOf(rightString);
-			} else if (left instanceof Double) {
-				rightO = Double.valueOf(rightString);
-			} else if (left instanceof Boolean) {
-				rightO = Boolean.valueOf(rightString);
-			} else if (left instanceof Date) {
-				rightO = ISO8601.parseToDate(rightString);
-			} else {
-				throw new IllegalArgumentException(
+			Object rightO = switch (left) {
+				case Integer _ -> Integer.valueOf(rightString);
+				case Float _ -> Float.valueOf(rightString);
+				case Double _ -> Double.valueOf(rightString);
+				case Boolean _ -> Boolean.valueOf(rightString);
+				case Date _ -> ISO8601.parseToDate(rightString);
+				default -> throw new IllegalArgumentException(
 						"Unhandled type combination " + left.getClass() + " / " + right.getClass());
-			}
+			};
 
 			return rightO.equals(left);
 		}
@@ -233,80 +227,79 @@ public class ObjectHelper {
 			return true;
 		if (left == null)
 			return false;
-		if (right == null)
-			return false;
 
-		if (right instanceof Collection<?> collectionRight) {
+		return switch (right) {
+			case null -> false;
+			case Collection<?> collectionRight -> {
 
-			if (left instanceof Collection<?> collectionLeft) {
-				for (Object l : collectionLeft) {
-					for (Object r : collectionRight) {
-						if (equals(r, l, ignoreCase))
-							return true;
-					}
-				}
-
-				return false;
-
-			} else if (left instanceof Object[] leftArr) {
-				for (Object r : collectionRight) {
-					for (Object l : leftArr) {
-						if (equals(r, l, ignoreCase))
-							return true;
-					}
-				}
-
-				return false;
-
-			} else {
-				for (Object o : collectionRight) {
-					if (equals(o, left, ignoreCase))
-						return true;
-				}
-
-				return false;
-			}
-		}
-
-		if (right instanceof Object[] arrayRight) {
-
-			if (left instanceof Collection<?> collectionLeft) {
-
-				for (Object o : arrayRight) {
+				if (left instanceof Collection<?> collectionLeft) {
 					for (Object l : collectionLeft) {
-						if (equals(l, o, ignoreCase))
-							return true;
+						for (Object r : collectionRight) {
+							if (equals(r, l, ignoreCase))
+								yield true;
+						}
 					}
-				}
 
-				return false;
+					yield false;
 
-			} else if (left instanceof Object[] leftArr) {
-
-				for (Object o : arrayRight) {
-					for (Object l : leftArr) {
-						if (equals(l, o, ignoreCase))
-							return true;
+				} else if (left instanceof Object[] leftArr) {
+					for (Object r : collectionRight) {
+						for (Object l : leftArr) {
+							if (equals(r, l, ignoreCase))
+								yield true;
+						}
 					}
-				}
 
-				return false;
+					yield false;
 
-			} else {
-				for (Object o : arrayRight) {
-					if (equals(left, o, ignoreCase))
-						return true;
+				} else {
+					for (Object o : collectionRight) {
+						if (equals(o, left, ignoreCase))
+							yield true;
+					}
+
+					yield false;
 				}
 			}
+			case Object[] arrayRight -> {
 
-			return false;
-		}
+				if (left instanceof Collection<?> collectionLeft) {
 
-		if (right instanceof String || right instanceof Number || right instanceof Boolean) {
-			return equals(left, right, ignoreCase);
-		}
+					for (Object o : arrayRight) {
+						for (Object l : collectionLeft) {
+							if (equals(l, o, ignoreCase))
+								yield true;
+						}
+					}
 
-		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
+					yield false;
+
+				} else if (left instanceof Object[] leftArr) {
+
+					for (Object o : arrayRight) {
+						for (Object l : leftArr) {
+							if (equals(l, o, ignoreCase))
+								yield true;
+						}
+					}
+
+					yield false;
+
+				} else {
+					for (Object o : arrayRight) {
+						if (equals(left, o, ignoreCase))
+							yield true;
+					}
+				}
+
+				yield false;
+			}
+
+			case String _, Number _, Boolean _ -> equals(left, right, ignoreCase);
+
+			default -> throw new IllegalArgumentException(
+					"Unhandled type combination " + left.getClass() + " / " + right.getClass());
+		};
 	}
 
 	public static boolean startsWith(Object left, Object right, boolean ignoreCase) {
@@ -346,15 +339,12 @@ public class ObjectHelper {
 	}
 
 	public static boolean isEmpty(Object object) {
-		if (object == null)
-			return true;
-		if (object instanceof String)
-			return ((String) object).isEmpty();
-		if (object instanceof Boolean)
-			return !((Boolean) object);
-		if (object instanceof Number)
-			return ((Number) object).doubleValue() == 0.0D;
-
-		return false;
+		return switch (object) {
+			case null -> true;
+			case String s -> s.isEmpty();
+			case Boolean b -> !b;
+			case Number number -> number.doubleValue() == 0.0D;
+			default -> false;
+		};
 	}
 }
