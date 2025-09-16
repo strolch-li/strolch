@@ -310,11 +310,23 @@ public class ObjectHelper {
 		if (right == null)
 			return false;
 
-		if (left instanceof String str && right instanceof String subStr) {
+		if (left instanceof String str) {
+			if (right instanceof String subStr) {
+				if (ignoreCase)
+					return str.toLowerCase().startsWith(subStr.toLowerCase());
+				return str.startsWith(subStr);
+			} else if (right instanceof String[] subStrs) {
+				for (String subStr : subStrs) {
+					if (ignoreCase) {
+						if (str.toLowerCase().startsWith(subStr.toLowerCase()))
+							return true;
+					} else if (str.startsWith(subStr)) {
+						return true;
+					}
+				}
 
-			if (ignoreCase)
-				return str.toLowerCase().startsWith(subStr.toLowerCase());
-			return str.startsWith(subStr);
+				return false;
+			}
 		}
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
@@ -328,11 +340,23 @@ public class ObjectHelper {
 		if (right == null)
 			return false;
 
-		if (left instanceof String str && right instanceof String subStr) {
+		if (left instanceof String str) {
+			if (right instanceof String subStr) {
+				if (ignoreCase)
+					return str.toLowerCase().endsWith(subStr.toLowerCase());
+				return str.endsWith(subStr);
+			} else if (right instanceof String[] subStrs) {
+				for (String subStr : subStrs) {
+					if (ignoreCase) {
+						if (str.toLowerCase().endsWith(subStr.toLowerCase()))
+							return true;
+					} else if (str.endsWith(subStr)) {
+						return true;
+					}
+				}
 
-			if (ignoreCase)
-				return str.toLowerCase().endsWith(subStr.toLowerCase());
-			return str.endsWith(subStr);
+				return false;
+			}
 		}
 
 		throw new IllegalArgumentException("Unhandled type combination " + left.getClass() + " / " + right.getClass());
