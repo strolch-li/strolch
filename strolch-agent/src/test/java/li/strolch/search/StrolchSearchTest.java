@@ -483,6 +483,7 @@ public class StrolchSearchTest {
 							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase("ROL")))
 							.and(param(BAG_ID, PARAM_STRING_ID, containsIgnoreCase(new String[]{"STR", "ROL"})))
 							.and(param(BAG_ID, PARAM_STRING_ID, startsWith("Str")))
+							.and(param(BAG_ID, PARAM_STRING_ID, startsWith(new String[]{"Str", "rol"})))
 							.and(param(BAG_ID, PARAM_STRING_ID, startsWithIgnoreCase("str")))
 							.and(param(BAG_ID, PARAM_STRING_ID, endsWith("lch")))
 							.and(param(BAG_ID, PARAM_STRING_ID, endsWithIgnoreCase("LCH")))
