@@ -41,7 +41,7 @@ import static li.strolch.utils.helper.StringHelper.formatNanoDuration;
 public class CachedRealmLoader {
 
 	private static final Logger logger = LoggerFactory.getLogger(CachedRealmLoader.class);
-	public static final int MIN_PAGE_SIZE = 200;
+	public static final long MIN_PAGE_SIZE = 200;
 
 	private final CachedRealm realm;
 	private final PersistenceHandler persistenceHandler;
@@ -99,7 +99,7 @@ public class CachedRealmLoader {
 		try (StrolchTransaction tx = this.realm.openTx(getCert(), "strolch_boot_" + context, false)) {
 			StrolchDao<T> dao = daoSupplier.apply(tx);
 			nrOfElements = dao.querySize();
-			logger.info("Loading {} {} from DB...", nrOfElements, context);
+			logger.info("Loading {} {} synchronously from DB...", nrOfElements, context);
 
 			Set<String> types = dao.queryTypes();
 			for (String type : types) {
@@ -115,7 +115,7 @@ public class CachedRealmLoader {
 		}
 
 		String durationS = formatNanoDuration(System.nanoTime() - start);
-		logger.info("Loading of {} {} took {}.", nrOfElements, context, durationS);
+		logger.info("Loading of {} {} synchronously took {}.", nrOfElements, context, durationS);
 	}
 
 	private <T extends StrolchRootElement> void loadElementsPagingAsync(String context,
@@ -123,57 +123,73 @@ public class CachedRealmLoader {
 			AtomicLong counter) {
 
 		long start = System.nanoTime();
-
 		Map<String, Long> sizeByTypes = getSizesByType(daoSupplier);
 		CachedElementMap<T> elementMap = elementMapSupplier.get();
+		logger.info("Queried {} types from DB took {}", sizeByTypes.size(),
+				formatNanoDuration(System.nanoTime() - start));
 
 		int availableProcessors = Runtime.getRuntime().availableProcessors();
 		long nrOfElements = sizeByTypes.values().stream().mapToLong(Long::longValue).sum();
-		logger.info("Loading {} {} from DB...", nrOfElements, context);
+		logger.info("Loading {} {} using paging from DB...", nrOfElements, context);
 
-		List<CompletableFuture<List<T>>> tasks = new ArrayList<>();
+		Map<String, Long> smallMaps = new HashMap<>();
+		Set<String> types = new HashSet<>(sizeByTypes.keySet());
+		for (String type : types) {
+			long size = sizeByTypes.get(type);
+			if (size < MIN_PAGE_SIZE * availableProcessors) {
+				smallMaps.put(type, size);
+				sizeByTypes.remove(type);
+			}
+		}
+
+		if (!smallMaps.isEmpty()) {
+			logger.info("Loading {} small {} maps from DB...", smallMaps.size(), context);
+			for (String type : smallMaps.keySet()) {
+				counter.addAndGet(loadPage(elementMap, daoSupplier, type, MAX_VALUE, 0));
+			}
+		}
+
+		logger.info("Loading {} large {} maps from DB in parallel...", sizeByTypes.size(), context);
+		List<CompletableFuture<Long>> tasks = new ArrayList<>();
 		sizeByTypes.keySet().stream().sorted(Comparator.comparing(sizeByTypes::get)).forEach(type -> {
 			long size = sizeByTypes.get(type);
-			if (size < MIN_PAGE_SIZE) {
-				logger.info("Loading {} {} of type {} from DB async in parallel...", size, context, type);
-				tasks.add(supplyAsync(() -> loadPage(daoSupplier, type, MAX_VALUE, 0)));
-			} else {
-				long pageSize = Math.max(MIN_PAGE_SIZE, size / availableProcessors);
-				logger.info("Loading {} {} of type {} in {} pages of {} from DB async in parallel...", size, context,
-						type, availableProcessors, pageSize);
-				long position = 0;
-				while (position < size) {
-					long offset = position;
-					tasks.add(supplyAsync(() -> loadPage(daoSupplier, type, pageSize, offset)));
-					position += pageSize;
-				}
+			long pageSize = Math.max(MIN_PAGE_SIZE, size / availableProcessors);
+			logger.info("Loading {} {} of type {} in {} pages of {} from DB async in parallel...", size, context, type,
+					availableProcessors, pageSize);
+			long position = 0;
+			while (position < size) {
+				long offset = position;
+				tasks.add(supplyAsync(() -> loadPage(elementMap, daoSupplier, type, pageSize, offset)));
+				position += pageSize;
 			}
 		});
 
 		// wait for all tasks to complete
-		Throwable failureEx = allOf(tasks.toArray(new CompletableFuture[0])).handle((u, t) -> t).join();
+		Throwable failureEx = allOf(tasks.toArray(new CompletableFuture[0])).handle((_, t) -> t).join();
 		if (failureEx != null)
 			throw new IllegalStateException("Failed to load " + context, failureEx);
 
 		// now insert elements into element map
-		tasks.stream().map(CompletableFuture::join).forEach(elements -> {
-			elementMap.insertAll(elements);
-			counter.addAndGet(elements.size());
-		});
+		tasks.stream().map(CompletableFuture::join).forEach(counter::addAndGet);
 
 		DBC.POST.assertEquals("Expected size should be same as counter", nrOfElements, counter.get());
 		String durationS = formatNanoDuration(System.nanoTime() - start);
-		logger.info("Loading of {} {} took {}.", counter, context, durationS);
+		logger.info("Loading of {} {} asynchronously took {}.", counter, context, durationS);
 	}
 
-	private <T extends StrolchRootElement> List<T> loadPage(Function<StrolchTransaction, StrolchDao<T>> daoSupplier,
-			String type, long pageSize, long offset) {
+	private <T extends StrolchRootElement> long loadPage(CachedElementMap<T> elementMap,
+			Function<StrolchTransaction, StrolchDao<T>> daoSupplier, String type, long pageSize, long offset) {
+		long count;
 		try (StrolchTransaction tx = this.realm
 				.openTx(getCert(), "strolch_boot", true)
 				.silentThreshold(10, SECONDS)
 				.suppressUpdates()) {
-			return daoSupplier.apply(tx).queryAll(pageSize, offset, type);
+			List<T> elements = daoSupplier.apply(tx).queryAll(pageSize, offset, type);
+			elementMap.insertAll(elements);
+			count = elements.size();
 		}
+
+		return count;
 	}
 
 	private <T extends StrolchRootElement> Map<String, Long> getSizesByType(
