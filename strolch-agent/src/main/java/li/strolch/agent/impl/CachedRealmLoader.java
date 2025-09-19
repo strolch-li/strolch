@@ -144,12 +144,16 @@ public class CachedRealmLoader {
 
 		if (!smallMaps.isEmpty()) {
 			logger.info("Loading {} small {} maps from DB...", smallMaps.size(), context);
+			long startI = System.nanoTime();
 			for (String type : smallMaps.keySet()) {
 				counter.addAndGet(loadPage(elementMap, daoSupplier, type, MAX_VALUE, 0));
 			}
+			String duration = formatNanoDuration(System.nanoTime() - startI);
+			logger.info("Loading {} small {} maps took {}", counter, context, duration);
 		}
 
 		logger.info("Loading {} large {} maps from DB in parallel...", sizeByTypes.size(), context);
+		long startI = System.nanoTime();
 		List<CompletableFuture<Long>> tasks = new ArrayList<>();
 		sizeByTypes.keySet().stream().sorted(Comparator.comparing(sizeByTypes::get)).forEach(type -> {
 			long size = sizeByTypes.get(type);
@@ -168,13 +172,15 @@ public class CachedRealmLoader {
 		Throwable failureEx = allOf(tasks.toArray(new CompletableFuture[0])).handle((_, t) -> t).join();
 		if (failureEx != null)
 			throw new IllegalStateException("Failed to load " + context, failureEx);
+		String duration = formatNanoDuration(System.nanoTime() - startI);
+		logger.info("Loading {} large {} maps took {}", counter, context, duration);
 
-		// now insert elements into element map
+		// count all elements inserted into map
 		tasks.stream().map(CompletableFuture::join).forEach(counter::addAndGet);
 
 		DBC.POST.assertEquals("Expected size should be same as counter", nrOfElements, counter.get());
-		String durationS = formatNanoDuration(System.nanoTime() - start);
-		logger.info("Loading of {} {} asynchronously took {}.", counter, context, durationS);
+		duration = formatNanoDuration(System.nanoTime() - start);
+		logger.info("Loading of {} {} asynchronously took {}.", counter, context, duration);
 	}
 
 	private <T extends StrolchRootElement> long loadPage(CachedElementMap<T> elementMap,
