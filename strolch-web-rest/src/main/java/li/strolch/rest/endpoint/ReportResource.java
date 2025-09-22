@@ -378,7 +378,7 @@ public class ReportResource {
 
 	@Operation(summary = "Get report as CSV", description = "Retrieves a report as a CSV file.", responses = {
 			@ApiResponse(responseCode = "200", description = "Successful retrieval",
-					content = @Content(mediaType = "text/csv")),
+					content = @Content(mediaType = TEXT_CSV)),
 			@ApiResponse(responseCode = "404", description = "Report not found"),
 			@ApiResponse(responseCode = "500", description = "Internal server error")})
 	@POST
@@ -487,7 +487,7 @@ public class ReportResource {
 
 				// get report content and add to the buffer
 				try (CSVPrinter csvP = new CSVPrinter(new OutputStreamWriter(out),
-						CSVFormat.DEFAULT.builder().setHeader(headers).setDelimiter(';').build())) {
+						CSVFormat.DEFAULT.builder().setHeader(headers).setDelimiter(';').get())) {
 
 					if (report.isParallel())
 						report.doReport().forEachOrdered(row -> writeCsv(csvP, row));
