@@ -394,7 +394,8 @@ public class ConfigurationSaxParser extends DefaultHandler {
 					} else {
 						if (StringHelper.isNotEmpty(otherComponentBuilder.getImpl())) {
 							thisComponentBuilder.setImpl(otherComponentBuilder.getImpl());
-							thisComponentBuilder.setDependencies(otherComponentBuilder.getDependencies());
+							if (otherComponentBuilder.getDependencies() != null)
+								otherComponentBuilder.getDependencies().forEach(thisComponentBuilder::addDependency);
 						}
 						thisComponentBuilder.getProperties().putAll(otherComponentBuilder.getProperties());
 					}
