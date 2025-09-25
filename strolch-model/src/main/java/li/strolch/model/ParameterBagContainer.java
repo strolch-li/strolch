@@ -1840,8 +1840,13 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * is empty
 	 */
 	default boolean isRelationSet(String paramKey) {
-		StringParameter relationP = getParameter(BAG_RELATIONS, paramKey);
-		return relationP != null && relationP.isSet();
+		Parameter<?> relationP = getParameter(BAG_RELATIONS, paramKey);
+		return switch (relationP) {
+			case StringParameter sp -> sp.isSet();
+			case StringListParameter sp -> sp.isSet();
+			case null -> true;
+			default -> throw new IllegalStateException("Unhandled Parameter type: " + relationP.getClass());
+		};
 	}
 
 	/**
@@ -1854,8 +1859,13 @@ public interface ParameterBagContainer extends StrolchElement {
 	 * id {@link StrolchModelConstants#BAG_RELATIONS} or if the value of the parameter is empty
 	 */
 	default boolean isRelationEmpty(String paramKey) {
-		StringParameter relationP = getParameter(BAG_RELATIONS, paramKey);
-		return relationP == null || relationP.isEmpty();
+		Parameter<?> relationP = getParameter(BAG_RELATIONS, paramKey);
+		return switch (relationP) {
+			case StringParameter sp -> sp.isEmpty();
+			case StringListParameter sp -> sp.isEmpty();
+			case null -> true;
+			default -> throw new IllegalStateException("Unhandled Parameter type: " + relationP.getClass());
+		};
 	}
 
 	/**
