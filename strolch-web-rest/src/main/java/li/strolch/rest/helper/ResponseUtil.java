@@ -216,7 +216,7 @@ public class ResponseUtil {
 			case StrolchAccessDeniedException ignored -> Status.FORBIDDEN;
 			case PrivilegeModelException ignored -> Status.FORBIDDEN;
 			case NotAuthenticatedException ignored -> Status.UNAUTHORIZED;
-			case PrivilegeException ignored -> Status.UNAUTHORIZED;
+			case PrivilegeException ignored -> Status.FORBIDDEN;
 			case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
 			case StrolchUserMessageException ignored -> Status.BAD_REQUEST;
 			case null, default -> Status.INTERNAL_SERVER_ERROR;
