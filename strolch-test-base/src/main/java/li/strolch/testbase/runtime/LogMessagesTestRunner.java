@@ -69,7 +69,7 @@ public class LogMessagesTestRunner {
 			this.operationsLog.addMessage(logMessage);
 
 			// default is async persisting...
-			while (this.operationsLog.isQueueNonEmpty())
+			while (this.operationsLog.isQueueNotEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
@@ -115,7 +115,7 @@ public class LogMessagesTestRunner {
 			}
 
 			// default is async persisting...
-			while (this.operationsLog.isQueueNonEmpty())
+			while (this.operationsLog.isQueueNotEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
@@ -159,19 +159,19 @@ public class LogMessagesTestRunner {
 			// update state of element
 			this.operationsLog.updateState(this.realmName, logMessage1.getLocator(), LogMessageState.Inactive);
 
-			while (this.operationsLog.isQueueNonEmpty())
+			while (this.operationsLog.isQueueNotEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
 			assertEquals(LogMessageState.Inactive, logMessage1.getState());
 
 			this.operationsLog.updateState(this.realmName, logMessage1.getId(), LogMessageState.Active);
-			while (this.operationsLog.isQueueNonEmpty())
+			while (this.operationsLog.isQueueNotEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 			assertEquals(LogMessageState.Active, logMessage1.getState());
 
-			while (this.operationsLog.isQueueNonEmpty())
+			while (this.operationsLog.isQueueNotEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
@@ -184,7 +184,7 @@ public class LogMessagesTestRunner {
 			List<LogMessage> toRemove = Arrays.asList(logMessage2, logMessage3);
 			this.operationsLog.removeMessages(toRemove);
 
-			while (this.operationsLog.isQueueNonEmpty())
+			while (this.operationsLog.isQueueNotEmpty())
 				//noinspection BusyWait
 				Thread.sleep(100L);
 
