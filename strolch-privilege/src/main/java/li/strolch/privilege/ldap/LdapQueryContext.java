@@ -17,7 +17,6 @@
 package li.strolch.privilege.ldap;
 
 import li.strolch.privilege.base.AccessDeniedException;
-import li.strolch.privilege.base.PrivilegeConstants;
 import li.strolch.privilege.helper.GroupsAndRoles;
 import li.strolch.privilege.helper.RemoteGroupMappingModel;
 import li.strolch.privilege.model.UserState;
@@ -36,7 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static li.strolch.privilege.base.PrivilegeConstants.*;
+import static li.strolch.privilege.base.PrivilegeConstants.EMAIL;
 import static li.strolch.utils.LdapHelper.ldapAttributesToString;
 import static li.strolch.utils.helper.StringHelper.*;
 
@@ -208,6 +207,8 @@ public abstract class LdapQueryContext {
 					"User %s can not login, as no group or role mappings were found for ldap groups %s".formatted(
 							username, ldapGroups));
 		}
+
+		logger.info("User {} has the following groups and roles: {}", username, groupsAndRoles);
 
 		// first see if we can find the primaryLocation from the department attribute:
 		String department = getDepartment(attrs);
