@@ -60,7 +60,7 @@ public class ToErrorReservationExecution extends ReservationExecution {
 		if (action.getType().equals(TYPE_RESERVE) && isReserved(tx(), action)) {
 			setActionState(action, State.EXECUTION);
 			toError(new LogMessage(tx().getRealmName(), tx().getCertificate().getUsername(), action.getLocator(),
-					LogSeverity.Error, LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
+					LogSeverity.Warning, LogMessageState.Information, ResourceBundle.getBundle("strolch-service"),
 					"execution.policy.reservation.alreadyReserved").value("resourceLoc",
 					action.getResourceLocator().toString()));
 		} else {
