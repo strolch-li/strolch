@@ -79,7 +79,8 @@ public class RemoteGroupMappingModel {
 			File basePathF = new File(basePath);
 			if (!basePathF.exists() && !basePathF.isDirectory()) {
 				String msg = "[{0}] Config file parameter {1} is not absolute, and base bath {2} is not a directory!";
-				msg = format(msg, RemoteGroupMappingModel.class.getName(), PARAM_CONFIG_FILE, basePathF.getAbsolutePath());
+				msg = format(msg, RemoteGroupMappingModel.class.getName(), PARAM_CONFIG_FILE,
+						basePathF.getAbsolutePath());
 				throw new PrivilegeException(msg);
 			}
 
@@ -141,12 +142,12 @@ public class RemoteGroupMappingModel {
 		return Set.of(overrideGroup);
 	}
 
-	public GroupsAndRoles mapRemoteGroupsToStrolch(Set<String> remoteGroups) {
+	public GroupsAndRoles mapRemoteGroupsToStrolch(String username, Set<String> remoteGroups) {
 
 		// first see if we have mappings for LDAP groups to local groups
 		Set<String> mappedGroupNames = remoteGroups
 				.stream()
-				.map(lg -> this.remoteGroupToLocalGroupMap.getOrDefault(lg, lg))
+				.map(rg -> this.remoteGroupToLocalGroupMap.getOrDefault(rg, rg))
 				.collect(toSet());
 
 		// now see if we have any groups with these names
@@ -156,6 +157,12 @@ public class RemoteGroupMappingModel {
 				.map(Group::name)
 				.filter(mappedGroupNames::contains)
 				.collect(HashSet::new, HashSet::add, HashSet::addAll);
+
+		Set<String> relevantRemoteGroups = remoteGroups
+				.stream()
+				.filter(rg -> this.remoteGroupToLocalGroupMap.containsKey(rg) && groups.contains(rg))
+				.collect(toSet());
+		logger.info("User {} has the following relevant remote groups: {}", username, relevantRemoteGroups);
 
 		// now map any groups to roles
 		Set<String> roles = new HashSet<>();

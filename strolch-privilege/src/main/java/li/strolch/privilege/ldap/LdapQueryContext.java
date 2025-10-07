@@ -197,7 +197,7 @@ public abstract class LdapQueryContext {
 							ldapAttributesToString(attrs)));
 
 		Set<String> ldapGroups = this.groupMappingModel.getUserGroupOverride(username, originalLdapGroups);
-		GroupsAndRoles groupsAndRoles = this.groupMappingModel.mapRemoteGroupsToStrolch(ldapGroups);
+		GroupsAndRoles groupsAndRoles = this.groupMappingModel.mapRemoteGroupsToStrolch(username, ldapGroups);
 
 		if (groupsAndRoles.isEmpty()) {
 			logger.error("User {} can not login, as no group or role mappings were found.", username);
