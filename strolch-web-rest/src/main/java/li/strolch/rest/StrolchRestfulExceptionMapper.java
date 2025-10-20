@@ -25,6 +25,7 @@ import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.exception.StrolchAccessDeniedException;
+import li.strolch.exception.StrolchElementNotFoundException;
 import li.strolch.exception.StrolchNotAuthenticatedException;
 import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.handler.operationslog.OperationsLog;
@@ -63,6 +64,7 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 				StrolchAccessDeniedException.class);
 		boolean logException = isNotAccessDeniedException
 				&& !hasCause(ex, StrolchUserMessageException.class)
+				&& !hasCause(ex, StrolchElementNotFoundException.class)
 				&& agent.hasComponent(OperationsLog.class);
 		if (logException) {
 			try {
