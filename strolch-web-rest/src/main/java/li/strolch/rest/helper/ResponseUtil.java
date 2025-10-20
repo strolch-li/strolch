@@ -212,13 +212,13 @@ public class ResponseUtil {
 	private static Status evaluateStatus(Throwable throwable) {
 		Throwable rootCause = throwable == null ? null : getRootCause(throwable);
 		return switch (rootCause) {
-			case AccessDeniedException ignored -> Status.FORBIDDEN;
-			case StrolchAccessDeniedException ignored -> Status.FORBIDDEN;
-			case PrivilegeModelException ignored -> Status.FORBIDDEN;
-			case NotAuthenticatedException ignored -> Status.UNAUTHORIZED;
-			case PrivilegeException ignored -> Status.FORBIDDEN;
-			case StrolchElementNotFoundException ignored -> Status.NOT_FOUND;
-			case StrolchUserMessageException ignored -> Status.BAD_REQUEST;
+			case AccessDeniedException _ -> Status.FORBIDDEN;
+			case StrolchAccessDeniedException _ -> Status.FORBIDDEN;
+			case PrivilegeModelException _ -> Status.FORBIDDEN;
+			case NotAuthenticatedException _ -> Status.UNAUTHORIZED;
+			case PrivilegeException _ -> Status.FORBIDDEN;
+			case StrolchElementNotFoundException _ -> Status.NOT_FOUND;
+			case StrolchUserMessageException _ -> Status.BAD_REQUEST;
 			case null, default -> Status.INTERNAL_SERVER_ERROR;
 		};
 	}
