@@ -22,16 +22,18 @@ import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
 import li.strolch.persistence.api.LogMessageDao;
 import li.strolch.persistence.api.StrolchPersistenceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static java.text.MessageFormat.format;
 import static li.strolch.utils.helper.StringHelper.commaSeparated;
 
 public class PostgreSqlLogMessageDao implements LogMessageDao {
@@ -53,13 +55,13 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 	private static final String queryCountByRealmSql = "select count(id) from operations_log where realm = ?";
 	private static final String queryByRealmMaxSql = "select "
-													 + FIELDS
-													 + " from operations_log where realm = ? order by id desc limit ? offset ?";
+			+ FIELDS
+			+ " from operations_log where realm = ? order by id desc limit ? offset ?";
 	private static final String queryValuesSql = "select key, value from operations_log_values where id = ?";
 
 	private static final String insertLogMessageSql = "insert into operations_log ("
-													  + FIELDS
-													  + ") values (?, ?, ?, ?, ?::log_severity_type, ?::log_state_type, ?, ?, ?, ?, ?)";
+			+ FIELDS
+			+ ") values (?, ?, ?, ?, ?::log_severity_type, ?::log_state_type, ?, ?, ?, ?, ?)";
 	private static final String insertValuesSql = "insert into operations_log_values (id, key, value) values (?, ?, ?)";
 
 	private static final String updateLogMessageStateSql
@@ -67,6 +69,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 	private static final String removeSql = "delete from operations_log where id = ?";
 	private static final String removeValuesSql = "delete from operations_log_values where id = ?";
+	private static final Logger log = LoggerFactory.getLogger(PostgreSqlLogMessageDao.class);
 
 	private final PostgreSqlStrolchTransaction tx;
 
@@ -131,9 +134,9 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			setLogMessageFields(logMessage, insertStatement);
 			int count = insertStatement.executeUpdate();
 			if (count != 1) {
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"Expected to insert 1 log_message record, but inserted {0} for LogMessage {1}", count,
-						logMessage.getId()));
+				throw new StrolchPersistenceException(
+						format("Expected to insert 1 log_message record, but inserted {0} for LogMessage {1}", count,
+								logMessage.getId()));
 			}
 
 			int nrOfInserts = setValues(logMessage, valuesStatement);
@@ -142,8 +145,8 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to insert LogMessage {0} due to {1}", logMessage.getId(),
-							e.getLocalizedMessage()), e);
+					format("Failed to insert LogMessage {0} due to {1}", logMessage.getId(), e.getLocalizedMessage()),
+					e);
 		}
 	}
 
@@ -165,7 +168,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to update LogMessage state {0} due to {1}", logMessage.getId(),
+					format("Failed to update LogMessage state {0} due to {1}", logMessage.getId(),
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -187,7 +190,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to update states for {0} LogMessages due to {1}", logMessages.size(),
+					format("Failed to update states for {0} LogMessages due to {1}", logMessages.size(),
 							e.getLocalizedMessage()), e);
 		}
 	}
@@ -201,8 +204,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to remove {0} due to {1}", logMessage.getId(),
-							e.getLocalizedMessage()), e);
+					format("Failed to remove {0} due to {1}", logMessage.getId(), e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -227,13 +229,13 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			int[] countAll = removeStatement.executeBatch();
 			if (countAll.length != nrOfRemoves) {
 				String msg = "Expected to delete {0} LogMessages but deleted {1} elements!";
-				msg = MessageFormat.format(msg, nrOfRemoves, countAll.length);
+				msg = format(msg, nrOfRemoves, countAll.length);
 				throw new StrolchPersistenceException(msg);
 			}
 			for (int count : countAll) {
 				if (count != 1) {
 					String msg = "Expected to delete 1 LogMessages per delete statement but deleted {0} elements!";
-					msg = MessageFormat.format(msg, count);
+					msg = format(msg, count);
 					throw new StrolchPersistenceException(msg);
 				}
 			}
@@ -241,20 +243,20 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			countAll = removeValuesStatement.executeBatch();
 			if (countAll.length != nrOfRemoves) {
 				String msg = "Expected to execute {0} delete value statements but executed {1} elements!";
-				msg = MessageFormat.format(msg, nrOfRemoves, countAll.length);
+				msg = format(msg, nrOfRemoves, countAll.length);
 				throw new StrolchPersistenceException(msg);
 			}
 			for (int i = 0; i < countAll.length; i++) {
-				if (countAll[i] != nrOfValueRemoves[i]) {
+				if (countAll[i] < nrOfValueRemoves[i]) {
 					String msg = "Expected to delete {0} values for LogMessage {1} but deleted {2} elements!";
-					msg = MessageFormat.format(msg, nrOfValueRemoves[i], logMessages.get(i).getId(), countAll[i]);
+					msg = format(msg, nrOfValueRemoves[i], logMessages.get(i).getId(), countAll[i]);
 					throw new StrolchPersistenceException(msg);
 				}
 			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to remove LogMessages due to {0}", e.getLocalizedMessage()), e);
+					format("Failed to remove LogMessages due to {0}", e.getLocalizedMessage()), e);
 		}
 	}
 
@@ -267,14 +269,14 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 		int count = removeStatement.executeUpdate();
 		if (count != 1) {
 			String msg = "Expected to delete 1 LogMessage with id {0} but deleted {1} elements!";
-			msg = MessageFormat.format(msg, logMessage.getId(), count);
+			msg = format(msg, logMessage.getId(), count);
 			throw new StrolchPersistenceException(msg);
 		}
 
 		count = removeValuesStatement.executeUpdate();
 		if (count != logMessage.getValues().size()) {
 			String msg = "Expected to delete {0} values for LogMessage with id {1} but deleted {2} elements!";
-			msg = MessageFormat.format(msg, logMessage.getValues().size(), logMessage.getId(), count);
+			msg = format(msg, logMessage.getValues().size(), logMessage.getId(), count);
 			throw new StrolchPersistenceException(msg);
 		}
 	}
@@ -282,15 +284,15 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 	private void validateValuesStatement(LogMessage logMessage, int nrOfInserts, int[] ints) {
 		if (ints.length != nrOfInserts) {
 			throw new StrolchPersistenceException(
-					MessageFormat.format("Expected to insert {0} value record, but inserted {1} for LogMessage {2}",
-							nrOfInserts, ints.length, logMessage.getId()));
+					format("Expected to insert {0} value record, but inserted {1} for LogMessage {2}", nrOfInserts,
+							ints.length, logMessage.getId()));
 		}
 
 		for (int i = 0; i < ints.length; i++) {
 			if (ints[i] != 1) {
-				throw new StrolchPersistenceException(MessageFormat.format(
-						"Expected to insert 1 record per value, but inserted {0} for value at index {1} for LogMessage {2}",
-						ints[i], i, logMessage.getId()));
+				throw new StrolchPersistenceException(
+						format("Expected to insert 1 record per value, but inserted {0} for value at index {1} for LogMessage {2}",
+								ints[i], i, logMessage.getId()));
 			}
 		}
 	}
