@@ -17,6 +17,7 @@ package li.strolch.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -56,6 +57,9 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 
 	@Override
 	public Response toResponse(Exception ex) {
+
+		if (ex instanceof WebApplicationException wae)
+			return wae.getResponse();
 
 		logger.error("Handling exception {}", ex.getClass(), ex);
 
