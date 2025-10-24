@@ -52,7 +52,7 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
 
 @Path("strolch/agent")
-@OpenAPIDefinition(info = @Info(title = "Strolch RESTful API", version = "1.0", description = """
+@OpenAPIDefinition(info = @Info(title = "Strolch RESTful API", version = "2.6.0", description = """
 		Strolch is an agent implementing a service architecture. With the exception of JAX-RS, everything is implemented in Java SE.
 		
 		All aspects of a framework for applications are implemented:
