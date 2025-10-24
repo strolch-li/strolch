@@ -72,7 +72,7 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 					contentType.append(", ");
 			}
 
-			if (!responseContext.getHeaders().containsKey(STROLCH_STROLCH_EXCEPTION_I18N))
+			if (!responseContext.getHeaders().containsKey(STROLCH_EXCEPTION_I18N))
 				logger.error("Request failed {} {}: {} {} Content-type: {}", this.request.getRemoteAddr(),
 						responseContext.getStatus(), method, uri, contentType);
 		}

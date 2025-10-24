@@ -181,7 +181,7 @@ public class ResponseUtil {
 						StrolchResponse.valueOf(msg, i18nMessage)).toJson();
 		Response.ResponseBuilder responseBuilder = Response.status(status).entity(json).type(APPLICATION_JSON);
 		if (i18nMessage != null)
-			responseBuilder.header(STROLCH_STROLCH_EXCEPTION_I18N, true);
+			responseBuilder.header(STROLCH_EXCEPTION_I18N, true);
 		return responseBuilder.build();
 	}
 
