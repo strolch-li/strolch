@@ -16,8 +16,6 @@
 
 package li.strolch.privilege.test;
 
-import org.junit.Ignore;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +28,11 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import java.util.Hashtable;
 
-@Ignore("This test requires a running LDAP server")
 public class LdapQueryExampleTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(LdapQueryExampleTest.class);
 
-	@Test
-	public void testLdapQueryExample() {
+	public static void main(String[] args) {
 		String ldapUrl = "ldap://localhost:10389";
 		String serviceUserDn = "uid=admin,ou=Admins,dc=strolch,dc=li";
 		String serviceUserPassword = "admin";
