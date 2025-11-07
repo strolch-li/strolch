@@ -72,7 +72,7 @@ public class StrolchXmlHelper {
 	}
 
 	public static Map<String, StrolchRootElement> parseToMap(InputStream stream, String encoding) {
-		return parseStream(stream, encoding).stream().collect(Collectors.toMap(StrolchRootElement::getId, e -> e));
+		return parseInputStreamAsStream(stream, encoding).collect(Collectors.toMap(StrolchRootElement::getId, e -> e));
 	}
 
 	public static SimpleStrolchElementListener parse(File file) {
@@ -103,7 +103,13 @@ public class StrolchXmlHelper {
 		return elementListener.streamElements();
 	}
 
-	public static List<StrolchRootElement> parseStream(InputStream stream, String encoding) {
+	public static Stream<StrolchRootElement> parseInputStreamAsStream(InputStream stream, String encoding) {
+		StrolchElementListenerToListListener elementListener = new StrolchElementListenerToListListener();
+		new XmlModelSaxStreamReader(elementListener, stream, encoding).parseStream();
+		return elementListener.streamElements();
+	}
+
+	public static List<StrolchRootElement> parseInputStreamAsList(InputStream stream, String encoding) {
 		StrolchElementListenerToListListener elementListener = new StrolchElementListenerToListListener();
 		new XmlModelSaxStreamReader(elementListener, stream, encoding).parseStream();
 		return elementListener.getElements();

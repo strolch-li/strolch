@@ -49,7 +49,7 @@ public class StrolchElementListenerToListListener implements StrolchElementListe
 	}
 
 	public Stream<StrolchRootElement> streamElements() {
-		return elements.stream();
+		return this.elements.stream();
 	}
 
 	public List<StrolchRootElement> getElements() {
