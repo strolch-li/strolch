@@ -247,7 +247,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 				throw new StrolchPersistenceException(msg);
 			}
 			for (int i = 0; i < countAll.length; i++) {
-				if (countAll[i] < nrOfValueRemoves[i]) {
+				if (nrOfValueRemoves[i] < countAll[i]) {
 					String msg = "Expected to delete {0} values for LogMessage {1} but deleted {2} elements!";
 					msg = format(msg, nrOfValueRemoves[i], logMessages.get(i).getId(), countAll[i]);
 					throw new StrolchPersistenceException(msg);
