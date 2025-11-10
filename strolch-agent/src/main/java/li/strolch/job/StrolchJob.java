@@ -321,7 +321,6 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 				operationsLog.addMessage(new LogMessage(realmName, SYSTEM_USER_AGENT,
 						Locator.valueOf(AGENT, StrolchJob.class.getSimpleName(), getName()), LogSeverity.Exception,
 						LogMessageState.Information, ResourceBundle.getBundle("strolch-agent"), "job.failed")
-						.withException(e)
 						.value("jobName", getClass().getName())
 						.value("reason", e));
 			}
