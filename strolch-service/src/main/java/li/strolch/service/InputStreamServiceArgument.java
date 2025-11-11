@@ -25,6 +25,8 @@ import java.io.InputStream;
 public class InputStreamServiceArgument extends ServiceArgument {
 
 	public InputStream inputStream;
+	public String filename;
+	public String encoding;
 
 	@Override
 	public JsonElement toJson() {
