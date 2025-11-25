@@ -190,7 +190,7 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 		ps.setString(8, audit.getAction());
 		ps.setString(9, audit.getAccessType().name());
-		ps.setString(10, audit.getAccessType().name());
+		ps.setString(10, audit.getSource());
 
 		if (audit.getAdditionalDataAsString() == null) {
 			ps.setObject(11, null);
