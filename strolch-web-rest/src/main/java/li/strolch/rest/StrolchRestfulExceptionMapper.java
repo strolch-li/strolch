@@ -89,7 +89,6 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 		}
 
 		return switch (ex) {
-			case NotFoundException ignored -> ResponseUtil.toResponse(Status.NOT_FOUND, ex);
 			case AccessDeniedException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.getMessage());
 			case StrolchAccessDeniedException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
 			case StrolchNotAuthenticatedException e -> {
