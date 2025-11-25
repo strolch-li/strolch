@@ -79,7 +79,7 @@ public class AuditsResource {
 			@QueryParam("from") String fromS, @QueryParam("to") String toS, @QueryParam("username") String username,
 			@QueryParam("elementType") String elementType, @QueryParam("elementSubType") String elementSubType,
 			@QueryParam("elementAccessed") String elementAccessed, @QueryParam("action") String action,
-			@QueryParam("accessType") String accessType) {
+			@QueryParam("source") String source, @QueryParam("accessType") String accessType) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer().getPrivilegeHandler();
@@ -132,6 +132,8 @@ public class AuditsResource {
 				audits = audits.filter(audit -> audit.getElementAccessed().equals(elementAccessed));
 			if (isNotEmpty(action))
 				audits = audits.filter(audit -> audit.getAction().equals(action));
+			if (isNotEmpty(source))
+				audits = audits.filter(audit -> audit.getSource().startsWith(source));
 			if (isNotEmpty(accessType)) {
 				AccessType accessType1 = AccessType.valueOf(accessType);
 				audits = audits.filter(audit -> audit.getAccessType().equals(accessType1));

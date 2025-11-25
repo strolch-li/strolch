@@ -58,6 +58,7 @@ public class AuditFromDomReader {
 				case NEW_VERSION -> audit.setNewVersion(ISO8601.parseToZdt(txtContent));
 				case ACTION -> audit.setAction(txtContent);
 				case ACCESS_TYPE -> audit.setAccessType(AccessType.valueOf(txtContent));
+				case SOURCE -> audit.setSource(txtContent);
 				case ADDITIONAL_DATA -> {
 					if (isNotEmpty(txtContent))
 						audit.setAdditionalDataAsString(txtContent);
@@ -74,6 +75,7 @@ public class AuditFromDomReader {
 		DBC.INTERIM.assertNotEmpty("ElementSubType" + msg, audit.getElementSubType());
 		DBC.INTERIM.assertNotEmpty("ElementAccessed" + msg, audit.getElementAccessed());
 		DBC.INTERIM.assertNotEmpty("Action" + msg, audit.getAction());
+		DBC.INTERIM.assertNotEmpty("Source" + msg, audit.getSource());
 		DBC.INTERIM.assertNotNull("AccessType" + msg, audit.getAccessType());
 
 		return audit;

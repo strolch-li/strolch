@@ -2193,6 +2193,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		audit.setAction(this.action);
 		audit.setAccessType(accessType);
+		audit.setSource(getCertificate().getSource());
 
 		return audit;
 	}

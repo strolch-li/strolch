@@ -522,6 +522,7 @@ public class ModelGenerator {
 		audit.setNewVersion(ZonedDateTime.now().plusDays(random.nextInt(100) - 20));
 		audit.setAction(randomValue(random, actions));
 		audit.setAccessType(AccessType.values()[random.nextInt(AccessType.values().length)]);
+		audit.setSource("unknown");
 		if (new Random().nextBoolean()) {
 			JsonObject json = new JsonObject();
 			json.addProperty("key", "value");

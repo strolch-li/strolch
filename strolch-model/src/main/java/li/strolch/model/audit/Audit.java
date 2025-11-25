@@ -38,7 +38,8 @@ public class Audit implements Comparable<Audit> {
 	private ZonedDateTime newVersion;
 	private String action;
 	private AccessType accessType;
-	private String additionalDataAsString;	
+	private String source;
+	private String additionalDataAsString;
 	private transient JsonElement additionalDataAsJson;
 
 	public Long getId() {
@@ -109,6 +110,18 @@ public class Audit implements Comparable<Audit> {
 		return this.accessType;
 	}
 
+	public void setAccessType(AccessType accessType) {
+		this.accessType = accessType;
+	}
+
+	public String getSource() {
+		return this.source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
 	public String getAdditionalDataAsString() {
 		return this.additionalDataAsString;
 	}
@@ -127,50 +140,49 @@ public class Audit implements Comparable<Audit> {
 		this.additionalDataAsString = additionalDataAsJson == null ? null : additionalDataAsJson.toString();
 	}
 
-	public void setAccessType(AccessType accessType) {
-		this.accessType = accessType;
-	}
-
 	public <U> U accept(AuditVisitor<U> visitor) {
 		return visitor.visitAudit(this);
 	}
 
 	public String buildRelevantHash() {
 		String builder = this.username
-						 + this.elementType
-						 + this.elementSubType
-						 + this.elementAccessed
-						 + this.action
-						 + this.accessType
-						 + this.additionalDataAsString;
+				+ this.elementType
+				+ this.elementSubType
+				+ this.elementAccessed
+				+ this.action
+				+ this.accessType
+				+ this.source
+				+ this.additionalDataAsString;
 		return hashSha256AsHex(builder);
 	}
 
 	@Override
 	public String toString() {
 		return "Audit{"
-			   + "id="
-			   + id
-			   + ", username='"
-			   + username
-			   + '\''
-			   + ", date="
-			   + date
-			   + ", elementType='"
-			   + elementType
-			   + '\''
-			   + ", elementSubType='"
-			   + elementSubType
-			   + '\''
-			   + ", elementAccessed='"
-			   + elementAccessed
-			   + '\''
-			   + ", action='"
-			   + action
-			   + '\''
-			   + ", accessType="
-			   + accessType
-			   + '}';
+				+ "id="
+				+ id
+				+ ", username='"
+				+ username
+				+ '\''
+				+ ", date="
+				+ date
+				+ ", elementType='"
+				+ elementType
+				+ '\''
+				+ ", elementSubType='"
+				+ elementSubType
+				+ '\''
+				+ ", elementAccessed='"
+				+ elementAccessed
+				+ '\''
+				+ ", action='"
+				+ action
+				+ '\''
+				+ ", accessType="
+				+ accessType
+				+ ", source="
+				+ source
+				+ '}';
 	}
 
 	@Override
