@@ -201,6 +201,13 @@ public class RuntimeMock {
 		return result;
 	}
 
+	public <T extends ServiceArgument, U extends ServiceResult> U doServiceAssertResultWarning(Certificate certificate,
+			Service<T, U> service, T argument) {
+		U result = getServiceHandler().doService(certificate, service, argument);
+		assertServiceResult(ServiceResultState.WARNING, result);
+		return result;
+	}
+
 	public static void assertServiceResult(ServiceResultState expectedState, Class<?> expectedResultType,
 			ServiceResult result) {
 		assertEquals("Expected service result of type " + expectedResultType + " but was " + result.getClass(),
