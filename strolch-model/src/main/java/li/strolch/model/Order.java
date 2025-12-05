@@ -329,13 +329,6 @@ public class Order extends AbstractStrolchRootElement implements StrolchRootElem
 	}
 
 	@Override
-	public String toString() {
-		if (this.version == null)
-			return getLocator().toString();
-		return getLocator() + ", Version: " + this.version.getVersion();
-	}
-
-	@Override
 	public int compareTo(Order o) {
 		return getId().compareTo(o.getId());
 	}
