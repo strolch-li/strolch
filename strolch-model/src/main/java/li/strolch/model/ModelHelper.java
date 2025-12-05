@@ -26,6 +26,11 @@ import static li.strolch.model.StrolchModelConstants.*;
  */
 public class ModelHelper {
 
+	public static void copyExistingBoolean(Resource src, Resource dst, String paramId) {
+		if (src.getBoolean(BAG_PARAMETERS, paramId))
+			dst.setBoolean(BAG_PARAMETERS, paramId, true);
+	}
+
 	public static void copyExistingString(Resource src, Resource dst, String paramId) {
 		copyStringParam(src, dst, BAG_PARAMETERS, paramId);
 	}
