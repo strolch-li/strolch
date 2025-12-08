@@ -258,6 +258,18 @@ public interface StrolchTransaction extends AutoCloseable {
 	<T extends StrolchPolicy> T getPolicy(PolicyContainer element, Class<T> clazz);
 
 	/**
+	 * Instantiates the policy using the given {@link Class} to retrieve the {@link PolicyDef} from the given element
+	 *
+	 * @param element    the element from which to retrieve the {@link PolicyDef
+	 * @param <T>        the type of policy to return
+	 * @param clazz      the type of policy to return
+	 * @param defaultDef the default policy definition if the given policy definition is unavailable
+	 *
+	 * @return the policy
+	 */
+	<T extends StrolchPolicy> T getPolicy(PolicyContainer element, Class<T> clazz, PolicyDef defaultDef);
+
+	/**
 	 * Instantiates the policy using the given {@link PolicyDef}
 	 *
 	 * @param policyDef the policy definition

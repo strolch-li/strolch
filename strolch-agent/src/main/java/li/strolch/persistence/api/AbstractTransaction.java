@@ -566,6 +566,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public <T extends StrolchPolicy> T getPolicy(PolicyContainer element, Class<T> clazz, PolicyDef defaultDef) {
+		PolicyDef policyDef = element.getPolicyDef(clazz, defaultDef);
+		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, this);
+	}
+
+	@Override
 	@Deprecated
 	public <T extends StrolchPolicy> T getPolicy(PolicyDef policyDef) {
 		return getContainer().getComponent(PolicyHandler.class).getPolicy(policyDef, this);
