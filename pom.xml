@@ -118,7 +118,7 @@
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
         <jakarta.websocket.version>2.2.0</jakarta.websocket.version>
         <jersey.version>3.1.10</jersey.version>
-        <swagger-v3.version>2.2.29</swagger-v3.version>
+        <swagger-v3.version>2.2.41</swagger-v3.version>
 
         <!-- test time dependencies -->
         <junit.version>4.13.2</junit.version>
