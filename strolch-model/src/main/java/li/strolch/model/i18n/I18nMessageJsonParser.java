@@ -22,6 +22,8 @@ import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 import li.strolch.utils.I18nMessage;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -33,7 +35,7 @@ public class I18nMessageJsonParser {
 		String bundle = messageJ.get(Tags.Json.BUNDLE).getAsString();
 		String message = messageJ.get(Tags.Json.MESSAGE).getAsString();
 
-		Properties properties = new Properties();
+		Map<String, String> map = new HashMap<>();
 		if (messageJ.has(Tags.Json.VALUES)) {
 			JsonArray valuesJ = messageJ.getAsJsonArray(Tags.Json.VALUES);
 			for (JsonElement jsonElement : valuesJ) {
@@ -41,11 +43,11 @@ public class I18nMessageJsonParser {
 
 				Set<String> keys = valueJ.keySet();
 				for (String propertyName : keys) {
-					properties.setProperty(propertyName, valueJ.get(propertyName).getAsString());
+					map.put(propertyName, valueJ.get(propertyName).getAsString());
 				}
 			}
 		}
 
-		return new I18nMessage(bundle, key, properties, message);
+		return new I18nMessage(bundle, key, map, message);
 	}
 }

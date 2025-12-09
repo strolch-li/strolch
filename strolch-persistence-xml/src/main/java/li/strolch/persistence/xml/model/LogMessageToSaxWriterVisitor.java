@@ -24,6 +24,7 @@ import li.strolch.utils.iso8601.ISO8601;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -67,15 +68,15 @@ public class LogMessageToSaxWriterVisitor {
 		writeElem(Tags.KEY, logMessage.getKey());
 		writeElem(Tags.EXCEPTION, logMessage.getStackTrace());
 
-		Properties properties = logMessage.getValues();
-		Set<String> keys = properties.stringPropertyNames();
+		Map<String, String> properties = logMessage.getValues();
+		Set<String> keys = properties.keySet();
 		if (!keys.isEmpty()) {
 			this.writer.writeStartElement(Tags.PROPERTIES);
 
 			for (String key : keys) {
 				this.writer.writeStartElement(Tags.PROPERTY);
 				this.writer.writeAttribute(Tags.KEY, key);
-				this.writer.writeAttribute(Tags.VALUE, properties.getProperty(key));
+				this.writer.writeAttribute(Tags.VALUE, properties.get(key));
 				this.writer.writeEndElement();
 			}
 

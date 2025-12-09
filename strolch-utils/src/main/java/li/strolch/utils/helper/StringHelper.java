@@ -24,6 +24,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -472,6 +473,67 @@ public class StringHelper {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Utility class for formatting message patterns containing named placeholders.
+	 * <p>
+	 * Placeholders use the syntax <code>{name}</code> and are replaced with the corresponding value from the provided
+	 * map. Missing keys are left unchanged.
+	 * <p>
+	 * Example:
+	 * <pre>
+	 *   StringHelper.format("Box #: {boxNo}", Map.of("boxNo", 42));
+	 *   // → "Box #: 42"
+	 * </pre>
+	 *
+	 * <b>Note:</b> This method also supports <code>${name}</code> placeholders. This is not encouraged for new code,
+	 * as
+	 * it is less readable and less maintainable than using <code>{name}</code> placeholders. However, it is supported
+	 * for backward compatibility.
+	 */
+	public static String format(String pattern, Map<String, ?> values) {
+		StringBuilder out = new StringBuilder();
+		int length = pattern.length();
+
+		for (int i = 0; i < length; i++) {
+			char c = pattern.charAt(i);
+
+			// Check for ${...}
+			if (c == '$' && i + 1 < length && pattern.charAt(i + 1) == '{') {
+				int end = pattern.indexOf('}', i + 2);
+				if (end < 0) {
+					out.append(c);
+					continue;
+				}
+
+				String key = pattern.substring(i + 2, end).trim();
+				Object value = values.get(key);
+
+				out.append(value != null ? value.toString() : "${" + key + "}");
+				i = end;
+				continue;
+			}
+
+			// Check for {...}
+			if (c == '{') {
+				int end = pattern.indexOf('}', i);
+				if (end < 0) {
+					out.append(c);
+					continue;
+				}
+
+				String key = pattern.substring(i + 1, end).trim();
+				Object value = values.get(key);
+
+				out.append(value != null ? value.toString() : "{" + key + "}");
+				i = end;
+			} else {
+				out.append(c);
+			}
+		}
+
+		return out.toString();
 	}
 
 	/**

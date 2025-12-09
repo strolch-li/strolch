@@ -41,8 +41,7 @@ public class I18nMessageResponse {
 		this.key = i18nMessage.getKey();
 		this.message = i18nMessage.getMessage();
 		this.exception = i18nMessage.getStackTrace();
-		this.values = new HashMap<>();
-		i18nMessage.getValues().forEach((o, o2) -> this.values.put(o.toString(), o2.toString()));
+		this.values = new HashMap<>(i18nMessage.getValues());
 	}
 
 	public String getKey() {
