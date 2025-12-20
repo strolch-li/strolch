@@ -26,7 +26,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -45,7 +46,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 	private LogMessageState state;
 	private String bundle;
 	private String key;
-	private Properties properties;
+	private Map<String, String> values;
 	private String message;
 	private String exception;
 
@@ -66,11 +67,11 @@ public class LogMessageSaxReader extends DefaultHandler {
 			}
 			case Tags.USERNAME, Tags.LOCATOR, Tags.SEVERITY, Tags.BUNDLE, Tags.KEY, Tags.MESSAGE, Tags.EXCEPTION,
 				 Tags.STATE -> this.sb = new StringBuilder();
-			case Tags.PROPERTIES -> this.properties = new Properties();
+			case Tags.PROPERTIES -> this.values = new HashMap<>();
 			case Tags.PROPERTY -> {
 				String key = attributes.getValue(Tags.KEY);
 				String value = attributes.getValue(Tags.VALUE);
-				this.properties.setProperty(key, value);
+				this.values.put(key, value);
 			}
 			default -> throw new IllegalArgumentException(
 					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
@@ -87,8 +88,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 					this.state = LogMessageState.Information;
 
 				LogMessage logMessage = new LogMessage(this.id, this.dateTime, this.realm, this.username, this.locator,
-						this.severity, this.state, this.bundle, this.key, this.properties, this.message,
-						this.exception);
+						this.severity, this.state, this.bundle, this.key, this.values, this.message, this.exception);
 				this.logMessageConsumer.accept(logMessage);
 				break;
 

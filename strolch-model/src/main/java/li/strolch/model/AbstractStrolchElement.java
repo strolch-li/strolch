@@ -137,6 +137,6 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 
 	@Override
 	public String toString() {
-		return getLocator().toString();
+		return getLocator() + ", Name: " + this.name;
 	}
 }

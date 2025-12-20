@@ -182,6 +182,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 		// - assign the class to the API
 		Map<String, PolicyType> policyTypes = policyModel.getPolicyTypes();
 		this.classByTypeMap = new MapOfMaps<>();
+		int count = 0;
 		for (PolicyType policyType : policyTypes.values()) {
 
 			String type = policyType.getType();
@@ -243,6 +244,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 						if (verbose)
 							logger.info("Loaded Policy {} / {} / {}", type, key, className);
 						this.classByTypeMap.addElement(type, key, (Class<? extends StrolchPolicy>) implClass);
+						count++;
 
 					} catch (ClassNotFoundException e) {
 						throw new StrolchPolicyException(
@@ -256,6 +258,9 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 								StrolchPolicyFileParser.POLICY_TYPE, type, e.getMessage()), e);
 			}
 		}
+
+		logger.info("Reloaded {} Policy types with {} Policies from file {}", this.classByTypeMap.sizeKeys(), count,
+				policyFile.getName());
 	}
 
 	private Constructor<?> getConstructorForPolicy(Class<?> implClass) throws NoSuchMethodException {

@@ -88,8 +88,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		this.type = type.intern();
 	}
 
-	///
-	///
+	//
 
 	/**
 	 * Returns true if the parameter with the given key does not exist or the value is empty, i.e.
@@ -131,6 +130,13 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 		if (param == null)
 			return "";
 		return param.getValue();
+	}
+
+	/**
+	 * @see #getBoolean(String)
+	 */
+	public boolean is(String paramKey) throws StrolchModelException {
+		return getBoolean(paramKey);
 	}
 
 	/**
@@ -565,8 +571,7 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 			param.setValue(value);
 	}
 
-	///
-	///
+	//
 
 	/**
 	 * Returns the {@link StringParameter} with the given paramKey
@@ -1107,7 +1112,6 @@ public abstract class ParameterizedElement extends AbstractStrolchElement {
 
 	@Override
 	public String toString() {
-
 		return "ParameterizedElement [id=" + this.id + ", name=" + this.name + ", type=" + this.type + "]";
 	}
 }

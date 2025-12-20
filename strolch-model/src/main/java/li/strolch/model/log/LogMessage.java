@@ -25,10 +25,7 @@ import li.strolch.utils.iso8601.ISO8601;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static li.strolch.utils.helper.StringHelper.hashSha256AsHex;
 
@@ -71,8 +68,8 @@ public class LogMessage extends I18nMessage {
 	}
 
 	public LogMessage(String id, ZonedDateTime zonedDateTime, String realm, String username, Locator locator,
-			LogSeverity severity, LogMessageState state, String bundle, String key, Properties values, String message,
-			String stackTrace) {
+			LogSeverity severity, LogMessageState state, String bundle, String key, Map<String, String> values,
+			String message, String stackTrace) {
 		super(bundle, key, values, message);
 		this.id = id;
 		this.zonedDateTime = zonedDateTime;
@@ -150,11 +147,7 @@ public class LogMessage extends I18nMessage {
 		jsonObject.addProperty(Json.LOCATOR, this.locator.toString());
 		if (this.stackTrace != null)
 			jsonObject.addProperty(Json.EXCEPTION, this.stackTrace);
-		JsonObject values = new JsonObject();
-		for (String key : getValues().stringPropertyNames()) {
-			values.addProperty(key, getValues().getProperty(key));
-		}
-		jsonObject.add(Json.VALUES, values);
+		jsonObject.add(Json.VALUES, getValuesAsJson());
 
 		return jsonObject;
 	}
@@ -173,15 +166,15 @@ public class LogMessage extends I18nMessage {
 		String message = messageJ.get(Json.MESSAGE).getAsString();
 		String stackTrace = messageJ.has(Json.EXCEPTION) ? messageJ.get(Json.EXCEPTION).getAsString() : "";
 
-		Properties properties = new Properties();
+		Map<String, String> values = new HashMap<>();
 		if (messageJ.has(Json.VALUES)) {
 			JsonObject valuesJ = messageJ.getAsJsonObject(Json.VALUES);
 			for (String propertyName : valuesJ.keySet()) {
-				properties.setProperty(propertyName, valuesJ.get(propertyName).getAsString());
+				values.put(propertyName, valuesJ.get(propertyName).getAsString());
 			}
 		}
 
-		return new LogMessage(id, zonedDateTime, realm, username, locator, severity, state, bundle, key, properties,
+		return new LogMessage(id, zonedDateTime, realm, username, locator, severity, state, bundle, key, values,
 				message, stackTrace);
 	}
 

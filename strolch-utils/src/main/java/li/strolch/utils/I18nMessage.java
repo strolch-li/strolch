@@ -16,6 +16,7 @@
 
 package li.strolch.utils;
 
+import com.google.gson.JsonObject;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.collections.MapOfSets;
 import li.strolch.utils.collections.TypedTuple;
@@ -38,7 +39,6 @@ import static java.util.Collections.emptySet;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
 import static li.strolch.utils.helper.ExceptionHelper.formatException;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
-import static li.strolch.utils.helper.StringHelper.EMPTY;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
 public class I18nMessage {
@@ -50,7 +50,7 @@ public class I18nMessage {
 
 	private final String bundleName;
 	private final String key;
-	private final Properties values;
+	private final Map<String, String> values;
 	private final ResourceBundle bundle;
 	private String message;
 	protected Throwable exception;
@@ -60,17 +60,17 @@ public class I18nMessage {
 		DBC.INTERIM.assertNotNull("bundle may not be null!", bundle);
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
 		this.key = key.intern();
-		this.values = new Properties();
+		this.values = new HashMap<>();
 		this.bundle = bundle;
 		this.bundleName = bundle.getBaseBundleName().intern();
 	}
 
-	public I18nMessage(String bundle, String key, Properties values, String message) {
+	public I18nMessage(String bundle, String key, Map<String, String> values, String message) {
 		DBC.INTERIM.assertNotNull("bundle must not be empty!", bundle);
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
 		DBC.INTERIM.assertNotEmpty("message must be set!", message);
 		this.key = key.intern();
-		this.values = values == null ? new Properties() : values;
+		this.values = values == null ? new HashMap<>() : values;
 		this.message = message;
 		this.bundle = findBundle(bundle);
 		this.bundleName = this.bundle == null ? bundle : this.bundle.getBaseBundleName();
@@ -78,7 +78,7 @@ public class I18nMessage {
 
 	public I18nMessage(I18nMessage other) {
 		this.key = other.key;
-		this.values = new Properties(other.values);
+		this.values = new HashMap<>(other.values);
 		this.bundle = other.bundle;
 		this.bundleName = other.bundleName;
 		this.message = other.message;
@@ -96,11 +96,17 @@ public class I18nMessage {
 		return this.bundle.getBaseBundleName();
 	}
 
-	public Properties getValues() {
+	public Map<String, String> getValues() {
 		return this.values;
 	}
 
-	public Object getValue(String key) {
+	public JsonObject getValuesAsJson() {
+		JsonObject valuesJ = new JsonObject();
+		values.forEach(valuesJ::addProperty);
+		return valuesJ;
+	}
+
+	public String getValue(String key) {
 		return this.values.getOrDefault(key, null);
 	}
 
@@ -142,7 +148,7 @@ public class I18nMessage {
 				logger.warn("No bundle found for {} {}. Available are: ", this.bundleName, locale);
 				getBundleMap().forEach((s, map) -> {
 					logger.info("  {}", s);
-					map.forEach((l, resourceBundle) -> logger.info("  {}: {}", l, map.keySet()));
+					map.forEach((l, _) -> logger.info("  {}: {}", l, map.keySet()));
 				});
 				missingKeysMap.addSet(this.bundleName + "_" + locale.toLanguageTag(), emptySet());
 			}
@@ -157,7 +163,7 @@ public class I18nMessage {
 
 	public I18nMessage value(String key, Object value) {
 		DBC.INTERIM.assertNotEmpty("key must be set!", key);
-		this.values.setProperty(key, value == null ? "(null)" : value.toString());
+		this.values.put(key, value == null ? "(null)" : value.toString());
 		return this;
 	}
 
@@ -202,7 +208,7 @@ public class I18nMessage {
 	public String formatMessage(ResourceBundle bundle) {
 		try {
 			String string = bundle.getString(this.key);
-			return StringHelper.replacePropertiesIn(this.values, EMPTY, string);
+			return StringHelper.format(string, this.values);
 		} catch (MissingResourceException e) {
 			String baseName = bundle.getBaseBundleName();
 			String languageTag = bundle.getLocale().toLanguageTag();
@@ -293,7 +299,7 @@ public class I18nMessage {
 			}
 
 			File jarD = jarLocationF.getParentFile();
-			File[] jarFiles = jarD.listFiles((dir, name) -> name.endsWith(".jar"));
+			File[] jarFiles = jarD.listFiles((_, name) -> name.endsWith(".jar"));
 			if (jarFiles == null)
 				return;
 
@@ -342,7 +348,7 @@ public class I18nMessage {
 
 			File classesD = new File(jarD.getParentFile(), "classes");
 			if (classesD.isDirectory()) {
-				File[] propertyFiles = classesD.listFiles((dir, name) -> name.endsWith(".properties") && !(
+				File[] propertyFiles = classesD.listFiles((_, name) -> name.endsWith(".properties") && !(
 						name.equals("appVersion.properties") || name.equals("ENV.properties")));
 				if (propertyFiles != null) {
 					for (File propertyFile : propertyFiles) {

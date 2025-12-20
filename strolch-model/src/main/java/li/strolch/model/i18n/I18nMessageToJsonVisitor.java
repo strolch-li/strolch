@@ -21,6 +21,7 @@ import li.strolch.model.Tags;
 import li.strolch.utils.I18nMessage;
 import li.strolch.utils.I18nMessageVisitor;
 
+import java.util.Map;
 import java.util.Properties;
 
 public class I18nMessageToJsonVisitor implements I18nMessageVisitor<JsonObject> {
@@ -33,10 +34,10 @@ public class I18nMessageToJsonVisitor implements I18nMessageVisitor<JsonObject> 
 		json.addProperty(Tags.Json.MESSAGE, message.getMessage());
 		json.addProperty(Tags.Json.EXCEPTION, message.getStackTrace());
 
-		Properties values = message.getValues();
+		Map<String, String> values = message.getValues();
 		if (!values.isEmpty()) {
 			JsonObject valuesJ = new JsonObject();
-			values.stringPropertyNames().forEach(key -> valuesJ.addProperty(key, values.getProperty(key)));
+			values.forEach(valuesJ::addProperty);
 			json.add(Tags.Json.VALUES, valuesJ);
 		}
 

@@ -136,6 +136,20 @@ public interface ParameterBagContainer extends StrolchElement {
 	}
 
 	/**
+	 * @see #getBoolean(String)
+	 */
+	default boolean is(String paramKey) throws StrolchModelException {
+		return getBoolean(paramKey);
+	}
+
+	/**
+	 * @see #getBoolean(String, String)
+	 */
+	default boolean is(String bagKey, String paramKey) throws StrolchModelException {
+		return getBoolean(bagKey, paramKey);
+	}
+
+	/**
 	 * Returns the value of the {@link BooleanParameter} with the given paramKey from the {@link ParameterBag} with the
 	 * ID {@link StrolchModelConstants#BAG_PARAMETERS}
 	 *

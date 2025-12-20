@@ -22,10 +22,7 @@ import li.strolch.persistence.api.StrolchPersistenceException;
 import li.strolch.utils.collections.DateRange;
 import org.postgresql.util.PGobject;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -49,20 +46,21 @@ public class PostgreSqlAuditDao implements AuditDao {
 	public static final String ELEMENT_ACCESSED = "element_accessed";
 	public static final String DATE = "date";
 	public static final String USERNAME = "username";
+	public static final String SOURCE = "source";
 	public static final String ADDITIONAL_DATA = "additional_data";
 	public static final String FIELDS = commaSeparated(ID, USERNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE,
-			ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE, ADDITIONAL_DATA);
+			ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE, SOURCE, ADDITIONAL_DATA);
 	public static final String TABLE_NAME = "audits";
 
 	private static final String querySizeSql = "select count(*) from audits";
 	private static final String querySizeBetweenSql = "select count(*) from audits where date between ? and ?";
 	private static final String queryAllBetweenSql = "select " + FIELDS + " from audits where date between ? and ?";
 	private static final String queryAllByTypeAndBetweenSql = "select "
-															  + FIELDS
-															  + " from audits where element_type = ? and date between ? and ?";
+			+ FIELDS
+			+ " from audits where element_type = ? and date between ? and ?";
 	private static final String insertSql = "insert into audits ("
-											+ FIELDS
-											+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?::access_type, ?)";
+			+ FIELDS
+			+ ") values (?, ?, ?, ?, ?, ?, ?, ?, ?::access_type, ?, ?)";
 
 	private final PostgreSqlStrolchTransaction tx;
 
@@ -168,16 +166,15 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 		// 1  id = ?, 
 		// 2  username = ?, 
-		// 3  firstname = ?,
-		// 4  lastname = ?, 
-		// 5  date = ?, 
-		// 6  element_type = ?, 
-		// 7  element_sub_type = ?, 
-		// 8  element_accessed = ?, 
-		// 9  new_version = ?, 
-		// 10 action = ?, 
-		// 11 access_type = ?::access_type
-		// 12 additional_data
+		// 3  date = ?,
+		// 4  element_type = ?,
+		// 5  element_sub_type = ?,
+		// 6  element_accessed = ?,
+		// 7  new_version = ?,
+		// 8 action = ?,
+		// 9 access_type = ?::access_type,
+		// 10 source = ?,
+		// 11 additional_data
 
 		ps.setLong(1, audit.getId());
 		ps.setString(2, audit.getUsername());
@@ -193,14 +190,15 @@ public class PostgreSqlAuditDao implements AuditDao {
 
 		ps.setString(8, audit.getAction());
 		ps.setString(9, audit.getAccessType().name());
+		ps.setString(10, audit.getSource());
 
 		if (audit.getAdditionalDataAsString() == null) {
-			ps.setObject(10, null);
+			ps.setObject(11, null);
 		} else {
 			PGobject pGobject = new PGobject();
 			pGobject.setType("json");
 			pGobject.setValue(audit.getAdditionalDataAsString());
-			ps.setObject(10, pGobject);
+			ps.setObject(11, pGobject);
 		}
 	}
 
@@ -218,8 +216,9 @@ public class PostgreSqlAuditDao implements AuditDao {
 			audit.setNewVersion(timestamp.toInstant().atZone(ZoneId.systemDefault()));
 		audit.setAction(resultSet.getString(8));
 		audit.setAccessType(AccessType.valueOf(resultSet.getString(9)));
+		audit.setSource(resultSet.getString(10));
 
-		PGobject pGobject = (PGobject) resultSet.getObject(10);
+		PGobject pGobject = (PGobject) resultSet.getObject(11);
 		if (pGobject != null) {
 			String json = pGobject.getValue();
 			if (json != null)

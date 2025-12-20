@@ -94,6 +94,10 @@ public class AuditSaxReader extends DefaultHandler {
 				this.currentAudit.setAccessType(AccessType.valueOf(this.sb.toString()));
 				this.sb = null;
 			}
+			case SOURCE -> {
+				this.currentAudit.setSource(this.sb.toString());
+				this.sb = null;
+			}
 			case ADDITIONAL_DATA -> {
 				this.currentAudit.setAdditionalDataAsString(this.sb.toString());
 				this.sb = null;

@@ -15,7 +15,6 @@
  */
 package li.strolch.rest.endpoint;
 
-import com.google.gson.JsonArray;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -26,7 +25,9 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import li.strolch.agent.I18nAgent;
 import li.strolch.agent.api.AuditTrail;
+import li.strolch.exception.StrolchUserMessageException;
 import li.strolch.model.audit.AccessType;
 import li.strolch.model.audit.Audit;
 import li.strolch.model.json.AuditToJsonVisitor;
@@ -37,6 +38,7 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.runtime.privilege.PrivilegeHandler;
+import li.strolch.utils.I18nMessage;
 import li.strolch.utils.collections.DateRange;
 import li.strolch.utils.collections.Paging;
 import li.strolch.utils.time.Interval;
@@ -49,7 +51,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.isNotEmpty;
@@ -78,7 +79,7 @@ public class AuditsResource {
 			@QueryParam("from") String fromS, @QueryParam("to") String toS, @QueryParam("username") String username,
 			@QueryParam("elementType") String elementType, @QueryParam("elementSubType") String elementSubType,
 			@QueryParam("elementAccessed") String elementAccessed, @QueryParam("action") String action,
-			@QueryParam("accessType") String accessType) {
+			@QueryParam("source") String source, @QueryParam("accessType") String accessType) {
 
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 		PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getContainer().getPrivilegeHandler();
@@ -106,9 +107,11 @@ public class AuditsResource {
 					"The duration of the date range is too long. Please use a date range of at most 30 days.");
 
 		Paging<Audit> paging;
+		AuditToJsonVisitor toJsonVisitor = new AuditToJsonVisitor().withAdditionalData();
 		try (StrolchTransaction tx = openTx(cert, realm)) {
+
 			if (!tx.isAuditTrailEnabled())
-				return ResponseUtil.toResponse(DATA, new JsonArray());
+				throw new StrolchUserMessageException(new I18nMessage(I18nAgent.i18nAgent, "auditTrailDisabled"));
 
 			AuditTrail auditTrail = tx.getAuditTrail();
 
@@ -129,6 +132,8 @@ public class AuditsResource {
 				audits = audits.filter(audit -> audit.getElementAccessed().equals(elementAccessed));
 			if (isNotEmpty(action))
 				audits = audits.filter(audit -> audit.getAction().equals(action));
+			if (isNotEmpty(source))
+				audits = audits.filter(audit -> audit.getSource().startsWith(source));
 			if (isNotEmpty(accessType)) {
 				AccessType accessType1 = AccessType.valueOf(accessType);
 				audits = audits.filter(audit -> audit.getAccessType().equals(accessType1));
@@ -141,7 +146,6 @@ public class AuditsResource {
 			paging.setDataSetSize(totalAudits);
 		}
 
-		AuditToJsonVisitor toJsonVisitor = new AuditToJsonVisitor().withAdditionalData();
 		return ResponseUtil.toResponse(paging, toJsonVisitor::visitAudit);
 	}
 }

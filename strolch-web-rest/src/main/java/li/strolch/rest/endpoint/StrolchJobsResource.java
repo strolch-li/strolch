@@ -34,8 +34,8 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.PrivilegeContext;
+import li.strolch.privilege.model.SimpleRestrictable;
 import li.strolch.rest.RestfulStrolchComponent;
-import li.strolch.rest.StrolchRestfulConstants;
 import li.strolch.rest.helper.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ import java.util.List;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static li.strolch.model.StrolchModelConstants.ROLE_STROLCH_ADMIN;
-import static li.strolch.rest.StrolchRestfulConstants.DATA;
+import static li.strolch.rest.StrolchRestfulConstants.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -70,8 +70,8 @@ public class StrolchJobsResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll(@Context HttpServletRequest request, @Context HttpHeaders headers) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
+		String source = (String) request.getAttribute(STROLCH_REQUEST_SOURCE);
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
 
 		try (StrolchTransaction tx = RestfulStrolchComponent.getInstance().openTx(cert, getContext())) {
@@ -113,25 +113,39 @@ public class StrolchJobsResource {
 	public Response doAction(@Context HttpServletRequest request, @Context HttpHeaders headers,
 			@PathParam("name") String name, @QueryParam("action") String action) {
 
-		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
-		String source = (String) request.getAttribute(StrolchRestfulConstants.STROLCH_REQUEST_SOURCE);
+		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);
+		String source = (String) request.getAttribute(STROLCH_REQUEST_SOURCE);
 
 		ComponentContainer container = RestfulStrolchComponent.getInstance().getContainer();
 		StrolchJobsHandler strolchJobsHandler = container.getComponent(StrolchJobsHandler.class);
 
 		try {
 			PrivilegeContext ctx = container.getPrivilegeHandler().validate(cert);
-			StrolchJob job = strolchJobsHandler.getJob(cert, source, name);
 
-			// assert user can access StrolchJobs
-			if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
-				ctx.validateAction(job);
+			if (name.equals(StrolchJobsHandler.class.getSimpleName())) {
+				if (action.equals("reloadJobs")) {
+					if (!ctx.hasRole(ROLE_STROLCH_ADMIN)) {
+						SimpleRestrictable restrictable = new SimpleRestrictable(name, "reloadJobs");
+						ctx.hasPrivilege(restrictable);
+					}
+					strolchJobsHandler.reloadJobs();
+				} else {
+					throw new IllegalArgumentException("Unhandled action " + action);
+				}
+			} else {
 
-			switch (action) {
-				case "runNow" -> job.runNow();
-				case "schedule" -> job.schedule();
-				case "cancel" -> job.cancel(true);
-				default -> throw new IllegalArgumentException("Unhandled action " + action);
+				StrolchJob job = strolchJobsHandler.getJob(cert, source, name);
+
+				// assert user can access StrolchJobs
+				if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
+					ctx.validateAction(job);
+
+				switch (action) {
+					case "runNow" -> job.runNow();
+					case "schedule" -> job.schedule();
+					case "cancel" -> job.cancel(true);
+					default -> throw new IllegalArgumentException("Unhandled action " + action);
+				}
 			}
 
 			return ResponseUtil.toResponse();

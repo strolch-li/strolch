@@ -299,15 +299,13 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 	private int setValues(LogMessage logMessage, PreparedStatement valuesStatement) throws SQLException {
 		// insert properties
-		Properties values = logMessage.getValues();
+		Map<String, String> values = logMessage.getValues();
 		int nrOfInserts = 0;
-		Set<String> keys = values.stringPropertyNames();
+		Set<String> keys = values.keySet();
 		for (String key : keys) {
-
 			valuesStatement.setString(1, logMessage.getId());
 			valuesStatement.setString(2, key);
-			valuesStatement.setString(3, values.getProperty(key));
-
+			valuesStatement.setString(3, values.get(key));
 			valuesStatement.addBatch();
 			nrOfInserts++;
 		}
@@ -356,14 +354,14 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 		String message = resultSet.getString(10);
 		String exception = resultSet.getString(11);
 
-		Properties properties = new Properties();
+		Map<String, String> values = new HashMap<>();
 		while (valuesResult.next()) {
 			String valueK = valuesResult.getString(1);
 			String valueV = valuesResult.getString(2);
-			properties.setProperty(valueK, valueV);
+			values.put(valueK, valueV);
 		}
 
-		return new LogMessage(id, dateTime, realm, username, locator, severity, state, bundle, key, properties, message,
+		return new LogMessage(id, dateTime, realm, username, locator, severity, state, bundle, key, values, message,
 				exception);
 	}
 }

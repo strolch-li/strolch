@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package li.strolch.service;
+-- add source column to audits
+ALTER TABLE audits ADD COLUMN source character varying(255) NOT NULL DEFAULT 'unknown';
 
-import com.google.gson.JsonElement;
-import li.strolch.model.Tags;
-import li.strolch.service.api.ServiceArgument;
-
-import java.io.InputStream;
-
-public class InputStreamServiceArgument extends ServiceArgument {
-
-	public InputStream inputStream;
-	public String filename;
-	public String encoding;
-
-	@Override
-	public JsonElement toJson() {
-		JsonElement json = super.toJson();
-		json.getAsJsonObject().addProperty(Tags.Json.OBJECT_TYPE, "InputStream");
-		return json;
-	}
-}
+INSERT INTO db_version
+  (version, app, description, created)
+values(
+  '0.9.10',
+  'strolch',
+  'Added new column source to table audits',
+  CURRENT_TIMESTAMP
+);

@@ -257,6 +257,7 @@ public class Tags {
 
 		public static final String ACTION = "Action";
 		public static final String ACCESS_TYPE = "AccessType";
+		public static final String SOURCE = "Source";
 		public static final String ADDITIONAL_DATA = "AdditionalData";
 	}
 }
