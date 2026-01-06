@@ -503,28 +503,31 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			Certificate certificate = buildPrivilegeContext(usage, user, source, ZonedDateTime.now(),
 					keepAlive).getCertificate();
 
-			if (usage.isAny()) {
-				persistSessionsAsync();
-
-				// save last login
-				UserHistory history = user.getHistory().withLastLogin(ZonedDateTime.now());
-				if (history.isFirstLoginEmpty())
-					history = history.withFirstLogin(ZonedDateTime.now());
-
-				if (!this.persistenceHandler.hasUser(user.getUsername())) {
-					// for remote, the user won't exist, if it is the user's first login
-					this.persistenceHandler.addUser(user.withHistory(history));
-				} else {
-					// otherwise we replace the user
-					this.persistenceHandler.replaceUser(user.withHistory(history));
+			switch (usage) {
+				case ANY -> {
+					persistSessionsAsync();
+					logger.info("User {} authenticated with password: {}", username, certificate);
 				}
-				persistModelAsync();
-
-				// log
-				logger.info("User {} authenticated with password : {}", username, certificate);
-			} else {
-				logger.info("User {} authenticated with basic auth/sigle use: {}", username, certificate);
+				case SINGLE ->
+						logger.info("User {} authenticated with basic auth/sigle use: {}", username, certificate);
+				case SET_PASSWORD ->
+						logger.info("User {} authenticated for SetPassword use: {}", username, certificate);
+				default -> throw new IllegalStateException("Unexpected usage: " + usage);
 			}
+
+			// save last login
+			UserHistory history = user.getHistory().withLastLogin(ZonedDateTime.now());
+			if (history.isFirstLoginEmpty())
+				history = history.withFirstLogin(ZonedDateTime.now());
+
+			if (this.persistenceHandler.hasUser(user.getUsername())) {
+				// we replace the user
+				this.persistenceHandler.replaceUser(user.withHistory(history));
+			} else {
+				// for remote, the user won't exist, if it is the user's first login
+				this.persistenceHandler.addUser(user.withHistory(history));
+			}
+			persistModelAsync();
 
 			// return the certificate
 			return certificate;
