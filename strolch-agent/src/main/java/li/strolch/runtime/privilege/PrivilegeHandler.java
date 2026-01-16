@@ -103,6 +103,13 @@ public interface PrivilegeHandler {
 	boolean isRefreshAllowed();
 
 	/**
+	 * Return true if resetting the password is allowed
+	 *
+	 * @return true if resetting the password is allowed
+	 */
+	boolean isPasswordResetAllowed();
+
+	/**
 	 * Returns the {@link PrivilegeContext} for the given certificate
 	 *
 	 * @param certificate the certificate

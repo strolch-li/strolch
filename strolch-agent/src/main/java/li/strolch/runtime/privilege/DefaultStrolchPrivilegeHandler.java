@@ -179,6 +179,11 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 		return this.privilegeHandler.isRefreshAllowed();
 	}
 
+	@Override
+	public boolean isPasswordResetAllowed() {
+		return this.privilegeHandler.isPasswordResetAllowed();
+	}
+
 	private void writeAudit(Certificate certificate, String action, AccessType accessType, String username) {
 		if (hasTx()) {
 			StrolchTransaction tx = getTx();

@@ -268,6 +268,21 @@ public class AuthenticationResource {
 		}
 	}
 
+	@GET
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("supportedOptions")
+	@Operation(summary = "Get supported options", description = "Returns details of the supported options",
+			responses = {@ApiResponse(responseCode = "200", description = "Options returned successfully",
+					content = @Content(mediaType = "application/json")),
+					@ApiResponse(responseCode = "500", description = "Internal server error")})
+	public Response getSupportedOptions() {
+		PrivilegeHandler privilegeHandler = RestfulStrolchComponent.getInstance().getPrivilegeHandler();
+		JsonObject result = new JsonObject();
+		result.addProperty("supportsPasswordReset", privilegeHandler.isPasswordResetAllowed());
+		return ResponseUtil.toResponse(result);
+	}
+
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
