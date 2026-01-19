@@ -27,6 +27,7 @@
             <Parameter name="persistSessionsPath" value="target/${target}/sessions.dat"/>
             <Parameter name="autoPersistOnUserChangesData" value="true"/>
             <Parameter name="privilegeConflictResolution" value="STRICT"/>
+            <Parameter name="allowPasswordReset" value="true"/>
         </Parameters>
 
         <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">

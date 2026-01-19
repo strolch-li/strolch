@@ -25,6 +25,7 @@
             <Parameter name="secretSalt" value="secret-key"/>
             <Parameter name="autoPersistOnUserChangesData" value="true"/>
             <Parameter name="privilegeConflictResolution" value="MERGE"/>
+            <Parameter name="allowPasswordReset" value="true"/>
         </Parameters>
 
         <EncryptionHandler class="li.strolch.privilege.handler.DefaultEncryptionHandler">
