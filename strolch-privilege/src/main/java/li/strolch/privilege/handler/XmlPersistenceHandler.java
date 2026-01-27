@@ -296,8 +296,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.caseInsensitiveUsername = parseBoolean(
 				this.parameterMap.getOrDefault(PARAM_CASE_INSENSITIVE_USERNAME, "true"));
 
-		if (reload())
-			logger.info("Privilege Data loaded.");
+		reload();
 	}
 
 	private File getFile(String basePath, String param, String defaultValue, boolean required) {
@@ -368,7 +367,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 				if (this.usersByUsername.containsKey(username))
 					throw new IllegalStateException(format("The user with username {0} already exists!", username));
 				if (this.usersById.containsKey(user.getUserId()))
-					throw new IllegalStateException(format("The user with user ID {0} already exists!", user.getUserId()));
+					throw new IllegalStateException(
+							format("The user with user ID {0} already exists!", user.getUserId()));
 				this.usersByUsername.put(username, user);
 				this.usersById.put(user.getUserId(), user);
 			});
@@ -385,10 +385,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		this.rolesDirty = false;
 		this.tokensDirty = false;
 
-		logger.info("Read {} Users", this.usersByUsername.size());
-		logger.info("Read {} Groups", this.groups.size());
-		logger.info("Read {} Roles", this.roles.size());
-		logger.info("Read {} Tokens", this.tokens.size());
+		logger.info("Read {} Users, {} Groups, {} Roles, {} Tokens", this.usersByUsername.size(), this.groups.size(),
+				this.roles.size(), this.tokens.size());
 
 		// validate referenced elements exist
 		for (User user : this.usersByUsername.values()) {

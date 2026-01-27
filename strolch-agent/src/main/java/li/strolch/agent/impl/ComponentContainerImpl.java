@@ -305,7 +305,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 		this.controllerMap = controllerMap;
 
 		// and configure the state handler
-		this.containerStateHandler = new ComponentContainerStateHandler(this.dependencyAnalyzer, strolchConfiguration);
+		boolean verbose = this.agent.getRuntimeConfiguration().isVerbose();
+		this.containerStateHandler = new ComponentContainerStateHandler(this.dependencyAnalyzer, strolchConfiguration,
+				verbose);
 
 		this.state = ComponentState.SETUP;
 

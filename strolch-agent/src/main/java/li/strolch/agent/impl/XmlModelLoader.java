@@ -62,9 +62,9 @@ public class XmlModelLoader {
 		}
 
 		String durationS = formatNanoDuration(statistics.durationNanos);
-		logger.info("Loaded XML Model file {} for realm {} took {}.", this.modelFile.getName(), realm.getRealm(), durationS);
-		logger.info("Loaded {} Orders", statistics.nrOfOrders);
-		logger.info("Loaded {} Resources", statistics.nrOfResources);
-		logger.info("Loaded {} Activities", statistics.nrOfActivities);
+		logger.info("Loaded XML Model file {} for realm {} took {}.", this.modelFile.getName(), realm.getRealm(),
+				durationS);
+		logger.info("Loaded {} Orders, {} Resource, {} Activities", statistics.nrOfOrders, statistics.nrOfResources,
+				statistics.nrOfActivities);
 	}
 }

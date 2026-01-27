@@ -20,6 +20,7 @@ import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchException;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfiguration;
+import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +37,13 @@ public class ComponentContainerStateHandler {
 	private static final Logger logger = LoggerFactory.getLogger(ComponentContainerStateHandler.class);
 	private final ComponentDependencyAnalyzer dependencyAnalyzer;
 	private final StrolchConfiguration strolchConfiguration;
+	private final boolean verbose;
 
 	public ComponentContainerStateHandler(ComponentDependencyAnalyzer dependencyAnalyzer,
-			StrolchConfiguration strolchConfiguration) {
+			StrolchConfiguration strolchConfiguration, boolean verbose) {
 		this.dependencyAnalyzer = dependencyAnalyzer;
 		this.strolchConfiguration = strolchConfiguration;
+		this.verbose = verbose;
 	}
 
 	public void initialize(Set<ComponentController> controllers) {
@@ -64,9 +67,10 @@ public class ComponentContainerStateHandler {
 						e);
 			}
 
-			long took = System.nanoTime() - start;
-			logger.info("Initialized component {}. Took {}", componentName, formatNanoDuration(took));
-
+			if (this.verbose) {
+				long took = System.nanoTime() - start;
+				logger.info("Initialized component {}. Took {}", componentName, StringHelper.formatNanoDuration(took));
+			}
 		}
 
 		// initialize direct downstream components
@@ -93,8 +97,10 @@ public class ComponentContainerStateHandler {
 				throw new StrolchException(MessageFormat.format("Failed to start component {0}", componentName), e);
 			}
 
-			long took = System.nanoTime() - start;
-			logger.info("Started component {}. Took {}", componentName, formatNanoDuration(took));
+			if (this.verbose) {
+				long took = System.nanoTime() - start;
+				logger.info("Started component {}. Took {}", componentName, StringHelper.formatNanoDuration(took));
+			}
 		}
 
 		// Start direct downstream components
@@ -122,8 +128,10 @@ public class ComponentContainerStateHandler {
 				logger.error(MessageFormat.format(msg, componentName, e.getMessage()), e);
 			}
 
-			long took = System.nanoTime() - start;
-			logger.info("Stopped component {}. Took {}", componentName, formatNanoDuration(took));
+			if (this.verbose) {
+				long took = System.nanoTime() - start;
+				logger.info("Stopped component {}. Took {}", componentName, StringHelper.formatNanoDuration(took));
+			}
 		}
 
 		// Stop direct upstream components
@@ -150,8 +158,10 @@ public class ComponentContainerStateHandler {
 				logger.error(MessageFormat.format(msg, componentName, e.getMessage()), e);
 			}
 
-			long took = System.nanoTime() - start;
-			logger.info("Destroyed component {}. Took {}", componentName, formatNanoDuration(took));
+			if (this.verbose) {
+				long took = System.nanoTime() - start;
+				logger.info("Destroyed component {}. Took {}", componentName, StringHelper.formatNanoDuration(took));
+			}
 		}
 
 		// Destroy direct upstream components

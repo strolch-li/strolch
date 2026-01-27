@@ -271,9 +271,8 @@ public class StrolchAgent {
 		if (this.container == null)
 			throw new RuntimeException("Please call setup first!");
 
-		this.executorPool = new ExecutorPool();
-
 		RuntimeConfiguration configuration = this.strolchConfiguration.getRuntimeConfiguration();
+		this.executorPool = new ExecutorPool(configuration.isVerbose());
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(PROP_TRY_LOCK_TIME_UNIT, TimeUnit.SECONDS.name()));
 		long time = configuration.getLong(PROP_TRY_LOCK_TIME, 10L);
 		this.lockHandler = new ElementLockingHandler<>(getScheduledExecutor(), timeUnit, time);
@@ -330,10 +329,10 @@ public class StrolchAgent {
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
 		logger.info("[{}] Setting up Strolch Container using the following paths:", environment);
-		logger.info(" - Config: {}", configPathF.getAbsolutePath());
-		logger.info(" - Data: {}", dataPathF.getAbsolutePath());
-		logger.info(" - Temp: {}", tempPathF.getAbsolutePath());
-		logger.info(" - user.dir: {}", SystemHelper.getUserDir());
+		logger.info("Config:   {}", configPathF.getAbsolutePath());
+		logger.info("Data:     {}", dataPathF.getAbsolutePath());
+		logger.info("Temp:     {}", tempPathF.getAbsolutePath());
+		logger.info("user.dir: {}", SystemHelper.getUserDir());
 
 		this.strolchConfiguration = parseConfiguration(environment, configPathF, dataPathF, tempPathF);
 

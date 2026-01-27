@@ -574,7 +574,7 @@ public class ControllerDependencyTest {
 		ComponentDependencyAnalyzer dependencyAnalyzer = new ComponentDependencyAnalyzer(this.strolchConfiguration,
 				this.controllerMap);
 		ComponentContainerStateHandler stateHandler = new ComponentContainerStateHandler(dependencyAnalyzer,
-				strolchConfiguration);
+				strolchConfiguration, true);
 
 		for (ComponentController controller : this.controllerMap.values()) {
 			assertEquals(ComponentState.UNDEFINED, controller.getState());
