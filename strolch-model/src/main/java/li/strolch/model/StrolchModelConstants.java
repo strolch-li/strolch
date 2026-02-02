@@ -116,6 +116,7 @@ public class StrolchModelConstants {
 	public static final String PARAM_LOCATION_NAMES = "locationNames";
 	public static final String PARAM_LANGUAGES = "languages";
 	public static final String PARAM_GROUPS = "groups";
+	public static final String PARAM_TX_LOCK_RETRIES = "txLockRetries";
 
 	public static class PolicyConstants {
 		public static final String POLICY_DEFAULT = "Default";
