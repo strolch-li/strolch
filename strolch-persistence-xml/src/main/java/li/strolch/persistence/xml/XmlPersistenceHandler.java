@@ -43,6 +43,7 @@ import java.util.*;
 
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
 import static li.strolch.db.DbConstants.PROP_USE_ENV;
+import static li.strolch.persistence.api.TransactionThreadLocal.setTx;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -209,7 +210,7 @@ public class XmlPersistenceHandler extends StrolchComponent implements Persisten
 			throw new IllegalStateException("No XML persistence enabled for realm " + realm.getRealm());
 
 		PersistenceTransaction tx = persistenceStore.persistenceManager.openTx();
-		return new XmlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, tx, this);
+		return setTx(new XmlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, tx, this));
 	}
 
 	@Override
