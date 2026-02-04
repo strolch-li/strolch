@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static li.strolch.db.DbConstants.*;
+import static li.strolch.persistence.api.TransactionThreadLocal.setTx;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -138,7 +139,8 @@ public class PostgreSqlPersistenceHandler extends StrolchComponent implements Pe
 	@Override
 	public StrolchTransaction openTx(StrolchRealm realm, Certificate certificate, String action, boolean readOnly) {
 		Connection connection = getConnection(realm.getRealm());
-		return new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, this, connection);
+		return setTx(new PostgreSqlStrolchTransaction(getContainer(), realm, certificate, action, readOnly, this,
+				connection));
 	}
 
 	public Connection getConnection(String realm) {

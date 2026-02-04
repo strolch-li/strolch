@@ -107,14 +107,14 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	private final Certificate certificate;
 	private PrivilegeContext privilegeContext;
 
+	private final int lockRetries;
+
 	public AbstractTransaction(ComponentContainer container, StrolchRealm realm, Certificate certificate, String action,
 			boolean readOnly) {
 		DBC.PRE.assertNotNull("container must be set!", container);
 		DBC.PRE.assertNotNull("realm must be set!", realm);
 		DBC.PRE.assertNotNull("certificate must be set!", certificate);
 		DBC.PRE.assertNotNull("action must be set!", action);
-
-		TransactionThreadLocal.setTx(this);
 
 		this.container = container;
 		this.privilegeHandler = container.getPrivilegeHandler();
@@ -134,6 +134,9 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 		this.resourceCache = synchronizedMapOfMaps(new MapOfMaps<>(1));
 		this.orderCache = synchronizedMapOfMaps(new MapOfMaps<>(1));
 		this.activityCache = synchronizedMapOfMaps(new MapOfMaps<>(1));
+
+		Resource configuration = getResourceBy(TYPE_CONFIGURATION, RES_CONFIGURATION, false);
+		this.lockRetries = configuration != null ? configuration.getInteger(PARAM_TX_LOCK_RETRIES) : 0;
 	}
 
 	@Override
@@ -360,7 +363,7 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 	@Override
 	public void lock(Locator locator) throws ElementLockingException {
-		lock(locator, 0);
+		lock(locator, this.lockRetries);
 	}
 
 	@Override

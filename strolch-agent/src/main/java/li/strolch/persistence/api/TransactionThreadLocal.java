@@ -36,11 +36,13 @@ public class TransactionThreadLocal extends ThreadLocal<StrolchTransaction> {
 		return tx;
 	}
 
-	public static void setTx(StrolchTransaction tx) {
+	public static StrolchTransaction setTx(StrolchTransaction tx) {
 		if (instance.get() != null)
 			logger.error("THIS THREAD HAS ALREADY OPENED A TX!");
 		else
 			instance.set(tx);
+
+		return tx;
 	}
 
 	public static void removeTx() {

@@ -28,6 +28,7 @@ import java.io.File;
 import java.text.MessageFormat;
 
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
+import static li.strolch.persistence.api.TransactionThreadLocal.setTx;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -56,7 +57,8 @@ public class TransientRealm extends InternalStrolchRealm {
 		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		//noinspection resource
-		return new TransientTransaction(this.container, this, certificate, action, readOnly).suppressAuditsForAudits();
+		return setTx(new TransientTransaction(this.container, this, certificate, action,
+				readOnly).suppressAuditsForAudits());
 	}
 
 	@Override

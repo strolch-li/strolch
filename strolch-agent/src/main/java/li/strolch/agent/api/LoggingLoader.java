@@ -34,34 +34,32 @@ public class LoggingLoader {
 	private static File lastConfigFile;
 
 	public static void reloadLogging(File configPathF) {
-
 		File logConfigFile = new File(configPathF, LOGBACK_XML);
-		if (!logConfigFile.exists()) {
-			logger.info("Not changing logback configuration as {} does not exist.", logConfigFile.getAbsolutePath());
+		if (!logConfigFile.exists())
+			return;
+
+		if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
+			logger.error(
+					"{}  exists, but LoggerFactory is not instance of ch.qos.logback.classic.LoggerContext. Ignoring.",
+					logConfigFile.getAbsolutePath());
 		} else {
-			if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext loggerContext)) {
-				logger.error(
-						"{}  exists, but LoggerFactory is not instance of ch.qos.logback.classic.LoggerContext. Ignoring.",
-						logConfigFile.getAbsolutePath());
-			} else {
-				logger.info("{} file exists. Reloading logging configuration from {}", logConfigFile.getAbsolutePath(),
-						logConfigFile);
+			logger.info("{} file exists. Reloading logging configuration from {}", logConfigFile.getAbsolutePath(),
+					logConfigFile);
+			try {
+				loggerContext.reset();
+				DefaultJoranConfigurator configurator = new DefaultJoranConfigurator();
+				configurator.setContext(loggerContext);
+				configurator.configureByResource(logConfigFile.toURI().toURL());
+				logger.info("Reloaded logger configuration from {}", logConfigFile.getAbsolutePath());
+				lastConfigFile = logConfigFile;
+			} catch (Exception e) {
 				try {
-					loggerContext.reset();
-					DefaultJoranConfigurator configurator = new DefaultJoranConfigurator();
-					configurator.setContext(loggerContext);
-					configurator.configureByResource(logConfigFile.toURI().toURL());
-					logger.info("Reloaded logger configuration from {}", logConfigFile.getAbsolutePath());
-					lastConfigFile = logConfigFile;
-				} catch (Exception e) {
-					try {
-						new ContextInitializer(loggerContext).autoConfig();
-					} catch (JoranException e1) {
-						logger.error("Failed to reload original config after failure to load new config from {}",
-								logConfigFile.getAbsolutePath(), e);
-					}
-					logger.error("Failed to reload logback configuration from file {}", logConfigFile, e);
+					new ContextInitializer(loggerContext).autoConfig();
+				} catch (JoranException e1) {
+					logger.error("Failed to reload original config after failure to load new config from {}",
+							logConfigFile.getAbsolutePath(), e);
 				}
+				logger.error("Failed to reload logback configuration from file {}", logConfigFile, e);
 			}
 		}
 	}

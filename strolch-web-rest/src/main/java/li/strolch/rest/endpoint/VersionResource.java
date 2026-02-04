@@ -64,9 +64,11 @@ public class VersionResource {
 			jsonObject.add(APP_VERSION, versionQuery.getAppVersion().toJson(false, !hideVersion));
 
 			return Response.ok(jsonObject.toString(), MediaType.APPLICATION_JSON).build();
-		}
+		} else {
 
-		boolean isStrolchAdmin = cert.hasRole(ROLE_STROLCH_ADMIN);
-		return Response.ok(versionQuery.toJson(isStrolchAdmin, true).toString(), MediaType.APPLICATION_JSON).build();
+			boolean isStrolchAdmin = cert.hasRole(ROLE_STROLCH_ADMIN);
+			JsonObject jsonObject = versionQuery.toJson(isStrolchAdmin, true);
+			return Response.ok(jsonObject.toString(), MediaType.APPLICATION_JSON).build();
+		}
 	}
 }

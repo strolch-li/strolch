@@ -313,9 +313,11 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			return Optional.empty();
 		}
 
-		logger.debug("Performing basic auth for user {}...", parts[0]);
+		String username = parts[0];
+		String password = parts[1];
+		logger.debug("Performing basic auth for user {}...", username);
 		StrolchSessionHandler sessionHandler = getSessionHandler();
-		Certificate certificate = sessionHandler.authenticate(parts[0], parts[1].toCharArray(), remoteIp, Usage.SINGLE,
+		Certificate certificate = sessionHandler.authenticate(username, password.toCharArray(), remoteIp, Usage.SINGLE,
 				false);
 
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);

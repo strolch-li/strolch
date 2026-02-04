@@ -1858,7 +1858,7 @@ public interface ParameterBagContainer extends StrolchElement {
 		return switch (relationP) {
 			case StringParameter sp -> sp.isSet();
 			case StringListParameter sp -> sp.isSet();
-			case null -> true;
+			case null -> false;
 			default -> throw new IllegalStateException("Unhandled Parameter type: " + relationP.getClass());
 		};
 	}

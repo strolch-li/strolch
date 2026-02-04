@@ -100,6 +100,7 @@ public interface PrivilegeHandler {
 
 	String PARAM_SECRET_KEY = "secretKey";
 	String PARAM_ALLOW_SESSION_REFRESH = "allowSessionRefresh";
+	String PARAM_ALLOW_PASSWORD_RESET = "allowPasswordReset";
 	String PARAM_DISALLOW_SOURCE_CHANGE = "disallowSourceChange";
 	String PARAM_CASE_INSENSITIVE_USERNAME = "caseInsensitiveUsername";
 	String PARAM_SECRET_SALT = "secretSalt";
@@ -639,6 +640,13 @@ public interface PrivilegeHandler {
 	 * @return true if refreshing sessions is allowed
 	 */
 	boolean isRefreshAllowed();
+
+	/**
+	 * Return true if resetting the password is allowed
+	 *
+	 * @return true if resetting the password is allowed
+	 */
+	boolean isPasswordResetAllowed();
 
 	/**
 	 * Returns true if persisting on user data changed enabled

@@ -141,6 +141,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	 * flag if session refreshing is allowed
 	 */
 	protected boolean allowSessionRefresh;
+	protected boolean allowPasswordReset;
 	protected boolean disallowSourceChange;
 
 	protected PrivilegeConflictResolution privilegeConflictResolution;
@@ -175,6 +176,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public boolean isRefreshAllowed() {
 		return this.allowSessionRefresh;
+	}
+
+	@Override
+	public boolean isPasswordResetAllowed() {
+		return this.allowPasswordReset;
 	}
 
 	@Override
@@ -398,16 +404,20 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public void initiateChallengeFor(Usage usage, String username) {
+		assertPasswordResetAllowed(usage);
 		initiateChallengeFor(usage, username, SOURCE_UNKNOWN);
 	}
 
 	@Override
 	public void initiateChallengeFor(Usage usage, String username, String source) {
+		assertPasswordResetAllowed(usage);
 		this.lockingHandler.lockedExecute(username, () -> internalInitiateChallengeFor(usage, username, source));
 	}
 
 	protected void internalInitiateChallengeFor(Usage usage, String username, String source) {
 		DBC.PRE.assertNotEmpty("source must not be empty!", source);
+
+		assertPasswordResetAllowed(usage);
 
 		// get User
 		User user = this.persistenceHandler.getUser(username);
@@ -418,6 +428,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.userChallengeHandler.initiateChallengeFor(usage, user, source);
 
 		logger.info("Initiated Challenge for {} with usage {}", username, usage);
+	}
+
+	private void assertPasswordResetAllowed(Usage usage) {
+		if (usage == Usage.SET_PASSWORD && !this.allowPasswordReset)
+			throw new AccessDeniedException("Resetting password not allowed!");
 	}
 
 	@Override
@@ -503,28 +518,31 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			Certificate certificate = buildPrivilegeContext(usage, user, source, ZonedDateTime.now(),
 					keepAlive).getCertificate();
 
-			if (usage.isAny()) {
-				persistSessionsAsync();
-
-				// save last login
-				UserHistory history = user.getHistory().withLastLogin(ZonedDateTime.now());
-				if (history.isFirstLoginEmpty())
-					history = history.withFirstLogin(ZonedDateTime.now());
-
-				if (!this.persistenceHandler.hasUser(user.getUsername())) {
-					// for remote, the user won't exist, if it is the user's first login
-					this.persistenceHandler.addUser(user.withHistory(history));
-				} else {
-					// otherwise we replace the user
-					this.persistenceHandler.replaceUser(user.withHistory(history));
+			switch (usage) {
+				case ANY -> {
+					persistSessionsAsync();
+					logger.info("User {} authenticated with password: {}", username, certificate);
 				}
-				persistModelAsync();
-
-				// log
-				logger.info("User {} authenticated with password : {}", username, certificate);
-			} else {
-				logger.info("User {} authenticated with basic auth/sigle use: {}", username, certificate);
+				case SINGLE ->
+						logger.info("User {} authenticated with basic auth/sigle use: {}", username, certificate);
+				case SET_PASSWORD ->
+						logger.info("User {} authenticated for SetPassword use: {}", username, certificate);
+				default -> throw new IllegalStateException("Unexpected usage: " + usage);
 			}
+
+			// save last login
+			UserHistory history = user.getHistory().withLastLogin(ZonedDateTime.now());
+			if (history.isFirstLoginEmpty())
+				history = history.withFirstLogin(ZonedDateTime.now());
+
+			if (this.persistenceHandler.hasUser(user.getUsername())) {
+				// we replace the user
+				this.persistenceHandler.replaceUser(user.withHistory(history));
+			} else {
+				// for remote, the user won't exist, if it is the user's first login
+				this.persistenceHandler.addUser(user.withHistory(history));
+			}
+			persistModelAsync();
 
 			// return the certificate
 			return certificate;
@@ -1044,6 +1062,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		handleSecretParams(parameterMap);
 
 		this.allowSessionRefresh = Boolean.parseBoolean(parameterMap.get(PARAM_ALLOW_SESSION_REFRESH));
+		this.allowPasswordReset = Boolean.parseBoolean(parameterMap.get(PARAM_ALLOW_PASSWORD_RESET));
 		this.disallowSourceChange = Boolean.parseBoolean(parameterMap.get(PARAM_DISALLOW_SOURCE_CHANGE));
 
 		this.crudHandler = new PrivilegeCrudHandler(this, this.policyMap, this.privilegeConflictResolution);

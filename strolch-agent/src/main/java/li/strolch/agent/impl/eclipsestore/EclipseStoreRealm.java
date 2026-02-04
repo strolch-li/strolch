@@ -44,6 +44,7 @@ import static java.text.MessageFormat.format;
 import static li.strolch.agent.impl.DefaultRealmHandler.PREFIX_DATA_STORE_FILE;
 import static li.strolch.db.DbConstants.PROP_ALLOW_DATA_INIT_ON_SCHEMA_CREATE;
 import static li.strolch.model.Tags.*;
+import static li.strolch.persistence.api.TransactionThreadLocal.setTx;
 import static li.strolch.runtime.StrolchConstants.makeRealmKey;
 import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
 
@@ -98,7 +99,8 @@ public class EclipseStoreRealm extends InternalStrolchRealm {
 		DBC.PRE.assertEquals("Realm is not in state started!", ComponentState.STARTED, getState());
 		DBC.PRE.assertNotNull("Certificate must be set!", certificate);
 		//noinspection resource
-		return new TransientTransaction(this.container, this, certificate, action, readOnly).suppressAuditsForAudits();
+		return setTx(new TransientTransaction(this.container, this, certificate, action,
+				readOnly).suppressAuditsForAudits());
 	}
 
 	@Override

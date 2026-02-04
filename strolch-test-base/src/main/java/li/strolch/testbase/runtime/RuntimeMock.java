@@ -115,8 +115,7 @@ public class RuntimeMock {
 		}
 
 		if (targetPathF.exists()) {
-			logger.info("Deleting all files in {}", targetPathF.getAbsolutePath());
-			if (!FileHelper.deleteFile(targetPathF, true)) {
+			if (!FileHelper.deleteFile(targetPathF, false)) {
 				String msg = "Failed to delete {0}";
 				msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 				throw new RuntimeException(msg);
@@ -128,8 +127,6 @@ public class RuntimeMock {
 			msg = MessageFormat.format(msg, targetPathF.getAbsolutePath());
 			throw new RuntimeException(msg);
 		}
-
-		logger.info("Mocking runtime from {} to {}", srcPathF.getAbsolutePath(), targetPathF.getAbsolutePath());
 
 		// setup the container
 		this.targetPath = targetPathF;

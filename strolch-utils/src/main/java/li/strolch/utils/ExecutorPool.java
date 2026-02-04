@@ -35,8 +35,14 @@ public class ExecutorPool {
 
 	private final Map<String, ExecutorService> executors;
 	private final Map<String, ScheduledExecutorService> scheduledExecutors;
+	private final boolean verbose;
 
 	public ExecutorPool() {
+		this(false);
+	}
+
+	public ExecutorPool(boolean verbose) {
+		this.verbose = verbose;
 		this.executors = new ConcurrentHashMap<>();
 		this.scheduledExecutors = new ConcurrentHashMap<>();
 	}
@@ -63,20 +69,23 @@ public class ExecutorPool {
 	}
 
 	private void shutdownExecutor(String name, ExecutorService executor) {
-		logger.info("Shutting down executor pool {}", name);
 		try {
 			List<Runnable> tasks = executor.shutdownNow();
-			if (!tasks.isEmpty()) {
-				logger.warn("The following {} tasks were never started for executor {} :", tasks.size(), name);
-				for (Runnable runnable : tasks) {
-					logger.warn("  {}", runnable);
+			if (!this.verbose) {
+				logger.info("Shutting down executor {} with {} tasks", name, tasks.size());
+			} else {
+				if (!tasks.isEmpty()) {
+					logger.warn("The following {} tasks were never started for executor {} :", tasks.size(), name);
+					for (Runnable runnable : tasks) {
+						logger.warn("  {}", runnable);
+					}
 				}
 			}
 
 			if (!executor.awaitTermination(5, TimeUnit.SECONDS))
 				logger.error("Executor {} did not stop after " + 5 + "s!", name);
 		} catch (InterruptedException e) {
-			logger.error("Was interrupted while shutting down tasks");
+			logger.error("Was interrupted while shutting down executor {}!", name, e);
 		}
 	}
 }

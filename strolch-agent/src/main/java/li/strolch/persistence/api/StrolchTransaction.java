@@ -821,7 +821,9 @@ public interface StrolchTransaction extends AutoCloseable {
 			String bagKey, String paramKey);
 
 	/**
-	 * Returns a stream of resources for the given types, if empty, streams all possible types
+	 * <p>Returns a stream of resources for the given types, if empty, streams all possible types</p>
+	 *
+	 * <i>Note:</i> This method does not stream over newly added or updated elements, only existing ones.
 	 *
 	 * @param types the types of resources to return in the stream, if empty, streams all possible types
 	 *
@@ -830,7 +832,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	Stream<Resource> streamResources(String... types);
 
 	/**
-	 * Returns a stream of orders for the given types, if empty, streams all possible types
+	 * <p>Returns a stream of orders for the given types, if empty, streams all possible types</p>
+	 *
+	 * <i>Note:</i> This method does not stream over newly added or updated elements, only existing ones.
 	 *
 	 * @param types the types of orders to return in the stream, if empty, streams all possible types
 	 *
@@ -839,7 +843,9 @@ public interface StrolchTransaction extends AutoCloseable {
 	Stream<Order> streamOrders(String... types);
 
 	/**
-	 * Returns a stream of activities for the given types, if empty, streams all possible types
+	 * <p>Returns a stream of activities for the given types, if empty, streams all possible types</p>
+	 *
+	 * <i>Note:</i> This method does not stream over newly added or updated elements, only existing ones.
 	 *
 	 * @param types the types of activities to return in the stream, if empty, streams all possible types
 	 *
