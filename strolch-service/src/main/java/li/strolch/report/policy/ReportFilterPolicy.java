@@ -62,8 +62,13 @@ public abstract class ReportFilterPolicy extends StrolchPolicy {
 		}
 	}
 
+	protected boolean handleNull() {
+		return false;
+	}
+
 	public boolean filter(Object value) {
-		DBC.PRE.assertNotNull("value required!", value);
+		if (value == null)
+			return handleNull();
 
 		Object left;
 		switch (value) {
