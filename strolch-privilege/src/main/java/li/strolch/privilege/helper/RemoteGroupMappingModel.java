@@ -160,7 +160,7 @@ public class RemoteGroupMappingModel {
 
 		Set<String> relevantRemoteGroups = remoteGroups
 				.stream()
-				.filter(rg -> this.remoteGroupToLocalGroupMap.containsKey(rg) && groups.contains(rg))
+				.filter(rg -> this.remoteGroupToLocalGroupMap.containsKey(rg) || groups.contains(rg))
 				.collect(toSet());
 		logger.info("User {} has the following relevant remote groups: {}", username, relevantRemoteGroups);
 
