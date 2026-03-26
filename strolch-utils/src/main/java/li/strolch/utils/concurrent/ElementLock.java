@@ -76,6 +76,7 @@ public class ElementLock extends ReentrantLock {
 			for (int i = 0; i < retries; i++) {
 				logger.warn("Failed to acquire lock for {}. Retrying in {}ms (attempt {}/{})", this.name, waitTimeMs,
 						(i + 1), retries);
+				handleRetry();
 
 				Thread.sleep(waitTimeMs);
 
@@ -96,6 +97,10 @@ public class ElementLock extends ReentrantLock {
 			Thread.currentThread().interrupt();
 			logger.error("Interrupted while trying to acquire lock for {}", this.name);
 		}
+	}
+
+	protected void handleRetry() {
+		// do nothing
 	}
 
 	private ElementLockingException handleLockTimeout(TimeUnit timeUnit, long tryLockTime) {
