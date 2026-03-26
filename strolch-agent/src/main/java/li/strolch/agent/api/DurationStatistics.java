@@ -94,6 +94,7 @@ public class DurationStatistics {
 		jsonObject.addProperty("maxDuration", max.toMillis());
 		jsonObject.addProperty("avgDuration", avg);
 		jsonObject.addProperty("medianDuration", median.toMillis());
+		jsonObject.addProperty("durationUnit", "ms");
 
 		return jsonObject;
 	}
