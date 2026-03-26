@@ -27,17 +27,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.time.temporal.ChronoUnit.*;
 
-public class Statistics {
+public class DurationStatistics {
 
-	private final Queue<Statistic> events;
+	private final Queue<DurationStatistic> events;
 
-	public Statistics() {
+	public DurationStatistics() {
 		this.events = new ConcurrentLinkedQueue<>();
 	}
 
 	public synchronized void recordEvent(Duration duration) {
 		LocalDateTime now = LocalDateTime.now();
-		this.events.add(new Statistic(now, duration));
+		this.events.add(new DurationStatistic(now, duration));
 		removeOldEvents(now);
 	}
 
@@ -110,11 +110,11 @@ public class Statistics {
 		}
 	}
 
-	private static class Statistic {
+	private static class DurationStatistic {
 		LocalDateTime timestamp;
 		Duration duration;
 
-		Statistic(LocalDateTime timestamp, Duration duration) {
+		DurationStatistic(LocalDateTime timestamp, Duration duration) {
 			this.timestamp = timestamp;
 			this.duration = duration;
 		}

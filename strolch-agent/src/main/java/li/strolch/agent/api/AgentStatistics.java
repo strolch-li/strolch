@@ -18,31 +18,52 @@ package li.strolch.agent.api;
 
 import com.google.gson.JsonObject;
 import li.strolch.persistence.api.TransactionResult;
+import li.strolch.persistence.api.TransactionState;
 
 import java.time.Duration;
 
 public class AgentStatistics {
 
-	private final Statistics transactions;
-	private final Statistics searches;
-	private final Statistics services;
+	private final DurationStatistics transactions;
+	private final DurationStatistics failedTransactions;
+	private final DurationStatistics retriedLocks;
+	private final DurationStatistics searches;
+	private final DurationStatistics services;
+	private final CountStatistics logonsWithActiveUsers;
 
 	public AgentStatistics() {
-		this.transactions = new Statistics();
-		this.searches = new Statistics();
-		this.services = new Statistics();
+		this.transactions = new DurationStatistics();
+		this.failedTransactions = new DurationStatistics();
+		this.retriedLocks = new DurationStatistics();
+		this.searches = new DurationStatistics();
+		this.services = new DurationStatistics();
+		this.logonsWithActiveUsers = new CountStatistics();
 	}
 
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		json.add("transactions", this.transactions.toJson());
+		json.add("failedTransactions", this.failedTransactions.toJson());
+		json.add("retriedLocks", this.retriedLocks.toJson());
 		json.add("searches", this.searches.toJson());
 		json.add("services", this.services.toJson());
+		json.add("logonsWithActiveUsers", this.logonsWithActiveUsers.toJson());
 		return json;
 	}
 
 	public void recordTransaction(TransactionResult result) {
-		this.transactions.recordEvent(Duration.ofNanos(result.getTxDuration()));
+		Duration duration = Duration.ofNanos(result.getTxDuration());
+		this.transactions.recordEvent(duration);
+		if (result.getState() != TransactionState.CLOSED && result.getState() != TransactionState.COMMITTED)
+			this.failedTransactions.recordEvent(duration);
+	}
+
+	public void recordRetriedLock() {
+		this.retriedLocks.recordEvent(Duration.ZERO);
+	}
+
+	public void recordLogon(int activeUsers) {
+		this.logonsWithActiveUsers.recordEvent(activeUsers);
 	}
 
 	public void recordSearch(long durationNanos) {
