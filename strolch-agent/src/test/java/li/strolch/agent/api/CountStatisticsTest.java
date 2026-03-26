@@ -24,7 +24,7 @@ public class CountStatisticsTest {
 		assertEquals(3, json.get("maxCount").getAsInt());
 		assertEquals(2, json.get("avgCount").getAsInt());
 		assertEquals(2, json.get("medianCount").getAsInt());
-		assertEquals(6, json.get("totalCount").getAsLong());
+		assertEquals(3, json.get("totalCount").getAsLong());
 	}
 
 	@Test

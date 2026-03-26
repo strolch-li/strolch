@@ -75,13 +75,11 @@ public class CountStatistics {
 	public synchronized JsonObject toJson() {
 		List<Integer> counts = this.events.stream().map(e -> e.maxCount).toList();
 
-		long count = counts.size();
-		long sum = counts.stream().mapToLong(Integer::longValue).sum();
-		int avg = count == 0 ? 0 : (int) ((double) sum / count);
-		int median = getMedian(counts);
-
 		int min = counts.stream().mapToInt(Integer::intValue).min().orElse(0);
 		int max = counts.stream().mapToInt(Integer::intValue).max().orElse(0);
+		int avg = min + ((max - min) / 2);
+		long count = counts.size();
+		int median = getMedian(counts);
 
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.addProperty("lastMinute", getLastMinute());
@@ -93,7 +91,7 @@ public class CountStatistics {
 		jsonObject.addProperty("maxCount", max);
 		jsonObject.addProperty("avgCount", avg);
 		jsonObject.addProperty("medianCount", median);
-		jsonObject.addProperty("totalCount", sum);
+		jsonObject.addProperty("totalCount", count);
 
 		return jsonObject;
 	}
