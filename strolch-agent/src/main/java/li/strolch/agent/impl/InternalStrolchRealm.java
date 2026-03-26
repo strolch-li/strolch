@@ -20,7 +20,6 @@ import li.strolch.model.Locator;
 import li.strolch.privilege.model.PrivilegeContext;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.runtime.configuration.StrolchConfigurationException;
-import li.strolch.utils.concurrent.ElementLockingHandler;
 import li.strolch.utils.dbc.DBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 	protected static final Logger logger = LoggerFactory.getLogger(InternalStrolchRealm.class);
 
 	private final String realm;
-	private ElementLockingHandler<Locator> lockHandler;
+	private StrolchElementLockingHandler<Locator> lockHandler;
 	private boolean auditTrailEnabled;
 	private boolean enableModelAudits;
 	private boolean enableAuditsOnRead;
@@ -124,8 +123,7 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		String propTryLockTime = makeRealmKey(this.realm, PROP_TRY_LOCK_TIME);
 		TimeUnit timeUnit = TimeUnit.valueOf(configuration.getString(propTryLockTimeUnit, TimeUnit.SECONDS.name()));
 		long time = configuration.getLong(propTryLockTime, 10L);
-		this.lockHandler = new ElementLockingHandler<>(this.container.getAgent().getScheduledExecutor(), timeUnit,
-				time);
+		this.lockHandler = new StrolchElementLockingHandler<>(this.container.getAgent(), timeUnit, time);
 
 		// versioning
 		String enableVersioningKey = makeRealmKey(getRealm(), PROP_ENABLE_VERSIONING);
