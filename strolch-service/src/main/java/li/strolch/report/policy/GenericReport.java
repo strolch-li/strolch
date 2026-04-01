@@ -843,7 +843,7 @@ public class GenericReport extends ReportPolicy {
 			Object value = evaluateColumnValue(refTuple.getFirst(), Map.of(element.getType(), element), true);
 			if (this.filterMissingValuesAsTrue && value == null)
 				continue;
-			if (value == null || !filterPolicy.filter(value))
+			if (!filterPolicy.filter(value))
 				return false;
 		}
 
@@ -884,7 +884,7 @@ public class GenericReport extends ReportPolicy {
 				Object value = evaluateColumnValue(refTuple.getFirst(), row, true);
 				if (this.filterMissingValuesAsTrue && value == null)
 					continue;
-				if (value == null || !filterPolicy.filter(value))
+				if (!filterPolicy.filter(value))
 					return false;
 			}
 		}

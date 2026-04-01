@@ -15,6 +15,7 @@
  */
 package li.strolch.runtime.sessions;
 
+import li.strolch.agent.api.AgentStatistics;
 import li.strolch.agent.api.ComponentContainer;
 import li.strolch.agent.api.StrolchComponent;
 import li.strolch.exception.StrolchNotAuthenticatedException;
@@ -142,6 +143,11 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		super.destroy();
 	}
 
+	private void recordLogon() {
+		AgentStatistics statistics = getAgent().getAgentStatistics();
+		statistics.recordLogon(this.certificateMap.size());
+	}
+
 	@Override
 	public Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive) {
 		DBC.PRE.assertNotEmpty("Username must be set!", username);
@@ -150,8 +156,10 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		Certificate certificate = this.privilegeHandler.authenticate(username, password, source, usage, keepAlive);
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
-		if (usage.isAny())
+		if (usage.isAny()) {
 			logger.info("{} sessions currently active.", this.certificateMap.size());
+			recordLogon();
+		}
 
 		return certificate;
 	}
@@ -162,6 +170,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
+		recordLogon();
 
 		return certificate;
 	}
@@ -172,6 +181,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
+		recordLogon();
 
 		return certificate;
 	}
@@ -183,6 +193,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 		invalidate(certificate);
 		this.certificateMap.put(refreshedSession.getAuthToken(), refreshedSession);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
+		recordLogon();
 
 		return refreshedSession;
 	}
@@ -290,6 +301,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
+		recordLogon();
 
 		return certificate;
 	}
@@ -305,6 +317,7 @@ public class DefaultStrolchSessionHandler extends StrolchComponent implements St
 
 		this.certificateMap.put(certificate.getAuthToken(), certificate);
 		logger.info("{} sessions currently active.", this.certificateMap.size());
+		recordLogon();
 
 		return certificate;
 	}

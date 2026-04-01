@@ -18,7 +18,6 @@ package li.strolch.agent.api;
 
 import com.google.gson.JsonObject;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -27,17 +26,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.time.temporal.ChronoUnit.*;
 
-public class Statistics {
+public class CountStatistics {
 
-	private final Queue<Statistic> events;
+	private final Queue<CountStatistic> events;
 
-	public Statistics() {
+	public CountStatistics() {
 		this.events = new ConcurrentLinkedQueue<>();
 	}
 
-	public synchronized void recordEvent(Duration duration) {
+	public synchronized void recordEvent(int count) {
 		LocalDateTime now = LocalDateTime.now();
-		this.events.add(new Statistic(now, duration));
+		this.events.add(new CountStatistic(now, count));
 		removeOldEvents(now);
 	}
 
@@ -74,15 +73,13 @@ public class Statistics {
 	}
 
 	public synchronized JsonObject toJson() {
-		List<Duration> durations = this.events.stream().map(e -> e.duration).toList();
+		List<Integer> counts = this.events.stream().map(e -> e.maxCount).toList();
 
-		long count = durations.size();
-		long sum = durations.stream().mapToLong(Duration::toMillis).sum();
-		int avg = count == 0 ? 0 : (int) ((double) sum / count);
-
-		Duration min = durations.stream().min(Duration::compareTo).orElse(Duration.ZERO);
-		Duration max = durations.stream().max(Duration::compareTo).orElse(Duration.ZERO);
-		Duration median = getMedian(durations);
+		int min = counts.stream().mapToInt(Integer::intValue).min().orElse(0);
+		int max = counts.stream().mapToInt(Integer::intValue).max().orElse(0);
+		int avg = min + ((max - min) / 2);
+		long count = counts.size();
+		int median = getMedian(counts);
 
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.addProperty("lastMinute", getLastMinute());
@@ -90,33 +87,34 @@ public class Statistics {
 		jsonObject.addProperty("last15Minutes", getLast15Minutes());
 		jsonObject.addProperty("lastHour", getLastHour());
 		jsonObject.addProperty("lastDay", getLastDay());
-		jsonObject.addProperty("minDuration", min.toMillis());
-		jsonObject.addProperty("maxDuration", max.toMillis());
-		jsonObject.addProperty("avgDuration", avg);
-		jsonObject.addProperty("medianDuration", median.toMillis());
+		jsonObject.addProperty("minCount", min);
+		jsonObject.addProperty("maxCount", max);
+		jsonObject.addProperty("avgCount", avg);
+		jsonObject.addProperty("medianCount", median);
+		jsonObject.addProperty("totalCount", count);
 
 		return jsonObject;
 	}
 
-	private Duration getMedian(List<Duration> durations) {
-		if (durations.isEmpty())
-			return Duration.ZERO;
-		List<Duration> sorted = durations.stream().sorted().toList();
+	private int getMedian(List<Integer> counts) {
+		if (counts.isEmpty())
+			return 0;
+		List<Integer> sorted = counts.stream().sorted().toList();
 		int middle = sorted.size() / 2;
 		if (sorted.size() % 2 == 0) {
-			return sorted.get(middle - 1).plus(sorted.get(middle)).dividedBy(2);
+			return (sorted.get(middle - 1) + sorted.get(middle)) / 2;
 		} else {
 			return sorted.get(middle);
 		}
 	}
 
-	private static class Statistic {
+	private static class CountStatistic {
 		LocalDateTime timestamp;
-		Duration duration;
+		int maxCount;
 
-		Statistic(LocalDateTime timestamp, Duration duration) {
+		CountStatistic(LocalDateTime timestamp, int maxCount) {
 			this.timestamp = timestamp;
-			this.duration = duration;
+			this.maxCount = maxCount;
 		}
 	}
 }

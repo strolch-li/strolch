@@ -213,7 +213,7 @@ public class ElementLockingHandler<T> {
 	/**
 	 * @see java.util.concurrent.locks.ReentrantLock#unlock()
 	 */
-	private void unlock(ReentrantLock lock) throws ElementLockingException {
+	protected void unlock(ReentrantLock lock) throws ElementLockingException {
 		try {
 			lock.unlock();
 		} catch (IllegalMonitorStateException e) {
@@ -225,7 +225,7 @@ public class ElementLockingHandler<T> {
 	/**
 	 * @see java.util.concurrent.locks.ReentrantLock#unlock()
 	 */
-	private void releaseLock(ReentrantLock lock) {
+	protected void releaseLock(ReentrantLock lock) {
 		while (lock.isHeldByCurrentThread() && lock.isLocked()) {
 			unlock(lock);
 		}
@@ -246,7 +246,7 @@ public class ElementLockingHandler<T> {
 			this.cleanupTask.cancel(true);
 	}
 
-	private void cleanupOldLocks() {
+	protected void cleanupOldLocks() {
 
 		Map<T, TypedTuple<ElementLock, Long>> lockMap;
 		synchronized (this.lockMap) {
@@ -265,7 +265,7 @@ public class ElementLockingHandler<T> {
 		logger.info("Pruned {} locks.", count);
 	}
 
-	private TypedTuple<ElementLock, Long> newLock(T element) {
+	protected TypedTuple<ElementLock, Long> newLock(T element) {
 		return new TypedTuple<>(new ElementLock(element.toString(), true), 0L);
 	}
 }
