@@ -214,7 +214,6 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			 PreparedStatement removeValuesStatement = this.tx.getConnection().prepareStatement(removeValuesSql)) {
 
 			int nrOfRemoves = 0;
-			int[] nrOfValueRemoves = new int[logMessages.size()];
 			for (LogMessage logMessage : logMessages) {
 
 				removeStatement.setString(1, logMessage.getId());
@@ -222,7 +221,6 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 
 				removeStatement.addBatch();
 				removeValuesStatement.addBatch();
-				nrOfValueRemoves[nrOfRemoves] = logMessage.getValues().size();
 				nrOfRemoves++;
 			}
 
@@ -246,13 +244,6 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 				msg = format(msg, nrOfRemoves, countAll.length);
 				throw new StrolchPersistenceException(msg);
 			}
-			for (int i = 0; i < countAll.length; i++) {
-				if (nrOfValueRemoves[i] < countAll[i]) {
-					String msg = "Expected to delete {0} values for LogMessage {1} but deleted {2} elements!";
-					msg = format(msg, nrOfValueRemoves[i], logMessages.get(i).getId(), countAll[i]);
-					throw new StrolchPersistenceException(msg);
-				}
-			}
 
 		} catch (SQLException e) {
 			throw new StrolchPersistenceException(
@@ -273,12 +264,7 @@ public class PostgreSqlLogMessageDao implements LogMessageDao {
 			throw new StrolchPersistenceException(msg);
 		}
 
-		count = removeValuesStatement.executeUpdate();
-		if (count != logMessage.getValues().size()) {
-			String msg = "Expected to delete {0} values for LogMessage with id {1} but deleted {2} elements!";
-			msg = format(msg, logMessage.getValues().size(), logMessage.getId(), count);
-			throw new StrolchPersistenceException(msg);
-		}
+		removeValuesStatement.executeUpdate();
 	}
 
 	private void validateValuesStatement(LogMessage logMessage, int nrOfInserts, int[] ints) {
