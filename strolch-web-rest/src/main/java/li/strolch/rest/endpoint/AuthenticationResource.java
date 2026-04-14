@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
@@ -165,7 +166,8 @@ public class AuthenticationResource {
 		JsonObject logoutResult = new JsonObject();
 
 		try {
-			StrolchSessionHandler sessionHandler = RestfulStrolchComponent.getInstance().getSessionHandler();
+			RestfulStrolchComponent restComponent = RestfulStrolchComponent.getInstance();
+			StrolchSessionHandler sessionHandler = restComponent.getSessionHandler();
 			String source = getRemoteIp(request);
 			if (!sessionHandler.isSessionKnown(authToken))
 				return Response.ok().build();
@@ -177,7 +179,9 @@ public class AuthenticationResource {
 			logoutResult.addProperty("authToken", authToken);
 			logoutResult.addProperty("msg",
 					MessageFormat.format("{0} has been logged out.", certificate.getUsername()));
-			return Response.ok().entity(logoutResult.toString()).build();
+
+			LocalDateTime expirationDate = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault());
+			return setCookiesAndReturnResponse(request, restComponent, 0, expirationDate, logoutResult, authToken);
 		} catch (Exception e) {
 			return handleSessionException("Failed to invalidate session", e);
 		}
