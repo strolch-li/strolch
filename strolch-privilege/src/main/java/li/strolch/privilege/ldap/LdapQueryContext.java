@@ -191,12 +191,12 @@ public abstract class LdapQueryContext {
 
 		// evaluate groups and roles for this user
 		Set<String> originalLdapGroups = getLdapGroups(attrs);
-		if (originalLdapGroups.isEmpty())
+		Set<String> ldapGroups = this.groupMappingModel.getUserGroupOverride(username, originalLdapGroups);
+		if (ldapGroups.isEmpty())
 			throw new AccessDeniedException(
 					"User %s can not login, as no LDAP groups could be evaluated! Attributes:\n%s".formatted(username,
 							ldapAttributesToString(attrs)));
 
-		Set<String> ldapGroups = this.groupMappingModel.getUserGroupOverride(username, originalLdapGroups);
 		GroupsAndRoles groupsAndRoles = this.groupMappingModel.mapRemoteGroupsToStrolch(username, ldapGroups);
 
 		if (groupsAndRoles.isEmpty()) {
