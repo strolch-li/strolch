@@ -59,6 +59,19 @@ public class InMemoryStrolchDao<T extends StrolchRootElement> implements Strolch
 	}
 
 	@Override
+	public long querySize(T element) {
+		return querySize(element.getType(), element.getId());
+	}
+
+	@Override
+	public long querySize(String type, String id) {
+		List<T> list = this.elements.getList(type);
+		if (list == null || list.isEmpty())
+			return 0L;
+		return list.stream().anyMatch(e -> e.getId().equals(id)) ? 1L : 0L;
+	}
+
+	@Override
 	public Set<String> queryTypes() throws StrolchPersistenceException {
 		return this.elements.keySet();
 	}

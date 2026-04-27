@@ -95,6 +95,29 @@ public interface ElementMap<T extends StrolchRootElement> {
 	long querySize(StrolchTransaction tx, String type);
 
 	/**
+	 * Queries the size associated with the given element.
+	 *
+	 * @param tx      the transaction
+	 * @param element the element whose associated size is to be queried
+	 *
+	 * @return the size associated with the specified element
+	 *
+	 * @see #querySize(StrolchTransaction, String, String)
+	 */
+	long querySize(StrolchTransaction tx, T element);
+
+	/**
+	 * Retrieves the size of a specific entity based on its type and identifier.
+	 *
+	 * @param tx   the transaction
+	 * @param type the type of the entity to query
+	 * @param id   the unique identifier of the entity
+	 *
+	 * @return the size of the entity as a long value
+	 */
+	long querySize(StrolchTransaction tx, String type, String id);
+
+	/**
 	 * Returns a copy of the element with the type "Template" and the id = type
 	 *
 	 * @param tx   the open {@link StrolchTransaction}

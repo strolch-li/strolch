@@ -80,6 +80,19 @@ public abstract class TransientElementMap<T extends StrolchRootElement> extends 
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx, T element) {
+		return querySize(tx, element.getType(), element.getId());
+	}
+
+	@Override
+	public long querySize(StrolchTransaction tx, String type, String id) {
+		Map<String, T> byType = this.elementMap.get(type);
+		if (byType == null)
+			return 0L;
+		return byType.containsKey(id) ? 1L : 0L;
+	}
+
+	@Override
 	public synchronized List<T> getElementsBy(StrolchTransaction tx, String type) {
 		Map<String, T> byType = this.elementMap.get(type);
 		if (byType == null)

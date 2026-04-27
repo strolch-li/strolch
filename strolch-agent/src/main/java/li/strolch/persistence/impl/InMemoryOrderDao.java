@@ -51,6 +51,16 @@ public class InMemoryOrderDao implements OrderDao {
 	}
 
 	@Override
+	public long querySize(Order element) {
+		return instance.querySize(element);
+	}
+
+	@Override
+	public long querySize(String type, String id) {
+		return instance.querySize(type, id);
+	}
+
+	@Override
 	public long querySize(DateRange dateRange, String... types) {
 		return instance
 				.getElements()

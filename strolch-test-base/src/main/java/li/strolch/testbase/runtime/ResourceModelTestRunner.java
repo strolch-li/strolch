@@ -99,6 +99,16 @@ public class ResourceModelTestRunner {
 
 			size = tx.getResourceMap().querySize(tx, "NonExistingType");
 			assertEquals("Should have zero objects of type 'NonExistingType'", 0, size);
+
+			assertEquals(1L, tx.getResourceMap().querySize(tx, resource1));
+			assertEquals(1L, tx.getResourceMap().querySize(tx, resource2));
+			assertEquals(1L, tx.getResourceMap().querySize(tx, resource3));
+
+			assertEquals(1L, tx.getResourceMap().querySize(tx, resource1.getType(), resource1.getId()));
+			assertEquals(1L, tx.getResourceMap().querySize(tx, resource2.getType(), resource2.getId()));
+			assertEquals(1L, tx.getResourceMap().querySize(tx, resource3.getType(), resource3.getId()));
+
+			assertEquals(0L, tx.getResourceMap().querySize(tx, "NonExistingType", "non-existing"));
 		}
 	}
 

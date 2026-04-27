@@ -102,6 +102,16 @@ public class ActivityModelTestRunner {
 
 			size = tx.getActivityMap().querySize(tx, "NonExistingType");
 			assertEquals("Should have zero objects of type 'NonExistingType'", 0, size);
+
+			assertEquals(1L, tx.getActivityMap().querySize(tx, activity1));
+			assertEquals(1L, tx.getActivityMap().querySize(tx, activity2));
+			assertEquals(1L, tx.getActivityMap().querySize(tx, activity3));
+
+			assertEquals(1L, tx.getActivityMap().querySize(tx, activity1.getType(), activity1.getId()));
+			assertEquals(1L, tx.getActivityMap().querySize(tx, activity2.getType(), activity2.getId()));
+			assertEquals(1L, tx.getActivityMap().querySize(tx, activity3.getType(), activity3.getId()));
+
+			assertEquals(0L, tx.getActivityMap().querySize(tx, "NonExistingType", "non-existing"));
 		}
 	}
 
