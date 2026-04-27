@@ -62,6 +62,27 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	long querySize(String... types);
 
 	/**
+	 * Queries the size associated with the given element.
+	 *
+	 * @param element the element whose associated size is to be queried
+	 *
+	 * @return the size associated with the specified element
+	 *
+	 * @see #querySize(String, String)
+	 */
+	long querySize(T element);
+
+	/**
+	 * Retrieves the size of a specific entity based on its type and identifier.
+	 *
+	 * @param type the type of the entity to query
+	 * @param id   the unique identifier of the entity
+	 *
+	 * @return the size of the entity as a long value
+	 */
+	long querySize(String type, String id);
+
+	/**
 	 * Queries the current list of types from the underlying persistence layer
 	 *
 	 * @return the set of types

@@ -43,6 +43,16 @@ public class InMemoryActivityDao implements ActivityDao {
 	}
 
 	@Override
+	public long querySize(Activity element) {
+		return instance.querySize(element);
+	}
+
+	@Override
+	public long querySize(String type, String id) {
+		return instance.querySize(type, id);
+	}
+
+	@Override
 	public Set<String> queryTypes() throws StrolchPersistenceException {
 		return instance.queryTypes();
 	}

@@ -150,6 +150,16 @@ public abstract class AuditingElementMapFacade<T extends StrolchRootElement> imp
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx, T element) {
+		return this.elementMap.querySize(tx, element);
+	}
+
+	@Override
+	public long querySize(StrolchTransaction tx, String type, String id) {
+		return this.elementMap.querySize(tx, type, id);
+	}
+
+	@Override
 	public T getTemplate(StrolchTransaction tx, String type) {
 		T template = this.elementMap.getTemplate(tx, type);
 		if (this.observeAccessReads && template != null) {

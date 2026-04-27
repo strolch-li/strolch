@@ -189,6 +189,28 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 		}
 	}
 
+	public long querySize(T element) {
+		return querySize(element.getType(), element.getId());
+	}
+
+	public long querySize(String type, String id) {
+		String sql = MessageFormat.format(querySizeOfElementSqlS, getTableName());
+		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
+			statement.setString(1, type);
+			statement.setString(2, id);
+
+			try (ResultSet result = statement.executeQuery()) {
+				result.next();
+				return result.getLong(1);
+			}
+
+		} catch (SQLException e) {
+			throw new StrolchPersistenceException(
+					MessageFormat.format("Failed to query size of {0}@{1} due to {2}", type, id,
+							e.getLocalizedMessage()), e);
+		}
+	}
+
 	@Override
 	public Set<String> queryTypes() {
 
@@ -501,22 +523,8 @@ public abstract class PostgresqlDao<T extends StrolchRootElement> implements Str
 	protected void internalRemove(T element) {
 
 		// first find out how many there are
-		long count;
-		String sql = MessageFormat.format(querySizeOfElementSqlS, getTableName());
-		try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
-			statement.setString(1, element.getType());
-			statement.setString(2, element.getId());
-
-			try (ResultSet result = statement.executeQuery()) {
-				result.next();
-				count = result.getLong(1);
-			}
-
-		} catch (SQLException e) {
-			throw new StrolchPersistenceException(
-					MessageFormat.format("Failed to remove {0} due to {1}", element.getLocator(),
-							e.getLocalizedMessage()), e);
-		}
+		long count = querySize(element);
+		String sql;
 
 		if (count == 0) {
 			throw new StrolchPersistenceException(

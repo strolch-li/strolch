@@ -109,6 +109,16 @@ public abstract class EclipseStoreElementMap<T extends StrolchRootElement> exten
 	}
 
 	@Override
+	public long querySize(StrolchTransaction tx, T element) {
+		return querySize(tx, element.getType(), element.getId());
+	}
+
+	@Override
+	public long querySize(StrolchTransaction tx, String type, String id) {
+		return this.root.hasElement(type, id) ? 1L : 0L;
+	}
+
+	@Override
 	protected T _getBy(String type, String id) {
 		return this.root.getBy(type, id);
 	}

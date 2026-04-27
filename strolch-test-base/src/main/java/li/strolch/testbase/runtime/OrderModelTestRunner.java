@@ -112,6 +112,16 @@ public class OrderModelTestRunner {
 
 			size = tx.getOrderMap().querySize(tx, "NonExistingType");
 			assertEquals("Should have zero objects of type 'NonExistingType'", 0, size);
+
+			assertEquals(1L, tx.getOrderMap().querySize(tx, order1));
+			assertEquals(1L, tx.getOrderMap().querySize(tx, order2));
+			assertEquals(1L, tx.getOrderMap().querySize(tx, order3));
+
+			assertEquals(1L, tx.getOrderMap().querySize(tx, order1.getType(), order1.getId()));
+			assertEquals(1L, tx.getOrderMap().querySize(tx, order2.getType(), order2.getId()));
+			assertEquals(1L, tx.getOrderMap().querySize(tx, order3.getType(), order3.getId()));
+
+			assertEquals(0L, tx.getOrderMap().querySize(tx, "NonExistingType", "non-existing"));
 		}
 
 		try (StrolchTransaction tx = this.runtimeMock.getRealm(this.realmName).openTx(this.certificate, "test", true)) {
