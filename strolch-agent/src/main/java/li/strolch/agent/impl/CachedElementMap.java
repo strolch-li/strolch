@@ -47,16 +47,6 @@ public abstract class CachedElementMap<T extends StrolchRootElement> extends Tra
 	protected abstract StrolchDao<T> getDbDao(StrolchTransaction tx);
 
 	@Override
-	public long querySize(StrolchTransaction tx, T element) {
-		return getDbDao(tx).querySize(element);
-	}
-
-	@Override
-	public long querySize(StrolchTransaction tx, String type, String id) {
-		return getDbDao(tx).querySize(type, id);
-	}
-
-	@Override
 	public synchronized void add(StrolchTransaction tx, T element) {
 		if (this.realm.isEnableVersioning()) {
 			int latestVersion = getLatestVersionFor(tx, element.getType(), element.getId()) + 1;
