@@ -73,6 +73,19 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	long querySize(T element);
 
 	/**
+	 * Returns true if an element exists in the underlying persistence layer.
+	 *
+	 * @param element the element to check for existence
+	 *
+	 * @return true if at least one matching element exists, false otherwise
+	 *
+	 * @see #querySize(StrolchRootElement)
+	 */
+	default boolean hasElement(T element) {
+		return querySize(element) != 0;
+	}
+
+	/**
 	 * Retrieves the size of a specific entity based on its type and identifier.
 	 *
 	 * @param type the type of the entity to query
@@ -81,6 +94,18 @@ public interface StrolchDao<T extends StrolchRootElement> {
 	 * @return the size of the entity as a long value
 	 */
 	long querySize(String type, String id);
+
+	/**
+	 * Returns true if an element of the given type and id exists in the underlying persistence layer.
+	 *
+	 * @param type the type of the entity to check
+	 * @param id   the unique identifier of the entity to check
+	 *
+	 * @return true if at least one matching element exists, false otherwise
+	 */
+	default boolean hasElement(String type, String id) {
+		return querySize(type, id) != 0;
+	}
 
 	/**
 	 * Queries the current list of types from the underlying persistence layer
