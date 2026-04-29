@@ -79,6 +79,16 @@ public abstract class AbstractDao<T extends StrolchRootElement> implements Strol
 	}
 
 	@Override
+	public long querySize(T element) {
+		return querySize(element.getType(), element.getId());
+	}
+
+	@Override
+	public long querySize(String type, String id) {
+		return this.tx.getObjectDao().hasElement(getTypeRef(type).getChildIdRef(this.tx, id)) ? 1L : 0L;
+	}
+
+	@Override
 	public Set<String> queryTypes() {
 		TypeRef typeRef = this.tx.getManager().getObjectRefCache().getTypeRef(getClassType());
 		return this.tx.getMetadataDao().queryTypeSet(typeRef);
