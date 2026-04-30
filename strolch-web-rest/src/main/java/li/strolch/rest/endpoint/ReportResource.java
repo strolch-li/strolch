@@ -135,21 +135,13 @@ public class ReportResource {
 
 		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
 
-		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
-		JsonObject localeJ = null;
-		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser
-					.parseString(new String(Files.readAllBytes(localesF.toPath())))
-					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toLanguageTag()))
-				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
-		}
+		JsonObject localeJ = getI18nData(request, cert);
 
 		long start = System.nanoTime();
 
 		JsonObject result = new JsonObject();
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-			 Report report = new Report(tx, id)) {
+		     Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
@@ -207,20 +199,12 @@ public class ReportResource {
 		String query = isNotEmpty(queryS) ? queryS.toLowerCase() : queryS;
 		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
 
-		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
-		JsonObject localeJ = null;
-		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser
-					.parseString(new String(Files.readAllBytes(localesF.toPath())))
-					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toLanguageTag()))
-				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
-		}
+		JsonObject localeJ = getI18nData(request, cert);
 
 		long start = System.nanoTime();
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-			 Report report = new Report(tx, id)) {
+		     Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
@@ -291,20 +275,12 @@ public class ReportResource {
 			to = null;
 		}
 
-		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
-		JsonObject localeJ = null;
-		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser
-					.parseString(new String(Files.readAllBytes(localesF.toPath())))
-					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toLanguageTag()))
-				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
-		}
+		JsonObject localeJ = getI18nData(request, cert);
 
 		long start = System.nanoTime();
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-			 Report report = new Report(tx, id)) {
+		     Report report = new Report(tx, id)) {
 
 			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 
@@ -424,15 +400,7 @@ public class ReportResource {
 			to = null;
 		}
 
-		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
-		JsonObject localeJ = null;
-		if (localesF.exists()) {
-			JsonObject localesJ = JsonParser
-					.parseString(new String(Files.readAllBytes(localesF.toPath())))
-					.getAsJsonObject();
-			if (localesJ.has(cert.getLocale().toLanguageTag()))
-				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
-		}
+		JsonObject localeJ = getI18nData(request, cert);
 
 		// create CSV printer with header
 		StreamingOutput out = getOut(cert, realm, id, localeJ, filters, from, to);
@@ -451,7 +419,7 @@ public class ReportResource {
 		return out -> {
 
 			try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
-				 Report report = new Report(tx, reportId)) {
+			     Report report = new Report(tx, reportId)) {
 
 				tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), reportId));
 
@@ -527,5 +495,18 @@ public class ReportResource {
 		}
 
 		return result;
+	}
+
+	private static JsonObject getI18nData(HttpServletRequest request, Certificate cert) throws IOException {
+		File localesF = new File(request.getServletContext().getRealPath(LOCALES_JSON));
+		JsonObject localeJ = null;
+		if (localesF.exists()) {
+			JsonObject localesJ = JsonParser
+					.parseString(new String(Files.readAllBytes(localesF.toPath())))
+					.getAsJsonObject();
+			if (localesJ.has(cert.getLocale().toLanguageTag()))
+				localeJ = localesJ.get(cert.getLocale().toLanguageTag()).getAsJsonObject();
+		}
+		return localeJ;
 	}
 }
