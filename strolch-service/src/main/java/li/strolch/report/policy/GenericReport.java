@@ -657,8 +657,12 @@ public class GenericReport extends ReportPolicy {
 	protected JsonObject mapCriteriaToJson(StrolchRootElement criterion) {
 		JsonObject result = new JsonObject();
 		result.addProperty(Tags.Json.ID, criterion.getId());
-		result.addProperty(Tags.Json.NAME, criterion.getName());
+		result.addProperty(Tags.Json.NAME, mapCriterionName(criterion));
 		return result;
+	}
+
+	protected String mapCriterionName(StrolchRootElement criterion) {
+		return criterion.getName();
 	}
 
 	protected Stream<? extends StrolchRootElement> prepareStreamForDirectCriteria(String type, int maxFacetValues) {
