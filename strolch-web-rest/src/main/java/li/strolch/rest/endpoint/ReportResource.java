@@ -321,10 +321,12 @@ public class ReportResource {
 			Resource reportR = tx.getResourceBy(TYPE_REPORT, id, true);
 			reportR.getParameterBag(BAG_COLUMNS).getParameterKeySet().forEach(s -> {
 				StringParameter param = reportR.getParameter(BAG_COLUMNS, s, true);
+				String name = param.getName();
+				String columnName = localeJ != null && localeJ.has(name) ? localeJ.get(name).getAsString() : name;
 
 				JsonObject o = new JsonObject();
 				o.addProperty(Tags.Json.ID, s);
-				o.addProperty(Tags.Json.NAME, param.getName());
+				o.addProperty(Tags.Json.NAME, columnName);
 				o.addProperty(Tags.Json.INDEX, param.getIndex());
 				col.add(o);
 			});
