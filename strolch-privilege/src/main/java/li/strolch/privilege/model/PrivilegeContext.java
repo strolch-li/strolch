@@ -16,10 +16,12 @@
 package li.strolch.privilege.model;
 
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.MissingRoleException;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.dbc.DBC;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,7 +41,7 @@ import static li.strolch.privilege.i18n.PrivilegeMessages.getString;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public record PrivilegeContext(Certificate certificate, Map<String, Privilege> privileges,
-							   Map<String, PrivilegePolicy> policies) {
+                               Map<String, PrivilegePolicy> policies) {
 
 	public PrivilegeContext(Certificate certificate, Map<String, Privilege> privileges,
 			Map<String, PrivilegePolicy> policies) {
@@ -126,7 +128,7 @@ public record PrivilegeContext(Certificate certificate, Map<String, Privilege> p
 	public boolean assertHasRole(String roleName) throws AccessDeniedException {
 		if (!this.certificate.hasRole(roleName)) {
 			String msg = format(getString("Privilege.noprivilege.role"), this.certificate.getUsername(), roleName);
-			throw new AccessDeniedException(msg);
+			throw new MissingRoleException(msg, getUsername(), List.of(roleName));
 		}
 
 		return true;
@@ -151,7 +153,7 @@ public record PrivilegeContext(Certificate certificate, Map<String, Privilege> p
 
 		String msg = format(getString("Privilege.noprivilege.role"), this.certificate.getUsername(),
 				String.join(", ", roleNames));
-		throw new AccessDeniedException(msg);
+		throw new MissingRoleException(msg, getUsername(), List.of(roleNames));
 	}
 
 	public boolean hasAnyGroup(String... groupNames) throws AccessDeniedException {

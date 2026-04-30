@@ -16,7 +16,6 @@
 package li.strolch.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -35,6 +34,7 @@ import li.strolch.model.log.LogMessage;
 import li.strolch.model.log.LogMessageState;
 import li.strolch.model.log.LogSeverity;
 import li.strolch.privilege.base.AccessDeniedException;
+import li.strolch.privilege.base.MissingRoleException;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.helper.RestfulHelper;
 import org.slf4j.Logger;
@@ -89,6 +89,7 @@ public class StrolchRestfulExceptionMapper implements ExceptionMapper<Exception>
 		}
 
 		return switch (ex) {
+			case MissingRoleException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.toI18n(agent.getLocale()));
 			case AccessDeniedException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.getMessage());
 			case StrolchAccessDeniedException e -> ResponseUtil.toResponse(Status.FORBIDDEN, e.getI18n());
 			case StrolchNotAuthenticatedException e -> {

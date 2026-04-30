@@ -59,7 +59,7 @@ public class ResponseUtil {
 	}
 
 	public static Response toResponse(Status status, I18nMessage msg) {
-		String json = StrolchResponse.valueOf(msg.getMessage()).toJson();
+		String json = StrolchResponse.valueOf(msg.getMessage(), msg).toJson();
 		return Response.status(status).entity(json).type(APPLICATION_JSON).build();
 	}
 
