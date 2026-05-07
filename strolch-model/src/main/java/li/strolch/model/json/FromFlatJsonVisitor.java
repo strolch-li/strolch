@@ -58,6 +58,7 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 	private final MapOfSets<String, String> ignoredKeys;
 	private final MapOfSets<String, String> optionalKeys;
 	private MapOfSets<String, String> nonEmptyParameters;
+	private boolean lenient;
 
 	private JsonObject srcObject;
 
@@ -75,6 +76,14 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 		this.nonEmptyParameters = new MapOfSets<>();
 		this.ignoredKeys = new MapOfSets<>();
 		this.optionalKeys = new MapOfSets<>();
+	}
+
+	public void setLenient(boolean lenient) {
+		this.lenient = lenient;
+	}
+
+	public boolean isLenient() {
+		return this.lenient;
 	}
 
 	public FromFlatJsonVisitor nonEmptyParameter(String paramId) {
@@ -197,7 +206,7 @@ public class FromFlatJsonVisitor implements StrolchRootElementVisitor<Void> {
 				JsonElement jsonElement = this.srcObject.get(paramId);
 				if (jsonElement == null) {
 
-					if (this.optionalKeys.containsElement(bagId, paramId))
+					if (this.lenient || this.optionalKeys.containsElement(bagId, paramId))
 						continue;
 
 					throw new StrolchModelException(
