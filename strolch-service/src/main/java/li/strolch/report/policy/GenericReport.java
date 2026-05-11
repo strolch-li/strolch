@@ -380,14 +380,14 @@ public class GenericReport extends ReportPolicy {
 				// transform each element into a map of Type,Value pairs
 				.map(this::evaluateRow);
 
-		stream = handleAdditionalTypes(stream);
+		stream = handleAdditionalTypes(stream, true);
 
 		stream = flatMap(stream);
 
 		if (hasFilter())
 			stream = stream.filter(this::filter);
 
-		stream = stream.peek(e -> this.counter.incrementAndGet());
+		stream = stream.peek(_ -> this.counter.incrementAndGet());
 
 		if (withOrdering && hasOrdering())
 			stream = stream.sorted(this::sort);
@@ -442,7 +442,7 @@ public class GenericReport extends ReportPolicy {
 	 * product stream
 	 */
 	protected Stream<Map<String, StrolchRootElement>> handleAdditionalTypes(
-			Stream<Map<String, StrolchRootElement>> stream) {
+			Stream<Map<String, StrolchRootElement>> stream, boolean optional) {
 
 		// see if we need to do additional type joining
 		ParameterBag additionalTypeBag = this.reportRes.getParameterBag(BAG_ADDITIONAL_TYPE);
@@ -470,13 +470,18 @@ public class GenericReport extends ReportPolicy {
 		return stream.flatMap(row -> {
 
 			StrolchRootElement joinElement = row.get(joinWithP.getUom());
-			if (joinElement == null)
+			if (joinElement == null) {
+				if (optional)
+					return Stream.of(row);
 				throw new IllegalStateException(
 						format("Additional join type {0} is not available on row for {1}", joinWithP.getUom(),
 								joinWithP.getLocator()));
+			}
 
 			Optional<Parameter<?>> refP = lookupParameter(joinWithP, joinElement, false);
 			if (refP.isEmpty()) {
+				if (optional)
+					return Stream.of(row);
 				throw new IllegalStateException(
 						format("Parameter reference ({0}) for {1} not found on {2}", joinWithP.getValue(),
 								joinWithP.getLocator(), joinElement.getLocator()));
@@ -1154,10 +1159,13 @@ public class GenericReport extends ReportPolicy {
 		} else {
 			// recursively find the dependency
 			StringParameter dependencyP = joinBag.getParameter(dependencyType);
-			if (dependencyP == null)
+			if (dependencyP == null) {
+				if (optional)
+					return null;
 				throw new IllegalStateException(
 						"The defined join dependency " + dependencyType + " does not exist for " + joinP.getLocator());
-			dependency = addColumnJoin(refs, joinBag, dependencyP, false);
+			}
+			dependency = addColumnJoin(refs, joinBag, dependencyP, optional);
 			if (dependency == null)
 				return null;
 		}
