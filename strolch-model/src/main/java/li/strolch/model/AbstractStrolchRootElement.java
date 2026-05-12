@@ -66,6 +66,12 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 
 	@Override
 	public void setRelations(String param, Collection<? extends StrolchRootElement> elements) {
+		StringListParameter relationsP = relationsBag().getParameter(param);
+		if (elements.isEmpty()) {
+			if (relationsP != null)
+				relationsP.clear();
+			return;
+		}
 
 		// validate we have same objects
 		List<String> objectTypes = elements.stream().map(StrolchRootElement::getObjectType).distinct().toList();
@@ -81,11 +87,10 @@ public abstract class AbstractStrolchRootElement extends GroupedParameterizedEle
 					.map(StrolchElement::getId)
 					.collect(Collectors.joining(", ")));
 
-		StringListParameter relationsP = relationsBag().getParameter(param);
 		if (relationsP == null) {
 			String name = buildParamName(param);
 			relationsP = new StringListParameter(param, name, emptyList());
-			setInterpretationAndUom(relationsP, objectTypes.get(0), types.get(0));
+			setInterpretationAndUom(relationsP, objectTypes.getFirst(), types.getFirst());
 
 			relationsBag().addParameter(relationsP);
 		}
