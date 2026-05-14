@@ -31,6 +31,7 @@ public class PrivilegeConstants {
 	public static final String LOCATIONS = "locations";
 	public static final String PRIMARY_LOCATION = "primaryLocation";
 	public static final String SECONDARY_LOCATIONS = "secondaryLocations";
+	public static final String FAVORITE_LOCATIONS = "favoriteLocations";
 	public static final String ROLES = "roles";
 	public static final String GROUPS = "groups";
 	public static final String EMAIL = "email";
