@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static java.text.MessageFormat.format;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 
 /**
@@ -51,8 +52,8 @@ import static li.strolch.privilege.base.PrivilegeConstants.*;
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public record User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
-				   UserState userState, Set<String> groups, Set<String> roles, Locale locale,
-				   Map<String, String> properties, boolean passwordChangeRequested, UserHistory history)
+                   UserState userState, Set<String> groups, Set<String> roles, Locale locale,
+                   Map<String, String> properties, boolean passwordChangeRequested, UserHistory history)
 		implements Comparable<User> {
 
 	public User(String userId, String username, PasswordCrypt passwordCrypt, String firstname, String lastname,
@@ -249,23 +250,10 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 	 */
 	@Override
 	public String toString() {
-		return "User [userId="
-				+ this.userId
-				+ ", username="
-				+ this.username
-				+ ", firstname="
-				+ this.firstname
-				+ ", lastname="
-				+ this.lastname
-				+ ", locale="
-				+ this.locale
-				+ ", userState="
-				+ this.userState
-				+ ", roles="
-				+ this.roles
-				+ ", groups="
-				+ this.groups
-				+ "]";
+		return format(
+				"User [userId={0}, username={1}, firstname={2}, lastname={3}, locale={4}, userState={5}, roles={6}, groups={7}]",
+				this.userId, this.username, this.firstname, this.lastname, this.locale, this.userState, this.roles,
+				this.groups);
 	}
 
 	@Override
@@ -300,6 +288,27 @@ public record User(String userId, String username, PasswordCrypt passwordCrypt, 
 		DBC.PRE.assertEmpty(() -> "User " + this.username + " already has user ID " + this.userId, this.userId);
 		return new User(userId, this.username, this.passwordCrypt, this.firstname, this.lastname, this.userState,
 				this.groups, this.roles, this.locale, this.properties, this.passwordChangeRequested, this.history);
+	}
+
+	public User withAdditionalProperties(Map<String, String> properties) {
+		DBC.PRE.assertNotNull("properties must not be null", properties);
+		return new User(this.userId, this.username, this.passwordCrypt, this.firstname, this.lastname, this.userState,
+				this.groups, this.roles, this.locale, mergeProperties(this.properties, properties),
+				this.passwordChangeRequested, this.history);
+	}
+
+	public User withPasswordCrypt(PasswordCrypt newPasswordCrypt) {
+		DBC.PRE.assertNotNull("newPasswordCrypt must not be null", newPasswordCrypt);
+		return new User(this.userId, this.username, newPasswordCrypt, this.firstname, this.lastname, this.userState,
+				this.groups, this.roles, this.locale, this.properties, this.passwordChangeRequested, this.history);
+	}
+
+	private Map<String, String> mergeProperties(Map<String, String> properties, Map<String, String> properties1) {
+		DBC.PRE.assertNotNull("properties must not be null", properties);
+		DBC.PRE.assertNotNull("properties1 must not be null", properties1);
+		Map<String, String> merged = new HashMap<>(properties);
+		merged.putAll(properties1);
+		return merged;
 	}
 
 	@Override

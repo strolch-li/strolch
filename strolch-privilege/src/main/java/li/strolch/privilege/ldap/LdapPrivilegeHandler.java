@@ -95,7 +95,7 @@ public class LdapPrivilegeHandler extends DefaultPrivilegeHandler {
 			User user = this.queryContext.buildUserFromSearchResult(username, searchResult);
 			if (internalUser == null)
 				return user;
-			return user.withHistory(internalUser.history());
+			return copyCustomProperties(user, internalUser).withHistory(internalUser.history());
 
 		} catch (AccessDeniedException e) {
 			throw e;

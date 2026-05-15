@@ -599,6 +599,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			if (user.getUserId() == null)
 				user = user.withUserId(internalUser.getUserId());
 
+			user = copyCustomProperties(user, internalUser);
+
 			history = history.withFirstLogin(internalUser.getHistory().getFirstLogin());
 			this.persistenceHandler.replaceUser(user.withHistory(history));
 		}
@@ -614,6 +616,16 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		logger.info("User {} authenticated with single sign on: {}", user.getUsername(), certificate);
 
 		return certificate;
+	}
+
+	protected User copyCustomProperties(User user, User internalUser) {
+		Map<String, String> properties = new HashMap<>();
+		for (String key : internalUser.getPropertyKeySet()) {
+			if (!user.hasProperty(key))
+				properties.put(key, internalUser.getProperty(key));
+		}
+
+		return user.withAdditionalProperties(properties);
 	}
 
 	@Override
@@ -691,7 +703,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		// write the sessions
 		try (OutputStream out = Files.newOutputStream(this.persistSessionsPath.toPath());
-			 OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
+		     OutputStream outputStream = AesCryptoHelper.wrapEncrypt(this.secretKey, out)) {
 
 			CertificateStubsSaxWriter writer = new CertificateStubsSaxWriter(sessions.get(), outputStream);
 			writer.write();
@@ -723,7 +735,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		List<CertificateStub> certificateStubs;
 		try (InputStream fin = Files.newInputStream(this.persistSessionsPath.toPath());
-			 InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey, fin)) {
+		     InputStream inputStream = AesCryptoHelper.wrapDecrypt(this.secretKey, fin)) {
 
 			CertificateStubsSaxReader reader = new CertificateStubsSaxReader(inputStream);
 			certificateStubs = reader.read();
@@ -844,9 +856,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			PasswordCrypt newPasswordCrypt = this.encryptionHandler.hashPassword(password, salt);
 
 			// create new user
-			user = new User(user.getUserId(), user.getUsername(), newPasswordCrypt, user.getFirstname(),
-					user.getLastname(), user.getUserState(), user.getGroups(), user.getRoles(), user.getLocale(),
-					user.getProperties(), user.isPasswordChangeRequested(), user.getHistory());
+			user = user.withPasswordCrypt(newPasswordCrypt);
 
 			// delegate user replacement to persistence handler
 			this.persistenceHandler.replaceUser(user);
