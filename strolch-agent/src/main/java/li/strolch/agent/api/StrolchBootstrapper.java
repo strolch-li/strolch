@@ -283,7 +283,7 @@ public class StrolchBootstrapper extends DefaultHandler {
 		// config path: readable directory
 		if (!this.configPathF.isDirectory() || !this.configPathF.canRead()) {
 			String msg = "[{0}] Config path is not readable at {1}";
-			msg = MessageFormat.format(msg, environment, this.configPathF);
+			msg = MessageFormat.format(msg, environment, this.configPathF.getAbsolutePath());
 			throw new StrolchConfigurationException(msg);
 		}
 		// configuration file must exist
