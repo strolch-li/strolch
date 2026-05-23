@@ -62,18 +62,24 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 						MessageFormat.format("The attribute {0} is missing for IncludeFile!", Tags.FILE));
 			}
 
-			File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
-			if (!includeFile.exists() || !includeFile.canRead()) {
-				String msg
-						= "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1}";
-				msg = MessageFormat.format(msg, this.modelFile.getAbsolutePath(), includeFileS);
-				throw new IllegalArgumentException(msg);
-			}
-
-			XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile, true, this.verbose);
-			handler.parseFile();
+			XmlModelSaxFileReader handler = getXmlModelSaxFileReader(includeFileS);
 			this.statistics.add(handler.statistics);
 		}
+	}
+
+	private XmlModelSaxFileReader getXmlModelSaxFileReader(String includeFileS) {
+		File includeFile = new File(this.modelFile.getParentFile(), includeFileS);
+		if (!includeFile.exists() || !includeFile.canRead()) {
+			String msg
+					= "The IncludeFile does not exist, or is not readable. Source model: {0} with IncludeFile: {1} at absolute path {2}";
+			msg = MessageFormat.format(msg, this.modelFile.getAbsolutePath(), includeFileS,
+					includeFile.getAbsolutePath());
+			throw new IllegalArgumentException(msg);
+		}
+
+		XmlModelSaxFileReader handler = new XmlModelSaxFileReader(this.listener, includeFile, true, this.verbose);
+		handler.parseFile();
+		return handler;
 	}
 
 	public void parseFile() {
