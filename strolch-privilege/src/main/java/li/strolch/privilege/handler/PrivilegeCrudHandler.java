@@ -1093,7 +1093,7 @@ public class PrivilegeCrudHandler {
 			String policy = privilege.getPolicy();
 			if (policy != null && !this.policyMap.containsKey(policy)) {
 				String msg = "Policy {0} for Privilege {1} does not exist on role {2}";
-				msg = format(msg, policy, privilege.getName(), role);
+				msg = format(msg, policy, privilege.getName(), role.name());
 				throw new PrivilegeModelException(msg);
 			}
 		}
