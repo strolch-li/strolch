@@ -49,6 +49,9 @@ import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonElement> {
 
+	private final ParameterValueToJsonElementVisitor parameterValueToJsonElementVisitor;
+	private final IValueToJsonElementVisitor ivalueToJsonElementVisitor;
+
 	private final MapOfSets<String, String> ignoredKeys;
 	private final Set<String> ignoredTimedStates;
 	private final Set<String> ignoredBagTypes;
@@ -79,6 +82,8 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		this.ignoredBagTypes = new HashSet<>();
 		this.flatBags = new HashSet<>();
 		this.flatBagsByType = new HashSet<>();
+		this.parameterValueToJsonElementVisitor = new ParameterValueToJsonElementVisitor();
+		this.ivalueToJsonElementVisitor = new IValueToJsonElementVisitor();
 	}
 
 	public boolean isFlat() {
@@ -580,7 +585,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 				if (isNotEmpty(valueChange.getStateId()))
 					changeJ.addProperty(STATE_ID, valueChange.getStateId());
 				changeJ.addProperty(TIME, formatDate(valueChange.getTime()));
-				changeJ.addProperty(VALUE, valueChange.getValue().getValueAsString());
+				changeJ.add(VALUE, valueChange.getValue().accept(ivalueToJsonElementVisitor));
 				changeJ.addProperty(TYPE, valueChange.getValue().getType());
 
 				changesJ.add(changeJ);
@@ -742,7 +747,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		if (param.getIndex() != 0)
 			paramJ.addProperty(INDEX, param.getIndex());
 
-		paramJ.addProperty(VALUE, param.getValueAsString());
+		paramJ.add(VALUE, param.accept(parameterValueToJsonElementVisitor));
 		return paramJ;
 	}
 
@@ -813,10 +818,10 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 			valuesJ.add(valueJ);
 
 			Long time = value.getTime();
-			String valueS = value.getValue().getValueAsString();
+			IValue<?> iValue = value.getValue();
 
 			valueJ.addProperty(TIME, formatDate(time));
-			valueJ.addProperty(VALUE, valueS);
+			valueJ.add(VALUE, iValue.accept(ivalueToJsonElementVisitor));
 		}
 		return stateJ;
 	}
@@ -829,7 +834,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		for (ITimeValue<? extends IValue<?>> v : timeEvolution.getValues()) {
 			JsonObject obj = new JsonObject();
 			obj.addProperty(DATE, ISO8601FormatFactory.getInstance().formatDate(v.getTime()));
-			obj.addProperty(VALUE, v.getValue().getValueAsString());
+			obj.add(VALUE, v.getValue().accept(ivalueToJsonElementVisitor));
 
 			arrayJ.add(obj);
 		}

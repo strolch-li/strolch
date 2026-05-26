@@ -161,8 +161,8 @@ public class StrolchElementFromJsonVisitor {
 				String timeS = timeValueJ.get(Json.TIME).getAsString();
 				long time = ISO8601FormatFactory.getInstance().parseDate(timeS).getTime();
 
-				String valueS = timeValueJ.get(Json.VALUE).getAsString();
-				timedState.setStateFromStringAt(time, valueS);
+				JsonElement valueJ = timeValueJ.get(Json.VALUE);
+				valueType.setValueFromJson(timedState, time, valueJ);
 			});
 		}
 	}
@@ -377,8 +377,8 @@ public class StrolchElementFromJsonVisitor {
 		if (jsonObject.has(Json.HIDDEN))
 			param.setHidden(jsonObject.get(Json.HIDDEN).getAsBoolean());
 
-		String value = jsonObject.get(Json.VALUE).getAsString();
-		param.setValueFromString(value);
+		JsonElement valueJ = jsonObject.get(Json.VALUE);
+		param.getValueType().setValueFromJson(param, valueJ);
 	}
 
 	protected void fillElement(JsonObject jsonObject, Action action) {
