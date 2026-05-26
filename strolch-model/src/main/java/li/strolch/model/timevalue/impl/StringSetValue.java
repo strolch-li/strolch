@@ -19,6 +19,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.model.visitor.IValueVisitor;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
 
@@ -156,5 +157,10 @@ public class StringSetValue implements IValue<Set<AString>>, Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(aStrings);
+	}
+
+	@Override
+	public <U> U accept(IValueVisitor<U> visitor) {
+		return visitor.accept(this);
 	}
 }

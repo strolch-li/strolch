@@ -15,6 +15,8 @@
  */
 package li.strolch.model.timevalue;
 
+import li.strolch.model.visitor.IValueVisitor;
+
 /**
  * A value object defining some basic algebraic operations. Mathematically speaking {@link IValue} objects define a
  * group with a addition operation.
@@ -59,4 +61,16 @@ public interface IValue<T> extends Comparable<IValue<T>> {
 	 * @return this value in string representation
 	 */
 	String getValueAsString();
+
+	/**
+	 * Accepts a visitor implementing the {@link IValueVisitor} interface and performs an operation defined by the
+	 * visitor. This method enables the implementation of the Visitor design pattern to separate operations from the
+	 * structure.
+	 *
+	 * @param <U>     the type of the result returned by the visitor
+	 * @param visitor the visitor instance implementing the operation to be performed
+	 *
+	 * @return the result of the operation defined by the visitor
+	 */
+	<U> U accept(IValueVisitor<U> visitor);
 }

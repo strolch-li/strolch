@@ -18,6 +18,7 @@ package li.strolch.model.timevalue.impl;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.model.visitor.IValueVisitor;
 import li.strolch.utils.helper.StringHelper;
 
 import java.io.Serializable;
@@ -139,5 +140,10 @@ public class FloatListValue implements IValue<List<Double>>, Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(value);
+	}
+
+	@Override
+	public <U> U accept(IValueVisitor<U> visitor) {
+		return visitor.accept(this);
 	}
 }

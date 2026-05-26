@@ -18,6 +18,7 @@ package li.strolch.model.timevalue.impl;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.timevalue.ITimeValue;
 import li.strolch.model.timevalue.IValue;
+import li.strolch.model.visitor.IValueVisitor;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -100,5 +101,10 @@ public class BooleanValue implements IValue<Boolean>, Serializable {
 	@Override
 	public int hashCode() {
 		return Objects.hash(value);
+	}
+
+	@Override
+	public <U> U accept(IValueVisitor<U> visitor) {
+		return visitor.accept(this);
 	}
 }
