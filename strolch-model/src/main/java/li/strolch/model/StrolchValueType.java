@@ -15,6 +15,8 @@
  */
 package li.strolch.model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import li.strolch.model.parameter.*;
 import li.strolch.model.timedstate.*;
@@ -27,9 +29,8 @@ import li.strolch.utils.time.PeriodDuration;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.joining;
 
@@ -48,6 +49,18 @@ public enum StrolchValueType {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
 			return new JsonPrimitive(((Boolean) value));
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			BooleanParameter param = (BooleanParameter) p;
+			param.setValue(jsonElement.getAsBoolean());
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			BooleanTimedState timedState = (BooleanTimedState) state;
+			timedState.getTimeEvolution().setValueAt(time, new BooleanValue(jsonElement.getAsBoolean()));
 		}
 
 		@Override
@@ -92,6 +105,18 @@ public enum StrolchValueType {
 		}
 
 		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			IntegerTimedState timedState = (IntegerTimedState) state;
+			timedState.getTimeEvolution().setValueAt(time, new IntegerValue(jsonElement.getAsInt()));
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			IntegerParameter param = (IntegerParameter) p;
+			param.setValue(jsonElement.getAsInt());
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return IntegerParameter.parseFromString(value);
 		}
@@ -133,6 +158,18 @@ public enum StrolchValueType {
 		}
 
 		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			FloatParameter param = (FloatParameter) p;
+			param.setValue(jsonElement.getAsDouble());
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			FloatTimedState timedState = (FloatTimedState) state;
+			timedState.getTimeEvolution().setValueAt(time, new FloatValue(jsonElement.getAsDouble()));
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return FloatParameter.parseFromString(value);
 		}
@@ -168,6 +205,18 @@ public enum StrolchValueType {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
 			return new JsonPrimitive((Long) value);
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			LongParameter param = (LongParameter) p;
+			param.setValue(jsonElement.getAsLong());
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			LongTimedState timedState = (LongTimedState) state;
+			timedState.getTimeEvolution().setValueAt(time, new LongValue(jsonElement.getAsLong()));
 		}
 
 		@Override
@@ -209,6 +258,18 @@ public enum StrolchValueType {
 		}
 
 		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			StringParameter param = (StringParameter) p;
+			param.setValue(jsonElement.getAsString());
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return value;
 		}
@@ -246,6 +307,18 @@ public enum StrolchValueType {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
 			return new JsonPrimitive((String) value);
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			StringParameter param = (StringParameter) p;
+			param.setValue(jsonElement.getAsString());
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
@@ -291,7 +364,19 @@ public enum StrolchValueType {
 				return new JsonPrimitive(ISO8601.toString((LocalDateTime) value));
 			if (value instanceof ZonedDateTime)
 				return new JsonPrimitive(ISO8601.toString((ZonedDateTime) value));
-			throw new ClassCastException("value " + value + " + has unexpected class " + value.getClass());
+			throw new ClassCastException("value " + value + " has unexpected class " + value.getClass());
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			DateParameter param = (DateParameter) p;
+			param.setValueFromString(jsonElement.getAsString());
 		}
 
 		@Override
@@ -327,6 +412,18 @@ public enum StrolchValueType {
 		@Override
 		public JsonPrimitive valueToJson(Object value) {
 			return new JsonPrimitive(((PeriodDuration) value).toString());
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			DurationParameter param = (DurationParameter) p;
+			param.setValueFromString(jsonElement.getAsString());
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
@@ -369,6 +466,29 @@ public enum StrolchValueType {
 		}
 
 		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			FloatListParameter param = (FloatListParameter) p;
+			parseJsonArray(jsonElement, param, Double::parseDouble);
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> s, long time, JsonElement jsonElement) {
+			FloatListTimedState state = (FloatListTimedState) s;
+
+			if (jsonElement.isJsonPrimitive()) {
+				String value = jsonElement.getAsString();
+				state.setStateFromStringAt(time, value);
+			} else {
+				JsonArray jsonArray = jsonElement.getAsJsonArray();
+				List<Double> list = new ArrayList<>();
+				for (JsonElement element : jsonArray) {
+					list.add(Double.parseDouble(element.getAsString().trim()));
+				}
+				state.getTimeEvolution().setValueAt(time, new FloatListValue(list));
+			}
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return FloatListParameter.parseFromString(value);
 		}
@@ -405,6 +525,29 @@ public enum StrolchValueType {
 		public JsonPrimitive valueToJson(Object value) {
 			@SuppressWarnings("unchecked") List<Integer> list = (List<Integer>) value;
 			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			IntegerListParameter param = (IntegerListParameter) p;
+			parseJsonArray(jsonElement, param, Integer::parseInt);
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> s, long time, JsonElement jsonElement) {
+			IntegerListTimedState state = (IntegerListTimedState) s;
+
+			if (jsonElement.isJsonPrimitive()) {
+				String value = jsonElement.getAsString();
+				state.setStateFromStringAt(time, value);
+			} else {
+				JsonArray jsonArray = jsonElement.getAsJsonArray();
+				List<Integer> list = new ArrayList<>();
+				for (JsonElement element : jsonArray) {
+					list.add(Integer.parseInt(element.getAsString().trim()));
+				}
+				state.getTimeEvolution().setValueAt(time, new IntegerListValue(list));
+			}
 		}
 
 		@Override
@@ -447,6 +590,18 @@ public enum StrolchValueType {
 		}
 
 		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			LongListParameter param = (LongListParameter) p;
+			parseJsonArray(jsonElement, param, Long::parseLong);
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			return LongListParameter.parseFromString(value);
 		}
@@ -485,6 +640,18 @@ public enum StrolchValueType {
 		public JsonPrimitive valueToJson(Object value) {
 			@SuppressWarnings("unchecked") List<String> list = (List<String>) value;
 			return new JsonPrimitive(list.stream().map(Objects::toString).collect(joining(", ")));
+		}
+
+		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			StringListParameter param = (StringListParameter) p;
+			parseJsonArray(jsonElement, param, String::valueOf);
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time, JsonElement jsonElement) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("TimeStates of type {0} are not supported!", getType()));
 		}
 
 		@Override
@@ -531,6 +698,29 @@ public enum StrolchValueType {
 		}
 
 		@Override
+		public void setValueFromJson(Parameter<?> p, JsonElement jsonElement) {
+			throw new UnsupportedOperationException(
+					MessageFormat.format("Setting value type {0} is not supported!", getType()));
+		}
+
+		@Override
+		public void setValueFromJson(StrolchTimedState<? extends IValue<?>> s, long time, JsonElement jsonElement) {
+			StringSetTimedState state = (StringSetTimedState) s;
+
+			if (jsonElement.isJsonPrimitive()) {
+				String value = jsonElement.getAsString();
+				state.setStateFromStringAt(time, value);
+			} else {
+				JsonArray jsonArray = jsonElement.getAsJsonArray();
+				Set<AString> list = new HashSet<>();
+				for (JsonElement element : jsonArray) {
+					list.add(new AString(element.getAsString().trim()));
+				}
+				state.getTimeEvolution().setValueAt(time, new StringSetValue(list));
+			}
+		}
+
+		@Override
 		public Object parseValue(String value) {
 			throw new UnsupportedOperationException(
 					MessageFormat.format("Parsing value of type {0} is not supported!", getType()));
@@ -553,6 +743,21 @@ public enum StrolchValueType {
 		}
 	};
 
+	private static <T> void parseJsonArray(JsonElement jsonElement, ListParameter<T> param,
+			Function<String, T> parser) {
+		if (jsonElement.isJsonPrimitive()) {
+			String value = jsonElement.getAsString();
+			param.setValueFromString(value);
+		} else {
+			JsonArray jsonArray = jsonElement.getAsJsonArray();
+			List<T> list = new ArrayList<>();
+			for (JsonElement element : jsonArray) {
+				list.add(parser.apply(element.getAsString().trim()));
+			}
+			param.setValue(list);
+		}
+	}
+
 	private final String type;
 
 	StrolchValueType(String type) {
@@ -572,6 +777,11 @@ public enum StrolchValueType {
 	}
 
 	public abstract JsonPrimitive valueToJson(Object value);
+
+	public abstract void setValueFromJson(Parameter<?> param, JsonElement jsonElement);
+
+	public abstract void setValueFromJson(StrolchTimedState<? extends IValue<?>> state, long time,
+			JsonElement jsonElement);
 
 	public abstract Object parseValue(String value);
 
