@@ -35,7 +35,7 @@ public enum DBC {
 	public void fail(String msg) {
 		String ex = "Assertion failed: {0}";
 		ex = MessageFormat.format(ex, msg);
-		throw new DbcException(ex);
+		throw new DbcException(ex, msg);
 	}
 
 	public <T> void assertEquals(String msg, T value1, T value2) {
@@ -54,7 +54,7 @@ public enum DBC {
 
 		String ex = "{0}: {1} != {2}";
 		ex = MessageFormat.format(ex, msgSupplier.get(), value1, value2);
-		throw new DbcException(ex);
+		throw new DbcException(ex, msgSupplier.get());
 	}
 
 	public <T> void assertEqualsIgnoreOrdering(String msg, Collection<T> value1, Collection<T> value2) {
@@ -71,7 +71,7 @@ public enum DBC {
 
 		String ex = "{0}: {1} != {2}";
 		ex = MessageFormat.format(ex, msgSupplier.get(), value1, value2);
-		throw new DbcException(ex);
+		throw new DbcException(ex, msgSupplier.get());
 	}
 
 	public <T> void assertNotEquals(String msg, T value1, T value2) {
@@ -87,7 +87,7 @@ public enum DBC {
 
 		String ex = "{0}: {1} == {2}";
 		ex = MessageFormat.format(ex, msgSupplier.get(), value1, value2);
-		throw new DbcException(ex);
+		throw new DbcException(ex, msgSupplier.get());
 	}
 
 	public void assertTrue(String msg, boolean value) {
@@ -98,7 +98,7 @@ public enum DBC {
 		if (!value) {
 			String ex = "Expected true, but was false: {0}";
 			ex = MessageFormat.format(ex, msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -110,7 +110,7 @@ public enum DBC {
 		if (value) {
 			String ex = "Expected false, but was true: {0}";
 			ex = MessageFormat.format(ex, msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -122,7 +122,7 @@ public enum DBC {
 		if (!StringHelper.isEmpty(value)) {
 			String ex = "{0}: Illegal non-empty value: {1}";
 			ex = MessageFormat.format(ex, msgSupplier.get(), value);
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -135,7 +135,7 @@ public enum DBC {
 		if (array.length != 0) {
 			String ex = "{0}: Illegal non-empty value: {1}";
 			ex = MessageFormat.format(ex, msgSupplier.get(), Arrays.toString(array));
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -148,7 +148,7 @@ public enum DBC {
 		if (!collection.isEmpty()) {
 			String ex = "{0}: Illegal non-empty value: {1}";
 			ex = MessageFormat.format(ex, msgSupplier.get(), collection.toString());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -160,7 +160,7 @@ public enum DBC {
 		if (StringHelper.isEmpty(value)) {
 			String ex = "{0}: Illegal empty value";
 			ex = MessageFormat.format(ex, msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -173,7 +173,7 @@ public enum DBC {
 		if (array.length == 0) {
 			String ex = "{0}: Illegal empty value";
 			ex = MessageFormat.format(ex, msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -186,7 +186,7 @@ public enum DBC {
 		if (collection.isEmpty()) {
 			String ex = "{0}: Illegal empty value";
 			ex = MessageFormat.format(ex, msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -198,7 +198,7 @@ public enum DBC {
 		if (value == null) {
 			String ex = "{0}: Illegal null value";
 			ex = MessageFormat.format(ex, msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -210,7 +210,7 @@ public enum DBC {
 		if (value != null) {
 			String ex = "{0}: {1} != null";
 			ex = MessageFormat.format(ex, msgSupplier.get(), value);
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -221,7 +221,7 @@ public enum DBC {
 	public void assertNotExists(Supplier<String> msgSupplier, File file) {
 		if (file.exists()) {
 			String ex = MessageFormat.format("Illegal situation as file ({0}) exists: {1}", file, msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
@@ -233,14 +233,21 @@ public enum DBC {
 		if (!file.exists()) {
 			String ex = MessageFormat.format("Illegal situation as file ({0}) does not exist: {1}", file,
 					msgSupplier.get());
-			throw new DbcException(ex);
+			throw new DbcException(ex, msgSupplier.get());
 		}
 	}
 
 	public static class DbcException extends RuntimeException {
 
-		public DbcException(String message) {
+		private String errorMsg;
+
+		public DbcException(String message, String errorMsg) {
 			super(message);
+			this.errorMsg = errorMsg;
+		}
+
+		public String getErrorMsg() {
+			return this.errorMsg;
 		}
 	}
 }
