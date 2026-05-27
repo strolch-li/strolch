@@ -23,6 +23,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.Tags;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.service.api.ServiceResultState;
+import li.strolch.utils.dbc.DBC;
 
 import static li.strolch.model.Tags.Json.*;
 import static li.strolch.rest.StrolchRestfulConstants.I18N;
@@ -61,7 +62,11 @@ public class ServiceResultResponse {
 		} else {
 			if (onlyRootCause) {
 				throwable = getRootCause(throwable);
-				this.msg = formatExceptionMessage(throwable, false);
+				if (throwable instanceof DBC.DbcException dbcException) {
+					this.msg = dbcException.getErrorMsg();
+				} else {
+					this.msg = formatExceptionMessage(throwable, false);
+				}
 			} else {
 				this.msg = serviceResult.getMessage();
 			}
