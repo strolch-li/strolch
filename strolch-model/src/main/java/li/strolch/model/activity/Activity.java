@@ -604,7 +604,7 @@ public class Activity extends AbstractStrolchRootElement
 	@Override
 	public State getState() {
 		if (this.elements == null || this.elements.isEmpty())
-			return State.CREATED;
+			return State.CLOSED;
 		return State.getState(this);
 	}
 
