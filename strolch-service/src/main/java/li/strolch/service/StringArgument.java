@@ -24,6 +24,13 @@ import li.strolch.service.api.ServiceArgument;
 public class StringArgument extends ServiceArgument {
 	public String value;
 
+	public StringArgument() {
+	}
+
+	public StringArgument(String value) {
+		this.value = value;
+	}
+
 	@Override
 	public JsonElement toJson() {
 		JsonObject jsonObject = new JsonObject();
