@@ -33,7 +33,7 @@ public class CertificateThreadLocal extends ThreadLocal<Certificate> {
 
 	public static void setCert(Certificate cert) {
 		if (instance.get() != null)
-			throw new IllegalStateException("THIS THREAD HAS ALREADY HAS A CERT!");
+			throw new IllegalStateException("THIS THREAD ALREADY HAS A CERT: " + instance.get().getSessionId());
 		instance.set(cert);
 	}
 
