@@ -26,7 +26,7 @@ public class CreatePersonalAccessTokenArgument {
 	public ZonedDateTime validFrom;
 	public ZonedDateTime validTo;
 	public Set<String> roles;
-	public List<Privilege> privileges;
+	public Set<String> privileges;
 
 	public void validate() {
 		DBC.PRE.assertNotEmpty("name must be set", name);

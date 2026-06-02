@@ -489,7 +489,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	@Override
 	public String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
-			ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges) {
+			ZonedDateTime validTo, Set<String> roles, Set<String> privileges) {
 		return this.crudHandler.createPersonalAccessToken(certificate, name, validFrom, validTo, roles, privileges);
 	}
 

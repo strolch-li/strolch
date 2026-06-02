@@ -53,11 +53,7 @@ public class PrivilegeElementFromJsonVisitor {
 			arg.roles = jsonArrayToSet(jsonObject.get("roles"));
 		}
 		if (jsonObject.has("privileges")) {
-			arg.privileges = new ArrayList<>();
-			JsonArray privilegesArr = jsonObject.get("privileges").getAsJsonArray();
-			for (JsonElement privilegeE : privilegesArr) {
-				arg.privileges.add(privilegeFromJson(privilegeE.getAsJsonObject()));
-			}
+			arg.privileges = jsonArrayToSet(jsonObject.get("privileges"));
 		}
 
 		return arg;

@@ -104,7 +104,7 @@ public class PrivilegeTest extends AbstractPrivilegeTest {
 	@Test
 	public void testAuthenticationAdmin2Ok() {
 		try {
-			login(ADMIN2, ArraysHelper.copyOf(PASS_ADMIN));
+			login(ADMIN2, ArraysHelper.copyOf(ADMIN2.toCharArray()));
 		} finally {
 			logout();
 		}

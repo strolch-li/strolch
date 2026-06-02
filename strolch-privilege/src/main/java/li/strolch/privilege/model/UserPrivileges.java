@@ -16,12 +16,14 @@
 
 package li.strolch.privilege.model;
 
-import java.util.List;
+import java.util.Set;
 
-public record UserPrivileges(UserRep userRep, List<Privilege> privileges) {
-	public UserPrivileges(UserRep userRep, List<Privilege> privileges) {
+public record UserPrivileges(UserRep userRep, Set<String> groups, Set<String> roles, Set<Privilege> privileges) {
+	public UserPrivileges(UserRep userRep, Set<String> groups, Set<String> roles, Set<Privilege> privileges) {
 		this.userRep = userRep.readOnly();
-		this.privileges = List.copyOf(privileges);
+		this.groups = Set.copyOf(groups);
+		this.roles = Set.copyOf(roles);
+		this.privileges = Set.copyOf(privileges);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

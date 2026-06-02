@@ -19,10 +19,10 @@ package li.strolch.privilege.model;
 import li.strolch.utils.dbc.DBC;
 
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.Set;
 
 public record PersonalAccessTokenRep(String tokenId, String username, String name, ZonedDateTime validFrom,
-									 ZonedDateTime validTo, ZonedDateTime lastUsed, List<Privilege> privileges) {
+									 ZonedDateTime validTo, ZonedDateTime lastUsed, Set<String> privileges) {
 
 	public PersonalAccessTokenRep {
 		DBC.PRE.assertNotEmpty("tokenId must be set", tokenId);
@@ -30,7 +30,7 @@ public record PersonalAccessTokenRep(String tokenId, String username, String nam
 		DBC.PRE.assertNotEmpty("name must be set", name);
 		DBC.PRE.assertNotNull("validFrom must be set", validFrom);
 		DBC.PRE.assertNotNull("validTo must be set", validTo);
-		privileges = List.copyOf(privileges);
+		privileges = Set.copyOf(privileges);
 	}
 
 	public <T> T accept(PrivilegeElementVisitor<T> visitor) {

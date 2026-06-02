@@ -35,7 +35,7 @@
         </Properties>
     </User>
 
-    <User userId="2" username="admin2" password="$PBKDF2WithHmacSHA512,10000,256$61646d696e32$6279316d33726458564f33664d423946467a5a32335133646549554d65697230">
+    <User userId="2" username="admin2" password="$PBKDF2WithHmacSHA512,10000,256$61646d696e32$c2f8c30e18c52ab374b4aa2040c0ea1837a6cfbfa0377e673ca735ce8e8e6f75">
         <Firstname>Application</Firstname>
         <Lastname>Administrator</Lastname>
         <State>ENABLED</State>

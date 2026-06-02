@@ -62,6 +62,8 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	@Override
 	public JsonObject visitUserPrivileges(UserPrivileges userPrivileges) {
 		JsonObject jsonObject = userPrivileges.userRep().accept(this);
+		addSet(jsonObject, userPrivileges.groups(), GROUPS);
+		addSet(jsonObject, userPrivileges.roles(), ROLES);
 		addPrivileges(userPrivileges.privileges(), jsonObject);
 		return jsonObject;
 	}
@@ -69,7 +71,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	@Override
 	public JsonObject visitGroupPrivileges(GroupPrivileges groupPrivileges) {
 		JsonObject jsonObject = groupPrivileges.group().accept(this);
-		addPrivileges(groupPrivileges.privileges(), jsonObject);
+		addSet(jsonObject, groupPrivileges.privileges(), PRIVILEGES);
 		return jsonObject;
 	}
 
@@ -96,7 +98,7 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.addProperty(LAST_USED,
 				personalAccessTokenRep.lastUsed() != null ? ISO8601.toString(personalAccessTokenRep.lastUsed()) : "-");
 
-		addPrivileges(personalAccessTokenRep.privileges(), jsonObject);
+		addSet(jsonObject, personalAccessTokenRep.privileges(), PRIVILEGES);
 
 		return jsonObject;
 	}

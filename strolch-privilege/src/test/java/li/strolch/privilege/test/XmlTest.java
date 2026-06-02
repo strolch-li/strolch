@@ -235,7 +235,7 @@ public class XmlTest {
 		User admin2 = findUser("admin2", users);
 		assertEquals("2", admin2.getUserId());
 		assertEquals("admin2", admin2.getUsername());
-		assertEquals("6279316d33726458564f33664d423946467a5a32335133646549554d65697230",
+		assertEquals("c2f8c30e18c52ab374b4aa2040c0ea1837a6cfbfa0377e673ca735ce8e8e6f75",
 				toHexString(admin2.getPasswordCrypt().password()));
 		assertEquals("Application", admin2.getFirstname());
 		assertEquals("Administrator", admin2.getLastname());

@@ -272,7 +272,7 @@ public interface PrivilegeHandler {
 	 * @return the newly created personal access token
 	 */
 	String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
-			ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges);
+			ZonedDateTime validTo, Set<String> roles, Set<String> privileges);
 
 	/**
 	 * Method to query {@link UserRep} which meet the criteria set in the given {@link UserRep}. Null fields mean the

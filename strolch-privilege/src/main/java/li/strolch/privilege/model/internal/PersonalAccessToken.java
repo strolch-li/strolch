@@ -46,7 +46,7 @@ public record PersonalAccessToken(String tokenId, String username, String name, 
 
 	public PersonalAccessTokenRep asRep() {
 		return new PersonalAccessTokenRep(this.tokenId, this.username, this.name, this.validFrom, this.validTo,
-				this.lastUsed, List.copyOf(this.privileges.values()));
+				this.lastUsed, this.privileges.keySet());
 	}
 
 	@Override

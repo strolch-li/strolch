@@ -108,9 +108,9 @@ public class PrivilegeContextBuilder {
 		// cache the privileges and policies for this user by role
 		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, policies);
 
-		Certificate certificate = new Certificate(usage, sessionId, user.getUserId(), user.getUsername(), user.getFirstname(),
-				user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive, user.getLocale(),
-				this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
+		Certificate certificate = new Certificate(usage, sessionId, user.getUserId(), user.getUsername(),
+				user.getFirstname(), user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive,
+				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
 
 		return new PrivilegeContext(certificate, privileges, policies);
 	}
@@ -122,7 +122,8 @@ public class PrivilegeContextBuilder {
 		Map<String, Privilege> privileges = new HashMap<>();
 		addPrivilegesForRoles(this.rolesWithGroupRoles, user.getUsername(), privileges, new HashMap<>());
 
-		return new UserPrivileges(user.asUserRep(), List.copyOf(privileges.values()));
+		return new UserPrivileges(user.asUserRep(), this.groups, this.rolesWithGroupRoles,
+				Set.copyOf(privileges.values()));
 	}
 
 	public GroupPrivileges buildGroupPrivilege(Group group) {
@@ -132,7 +133,7 @@ public class PrivilegeContextBuilder {
 		Map<String, Privilege> privileges = new HashMap<>();
 		addPrivilegesForRoles(groupRoles, group.name(), privileges, new HashMap<>());
 
-		return new GroupPrivileges(group, List.copyOf(privileges.values()));
+		return new GroupPrivileges(group, privileges.keySet());
 	}
 
 	protected void prepare(User user) {

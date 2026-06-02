@@ -152,7 +152,7 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 		Privilege privilegeAction = adminCtx.getPrivileges().get("PrivilegeAction");
 		assertNotNull(privilegeAction);
 
-		List<Privilege> privileges = List.of(privilegeAction);
+		Set<String> privileges = Set.of("PrivilegeAction");
 		String token = this.privilegeHandler.createPersonalAccessToken(cert, "Privileges Subset Token",
 				ZonedDateTime.now(), ZonedDateTime.now().plusDays(1), null, privileges);
 
@@ -188,12 +188,11 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 		// try to create a token with a privilege admin doesn't have
 		// we'll define a completely new privilege that NO role has
 
-		Privilege escalationPrivilege = new Privilege("NonExistentPrivilege", "DefaultPrivilege", true,
-				Collections.emptySet(), Collections.emptySet());
+		Set<String> escalationPrivilege = Set.of("NonExistentPrivilege");
 
 		try {
 			this.privilegeHandler.createPersonalAccessToken(cert, "Escalation Token", ZonedDateTime.now(),
-					ZonedDateTime.now().plusDays(1), null, List.of(escalationPrivilege));
+					ZonedDateTime.now().plusDays(1), null, escalationPrivilege);
 			fail("Should have failed to create token with escalation");
 		} catch (Exception e) {
 			assertTrue(e.getMessage().contains("does not have any of the given roles or privileges"));

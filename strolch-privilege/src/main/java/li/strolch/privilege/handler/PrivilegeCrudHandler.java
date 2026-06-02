@@ -142,7 +142,7 @@ public class PrivilegeCrudHandler {
 	}
 
 	public String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
-			ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges) {
+			ZonedDateTime validTo, Set<String> roles, Set<String> privileges) {
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		validateCreatePersonalAccessToken(prvCtx);
 
@@ -187,10 +187,10 @@ public class PrivilegeCrudHandler {
 
 			// Add additional privileges
 			if (privileges != null && !privileges.isEmpty()) {
-				for (Privilege privilege : privileges) {
-					if (userPrivileges.containsKey(privilege.getName())) {
+				for (String privilegeName : privileges) {
+					if (userPrivileges.containsKey(privilegeName)) {
 						// we take the user's privilege, not the passed one, to ensure no escalation
-						subsetPrivileges.put(privilege.getName(), userPrivileges.get(privilege.getName()));
+						subsetPrivileges.put(privilegeName, userPrivileges.get(privilegeName));
 					}
 				}
 			}
