@@ -194,7 +194,7 @@ public class XmlTest {
 		Map<String, User> users = xmlHandler.getUsersByUsername();
 		assertNotNull(users);
 
-		assertEquals(4, users.size());
+		assertEquals(5, users.size());
 
 		//
 		// users
@@ -235,7 +235,7 @@ public class XmlTest {
 		User admin2 = findUser("admin2", users);
 		assertEquals("2", admin2.getUserId());
 		assertEquals("admin2", admin2.getUsername());
-		assertEquals("8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+		assertEquals("6279316d33726458564f33664d423946467a5a32335133646549554d65697230",
 				toHexString(admin2.getPasswordCrypt().password()));
 		assertEquals("Application", admin2.getFirstname());
 		assertEquals("Administrator", admin2.getLastname());
@@ -284,18 +284,20 @@ public class XmlTest {
 		File xmlFile = new File(SRC_TEST + "PrivilegeTokens.xml");
 		XmlHelper.parseDocument(xmlFile, xmlHandler);
 
-		Map<String, AccessToken> tokens = xmlHandler.getTokens();
+		Map<String, PersonalAccessToken> tokens = xmlHandler.getTokens();
 		assertNotNull(tokens);
 
 		assertEquals(1, tokens.size());
 
-		AccessToken token = tokens.get("50b31270-bc49-4940-97ec-d4aa0d1ad649");
+		PersonalAccessToken token = tokens.get("50b31270-bc49-4940-97ec-d4aa0d1ad649");
 		assertEquals("50b31270-bc49-4940-97ec-d4aa0d1ad649", token.tokenId());
 		assertEquals("admin", token.username());
+		assertEquals("Test Token", token.name());
 		assertEquals("cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344",
 				toHexString(token.passwordCrypt().password()));
 		assertEquals(parseToZdt("2024-02-12T08:00:00.000+01:00"), token.validFrom());
 		assertEquals(parseToZdt("3000-01-01T01:00:00.000+01:00"), token.validTo());
+		assertEquals(parseToZdt("2024-02-12T09:00:00.000+01:00"), token.lastUsed());
 		assertEquals(2, token.privileges().size());
 
 		Privilege privilegeAction = token.privileges().get("Foo");
@@ -326,7 +328,7 @@ public class XmlTest {
 		// PrivilegeAdmin
 		Role privilegeAdmin = findRole("PrivilegeAdmin", roles);
 		assertEquals("PrivilegeAdmin", privilegeAdmin.getName());
-		assertEquals(22, privilegeAdmin.getPrivilegeNames().size());
+		assertEquals(24, privilegeAdmin.getPrivilegeNames().size());
 		Privilege privilegeAction = privilegeAdmin.getPrivilege(PrivilegeHandler.PRIVILEGE_ACTION);
 		assertFalse(privilegeAction.isAllAllowed());
 		assertEquals(5, privilegeAction.getAllowList().size());
@@ -616,15 +618,15 @@ public class XmlTest {
 				new Privilege("Bar2", "DefaultPrivilege", true, Collections.emptySet(), Collections.emptySet()));
 
 		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
-		AccessToken token1 = new AccessToken(UUID.randomUUID().toString(), "admin",
+		PersonalAccessToken token1 = new PersonalAccessToken(UUID.randomUUID().toString(), "admin", "Token 1",
 				new PasswordCrypt("password1".getBytes(), "salt1".getBytes(), "PBKDF2WithHmacSHA512", 10000, 256), now,
-				now.plusDays(1), privileges1);
+				now.plusDays(1), now, privileges1);
 
-		AccessToken token2 = new AccessToken(UUID.randomUUID().toString(), "user",
+		PersonalAccessToken token2 = new PersonalAccessToken(UUID.randomUUID().toString(), "user", "Token 2",
 				new PasswordCrypt("password2".getBytes(), "salt2".getBytes(), "PBKDF2WithHmacSHA512", 10000, 256), now,
-				now.plusDays(2), privileges2);
+				now.plusDays(2), null, privileges2);
 
-		List<AccessToken> tokens = new ArrayList<>();
+		List<PersonalAccessToken> tokens = new ArrayList<>();
 		tokens.add(token1);
 		tokens.add(token2);
 
@@ -635,22 +637,26 @@ public class XmlTest {
 		PrivilegeTokensSaxReader xmlHandler = new PrivilegeTokensSaxReader(true);
 		XmlHelper.parseDocument(tokensFile, xmlHandler);
 
-		Map<String, AccessToken> parsedTokens = xmlHandler.getTokens();
+		Map<String, PersonalAccessToken> parsedTokens = xmlHandler.getTokens();
 		assertNotNull(parsedTokens);
 		assertEquals(2, parsedTokens.size());
 
-		AccessToken parsedToken1 = parsedTokens.get(token1.tokenId());
-		AccessToken parsedToken2 = parsedTokens.get(token2.tokenId());
+		PersonalAccessToken parsedToken1 = parsedTokens.get(token1.tokenId());
+		PersonalAccessToken parsedToken2 = parsedTokens.get(token2.tokenId());
 
 		assertEquals(token1.username(), parsedToken1.username());
+		assertEquals(token1.name(), parsedToken1.name());
 		assertEquals(token1.validFrom(), parsedToken1.validFrom());
 		assertEquals(token1.validTo(), parsedToken1.validTo());
+		assertEquals(token1.lastUsed(), parsedToken1.lastUsed());
 		assertEquals(token1.passwordCrypt(), parsedToken1.passwordCrypt());
 		assertEquals(token1.privileges(), parsedToken1.privileges());
 
 		assertEquals(token2.username(), parsedToken2.username());
+		assertEquals(token2.name(), parsedToken2.name());
 		assertEquals(token2.validFrom(), parsedToken2.validFrom());
 		assertEquals(token2.validTo(), parsedToken2.validTo());
+		assertEquals(token2.lastUsed(), parsedToken2.lastUsed());
 		assertEquals(token2.passwordCrypt(), parsedToken2.passwordCrypt());
 		assertEquals(token2.privileges(), parsedToken2.privileges());
 	}

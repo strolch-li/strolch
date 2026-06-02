@@ -26,4 +26,30 @@ To create a Strolch project see https://strolch.li/development/
 
 ## More Information
 
-Find more to Strolch at our website: https://strolch.li
+Find more about Strolch at our website: https://strolch.li
+
+## Features
+
+### Personal Access Tokens (PATs)
+Personal Access Tokens (PATs) allow users to generate long-lived credentials to perform actions without a standard login flow. PATs can be restricted to a specific set of privileges and have their own expiration date.
+
+#### Using PATs
+Users can manage their PATs through the `PrivilegeHandler`. A PAT can be used for authentication by providing it to the `authenticatePersonalAccessToken` method, which returns a `Certificate` with the restricted scope defined for that token.
+
+For more technical details, see [strolch-privilege/docs/PersonalAccessToken.md](strolch-privilege/docs/PersonalAccessToken.md).
+
+## Build and Configuration
+
+### Prerequisites
+- Java (JDK 25 or higher recommended)
+- Maven 3.6+
+
+### Build Instructions
+To build the entire project from the root:
+```bash
+mvn clean install
+```
+To skip tests:
+```bash
+mvn clean install -DskipTests
+```
