@@ -21,6 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import li.strolch.privilege.model.*;
+import li.strolch.utils.iso8601.ISO8601;
 
 import java.util.*;
 
@@ -36,6 +37,30 @@ public class PrivilegeElementFromJsonVisitor {
 
 	public Privilege privilegeFromJson(String string) {
 		return privilegeFromJson(JsonParser.parseString(string).getAsJsonObject());
+	}
+
+	public CreatePersonalAccessTokenArgument createPersonalAccessTokenArgumentFromJson(String string) {
+		return createPersonalAccessTokenArgumentFromJson(JsonParser.parseString(string).getAsJsonObject());
+	}
+
+	public CreatePersonalAccessTokenArgument createPersonalAccessTokenArgumentFromJson(JsonObject jsonObject) {
+		CreatePersonalAccessTokenArgument arg = new CreatePersonalAccessTokenArgument();
+		arg.name = jsonObject.get("name").getAsString();
+		arg.validFrom = ISO8601.parseToZdt(jsonObject.get("validFrom").getAsString());
+		arg.validTo = ISO8601.parseToZdt(jsonObject.get("validTo").getAsString());
+
+		if (jsonObject.has("roles")) {
+			arg.roles = jsonArrayToSet(jsonObject.get("roles"));
+		}
+		if (jsonObject.has("privileges")) {
+			arg.privileges = new ArrayList<>();
+			JsonArray privilegesArr = jsonObject.get("privileges").getAsJsonArray();
+			for (JsonElement privilegeE : privilegesArr) {
+				arg.privileges.add(privilegeFromJson(privilegeE.getAsJsonObject()));
+			}
+		}
+
+		return arg;
 	}
 
 	public RoleRep roleRepFromJson(JsonObject jsonObject) {

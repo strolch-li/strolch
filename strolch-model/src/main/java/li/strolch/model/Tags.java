@@ -189,6 +189,11 @@ public class Tags {
 		public static final String LAST_LOGIN = "lastLogin";
 		public static final String LAST_PASSWORD_CHANGE = "lastPasswordChange";
 
+		public static final String TOKEN_ID = "tokenId";
+		public static final String VALID_FROM = "validFrom";
+		public static final String VALID_TO = "validTo";
+		public static final String LAST_USED = "lastUsed";
+
 		public static final String APP_VERSION = "appVersion";
 		public static final String APPLICATION_NAME = "applicationName";
 		public static final String SYSTEM_STATE = "systemState";

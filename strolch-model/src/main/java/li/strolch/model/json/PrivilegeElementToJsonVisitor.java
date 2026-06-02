@@ -85,6 +85,22 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 	}
 
 	@Override
+	public JsonObject visitPersonalAccessTokenRep(PersonalAccessTokenRep personalAccessTokenRep) {
+		JsonObject jsonObject = new JsonObject();
+
+		jsonObject.addProperty(TOKEN_ID, personalAccessTokenRep.tokenId());
+		jsonObject.addProperty(USERNAME, personalAccessTokenRep.username());
+		jsonObject.addProperty(NAME, personalAccessTokenRep.name());
+		jsonObject.addProperty(VALID_FROM, ISO8601.toString(personalAccessTokenRep.validFrom()));
+		jsonObject.addProperty(VALID_TO, ISO8601.toString(personalAccessTokenRep.validTo()));
+		jsonObject.addProperty(LAST_USED, ISO8601.toString(personalAccessTokenRep.lastUsed()));
+
+		addPrivileges(personalAccessTokenRep.privileges(), jsonObject);
+
+		return jsonObject;
+	}
+
+	@Override
 	public JsonObject visitPrivilegeRep(Privilege privilegeRep) {
 		JsonObject jsonObject = new JsonObject();
 
