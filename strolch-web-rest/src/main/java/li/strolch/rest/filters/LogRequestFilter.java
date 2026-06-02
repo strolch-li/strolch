@@ -78,3 +78,4 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 		}
 	}
 }
+	

@@ -18,6 +18,7 @@ package li.strolch.rest.endpoint;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -85,13 +86,13 @@ public class PersonalAccessTokenResource {
 
 	@Operation(summary = "Create a new personal access token", description = "Creates a new personal access token.",
 			responses = {@ApiResponse(responseCode = "200", description = "Token created successfully.",
-					content = @Content(mediaType = "application/json", schema = @Schema(type = "string"))),
+					content = @Content(mediaType = "application/json", schema = @Schema(type = "object"))),
 					@ApiResponse(responseCode = "400", description = "Invalid request format."),
 					@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createToken(String data, @Context HttpServletRequest request) {
+	public Response createToken(@Context HttpServletRequest request, String data) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		CreatePersonalAccessTokenArgument arg = new PrivilegeElementFromJsonVisitor()
@@ -106,7 +107,9 @@ public class PersonalAccessTokenResource {
 		if (svcResult.isNok())
 			return toResponse(svcResult);
 
-		return Response.ok(svcResult.getRawToken(), MediaType.TEXT_PLAIN).build();
+		JsonObject result = new JsonObject();
+		result.addProperty("token", svcResult.getRawToken());
+		return Response.ok(new Gson().toJson(result), MediaType.APPLICATION_JSON).build();
 	}
 
 	@Operation(summary = "Remove a personal access token",

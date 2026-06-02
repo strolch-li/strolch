@@ -97,7 +97,7 @@ public interface PrivilegeHandler {
 	String PRIVILEGE_SET_USER_STATE = "PrivilegeSetUserState";
 	String PRIVILEGE_SET_USER_PASSWORD = "PrivilegeSetUserPassword";
 	String PRIVILEGE_REQUIRE_PASSWORD_CHANGE = "RequirePasswordChange";
-	String PRIVILEGE_CREATE_PERSONAL_ACCESS_TOKEN = "PrivilegeCreatePersonalAccessToken";
+	String PRIVILEGE_PERSONAL_ACCESS_TOKEN = "PrivilegePersonalAccessToken";
 
 	///
 

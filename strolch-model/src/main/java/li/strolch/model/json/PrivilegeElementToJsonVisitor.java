@@ -93,7 +93,8 @@ public class PrivilegeElementToJsonVisitor implements PrivilegeElementVisitor<Js
 		jsonObject.addProperty(NAME, personalAccessTokenRep.name());
 		jsonObject.addProperty(VALID_FROM, ISO8601.toString(personalAccessTokenRep.validFrom()));
 		jsonObject.addProperty(VALID_TO, ISO8601.toString(personalAccessTokenRep.validTo()));
-		jsonObject.addProperty(LAST_USED, ISO8601.toString(personalAccessTokenRep.lastUsed()));
+		jsonObject.addProperty(LAST_USED,
+				personalAccessTokenRep.lastUsed() != null ? ISO8601.toString(personalAccessTokenRep.lastUsed()) : "-");
 
 		addPrivileges(personalAccessTokenRep.privileges(), jsonObject);
 

@@ -167,7 +167,7 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 
 	@Test
 	public void shouldFailToCreateTokenWithoutPrivilege() {
-		// jill does not have PrivilegeCreatePersonalAccessToken
+		// jill does not have PrivilegePersonalAccessToken
 		login("jill", "admin".toCharArray());
 		Certificate cert = this.ctx.getCertificate();
 
@@ -176,7 +176,7 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 					ZonedDateTime.now().plusDays(1), null, null);
 			fail("Should have failed to create token without privilege");
 		} catch (Exception e) {
-			assertTrue(e.getMessage().contains("PrivilegeCreatePersonalAccessToken"));
+			assertTrue(e.getMessage().contains("PrivilegePersonalAccessToken"));
 		}
 	}
 

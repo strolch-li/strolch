@@ -37,7 +37,7 @@ Used for API communication.
 The core interface for PAT management:
 - `getPersonalAccessTokens(Certificate certificate)`: List tokens for the current user.
 - `getPersonalAccessTokens(Certificate certificate, String username)`: List tokens for the given user.
-- `createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom, ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges)`: Create a new token for the current user. Requires `PrivilegeCreatePersonalAccessToken`.
+- `createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom, ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges)`: Create a new token for the current user. Requires `PrivilegePersonalAccessToken`.
   - The new token's privileges are a snapshot of the user's *current* privileges at the time of creation, optionally filtered by the given roles and/or privileges. 
   - If both roles and privileges are null or empty, then all of the user's current privileges are assigned to the token.
 - `removePersonalAccessToken(Certificate certificate, String tokenId)`: Revoke a token.
@@ -116,7 +116,7 @@ Creates a new token with a specific name, validity period, and optional privileg
 - **Method**: `POST`
 - **Path**: `/`
 - **Consumes**: `application/json`
-- **Produces**: `application/json` (Raw token as string)
+- **Produces**: `application/json`
 - **Request Body**: `CreatePersonalAccessTokenArgument`
 
 **Request Body Schema**:
@@ -139,7 +139,12 @@ Creates a new token with a specific name, validity period, and optional privileg
 
 **Response**:
 - **Status**: `200 OK`
-- **Body**: `tokenId:tokenValue` (e.g., `550e8400-e29b-41d4-a716-446655440000:aB1c...`)
+- **Body**:
+```json
+{
+  "token": "550e8400-e29b-41d4-a716-446655440000:aB1c..."
+}
+```
 - **Note**: This is the **only time** the `tokenValue` is returned. It must be stored securely by the client.
 
 ---

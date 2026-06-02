@@ -33,17 +33,17 @@ public class PersonalAccessTokenResourceTest extends AbstractRestfulTest {
 
 	@Override
 	protected void logout(String authToken) {
-		logout("jill", authToken);
+		logout("admin", authToken);
 	}
 
 	@Test
 	public void shouldManagePersonalAccessTokens() {
-		String authToken = authenticate();
+		String authToken = authenticate("admin", "admin");
 
 		try {
 			// 1. Get tokens (should be empty)
 			try (Response response = target()
-					.path("strolch/privilege/personal-access-tokens")
+					.path("strolch/privilege/tokens")
 					.request(MediaType.APPLICATION_JSON)
 					.header("Authorization", authToken)
 					.get()) {
@@ -59,15 +59,16 @@ public class PersonalAccessTokenResourceTest extends AbstractRestfulTest {
 			createArg.addProperty("validTo", ISO8601.toString(ZonedDateTime.now().plusDays(7)));
 
 			try (Response response = target()
-					.path("strolch/privilege/personal-access-tokens")
+					.path("strolch/privilege/tokens")
 					.request(MediaType.APPLICATION_JSON)
 					.header("Authorization", authToken)
 					.post(Entity.json(createArg.toString()))) {
-				if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
-					System.out.println("[DEBUG_LOG] Create PAT failed: " + response.getStatus());
-					System.out.println("[DEBUG_LOG] Response: " + response.readEntity(String.class));
+				if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+					String body = response.readEntity(String.class);
+					logger.error("[DEBUG_LOG] Create PAT failed: : {} {}", response.getStatus(), body);
+					fail(body);
 				}
-				assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 				JsonObject result = JsonParser.parseString(response.readEntity(String.class)).getAsJsonObject();
 				String rawToken = result.get("token").getAsString();
 				assertNotNull(rawToken);
@@ -77,7 +78,7 @@ public class PersonalAccessTokenResourceTest extends AbstractRestfulTest {
 			// 3. Get tokens (should have 1)
 			String tokenId;
 			try (Response response = target()
-					.path("strolch/privilege/personal-access-tokens")
+					.path("strolch/privilege/tokens")
 					.request(MediaType.APPLICATION_JSON)
 					.header("Authorization", authToken)
 					.get()) {
@@ -91,7 +92,7 @@ public class PersonalAccessTokenResourceTest extends AbstractRestfulTest {
 
 			// 4. Remove the token
 			try (Response response = target()
-					.path("strolch/privilege/personal-access-tokens/" + tokenId)
+					.path("strolch/privilege/tokens/" + tokenId)
 					.request(MediaType.APPLICATION_JSON)
 					.header("Authorization", authToken)
 					.delete()) {
@@ -100,7 +101,7 @@ public class PersonalAccessTokenResourceTest extends AbstractRestfulTest {
 
 			// 5. Get tokens (should be empty again)
 			try (Response response = target()
-					.path("strolch/privilege/personal-access-tokens")
+					.path("strolch/privilege/tokens")
 					.request(MediaType.APPLICATION_JSON)
 					.header("Authorization", authToken)
 					.get()) {

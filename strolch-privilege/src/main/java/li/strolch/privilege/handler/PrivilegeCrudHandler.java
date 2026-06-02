@@ -19,12 +19,9 @@ package li.strolch.privilege.handler;
 import li.strolch.privilege.base.PrivilegeConflictResolution;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
+import li.strolch.privilege.helper.ModelHelper;
 import li.strolch.privilege.model.*;
-import li.strolch.privilege.model.internal.PasswordCrypt;
-import li.strolch.privilege.model.internal.PersonalAccessToken;
-import li.strolch.privilege.model.internal.Role;
-import li.strolch.privilege.model.internal.User;
-import li.strolch.privilege.model.internal.UserHistory;
+import li.strolch.privilege.model.internal.*;
 import li.strolch.privilege.policy.PrivilegePolicy;
 import li.strolch.utils.collections.Tuple;
 import org.jetbrains.annotations.Nullable;
@@ -137,7 +134,8 @@ public class PrivilegeCrudHandler {
 			prvCtx.validateAction(new SimpleRestrictable(PersonalAccessToken.class.getName(), username));
 		}
 
-		return this.privilegeHandler.persistenceHandler.getAccessTokensForUser(username)
+		return this.privilegeHandler.persistenceHandler
+				.getAccessTokensForUser(username)
 				.stream()
 				.map(PersonalAccessToken::asRep)
 				.toList();
@@ -146,7 +144,7 @@ public class PrivilegeCrudHandler {
 	public String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
 			ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges) {
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
-		validateCreatePersonalAccessToken(prvCtx, certificate.getUsername());
+		validateCreatePersonalAccessToken(prvCtx);
 
 		User user = this.privilegeHandler.persistenceHandler.getUser(certificate.getUsername());
 		if (user == null)
@@ -156,18 +154,21 @@ public class PrivilegeCrudHandler {
 
 		// If roles and privileges are null or empty, then use all current privileges
 		if ((roles == null || roles.isEmpty()) && (privileges == null || privileges.isEmpty())) {
-			PrivilegeContext userPrvCtx = this.privilegeHandler.getPrivilegeContextBuilder()
+			PrivilegeContext userPrvCtx = this.privilegeHandler
+					.getPrivilegeContextBuilder()
 					.buildPrivilegeContext(Usage.API, user, "system", ZonedDateTime.now(), false);
 			subsetPrivileges.putAll(userPrvCtx.getPrivileges());
 		} else {
 			// user's current privileges for subsetting
-			PrivilegeContext userPrvCtx = this.privilegeHandler.getPrivilegeContextBuilder()
+			PrivilegeContext userPrvCtx = this.privilegeHandler
+					.getPrivilegeContextBuilder()
 					.buildPrivilegeContext(Usage.API, user, "system", ZonedDateTime.now(), false);
 			Map<String, Privilege> userPrivileges = userPrvCtx.getPrivileges();
 
 			// Add privileges from roles
 			if (roles != null && !roles.isEmpty()) {
-				Set<String> userRoles = user.getRoles();
+				Set<String> userRoles = ModelHelper.streamAllRolesForUser(this.privilegeHandler.persistenceHandler, user)
+						.collect(java.util.stream.Collectors.toSet());
 				Set<String> subsetRoles = new HashSet<>();
 				for (String role : roles) {
 					if (userRoles.contains(role))
@@ -177,7 +178,8 @@ public class PrivilegeCrudHandler {
 				if (!subsetRoles.isEmpty()) {
 					Map<String, Privilege> rolePrivileges = new HashMap<>();
 					Map<String, PrivilegePolicy> rolePolicies = new HashMap<>();
-					this.privilegeHandler.getPrivilegeContextBuilder()
+					this.privilegeHandler
+							.getPrivilegeContextBuilder()
 							.addPrivilegesForRoles(subsetRoles, user.getUsername(), rolePrivileges, rolePolicies);
 					subsetPrivileges.putAll(rolePrivileges);
 				}
@@ -202,15 +204,16 @@ public class PrivilegeCrudHandler {
 		return doCreatePersonalAccessToken(name, validFrom, validTo, user, subsetPrivileges);
 	}
 
-	private void validateCreatePersonalAccessToken(PrivilegeContext prvCtx, String username) {
-		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_CREATE_PERSONAL_ACCESS_TOKEN, username));
+	private void validateCreatePersonalAccessToken(PrivilegeContext prvCtx) {
+		prvCtx.assertHasPrivilege(PRIVILEGE_PERSONAL_ACCESS_TOKEN);
 	}
 
 	private String doCreatePersonalAccessToken(String name, ZonedDateTime validFrom, ZonedDateTime validTo, User user,
 			Map<String, Privilege> privileges) {
 		String tokenId = UUID.randomUUID().toString();
 		String token = this.privilegeHandler.getEncryptionHandler().nextToken();
-		PasswordCrypt passwordCrypt = this.privilegeHandler.getEncryptionHandler()
+		PasswordCrypt passwordCrypt = this.privilegeHandler
+				.getEncryptionHandler()
 				.hashPassword(token.toCharArray(), this.privilegeHandler.getEncryptionHandler().nextSalt());
 
 		PersonalAccessToken pat = new PersonalAccessToken(tokenId, user.getUsername(), name, passwordCrypt, validFrom,

@@ -93,6 +93,7 @@ public class XmlConstants {
 	public static final String PARAM_GROUPS_FILE = "groupsXmlFile";
 	public static final String PARAM_GROUPS_FILE_DEF = "PrivilegeGroups.xml";
 	public static final String PARAM_TOKENS_FILE = "tokensXmlFile";
+	public static final String PARAM_TOKENS_FILE_DEF = "PrivilegeTokens.xml";
 	public static final String PARAM_ROLES_FILE = "rolesXmlFile";
 	public static final String PARAM_ROLES_FILE_DEF = "PrivilegeRoles.xml";
 	public static final String PARAM_BASE_PATH = "basePath";

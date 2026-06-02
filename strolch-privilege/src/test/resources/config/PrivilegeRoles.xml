@@ -87,7 +87,7 @@
         <Privilege name="RequirePasswordChange" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeCreatePersonalAccessToken" policy="DefaultPrivilege">
+        <Privilege name="PrivilegePersonalAccessToken" policy="DefaultPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="li.strolch.privilege.model.internal.PersonalAccessToken" policy="UserAccessPrivilege">

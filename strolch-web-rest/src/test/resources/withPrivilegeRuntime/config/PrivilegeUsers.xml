@@ -16,7 +16,7 @@
   -->
 
 <Users>
-	<User userId="1" username="agent">
+	<User userId="0" username="agent">
 		<State>SYSTEM</State>
 		<Roles>
 			<Role>agent</Role>

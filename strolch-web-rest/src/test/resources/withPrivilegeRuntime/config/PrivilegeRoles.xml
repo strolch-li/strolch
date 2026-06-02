@@ -66,7 +66,7 @@
 	</Role>
 
 	<Role name="AppUser">
-		<Privilege name="PrivilegeCreatePersonalAccessToken" policy="DefaultPrivilege">
+		<Privilege name="PrivilegePersonalAccessToken" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
 		<Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">

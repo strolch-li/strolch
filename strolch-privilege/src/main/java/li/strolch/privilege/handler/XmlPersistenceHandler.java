@@ -285,7 +285,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		File usersPath = getFile(basePath, PARAM_USERS_FILE, PARAM_USERS_FILE_DEF, true);
 		File groupsPath = getFile(basePath, PARAM_GROUPS_FILE, PARAM_GROUPS_FILE_DEF, false);
 		File rolesPath = getFile(basePath, PARAM_ROLES_FILE, PARAM_ROLES_FILE_DEF, true);
-		File tokensPath = getFile(basePath, PARAM_ROLES_FILE, PARAM_TOKENS_FILE, false);
+		File tokensPath = getFile(basePath, PARAM_TOKENS_FILE, PARAM_TOKENS_FILE_DEF, false);
 
 		// save path to model
 		this.usersPath = usersPath;

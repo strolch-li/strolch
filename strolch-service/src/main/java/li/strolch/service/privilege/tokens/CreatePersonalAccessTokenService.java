@@ -22,7 +22,7 @@ import li.strolch.service.api.AbstractService;
 import li.strolch.service.api.ServiceArgument;
 import li.strolch.service.api.ServiceResultState;
 
-import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_CREATE_PERSONAL_ACCESS_TOKEN;
+import static li.strolch.privilege.handler.PrivilegeHandler.PRIVILEGE_PERSONAL_ACCESS_TOKEN;
 
 public class CreatePersonalAccessTokenService extends AbstractService<CreatePersonalAccessTokenService.CreatePersonalAccessTokenServiceArgument, PrivilegeTokenResult> {
 
@@ -41,7 +41,7 @@ public class CreatePersonalAccessTokenService extends AbstractService<CreatePers
 		PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
 
 		String rawToken;
-		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_CREATE_PERSONAL_ACCESS_TOKEN)) {
+		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_PERSONAL_ACCESS_TOKEN)) {
 			rawToken = privilegeHandler.createPersonalAccessToken(tx.getCertificate(), arg.arg.name, arg.arg.validFrom,
 					arg.arg.validTo, arg.arg.roles, arg.arg.privileges);
 			tx.commitOnClose();
