@@ -66,6 +66,15 @@
 	</Role>
 
 	<Role name="AppUser">
+		<Privilege name="PrivilegeCreatePersonalAccessToken" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
+		<Privilege name="PrivilegeRemoveUser" policy="UserAccessPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
 		<Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
