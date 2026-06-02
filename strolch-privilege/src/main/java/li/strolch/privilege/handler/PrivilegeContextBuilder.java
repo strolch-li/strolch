@@ -22,6 +22,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.helper.ModelHelper;
 import li.strolch.privilege.model.*;
+import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
@@ -63,6 +64,34 @@ public class PrivilegeContextBuilder {
 		String authToken = this.privilegeHandler.getEncryptionHandler().nextToken();
 		String sessionId = UUID.randomUUID().toString();
 		return buildPrivilegeContext(usage, user, authToken, sessionId, source, loginTime, keepAlive);
+	}
+
+	public PrivilegeContext buildPrivilegeContext(PersonalAccessToken personalAccessToken, User user, String source,
+			ZonedDateTime loginTime) {
+		DBC.PRE.assertNotEmpty("source must not be empty!", source);
+
+		prepare(user);
+
+		Map<String, Privilege> privileges = new HashMap<>();
+		Map<String, PrivilegePolicy> policies = new HashMap<>();
+
+		// cache the privileges and policies for this user by the privileges defined on the token
+		for (Privilege privilege : personalAccessToken.privileges().values()) {
+			String privilegeName = privilege.name();
+			privileges.put(privilegeName, privilege);
+
+			// cache the policy for the privilege
+			addPolicyForPrivilege(policies, privilege, privilegeName);
+		}
+
+		String authToken = this.privilegeHandler.getEncryptionHandler().nextToken();
+		String sessionId = UUID.randomUUID().toString();
+
+		Certificate certificate = new Certificate(Usage.API, sessionId, user.getUserId(), user.getUsername(),
+				user.getFirstname(), user.getLastname(), user.getUserState(), authToken, source, loginTime, false,
+				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
+
+		return new PrivilegeContext(certificate, privileges, policies);
 	}
 
 	public PrivilegeContext buildPrivilegeContext(Usage usage, User user, String authToken, String sessionId,

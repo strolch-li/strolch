@@ -21,7 +21,8 @@ import li.strolch.privilege.base.PrivilegeException;
 public enum Usage {
 	ANY("any"),
 	SINGLE("single"),
-	SET_PASSWORD("set-password");
+	SET_PASSWORD("set-password"),
+	API("api");
 
 	private final String value;
 
@@ -43,6 +44,10 @@ public enum Usage {
 
 	public boolean isSetPassword() {
 		return this == SET_PASSWORD;
+	}
+
+	public boolean isApi() {
+		return this == API;
 	}
 
 	public static Usage byValue(String value) {

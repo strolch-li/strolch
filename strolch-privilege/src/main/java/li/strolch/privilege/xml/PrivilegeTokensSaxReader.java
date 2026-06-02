@@ -16,7 +16,7 @@
 package li.strolch.privilege.xml;
 
 import li.strolch.privilege.model.Privilege;
-import li.strolch.privilege.model.internal.AccessToken;
+import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.PasswordCrypt;
 import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.iso8601.ISO8601;
@@ -41,7 +41,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 
 	private final Deque<DefaultHandler> buildersStack = new ArrayDeque<>();
 
-	private final Map<String, AccessToken> tokens;
+	private final Map<String, PersonalAccessToken> tokens;
 	private final boolean verbose;
 
 	public PrivilegeTokensSaxReader(boolean verbose) {
@@ -49,7 +49,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 		this.tokens = new HashMap<>();
 	}
 
-	public Map<String, AccessToken> getTokens() {
+	public Map<String, PersonalAccessToken> getTokens() {
 		return this.tokens;
 	}
 
@@ -58,7 +58,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 
 		if (qName.equals(TOKEN)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(AccessTokenParser.class)))
-				throw new IllegalArgumentException("Previous AccessToken not closed!");
+				throw new IllegalArgumentException("Previous PersonalAccessToken not closed!");
 			this.buildersStack.push(new AccessTokenParser());
 		}
 
@@ -104,9 +104,11 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 
 		private String username;
 		private String tokenId;
+		private String name;
 		private PasswordCrypt token;
 		private ZonedDateTime validFrom;
 		private ZonedDateTime validTo;
+		private ZonedDateTime lastUsed;
 
 		private Map<String, Privilege> privileges;
 
@@ -121,9 +123,11 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 
 			this.username = null;
 			this.tokenId = null;
+			this.name = null;
 			this.token = null;
 			this.validFrom = null;
 			this.validTo = null;
+			this.lastUsed = null;
 		}
 
 		@Override
@@ -136,9 +140,14 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 				case TOKEN -> {
 					this.username = attributes.getValue(ATTR_USERNAME).trim();
 					this.tokenId = attributes.getValue(ATTR_TOKEN_ID).trim();
+					this.name = attributes.getValue(ATTR_NAME).trim();
 					this.token = PasswordCrypt.parse(attributes.getValue(ATTR_TOKEN).trim());
 					this.validFrom = ISO8601.parseToZdt(attributes.getValue(ATTR_VALID_FROM).trim());
 					this.validTo = ISO8601.parseToZdt(attributes.getValue(ATTR_VALID_TO).trim());
+
+					String lastUsedS = attributes.getValue(ATTR_LAST_USED);
+					if (StringHelper.isNotEmpty(lastUsedS))
+						this.lastUsed = ISO8601.parseToZdt(lastUsedS.trim());
 				}
 				case PRIVILEGE -> {
 					if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PrivilegeParser.class)))
@@ -172,11 +181,11 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 			}
 
 			if (qName.equals(TOKEN)) {
-				AccessToken token = new AccessToken(this.tokenId, this.username, this.token, this.validFrom,
-						this.validTo, this.privileges);
+				PersonalAccessToken token = new PersonalAccessToken(this.tokenId, this.username, this.name, this.token,
+						this.validFrom, this.validTo, this.lastUsed, this.privileges);
 				tokens.put(token.tokenId(), token);
 				if (verbose)
-					logger.info("New AccessToken: {}", token);
+					logger.info("New PersonalAccessToken: {}", token);
 				init();
 			}
 		}

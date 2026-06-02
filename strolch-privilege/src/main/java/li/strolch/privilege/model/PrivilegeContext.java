@@ -93,6 +93,10 @@ public record PrivilegeContext(Certificate certificate, Map<String, Privilege> p
 		return this.privileges.keySet();
 	}
 
+	public Map<String, Privilege> getPrivileges() {
+		return Map.copyOf(this.privileges);
+	}
+
 	public void assertHasPrivilege(String privilegeName) throws AccessDeniedException {
 		if (!this.privileges.containsKey(privilegeName)) {
 			String msg = format(getString("Privilege.noprivilege.user"), this.certificate.getUsername(), privilegeName);

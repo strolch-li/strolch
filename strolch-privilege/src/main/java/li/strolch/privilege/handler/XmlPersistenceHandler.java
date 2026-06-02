@@ -18,7 +18,7 @@ package li.strolch.privilege.handler;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.Group;
-import li.strolch.privilege.model.internal.AccessToken;
+import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.xml.*;
@@ -58,7 +58,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	private final Map<String, User> usersById;
 	private final Map<String, Group> groups;
 	private final Map<String, Role> roles;
-	private final Map<String, AccessToken> tokens;
+	private final Map<String, PersonalAccessToken> tokens;
 
 	private boolean usersDirty;
 	private boolean groupsDirty;
@@ -110,7 +110,7 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
-	public List<AccessToken> getAllAccessTokens() {
+	public List<PersonalAccessToken> getAllAccessTokens() {
 		synchronized (this.tokens) {
 			return new LinkedList<>(this.tokens.values());
 		}
@@ -232,12 +232,12 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
-	public AccessToken getAccessToken(String tokenId) {
+	public PersonalAccessToken getAccessToken(String tokenId) {
 		return this.tokens.get(tokenId);
 	}
 
 	@Override
-	public void addAccessToken(AccessToken accessToken) {
+	public void addAccessToken(PersonalAccessToken accessToken) {
 		if (this.tokens.containsKey(accessToken.tokenId()))
 			throw new IllegalStateException(format("The access token {0} already exists!", accessToken.tokenId()));
 		this.tokens.put(accessToken.tokenId(), accessToken);
@@ -245,14 +245,14 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 	}
 
 	@Override
-	public AccessToken removeAccessToken(String tokenId) {
-		AccessToken token = this.tokens.remove(tokenId);
+	public PersonalAccessToken removeAccessToken(String tokenId) {
+		PersonalAccessToken token = this.tokens.remove(tokenId);
 		this.tokensDirty = token != null;
 		return token;
 	}
 
 	@Override
-	public List<AccessToken> getAccessTokensForUser(String username) {
+	public List<PersonalAccessToken> getAccessTokensForUser(String username) {
 		synchronized (this.tokens) {
 			return this.tokens.values().stream().filter(t -> t.username().equals(username)).toList();
 		}
@@ -413,8 +413,8 @@ public class XmlPersistenceHandler implements PersistenceHandler {
 		}
 
 		// validate users exist for tokens
-		for (Iterator<AccessToken> iterator = this.tokens.values().iterator(); iterator.hasNext(); ) {
-			AccessToken token = iterator.next();
+		for (Iterator<PersonalAccessToken> iterator = this.tokens.values().iterator(); iterator.hasNext(); ) {
+			PersonalAccessToken token = iterator.next();
 			if (getUser(token.username()) == null) {
 				logger.error("User {} does not exist referenced by token {}", token.username(), token.tokenId());
 				iterator.remove();

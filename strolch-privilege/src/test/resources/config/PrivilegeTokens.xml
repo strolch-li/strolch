@@ -16,9 +16,10 @@
   -->
 
 <Tokens>
-    <Token username="admin" tokenId="50b31270-bc49-4940-97ec-d4aa0d1ad649"
+    <Token username="admin" tokenId="50b31270-bc49-4940-97ec-d4aa0d1ad649" name="Test Token"
            token="$PBKDF2WithHmacSHA512,10000,256$61646d696e$cb69962946617da006a2f95776d78b49e5ec7941d2bdb2d25cdb05f957f64344"
-           validFrom="2024-02-12T08:00:00.000+01:00" validTo="3000-01-01T01:00:00.000+01:00">
+           validFrom="2024-02-12T08:00:00.000+01:00" validTo="3000-01-01T01:00:00.000+01:00"
+           lastUsed="2024-02-12T09:00:00.000+01:00">
         <Privilege name="Foo" policy="DefaultPrivilege">
             <Allow>allow1</Allow>
             <Deny>deny1</Deny>

@@ -76,6 +76,7 @@ public class XmlConstants {
 	public static final String ATTR_USERNAME = "username";
 	public static final String ATTR_TOKEN_ID = "tokenId";
 	public static final String ATTR_TOKEN = "token";
+	public static final String ATTR_LAST_USED = "lastUsed";
 	public static final String ATTR_VALID_FROM = "validFrom";
 	public static final String ATTR_VALID_TO = "validTo";
 	public static final String ATTR_AUTH_TOKEN = "authToken";

@@ -24,9 +24,11 @@ import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The {@link PrivilegeHandler} is the centrally exposed API for accessing the privilege library. It exposes all needed
@@ -95,6 +97,7 @@ public interface PrivilegeHandler {
 	String PRIVILEGE_SET_USER_STATE = "PrivilegeSetUserState";
 	String PRIVILEGE_SET_USER_PASSWORD = "PrivilegeSetUserPassword";
 	String PRIVILEGE_REQUIRE_PASSWORD_CHANGE = "RequirePasswordChange";
+	String PRIVILEGE_CREATE_PERSONAL_ACCESS_TOKEN = "PrivilegeCreatePersonalAccessToken";
 
 	///
 
@@ -234,6 +237,44 @@ public interface PrivilegeHandler {
 	List<UserRep> getUsers(Certificate certificate);
 
 	/**
+	 * Returns the personal access tokens for the user of the given {@link Certificate}
+	 *
+	 * @param certificate the {@link Certificate} of the user
+	 *
+	 * @return the list of personal access tokens
+	 */
+	List<PersonalAccessTokenRep> getPersonalAccessTokens(Certificate certificate);
+
+	/**
+	 * Returns the personal access tokens for the given username. This requires the user to have the privilege to see
+	 * other users' tokens.
+	 *
+	 * @param certificate the {@link Certificate} of the user
+	 * @param username    the username of the user whose tokens should be returned
+	 *
+	 * @return the list of personal access tokens
+	 */
+	List<PersonalAccessTokenRep> getPersonalAccessTokens(Certificate certificate, String username);
+
+	/**
+	 * Creates a new personal access token for the user of the given {@link Certificate}. The new token's privileges are
+	 * a snapshot of the user's *current* privileges at the time of creation, optionally filtered by the given roles
+	 * and/or privileges. If both roles and privileges are null or empty, then all of the user's current privileges are
+	 * assigned to the token.
+	 *
+	 * @param certificate the {@link Certificate} of the user
+	 * @param name        the name of the token
+	 * @param validFrom   the date from which the token is valid
+	 * @param validTo     the date until which the token is valid
+	 * @param roles       the subset of roles for the token, or null if all roles should be used
+	 * @param privileges  the subset of privileges for the token, or null if all privileges should be used
+	 *
+	 * @return the newly created personal access token
+	 */
+	String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
+			ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges);
+
+	/**
 	 * Method to query {@link UserRep} which meet the criteria set in the given {@link UserRep}. Null fields mean the
 	 * fields are irrelevant.
 	 *
@@ -243,6 +284,14 @@ public interface PrivilegeHandler {
 	 * @return a list of {@link UserRep}s which fit the given criteria
 	 */
 	List<UserRep> queryUsers(Certificate certificate, UserRep selectorRep);
+
+	/**
+	 * Removes a personal access token.
+	 *
+	 * @param certificate the {@link Certificate} of the user
+	 * @param tokenId     the id of the token to remove
+	 */
+	void removePersonalAccessToken(Certificate certificate, String tokenId);
 
 	/**
 	 * Removes the user with the given username
@@ -596,6 +645,18 @@ public interface PrivilegeHandler {
 	 */
 	Certificate authenticate(String username, char[] password, String source, Usage usage, boolean keepAlive)
 			throws AccessDeniedException;
+
+	/**
+	 * Authenticates a user with a personal access token.
+	 *
+	 * @param token  the personal access token
+	 * @param source the source from where the user is authenticating
+	 *
+	 * @return a {@link Certificate} if authentication was successful
+	 *
+	 * @throws AccessDeniedException if the token is invalid or expired
+	 */
+	Certificate authenticatePersonalAccessToken(String token, String source) throws AccessDeniedException;
 
 	/**
 	 * Authenticates a user on a remote Single Sign On service. This is implemented by the

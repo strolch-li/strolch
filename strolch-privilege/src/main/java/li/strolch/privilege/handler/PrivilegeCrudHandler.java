@@ -21,6 +21,7 @@ import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.base.PrivilegeModelException;
 import li.strolch.privilege.model.*;
 import li.strolch.privilege.model.internal.PasswordCrypt;
+import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.model.internal.UserHistory;
@@ -123,6 +124,119 @@ public class PrivilegeCrudHandler {
 			return null;
 		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_GET_USER, new Tuple(null, user)));
 		return user;
+	}
+
+	public List<PersonalAccessTokenRep> getPersonalAccessTokens(Certificate certificate, String username) {
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		User user = this.privilegeHandler.persistenceHandler.getUser(username);
+		if (user == null)
+			throw new PrivilegeException("User " + username + " does not exist!");
+
+		if (!certificate.getUsername().equals(username)) {
+			// user wants to see other users' tokens, check privilege
+			prvCtx.validateAction(new SimpleRestrictable(PersonalAccessToken.class.getName(), username));
+		}
+
+		return this.privilegeHandler.persistenceHandler.getAccessTokensForUser(username)
+				.stream()
+				.map(PersonalAccessToken::asRep)
+				.toList();
+	}
+
+	public String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
+			ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges) {
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+		validateCreatePersonalAccessToken(prvCtx, certificate.getUsername());
+
+		User user = this.privilegeHandler.persistenceHandler.getUser(certificate.getUsername());
+		if (user == null)
+			throw new PrivilegeException("User " + certificate.getUsername() + " does not exist!");
+
+		Map<String, Privilege> subsetPrivileges = new HashMap<>();
+
+		// If roles and privileges are null or empty, then use all current privileges
+		if ((roles == null || roles.isEmpty()) && (privileges == null || privileges.isEmpty())) {
+			PrivilegeContext userPrvCtx = this.privilegeHandler.getPrivilegeContextBuilder()
+					.buildPrivilegeContext(Usage.API, user, "system", ZonedDateTime.now(), false);
+			subsetPrivileges.putAll(userPrvCtx.getPrivileges());
+		} else {
+			// user's current privileges for subsetting
+			PrivilegeContext userPrvCtx = this.privilegeHandler.getPrivilegeContextBuilder()
+					.buildPrivilegeContext(Usage.API, user, "system", ZonedDateTime.now(), false);
+			Map<String, Privilege> userPrivileges = userPrvCtx.getPrivileges();
+
+			// Add privileges from roles
+			if (roles != null && !roles.isEmpty()) {
+				Set<String> userRoles = user.getRoles();
+				Set<String> subsetRoles = new HashSet<>();
+				for (String role : roles) {
+					if (userRoles.contains(role))
+						subsetRoles.add(role);
+				}
+
+				if (!subsetRoles.isEmpty()) {
+					Map<String, Privilege> rolePrivileges = new HashMap<>();
+					Map<String, PrivilegePolicy> rolePolicies = new HashMap<>();
+					this.privilegeHandler.getPrivilegeContextBuilder()
+							.addPrivilegesForRoles(subsetRoles, user.getUsername(), rolePrivileges, rolePolicies);
+					subsetPrivileges.putAll(rolePrivileges);
+				}
+			}
+
+			// Add additional privileges
+			if (privileges != null && !privileges.isEmpty()) {
+				for (Privilege privilege : privileges) {
+					if (userPrivileges.containsKey(privilege.getName())) {
+						// we take the user's privilege, not the passed one, to ensure no escalation
+						subsetPrivileges.put(privilege.getName(), userPrivileges.get(privilege.getName()));
+					}
+				}
+			}
+
+			if (subsetPrivileges.isEmpty()) {
+				throw new PrivilegeException(
+						"User " + user.getUsername() + " does not have any of the given roles or privileges!");
+			}
+		}
+
+		return doCreatePersonalAccessToken(name, validFrom, validTo, user, subsetPrivileges);
+	}
+
+	private void validateCreatePersonalAccessToken(PrivilegeContext prvCtx, String username) {
+		prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_CREATE_PERSONAL_ACCESS_TOKEN, username));
+	}
+
+	private String doCreatePersonalAccessToken(String name, ZonedDateTime validFrom, ZonedDateTime validTo, User user,
+			Map<String, Privilege> privileges) {
+		String tokenId = UUID.randomUUID().toString();
+		String token = this.privilegeHandler.getEncryptionHandler().nextToken();
+		PasswordCrypt passwordCrypt = this.privilegeHandler.getEncryptionHandler()
+				.hashPassword(token.toCharArray(), this.privilegeHandler.getEncryptionHandler().nextSalt());
+
+		PersonalAccessToken pat = new PersonalAccessToken(tokenId, user.getUsername(), name, passwordCrypt, validFrom,
+				validTo, null, privileges);
+
+		this.privilegeHandler.persistenceHandler.addAccessToken(pat);
+		this.privilegeHandler.persistModelAsync();
+
+		return tokenId + ":" + token;
+	}
+
+	public void removePersonalAccessToken(Certificate certificate, String tokenId) {
+		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
+
+		PersonalAccessToken token = this.privilegeHandler.persistenceHandler.getAccessToken(tokenId);
+		if (token == null)
+			throw new PrivilegeException("Personal access token " + tokenId + " does not exist!");
+
+		if (!certificate.getUsername().equals(token.username())) {
+			// user wants to remove other users' tokens, check privilege
+			prvCtx.validateAction(new SimpleRestrictable(PersonalAccessToken.class.getName(), token.username()));
+		}
+
+		this.privilegeHandler.persistenceHandler.removeAccessToken(tokenId);
+		this.privilegeHandler.personalAccessTokenCache.remove(tokenId);
+		this.privilegeHandler.persistModelAsync();
 	}
 
 	public Map<String, String> getPolicyDefs(Certificate certificate) {

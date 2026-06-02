@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2025 Robert von Burg <eitch@eitchnet.ch>
+ * Copyright (c) 2015-2025 Robert von Burg <eitch@eitchnet.ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package li.strolch.privilege.model;
 
-public interface PrivilegeElementVisitor<T> {
+import li.strolch.utils.dbc.DBC;
 
-	T visitUserRep(UserRep userRep);
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Set;
 
-	T visitRoleRep(RoleRep roleRep);
+public class CreatePersonalAccessTokenArgument {
+	public String name;
+	public ZonedDateTime validFrom;
+	public ZonedDateTime validTo;
+	public Set<String> roles;
+	public List<Privilege> privileges;
 
-	T visitGroup(Group group);
-
-	T visitPrivilegeRep(Privilege privilege);
-
-	T visitUserPrivileges(UserPrivileges userPrivileges);
-
-	T visitGroupPrivileges(GroupPrivileges groupPrivileges);
-
-	default T visitPersonalAccessTokenRep(PersonalAccessTokenRep personalAccessTokenRep) {
-		throw new UnsupportedOperationException(getClass().getName() + " does not support PersonalAccessTokenRep");
+	public void validate() {
+		DBC.PRE.assertNotEmpty("name must be set", name);
+		DBC.PRE.assertNotNull("validFrom must be set", validFrom);
+		DBC.PRE.assertNotNull("validTo must be set", validTo);
 	}
 }

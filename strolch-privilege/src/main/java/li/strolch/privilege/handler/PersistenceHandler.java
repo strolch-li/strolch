@@ -18,7 +18,7 @@ package li.strolch.privilege.handler;
 import li.strolch.privilege.model.Group;
 import li.strolch.privilege.model.Privilege;
 import li.strolch.privilege.model.Restrictable;
-import li.strolch.privilege.model.internal.AccessToken;
+import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.privilege.model.internal.Role;
 import li.strolch.privilege.model.internal.User;
 import li.strolch.privilege.policy.PrivilegePolicy;
@@ -66,11 +66,11 @@ public interface PersistenceHandler {
 	List<Role> getAllRoles();
 
 	/**
-	 * Returns all currently known {@link AccessToken}s.
+	 * Returns all currently known {@link PersonalAccessToken}s.
 	 *
-	 * @return a list of all currently known {@link AccessToken}s.
+	 * @return a list of all currently known {@link PersonalAccessToken}s.
 	 */
-	List<AccessToken> getAllAccessTokens();
+	List<PersonalAccessToken> getAllAccessTokens();
 
 	/**
 	 * Returns a {@link User} object from the underlying database
@@ -187,27 +187,27 @@ public interface PersistenceHandler {
 	void replaceGroup(Group group);
 
 	/**
-	 * Returns a {@link AccessToken} object from the underlying database
+	 * Returns a {@link PersonalAccessToken} object from the underlying database
 	 *
-	 * @param tokenId the id of the {@link AccessToken} object to return
+	 * @param tokenId the id of the {@link PersonalAccessToken} object to return
 	 *
-	 * @return the {@link AccessToken} object, or null if it was not found
+	 * @return the {@link PersonalAccessToken} object, or null if it was not found
 	 */
-	AccessToken getAccessToken(String tokenId);
+	PersonalAccessToken getAccessToken(String tokenId);
 
 	/**
-	 * Adds an {@link AccessToken} to the underlying database.
+	 * Adds an {@link PersonalAccessToken} to the underlying database.
 	 *
-	 * @param accessToken the {@link AccessToken} to be added
+	 * @param accessToken the {@link PersonalAccessToken} to be added
 	 */
-	void addAccessToken(AccessToken accessToken);
+	void addAccessToken(PersonalAccessToken accessToken);
 
 	/**
-	 * Removes an {@link AccessToken} from the underlying database.
+	 * Removes an {@link PersonalAccessToken} from the underlying database.
 	 *
-	 * @param tokenId the id of the {@link AccessToken} to be removed
+	 * @param tokenId the id of the {@link PersonalAccessToken} to be removed
 	 */
-	AccessToken removeAccessToken(String tokenId);
+	PersonalAccessToken removeAccessToken(String tokenId);
 
 	/**
 	 * Retrieves a list of access tokens associated with a specified user.
@@ -216,7 +216,7 @@ public interface PersistenceHandler {
 	 *
 	 * @return a list of access tokens associated with the specified user
 	 */
-	List<AccessToken> getAccessTokensForUser(String username);
+	List<PersonalAccessToken> getAccessTokensForUser(String username);
 
 	/**
 	 * Informs this {@link PersistenceHandler} to persist any changes which need to be saved

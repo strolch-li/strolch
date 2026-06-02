@@ -35,7 +35,7 @@
         </Properties>
     </User>
 
-    <User userId="2" username="admin2" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+    <User userId="2" username="admin2" password="$PBKDF2WithHmacSHA512,10000,256$61646d696e32$6279316d33726458564f33664d423946467a5a32335133646549554d65697230">
         <Firstname>Application</Firstname>
         <Lastname>Administrator</Lastname>
         <State>ENABLED</State>
@@ -69,6 +69,16 @@
         <Locale>en-GB</Locale>
         <Roles>
             <Role>system_admin_privileges</Role>
+        </Roles>
+    </User>
+
+    <User userId="5" username="jill" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918">
+        <Firstname>Jill</Firstname>
+        <Lastname>Smith</Lastname>
+        <State>ENABLED</State>
+        <Locale>en-GB</Locale>
+        <Roles>
+            <Role>AppUser</Role>
         </Roles>
     </User>
 

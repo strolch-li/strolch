@@ -17,7 +17,7 @@ package li.strolch.privilege.xml;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.privilege.model.Privilege;
-import li.strolch.privilege.model.internal.AccessToken;
+import li.strolch.privilege.model.internal.PersonalAccessToken;
 import li.strolch.utils.iso8601.ISO8601;
 
 import javax.xml.stream.XMLStreamException;
@@ -36,10 +36,10 @@ import static li.strolch.privilege.helper.XmlHelper.openXmlStreamWriterDocument;
  */
 public class PrivilegeTokensSaxWriter {
 
-	private final List<AccessToken> tokens;
+	private final List<PersonalAccessToken> tokens;
 	private final File modelFile;
 
-	public PrivilegeTokensSaxWriter(List<AccessToken> tokens, File modelFile) {
+	public PrivilegeTokensSaxWriter(List<PersonalAccessToken> tokens, File modelFile) {
 		this.tokens = tokens;
 		this.modelFile = modelFile;
 	}
@@ -51,18 +51,21 @@ public class PrivilegeTokensSaxWriter {
 			IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
 			xmlWriter.writeStartElement(TOKENS);
 
-			List<AccessToken> tokens = new ArrayList<>(this.tokens);
-			tokens.sort(comparing((AccessToken t) -> t.username().toLowerCase(Locale.ROOT)).thenComparing(
-					AccessToken::tokenId));
-			for (AccessToken token : tokens) {
+			List<PersonalAccessToken> tokens = new ArrayList<>(this.tokens);
+			tokens.sort(comparing((PersonalAccessToken t) -> t.username().toLowerCase(Locale.ROOT)).thenComparing(
+					PersonalAccessToken::tokenId));
+			for (PersonalAccessToken token : tokens) {
 
 				// start the role element
 				xmlWriter.writeStartElement(TOKEN);
 				xmlWriter.writeAttribute(ATTR_USERNAME, token.username());
 				xmlWriter.writeAttribute(ATTR_TOKEN_ID, token.tokenId());
+				xmlWriter.writeAttribute(ATTR_NAME, token.name());
 				xmlWriter.writeAttribute(ATTR_TOKEN, token.passwordCrypt().buildPasswordString());
 				xmlWriter.writeAttribute(ATTR_VALID_FROM, ISO8601.toString(token.validFrom()));
 				xmlWriter.writeAttribute(ATTR_VALID_TO, ISO8601.toString(token.validTo()));
+				if (token.lastUsed() != null)
+					xmlWriter.writeAttribute(ATTR_LAST_USED, ISO8601.toString(token.lastUsed()));
 
 				List<Privilege> privileges = new ArrayList<>(token.privileges().values());
 				PrivilegeRolesSaxWriter.writePrivileges(privileges, xmlWriter);

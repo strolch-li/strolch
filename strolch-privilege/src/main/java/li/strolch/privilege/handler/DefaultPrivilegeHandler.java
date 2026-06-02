@@ -149,9 +149,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected Map<String, String> parameterMap;
 
 	protected ElementLockingHandler<String> lockingHandler;
+	protected Map<String, PersonalAccessTokenCacheEntry> personalAccessTokenCache;
 	protected ScheduledExecutorService executorService;
 	protected Future<?> persistSessionsTask;
 	protected Future<?> persistModelTask;
+	protected Future<?> prunePersonalAccessTokenCacheTask;
 
 	@Override
 	public SingleSignOnHandler getSsoHandler() {
@@ -473,6 +475,105 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 		logger.info("Challenge validated for user {} with usage {}", username, usage);
 		return certificate;
+	}
+
+	@Override
+	public List<PersonalAccessTokenRep> getPersonalAccessTokens(Certificate certificate) {
+		return this.crudHandler.getPersonalAccessTokens(certificate, certificate.getUsername());
+	}
+
+	@Override
+	public List<PersonalAccessTokenRep> getPersonalAccessTokens(Certificate certificate, String username) {
+		return this.crudHandler.getPersonalAccessTokens(certificate, username);
+	}
+
+	@Override
+	public String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
+			ZonedDateTime validTo, Set<String> roles, List<Privilege> privileges) {
+		return this.crudHandler.createPersonalAccessToken(certificate, name, validFrom, validTo, roles, privileges);
+	}
+
+	@Override
+	public void removePersonalAccessToken(Certificate certificate, String tokenId) {
+		this.crudHandler.removePersonalAccessToken(certificate, tokenId);
+	}
+
+	@Override
+	public Certificate authenticatePersonalAccessToken(String token, String source) throws AccessDeniedException {
+		DBC.PRE.assertNotEmpty("token", token);
+		DBC.PRE.assertNotEmpty("source", source);
+
+		// The token is expected to be in the format: tokenId:tokenValue
+		String[] parts = token.split(":", 2);
+		if (parts.length != 2)
+			throw new AccessDeniedException("Invalid personal access token format!");
+
+		String tokenId = parts[0];
+		String tokenValue = parts[1];
+
+		// check cache
+		PersonalAccessTokenCacheEntry cachedEntry = this.personalAccessTokenCache.get(tokenId);
+		if (cachedEntry != null) {
+			// validate token still exists and is valid
+			PersonalAccessToken pat = this.persistenceHandler.getAccessToken(tokenId);
+			if (pat != null && pat.validFrom().isBefore(ZonedDateTime.now()) && pat
+					.validTo()
+					.isAfter(ZonedDateTime.now())) {
+				// validate user still exists and is enabled
+				User user = this.persistenceHandler.getUser(pat.username());
+				if (user != null && user.getUserState() == UserState.ENABLED) {
+					// Cache hit and valid
+					cachedEntry.lastAccess = System.currentTimeMillis();
+					return cachedEntry.context.getCertificate();
+				}
+			}
+
+			// Cache is invalid or expired
+			this.personalAccessTokenCache.remove(tokenId);
+		}
+
+		// tokens are stored as hashed PasswordCrypt
+		PersonalAccessToken pat = this.persistenceHandler.getAccessToken(tokenId);
+		if (pat == null)
+			throw new AccessDeniedException("Invalid personal access token!");
+
+		PasswordCrypt passwordCrypt = pat.passwordCrypt();
+		try {
+			PasswordCrypt hashedToken = this.encryptionHandler.hashPassword(tokenValue.toCharArray(),
+					passwordCrypt.salt(), passwordCrypt.hashAlgorithm(), passwordCrypt.hashIterations(),
+					passwordCrypt.hashKeyLength());
+			if (!Arrays.equals(passwordCrypt.password(), hashedToken.password())) {
+				throw new AccessDeniedException("Invalid personal access token!");
+			}
+		} catch (AccessDeniedException e) {
+			throw e;
+		} catch (Exception e) {
+			logger.error("Failed to hash token for comparison", e);
+			throw new AccessDeniedException("Failed to authenticate personal access token!");
+		}
+
+		if (pat.validFrom().isAfter(ZonedDateTime.now()) || pat.validTo().isBefore(ZonedDateTime.now()))
+			throw new AccessDeniedException("Personal access token is expired or not yet valid!");
+
+		User user = this.persistenceHandler.getUser(pat.username());
+		if (user == null)
+			throw new AccessDeniedException("User " + pat.username() + " does not exist anymore!");
+
+		if (user.getUserState() != UserState.ENABLED)
+			throw new AccessDeniedException("User " + pat.username() + " is " + user.getUserState());
+
+		// update last used
+		PersonalAccessToken updatedToken = pat.withLastUsed(ZonedDateTime.now());
+		this.persistenceHandler.removeAccessToken(pat.tokenId());
+		this.persistenceHandler.addAccessToken(updatedToken);
+
+		// Build context
+		PrivilegeContext prvCtx = getPrivilegeContextBuilder().buildPrivilegeContext(updatedToken, user, source,
+				ZonedDateTime.now());
+		this.privilegeContextMap.put(prvCtx.getCertificate().getSessionId(), prvCtx);
+		this.personalAccessTokenCache.put(tokenId, new PersonalAccessTokenCacheEntry(prvCtx));
+
+		return prvCtx.getCertificate();
 	}
 
 	@Override
@@ -1017,11 +1118,25 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	@Override
 	public void start() {
 		this.lockingHandler.start();
+
+		this.prunePersonalAccessTokenCacheTask = this.executorService.scheduleAtFixedRate(
+				this::prunePersonalAccessTokenCache, 1, 1, TimeUnit.MINUTES);
+	}
+
+	protected void prunePersonalAccessTokenCache() {
+		long now = System.currentTimeMillis();
+		long tenMinutesAgo = now - TimeUnit.MINUTES.toMillis(10);
+		this.personalAccessTokenCache.entrySet().removeIf(entry -> entry.getValue().lastAccess < tenMinutesAgo);
 	}
 
 	@Override
 	public void stop() {
 		this.lockingHandler.stop();
+
+		if (this.prunePersonalAccessTokenCacheTask != null) {
+			this.prunePersonalAccessTokenCacheTask.cancel(true);
+			this.prunePersonalAccessTokenCacheTask = null;
+		}
 	}
 
 	@Override
@@ -1086,6 +1201,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		validatePrivilegeConflicts();
 
 		this.privilegeContextMap = new ConcurrentHashMap<>();
+		this.personalAccessTokenCache = new ConcurrentHashMap<>();
 
 		loadSessions();
 
@@ -1399,5 +1515,15 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected PrivilegeContextBuilder getPrivilegeContextBuilder() {
 		return new PrivilegeContextBuilder(this);
+	}
+
+	protected static class PersonalAccessTokenCacheEntry {
+		public final PrivilegeContext context;
+		public long lastAccess;
+
+		public PersonalAccessTokenCacheEntry(PrivilegeContext context) {
+			this.context = context;
+			this.lastAccess = System.currentTimeMillis();
+		}
 	}
 }
