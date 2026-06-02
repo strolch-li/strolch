@@ -192,6 +192,9 @@
         <Privilege name="RequirePasswordChange" policy="UserAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
+        <Privilege name="PrivilegeCreatePersonalAccessToken" policy="DefaultPrivilege">
+            <AllAllowed>true</AllAllowed>
+        </Privilege>
         <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
             <Allow>li.strolch.service.privilege.roles.PrivilegeAddRoleService</Allow>
             <Allow>li.strolch.service.privilege.roles.PrivilegeRemoveRoleService</Allow>
@@ -203,6 +206,9 @@
             <Allow>li.strolch.service.privilege.users.PrivilegeSetUserStateService</Allow>
             <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserRolesService</Allow>
             <Allow>li.strolch.service.privilege.users.PrivilegeUpdateUserService</Allow>
+            <Allow>li.strolch.service.privilege.tokens.CreatePersonalAccessTokenService</Allow>
+            <Allow>li.strolch.service.privilege.tokens.GetPersonalAccessTokensService</Allow>
+            <Allow>li.strolch.service.privilege.tokens.RemovePersonalAccessTokenService</Allow>
         </Privilege>
     </Role>
 </Roles>
