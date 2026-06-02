@@ -66,26 +66,123 @@ To maintain performance while managing memory, the PAT cache is pruned by a back
 
 ## Integration Points
 
-### REST API
-The following endpoints are available for managing Personal Access Tokens:
+### REST API Specification
 
-| Method | Path | Description |
-| --- | --- | --- |
-| `GET` | `/strolch/privilege/tokens` | List all PATs for the currently authenticated user. |
-| `POST` | `/strolch/privilege/tokens` | Create a new PAT. |
-| `DELETE` | `/strolch/privilege/tokens/{tokenId}` | Revoke a PAT. |
+#### Base URL
+`{server_url}/rest/strolch/privilege/tokens`
 
-#### Create PAT Request Body
+#### Authentication
+All requests require a valid Strolch authentication token (session token) passed in the `Authorization` header.
+- **Header**: `Authorization: <session_token>`
+
+---
+
+#### 1. List Personal Access Tokens
+Retrieves all tokens belonging to the authenticated user.
+
+- **Method**: `GET`
+- **Path**: `/`
+- **Produces**: `application/json`
+- **Response Body**: `Array<PersonalAccessTokenRep>`
+
+**Response Example**:
+```json
+[
+  {
+    "tokenId": "550e8400-e29b-41d4-a716-446655440000",
+    "username": "jdoe",
+    "name": "Integration Script",
+    "validFrom": "2024-01-01T00:00:00.000Z",
+    "validTo": "2024-12-31T23:59:59.000Z",
+    "lastUsed": "2024-06-02T10:00:00.000Z",
+    "privileges": [
+      {
+        "name": "li.strolch.service.api.Service",
+        "policy": "DefaultPrivilege",
+        "allAllowed": false,
+        "allowList": ["GetOrderService"],
+        "denyList": []
+      }
+    ]
+  }
+]
+```
+
+---
+
+#### 2. Create Personal Access Token
+Creates a new token with a specific name, validity period, and optional privilege subset.
+
+- **Method**: `POST`
+- **Path**: `/`
+- **Consumes**: `application/json`
+- **Produces**: `application/json` (Raw token as string)
+- **Request Body**: `CreatePersonalAccessTokenArgument`
+
+**Request Body Schema**:
+- `name` (String, required): Descriptive name for the token.
+- `validFrom` (ISO8601 String, required): Start date of token validity.
+- `validTo` (ISO8601 String, required): Expiry date of token.
+- `roles` (Array<String>, optional): List of role names to restrict the token to.
+- `privileges` (Array<Privilege>, optional): List of specific privileges to assign.
+
+**Request Example**:
 ```json
 {
-  "name": "My API Token",
-  "validFrom": "2024-01-01T00:00:00Z",
-  "validTo": "2025-01-01T00:00:00Z",
+  "name": "My New Token",
+  "validFrom": "2024-06-02T00:00:00Z",
+  "validTo": "2025-06-02T00:00:00Z",
   "roles": ["AppUser"],
   "privileges": []
 }
 ```
-The response is the raw token string in the format `tokenId:tokenValue`. **This is the only time the token value is shown.**
+
+**Response**:
+- **Status**: `200 OK`
+- **Body**: `tokenId:tokenValue` (e.g., `550e8400-e29b-41d4-a716-446655440000:aB1c...`)
+- **Note**: This is the **only time** the `tokenValue` is returned. It must be stored securely by the client.
+
+---
+
+#### 3. Revoke Personal Access Token
+Immediately invalidates a token by its ID.
+
+- **Method**: `DELETE`
+- **Path**: `/{tokenId}`
+- **Produces**: `application/json`
+- **Response Body**: `ServiceResultResponse`
+
+**Response Example**:
+```json
+{
+  "state": "SUCCESS",
+  "message": "Token removed successfully."
+}
+```
+
+---
+
+#### Data Models
+
+##### Privilege Object
+```json
+{
+  "name": "string",
+  "policy": "string",
+  "allAllowed": "boolean",
+  "allowList": ["string"],
+  "denyList": ["string"]
+}
+```
+
+##### PersonalAccessTokenRep
+- `tokenId` (UUID String)
+- `username` (String)
+- `name` (String)
+- `validFrom` (ISO8601 String)
+- `validTo` (ISO8601 String)
+- `lastUsed` (ISO8601 String)
+- `privileges` (Array<Privilege>)
 
 ### Persistence
 PATs are persisted via the `PersistenceHandler`. The default `XmlPersistenceHandler` stores them in `PrivilegeTokens.xml`.
