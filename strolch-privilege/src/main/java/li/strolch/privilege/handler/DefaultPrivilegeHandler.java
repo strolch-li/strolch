@@ -459,7 +459,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		}
 
 		// validate the response
-		UserChallenge userChallenge = this.userChallengeHandler.validateResponse(user, challenge);
+		UserChallenge userChallenge = this.userChallengeHandler.validateResponse(user, trimOrEmpty(challenge));
 
 		// initialize a new privilege context
 		Usage usage = userChallenge.getUsage();
