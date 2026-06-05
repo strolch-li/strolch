@@ -38,6 +38,16 @@ import static java.text.MessageFormat.format;
 import static java.util.Objects.requireNonNull;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
+/**
+ * The {@code StrolchBootstrapper} class is responsible for bootstrapping and configuring a StrolchAgent instance. It
+ * provides various methods to set up the Strolch environment, parse bootstrap files, and load configurations based on
+ * the provided parameters such as environment, class, or bootstrap files.
+ * <p>
+ * This class extends {@link DefaultHandler} to handle XML parsing during bootstrap file processing.
+ * <p>
+ * The {@code StrolchBootstrapper} can load configurations from: - Environment variables - Bootstrap files -
+ * User-defined directory structures - Root paths or copied configurations
+ */
 public class StrolchBootstrapper extends DefaultHandler {
 
 	private static final Logger logger = LoggerFactory.getLogger(StrolchBootstrapper.class);
@@ -122,10 +132,16 @@ public class StrolchBootstrapper extends DefaultHandler {
 		this.appVersion = new StrolchVersion(env);
 	}
 
-	public void setEnvironmentOverride(String environmentOverride) {
-		this.environmentOverride = environmentOverride;
-	}
-
+	/**
+	 * Sets up the {@link StrolchAgent} instance based on the user directory using the specified environment and
+	 * sub-directory path. Paths for configuration, data, and temporary files will be derived and initialized relative
+	 * to the given sub-directory path.
+	 *
+	 * @param environment the environment that the {@link StrolchAgent} should use; must not be empty
+	 * @param subPath     the sub-directory path relative to the user directory; must not be empty
+	 *
+	 * @return the configured {@link StrolchAgent} instance
+	 */
 	public StrolchAgent setupByUserDir(String environment, String subPath) {
 		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
 		DBC.PRE.assertNotEmpty("Sub Path must be set!", subPath);
@@ -139,6 +155,19 @@ public class StrolchBootstrapper extends DefaultHandler {
 		return setup();
 	}
 
+	/**
+	 * Attempts to initialize and set up a {@link StrolchAgent} based on environment variables. Checks if the specified
+	 * environment variables for the environment and runtime path are set and valid. If the conditions are met, the
+	 * agent is initialized with these parameters.
+	 *
+	 * @param appClass the application {@link Class}, used to reference resources and configurations required for setup
+	 *
+	 * @return an {@link Optional} containing the initialized {@link StrolchAgent} if successful; an empty
+	 * {@link Optional} if the environment variables are missing or invalid
+	 *
+	 * @throws IllegalStateException if the runtime path specified by the environment variable does not exist or is not
+	 *                               a directory
+	 */
 	public Optional<StrolchAgent> trySetupByEnvironment(Class<?> appClass) {
 		String sysEnv = System.getenv(ENV_STROLCH_ENVIRONMENT);
 		String sysEnvPath = System.getenv(ENV_STROLCH_RUNTIME_PATH);
@@ -163,6 +192,17 @@ public class StrolchBootstrapper extends DefaultHandler {
 		return Optional.of(bootstrapper.setupByRoot(sysEnv, rootPath));
 	}
 
+	/**
+	 * Configures and initializes a {@link StrolchAgent} instance based on the specified environment and root directory.
+	 * The method sets up paths for configuration, data, and temporary files relative to the provided root directory,
+	 * then completes the setup process by invoking the {@code setup()} method.
+	 *
+	 * @param environment the environment identifier to be used for setup; must not be empty
+	 * @param rootPath    the root directory containing the required configuration, data, and temporary paths; must not
+	 *                    be null
+	 *
+	 * @return the configured {@link StrolchAgent} instance
+	 */
 	public StrolchAgent setupByRoot(String environment, File rootPath) {
 		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
 		DBC.PRE.assertNotNull("rootPath must be set!", rootPath);
@@ -175,6 +215,13 @@ public class StrolchBootstrapper extends DefaultHandler {
 		return setup();
 	}
 
+	/**
+	 * Sets up the StrolchAgent by loading configuration from the default bootstrap file.
+	 *
+	 * @param clazz the class used as a reference to locate the bootstrap file within the resource environment
+	 *
+	 * @return the configured StrolchAgent instance
+	 */
 	public StrolchAgent setupByBootstrapFile(Class<?> clazz) {
 		logger.info("Setting up agent using bootstrap file...");
 		String bootstrapFileName = "/" + FILE_BOOTSTRAP;
@@ -184,30 +231,12 @@ public class StrolchBootstrapper extends DefaultHandler {
 	}
 
 	/**
-	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
-	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
+	 * Sets up the StrolchAgent by loading the specified bootstrap file for configuration.
 	 *
-	 * @param clazz         the class from which to load the resource as stream
-	 * @param bootstrapFile the bootstrap file to load
+	 * @param clazz         the class used to determine the resource environment
+	 * @param bootstrapFile the input stream of the bootstrap file to be parsed
 	 *
-	 * @return the Agent which is setup
-	 */
-	public StrolchAgent setupByBootstrapFile(Class<?> clazz, File bootstrapFile) {
-		DBC.PRE.assertNotNull("clazz must be set!", clazz);
-		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
-		this.environment = StrolchEnvironment.getEnvironmentFromResourceEnv(clazz);
-		parseBoostrapFile(bootstrapFile);
-		return setup();
-	}
-
-	/**
-	 * Set up Strolch by evaluating the environment from {@link StrolchEnvironment#getEnvironmentFromResourceEnv(Class)}
-	 * and then delegating to {@link #setupByBootstrapFile(String, File)}
-	 *
-	 * @param clazz         the class from which to load the resource as stream
-	 * @param bootstrapFile the input stream to the bootstrap file to load
-	 *
-	 * @return the Agent which is setup
+	 * @return the configured StrolchAgent instance
 	 */
 	public StrolchAgent setupByBootstrapFile(Class<?> clazz, InputStream bootstrapFile) {
 		DBC.PRE.assertNotNull("clazz must be set!", clazz);
@@ -234,21 +263,24 @@ public class StrolchBootstrapper extends DefaultHandler {
 	}
 
 	/**
-	 * Set up Strolch by loading the given bootstrap file for configuration
+	 * Configures and initializes a {@link StrolchAgent} instance by copying the contents of a source root directory to
+	 * a destination root directory. The method ensures the validity and integrity of both source and destination
+	 * directories, copies the necessary files, and sets up paths for configuration, data, and temporary files.
 	 *
-	 * @param environment   the environment to load from the boostrap file
-	 * @param bootstrapFile the input stream to the bootstrap file to load
+	 * @param environment the environment identifier for this setup process; must not be empty
+	 * @param rootSrcPath the source root directory, which must exist, be a readable directory, and contain the required
+	 *                    configuration file
+	 * @param rootDstPath the destination root directory, which must either not exist (and be created) or be an empty
+	 *                    directory if it already exists
 	 *
-	 * @return the Agent which is setup
+	 * @return the configured {@link StrolchAgent} instance
+	 *
+	 * @throws IllegalArgumentException      if the environment is empty
+	 * @throws NullPointerException          if the source or destination root paths are null
+	 * @throws StrolchConfigurationException if the source root path is not a readable directory, if it lacks the
+	 *                                       required configuration file, or if the destination root path is invalid
+	 * @throws RuntimeException              if copying the source files to the destination directory fails
 	 */
-	public StrolchAgent setupByBootstrapFile(String environment, InputStream bootstrapFile) {
-		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
-		DBC.PRE.assertNotNull("bootstrapFile must be set!", bootstrapFile);
-		this.environment = environment;
-		parseBoostrapFile(bootstrapFile);
-		return setup();
-	}
-
 	public StrolchAgent setupByCopyingRoot(String environment, File rootSrcPath, File rootDstPath) {
 		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
 		DBC.PRE.assertNotNull("rootPath must be set!", rootSrcPath);
@@ -306,6 +338,17 @@ public class StrolchBootstrapper extends DefaultHandler {
 		return setup();
 	}
 
+	/**
+	 * Sets up and initializes a StrolchAgent instance with the provided environment, configuration path, data path, and
+	 * temporary path. Validates the paths, ensuring they meet the necessary requirements (existence, readability,
+	 * writability, etc.). Throws a StrolchConfigurationException if any validation checks fail. Reloads logging
+	 * configurations before initializing the agent.
+	 *
+	 * @return an instance of {@code StrolchAgent} configured for the specified environment
+	 *
+	 * @throws IllegalArgumentException      if required fields are not set
+	 * @throws StrolchConfigurationException if any path validation checks fail
+	 */
 	private StrolchAgent setup() {
 
 		DBC.PRE.assertNotEmpty("Environment must be set!", this.environment);
