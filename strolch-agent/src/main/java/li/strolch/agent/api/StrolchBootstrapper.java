@@ -146,19 +146,18 @@ public class StrolchBootstrapper extends DefaultHandler {
 			return Optional.empty();
 
 		if (isEmpty(sysEnvPath)) {
-			logger.error("Detected environment var {}={} but environment var {} is not set!", ENV_STROLCH_ENVIRONMENT, sysEnv,
-					ENV_STROLCH_RUNTIME_PATH);
+			logger.error("Detected environment var {}={} but environment var {} is not set!", ENV_STROLCH_ENVIRONMENT,
+					sysEnv, ENV_STROLCH_RUNTIME_PATH);
 			return Optional.empty();
 		}
 
-		logger.info("Detected environment var {}={} and {}={}", ENV_STROLCH_ENVIRONMENT, sysEnv, ENV_STROLCH_RUNTIME_PATH, sysEnvPath);
+		logger.info("Detected environment var {}={} and {}={}", ENV_STROLCH_ENVIRONMENT, sysEnv,
+				ENV_STROLCH_RUNTIME_PATH, sysEnvPath);
 
 		File rootPath = new File(sysEnvPath);
 		if (!rootPath.isDirectory())
-			throw new IllegalStateException(
-					format("Detected environment var {0}={1} but path {2}={3} does not exist!",
-							ENV_STROLCH_RUNTIME_PATH,
-							sysEnv, ENV_STROLCH_RUNTIME_PATH, sysEnvPath));
+			throw new IllegalStateException(format("Detected environment var {0}={1} but path {2}={3} does not exist!",
+					ENV_STROLCH_RUNTIME_PATH, sysEnv, ENV_STROLCH_RUNTIME_PATH, sysEnvPath));
 
 		StrolchBootstrapper bootstrapper = new StrolchBootstrapper(appClass);
 		return Optional.of(bootstrapper.setupByRoot(sysEnv, rootPath));
@@ -172,63 +171,6 @@ public class StrolchBootstrapper extends DefaultHandler {
 		this.configPathF = new File(rootPath, PATH_CONFIG);
 		this.dataPathF = new File(rootPath, PATH_DATA);
 		this.tempPathF = new File(rootPath, PATH_TEMP);
-
-		return setup();
-	}
-
-	public StrolchAgent setupByCopyingRoot(String environment, File rootSrcPath, File rootDstPath) {
-		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
-		DBC.PRE.assertNotNull("rootPath must be set!", rootSrcPath);
-		DBC.PRE.assertNotNull("rootPath must be set!", rootDstPath);
-
-		this.environment = environment;
-
-		// root path: readable directory
-		if (!rootSrcPath.isDirectory() || !rootSrcPath.canRead()) {
-			String msg = "[{0}] Root src path is not readable at {1}";
-			msg = format(msg, environment, rootSrcPath);
-			throw new StrolchConfigurationException(msg);
-		}
-
-		// Make sure config exists in this root src
-		File configPathF = new File(rootSrcPath, PATH_CONFIG);
-		File configurationFile = new File(configPathF, ConfigurationParser.STROLCH_CONFIGURATION_XML);
-		if (!configurationFile.isFile() || !configurationFile.canRead()) {
-			String msg = "[{0}] Source Configuration file is not readable at {1}";
-			msg = format(msg, environment, configurationFile);
-			throw new StrolchConfigurationException(msg);
-		}
-
-		// if destination exists, make sure it is a directory and empty
-		if (rootDstPath.exists()) {
-			if (!rootDstPath.isDirectory()) {
-				String msg = "[{0}] Destination root exists and is not a directory at {1}";
-				msg = format(msg, environment, rootDstPath.getAbsolutePath());
-				throw new StrolchConfigurationException(msg);
-			}
-			if (requireNonNull(rootDstPath.list()).length != 0) {
-				String msg = "[{0}] Destination root exists and is not empty at {1}";
-				msg = format(msg, environment, rootDstPath.getAbsolutePath());
-				throw new StrolchConfigurationException(msg);
-			}
-		} else if (!rootDstPath.mkdir()) {
-			String msg
-					= "[{0}] Destination root does not exist and could not be created. Either parent does not exist, or permission is denied at {1}";
-			msg = format(msg, environment, rootDstPath.getAbsolutePath());
-			throw new StrolchConfigurationException(msg);
-		}
-
-		logger.info("[{}] Copying source {} to {}", environment, rootSrcPath.getAbsolutePath(),
-				rootDstPath.getAbsolutePath());
-
-		if (!FileHelper.copy(rootSrcPath.listFiles(), rootDstPath, true)) {
-			throw new RuntimeException(format("[{0}] Failed to copy source files from {1} to {2}", environment,
-					rootSrcPath.getAbsolutePath(), rootDstPath.getAbsolutePath()));
-		}
-
-		this.configPathF = new File(rootDstPath, PATH_CONFIG);
-		this.dataPathF = new File(rootDstPath, PATH_DATA);
-		this.tempPathF = new File(rootDstPath, PATH_TEMP);
 
 		return setup();
 	}
@@ -307,6 +249,63 @@ public class StrolchBootstrapper extends DefaultHandler {
 		return setup();
 	}
 
+	public StrolchAgent setupByCopyingRoot(String environment, File rootSrcPath, File rootDstPath) {
+		DBC.PRE.assertNotEmpty("Environment must be set!", environment);
+		DBC.PRE.assertNotNull("rootPath must be set!", rootSrcPath);
+		DBC.PRE.assertNotNull("rootPath must be set!", rootDstPath);
+
+		this.environment = environment;
+
+		// root path: readable directory
+		if (!rootSrcPath.isDirectory() || !rootSrcPath.canRead()) {
+			String msg = "[{0}] Root src path is not readable at {1}";
+			msg = format(msg, environment, rootSrcPath);
+			throw new StrolchConfigurationException(msg);
+		}
+
+		// Make sure config exists in this root src
+		File configPathF = new File(rootSrcPath, PATH_CONFIG);
+		File configurationFile = new File(configPathF, ConfigurationParser.STROLCH_CONFIGURATION_XML);
+		if (!configurationFile.isFile() || !configurationFile.canRead()) {
+			String msg = "[{0}] Source Configuration file is not readable at {1}";
+			msg = format(msg, environment, configurationFile);
+			throw new StrolchConfigurationException(msg);
+		}
+
+		// if destination exists, make sure it is a directory and empty
+		if (rootDstPath.exists()) {
+			if (!rootDstPath.isDirectory()) {
+				String msg = "[{0}] Destination root exists and is not a directory at {1}";
+				msg = format(msg, environment, rootDstPath.getAbsolutePath());
+				throw new StrolchConfigurationException(msg);
+			}
+			if (requireNonNull(rootDstPath.list()).length != 0) {
+				String msg = "[{0}] Destination root exists and is not empty at {1}";
+				msg = format(msg, environment, rootDstPath.getAbsolutePath());
+				throw new StrolchConfigurationException(msg);
+			}
+		} else if (!rootDstPath.mkdir()) {
+			String msg
+					= "[{0}] Destination root does not exist and could not be created. Either parent does not exist, or permission is denied at {1}";
+			msg = format(msg, environment, rootDstPath.getAbsolutePath());
+			throw new StrolchConfigurationException(msg);
+		}
+
+		logger.info("[{}] Copying source {} to {}", environment, rootSrcPath.getAbsolutePath(),
+				rootDstPath.getAbsolutePath());
+
+		if (!FileHelper.copy(rootSrcPath.listFiles(), rootDstPath, true)) {
+			throw new RuntimeException(format("[{0}] Failed to copy source files from {1} to {2}", environment,
+					rootSrcPath.getAbsolutePath(), rootDstPath.getAbsolutePath()));
+		}
+
+		this.configPathF = new File(rootDstPath, PATH_CONFIG);
+		this.dataPathF = new File(rootDstPath, PATH_DATA);
+		this.tempPathF = new File(rootDstPath, PATH_TEMP);
+
+		return setup();
+	}
+
 	private StrolchAgent setup() {
 
 		DBC.PRE.assertNotEmpty("Environment must be set!", this.environment);
@@ -373,10 +372,9 @@ public class StrolchBootstrapper extends DefaultHandler {
 		XmlHelper.parseDocument(bootstrapFile, this);
 
 		if (!this.envFound) {
-			throw new StrolchConfigurationException("Environment "
-					+ this.environment
-					+ " not configured in bootstrap configuration "
-					+ bootstrapFile.getAbsolutePath());
+			throw new StrolchConfigurationException(
+					format("Environment {0} not configured in bootstrap configuration {1}", this.environment,
+							bootstrapFile.getAbsolutePath()));
 		}
 
 		evaluatePaths();
@@ -388,9 +386,9 @@ public class StrolchBootstrapper extends DefaultHandler {
 		XmlHelper.parseDocument(bootstrapStream, this);
 
 		if (!this.envFound) {
-			throw new StrolchConfigurationException("Environment "
-					+ this.environment
-					+ " not configured in bootstrap configuration from given stream!");
+			throw new StrolchConfigurationException(
+					format("Environment {0} not configured in bootstrap configuration from given stream!",
+							this.environment));
 		}
 
 		evaluatePaths();
@@ -402,13 +400,9 @@ public class StrolchBootstrapper extends DefaultHandler {
 		if (!this.defaultAllowed) {
 			if (StringHelper.isEmpty(this.configS) || StringHelper.isEmpty(this.dataS) || StringHelper.isEmpty(
 					this.tempS)) {
-				String msg = "One element of "
-						+ Arrays.toString(new String[]{CONFIG, DATA, TEMP})
-						+ " is not set and environment "
-						+ this.environment
-						+ " does not have attribute "
-						+ DEFAULT
-						+ "=\"true\". Either set the value or allow using default values!";
+				String msg = format(
+						"One element of {0} is not set and environment {1} does not have attribute {2}=\"true\". Either set the value or allow using default values!",
+						Arrays.toString(new String[]{CONFIG, DATA, TEMP}), this.environment, DEFAULT);
 				throw new StrolchConfigurationException(msg);
 			}
 		}
