@@ -141,4 +141,8 @@ public record Group(String name, Set<String> roles, Map<String, String> properti
 	public int compareTo(Group o) {
 		return this.name.compareTo(o.name);
 	}
+
+	public Group withProperties(Map<String, String> properties) {
+		return new Group(this.name, this.roles, properties);
+	}
 }
