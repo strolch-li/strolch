@@ -48,7 +48,6 @@ public class PrivilegeContextBuilder {
 	protected final PersistenceHandler persistenceHandler;
 
 	protected Set<String> groups;
-	protected Set<String> userDirectRoles;
 	protected Set<String> rolesWithGroupRoles;
 	protected Map<String, String> properties;
 
@@ -89,7 +88,7 @@ public class PrivilegeContextBuilder {
 
 		Certificate certificate = new Certificate(Usage.API, sessionId, user.getUserId(), user.getUsername(),
 				user.getFirstname(), user.getLastname(), user.getUserState(), authToken, source, loginTime, false,
-				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
+				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.properties);
 
 		return new PrivilegeContext(certificate, privileges, policies);
 	}
@@ -110,7 +109,7 @@ public class PrivilegeContextBuilder {
 
 		Certificate certificate = new Certificate(usage, sessionId, user.getUserId(), user.getUsername(),
 				user.getFirstname(), user.getLastname(), user.getUserState(), authToken, source, loginTime, keepAlive,
-				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.userDirectRoles, this.properties);
+				user.getLocale(), this.groups, this.rolesWithGroupRoles, this.properties);
 
 		return new PrivilegeContext(certificate, privileges, policies);
 	}
@@ -147,8 +146,8 @@ public class PrivilegeContextBuilder {
 				.collect(toCollection(TreeSet::new));
 
 		this.groups = groups.stream().map(Group::name).collect(toCollection(TreeSet::new));
-		this.userDirectRoles = user.getRoles().stream().sorted().collect(toCollection(TreeSet::new));
-		if (this.groups.isEmpty() && this.userDirectRoles.isEmpty())
+		Set<String> userDirectRoles = user.getRoles().stream().sorted().collect(toCollection(TreeSet::new));
+		if (this.groups.isEmpty() && userDirectRoles.isEmpty())
 			throw new AccessDeniedException("User " + user.getUsername() + " has no active groups or roles!");
 
 		this.rolesWithGroupRoles = concat(user.getRoles().stream(), streamAllRolesForGroups(groups.stream()))

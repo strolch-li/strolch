@@ -25,14 +25,14 @@ import java.util.Locale;
 import java.util.Set;
 
 public record UserSession(boolean keepAlive, String sessionId, ZonedDateTime loginTime, String username,
-						  String firstName, String lastName, String source, Set<String> userGroups,
-						  Set<String> userRoles, Set<String> userDirectRoles, Locale locale, ZonedDateTime lastAccess) {
+                          String firstName, String lastName, String source, Set<String> userGroups,
+                          Set<String> userRoles, Locale locale, ZonedDateTime lastAccess) {
 
 	public static UserSession valueOf(Certificate certificate) {
 		return new UserSession(certificate.isKeepAlive(), certificate.getSessionId(), certificate.getLoginTime(),
 				certificate.getUsername(), certificate.getFirstname(), certificate.getLastname(),
 				certificate.getSource(), certificate.getUserGroups(), certificate.getUserRoles(),
-				certificate.getUserDirectRoles(), certificate.getLocale(), certificate.getLastAccess());
+				certificate.getLocale(), certificate.getLastAccess());
 	}
 
 	public JsonObject toJson() {
@@ -50,7 +50,7 @@ public record UserSession(boolean keepAlive, String sessionId, ZonedDateTime log
 		jsonObject.addProperty("lastAccess", ISO8601.toString(this.lastAccess));
 
 		JsonArray rolesJ = new JsonArray();
-		this.userDirectRoles.forEach(rolesJ::add);
+		this.userRoles.forEach(rolesJ::add);
 		jsonObject.add("roles", rolesJ);
 
 		JsonArray groupsJ = new JsonArray();

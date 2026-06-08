@@ -105,11 +105,11 @@ public record PrivilegeContext(Certificate certificate, Map<String, Privilege> p
 	}
 
 	public boolean hasGroup(String groupName) {
-		return getGroups().contains(groupName);
+		return this.certificate.hasGroup(groupName);
 	}
 
 	public boolean hasRole(String roleName) {
-		return getRoles().contains(roleName);
+		return this.certificate.hasRole(roleName);
 	}
 
 	public Set<String> getRoles() {
