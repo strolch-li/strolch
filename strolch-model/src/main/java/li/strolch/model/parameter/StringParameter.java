@@ -19,6 +19,7 @@ import li.strolch.exception.StrolchException;
 import li.strolch.model.StrolchValueType;
 import li.strolch.model.visitor.StrolchElementVisitor;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 
 import java.text.MessageFormat;
 import java.util.Objects;
@@ -87,6 +88,30 @@ public class StringParameter extends AbstractParameter<String> {
 		assertNotReadonly();
 		validateValue(value);
 		this.value = value;
+	}
+
+	public void prepend(String value, String delimiter) {
+		assertNotReadonly();
+		if (StringHelper.isEmpty(value))
+			return;
+		validateValue(value);
+
+		if (this.value.isEmpty())
+			this.value = value;
+		else
+			this.value = value + delimiter + this.value;
+	}
+
+	public void append(String value, String delimiter) {
+		assertNotReadonly();
+		if (StringHelper.isEmpty(value))
+			return;
+		validateValue(value);
+
+		if (this.value.isEmpty())
+			this.value = value;
+		else
+			this.value += delimiter + value;
 	}
 
 	public void setValueE(Enum<?> value) {
