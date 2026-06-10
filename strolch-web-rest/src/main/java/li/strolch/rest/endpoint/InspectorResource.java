@@ -106,7 +106,11 @@ public class InspectorResource {
 	}
 
 	private StrolchTransaction openTx(Certificate certificate, String realm) {
-		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getCallerMethod());
+		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, getCallerMethod(2));
+	}
+
+	private StrolchTransaction openTx(Certificate certificate, String realm, String action) {
+		return RestfulStrolchComponent.getInstance().openTx(certificate, realm, action);
 	}
 
 	@Operation(summary = "Get agent overview",
@@ -216,8 +220,9 @@ public class InspectorResource {
 
 		Certificate cert = validateCertificate(request);
 
+		String action = getCallerMethod(1);
 		StreamingOutput streamingOutput = stream -> {
-			try (StrolchTransaction tx = openTx(cert, realm)) {
+			try (StrolchTransaction tx = openTx(cert, realm, action)) {
 				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
@@ -367,8 +372,9 @@ public class InspectorResource {
 
 		Certificate cert = validateCertificate(request);
 
+		String action = getCallerMethod(1);
 		StreamingOutput streamingOutput = stream -> {
-			try (StrolchTransaction tx = openTx(cert, realm)) {
+			try (StrolchTransaction tx = openTx(cert, realm, action)) {
 				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
@@ -402,8 +408,9 @@ public class InspectorResource {
 
 		Certificate cert = validateCertificate(request);
 
+		String action = getCallerMethod(1);
 		StreamingOutput streamingOutput = stream -> {
-			try (StrolchTransaction tx = openTx(cert, realm)) {
+			try (StrolchTransaction tx = openTx(cert, realm, action)) {
 				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
@@ -437,8 +444,9 @@ public class InspectorResource {
 
 		Certificate cert = validateCertificate(request);
 
+		String action = getCallerMethod(1);
 		StreamingOutput streamingOutput = stream -> {
-			try (StrolchTransaction tx = openTx(cert, realm)) {
+			try (StrolchTransaction tx = openTx(cert, realm, action)) {
 				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
 
@@ -634,8 +642,9 @@ public class InspectorResource {
 
 		ResourceSearch search = SearchBuilder.buildResourceSearch(queryData.getQuery(), type);
 
+		String action = getCallerMethod(1);
 		StreamingOutput streamingOutput = stream -> {
-			try (StrolchTransaction tx = openTx(cert, realm)) {
+			try (StrolchTransaction tx = openTx(cert, realm, action)) {
 
 				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
@@ -676,8 +685,9 @@ public class InspectorResource {
 
 		OrderSearch search = SearchBuilder.buildOrderSearch(queryData.getQuery(), type);
 
+		String action = getCallerMethod(1);
 		StreamingOutput streamingOutput = stream -> {
-			try (StrolchTransaction tx = openTx(cert, realm)) {
+			try (StrolchTransaction tx = openTx(cert, realm, action)) {
 
 				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);
@@ -718,8 +728,9 @@ public class InspectorResource {
 
 		ActivitySearch search = SearchBuilder.buildActivitySearch(queryData.getQuery(), type);
 
+		String action = getCallerMethod(1);
 		StreamingOutput streamingOutput = stream -> {
-			try (StrolchTransaction tx = openTx(cert, realm)) {
+			try (StrolchTransaction tx = openTx(cert, realm, action)) {
 
 				XMLStreamWriter writer = StrolchXmlHelper.prepareXmlStreamWriter(stream);
 				StrolchElementToSaxWriterVisitor visitor = new StrolchElementToSaxWriterVisitor(writer);

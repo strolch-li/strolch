@@ -70,6 +70,7 @@ import static li.strolch.report.ReportConstants.*;
 import static li.strolch.rest.RestfulStrolchComponent.getInstance;
 import static li.strolch.rest.StrolchRestfulConstants.*;
 import static li.strolch.rest.StrolchRestfulConstants.PARAM_DATE_RANGE_SEL;
+import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.StringHelper.*;
 import static li.strolch.utils.iso8601.ISO8601.MAX_LOCAL_TIME;
 
@@ -347,7 +348,7 @@ public class ReportResource {
 		JsonObject localeJ = getI18nData(request, cert);
 
 		// create CSV printer with header
-		StreamingOutput out = getOut(cert, realm, id, localeJ, filters, from, to);
+		StreamingOutput out = getOut(cert, realm, id, localeJ, filters, from, to, getCallerMethod(1));
 
 		// send
 		String fileName = id + "_" + System.currentTimeMillis() + ".csv";
@@ -358,11 +359,11 @@ public class ReportResource {
 	}
 
 	private StreamingOutput getOut(Certificate cert, String realm, String reportId, JsonObject localeJ,
-			MapOfSets<String, String> filters, ZonedDateTime from, ZonedDateTime to) {
+			MapOfSets<String, String> filters, ZonedDateTime from, ZonedDateTime to, String action) {
 
 		return out -> {
 
-			try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
+			try (StrolchTransaction tx = getInstance().openTx(cert, realm, action);
 			     Report report = new Report(tx, reportId)) {
 
 				prepareReport(reportId, tx, localeJ, report, from, to);
