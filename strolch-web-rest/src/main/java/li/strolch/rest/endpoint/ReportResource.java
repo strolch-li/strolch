@@ -133,29 +133,23 @@ public class ReportResource {
 		if (isEmpty(realm))
 			realm = getInstance().getContainer().getRealm(cert).getRealm();
 
-		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
-
-		JsonObject localeJ = getI18nData(request, cert);
-
 		long start = System.nanoTime();
-
+		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
+		JsonObject localeJ = getI18nData(request, cert);
 		JsonObject result = new JsonObject();
+
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 		     Report report = new Report(tx, id)) {
-
-			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
-
-			// set i18n data if possible
+			assertHasReportPrivilege(id, tx);
 			if (localeJ != null)
 				report.getReportPolicy().setI18nData(localeJ);
 
 			JsonArray facetsJ = new JsonArray();
-			JsonObject finalLocaleJ = localeJ;
 
 			MapOfSets<String, JsonObject> criteria = report.generateFilterCriteria(limit);
 
 			criteria.keySet().stream().sorted(comparing(type -> {
-				JsonElement translatedJ = finalLocaleJ == null ? null : finalLocaleJ.get(type);
+				JsonElement translatedJ = localeJ == null ? null : localeJ.get(type);
 				return translatedJ == null ? type : translatedJ.getAsString();
 			})).forEach(type -> {
 				Set<JsonObject> elements = criteria.getSet(type);
@@ -198,17 +192,12 @@ public class ReportResource {
 
 		String query = isNotEmpty(queryS) ? queryS.toLowerCase() : queryS;
 		int limit = isNotEmpty(limitS) ? Integer.parseInt(limitS) : 10;
-
-		JsonObject localeJ = getI18nData(request, cert);
-
 		long start = System.nanoTime();
+		JsonObject localeJ = getI18nData(request, cert);
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 		     Report report = new Report(tx, id)) {
-
-			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
-
-			// set i18n data if possible
+			assertHasReportPrivilege(id, tx);
 			if (localeJ != null)
 				report.getReportPolicy().setI18nData(localeJ);
 
@@ -222,6 +211,10 @@ public class ReportResource {
 			logger.info("Facet Generation for {}.{} took: {}", id, type, duration);
 			return ResponseUtil.toResponse(DATA, array);
 		}
+	}
+
+	private static void assertHasReportPrivilege(String id, StrolchTransaction tx) {
+		tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
 	}
 
 	@Operation(summary = "Get report by ID", description = "Retrieves a report based on its ID.", responses = {
@@ -241,10 +234,10 @@ public class ReportResource {
 			realm = getInstance().getContainer().getRealm(cert).getRealm();
 
 		DBC.PRE.assertNotEmpty("report ID is required", id);
+		long start = System.nanoTime();
 
 		// get information from body
 		JsonObject jsonObject = JsonParser.parseString(data).getAsJsonObject();
-
 		int offset = jsonObject.get(OFFSET) != null ? jsonObject.get(OFFSET).getAsInt() : 50;
 		int limit = jsonObject.get(LIMIT) != null ? jsonObject.get(LIMIT).getAsInt() : 50;
 
@@ -255,49 +248,13 @@ public class ReportResource {
 		JsonObject rangeJ = jsonObject.get(PARAM_DATE_RANGE) != null ? jsonObject.getAsJsonObject(PARAM_DATE_RANGE) :
 				null;
 
-		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
-				rangeJ.get(PARAM_FROM).getAsString() : null;
-		ZonedDateTime from;
-		try {
-			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
-		} catch (Exception e) {
-			logger.error("Could not parse 'from' date, setting it to null.", e);
-			from = null;
-		}
-
-		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
-				rangeJ.get(PARAM_TO).getAsString() : null;
-		ZonedDateTime to;
-		try {
-			to = (toS != null) ? ISO8601.parseToZdt(toS).with(MAX_LOCAL_TIME) : null;
-		} catch (Exception e) {
-			logger.error("Could not parse 'to' date, setting it to null.", e);
-			to = null;
-		}
-
+		ZonedDateTime from = getFrom(rangeJ);
+		ZonedDateTime to = getTo(rangeJ);
 		JsonObject localeJ = getI18nData(request, cert);
-
-		long start = System.nanoTime();
 
 		try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 		     Report report = new Report(tx, id)) {
-
-			tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), id));
-
-			// set i18n data if possible
-			if (localeJ != null)
-				report.getReportPolicy().setI18nData(localeJ);
-
-			// add filters from request
-			if (report.hasDateRangeSelector()) {
-				DateRange dateRange = new DateRange();
-				if (from != null)
-					dateRange = dateRange.from(from, true);
-				if (to != null)
-					dateRange = dateRange.to(to, true);
-
-				report.dateRange(dateRange);
-			}
+			prepareReport(id, tx, localeJ, report, from, to);
 
 			if (!filters.isEmpty())
 				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
@@ -382,25 +339,9 @@ public class ReportResource {
 		JsonObject rangeJ = jsonObject != null && jsonObject.get(PARAM_DATE_RANGE) != null ?
 				jsonObject.getAsJsonObject(PARAM_DATE_RANGE) : null;
 
-		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
-				rangeJ.get(PARAM_FROM).getAsString() : null;
-		ZonedDateTime from;
-		try {
-			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
-		} catch (Exception e) {
-			logger.error("Could not parse 'from' date, setting it to null.", e);
-			from = null;
-		}
+		ZonedDateTime from = getFrom(rangeJ);
 
-		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
-				rangeJ.get(PARAM_TO).getAsString() : null;
-		ZonedDateTime to;
-		try {
-			to = (toS != null) ? ISO8601.parseToZdt(toS).with(MAX_LOCAL_TIME) : null;
-		} catch (Exception e) {
-			logger.error("Could not parse 'to' date, setting it to null.", e);
-			to = null;
-		}
+		ZonedDateTime to = getTo(rangeJ);
 
 		JsonObject localeJ = getI18nData(request, cert);
 
@@ -423,22 +364,7 @@ public class ReportResource {
 			try (StrolchTransaction tx = getInstance().openTx(cert, realm, getContext());
 			     Report report = new Report(tx, reportId)) {
 
-				tx.getPrivilegeContext().validateAction(new SimpleRestrictable(ReportSearch.class.getName(), reportId));
-
-				// set i18n data if possible
-				if (localeJ != null)
-					report.getReportPolicy().setI18nData(localeJ);
-
-				// add filters from request
-				if (report.hasDateRangeSelector()) {
-					DateRange dateRange = new DateRange();
-					if (from != null)
-						dateRange = dateRange.from(from, true);
-					if (to != null)
-						dateRange = dateRange.to(to, true);
-
-					report.dateRange(dateRange);
-				}
+				prepareReport(reportId, tx, localeJ, report, from, to);
 
 				// add filters from request
 				filters.keySet().forEach(f -> report.filter(f, filters.getSet(f)));
@@ -474,6 +400,52 @@ public class ReportResource {
 		} catch (Exception e) {
 			logger.error("Could not write CSV row", e);
 		}
+	}
+
+	private static void prepareReport(String id, StrolchTransaction tx, JsonObject localeJ, Report report,
+			ZonedDateTime from, ZonedDateTime to) {
+		assertHasReportPrivilege(id, tx);
+
+		// set i18n data if possible
+		if (localeJ != null)
+			report.getReportPolicy().setI18nData(localeJ);
+
+		// add filters from request
+		if (report.hasDateRangeSelector()) {
+			DateRange dateRange = new DateRange();
+			if (from != null)
+				dateRange = dateRange.from(from, true);
+			if (to != null)
+				dateRange = dateRange.to(to, true);
+
+			report.dateRange(dateRange);
+		}
+	}
+
+	private static ZonedDateTime getTo(JsonObject rangeJ) {
+		String toS = rangeJ != null && rangeJ.get(PARAM_TO) != null && !rangeJ.get(PARAM_TO).isJsonNull() ?
+				rangeJ.get(PARAM_TO).getAsString() : null;
+		ZonedDateTime to;
+		try {
+			to = (toS != null) ? ISO8601.parseToZdt(toS).with(MAX_LOCAL_TIME) : null;
+		} catch (Exception e) {
+			logger.error("Could not parse 'to' date, setting it to null.", e);
+			to = null;
+		}
+		return to;
+	}
+
+	private static ZonedDateTime getFrom(JsonObject rangeJ) {
+		String fromS = rangeJ != null && rangeJ.get(PARAM_FROM) != null && !rangeJ.get(PARAM_FROM).isJsonNull() ?
+				rangeJ.get(PARAM_FROM).getAsString() : null;
+		ZonedDateTime from;
+		try {
+			from = fromS != null ? ISO8601.parseToZdt(fromS).with(LocalTime.MIN) : null;
+		} catch (Exception e) {
+			logger.error("Could not parse 'from' date, setting it to null.", e);
+			from = null;
+		}
+		return from;
 	}
 
 	private MapOfSets<String, String> getFiltersFromJson(JsonArray filters) {
