@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -382,6 +383,7 @@ public class ReportResource {
 				}
 
 				// get report content and add to the buffer
+				out.write(UTF8_BOM.getBytes(StandardCharsets.UTF_8));
 				try (CSVPrinter csvP = new CSVPrinter(new OutputStreamWriter(out),
 						CSVFormat.DEFAULT.builder().setHeader(headers).setDelimiter(';').get())) {
 
