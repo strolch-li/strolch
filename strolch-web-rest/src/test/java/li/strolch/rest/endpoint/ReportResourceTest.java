@@ -224,7 +224,6 @@ public class ReportResourceTest extends AbstractRestfulTest {
 				.header("Authorization", authToken)
 				.post(Entity.json(query.toString()))) {
 			assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-			System.out.println("[DEBUG_LOG] Media Type: " + response.getMediaType());
 			assertTrue("Media type should start with text/csv", response.getMediaType().toString().startsWith(TEXT_CSV));
 			byte[] responseBytes = response.readEntity(byte[].class);
 			assertNotNull(responseBytes);
@@ -236,7 +235,6 @@ public class ReportResourceTest extends AbstractRestfulTest {
 			assertEquals((byte) 0xBF, responseBytes[2]);
 
 			String csv = new String(responseBytes, 3, responseBytes.length - 3, java.nio.charset.StandardCharsets.UTF_8);
-			System.out.println("[DEBUG_LOG] CSV Content:\n" + csv);
 			assertFalse(csv.isEmpty());
 
 			String[] lines = csv.split("\n");
