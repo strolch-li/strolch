@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2025 Robert von Burg <eitch@eitchnet.ch>
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<StrolchConfiguration>
+	<env id="dev">
+		<Runtime>
+			<applicationName>StrolchRuntimeTest</applicationName>
+		</Runtime>
+		<Component>
+			<name>PrivilegeHandler</name>
+			<api>li.strolch.runtime.privilege.PrivilegeHandler</api>
+			<impl>li.strolch.runtime.privilege.DefaultStrolchPrivilegeHandler</impl>
+			<Properties>
+				<privilegeConfigFile>PrivilegeConfig.xml</privilegeConfigFile>
+			</Properties>
+		</Component>
+		<Component>
+			<name>RealmHandler</name>
+			<api>li.strolch.agent.api.RealmHandler</api>
+			<impl>li.strolch.agent.impl.DefaultRealmHandler</impl>
+			<depends>PrivilegeHandler</depends>
+			<Properties>
+				<dataStoreMode>TRANSIENT</dataStoreMode>
+				<dataStoreFile>StrolchModel.xml</dataStoreFile>
+				<tryLockTime>1</tryLockTime>
+				<tryLockTimeUnit>SECONDS</tryLockTimeUnit>
+			</Properties>
+		</Component>
+
+		<Component>
+			<name>ServiceHandler</name>
+			<api>li.strolch.service.api.ServiceHandler</api>
+			<impl>li.strolch.service.api.DefaultServiceHandler</impl>
+			<depends>RealmHandler</depends>
+			<Properties>
+				<verbose>true</verbose>
+			</Properties>
+		</Component>
+
+		<Component>
+			<name>PolicyHandler</name>
+			<api>li.strolch.policy.PolicyHandler</api>
+			<impl>li.strolch.policy.DefaultPolicyHandler</impl>
+			<depends>RealmHandler</depends>
+			<Properties>
+				<readPolicyFile>true</readPolicyFile>
+				<policyConfigFile>StrolchPolicies.xml</policyConfigFile>
+			</Properties>
+		</Component>
+
+
+		<Component>
+			<name>EnumHandler</name>
+			<api>li.strolch.runtime.query.enums.EnumHandler</api>
+			<impl>li.strolch.runtime.query.enums.DefaultEnumHandler</impl>
+			<depends>RealmHandler</depends>
+		</Component>
+
+		<Component>
+			<name>SessionHandler</name>
+			<api>li.strolch.runtime.sessions.StrolchSessionHandler</api>
+			<impl>li.strolch.runtime.sessions.DefaultStrolchSessionHandler</impl>
+			<depends>RealmHandler</depends>
+			<depends>PrivilegeHandler</depends>
+			<Properties>
+				<session.ttl.minutes>1440</session.ttl.minutes>
+				<session.maxKeepAlive.minutes>10080</session.maxKeepAlive.minutes>
+			</Properties>
+		</Component>
+		<Component>
+			<name>RestfulHandler</name>
+			<api>li.strolch.rest.RestfulStrolchComponent</api>
+			<impl>li.strolch.rest.RestfulStrolchComponent</impl>
+			<depends>SessionHandler</depends>
+			<Properties>
+				<secureCookie>false</secureCookie>
+				<restLogging>false</restLogging>
+				<restLoggingEntity>false</restLoggingEntity>
+				<restTracing>ALL</restTracing>
+			</Properties>
+		</Component>
+
+	</env>
+</StrolchConfiguration>
