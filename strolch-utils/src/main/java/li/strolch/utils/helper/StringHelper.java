@@ -49,6 +49,7 @@ public class StringHelper {
 	public static final String DOT = ".";
 	public static final String SEMICOLON = ";";
 	public static final String COLON = ":";
+	public static final String UTF8_BOM = "\uFEFF";
 
 	private static final Logger logger = LoggerFactory.getLogger(StringHelper.class);
 
