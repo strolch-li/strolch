@@ -203,4 +203,54 @@ public class ReportResourceTest extends AbstractRestfulTest {
 			logout("test", authToken);
 		}
 	}
+
+	@Test
+	public void shouldGetReportByIdAsCsv() {
+		String authToken = authenticate("test", "test");
+
+		JsonObject query = new JsonObject();
+		JsonArray filters = new JsonArray();
+		JsonObject filter = new JsonObject();
+		filter.addProperty(ReportConstants.PARAM_FACET_TYPE, "Product");
+		JsonArray facetFilters = new JsonArray();
+		facetFilters.add("product01");
+		filter.add(ReportConstants.PARAM_FACET_FILTERS, facetFilters);
+		filters.add(filter);
+		query.add(PARAM_FILTER, filters);
+
+		try (Response response = target()
+				.path("strolch/reports/stockReport/csv")
+				.request(TEXT_CSV)
+				.header("Authorization", authToken)
+				.post(Entity.json(query.toString()))) {
+			assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+			System.out.println("[DEBUG_LOG] Media Type: " + response.getMediaType());
+			assertTrue("Media type should start with text/csv", response.getMediaType().toString().startsWith(TEXT_CSV));
+			byte[] responseBytes = response.readEntity(byte[].class);
+			assertNotNull(responseBytes);
+			assertTrue("Response should not be empty", responseBytes.length > 3);
+
+			// Check for UTF-8 BOM: 0xEF, 0xBB, 0xBF
+			assertEquals((byte) 0xEF, responseBytes[0]);
+			assertEquals((byte) 0xBB, responseBytes[1]);
+			assertEquals((byte) 0xBF, responseBytes[2]);
+
+			String csv = new String(responseBytes, 3, responseBytes.length - 3, java.nio.charset.StandardCharsets.UTF_8);
+			System.out.println("[DEBUG_LOG] CSV Content:\n" + csv);
+			assertFalse(csv.isEmpty());
+
+			String[] lines = csv.split("\n");
+			assertTrue("CSV should have at least 2 lines (header + 1 data line), but was: " + lines.length,
+					lines.length >= 2);
+
+			// Check header
+			assertTrue(lines[0].contains("product"));
+			assertTrue(lines[0].contains("quantity"));
+
+			// Check data (product01 matches 2 rows in original test, but with filter it should be there)
+			assertTrue(csv.contains("Product 01"));
+		} finally {
+			logout("test", authToken);
+		}
+	}
 }
