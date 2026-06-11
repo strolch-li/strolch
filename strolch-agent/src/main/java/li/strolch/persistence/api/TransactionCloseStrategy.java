@@ -28,7 +28,9 @@ import li.strolch.exception.StrolchException;
 public enum TransactionCloseStrategy {
 
 	/**
-	 * <p>The default close strategy. It defines a writeable transaction</p>
+	 * Represents the default transaction close strategy where the transaction is not readonly, is writeable, and
+	 * automatically manages resource closure in a standard manner. The {@code close} method ensures the transaction is
+	 * properly finalized without imposing additional constraints.
 	 */
 	DEFAULT() {
 		@Override
@@ -44,6 +46,33 @@ public enum TransactionCloseStrategy {
 		@Override
 		public void close(StrolchTransaction tx) throws StrolchException {
 			tx.autoCloseableReadOnly();
+		}
+	},
+
+	/**
+	 * Defines the close strategy where a transaction will roll back changes in case of a failure.
+	 * <p>
+	 * <b>Note:</b> It is still required that the transaction be commited by calling
+	 * #{@link StrolchTransaction#commitOnClose()}
+	 * <p>
+	 * This strategy is used for transactions where changes are allowed to be made (writeable), but these changes will
+	 * not be committed if the transaction encounters an error. Instead, the transaction ensures that any modifications
+	 * are rolled back, leaving the system in its original state in the event of a failure.
+	 */
+	ROLLBACK_ON_FAILURE() {
+		@Override
+		public boolean isReadonly() {
+			return false;
+		}
+
+		@Override
+		public boolean isWriteable() {
+			return true;
+		}
+
+		@Override
+		public void close(StrolchTransaction tx) throws StrolchException {
+			tx.autoCloseableRollback();
 		}
 	},
 

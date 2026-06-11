@@ -380,6 +380,11 @@ public interface StrolchTransaction extends AutoCloseable {
 	StrolchTransaction commitOnClose();
 
 	/**
+	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK_ON_FAILURE}
+	 */
+	StrolchTransaction rollbackOnFailure();
+
+	/**
 	 * Sets the {@link TransactionCloseStrategy} to {@link TransactionCloseStrategy#ROLLBACK}
 	 */
 	StrolchTransaction rollbackOnClose();
