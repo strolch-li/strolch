@@ -243,6 +243,12 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 	}
 
 	@Override
+	public StrolchTransaction rollbackOnFailure() {
+		setCloseStrategy(TransactionCloseStrategy.ROLLBACK_ON_FAILURE);
+		return this;
+	}
+
+	@Override
 	public StrolchTransaction rollbackOnClose() {
 		setCloseStrategy(TransactionCloseStrategy.ROLLBACK);
 		return this;
