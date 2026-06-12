@@ -186,12 +186,14 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.restTracingThreshold = configuration.getString(PARAM_REST_TRACING_THRESHOLD, "TRACE");
 		this.forwardIgnoreIp = configuration.getString(PARAM_FORWARD_IGNORE_IP, "");
 
-		logger.info("Set restLogging={} with logEntities={} restTracing={} with threshold={}", this.restLogging,
-				this.restLoggingEntity, this.restTracing, this.restTracingThreshold);
+		if (configuration.isVerbose())
+			logger.info("Set restLogging={} with logEntities={} restTracing={} with threshold={}", this.restLogging,
+					this.restLoggingEntity, this.restTracing, this.restTracingThreshold);
 
 		// set http cache mode
 		String cacheMode = configuration.getString(PARAM_HTTP_CACHE_MODE, HttpCacheResponseFilter.NO_CACHE);
-		logger.info("HTTP header cache mode is set to {}", cacheMode);
+		if (configuration.isVerbose())
+			logger.info("HTTP header cache mode is set to {}", cacheMode);
 
 		this.secureCookie = configuration.getBoolean(PARAM_SECURE_COOKIE, true);
 		this.cookieMaxAge = configuration.getInt(PARAM_COOKIE_MAX_AGE, (int) TimeUnit.DAYS.toSeconds(1));
@@ -205,7 +207,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		this.hideVersionFromUnauthorizedClients = configuration.getBoolean(PARAM_HIDE_VERSION_FROM_UNAUTHORIZED_CLIENTS,
 				false);
 
-		logger.info("Cookie max age is {}s and is {}", this.cookieMaxAge, this.secureCookie ? "secure" : "not secure");
+		if (configuration.isVerbose())
+			logger.info("Cookie max age is {}s and is {}", this.cookieMaxAge,
+					this.secureCookie ? "secure" : "not secure");
 
 		initialized = true;
 		super.initialize(configuration);
@@ -283,10 +287,12 @@ public class RestfulStrolchComponent extends StrolchComponent {
 		if (!initialized)
 			throw new IllegalStateException("Strolch Component not yet initialized!");
 
-		logger.info("Local web path is {}", servletContext.getRealPath("/"));
+		if (getConfiguration().isVerbose())
+			logger.info("Local web path is {}", servletContext.getRealPath("/"));
 
 		this.webPath = servletContext.getContextPath();
-		logger.info("Context path is {}", this.webPath);
+		if (getConfiguration().isVerbose())
+			logger.info("Context path is {}", this.webPath);
 
 		SessionCookieConfig sessionCookieConfig = servletContext.getSessionCookieConfig();
 		if (this.secureCookie)

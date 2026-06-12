@@ -137,7 +137,8 @@ public class AbstractPrivilegeTest {
 	protected void initialize(String dst, String configFilename) {
 		try {
 			File privilegeConfigFile = getPrivilegeConfigFile(dst, configFilename);
-			this.privilegeHandler = new PrivilegeInitializer(executorService).initializeFromXml(privilegeConfigFile);
+			this.privilegeHandler = new PrivilegeInitializer(true, executorService).initializeFromXml(
+					privilegeConfigFile);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			throw new RuntimeException("Initialization failed", e);

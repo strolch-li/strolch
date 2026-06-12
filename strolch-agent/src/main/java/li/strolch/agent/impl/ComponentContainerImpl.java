@@ -259,7 +259,7 @@ public class ComponentContainerImpl implements ComponentContainer {
 			throw new StrolchConfigurationException(msg, e);
 
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException |
-				 IllegalArgumentException | InvocationTargetException e) {
+		         IllegalArgumentException | InvocationTargetException e) {
 
 			String msg = "Could not load class for component {0} due to: {1}";
 			msg = MessageFormat.format(msg, componentName, getRootCauseMessage(e));
@@ -278,8 +278,9 @@ public class ComponentContainerImpl implements ComponentContainer {
 		String environment = getEnvironment();
 		String applicationName = getApplicationName();
 		System.setProperty("user.timezone", getTimezone());
-		logger.info("Application {}:{} is using locale {} and timezone {}", applicationName, environment,
-				Locale.getDefault(), System.getProperty("user.timezone"));
+		if (strolchConfiguration.getRuntimeConfiguration().isVerbose())
+			logger.info("Application {}:{} is using locale {} and timezone {}", applicationName, environment,
+					Locale.getDefault(), System.getProperty("user.timezone"));
 
 		// set up the container itself
 		MapOfLists<Class<?>, StrolchComponent> componentMap = new MapOfLists<>();
@@ -311,9 +312,11 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.SETUP;
 
-		long took = System.nanoTime() - start;
-		logger.info("{}:{} Strolch Container setup with {} components. Took {}", applicationName, environment,
-				this.componentsByType.size(), formatNanoDuration(took));
+		if (strolchConfiguration.getRuntimeConfiguration().isVerbose()) {
+			long took = System.nanoTime() - start;
+			logger.info("{}:{} Strolch Container setup with {} components. Took {}", applicationName, environment,
+					this.componentsByType.size(), formatNanoDuration(took));
+		}
 	}
 
 	public void initialize() {
@@ -351,7 +354,8 @@ public class ComponentContainerImpl implements ComponentContainer {
 
 		this.state = ComponentState.STARTED;
 
-		logger.info("Garbage collecting after startup...");
+		if (this.agent.getRuntimeConfiguration().isVerbose())
+			logger.info("Garbage collecting after startup...");
 		System.gc();
 		logger.info("System: {}", SystemHelper.asString());
 		logger.info("Memory: {}", SystemHelper.getMemorySummary());

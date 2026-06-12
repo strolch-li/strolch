@@ -328,20 +328,22 @@ public class StrolchAgent {
 	 */
 	void setup(String environment, File configPathF, File dataPathF, File tempPathF) {
 
-		logger.info("[{}] Setting up Strolch Container using the following paths:", environment);
-		logger.info("Config:   {}", configPathF.getAbsolutePath());
-		logger.info("Data:     {}", dataPathF.getAbsolutePath());
-		logger.info("Temp:     {}", tempPathF.getAbsolutePath());
-		logger.info("user.dir: {}", SystemHelper.getUserDir());
-
 		this.strolchConfiguration = parseConfiguration(environment, configPathF, dataPathF, tempPathF);
+		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
+
+		if (config.isVerbose()) {
+			logger.info("[{}] Setting up Strolch Container using the following paths:", environment);
+			logger.info("Config:   {}", configPathF.getAbsolutePath());
+			logger.info("Data:     {}", dataPathF.getAbsolutePath());
+			logger.info("Temp:     {}", tempPathF.getAbsolutePath());
+			logger.info("user.dir: {}", SystemHelper.getUserDir());
+		}
 
 		ComponentContainerImpl container = new ComponentContainerImpl(this);
 		container.setup(this.strolchConfiguration);
 
 		this.container = container;
 
-		RuntimeConfiguration config = this.strolchConfiguration.getRuntimeConfiguration();
 		logger.info("Setup Agent {}:{}", config.getApplicationName(), config.getEnvironment());
 	}
 

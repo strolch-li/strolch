@@ -132,39 +132,41 @@ public abstract class InternalStrolchRealm implements StrolchRealm {
 		String txLoggingThresholdMsKey = makeRealmKey(getRealm(), PROP_TX_LOGGING_THRESHOLD_MS);
 		this.txLoggingThresholdMs = configuration.getLong(txLoggingThresholdMsKey, 0L);
 
-		if (this.auditTrailEnabled) {
-			logger.info("Enabling AuditTrail for realm {}", getRealm());
+		if (configuration.isVerbose()) {
+			if (this.auditTrailEnabled) {
+				logger.info("Enabling AuditTrail for realm {}", getRealm());
 
-			if (this.enableModelAudits) {
-				logger.info("Enabling model audits for realm {}", getRealm());
-				if (this.enableAuditsOnRead)
-					logger.info("Enabling model audits on read for realm {}", getRealm());
-				else
-					logger.info("Not enabling model audits on read for realm {}", getRealm());
+				if (this.enableModelAudits) {
+					logger.info("Enabling model audits for realm {}", getRealm());
+					if (this.enableAuditsOnRead)
+						logger.info("Enabling model audits on read for realm {}", getRealm());
+					else
+						logger.info("Not enabling model audits on read for realm {}", getRealm());
+				} else {
+					logger.info("Not enabling model audits for realm {}", getRealm());
+				}
+
+				if (this.enableAuditsForAudits) {
+					logger.info("Enabling audits for audits for realm {}", getRealm());
+				} else {
+					logger.info("Not enabling audits for audits for realm {}", getRealm());
+				}
 			} else {
-				logger.info("Not enabling model audits for realm {}", getRealm());
+				logger.info("AuditTrail not enabled for realm {}", getRealm());
 			}
 
-			if (this.enableAuditsForAudits) {
-				logger.info("Enabling audits for audits for realm {}", getRealm());
-			} else {
-				logger.info("Not enabling audits for audits for realm {}", getRealm());
-			}
-		} else {
-			logger.info("AuditTrail not enabled for realm {}", getRealm());
+			if (this.updateObservers)
+				logger.info("Enabling Observer Updates for realm {}", getRealm());
+			else
+				logger.info("Observer Updates not enabled for realm {}", getRealm());
+
+			if (this.enableVersioning)
+				logger.info("Enabling Versioning for realm {}", getRealm());
+			else
+				logger.info("Versioning not enabled for realm {}", getRealm());
+
+			logger.info("Using a locking try timeout of {}s", timeUnit.toSeconds(time));
 		}
-
-		if (this.updateObservers)
-			logger.info("Enabling Observer Updates for realm {}", getRealm());
-		else
-			logger.info("Observer Updates not enabled for realm {}", getRealm());
-
-		if (this.enableVersioning)
-			logger.info("Enabling Versioning for realm {}", getRealm());
-		else
-			logger.info("Versioning not enabled for realm {}", getRealm());
-
-		logger.info("Using a locking try timeout of {}s", timeUnit.toSeconds(time));
 
 		this.state = ComponentState.INITIALIZED;
 	}

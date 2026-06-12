@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static li.strolch.privilege.helper.XmlConstants.PARAM_BASE_PATH;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_VERBOSE;
 import static li.strolch.utils.helper.ClassHelper.instantiateClass;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 
@@ -47,6 +48,7 @@ public class PrivilegeInitializer {
 	private static final Logger logger = LoggerFactory.getLogger(PrivilegeInitializer.class);
 
 	private final ScheduledExecutorService executorService;
+	private final boolean verbose;
 
 	private PrivilegeContainerModel containerModel;
 	private EncryptionHandler encryptionHandler;
@@ -56,7 +58,8 @@ public class PrivilegeInitializer {
 	private SingleSignOnHandler ssoHandler;
 	private PrivilegeHandler privilegeHandler;
 
-	public PrivilegeInitializer(ScheduledExecutorService executorService) {
+	public PrivilegeInitializer(boolean verbose, ScheduledExecutorService executorService) {
+		this.verbose = verbose;
 		DBC.PRE.assertNotNull("executorService may not be null", executorService);
 		this.executorService = executorService;
 	}
@@ -130,6 +133,8 @@ public class PrivilegeInitializer {
 		DefaultPrivilegeHandler privilegeHandler;
 
 		Map<String, String> parameterMap = this.containerModel.getParameterMap();
+		if (this.verbose)
+			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));
 		parameterMap.put(PARAM_BASE_PATH, this.containerModel.getBasePath().getAbsolutePath());
 
 		if (this.containerModel.getPrivilegeHandlerClassName() == null) {
@@ -161,6 +166,8 @@ public class PrivilegeInitializer {
 		String ssoHandlerClassName = this.containerModel.getSsoHandlerClassName();
 		SingleSignOnHandler ssoHandler = instantiateClass(ssoHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getSsoHandlerParameterMap();
+		if (this.verbose)
+			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));
 
 		try {
 			ssoHandler.initialize(this.persistenceHandler, parameterMap);
@@ -177,6 +184,8 @@ public class PrivilegeInitializer {
 		String challengeHandlerClassName = this.containerModel.getUserChallengeHandlerClassName();
 		UserChallengeHandler challengeHandler = instantiateClass(challengeHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getUserChallengeHandlerParameterMap();
+		if (this.verbose)
+			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));
 
 		try {
 			challengeHandler.initialize(parameterMap);
@@ -194,6 +203,8 @@ public class PrivilegeInitializer {
 		PersistenceHandler persistenceHandler = instantiateClass(persistenceHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getPersistenceHandlerParameterMap();
 		parameterMap.put(PARAM_BASE_PATH, this.containerModel.getBasePath().getAbsolutePath());
+		if (this.verbose)
+			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));
 
 		try {
 			persistenceHandler.initialize(parameterMap);
@@ -209,12 +220,16 @@ public class PrivilegeInitializer {
 	private PasswordStrengthHandler initializePasswordStrengthHandler() {
 		String passwordStrengthHandlerClassName = this.containerModel.getPasswordStrengthHandlerClassName();
 		if (isEmpty(passwordStrengthHandlerClassName)) {
-			logger.info("No PasswordStrengthHandler defined, using {}", SimplePasswordStrengthHandler.class.getName());
+			if (this.verbose)
+				logger.info("No PasswordStrengthHandler defined, using {}",
+						SimplePasswordStrengthHandler.class.getName());
 			passwordStrengthHandlerClassName = SimplePasswordStrengthHandler.class.getName();
 		}
 
 		PasswordStrengthHandler passwordStrengthHandler = instantiateClass(passwordStrengthHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getPasswordStrengthHandlerParameterMap();
+		if (this.verbose)
+			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));
 
 		try {
 			passwordStrengthHandler.initialize(parameterMap);
@@ -231,6 +246,8 @@ public class PrivilegeInitializer {
 		String encryptionHandlerClassName = this.containerModel.getEncryptionHandlerClassName();
 		EncryptionHandler encryptionHandler = instantiateClass(encryptionHandlerClassName);
 		Map<String, String> parameterMap = this.containerModel.getEncryptionHandlerParameterMap();
+		if (this.verbose)
+			parameterMap.put(PARAM_VERBOSE, String.valueOf(true));
 
 		try {
 			encryptionHandler.initialize(parameterMap);

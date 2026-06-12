@@ -162,6 +162,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		this.parameterMap = parameterMap;
 
 		this.secureRandom = new SecureRandom();
+		boolean verbose = Boolean.parseBoolean(parameterMap.getOrDefault(PARAM_VERBOSE, "false"));
 
 		// get hash algorithm parameters
 		this.algorithm = parameterMap.getOrDefault(PARAM_HASH_ALGORITHM, DEFAULT_ALGORITHM);
@@ -174,7 +175,8 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		// test non-salt hash algorithm
 		try {
 			hashPasswordWithoutSalt("test".toCharArray());
-			logger.info("Using non-salt hashing algorithm {}", this.nonSaltAlgorithm);
+			if (verbose)
+				logger.info("Using non-salt hashing algorithm {}", this.nonSaltAlgorithm);
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
 			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), PARAM_HASH_ALGORITHM_NON_SALT,
@@ -185,7 +187,8 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 		// test hash algorithm
 		try {
 			hashPassword("test".toCharArray(), "test".getBytes());
-			logger.info("Using hashing algorithm {}", this.algorithm);
+			if (verbose)
+				logger.info("Using hashing algorithm {}", this.algorithm);
 		} catch (Exception e) {
 			String msg = "[{0}] Defined parameter {1} is invalid because of underlying exception: {2}";
 			msg = MessageFormat.format(msg, EncryptionHandler.class.getName(), PARAM_HASH_ALGORITHM,

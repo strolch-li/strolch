@@ -48,6 +48,7 @@ import static java.text.MessageFormat.format;
 import static java.util.stream.Collectors.toList;
 import static li.strolch.privilege.handler.PrivilegeCrudHandler.clearPassword;
 import static li.strolch.privilege.helper.ModelHelper.streamAllRolesForUser;
+import static li.strolch.privilege.helper.XmlConstants.PARAM_VERBOSE;
 import static li.strolch.utils.helper.ExceptionHelper.getRootCause;
 import static li.strolch.utils.helper.StringHelper.isEmpty;
 import static li.strolch.utils.helper.StringHelper.trimOrEmpty;
@@ -154,6 +155,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 	protected Future<?> persistSessionsTask;
 	protected Future<?> persistModelTask;
 	protected Future<?> prunePersonalAccessTokenCacheTask;
+	private boolean verbose;
 
 	@Override
 	public SingleSignOnHandler getSsoHandler() {
@@ -1180,6 +1182,7 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		this.persistenceHandler = persistenceHandler;
 		this.userChallengeHandler = userChallengeHandler;
 		this.ssoHandler = ssoHandler;
+		this.verbose = Boolean.parseBoolean(parameterMap.get(PARAM_VERBOSE));
 
 		handleAutoPersistOnUserDataChange(parameterMap);
 		handlePersistSessionsParam(parameterMap);
@@ -1215,7 +1218,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			this.autoPersistOnUserChangesData = false;
 		} else if (autoPersistS.equals(Boolean.TRUE.toString())) {
 			this.autoPersistOnUserChangesData = true;
-			logger.info("Enabling automatic persistence when user changes their data.");
+			if (this.verbose)
+				logger.info("Enabling automatic persistence when user changes their data.");
 		} else {
 			String msg = "Parameter {0} has illegal value {1}. Overriding with {2}";
 			msg = format(msg, PARAM_AUTO_PERSIST_ON_USER_CHANGES_DATA, autoPersistS, Boolean.FALSE);
@@ -1239,7 +1243,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 			}
 
 			this.persistSessionsPath = getPersistSessionFile(persistSessionsPathS);
-			logger.info("Enabling persistence of sessions to {}", this.persistSessionsPath.getAbsolutePath());
+			if (this.verbose)
+				logger.info("Enabling persistence of sessions to {}", this.persistSessionsPath.getAbsolutePath());
 		} else {
 			String msg = "Parameter {0} has illegal value {1}. Overriding with {2}";
 			msg = format(msg, PARAM_PERSIST_SESSIONS, persistSessionsS, Boolean.FALSE);
@@ -1282,7 +1287,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				throw new PrivilegeModelException(msg);
 			}
 		}
-		logger.info("Privilege conflict resolution set to {}", this.privilegeConflictResolution);
+		if (this.verbose)
+			logger.info("Privilege conflict resolution set to {}", this.privilegeConflictResolution);
 	}
 
 	private void handleSecretParams(Map<String, String> parameterMap) {

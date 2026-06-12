@@ -76,11 +76,7 @@ public class SmtpMailHandler extends MailHandler {
 		SmtpMailer smtpMailer = initializeSmtpMailer(configuration);
 
 		File configPath = configuration.getRuntimeConfiguration().getConfigPath();
-		if (!configuration.getBoolean(PARAM_SIGN, false) || !configuration.hasProperty(PARAM_SIGNING_KEY)) {
-			logger.info(
-					"Signing of emails is not enabled as signing is not enabled in configuration and no signing key is defined in configuration!");
-		} else {
-
+		if (configuration.getBoolean(PARAM_SIGN, false) && configuration.hasProperty(PARAM_SIGNING_KEY)) {
 			String signingKeyPassword = configuration.getSecret(PARAM_SIGNING_KEY_PASSWORD);
 			File signingKey = new File(configPath, configuration.getString(PARAM_SIGNING_KEY, null));
 			if (!signingKey.exists())
@@ -90,10 +86,7 @@ public class SmtpMailHandler extends MailHandler {
 			logger.info("Enabled signing of emails with key {}", signingKey.getAbsolutePath());
 		}
 
-		if (!configuration.getBoolean(PARAM_ENCRYPT, false) || !configuration.hasProperty(
-				PARAM_RECIPIENT_PUBLIC_KEYS)) {
-			logger.info("Not enabling encryption of e-mails as encryption is not enabled in configuration!");
-		} else {
+		if (configuration.getBoolean(PARAM_ENCRYPT, false) && configuration.hasProperty(PARAM_RECIPIENT_PUBLIC_KEYS)) {
 			if (!this.signingEnabled)
 				throw new IllegalStateException(
 						"Can not enable encryption without a signing key! Please set configuration property %s and %s".formatted(

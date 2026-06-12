@@ -125,7 +125,8 @@ public class DefaultStrolchPrivilegeHandler extends StrolchComponent implements 
 			if (getConfiguration().isVerbose())
 				parameterMap.put(PARAM_VERBOSE, "true");
 
-			return new PrivilegeInitializer(getScheduledExecutor(getName())).initializeFromXml(containerModel);
+			return new PrivilegeInitializer(getConfiguration().isVerbose(),
+					getScheduledExecutor(getName())).initializeFromXml(containerModel);
 
 		} catch (Exception e) {
 			String msg = "Failed to load Privilege configuration from {0}";
