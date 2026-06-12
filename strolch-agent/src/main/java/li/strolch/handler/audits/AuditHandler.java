@@ -98,9 +98,8 @@ public class AuditHandler extends StrolchComponent {
 				poll.run();
 
 			} catch (InterruptedException e) {
-				if (!this.run)
-					logger.warn("Interrupted!");
-				else
+				Thread.currentThread().interrupt();
+				if (this.run)
 					logger.error("Failed to perform a task", e);
 			} catch (Exception e) {
 				logger.error("Failed to perform a task", e);

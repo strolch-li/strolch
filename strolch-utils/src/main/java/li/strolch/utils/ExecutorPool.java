@@ -72,7 +72,8 @@ public class ExecutorPool {
 		try {
 			List<Runnable> tasks = executor.shutdownNow();
 			if (!this.verbose) {
-				logger.info("Shutting down executor {} with {} tasks", name, tasks.size());
+				if (!tasks.isEmpty())
+					logger.info("Shutting down executor {} with {} tasks", name, tasks.size());
 			} else {
 				if (!tasks.isEmpty()) {
 					logger.warn("The following {} tasks were never started for executor {} :", tasks.size(), name);
