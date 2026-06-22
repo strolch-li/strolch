@@ -843,6 +843,6 @@ public class StringHelper {
 	 * @return a new string where all whitespace and special characters are replaced with underscores
 	 */
 	public static String replaceWhitespaceAndSpecialCharactersWithUnderscore(String str) {
-		return str.replaceAll("\\s", "_").replaceAll("[^a-zA-Z0-9_]", "_");
+		return str.replaceAll("\\s", "_").replaceAll("[\\W_]", "_");
 	}
 }
