@@ -489,9 +489,8 @@ public class StringHelper {
 	 * </pre>
 	 *
 	 * <b>Note:</b> This method also supports <code>${name}</code> placeholders. This is not encouraged for new code,
-	 * as
-	 * it is less readable and less maintainable than using <code>{name}</code> placeholders. However, it is supported
-	 * for backward compatibility.
+	 * as it is less readable and less maintainable than using <code>{name}</code> placeholders. However, it is
+	 * supported for backward compatibility.
 	 */
 	public static String format(String pattern, Map<String, ?> values) {
 		StringBuilder out = new StringBuilder();
@@ -833,5 +832,17 @@ public class StringHelper {
 		}
 
 		return sb.toString();
+	}
+
+	/**
+	 * Replaces all whitespace characters and special characters in the input string with underscores. Alphanumeric
+	 * characters and underscores are preserved.
+	 *
+	 * @param str the input string to process, which may contain whitespace or special characters
+	 *
+	 * @return a new string where all whitespace and special characters are replaced with underscores
+	 */
+	public static String replaceWhitespaceAndSpecialCharactersWithUnderscore(String str) {
+		return str.replaceAll("\\s", "_").replaceAll("[^a-zA-Z0-9_]", "_");
 	}
 }
