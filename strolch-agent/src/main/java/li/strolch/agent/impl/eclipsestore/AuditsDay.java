@@ -122,7 +122,7 @@ public class AuditsDay {
 		ZonedDateTime date = audit.getDate();
 		if (date.getYear() != this.year)
 			throw new IllegalStateException("Audit year " + date.getYear() + " is not for this year " + this.year);
-		if (date.getMonth() != this.month)
+		if (date.getMonth().equals(this.month))
 			throw new IllegalStateException("Audit month " + date.getMonth() + " is not for this month " + this.month);
 		if (date.getDayOfMonth() != this.day)
 			throw new IllegalStateException(
