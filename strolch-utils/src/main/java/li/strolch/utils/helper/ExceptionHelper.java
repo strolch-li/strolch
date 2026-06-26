@@ -98,8 +98,10 @@ public class ExceptionHelper {
 	 * @return the exception as string
 	 */
 	public static String getExceptionMessage(Throwable t, boolean withClassName) {
-		if (withClassName || isEmpty(t.getMessage()))
-			return t.getClass().getName() + ": " + t.getMessage();
+		if (isEmpty(t.getMessage()))
+			return t.getClass().getSimpleName();
+		if (withClassName)
+			return t.getClass().getSimpleName() + ": " + t.getMessage();
 		return t.getMessage();
 	}
 
