@@ -129,6 +129,12 @@ public class ModelGenerator {
 
 	public static final String ACTION_RES_TYPE = "ResType";
 	public static final String ACTION_RES_ID = "@resId";
+	public static final String ACTION = "Action";
+
+	private static final Random random = new SecureRandom();
+
+	private ModelGenerator() {
+	}
 
 	/**
 	 * Creates an {@link Resource} with the given values and adds a {@link ParameterBag} by calling
@@ -350,7 +356,7 @@ public class ModelGenerator {
 		ParameterBag bag = createParameterBag(BAG_ID, BAG_NAME, BAG_TYPE);
 		rootActivity.addParameterBag(bag);
 
-		Action action = createAction("action_" + rootActivity.getId(), "Action " + rootActivity.getName(), "Use");
+		Action action = createAction("action_" + rootActivity.getId(), ACTION + " " + rootActivity.getName(), "Use");
 		rootActivity.addElement(action);
 
 		Activity subActivity = new Activity("sub_" + id, "sub_" + name, type, timeOrdering);
@@ -358,7 +364,7 @@ public class ModelGenerator {
 		subActivity.addParameterBag(bag);
 		rootActivity.addElement(subActivity);
 
-		action = createAction("action_" + id, "Action " + name, "Use");
+		action = createAction("action_" + id, ACTION + " " + name, "Use");
 		subActivity.addElement(action);
 
 		Activity subSubActivity = new Activity("subSub_" + id, "subSub_" + name, type, timeOrdering);
@@ -366,10 +372,10 @@ public class ModelGenerator {
 		subSubActivity.addParameterBag(bag);
 		subActivity.addElement(subSubActivity);
 
-		action = createAction("action1_" + id, "Action " + name, "Use");
+		action = createAction("action1_" + id, ACTION + " " + name, "Use");
 		subSubActivity.addElement(action);
 
-		action = createAction("action2_" + id, "Action " + name, "Use");
+		action = createAction("action2_" + id, ACTION + " " + name, "Use");
 		subSubActivity.addElement(action);
 
 		rootActivity.setPolicyDefs(createPolicyDefs());
@@ -499,13 +505,12 @@ public class ModelGenerator {
 		bag.addParameter(longListP);
 	}
 
-	private static String randomValue(Random rand, String[] values) {
-		return values[rand.nextInt(values.length)];
+	private static String randomValue(String[] values) {
+		return values[random.nextInt(values.length)];
 	}
 
 	public static Audit randomAudit() {
 
-		Random random = new SecureRandom();
 		String[] usernames = new String[]{"bob", "alice", "jenny"};
 		String[] types = new String[]{Tags.RESOURCE, Tags.ORDER, Tags.AUDIT};
 		String[] subTypes = new String[]{"Ball", "Something", "Foo", "Bar"};
@@ -514,16 +519,16 @@ public class ModelGenerator {
 
 		Audit audit = new Audit();
 		audit.setId(StringHelper.getUniqueIdLong());
-		audit.setUsername(randomValue(random, usernames));
-		audit.setDate(ZonedDateTime.now().plusDays(random.nextInt(100) - 20));
-		audit.setElementType(randomValue(random, types));
-		audit.setElementSubType(randomValue(random, subTypes));
+		audit.setUsername(randomValue(usernames));
+		audit.setDate(ZonedDateTime.now().plusDays(random.nextInt(100) - 20L));
+		audit.setElementType(randomValue(types));
+		audit.setElementSubType(randomValue(subTypes));
 		audit.setElementAccessed(StringHelper.getUniqueId());
-		audit.setNewVersion(ZonedDateTime.now().plusDays(random.nextInt(100) - 20));
-		audit.setAction(randomValue(random, actions));
+		audit.setNewVersion(ZonedDateTime.now().plusDays(random.nextInt(100) - 20L));
+		audit.setAction(randomValue(actions));
 		audit.setAccessType(AccessType.values()[random.nextInt(AccessType.values().length)]);
 		audit.setSource("unknown");
-		if (new SecureRandom().nextBoolean()) {
+		if (random.nextBoolean()) {
 			JsonObject json = new JsonObject();
 			json.addProperty("key", "value");
 			audit.setAdditionalDataAsJson(json);
