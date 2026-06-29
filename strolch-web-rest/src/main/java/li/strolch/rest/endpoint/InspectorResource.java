@@ -58,6 +58,7 @@ import li.strolch.service.api.ServiceHandler;
 import li.strolch.service.api.ServiceResult;
 import li.strolch.utils.dbc.DBC;
 import li.strolch.utils.helper.StringHelper;
+import li.strolch.utils.helper.TempFileOptions;
 import li.strolch.utils.iso8601.ISO8601FormatFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -84,6 +87,8 @@ import static li.strolch.runtime.StrolchConstants.StrolchPrivilegeConstants.PRIV
 import static li.strolch.search.SearchBuilder.orderBy;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethod;
 import static li.strolch.utils.helper.ExceptionHelper.getCallerMethodNoClass;
+import static li.strolch.utils.helper.FileHelper.getTempFile;
+import static li.strolch.utils.helper.TempFileOptions.APPEND_MILLIS;
 import static li.strolch.utils.helper.XmlHelper.getSaxParser;
 
 /**
@@ -1254,7 +1259,14 @@ public class InspectorResource {
 		File tempFile = null;
 		try {
 
-			tempFile = File.createTempFile("strolch_model_upload_", ".xml");
+			File tempPath = new File(
+					RestfulStrolchComponent.getInstance().getAgent().getRuntimeConfiguration().getTempPath(),
+					"strolch_model_upload");
+			if (!tempPath.exists() && !tempPath.mkdirs())
+				throw new RuntimeException("Could not create temp path: " + tempPath.getName());
+			Set<TempFileOptions> options = Set.of(APPEND_MILLIS);
+			tempFile = getTempFile(tempPath, "strolch_model_upload_", ".xml", options);
+
 			try (FileWriter out = new FileWriter(tempFile)) {
 				out.write(data);
 			}
@@ -1285,9 +1297,13 @@ public class InspectorResource {
 			logger.error(e.getMessage(), e);
 			return toResponse(e);
 		} finally {
-			if (tempFile != null && !tempFile.delete())
-				logger.error("Failed to delete temp file {}", tempFile.getAbsolutePath());
-
+			if (tempFile != null) {
+				try {
+					Files.deleteIfExists(tempFile.toPath());
+				} catch (IOException e) {
+					logger.error("Failed to delete {}", tempFile.getAbsolutePath());
+				}
+			}
 		}
 	}
 
