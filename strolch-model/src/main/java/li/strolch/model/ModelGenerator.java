@@ -523,7 +523,7 @@ public class ModelGenerator {
 		audit.setAction(randomValue(random, actions));
 		audit.setAccessType(AccessType.values()[random.nextInt(AccessType.values().length)]);
 		audit.setSource("unknown");
-		if (new Random().nextBoolean()) {
+		if (new SecureRandom().nextBoolean()) {
 			JsonObject json = new JsonObject();
 			json.addProperty("key", "value");
 			audit.setAdditionalDataAsJson(json);
