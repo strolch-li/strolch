@@ -226,6 +226,8 @@ public class StrolchBootstrapper extends DefaultHandler {
 		logger.info("Setting up agent using bootstrap file...");
 		String bootstrapFileName = "/" + FILE_BOOTSTRAP;
 		InputStream bootstrapFile = clazz.getResourceAsStream(bootstrapFileName);
+		if (bootstrapFile == null)
+			throw new IllegalStateException("Bootstrap file " + FILE_BOOTSTRAP + " not found!");
 		StrolchBootstrapper bootstrapper = new StrolchBootstrapper(clazz);
 		return bootstrapper.setupByBootstrapFile(clazz, bootstrapFile);
 	}
