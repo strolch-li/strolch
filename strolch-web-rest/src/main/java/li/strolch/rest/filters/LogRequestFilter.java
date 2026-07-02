@@ -72,9 +72,18 @@ public class LogRequestFilter implements ContainerRequestFilter, ContainerRespon
 					contentType.append(", ");
 			}
 
+			Enumeration<String> contentEncodingEnumeration = request.getHeaders("content-encoding");
+			StringBuilder contentEncoding = new StringBuilder();
+			while (contentEncodingEnumeration.hasMoreElements()) {
+				contentEncoding.append(contentEncodingEnumeration.nextElement());
+				if (contentEncodingEnumeration.hasMoreElements())
+					contentEncoding.append(", ");
+			}
+
 			if (!responseContext.getHeaders().containsKey(STROLCH_EXCEPTION_I18N))
-				logger.error("Request failed {} {}: {} {} Content-type: {}", this.request.getRemoteAddr(),
-						responseContext.getStatus(), method, uri, contentType);
+				logger.error("Request failed {} {}: {} {} Content-type: {}, Content-encoding: {}",
+						this.request.getRemoteAddr(), responseContext.getStatus(), method, uri, contentType,
+						contentEncoding);
 		}
 	}
 }
