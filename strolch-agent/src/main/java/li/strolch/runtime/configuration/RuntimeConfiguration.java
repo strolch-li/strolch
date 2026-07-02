@@ -147,8 +147,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		try {
 			return Duration.parse(value);
 		} catch (Exception e) {
-			logger.error("Failed to parse retention duration {} for prefix {}. Falling back to P7D.", value, prefix);
-			return Duration.ofDays(7);
+			logger.error("Failed to parse retention duration {} for prefix {}. Falling back to P3M.", value, prefix);
+			return Duration.ofDays(90);
 		}
 	}
 
