@@ -18,9 +18,12 @@ package li.strolch.runtime.configuration;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -29,9 +32,19 @@ import static li.strolch.model.Tags.Json.VERBOSE;
 
 public class RuntimeConfiguration extends AbstractionConfiguration {
 
+	private static final Logger logger = LoggerFactory.getLogger(RuntimeConfiguration.class);
+
 	public static final String PROP_LOCALE = "locale";
 	public static final String RUNTIME = "Runtime";
 	public static final String PROP_TIMEZONE = "timezone";
+
+	public static final String PROP_TEMP_RETENTION_DEFAULT = "temp.retention.default";
+	public static final String PROP_TEMP_RETENTION_PREFIX = "temp.retention.";
+
+	public static final String PROP_TEMP_RETENTION_KEEP_DEFAULT = "temp.retention.keep.default";
+	public static final String PROP_TEMP_RETENTION_KEEP_PREFIX = "temp.retention.keep.";
+
+	public static final String PROP_TEMP_RETENTION_DELETE_ENABLED = "temp.retention.delete.enabled";
 
 	private final String applicationName;
 	private final String environment;
@@ -121,6 +134,33 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public boolean isVerbose() {
 		return this.verbose;
+	}
+
+	public Duration getTempRetention(String prefix) {
+		String key = PROP_TEMP_RETENTION_PREFIX + prefix;
+		String value;
+		if (hasProperty(key))
+			value = getString(key, null);
+		else
+			value = getString(PROP_TEMP_RETENTION_DEFAULT, "P3M");
+
+		try {
+			return Duration.parse(value);
+		} catch (Exception e) {
+			logger.error("Failed to parse retention duration {} for prefix {}. Falling back to P7D.", value, prefix);
+			return Duration.ofDays(7);
+		}
+	}
+
+	public int getTempRetentionKeep(String prefix) {
+		String key = PROP_TEMP_RETENTION_KEEP_PREFIX + prefix;
+		if (hasProperty(key))
+			return getInt(key, 0);
+		return getInt(PROP_TEMP_RETENTION_KEEP_DEFAULT, 0);
+	}
+
+	public boolean isTempRetentionDeleteEnabled() {
+		return getBoolean(PROP_TEMP_RETENTION_DELETE_ENABLED, false);
 	}
 
 	/**
