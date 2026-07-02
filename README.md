@@ -38,6 +38,16 @@ Users can manage their PATs through the `PrivilegeHandler`. A PAT can be used fo
 
 For more technical details, see [strolch-privilege/docs/PersonalAccessToken.md](strolch-privilege/docs/PersonalAccessToken.md).
 
+### Temporary File Retention
+Strolch provides a mechanism to automatically clear old temporary files. This is handled by the `ClearTempPathJob`, which runs daily by default.
+
+#### Configuration
+Retention periods can be configured in `strolch.xml` using ISO-8601 durations:
+- `temp.retention.default`: Default retention (default is 3 months).
+- `temp.retention.<prefix>`: Specific retention for a subdirectory in the temp path.
+
+For more details, see [docs/TemporaryFileRetention.md](docs/TemporaryFileRetention.md).
+
 ## Build and Configuration
 
 ### Prerequisites
