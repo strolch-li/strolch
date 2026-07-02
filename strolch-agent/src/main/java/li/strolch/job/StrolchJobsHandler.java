@@ -89,13 +89,25 @@ public class StrolchJobsHandler extends StrolchComponent {
 		});
 
 		StrolchAgent agent = getContainer().getAgent();
+		addReloadJobsJob(agent, jobs);
+		addClearTempPathJob(agent, jobs);
+
+		this.jobs = new HashMap<>();
+		jobs.forEach(job -> internalRegister(job).schedule());
+	}
+
+	private static void addClearTempPathJob(StrolchAgent agent, List<StrolchJob> jobs) {
+		ClearTempPathJob clearTempPathJob = new ClearTempPathJob(agent, JobMode.Recurring, 1, TimeUnit.HOURS, 1,
+				TimeUnit.DAYS);
+		clearTempPathJob.setConfigureMethod(ConfigureMethod.Programmatic);
+		jobs.add(clearTempPathJob);
+	}
+
+	private static void addReloadJobsJob(StrolchAgent agent, List<StrolchJob> jobs) {
 		ReloadJobsJob reloadJobsJob = new ReloadJobsJob(agent, ReloadJobsJob.class.getSimpleName(),
 				ReloadJobsJob.class.getSimpleName(), JobMode.Manual);
 		reloadJobsJob.setConfigureMethod(ConfigureMethod.Model);
 		jobs.add(reloadJobsJob);
-
-		this.jobs = new HashMap<>();
-		jobs.forEach(job -> internalRegister(job).schedule());
 	}
 
 	private void loadJob(List<StrolchJob> jobs, Resource jobRes, boolean catchExceptions) {
