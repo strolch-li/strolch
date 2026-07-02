@@ -27,11 +27,11 @@ public class ExceptionHelperTest {
 	public void shouldGetExceptionMsg() {
 
 		Exception e = nestedException();
-		assertEquals("java.lang.RuntimeException: Third", ExceptionHelper.getExceptionMessage(e));
+		assertEquals("RuntimeException: Third", ExceptionHelper.getExceptionMessage(e));
 		assertEquals("""
-				java.lang.RuntimeException: Third
-				java.lang.RuntimeException: Second
-				java.lang.RuntimeException: First""", ExceptionHelper.getExceptionMessageWithCauses(e));
+				RuntimeException: Third
+				RuntimeException: Second
+				RuntimeException: First""", ExceptionHelper.getExceptionMessageWithCauses(e));
 	}
 
 	@Test
@@ -45,9 +45,9 @@ public class ExceptionHelperTest {
 
 		formatException = ExceptionHelper.formatExceptionMessage(e);
 		assertEquals("""
-				java.lang.RuntimeException: Third
-				cause: java.lang.RuntimeException: Second
-				cause: java.lang.RuntimeException: First""", formatException);
+				RuntimeException: Third
+				cause: RuntimeException: Second
+				cause: RuntimeException: First""", formatException);
 	}
 
 	private Exception nestedException() {
