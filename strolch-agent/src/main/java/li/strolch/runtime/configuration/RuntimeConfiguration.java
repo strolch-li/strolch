@@ -142,12 +142,12 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		if (hasProperty(key))
 			value = getString(key, null);
 		else
-			value = getString(PROP_TEMP_RETENTION_DEFAULT, "P3M");
+			value = getString(PROP_TEMP_RETENTION_DEFAULT, "P90D");
 
 		try {
 			return Duration.parse(value);
 		} catch (Exception e) {
-			logger.error("Failed to parse retention duration {} for prefix {}. Falling back to P3M.", value, prefix);
+			logger.error("Failed to parse retention duration {} for prefix {}. Falling back to P90D.", value, prefix);
 			return Duration.ofDays(90);
 		}
 	}

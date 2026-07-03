@@ -55,7 +55,7 @@ A new `StrolchJob` called `ClearTempPathJob` is implemented to perform the clean
     <tempPath>temp</tempPath>
     <properties>
         <!-- Default retention: 3 months -->
-        <property name="temp.retention.default" value="P3M" />
+        <property name="temp.retention.default" value="P90D" />
         <!-- Default keep: 0 files -->
         <property name="temp.retention.keep.default" value="0" />
         
