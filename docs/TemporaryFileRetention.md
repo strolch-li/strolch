@@ -54,17 +54,20 @@ A new `StrolchJob` called `ClearTempPathJob` is implemented to perform the clean
 <Runtime>
     <tempPath>temp</tempPath>
     <properties>
+        <!-- enable removal -->
+        <temp.retention.delete.enabled>true</temp.retention.delete.enabled>
+        
         <!-- Default retention: 3 months -->
-        <property name="temp.retention.default" value="P90D" />
+        <temp.retention.default>P90D</temp.retention.default>
         <!-- Default keep: 0 files -->
-        <property name="temp.retention.keep.default" value="0" />
+        <temp.retention.keep.default>0</temp.retention.keep.default>
         
         <!-- Prefix-specific retention for 'import': 1 day, keep 10 files -->
-        <property name="temp.retention.import" value="P1D" />
-        <property name="temp.retention.keep.import" value="10" />
+        <temp.retention.import>P1D</temp.retention.import>
+        <temp.retention.keep.import>10</temp.retention.keep.import>
         
         <!-- Prefix-specific retention for 'reports': 30 days -->
-        <property name="temp.retention.reports" value="P30D" />
+        <temp.retention.reports>P30D</temp.retention.reports>
     </properties>
 </Runtime>
 ```
