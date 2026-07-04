@@ -1,45 +1,41 @@
-li.strolch.utils
-======================
+# strolch-utils
 
-Java Utilites which ease daily work when programming in the Java language
+The `strolch-utils` module is a collection of project-independent Java utility classes and helpers designed to simplify common programming tasks. It covers areas such as Design by Contract (DBC), object modification tracking, date/time handling, specialized collections, and various helper utilities for common Java types.
 
-Dependencies
-----------------------
-This utility package is built by Maven3 and has very few external dependencies. The current dependencies are:
-* the Java Runtime Environment 8
-* JUnit 4.11 (test scope)
-* slf4j 1.7.2
-* slf4j-log4j bindings (test scope)
+## Dependencies
 
-Features
-----------------------
-* RMI File client/server
-  * This is a small RMI client server which allows to fetch files from a server which exposes the RmiFileHandler class via RMI
-* ObjectFilter
-  * The ObjectFilter allows to keep track of modifications to objects. The modifications are add/update/remove.
-  * You register the modification of an object on the filter and when all is done, you query the filter for all the add/update/remove modifications so that you only persist the required changes to your database
-* ArraysHelper
-  * The ArraysHelper contains methods to handling arrays
-* BaseEncoding
-  * The BaseEncoding class implements RFC4648 and thus implements Base64, Base32, Base16 in all their different alphabets and also implementes the D-Base32 encoding
-* ByteHelper
-  * The ByteHelper contains methods to print, convert and manipulate bytes 
-* FileHelper
-  * The FileHelper contains methods relevant to files. E.g. recursively deleting directories, copying files, reading/writing files etc.
-* ProcessHelper
-  * The ProcessHelper abstracts away OS specific process tasks
-* StringHelper
-  * The StringHelper contains methods for handling Strings
-* SystemHelper
-  * The SystemHelper contains methods to get system specific information
-* XmlHelper
-  * The XmlHelper contains methods to handle XML files
+This utility package is built by Maven and has very few external dependencies. The current dependencies include:
 
-Building
--------------------------
-* Prerequisites:
-  * JDK 8 is installed and JAVA_HOME is properly set and ../bin is in path
-  * Maven 3 is installed and MAVEN_HOME is properly set and ../bin is in path
-* Clone repository and change path to root
-* Run maven:
-  * mvn clean install
+- Java 25 (Recommended)
+- SLF4J (Logging API)
+- GSON (JSON processing)
+- Jakarta XML Binding (JAXB)
+- Jakarta Mail
+- Bouncy Castle (Cryptography)
+
+## Features
+
+- **Design by Contract (DBC)**: Assertions for preconditions, postconditions, and intermediate checks.
+- **ObjectFilter**: Efficient tracking of object modifications (Add/Update/Remove).
+- **ISO8601**: Standardized date and time handling.
+- **Specialized Collections**: `MapOfLists`, `MapOfSets`, `MapOfMaps`, and `Paging` utilities.
+- **Helper Classes**: Comprehensive helpers for Strings, Files, XML, Dates, Exceptions, and more.
+- **I18n Utilities**: Framework for internationalized messages.
+- **Database Utilities**: Helpers for database connection and schema management.
+
+For more technical details, see [docs/strolch-utils.md](docs/strolch-utils.md).
+
+## Building
+
+### Prerequisites
+
+- JDK 25 is installed.
+- Maven 3.6+ is installed.
+
+### Build Instructions
+
+To build the project:
+
+```bash
+mvn clean install
+```

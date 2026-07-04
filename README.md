@@ -58,6 +58,11 @@ Retention periods can be configured in `strolch.xml` using ISO-8601 durations:
 
 For more details, see [docs/TemporaryFileRetention.md](docs/TemporaryFileRetention.md).
 
+### Strolch Utils
+The `strolch-utils` module is a collection of project-independent Java utility classes and helpers designed to simplify common programming tasks. It covers areas such as Design by Contract (DBC), object modification tracking, date/time handling, specialized collections, and various helper utilities for common Java types.
+
+For more technical details, see [strolch-utils/docs/strolch-utils.md](strolch-utils/docs/strolch-utils.md).
+
 ### PostgreSQL Persistence
 The `strolch-persistence-postgresql` module provides a PostgreSQL-based persistence implementation. It supports storing Strolch elements in a PostgreSQL database using either XML or JSON formats. It includes automatic schema management and high-performance connection pooling.
 
