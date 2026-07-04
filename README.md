@@ -43,6 +43,11 @@ Users can manage their PATs through the `PrivilegeHandler`. A PAT can be used fo
 
 For more technical details, see [strolch-privilege/docs/PersonalAccessToken.md](strolch-privilege/docs/PersonalAccessToken.md).
 
+### Strolch Services
+The `strolch-service` module provides the Service API for Strolch. It encapsulates business logic into reusable Services and Commands, and provides specialized frameworks for execution, reporting, and migrations.
+
+For more technical details, see [strolch-service/README.md](strolch-service/README.md).
+
 ### Temporary File Retention
 Strolch provides a mechanism to automatically clear old temporary files. This is handled by the `ClearTempPathJob`, which runs daily by default.
 
