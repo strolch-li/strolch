@@ -63,6 +63,11 @@ The `strolch-persistence-xml` module provides a filesystem-based XML persistence
 
 For more technical details and setup instructions, see [strolch-persistence-xml/README.md](strolch-persistence-xml/README.md).
 
+### Privilege
+The `strolch-privilege` module is the Role-Based Access Control (RBAC) engine for Strolch. It handles user authentication, session management, and authorization using extensible policies.
+
+For more technical details and setup instructions, see [strolch-privilege/README.md](strolch-privilege/README.md).
+
 ## Build and Configuration
 
 ### Prerequisites
