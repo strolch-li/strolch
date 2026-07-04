@@ -58,6 +58,11 @@ The `strolch-persistence-postgresql` module provides a PostgreSQL-based persiste
 
 For more technical details and setup instructions, see [strolch-persistence-postgresql/README.md](strolch-persistence-postgresql/README.md).
 
+### XML Persistence
+The `strolch-persistence-xml` module provides a filesystem-based XML persistence implementation. It stores each Strolch element in its own XML file on the disk. It is suitable for smaller applications or development environments.
+
+For more technical details and setup instructions, see [strolch-persistence-xml/README.md](strolch-persistence-xml/README.md).
+
 ## Build and Configuration
 
 ### Prerequisites
