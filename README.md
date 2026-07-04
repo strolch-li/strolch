@@ -53,6 +53,11 @@ Retention periods can be configured in `strolch.xml` using ISO-8601 durations:
 
 For more details, see [docs/TemporaryFileRetention.md](docs/TemporaryFileRetention.md).
 
+### PostgreSQL Persistence
+The `strolch-persistence-postgresql` module provides a PostgreSQL-based persistence implementation. It supports storing Strolch elements in a PostgreSQL database using either XML or JSON formats. It includes automatic schema management and high-performance connection pooling.
+
+For more technical details and setup instructions, see [strolch-persistence-postgresql/README.md](strolch-persistence-postgresql/README.md).
+
 ## Build and Configuration
 
 ### Prerequisites

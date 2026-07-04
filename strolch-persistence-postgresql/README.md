@@ -3,46 +3,38 @@
 
 [![Build Status](http://jenkins.eitchnet.ch/buildStatus/icon?job=li.strolch.persistence.postgresql)](http://jenkins.eitchnet.ch/view/strolch/job/li.strolch.persistence.postgresql/)
 
-PostgreSQL Persistence Implementation for Strolch
+This module provides the PostgreSQL persistence implementation for the Strolch framework.
 
-# Setup
-1.	Install PostgreSQL version with at least version 9.1:
+## Overview
+The PostgreSQL persistence handler allows Strolch to store its data model (Resources, Orders, Activities, Audits, and LogMessages) in a PostgreSQL database. It supports both XML and JSON data types for element storage and includes comprehensive schema management.
+
+## Features
+- Full support for core Strolch element types.
+- Multiple realm support with individual database configurations.
+- Automatic schema creation and migration.
+- High-performance connection pooling via HikariCP.
+- Support for XML and JSON (jsonb) storage.
+- Separate archive database support.
+
+## Documentation
+- [Technical Specification](docs/technical-spec.md) - Detailed architecture and configuration guide.
+
+## Setup
+
+### 1. PostgreSQL Installation
+Ensure you have PostgreSQL installed (version 9.4 or higher recommended for JSONB support).
+
+### 2. Database and User Creation
+Create a new database and a user with the necessary privileges:
+
 ```sql
-1. $ sudo aptitude install postgresql postgresql-client
+CREATE USER strolch_user WITH PASSWORD 'strolch_pass';
+CREATE DATABASE strolch_db OWNER strolch_user;
+GRANT ALL PRIVILEGES ON DATABASE strolch_db TO strolch_user;
 ```
 
-2.	Set a password for user 'postgres'
-```sql
-$ sudo -u postgres psql postgres
-$ postgres=# 
-\password postgres
-```
-
-3.	Create the user and DB:
-```sql
-4. $ sudo -u postgres psql
-$ postgres=# 
-create user testuser with password 'test';
-create database testdb owner testuser;
-GRANT CONNECT ON DATABASE testdb TO testuser ;
-```
-
-# For tests:
-```sql
-create user testuser with password 'test';
-create database testdb owner testuser;
-GRANT CONNECT ON DATABASE testdb TO testuser ;
-
-create user testuser1 with password 'test';
-create database testdb1 owner testuser1;
-GRANT CONNECT ON DATABASE testdb1 TO testuser1 ;
-
-create user testuser2 with password 'test';
-create database testdb2 owner testuser2;
-GRANT CONNECT ON DATABASE testdb2 TO testuser2 ;
-```
-
-4.	Added new component, setting properties for PostgreSQL DB:
+### 3. Strolch Configuration
+Configure the `PersistenceHandler` in your `StrolchConfiguration.xml`:
 
 ```xml
 <Component>
@@ -50,46 +42,45 @@ GRANT CONNECT ON DATABASE testdb2 TO testuser2 ;
     <api>li.strolch.persistence.api.StrolchPersistenceHandler</api>
     <impl>li.strolch.persistence.postgresql.PostgreSqlPersistenceHandler</impl>
     <Properties>
-        <allowSchemaCreation>false</allowSchemaCreation>
-        <db.url>jdbc:postgresql://localhost/testdb</db.url>
-        <db.username>testUser</db.username>
-        <db.password>test</db.password>
+        <dataType>json</dataType>
+        <allowSchemaCreation>true</allowSchemaCreation>
+        <db.url>jdbc:postgresql://localhost/strolch_db</db.url>
+        <db.username>strolch_user</db.username>
+        <db.password>strolch_pass</db.password>
     </Properties>
 </Component>
 ```
 
-5.	Create tables, or allow strolch to due it for you.
+For detailed configuration options, see the [Technical Specification](docs/technical-spec.md).
 
+## Development and Testing
 
-# Appendix
-1.	To drop the user and DB:
+### Running Tests
+To run the tests for this module, you need a running PostgreSQL instance with three test databases: `testdb`, `testdb1`, and `testdb2`.
+
 ```sql
-$ sudo -u postgres psql postgres
-$ postgres=# 
-revoke ALL PRIVILEGES ON DATABASE testdb from testuser;
-drop user testuser;
-drop database testdb;
+-- testdb
+CREATE USER testuser WITH PASSWORD 'test';
+CREATE DATABASE testdb OWNER testuser;
+GRANT ALL PRIVILEGES ON DATABASE testdb TO testuser;
+
+-- testdb1
+CREATE USER testuser1 WITH PASSWORD 'test';
+CREATE DATABASE testdb1 OWNER testuser1;
+GRANT ALL PRIVILEGES ON DATABASE testdb1 TO testuser1;
+
+-- testdb2
+CREATE USER testuser2 WITH PASSWORD 'test';
+CREATE DATABASE testdb2 OWNER testuser2;
+GRANT ALL PRIVILEGES ON DATABASE testdb2 TO testuser2;
 ```
 
-2.	Create a database:
-```sql
-$ createdb -p 5432 -O drupal -U drupal -E UTF8 testingsiteone -T template0
+Then run the tests:
+```bash
+mvn test
 ```
 
-3.	Dropping the database
-```sql
-$ dropdb -p 5432 -U drupal testingsiteone
-```
-
-4.	Dumping the database
-```sql
-$ pg_dump -p 5432 -h localhost -Fc -U drupal --no-owner testingsiteone > /tmp/testingsiteone_$(date +"%Y-%m-%d_%s").pgdump
-```
-
-5.	Restoring the database
-```sql
-$ pg_restore -p 5432 -h localhost -Fc -d testingsiteone -U drupal --no-owner < /tmp/path-to-the-file.pgdump
-```
-
-# References
-http://www.pixelite.co.nz/article/installing-and-configuring-postgresql-91-ubuntu-1204-local-drupal-development
+## References
+- [Strolch Framework](https://strolch.li)
+- [PostgreSQL](https://www.postgresql.org/)
+- [HikariCP](https://github.com/brettwooldridge/HikariCP)
