@@ -30,6 +30,11 @@ Find more about Strolch at our website: https://strolch.li
 
 ## Features
 
+### Strolch Model
+The Strolch model defines the core data structures used in the framework, including Resources, Orders, and Activities. It provides shared Java types, serialization contracts, and a flexible hierarchy for managing data through ParameterBags and Parameters.
+
+For more technical details, see [strolch-model/docs/strolch-model.md](strolch-model/docs/strolch-model.md).
+
 ### Personal Access Tokens (PATs)
 Personal Access Tokens (PATs) allow users to generate long-lived credentials to perform actions without a standard login flow. PATs can be restricted to a specific set of privileges and have their own expiration date.
 

@@ -2,8 +2,8 @@ li.strolch.model
 ================
 
 `strolch-model` contains the core object model used by Strolch agents, persistence modules, searches, services, and REST APIs.
-It provides the Java representation of Strolch root elements, parameter containers, policies, timed states, activities, XML/JSON
-conversion, and builder APIs.
+It provides the Java representation of Strolch root elements, parameter containers, policies, timed states, activities, audit records,
+log messages, XML/JSON conversion, and builder APIs.
 
 The module is intentionally independent from persistence and runtime agent concerns. It defines what a Strolch model is and how it
 can be represented, cloned, traversed, serialized, and modified in memory.
@@ -75,6 +75,12 @@ Supported timed state value types are:
 Policies attach configurable behavior to root elements or activity elements. A model element stores `PolicyDef` entries by policy
 type. Runtime modules can resolve these definitions to concrete policy implementations.
 
+### Relationships
+
+Relationships between root elements are defined using parameters. By convention, these are stored in a `ParameterBag` with the ID
+`relations`. Relationships can be 1-to-1 (using `StringParameter`) or 1-to-N (using `StringListParameter`). Convenience methods like
+`setRelation()` and `getRelationId()` simplify managing these references.
+
 ### Activities and actions
 
 Activities model work structures. They can contain:
@@ -89,6 +95,18 @@ Activities model work structures. They can contain:
 
 Model elements expose `Locator` values that identify their position in the model hierarchy. Visitors are available for traversing
 and converting model elements, including XML and JSON conversion visitors.
+
+### Audits and log messages
+
+The model includes specialized elements for system events:
+
+* `Audit` records track access and changes to elements, capturing "who, what, and when".
+* `LogMessage` provides internationalized system logging, which can be associated with specific model elements via locators.
+
+### Exceptions
+
+Strolch uses runtime exceptions for error handling. The base class is `StrolchException`, and most model-related errors
+throw `StrolchModelException`. All exceptions support internationalization via `I18nMessage`.
 
 ### Cloning and read-only handling
 
@@ -124,8 +142,19 @@ Builder API
 -----------
 
 The `li.strolch.model.builder` package contains fluent builders for root elements, parameter bags, parameters, policies, activities,
-and actions. Prefer builders when creating model elements in tests or setup code because they keep object construction concise and
-consistent with the model hierarchy.
+and actions. Builders ensure that element construction is concise, consistent, and follows the hierarchical requirements of the
+model.
+
+JSON serialization
+------------------
+
+Strolch supports two primary styles of JSON serialization:
+
+* **Full serialization**: Preserves the complete metadata and typed structure of parameters, mirroring the XML format.
+* **Flat serialization**: Maps parameters directly as `key: value` pairs on the root object, ideal for concise REST APIs.
+
+Serialization behavior can be further customized by ignoring specific elements, using hooks, or controlling the depth of
+activity hierarchies.
 
 Related documentation
 ---------------------
