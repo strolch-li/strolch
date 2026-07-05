@@ -12,6 +12,7 @@
 The main repository which contains all of Strolch.
 
 ## Getting Started
+
 Either use a version on Maven Central: https://mvnrepository.com/artifact/li.strolch/
 
 Or install locally first:
@@ -31,12 +32,17 @@ Find more about Strolch at our website: https://strolch.li
 ## Features
 
 ### Strolch Model
-The Strolch model defines the core data structures used in the framework, including Resources, Orders, and Activities. It provides shared Java types, serialization contracts, and a flexible hierarchy for managing data through ParameterBags and Parameters.
+
+The Strolch model defines the core data structures used in the framework, including Resources, Orders, and Activities.
+It provides shared Java types, serialization contracts, and a flexible hierarchy for managing data through ParameterBags
+and Parameters.
 
 For more technical details, see [strolch-model/docs/strolch-model.md](strolch-model/docs/strolch-model.md).
 
 ### Personal Access Tokens (PATs)
-Personal Access Tokens (PATs) allow users to generate long-lived credentials to perform actions without a standard login flow. PATs can be restricted to a specific set of privileges and have their own expiration date.
+
+Personal Access Tokens (PATs) allow users to generate long-lived credentials to perform actions without a standard login
+flow. PATs can be restricted to a specific set of privileges and have their own expiration date.
 
 #### Using PATs
 
@@ -48,22 +54,31 @@ For more technical details,
 see [strolch-privilege/docs/PersonalAccessToken.md](strolch-privilege/docs/PersonalAccessToken.md).
 
 ### Strolch Services
-The `strolch-service` module provides the Service API for Strolch. It encapsulates business logic into reusable Services and Commands, and provides specialized frameworks for execution, reporting, and migrations.
+
+The `strolch-service` module provides the Service API for Strolch. It encapsulates business logic into reusable Services
+and Commands, and provides specialized frameworks for execution, reporting, and migrations.
 
 For more technical details, see [strolch-service/README.md](strolch-service/README.md).
 
 ### Temporary File Retention
-Strolch provides a mechanism to automatically clear old temporary files. This is handled by the `ClearTempPathJob`, which runs daily by default.
+
+Strolch provides a mechanism to automatically clear old temporary files. This is handled by the `ClearTempPathJob`,
+which runs daily by default.
 
 #### Configuration
+
 Retention periods can be configured in `strolch.xml` using ISO-8601 durations:
+
 - `temp.retention.default`: Default retention (default is 3 months).
 - `temp.retention.<prefix>`: Specific retention for a subdirectory in the temp path.
 
 For more details, see [docs/TemporaryFileRetention.md](docs/TemporaryFileRetention.md).
 
 ### Strolch Utils
-The `strolch-utils` module is a collection of project-independent Java utility classes and helpers designed to simplify common programming tasks. It covers areas such as Design by Contract (DBC), object modification tracking, date/time handling, specialized collections, and various helper utilities for common Java types.
+
+The `strolch-utils` module is a collection of project-independent Java utility classes and helpers designed to simplify
+common programming tasks. It covers areas such as Design by Contract (DBC), object modification tracking, date/time
+handling, specialized collections, and various helper utilities for common Java types.
 
 For more technical details, see [strolch-utils/docs/strolch-utils.md](strolch-utils/docs/strolch-utils.md).
 
@@ -85,7 +100,9 @@ For more technical details and setup instructions,
 see [strolch-persistence-xml/README.md](strolch-persistence-xml/README.md).
 
 ### Privilege
-The `strolch-privilege` module is the Role-Based Access Control (RBAC) engine for Strolch. It handles user authentication, session management, and authorization using extensible policies.
+
+The `strolch-privilege` module is the Role-Based Access Control (RBAC) engine for Strolch. It handles user
+authentication, session management, and authorization using extensible policies.
 
 For more technical details and setup instructions, see [strolch-privilege/README.md](strolch-privilege/README.md).
 
@@ -96,18 +113,30 @@ HTTP requests.
 
 For more technical details and setup instructions, see [strolch-web-rest/README.md](strolch-web-rest/README.md).
 
+## WebSocket API
+
+The `strolch-websocket` module provides a WebSocket API for Strolch. It allows you to receive real-time updates when
+Strolch elements are changed.
+
+For more technical details and setup instructions, see [strolch-websocket/README.md](strolch-websocket/README.md).
+
 ## Build and Configuration
 
 ### Prerequisites
+
 - Java (JDK 25 or higher recommended)
 - Maven 3.6+
 
 ### Build Instructions
+
 To build the entire project from the root:
+
 ```bash
 mvn clean install
 ```
+
 To skip tests:
+
 ```bash
 mvn clean install -DskipTests
 ```
