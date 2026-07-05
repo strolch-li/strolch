@@ -39,9 +39,13 @@ For more technical details, see [strolch-model/docs/strolch-model.md](strolch-mo
 Personal Access Tokens (PATs) allow users to generate long-lived credentials to perform actions without a standard login flow. PATs can be restricted to a specific set of privileges and have their own expiration date.
 
 #### Using PATs
-Users can manage their PATs through the `PrivilegeHandler`. A PAT can be used for authentication by providing it to the `authenticatePersonalAccessToken` method, which returns a `Certificate` with the restricted scope defined for that token.
 
-For more technical details, see [strolch-privilege/docs/PersonalAccessToken.md](strolch-privilege/docs/PersonalAccessToken.md).
+Users can manage their PATs through the `PrivilegeHandler`. A PAT can be used for authentication by providing it to the
+`authenticatePersonalAccessToken` method, which returns a `Certificate` with the restricted scope defined for that
+token.
+
+For more technical details,
+see [strolch-privilege/docs/PersonalAccessToken.md](strolch-privilege/docs/PersonalAccessToken.md).
 
 ### Strolch Services
 The `strolch-service` module provides the Service API for Strolch. It encapsulates business logic into reusable Services and Commands, and provides specialized frameworks for execution, reporting, and migrations.
@@ -64,14 +68,21 @@ The `strolch-utils` module is a collection of project-independent Java utility c
 For more technical details, see [strolch-utils/docs/strolch-utils.md](strolch-utils/docs/strolch-utils.md).
 
 ### PostgreSQL Persistence
-The `strolch-persistence-postgresql` module provides a PostgreSQL-based persistence implementation. It supports storing Strolch elements in a PostgreSQL database using either XML or JSON formats. It includes automatic schema management and high-performance connection pooling.
 
-For more technical details and setup instructions, see [strolch-persistence-postgresql/README.md](strolch-persistence-postgresql/README.md).
+The `strolch-persistence-postgresql` module provides a PostgreSQL-based persistence implementation. It supports storing
+Strolch elements in a PostgreSQL database using either XML or JSON formats. It includes automatic schema management and
+high-performance connection pooling.
+
+For more technical details and setup instructions,
+see [strolch-persistence-postgresql/README.md](strolch-persistence-postgresql/README.md).
 
 ### XML Persistence
-The `strolch-persistence-xml` module provides a filesystem-based XML persistence implementation. It stores each Strolch element in its own XML file on the disk. It is suitable for smaller applications or development environments.
 
-For more technical details and setup instructions, see [strolch-persistence-xml/README.md](strolch-persistence-xml/README.md).
+The `strolch-persistence-xml` module provides a filesystem-based XML persistence implementation. It stores each Strolch
+element in its own XML file on the disk. It is suitable for smaller applications or development environments.
+
+For more technical details and setup instructions,
+see [strolch-persistence-xml/README.md](strolch-persistence-xml/README.md).
 
 ### Privilege
 The `strolch-privilege` module is the Role-Based Access Control (RBAC) engine for Strolch. It handles user authentication, session management, and authorization using extensible policies.
