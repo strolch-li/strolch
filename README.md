@@ -78,6 +78,13 @@ The `strolch-privilege` module is the Role-Based Access Control (RBAC) engine fo
 
 For more technical details and setup instructions, see [strolch-privilege/README.md](strolch-privilege/README.md).
 
+## REST API
+
+The `strolch-web-rest` module provides a REST API for Strolch. It allows you to interact with Strolch elements using
+HTTP requests.
+
+For more technical details and setup instructions, see [strolch-web-rest/README.md](strolch-web-rest/README.md).
+
 ## Build and Configuration
 
 ### Prerequisites
