@@ -115,6 +115,7 @@ public class ClearTempPathJobTest {
 			// Enable deletion
 			Map<String, String> properties1 = agent.getRuntimeConfiguration().getAsMap();
 			properties1.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties1.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DEFAULT, "P7D");
 			agent.getRuntimeConfiguration().updateProperties(properties1);
 
 			// Run job
@@ -161,6 +162,7 @@ public class ClearTempPathJobTest {
 
 			// Enable deletion
 			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DEFAULT, "P7D");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
 			// Run job
@@ -199,6 +201,7 @@ public class ClearTempPathJobTest {
 
 			// Enable deletion
 			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DEFAULT, "P7D");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
 			// Run job
