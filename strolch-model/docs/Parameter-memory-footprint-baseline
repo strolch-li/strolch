@@ -1,0 +1,49 @@
+Parameter memory footprint baseline
+===================================
+resources              : 100000
+parameters             : 2000000
+retained heap bytes    : 257914968
+retained heap MiB      : 245.97
+bytes per resource     : 2579.15
+bytes per parameter    : 128.96
+
+Object counts and retained heap by class
+java.util.ArrayList@87a85e1d footprint:
+     COUNT       AVG       SUM   DESCRIPTION
+    200055        39   7913472   [B
+    200001        29   6000016   [Ljava.lang.Object;
+    200000        84  16800000   [Ljava.util.HashMap$Node;
+         1        16        16   java.lang.Boolean
+    200000        24   4800000   java.lang.Double
+    100000        16   1600000   java.lang.Integer
+    200000        24   4800000   java.lang.Long
+    200055        24   4801320   java.lang.String
+    100001        24   2400024   java.time.LocalDate
+    100001        24   2400024   java.time.LocalDateTime
+         1        24        24   java.time.LocalTime
+         1        24        24   java.time.ZoneOffset
+    100001        24   2400024   java.time.ZonedDateTime
+    200001        24   4800024   java.util.ArrayList
+    200000        48   9600000   java.util.HashMap
+   2100000        32  67200000   java.util.HashMap$Node
+    100000        48   4800000   li.strolch.model.ParameterBag
+    100000        56   5600000   li.strolch.model.Resource
+    200000        56  11200000   li.strolch.model.parameter.BooleanParameter
+    200000        56  11200000   li.strolch.model.parameter.DateParameter
+    200000        56  11200000   li.strolch.model.parameter.FloatParameter
+    100000        56   5600000   li.strolch.model.parameter.IntegerListParameter
+    300000        56  16800000   li.strolch.model.parameter.IntegerParameter
+    200000        56  11200000   li.strolch.model.parameter.LongParameter
+    100000        56   5600000   li.strolch.model.parameter.StringListParameter
+    600000        56  33600000   li.strolch.model.parameter.StringParameter
+    100000        56   5600000   li.strolch.model.parameter.TextParameter
+   6300118           257914968   (total)
+
+
+
+Lookup and mutation micro-scenarios
+getParameter ns/op     : 253.48
+getString ns/op        : 241.89
+setValue ns/op         : 267.57
+clear ns/op            : 349.77
+getClone ns/op         : 1525.76
