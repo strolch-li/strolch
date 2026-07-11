@@ -61,20 +61,6 @@ public interface StrolchElement {
 	String getName();
 
 	/**
-	 * Set the currently set long value which defines the primary key for use in RDBM-Systems
-	 *
-	 * @param dbid the dbid to set
-	 */
-	void setDbid(long dbid);
-
-	/**
-	 * Returns the currently set long value which defines the primary key for use in RDBM-Systems
-	 *
-	 * @return the currently set long value which defines the primary key for use in RDBM-Systems
-	 */
-	long getDbid();
-
-	/**
 	 * Returns the type of this {@link StrolchElement}
 	 *
 	 * @return the type of this {@link StrolchElement}

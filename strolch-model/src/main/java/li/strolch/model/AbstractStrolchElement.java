@@ -27,7 +27,6 @@ import java.text.MessageFormat;
  */
 public abstract class AbstractStrolchElement implements StrolchElement {
 
-	protected long dbid = Long.MAX_VALUE;
 	protected String id;
 	protected String name;
 	protected boolean readOnly;
@@ -48,16 +47,6 @@ public abstract class AbstractStrolchElement implements StrolchElement {
 	public AbstractStrolchElement(String id, String name) {
 		setId(id);
 		setName(name);
-	}
-
-	@Override
-	public long getDbid() {
-		return this.dbid;
-	}
-
-	@Override
-	public void setDbid(long dbid) {
-		this.dbid = dbid;
 	}
 
 	@Override
