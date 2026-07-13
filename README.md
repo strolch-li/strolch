@@ -39,6 +39,8 @@ and Parameters.
 
 For more technical details, see [strolch-model/docs/strolch-model.md](strolch-model/docs/strolch-model.md).
 
+[parameter-memory-footprint-baseline.md](strolch-model/docs/parameter-memory-footprint-baseline.md)
+
 ### Personal Access Tokens (PATs)
 
 Personal Access Tokens (PATs) allow users to generate long-lived credentials to perform actions without a standard login
