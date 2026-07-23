@@ -163,10 +163,18 @@ public class RootElementSearchResult<T extends StrolchRootElement> extends Searc
 	 * @return this instance for chaining.
 	 */
 	public RootElementSearchResult<T> cloneIfReadOnly() {
+		return ensureModifiable();
+	}
+
+	/**
+	 * Ensures that all elements in the current search result stream are modifiable. If an element is readonly,
+	 * it is replaced with a clone that can be modified.
+	 *
+	 * @return this instance with the updated stream, allowing method chaining
+	 */
+	public RootElementSearchResult<T> ensureModifiable() {
 		this.stream = this.stream.map(e -> {
-			if (!e.isReadOnly())
-				return e;
-			@SuppressWarnings("unchecked") T clone = (T) e.getClone(true);
+			@SuppressWarnings("unchecked") T clone = (T) e.ensureModifiable();
 			return clone;
 		});
 		return this;
