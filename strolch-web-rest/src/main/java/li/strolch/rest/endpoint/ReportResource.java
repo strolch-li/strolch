@@ -170,7 +170,7 @@ public class ReportResource {
 			result.addProperty(PARAM_DURATION, duration);
 			result.addProperty(PARAM_PARALLEL, report.isParallel());
 
-			logger.info("Facet Generation for {} took: {}", id, duration);
+			logger.info("Facet Generation for {} took: {}", report.getReportResource().getId(), duration);
 			return ResponseUtil.toResponse(DATA, result);
 		}
 	}
@@ -210,7 +210,7 @@ public class ReportResource {
 					.collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
 
 			String duration = formatNanoDuration(System.nanoTime() - start);
-			logger.info("Facet Generation for {}.{} took: {}", id, type, duration);
+			logger.info("Facet Generation for {}.{} took: {}", report.getReportResource().getId(), type, duration);
 			return ResponseUtil.toResponse(DATA, array);
 		}
 	}
@@ -308,7 +308,7 @@ public class ReportResource {
 			finalResult.addProperty(PARAM_DURATION, duration);
 			finalResult.addProperty(PARAM_PARALLEL, report.isParallel());
 
-			logger.info("{} Report took: {}", id, duration);
+			logger.info("{} Report took: {}", report.getReportResource().getId(), duration);
 			return ResponseUtil.toResponse(DATA, finalResult);
 		}
 	}
