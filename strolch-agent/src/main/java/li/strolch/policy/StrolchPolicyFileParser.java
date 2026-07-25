@@ -22,19 +22,12 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.util.HashMap;
 import java.util.Map;
 
+import static li.strolch.policy.PolicySerializationConstants.*;
+
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
 public class StrolchPolicyFileParser extends DefaultHandler {
-
-	public static final String POLICY = "Policy";
-	public static final String POLICY_TYPE = "PolicyType";
-
-	public static final String TYPE = "Type";
-	public static final String API = "Api";
-
-	public static final String KEY = "Key";
-	public static final String CLASS = "Class";
 
 	private final PolicyModel policyModel;
 	private PolicyType policyType;
