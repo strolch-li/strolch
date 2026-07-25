@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StrolchPolicies>
+    <PolicyType Type="ConfigurationPolicy" Api="li.strolch.policy.ConfigurationPolicy">
+        <Policy Key="DefaultConfigurationPolicy" Class="li.strolch.policy.DefaultConfigurationPolicy"/>
+    </PolicyType>
+</StrolchPolicies>
