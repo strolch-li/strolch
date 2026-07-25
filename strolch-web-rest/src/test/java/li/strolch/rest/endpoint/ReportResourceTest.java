@@ -30,15 +30,12 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import java.io.File;
 
 import static li.strolch.rest.StrolchRestfulConstants.*;
 import static org.junit.Assert.*;
 
-@RunWith(JUnit4.class)
 public class ReportResourceTest extends AbstractRestfulTest {
 
 	private static final String RUNTIME_PATH = "target/ReportResourceTest/";
