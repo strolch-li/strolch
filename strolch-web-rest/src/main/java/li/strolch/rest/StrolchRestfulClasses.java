@@ -47,6 +47,7 @@ public class StrolchRestfulClasses {
 		restfulClasses.add(OperationsLogResource.class);
 		restfulClasses.add(AgentResource.class);
 		restfulClasses.add(NotificationResource.class);
+		restfulClasses.add(StrolchConfigurationResource.class);
 
 		// privilege
 		restfulClasses.add(PrivilegeUsersResource.class);
