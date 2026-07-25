@@ -36,6 +36,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import static java.util.Collections.emptySet;
+import static li.strolch.utils.ClassScanningHelper.shouldIgnoreFile;
+import static li.strolch.utils.ClassScanningHelper.shouldIgnorePropertyFile;
 import static li.strolch.utils.collections.SynchronizedCollections.synchronizedMapOfSets;
 import static li.strolch.utils.helper.ExceptionHelper.formatException;
 import static li.strolch.utils.helper.ExceptionHelper.getExceptionMessageWithCauses;
@@ -439,80 +441,5 @@ public class I18nMessage {
 				boolean reload) throws IOException {
 			return new PropertyResourceBundle(this.stream);
 		}
-	}
-
-	private static boolean shouldIgnorePropertyFile(String name) {
-		return name.startsWith("META-INF")
-				|| name.equals("ENV.properties")
-				|| name.equals("agentVersion.properties")
-				|| name.equals("appVersion.properties")
-				|| name.equals("componentVersion.properties")
-				|| name.contains("_db_version");
-	}
-
-	private static boolean shouldIgnoreFile(File file) {
-		String name = file.getName();
-		return name.contains("aopalliance")
-				|| name.contains("activation")
-				|| name.contains("antlr")
-				|| name.contains("assertj-core")
-				|| name.startsWith("com.sun")
-				|| name.startsWith("commonj.")
-				|| name.startsWith("commons-")
-				|| name.startsWith("jackson-")
-				|| name.startsWith("hapi-")
-				|| name.startsWith("jaxb-")
-				|| name.startsWith("org.hl7.")
-				|| name.startsWith("org.glassfish.")
-				|| name.startsWith("listenablefuture-")
-				|| name.startsWith("j2objc-annotations")
-				|| name.startsWith("failureaccess-")
-				|| name.startsWith("error_prone_")
-				|| name.startsWith("guava-")
-				|| name.startsWith("org.eclipse")
-				|| name.startsWith("javax")
-				|| name.startsWith("jaxws")
-				|| name.startsWith("jaxrs")
-				|| name.startsWith("jaxb")
-				// bouncy castle
-				|| name.contains("-jdk18on-")
-				|| name.contains("jsr305")
-				|| name.contains("c3p0")
-				|| name.contains("camel")
-				|| name.contains("checker-qual")
-				|| name.contains("cron")
-				|| name.contains("FastInfoset")
-				|| name.contains("gmbal")
-				|| name.contains("grizzly")
-				|| name.contains("gson")
-				|| name.contains("ha-api")
-				|| name.contains("HikariCP")
-				|| name.contains("hk2")
-				|| name.contains("icu4j")
-				|| name.contains("jakarta")
-				|| name.contains("javassist")
-				|| name.contains("jersey")
-				|| name.contains("joda-time")
-				|| name.contains("logback")
-				|| name.contains("management-api")
-				|| name.contains("mchange-commons-java")
-				|| name.contains("mimepull")
-				|| name.contains("org.abego.treelayout")
-				|| name.contains("osgi")
-				|| name.contains("pfl-basic")
-				|| name.contains("pfl-tf")
-				|| name.contains("policy-2.7.10")
-				|| name.contains("postgresql")
-				|| name.contains("quartz")
-				|| name.contains("saaj-impl")
-				|| name.contains("sax")
-				|| name.contains("slf4j")
-				|| name.contains("ST4")
-				|| name.contains("stax-ex")
-				|| name.contains("stax2-api")
-				|| name.contains("streambuffer")
-				|| name.contains("tyrus")
-				|| name.contains("validation-api")
-				|| name.contains("yasson");
 	}
 }
