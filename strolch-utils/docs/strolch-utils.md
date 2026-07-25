@@ -38,13 +38,14 @@ The `li.strolch.utils.collections` package contains several specialized collecti
 - `Paging`: A utility for handling paginated data sets.
 
 ### Helper Classes
-A wide range of helper classes are available in `li.strolch.utils.helper` to simplify operations on common Java types and tasks:
+A wide range of helper classes are available in `li.strolch.utils.helper` and `li.strolch.utils` to simplify operations on common Java types and tasks:
 - `StringHelper`: String manipulation, validation, and conversion.
 - `FileHelper`: File and directory operations (copy, delete recursively, read/write).
 - `XmlHelper`: XML parsing, transformation, and formatting.
 - `DateHelper`: Date manipulation and calculations.
 - `ExceptionHelper`: Utilities for handling and formatting exceptions.
 - `SystemHelper`: Access to system-specific information and OS-specific tasks.
+- `ClassScanningHelper`: Utilities for filtering files and classes during classpath scanning (e.g., ignoring common libraries and metadata).
 
 ### I18n Utilities
 The `I18nUtils` and `I18nMessage` classes provide a framework for handling internationalized messages, allowing for easy localization of user-facing strings.
