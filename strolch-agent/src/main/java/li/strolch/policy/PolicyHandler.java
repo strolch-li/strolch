@@ -18,6 +18,7 @@ package li.strolch.policy;
 import li.strolch.model.policy.PolicyDef;
 import li.strolch.model.policy.PolicyDefVisitor;
 import li.strolch.persistence.api.StrolchTransaction;
+import li.strolch.policy.StrolchPolicyFileParser.PolicyModel;
 
 import java.util.Set;
 
@@ -94,4 +95,23 @@ public interface PolicyHandler {
 	 * Reload the policies configuration
 	 */
 	void reloadPolicies();
+
+	/**
+	 * Returns the current {@link PolicyModel}
+	 *
+	 * @return the current {@link PolicyModel}
+	 */
+	PolicyModel getPolicyModel();
+
+	/**
+	 * Updates the internal {@link PolicyModel}
+	 *
+	 * @param policyModel the {@link PolicyModel} to update
+	 */
+	void updatePolicies(PolicyModel policyModel);
+
+	/**
+	 * Persists the current {@link PolicyModel} back to the configuration file
+	 */
+	void savePolicies();
 }

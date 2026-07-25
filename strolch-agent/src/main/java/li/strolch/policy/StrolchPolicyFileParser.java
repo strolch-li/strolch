@@ -19,7 +19,9 @@ import li.strolch.utils.dbc.DBC;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static li.strolch.policy.PolicySerializationConstants.*;
@@ -86,12 +88,14 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 		private final String type;
 		private final String api;
 		private final Map<String, String> policyByKeyMap;
+		private final List<String> possibleImplementations;
 
 		public PolicyType(String type, String api) {
 			super();
 			this.type = type;
 			this.api = api;
 			this.policyByKeyMap = new HashMap<>();
+			this.possibleImplementations = new ArrayList<>();
 		}
 
 		public String getApi() {
@@ -104,6 +108,15 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 
 		public Map<String, String> getPolicyByKeyMap() {
 			return this.policyByKeyMap;
+		}
+
+		public List<String> getPossibleImplementations() {
+			return this.possibleImplementations;
+		}
+
+		public void addPossibleImplementation(String implementation) {
+			if (!this.possibleImplementations.contains(implementation))
+				this.possibleImplementations.add(implementation);
 		}
 	}
 }

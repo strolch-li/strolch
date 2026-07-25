@@ -34,10 +34,10 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static li.strolch.policy.PolicySerializationConstants.POLICY;
+import static li.strolch.policy.PolicySerializationConstants.POLICY_TYPE;
 
 /**
  * <p>
@@ -63,6 +63,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 	private static final String DEF_STROLCH_POLICIES_XML = "StrolchPolicies.xml";
 
 	private MapOfMaps<String, String, Class<? extends StrolchPolicy>> classByTypeMap;
+	private PolicyModel policyModel;
 
 	public DefaultPolicyHandler(ComponentContainer container, String componentName) {
 		super(container, componentName);
@@ -158,6 +159,50 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 		reloadPolicies(getConfiguration());
 	}
 
+	@Override
+	public PolicyModel getPolicyModel() {
+		List<Class<? extends StrolchPolicy>> policies = StrolchPolicyScanner.scan();
+		for (PolicyType policyType : this.policyModel.getPolicyTypes().values()) {
+			try {
+				Class<?> apiClass = Class.forName(policyType.getApi());
+				for (Class<? extends StrolchPolicy> policyClass : policies) {
+					if (apiClass.isAssignableFrom(policyClass)) {
+						policyType.addPossibleImplementation(policyClass.getName());
+					}
+				}
+			} catch (ClassNotFoundException e) {
+				logger.error("Could not find API class {}", policyType.getApi(), e);
+			}
+		}
+		return this.policyModel;
+	}
+
+	@Override
+	public void updatePolicies(PolicyModel policyModel) {
+		this.policyModel = policyModel;
+		MapOfMaps<String, String, Class<? extends StrolchPolicy>> newClassByTypeMap = new MapOfMaps<>();
+		for (PolicyType policyType : policyModel.getPolicyTypes().values()) {
+			for (Map.Entry<String, String> entry : policyType.getPolicyByKeyMap().entrySet()) {
+				try {
+					Class<?> implClass = Class.forName(entry.getValue());
+					//noinspection unchecked
+					newClassByTypeMap.addElement(policyType.getType(), entry.getKey(),
+							(Class<? extends StrolchPolicy>) implClass);
+				} catch (ClassNotFoundException e) {
+					throw new StrolchPolicyException("Could not find class " + entry.getValue(), e);
+				}
+			}
+		}
+		this.classByTypeMap = newClassByTypeMap;
+	}
+
+	@Override
+	public void savePolicies() {
+		File policyFile = getConfiguration().getConfigFile(PROP_POLICY_CONFIG, DEF_STROLCH_POLICIES_XML,
+				getConfiguration().getRuntimeConfiguration());
+		new StrolchPolicyFileWriter(policyFile).save(this.policyModel);
+	}
+
 	private void reloadPolicies(ComponentConfiguration configuration) {
 		if (configuration.getBoolean(PROP_READ_POLICY_FILE, Boolean.TRUE)) {
 			File policyFile = configuration.getConfigFile(PROP_POLICY_CONFIG, DEF_STROLCH_POLICIES_XML,
@@ -174,13 +219,13 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 		// first we parse the file
 		StrolchPolicyFileParser xmlHandler = new StrolchPolicyFileParser();
 		XmlHelper.parseDocument(policyFile, xmlHandler, verbose);
-		PolicyModel policyModel = xmlHandler.getPolicyModel();
+		this.policyModel = xmlHandler.getPolicyModel();
 
 		// then we iterate the parsed model, validating that we can:
 		// - access the API class
 		// - instantiate the class
 		// - assign the class to the API
-		Map<String, PolicyType> policyTypes = policyModel.getPolicyTypes();
+		Map<String, PolicyType> policyTypes = this.policyModel.getPolicyTypes();
 		this.classByTypeMap = new MapOfMaps<>();
 		int count = 0;
 		for (PolicyType policyType : policyTypes.values()) {
@@ -206,16 +251,15 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 						// assert API is a Policy
 						if (!StrolchPolicy.class.isAssignableFrom(implClass)) {
 							throw new StrolchPolicyException(MessageFormat.format(
-									"Invalid {0} configuration for Type={1} Key={2} as {3} is not a {4}",
-									StrolchPolicyFileParser.POLICY, type, key, className,
-									StrolchPolicy.class.getName()));
+									"Invalid {0} configuration for Type={1} Key={2} as {3} is not a {4}", POLICY, type,
+									key, className, StrolchPolicy.class.getName()));
 						}
 
 						// assert is assignable to API class
 						if (!apiClass.isAssignableFrom(implClass)) {
 							throw new StrolchPolicyException(MessageFormat.format(
 									"Invalid {0} configuration for Type={1} Key={2} as {3} is not assignable from {4}",
-									StrolchPolicyFileParser.POLICY, type, key, className, api));
+									POLICY, type, key, className, api));
 						}
 
 						// and assert is not abstract
@@ -223,7 +267,7 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 								implClass.getModifiers()))
 							throw new IllegalStateException(MessageFormat.format(
 									"Invalid {0} configuration for Type={1} Key={2} as {3} is abstract or an interface!",
-									StrolchPolicyFileParser.POLICY, type, key, className));
+									POLICY, type, key, className));
 
 						Constructor<?> constructor;
 						try {
@@ -231,14 +275,14 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 						} catch (NoSuchMethodException e) {
 							throw new IllegalStateException(MessageFormat.format(
 									"Invalid {0} configuration for Type={1} Key={2} as constructor (StrolchTransaction) or (ComponentContainer, StrolchTransaction) does not exist!",
-									StrolchPolicyFileParser.POLICY, type, key));
+									POLICY, type, key));
 						}
 
 						if (Modifier.isAbstract(constructor.getModifiers()) || Modifier.isInterface(
 								constructor.getModifiers()))
 							throw new IllegalStateException(MessageFormat.format(
 									"Invalid {0} configuration for Type={1} Key={2} as constructor is abstract or an interface!",
-									StrolchPolicyFileParser.POLICY, type, key));
+									POLICY, type, key));
 
 						// store the implementation class
 						if (verbose)
@@ -249,13 +293,13 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 					} catch (ClassNotFoundException e) {
 						throw new StrolchPolicyException(
 								MessageFormat.format("Invalid {0} configuration for Type={1} Key={2} due to {3}",
-										StrolchPolicyFileParser.POLICY, type, key, e.getMessage()), e);
+										POLICY, type, key, e.getMessage()), e);
 					}
 				}
 			} catch (ClassNotFoundException e) {
 				throw new StrolchPolicyException(
-						MessageFormat.format("Invalid {0} configuration for Type={1} due to {2}",
-								StrolchPolicyFileParser.POLICY_TYPE, type, e.getMessage()), e);
+						MessageFormat.format("Invalid {0} configuration for Type={1} due to {2}", POLICY_TYPE, type,
+								e.getMessage()), e);
 			}
 		}
 
