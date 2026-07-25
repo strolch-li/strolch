@@ -266,6 +266,9 @@ public class RestfulStrolchComponent extends StrolchComponent {
 	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz) {
 		return getContainer().getRealm(certificate).openTx(certificate, clazz, true);
 	}
+	public StrolchTransaction openTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
+		return getContainer().getRealm(certificate).openTx(certificate, clazz, readOnly);
+	}
 
 	public StrolchTransaction openTx(Certificate certificate, String name) {
 		return getContainer().getRealm(certificate).openTx(certificate, name, true);
