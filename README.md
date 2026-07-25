@@ -76,6 +76,20 @@ Retention periods can be configured in `strolch.xml` using ISO-8601 durations:
 
 For more details, see [docs/TemporaryFileRetention.md](docs/TemporaryFileRetention.md).
 
+### Runtime Configuration Management
+
+Strolch allows managing its runtime configuration and policy mappings through a unified API and REST endpoints. This
+enables dynamic updates to the system behavior without requiring a restart.
+
+#### Features
+
+- **Unified Access**: Manage core configuration and policy mappings through `ConfigurationPolicy`.
+- **REST API**: Specialized endpoints for remote configuration management.
+- **Policy Discovery**: Automatic classpath scanning for new policy implementations.
+- **Persistence**: Changes to policy mappings are persisted back to `StrolchPolicies.xml`.
+
+For more technical details, see [docs/RuntimeConfigurationManagement.md](docs/RuntimeConfigurationManagement.md).
+
 ### Strolch Utils
 
 The `strolch-utils` module is a collection of project-independent Java utility classes and helpers designed to simplify

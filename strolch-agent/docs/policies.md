@@ -78,3 +78,9 @@ PolicyDef policyDef = PolicyDef.getJavaPolicy(ExecutionPolicy.class, MyExecution
 -   **Decoupling**: Business logic is decoupled from the core framework and the data model.
 -   **Flexibility**: Different implementations can be used for different types of elements or even specific element instances.
 -   **Testability**: Policies can be easily mocked or replaced in tests.
+
+#### Runtime Management
+
+Strolch provides a `ConfigurationPolicy` and corresponding REST API to manage these policy mappings at runtime. This allows changing the implementation for a policy type without restarting the agent. Updates are persisted back to the XML configuration.
+
+For more details, see the [Runtime Configuration Management documentation](../../README.md#runtime-configuration-management).
