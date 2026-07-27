@@ -50,19 +50,40 @@ public class StrolchPolicyScanner {
 			Enumeration<URL> resources = classLoader.getResources("");
 			List<URL> resourceList = Collections.list(resources);
 
+			Set<File> classpathFiles = new HashSet<>();
+			for (URL url : resourceList) {
+				if (url.getProtocol().equals("file")) {
+					classpathFiles.add(new File(url.getPath()));
+				} else if (url.getProtocol().equals("jar")) {
+					String path = url.getPath();
+					if (path.startsWith("file:")) {
+						path = path.substring(5);
+					}
+					int bangIndex = path.indexOf('!');
+					if (bangIndex != -1) {
+						path = path.substring(0, bangIndex);
+					}
+					classpathFiles.add(new File(path));
+				} else {
+					logger.warn("Ignoring URL: {}", url);
+				}
+			}
+
 			// Also scan JARs
 			String classPath = System.getProperty("java.class.path");
 			String[] classPathElements = classPath.split(File.pathSeparator);
 			for (String element : classPathElements) {
-				if (shouldIgnoreFile(element))
+				classpathFiles.add(new File(element));
+			}
+
+			for (File file : classpathFiles) {
+				if (shouldIgnoreFile(file))
 					continue;
 
-				File file = new File(element);
 				if (file.isDirectory()) {
 					scanDirectory(file, "", policies, classLoader);
 				} else if (file.getName().endsWith(".jar")) {
-					if (!shouldIgnoreFile(file))
-						scanJar(file, policies, classLoader);
+					scanJar(file, policies, classLoader);
 				}
 			}
 
