@@ -19,6 +19,7 @@ package li.strolch.job;
 import li.strolch.RuntimeMock;
 import li.strolch.agent.api.StrolchAgent;
 import li.strolch.runtime.configuration.RuntimeConfiguration;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static li.strolch.runtime.configuration.RuntimeConfiguration.*;
 import static org.junit.Assert.*;
 
 public class ClearTempPathJobTest {
@@ -41,7 +43,8 @@ public class ClearTempPathJobTest {
 		targetPath = new File("target/" + ClearTempPathJobTest.class.getSimpleName());
 		if (targetPath.exists())
 			deleteRecursive(targetPath);
-		targetPath.mkdirs();
+		if (!targetPath.mkdirs())
+			fail("Failed to create target path " + targetPath.getAbsolutePath());
 	}
 
 	@After
@@ -56,14 +59,15 @@ public class ClearTempPathJobTest {
 				deleteRecursive(f);
 			}
 		}
-		file.delete();
+		if (!file.delete())
+			fail("Failed to delete file " + file.getAbsolutePath());
 	}
 
 	@Test
 	public void shouldGetTempRetention() {
 		Map<String, String> values = new HashMap<>();
-		values.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DEFAULT, "P10D");
-		values.put(RuntimeConfiguration.PROP_TEMP_RETENTION_PREFIX + "test", "P1D");
+		values.put(PROP_TEMP_RETENTION_DEFAULT, "P10D");
+		values.put(PROP_TEMP_RETENTION_PREFIX + "test", "P1D");
 
 		RuntimeConfiguration config = new RuntimeConfiguration("test", "test", values,
 				new File("src/test/resources/configtest/config"), new File("target"), targetPath, Set.of());
@@ -77,8 +81,8 @@ public class ClearTempPathJobTest {
 	@Test
 	public void shouldGetTempRetentionKeep() {
 		Map<String, String> values = new HashMap<>();
-		values.put(RuntimeConfiguration.PROP_TEMP_RETENTION_KEEP_DEFAULT, "5");
-		values.put(RuntimeConfiguration.PROP_TEMP_RETENTION_KEEP_PREFIX + "test", "10");
+		values.put(PROP_TEMP_RETENTION_KEEP_DEFAULT, "5");
+		values.put(PROP_TEMP_RETENTION_KEEP_PREFIX + "test", "10");
 
 		RuntimeConfiguration config = new RuntimeConfiguration("test", "test", values,
 				new File("src/test/resources/configtest/config"), new File("target"), targetPath, Set.of());
@@ -103,10 +107,7 @@ public class ClearTempPathJobTest {
 			if (!prefixDir.exists() && !prefixDir.mkdirs())
 				throw new IOException("Failed to create prefix dir " + prefixDir.getAbsolutePath());
 
-			File oldFile = new File(prefixDir, "old.txt");
-			if (!oldFile.createNewFile())
-				throw new IOException("Failed to create old file " + oldFile.getAbsolutePath());
-			oldFile.setLastModified(System.currentTimeMillis() - Duration.ofDays(8).toMillis());
+			File oldFile = createOldFile(prefixDir, "old.txt", 8);
 
 			File newFile = new File(prefixDir, "new.txt");
 			if (!newFile.createNewFile())
@@ -114,8 +115,8 @@ public class ClearTempPathJobTest {
 
 			// Enable deletion
 			Map<String, String> properties1 = agent.getRuntimeConfiguration().getAsMap();
-			properties1.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
-			properties1.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DEFAULT, "P7D");
+			properties1.put(PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties1.put(PROP_TEMP_RETENTION_DEFAULT, "P7D");
 			agent.getRuntimeConfiguration().updateProperties(properties1);
 
 			// Run job
@@ -137,7 +138,7 @@ public class ClearTempPathJobTest {
 
 			// Mock keep property
 			Map<String, String> properties = agent.getRuntimeConfiguration().getAsMap();
-			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_KEEP_PREFIX + "keep_test", "2");
+			properties.put(PROP_TEMP_RETENTION_KEEP_PREFIX + "keep_test", "2");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
 			File tempPath = agent.getRuntimeConfiguration().getTempPath();
@@ -148,21 +149,13 @@ public class ClearTempPathJobTest {
 				throw new IOException("Failed to create prefix dir " + prefixDir.getAbsolutePath());
 
 			// Create 3 old files
-			File old1 = new File(prefixDir, "old1.txt");
-			old1.createNewFile();
-			old1.setLastModified(System.currentTimeMillis() - Duration.ofDays(10).toMillis());
-
-			File old2 = new File(prefixDir, "old2.txt");
-			old2.createNewFile();
-			old2.setLastModified(System.currentTimeMillis() - Duration.ofDays(9).toMillis());
-
-			File old3 = new File(prefixDir, "old3.txt");
-			old3.createNewFile();
-			old3.setLastModified(System.currentTimeMillis() - Duration.ofDays(8).toMillis());
+			File old1 = createOldFile(prefixDir, "old1.txt", 10);
+			File old2 = createOldFile(prefixDir, "old2.txt", 9);
+			File old3 = createOldFile(prefixDir, "old3.txt", 8);
 
 			// Enable deletion
-			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
-			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DEFAULT, "P7D");
+			properties.put(PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties.put(PROP_TEMP_RETENTION_DEFAULT, "P7D");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
 			// Run job
@@ -176,6 +169,16 @@ public class ClearTempPathJobTest {
 		}
 	}
 
+	@NotNull
+	private static File createOldFile(File prefixDir, String file, int days) throws IOException {
+		File old3 = new File(prefixDir, file);
+		if (!old3.createNewFile())
+			throw new IOException("Failed to create old file " + old3.getAbsolutePath());
+		if (!old3.setLastModified(System.currentTimeMillis() - Duration.ofDays(days).toMillis()))
+			throw new IOException("Failed to set last modified date on old file " + old3.getAbsolutePath());
+		return old3;
+	}
+
 	@Test
 	public void shouldKeepAtLeastNRootFiles() throws Exception {
 		try (RuntimeMock runtimeMock = new RuntimeMock(targetPath.getAbsolutePath(),
@@ -185,23 +188,18 @@ public class ClearTempPathJobTest {
 
 			// Mock keep property for default
 			Map<String, String> properties = agent.getRuntimeConfiguration().getAsMap();
-			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_KEEP_DEFAULT, "1");
+			properties.put(PROP_TEMP_RETENTION_KEEP_DEFAULT, "1");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
 			File tempPath = agent.getRuntimeConfiguration().getTempPath();
 
 			// Create 2 old files in root
-			File old1 = new File(tempPath, "old1.txt");
-			old1.createNewFile();
-			old1.setLastModified(System.currentTimeMillis() - Duration.ofDays(10).toMillis());
-
-			File old2 = new File(tempPath, "old2.txt");
-			old2.createNewFile();
-			old2.setLastModified(System.currentTimeMillis() - Duration.ofDays(9).toMillis());
+			File old1 = createOldFile(tempPath, "old1.txt", 10);
+			File old2 = createOldFile(tempPath, "old2.txt", 9);
 
 			// Enable deletion
-			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
-			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DEFAULT, "P7D");
+			properties.put(PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties.put(PROP_TEMP_RETENTION_DEFAULT, "P7D");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
 			// Run job
@@ -223,15 +221,13 @@ public class ClearTempPathJobTest {
 
 			// Ensure deletion is disabled (default)
 			Map<String, String> properties = agent.getRuntimeConfiguration().getAsMap();
-			properties.put(RuntimeConfiguration.PROP_TEMP_RETENTION_DELETE_ENABLED, "false");
+			properties.put(PROP_TEMP_RETENTION_DELETE_ENABLED, "false");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
 			File tempPath = agent.getRuntimeConfiguration().getTempPath();
 
 			// Create old file
-			File oldFile = new File(tempPath, "old.txt");
-			oldFile.createNewFile();
-			oldFile.setLastModified(System.currentTimeMillis() - Duration.ofDays(100).toMillis());
+			File oldFile = createOldFile(tempPath, "old1.txt", 100);
 
 			// Run job
 			ClearTempPathJob job = new ClearTempPathJob(agent, "test", "test", JobMode.Manual);
@@ -239,6 +235,33 @@ public class ClearTempPathJobTest {
 
 			// Verify: old file should still exist because we are in simulation mode
 			assertTrue("old file should still exist in simulation mode", oldFile.exists());
+		}
+	}
+
+	@Test
+	public void shouldClearArbitraryTempPaths() throws Exception {
+		try (RuntimeMock runtimeMock = new RuntimeMock(targetPath.getAbsolutePath(),
+				"src/test/resources/minimaltest").mockRuntime()) {
+			runtimeMock.startContainer();
+			StrolchAgent agent = runtimeMock.getAgent();
+
+			File customTempPath = new File(targetPath, "custom_temp");
+			if (!customTempPath.mkdirs())
+				fail("Failed to create custom temp path " + customTempPath.getAbsolutePath());
+
+			File oldFile = createOldFile(customTempPath, "old1.txt", 10);
+
+			Map<String, String> properties = agent.getRuntimeConfiguration().getAsMap();
+			properties.put(PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties.put(PROP_CLEAR_TEMP_PATH_IDS, "custom");
+			properties.put(PROP_CLEAR_TEMP_PATH_PREFIX + "custom.path", customTempPath.getAbsolutePath());
+			properties.put(PROP_CLEAR_TEMP_PATH_PREFIX + "custom.retention", "P7D");
+			agent.getRuntimeConfiguration().updateProperties(properties);
+
+			ClearTempPathsJob job = new ClearTempPathsJob(agent, "test", "test", JobMode.Manual);
+			job.execute(null);
+
+			assertFalse("Old file in custom temp path should be deleted", oldFile.exists());
 		}
 	}
 }
