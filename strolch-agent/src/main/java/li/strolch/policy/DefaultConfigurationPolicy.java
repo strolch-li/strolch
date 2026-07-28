@@ -55,6 +55,6 @@ public class DefaultConfigurationPolicy extends ConfigurationPolicy {
 	public void updatePolicyModel(PolicyModel policyModel) {
 		PolicyHandler policyHandler = getComponent(PolicyHandler.class);
 		policyHandler.updatePolicies(policyModel);
-		policyHandler.savePolicies();
+		policyHandler.savePolicies(tx().getUsername());
 	}
 }

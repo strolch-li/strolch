@@ -64,4 +64,15 @@ public class PolicyHandlerTest {
 			}
 		});
 	}
+
+	@Test
+	public void shouldSavePoliciesWithBackup() throws Exception {
+		RuntimeMock.runInStrolch(PATH_EMPTY_RUNTIME, ComponentContainerTest.PATH_TRANSIENT_CONTAINER, (_, agent) -> {
+			PolicyHandler policyHandler = agent.getContainer().getComponent(PolicyHandler.class);
+			ComponentContainer container = agent.getContainer();
+			Certificate certificate = container.getPrivilegeHandler().authenticate("test", "test".toCharArray());
+			policyHandler.savePolicies(certificate.getUsername());
+			policyHandler.savePolicies(certificate.getUsername());
+		});
+	}
 }

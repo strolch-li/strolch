@@ -113,5 +113,5 @@ public interface PolicyHandler {
 	/**
 	 * Persists the current {@link PolicyModel} back to the configuration file
 	 */
-	void savePolicies();
+	void savePolicies(String username);
 }

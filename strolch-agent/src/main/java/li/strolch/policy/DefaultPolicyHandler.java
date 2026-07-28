@@ -28,12 +28,17 @@ import li.strolch.policy.StrolchPolicyFileParser.PolicyType;
 import li.strolch.runtime.configuration.ComponentConfiguration;
 import li.strolch.utils.collections.MapOfMaps;
 import li.strolch.utils.dbc.DBC;
+import li.strolch.utils.helper.StringHelper;
 import li.strolch.utils.helper.XmlHelper;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static li.strolch.policy.PolicySerializationConstants.POLICY;
@@ -197,10 +202,40 @@ public class DefaultPolicyHandler extends StrolchComponent implements PolicyHand
 	}
 
 	@Override
-	public void savePolicies() {
+	public void savePolicies(String username) {
+		username = StringHelper.replaceWhitespaceAndSpecialCharactersWithUnderscore(username);
+
 		File policyFile = getConfiguration().getConfigFile(PROP_POLICY_CONFIG, DEF_STROLCH_POLICIES_XML,
 				getConfiguration().getRuntimeConfiguration());
+		String backupFile = null;
+		if (policyFile.exists())
+			backupFile = backupPolicyFile(username, policyFile);
 		new StrolchPolicyFileWriter(policyFile).save(this.policyModel);
+		if (backupFile == null)
+			logger.info("User {} updated policy file {}", username, policyFile.getName());
+		else
+			logger.info("User {} updated policy file {} with backup {}", username, policyFile.getName(), backupFile);
+	}
+
+	protected String backupPolicyFile(String username, File policyFile) {
+		File subDir = new File(policyFile.getParentFile(), "backup");
+		if (!subDir.exists() && !subDir.mkdirs())
+			throw new StrolchPolicyException("Failed to create backup subdirectory " + subDir.getAbsolutePath());
+
+		String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"));
+		String fileName = policyFile.getName();
+		int extIdx = fileName.lastIndexOf('.');
+		String baseName = extIdx != -1 ? fileName.substring(0, extIdx) : fileName;
+		String ext = extIdx != -1 ? fileName.substring(extIdx) : "";
+
+		File backupFile = new File(subDir, baseName + "_" + username + "_" + timestamp + ext);
+		try {
+			Files.copy(policyFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			return backupFile.getName();
+		} catch (Exception e) {
+			throw new StrolchPolicyException("Failed to copy previous policy file to " + backupFile.getAbsolutePath(),
+					e);
+		}
 	}
 
 	private void reloadPolicies(ComponentConfiguration configuration) {
