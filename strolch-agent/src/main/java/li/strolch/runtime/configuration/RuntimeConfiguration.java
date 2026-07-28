@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.text.MessageFormat;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +47,9 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 	public static final String PROP_TEMP_RETENTION_KEEP_PREFIX = "temp.retention.keep.";
 
 	public static final String PROP_TEMP_RETENTION_DELETE_ENABLED = "temp.retention.delete.enabled";
+
+	public static final String PROP_CLEAR_TEMP_PATH_IDS = "clear.temp.path.ids";
+	public static final String PROP_CLEAR_TEMP_PATH_PREFIX = "clear.temp.path.";
 
 	private final String applicationName;
 	private final String environment;
@@ -161,6 +166,45 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public boolean isTempRetentionDeleteEnabled() {
 		return getBoolean(PROP_TEMP_RETENTION_DELETE_ENABLED, false);
+	}
+
+	public List<String> getClearTempPathIds() {
+		List<String> pathIds = new ArrayList<>();
+		String value = getString(PROP_CLEAR_TEMP_PATH_IDS, null);
+		if (value != null && !value.isEmpty()) {
+			for (String idStr : value.split(",")) {
+				idStr = idStr.trim();
+				if (!idStr.isEmpty()) {
+					pathIds.add(idStr);
+				}
+			}
+		}
+		return pathIds;
+	}
+
+	public File getClearTempPath(String pathId) {
+		String key = PROP_CLEAR_TEMP_PATH_PREFIX + pathId + ".path";
+		String value = getString(key, null);
+		if (value == null || value.isEmpty()) {
+			return null;
+		}
+		return new File(value);
+	}
+
+	public Duration getClearTempPathRetention(String pathId) {
+		String key = PROP_CLEAR_TEMP_PATH_PREFIX + pathId + ".retention";
+		String value = getString(key, "P90D");
+		try {
+			return Duration.parse(value);
+		} catch (Exception e) {
+			logger.error("Failed to parse retention duration {} for clear temp path id {}. Falling back to P90D.", value, pathId);
+			return Duration.ofDays(90);
+		}
+	}
+
+	public int getClearTempPathKeep(String pathId) {
+		String key = PROP_CLEAR_TEMP_PATH_PREFIX + pathId + ".keep";
+		return getInt(key, 0);
 	}
 
 	/**
