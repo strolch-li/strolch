@@ -28,6 +28,13 @@ By default, the job runs in simulation mode and only logs what would be deleted.
 - **Property**: `temp.retention.delete.enabled`
 - **Behavior**: If `true`, files are actually deleted. If `false` (default), the job only logs which files and directories would be deleted.
 
+### Arbitrary Temporary Paths (`ClearTempPathsJob`)
+In addition to the standard agent temporary path, arbitrary external temporary paths can be configured for cleanup.
+- **Property**: `clear.temp.path.ids` (comma-separated list of path IDs)
+- **Path Property**: `clear.temp.path.<pathId>.path` (absolute or relative path to clean)
+- **Retention Property**: `clear.temp.path.<pathId>.retention` (ISO-8601 duration, default `P90D`)
+- **Keep Property**: `clear.temp.path.<pathId>.keep` (minimum number of files to keep, default `0`)
+
 ## Implementation Details
 
 ### RuntimeConfiguration
@@ -36,18 +43,16 @@ The `RuntimeConfiguration` class is extended with constants and methods to retri
 - `getTempRetentionKeep(String prefix)`: Returns the number of files to keep for the given prefix, falling back to the default keep if not specified.
 - `isTempRetentionDeleteEnabled()`: Returns whether deletion is enabled.
 
-### ClearTempPathJob
-A new `StrolchJob` called `ClearTempPathJob` is implemented to perform the cleanup:
-- **Frequency**: Runs once a day by default (configurable).
+### ClearTempPathJob and ClearTempPathsJob
+Two jobs are implemented to perform the cleanup:
+1. `ClearTempPathJob`: Cleans the agent's standard `tempPath` (subdirectories/prefixes and root files).
+2. `ClearTempPathsJob`: Cleans arbitrary temporary paths configured via `clear.temp.paths`.
+- **Frequency**: Runs periodically (e.g. daily/hourly).
 - **Behavior**:
-    1. Iterates through all files and subdirectories in the `tempPath`.
-    2. For each subdirectory (prefix), it determines the applicable retention period and the number of files to keep.
-    3. It collects all files in the prefix directory recursively.
-    4. It sorts the files by last modified date (newest first).
-    5. It keeps the first `n` files (where `n` is the "keep" count).
-    6. For the remaining files, it deletes any file whose last modified time is older than the retention period.
-    7. Recursively deletes empty subdirectories.
-    8. Files directly in the `tempPath` root are cleaned using the default retention and keep settings.
+    1. Iterates through all files and subdirectories in the configured temp path(s).
+    2. Determines the applicable retention period and the number of files to keep.
+    3. Collects all files recursively, sorts them by last modified date (newest first), and preserves the first `n` files.
+    4. Deletes files older than the retention period and cleans up empty subdirectories.
 
 ## Example Configuration in strolch.xml
 ```xml
@@ -68,6 +73,18 @@ A new `StrolchJob` called `ClearTempPathJob` is implemented to perform the clean
         
         <!-- Prefix-specific retention for 'reports': 30 days -->
         <temp.retention.reports>P30D</temp.retention.reports>
+        
+        <!-- Arbitrary temporary paths cleanup -->
+        <clear.temp.path.ids>tmp,custom_exports</clear.temp.path.ids>
+        
+        <clear.temp.path.tmp.path>/var/log/app/tmp</clear.temp.path.tmp.path>
+        <clear.temp.path.tmp.retention>P7D</clear.temp.path.tmp.retention>
+        <clear.temp.path.tmp.keep>5</clear.temp.path.tmp.keep>
+        
+        <clear.temp.path.custom_exports.path>/tmp/custom_exports</clear.temp.path.custom_exports.path>
+        <clear.temp.path.custom_exports.retention>P7D</clear.temp.path.custom_exports.retention>
+        <clear.temp.path.custom_exports.keep>5</clear.temp.path.custom_exports.keep>
+
     </properties>
 </Runtime>
 ```
