@@ -43,6 +43,9 @@ import li.strolch.rest.RestfulStrolchComponent;
 import li.strolch.rest.helper.ResponseUtil;
 import li.strolch.rest.model.StrolchResponse;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import static li.strolch.rest.StrolchRestfulConstants.DATA;
@@ -50,7 +53,7 @@ import static li.strolch.rest.StrolchRestfulConstants.STROLCH_CERTIFICATE;
 
 @Path("strolch/configuration")
 @Tag(name = "Configuration", description = "API to view and modify Strolch configuration and policies")
-public class StrolchConfigurationResource {
+public class ConfigurationResource {
 
 	private static Certificate validateCertificate(HttpServletRequest request, String action) {
 		Certificate cert = (Certificate) request.getAttribute(STROLCH_CERTIFICATE);

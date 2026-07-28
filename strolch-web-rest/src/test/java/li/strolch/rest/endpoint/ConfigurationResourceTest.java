@@ -33,7 +33,7 @@ import static li.strolch.rest.StrolchRestfulConstants.DATA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class StrolchConfigurationResourceTest extends AbstractRestfulTest {
+public class ConfigurationResourceTest extends AbstractRestfulTest {
 
 	private static final String RUNTIME_PATH = "target/StrolchConfigurationResourceTest/";
 	private static final String CONFIG_SRC = "src/test/resources/configtest";
