@@ -156,8 +156,12 @@ public class StrolchConfigurationResource {
 
 	private JsonObject policyModelToJson(PolicyModel policyModel) {
 		JsonObject policyTypesJ = new JsonObject();
-		for (Map.Entry<String, PolicyType> entry : policyModel.getPolicyTypes().entrySet()) {
-			PolicyType policyType = entry.getValue();
+
+		Map<String, PolicyType> policyTypes = policyModel.getPolicyTypes();
+		List<String> policyTypeNames = new ArrayList<>(policyTypes.keySet());
+		policyTypeNames.sort(Comparator.naturalOrder());
+		for (String policyTypeName : policyTypeNames) {
+			PolicyType policyType = policyTypes.get(policyTypeName);
 			JsonObject policyTypeJ = new JsonObject();
 			policyTypeJ.addProperty("type", policyType.getType());
 			policyTypeJ.addProperty("api", policyType.getApi());
@@ -174,7 +178,7 @@ public class StrolchConfigurationResource {
 			}
 			policyTypeJ.add("possibleImplementations", possibleImplementationsJ);
 
-			policyTypesJ.add(entry.getKey(), policyTypeJ);
+			policyTypesJ.add(policyTypeName, policyTypeJ);
 		}
 
 		JsonObject resultJ = new JsonObject();
