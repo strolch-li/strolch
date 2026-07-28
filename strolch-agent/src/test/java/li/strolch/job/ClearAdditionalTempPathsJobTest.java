@@ -34,13 +34,13 @@ import java.util.Set;
 import static li.strolch.runtime.configuration.RuntimeConfiguration.*;
 import static org.junit.Assert.*;
 
-public class ClearTempPathJobTest {
+public class ClearAdditionalTempPathsJobTest {
 
 	private File targetPath;
 
 	@Before
 	public void setUp() {
-		targetPath = new File("target/" + ClearTempPathJobTest.class.getSimpleName());
+		targetPath = new File("target/" + ClearAdditionalTempPathsJobTest.class.getSimpleName());
 		if (targetPath.exists())
 			deleteRecursive(targetPath);
 		if (!targetPath.mkdirs())
@@ -258,7 +258,7 @@ public class ClearTempPathJobTest {
 			properties.put(PROP_CLEAR_TEMP_PATH_PREFIX + "custom.retention", "P7D");
 			agent.getRuntimeConfiguration().updateProperties(properties);
 
-			ClearTempPathsJob job = new ClearTempPathsJob(agent, "test", "test", JobMode.Manual);
+			ClearAdditionalTempPathsJob job = new ClearAdditionalTempPathsJob(agent, "test", "test", JobMode.Manual);
 			job.execute(null);
 
 			assertFalse("Old file in custom temp path should be deleted", oldFile.exists());

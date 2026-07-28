@@ -28,7 +28,7 @@ By default, the job runs in simulation mode and only logs what would be deleted.
 - **Property**: `temp.retention.delete.enabled`
 - **Behavior**: If `true`, files are actually deleted. If `false` (default), the job only logs which files and directories would be deleted.
 
-### Arbitrary Temporary Paths (`ClearTempPathsJob`)
+### Arbitrary Temporary Paths (`ClearAdditionalTempPathsJob`)
 In addition to the standard agent temporary path, arbitrary external temporary paths can be configured for cleanup.
 - **Property**: `clear.temp.path.ids` (comma-separated list of path IDs)
 - **Path Property**: `clear.temp.path.<pathId>.path` (absolute or relative path to clean)
@@ -46,7 +46,7 @@ The `RuntimeConfiguration` class is extended with constants and methods to retri
 ### ClearTempPathJob and ClearTempPathsJob
 Two jobs are implemented to perform the cleanup:
 1. `ClearTempPathJob`: Cleans the agent's standard `tempPath` (subdirectories/prefixes and root files).
-2. `ClearTempPathsJob`: Cleans arbitrary temporary paths configured via `clear.temp.paths`.
+2. `ClearAdditionalTempPathsJob`: Cleans arbitrary temporary paths configured via `clear.temp.paths`.
 - **Frequency**: Runs periodically (e.g. daily/hourly).
 - **Behavior**:
     1. Iterates through all files and subdirectories in the configured temp path(s).

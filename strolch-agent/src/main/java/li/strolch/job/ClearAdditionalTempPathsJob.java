@@ -35,17 +35,17 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Robert von Burg <eitch@eitchnet.ch>
  */
-public class ClearTempPathsJob extends StrolchJob {
+public class ClearAdditionalTempPathsJob extends StrolchJob {
 
-	private static final Logger logger = LoggerFactory.getLogger(ClearTempPathsJob.class);
+	private static final Logger logger = LoggerFactory.getLogger(ClearAdditionalTempPathsJob.class);
 
-	public ClearTempPathsJob(StrolchAgent agent, String id, String name, JobMode jobMode) {
+	public ClearAdditionalTempPathsJob(StrolchAgent agent, String id, String name, JobMode jobMode) {
 		super(agent, id, name, jobMode);
 	}
 
-	public ClearTempPathsJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit,
+	public ClearAdditionalTempPathsJob(StrolchAgent agent, JobMode jobMode, long initialDelay, TimeUnit initialDelayTimeUnit,
 			long delay, TimeUnit delayTimeUnit) {
-		super(agent, ClearTempPathsJob.class.getSimpleName(), ClearTempPathsJob.class.getSimpleName(), jobMode);
+		super(agent, ClearAdditionalTempPathsJob.class.getSimpleName(), ClearAdditionalTempPathsJob.class.getSimpleName(), jobMode);
 		setDelay(initialDelay, initialDelayTimeUnit, delay, delayTimeUnit);
 	}
 
