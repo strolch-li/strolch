@@ -631,7 +631,9 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		if (!element.hasParameterBags())
 			return;
 
-		for (String bagId : element.getParameterBagKeySet()) {
+		List<String> bagIds = new ArrayList<>(element.getParameterBagKeySet());
+		bagIds.sort(String::compareTo);
+		for (String bagId : bagIds) {
 			ParameterBag bag = element.getParameterBag(bagId);
 			if (!bag.hasParameters())
 				continue;
@@ -671,7 +673,7 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 	}
 
 	private void addParameterBagFlat(JsonObject rootJ, Set<String> ignoredParamIds, ParameterBag parameterBag) {
-		parameterBag.streamOfParameters().sorted(comparing(Parameter::getIndex)).forEach(param -> {
+		parameterBag.streamOfParameters().sorted(getParameterComparator()).forEach(param -> {
 			String paramId = param.getId();
 
 			// see if this parameter must be ignored
@@ -719,15 +721,20 @@ public class StrolchElementToJsonVisitor implements StrolchElementVisitor<JsonEl
 		JsonObject paramsJ = new JsonObject();
 		bagJ.add(PARAMETERS, paramsJ);
 
-		bag
-				.streamOfParameters()
-				.sorted(comparing(Parameter::getIndex))
-				.forEach(param -> paramsJ.add(param.getId(), paramToJsonFull(param)));
+		List<Parameter<?>> parameters = new ArrayList<>(bag.getParameters());
+		parameters.sort(comparing(Parameter::getName));
+		for (Parameter<?> parameter : parameters) {
+			paramsJ.add(parameter.getId(), paramToJsonFull(parameter));
+		}
 
 		if (this.bagHooks != null && !this.bagHooks.isEmpty())
 			this.bagHooks.forEach(e -> e.accept(bag, bagJ));
 
 		return bagJ;
+	}
+
+	private static Comparator<Parameter<?>> getParameterComparator() {
+		return comparing((Parameter<?> t) -> t.getIndex()).thenComparing(Parameter::getName);
 	}
 
 	private JsonObject paramToJsonFull(Parameter<?> param) {
