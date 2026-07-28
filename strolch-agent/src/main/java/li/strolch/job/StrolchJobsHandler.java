@@ -99,12 +99,12 @@ public class StrolchJobsHandler extends StrolchComponent {
 	private static void addClearTempPathJob(StrolchAgent agent, List<StrolchJob> jobs) {
 		ClearTempPathJob clearTempPathJob = new ClearTempPathJob(agent, JobMode.Recurring, 1, TimeUnit.HOURS, 1,
 				TimeUnit.DAYS);
-		clearTempPathJob.setConfigureMethod(ConfigureMethod.Programmatic);
+		clearTempPathJob.setConfigureMethod(ConfigureMethod.Model);
 		jobs.add(clearTempPathJob);
 
 		ClearAdditionalTempPathsJob clearAdditionalTempPathsJob = new ClearAdditionalTempPathsJob(agent,
 				JobMode.Recurring, 1, TimeUnit.HOURS, 1, TimeUnit.DAYS);
-		clearAdditionalTempPathsJob.setConfigureMethod(ConfigureMethod.Programmatic);
+		clearAdditionalTempPathsJob.setConfigureMethod(ConfigureMethod.Model);
 		jobs.add(clearAdditionalTempPathsJob);
 	}
 
