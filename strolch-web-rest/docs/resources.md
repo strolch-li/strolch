@@ -77,7 +77,7 @@ General agent information and actions.
 - `GET strolch/agent`: Returns agent status.
 - `POST strolch/agent/reloadConfiguration`: Reloads the agent configuration.
 
-### `StrolchConfigurationResource`
+### `ConfigurationResource`
 Manage runtime configuration and policy mappings.
 - **Base Path:** `strolch/configuration`
 - `GET strolch/configuration/resource`: Retrieves the Strolch configuration resource.
