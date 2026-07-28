@@ -16,16 +16,24 @@
 
 package li.strolch.policy;
 
+import javanet.staxutils.IndentingXMLStreamWriter;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyModel;
 import li.strolch.policy.StrolchPolicyFileParser.PolicyType;
-import li.strolch.utils.helper.XmlHelper;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.File;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import static li.strolch.policy.PolicySerializationConstants.*;
+import static li.strolch.privilege.helper.XmlHelper.openXmlStreamWriterDocument;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -39,29 +47,44 @@ public class StrolchPolicyFileWriter {
 	}
 
 	public void save(PolicyModel policyModel) {
-		try {
-			Document doc = XmlHelper.getDocumentBuilder().newDocument();
-			Element rootElement = doc.createElement(STROLCH_POLICIES);
-			doc.appendChild(rootElement);
+		try (OutputStream out = Files.newOutputStream(this.policyFile.toPath());
+		     Writer ioWriter = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
 
-			for (PolicyType policyType : policyModel.getPolicyTypes().values()) {
-				Element policyTypeE = doc.createElement(POLICY_TYPE);
-				policyTypeE.setAttribute(TYPE, policyType.getType());
-				policyTypeE.setAttribute(API, policyType.getApi());
-				rootElement.appendChild(policyTypeE);
+			IndentingXMLStreamWriter xmlWriter = openXmlStreamWriterDocument(ioWriter);
+			xmlWriter.writeStartElement(STROLCH_POLICIES);
 
-				for (Map.Entry<String, String> entry : policyType.getPolicyByKeyMap().entrySet()) {
-					Element policyE = doc.createElement(POLICY);
-					policyE.setAttribute(KEY, entry.getKey());
-					policyE.setAttribute(CLASS, entry.getValue());
-					policyTypeE.appendChild(policyE);
-				}
+			Map<String, PolicyType> policyTypes = policyModel.getPolicyTypes();
+			List<String> policyTypeNames = new ArrayList<>(policyTypes.keySet());
+			policyTypeNames.sort(Comparator.naturalOrder());
+			for (String policyTypeName : policyTypeNames) {
+				PolicyType policyType = policyTypes.get(policyTypeName);
+				writePolicyType(xmlWriter, policyType);
 			}
 
-			XmlHelper.writeDocument(doc, this.policyFile);
+			xmlWriter.writeEndDocument();
+			xmlWriter.flush();
 
 		} catch (Exception e) {
 			throw new RuntimeException("Failed to save policies to " + this.policyFile.getAbsolutePath(), e);
 		}
+	}
+
+	private void writePolicyType(IndentingXMLStreamWriter xmlWriter, PolicyType policyType) throws XMLStreamException {
+		Map<String, String> policyByKeyMap = policyType.getPolicyByKeyMap();
+		if (policyByKeyMap.isEmpty())
+			xmlWriter.writeEmptyElement(POLICY_TYPE);
+		else
+			xmlWriter.writeStartElement(POLICY_TYPE);
+		xmlWriter.writeAttribute(TYPE, policyType.getType());
+		xmlWriter.writeAttribute(API, policyType.getApi());
+
+		for (Map.Entry<String, String> entry : policyByKeyMap.entrySet()) {
+			xmlWriter.writeEmptyElement(POLICY);
+			xmlWriter.writeAttribute(KEY, entry.getKey());
+			xmlWriter.writeAttribute(CLASS, entry.getValue());
+		}
+
+		if (!policyByKeyMap.isEmpty())
+			xmlWriter.writeEndElement();
 	}
 }
