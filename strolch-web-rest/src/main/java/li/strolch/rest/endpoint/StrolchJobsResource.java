@@ -135,6 +135,8 @@ public class StrolchJobsResource {
 			} else {
 
 				StrolchJob job = strolchJobsHandler.getJob(cert, source, name);
+				if (job.isRunning())
+					throw new IllegalStateException("Job " + name + " is already running");
 
 				// assert user can access StrolchJobs
 				if (!ctx.hasRole(ROLE_STROLCH_ADMIN))
