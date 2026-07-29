@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -85,7 +84,7 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	private long delay;
 	private TimeUnit delayTimeUnit;
 
-	private boolean running;
+	private volatile boolean running;
 	private long nrOfExecutions;
 	private long totalDuration;
 	private long lastDuration;
@@ -217,6 +216,10 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 		return this.lastException;
 	}
 
+	public boolean isRunning() {
+		return this.running;
+	}
+
 	/**
 	 * Performs the given {@link PrivilegedRunnable} as the privileged system user
 	 * {@link StrolchConstants#SYSTEM_USER_AGENT}
@@ -301,6 +304,8 @@ public abstract class StrolchJob implements Runnable, Restrictable {
 	}
 
 	private void doWork() {
+		logger.info("Executing job {}", getName());
+
 		synchronized (this.mutex) {
 			if (this.running)
 				throw new IllegalStateException("Already running!");
