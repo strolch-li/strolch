@@ -24,13 +24,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.text.MessageFormat;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static li.strolch.model.Tags.Json.VERBOSE;
+import static li.strolch.utils.helper.StringHelper.isEmpty;
+import static li.strolch.utils.helper.StringHelper.isNotEmpty;
 
 public class RuntimeConfiguration extends AbstractionConfiguration {
 
@@ -170,24 +168,22 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 
 	public List<String> getClearTempPathIds() {
 		List<String> pathIds = new ArrayList<>();
-		String value = getString(PROP_CLEAR_TEMP_PATH_IDS, null);
-		if (value != null && !value.isEmpty()) {
-			for (String idStr : value.split(",")) {
-				idStr = idStr.trim();
-				if (!idStr.isEmpty()) {
-					pathIds.add(idStr);
-				}
-			}
+		String value = getString(PROP_CLEAR_TEMP_PATH_IDS, "");
+		if (isEmpty(value))
+			return pathIds;
+		for (String idStr : value.split(",")) {
+			idStr = idStr.trim();
+			if (isNotEmpty(idStr))
+				pathIds.add(idStr);
 		}
 		return pathIds;
 	}
 
 	public File getClearTempPath(String pathId) {
 		String key = PROP_CLEAR_TEMP_PATH_PREFIX + pathId + ".path";
-		String value = getString(key, null);
-		if (value == null || value.isEmpty()) {
+		String value = getString(key, "");
+		if (isEmpty(value))
 			return null;
-		}
 		return new File(value);
 	}
 
@@ -197,7 +193,8 @@ public class RuntimeConfiguration extends AbstractionConfiguration {
 		try {
 			return Duration.parse(value);
 		} catch (Exception e) {
-			logger.error("Failed to parse retention duration {} for clear temp path id {}. Falling back to P90D.", value, pathId);
+			logger.error("Failed to parse retention duration {} for clear temp path id {}. Falling back to P90D.",
+					value, pathId);
 			return Duration.ofDays(90);
 		}
 	}
