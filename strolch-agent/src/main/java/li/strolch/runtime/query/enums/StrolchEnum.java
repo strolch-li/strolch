@@ -20,9 +20,7 @@ import com.google.gson.JsonObject;
 import li.strolch.model.Tags;
 import li.strolch.utils.helper.StringHelper;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -39,7 +37,7 @@ public class StrolchEnum {
 		this.name = name;
 		this.locale = locale.toLanguageTag();
 		this.localeL = locale;
-		this.values = values;
+		this.values = Map.copyOf(values);
 	}
 
 	public String getName() {
@@ -82,6 +80,10 @@ public class StrolchEnum {
 
 	public Set<String> keySet() {
 		return this.values.keySet();
+	}
+
+	public List<String> values() {
+		return new ArrayList<>(this.values.values());
 	}
 
 	public JsonObject toJson() {
