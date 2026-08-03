@@ -68,12 +68,32 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 	}
 
 	private StrolchEnum getEnum(StrolchTransaction tx, String name, Locale locale, boolean withoutHidden) {
-		Resource enumeration = tx.getResourceBy(TYPE_ENUMERATION, name, true);
+		return getEnum(tx, name, locale, withoutHidden, true).orElseThrow(
+				() -> new StrolchException("Enum " + name + " not found"));
+	}
+
+	@Override
+	public Optional<StrolchEnum> getEnumO(StrolchTransaction tx, String name) {
+		return getEnum(tx, name, tx.getLocale(), false, false);
+	}
+
+	@Override
+	public Optional<StrolchEnum> getEnumO(StrolchTransaction tx, String name, boolean withoutHidden) {
+		return getEnum(tx, name, tx.getLocale(), withoutHidden, false);
+	}
+
+	private Optional<StrolchEnum> getEnum(StrolchTransaction tx, String name, Locale locale, boolean withoutHidden,
+			boolean assertExists) {
+
+		Resource enumeration = tx.getResourceBy(TYPE_ENUMERATION, name, assertExists);
+		if (enumeration == null)
+			return Optional.empty();
+
 		ParameterBag enumValuesByLanguage = findParameterBagByLanguage(enumeration, locale);
 
 		List<Parameter<?>> parameters = enumValuesByLanguage.getParameters();
 		parameters.sort(Comparator.comparing(Parameter::getIndex));
-		Map<String, String> values = new LinkedHashMap<>(parameters.size());
+		Map<String, String> values = LinkedHashMap.newLinkedHashMap(parameters.size());
 		for (Parameter<?> param : parameters) {
 			if (withoutHidden && param.isHidden())
 				continue;
@@ -81,7 +101,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 			values.put(enumParam.getId(), enumParam.getValue());
 		}
 
-		return new StrolchEnum(name, locale, values);
+		return Optional.of(new StrolchEnum(name, locale, values));
 	}
 
 	private ParameterBag findParameterBagByLanguage(Resource enumeration, Locale locale) {

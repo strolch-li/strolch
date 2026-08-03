@@ -19,6 +19,7 @@ import li.strolch.persistence.api.StrolchTransaction;
 import li.strolch.privilege.model.Certificate;
 
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * @author Robert von Burg <eitch@eitchnet.ch>
@@ -32,4 +33,8 @@ public interface EnumHandler {
 	StrolchEnum getEnum(StrolchTransaction tx, String name);
 
 	StrolchEnum getEnum(StrolchTransaction tx, String name, boolean withoutHidden);
+
+	Optional<StrolchEnum> getEnumO(StrolchTransaction tx, String name);
+
+	Optional<StrolchEnum> getEnumO(StrolchTransaction tx, String name, boolean withoutHidden);
 }
