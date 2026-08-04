@@ -76,6 +76,10 @@ public class RuntimeMock {
 		return this.container.getRealm(certificate).openTx(certificate, getClass(), readOnly).rollbackOnFailure();
 	}
 
+	public StrolchTransaction openUserTx(Certificate certificate, Class<?> clazz, boolean readOnly) {
+		return this.container.getRealm(certificate).openTx(certificate, clazz, readOnly).rollbackOnFailure();
+	}
+
 	public Certificate loginAdmin() {
 		return getPrivilegeHandler().authenticate("admin", "admin".toCharArray());
 	}
