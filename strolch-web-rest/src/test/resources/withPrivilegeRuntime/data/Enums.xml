@@ -20,14 +20,14 @@
 
     <Resource Id="salutation" Name="Salutations" Type="Enumeration">
         <ParameterBag Id="en" Name="Salutations" Type="Enumeration">
-            <Parameter Id="mr" Name="Mr" Type="String" Value="Mr"/>
-            <Parameter Id="ms" Name="Ms" Type="String" Value="Ms"/>
-            <Parameter Id="mrs" Name="Mrs" Type="String" Value="Mrs"/>
+            <Parameter Id="mrs" Name="Mrs" Index="1" Type="String" Value="Mrs"/>
+            <Parameter Id="ms" Name="Ms" Index="2" Type="String" Value="Ms"/>
+            <Parameter Id="mr" Name="Mr" Index="3" Type="String" Value="Mr"/>
         </ParameterBag>
         <ParameterBag Id="de" Name="Salutations" Type="Enumeration">
-            <Parameter Id="mr" Name="Mr" Type="String" Value="Herr"/>
-            <Parameter Id="ms" Name="Ms" Type="String" Value="Frau"/>
-            <Parameter Id="mrs" Name="Mrs" Type="String" Value="Frau"/>
+            <Parameter Id="mrs" Name="Mrs" Index="1" Type="String" Value="Frau"/>
+            <Parameter Id="mr" Name="Mr" Index="2" Type="String" Value="Herr"/>
+            <Parameter Id="ms" Name="Ms" Index="2" Type="String" Value="Frau"/>
         </ParameterBag>
     </Resource>
 
