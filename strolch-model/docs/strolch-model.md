@@ -111,17 +111,23 @@ To allow tools and the UI to understand the nature of a relationship, the follow
 
 ### Convenience methods
 
-Root elements provide convenience methods for common relationship operations:
+Root elements provide convenience methods for common relationship operations between any `StrolchRootElement` (Resource, Order, or Activity):
 
 ```java
 // Set a 1-to-1 relation to a Resource
-resource.setRelation("parent", otherResource);
+resource.setRelation("product", productResource);
+
+// Set a 1-to-1 relation to an Order
+resource.setRelation("currentOrder", order);
+
+// Set a 1-to-1 relation using only the ID
+resource.setRelationId("parent", "otherElementId");
 
 // Add a Resource to a 1-to-N relation
 resource.addRelation("parts", partResource);
 
 // Retrieve the ID of a related element
-String parentId = resource.getRelationId("parent");
+String productId = resource.getRelationId("product");
 
 // Retrieve all IDs of a 1-to-N relation
 List<String> partIds = resource.getRelationIds("parts");
