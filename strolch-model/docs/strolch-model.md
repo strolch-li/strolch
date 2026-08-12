@@ -135,6 +135,34 @@ List<String> partIds = resource.getRelationIds("parts");
 
 The `relationsBag()` method provides access to the dedicated bag, creating it if it doesn't exist.
 
+### XML representation
+
+In Strolch XML (e.g., `templates.xml` or `Model.xml`), relationships are defined as `Parameter` elements within a `ParameterBag` that has the ID `relations`. The metadata is set using the `Interpretation` and `Uom` attributes.
+
+Strolch elements are defined in XML files (typically `templates.xml` or `Model.xml`) using the following structure:
+
+```xml
+<StrolchModel xmlns="https://strolch.li/schema/StrolchModel.xsd">
+    <Resource Id="myResourceId" Name="My Resource Name" Type="MyResourceType">
+        <!-- Parameters are grouped in bags -->
+        <ParameterBag Id="parameters" Name="Parameters" Type="Parameters">
+            <Parameter Id="color" Name="Color" Type="String" Value="Red"/>
+            <Parameter Id="weight" Name="Weight" Type="Integer" Value="10"/>
+            <Parameter Id="active" Name="Active" Type="Boolean" Value="true"/>
+        </ParameterBag>
+        
+        <!-- Relationships are defined in a special bag with ID 'relations' -->
+        <ParameterBag Id="relations" Name="Relations" Type="Relations">
+             <!-- Use Interpretation and Uom attributes for metadata -->
+            <Parameter Id="parent" Name="Parent" Type="String" 
+                       Interpretation="Resource-Ref" Uom="MyResourceType" Value=""/>
+        </ParameterBag>
+    </Resource>
+</StrolchModel>
+```
+
+Note: All attribute names e.g. `Id`, `Name`, `Interpretation`, `Uom`, etc. are **case-sensitive** and must be capitalized as shown.
+
 ### Specialized relationships
 
 Beyond the general `relations` bag convention, some model elements have specialized relationship fields:
