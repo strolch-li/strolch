@@ -37,7 +37,7 @@ public class StrolchEnum {
 		this.name = name;
 		this.locale = locale.toLanguageTag();
 		this.localeL = locale;
-		this.values = Map.copyOf(values);
+		this.values = new TreeMap<>(values);
 	}
 
 	public String getName() {

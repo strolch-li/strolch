@@ -93,7 +93,7 @@ public class DefaultEnumHandler extends StrolchComponent implements EnumHandler 
 
 		List<Parameter<?>> parameters = enumValuesByLanguage.getParameters();
 		parameters.sort(Comparator.comparing(Parameter::getIndex));
-		Map<String, String> values = LinkedHashMap.newLinkedHashMap(parameters.size());
+		Map<String, String> values = new TreeMap<>();
 		for (Parameter<?> param : parameters) {
 			if (withoutHidden && param.isHidden())
 				continue;
