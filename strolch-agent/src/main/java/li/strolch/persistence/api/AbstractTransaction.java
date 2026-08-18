@@ -405,6 +405,13 @@ public abstract class AbstractTransaction implements StrolchTransaction {
 
 		lock(element);
 
+		// can't read-lock element if it was previously modified and thus is in the object filter!
+		if (hasElementInFilter(element.getObjectType(), Resource.locatorFor(element.getType(), element.getId()))) {
+			logger.warn("Element {} is in object filter with operation {}, can't read-lock", element.getLocator(),
+					this.objectFilter.getOperation(element.getObjectType(), element.getLocator()));
+			return element;
+		}
+
 		Locator locator = element.getLocator();
 		removeFromCache(locator);
 
