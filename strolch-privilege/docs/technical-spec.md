@@ -318,16 +318,16 @@ Defines the roles and their associated privileges.
         <Privilege name="PrivilegeGetRole" policy="RoleAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeGetGroup" policy="RoleAccessPrivilege">
+        <Privilege name="PrivilegeGetGroup" policy="GroupAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeAddGroup" policy="RoleAccessPrivilege">
+        <Privilege name="PrivilegeAddGroup" policy="GroupAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeModifyGroup" policy="RoleAccessPrivilege">
+        <Privilege name="PrivilegeModifyGroup" policy="GroupAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
-        <Privilege name="PrivilegeRemoveGroup" policy="RoleAccessPrivilege">
+        <Privilege name="PrivilegeRemoveGroup" policy="GroupAccessPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
         <Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
