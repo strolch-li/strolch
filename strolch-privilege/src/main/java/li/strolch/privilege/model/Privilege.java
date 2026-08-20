@@ -86,7 +86,7 @@ public record Privilege(String name, String policy, boolean allAllowed, Set<Stri
 	}
 
 	public boolean hasDenied() {
-		return !this.allowList.isEmpty();
+		return !this.denyList.isEmpty();
 	}
 
 	public boolean isDenied(String value) {
