@@ -205,7 +205,8 @@ The main configuration file for the `PrivilegeHandler`.
 
     <Policies>
         <Policy name="DefaultPrivilege" class="li.strolch.privilege.policy.DefaultPrivilege" />
-        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege" />
+        <Policy name="RoleAccessPrivilege" class="li.strolch.privilege.policy.RoleAccessPrivilege"/>
+        <Policy name="GroupAccessPrivilege" class="li.strolch.privilege.policy.GroupAccessPrivilege"/>
         <Policy name="UserAccessPrivilege" class="li.strolch.privilege.policy.UserAccessPrivilege" />
         <Policy name="UserSessionAccessPrivilege" class="li.strolch.privilege.policy.UsernameFromCertificatePrivilege"/>
     </Policies>
