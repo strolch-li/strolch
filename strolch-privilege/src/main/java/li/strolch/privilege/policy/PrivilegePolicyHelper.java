@@ -30,15 +30,21 @@ import java.text.MessageFormat;
  */
 public class PrivilegePolicyHelper {
 
+	private PrivilegePolicyHelper() {
+	}
+
 	/**
-	 * Validates the given values and returns the privilege name
+	 * Validates the provided privilege and restrictable objects to ensure their compatibility, and retrieves the
+	 * privilege name associated with the restrictable object. This method ensures that the privilege's name matches the
+	 * privilege name required by the restrictable object.
 	 *
-	 * @param privilege    the {@link Privilege}
-	 * @param restrictable the {@link Restrictable}
+	 * @param privilege    the {@link Privilege} to be validated; must not be null
+	 * @param restrictable the {@link Restrictable} to be validated; must not be null
 	 *
-	 * @return the privilege name
+	 * @return the privilege name associated with the restrictable, if the validation passes
 	 *
-	 * @throws PrivilegeException if something is wrong
+	 * @throws PrivilegeException if the privilege or restrictable is null, if the privilege name is empty, or if the
+	 *                            privilege name does not match the restrictable's required privilege name
 	 */
 	public static String preValidate(Privilege privilege, Restrictable restrictable) throws PrivilegeException {
 		if (privilege == null)
@@ -65,30 +71,33 @@ public class PrivilegePolicyHelper {
 	}
 
 	/**
-	 * Validates privilege is granted by checking first if all is allows, then the deny values, then the allow values.
-	 * If the privilegeValue is in the deny list or not in the allow list, then access is denied and the
-	 * {@link AccessDeniedException} is thrown
+	 * Checks whether the specified privilege value is allowed or denied based on the given privilege's configuration.
+	 * The method first evaluates denied values, then allowed values. If the privilege value is not explicitly allowed
+	 * or denied, it handles access denial based on the given parameters.
 	 *
-	 * @param ctx                the context
-	 * @param privilege          the privielge
-	 * @param restrictable       the restrictable
-	 * @param privilegeValue     the privilege value
-	 * @param assertHasPrivilege if true and the privilege is missing, then an {@link AccessDeniedException} is thrown
-	 *                           if privilege, otherwise a false is returned
+	 * @param ctx                the {@link PrivilegeContext} providing the context of the privilege check
+	 * @param privilege          the {@link Privilege} containing the allowed and denied privilege configurations
+	 * @param restrictable       the {@link Restrictable} associated with the privilege
+	 * @param privilegeValue     the specific privilege value to check
+	 * @param assertHasPrivilege a flag indicating whether an exception should be thrown if access is denied
 	 *
-	 * @return true if access is allowed, false if not allowed and assertHasPrivilege is false
+	 * @return {@code true} if the privilege value is allowed; {@code false} if it is denied and
+	 * {@code assertHasPrivilege} is {@code false}
 	 *
-	 * @throws AccessDeniedException if access is denied
+	 * @throws AccessDeniedException if access is denied and {@code assertHasPrivilege} is {@code true}
 	 */
 	public static boolean checkByAllowDenyValues(PrivilegeContext ctx, Privilege privilege, Restrictable restrictable,
 			String privilegeValue, boolean assertHasPrivilege) throws AccessDeniedException {
 
 		// first check values not allowed
-		if (privilege.isDenied(privilegeValue))
-			return handleAccessDenied(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
-
 		// now check values allowed
-		if (privilege.isAllowed(privilegeValue))
+		if (privilege.hasDenied()) {
+			if (privilege.isDenied(privilegeValue))
+				return handleAccessDenied(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
+			return true;
+		}
+
+		if (privilege.hasAllowed() && privilege.isAllowed(privilegeValue))
 			return true;
 
 		return handleAccessDenied(ctx, privilege, restrictable, privilegeValue, assertHasPrivilege);
