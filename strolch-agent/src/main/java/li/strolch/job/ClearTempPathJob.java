@@ -75,7 +75,6 @@ public class ClearTempPathJob extends StrolchJob {
 				Duration retention = runtimeConfiguration.getTempRetention(prefixDir.getName());
 				int keep = runtimeConfiguration.getTempRetentionKeep(prefixDir.getName());
 				clearOldFiles(prefixDir, retention, keep, verbose, deleteEnabled, stats);
-				deleteIfEmpty(prefixDir, verbose, deleteEnabled, stats);
 			}
 		}
 
@@ -93,38 +92,41 @@ public class ClearTempPathJob extends StrolchJob {
 			}
 		}
 
+		logStats(logger, tempPath, stats, deleteEnabled);
+	}
+
+	protected void logStats(Logger logger, File path, Stats stats, boolean deleteEnabled) {
 		if (stats.deletedFiles > 0 || stats.deletedDirs > 0 || stats.failedDeletions > 0) {
 			if (deleteEnabled) {
 				logger.info("Cleared {} files and {} empty directories in temp path {}. ({} failed deletions)",
-						stats.deletedFiles, stats.deletedDirs, tempPath.getAbsolutePath(), stats.failedDeletions);
+						stats.deletedFiles, stats.deletedDirs, path.getAbsolutePath(), stats.failedDeletions);
 			} else {
 				logger.info("Simulation: would have cleared {} files and {} empty directories in temp path {}.",
-						stats.deletedFiles, stats.deletedDirs, tempPath.getAbsolutePath());
+						stats.deletedFiles, stats.deletedDirs, path.getAbsolutePath());
 			}
 		} else {
-			logger.info("No old data to clear in temp path {}.", tempPath.getAbsolutePath());
+			logger.info("No old data to clear in temp path {}.", path.getAbsolutePath());
 		}
 	}
 
-	private void clearOldFiles(File dir, Duration retention, int keep, boolean verbose, boolean deleteEnabled,
+	protected void clearOldFiles(File dir, Duration retention, int keep, boolean verbose, boolean deleteEnabled,
 			Stats stats) {
 		List<File> allFiles = new ArrayList<>();
 		findFilesRecursive(dir, allFiles);
 
-		if (allFiles.size() <= keep)
-			return;
+		if (allFiles.size() > keep) {
+			allFiles.sort(Comparator.comparingLong(File::lastModified).reversed());
 
-		allFiles.sort(Comparator.comparingLong(File::lastModified).reversed());
-
-		for (int i = keep; i < allFiles.size(); i++) {
-			clearIfOld(allFiles.get(i), retention, verbose, deleteEnabled, stats);
+			for (int i = keep; i < allFiles.size(); i++) {
+				clearIfOld(allFiles.get(i), retention, verbose, deleteEnabled, stats);
+			}
 		}
 
 		// Cleanup empty directories
 		cleanupEmptyDirectories(dir, verbose, deleteEnabled, stats);
 	}
 
-	private void findFilesRecursive(File dir, List<File> allFiles) {
+	protected void findFilesRecursive(File dir, List<File> allFiles) {
 		File[] children = dir.listFiles();
 		if (children == null)
 			return;
@@ -136,7 +138,7 @@ public class ClearTempPathJob extends StrolchJob {
 		}
 	}
 
-	private void cleanupEmptyDirectories(File dir, boolean verbose, boolean deleteEnabled, Stats stats) {
+	protected void cleanupEmptyDirectories(File dir, boolean verbose, boolean deleteEnabled, Stats stats) {
 		File[] children = dir.listFiles();
 		if (children == null)
 			return;
@@ -148,7 +150,7 @@ public class ClearTempPathJob extends StrolchJob {
 		}
 	}
 
-	private void clearIfOld(File file, Duration retention, boolean verbose, boolean deleteEnabled, Stats stats) {
+	protected void clearIfOld(File file, Duration retention, boolean verbose, boolean deleteEnabled, Stats stats) {
 		Instant lastModified = Instant.ofEpochMilli(file.lastModified());
 		Instant threshold = Instant.now().minus(retention);
 		if (lastModified.isBefore(threshold)) {
@@ -168,7 +170,7 @@ public class ClearTempPathJob extends StrolchJob {
 		}
 	}
 
-	private void deleteIfEmpty(File dir, boolean verbose, boolean deleteEnabled, Stats stats) {
+	protected void deleteIfEmpty(File dir, boolean verbose, boolean deleteEnabled, Stats stats) {
 		File[] listFiles = dir.listFiles();
 		if (listFiles != null && listFiles.length == 0) {
 			if (deleteEnabled) {
@@ -184,9 +186,9 @@ public class ClearTempPathJob extends StrolchJob {
 		}
 	}
 
-	private static class Stats {
-		int deletedFiles;
-		int deletedDirs;
-		int failedDeletions;
+	protected static class Stats {
+		public int deletedFiles;
+		public int deletedDirs;
+		public int failedDeletions;
 	}
 }

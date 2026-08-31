@@ -126,6 +126,42 @@ public class ClearAdditionalTempPathsJobTest {
 			// Verify (default retention is P7D)
 			assertFalse("Old file should be deleted", oldFile.exists());
 			assertTrue("New file should still exist", newFile.exists());
+			assertTrue("Prefix dir should still exist", prefixDir.exists());
+		}
+	}
+
+	@Test
+	public void shouldNotDeleteContextPathWhenEmpty() throws Exception {
+		try (RuntimeMock runtimeMock = new RuntimeMock(targetPath.getAbsolutePath(),
+				"src/test/resources/minimaltest").mockRuntime()) {
+			runtimeMock.startContainer();
+			StrolchAgent agent = runtimeMock.getAgent();
+			RuntimeConfiguration runtimeConfig = agent.getRuntimeConfiguration();
+
+			File tempPath = runtimeConfig.getTempPath();
+
+			// Prepare context directory with sub-directory and old file
+			File contextDir = new File(tempPath, "context_test");
+			File subDir = new File(contextDir, "sub");
+			if (!subDir.mkdirs())
+				throw new IOException("Failed to create sub dir " + subDir.getAbsolutePath());
+
+			File oldFile = createOldFile(subDir, "old.txt", 8);
+
+			// Enable deletion
+			Map<String, String> properties = agent.getRuntimeConfiguration().getAsMap();
+			properties.put(PROP_TEMP_RETENTION_DELETE_ENABLED, "true");
+			properties.put(PROP_TEMP_RETENTION_DEFAULT, "P7D");
+			agent.getRuntimeConfiguration().updateProperties(properties);
+
+			// Run job
+			ClearTempPathJob job = new ClearTempPathJob(agent, "test", "test", JobMode.Manual);
+			job.execute(null);
+
+			// Verify: old file and sub directory should be deleted, but context directory must remain
+			assertFalse("Old file should be deleted", oldFile.exists());
+			assertFalse("Empty sub directory should be deleted", subDir.exists());
+			assertTrue("Context path should still exist even when empty", contextDir.exists());
 		}
 	}
 
