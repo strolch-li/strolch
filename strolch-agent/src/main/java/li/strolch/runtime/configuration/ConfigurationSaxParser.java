@@ -76,7 +76,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		this.locatorBuilder.append(qName);
+		this.locatorBuilder.append(localName);
 
 		Locator locator = this.locatorBuilder.build();
 
@@ -215,9 +215,9 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-			if (qName.equals(APPLICATION_NAME)) {
+			if (localName.equals(APPLICATION_NAME)) {
 				this.valueBuffer = new StringBuilder();
-			} else if (qName.equals(LANGUAGE)) {
+			} else if (localName.equals(LANGUAGE)) {
 				String locale = attributes.getValue(Tags.Json.LOCALE);
 				String name = attributes.getValue(Tags.Json.NAME);
 				if (StringHelper.isEmpty(locale) || StringHelper.isEmpty(name)) {
@@ -231,7 +231,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		@Override
 		public void endElement(String uri, String localName, String qName) {
-			if (qName.equals(APPLICATION_NAME)) {
+			if (localName.equals(APPLICATION_NAME)) {
 				String applicationName = this.valueBuffer.toString();
 				this.configurationBuilder.runtimeBuilder().setApplicationName(applicationName);
 				this.valueBuffer = null;
@@ -247,7 +247,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-			switch (qName) {
+			switch (localName) {
 				case NAME, API, IMPL, DEPENDS -> this.valueBuffer = new StringBuilder();
 				default -> {
 					// no nothing for others, as only these are text elements
@@ -257,7 +257,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 
 		@Override
 		public void endElement(String uri, String localName, String qName) {
-			switch (qName) {
+			switch (localName) {
 				case NAME -> {
 					String name = this.valueBuffer.toString();
 					this.configurationBuilder.componentBuilder().setName(name);
@@ -276,7 +276,7 @@ public class ConfigurationSaxParser extends DefaultHandler {
 					String depends = this.valueBuffer.toString();
 					this.configurationBuilder.componentBuilder().addDependency(depends);
 				}
-				default -> throw new IllegalStateException("Unexpected value: " + qName);
+				default -> throw new IllegalStateException("Unexpected value: " + localName);
 			}
 		}
 
@@ -294,19 +294,19 @@ public class ConfigurationSaxParser extends DefaultHandler {
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			if (this.propertyName != null) {
 				String msg = "Opening another tag {0} although {1} is still open!";
-				msg = MessageFormat.format(msg, this.propertyName, qName);
+				msg = MessageFormat.format(msg, this.propertyName, localName);
 				throw new IllegalStateException(msg);
 			}
 
-			this.propertyName = qName;
+			this.propertyName = localName;
 			this.valueBuffer = new StringBuilder();
 		}
 
 		@Override
 		public void endElement(String uri, String localName, String qName) {
-			if (this.propertyName == null || !this.propertyName.equals(qName)) {
+			if (this.propertyName == null || !this.propertyName.equals(localName)) {
 				String msg = "Previous tag {0} was not closed before new tag {1}!";
-				msg = MessageFormat.format(msg, this.propertyName, qName);
+				msg = MessageFormat.format(msg, this.propertyName, localName);
 				throw new IllegalStateException(msg);
 			}
 

@@ -52,11 +52,11 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (qName.equals(GROUP)) {
+		if (localName.equals(GROUP)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(GroupParser.class)))
 				throw new IllegalArgumentException("Previous Group not closed!");
 			this.buildersStack.push(new GroupParser());
-		} else if (qName.equals(PROPERTIES)) {
+		} else if (localName.equals(PROPERTIES)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
 				throw new IllegalArgumentException("Previous Properties not closed!");
 			this.buildersStack.push(new PropertyParser());
@@ -79,9 +79,9 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (qName.equals(GROUP)) {
+		if (localName.equals(GROUP)) {
 			elementParser = this.buildersStack.pop();
-		} else if (qName.equals(PROPERTIES)) {
+		} else if (localName.equals(PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -127,7 +127,7 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			if (qName.equals(GROUP)) {
+			if (localName.equals(GROUP)) {
 				this.name = attributes.getValue(ATTR_NAME).trim();
 			}
 		}
@@ -140,7 +140,7 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) {
 
-			switch (qName) {
+			switch (localName) {
 				case ROLE -> this.roles.add(getText());
 				case GROUP -> {
 
@@ -152,9 +152,11 @@ public class PrivilegeGroupsSaxReader extends DefaultHandler {
 				}
 				default -> {
 					if (!(
-							qName.equals(GROUPS) || qName.equals(ROLES) || qName.equals(PARAMETER) || qName.equals(
-									PARAMETERS))) {
-						throw new IllegalArgumentException("Unhandled tag " + qName);
+							localName.equals(GROUPS)
+									|| localName.equals(ROLES)
+									|| localName.equals(PARAMETER)
+									|| localName.equals(PARAMETERS))) {
+						throw new IllegalArgumentException("Unhandled tag " + localName);
 					}
 				}
 			}

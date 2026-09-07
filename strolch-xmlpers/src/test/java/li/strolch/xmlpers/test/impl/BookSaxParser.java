@@ -60,7 +60,7 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-		if (qName.equals("Book")) {
+		if (localName.equals("Book")) {
 			String idS = attributes.getValue("id");
 			long id = Long.parseLong(idS);
 			Book book = new Book(id);
@@ -72,7 +72,7 @@ public class BookSaxParser extends DefaultHandler implements SaxParser<Book> {
 			book.setPrice(price);
 			this.book = book;
 		} else {
-			throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
+			throw new IllegalArgumentException("The element '" + localName + "' is unhandled!");
 		}
 	}
 }

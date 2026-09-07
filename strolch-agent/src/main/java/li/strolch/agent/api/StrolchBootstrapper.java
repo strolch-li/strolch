@@ -475,11 +475,10 @@ public class StrolchBootstrapper extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-		switch (qName) {
-			case STROLCH_BOOTSTRAP:
-				break;
-
-			case ENV:
+		switch (localName) {
+			case STROLCH_BOOTSTRAP -> {
+			}
+			case ENV -> {
 				if (attributes.getValue(ID).equals(this.environment)) {
 					this.insideEnv = true;
 					this.envFound = true;
@@ -489,59 +488,44 @@ public class StrolchBootstrapper extends DefaultHandler {
 
 				String defaultS = attributes.getValue(DEFAULT);
 				this.defaultAllowed = defaultS != null && StringHelper.parseBoolean(defaultS);
-
-				break;
-
-			case ENVIRONMENT:
-			case ROOT:
-			case CONFIG:
-			case DATA:
-			case TEMP:
+			}
+			case ENVIRONMENT, ROOT, CONFIG, DATA, TEMP -> {
 
 				if (this.insideEnv)
 					this.textB = new StringBuilder();
-
-				break;
-
-			default:
-				throw new StrolchConfigurationException("Unhandled element " + qName);
+			}
+			default -> throw new StrolchConfigurationException("Unhandled element " + localName);
 		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 
-		switch (qName) {
-			case STROLCH_BOOTSTRAP:
-				break;
-
-			case ENV:
-				this.insideEnv = false;
-				break;
-
-			case ENVIRONMENT:
+		switch (localName) {
+			case STROLCH_BOOTSTRAP -> {
+			}
+			case ENV -> this.insideEnv = false;
+			case ENVIRONMENT -> {
 				if (this.insideEnv)
 					this.environmentOverride = this.textB.toString();
-				break;
-			case ROOT:
+			}
+			case ROOT -> {
 				if (this.insideEnv)
 					this.rootS = this.textB.toString();
-				break;
-			case CONFIG:
+			}
+			case CONFIG -> {
 				if (this.insideEnv)
 					this.configS = this.textB.toString();
-				break;
-			case DATA:
+			}
+			case DATA -> {
 				if (this.insideEnv)
 					this.dataS = this.textB.toString();
-				break;
-			case TEMP:
+			}
+			case TEMP -> {
 				if (this.insideEnv)
 					this.tempS = this.textB.toString();
-				break;
-
-			default:
-				throw new StrolchConfigurationException("Unhandled element " + qName);
+			}
+			default -> throw new StrolchConfigurationException("Unhandled element " + localName);
 		}
 
 		this.textB = null;

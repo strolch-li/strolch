@@ -56,7 +56,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (qName.equals(TOKEN)) {
+		if (localName.equals(TOKEN)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(AccessTokenParser.class)))
 				throw new IllegalArgumentException("Previous PersonalAccessToken not closed!");
 			this.buildersStack.push(new AccessTokenParser());
@@ -78,7 +78,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 		if (!this.buildersStack.isEmpty())
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
-		if (qName.equals(TOKEN)) {
+		if (localName.equals(TOKEN)) {
 			this.buildersStack.pop();
 		}
 	}
@@ -136,7 +136,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			switch (qName) {
+			switch (localName) {
 				case TOKEN -> {
 					this.username = attributes.getValue(ATTR_USERNAME).trim();
 					this.tokenId = attributes.getValue(ATTR_TOKEN_ID).trim();
@@ -176,11 +176,11 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 			if (!this.buildersStack.isEmpty())
 				this.buildersStack.peek().endElement(uri, localName, qName);
 
-			if (qName.equals(PRIVILEGE)) {
+			if (localName.equals(PRIVILEGE)) {
 				this.buildersStack.pop();
 			}
 
-			if (qName.equals(TOKEN)) {
+			if (localName.equals(TOKEN)) {
 				PersonalAccessToken token = new PersonalAccessToken(this.tokenId, this.username, this.name, this.token,
 						this.validFrom, this.validTo, this.lastUsed, this.privileges);
 				tokens.put(token.tokenId(), token);
@@ -223,7 +223,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			switch (qName) {
+			switch (localName) {
 				case PRIVILEGE -> {
 					this.privilegeName = attributes.getValue(ATTR_NAME).trim();
 					this.privilegePolicy = attributes.getValue(ATTR_POLICY).trim();
@@ -231,7 +231,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 				case ALLOW, DENY, ALL_ALLOWED -> {
 				}
 				// no-op
-				default -> throw new IllegalArgumentException("Unhandled tag " + qName);
+				default -> throw new IllegalArgumentException("Unhandled tag " + localName);
 			}
 		}
 
@@ -243,7 +243,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 
 		@Override
 		public void endElement(String uri, String localName, String qName) {
-			switch (qName) {
+			switch (localName) {
 				case ALL_ALLOWED -> this.allAllowed = StringHelper.parseBoolean(getText());
 				case ALLOW -> this.allowList.add(getText());
 				case DENY -> this.denyList.add(getText());
@@ -257,7 +257,7 @@ public class PrivilegeTokensSaxReader extends DefaultHandler {
 					this.denyList = new HashSet<>();
 					this.allowList = new HashSet<>();
 				}
-				default -> throw new IllegalStateException("Unexpected value: " + qName);
+				default -> throw new IllegalStateException("Unexpected value: " + localName);
 			}
 		}
 

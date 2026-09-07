@@ -32,13 +32,13 @@ class PropertyParser extends ElementParserAdapter {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-		if (qName.equals(PROPERTY)) {
+		if (localName.equals(PROPERTY)) {
 			String key = attributes.getValue(ATTR_NAME).trim();
 			String value = attributes.getValue(ATTR_VALUE).trim();
 			this.parameterMap.put(key, value);
 		} else {
-			if (!qName.equals(PROPERTIES)) {
-				throw new IllegalArgumentException("Unhandled tag " + qName);
+			if (!localName.equals(PROPERTIES)) {
+				throw new IllegalArgumentException("Unhandled tag " + localName);
 			}
 		}
 	}

@@ -53,8 +53,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-
-		switch (qName) {
+		switch (localName) {
 			case ROOT_CERTIFICATES -> {
 			}
 			case CERTIFICATE -> {
@@ -75,7 +74,7 @@ public class CertificateStubsSaxReader extends DefaultHandler {
 					stub.source = SOURCE_UNKNOWN;
 				this.stubs.add(stub);
 			}
-			default -> throw new PrivilegeException("Unhandled tag " + qName);
+			default -> throw new PrivilegeException("Unhandled tag " + localName);
 		}
 	}
 

@@ -58,8 +58,7 @@ public class LogMessageSaxReader extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-
-		switch (qName) {
+		switch (localName) {
 			case Tags.LOG_MESSAGE -> {
 				this.id = attributes.getValue(Tags.ID);
 				this.dateTime = ISO8601.parseToZdt(attributes.getValue(Tags.DATE));
@@ -74,71 +73,59 @@ public class LogMessageSaxReader extends DefaultHandler {
 				this.values.put(key, value);
 			}
 			default -> throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+					MessageFormat.format("The element ''{0}'' is unhandled!", localName));
 		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
-
-		switch (qName) {
-
-			case Tags.LOG_MESSAGE:
+		switch (localName) {
+			case Tags.LOG_MESSAGE -> {
 				if (this.state == null)
 					this.state = LogMessageState.Information;
 
 				LogMessage logMessage = new LogMessage(this.id, this.dateTime, this.realm, this.username, this.locator,
 						this.severity, this.state, this.bundle, this.key, this.values, this.message, this.exception);
 				this.logMessageConsumer.accept(logMessage);
-				break;
-
-			case Tags.USERNAME:
+			}
+			case Tags.USERNAME -> {
 				this.username = this.sb.toString();
 				this.sb = null;
-				break;
-
-			case Tags.LOCATOR:
+			}
+			case Tags.LOCATOR -> {
 				this.locator = Locator.valueOf(this.sb.toString());
 				this.sb = null;
-				break;
-
-			case Tags.SEVERITY:
+			}
+			case Tags.SEVERITY -> {
 				this.severity = LogSeverity.valueOf(this.sb.toString());
 				this.sb = null;
-				break;
-
-			case Tags.STATE:
+			}
+			case Tags.STATE -> {
 				this.state = LogMessageState.valueOf(this.sb.toString());
 				this.sb = null;
-				break;
-
-			case Tags.BUNDLE:
+			}
+			case Tags.BUNDLE -> {
 				this.bundle = this.sb.toString();
 				this.sb = null;
-				break;
-
-			case Tags.KEY:
+			}
+			case Tags.KEY -> {
 				this.key = this.sb.toString();
 				this.sb = null;
-				break;
-
-			case Tags.MESSAGE:
+			}
+			case Tags.MESSAGE -> {
 				this.message = this.sb.toString();
 				this.sb = null;
-				break;
-
-			case Tags.EXCEPTION:
+			}
+			case Tags.EXCEPTION -> {
 				this.exception = this.sb.toString();
 				this.sb = null;
-				break;
-
-			case Tags.PROPERTIES:
-			case Tags.PROPERTY:
-				break;
-
-			default:
-				throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
+			}
+			case Tags.PROPERTIES, Tags.PROPERTY -> {
+			}
+			default -> throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", localName));
 		}
+
 	}
 
 	@Override
