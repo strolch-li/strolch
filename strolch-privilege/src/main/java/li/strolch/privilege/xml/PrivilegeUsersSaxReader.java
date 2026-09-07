@@ -60,11 +60,11 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-		if (localName.equals(USER)) {
+		if (qName.equals(USER)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(UserParser.class)))
 				throw new IllegalArgumentException("Previous User not closed!");
 			this.buildersStack.push(new UserParser());
-		} else if (localName.equals(PROPERTIES)) {
+		} else if (qName.equals(PROPERTIES)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(PropertyParser.class)))
 				throw new IllegalArgumentException("Previous Properties not closed!");
 			this.buildersStack.push(new PropertyParser());
@@ -87,9 +87,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (localName.equals(USER)) {
+		if (qName.equals(USER)) {
 			elementParser = this.buildersStack.pop();
-		} else if (localName.equals(PROPERTIES)) {
+		} else if (qName.equals(PROPERTIES)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -144,14 +144,14 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			if (localName.equals(USER)) {
+			if (qName.equals(USER)) {
 				this.userId = attributes.getValue(ATTR_USER_ID).trim();
 				this.username = attributes.getValue(ATTR_USERNAME).trim();
 
 				String password = attributes.getValue(ATTR_PASSWORD);
 				String salt = attributes.getValue(ATTR_SALT);
 				this.passwordCrypt = PasswordCrypt.parse(password, salt);
-			} else if (localName.equals(HISTORY)) {
+			} else if (qName.equals(HISTORY)) {
 				this.history = UserHistory.EMPTY;
 			}
 		}
@@ -164,7 +164,7 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 		@Override
 		public void endElement(String uri, String localName, String qName) {
 
-			switch (localName) {
+			switch (qName) {
 				case FIRSTNAME -> this.firstName = getText();
 				case LASTNAME -> this.lastname = getText();
 				case STATE -> this.userState = UserState.valueOf(getText());
@@ -196,12 +196,9 @@ public class PrivilegeUsersSaxReader extends DefaultHandler {
 				}
 				default -> {
 					if (!(
-							localName.equals(ROLES)
-									|| localName.equals(GROUPS)
-									|| localName.equals(PARAMETER)
-									|| localName.equals(HISTORY)
-									|| localName.equals(PARAMETERS))) {
-						throw new IllegalArgumentException("Unhandled tag " + localName);
+							qName.equals(ROLES) || qName.equals(GROUPS) || qName.equals(PARAMETER) || qName.equals(
+									HISTORY) || qName.equals(PARAMETERS))) {
+						throw new IllegalArgumentException("Unhandled tag " + qName);
 					}
 				}
 			}

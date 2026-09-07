@@ -69,7 +69,7 @@ public class XmlModelSaxStreamReader extends XmlModelSaxReader {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (localName.equals(Tags.INCLUDE_FILE)) {
+		if (qName.equals(Tags.INCLUDE_FILE)) {
 			String msg = "The {0} can''t handle Tags of type {1}";
 			msg = MessageFormat.format(msg, XmlModelSaxStreamReader.class.getName(), Tags.INCLUDE_FILE);
 			throw new IllegalArgumentException(msg);

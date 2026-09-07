@@ -46,7 +46,7 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		switch (localName) {
+		switch (qName) {
 			case CONTAINER -> this.buildersStack.push(new ContainerParser());
 			case PARAMETERS -> this.buildersStack.push(new ParametersParser());
 			case POLICIES -> this.buildersStack.push(new PoliciesParser());
@@ -71,7 +71,7 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		if (!this.buildersStack.isEmpty())
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
-		ElementParser elementParser = switch (localName) {
+		ElementParser elementParser = switch (qName) {
 			case CONTAINER, PARAMETERS, POLICIES -> this.buildersStack.pop();
 			default -> null;
 		};
@@ -87,39 +87,39 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-			switch (localName) {
-				case CONTAINER -> this.currentElement = localName;
+			switch (qName) {
+				case CONTAINER -> this.currentElement = qName;
 				case HANDLER_PRIVILEGE -> {
-					this.currentElement = localName;
+					this.currentElement = qName;
 					String className = attributes.getValue(ATTR_CLASS).trim();
 					getContainerModel().setPrivilegeHandlerClassName(className);
 				}
 				case HANDLER_ENCRYPTION -> {
-					this.currentElement = localName;
+					this.currentElement = qName;
 					String className = attributes.getValue(ATTR_CLASS).trim();
 					getContainerModel().setEncryptionHandlerClassName(className);
 				}
 				case HANDLER_PASSWORD_STRENGTH -> {
-					this.currentElement = localName;
+					this.currentElement = qName;
 					String className = attributes.getValue(ATTR_CLASS).trim();
 					getContainerModel().setPasswordStrengthHandlerClassName(className);
 				}
 				case HANDLER_PERSISTENCE -> {
-					this.currentElement = localName;
+					this.currentElement = qName;
 					String className = attributes.getValue(ATTR_CLASS).trim();
 					getContainerModel().setPersistenceHandlerClassName(className);
 				}
 				case HANDLER_USER_CHALLENGE -> {
-					this.currentElement = localName;
+					this.currentElement = qName;
 					String className = attributes.getValue(ATTR_CLASS).trim();
 					getContainerModel().setUserChallengeHandlerClassName(className);
 				}
 				case HANDLER_SSO -> {
-					this.currentElement = localName;
+					this.currentElement = qName;
 					String className = attributes.getValue(ATTR_CLASS).trim();
 					getContainerModel().setSsoHandlerClassName(className);
 				}
-				default -> throw new IllegalStateException("Unexpected value: " + localName);
+				default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
 		}
 
@@ -150,7 +150,7 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-			if (localName.equals(PARAMETER)) {
+			if (qName.equals(PARAMETER)) {
 				String key = attributes.getValue(ATTR_NAME).trim();
 				String value = attributes.getValue(ATTR_VALUE).trim();
 				this.parameterMap.put(key, value);
@@ -171,7 +171,7 @@ public class PrivilegeConfigSaxReader extends DefaultHandler {
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) {
-			if (localName.equals(POLICY)) {
+			if (qName.equals(POLICY)) {
 				String policyName = attributes.getValue(ATTR_NAME).trim();
 				String policyClassName = attributes.getValue(ATTR_CLASS).trim();
 

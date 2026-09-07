@@ -23,7 +23,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.text.MessageFormat;
 import java.util.function.Consumer;
 
-import static java.text.MessageFormat.*;
 import static li.strolch.model.Tags.Audit.*;
 
 /**
@@ -42,21 +41,23 @@ public class AuditSaxReader extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (localName) {
+
+		switch (qName) {
 			case Tags.AUDIT -> {
 				this.currentAudit = new Audit();
 				this.currentAudit.setId(Long.parseLong(attributes.getValue(ID)));
 			}
 			case USERNAME, DATE, ELEMENT_TYPE, ELEMENT_SUB_TYPE, ELEMENT_ACCESSED, NEW_VERSION, ACTION, ACCESS_TYPE,
 				 ADDITIONAL_DATA -> this.sb = new StringBuilder();
-			default -> throw new IllegalArgumentException(format("The element ''{0}'' is unhandled!", localName));
+			default -> throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 
-		switch (localName) {
+		switch (qName) {
 			case Tags.AUDIT -> {
 				this.auditConsumer.accept(this.currentAudit);
 				this.currentAudit = null;
@@ -101,7 +102,8 @@ public class AuditSaxReader extends DefaultHandler {
 				this.currentAudit.setAdditionalDataAsString(this.sb.toString());
 				this.sb = null;
 			}
-			default -> throw new IllegalArgumentException(format("The element ''{0}'' is unhandled!", localName));
+			default -> throw new IllegalArgumentException(
+					MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 

@@ -48,8 +48,8 @@ public class XmlModelSaxFileReader extends XmlModelSaxReader {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (!Tags.INCLUDE_FILE.equals(localName)) {
-			super.startElement(uri, localName, localName, attributes);
+		if (!Tags.INCLUDE_FILE.equals(qName)) {
+			super.startElement(uri, localName, qName, attributes);
 		} else {
 			if (!this.allowInclude) {
 				String msg = "ModelFile {0} has includes which are disabled for this parse invocation!";

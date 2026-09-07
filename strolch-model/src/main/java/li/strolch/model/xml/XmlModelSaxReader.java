@@ -79,18 +79,22 @@ public class XmlModelSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		switch (localName) {
-			case STROLCH_MODEL -> {
-			}
-			case RESOURCE -> {
+		switch (qName) {
+
+			case STROLCH_MODEL:
+				break;
+
+			case RESOURCE:
 
 				String resId = attributes.getValue(ID);
 				String resName = attributes.getValue(NAME);
 				String resType = attributes.getValue(TYPE);
 
 				this.parameterizedElement = new Resource(resId, resName, resType);
-			}
-			case ACTIVITY -> {
+
+				break;
+
+			case ACTIVITY:
 
 				String activityId = attributes.getValue(ID);
 				String activityName = attributes.getValue(NAME);
@@ -104,8 +108,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 				this.parameterizedElement = activity;
 
 				this.activityStack.push(activity);
-			}
-			case ACTION -> {
+
+				break;
+
+			case ACTION:
 
 				String actionId = attributes.getValue(ID);
 				String actionName = attributes.getValue(NAME);
@@ -120,8 +126,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 					action.setState(State.parse(actionState));
 
 				this.parameterizedElement = action;
-			}
-			case VALUE_CHANGE -> {
+
+				break;
+
+			case VALUE_CHANGE:
 
 				String valueChangeStateId = attributes.getValue(STATE_ID);
 				String valueChangeTimeS = attributes.getValue(TIME);
@@ -137,8 +145,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 				ValueChange<IValue<?>> valueChange = new ValueChange<>(valueChangeTime, value, valueChangeStateId);
 
 				((Action) this.parameterizedElement).addChange(valueChange);
-			}
-			case ORDER -> {
+
+				break;
+
+			case ORDER:
 				String orderId = attributes.getValue(ID);
 				String orderName = attributes.getValue(NAME);
 				String orderType = attributes.getValue(TYPE);
@@ -153,14 +163,18 @@ public class XmlModelSaxReader extends DefaultHandler {
 					order.setState(State.parse(orderStateS));
 
 				this.parameterizedElement = order;
-			}
-			case PARAMETER_BAG -> {
+
+				break;
+
+			case PARAMETER_BAG:
 				String pBagId = attributes.getValue(ID);
 				String pBagName = attributes.getValue(NAME);
 				String pBagType = attributes.getValue(TYPE);
 				this.pBag = new ParameterBag(pBagId, pBagName, pBagType);
-			}
-			case PARAMETER -> {
+
+				break;
+
+			case PARAMETER:
 
 				String paramId = attributes.getValue(ID);
 				try {
@@ -205,8 +219,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 							+ " due to "
 							+ e.getMessage(), e);
 				}
-			}
-			case TIMED_STATE -> {
+
+				break;
+
+			case TIMED_STATE:
 
 				String stateId = attributes.getValue(ID);
 				try {
@@ -237,8 +253,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 							+ " due to "
 							+ e.getMessage(), e);
 				}
-			}
-			case VALUE -> {
+
+				break;
+
+			case VALUE:
 
 				String valueTime = attributes.getValue(TIME);
 				Date date = ISO8601FormatFactory.getInstance().parseDate(valueTime);
@@ -246,9 +264,16 @@ public class XmlModelSaxReader extends DefaultHandler {
 				String valueValue = attributes.getValue(VALUE);
 
 				this.state.setStateFromStringAt(time, valueValue);
-			}
-			case POLICIES -> this.policies = new PolicyDefs();
-			case POLICY -> {
+
+				break;
+
+			case POLICIES:
+
+				this.policies = new PolicyDefs();
+
+				break;
+
+			case POLICY:
 
 				String policyType = attributes.getValue(TYPE);
 				String policyValue = attributes.getValue(VALUE);
@@ -272,8 +297,10 @@ public class XmlModelSaxReader extends DefaultHandler {
 							+ " due to "
 							+ e.getMessage(), e);
 				}
-			}
-			case VERSION -> {
+
+				break;
+
+			case VERSION:
 
 				try {
 					String versionS = attributes.getValue(VERSION);
@@ -310,9 +337,11 @@ public class XmlModelSaxReader extends DefaultHandler {
 							+ " due to "
 							+ e.getMessage(), e);
 				}
-			}
-			default -> throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", localName));
+
+				break;
+
+			default:
+				throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 
@@ -326,13 +355,15 @@ public class XmlModelSaxReader extends DefaultHandler {
 	@Override
 	public void endElement(String uri, String localName, String qName) {
 
-		switch (localName) {
-			case RESOURCE -> {
+		switch (qName) {
+			case RESOURCE:
 				this.listener.notifyResource((Resource) this.parameterizedElement);
 				this.statistics.nrOfResources++;
 				this.parameterizedElement = null;
-			}
-			case ACTIVITY -> {
+
+				break;
+
+			case ACTIVITY:
 
 				Activity activity = this.activityStack.pop();
 				if (this.activityStack.isEmpty()) {
@@ -343,51 +374,79 @@ public class XmlModelSaxReader extends DefaultHandler {
 					this.activityStack.peek().addElement(activity);
 					this.parameterizedElement = this.activityStack.peek();
 				}
-			}
-			case ORDER -> {
+
+				break;
+
+			case ORDER:
 
 				this.listener.notifyOrder((Order) this.parameterizedElement);
 				this.statistics.nrOfOrders++;
 				this.parameterizedElement = null;
-			}
-			case ACTION -> {
+
+				break;
+
+			case ACTION:
 
 				if (this.activityStack.isEmpty())
 					throw new IllegalStateException("Missing parent for action");
 				this.activityStack.peek().addElement((Action) parameterizedElement);
 				this.parameterizedElement = this.activityStack.peek();
-			}
-			case PARAMETER_BAG -> {
+
+				break;
+
+			case PARAMETER_BAG:
 
 				this.parameterizedElement.addParameterBag(pBag);
 				this.pBag = null;
-			}
-			case TIMED_STATE -> ((Resource) this.parameterizedElement).addTimedState(this.state);
-			case POLICIES -> {
 
-				switch (this.parameterizedElement) {
-					case Resource resource -> resource.setPolicyDefs(this.policies);
-					case Order order -> order.setPolicyDefs(this.policies);
-					case Activity activity1 -> activity1.setPolicyDefs(this.policies);
-					case Action action -> action.setPolicyDefs(this.policies);
-					default -> throw new StrolchPolicyException(
+				break;
+
+			case TIMED_STATE:
+
+				((Resource) this.parameterizedElement).addTimedState(this.state);
+
+				break;
+
+			case POLICIES:
+
+				if (this.parameterizedElement instanceof Resource) {
+					((Resource) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else if (this.parameterizedElement instanceof Order) {
+					((Order) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else if (this.parameterizedElement instanceof Activity) {
+					((Activity) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else if (this.parameterizedElement instanceof Action) {
+					((Action) this.parameterizedElement).setPolicyDefs(this.policies);
+				} else {
+					throw new StrolchPolicyException(
 							"Policies are not allowed on " + this.parameterizedElement.getClass());
 				}
 
 				this.policies = null;
-			}
-			case PARAMETER -> {
+
+				break;
+
+			case PARAMETER:
 
 				if (this.textParam != null) {
 					this.textParam.setValue(this.textBuffer.toString());
 					this.textBuffer = null;
 					this.textParam = null;
 				}
-			}
-			case POLICY, VERSION, INCLUDE_FILE, VALUE, VALUE_CHANGE, STROLCH_MODEL -> {
-			}
-			default -> throw new IllegalArgumentException(
-					MessageFormat.format("The element ''{0}'' is unhandled!", localName));
+
+				break;
+
+			case POLICY:
+			case VERSION:
+			case INCLUDE_FILE:
+			case VALUE:
+			case VALUE_CHANGE:
+			case STROLCH_MODEL:
+
+				break;
+
+			default:
+				throw new IllegalArgumentException(MessageFormat.format("The element ''{0}'' is unhandled!", qName));
 		}
 	}
 }

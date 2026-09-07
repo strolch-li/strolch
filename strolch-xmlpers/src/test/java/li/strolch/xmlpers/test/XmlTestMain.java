@@ -127,26 +127,27 @@ public class XmlTestMain {
 			@Override
 			public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-				switch (localName) {
-					case "Resource" -> {
+				switch (qName) {
+					case "Resource":
 						MyModel res = new MyModel();
 						res.setId(attributes.getValue("id"));
 						res.setName(attributes.getValue("name"));
 						res.setType(attributes.getValue("type"));
 						currentRes[0] = res;
 						resources.add(res);
-					}
-					case "Parameter" -> {
+						break;
+					case "Parameter":
 						MyParameter param = new MyParameter();
 						param.setId(attributes.getValue("id"));
 						param.setName(attributes.getValue("name"));
 						param.setType(attributes.getValue("type"));
 						param.setValue(attributes.getValue("value"));
 						currentRes[0].addParameter(param);
-					}
-					case "model" -> {
-					}
-					default -> throw new IllegalArgumentException("The element '" + localName + "' is unhandled!");
+						break;
+					case "model":
+						break;
+					default:
+						throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
 				}
 			}
 		};

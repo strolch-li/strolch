@@ -52,7 +52,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
-		if (localName.equals(ROLE)) {
+		if (qName.equals(ROLE)) {
 			if (this.buildersStack.stream().anyMatch(e -> e.getClass().equals(RoleParser.class)))
 				throw new IllegalArgumentException("Previous Role not closed!");
 			this.buildersStack.push(new RoleParser());
@@ -75,7 +75,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 			this.buildersStack.peek().endElement(uri, localName, qName);
 
 		ElementParser elementParser = null;
-		if (localName.equals(ROLE)) {
+		if (qName.equals(ROLE)) {
 			elementParser = this.buildersStack.pop();
 		}
 
@@ -132,7 +132,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 			this.text = new StringBuilder();
 
-			switch (localName) {
+			switch (qName) {
 				case ROLE -> this.roleName = attributes.getValue(ATTR_NAME).trim();
 				case PRIVILEGE -> {
 					this.privilegeName = attributes.getValue(ATTR_NAME).trim();
@@ -141,7 +141,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 				case ALLOW, DENY, ALL_ALLOWED -> {
 				}
 				// no-op
-				default -> throw new IllegalArgumentException("Unhandled tag " + localName);
+				default -> throw new IllegalArgumentException("Unhandled tag " + qName);
 			}
 		}
 
@@ -153,7 +153,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 
 		@Override
 		public void endElement(String uri, String localName, String qName) {
-			switch (localName) {
+			switch (qName) {
 				case ALL_ALLOWED -> this.allAllowed = StringHelper.parseBoolean(getText());
 				case ALLOW -> this.allowList.add(getText());
 				case DENY -> this.denyList.add(getText());
@@ -174,7 +174,7 @@ public class PrivilegeRolesSaxReader extends DefaultHandler {
 						logger.info("New Role: {}", role);
 					init();
 				}
-				default -> throw new IllegalStateException("Unexpected value: " + localName);
+				default -> throw new IllegalStateException("Unexpected value: " + qName);
 			}
 		}
 

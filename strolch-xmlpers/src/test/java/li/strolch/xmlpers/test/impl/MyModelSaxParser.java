@@ -64,7 +64,7 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-		switch (localName) {
+		switch (qName) {
 			case "Resource" -> {
 				String id = attributes.getValue("id");
 				String name = attributes.getValue("name");
@@ -78,7 +78,7 @@ class MyModelSaxParser extends DefaultHandler implements SaxParser<MyModel> {
 				String value = attributes.getValue("value");
 				this.resource.addParameter(new MyParameter(id, name, type, value));
 			}
-			default -> throw new IllegalArgumentException("The element '" + localName + "' is unhandled!");
+			default -> throw new IllegalArgumentException("The element '" + qName + "' is unhandled!");
 		}
 	}
 }

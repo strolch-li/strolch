@@ -40,7 +40,7 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) {
-		switch (localName) {
+		switch (qName) {
 			case POLICY_TYPE -> {
 				String type = attributes.getValue(TYPE);
 				String api = attributes.getValue(API);
@@ -63,7 +63,7 @@ public class StrolchPolicyFileParser extends DefaultHandler {
 
 	@Override
 	public void endElement(String uri, String localName, String qName) {
-		if (localName.equals(POLICY_TYPE)) {
+		if (qName.equals(POLICY_TYPE)) {
 			this.policyType = null;
 		}
 	}
