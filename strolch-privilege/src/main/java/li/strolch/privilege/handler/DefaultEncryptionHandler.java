@@ -18,7 +18,6 @@ package li.strolch.privilege.handler;
 import li.strolch.privilege.base.PrivilegeException;
 import li.strolch.privilege.helper.XmlConstants;
 import li.strolch.privilege.model.internal.PasswordCrypt;
-import li.strolch.utils.helper.StringHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +34,8 @@ import java.util.Map;
 import static java.lang.String.valueOf;
 import static li.strolch.privilege.base.PrivilegeConstants.*;
 import static li.strolch.privilege.helper.XmlConstants.*;
+import static li.strolch.utils.helper.StringHelper.formatMillisecondsDuration;
+import static li.strolch.utils.helper.StringHelper.toHexString;
 
 /**
  * <p>
@@ -106,7 +107,7 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	public String nextToken() {
 		byte[] bytes = new byte[32];
 		this.secureRandom.nextBytes(bytes);
-		return StringHelper.toHexString(bytes);
+		return toHexString(bytes);
 	}
 
 	@Override
@@ -138,9 +139,19 @@ public class DefaultEncryptionHandler implements EncryptionHandler {
 	public PasswordCrypt hashPassword(char[] password, byte[] salt, String algorithm, int iterations, int keyLength) {
 
 		try {
+			long start = System.currentTimeMillis();
 			SecretKeyFactory skf = SecretKeyFactory.getInstance(algorithm);
 			PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keyLength);
 			SecretKey key = skf.generateSecret(spec);
+
+			long end = System.currentTimeMillis();
+			long duration = end - start;
+			if (duration < 1000)
+				logger.info("Hashing password took {}. This is too short. Consider increasing iterations.",
+						formatMillisecondsDuration(duration));
+			else if (duration > 5000)
+				logger.info("Hashing password took {}. This is too long. Consider decreasing iterations.",
+						formatMillisecondsDuration(duration));
 
 			return new PasswordCrypt(key.getEncoded(), salt, algorithm, iterations, keyLength);
 
