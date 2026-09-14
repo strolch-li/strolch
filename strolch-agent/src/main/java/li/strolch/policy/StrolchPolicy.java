@@ -25,6 +25,8 @@ import li.strolch.service.api.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 import static li.strolch.model.StrolchModelConstants.PolicyConstants.PARAM_ORDER;
 
 /**
@@ -74,6 +76,21 @@ public abstract class StrolchPolicy {
 	 */
 	protected <V> V getComponent(Class<V> clazz) throws IllegalArgumentException {
 		return this.container.getComponent(clazz);
+	}
+
+	/**
+	 * Retrieves an optional component of the specified type from the container. If the component is not registered in
+	 * the container, an empty {@code Optional} is returned.
+	 *
+	 * @param <T>   the type of the component to retrieve
+	 * @param clazz the class of the component type to retrieve
+	 *
+	 * @return an {@code Optional} containing the component if it exists, or an empty {@code Optional} if it does not
+	 *
+	 * @throws IllegalArgumentException if the retrieval fails due to invalid arguments
+	 */
+	protected <T> Optional<T> getComponentO(Class<T> clazz) throws IllegalArgumentException {
+		return this.container.getComponentO(clazz);
 	}
 
 	/**

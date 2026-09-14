@@ -247,6 +247,18 @@ public interface StrolchTransaction extends AutoCloseable {
 	<T> T getComponent(Class<T> clazz) throws IllegalArgumentException;
 
 	/**
+	 * Retrieves an optional component of the specified type if available.
+	 *
+	 * @param <T>   the type of the component to retrieve
+	 * @param clazz the class object representing the type of the component
+	 *
+	 * @return an Optional containing the component if available, or an empty Optional if not found
+	 *
+	 * @throws IllegalArgumentException if the provided class is null or invalid
+	 */
+	<T> Optional<T> getComponentO(Class<T> clazz) throws IllegalArgumentException;
+
+	/**
 	 * Instantiates the policy using the given {@link Class} to retrieve the {@link PolicyDef} from the given element
 	 *
 	 * @param element the element from which to retrieve the {@link PolicyDef
