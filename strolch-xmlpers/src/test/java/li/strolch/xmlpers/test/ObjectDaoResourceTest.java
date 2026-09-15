@@ -229,7 +229,7 @@ public class ObjectDaoResourceTest extends AbstractPersistenceTest {
 			}
 		});
 
-		MatcherAssert.assertThat(exception.getMessage(), containsString("Persistence unit does not exist for"));
+		MatcherAssert.assertThat(exception.getMessage(), containsString("Persistence unit parent directory does not exist"));
 	}
 
 	@Test
