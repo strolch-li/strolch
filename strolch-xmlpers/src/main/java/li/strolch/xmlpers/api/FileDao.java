@@ -178,14 +178,21 @@ public class FileDao {
 
 	private void assertPathIsFileAndWritable(File path, ObjectRef objectRef) {
 		if (!path.exists()) {
-			String msg = "Persistence unit does not exist for {0} at {1}";
+			String msg = "Persistence unit parent directory does not exist for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
 
-		if (!path.isFile() || !path.canWrite()) {
+		if (!path.isFile()) {
 			String msg;
-			msg = "Persistence unit is not a file or is not readable for {0} at {1}";
+			msg = "Persistence unit is not a file for {0} at {1}";
+			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
+			throw new XmlPersistenceException(msg);
+		}
+
+		if (!path.canWrite()) {
+			String msg;
+			msg = "Persistence unit is not writeable for {0} at {1}";
 			msg = MessageFormat.format(msg, objectRef.getName(), path.getAbsolutePath());
 			throw new XmlPersistenceException(msg);
 		}
