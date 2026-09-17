@@ -35,7 +35,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -524,9 +527,11 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 				// validate user still exists and is enabled
 				User user = this.persistenceHandler.getUser(pat.username());
 				if (user != null && user.getUserState() == UserState.ENABLED) {
-					// Cache hit and valid
-					cachedEntry.lastAccess = System.currentTimeMillis();
-					return cachedEntry.context.getCertificate();
+					if (cachedEntry.matches(tokenValue, pat.passwordCrypt().salt())) {
+						// Cache hit and valid
+						cachedEntry.lastAccess = System.currentTimeMillis();
+						return cachedEntry.context.getCertificate();
+					}
 				}
 			}
 
@@ -573,7 +578,8 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 		PrivilegeContext prvCtx = getPrivilegeContextBuilder().buildPrivilegeContext(updatedToken, user, source,
 				ZonedDateTime.now());
 		this.privilegeContextMap.put(prvCtx.getCertificate().getSessionId(), prvCtx);
-		this.personalAccessTokenCache.put(tokenId, new PersonalAccessTokenCacheEntry(prvCtx));
+		this.personalAccessTokenCache.put(tokenId,
+				new PersonalAccessTokenCacheEntry(prvCtx, tokenValue, passwordCrypt.salt()));
 
 		return prvCtx.getCertificate();
 	}
@@ -1525,11 +1531,29 @@ public class DefaultPrivilegeHandler implements PrivilegeHandler {
 
 	protected static class PersonalAccessTokenCacheEntry {
 		public final PrivilegeContext context;
+		public final byte[] fastHash;
 		public long lastAccess;
 
-		public PersonalAccessTokenCacheEntry(PrivilegeContext context) {
+		public PersonalAccessTokenCacheEntry(PrivilegeContext context, String tokenValue, byte[] salt) {
 			this.context = context;
+			this.fastHash = hashTokenFast(tokenValue, salt);
 			this.lastAccess = System.currentTimeMillis();
+		}
+
+		public boolean matches(String tokenValue, byte[] salt) {
+			byte[] candidate = hashTokenFast(tokenValue, salt);
+			return MessageDigest.isEqual(this.fastHash, candidate);
+		}
+
+		private static byte[] hashTokenFast(String tokenValue, byte[] salt) {
+			try {
+				MessageDigest digest = MessageDigest.getInstance("SHA-256");
+				if (salt != null)
+					digest.update(salt);
+				return digest.digest(tokenValue.getBytes(StandardCharsets.UTF_8));
+			} catch (NoSuchAlgorithmException e) {
+				throw new IllegalStateException("SHA-256 not available!", e);
+			}
 		}
 	}
 }

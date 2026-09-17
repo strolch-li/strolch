@@ -220,8 +220,16 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 		assertNotNull(apiCert2);
 		assertEquals(apiCert1.getSessionId(), apiCert2.getSessionId());
 
-		// Verify revocation clears cache
+		// Wrong secret with cached tokenId must fail
 		String tokenId = token.split(":")[0];
+		try {
+			this.privilegeHandler.authenticatePersonalAccessToken(tokenId + ":wrongSecret", "api-test");
+			fail("Should have failed to authenticate with wrong secret even if tokenId is cached");
+		} catch (Exception e) {
+			assertEquals("Invalid personal access token!", e.getMessage());
+		}
+
+		// Verify revocation clears cache
 		this.privilegeHandler.removePersonalAccessToken(cert, tokenId);
 
 		try {
