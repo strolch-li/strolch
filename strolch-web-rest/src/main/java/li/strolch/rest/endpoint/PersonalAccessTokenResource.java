@@ -59,19 +59,21 @@ public class PersonalAccessTokenResource {
 	}
 
 	@Operation(summary = "Get all personal access tokens",
-			description = "Retrieves a list of all personal access tokens for the authenticated user.", responses = {
+			description = "Retrieves a list of all personal access tokens for the authenticated user, or for a specified user if permitted.", responses = {
 			@ApiResponse(responseCode = "200", description = "Tokens retrieved successfully.",
 					content = @Content(mediaType = "application/json", schema = @Schema(type = "array"))),
 			@ApiResponse(responseCode = "500", description = "Internal server error.")})
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getTokens(@Context HttpServletRequest request) {
+	public Response getTokens(@Context HttpServletRequest request, @QueryParam("username") String username) {
 		Certificate cert = (Certificate) request.getAttribute(StrolchRestfulConstants.STROLCH_CERTIFICATE);
 
 		ServiceHandler svcHandler = RestfulStrolchComponent.getInstance().getComponent(ServiceHandler.class);
 		GetPersonalAccessTokensService svc = new GetPersonalAccessTokensService();
+		GetPersonalAccessTokensService.GetPersonalAccessTokensArgument svcArg = svc.getArgumentInstance();
+		svcArg.username = username;
 
-		PrivilegeTokenResult svcResult = svcHandler.doService(cert, svc, svc.getArgumentInstance());
+		PrivilegeTokenResult svcResult = svcHandler.doService(cert, svc, svcArg);
 		if (svcResult.isNok())
 			return toResponse(svcResult);
 

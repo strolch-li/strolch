@@ -24,7 +24,7 @@ import li.strolch.service.api.ServiceResultState;
 
 import java.util.List;
 
-public class GetPersonalAccessTokensService extends AbstractService<ServiceArgument, PrivilegeTokenResult> {
+public class GetPersonalAccessTokensService extends AbstractService<GetPersonalAccessTokensService.GetPersonalAccessTokensArgument, PrivilegeTokenResult> {
 
 	@Override
 	protected PrivilegeTokenResult getResultInstance() {
@@ -32,20 +32,27 @@ public class GetPersonalAccessTokensService extends AbstractService<ServiceArgum
 	}
 
 	@Override
-	public ServiceArgument getArgumentInstance() {
-		return new ServiceArgument();
+	public GetPersonalAccessTokensArgument getArgumentInstance() {
+		return new GetPersonalAccessTokensArgument();
 	}
 
 	@Override
-	protected PrivilegeTokenResult internalDoService(ServiceArgument arg) {
+	protected PrivilegeTokenResult internalDoService(GetPersonalAccessTokensArgument arg) {
 		PrivilegeHandler privilegeHandler = getContainer().getPrivilegeHandler().getPrivilegeHandler();
 
 		List<PersonalAccessTokenRep> tokens;
 		try (StrolchTransaction tx = openArgOrUserTx(arg)) {
-			tokens = privilegeHandler.getPersonalAccessTokens(tx.getCertificate());
+			if (arg.username == null || arg.username.isEmpty())
+				tokens = privilegeHandler.getPersonalAccessTokens(tx.getCertificate());
+			else
+				tokens = privilegeHandler.getPersonalAccessTokens(tx.getCertificate(), arg.username);
 			tx.commitOnClose();
 		}
 
 		return new PrivilegeTokenResult(tokens);
+	}
+
+	public static class GetPersonalAccessTokensArgument extends ServiceArgument {
+		public String username;
 	}
 }

@@ -42,8 +42,8 @@ public class CreatePersonalAccessTokenService extends AbstractService<CreatePers
 
 		String rawToken;
 		try (StrolchTransaction tx = openArgOrUserTx(arg, PRIVILEGE_PERSONAL_ACCESS_TOKEN)) {
-			rawToken = privilegeHandler.createPersonalAccessToken(tx.getCertificate(), arg.arg.name, arg.arg.validFrom,
-					arg.arg.validTo, arg.arg.roles, arg.arg.privileges);
+			rawToken = privilegeHandler.createPersonalAccessToken(tx.getCertificate(), arg.arg.username, arg.arg.name,
+					arg.arg.validFrom, arg.arg.validTo, arg.arg.roles, arg.arg.privileges);
 			tx.commitOnClose();
 		}
 

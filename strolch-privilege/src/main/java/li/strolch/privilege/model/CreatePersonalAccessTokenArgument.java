@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 public class CreatePersonalAccessTokenArgument {
+	public String username;
 	public String name;
 	public ZonedDateTime validFrom;
 	public ZonedDateTime validTo;

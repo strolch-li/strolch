@@ -49,7 +49,7 @@ public class PersonalAccessTokenServiceTest extends AbstractRealmServiceTest<Ser
 	public void shouldManagePersonalAccessTokens() throws Exception {
 
 		// 1. Get tokens (should be empty initially)
-		ServiceArgument getArg = getArgInstance();
+		GetPersonalAccessTokensService.GetPersonalAccessTokensArgument getArg = new GetPersonalAccessTokensService.GetPersonalAccessTokensArgument();
 		getArg.realm = REALM_TRANSIENT;
 		System.out.println("[DEBUG_LOG] Admin certificate: " + certificate);
 		System.out.println("[DEBUG_LOG] Admin roles: " + certificate.getUserRoles());
@@ -95,5 +95,50 @@ public class PersonalAccessTokenServiceTest extends AbstractRealmServiceTest<Ser
 		assertTrue(result.getMessage(), result.isOk());
 		tokens = result.getTokens();
 		assertTrue(tokens.isEmpty());
+	}
+
+	@Test
+	public void shouldCreatePersonalAccessTokenForOtherUser() throws Exception {
+		// 1. Create token for user 'test' as admin
+		CreatePersonalAccessTokenService createSvc = new CreatePersonalAccessTokenService();
+		CreatePersonalAccessTokenService.CreatePersonalAccessTokenServiceArgument createArg = new CreatePersonalAccessTokenService.CreatePersonalAccessTokenServiceArgument();
+		createArg.realm = REALM_TRANSIENT;
+		createArg.arg = new CreatePersonalAccessTokenArgument();
+		createArg.arg.username = "test";
+		createArg.arg.name = "Service Token For Test User";
+		createArg.arg.validFrom = ZonedDateTime.now();
+		createArg.arg.validTo = ZonedDateTime.now().plusDays(30);
+
+		PrivilegeTokenResult createResult = getServiceHandler().doService(certificate, createSvc, createArg);
+		assertTrue(createResult.getMessage(), createResult.isOk());
+		String rawToken = createResult.getRawToken();
+		assertNotNull(rawToken);
+		assertTrue(rawToken.contains(":"));
+
+		// 2. Get tokens for 'test'
+		GetPersonalAccessTokensService.GetPersonalAccessTokensArgument getArg = new GetPersonalAccessTokensService.GetPersonalAccessTokensArgument();
+		getArg.realm = REALM_TRANSIENT;
+		getArg.username = "test";
+
+		PrivilegeTokenResult result = getServiceHandler().doService(certificate, new GetPersonalAccessTokensService(), getArg);
+		assertTrue(result.getMessage(), result.isOk());
+		List<PersonalAccessTokenRep> tokens = result.getTokens();
+		assertEquals(1, tokens.size());
+		assertEquals("Service Token For Test User", tokens.get(0).name());
+		assertEquals("test", tokens.get(0).username());
+
+		// 3. Remove the token
+		RemovePersonalAccessTokenService removeSvc = new RemovePersonalAccessTokenService();
+		PrivilegeUserIdArgument removeArg = new PrivilegeUserIdArgument();
+		removeArg.realm = REALM_TRANSIENT;
+		removeArg.userId = tokens.get(0).tokenId();
+
+		ServiceResult removeResult = getServiceHandler().doService(certificate, removeSvc, removeArg);
+		assertTrue(removeResult.getMessage(), removeResult.isOk());
+
+		// 4. Verify empty
+		result = getServiceHandler().doService(certificate, new GetPersonalAccessTokensService(), getArg);
+		assertTrue(result.getMessage(), result.isOk());
+		assertTrue(result.getTokens().isEmpty());
 	}
 }

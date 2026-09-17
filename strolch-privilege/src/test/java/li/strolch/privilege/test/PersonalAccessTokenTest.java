@@ -239,4 +239,89 @@ public class PersonalAccessTokenTest extends AbstractPrivilegeTest {
 			assertEquals("Invalid personal access token!", e.getMessage());
 		}
 	}
+
+	@Test
+	public void shouldCreatePersonalAccessTokenForOtherUser() {
+		login("admin", "admin".toCharArray());
+		Certificate adminCert = this.ctx.getCertificate();
+
+		ZonedDateTime validFrom = ZonedDateTime.now();
+		ZonedDateTime validTo = validFrom.plusYears(1);
+
+		// Admin creates token for user jill
+		String token = this.privilegeHandler.createPersonalAccessToken(adminCert, "jill", "Jill API Token", validFrom,
+				validTo, null, null);
+		assertNotNull(token);
+
+		// Admin lists tokens for jill
+		List<PersonalAccessTokenRep> jillTokens = this.privilegeHandler.getPersonalAccessTokens(adminCert, "jill");
+		assertEquals(1, jillTokens.size());
+		PersonalAccessTokenRep tokenRep = jillTokens.get(0);
+		assertEquals("Jill API Token", tokenRep.name());
+		assertEquals("jill", tokenRep.username());
+
+		// Authenticate with Jill's token
+		Certificate jillApiCert = this.privilegeHandler.authenticatePersonalAccessToken(token, "api-test");
+		assertNotNull(jillApiCert);
+		assertEquals("jill", jillApiCert.getUsername());
+		assertTrue(jillApiCert.getUsage().isApi());
+
+		// Verify privileges belong to Jill (AppUser role: TestRestrictable), not admin (PrivilegeAction)
+		PrivilegeContext jillApiCtx = this.privilegeHandler.validate(jillApiCert);
+		jillApiCtx.assertHasPrivilege("li.strolch.privilege.test.model.TestRestrictable");
+		assertFalse(jillApiCtx.getPrivileges().containsKey("PrivilegeAction"));
+
+		// Admin removes Jill's token
+		this.privilegeHandler.removePersonalAccessToken(adminCert, tokenRep.tokenId());
+		jillTokens = this.privilegeHandler.getPersonalAccessTokens(adminCert, "jill");
+		assertTrue(jillTokens.isEmpty());
+	}
+
+	@Test
+	public void shouldFailToCreateTokenForNonExistentUser() {
+		login("admin", "admin".toCharArray());
+		Certificate adminCert = this.ctx.getCertificate();
+
+		try {
+			this.privilegeHandler.createPersonalAccessToken(adminCert, "nonExistentUser", "Invalid Token",
+					ZonedDateTime.now(), ZonedDateTime.now().plusDays(1), null, null);
+			fail("Should have failed to create token for non-existent user");
+		} catch (Exception e) {
+			assertTrue(e.getMessage().contains("does not exist"));
+		}
+	}
+
+	@Test
+	public void shouldFailToCreateTokenForOtherUserWithoutPermission() {
+		// jill does not have UserAccessPrivilege for other users
+		login("jill", "admin".toCharArray());
+		Certificate jillCert = this.ctx.getCertificate();
+
+		try {
+			this.privilegeHandler.createPersonalAccessToken(jillCert, "admin", "Jill Hacking Admin Token",
+					ZonedDateTime.now(), ZonedDateTime.now().plusDays(1), null, null);
+			fail("Should have failed to create token for admin as jill");
+		} catch (Exception e) {
+			// Either fails because Jill lacks PrivilegePersonalAccessToken or lacks UserAccessPrivilege
+			assertTrue(e.getMessage().contains("PrivilegePersonalAccessToken") || e.getMessage().contains("AccessDeniedException"));
+		}
+	}
+
+	@Test
+	public void shouldNotEscalatePrivilegesForOtherUser() {
+		login("admin", "admin".toCharArray());
+		Certificate adminCert = this.ctx.getCertificate();
+
+		// Admin has PrivilegeAction, but Jill does not
+		// If Admin tries to assign PrivilegeAction to Jill's token, it should fail
+		Set<String> privileges = Set.of("PrivilegeAction");
+
+		try {
+			this.privilegeHandler.createPersonalAccessToken(adminCert, "jill", "Escalated Jill Token",
+					ZonedDateTime.now(), ZonedDateTime.now().plusDays(1), null, privileges);
+			fail("Should have failed because Jill does not have PrivilegeAction");
+		} catch (Exception e) {
+			assertTrue(e.getMessage().contains("does not have any of the given roles or privileges"));
+		}
+	}
 }

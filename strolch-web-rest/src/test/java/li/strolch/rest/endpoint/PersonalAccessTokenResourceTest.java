@@ -256,4 +256,83 @@ public class PersonalAccessTokenResourceTest extends AbstractRestfulTest {
 			logout(authToken);
 		}
 	}
+
+	@Test
+	public void shouldCreateAndGetTokensForOtherUser() {
+		String authToken = authenticate("admin", "admin");
+
+		try {
+			// 1. Create a token for bob
+			JsonObject createArg = new JsonObject();
+			createArg.addProperty("username", "bob");
+			createArg.addProperty("name", "Bob REST Token");
+			createArg.addProperty("validFrom", ISO8601.toString(ZonedDateTime.now()));
+			createArg.addProperty("validTo", ISO8601.toString(ZonedDateTime.now().plusDays(7)));
+
+			String rawToken;
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", authToken)
+					.post(Entity.json(createArg.toString()))) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonObject result = JsonParser.parseString(response.readEntity(String.class)).getAsJsonObject();
+				rawToken = result.get("token").getAsString();
+				assertNotNull(rawToken);
+			}
+
+			// 2. Query tokens for bob using ?username=bob
+			String tokenId;
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.queryParam("username", "bob")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", authToken)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+				JsonObject tokenObj = tokens.get(0).getAsJsonObject();
+				assertEquals("Bob REST Token", tokenObj.get("name").getAsString());
+				assertEquals("bob", tokenObj.get("username").getAsString());
+				tokenId = tokenObj.get("tokenId").getAsString();
+			}
+
+			// 3. Authenticate with bob's token
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", "Bearer " + rawToken)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+				assertEquals("bob", tokens.get(0).getAsJsonObject().get("username").getAsString());
+			}
+
+			// 4. Remove token
+			try (Response response = target()
+					.path("strolch/privilege/tokens/" + tokenId)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", authToken)
+					.delete()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+			}
+
+			// 5. Query tokens for bob again
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.queryParam("username", "bob")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", authToken)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(0, tokens.size());
+			}
+
+		} finally {
+			logout(authToken);
+		}
+	}
 }

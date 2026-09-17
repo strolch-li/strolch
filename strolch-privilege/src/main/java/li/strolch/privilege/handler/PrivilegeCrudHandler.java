@@ -131,7 +131,7 @@ public class PrivilegeCrudHandler {
 
 		if (!certificate.getUsername().equals(username)) {
 			// user wants to see other users' tokens, check privilege
-			prvCtx.validateAction(new SimpleRestrictable(PersonalAccessToken.class.getName(), username));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, username));
 		}
 
 		return this.privilegeHandler.persistenceHandler
@@ -141,14 +141,22 @@ public class PrivilegeCrudHandler {
 				.toList();
 	}
 
-	public String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
-			ZonedDateTime validTo, Set<String> roles, Set<String> privileges) {
+	public String createPersonalAccessToken(Certificate certificate, String username, String name,
+			ZonedDateTime validFrom, ZonedDateTime validTo, Set<String> roles, Set<String> privileges) {
 		PrivilegeContext prvCtx = this.privilegeHandler.validate(certificate);
 		validateCreatePersonalAccessToken(prvCtx);
 
-		User user = this.privilegeHandler.persistenceHandler.getUser(certificate.getUsername());
+		if (username == null || username.isEmpty())
+			username = certificate.getUsername();
+
+		if (!certificate.getUsername().equals(username)) {
+			// user wants to create token for another user, check privilege
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, username));
+		}
+
+		User user = this.privilegeHandler.persistenceHandler.getUser(username);
 		if (user == null)
-			throw new PrivilegeException("User " + certificate.getUsername() + " does not exist!");
+			throw new PrivilegeException("User " + username + " does not exist!");
 
 		Map<String, Privilege> subsetPrivileges = new HashMap<>();
 
@@ -167,7 +175,8 @@ public class PrivilegeCrudHandler {
 
 			// Add privileges from roles
 			if (roles != null && !roles.isEmpty()) {
-				Set<String> userRoles = ModelHelper.streamAllRolesForUser(this.privilegeHandler.persistenceHandler, user)
+				Set<String> userRoles = ModelHelper
+						.streamAllRolesForUser(this.privilegeHandler.persistenceHandler, user)
 						.collect(java.util.stream.Collectors.toSet());
 				Set<String> subsetRoles = new HashSet<>();
 				for (String role : roles) {
@@ -204,6 +213,12 @@ public class PrivilegeCrudHandler {
 		return doCreatePersonalAccessToken(name, validFrom, validTo, user, subsetPrivileges);
 	}
 
+	public String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
+			ZonedDateTime validTo, Set<String> roles, Set<String> privileges) {
+		return createPersonalAccessToken(certificate, certificate.getUsername(), name, validFrom, validTo, roles,
+				privileges);
+	}
+
 	private void validateCreatePersonalAccessToken(PrivilegeContext prvCtx) {
 		prvCtx.assertHasPrivilege(PRIVILEGE_PERSONAL_ACCESS_TOKEN);
 	}
@@ -234,7 +249,7 @@ public class PrivilegeCrudHandler {
 
 		if (!certificate.getUsername().equals(token.username())) {
 			// user wants to remove other users' tokens, check privilege
-			prvCtx.validateAction(new SimpleRestrictable(PersonalAccessToken.class.getName(), token.username()));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, token.username()));
 		}
 
 		this.privilegeHandler.persistenceHandler.removeAccessToken(tokenId);

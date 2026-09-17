@@ -69,6 +69,9 @@
 		<Privilege name="PrivilegePersonalAccessToken" policy="DefaultPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>
+		<Privilege name="PrivilegePersonalAccessTokenUser" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
 		<Privilege name="PrivilegeGetUser" policy="UserAccessPrivilege">
 			<AllAllowed>true</AllAllowed>
 		</Privilege>

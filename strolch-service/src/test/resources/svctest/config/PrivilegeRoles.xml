@@ -195,6 +195,9 @@
         <Privilege name="PrivilegePersonalAccessToken" policy="DefaultPrivilege">
             <AllAllowed>true</AllAllowed>
         </Privilege>
+		<Privilege name="PrivilegePersonalAccessTokenUser" policy="DefaultPrivilege">
+			<AllAllowed>true</AllAllowed>
+		</Privilege>
         <Privilege name="li.strolch.service.api.Service" policy="DefaultPrivilege">
             <Allow>li.strolch.service.privilege.roles.PrivilegeAddRoleService</Allow>
             <Allow>li.strolch.service.privilege.roles.PrivilegeRemoveRoleService</Allow>

@@ -16,6 +16,7 @@ public class PrivilegeElementFromJsonVisitorTest {
 	@Test
 	public void shouldParseCreatePersonalAccessTokenArgument() {
 		JsonObject json = new JsonObject();
+		json.addProperty("username", "api-user");
 		json.addProperty("name", "test-token");
 		json.addProperty("validFrom", "2026-06-01T12:00:00.000Z");
 		json.addProperty("validTo", "2026-07-01T12:00:00.000Z");
@@ -31,6 +32,7 @@ public class PrivilegeElementFromJsonVisitorTest {
 		PrivilegeElementFromJsonVisitor visitor = new PrivilegeElementFromJsonVisitor();
 		CreatePersonalAccessTokenArgument arg = visitor.createPersonalAccessTokenArgumentFromJson(json);
 
+		assertEquals("api-user", arg.username);
 		assertEquals("test-token", arg.name);
 		assertTrue(arg.roles.contains("role1"));
 		assertTrue(arg.privileges.contains("priv1"));

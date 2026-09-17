@@ -98,6 +98,7 @@ public interface PrivilegeHandler {
 	String PRIVILEGE_SET_USER_PASSWORD = "PrivilegeSetUserPassword";
 	String PRIVILEGE_REQUIRE_PASSWORD_CHANGE = "RequirePasswordChange";
 	String PRIVILEGE_PERSONAL_ACCESS_TOKEN = "PrivilegePersonalAccessToken";
+	String PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER = "PrivilegePersonalAccessTokenUser";
 
 	///
 
@@ -257,6 +258,24 @@ public interface PrivilegeHandler {
 	List<PersonalAccessTokenRep> getPersonalAccessTokens(Certificate certificate, String username);
 
 	/**
+	 * Creates a new personal access token for the given user. The new token's privileges are a snapshot of the user's
+	 * *current* privileges at the time of creation, optionally filtered by the given roles and/or privileges. If both
+	 * roles and privileges are null or empty, then all of the user's current privileges are assigned to the token.
+	 *
+	 * @param certificate the {@link Certificate} of the user performing the creation
+	 * @param username    the username of the user for whom the token is created
+	 * @param name        the name of the token
+	 * @param validFrom   the date from which the token is valid
+	 * @param validTo     the date until which the token is valid
+	 * @param roles       the subset of roles for the token, or null if all roles should be used
+	 * @param privileges  the subset of privileges for the token, or null if all privileges should be used
+	 *
+	 * @return the newly created personal access token
+	 */
+	String createPersonalAccessToken(Certificate certificate, String username, String name, ZonedDateTime validFrom,
+			ZonedDateTime validTo, Set<String> roles, Set<String> privileges);
+
+	/**
 	 * Creates a new personal access token for the user of the given {@link Certificate}. The new token's privileges are
 	 * a snapshot of the user's *current* privileges at the time of creation, optionally filtered by the given roles
 	 * and/or privileges. If both roles and privileges are null or empty, then all of the user's current privileges are
@@ -271,8 +290,11 @@ public interface PrivilegeHandler {
 	 *
 	 * @return the newly created personal access token
 	 */
-	String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
-			ZonedDateTime validTo, Set<String> roles, Set<String> privileges);
+	default String createPersonalAccessToken(Certificate certificate, String name, ZonedDateTime validFrom,
+			ZonedDateTime validTo, Set<String> roles, Set<String> privileges) {
+		return createPersonalAccessToken(certificate, certificate.getUsername(), name, validFrom, validTo, roles,
+				privileges);
+	}
 
 	/**
 	 * Method to query {@link UserRep} which meet the criteria set in the given {@link UserRep}. Null fields mean the

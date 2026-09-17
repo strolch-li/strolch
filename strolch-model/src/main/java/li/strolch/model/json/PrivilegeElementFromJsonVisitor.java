@@ -45,6 +45,9 @@ public class PrivilegeElementFromJsonVisitor {
 
 	public CreatePersonalAccessTokenArgument createPersonalAccessTokenArgumentFromJson(JsonObject jsonObject) {
 		CreatePersonalAccessTokenArgument arg = new CreatePersonalAccessTokenArgument();
+		if (jsonObject.has("username")) {
+			arg.username = jsonObject.get("username").getAsString().trim();
+		}
 		arg.name = jsonObject.get("name").getAsString();
 		arg.validFrom = ISO8601.parseToZdt(jsonObject.get("validFrom").getAsString());
 		arg.validTo = ISO8601.parseToZdt(jsonObject.get("validTo").getAsString());
