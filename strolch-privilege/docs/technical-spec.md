@@ -108,7 +108,7 @@ The `PrivilegeHandler` is configured via a `PrivilegeConfig.xml` file or within 
 | `privilegeConflictResolution` | Resolution strategy when multiple roles define the same privilege (`STRICT`, `MERGE`). | `MERGE` |
 
 ### EncryptionHandler Properties
-Configure the `DefaultEncryptionHandler` for password hashing:
+Configure the `DefaultEncryptionHandler` for password and token hashing:
 
 | Property | Description | Default |
 | --- | --- | --- |
@@ -116,6 +116,61 @@ Configure the `DefaultEncryptionHandler` for password hashing:
 | `hashAlgorithmNonSalt` | Hashing algorithm for legacy/non-salted hashes. | `SHA-256` |
 | `hashIterations` | Number of iterations for PBKDF2. | `200000` |
 | `hashKeyLength` | Key length for the generated hash. | `256` |
+
+## Cryptography, Hashing, and Salting Architecture
+
+### Token Generation & Entropy Rationale
+- **Entropy & Search Space**: Tokens generated via `DefaultEncryptionHandler.nextToken()` produce 32 bytes (256 bits) of random data from `java.security.SecureRandom`, serialized as a 64-character hexadecimal string. With a search space of $2^{256} \approx 1.15 \times 10^{77}$, brute-force enumeration attacks are computationally infeasible.
+- **CSPRNG**: Utilizes the operating system's cryptographic entropy source (`/dev/urandom` / `NativePRNG` on Unix/Linux, `CryptGenRandom` / `BCryptGenRandom` on Windows).
+- **Dual-Layer Identifier Scheme**: Personal Access Tokens (PATs) combine a UUIDv4 `tokenId` and a 256-bit `tokenValue` (`<tokenId>:<tokenValue>`), isolating storage and primary-key lookups from the token secret.
+- **Standards Baselines**: Exceeds NIST SP 800-63B and OWASP guidelines (minimum $\ge 128$ bits of entropy for secrets).
+
+### Salting Strategy
+- **Salt Generation**: Generated per-credential via `DefaultEncryptionHandler.nextSalt()` using `SecureRandom.nextBytes()` producing a 32-byte (256-bit) salt.
+- **Rainbow Table & Collision Protection**: The 32-byte unique salt ensures identical passwords or token values produce entirely different hash outputs, mitigating precomputation and rainbow table attacks.
+
+### Hashing Architecture
+- **Algorithm**: Default algorithm is `PBKDF2WithHmacSHA512` (Password-Based Key Derivation Function 2 with SHA-512 HMAC), with configurable key length (default 256 bits) and iteration count (default 200,000 for user passwords, 10,000 in test configurations).
+- **At-Rest Storage Format**: Stored using the self-describing `PasswordCrypt` format:
+  ```text
+  $<hashAlgorithm>,<hashIterations>,<hashKeyLength>$<hexSalt>$<hexHash>
+  ```
+  Example: `$PBKDF2WithHmacSHA512,200000,256$61646d696e...$cb699629...`
+- **Fast Token Verification Caching**: To prevent CPU exhaustion and high latency on high-throughput REST API calls using Personal Access Tokens, verified tokens are cached in-memory with a fast SHA-256 hash incorporating the token's salt, bypassing repetitive PBKDF2 key derivation while maintaining secret validation.
+
+## Cryptographic Assessment & Technical Debt (Areas to Address)
+
+The following architectural weaknesses and technical debt items have been identified in the privilege encryption layer and should be addressed in future iterations:
+
+### 1. Non-Constant-Time Hash Comparison (Timing Attack Vulnerability)
+- **Current Behavior**: `DefaultPrivilegeHandler` uses `Arrays.equals(requestPasswordCrypt.password(), userPasswordCrypt.password())` in `internalAuthenticate()` and for non-cached PAT verification in `authenticatePersonalAccessToken()`.
+- **Issue**: `Arrays.equals()` returns `false` early on the first mismatched byte, creating a timing side-channel that could theoretically allow timing-based secret discovery.
+- **Recommendation**: Replace `Arrays.equals()` with `java.security.MessageDigest.isEqual()`, which provides constant-time comparison resistant to timing attacks (as is already used in `PersonalAccessTokenCacheEntry.matches()`).
+
+### 2. Password Memory Exposure and Charset in Non-Salt Hashing
+- **Current Behavior**: `DefaultEncryptionHandler.hashPasswordWithoutSalt(char[] password)` converts the character array to an immutable Java `String` via `new String(password).getBytes()`.
+- **Issue**:
+  - `new String(password)` allocates immutable `String` objects on the heap, preventing secure zeroing of password memory after authentication.
+  - `.getBytes()` without an explicit charset argument relies on the host platform's default charset instead of `StandardCharsets.UTF_8`.
+- **Recommendation**: Deprecate and remove non-salted password hashing, and ensure all cryptographic operations strictly use UTF-8 byte conversions without intermediate persistent `String` allocations.
+
+### 3. Deprecation of Legacy Non-Salt Hashing
+- **Current Behavior**: `DefaultEncryptionHandler` retains `PARAM_HASH_ALGORITHM_NON_SALT` (defaulting to SHA-256) and `hashPasswordWithoutSalt()` for legacy compatibility.
+- **Issue**: Unsalted password hashing is cryptographically insecure against modern dictionary and rainbow table attacks.
+- **Recommendation**: Formally mark `hashPasswordWithoutSalt` and related configurations as `@Deprecated(forRemoval = true)`.
+
+### 4. Excessive Logging on Duration Thresholds
+- **Current Behavior**: `DefaultEncryptionHandler.hashPassword()` logs an `INFO` level message on every hash operation taking `< 1000ms` or `> 5000ms`:
+  ```java
+  if (duration < 1000)
+      logger.info("Hashing password took {}. This is too short. Consider increasing iterations.", ...);
+  ```
+- **Issue**: Produces excessive log spam in development, test suites, and high-performance server environments with optimized CPU profiles.
+- **Recommendation**: Change log level from `INFO` to `DEBUG` or evaluate the threshold only once during handler initialization / configuration diagnostics.
+
+### 5. Automatic Password Hash Upgrading on Authentication
+- **Current Behavior**: `DefaultEncryptionHandler.isPasswordCryptOutdated()` correctly detects when a stored `PasswordCrypt` does not match the current system configuration (e.g., when iteration count is increased from 10,000 to 200,000 or algorithm is changed). However, `DefaultPrivilegeHandler` does not automatically re-hash and update the user's persisted record upon successful login.
+- **Recommendation**: In `DefaultPrivilegeHandler.internalAuthenticate()`, if authentication succeeds and `isPasswordCryptOutdated(userPasswordCrypt)` returns `true`, compute a new `PasswordCrypt` with the updated parameters and persist the updated user model asynchronously.
 
 ## Authentication Handlers
 
