@@ -77,7 +77,7 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 
 		switch (privilegeName) {
 			case PRIVILEGE_GET_USER, PRIVILEGE_ADD_USER, PRIVILEGE_MODIFY_USER, PRIVILEGE_SET_USER_PASSWORD,
-				 PRIVILEGE_REMOVE_USER -> {
+				 PRIVILEGE_REMOVE_USER, PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER -> {
 
 				if (isStrolchAdminAndIgnoreOrganisation(ctx))
 					break;
@@ -98,9 +98,8 @@ public class UserAccessWithSameOrganisationPrivilege extends UserAccessPrivilege
 
 			}
 			default -> {
-				String msg = Restrictable.class.getName() + PrivilegeMessages.getString(
-						"Privilege.userAccessPrivilege.unknownPrivilege");
-				msg = format(msg, privilegeName);
+				String msg = PrivilegeMessages.getString("Privilege.userAccessPrivilege.unknownPrivilege");
+				msg = format(msg, privilegeName, privilege.getPolicy());
 				throw new PrivilegeException(msg);
 			}
 		}

@@ -131,7 +131,7 @@ public class PrivilegeCrudHandler {
 
 		if (!certificate.getUsername().equals(username)) {
 			// user wants to see other users' tokens, check privilege
-			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, username));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, new Tuple(null, username)));
 		}
 
 		return this.privilegeHandler.persistenceHandler
@@ -151,7 +151,7 @@ public class PrivilegeCrudHandler {
 
 		if (!certificate.getUsername().equals(username)) {
 			// user wants to create token for another user, check privilege
-			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, username));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, new Tuple(null, username)));
 		}
 
 		User user = this.privilegeHandler.persistenceHandler.getUser(username);
@@ -249,7 +249,7 @@ public class PrivilegeCrudHandler {
 
 		if (!certificate.getUsername().equals(token.username())) {
 			// user wants to remove other users' tokens, check privilege
-			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, token.username()));
+			prvCtx.validateAction(new SimpleRestrictable(PRIVILEGE_PERSONAL_ACCESS_TOKEN_USER, new Tuple(null, token.username())));
 		}
 
 		this.privilegeHandler.persistenceHandler.removeAccessToken(tokenId);
