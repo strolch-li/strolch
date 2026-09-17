@@ -50,12 +50,13 @@ The core interface for PAT management:
    - The token must still exist in the persistence layer (revocation check).
    - The token must still be within its validity period.
    - The associated user must still be enabled.
-4. If a valid cached context is found, it is returned immediately, skipping expensive cryptographic hashing.
+   - The provided `tokenValue` is verified against a cached fast cryptographic hash ($O(1)$ SHA-256).
+4. If a valid cached context is found and the token secret matches, it is returned immediately, skipping expensive cryptographic PBKDF2 hashing.
 5. If no valid cache entry exists:
    - It looks up the `PersonalAccessToken` by its `tokenId` in the `PersistenceHandler`.
-   - It hashes the provided `tokenValue` and compares it with the stored hash.
+   - It hashes the provided `tokenValue` using PBKDF2 and compares it with the stored hash.
    - It verifies the token's validity and the user's state.
-   - A new `PrivilegeContext` is built and added to the cache.
+   - A new `PrivilegeContext` is built and added to the cache along with the fast verification hash.
    - The `lastUsed` timestamp is updated in the persistence layer.
 6. A `Certificate` with `Usage.API` is returned.
 
@@ -63,6 +64,17 @@ The core interface for PAT management:
 To maintain performance while managing memory, the PAT cache is pruned by a background task that runs every minute. 
 - A cached `PrivilegeContext` is removed from the cache if it hasn't been accessed for more than 10 minutes (idle timeout).
 - Every access to a cached PAT context updates its last access time.
+
+## REST & HTTP Authentication
+
+PATs can be used across multiple HTTP authentication headers in Strolch REST APIs:
+
+1. **HTTP Basic Auth**: Legacy clients and automation scripts can pass PATs in standard Basic Auth headers (`Authorization: Basic <base64>`):
+   - `base64(tokenId:tokenValue)` (Token ID in username, token secret in password)
+   - `base64(username:tokenId:tokenValue)` (Username in username, full PAT in password)
+   - `base64(tokenId:tokenValue:)` (Full PAT in username)
+2. **Bearer Auth**: Standard modern header `Authorization: Bearer <tokenId:tokenValue>`.
+3. **Direct Authorization Header**: `Authorization: <tokenId:tokenValue>`.
 
 ## Integration Points
 
