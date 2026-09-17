@@ -27,6 +27,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -844,5 +845,22 @@ public class StringHelper {
 	 */
 	public static String replaceWhitespaceAndSpecialCharactersWithUnderscore(String str) {
 		return str.replaceAll("\\s", "_").replaceAll("[\\W_]", "_");
+	}
+
+	/**
+	 * Checks if the given string is a valid UUID (36-character canonical representation: 8-4-4-4-12 hex digits)
+	 *
+	 * @param str the string to check
+	 *
+	 * @return true if the string is a valid UUID, false otherwise
+	 */
+	public static boolean isUuid(String str) {
+		if (str == null || str.length() != 36)
+			return false;
+		try {
+			return UUID.fromString(str).toString().equalsIgnoreCase(str);
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

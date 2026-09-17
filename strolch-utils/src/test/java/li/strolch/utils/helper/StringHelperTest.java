@@ -2,7 +2,7 @@ package li.strolch.utils.helper;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class StringHelperTest {
 
@@ -60,5 +60,18 @@ public class StringHelperTest {
 		String expected = "Hello___World___";
 		String actual = StringHelper.replaceWhitespaceAndSpecialCharactersWithUnderscore(str);
 		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testIsUuid() {
+		assertTrue(StringHelper.isUuid("550e8400-e29b-41d4-a716-446655440000"));
+		assertTrue(StringHelper.isUuid("550E8400-E29B-41D4-A716-446655440000"));
+		assertTrue(StringHelper.isUuid("00000000-0000-0000-0000-000000000000"));
+		assertFalse(StringHelper.isUuid(null));
+		assertFalse(StringHelper.isUuid(""));
+		assertFalse(StringHelper.isUuid("admin"));
+		assertFalse(StringHelper.isUuid("550e8400-e29b-41d4-a716-446655440000-extra"));
+		assertFalse(StringHelper.isUuid("550e8400-e29b-41d4-a716-44665544000z"));
+		assertFalse(StringHelper.isUuid("550e8400:e29b:41d4:a716:446655440000"));
 	}
 }
