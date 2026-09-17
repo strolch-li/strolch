@@ -63,4 +63,28 @@ public class AuthenticationTest extends AbstractRestfulTest {
 			assertEquals(Status.OK.getStatusCode(), result.getStatus());
 		}
 	}
+
+	@Test
+	public void shouldAuthenticateWithBasicAuth() {
+		String basicAuth = "Basic " + Base64.getEncoder().encodeToString("admin:admin".getBytes());
+		try (Response result = target()
+				.path("strolch/privilege/tokens")
+				.request(MediaType.APPLICATION_JSON)
+				.header("Authorization", basicAuth)
+				.get()) {
+			assertEquals(Status.OK.getStatusCode(), result.getStatus());
+		}
+	}
+
+	@Test
+	public void shouldNotAuthenticateWithInvalidBasicAuth() {
+		String basicAuth = "Basic " + Base64.getEncoder().encodeToString("admin:wrongpassword".getBytes());
+		try (Response result = target()
+				.path("strolch/privilege/tokens")
+				.request(MediaType.APPLICATION_JSON)
+				.header("Authorization", basicAuth)
+				.get()) {
+			assertEquals(Status.UNAUTHORIZED.getStatusCode(), result.getStatus());
+		}
+	}
 }

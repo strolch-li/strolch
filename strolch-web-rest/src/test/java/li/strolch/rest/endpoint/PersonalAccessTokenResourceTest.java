@@ -26,6 +26,7 @@ import li.strolch.utils.iso8601.ISO8601;
 import org.junit.Test;
 
 import java.time.ZonedDateTime;
+import java.util.Base64;
 
 import static org.junit.Assert.*;
 
@@ -108,6 +109,147 @@ public class PersonalAccessTokenResourceTest extends AbstractRestfulTest {
 				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
 				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
 				assertEquals(0, tokens.size());
+			}
+
+		} finally {
+			logout(authToken);
+		}
+	}
+
+	@Test
+	public void shouldAuthenticateWithPersonalAccessTokensViaBasicAndBearerAuth() {
+		String authToken = authenticate("admin", "admin");
+		String rawToken;
+		String tokenId;
+
+		try {
+			// 1. Create a token
+			JsonObject createArg = new JsonObject();
+			createArg.addProperty("name", "Auth Test Token");
+			createArg.addProperty("validFrom", ISO8601.toString(ZonedDateTime.now()));
+			createArg.addProperty("validTo", ISO8601.toString(ZonedDateTime.now().plusDays(7)));
+
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", authToken)
+					.post(Entity.json(createArg.toString()))) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonObject result = JsonParser.parseString(response.readEntity(String.class)).getAsJsonObject();
+				rawToken = result.get("token").getAsString();
+				assertNotNull(rawToken);
+				assertTrue(rawToken.contains(":"));
+			}
+
+			String[] tokenParts = rawToken.split(":", 2);
+			tokenId = tokenParts[0];
+			String tokenValue = tokenParts[1];
+
+			// 2. Test Basic Auth: username = tokenId, password = tokenValue
+			String basicHeader1 = "Basic " + Base64.getEncoder().encodeToString((tokenId + ":" + tokenValue).getBytes());
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", basicHeader1)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+			}
+
+			// 3. Test Basic Auth: username = admin, password = rawToken (tokenId:tokenValue)
+			String basicHeader2 = "Basic " + Base64.getEncoder().encodeToString(("admin:" + rawToken).getBytes());
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", basicHeader2)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+			}
+
+			// 4. Test Basic Auth: username = rawToken, password = ""
+			String basicHeader3 = "Basic " + Base64.getEncoder().encodeToString((rawToken + ":").getBytes());
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", basicHeader3)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+			}
+
+			// 5. Test Basic Auth: username = rawToken, password = "dummy"
+			String basicHeader4 = "Basic " + Base64.getEncoder().encodeToString((rawToken + ":dummy").getBytes());
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", basicHeader4)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+			}
+
+			// 6. Test Bearer Auth: Authorization: Bearer <rawToken>
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", "Bearer " + rawToken)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+			}
+
+			// 7. Test Direct Header: Authorization: <rawToken>
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", rawToken)
+					.get()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+				JsonArray tokens = JsonParser.parseString(response.readEntity(String.class)).getAsJsonArray();
+				assertEquals(1, tokens.size());
+			}
+
+			// 8. Test invalid Basic Auth token value: should fail with 401 UNAUTHORIZED
+			String invalidBasicHeader = "Basic " + Base64.getEncoder().encodeToString((tokenId + ":invalidSecret").getBytes());
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", invalidBasicHeader)
+					.get()) {
+				assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+			}
+
+			// 9. Test invalid Bearer token: should fail with 401 UNAUTHORIZED
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", "Bearer " + tokenId + ":invalidSecret")
+					.get()) {
+				assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+			}
+
+			// 10. Clean up: remove the token
+			try (Response response = target()
+					.path("strolch/privilege/tokens/" + tokenId)
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", authToken)
+					.delete()) {
+				assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+			}
+
+			// 11. After removal, authenticating with the revoked PAT should fail
+			try (Response response = target()
+					.path("strolch/privilege/tokens")
+					.request(MediaType.APPLICATION_JSON)
+					.header("Authorization", basicHeader1)
+					.get()) {
+				assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 			}
 
 		} finally {

@@ -217,6 +217,15 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		String sessionId = trimOrEmpty(requestContext.getHeaderString(AUTHORIZATION));
 		if (isNotEmpty(sessionId)) {
+			if (sessionId.startsWith("Basic ")) {
+				if (getRestful().isBasicAuthEnabled())
+					return authenticateBasic(requestContext, sessionId, remoteIp);
+				return Optional.empty();
+			}
+			if (sessionId.startsWith("Bearer "))
+				return authenticateBearer(requestContext, sessionId, remoteIp);
+			if (sessionId.contains(":") && isUuid(sessionId.split(":", 2)[0]))
+				return validateCertificate(requestContext, sessionId, remoteIp);
 			if (sessionHandler.isSessionKnown(sessionId)) {
 				return validateCertificate(requestContext, sessionId, remoteIp);
 			} else {
@@ -257,6 +266,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			return validateCookie(requestContext, remoteIp);
 		if (authorization.startsWith("Basic "))
 			return authenticateBasic(requestContext, authorization, remoteIp);
+		if (authorization.startsWith("Bearer "))
+			return authenticateBearer(requestContext, authorization, remoteIp);
 		return validateCertificate(requestContext, authorization, remoteIp);
 	}
 
@@ -316,10 +327,18 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		String username = basicAuth.substring(0, index);
 		String password = basicAuth.substring(index + 1);
-		logger.debug("Performing basic auth for user {}...", username);
 		StrolchSessionHandler sessionHandler = getSessionHandler();
-		Certificate certificate = sessionHandler.authenticate(username, password.toCharArray(), remoteIp, Usage.SINGLE,
-				false);
+
+		String pat = extractPersonalAccessToken(username, password);
+		Certificate certificate;
+		if (pat != null) {
+			logger.debug("Performing basic auth with personal access token for user/token {}...", username);
+			certificate = sessionHandler.authenticatePersonalAccessToken(pat, remoteIp);
+		} else {
+			logger.debug("Performing basic auth for user {}...", username);
+			certificate = sessionHandler.authenticate(username, password.toCharArray(), remoteIp, Usage.SINGLE,
+					false);
+		}
 
 		requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
 		requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
@@ -327,9 +346,66 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 		return Optional.ofNullable(certificate);
 	}
 
+	protected String extractPersonalAccessToken(String username, String password) {
+		if (isNotEmpty(password) && password.contains(":")) {
+			String[] parts = password.split(":", 2);
+			if (isUuid(parts[0]))
+				return password;
+		}
+		if (isUuid(username) && isNotEmpty(password)) {
+			return username + ":" + password.split(":", 2)[0];
+		}
+		if (isNotEmpty(username) && username.contains(":")) {
+			String[] parts = username.split(":", 2);
+			if (isUuid(parts[0]))
+				return username;
+		}
+		return null;
+	}
+
+	protected Optional<Certificate> authenticateBearer(ContainerRequestContext requestContext, String authorization,
+			String remoteIp) {
+		String token = authorization.substring("Bearer ".length()).trim();
+		if (token.isEmpty()) {
+			logger.error("Bearer token is empty on request to URL {}", requestContext.getUriInfo().getPath());
+			requestContext.abortWith(Response
+					.status(Response.Status.UNAUTHORIZED)
+					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.entity("Missing Bearer Token!")
+					.build());
+			return Optional.empty();
+		}
+
+		if (token.contains(":")) {
+			String[] parts = token.split(":", 2);
+			if (isUuid(parts[0])) {
+				logger.debug("Performing personal access token auth via bearer token...");
+				StrolchSessionHandler sessionHandler = getSessionHandler();
+				Certificate certificate = sessionHandler.authenticatePersonalAccessToken(token, remoteIp);
+				requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+				requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
+				return Optional.ofNullable(certificate);
+			}
+		}
+
+		return validateCertificate(requestContext, token, remoteIp);
+	}
+
 	protected Optional<Certificate> validateCertificate(ContainerRequestContext requestContext, String sessionId,
 			String remoteIp) {
 		StrolchSessionHandler sessionHandler = getSessionHandler();
+
+		if (sessionId.contains(":")) {
+			String[] parts = sessionId.split(":", 2);
+			if (isUuid(parts[0])) {
+				logger.debug("Performing personal access token auth via authorization header...");
+				Certificate certificate = sessionHandler.authenticatePersonalAccessToken(sessionId, remoteIp);
+				requestContext.setProperty(STROLCH_CERTIFICATE, certificate);
+				requestContext.setProperty(STROLCH_REQUEST_SOURCE, remoteIp);
+				return Optional.ofNullable(certificate);
+			}
+		}
+
 		if (!sessionHandler.isSessionKnown(sessionId)) {
 			logger.debug("Ignoring unknown session!");
 			requestContext.abortWith(Response
