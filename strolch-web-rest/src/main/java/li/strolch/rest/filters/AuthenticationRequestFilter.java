@@ -303,8 +303,9 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 
 		String basicAuth = authorization.substring("Basic ".length());
 		basicAuth = new String(Base64.getDecoder().decode(basicAuth.getBytes()), StandardCharsets.UTF_8);
-		String[] parts = basicAuth.split(":");
-		if (parts.length != 2) {
+		int index = basicAuth.indexOf(":");
+		if (index == -1) {
+			logger.error("Invalid Basic Authorization, as no ':' found");
 			requestContext.abortWith(Response
 					.status(Response.Status.BAD_REQUEST)
 					.header(CONTENT_TYPE, MediaType.TEXT_PLAIN)
@@ -313,8 +314,8 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
 			return Optional.empty();
 		}
 
-		String username = parts[0];
-		String password = parts[1];
+		String username = basicAuth.substring(0, index);
+		String password = basicAuth.substring(index + 1);
 		logger.debug("Performing basic auth for user {}...", username);
 		StrolchSessionHandler sessionHandler = getSessionHandler();
 		Certificate certificate = sessionHandler.authenticate(username, password.toCharArray(), remoteIp, Usage.SINGLE,
